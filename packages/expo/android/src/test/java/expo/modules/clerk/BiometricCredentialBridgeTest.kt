@@ -4,55 +4,55 @@ import com.clerk.api.network.model.error.ClerkErrorResponse
 import com.clerk.api.network.model.error.Error as ClerkAPIError
 import com.clerk.api.network.serialization.ClerkResult
 import com.clerk.api.signin.SignIn
-import com.clerk.api.trusteddevice.TrustedDevice
-import com.clerk.api.trusteddevice.TrustedDeviceAvailability
-import com.clerk.api.trusteddevice.TrustedDeviceKeyManagerException
-import com.clerk.api.trusteddevice.TrustedDevicePolicy
+import com.clerk.api.biometriccredential.BiometricCredential
+import com.clerk.api.biometriccredential.BiometricCredentialAvailability
+import com.clerk.api.biometriccredential.BiometricCredentialKeyManagerException
+import com.clerk.api.biometriccredential.BiometricCredentialPolicy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class TrustedDeviceBridgeTest {
+class BiometricCredentialBridgeTest {
     @Test
-    fun `requires Clerk initialization before trusted-device operations`() {
+    fun `requires Clerk initialization before biometric-credential operations`() {
         assertEquals(
-            TrustedDeviceBridgeError(
+            BiometricCredentialBridgeError(
                 code = "environment_unavailable",
-                message = "Trusted-device operations are unavailable until Clerk finishes configuring."
+                message = "Biometric credential operations are unavailable until Clerk finishes configuring."
             ),
-            trustedDeviceEnvironmentError(isInitialized = false)
+            biometricCredentialEnvironmentError(isInitialized = false)
         )
-        assertNull(trustedDeviceEnvironmentError(isInitialized = true))
+        assertNull(biometricCredentialEnvironmentError(isInitialized = true))
     }
 
     @Test
-    fun `maps trusted-device availability to the JavaScript contract`() {
+    fun `maps biometric-credential availability to the JavaScript contract`() {
         assertEquals(
             mapOf("isAvailable" to true, "unavailableReason" to null),
-            trustedDeviceAvailabilityPayload(TrustedDeviceAvailability.Available)
+            biometricCredentialAvailabilityPayload(BiometricCredentialAvailability.Available)
         )
         assertEquals(
             mapOf(
                 "isAvailable" to false,
                 "unavailableReason" to "biometric_authentication_unavailable"
             ),
-            trustedDeviceAvailabilityPayload(
-                TrustedDeviceAvailability.Unavailable(
-                    TrustedDeviceAvailability.UnavailableReason.BIOMETRIC_AUTHENTICATION_UNAVAILABLE
+            biometricCredentialAvailabilityPayload(
+                BiometricCredentialAvailability.Unavailable(
+                    BiometricCredentialAvailability.UnavailableReason.BIOMETRIC_AUTHENTICATION_UNAVAILABLE
                 )
             )
         )
     }
 
     @Test
-    fun `maps trusted-device resources to the JavaScript contract`() {
-        val payload = trustedDevicePayload(
-            TrustedDevice(
+    fun `maps biometric-credential resources to the JavaScript contract`() {
+        val payload = biometricCredentialPayload(
+            BiometricCredential(
                 id = "td_123",
-                platform = TrustedDevice.Platform.ANDROID,
+                platform = BiometricCredential.Platform.ANDROID,
                 appIdentifier = "com.example.app",
                 name = "Pixel",
-                status = TrustedDevice.Status.ACTIVE,
+                status = BiometricCredential.Status.ACTIVE,
                 createdAt = 1_700_000_000_000,
                 updatedAt = 1_700_000_100_000,
                 lastUsedAt = 1_700_000_200_000
@@ -70,26 +70,26 @@ class TrustedDeviceBridgeTest {
     @Test
     fun `maps every supported authentication policy`() {
         assertEquals(
-            TrustedDevicePolicy.BIOMETRY_CURRENT_SET,
-            trustedDevicePolicy("biometry_current_set")
+            BiometricCredentialPolicy.BIOMETRY_CURRENT_SET,
+            biometricCredentialPolicy("biometry_current_set")
         )
-        assertEquals(TrustedDevicePolicy.BIOMETRY_ANY, trustedDevicePolicy("biometry_any"))
+        assertEquals(BiometricCredentialPolicy.BIOMETRY_ANY, biometricCredentialPolicy("biometry_any"))
         assertEquals(
-            TrustedDevicePolicy.BIOMETRY_OR_DEVICE_PASSCODE,
-            trustedDevicePolicy("biometry_or_device_passcode")
+            BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE,
+            biometricCredentialPolicy("biometry_or_device_passcode")
         )
-        assertNull(trustedDevicePolicy("unsupported"))
+        assertNull(biometricCredentialPolicy("unsupported"))
     }
 
     @Test
-    fun `maps trusted-device sign-in results`() {
+    fun `maps biometric sign-in results`() {
         assertEquals(
             mapOf(
                 "id" to "sia_123",
                 "status" to "complete",
                 "createdSessionId" to "sess_123"
             ),
-            trustedDeviceSignInPayload(
+            biometricSignInPayload(
                 SignIn(
                     id = "sia_123",
                     status = SignIn.Status.COMPLETE,
@@ -106,7 +106,7 @@ class TrustedDeviceBridgeTest {
                 errors = listOf(
                     ClerkAPIError(
                         code = "trusted_device_not_registered",
-                        message = "Trusted device not found.",
+                        message = "Biometric credential not found.",
                         longMessage = "This device is no longer registered as trusted."
                     )
                 )
@@ -114,14 +114,14 @@ class TrustedDeviceBridgeTest {
         )
 
         assertEquals(
-            TrustedDeviceBridgeError(
+            BiometricCredentialBridgeError(
                 code = "trusted_device_not_registered",
                 message = "This device is no longer registered as trusted."
             ),
-            trustedDeviceBridgeError(
+            biometricCredentialBridgeError(
                 failure = failure,
                 fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
-                fallbackMessage = "Unable to sign in with trusted device"
+                fallbackMessage = "Unable to sign in with biometric credential"
             )
         )
     }
@@ -130,13 +130,13 @@ class TrustedDeviceBridgeTest {
     fun `normalizes native key-manager error codes`() {
         assertEquals(
             "biometric_authentication_canceled",
-            trustedDeviceKeyManagerErrorCode(
-                TrustedDeviceKeyManagerException.Code.BIOMETRIC_AUTHENTICATION_CANCELED
+            biometricCredentialKeyManagerErrorCode(
+                BiometricCredentialKeyManagerException.Code.BIOMETRIC_AUTHENTICATION_CANCELED
             )
         )
         assertEquals(
             "key_invalidated",
-            trustedDeviceKeyManagerErrorCode(TrustedDeviceKeyManagerException.Code.KEY_INVALIDATED)
+            biometricCredentialKeyManagerErrorCode(BiometricCredentialKeyManagerException.Code.KEY_INVALIDATED)
         )
     }
 }
