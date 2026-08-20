@@ -2,6 +2,7 @@ import { Freeze } from '@clerk/headless/utils';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import type {
   ReverificationChallengeState,
+  UserProfileBackupCodesFlowState,
   UserProfileDeleteAccountFlowState,
   UserProfileDeviceDetailsFlowState,
   UserProfileMfaAddFlowState,
@@ -13,6 +14,7 @@ import type {
   UserProfileSignOutAllDevicesFlowState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
+import { UserProfileBackupCodesDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-backup-codes-dialog.view';
 import { UserProfileDeleteAccountDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-account-dialog.view';
 import { UserProfileDeviceDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-device-dialog.view';
 import {
@@ -78,6 +80,15 @@ const INITIAL_DEVICES: UserProfileDevice[] = [
   },
 ];
 
+function downloadBackupCodes(codes: string[]) {
+  const url = URL.createObjectURL(new Blob([codes.join('\n')], { type: 'text/plain' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'clerk-backup-codes.txt';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow> }) {
   const verificationDialog = (
     operation:
@@ -87,6 +98,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
       | 'remove-passkey'
       | 'add-mfa'
       | 'remove-mfa'
+      | 'backup-codes'
       | 'delete-account'
       | 'sign-out-device'
       | 'sign-out-all-devices',
@@ -206,6 +218,31 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
           verificationDialog={verificationDialog('remove-mfa')}
         />
       ) : null}
+      {flow.backupCodes ? (
+        <UserProfileBackupCodesDialogView
+          open
+          state={flow.backupCodes}
+          onOpenChange={open => {
+            if (!open) {
+              flow.closeBackupCodes();
+            }
+          }}
+          onGenerate={flow.generateBackupCodes}
+          onCopy={() => {
+            if (flow.backupCodes?.step === 'codes') {
+              void navigator.clipboard?.writeText(flow.backupCodes.codes.join('\n'));
+              flow.markBackupCodesCopied();
+            }
+          }}
+          onDownload={() => {
+            if (flow.backupCodes?.step === 'codes') {
+              downloadBackupCodes(flow.backupCodes.codes);
+            }
+          }}
+          onPrint={() => window.print()}
+          verificationDialog={verificationDialog('backup-codes')}
+        />
+      ) : null}
       {flow.deleteAccount ? (
         <UserProfileDeleteAccountDialogView
           open
@@ -311,9 +348,18 @@ function RadioGroup<Value extends string>({
   );
 }
 
-const REVERIFICATION_STRATEGIES = ['password', 'email_code', 'phone_code', 'passkey', 'totp'] as const;
-
 function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: (next: SecurityFlowConfig) => void }) {
+  const reverificationStrategies: ReverificationChallengeState['strategy'][] = [
+    ...(config.hasPassword ? (['password'] as const) : []),
+    'email_code',
+    ...(config.hasMfaPhone ? (['phone_code'] as const) : []),
+    ...(config.hasPasskey ? (['passkey'] as const) : []),
+    ...(config.hasMfaAuthenticator ? (['totp'] as const) : []),
+    ...(config.backupCodesEnabled && (config.hasMfaPhone || config.hasMfaAuthenticator)
+      ? (['backup_code'] as const)
+      : []),
+  ];
+
   return (
     <div style={controlsBar}>
       <label style={controlLabel}>
@@ -337,6 +383,10 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
               ...config,
               passwordAvailable: event.target.checked,
               hasPassword: event.target.checked ? config.hasPassword : false,
+              reverificationStrategy:
+                !event.target.checked && config.reverificationStrategy === 'password'
+                  ? 'email_code'
+                  : config.reverificationStrategy,
             })
           }
         />
@@ -347,7 +397,16 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
           checked={config.hasPassword}
           disabled={!config.passwordAvailable}
           type='checkbox'
-          onChange={event => onChange({ ...config, hasPassword: event.target.checked })}
+          onChange={event =>
+            onChange({
+              ...config,
+              hasPassword: event.target.checked,
+              reverificationStrategy:
+                !event.target.checked && config.reverificationStrategy === 'password'
+                  ? 'email_code'
+                  : config.reverificationStrategy,
+            })
+          }
         />
         <span style={controlName}>Password already set</span>
       </label>
@@ -360,6 +419,10 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
               ...config,
               passkeysAvailable: event.target.checked,
               hasPasskey: event.target.checked ? config.hasPasskey : false,
+              reverificationStrategy:
+                !event.target.checked && config.reverificationStrategy === 'passkey'
+                  ? 'email_code'
+                  : config.reverificationStrategy,
             })
           }
         />
@@ -370,7 +433,16 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
           checked={config.hasPasskey}
           disabled={!config.passkeysAvailable}
           type='checkbox'
-          onChange={event => onChange({ ...config, hasPasskey: event.target.checked })}
+          onChange={event =>
+            onChange({
+              ...config,
+              hasPasskey: event.target.checked,
+              reverificationStrategy:
+                !event.target.checked && config.reverificationStrategy === 'passkey'
+                  ? 'email_code'
+                  : config.reverificationStrategy,
+            })
+          }
         />
         <span style={controlName}>Passkey already added</span>
       </label>
@@ -378,7 +450,20 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         <input
           checked={config.hasMfaPhone}
           type='checkbox'
-          onChange={event => onChange({ ...config, hasMfaPhone: event.target.checked })}
+          onChange={event =>
+            onChange({
+              ...config,
+              hasMfaPhone: event.target.checked,
+              backupCodesEnabled:
+                event.target.checked || config.hasMfaAuthenticator ? config.backupCodesEnabled : false,
+              reverificationStrategy:
+                !event.target.checked &&
+                (config.reverificationStrategy === 'phone_code' ||
+                  (!config.hasMfaAuthenticator && config.reverificationStrategy === 'backup_code'))
+                  ? 'email_code'
+                  : config.reverificationStrategy,
+            })
+          }
         />
         <span style={controlName}>Phone number verification</span>
       </label>
@@ -386,9 +471,39 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         <input
           checked={config.hasMfaAuthenticator}
           type='checkbox'
-          onChange={event => onChange({ ...config, hasMfaAuthenticator: event.target.checked })}
+          onChange={event =>
+            onChange({
+              ...config,
+              hasMfaAuthenticator: event.target.checked,
+              backupCodesEnabled: event.target.checked || config.hasMfaPhone ? config.backupCodesEnabled : false,
+              reverificationStrategy:
+                !event.target.checked &&
+                (config.reverificationStrategy === 'totp' ||
+                  (!config.hasMfaPhone && config.reverificationStrategy === 'backup_code'))
+                  ? 'email_code'
+                  : config.reverificationStrategy,
+            })
+          }
         />
         <span style={controlName}>Authenticator app</span>
+      </label>
+      <label style={{ ...controlLabel, opacity: config.hasMfaPhone || config.hasMfaAuthenticator ? 1 : 0.5 }}>
+        <input
+          checked={config.backupCodesEnabled}
+          disabled={!config.hasMfaPhone && !config.hasMfaAuthenticator}
+          type='checkbox'
+          onChange={event =>
+            onChange({
+              ...config,
+              backupCodesEnabled: event.target.checked,
+              reverificationStrategy:
+                !event.target.checked && config.reverificationStrategy === 'backup_code'
+                  ? 'email_code'
+                  : config.reverificationStrategy,
+            })
+          }
+        />
+        <span style={controlName}>Backup codes</span>
       </label>
       <label style={controlLabel}>
         <input
@@ -411,7 +526,7 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
       <RadioGroup
         disabled={!config.requireReverification}
         legend='Reverification method'
-        options={REVERIFICATION_STRATEGIES}
+        options={reverificationStrategies}
         value={config.reverificationStrategy}
         onChange={reverificationStrategy => onChange({ ...config, reverificationStrategy })}
       />
@@ -440,10 +555,22 @@ export function Default() {
     onHasPasswordChange: hasPassword => setConfig(current => ({ ...current, hasPassword })),
     onHasPasskeyChange: hasPasskey => setConfig(current => ({ ...current, hasPasskey })),
     onMfaMethodChange: (method, enabled) =>
-      setConfig(current => ({
-        ...current,
-        ...(method === 'sms' ? { hasMfaPhone: enabled } : { hasMfaAuthenticator: enabled }),
-      })),
+      setConfig(current => {
+        const hasMfaPhone = method === 'sms' ? enabled : current.hasMfaPhone;
+        const hasMfaAuthenticator = method === 'authenticator' ? enabled : current.hasMfaAuthenticator;
+        return {
+          ...current,
+          hasMfaPhone,
+          hasMfaAuthenticator,
+          backupCodesEnabled: hasMfaPhone || hasMfaAuthenticator ? current.backupCodesEnabled : false,
+          reverificationStrategy:
+            !enabled &&
+            (current.reverificationStrategy === (method === 'sms' ? 'phone_code' : 'totp') ||
+              (!hasMfaPhone && !hasMfaAuthenticator && current.reverificationStrategy === 'backup_code'))
+              ? 'email_code'
+              : current.reverificationStrategy,
+        };
+      }),
   });
 
   return (
@@ -465,6 +592,7 @@ export function Default() {
         onManageDevice={flow.openDevice}
         onManagePasskey={flow.openRenamePasskey}
         onRemoveMfaMethod={flow.openRemoveMfa}
+        onRegenerateBackupCodes={flow.openBackupCodes}
         onRemovePasskey={flow.openRemovePasskey}
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
         onSignOutDevice={flow.openDevice}
@@ -488,6 +616,7 @@ type SecuritySnapshot =
   | ({ flow: 'remove-passkey' } & Snapshot<UserProfilePasskeyRemoveFlowState>)
   | ({ flow: 'add-mfa' } & Snapshot<UserProfileMfaAddFlowState>)
   | ({ flow: 'remove-mfa' } & Snapshot<UserProfileMfaRemoveFlowState>)
+  | ({ flow: 'backup-codes' } & Snapshot<UserProfileBackupCodesFlowState>)
   | ({ flow: 'delete-account' } & Snapshot<UserProfileDeleteAccountFlowState>)
   | ({ flow: 'device' } & Snapshot<UserProfileDeviceDetailsFlowState>)
   | ({ flow: 'sign-out-all-devices' } & Snapshot<UserProfileSignOutAllDevicesFlowState>);
@@ -994,6 +1123,59 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     reverification: idleVerification,
   },
   {
+    flow: 'backup-codes',
+    step: 'backup codes',
+    variant: 'confirm',
+    state: { step: 'confirm', isSubmitting: false, errors: {} },
+  },
+  {
+    flow: 'backup-codes',
+    step: 'backup codes',
+    variant: 'generating',
+    state: { step: 'generating', isSubmitting: true, errors: {} },
+  },
+  {
+    flow: 'backup-codes',
+    step: 'backup codes',
+    variant: 'server error',
+    state: {
+      step: 'generating',
+      isSubmitting: false,
+      errors: { form: 'Something went wrong. Please try again.' },
+    },
+  },
+  {
+    flow: 'backup-codes',
+    step: 'backup codes',
+    variant: 'reverification',
+    state: { step: 'generating', isSubmitting: true, errors: {} },
+    reverification: idleVerification,
+  },
+  {
+    flow: 'backup-codes',
+    step: 'new codes',
+    variant: 'ready',
+    state: {
+      step: 'codes',
+      codes: ['3k4p-7m2q', '9w6d-2x8n', '5t1r-8c4v', '7j3f-6h9s', '2b8m-4q1k', '6n5x-9p3d'],
+      copied: false,
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'backup-codes',
+    step: 'new codes',
+    variant: 'copied',
+    state: {
+      step: 'codes',
+      codes: ['3k4p-7m2q', '9w6d-2x8n', '5t1r-8c4v', '7j3f-6h9s', '2b8m-4q1k', '6n5x-9p3d'],
+      copied: true,
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
     flow: 'delete-account',
     step: 'delete account',
     variant: 'idle',
@@ -1183,6 +1365,18 @@ export function States() {
           state={snapshot.state}
           onOpenChange={setOpen}
           onRemove={noop}
+          verificationDialog={verification}
+        />
+      ) : null}
+      {snapshot.flow === 'backup-codes' ? (
+        <UserProfileBackupCodesDialogView
+          open={open}
+          state={snapshot.state}
+          onOpenChange={setOpen}
+          onGenerate={noop}
+          onCopy={noop}
+          onDownload={noop}
+          onPrint={noop}
           verificationDialog={verification}
         />
       ) : null}

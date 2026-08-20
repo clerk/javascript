@@ -355,6 +355,25 @@ export interface UserProfileMfaRemoveFlowState {
   errors: FlowErrors;
 }
 
+export type UserProfileBackupCodesFlowState =
+  | {
+      step: 'confirm';
+      isSubmitting: false;
+      errors: FlowErrors;
+    }
+  | {
+      step: 'generating';
+      isSubmitting: boolean;
+      errors: FlowErrors;
+    }
+  | {
+      step: 'codes';
+      codes: string[];
+      copied: boolean;
+      isSubmitting: false;
+      errors: FlowErrors;
+    };
+
 export interface UserProfilePasskeyAddFlowState {
   isSubmitting: boolean;
   errors: FlowErrors;
