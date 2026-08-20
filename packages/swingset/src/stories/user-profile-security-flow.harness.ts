@@ -5,6 +5,9 @@ import type {
   UserProfileMfaAddFlowState,
   UserProfileMfaMethodType,
   UserProfileMfaRemoveFlowState,
+  UserProfilePasskeyAddFlowState,
+  UserProfilePasskeyRemoveFlowState,
+  UserProfilePasskeyRenameFlowState,
   UserProfilePasswordField,
   UserProfilePasswordFlowState,
   UserProfilePasswordValues,
@@ -13,6 +16,7 @@ import type {
 import type {
   UserProfileDevice,
   UserProfileMfaMethod,
+  UserProfilePasskey,
 } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -20,6 +24,8 @@ export interface SecurityFlowConfig {
   latencyMs: number;
   passwordAvailable: boolean;
   hasPassword: boolean;
+  passkeysAvailable: boolean;
+  hasPasskey: boolean;
   hasMfaPhone: boolean;
   hasMfaAuthenticator: boolean;
   requireReverification: boolean;
@@ -33,6 +39,8 @@ export const DEFAULT_SECURITY_FLOW_CONFIG: SecurityFlowConfig = {
   latencyMs: 900,
   passwordAvailable: true,
   hasPassword: true,
+  passkeysAvailable: true,
+  hasPasskey: true,
   hasMfaPhone: false,
   hasMfaAuthenticator: false,
   requireReverification: false,
@@ -50,6 +58,9 @@ const EMPTY_PASSWORD_VALUES: UserProfilePasswordValues = {
 
 type SecurityOperation =
   | 'password'
+  | 'add-passkey'
+  | 'rename-passkey'
+  | 'remove-passkey'
   | 'add-mfa'
   | 'remove-mfa'
   | 'delete-account'
@@ -69,11 +80,13 @@ export function useSecurityFlow({
   config = DEFAULT_SECURITY_FLOW_CONFIG,
   initialDevices,
   onHasPasswordChange,
+  onHasPasskeyChange,
   onMfaMethodChange,
 }: {
   config?: SecurityFlowConfig;
   initialDevices: UserProfileDevice[];
   onHasPasswordChange?: (hasPassword: boolean) => void;
+  onHasPasskeyChange?: (hasPasskey: boolean) => void;
   onMfaMethodChange?: (method: UserProfileMfaMethodType, enabled: boolean) => void;
 }) {
   const settingsRef = useRef(config);
@@ -84,7 +97,11 @@ export function useSecurityFlow({
   const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>(() =>
     methodsFromConfig(config.hasMfaPhone, config.hasMfaAuthenticator),
   );
+  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>(() => passkeysFromConfig(config.hasPasskey));
   const [password, setPassword] = useState<UserProfilePasswordFlowState | null>(null);
+  const [addPasskey, setAddPasskey] = useState<UserProfilePasskeyAddFlowState | null>(null);
+  const [renamePasskey, setRenamePasskey] = useState<UserProfilePasskeyRenameFlowState | null>(null);
+  const [removePasskey, setRemovePasskey] = useState<UserProfilePasskeyRemoveFlowState | null>(null);
   const [addMfa, setAddMfa] = useState<UserProfileMfaAddFlowState | null>(null);
   const [removeMfa, setRemoveMfa] = useState<UserProfileMfaRemoveFlowState | null>(null);
   const [deleteAccount, setDeleteAccount] = useState<UserProfileDeleteAccountFlowState | null>(null);
@@ -94,6 +111,7 @@ export function useSecurityFlow({
   const verificationGate = useRef<{ operation: SecurityOperation; resolve: (verified: boolean) => void } | null>(null);
 
   useEffect(() => setHasPassword(config.hasPassword), [config.hasPassword]);
+  useEffect(() => setPasskeys(current => passkeysFromConfig(config.hasPasskey, current)), [config.hasPasskey]);
   useEffect(
     () => setMfaMethods(current => methodsFromConfig(config.hasMfaPhone, config.hasMfaAuthenticator, current)),
     [config.hasMfaAuthenticator, config.hasMfaPhone],
@@ -112,6 +130,12 @@ export function useSecurityFlow({
       }
       if (operation === 'password') {
         setPassword(null);
+      } else if (operation === 'add-passkey') {
+        setAddPasskey(null);
+      } else if (operation === 'rename-passkey') {
+        setRenamePasskey(null);
+      } else if (operation === 'remove-passkey') {
+        setRemovePasskey(null);
       } else if (operation === 'add-mfa') {
         setAddMfa(null);
       } else if (operation === 'remove-mfa') {
@@ -130,6 +154,18 @@ export function useSecurityFlow({
   const setSubmitting = useCallback((operation: SecurityOperation, isSubmitting: boolean, formError?: string) => {
     if (operation === 'password') {
       setPassword(current =>
+        current ? { ...current, isSubmitting, errors: formError ? { form: formError } : {} } : current,
+      );
+    } else if (operation === 'add-passkey') {
+      setAddPasskey(current =>
+        current ? { ...current, isSubmitting, errors: formError ? { form: formError } : {} } : current,
+      );
+    } else if (operation === 'rename-passkey') {
+      setRenamePasskey(current =>
+        current ? { ...current, isSubmitting, errors: formError ? { form: formError } : {} } : current,
+      );
+    } else if (operation === 'remove-passkey') {
+      setRemovePasskey(current =>
         current ? { ...current, isSubmitting, errors: formError ? { form: formError } : {} } : current,
       );
     } else if (operation === 'add-mfa') {
@@ -253,6 +289,77 @@ export function useSecurityFlow({
       closeOperation('password');
     });
   }, [closeOperation, onHasPasswordChange, password, runMutation]);
+
+  const openAddPasskey = useCallback(() => {
+    setAddPasskey({ isSubmitting: false, errors: {} });
+  }, []);
+
+  const submitAddPasskey = useCallback(() => {
+    void runMutation('add-passkey', () => {
+      setPasskeys(current => [
+        ...current,
+        {
+          id: `passkey-${Date.now()}`,
+          name: `Passkey ${current.length + 1}`,
+          createdAtLabel: 'Created just now',
+        },
+      ]);
+      onHasPasskeyChange?.(true);
+      closeOperation('add-passkey');
+    });
+  }, [closeOperation, onHasPasskeyChange, runMutation]);
+
+  const openRenamePasskey = useCallback(
+    (id: string) => {
+      const passkey = passkeys.find(candidate => candidate.id === id);
+      if (passkey) {
+        setRenamePasskey({
+          id,
+          originalName: passkey.name,
+          name: passkey.name,
+          isSubmitting: false,
+          errors: {},
+        });
+      }
+    },
+    [passkeys],
+  );
+
+  const submitRenamePasskey = useCallback(() => {
+    if (!renamePasskey || renamePasskey.name.length < 2 || renamePasskey.name === renamePasskey.originalName) {
+      return;
+    }
+    const { id, name } = renamePasskey;
+    void runMutation('rename-passkey', () => {
+      setPasskeys(current => current.map(passkey => (passkey.id === id ? { ...passkey, name } : passkey)));
+      closeOperation('rename-passkey');
+    });
+  }, [closeOperation, renamePasskey, runMutation]);
+
+  const openRemovePasskey = useCallback(
+    (id: string) => {
+      const passkey = passkeys.find(candidate => candidate.id === id);
+      if (passkey) {
+        setRemovePasskey({ id, name: passkey.name, isSubmitting: false, errors: {} });
+      }
+    },
+    [passkeys],
+  );
+
+  const submitRemovePasskey = useCallback(() => {
+    if (!removePasskey) {
+      return;
+    }
+    const { id } = removePasskey;
+    void runMutation('remove-passkey', () => {
+      setPasskeys(current => {
+        const next = current.filter(passkey => passkey.id !== id);
+        onHasPasskeyChange?.(next.length > 0);
+        return next;
+      });
+      closeOperation('remove-passkey');
+    });
+  }, [closeOperation, onHasPasskeyChange, removePasskey, runMutation]);
 
   const openAddMfa = useCallback((method: UserProfileMfaMethodType) => {
     if (method === 'sms') {
@@ -529,9 +636,13 @@ export function useSecurityFlow({
   return {
     config,
     hasPassword,
+    passkeys,
     mfaMethods,
     devices,
     password,
+    addPasskey,
+    renamePasskey,
+    removePasskey,
     addMfa,
     removeMfa,
     deleteAccount,
@@ -542,6 +653,17 @@ export function useSecurityFlow({
     closePassword: () => closeOperation('password'),
     updatePasswordValue,
     submitPassword,
+    openAddPasskey,
+    closeAddPasskey: () => closeOperation('add-passkey'),
+    submitAddPasskey,
+    openRenamePasskey,
+    closeRenamePasskey: () => closeOperation('rename-passkey'),
+    updatePasskeyName: (name: string) =>
+      setRenamePasskey(current => (current ? { ...current, name, errors: {} } : current)),
+    submitRenamePasskey,
+    openRemovePasskey,
+    closeRemovePasskey: () => closeOperation('remove-passkey'),
+    submitRemovePasskey,
     openAddMfa,
     closeAddMfa: () => closeOperation('add-mfa'),
     updateMfaPhoneNumber: (phoneNumber: string) =>
@@ -588,4 +710,20 @@ function methodsFromConfig(hasMfaPhone: boolean, hasMfaAuthenticator: boolean, c
     ...(hasMfaPhone ? [phone ?? { id: 'sms', type: 'sms' as const, description: '+1 801-888-8181' }] : []),
     ...(hasMfaAuthenticator ? [authenticator ?? { id: 'authenticator', type: 'authenticator' as const }] : []),
   ];
+}
+
+function passkeysFromConfig(hasPasskey: boolean, current: UserProfilePasskey[] = []) {
+  if (!hasPasskey) {
+    return [];
+  }
+  return current.length > 0
+    ? current
+    : [
+        {
+          id: 'passkey',
+          name: 'Passkey',
+          createdAtLabel: 'Created today at 10:12 PM',
+          lastUsedAtLabel: 'Last used 1h ago',
+        },
+      ];
 }
