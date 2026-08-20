@@ -54,7 +54,6 @@ const mergeEnvVarsWithParams = (
     isSatellite: paramSatellite || import.meta.env.PUBLIC_CLERK_IS_SATELLITE,
     proxyUrl: paramProxy || import.meta.env.PUBLIC_CLERK_PROXY_URL,
     domain: paramDomain || import.meta.env.PUBLIC_CLERK_DOMAIN,
-    // In keyless mode, use server-injected publishableKey from params
     publishableKey:
       paramPublishableKey || internalOptions?.publishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     __internal_clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,
@@ -69,10 +68,6 @@ const mergeEnvVarsWithParams = (
     unsafe_disableDevelopmentModeConsoleWarning:
       paramUnsafeDisableDevelopmentModeConsoleWarning ??
       isTruthy(import.meta.env.PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING),
-    // Read from params (server-injected via __CLERK_ASTRO_SAFE_VARS__)
-    // These are dynamically resolved by middleware, not from env vars
-    __internal_keylessClaimUrl: internalOptions?.keylessClaimUrl,
-    __internal_keylessApiKeysUrl: internalOptions?.keylessApiKeysUrl,
     ...rest,
   };
 };
