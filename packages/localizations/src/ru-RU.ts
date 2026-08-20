@@ -1297,6 +1297,11 @@ export const ruRU: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Используйте другой метод',
       subtitle: 'Введите пароль, связанный с вашей учетной записью',
@@ -1445,6 +1450,10 @@ export const ruRU: LocalizationResource = {
       subtitle:
         'Использование вашего ключа доступа подтверждает вашу личность. Ваше устройство может запросить ваш отпечаток пальца, лицо или блокировку экрана.',
       title: 'Используйте ваш ключ доступа',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Использовать другой метод',

@@ -1291,6 +1291,11 @@ export const skSK: LocalizationResource = {
         'Použitie passkey potvrdí vašu identitu. Vaše zariadenie vás môže vyzvať na potvrdenie odtlačkom, tvárou alebo kódom.',
       title: 'Použiť Passkey',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Použiť inú metódu',
       subtitle: 'Pre pokračovanie vložte svoje aktuálne heslo',
@@ -1438,6 +1443,10 @@ export const skSK: LocalizationResource = {
       subtitle:
         'Použitie passkey potvrdí vašu identitu. Vaše zariadenie vás môže vyzvať na potvrdenie odtlačkom, tvárou alebo kódom.',
       title: 'Prihlásiť sa pomocou Passkey',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Použiť inú metódu',

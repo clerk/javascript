@@ -1290,6 +1290,11 @@ export const svSE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Använd en annan metod',
       subtitle: 'Ange lösenordet som är kopplat till ditt konto',
@@ -1438,6 +1443,10 @@ export const svSE: LocalizationResource = {
       subtitle:
         'Att använda din passkey bekräftar att det är du. Din enhet kan be om ditt fingeravtryck, ansikte eller skärmlås.',
       title: 'Använd din passkey',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Använd en annan metod',

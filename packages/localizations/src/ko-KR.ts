@@ -1287,6 +1287,11 @@ export const koKR: LocalizationResource = {
       subtitle: '패스키로 신원을 확인해요. 기기에서 지문, 얼굴 또는 화면 잠금을 요청할 수 있어요.',
       title: '패스키 사용',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '다른 방법 사용하기',
       subtitle: '계속하려면 현재 비밀번호를 입력하세요',
@@ -1431,6 +1436,10 @@ export const koKR: LocalizationResource = {
     passkey: {
       subtitle: '패스키로 로그인하면 본인 확인이 돼요. 기기에서 지문, 얼굴 또는 화면 잠금을 요청할 수 있어요.',
       title: '패스키 사용',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '다른 방법 사용하기',

@@ -1282,6 +1282,11 @@ export const kkKZ: LocalizationResource = {
         'Құпия кілт арқылы сіздің тұлғаңыз расталады. Құрылғыңыз саусақ ізі, бет бейнесі немесе экран құлыптамасын сұрауы мүмкін.',
       title: 'Құпия кілт қолдану',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Басқа әдісті қолдану',
       subtitle: 'Жалғастыру үшін құпия сөзді енгізіңіз',
@@ -1428,6 +1433,10 @@ export const kkKZ: LocalizationResource = {
       subtitle:
         'Құпия кілт арқылы тұлғаңыз расталады. Құрылғыңыз саусақ ізі, бет бейнесі немесе экран құлыптамасын сұрауы мүмкін.',
       title: 'Құпия кілт қолдану',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Басқа әдісті қолдану',
