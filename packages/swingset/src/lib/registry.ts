@@ -1,5 +1,10 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import {
+  Default as AlertDialogDefault,
+  DiscardChanges as AlertDialogDiscardChanges,
+  meta as alertDialogComponentMeta,
+} from '../stories/alert-dialog.component.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -22,7 +27,6 @@ import {
   meta as cardComponentMeta,
 } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
-import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
@@ -57,38 +61,6 @@ import {
 } from '../stories/item.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
-import {
-  Default as OrganizationProfileDefault,
-  meta as organizationProfileMeta,
-} from '../stories/organization-profile.stories';
-import {
-  Default as OrganizationProfileApiKeysPanelDefault,
-  meta as organizationProfileApiKeysPanelMeta,
-} from '../stories/organization-profile-api-keys-panel.stories';
-import {
-  Default as OrganizationProfileDeleteSectionDefault,
-  meta as organizationProfileDeleteSectionMeta,
-} from '../stories/organization-profile-delete-section.stories';
-import {
-  Default as OrganizationProfileDomainsSectionDefault,
-  meta as organizationProfileDomainsSectionMeta,
-} from '../stories/organization-profile-domains-section.stories';
-import {
-  Default as OrganizationProfileGeneralPanelDefault,
-  meta as organizationProfileGeneralPanelMeta,
-} from '../stories/organization-profile-general-panel.stories';
-import {
-  Default as OrganizationProfileLeaveSectionDefault,
-  meta as organizationProfileLeaveSectionMeta,
-} from '../stories/organization-profile-leave-section.stories';
-import {
-  Default as OrganizationProfileMembersPanelDefault,
-  meta as organizationProfileMembersPanelMeta,
-} from '../stories/organization-profile-members-panel.stories';
-import {
-  Default as OrganizationProfileProfileSectionDefault,
-  meta as organizationProfileProfileSectionMeta,
-} from '../stories/organization-profile-profile-section.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -106,15 +78,14 @@ import {
   ShadowIndicators as ScrollAreaShadowIndicators,
   ThemedScrollbar as ScrollAreaThemedScrollbar,
 } from '../stories/scroll-area.stories';
-import { meta as selectMeta } from '../stories/select.stories';
 import {
-  ConnectedAccounts as SettingsConnectedAccounts,
-  Default as SettingsDefault,
-  Destructive as SettingsDestructive,
-  meta as settingsMeta,
-  MultipleEmailAndPhoneNumbers as SettingsMultipleEmailAndPhoneNumbers,
-} from '../stories/settings.stories';
-import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
+  ConnectedAccounts as SectionConnectedAccounts,
+  Default as SectionDefault,
+  Destructive as SectionDestructive,
+  meta as sectionMeta,
+  MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
+} from '../stories/section.stories';
+import { meta as selectMeta } from '../stories/select.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
   Colors as TextColors,
@@ -130,45 +101,42 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
+import {
+  Default as UserProfileAccountSectionDefault,
+  meta as userProfileAccountSectionMeta,
+} from '../stories/user-profile-account-section.stories';
+import {
+  Default as UserProfileConnectedAccountsSectionDefault,
+  meta as userProfileConnectedAccountsSectionMeta,
+} from '../stories/user-profile-connected-accounts-section.stories';
+import {
+  Default as UserProfileDeleteSectionDefault,
+  meta as userProfileDeleteSectionMeta,
+} from '../stories/user-profile-delete-section.stories';
+import {
+  Default as UserProfileProfilePanelDefault,
+  meta as userProfileProfilePanelMeta,
+} from '../stories/user-profile-profile-panel.stories';
+import {
+  Default as UserProfileWeb3WalletsSectionDefault,
+  meta as userProfileWeb3WalletsSectionMeta,
+} from '../stories/user-profile-web3-wallets-section.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
-const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
-const settingsModule: StoryModule = {
-  meta: settingsMeta,
-  Default: SettingsDefault,
-  MultipleEmailAndPhoneNumbers: SettingsMultipleEmailAndPhoneNumbers,
-  ConnectedAccounts: SettingsConnectedAccounts,
-  Destructive: SettingsDestructive,
+const sectionModule: StoryModule = {
+  meta: sectionMeta,
+  Default: SectionDefault,
+  MultipleEmailAndPhoneNumbers: SectionMultipleEmailAndPhoneNumbers,
+  ConnectedAccounts: SectionConnectedAccounts,
+  Destructive: SectionDestructive,
 };
-const organizationProfileLeaveSectionModule: StoryModule = {
-  meta: organizationProfileLeaveSectionMeta,
-  Default: OrganizationProfileLeaveSectionDefault,
-};
-const organizationProfileDeleteSectionModule: StoryModule = {
-  meta: organizationProfileDeleteSectionMeta,
-  Default: OrganizationProfileDeleteSectionDefault,
-};
-const organizationProfileProfileSectionModule: StoryModule = {
-  meta: organizationProfileProfileSectionMeta,
-  Default: OrganizationProfileProfileSectionDefault,
-};
-const organizationProfileDomainsSectionModule: StoryModule = {
-  meta: organizationProfileDomainsSectionMeta,
-  Default: OrganizationProfileDomainsSectionDefault,
-};
-const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, Default: OrganizationProfileDefault };
-const organizationProfileGeneralPanelModule: StoryModule = {
-  meta: organizationProfileGeneralPanelMeta,
-  Default: OrganizationProfileGeneralPanelDefault,
-};
-const organizationProfileApiKeysPanelModule: StoryModule = {
-  meta: organizationProfileApiKeysPanelMeta,
-  Default: OrganizationProfileApiKeysPanelDefault,
-};
-const organizationProfileMembersPanelModule: StoryModule = {
-  meta: organizationProfileMembersPanelMeta,
-  Default: OrganizationProfileMembersPanelDefault,
+const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+
+const alertDialogComponentModule: StoryModule = {
+  meta: alertDialogComponentMeta,
+  Default: AlertDialogDefault,
+  DiscardChanges: AlertDialogDiscardChanges,
 };
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
@@ -192,8 +160,6 @@ const badgeModule: StoryModule = {
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
-
-const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
 const popoverComponentModule: StoryModule = {
   meta: popoverComponentMeta,
@@ -225,8 +191,6 @@ const headingModule: StoryModule = {
 };
 
 const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
-
-const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
@@ -271,20 +235,35 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const userProfileAccountSectionModule: StoryModule = {
+  meta: userProfileAccountSectionMeta,
+  Default: UserProfileAccountSectionDefault,
+};
+const userProfileProfilePanelModule: StoryModule = {
+  meta: userProfileProfilePanelMeta,
+  Default: UserProfileProfilePanelDefault,
+};
+const userProfileConnectedAccountsSectionModule: StoryModule = {
+  meta: userProfileConnectedAccountsSectionMeta,
+  Default: UserProfileConnectedAccountsSectionDefault,
+};
+const userProfileWeb3WalletsSectionModule: StoryModule = {
+  meta: userProfileWeb3WalletsSectionMeta,
+  Default: UserProfileWeb3WalletsSectionDefault,
+};
+const userProfileDeleteSectionModule: StoryModule = {
+  meta: userProfileDeleteSectionMeta,
+  Default: UserProfileDeleteSectionDefault,
+};
+
 export const registry: StoryModule[] = [
   // User
   userButtonModule,
-  // Organization
-  organizationProfileModule,
-  organizationProfileGeneralPanelModule,
-  organizationProfileApiKeysPanelModule,
-  organizationProfileMembersPanelModule,
-  organizationProfileProfileSectionModule,
-  organizationProfileDomainsSectionModule,
-  organizationProfileLeaveSectionModule,
-  organizationProfileDeleteSectionModule,
-  // Blocks
-  destructiveModule,
+  userProfileProfilePanelModule,
+  userProfileAccountSectionModule,
+  userProfileConnectedAccountsSectionModule,
+  userProfileWeb3WalletsSectionModule,
+  userProfileDeleteSectionModule,
   // Components
   avatarModule,
   badgeModule,
@@ -293,12 +272,12 @@ export const registry: StoryModule[] = [
   inputModule,
   itemModule,
   dialogComponentModule,
+  alertDialogComponentModule,
   headingModule,
   iconModule,
   menuComponentModule,
   popoverComponentModule,
-  settingsModule,
-  tabsComponentModule,
+  sectionModule,
   textModule,
   fieldModule,
   // Primitives — alphabetical within the group.

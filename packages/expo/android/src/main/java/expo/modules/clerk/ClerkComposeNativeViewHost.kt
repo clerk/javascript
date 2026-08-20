@@ -2,12 +2,14 @@ package expo.modules.clerk
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -21,13 +23,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
+abstract class ClerkComposeNativeViewHost(
+  context: Context,
+  appContext: AppContext,
+  private val retainCompositionOnDetach: Boolean = false,
+) : ExpoView(context, appContext) {
   protected val activity: ComponentActivity? = findActivity(context)
 
   private var recomposer: Recomposer? = null
   private var recomposerJob: Job? = null
 
   private val composeView = ComposeView(context).also { view ->
+    if (retainCompositionOnDetach) {
+      // Native tab navigators detach inactive screens from the window. Keep the
+      // composition alive until React actually destroys this Expo view so Clerk's
+      // internal navigation back stack survives a tab switch.
+      view.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    }
     activity?.let { act ->
       view.setViewTreeLifecycleOwner(act)
       view.setViewTreeViewModelStoreOwner(act)
@@ -47,12 +59,17 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
   }
 
   override fun onDetachedFromWindow() {
-    recomposer?.cancel()
-    recomposerJob?.cancel()
-    recomposer = null
-    recomposerJob = null
+    if (!retainCompositionOnDetach) {
+      stopRecomposer()
+    }
     onHostDetachedFromWindow()
     super.onDetachedFromWindow()
+  }
+
+  fun destroyHost() {
+    composeView.disposeComposition()
+    stopRecomposer()
+    onHostDestroyed()
   }
 
   private fun startRecomposer() {
@@ -66,6 +83,13 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
     recomposerJob = CoroutineScope(recomposerContext).launch {
       newRecomposer.runRecomposeAndApplyChanges()
     }
+  }
+
+  private fun stopRecomposer() {
+    recomposer?.cancel()
+    recomposerJob?.cancel()
+    recomposer = null
+    recomposerJob = null
   }
 
   fun setupView() {
@@ -90,6 +114,23 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
   protected open fun localViewModelStoreOwner(): ViewModelStoreOwner? = activity
 
   protected open fun onHostDetachedFromWindow() {}
+
+  protected open fun onHostDestroyed() {}
+
+  protected fun layoutAndroidViewHandler(view: View) {
+    view.post {
+      val holder = view.parent as? View ?: return@post
+      val handler = holder.parent as? View ?: return@post
+      val owner = handler.parent as? View ?: return@post
+
+      // AndroidView's handler can enter the hierarchy after its Compose owner was laid out.
+      handler.measure(
+        View.MeasureSpec.makeMeasureSpec(owner.width, View.MeasureSpec.EXACTLY),
+        View.MeasureSpec.makeMeasureSpec(owner.height, View.MeasureSpec.EXACTLY),
+      )
+      handler.layout(0, 0, owner.width, owner.height)
+    }
+  }
 
   @Composable
   protected abstract fun Content()

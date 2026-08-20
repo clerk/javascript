@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
@@ -18,7 +17,7 @@ export const meta: StoryMeta = {
   styles: {
     _variants: {
       shape: { circle: {}, square: {} },
-      size: { lg: {}, md: {}, sm: {}, xs: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {}, xl: {} },
     },
     _defaultVariants: {
       shape: 'circle',
@@ -76,7 +75,7 @@ export function Interactive(props: Record<string, unknown>) {
   return (
     <Avatar.Root
       {...knobsAsProps(props)}
-      size='lg'
+      size='xl'
       render={
         <button
           type='button'
@@ -99,7 +98,7 @@ export function Interactive(props: Record<string, unknown>) {
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(size => (
         <Avatar.Root
           key={size}
           {...knobsAsProps(props)}

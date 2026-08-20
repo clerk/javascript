@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
@@ -212,8 +211,11 @@ export function HoverReveal() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      css={{ '--cl-scrollbar-thumb-idle': 'oklch(from var(--cl-scrollbar-thumb) l c h / 0)' }}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
+      style={{
+        height: 260,
+        borderRadius: radiusVars['--cl-radius-sm'],
+        '--cl-scrollbar-thumb-idle': 'oklch(from var(--cl-scrollbar-thumb) l c h / 0)',
+      }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {manyRows.map(name => (
@@ -236,29 +238,36 @@ export function ThemedScrollbar() {
   const root = stylex.props(scrollAreaRoot);
 
   return (
-    <div
-      {...root}
-      className={`${root.className} border-border w-full border`}
-      css={{
-        '--cl-scrollbar-width': '14px',
-        '--cl-scrollbar-thumb-inset': '4px',
-        '--cl-duration-base': '0.6s',
-        '--cl-scrollbar-thumb': 'oklch(0.77 0.16 70)',
-        '&:hover': { '--cl-scrollbar-thumb': 'oklch(0.72 0.15 195)' },
-        '--cl-scrollbar-thumb-hover': 'oklch(0.65 0.24 15)',
-        '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
-      }}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
-    >
-      <Item.Group {...stylex.props(...scrollAreaViewport())}>
-        {manyRows.map(name => (
-          <OrganizationRow
-            key={name}
-            name={name}
-          />
-        ))}
-      </Item.Group>
-    </div>
+    <>
+      {/* Both halves of the amber → teal pair live here: an inline base value would outrank the
+          hover rule, since inline styles beat any stylesheet selector. */}
+      <style>{`
+        .demo-themed-scrollbar { --cl-scrollbar-thumb: oklch(0.77 0.16 70); }
+        .demo-themed-scrollbar:hover { --cl-scrollbar-thumb: oklch(0.72 0.15 195); }
+      `}</style>
+      <div
+        {...root}
+        className={`${root.className} demo-themed-scrollbar border-border w-full border`}
+        style={{
+          height: 260,
+          borderRadius: radiusVars['--cl-radius-sm'],
+          '--cl-scrollbar-width': '14px',
+          '--cl-scrollbar-thumb-inset': '4px',
+          '--cl-duration-base': '0.6s',
+          '--cl-scrollbar-thumb-hover': 'oklch(0.65 0.24 15)',
+          '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
+        }}
+      >
+        <Item.Group {...stylex.props(...scrollAreaViewport())}>
+          {manyRows.map(name => (
+            <OrganizationRow
+              key={name}
+              name={name}
+            />
+          ))}
+        </Item.Group>
+      </div>
+    </>
   );
 }
 

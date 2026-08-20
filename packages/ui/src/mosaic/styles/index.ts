@@ -6,6 +6,23 @@
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
+export { AlertDialog, createConfirmHandle, useConfirmedClose } from '../components/alert-dialog';
+export type {
+  ConfirmHandle,
+  ConfirmOptions,
+  UseConfirmedCloseOptions,
+  AlertDialogActionsProps,
+  AlertDialogBackdropProps,
+  AlertDialogCloseProps,
+  AlertDialogConfirmProps,
+  AlertDialogDescriptionProps,
+  AlertDialogPopupProps,
+  AlertDialogProps,
+  AlertDialogRootProps,
+  AlertDialogTitleProps,
+  AlertDialogTriggerProps,
+  AlertDialogViewportProps,
+} from '../components/alert-dialog';
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
@@ -14,12 +31,27 @@ export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
+export { Dialog } from '../components/dialog';
+export type {
+  DialogBackdropProps,
+  DialogCloseButtonProps,
+  DialogCloseProps,
+  DialogDescriptionProps,
+  DialogPopupProps,
+  DialogProps,
+  DialogRootProps,
+  DialogSize,
+  DialogTitleProps,
+  DialogTriggerProps,
+  DialogViewportProps,
+} from '../components/dialog';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
 export type { IconProps } from '../components/icon';
+export type { MosaicIconOverride, MosaicIconOverrides } from '../icons/overrides';
 export { Input } from '../components/input';
 export type { InputProps } from '../components/input';
 export { Item } from '../components/item';
@@ -34,21 +66,21 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
-export { Settings, settingsVars } from '../components/settings';
+export { Section } from '../components/section';
 export type {
-  SettingsActionsProps,
-  SettingsContentProps,
-  SettingsDescriptionProps,
-  SettingsGroupProps,
-  SettingsItemProps,
-  SettingsItemsProps,
-  SettingsLabelProps,
-  SettingsMediaProps,
-  SettingsMediaSize,
-  SettingsRootProps,
-  SettingsRowProps,
-  SettingsTitleProps,
-} from '../components/settings';
+  SectionActionsProps,
+  SectionContentProps,
+  SectionDescriptionProps,
+  SectionGroupProps,
+  SectionItemProps,
+  SectionItemsProps,
+  SectionLabelProps,
+  SectionMediaProps,
+  SectionMediaSize,
+  SectionRootProps,
+  SectionRowProps,
+  SectionTitleProps,
+} from '../components/section';
 export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';

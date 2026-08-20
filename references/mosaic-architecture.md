@@ -4,85 +4,30 @@
 
 Mosaic is the next-generation design system for Clerk's UI components, replacing the existing styled system. Both systems coexist during migration — Mosaic lives under `packages/ui/src/mosaic/` as a self-contained module that doesn't touch any existing code.
 
-Mosaic uses Emotion for CSS-in-JS but delivers theme tokens via its own React context (not Emotion's `ThemeProvider`). This avoids type conflicts with the existing system's `InternalTheme` augmentation on Emotion's global `Theme` interface.
+Mosaic components are authored with **StyleX** (`stylex.create` plus the `themeProps` / `mergeStyleProps` helpers in `props.ts`). StyleX compiles the styles out to a static stylesheet at build time, so Mosaic ships no CSS-in-JS runtime and does not use Emotion. (Swingset's dev server is the one exception: it enables StyleX's `runtimeInjection` so edits hot-reload.)
 
-The public styling contract is a **stable per-slot class** plus **`data-<axis>` attributes**: a part emits `class="cl-<slot>"` for its identity (`.cl-button`, `.cl-item`) and `data-<axis>="<value>"` / presence `data-<state>` for its variants and state. Consumers target those, never StyleX's hashed atoms; tokens ship as overridable `--cl-*` custom properties. Newer components are authored with **StyleX** (`stylex.create` + the `themeProps`/`mergeStyleProps` helpers in `props.ts`). The slot-recipe engine described further below (`defineSlotRecipe`, `useRecipe`, and its older `data-cl-slot`/`data-cl-*` attribute contract) is the legacy authoring path still used by un-migrated components during the migration.
+The public styling contract is a **stable per-slot class** plus **`data-<axis>` attributes**: a part emits `class="cl-<slot>"` for its identity (`.cl-button`, `.cl-item`) and `data-<axis>="<value>"` / presence `data-<state>` for its variants and state. Consumers target those, never StyleX's hashed atoms; tokens ship as overridable `--cl-*` custom properties.
 
 Once migration is complete, the old system is removed and Mosaic becomes the sole design system.
 
 ## Token architecture
 
-### MosaicTheme
-
-The token type is derived from the default values — not a hand-written interface:
+Tokens are CSS custom properties declared through `stylex.defineVars` in `tokens.stylex.ts`. Each var is named explicitly (`'--cl-color-primary'`, not a generated hash) so it is a stable, documented handle a consumer can override:
 
 ```ts
-// packages/ui/src/mosaic/variables.ts
-export const defaultMosaicVariables = Object.freeze({
-  color: { primary: '...', primaryForeground: '...', ... },
-  spacing: '0.25rem',
-  rounded: { xs: '0.125rem', sm: '0.25rem', md: '0.375rem', ... },
-  text: { xs: { fontSize: '0.75rem', lineHeight: '...' }, ... },
-} as const);
-
-export type MosaicTokens = typeof defaultMosaicVariables;
+// packages/ui/src/mosaic/tokens.stylex.ts
+export const colorVars = stylex.defineVars({
+  '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
+  '--cl-color-primary-foreground': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+  // …
+});
 ```
 
-### MosaicTheme helpers
+Groups: `colorVars`, `radiusVars`, `targetVars`, `scrollbarVars`, `scrollFadeVars`, `spacingVars`, `space`, `typeScaleVars`, `fontFamilyVars`, `fontWeightVars`, `durationVars`, `easingVars`.
 
-`MosaicTheme` includes computed helpers alongside static tokens:
+Light and dark come from CSS `light-dark()` on the default values, so there is no theme object and no re-render on theme change — the browser resolves it.
 
-```ts
-const theme = useMosaicTheme();
-
-// spacing(n) — multiply base spacing by n
-theme.spacing(2); // "calc(0.25rem * 2)"
-
-// alpha(color, opacity) — apply opacity via color-mix
-theme.alpha('primary', 80); // "color-mix(in oklab, <primary-value> 80%, transparent)"
-
-// mix(colorA, colorB, percentage) — blend colors via color-mix
-theme.mix('primary', 'primaryForeground', 50); // "color-mix(in oklab, <primary>, <primaryForeground> 50%)"
-
-// text(key) — typography scale with fontSize + lineHeight
-theme.text('sm'); // { fontSize: '0.875rem', lineHeight: '...' }
-```
-
-## Theme delivery
-
-### MosaicProvider
-
-Single provider that handles cascade and theme delivery. It accepts `appearance` (consumer overrides) and `scope` (the active flow key):
-
-```tsx
-import { MosaicProvider } from '../mosaic/MosaicProvider';
-
-<MosaicProvider>{children}</MosaicProvider>;
-```
-
-### useMosaicTheme
-
-Hook to access the resolved theme:
-
-```tsx
-import { useMosaicTheme } from '../mosaic/MosaicProvider';
-
-function MyComponent() {
-  const theme = useMosaicTheme();
-  return <div css={{ color: theme.color.primary, padding: theme.spacing(4) }} />;
-}
-```
-
-### Why React context instead of Emotion's ThemeProvider
-
-Emotion's `ThemeProvider` is typed to the global `Theme` interface, which is augmented to `InternalTheme` in `emotion.d.ts`. Passing a `MosaicTheme` to it would be a type error. A plain React context avoids this entirely.
-
-What we lose:
-
-1. **`css={(t) => ...}` function form** — Emotion would type `t` as `InternalTheme`. Use `useMosaicTheme()` (or a recipe `theme => config`) instead.
-2. **`useTheme()` from `@emotion/react`** — use `useMosaicTheme()` instead.
-
-What we keep: `css` prop (with plain objects), `keyframes`, `Global`, style serialization, deduplication, SSR.
+`@stylexjs/enforce-extension` requires a `.stylex.ts` file to export nothing but its `defineVars` results, so the derived token-name unions (`ColorVarName`, `RadiusVarName`, …) live in `styles/index.ts` as `keyof typeof colorVars`.
 
 ## Public styling API
 
@@ -121,230 +66,68 @@ Tokens are a third, independent lever: every `--cl-*` custom property (`--cl-col
 
 State styling uses real class + attribute-selector specificity — no `&&` boost, no data-attr-vs-class ambiguity.
 
-## Appearance & cascade
+## MosaicProvider
 
-> Legacy authoring path. `appearance.elements` + the slot cascade belong to the Emotion slot-recipe engine. StyleX components style via the class + `data-<axis>` contract above and `className`/`style`; they do not read `appearance.elements`.
-
-`MosaicProvider` takes `appearance` + `scope`:
+Mosaic components need no provider to render or to be styled — the stylesheet and the `--cl-*` tokens do that work. `MosaicProvider` exists for one thing: per-name icon glyph overrides.
 
 ```tsx
-<MosaicProvider
-  scope="signIn"
-  appearance={{
-    variables: { rounded: { md: '1rem' } },     // design tokens — global only, not scopable
-    elements: {
-      button: { backgroundColor: 'red' },        // slot styles — global
-      signIn: { button: { color: 'lime' } },     // slot styles — scoped to <SignIn>
-    },
-  }}
->
+import { MosaicProvider } from '../mosaic/MosaicProvider';
+
+<MosaicProvider icons={{ 'chevron-right': <MyChevron /> }}>{children}</MosaicProvider>;
 ```
 
-Two independent cascades, both low → high:
-
-**Tokens (`appearance.variables`)**
-
-1. `defaultMosaicVariables`
-2. Base theme overrides (prebuilt themes)
-3. `appearance.variables` (global; **not** scopable)
-
-Resolved once into `MosaicTheme` via `resolveVariables`.
-
-**Styles (`appearance.elements`), per slot**
-
-1. Recipe `base` → `variants` → `compoundVariants` → `sx`
-2. `appearance.elements[slot]` (global)
-3. `appearance.elements[scope][slot]` (scoped — wins inside the flow)
-
-Scope keys (`signIn`, `userButton`, …) live **inside** `elements`, keyed by flow, holding slot→style maps only. They never carry `variables`. `parseMosaicAppearance(appearance, scope)` strips scope keys out of the global layer and appends the scoped layer, returning `[global, scoped]` — so scoping falls out of layer order and the resolver (`resolveSlotCss`) needs no special-casing. Standalone (no provider/appearance) degrades to pure recipe styles.
-
-## Slot recipes
-
-> Legacy authoring path, still used by un-migrated components. New components use StyleX (`stylex.create` + `themeProps`); see `references/stylex.md`. The slot identity here is the `data-cl-slot` attribute, which the StyleX contract replaces with the `.cl-<slot>` class.
-
-`defineSlotRecipe` (`slot-recipe.ts`) is the single authoring primitive. One recipe owns _variants_, _slot identity_ (`data-cl-slot`), _state→attribute mapping_, and the _appearance cascade_. It absorbs the old `cva` variant-merge engine — `cva.ts` is gone.
-
-`useRecipe(recipe, opts)` resolves a recipe against the active theme + appearance and returns **per-slot props** with `css` already merged (base → variants → compound → sx → appearance) and all data attributes attached. Authors never hand-thread `css={[...]}`.
-
-Either form may be a static config or a `theme => config` function, so token values can be used inline while still honoring per-provider variable overrides.
-
-### Single-slot (the old `cva` use case)
-
-```ts
-export const buttonRecipe = defineSlotRecipe(theme => ({
-  slot: 'button', // shorthand → implicit `root` slot
-  base: { display: 'inline-flex', borderRadius: theme.rounded.md, _disabled: { opacity: 0.5 } },
-  variants: {
-    color: { primary: { backgroundColor: theme.color.primary } },
-    size: { sm: { ...theme.text('xs') }, md: { ...theme.text('sm') } },
-  },
-  defaultVariants: { color: 'primary', size: 'md' },
-}));
-
-declare module '../registry' {
-  interface MosaicSlotRegistry { button: true } // slot id registered once, co-located
-}
-
-export type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantProps<typeof buttonRecipe>;
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  const { color, size, disabled, sx, children, ...rest } = props;
-  const { root } = useRecipe(buttonRecipe, { variants: { color, size }, state: { disabled: !!disabled }, sx });
-  return (
-    <button ref={ref} disabled={disabled || false} type="button" {...rest} {...root}>
-      {children}
-    </button>
-  );
-});
-```
-
-`disabled` is **state**, not a variant: it emits `data-cl-disabled` and is styled via the `_disabled` condition — so consumers can override it through `appearance.elements`.
-
-### Multi-slot
-
-```ts
-const cardRecipe = defineSlotRecipe({
-  slots: { root: { slot: 'card' }, header: { slot: 'cardHeader' }, body: { slot: 'cardBody' } },
-  base: { root: { borderRadius: 8 }, header: { fontWeight: 600 }, body: {} },
-  variants: {
-    tone: {
-      neutral: { root: { borderColor: 'gray' } },
-      danger: { root: { borderColor: 'red', _invalid: { boxShadow: '…' } } },
-    },
-  },
-  defaultVariants: { tone: 'neutral' },
-});
-
-function Card({ tone, invalid, title, children }: CardProps) {
-  const s = useRecipe(cardRecipe, { variants: { tone }, state: { invalid } });
-  return (
-    <div {...s.root}>
-      <div {...s.header}>{title}</div>
-      <div {...s.body}>{children}</div>
-    </div>
-  );
-}
-```
-
-State and variant attributes attach to **every** slot, so a nested condition (`_invalid`) resolves on whichever slot styles it.
-
-### Sugar — `useSlot` / `slot`
-
-For elements that need no variants (`useSlot.ts`):
-
-```tsx
-// useSlot — themeable, targetable, appearance-aware. css = sx + appearance only (no recipe styles).
-function Avatar({ disabled }: AvatarProps) {
-  const root = useSlot('avatarBox', { state: { disabled } });
-  return <div {...root} />;
-}
-
-// slot() — the barest: just makes an element targetable. No hook, no css.
-<span {...slot('badgeText')}>{text}</span>;
-```
-
-The full spectrum, heaviest → lightest, is one machine: `useRecipe` (variants + slots) → `useSlot` (attrs + appearance) → `slot()` (attr only). You never reach for a recipe just to get a `data-cl-slot`.
-
-### RecipeVariantProps
-
-Infers a component's variant props (plus `sx`) from its recipe — the recipe equivalent of the old `VariantProps`, so variant axes aren't re-declared by hand:
-
-```ts
-import { type RecipeVariantProps } from '../mosaic/slot-recipe';
-
-export type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantProps<typeof buttonRecipe>;
-// → { color?: 'primary'; size?: 'sm' | 'md'; sx?: SxProp }
-```
-
-Boolean variants (`{ true, false }`) infer as `boolean`; at runtime `true`/`false` are coerced to `'true'`/`'false'` for variant-map lookup. Two distinct `null` cases: (1) when a variant map entry is `null`, `pickSlot` converts it to `undefined` and `mergeInto` skips falsy sources, so that entry contributes no styles; (2) when a variant prop is explicitly passed `null` at the call site, it is coerced to the string key `"null"` for recipe lookup — styles apply only if the recipe defines a `"null"` variant.
-
-## Slot registry
-
-Slot ids are assembled by **module augmentation** — no central list, no `APPEARANCE_KEYS` array, no codegen, no "build the types" step.
-
-```ts
-// registry.ts — the empty seam; never edited
-export interface MosaicSlotRegistry {}
-export type MosaicSlotId = keyof MosaicSlotRegistry;
-export type MosaicElements = Partial<Record<MosaicSlotId | (string & {}), StyleRule | string>>;
-```
-
-Each recipe file contributes its slot ids next to the recipe via `declare module '../registry'`. **Add a component → write its recipe + one augmentation block → its slot ids autocomplete in `appearance.elements` automatically.** The `(string & {})` arm keeps ad-hoc slots valid even for a slot whose file isn't imported in a given consumer.
-
-`StyleRule` is a csstype-backed `CSSObject` (typed CSS properties + arbitrary nested selectors / conditions / at-rules), mirroring Emotion's `CSSObject`. So `appearance.elements`, `sx`, and recipe style blocks all autocomplete CSS property names while still permitting nesting.
-
-## Conditions
-
-Named pseudo-state / media keys (`packages/ui/src/mosaic/conditions.ts`). Each maps to a
-nesting chain of selectors (`&` is the styled element) and is rewritten to its selector form by
-`expandConditions`, which runs once on the fully-merged `css` at the end of `useRecipe` / `useSlot`.
-
-| Condition       | Expands to                                                     |
-| --------------- | -------------------------------------------------------------- |
-| `_hover`        | `@media (hover: hover) { &:hover }`                            |
-| `_focus`        | `&:focus`                                                      |
-| `_focusVisible` | `&:focus-visible`                                              |
-| `_focusWithin`  | `&:focus-within`                                               |
-| `_active`       | `&:active`                                                     |
-| `_disabled`     | `&[data-cl-disabled]` (the attr Mosaic emits, not `:disabled`) |
-| `_invalid`      | `&[aria-invalid="true"]`                                       |
-| `_motionSafe`   | `@media (prefers-reduced-motion: no-preference)`               |
-| `_motionReduce` | `@media (prefers-reduced-motion: reduce)`                      |
-
-The **same keys** work in recipe `base`/`variants`, the `sx` prop, and consumer
-`appearance.elements` — so consumers can override hover/focus/etc. through `elements`:
-
-```ts
-<MosaicProvider appearance={{ elements: { button: { _hover: { backgroundColor: 'red' } } } }}>
-```
-
-Because conditions stay as raw keys through every merge layer (base → variants → compound → sx →
-appearance) and expand only at the end, a recipe's `_hover` and a consumer's `_hover` merge by key
-first (consumer wins) instead of producing duplicate hover blocks. Raw selectors (`'&:active'`,
-`'@media …'`) remain valid as an escape hatch — only registered condition keys are rewritten.
+`<Icon name='chevron-right' />` renders the override in place of the built-in glyph and applies Mosaic's own sizing props to it, so a swapped glyph stays visually consistent with the rest. Outside a provider, `useMosaicIcons()` returns `{}` and every icon falls back to `iconRegistry`.
 
 ## Component authoring pattern
 
+Styles are declared once per component with `stylex.create`, keyed off the same axes the component exposes as props, then fused with `themeProps` output and the consumer's `className`/`style`:
+
 ```tsx
-import { defineSlotRecipe, useRecipe, type RecipeVariantProps } from '../mosaic/slot-recipe';
+const styles = stylex.create({
+  base: { display: 'inline-flex', borderRadius: radiusVars['--cl-radius-md'] },
+});
 
-// 1. Define the recipe + register its slot id(s)
-const styles = defineSlotRecipe(theme => ({
-  slot: 'button',
-  base: { borderRadius: theme.rounded.md, fontFamily: 'inherit', _disabled: { opacity: 0.5, cursor: 'not-allowed' } },
-  variants: {
-    intent: {
-      primary: { background: theme.color.primary, color: theme.color.primaryForeground },
-      outline: { background: 'transparent', border: `1px solid ${theme.color.primary}` },
-    },
-    size: { sm: { padding: theme.spacing(2) }, md: { padding: theme.spacing(3) } },
-  },
-  defaultVariants: { intent: 'primary', size: 'md' },
-}));
+// `color` and `variant` are independent props, but every pair resolves to one style, so they are
+// keyed compositely rather than merged at render time.
+const variants = stylex.create({
+  'filled-primary': { backgroundColor: colorVars['--cl-color-primary'], borderColor: 'transparent' },
+  'filled-negative': { backgroundColor: colorVars['--cl-color-negative'], borderColor: 'transparent' },
+  'outline-primary': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-primary'] },
+  'outline-negative': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-negative'] },
+});
 
-declare module '../registry' {
-  interface MosaicSlotRegistry {
-    button: true;
-  }
-}
-
-// 2. Infer props from the recipe
-type ButtonProps = React.ComponentPropsWithRef<'button'> & RecipeVariantProps<typeof styles>;
-
-// 3. Destructure variants + state, spread the resolved slot props (css + data attributes)
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  const { intent, size, disabled, sx, ...rest } = props;
-  const { root } = useRecipe(styles, { variants: { intent, size }, state: { disabled: !!disabled }, sx });
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { color = 'primary', variant = 'filled', size = 'md', disabled, className, style, ...rest },
+  ref,
+) {
+  const props = mergeStyleProps(
+    themeProps('button', { color, variant, size, disabled }),
+    stylex.props(reset.base, styles.base, variants[`${variant}-${color}`]),
+    className,
+    style,
+  );
   return (
     <button
       ref={ref}
-      disabled={disabled || false}
+      disabled={disabled}
+      {...props}
       {...rest}
-      {...root}
     />
   );
 });
 ```
+
+`mergeStyleProps` applies its arguments in order — stable class + data attrs, then StyleX atoms, then the consumer's `className` and `style`. Only `style` wins by that ordering: it is an inline style, which outranks any stylesheet rule. A consumer's `className` wins for a different reason — class order inside the attribute has no effect on the cascade, so the consumer's rule wins because the Mosaic sheet is imported into a cascade layer (`@import '@clerk/ui/styles.css' layer(components)`) and an unlayered rule beats any layered one.
+
+`components/reset.styles.ts` holds the per-element resets so a component does not re-declare UA-normalization.
+
+For the full StyleX authoring rules (token usage, the local `s(n)` spacing helper, the CSS build), see the `mosaic` Claude Code skill's `references/stylex.md`.
+
+## CSS build
+
+`styles/index.ts` is a StyleX-only barrel re-exporting every Mosaic component, the token groups, and the styling helpers. `tsdown.mosaic.config.mts` walks that graph with the StyleX rollup plugin and extracts one static `dist-mosaic/styles.css`. A component is not shipped until it is exported from that barrel.
+
+Run it with `pnpm build:mosaic` in `packages/ui`.
 
 ## Flow and data architecture
 
@@ -463,90 +246,77 @@ Controllers should pass plain data and plain functions into machines. Do not pas
 Views render snapshots and emit events. They receive any derived booleans from the controller, including `actor.can(...)` results, so they do not duplicate machine guards:
 
 ```tsx
-<Destructive
-  open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
-  resourceName={snapshot.context.organizationName}
-  confirmationValue={snapshot.context.confirmationValue}
-  onConfirmationValueChange={value => send({ type: 'TYPE_CONFIRMATION', value })}
-  onDelete={() => send({ type: 'CONFIRM' })}
-  canSubmit={canSubmit}
-  isDeleting={snapshot.value === 'deleting'}
-  error={snapshot.context.error}
-/>
+export function DeleteOrganizationView({ snapshot, send, canSubmit }: DeleteOrganizationViewProps) {
+  return (
+    <Field.Root>
+      <Field.Label>Type {snapshot.context.organizationName} to confirm</Field.Label>
+      <Input
+        value={snapshot.context.confirmationValue}
+        onChange={event => send({ type: 'TYPE_CONFIRMATION', value: event.target.value })}
+      />
+      {snapshot.context.error ? <Field.Error>{snapshot.context.error}</Field.Error> : null}
+      <Button
+        color='negative'
+        disabled={!canSubmit}
+        onClick={() => send({ type: 'CONFIRM' })}
+      >
+        Delete organization
+      </Button>
+    </Field.Root>
+  );
+}
 ```
 
 View tests should render the view directly with a fake snapshot and fake `send`. They should not use Clerk providers or Clerk fixtures.
 
 ## Coexistence with existing system
 
-### Provider tree
-
-```text
-StyleCacheProvider (shared Emotion cache)
-└── AppearanceProvider (existing)
-    └── InternalThemeProvider (existing — Emotion ThemeProvider)
-        └── MosaicProvider (new — plain React context)
-            └── [mixed component tree]
-                ├── ExistingComponent  → css={t => t.colors.$primary500}
-                └── MosaicComponent    → {...useRecipe(recipe, { variants }).root}
-```
-
 ### Rules
 
-- **Do not** pass `MosaicTheme` to Emotion's `ThemeProvider`
-- **Do not** use `css={(t) => ...}` function form in Mosaic components (Emotion types `t` as `InternalTheme`)
-- **Do** author components with `defineSlotRecipe` + `useRecipe` (or `useSlot` / `slot` for the no-variant cases)
-- **Do** import from `src/mosaic/` directly (no barrel files)
-
-### What shares
-
-- Emotion cache (`cl-internal` key) — both systems inject into the same cache
-- `@emotion/react`'s `css` prop — both systems use it (Mosaic with plain objects, existing with theme callbacks)
-- `keyframes`, `Global` — available to both
+- **Do** author components with StyleX (`stylex.create` + `themeProps` / `mergeStyleProps`)
+- **Do not** use Emotion in Mosaic — no `css` prop, no `styled`, no theme callbacks
+- **Do** export every new component from `styles/index.ts`, or its CSS never ships
+- **Do** import from `src/mosaic/` directly (no barrel files) inside `packages/ui`
 
 ### What doesn't share
 
-- Theme type — `MosaicTheme` vs `InternalTheme` (completely independent)
-- Theme delivery — React context vs Emotion's `ThemeProvider`
-- Variant utility — slot recipes (`defineSlotRecipe`) vs `createVariants`
-- Styling contract — `data-cl-*` attributes + `appearance.elements` vs the legacy `customizables` / `APPEARANCE_KEYS` registry
+- Styling engine — StyleX (static CSS) vs Emotion (runtime CSS-in-JS)
+- Tokens — `--cl-*` custom properties vs `InternalTheme`
+- Variant utility — `stylex.create` + `themeProps` vs `createVariants`
+- Styling contract — `.cl-<slot>` class + `data-<axis>` attributes vs the legacy `customizables` / `APPEARANCE_KEYS` registry
 
 ## Migration guide
 
 To migrate a component from the old system to Mosaic:
 
-1. Replace `createVariants` with `defineSlotRecipe` — move from `(theme, props) => ({ base, variants })` to `theme => ({ slot, base, variants })`. Variant props that were in the `props` parameter become proper variants.
-2. Register the component's slot id(s) with a `declare module '../registry'` block next to the recipe.
-3. Replace `applyVariants(props)` with `useRecipe(recipe, { variants, state, sx })` and spread the returned slot props (`{...root}`) onto the element — `css` and the `data-cl-*` attributes come together.
-4. Move stateful styling (disabled/hover/focus/invalid) to **state + conditions** (`state: { disabled }` + `_disabled`/`_hover`) instead of boolean variants or raw pseudo-selectors, so it stays overridable through `appearance.elements`.
-5. Infer props with `RecipeVariantProps<typeof recipe>`; remove `filterProps` (destructure variant keys directly).
-6. Update token references — e.g. `theme.colors.$primary500` → `theme.color.primary`.
-7. Ensure the component is inside a `MosaicProvider` in the tree.
+1. Replace `createVariants` with `stylex.create` — one style key per variant value, selected by the prop at render time instead of merged by a runtime engine.
+2. Replace `applyVariants(props)` with `mergeStyleProps(themeProps(slot, variants), stylex.props(...), className, style)` and spread the result onto the element.
+3. Move stateful styling (disabled/hover/focus/invalid) into StyleX conditions. A condition is a key _inside a property's value object_ alongside `default`, never a top-level style key, and an attribute selector must be wrapped in `:is(...)`:
 
-The steps above cover the **styling** migration (recipes + tokens). For **flow**
-components — where the legacy component also fuses data-fetching and flow logic —
-splitting that logic into the machine/controller/view layers and verifying no
-implicit behavior is dropped is its own end-to-end workflow. See the `mosaic`
-Claude Code skill (`.claude/skills/mosaic/`), in particular its
-`references/migration.md`.
+   ```ts
+   cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
+   ```
+
+4. Update token references — e.g. `theme.colors.$primary500` → `colorVars['--cl-color-primary']`.
+5. Export the component from `styles/index.ts` and run `pnpm build:mosaic`.
+
+The steps above cover the **styling** migration. For **flow** components — where the legacy component also fuses data-fetching and flow logic — splitting that logic into the machine/controller/view layers and verifying no implicit behavior is dropped is its own end-to-end workflow. See the `mosaic` Claude Code skill (`.claude/skills/mosaic/`), in particular its `references/migration.md`.
 
 ## Files
 
-| File                                              | Purpose                                                                     |
-| ------------------------------------------------- | --------------------------------------------------------------------------- |
-| `src/mosaic/variables.ts`                         | Token types, `MosaicVariables`, `resolveVariables`, defaults                |
-| `src/mosaic/MosaicProvider.tsx`                   | Provider (`appearance` + `scope`) + `useMosaicTheme()` hook                 |
-| `src/mosaic/appearance.ts`                        | `MosaicAppearance` shape, scope parsing, `useMosaicAppearance` context      |
-| `src/mosaic/registry.ts`                          | `MosaicSlotRegistry` augmentation seam, `MosaicSlotId`, `MosaicElements`    |
-| `src/mosaic/slot-recipe.ts`                       | `defineSlotRecipe`, `useRecipe`, `RecipeVariantProps`, `StyleRule`/`SxProp` |
-| `src/mosaic/useSlot.ts`                           | `useSlot` + `slot()` sugar for non-recipe parts                             |
-| `src/mosaic/resolveSlot.ts`                       | Pure per-slot appearance-layer resolver (`resolveSlotCss`)                  |
-| `src/mosaic/conditions.ts`                        | Condition vocabulary (`_hover`, …) + `expandConditions`                     |
-| `src/mosaic/machine/`                             | State-machine runtime (`createMachine`, `createActor`, `useMachine`)        |
-| `src/mosaic/<feature>/*-machine.ts`               | Pure flow rules for a Mosaic feature (e.g. `organization/`)                 |
-| `src/mosaic/<feature>/*-controller.tsx`           | Clerk/mock data adapters and actor wiring for a Mosaic feature              |
-| `src/mosaic/<feature>/*-view.tsx`                 | Clerk-free view modules that render snapshots and send events               |
-| `src/mosaic/__tests__/slot-recipe.test.ts`        | Recipe resolution, attrs, conditions, `useSlot`/`slot` specs                |
-| `src/mosaic/__tests__/resolveSlot.test.ts`        | Appearance-layer resolution specs                                           |
-| `src/mosaic/__tests__/MosaicProvider.test.tsx`    | Appearance/scope parsing + theme-from-variables specs                       |
-| `src/mosaic/components/__tests__/button.test.tsx` | Component-level slot/state/variant/appearance specs                         |
+| File                                           | Purpose                                                              |
+| ---------------------------------------------- | -------------------------------------------------------------------- |
+| `src/mosaic/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`              |
+| `src/mosaic/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`              |
+| `src/mosaic/MosaicProvider.tsx`                | Provider for the `icons` prop (per-name glyph overrides)             |
+| `src/mosaic/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context              |
+| `src/mosaic/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                             |
+| `src/mosaic/components/reset.styles.ts`        | Per-element UA resets shared by every component                      |
+| `src/mosaic/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                   |
+| `src/mosaic/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`) |
+| `src/mosaic/<feature>/*.machine.ts`            | Pure flow rules for a Mosaic feature                                 |
+| `src/mosaic/<feature>/*.controller.tsx`        | Clerk/mock data adapters and actor wiring for a Mosaic feature       |
+| `src/mosaic/<feature>/*.view.tsx`              | Clerk-free view modules that render snapshots and send events        |
+| `src/mosaic/components/reset.test.tsx`         | Reset specs                                                          |
+| `src/mosaic/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                          |
+| `src/mosaic/components/button/button.test.tsx` | Component-level slot/state/variant specs                             |

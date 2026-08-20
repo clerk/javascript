@@ -1,14 +1,13 @@
 # Styling a component with StyleX
 
-Mosaic styling is migrating off the Emotion slot-recipe engine (`styling.md`)
-onto **StyleX** (`@stylexjs/stylex` 0.19). StyleX is compile-time atomic CSS: the
-style objects become hashed atom classes plus one static stylesheet, with zero
-runtime. This file is the authoring model for the StyleX layer; read it against
-the pilot, `packages/ui/src/mosaic/components/button/`.
+Mosaic is styled with **StyleX** (`@stylexjs/stylex` 0.19). StyleX is
+compile-time atomic CSS: the style objects become hashed atom classes plus one
+static stylesheet, with zero runtime. This file is the authoring model; read it
+against the reference component, `packages/ui/src/mosaic/components/button/`.
 
-The public contract is unchanged from the recipe era — consumers still target
-`--cl-*` vars, the `.cl-<slot>` class, and `data-<axis>` attrs, never StyleX's
-hashed `x…` atoms. What changes is how a component is authored internally.
+Consumers target `--cl-*` vars, the `.cl-<slot>` class, and `data-<axis>` attrs,
+never StyleX's hashed `x…` atoms. That public contract is fixed; everything
+below is how a component is authored internally to produce it.
 
 The guidance below is opinionated and evidence-backed: it codifies patterns
 proven out across a full StyleX component library (tokens, ~100 components,

@@ -1776,6 +1776,7 @@ export const msMY: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
     form_password_or_identifier_incorrect:
       'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
