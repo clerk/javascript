@@ -11,6 +11,7 @@ describe('UserProfileSignOutAllDevicesDialogView', () => {
       <MosaicProvider>
         <UserProfileSignOutAllDevicesDialogView
           open
+          state={{ isSubmitting: false, errors: {} }}
           onSignOut={vi.fn()}
         />
       </MosaicProvider>,
@@ -28,6 +29,7 @@ describe('UserProfileSignOutAllDevicesDialogView', () => {
       <MosaicProvider>
         <UserProfileSignOutAllDevicesDialogView
           open
+          state={{ isSubmitting: false, errors: {} }}
           onSignOut={onSignOut}
         />
       </MosaicProvider>,
@@ -37,5 +39,34 @@ describe('UserProfileSignOutAllDevicesDialogView', () => {
 
     expect(onSignOut).toHaveBeenCalledOnce();
     expect(screen.getByRole('alertdialog', { name: 'Sign out of all devices?' })).toBeInTheDocument();
+  });
+
+  it('renders an unattributed form error', () => {
+    render(
+      <MosaicProvider>
+        <UserProfileSignOutAllDevicesDialogView
+          open
+          state={{ isSubmitting: false, errors: { form: 'Something went wrong. Please try again.' } }}
+          onSignOut={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+  });
+
+  it('announces a pending sign-out without changing the button label', () => {
+    render(
+      <MosaicProvider>
+        <UserProfileSignOutAllDevicesDialogView
+          open
+          state={{ isSubmitting: true, errors: {} }}
+          onSignOut={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Sign out of all devices' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('progressbar', { name: 'Signing out of all devices' })).toBeInTheDocument();
   });
 });

@@ -1,30 +1,30 @@
 import * as stylex from '@stylexjs/stylex';
 import { type FormEvent, type ReactNode, useId } from 'react';
 
-import { Button } from '../components/button';
+import { Button, SubmitButton } from '../components/button';
 import { Card } from '../components/card';
 import { Dialog, type DialogProps } from '../components/dialog';
 import { Field } from '../components/field';
 import { Heading } from '../components/heading';
 import { Input } from '../components/input';
+import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
+import type {
+  UserProfilePasswordField,
+  UserProfilePasswordFlowState,
+  UserProfilePasswordValues,
+} from './dialogs/flow.types';
 import { passwordDialogStyles as styles } from './user-profile-password-dialog.styles';
 
-export interface UserProfilePasswordValues {
-  newPassword: string;
-  confirmPassword: string;
-  signOutOfOtherSessions: boolean;
-}
-
-export type UserProfilePasswordField = keyof UserProfilePasswordValues;
-export type UserProfilePasswordMode = 'change' | 'set';
+export type {
+  UserProfilePasswordField,
+  UserProfilePasswordMode,
+  UserProfilePasswordValues,
+} from './dialogs/flow.types';
 
 export interface UserProfilePasswordDialogViewProps extends Pick<DialogProps, 'open' | 'defaultOpen' | 'onOpenChange'> {
-  values: UserProfilePasswordValues;
-  mode?: UserProfilePasswordMode;
+  state: UserProfilePasswordFlowState;
   canSubmit?: boolean;
-  submitting?: boolean;
-  errors?: Partial<Record<UserProfilePasswordField, string>>;
   /** A verification prompt rendered inside the password dialog's stacking context. */
   verificationDialog?: ReactNode;
   onValueChange: <Field extends UserProfilePasswordField>(
@@ -35,21 +35,18 @@ export interface UserProfilePasswordDialogViewProps extends Pick<DialogProps, 'o
 }
 
 export function UserProfilePasswordDialogView({
-  values,
-  mode = 'change',
+  state,
   canSubmit = false,
-  submitting = false,
-  errors = {},
   verificationDialog,
   onValueChange,
   onSubmit,
   ...dialogProps
 }: UserProfilePasswordDialogViewProps) {
+  const { values, mode, isSubmitting, errors } = state;
   const title = mode === 'set' ? 'Set password' : 'Change password';
-  const submittingLabel = mode === 'set' ? 'Setting…' : 'Changing…';
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSubmit && !submitting) {
+    if (canSubmit && !isSubmitting) {
       onSubmit(values);
     }
   };
@@ -89,7 +86,7 @@ export function UserProfilePasswordDialogView({
                     autoComplete='new-password'
                     value={values.newPassword}
                     error={errors.newPassword}
-                    disabled={submitting}
+                    disabled={isSubmitting}
                     onChange={value => onValueChange('newPassword', value)}
                   />
                   <PasswordField
@@ -98,14 +95,22 @@ export function UserProfilePasswordDialogView({
                     autoComplete='new-password'
                     value={values.confirmPassword}
                     error={errors.confirmPassword}
-                    disabled={submitting}
+                    disabled={isSubmitting}
                     onChange={value => onValueChange('confirmPassword', value)}
                   />
                   <SignOutOfOtherSessionsField
                     checked={values.signOutOfOtherSessions}
-                    disabled={submitting}
+                    disabled={isSubmitting}
                     onChange={checked => onValueChange('signOutOfOtherSessions', checked)}
                   />
+                  {errors.form ? (
+                    <Text
+                      color='negative'
+                      role='alert'
+                    >
+                      {errors.form}
+                    </Text>
+                  ) : null}
                 </div>
               </Card.Content>
               <Card.Footer {...themeProps('user-profile-password-dialog-actions')}>
@@ -120,14 +125,14 @@ export function UserProfilePasswordDialogView({
                     </Button>
                   )}
                 />
-                <Button
-                  type='submit'
-                  disabled={!canSubmit || submitting}
-                  focusableWhenDisabled
+                <SubmitButton
+                  disabled={!canSubmit}
+                  isPending={isSubmitting}
+                  pendingLabel={mode === 'set' ? 'Setting password' : 'Changing password'}
                   {...stylex.props(styles.footerButton)}
                 >
-                  {submitting ? submittingLabel : title}
-                </Button>
+                  {title}
+                </SubmitButton>
               </Card.Footer>
             </form>
           </Dialog.Popup>

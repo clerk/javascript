@@ -146,6 +146,19 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 
+  it('offers to set a password when password authentication is available', () => {
+    renderView({
+      hasPassword: false,
+      passwordAvailable: true,
+      passkeys: undefined,
+      mfaMethods: undefined,
+      onChangePassword: vi.fn(),
+    });
+
+    expect(screen.getByText('Password')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Set password' })).toBeInTheDocument();
+  });
+
   it('does not render actions for the current device', () => {
     renderView({
       onManageDevice: vi.fn(),

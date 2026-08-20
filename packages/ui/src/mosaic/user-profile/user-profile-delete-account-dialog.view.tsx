@@ -2,12 +2,13 @@ import * as stylex from '@stylexjs/stylex';
 import { type FormEvent, type ReactNode } from 'react';
 
 import { AlertDialog, type AlertDialogProps } from '../components/alert-dialog';
-import { Button } from '../components/button';
+import { Button, SubmitButton } from '../components/button';
 import { Field } from '../components/field';
 import { Heading } from '../components/heading';
 import { Input } from '../components/input';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
+import type { UserProfileDeleteAccountFlowState } from './dialogs/flow.types';
 import { deleteAccountDialogStyles as styles } from './user-profile-delete-account-dialog.styles';
 
 const confirmationText = 'Delete account';
@@ -16,8 +17,7 @@ export interface UserProfileDeleteAccountDialogViewProps extends Pick<
   AlertDialogProps,
   'open' | 'defaultOpen' | 'onOpenChange'
 > {
-  confirmation: string;
-  submitting?: boolean;
+  state: UserProfileDeleteAccountFlowState;
   /** A verification prompt rendered inside the delete-account alert's stacking context. */
   verificationDialog?: ReactNode;
   onConfirmationChange: (value: string) => void;
@@ -25,17 +25,17 @@ export interface UserProfileDeleteAccountDialogViewProps extends Pick<
 }
 
 export function UserProfileDeleteAccountDialogView({
-  confirmation,
-  submitting = false,
+  state,
   verificationDialog,
   onConfirmationChange,
   onDelete,
   ...dialogProps
 }: UserProfileDeleteAccountDialogViewProps) {
+  const { confirmation, isSubmitting, errors } = state;
   const canSubmit = confirmation === confirmationText;
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSubmit && !submitting) {
+    if (canSubmit && !isSubmitting) {
       onDelete();
     }
   };
@@ -57,28 +57,37 @@ export function UserProfileDeleteAccountDialogView({
             >
               <Field.Root
                 required
-                disabled={submitting}
+                disabled={isSubmitting}
                 {...stylex.props(styles.field)}
               >
                 <Field.Label>Type “Delete account” below to continue</Field.Label>
                 <Input
                   name='deleteConfirmation'
                   autoComplete='off'
+                  spellCheck={false}
                   placeholder={confirmationText}
                   value={confirmation}
                   onChange={event => onConfirmationChange(event.target.value)}
                 />
               </Field.Root>
+              {errors.form ? (
+                <Text
+                  color='negative'
+                  role='alert'
+                >
+                  {errors.form}
+                </Text>
+              ) : null}
               <AlertDialog.Actions>
                 <AlertDialog.Close render={<Button variant='outline' />}>Cancel</AlertDialog.Close>
-                <Button
-                  type='submit'
+                <SubmitButton
                   color='negative'
-                  disabled={!canSubmit || submitting}
-                  focusableWhenDisabled
+                  disabled={!canSubmit}
+                  isPending={isSubmitting}
+                  pendingLabel='Deleting account'
                 >
-                  {submitting ? 'Deleting…' : 'Delete account'}
-                </Button>
+                  Delete account
+                </SubmitButton>
               </AlertDialog.Actions>
             </form>
           </AlertDialog.Popup>

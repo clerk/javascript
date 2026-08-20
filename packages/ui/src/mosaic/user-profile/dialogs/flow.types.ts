@@ -126,7 +126,7 @@ export interface ConfirmContactActionState {
  * which stays open and pending behind it; on success the original flow resumes where it left off.
  */
 export interface ReverificationChallengeState {
-  strategy: 'password' | 'email_code' | 'phone_code';
+  strategy: 'password' | 'email_code' | 'phone_code' | 'passkey' | 'totp' | 'backup_code';
   /** The address or number a code was sent to. Absent for the password strategy. */
   identifier?: string;
   value: string;
@@ -265,4 +265,31 @@ export interface AccountSectionFlows {
   editProfile?: EditProfileFlow | null;
   /** Stacks over whichever flow raised it. Shared across sections; it lives here until a second one needs it. */
   reverification?: ReverificationFlow | null;
+}
+
+export interface UserProfilePasswordValues {
+  newPassword: string;
+  confirmPassword: string;
+  signOutOfOtherSessions: boolean;
+}
+
+export type UserProfilePasswordField = keyof UserProfilePasswordValues;
+export type UserProfilePasswordMode = 'change' | 'set';
+
+export interface UserProfilePasswordFlowState {
+  mode: UserProfilePasswordMode;
+  values: UserProfilePasswordValues;
+  isSubmitting: boolean;
+  errors: FlowErrors & Partial<Record<UserProfilePasswordField, string>>;
+}
+
+export interface UserProfileDeleteAccountFlowState {
+  confirmation: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfileSignOutAllDevicesFlowState {
+  isSubmitting: boolean;
+  errors: FlowErrors;
 }

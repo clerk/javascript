@@ -1,0 +1,43 @@
+import * as Stories from './user-profile-security-flows.stories';
+
+# Security flows
+
+The password, delete-account, and sign-out-all-devices journeys driven by a simulated backend that
+takes time, can fail, and can require a stacked reverification challenge.
+
+The failure-point control distinguishes an initial mutation failure from a failed reverification
+attempt and a failure when the original mutation is retried. Reverification-only targets appear
+only when reverification is required.
+
+The production views render controlled state snapshots and emit events. The state transitions and
+simulated backend live only in `user-profile-security-flow.harness.ts`; a Clerk-backed controller
+can replace that harness without changing the dialog views.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Security panel', href: '/user-profile/user-profile-security-panel', layer: 'User Profile' },
+    { name: 'Password section', href: '/user-profile/user-profile-password-section', layer: 'User Profile' },
+    { name: 'Active devices', href: '/user-profile/user-profile-active-devices-section', layer: 'User Profile' },
+    { name: 'Danger zone', href: '/user-profile/user-profile-delete-section', layer: 'User Profile' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Alert dialog', href: '/components/alert-dialog', layer: 'Components' },
+  ]}
+/>
+
+## Every security-dialog state
+
+Each option sends one controlled snapshot directly to its production view. This makes pending,
+failure, set-password, and nested reverification states inspectable without replaying the journey.
+
+<Story
+  name='States'
+  storyModule={Stories}
+/>
+
+## Temporary components
+
+Security reuses the same temporary reverification code field as Contact flows until the full Mosaic
+OTP implementation is available. The password sign-out option uses a native checkbox until Mosaic
+Checkbox is available.
