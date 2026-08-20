@@ -19,6 +19,28 @@ describe('Mosaic Icon', () => {
     expect(svg?.querySelector('path')).not.toBeNull();
   });
 
+  it.each(['security-phone', 'security-lock-square', 'security-passkey'] as const)(
+    'renders the %s glyph on its 18px canvas',
+    name => {
+      const { container } = wrap(<Icon name={name} />);
+      const svg = container.querySelector('svg');
+
+      expect(svg).toHaveAttribute('viewBox', '0 0 18 18');
+      expect(svg?.querySelector('path')).toHaveAttribute('fill', 'currentColor');
+    },
+  );
+
+  it.each([
+    ['device-phone', ['#646464', '#646464', '#343434', '#575757', '#171717', 'black']],
+    ['device-laptop', ['black', '#575757', 'black', '#444444', '#171717']],
+  ] as const)('preserves the supplied %s palette', (name, palette) => {
+    const { container } = wrap(<Icon name={name} />);
+    const paths = Array.from(container.querySelectorAll('path'));
+
+    expect(container.querySelector('svg')).toHaveAttribute('viewBox', '0 0 18 18');
+    expect(paths.map(path => path.getAttribute('fill'))).toEqual(palette);
+  });
+
   it('applies the default size when none is passed', () => {
     const { container } = wrap(<Icon name='chevron-right' />);
     expect(container.querySelector('svg')).toHaveAttribute('data-size', 'md');

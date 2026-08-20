@@ -9,10 +9,11 @@ export const styles = stylex.create({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    rowGap: space['2'],
+    rowGap: space['3'],
     width: '100%',
   },
   title: {
+    color: colorVars['--cl-color-neutral'],
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   group: {
@@ -36,31 +37,45 @@ export const styles = stylex.create({
     flexDirection: 'column',
     paddingBlockEnd: {
       default: space['4'],
-      [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['1'],
+      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
     },
-    paddingBlockStart: space['4'],
+    paddingBlockStart: {
+      default: space['4'],
+      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: space['3'],
+    },
     rowGap: {
       default: space['2'],
-      [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['3'],
+      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
     },
-    minHeight: `calc(${space['18.5']} + 1px)`,
+    minHeight: {
+      default: `calc(${space['18.5']} + 1px)`,
+      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
+    },
     width: 'auto',
   },
   items: {
     display: 'flex',
     flexDirection: 'column',
+    marginBlockStart: space['3'],
     width: '100%',
   },
   item: {
+    paddingBlock: {
+      default: null,
+      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: space['4'],
+    },
     alignItems: 'center',
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: {
+      default: '0px',
+      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: '1px',
+    },
     columnGap: space['3'],
     display: 'flex',
     flexWrap: 'nowrap',
     justifyContent: 'space-between',
     width: '100%',
-  },
-  nestedItem: {
-    paddingBlock: space['1'],
   },
   mediaBase: {
     alignItems: 'center',

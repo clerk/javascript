@@ -101,10 +101,30 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
+import { Default as UserPageDefault, meta as userPageMeta } from '../stories/user-page.stories';
 import {
   Default as UserProfileAccountSectionDefault,
   meta as userProfileAccountSectionMeta,
+  MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
 } from '../stories/user-profile-account-section.stories';
+import {
+  Default as UserProfileActiveDevicesSectionDefault,
+  meta as userProfileActiveDevicesSectionMeta,
+} from '../stories/user-profile-active-devices-section.stories';
+import {
+  Default as UserProfileApiKeysPanelDefault,
+  Empty as UserProfileApiKeysPanelEmpty,
+  meta as userProfileApiKeysPanelMeta,
+} from '../stories/user-profile-api-keys-panel.stories';
+import {
+  Default as UserProfileBillingHistorySectionDefault,
+  Empty as UserProfileBillingHistorySectionEmpty,
+  meta as userProfileBillingHistorySectionMeta,
+} from '../stories/user-profile-billing-history-section.stories';
+import {
+  Default as UserProfileBillingPanelDefault,
+  meta as userProfileBillingPanelMeta,
+} from '../stories/user-profile-billing-panel.stories';
 import {
   Default as UserProfileConnectedAccountsSectionDefault,
   meta as userProfileConnectedAccountsSectionMeta,
@@ -114,9 +134,36 @@ import {
   meta as userProfileDeleteSectionMeta,
 } from '../stories/user-profile-delete-section.stories';
 import {
+  Default as UserProfileMfaSectionDefault,
+  Empty as UserProfileMfaSectionEmpty,
+  meta as userProfileMfaSectionMeta,
+} from '../stories/user-profile-mfa-section.stories';
+import {
+  Default as UserProfilePasskeysSectionDefault,
+  Empty as UserProfilePasskeysSectionEmpty,
+  meta as userProfilePasskeysSectionMeta,
+} from '../stories/user-profile-passkeys-section.stories';
+import {
+  Default as UserProfilePasswordSectionDefault,
+  meta as userProfilePasswordSectionMeta,
+} from '../stories/user-profile-password-section.stories';
+import {
+  Default as UserProfilePaymentMethodsSectionDefault,
+  Empty as UserProfilePaymentMethodsSectionEmpty,
+  meta as userProfilePaymentMethodsSectionMeta,
+} from '../stories/user-profile-payment-methods-section.stories';
+import {
   Default as UserProfileProfilePanelDefault,
   meta as userProfileProfilePanelMeta,
 } from '../stories/user-profile-profile-panel.stories';
+import {
+  Default as UserProfileSecurityPanelDefault,
+  meta as userProfileSecurityPanelMeta,
+} from '../stories/user-profile-security-panel.stories';
+import {
+  Default as UserProfileSubscriptionSectionDefault,
+  meta as userProfileSubscriptionSectionMeta,
+} from '../stories/user-profile-subscription-section.stories';
 import {
   Default as UserProfileWeb3WalletsSectionDefault,
   meta as userProfileWeb3WalletsSectionMeta,
@@ -235,13 +282,64 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const userProfileApiKeysPanelModule: StoryModule = {
+  meta: userProfileApiKeysPanelMeta,
+  Default: UserProfileApiKeysPanelDefault,
+  Empty: UserProfileApiKeysPanelEmpty,
+};
+const userPageModule: StoryModule = {
+  meta: userPageMeta,
+  Default: UserPageDefault,
+};
+
 const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
+  MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
   Default: UserProfileProfilePanelDefault,
+};
+const userProfileSecurityPanelModule: StoryModule = {
+  meta: userProfileSecurityPanelMeta,
+  Default: UserProfileSecurityPanelDefault,
+};
+const userProfileBillingPanelModule: StoryModule = {
+  meta: userProfileBillingPanelMeta,
+  Default: UserProfileBillingPanelDefault,
+};
+const userProfileBillingHistorySectionModule: StoryModule = {
+  meta: userProfileBillingHistorySectionMeta,
+  Default: UserProfileBillingHistorySectionDefault,
+  Empty: UserProfileBillingHistorySectionEmpty,
+};
+const userProfilePasswordSectionModule: StoryModule = {
+  meta: userProfilePasswordSectionMeta,
+  Default: UserProfilePasswordSectionDefault,
+};
+const userProfilePasskeysSectionModule: StoryModule = {
+  meta: userProfilePasskeysSectionMeta,
+  Default: UserProfilePasskeysSectionDefault,
+  Empty: UserProfilePasskeysSectionEmpty,
+};
+const userProfileMfaSectionModule: StoryModule = {
+  meta: userProfileMfaSectionMeta,
+  Default: UserProfileMfaSectionDefault,
+  Empty: UserProfileMfaSectionEmpty,
+};
+const userProfileActiveDevicesSectionModule: StoryModule = {
+  meta: userProfileActiveDevicesSectionMeta,
+  Default: UserProfileActiveDevicesSectionDefault,
+};
+const userProfileSubscriptionSectionModule: StoryModule = {
+  meta: userProfileSubscriptionSectionMeta,
+  Default: UserProfileSubscriptionSectionDefault,
+};
+const userProfilePaymentMethodsSectionModule: StoryModule = {
+  meta: userProfilePaymentMethodsSectionMeta,
+  Default: UserProfilePaymentMethodsSectionDefault,
+  Empty: UserProfilePaymentMethodsSectionEmpty,
 };
 const userProfileConnectedAccountsSectionModule: StoryModule = {
   meta: userProfileConnectedAccountsSectionMeta,
@@ -257,10 +355,24 @@ const userProfileDeleteSectionModule: StoryModule = {
 };
 
 export const registry: StoryModule[] = [
-  // User
+  // User Button
   userButtonModule,
+  // User Profile
+  userPageModule,
+  // User Profile · Panels
   userProfileProfilePanelModule,
+  userProfileSecurityPanelModule,
+  userProfileBillingPanelModule,
+  userProfileApiKeysPanelModule,
+  // User Profile · Sections
   userProfileAccountSectionModule,
+  userProfilePasswordSectionModule,
+  userProfilePasskeysSectionModule,
+  userProfileMfaSectionModule,
+  userProfileActiveDevicesSectionModule,
+  userProfileSubscriptionSectionModule,
+  userProfilePaymentMethodsSectionModule,
+  userProfileBillingHistorySectionModule,
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,

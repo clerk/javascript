@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { space } from '../tokens.stylex';
+import { colorVars, radiusVars, space } from '../tokens.stylex';
 
 export const styles = stylex.create({
   contactValue: {
@@ -9,17 +9,17 @@ export const styles = stylex.create({
     display: 'flex',
     minWidth: 0,
   },
-  providerMedia: {
-    borderColor: 'light-dark(var(--cl-color-border-faded), var(--cl-color-background))',
-    borderRadius: 'var(--cl-radius-lg)',
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    backgroundColor: 'var(--cl-color-background)',
-  },
   providerIcon: {
     display: 'block',
     height: space['5'],
     width: space['5'],
+  },
+  providerMedia: {
+    borderColor: `light-dark(${colorVars['--cl-color-border-faded']}, ${colorVars['--cl-color-background']})`,
+    borderRadius: radiusVars['--cl-radius-lg'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    backgroundColor: colorVars['--cl-color-background'],
   },
   root: {
     gap: space['4'],
@@ -30,5 +30,6 @@ export const styles = stylex.create({
     gap: space['8'],
     display: 'flex',
     flexDirection: 'column',
+    width: '100%',
   },
 });
