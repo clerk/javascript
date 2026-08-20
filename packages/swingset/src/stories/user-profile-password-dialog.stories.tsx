@@ -1,4 +1,9 @@
 import { Button } from '@clerk/ui/mosaic/components/button';
+import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+import { Field } from '@clerk/ui/mosaic/components/field';
+import { Heading } from '@clerk/ui/mosaic/components/heading';
+import { Input } from '@clerk/ui/mosaic/components/input';
+import { Text } from '@clerk/ui/mosaic/components/text';
 import type {
   UserProfilePasswordField,
   UserProfilePasswordMode,
@@ -25,8 +30,15 @@ const emptyValues: UserProfilePasswordValues = {
   signOutOfOtherSessions: true,
 };
 
-function PasswordDialogStory({ mode }: { mode: UserProfilePasswordMode }) {
+function PasswordDialogStory({
+  mode,
+  withVerification = false,
+}: {
+  mode: UserProfilePasswordMode;
+  withVerification?: boolean;
+}) {
   const [open, setOpen] = useState(false);
+  const [verificationOpen, setVerificationOpen] = useState(false);
   const [values, setValues] = useState(emptyValues);
   const canSubmit = Boolean(values.newPassword) && values.newPassword === values.confirmPassword;
   const label = mode === 'set' ? 'Set password' : 'Change password';
@@ -43,7 +55,12 @@ function PasswordDialogStory({ mode }: { mode: UserProfilePasswordMode }) {
       <Button onClick={() => setOpen(true)}>{label}</Button>
       <UserProfilePasswordDialogView
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={nextOpen => {
+          setOpen(nextOpen);
+          if (!nextOpen) {
+            setVerificationOpen(false);
+          }
+        }}
         values={values}
         mode={mode}
         canSubmit={canSubmit}
@@ -54,9 +71,26 @@ function PasswordDialogStory({ mode }: { mode: UserProfilePasswordMode }) {
         }
         onValueChange={updateValue}
         onSubmit={() => {
+          if (withVerification) {
+            setVerificationOpen(true);
+            return;
+          }
           setOpen(false);
           setValues(emptyValues);
         }}
+        verificationDialog={
+          withVerification ? (
+            <OtpVerificationPrompt
+              open={verificationOpen}
+              onOpenChange={setVerificationOpen}
+              onVerify={() => {
+                setVerificationOpen(false);
+                setOpen(false);
+                setValues(emptyValues);
+              }}
+            />
+          ) : null
+        }
       />
     </>
   );
@@ -68,4 +102,77 @@ export function Change() {
 
 export function Set() {
   return <PasswordDialogStory mode='set' />;
+}
+
+export function Verification() {
+  return (
+    <PasswordDialogStory
+      mode='change'
+      withVerification
+    />
+  );
+}
+
+// TODO: Replace this dummy OTP prompt with the full User Verification dialog implementation.
+function OtpVerificationPrompt({
+  open,
+  onOpenChange,
+  onVerify,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onVerify: () => void;
+}) {
+  const [code, setCode] = useState('');
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={nextOpen => {
+        onOpenChange(nextOpen);
+        if (!nextOpen) {
+          setCode('');
+        }
+      }}
+      closedBy='closerequest'
+    >
+      <Dialog.CloseButton />
+      <Dialog.Title render={<Heading size='sm' />}>Verify your identity</Dialog.Title>
+      <Dialog.Description render={<Text />}>Enter the verification code sent to your email address.</Dialog.Description>
+      <form
+        style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+        onSubmit={event => {
+          event.preventDefault();
+          if (code.length === 6) {
+            onVerify();
+          }
+        }}
+      >
+        <Field.Root
+          required
+          style={{ display: 'grid', gap: '0.5rem' }}
+        >
+          <Field.Label>Verification code</Field.Label>
+          <Input
+            name='code'
+            autoComplete='one-time-code'
+            inputMode='numeric'
+            maxLength={6}
+            value={code}
+            onChange={event => setCode(event.target.value.replace(/\D/g, ''))}
+          />
+        </Field.Root>
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+          <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+          <Button
+            type='submit'
+            disabled={code.length !== 6}
+            focusableWhenDisabled
+          >
+            Verify
+          </Button>
+        </div>
+      </form>
+    </Dialog>
+  );
 }

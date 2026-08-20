@@ -147,6 +147,7 @@ import {
   Change as UserProfilePasswordDialogChange,
   meta as userProfilePasswordDialogMeta,
   Set as UserProfilePasswordDialogSet,
+  Verification as UserProfilePasswordDialogVerification,
 } from '../stories/user-profile-password-dialog.stories';
 import {
   Default as UserProfilePasswordSectionDefault,
@@ -362,6 +363,7 @@ const userProfilePasswordDialogModule: StoryModule = {
   meta: userProfilePasswordDialogMeta,
   Change: UserProfilePasswordDialogChange,
   Set: UserProfilePasswordDialogSet,
+  Verification: UserProfilePasswordDialogVerification,
 };
 
 export const registry: StoryModule[] = [
