@@ -8,6 +8,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useBackupCodesDialogStory } from './helpers/use-backup-codes-dialog-story';
 import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
 import { useDeviceDialogStory } from './helpers/use-device-dialog-story';
 import { useMfaDialogStory } from './helpers/use-mfa-dialog-story';
@@ -26,6 +27,7 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
+  const { openBackupCodesDialog, backupCodesDialog } = useBackupCodesDialogStory();
   const { openDeleteAccountDialog, deleteAccountDialog } = useDeleteAccountDialogStory();
   const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
   const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
@@ -40,6 +42,7 @@ export function Default() {
     usePasskeyDialogStory({ passkeys, onChange: setPasskeys });
   const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>([
     { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
+    { id: 'backup-codes', type: 'backup-codes' },
   ]);
   const { openAddMfaDialog, openRemoveMfaDialog, mfaDialogs } = useMfaDialogStory({
     methods: mfaMethods,
@@ -115,6 +118,7 @@ export function Default() {
         onManagePasskey={openRenamePasskeyDialog}
         onRemoveMfaMethod={openRemoveMfaDialog}
         onRemovePasskey={openRemovePasskeyDialog}
+        onRegenerateBackupCodes={openBackupCodesDialog}
         onSignOutAllOtherDevices={openSignOutAllDevicesDialog}
         onSignOutDevice={openDevice}
       />
@@ -124,6 +128,7 @@ export function Default() {
       {deviceDialog}
       {mfaDialogs}
       {passkeyDialogs}
+      {backupCodesDialog}
     </>
   );
 }
