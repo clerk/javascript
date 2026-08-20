@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { ProtectCheckResource } from '@clerk/shared/types';
 import React from 'react';
@@ -8,17 +8,12 @@ import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
 
 /**
- * A plain GET reload does not re-mint a protect_check challenge server-side, so an expired
- * challenge would otherwise reload → still expired → reload again, forever. Cap the attempts
- * and surface an error instead of spinning silently.
- *
- * NOTE: who re-mints an expired challenge on read (FAPI vs. re-running the gated step) is still
- * being decided with the clerk_go team; this cap is the defensive floor until that lands.
+ * Mirrors `MAX_EXPIRED_RELOADS` from `@clerk/shared/internal/clerk-js/protectCheckLifecycle`.
+ * Kept as a local literal because it is needed before (and outside) the RHC-gated dynamic import
+ * below — a static value import of that module would drag the challenge loader back into no-RHC
+ * bundles.
  */
 const MAX_EXPIRED_RELOADS = 2;
-
-/** Upper bound on how long we wait for the challenge SDK to settle before failing loud. */
-const PROTECT_CHECK_SCRIPT_TIMEOUT_MS = 60_000;
 
 export interface ProtectCheckRunnerParams<TResource> {
   /**
@@ -61,7 +56,10 @@ export interface ProtectCheckRunner {
  * Shared driver for the `<SignInProtectCheck />` and `<SignUpProtectCheck />` cards. Both run the
  * exact same lifecycle — load + execute the Protect SDK, submit the proof token, continue the flow
  * — so the abort/cancel/expiry/timeout/no-RHC handling lives here once instead of being duplicated
- * (and drifting) across the two components.
+ * (and drifting) across the two components. The framework-free parts of that lifecycle (timeout
+ * race, container ownership, `already_resolved` recovery) live in
+ * `@clerk/shared/internal/clerk-js/protectCheckLifecycle`; this hook owns the React orchestration
+ * around them.
  *
  * Must be called from within a `CardStateProvider`.
  */
@@ -141,8 +139,8 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
     // Fail closed in no-RHC builds (chrome extension / clerk.no-rhc.js): the gate requires a
     // remote `import(sdk_url)` we must not perform there. This guard MUST live in the component
-    // layer — `executeProtectCheck` is in `@clerk/shared`, compiled once with the flag hard-coded
-    // `false`, so a guard there would never trip.
+    // layer — the shared lifecycle module is compiled once with the flag hard-coded `false`, so
+    // a guard there would never trip.
     if (__BUILD_DISABLE_RHC__) {
       failWith(
         ERROR_CODES.PROTECT_CHECK_UNSUPPORTED_ENVIRONMENT,
@@ -205,9 +203,11 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
     // This run owns the container outright: drop anything a previous run left behind (a solved or
     // errored widget) so the spinner covers the load phase and a re-rendering SDK can't stack a
-    // second widget under a stale one. Reset visibility in the same breath — the container is
-    // empty by construction here, and waiting on the observer callback would leave the state
-    // stale for a scheduling-dependent window (especially on the MutationObserver fallback).
+    // second widget under a stale one — synchronously, before the chunk import below can add a
+    // frame of stale widget. (`executeProtectCheckWithTimeout` clears again; that's idempotent.)
+    // Reset visibility in the same breath — the container is empty by construction here, and
+    // waiting on the observer callback would leave the state stale for a scheduling-dependent
+    // window (especially on the MutationObserver fallback).
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
@@ -217,9 +217,8 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     setIsRunning(true);
 
     const runChallenge = async () => {
-      let timeoutId: ReturnType<typeof setTimeout> | undefined;
       try {
-        // Load the Protect SDK loader lazily, gated on the same compile-time flag as the
+        // Load the Protect check module lazily, gated on the same compile-time flag as the
         // fail-closed guard above. In no-RHC builds `__BUILD_DISABLE_RHC__` is `true`, so this
         // branch (and the dynamic `import()` below it) is dead-code-eliminated — the loader and
         // its remote `import(sdk_url)` are tree-shaken out of those bundles entirely rather than
@@ -227,58 +226,33 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
         if (__BUILD_DISABLE_RHC__) {
           return;
         }
-        const { executeProtectCheck } = await import('@clerk/shared/internal/clerk-js/protectCheck');
-        const proofToken = await Promise.race([
-          executeProtectCheck(protectCheck, container, { signal: abortController.signal, setWidgetVisible }),
-          new Promise<never>((_, reject) => {
-            timeoutId = setTimeout(() => {
-              // Stop the (possibly hung) SDK and surface a retryable timeout error.
-              abortController.abort();
-              reject(
-                new ClerkRuntimeError('Protect verification timed out', {
-                  code: ERROR_CODES.PROTECT_CHECK_TIMED_OUT,
-                }),
-              );
-            }, PROTECT_CHECK_SCRIPT_TIMEOUT_MS);
-          }),
-        ]);
+        const { executeProtectCheckWithTimeout, submitProtectCheckProof } =
+          await import('@clerk/shared/internal/clerk-js/protectCheckLifecycle');
+        const proofToken = await executeProtectCheckWithTimeout(protectCheck, container, {
+          signal: abortController.signal,
+          setWidgetVisible,
+        });
         if (cancelled) {
           return;
         }
 
-        let updatedResource: TResource;
-        try {
-          updatedResource = await submitProtectCheck({ proofToken });
-        } catch (err) {
-          if (cancelled) {
-            return;
-          }
-          // `protect_check_already_resolved` is retry-safe: the server's state has already moved
-          // past this gate. Reload to clear the stale local protectCheck, then continue routing on
-          // the refreshed live resource.
-          if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === ERROR_CODES.PROTECT_CHECK_ALREADY_RESOLVED) {
-            await reload();
-            if (isUnmounted()) {
-              return;
-            }
-            await onResolved(getResource(), isUnmounted);
-            return;
-          }
-          throw err;
-        }
-        if (isUnmounted()) {
+        const result = await submitProtectCheckProof({
+          proofToken,
+          submitProtectCheck,
+          reload,
+          getResource,
+          isCancelled: () => cancelled,
+        });
+        if (result.status === 'cancelled' || isUnmounted()) {
           return;
         }
-        await onResolved(updatedResource, isUnmounted);
+        await onResolved(result.resource, isUnmounted);
       } catch (err: any) {
         if (cancelled) {
           return;
         }
         handleError(err, [], card.setError);
       } finally {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
         if (!cancelled) {
           isRunningRef.current = false;
           setIsRunning(false);

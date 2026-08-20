@@ -8,15 +8,18 @@ import { fireEvent, render } from '@/test/utils';
 
 import { SignInProtectCheck } from '../SignInProtectCheck';
 
-vi.mock('@clerk/shared/internal/clerk-js/protectCheck', () => ({
-  executeProtectCheck: vi.fn(),
+// Only the script execution is mocked; `submitProtectCheckProof` stays real so the
+// already-resolved recovery path is exercised end-to-end.
+vi.mock('@clerk/shared/internal/clerk-js/protectCheckLifecycle', async importOriginal => ({
+  ...(await importOriginal<typeof import('@clerk/shared/internal/clerk-js/protectCheckLifecycle')>()),
+  executeProtectCheckWithTimeout: vi.fn(),
 }));
 
-import { executeProtectCheck } from '@clerk/shared/internal/clerk-js/protectCheck';
+import { executeProtectCheckWithTimeout } from '@clerk/shared/internal/clerk-js/protectCheckLifecycle';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
-const mockExecute = executeProtectCheck as unknown as ReturnType<typeof vi.fn>;
+const mockExecute = executeProtectCheckWithTimeout as unknown as ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   mockExecute.mockReset();
