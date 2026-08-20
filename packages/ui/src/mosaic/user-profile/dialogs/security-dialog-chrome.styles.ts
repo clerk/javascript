@@ -58,6 +58,29 @@ export const securityDialogStyles = stylex.create({
   codeInputInvalid: {
     borderColor: colorVars['--cl-color-negative'],
   },
+  countrySelect: {
+    borderColor: colorVars['--cl-color-border'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    paddingBlock: space['2'],
+    paddingInline: space['2'],
+    backgroundColor: colorVars['--cl-color-input'],
+    borderEndEndRadius: 0,
+    borderEndStartRadius: radiusVars['--cl-radius-md'],
+    borderStartEndRadius: 0,
+    borderStartStartRadius: radiusVars['--cl-radius-md'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+  },
+  phoneRow: {
+    display: 'flex',
+    width: '100%',
+  },
+  phoneInput: {
+    flex: '1',
+    borderEndStartRadius: 0,
+    borderStartStartRadius: 0,
+    marginInlineStart: '-1px',
+  },
   muted: {
     color: colorVars['--cl-color-neutral-faded'],
     fontSize: typeScaleVars['--cl-text-sm-size'],

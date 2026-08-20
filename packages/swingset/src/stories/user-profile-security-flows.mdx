@@ -2,8 +2,10 @@ import * as Stories from './user-profile-security-flows.stories';
 
 # Security flows
 
-The password, delete-account, individual-device, and sign-out-all-devices journeys driven by a
-simulated backend that takes time, can fail, and can require a stacked reverification challenge.
+The password, two-factor enrollment and removal, delete-account, individual-device, and
+sign-out-all-devices journeys driven by a simulated backend that takes time, can fail, and can
+require a stacked reverification challenge. Two-factor enrollment is limited to phone number and
+authenticator app; backup codes are disabled for this design.
 
 The failure-point control distinguishes an initial mutation failure from a failed reverification
 attempt and a failure when the original mutation is retried. Reverification-only targets appear
@@ -19,6 +21,7 @@ can replace that harness without changing the dialog views.
   composition={[
     { name: 'Security panel', href: '/user-profile/user-profile-security-panel', layer: 'User Profile' },
     { name: 'Password section', href: '/user-profile/user-profile-password-section', layer: 'User Profile' },
+    { name: '2-step verification', href: '/user-profile/user-profile-mfa-section', layer: 'User Profile' },
     { name: 'Active devices', href: '/user-profile/user-profile-active-devices-section', layer: 'User Profile' },
     { name: 'Danger zone', href: '/user-profile/user-profile-delete-section', layer: 'User Profile' },
     { name: 'Dialog', href: '/components/dialog', layer: 'Components' },

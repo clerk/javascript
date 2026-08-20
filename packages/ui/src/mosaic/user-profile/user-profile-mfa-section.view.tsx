@@ -25,7 +25,7 @@ export interface UserProfileMfaSectionViewProps {
 }
 
 const labels: Record<UserProfileMfaMethod['type'], string> = {
-  sms: 'SMS verification',
+  sms: 'Phone number',
   authenticator: 'Authenticator app',
   'backup-codes': 'Backup codes',
 };

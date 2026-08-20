@@ -10,6 +10,7 @@ import type { StoryMeta } from '@/lib/types';
 
 import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
 import { useDeviceDialogStory } from './helpers/use-device-dialog-story';
+import { useMfaDialogStory } from './helpers/use-mfa-dialog-story';
 import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
 import { useSignOutAllDevicesDialogStory } from './helpers/use-sign-out-all-devices-dialog-story';
 
@@ -36,8 +37,11 @@ export function Default() {
   ]);
   const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>([
     { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
-    { id: 'backup', type: 'backup-codes' },
   ]);
+  const { openAddMfaDialog, openRemoveMfaDialog, mfaDialogs } = useMfaDialogStory({
+    methods: mfaMethods,
+    onChange: setMfaMethods,
+  });
   const [devices, setDevices] = useState<UserProfileDevice[]>([
     {
       id: 'current',
@@ -100,22 +104,7 @@ export function Default() {
         hasPassword
         mfaMethods={mfaMethods}
         passkeys={passkeys}
-        onAddMfaMethod={type =>
-          setMfaMethods(current => {
-            const timestamp = Date.now();
-            return [
-              ...current,
-              {
-                id: `${type}-${timestamp}`,
-                type,
-                description: type === 'sms' ? '+1 801-555-0100' : undefined,
-              },
-              ...(current.some(method => method.type === 'backup-codes')
-                ? []
-                : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
-            ];
-          })
-        }
+        onAddMfaMethod={openAddMfaDialog}
         onAddPasskey={() =>
           setPasskeys(current => [
             ...current,
@@ -126,12 +115,7 @@ export function Default() {
         onDeleteAccount={openDeleteAccountDialog}
         onManageDevice={openDevice}
         onManagePasskey={() => undefined}
-        onRegenerateBackupCodes={() =>
-          setMfaMethods(current =>
-            current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
-          )
-        }
-        onRemoveMfaMethod={id => setMfaMethods(current => current.filter(method => method.id !== id))}
+        onRemoveMfaMethod={openRemoveMfaDialog}
         onRemovePasskey={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
         onSignOutAllOtherDevices={openSignOutAllDevicesDialog}
         onSignOutDevice={openDevice}
@@ -140,6 +124,7 @@ export function Default() {
       {deleteAccountDialog}
       {signOutAllDevicesDialog}
       {deviceDialog}
+      {mfaDialogs}
     </>
   );
 }

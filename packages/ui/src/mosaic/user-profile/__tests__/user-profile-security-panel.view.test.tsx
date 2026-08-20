@@ -104,7 +104,7 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Change password' }));
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(screen.queryByRole('menuitem', { name: 'SMS verification' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Phone number' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
@@ -190,7 +190,7 @@ describe('UserProfileSecurityPanelView', () => {
     });
 
     expect(screen.getByText('Backup codes')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
+    await user.click(screen.getByRole('button', { name: 'Manage Phone number' }));
     expect(screen.queryByRole('menuitem', { name: 'Manage' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
