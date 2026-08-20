@@ -9,6 +9,7 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
+import { useDeviceDialogStory } from './helpers/use-device-dialog-story';
 import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
 import { useSignOutAllDevicesDialogStory } from './helpers/use-sign-out-all-devices-dialog-story';
 
@@ -56,11 +57,41 @@ export function Default() {
       name: 'Clerk App on macOS',
       description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
       type: 'desktop',
+      details: {
+        title: 'Macbook Pro · Chrome',
+        lastActiveAtLabel: 'Last active 4 days ago',
+        deviceName: 'Macbook Pro',
+        browserName: 'Chrome 150.0.0.0',
+        ipAddress: '2600:100e:b10b:787b:e8ae:6e75:fc2f:b10',
+        location: 'Salt Lake City, UT, United States',
+        locationFlag: '🇺🇸',
+        originalSignInAtLabel: 'July 5th, 2026',
+      },
     },
   ]);
   const { openSignOutAllDevicesDialog, signOutAllDevicesDialog } = useSignOutAllDevicesDialogStory({
     onSignOut: () => setDevices(current => current.filter(device => device.isCurrent)),
   });
+  const { openDeviceDialog, deviceDialog } = useDeviceDialogStory({
+    onSignOut: id => setDevices(current => current.filter(device => device.id !== id)),
+  });
+  const openDevice = (id: string) => {
+    const device = devices.find(candidate => candidate.id === id);
+    if (!device) {
+      return;
+    }
+    openDeviceDialog({
+      id,
+      title: device.details?.title ?? device.name,
+      lastActiveAtLabel: device.details?.lastActiveAtLabel ?? device.description ?? 'Active now',
+      deviceName: device.details?.deviceName ?? device.name,
+      browserName: device.details?.browserName ?? 'Unknown',
+      ipAddress: device.details?.ipAddress ?? 'Unknown',
+      location: device.details?.location ?? 'Unknown',
+      locationFlag: device.details?.locationFlag,
+      originalSignInAtLabel: device.details?.originalSignInAtLabel ?? 'Unknown',
+    });
+  };
 
   return (
     <>
@@ -93,7 +124,7 @@ export function Default() {
         }
         onChangePassword={openPasswordDialog}
         onDeleteAccount={openDeleteAccountDialog}
-        onManageDevice={() => undefined}
+        onManageDevice={openDevice}
         onManagePasskey={() => undefined}
         onRegenerateBackupCodes={() =>
           setMfaMethods(current =>
@@ -103,11 +134,12 @@ export function Default() {
         onRemoveMfaMethod={id => setMfaMethods(current => current.filter(method => method.id !== id))}
         onRemovePasskey={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
         onSignOutAllOtherDevices={openSignOutAllDevicesDialog}
-        onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
+        onSignOutDevice={openDevice}
       />
       {passwordDialog}
       {deleteAccountDialog}
       {signOutAllDevicesDialog}
+      {deviceDialog}
     </>
   );
 }

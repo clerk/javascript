@@ -293,3 +293,22 @@ export interface UserProfileSignOutAllDevicesFlowState {
   isSubmitting: boolean;
   errors: FlowErrors;
 }
+
+export interface UserProfileDeviceDetails {
+  id: string;
+  title: string;
+  lastActiveAtLabel: string;
+  deviceName: string;
+  browserName: string;
+  ipAddress: string;
+  location: string;
+  locationFlag?: string;
+  originalSignInAtLabel: string;
+}
+
+export interface UserProfileDeviceDetailsFlowState {
+  step: 'details' | 'confirm';
+  device: UserProfileDeviceDetails;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
