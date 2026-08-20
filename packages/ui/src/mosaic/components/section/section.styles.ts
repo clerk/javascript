@@ -54,14 +54,9 @@ export const styles = stylex.create({
     width: 'auto',
   },
   items: {
-    backgroundColor: colorVars['--cl-color-border'],
-    borderBlockStartColor: colorVars['--cl-color-border'],
-    borderBlockStartStyle: 'solid',
-    borderBlockStartWidth: '1px',
     display: 'flex',
     flexDirection: 'column',
     marginBlockStart: space['3'],
-    rowGap: '1px',
     width: '100%',
   },
   item: {
@@ -70,9 +65,11 @@ export const styles = stylex.create({
       [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: space['4'],
     },
     alignItems: 'center',
-    backgroundColor: {
-      default: null,
-      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: colorVars['--cl-color-card'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: {
+      default: '0px',
+      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: '1px',
     },
     columnGap: space['3'],
     display: 'flex',
