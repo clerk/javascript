@@ -111,7 +111,6 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
  * In non-staging mode, sets the production PK/SK and returns.
  */
 async function withInstanceKeys(keyName: string, env: EnvironmentConfig): Promise<EnvironmentConfig> {
-  env.setInstanceKeyName(keyName);
   const configPath = resolve(import.meta.dirname, '..', 'configs', `${keyName}.js`);
   const keys =
     process.env.E2E_STAGING !== '1' && (await fs.pathExists(configPath)) && constants.CLERK_PLATFORM_API_KEY

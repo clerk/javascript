@@ -140,11 +140,6 @@ export const createLongRunningApps = () => {
         const availableIds = stagingReadyConfigs.map(c => `\n- ${c.id}`).join('');
         throw new Error(`Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`);
       }
-      res.forEach(app => {
-        console.log(
-          `>>instance-key-usage event=getByPattern keyName=${app.env.instanceKeyName || 'none'} envId=${app.env.id || 'none'} appId=${app.id}`,
-        );
-      });
       return [...res] as any as LongRunningApplication[];
     },
   };
