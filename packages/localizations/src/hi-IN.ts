@@ -105,8 +105,11 @@ export const hiIN: LocalizationResource = {
       'आप मासिक भुगतान करके इस योजना की सदस्यता नहीं ले सकते। इस योजना की सदस्यता लेने के लिए, आपको वार्षिक भुगतान करना चुनना होगा।',
     cannotSubscribeUnrecoverable: 'आप इस योजना की सदस्यता नहीं ले सकते। आपकी मौजूदा सदस्यता इस योजना से अधिक महंगी है।',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'आपका भुगतान सफल रहा।',
       description__subscriptionSuccessful: 'आपकी नई सदस्यता पूरी तरह तैयार है।',
+      discount: undefined,
       downgradeNotice:
         'बिलिंग चक्र के अंत तक आप अपनी मौजूदा सदस्यता और उसकी सुविधाएँ रखेंगे, फिर आपको इस सदस्यता पर स्विच कर दिया जाएगा।',
       emailForm: {
@@ -122,6 +125,8 @@ export const hiIN: LocalizationResource = {
       },
       pastDueNotice: 'आपकी पिछली सदस्यता बकाया थी, बिना किसी भुगतान के।',
       perMonth: 'प्रति माह',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'चेकआउट',
       title__paymentSuccessful: 'भुगतान सफल रहा!',
       title__subscriptionSuccessful: 'सफल!',
@@ -132,6 +137,9 @@ export const hiIN: LocalizationResource = {
     credit: 'क्रेडिट',
     creditRemainder: 'आपकी मौजूदा सदस्यता की शेष अवधि के लिए क्रेडिट।',
     defaultFreePlanActive: 'आप वर्तमान में निःशुल्क योजना पर हैं',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'मुफ्त',
     getStarted: 'शुरू करें',
     highlightedPlanBadge: 'लोकप्रिय',
@@ -143,6 +151,7 @@ export const hiIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'मासिक',
+    months: undefined,
     pastDue: 'बकाया',
     pay: '{{amount}} भुगतान करें',
     payerCreditRemainder: undefined,
@@ -221,6 +230,7 @@ export const hiIN: LocalizationResource = {
     year: 'वर्ष',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1767,6 +1777,7 @@ export const hiIN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'आपके द्वारा दर्ज किया गया पासवर्ड गलत है। कृपया पुनः प्रयास करें।',
     form_password_length_too_short: 'आपका पासवर्ड बहुत छोटा है। इसमें कम से कम 8 अक्षर होने चाहिए।',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'आपका पासवर्ड पर्याप्त मजबूत नहीं है।',
     form_password_or_identifier_incorrect:
       'पासवर्ड या ईमेल पता गलत है। कृपया पुनः प्रयास करें या किसी अन्य विधि का उपयोग करें।',

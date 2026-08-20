@@ -168,14 +168,14 @@ it out of view.
 
 ## Parts
 
-| Part                  | Slot            | Description                                                                         |
-| --------------------- | --------------- | ----------------------------------------------------------------------------------- |
-| `Popover.Root`        | —               | State provider; owns open/close, `placement`, `sideOffset`, `alignOffset`, `modal`. |
-| `Popover.Trigger`     | —               | Anchor element; renders a `<button>` and accepts a `render` prop.                   |
-| `Popover.Popup`       | `popover-popup` | The floating box; owns `size`, viewport clamps, and the enter/exit run.             |
-| `Popover.Close`       | —               | Dismisses the popover; accepts a `render` prop.                                     |
-| `Popover.Title`       | —               | Heading; wired to the popup's `aria-labelledby`.                                    |
-| `Popover.Description` | —               | Description; wired to the popup's `aria-describedby`.                               |
+| Part                  | Slot              | Description                                                                         |
+| --------------------- | ----------------- | ----------------------------------------------------------------------------------- |
+| `Popover.Root`        | —                 | State provider; owns open/close, `placement`, `sideOffset`, `alignOffset`, `modal`. |
+| `Popover.Trigger`     | `popover-trigger` | Anchor element; renders a `<button>` and accepts a `render` prop.                   |
+| `Popover.Popup`       | `popover-popup`   | The floating box; owns `size`, viewport clamps, and the enter/exit run.             |
+| `Popover.Close`       | —                 | Dismisses the popover; accepts a `render` prop.                                     |
+| `Popover.Title`       | —                 | Heading; wired to the popup's `aria-labelledby`.                                    |
+| `Popover.Description` | —                 | Description; wired to the popup's `aria-describedby`.                               |
 
 `Popover.Popup` renders the portal and the floating positioner internally. The positioner carries
 the `popover-positioner` slot and is the `role="dialog"` element, which is why the popup's
@@ -186,7 +186,7 @@ them through your own typography (`Heading`, `Text`) inside the surface.
 
 ## Styling
 
-Unlike the slot-recipe components, the Mosaic popover is themed with **StyleX**. Each styled part
+The Mosaic popover is themed with **StyleX**. Each styled part
 carries a stable `.cl-<slot>` class (the slots in the table above) alongside the StyleX atoms.
 Consumers never target the hashed atomic classes — override by targeting the `.cl-*` slot from a
 CSS layer that wins over `@clerk/ui/styles.css`:

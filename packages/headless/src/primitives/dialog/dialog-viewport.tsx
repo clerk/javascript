@@ -23,9 +23,9 @@ export interface DialogViewportProps extends ComponentProps<'div'> {
 export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportProps>(
   function DialogViewport(props, ref) {
     const { render, lockScroll = true, ...otherProps } = props;
-    const { open, mounted, transitionProps, modal } = useDialogContext();
+    const { open, mounted, isNested, transitionProps, modal } = useDialogContext();
 
-    const state = { open };
+    const state = { open, nested: isNested };
 
     const defaultProps = {
       ...transitionProps,
@@ -40,6 +40,7 @@ export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportPro
       state,
       stateAttributesMapping: {
         open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
+        nested: (v: boolean): Record<string, string> | null => (v ? { 'data-nested': '' } : null),
       },
       props: mergeProps<'div'>(defaultProps, otherProps),
     });

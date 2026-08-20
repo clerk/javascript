@@ -1,5 +1,66 @@
 # Change Log
 
+## 3.16.9
+
+### Patch Changes
+
+- Reject JWT-template tokens where a session or handshake token is expected. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token in the `Authorization` header or `__session` cookie. Tokens with no category tag, and instances configured to omit it, are unaffected. ([#9469](https://github.com/clerk/javascript/pull/9469)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.16.8
+
+### Patch Changes
+
+- Scope the JWKS cache per Clerk instance. The cache was keyed on the JWT `kid` alone and shared across the whole process, so an application verifying tokens for more than one Clerk instance (for example the Dynamic Keys / multi-tenant pattern) could resolve a signing key that was fetched for a different instance. Keys are now cached separately per secret key and API URL, so a token can only be verified against the instance whose credentials fetched its signing key. ([#9394](https://github.com/clerk/javascript/pull/9394)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+  Networkless verification with `jwtKey` had the same flaw: the JWK derived from the PEM was cached by `kid` alone, so a process verifying tokens with different `jwtKey` values could resolve a key derived from another instance's PEM. The JWK is now always derived from the `jwtKey` that was passed in.
+
+  The `jwk-kid-mismatch` error message no longer lists the key IDs currently held in the cache.
+
+## 3.16.7
+
+### Patch Changes
+
+- Fix `Cookie` header parsing in `authenticateRequest()` to follow RFC 6265 and guard against a non-string `iss`. Legitimate cookies and JWTs are unaffected. ([#9466](https://github.com/clerk/javascript/pull/9466)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+
+## 3.16.6
+
+### Patch Changes
+
+- Updated dependencies [[`7f5c294`](https://github.com/clerk/javascript/commit/7f5c2947e2b3b2ac9677116ff7eede61a1dab649)]:
+  - @clerk/shared@4.29.1
+
+## 3.16.5
+
+### Patch Changes
+
+- Billing applied-discount snapshots now include optional `durationInCycles`. Payment attempt and statement UIs use the original discount length instead of cycles remaining, and omit the duration copy when it is unavailable. ([#9401](https://github.com/clerk/javascript/pull/9401)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Updated dependencies [[`81840b3`](https://github.com/clerk/javascript/commit/81840b3b28bf89fdd6afcc155a84bc641dcd3b69), [`b7fb564`](https://github.com/clerk/javascript/commit/b7fb56455a657b209c0bb292bf05145e6dcde790), [`44edcc9`](https://github.com/clerk/javascript/commit/44edcc961664e83b8ff7d3c946b880fbb5a7d897)]:
+  - @clerk/shared@4.29.0
+
+## 3.16.4
+
+### Patch Changes
+
+- Update the `lockUser()` documentation to link to the current Rules page in the Clerk Dashboard. ([#9372](https://github.com/clerk/javascript/pull/9372)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 3.16.3
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/shared@4.28.1
+
+## 3.16.2
+
+### Patch Changes
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/shared@4.28.0
+
 ## 3.16.1
 
 ### Patch Changes

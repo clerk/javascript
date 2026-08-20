@@ -106,8 +106,11 @@ export const nbNO: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Du kan ikke abonnere på denne planen. Ditt eksisterende abonnement er dyrere enn denne planen.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Betalingen din var vellykket.',
       description__subscriptionSuccessful: 'Ditt nye abonnement er klart.',
+      discount: undefined,
       downgradeNotice:
         'Du beholder ditt nåværende abonnement og dets funksjoner til slutten av faktureringsperioden, deretter byttes du til dette abonnementet.',
       emailForm: {
@@ -123,6 +126,8 @@ export const nbNO: LocalizationResource = {
       },
       pastDueNotice: 'Ditt forrige abonnement var forfalt, uten betaling.',
       perMonth: 'per måned',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Kasse',
       title__paymentSuccessful: 'Betalingen var vellykket!',
       title__subscriptionSuccessful: 'Fullført!',
@@ -133,6 +138,9 @@ export const nbNO: LocalizationResource = {
     credit: 'Kreditt',
     creditRemainder: 'Kreditt for gjenstående del av ditt nåværende abonnement.',
     defaultFreePlanActive: 'Du er på gratis-planen',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratis',
     getStarted: 'Kom i gang',
     highlightedPlanBadge: 'Populær',
@@ -144,6 +152,7 @@ export const nbNO: LocalizationResource = {
     monthAbbreviation: 'mnd',
     monthPerUnit: 'Måned per {{unitName}}',
     monthly: 'Månedlig',
+    months: undefined,
     pastDue: 'Forfalt',
     pay: 'Betal {{amount}}',
     payerCreditRemainder: 'Kreditt fra kontosaldo.',
@@ -222,6 +231,7 @@ export const nbNO: LocalizationResource = {
     year: 'År',
     yearAbbreviation: 'år',
     yearPerUnit: 'År per {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1771,6 +1781,7 @@ export const nbNO: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Passordet ditt er for kort. Det må være minst 8 tegn langt.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
     form_password_or_identifier_incorrect:
       'Passordet eller e-postadressen er feil. Prøv igjen eller bruk en annen metode.',

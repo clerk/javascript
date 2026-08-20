@@ -105,8 +105,11 @@ export const caES: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       "No pots subscriure't a aquest pla. La teva subscripció actual és més cara que aquest pla.",
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: "El teu pagament s'ha realitzat correctament.",
       description__subscriptionSuccessful: 'La teva nova subscripció està a punt.',
+      discount: undefined,
       downgradeNotice:
         'Mantindràs la teva subscripció actual i les seves funcions fins al final del cicle de facturació; després es canviarà a aquesta subscripció.',
       emailForm: {
@@ -123,6 +126,8 @@ export const caES: LocalizationResource = {
       },
       pastDueNotice: 'La teva subscripció anterior tenia un pagament pendent.',
       perMonth: 'al mes',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pagament',
       title__paymentSuccessful: 'Pagament realitzat amb èxit!',
       title__subscriptionSuccessful: 'Tot a punt!',
@@ -133,6 +138,9 @@ export const caES: LocalizationResource = {
     credit: 'Crèdit',
     creditRemainder: 'Crèdit pel temps restant de la teva subscripció actual.',
     defaultFreePlanActive: 'Estàs al pla gratuït',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuït',
     getStarted: 'Comença',
     highlightedPlanBadge: 'Popular',
@@ -144,6 +152,7 @@ export const caES: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensual',
+    months: undefined,
     pastDue: 'Pagament pendent',
     pay: 'Paga {{amount}}',
     payerCreditRemainder: undefined,
@@ -222,6 +231,7 @@ export const caES: LocalizationResource = {
     year: 'Any',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1759,6 +1769,7 @@ export const caES: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'La contrasenya introduïda és incorrecta.',
     form_password_length_too_short: 'La teva contrasenya ha de tenir almenys 8 caràcters.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'La teva contrasenya no és prou forta.',
     form_password_or_identifier_incorrect:
       "La contrasenya o l'identificador és incorrecte. Torna-ho a intentar o utilitza un altre mètode.",

@@ -104,8 +104,11 @@ export const ptBR: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Você não pode assinar este plano. Sua assinatura existente é mais cara que este plano.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Seu pagamento foi realizado com sucesso.',
       description__subscriptionSuccessful: 'Sua nova assinatura está pronta.',
+      discount: undefined,
       downgradeNotice:
         'Você manterá sua assinatura atual e seus recursos até o final do ciclo de faturamento, após o qual você será transferido para este plano.',
       emailForm: {
@@ -122,6 +125,8 @@ export const ptBR: LocalizationResource = {
       },
       pastDueNotice: 'Sua assinatura anterior estava em atraso, sem pagamento.',
       perMonth: 'por mês',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Checkout',
       title__paymentSuccessful: 'Pagamento realizado com sucesso!',
       title__subscriptionSuccessful: 'Sucesso!',
@@ -132,6 +137,9 @@ export const ptBR: LocalizationResource = {
     credit: 'Crédito',
     creditRemainder: 'Crédito para o restante da sua assinatura atual.',
     defaultFreePlanActive: 'Você está atualmente no plano Gratuito',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuito',
     getStarted: 'Começar',
     highlightedPlanBadge: 'Popular',
@@ -143,6 +151,7 @@ export const ptBR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensal',
+    months: undefined,
     pastDue: 'Atrasado',
     pay: 'Pagar {{amount}}',
     payerCreditRemainder: undefined,
@@ -221,6 +230,7 @@ export const ptBR: LocalizationResource = {
     year: 'Ano',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1764,6 +1774,7 @@ export const ptBR: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Senha incorreta.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
     form_password_or_identifier_incorrect:
       'A senha ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',

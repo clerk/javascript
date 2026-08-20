@@ -1,5 +1,76 @@
 # @clerk/tanstack-react-start
 
+## 1.5.5
+
+### Patch Changes
+
+- Updated dependencies [[`10615ea`](https://github.com/clerk/javascript/commit/10615eac545d855c5f83c90b38579d04d36c9b1d)]:
+  - @clerk/backend@3.16.9
+  - @clerk/react@6.14.4
+
+## 1.5.4
+
+### Patch Changes
+
+- Updated dependencies [[`4ebcff3`](https://github.com/clerk/javascript/commit/4ebcff39c7a9ba532307e50b8ab673637d9f7540)]:
+  - @clerk/backend@3.16.8
+
+## 1.5.3
+
+### Patch Changes
+
+- Updated dependencies [[`daae528`](https://github.com/clerk/javascript/commit/daae5281dc3babb3e4f93ff05861736c3b784d0e), [`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/backend@3.16.7
+  - @clerk/shared@4.29.2
+  - @clerk/react@6.14.4
+
+## 1.5.2
+
+### Patch Changes
+
+- Updated dependencies [[`7f5c294`](https://github.com/clerk/javascript/commit/7f5c2947e2b3b2ac9677116ff7eede61a1dab649)]:
+  - @clerk/shared@4.29.1
+  - @clerk/backend@3.16.6
+  - @clerk/react@6.14.3
+
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`81840b3`](https://github.com/clerk/javascript/commit/81840b3b28bf89fdd6afcc155a84bc641dcd3b69), [`b7fb564`](https://github.com/clerk/javascript/commit/b7fb56455a657b209c0bb292bf05145e6dcde790), [`44edcc9`](https://github.com/clerk/javascript/commit/44edcc961664e83b8ff7d3c946b880fbb5a7d897)]:
+  - @clerk/shared@4.29.0
+  - @clerk/backend@3.16.5
+  - @clerk/react@6.14.2
+
+## 1.5.0
+
+### Minor Changes
+
+- Raise the minimum supported peer dependencies to `@tanstack/react-start@^1.167.17` and `@tanstack/react-router@^1.168.10`. TanStack Start 1.167.17 ensures request middleware context, such as the `auth` value provided by `clerkMiddleware()`, cannot be overridden by client-provided context in server function execution paths ([TanStack/router#7135](https://github.com/TanStack/router/pull/7135)). ([#9362](https://github.com/clerk/javascript/pull/9362)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`167204b`](https://github.com/clerk/javascript/commit/167204b8b810a302364883a1aa048233a0216be8)]:
+  - @clerk/backend@3.16.4
+
+## 1.4.31
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/shared@4.28.1
+  - @clerk/backend@3.16.3
+  - @clerk/react@6.14.1
+
+## 1.4.30
+
+### Patch Changes
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/shared@4.28.0
+  - @clerk/react@6.14.0
+  - @clerk/backend@3.16.2
+
 ## 1.4.29
 
 ### Patch Changes

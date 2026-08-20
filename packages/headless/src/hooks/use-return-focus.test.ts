@@ -1,10 +1,10 @@
-import type { FloatingEvents } from '@floating-ui/react';
+import type { FloatingEvents, OpenChangeReason } from '@floating-ui/react';
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { useReturnFocus } from './use-return-focus';
 
-function createEvents(): FloatingEvents & { close: (event?: Event) => void } {
+function createEvents(): FloatingEvents & { close: (event?: Event, reason?: OpenChangeReason) => void } {
   const handlers = new Map<string, Array<(data: unknown) => void>>();
 
   return {
@@ -20,8 +20,8 @@ function createEvents(): FloatingEvents & { close: (event?: Event) => void } {
         (handlers.get(event) ?? []).filter(h => h !== handler),
       );
     },
-    close(event) {
-      this.emit('openchange', { open: false, event });
+    close(event, reason) {
+      this.emit('openchange', { open: false, event, reason });
     },
   };
 }
@@ -60,7 +60,17 @@ describe('useReturnFocus', () => {
     const { events, result, open } = renderReturnFocus(trigger);
     open(true);
 
-    events.close(new KeyboardEvent('keydown', { key: 'Escape' }));
+    events.close(new KeyboardEvent('keydown', { key: 'Escape' }), 'escape-key');
+
+    expect(result.current.current).toBe(trigger);
+  });
+
+  it('keeps the trigger when a forwarded event carries no dismissal reason', () => {
+    const { events, result, open } = renderReturnFocus(trigger);
+    open(true);
+
+    // A Close button forwards its click through `setOpen` with no floating-ui reason.
+    events.close(new MouseEvent('click', { detail: 1 }));
 
     expect(result.current.current).toBe(trigger);
   });
@@ -76,11 +86,11 @@ describe('useReturnFocus', () => {
     expect(result.current.current).toBe(trigger);
   });
 
-  it('leaves focus alone when the close came from a pointer', () => {
+  it('leaves focus alone when the close came from a pointer dismissal', () => {
     const { events, result, open } = renderReturnFocus(trigger);
     open(true);
 
-    events.close(new MouseEvent('mousedown', { detail: 1 }));
+    events.close(new MouseEvent('mousedown', { detail: 1 }), 'outside-press');
 
     expect(result.current.current).toBeNull();
   });
@@ -88,7 +98,7 @@ describe('useReturnFocus', () => {
   it('restores the trigger on the next open', () => {
     const { events, result, open } = renderReturnFocus(trigger);
     open(true);
-    events.close(new MouseEvent('mousedown', { detail: 1 }));
+    events.close(new MouseEvent('mousedown', { detail: 1 }), 'outside-press');
 
     open(false);
     open(true);

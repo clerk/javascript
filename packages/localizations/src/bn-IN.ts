@@ -105,8 +105,11 @@ export const bnIN: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'আপনি এই প্ল্যানে সাবস্ক্রাইব করতে পারবেন না। আপনার বিদ্যমান সাবস্ক্রিপশন এই প্ল্যানের চেয়ে বেশি ব্যয়বহুল।',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'আপনার পেমেন্ট সফল হয়েছে।',
       description__subscriptionSuccessful: 'আপনার নতুন সাবস্ক্রিপশন সম্পূর্ণ প্রস্তুত।',
+      discount: undefined,
       downgradeNotice:
         'বিলিং চক্রের শেষ পর্যন্ত আপনি আপনার বর্তমান সাবস্ক্রিপশন এবং এর বৈশিষ্ট্যগুলি রাখবেন, তারপরে আপনাকে এই সাবস্ক্রিপশনে স্যুইচ করা হবে।',
       emailForm: {
@@ -122,6 +125,8 @@ export const bnIN: LocalizationResource = {
       },
       pastDueNotice: 'আপনার পূর্ববর্তী সাবস্ক্রিপশন বকেয়া ছিল, কোনো পেমেন্ট ছাড়াই।',
       perMonth: 'প্রতি মাসে',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'চেকআউট',
       title__paymentSuccessful: 'পেমেন্ট সফল হয়েছে!',
       title__subscriptionSuccessful: 'সফল!',
@@ -132,6 +137,9 @@ export const bnIN: LocalizationResource = {
     credit: 'ক্রেডিট',
     creditRemainder: 'আপনার বর্তমান সাবস্ক্রিপশনের অবশিষ্ট সময়ের জন্য ক্রেডিট।',
     defaultFreePlanActive: 'আপনি বর্তমানে বিনামূল্যের প্ল্যানে আছেন',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'বিনামূল্যে',
     getStarted: 'শুরু করুন',
     highlightedPlanBadge: 'জনপ্রিয়',
@@ -143,6 +151,7 @@ export const bnIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'মাসিক',
+    months: undefined,
     pastDue: 'বকেয়া',
     pay: '{{amount}} পরিশোধ করুন',
     payerCreditRemainder: undefined,
@@ -221,6 +230,7 @@ export const bnIN: LocalizationResource = {
     year: 'বছর',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1768,6 +1778,7 @@ export const bnIN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'আপনার পাসওয়ার্ড যথেষ্ট শক্তিশালী নয়।',
     form_password_or_identifier_incorrect:
       'পাসওয়ার্ড বা ইমেইল ঠিকানা ভুল। আবার চেষ্টা করুন বা অন্য পদ্ধতি ব্যবহার করুন।',

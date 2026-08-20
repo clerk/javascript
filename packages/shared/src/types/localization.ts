@@ -186,9 +186,11 @@ export type __internal_LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   billing: {
     month: LocalizationValue;
+    months: LocalizationValue;
     monthAbbreviation: LocalizationValue;
     monthPerUnit: LocalizationValue<'unitName'>;
     year: LocalizationValue;
+    years: LocalizationValue;
     yearAbbreviation: LocalizationValue;
     yearPerUnit: LocalizationValue<'unitName'>;
     free: LocalizationValue;
@@ -223,6 +225,9 @@ export type __internal_LocalizationResource = {
     alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
+    discountAmount: LocalizationValue<'amount'>;
+    discountCyclesRemaining: LocalizationValue<'cycles' | 'period'>;
+    discountDuration: LocalizationValue<'amount' | 'cycles' | 'period'>;
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
     viewPayment: LocalizationValue;
@@ -298,6 +303,11 @@ export type __internal_LocalizationResource = {
       };
     };
     checkout: {
+      addPromoCode: LocalizationValue;
+      applyPromoCode: LocalizationValue;
+      discount: LocalizationValue;
+      promoCodePlaceholder: LocalizationValue;
+      removePromoCode: LocalizationValue;
       title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
@@ -2157,6 +2167,7 @@ type UnstableErrors = WithParamName<{
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
   form_new_password_matches_current: LocalizationValue;
+  form_password_matches_identifier: LocalizationValue;
   /** @deprecated Use `form_password_compromised__sign_in` instead */
   form_password_untrusted__sign_in: LocalizationValue;
   form_password_compromised__sign_in: LocalizationValue;

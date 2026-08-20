@@ -105,8 +105,11 @@ export const deDE: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Sie können diesen Plan nicht abonnieren. Ihr vorhandenes Abonnement ist teurer als dieser Plan.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Ihre Bezahlung war erfolgreich.',
       description__subscriptionSuccessful: 'Ihr Abonnement wurde erfolgreich aktiviert.',
+      discount: undefined,
       downgradeNotice:
         'Sie behalten Ihr aktuelles Abonnement bis zum Ende des Abrechnungszeitraums. So lange können Sie weiterhin alle Funktionen nutzen, danach werden Sie auf dieses Abonnement umgestellt.',
       emailForm: {
@@ -122,6 +125,8 @@ export const deDE: LocalizationResource = {
       },
       pastDueNotice: 'Ihr vorheriges Abonnement war überfällig, ohne Zahlung.',
       perMonth: 'pro Monat',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Bezahlung',
       title__paymentSuccessful: 'Zahlung erfolgreich!',
       title__subscriptionSuccessful: 'Geschafft!',
@@ -132,6 +137,9 @@ export const deDE: LocalizationResource = {
     credit: 'Guthaben',
     creditRemainder: 'Verbleibendes Guthaben für den restlichen Abrechnungszeitraum.',
     defaultFreePlanActive: 'Sie nutzen aktuell den kostenlosen Plan.',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Kostenlos',
     getStarted: 'Jetzt starten',
     highlightedPlanBadge: 'Beliebt',
@@ -143,6 +151,7 @@ export const deDE: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Monatlich',
+    months: undefined,
     pastDue: 'Überfällig',
     pay: '{{amount}} bezahlen',
     payerCreditRemainder: undefined,
@@ -221,6 +230,7 @@ export const deDE: LocalizationResource = {
     year: 'Jahr',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1769,6 +1779,7 @@ export const deDE: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Passwort nicht stark genug.',
     form_password_or_identifier_incorrect:
       'Passwort oder E-Mail-Adresse ist falsch. Versuchen Sie es erneut oder verwenden Sie eine andere Methode.',

@@ -100,8 +100,11 @@ export const kkKZ: LocalizationResource = {
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Сіздің жаңа жазылымыңыз дайын.',
       description__subscriptionSuccessful: 'Сіздің жаңа жазылымыңыз дайын.',
+      discount: undefined,
       downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
@@ -116,6 +119,8 @@ export const kkKZ: LocalizationResource = {
       },
       pastDueNotice: undefined,
       perMonth: undefined,
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: undefined,
       title__paymentSuccessful: 'Төлем сәтті аяқталды!',
       title__subscriptionSuccessful: 'Сәтті!',
@@ -126,6 +131,9 @@ export const kkKZ: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Тегін',
     getStarted: 'Бастау',
     highlightedPlanBadge: undefined,
@@ -137,6 +145,7 @@ export const kkKZ: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -215,6 +224,7 @@ export const kkKZ: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1739,6 +1749,7 @@ export const kkKZ: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Құпия сөз қате.',
     form_password_length_too_short: 'Құпия сөз тым қысқа. Кемінде 8 таңба болуы керек.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Құпия сөз әлсіз.',
     form_password_or_identifier_incorrect:
       'Құпия сөз немесе электрондық пошта мекенжайы дұрыс емес. Қайталап көріңіз немесе басқа әдісті пайдаланыңыз.',
