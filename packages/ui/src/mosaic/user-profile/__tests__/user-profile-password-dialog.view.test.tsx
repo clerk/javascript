@@ -129,4 +129,22 @@ describe('UserProfilePasswordDialogView', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
   });
+
+  it('renders enterprise-managed passwords as read-only', () => {
+    render(
+      <MosaicProvider>
+        <UserProfilePasswordDialogView
+          open
+          state={{ mode: 'change', values: emptyValues, isReadOnly: true, isSubmitting: false, errors: {} }}
+          canSubmit
+          onValueChange={vi.fn()}
+          onSubmit={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByText('Your password is managed by your enterprise connection.')).toBeInTheDocument();
+    expect(screen.getByLabelText('New password')).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
+  });
 });

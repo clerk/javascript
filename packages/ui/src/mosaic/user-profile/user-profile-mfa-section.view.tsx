@@ -12,12 +12,14 @@ export interface UserProfileMfaMethod {
   type: 'sms' | 'authenticator' | 'backup-codes';
   label?: string;
   description?: string;
+  removable?: boolean;
 }
 
 export type UserProfileMfaAddableMethod = Extract<UserProfileMfaMethod['type'], 'sms' | 'authenticator'>;
 
 export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];
+  addableMethods?: UserProfileMfaAddableMethod[];
   sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
@@ -30,16 +32,19 @@ const labels: Record<UserProfileMfaMethod['type'], string> = {
   'backup-codes': 'Backup codes',
 };
 
-const addableMethods: UserProfileMfaAddableMethod[] = ['sms', 'authenticator'];
+const defaultAddableMethods: UserProfileMfaAddableMethod[] = ['sms', 'authenticator'];
 
 export function UserProfileMfaSectionView({
   methods,
+  addableMethods = defaultAddableMethods,
   sectionTitle,
   onAdd,
   onRegenerateBackupCodes,
   onRemove,
 }: UserProfileMfaSectionViewProps) {
-  const availableMethods = addableMethods.filter(type => !methods.some(method => method.type === type));
+  const availableMethods = addableMethods.filter(
+    type => type === 'sms' || !methods.some(method => method.type === type),
+  );
   const hasConfiguredMethod = methods.some(method => method.type === 'sms' || method.type === 'authenticator');
   const visibleMethods = methods.filter(method => method.type !== 'backup-codes' || hasConfiguredMethod);
 
@@ -95,7 +100,7 @@ export function UserProfileMfaSectionView({
               onClick: onRegenerateBackupCodes,
             });
           }
-        } else if (onRemove) {
+        } else if (onRemove && method.removable !== false) {
           actions.push({ label: 'Remove method', color: 'negative', onClick: () => onRemove(method.id) });
         }
 

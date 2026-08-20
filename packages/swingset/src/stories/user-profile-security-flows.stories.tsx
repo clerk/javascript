@@ -198,10 +198,25 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
             }
           }}
           onCodeChange={flow.updateMfaCode}
+          onAddPhone={flow.addNewMfaPhone}
+          onSelectPhone={flow.selectMfaPhone}
           onPhoneNumberChange={flow.updateMfaPhoneNumber}
           onResend={() => void flow.resendMfaCode()}
           onSubmit={code => void flow.submitAddMfa(code)}
           onToggleDisplayFormat={flow.toggleMfaDisplayFormat}
+          onCopyBackupCodes={() => {
+            if (flow.addMfa?.step === 'backup-codes') {
+              void navigator.clipboard?.writeText(flow.addMfa.codes.join('\n'));
+              flow.markMfaBackupCodesCopied();
+            }
+          }}
+          onDownloadBackupCodes={() => {
+            if (flow.addMfa?.step === 'backup-codes') {
+              downloadBackupCodes(flow.addMfa.codes);
+            }
+          }}
+          onPrintBackupCodes={() => window.print()}
+          onFinish={flow.finishAddMfa}
           verificationDialog={verificationDialog('add-mfa')}
         />
       ) : null}
@@ -408,6 +423,15 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         />
         <span style={controlName}>Password already set</span>
       </label>
+      <label style={{ ...controlLabel, opacity: config.passwordAvailable ? 1 : 0.5 }}>
+        <input
+          checked={config.passwordReadOnly}
+          disabled={!config.passwordAvailable}
+          type='checkbox'
+          onChange={event => onChange({ ...config, passwordReadOnly: event.target.checked })}
+        />
+        <span style={controlName}>Enterprise-managed password</span>
+      </label>
       <label style={controlLabel}>
         <input
           checked={config.passkeysAvailable}
@@ -443,6 +467,31 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
           }
         />
         <span style={controlName}>Passkey already added</span>
+      </label>
+      <label style={{ ...controlLabel, opacity: config.passkeysAvailable ? 1 : 0.5 }}>
+        <input
+          checked={config.passkeyCreationAvailable}
+          disabled={!config.passkeysAvailable}
+          type='checkbox'
+          onChange={event => onChange({ ...config, passkeyCreationAvailable: event.target.checked })}
+        />
+        <span style={controlName}>Passkey creation available</span>
+      </label>
+      <label style={controlLabel}>
+        <input
+          checked={config.mfaPhoneAvailable}
+          type='checkbox'
+          onChange={event => onChange({ ...config, mfaPhoneAvailable: event.target.checked })}
+        />
+        <span style={controlName}>Phone verification available</span>
+      </label>
+      <label style={controlLabel}>
+        <input
+          checked={config.mfaAuthenticatorAvailable}
+          type='checkbox'
+          onChange={event => onChange({ ...config, mfaAuthenticatorAvailable: event.target.checked })}
+        />
+        <span style={controlName}>Authenticator app available</span>
       </label>
       <label style={controlLabel}>
         <input
@@ -484,10 +533,34 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         />
         <span style={controlName}>Authenticator app</span>
       </label>
+      <RadioGroup
+        legend='Available phone to enroll'
+        options={['none', 'verified', 'unverified'] as const}
+        value={config.availableMfaPhone}
+        onChange={availableMfaPhone => onChange({ ...config, availableMfaPhone })}
+      />
+      <label style={controlLabel}>
+        <input
+          checked={config.backupCodesAvailable}
+          type='checkbox'
+          onChange={event =>
+            onChange({
+              ...config,
+              backupCodesAvailable: event.target.checked,
+              hasBackupCodes: event.target.checked ? config.hasBackupCodes : false,
+              reverificationStrategy:
+                !event.target.checked && config.reverificationStrategy === 'backup_code'
+                  ? 'email_code'
+                  : config.reverificationStrategy,
+            })
+          }
+        />
+        <span style={controlName}>Instance generates backup codes</span>
+      </label>
       <label style={{ ...controlLabel, opacity: config.hasMfaPhone || config.hasMfaAuthenticator ? 1 : 0.5 }}>
         <input
           checked={config.hasBackupCodes}
-          disabled={!config.hasMfaPhone && !config.hasMfaAuthenticator}
+          disabled={!config.backupCodesAvailable || (!config.hasMfaPhone && !config.hasMfaAuthenticator)}
           type='checkbox'
           onChange={event =>
             onChange({
@@ -501,6 +574,22 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
           }
         />
         <span style={controlName}>Backup codes exist</span>
+      </label>
+      <label style={controlLabel}>
+        <input
+          checked={config.mfaRequired}
+          type='checkbox'
+          onChange={event => onChange({ ...config, mfaRequired: event.target.checked })}
+        />
+        <span style={controlName}>Two-step verification required</span>
+      </label>
+      <label style={controlLabel}>
+        <input
+          checked={config.deleteAccountAvailable}
+          type='checkbox'
+          onChange={event => onChange({ ...config, deleteAccountAvailable: event.target.checked })}
+        />
+        <span style={controlName}>Self-service account deletion</span>
       </label>
       <label style={controlLabel}>
         <input
@@ -551,6 +640,7 @@ export function Default() {
     initialDevices: INITIAL_DEVICES,
     onHasPasswordChange: hasPassword => setConfig(current => ({ ...current, hasPassword })),
     onHasPasskeyChange: hasPasskey => setConfig(current => ({ ...current, hasPasskey })),
+    onBackupCodesChange: hasBackupCodes => setConfig(current => ({ ...current, hasBackupCodes })),
     onMfaMethodChange: (method, enabled) =>
       setConfig(current => {
         const hasMfaPhone = method === 'sms' ? enabled : current.hasMfaPhone;
@@ -580,12 +670,16 @@ export function Default() {
         devices={flow.devices}
         hasPassword={flow.hasPassword}
         mfaMethods={flow.mfaMethods}
+        mfaAddableMethods={[
+          ...(config.mfaPhoneAvailable ? (['sms'] as const) : []),
+          ...(config.mfaAuthenticatorAvailable ? (['authenticator'] as const) : []),
+        ]}
         passkeys={config.passkeysAvailable ? flow.passkeys : undefined}
         passwordAvailable={config.passwordAvailable}
-        onAddPasskey={config.passkeysAvailable ? flow.openAddPasskey : undefined}
+        onAddPasskey={config.passkeysAvailable && config.passkeyCreationAvailable ? flow.openAddPasskey : undefined}
         onChangePassword={config.passwordAvailable ? flow.openPassword : undefined}
-        onAddMfaMethod={flow.openAddMfa}
-        onDeleteAccount={flow.openDeleteAccount}
+        onAddMfaMethod={config.mfaPhoneAvailable || config.mfaAuthenticatorAvailable ? flow.openAddMfa : undefined}
+        onDeleteAccount={config.deleteAccountAvailable ? flow.openDeleteAccount : undefined}
         onManageDevice={flow.openDevice}
         onManagePasskey={flow.openRenamePasskey}
         onRemoveMfaMethod={flow.openRemoveMfa}
@@ -755,6 +849,18 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
   {
     flow: 'password',
     step: 'password',
+    variant: 'enterprise managed',
+    state: {
+      mode: 'change',
+      values: { ...passwordValues, newPassword: '', confirmPassword: '' },
+      isReadOnly: true,
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'password',
+    step: 'password',
     variant: 'submitting',
     state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
   },
@@ -876,19 +982,6 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     },
   },
   {
-    flow: 'rename-passkey',
-    step: 'rename passkey',
-    variant: 'reverification',
-    state: {
-      id: 'passkey',
-      originalName: 'Passkey',
-      name: 'Chrome on macOS',
-      isSubmitting: true,
-      errors: {},
-    },
-    reverification: idleVerification,
-  },
-  {
     flow: 'remove-passkey',
     step: 'remove passkey',
     variant: 'idle',
@@ -912,11 +1005,32 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     },
   },
   {
-    flow: 'remove-passkey',
-    step: 'remove passkey',
-    variant: 'reverification',
-    state: { id: 'passkey', name: 'Chrome on macOS', isSubmitting: true, errors: {} },
-    reverification: idleVerification,
+    flow: 'add-mfa',
+    step: 'choose phone',
+    variant: 'existing numbers',
+    state: {
+      method: 'sms',
+      step: 'select-phone',
+      phones: [
+        { id: 'verified', label: '+1 801-888-8181', isVerified: true },
+        { id: 'unverified', label: '+1 801-555-0100', isVerified: false },
+      ],
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'choose phone',
+    variant: 'enabling existing',
+    state: {
+      method: 'sms',
+      step: 'select-phone',
+      phones: [{ id: 'verified', label: '+1 801-888-8181', isVerified: true }],
+      loadingPhoneId: 'verified',
+      isSubmitting: true,
+      errors: {},
+    },
   },
   {
     flow: 'add-mfa',
@@ -973,6 +1087,23 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
       resend: { isResending: false, secondsRemaining: 0 },
       isSubmitting: false,
       errors: { field: 'Incorrect code. Please try again.' },
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'add authenticator',
+    variant: 'preparing',
+    state: { method: 'authenticator', step: 'preparing', isSubmitting: true, errors: {} },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'add authenticator',
+    variant: 'preparation error',
+    state: {
+      method: 'authenticator',
+      step: 'preparing',
+      isSubmitting: false,
+      errors: { form: 'Something went wrong. Please try again.' },
     },
   },
   {
@@ -1045,11 +1176,12 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
   },
   {
     flow: 'add-mfa',
-    step: 'verify authenticator',
+    step: 'verify phone',
     variant: 'reverification',
     state: {
-      method: 'authenticator',
+      method: 'sms',
       step: 'verify',
+      identifier: '+1 801 555 0100',
       code: '424242',
       status: 'verifying',
       resend: { isResending: false, secondsRemaining: 0 },
@@ -1057,6 +1189,25 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
       errors: {},
     },
     reverification: idleVerification,
+  },
+  {
+    flow: 'add-mfa',
+    step: 'backup codes after enrollment',
+    variant: 'ready',
+    state: {
+      method: 'authenticator',
+      step: 'backup-codes',
+      codes: ['3k4p-7m2q', '9w6d-2x8n', '5t1r-8c4v', '7j3f-6h9s', '2b8m-4q1k', '6n5x-9p3d'],
+      copied: false,
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'add authenticator',
+    variant: 'success without backup codes',
+    state: { method: 'authenticator', step: 'success', isSubmitting: false, errors: {} },
   },
   {
     flow: 'remove-mfa',
@@ -1105,19 +1256,6 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
       isSubmitting: false,
       errors: { form: 'Something went wrong. Please try again.' },
     },
-  },
-  {
-    flow: 'remove-mfa',
-    step: 'remove method',
-    variant: 'reverification',
-    state: {
-      method: 'authenticator',
-      id: 'authenticator',
-      label: 'Authenticator app',
-      isSubmitting: true,
-      errors: {},
-    },
-    reverification: idleVerification,
   },
   {
     flow: 'backup-codes',
@@ -1343,10 +1481,16 @@ export function States() {
           state={snapshot.state}
           onOpenChange={setOpen}
           onCodeChange={noop}
+          onAddPhone={noop}
+          onSelectPhone={noop}
           onPhoneNumberChange={noop}
           onResend={noop}
           onSubmit={noop}
           onToggleDisplayFormat={noop}
+          onCopyBackupCodes={noop}
+          onDownloadBackupCodes={noop}
+          onPrintBackupCodes={noop}
+          onFinish={noop}
           verificationDialog={verification}
         />
       ) : null}

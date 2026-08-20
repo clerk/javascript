@@ -24,6 +24,7 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
   passwordAvailable?: boolean;
   passkeys?: UserProfilePasskey[];
   mfaMethods?: UserProfileMfaMethod[];
+  mfaAddableMethods?: UserProfileMfaAddableMethod[];
   devices?: UserProfileDevice[];
   onChangePassword?: () => void;
   onAddPasskey?: () => void;
@@ -40,6 +41,7 @@ export function UserProfileSecurityPanelView({
   passwordAvailable = hasPassword,
   passkeys,
   mfaMethods,
+  mfaAddableMethods,
   devices,
   onChangePassword,
   onAddPasskey,
@@ -84,6 +86,7 @@ export function UserProfileSecurityPanelView({
             {mfaMethods !== undefined ? (
               <UserProfileMfaSectionView
                 methods={mfaMethods}
+                addableMethods={mfaAddableMethods}
                 sectionTitle={!passwordAvailable && passkeys === undefined ? 'Authentication' : undefined}
                 onAdd={onAddMfaMethod}
                 onRegenerateBackupCodes={onRegenerateBackupCodes}

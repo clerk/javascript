@@ -5,6 +5,7 @@ import { Button, SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
+import type { ReverificationChallengeActions, ReverificationChallengeState } from './flow.types';
 import {
   CodeInput,
   DialogBody,
@@ -17,7 +18,6 @@ import {
   ResendButton,
 } from './flow-dialog-chrome';
 import { styles } from './flow-dialogs.styles';
-import type { ReverificationChallengeActions, ReverificationChallengeState } from './flow.types';
 
 export interface ReverificationDialogViewProps extends ReverificationChallengeActions {
   state: ReverificationChallengeState;
