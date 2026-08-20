@@ -8,6 +8,8 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
+
 export { default as __source } from './user-profile-security-panel.stories?raw';
 
 export const meta: StoryMeta = {
@@ -19,6 +21,7 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
+  const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
   const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
     {
       id: 'passkey',
@@ -54,46 +57,49 @@ export function Default() {
   ]);
 
   return (
-    <UserProfileSecurityPanelView
-      devices={devices}
-      hasPassword
-      mfaMethods={mfaMethods}
-      passkeys={passkeys}
-      onAddMfaMethod={type =>
-        setMfaMethods(current => {
-          const timestamp = Date.now();
-          return [
+    <>
+      <UserProfileSecurityPanelView
+        devices={devices}
+        hasPassword
+        mfaMethods={mfaMethods}
+        passkeys={passkeys}
+        onAddMfaMethod={type =>
+          setMfaMethods(current => {
+            const timestamp = Date.now();
+            return [
+              ...current,
+              {
+                id: `${type}-${timestamp}`,
+                type,
+                description: type === 'sms' ? '+1 801-555-0100' : undefined,
+              },
+              ...(current.some(method => method.type === 'backup-codes')
+                ? []
+                : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
+            ];
+          })
+        }
+        onAddPasskey={() =>
+          setPasskeys(current => [
             ...current,
-            {
-              id: `${type}-${timestamp}`,
-              type,
-              description: type === 'sms' ? '+1 801-555-0100' : undefined,
-            },
-            ...(current.some(method => method.type === 'backup-codes')
-              ? []
-              : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
-          ];
-        })
-      }
-      onAddPasskey={() =>
-        setPasskeys(current => [
-          ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ])
-      }
-      onChangePassword={() => undefined}
-      onDeleteAccount={() => undefined}
-      onManageDevice={() => undefined}
-      onManagePasskey={() => undefined}
-      onRegenerateBackupCodes={() =>
-        setMfaMethods(current =>
-          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
-        )
-      }
-      onRemoveMfaMethod={id => setMfaMethods(current => current.filter(method => method.id !== id))}
-      onRemovePasskey={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
-      onSignOutAllOtherDevices={() => setDevices(current => current.filter(device => device.isCurrent))}
-      onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
-    />
+            { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
+          ])
+        }
+        onChangePassword={openPasswordDialog}
+        onDeleteAccount={() => undefined}
+        onManageDevice={() => undefined}
+        onManagePasskey={() => undefined}
+        onRegenerateBackupCodes={() =>
+          setMfaMethods(current =>
+            current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
+          )
+        }
+        onRemoveMfaMethod={id => setMfaMethods(current => current.filter(method => method.id !== id))}
+        onRemovePasskey={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
+        onSignOutAllOtherDevices={() => setDevices(current => current.filter(device => device.isCurrent))}
+        onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
+      />
+      {passwordDialog}
+    </>
   );
 }

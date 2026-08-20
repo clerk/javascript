@@ -16,6 +16,8 @@ import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
+
 export { default as __source } from './user-page.stories?raw';
 
 export const meta: StoryMeta = {
@@ -45,6 +47,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
 ];
 
 export function Default() {
+  const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
@@ -161,7 +164,7 @@ export function Default() {
           ...current,
           { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
         ]),
-      onChangePassword: () => undefined,
+      onChangePassword: openPasswordDialog,
       onDeleteAccount: () => undefined,
       onManageDevice: () => undefined,
       onManagePasskey: () => undefined,
@@ -242,10 +245,13 @@ export function Default() {
   };
 
   return (
-    <UserPageView
-      activePanel={activePanel}
-      panels={panels}
-      onPanelChange={setActivePanel}
-    />
+    <>
+      <UserPageView
+        activePanel={activePanel}
+        panels={panels}
+        onPanelChange={setActivePanel}
+      />
+      {passwordDialog}
+    </>
   );
 }
