@@ -17,17 +17,22 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/user-profile/user-profile-account-section.view.tsx',
 };
 
-export function Default() {
-  const [emails, setEmails] = useState<UserProfileEmail[]>([
-    { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
-    { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
-  ]);
+function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: boolean }) {
+  const [emails, setEmails] = useState<UserProfileEmail[]>(
+    allowMultipleAccounts
+      ? [
+          { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
+          { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
+        ]
+      : [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
+  );
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
 
   return (
     <UserProfileAccountSectionView
+      allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
       imageUrl='https://avatars.githubusercontent.com/u/51144033?v=4'
       name='Preston Booth'
@@ -58,4 +63,12 @@ export function Default() {
       onUsernameChange={() => undefined}
     />
   );
+}
+
+export function Default() {
+  return <AccountSection allowMultipleAccounts={false} />;
+}
+
+export function MultipleAccounts() {
+  return <AccountSection allowMultipleAccounts />;
 }

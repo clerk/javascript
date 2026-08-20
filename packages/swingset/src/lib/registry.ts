@@ -105,6 +105,7 @@ import { Default as UserPageDefault, meta as userPageMeta } from '../stories/use
 import {
   Default as UserProfileAccountSectionDefault,
   meta as userProfileAccountSectionMeta,
+  MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
 } from '../stories/user-profile-account-section.stories';
 import {
   Default as UserProfileActiveDevicesSectionDefault,
@@ -294,6 +295,7 @@ const userPageModule: StoryModule = {
 const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
+  MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,

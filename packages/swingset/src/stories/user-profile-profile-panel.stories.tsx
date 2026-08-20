@@ -28,6 +28,7 @@ export function Default(_args: Record<string, unknown>) {
 
   return (
     <UserProfileProfilePanelView
+      allowMultipleAccounts
       emails={emails}
       connectedAccounts={[
         {

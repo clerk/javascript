@@ -26,6 +26,7 @@ export interface UserProfilePhone {
 }
 
 export interface UserProfileAccountSectionViewProps {
+  allowMultipleAccounts?: boolean;
   imageUrl?: string;
   name: string;
   username: string;
@@ -47,6 +48,7 @@ export interface UserProfileAccountSectionViewProps {
 }
 
 export function UserProfileAccountSectionView({
+  allowMultipleAccounts = false,
   imageUrl,
   name,
   username,
@@ -74,7 +76,6 @@ export function UserProfileAccountSectionView({
     .toUpperCase();
   const updateName = onNameChange ? () => onNameChange(name) : undefined;
   const updateUsername = onUsernameChange ? () => onUsernameChange(username) : undefined;
-  const shouldBreakOutContacts = emails.length > 1 || phones.length > 1;
 
   return (
     <div {...stylex.props(styles.sections)}>
@@ -150,7 +151,7 @@ export function UserProfileAccountSectionView({
               ) : null}
             </Section.Item>
           </Section.Row>
-          {!shouldBreakOutContacts ? (
+          {!allowMultipleAccounts ? (
             <SingleContactRow
               items={emails}
               kind='email'
@@ -159,7 +160,7 @@ export function UserProfileAccountSectionView({
               onManage={onManageEmail}
             />
           ) : null}
-          {!shouldBreakOutContacts ? (
+          {!allowMultipleAccounts ? (
             <SingleContactRow
               items={phones}
               kind='phone'
@@ -170,7 +171,7 @@ export function UserProfileAccountSectionView({
           ) : null}
         </Section.Group>
       </Section.Root>
-      {shouldBreakOutContacts ? (
+      {allowMultipleAccounts ? (
         <ContactSection
           items={emails}
           kind='email'
@@ -182,7 +183,7 @@ export function UserProfileAccountSectionView({
           onVerify={onVerifyEmail}
         />
       ) : null}
-      {shouldBreakOutContacts ? (
+      {allowMultipleAccounts ? (
         <ContactSection
           items={phones}
           kind='phone'

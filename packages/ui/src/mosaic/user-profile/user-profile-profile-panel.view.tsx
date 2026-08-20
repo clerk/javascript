@@ -32,6 +32,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
 }
 
 export function UserProfileProfilePanelView({
+  allowMultipleAccounts,
   imageUrl,
   name = '',
   username = '',
@@ -71,6 +72,7 @@ export function UserProfileProfilePanelView({
       </Heading>
       <div {...stylex.props(styles.sections)}>
         <UserProfileAccountSectionView
+          allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
           imageUrl={imageUrl}
           name={name}

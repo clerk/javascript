@@ -7,6 +7,7 @@ import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-p
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
 
 const props: UserProfileProfilePanelViewProps = {
+  allowMultipleAccounts: true,
   name: 'Preston Booth',
   username: 'prestonxyz',
   emails: [
@@ -68,8 +69,12 @@ describe('UserProfileProfilePanelView', () => {
     expect(onEditProfilePicture).toHaveBeenCalledOnce();
   });
 
-  it('breaks out both contact types when either has multiple entries', () => {
-    renderView({ onAddEmail: vi.fn(), onAddPhone: vi.fn() });
+  it('breaks out both contact types when multiple accounts are allowed', () => {
+    renderView({
+      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
+      onAddEmail: vi.fn(),
+      onAddPhone: vi.fn(),
+    });
 
     const accountSection = screen.getByRole('region', { name: 'Account' });
     const emailSection = screen.getByRole('region', { name: 'Email' });
@@ -78,14 +83,14 @@ describe('UserProfileProfilePanelView', () => {
     expect(accountSection).not.toContainElement(emailSection);
     expect(accountSection).not.toContainElement(phoneSection);
     expect(emailSection).toHaveTextContent('item1@clerk.dev');
-    expect(emailSection).toHaveTextContent('item2@clerk.dev');
     expect(phoneSection).toHaveTextContent('+1 801-888-8181');
     expect(within(emailSection).getByRole('button', { name: 'Add email' })).toHaveTextContent('Add');
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toHaveTextContent('Add');
   });
 
-  it('keeps both contact types inside Account when neither has multiple entries', () => {
+  it('keeps both contact types inside Account when multiple accounts are not allowed', () => {
     renderView({
+      allowMultipleAccounts: false,
       emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
       onManageEmail: vi.fn(),
       onManagePhone: vi.fn(),
@@ -106,6 +111,7 @@ describe('UserProfileProfilePanelView', () => {
     const onManagePhone = vi.fn();
     const user = userEvent.setup();
     renderView({
+      allowMultipleAccounts: false,
       emails: [],
       onAddEmail,
       onManagePhone,
