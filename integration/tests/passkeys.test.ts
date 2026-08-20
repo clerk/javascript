@@ -128,7 +128,7 @@ test.describe('passkeys as a second factor @generic', () => {
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({ fictionalEmail: true, withPassword: true });
+    fakeUser = u.services.users.createFakeUser(test, { fictionalEmail: true, withPassword: true });
     const user = await u.services.users.createBapiUser(fakeUser);
     userId = user.id;
   });
