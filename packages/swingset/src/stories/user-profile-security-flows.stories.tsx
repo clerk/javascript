@@ -3,11 +3,13 @@ import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import type {
   ReverificationChallengeState,
   UserProfileDeleteAccountFlowState,
+  UserProfileDeviceDetailsFlowState,
   UserProfilePasswordFlowState,
   UserProfileSignOutAllDevicesFlowState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import { UserProfileDeleteAccountDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-account-dialog.view';
+import { UserProfileDeviceDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-device-dialog.view';
 import { UserProfilePasswordDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-password-dialog.view';
 import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
@@ -49,11 +51,23 @@ const INITIAL_DEVICES: UserProfileDevice[] = [
     name: 'Clerk App on macOS',
     description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
     type: 'desktop',
+    details: {
+      title: 'Macbook Pro · Chrome',
+      lastActiveAtLabel: 'Last active 4 days ago',
+      deviceName: 'Macbook Pro',
+      browserName: 'Chrome 150.0.0.0',
+      ipAddress: '2600:100e:b10b:787b:e8ae:6e75:fc2f:b10',
+      location: 'Salt Lake City, UT, United States',
+      locationFlag: '🇺🇸',
+      originalSignInAtLabel: 'July 5th, 2026',
+    },
   },
 ];
 
 function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow> }) {
-  const verificationDialog = (operation: 'password' | 'delete-account' | 'sign-out-all-devices') => {
+  const verificationDialog = (
+    operation: 'password' | 'delete-account' | 'sign-out-device' | 'sign-out-all-devices',
+  ) => {
     const challenge = flow.reverification?.operation === operation ? flow.reverification.state : null;
     return (
       <Dialog
@@ -124,6 +138,21 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
           }}
           onSignOut={flow.submitSignOutAllDevices}
           verificationDialog={verificationDialog('sign-out-all-devices')}
+        />
+      ) : null}
+      {flow.device ? (
+        <UserProfileDeviceDialogView
+          open
+          state={flow.device}
+          onOpenChange={open => {
+            if (!open) {
+              flow.closeDevice();
+            }
+          }}
+          onRequestSignOut={flow.requestSignOutDevice}
+          onCancelSignOut={flow.cancelSignOutDevice}
+          onSignOut={flow.submitSignOutDevice}
+          verificationDialog={verificationDialog('sign-out-device')}
         />
       ) : null}
     </>
@@ -291,9 +320,9 @@ export function Default() {
         passwordAvailable={config.passwordAvailable}
         onChangePassword={config.passwordAvailable ? flow.openPassword : undefined}
         onDeleteAccount={flow.openDeleteAccount}
-        onManageDevice={() => undefined}
+        onManageDevice={flow.openDevice}
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
-        onSignOutDevice={() => undefined}
+        onSignOutDevice={flow.openDevice}
       />
       <SecurityFlowDialogs flow={flow} />
     </div>
@@ -310,6 +339,7 @@ interface Snapshot<State> {
 type SecuritySnapshot =
   | ({ flow: 'password' } & Snapshot<UserProfilePasswordFlowState>)
   | ({ flow: 'delete-account' } & Snapshot<UserProfileDeleteAccountFlowState>)
+  | ({ flow: 'device' } & Snapshot<UserProfileDeviceDetailsFlowState>)
   | ({ flow: 'sign-out-all-devices' } & Snapshot<UserProfileSignOutAllDevicesFlowState>);
 
 const snapshotPicker = { display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%' } as const;
@@ -399,6 +429,17 @@ const idleVerification: ReverificationChallengeState = {
   status: 'idle',
   errors: {},
   resend: { isResending: false, secondsRemaining: 0 },
+};
+const deviceDetails: UserProfileDeviceDetailsFlowState['device'] = {
+  id: 'desktop',
+  title: 'Macbook Pro · Chrome',
+  lastActiveAtLabel: 'Last active 4 days ago',
+  deviceName: 'Macbook Pro',
+  browserName: 'Chrome 150.0.0.0',
+  ipAddress: '2600:100e:b10b:787b:e8ae:6e75:fc2f:b10',
+  location: 'Salt Lake City, UT, United States',
+  locationFlag: '🇺🇸',
+  originalSignInAtLabel: 'July 5th, 2026',
 };
 
 const SNAPSHOTS: readonly SecuritySnapshot[] = [
@@ -521,6 +562,42 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     reverification: idleVerification,
   },
   {
+    flow: 'device',
+    step: 'device',
+    variant: 'details',
+    state: { step: 'details', device: deviceDetails, isSubmitting: false, errors: {} },
+  },
+  {
+    flow: 'device',
+    step: 'device',
+    variant: 'confirm',
+    state: { step: 'confirm', device: deviceDetails, isSubmitting: false, errors: {} },
+  },
+  {
+    flow: 'device',
+    step: 'device',
+    variant: 'submitting',
+    state: { step: 'confirm', device: deviceDetails, isSubmitting: true, errors: {} },
+  },
+  {
+    flow: 'device',
+    step: 'device',
+    variant: 'server error',
+    state: {
+      device: deviceDetails,
+      step: 'confirm',
+      isSubmitting: false,
+      errors: { form: 'Something went wrong. Please try again.' },
+    },
+  },
+  {
+    flow: 'device',
+    step: 'device',
+    variant: 'reverification',
+    state: { step: 'confirm', device: deviceDetails, isSubmitting: true, errors: {} },
+    reverification: idleVerification,
+  },
+  {
     flow: 'sign-out-all-devices',
     step: 'sign out all',
     variant: 'idle',
@@ -607,6 +684,17 @@ export function States() {
           open={open}
           state={snapshot.state}
           onOpenChange={setOpen}
+          onSignOut={noop}
+          verificationDialog={verification}
+        />
+      ) : null}
+      {snapshot.flow === 'device' ? (
+        <UserProfileDeviceDialogView
+          open={open}
+          state={snapshot.state}
+          onOpenChange={setOpen}
+          onRequestSignOut={noop}
+          onCancelSignOut={noop}
           onSignOut={noop}
           verificationDialog={verification}
         />

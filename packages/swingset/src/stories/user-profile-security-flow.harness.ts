@@ -1,6 +1,7 @@
 import type {
   ReverificationChallengeState,
   UserProfileDeleteAccountFlowState,
+  UserProfileDeviceDetailsFlowState,
   UserProfilePasswordField,
   UserProfilePasswordFlowState,
   UserProfilePasswordValues,
@@ -37,7 +38,7 @@ const EMPTY_PASSWORD_VALUES: UserProfilePasswordValues = {
   signOutOfOtherSessions: true,
 };
 
-type SecurityOperation = 'password' | 'delete-account' | 'sign-out-all-devices';
+type SecurityOperation = 'password' | 'delete-account' | 'sign-out-device' | 'sign-out-all-devices';
 
 interface ReverificationState {
   operation: SecurityOperation;
@@ -64,6 +65,7 @@ export function useSecurityFlow({
   const [devices, setDevices] = useState(initialDevices);
   const [password, setPassword] = useState<UserProfilePasswordFlowState | null>(null);
   const [deleteAccount, setDeleteAccount] = useState<UserProfileDeleteAccountFlowState | null>(null);
+  const [device, setDevice] = useState<UserProfileDeviceDetailsFlowState | null>(null);
   const [signOutAllDevices, setSignOutAllDevices] = useState<UserProfileSignOutAllDevicesFlowState | null>(null);
   const [reverification, setReverification] = useState<ReverificationState | null>(null);
   const verificationGate = useRef<{ operation: SecurityOperation; resolve: (verified: boolean) => void } | null>(null);
@@ -85,6 +87,8 @@ export function useSecurityFlow({
         setPassword(null);
       } else if (operation === 'delete-account') {
         setDeleteAccount(null);
+      } else if (operation === 'sign-out-device') {
+        setDevice(null);
       } else {
         setSignOutAllDevices(null);
       }
@@ -99,6 +103,10 @@ export function useSecurityFlow({
       );
     } else if (operation === 'delete-account') {
       setDeleteAccount(current =>
+        current ? { ...current, isSubmitting, errors: formError ? { form: formError } : {} } : current,
+      );
+    } else if (operation === 'sign-out-device') {
+      setDevice(current =>
         current ? { ...current, isSubmitting, errors: formError ? { form: formError } : {} } : current,
       );
     } else {
@@ -219,6 +227,51 @@ export function useSecurityFlow({
     });
   }, [closeOperation, runMutation]);
 
+  const openDevice = useCallback(
+    (id: string) => {
+      const selected = devices.find(candidate => candidate.id === id);
+      if (!selected) {
+        return;
+      }
+      setDevice({
+        step: 'details',
+        device: {
+          id: selected.id,
+          title: selected.details?.title ?? selected.name,
+          lastActiveAtLabel: selected.details?.lastActiveAtLabel ?? selected.description ?? 'Active now',
+          deviceName: selected.details?.deviceName ?? selected.name,
+          browserName: selected.details?.browserName ?? 'Unknown',
+          ipAddress: selected.details?.ipAddress ?? 'Unknown',
+          location: selected.details?.location ?? 'Unknown',
+          locationFlag: selected.details?.locationFlag,
+          originalSignInAtLabel: selected.details?.originalSignInAtLabel ?? 'Unknown',
+        },
+        isSubmitting: false,
+        errors: {},
+      });
+    },
+    [devices],
+  );
+
+  const requestSignOutDevice = useCallback(() => {
+    setDevice(current => (current ? { ...current, step: 'confirm', errors: {} } : current));
+  }, []);
+
+  const cancelSignOutDevice = useCallback(() => {
+    setDevice(current => (current ? { ...current, step: 'details', errors: {} } : current));
+  }, []);
+
+  const submitSignOutDevice = useCallback(() => {
+    if (!device) {
+      return;
+    }
+    const deviceId = device.device.id;
+    void runMutation('sign-out-device', () => {
+      setDevices(current => current.filter(candidate => candidate.id !== deviceId));
+      closeOperation('sign-out-device');
+    });
+  }, [closeOperation, device, runMutation]);
+
   const updateVerificationValue = useCallback((value: string) => {
     setReverification(current =>
       current ? { ...current, state: { ...current.state, value, status: 'idle', errors: {} } } : current,
@@ -304,6 +357,7 @@ export function useSecurityFlow({
     devices,
     password,
     deleteAccount,
+    device,
     signOutAllDevices,
     reverification,
     openPassword,
@@ -315,6 +369,11 @@ export function useSecurityFlow({
     updateDeleteConfirmation: (confirmation: string) =>
       setDeleteAccount(current => (current ? { ...current, confirmation, errors: {} } : current)),
     submitDeleteAccount,
+    openDevice,
+    closeDevice: () => closeOperation('sign-out-device'),
+    requestSignOutDevice,
+    cancelSignOutDevice,
+    submitSignOutDevice,
     openSignOutAllDevices,
     closeSignOutAllDevices: () => closeOperation('sign-out-all-devices'),
     submitSignOutAllDevices,

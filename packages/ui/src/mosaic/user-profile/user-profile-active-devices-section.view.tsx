@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../components/button';
 import { Section } from '../components/section';
+import type { UserProfileDeviceDetails } from './dialogs/flow.types';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
@@ -13,6 +14,7 @@ export interface UserProfileDevice {
   description?: string;
   type: 'desktop' | 'mobile';
   isCurrent?: boolean;
+  details?: Omit<UserProfileDeviceDetails, 'id'>;
 }
 
 export interface UserProfileActiveDevicesSectionViewProps {
