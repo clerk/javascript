@@ -136,6 +136,10 @@ import {
   meta as userProfileConnectedAccountsSectionMeta,
 } from '../stories/user-profile-connected-accounts-section.stories';
 import {
+  Default as UserProfileDeleteAccountDialogDefault,
+  meta as userProfileDeleteAccountDialogMeta,
+} from '../stories/user-profile-delete-account-dialog.stories';
+import {
   Default as UserProfileDeleteSectionDefault,
   meta as userProfileDeleteSectionMeta,
 } from '../stories/user-profile-delete-section.stories';
@@ -371,6 +375,10 @@ const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
 };
+const userProfileDeleteAccountDialogModule: StoryModule = {
+  meta: userProfileDeleteAccountDialogMeta,
+  Default: UserProfileDeleteAccountDialogDefault,
+};
 const userProfilePasswordDialogModule: StoryModule = {
   meta: userProfilePasswordDialogMeta,
   Change: UserProfilePasswordDialogChange,
@@ -402,6 +410,7 @@ export const registry: StoryModule[] = [
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
   // User Profile · Dialogs
+  userProfileDeleteAccountDialogModule,
   userProfilePasswordDialogModule,
   // Components
   avatarModule,

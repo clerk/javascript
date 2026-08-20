@@ -8,6 +8,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
 import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
 
 export { default as __source } from './user-profile-security-panel.stories?raw';
@@ -21,6 +22,7 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
+  const { openDeleteAccountDialog, deleteAccountDialog } = useDeleteAccountDialogStory();
   const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
   const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
     {
@@ -86,7 +88,7 @@ export function Default() {
           ])
         }
         onChangePassword={openPasswordDialog}
-        onDeleteAccount={() => undefined}
+        onDeleteAccount={openDeleteAccountDialog}
         onManageDevice={() => undefined}
         onManagePasskey={() => undefined}
         onRegenerateBackupCodes={() =>
@@ -100,6 +102,7 @@ export function Default() {
         onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
       />
       {passwordDialog}
+      {deleteAccountDialog}
     </>
   );
 }
