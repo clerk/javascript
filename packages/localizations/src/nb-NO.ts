@@ -747,6 +747,7 @@ export const nbNO: LocalizationResource = {
         },
         verifiedAtLabel: "Verifisert den {{ date | shortDate('nb-NO') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Legg til {{domain}}',

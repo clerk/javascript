@@ -740,6 +740,7 @@ export const svSE: LocalizationResource = {
         },
         verifiedAtLabel: "Verifierad den {{ date | shortDate('sv-SE') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Lägg till {{domain}}',

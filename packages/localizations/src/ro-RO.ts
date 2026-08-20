@@ -746,6 +746,7 @@ export const roRO: LocalizationResource = {
         },
         verifiedAtLabel: "Verificat pe {{ date | shortDate('ro-RO') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Adaugă {{domain}}',

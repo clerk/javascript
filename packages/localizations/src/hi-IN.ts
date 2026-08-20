@@ -746,6 +746,7 @@ export const hiIN: LocalizationResource = {
         },
         verifiedAtLabel: "{{ date | shortDate('hi-IN') }} को सत्यापित",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} जोड़ें',

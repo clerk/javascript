@@ -740,6 +740,7 @@ export const ruRU: LocalizationResource = {
         },
         verifiedAtLabel: "Подтверждён {{ date | shortDate('ru-RU') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Добавить {{domain}}',

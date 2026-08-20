@@ -740,6 +740,7 @@ export const mnMN: LocalizationResource = {
         },
         verifiedAtLabel: "{{ date | shortDate('mn-MN') }}-нд баталгаажсан",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} нэмэх',

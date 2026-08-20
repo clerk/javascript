@@ -741,6 +741,7 @@ export const bgBG: LocalizationResource = {
         },
         verifiedAtLabel: "Потвърден на {{ date | shortDate('bg-BG') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Добавяне на {{domain}}',

@@ -744,6 +744,7 @@ export const csCZ: LocalizationResource = {
         },
         verifiedAtLabel: "Ověřeno {{ date | shortDate('cs-CZ') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Přidat {{domain}}',
