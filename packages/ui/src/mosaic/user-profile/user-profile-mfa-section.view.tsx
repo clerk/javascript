@@ -91,7 +91,7 @@ export function UserProfileMfaSectionView({
         if (method.type === 'backup-codes') {
           if (onRegenerateBackupCodes) {
             actions.push({
-              label: 'Regenerate',
+              label: 'Regenerate backup codes',
               onClick: onRegenerateBackupCodes,
             });
           }

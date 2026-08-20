@@ -353,11 +353,6 @@ export interface UserProfileMfaRemoveFlowState {
 
 export type UserProfileBackupCodesFlowState =
   | {
-      step: 'confirm';
-      isSubmitting: false;
-      errors: FlowErrors;
-    }
-  | {
       step: 'generating';
       isSubmitting: boolean;
       errors: FlowErrors;

@@ -195,7 +195,7 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
     expect(screen.queryByRole('menuitem', { name: 'Remove method' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate backup codes' }));
 
     expect(onRemoveMfaMethod).toHaveBeenCalledWith('sms_1');
     expect(onRegenerateBackupCodes).toHaveBeenCalledOnce();

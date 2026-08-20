@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useBackupCodesDialogStory } from './helpers/use-backup-codes-dialog-story';
 import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
 import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
 import { useSignOutAllDevicesDialogStory } from './helpers/use-sign-out-all-devices-dialog-story';
@@ -49,6 +50,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
 ];
 
 export function Default() {
+  const { openBackupCodesDialog, backupCodesDialog } = useBackupCodesDialogStory();
   const { openDeleteAccountDialog, deleteAccountDialog } = useDeleteAccountDialogStory();
   const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
@@ -174,10 +176,7 @@ export function Default() {
       onDeleteAccount: openDeleteAccountDialog,
       onManageDevice: () => undefined,
       onManagePasskey: () => undefined,
-      onRegenerateBackupCodes: () =>
-        setMfaMethods(current =>
-          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
-        ),
+      onRegenerateBackupCodes: openBackupCodesDialog,
       onRemoveMfaMethod: id => setMfaMethods(current => current.filter(method => method.id !== id)),
       onRemovePasskey: id => setPasskeys(current => current.filter(passkey => passkey.id !== id)),
       onSignOutAllOtherDevices: openSignOutAllDevicesDialog,
@@ -260,6 +259,7 @@ export function Default() {
       {passwordDialog}
       {deleteAccountDialog}
       {signOutAllDevicesDialog}
+      {backupCodesDialog}
     </>
   );
 }
