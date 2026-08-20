@@ -40,12 +40,13 @@ export interface KeylessStorage {
 export interface KeylessAPI {
   /**
    * Creates a new accountless application.
+   * Optional: SDKs that no longer mint keyless applications omit it.
    *
    * @param requestHeaders - Optional headers to include with the request.
    * @param source - Optional source value to include with the request.
    * @returns The created AccountlessApplication or null if failed.
    */
-  createAccountlessApplication(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
+  createAccountlessApplication?(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
 
   /**
    * Notifies the backend that onboarding is complete (instance has been claimed).
@@ -208,6 +209,10 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
       const existingConfig = safeParseConfig();
       if (existingConfig?.publishableKey && existingConfig?.secretKey) {
         return existingConfig;
+      }
+
+      if (!api.createAccountlessApplication) {
+        return null;
       }
 
       // Create metadata headers

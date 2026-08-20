@@ -32,7 +32,7 @@ const createApi = (overrides: Partial<KeylessAPI> = {}): KeylessAPI => ({
 
 describe('createKeylessService', () => {
   it('passes the framework as the source when creating an accountless application', async () => {
-    const createAccountlessApplication = vi.fn<KeylessAPI['createAccountlessApplication']>(() =>
+    const createAccountlessApplication = vi.fn<NonNullable<KeylessAPI['createAccountlessApplication']>>(() =>
       Promise.resolve(accountlessApplication),
     );
 
@@ -66,7 +66,7 @@ describe('createKeylessService', () => {
   });
 
   it('sanitizes the framework before passing it as the source', async () => {
-    const createAccountlessApplication = vi.fn<KeylessAPI['createAccountlessApplication']>(() =>
+    const createAccountlessApplication = vi.fn<NonNullable<KeylessAPI['createAccountlessApplication']>>(() =>
       Promise.resolve(accountlessApplication),
     );
 
@@ -82,7 +82,7 @@ describe('createKeylessService', () => {
   });
 
   it('falls back to javascript when framework sanitization produces an empty source', async () => {
-    const createAccountlessApplication = vi.fn<KeylessAPI['createAccountlessApplication']>(() =>
+    const createAccountlessApplication = vi.fn<NonNullable<KeylessAPI['createAccountlessApplication']>>(() =>
       Promise.resolve(accountlessApplication),
     );
 
@@ -98,7 +98,7 @@ describe('createKeylessService', () => {
   });
 
   it('truncates the source before passing it to the accountless application API', async () => {
-    const createAccountlessApplication = vi.fn<KeylessAPI['createAccountlessApplication']>(() =>
+    const createAccountlessApplication = vi.fn<NonNullable<KeylessAPI['createAccountlessApplication']>>(() =>
       Promise.resolve(accountlessApplication),
     );
 

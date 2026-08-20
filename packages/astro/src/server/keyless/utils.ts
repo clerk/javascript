@@ -1,23 +1,39 @@
-import { resolveKeysWithKeylessFallback as sharedResolveKeysWithKeylessFallback } from '@clerk/shared/keyless';
+import { clerkDevelopmentCache, createConfirmationMessage } from '@clerk/shared/keyless';
 import type { APIContext } from 'astro';
-export type { KeylessResult } from '@clerk/shared/keyless';
 
 import { canUseKeyless } from '../../utils/feature-flags';
 import { keyless } from './index';
 
 /**
- * Resolves Clerk keys, falling back to keyless mode in development if configured keys are missing.
+ * Notifies the dashboard that a claimed keyless application is now running with its
+ * keys configured, and logs a one-time confirmation. No-ops unless the configured
+ * publishable key matches the locally stored keyless keys.
  */
-export async function resolveKeysWithKeylessFallback(
+export async function completeOnboardingIfClaimed(
   configuredPublishableKey: string | undefined,
-  configuredSecretKey: string | undefined,
   context: APIContext,
-) {
-  const keylessService = await keyless(context);
-  return sharedResolveKeysWithKeylessFallback(
-    configuredPublishableKey,
-    configuredSecretKey,
-    keylessService,
-    canUseKeyless,
-  );
+): Promise<void> {
+  if (!canUseKeyless || !configuredPublishableKey) {
+    return;
+  }
+
+  const keylessService = keyless(context);
+  const locallyStoredKeys = keylessService.readKeys();
+  if (locallyStoredKeys?.publishableKey !== configuredPublishableKey) {
+    return;
+  }
+
+  try {
+    await clerkDevelopmentCache?.run(() => keylessService.completeOnboarding(), {
+      cacheKey: `${locallyStoredKeys.publishableKey}_complete`,
+      onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
+    });
+  } catch {
+    // noop
+  }
+
+  clerkDevelopmentCache?.log({
+    cacheKey: `${locallyStoredKeys.publishableKey}_claimed`,
+    msg: createConfirmationMessage(),
+  });
 }

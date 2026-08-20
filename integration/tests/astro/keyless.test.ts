@@ -1,12 +1,11 @@
-import { test } from '@playwright/test';
+import * as path from 'node:path';
+
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import {
-  testClaimedAppWithMissingKeys,
-  testKeylessRemovedAfterEnvAndRestart,
-  testToggleCollapsePopoverAndClaim,
-} from '../../testUtils/keylessHelpers';
+import { fs } from '../../scripts';
+import { createTestUtils } from '../../testUtils';
 
 const commonSetup = appConfigs.astro.node.clone();
 
@@ -21,34 +20,53 @@ test.describe('Keyless mode @astro', () => {
   });
 
   let app: Application;
-  let dashboardUrl = 'https://dashboard.clerk.com/';
 
   test.beforeAll(async () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    if (appConfigs.envs.withKeyless.privateVariables.get('CLERK_API_URL')?.includes('clerkstage')) {
-      dashboardUrl = 'https://dashboard.clerkstage.dev/';
-    }
-    await app.dev();
+    // Without keys the app 500s on every request, so readiness can't wait for a 2xx
+    await app.dev({ acceptAnyResponse: true });
   });
 
   test.afterAll(async () => {
     await app?.teardown();
   });
 
-  test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'astro' });
-  });
-
-  test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
+  test('Without keys, requests fail with the missing env vars error instead of keyless bootstrap.', async ({
     page,
-    context,
   }) => {
-    await testClaimedAppWithMissingKeys({ page, context, app, dashboardUrl });
+    const response = await page.goto(`${app.serverUrl}/`);
+    expect(response?.status()).toBe(500);
+    const content = await page.content();
+    expect(content).toContain('Publishable key is missing');
+    expect(content).toContain('npx clerk@latest init');
   });
 
-  test('Keyless popover is removed after adding keys to .env and restarting.', async ({ page, context }) => {
-    await testKeylessRemovedAfterEnvAndRestart({ page, context, app });
+  test('Claimed application with keys inside .env renders without the keyless popover.', async ({ page, context }) => {
+    /**
+     * Seed claimed keyless state directly: the SDK no longer mints keys, so write the
+     * keys fixture to `.clerk/.tmp/keyless.json` and copy the matching keys into `.env`.
+     */
+    const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+    const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
+    await fs.ensureDir(path.join(app.appDir, '.clerk', '.tmp'));
+    await fs.writeJSON(path.join(app.appDir, '.clerk', '.tmp', 'keyless.json'), {
+      publishableKey,
+      secretKey,
+      claimUrl: 'https://dashboard.clerk.com/apps/claim',
+      apiKeysUrl: 'https://dashboard.clerk.com/last-active?path=api-keys',
+    });
+    await app.keylessToEnv();
+    // Restart the dev server to pick up new env vars (Vite doesn't hot-reload .env)
+    await app.restart();
+
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    // Claimed apps with configured keys run without any keyless UI
+    await u.po.keylessPopover.waitForUnmounted();
   });
 });
