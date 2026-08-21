@@ -1,19 +1,28 @@
 import * as Stories from './user-profile-security-panel-flow.stories';
 
-# User profile security panel flow
+# Security panel flow
 
-The password, two-factor enrollment and removal, delete-account, individual-device, and
-sign-out-all-other-devices journeys driven by a simulated backend that takes time, can fail, and can
-require a stacked reverification challenge. The panel is the flow boundary; password, passkey, MFA,
-device, and deletion state remain internal slices of its single harness.
+This story covers password, passkey, two-step verification, device, and account deletion actions.
+The controls can add a delay, trigger an error, or require an identity check.
 
-The failure-point control distinguishes an initial mutation failure from a failed reverification
-attempt and a failure when the original mutation is retried. Reverification-only targets appear
-only when reverification is required.
+Errors can happen on the first request, during the identity check, or when the original request is
+tried again. The mock controller handles these steps. The views only display the current state and
+report what the user did.
 
-The production views render controlled state snapshots and emit events. The state transitions and
-simulated backend live only in `user-profile-security-panel-flow.harness.ts`; a Clerk-backed controller
-can replace that harness without changing the dialog views.
+## Legacy behavior covered
+
+| Area             | What this story covers                                                                                                                         |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Panel            | Which sections and actions are available, plus device loading and error states                                                                 |
+| Password         | Setting or changing a password, password rules, mismatched passwords, read-only passwords, and signing out other devices                       |
+| Passkeys         | Creating a passkey right away, unsupported browsers, cancelled and failed requests, renaming, removal, and identity checks                     |
+| Two-step         | Adding phone or authenticator methods, entering and resending codes, QR and setup keys, backup codes, defaults, removal rules, and errors      |
+| Devices          | Active and pending devices, current and impersonated sessions, signing out one device, and the added “sign out all other devices” confirmation |
+| Account deletion | Confirmation text, identity checks, failed requests, and where the user goes after deleting an account                                         |
+| Identity checks  | Password, email, phone, passkey, authenticator, and backup-code methods, including selection, loading, help, and error states                  |
+
+“Sign out all other devices” is an added flow. Regular dialogs close when clicking outside them.
+Destructive confirmation dialogs do not.
 
 <Story
   name='Default'
@@ -29,18 +38,17 @@ can replace that harness without changing the dialog views.
   ]}
 />
 
-## Every security-dialog state
+## Dialog states
 
-Each option sends one controlled snapshot directly to its production view. This makes pending,
-failure, set-password, and nested reverification states inspectable without replaying the journey.
+Choose a state to open the real view directly. This makes loading, errors, password setup, and
+identity checks easy to inspect without clicking through the full flow.
 
 <Story
   name='States'
   storyModule={Stories}
 />
 
-## Temporary components
+## Temporary UI
 
-Security reuses the same temporary reverification code field as Contact flows until the full Mosaic
-OTP implementation is available. The password sign-out option uses a native checkbox until Mosaic
-Checkbox is available.
+The identity-check code field is temporary until the Mosaic code input is ready. The password form
+uses a native checkbox until the Mosaic checkbox is ready.
