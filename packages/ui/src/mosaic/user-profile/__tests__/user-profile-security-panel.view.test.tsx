@@ -182,6 +182,49 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByRole('button', { name: 'Manage Safari on iOS' })).toBeInTheDocument();
   });
 
+  it('represents device loading, errors, session filtering, and impersonation relationships', () => {
+    const loading = renderView({ devices: [], devicesStatus: 'loading' });
+    expect(screen.getByRole('status', { name: 'Loading active devices' })).toBeInTheDocument();
+    loading.unmount();
+
+    const failed = renderView({ devices: [], devicesStatus: 'error', devicesError: 'Sessions are unavailable.' });
+    expect(screen.getByText('Sessions are unavailable.')).toBeInTheDocument();
+    failed.unmount();
+
+    renderView({
+      devices: [
+        {
+          id: 'current',
+          name: 'Safari',
+          type: 'desktop',
+          isCurrent: true,
+          relationship: 'current-impersonating',
+          status: 'active',
+        },
+        {
+          id: 'user',
+          name: 'Chrome',
+          type: 'desktop',
+          relationship: 'user-device',
+          status: 'pending',
+        },
+        {
+          id: 'actor',
+          name: 'Firefox',
+          type: 'desktop',
+          relationship: 'other-impersonator',
+          status: 'active',
+        },
+        { id: 'ended', name: 'Ended session', type: 'mobile', status: 'ended' },
+      ],
+    });
+
+    expect(screen.getByText('This device')).toBeInTheDocument();
+    expect(screen.getByText('User device')).toBeInTheDocument();
+    expect(screen.getByText('Other impersonator device')).toBeInTheDocument();
+    expect(screen.queryByText('Ended session')).not.toBeInTheDocument();
+  });
+
   it('only shows backup codes with another verification method and only allows regeneration', async () => {
     const onRegenerateBackupCodes = vi.fn();
     const onRemoveMfaMethod = vi.fn();

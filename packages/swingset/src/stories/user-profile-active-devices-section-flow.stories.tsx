@@ -21,12 +21,13 @@ export const meta: StoryMeta = {
 };
 
 const DEVICES: UserProfileDevice[] = [
-  { id: 'current', name: 'Safari on macOS', type: 'desktop', isCurrent: true },
+  { id: 'current', name: 'Safari on macOS', type: 'desktop', isCurrent: true, relationship: 'current' },
   {
     id: 'desktop',
     name: 'Chrome on macOS',
     description: 'Last active 4 days ago',
     type: 'desktop',
+    relationship: 'other',
     details: {
       title: 'Macbook Pro · Chrome',
       lastActiveAtLabel: 'Last active 4 days ago',
@@ -57,7 +58,7 @@ export function Default() {
       <UserProfileActiveDevicesSectionView
         devices={flow.devices}
         onManageDevice={flow.openDevice}
-        onSignOutDevice={flow.openDevice}
+        onSignOutDevice={flow.openSignOutDevice}
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
       />
       <ActiveDevicesSectionFlowDialogs flow={flow} />
@@ -67,6 +68,52 @@ export function Default() {
 
 export function States() {
   return <SecurityFlowStates flows={['device', 'sign-out-all-devices']} />;
+}
+
+export function ProfileStates() {
+  return (
+    <div style={storyColumn}>
+      <UserProfileActiveDevicesSectionView
+        devices={[]}
+        status='loading'
+      />
+      <UserProfileActiveDevicesSectionView
+        devices={[]}
+        status='error'
+        error='Could not load active devices.'
+      />
+      <UserProfileActiveDevicesSectionView
+        devices={[
+          {
+            id: 'current-actor',
+            name: 'Safari on macOS',
+            type: 'desktop',
+            isCurrent: true,
+            relationship: 'current-impersonating',
+            status: 'active',
+          },
+          {
+            id: 'user',
+            name: 'Chrome on macOS',
+            type: 'desktop',
+            relationship: 'user-device',
+            status: 'pending',
+          },
+          {
+            id: 'other-actor',
+            name: 'Firefox on Windows',
+            type: 'desktop',
+            relationship: 'other-impersonator',
+            status: 'active',
+            isRevoking: true,
+          },
+          { id: 'ended', name: 'Ended mobile session', type: 'mobile', status: 'ended' },
+        ]}
+        onManageDevice={() => undefined}
+        onSignOutDevice={() => undefined}
+      />
+    </div>
+  );
 }
 
 const storyColumn = { display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' } as const;

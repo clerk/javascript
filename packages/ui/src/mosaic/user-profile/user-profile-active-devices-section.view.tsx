@@ -1,6 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../components/button';
+import { Badge } from '../components/badge';
+import { Spinner } from '../components/spinner';
 import { Section } from '../components/section';
 import type { UserProfileDeviceDetails } from './dialogs/flow.types';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
@@ -14,6 +16,9 @@ export interface UserProfileDevice {
   description?: string;
   type: 'desktop' | 'mobile';
   isCurrent?: boolean;
+  status?: 'active' | 'pending' | 'ended';
+  relationship?: 'current' | 'current-impersonating' | 'user-device' | 'other-impersonator' | 'other';
+  isRevoking?: boolean;
   details?: Omit<UserProfileDeviceDetails, 'id'>;
 }
 
@@ -22,6 +27,8 @@ export interface UserProfileActiveDevicesSectionViewProps {
   onManageDevice?: (id: string) => void;
   onSignOutDevice?: (id: string) => void;
   onSignOutAllOtherDevices?: () => void;
+  status?: 'loading' | 'ready' | 'error';
+  error?: string;
 }
 
 export function UserProfileActiveDevicesSectionView({
@@ -29,9 +36,51 @@ export function UserProfileActiveDevicesSectionView({
   onManageDevice,
   onSignOutDevice,
   onSignOutAllOtherDevices,
+  status = 'ready',
+  error,
 }: UserProfileActiveDevicesSectionViewProps) {
-  const currentDevices = devices.filter(device => device.isCurrent);
-  const otherDevices = devices.filter(device => !device.isCurrent);
+  const visibleDevices = devices.filter(
+    device => !device.status || device.status === 'active' || device.status === 'pending',
+  );
+  const currentDevices = visibleDevices.filter(device => device.isCurrent);
+  const otherDevices = visibleDevices.filter(device => !device.isCurrent);
+
+  if (status === 'loading') {
+    return (
+      <Section.Root>
+        <Section.Title>Active devices</Section.Title>
+        <Section.Group>
+          <Section.Row>
+            <Section.Item>
+              <span
+                aria-label='Loading active devices'
+                role='status'
+              >
+                <Spinner />
+              </span>
+            </Section.Item>
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <Section.Root>
+        <Section.Title>Active devices</Section.Title>
+        <Section.Group>
+          <Section.Row>
+            <Section.Item>
+              <Section.Content>
+                <Section.Description>{error ?? 'Could not load active devices.'}</Section.Description>
+              </Section.Content>
+            </Section.Item>
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>
+    );
+  }
 
   return (
     <div {...stylex.props(styles.sectionCards)}>
@@ -107,22 +156,33 @@ function DeviceItem({
 }) {
   const actions: UserProfileMenuAction[] = [];
 
-  if (onManage) {
+  if (onManage && !device.isRevoking) {
     actions.push({ label: 'Manage', onClick: () => onManage(device.id) });
   }
-  if (onSignOut) {
+  if (onSignOut && !device.isRevoking) {
     actions.push({ label: 'Sign out', color: 'negative', onClick: () => onSignOut(device.id) });
   }
 
   return (
-    <Section.Item>
+    <Section.Item aria-disabled={device.isRevoking || undefined}>
       <UserProfileSecurityIcon name={device.type} />
       <Section.Content>
-        <Section.Label>{device.name}</Section.Label>
+        <Section.Label>
+          {device.name}{' '}
+          {device.relationship === 'current' || device.relationship === 'current-impersonating' ? (
+            <Badge color={device.relationship === 'current-impersonating' ? 'negative' : 'primary'}>This device</Badge>
+          ) : null}
+          {device.relationship === 'user-device' ? <Badge color='neutral'>User device</Badge> : null}
+          {device.relationship === 'other-impersonator' ? (
+            <Badge color='negative'>Other impersonator device</Badge>
+          ) : null}
+        </Section.Label>
         {device.isCurrent || device.description ? (
           <Section.Description {...stylex.props(styles.descriptionLine)}>
-            {device.isCurrent ? <span {...stylex.props(styles.currentDevice)}>This device</span> : null}
-            {device.isCurrent && device.description ? <span>·</span> : null}
+            {device.isCurrent && !device.relationship ? (
+              <span {...stylex.props(styles.currentDevice)}>This device</span>
+            ) : null}
+            {device.isCurrent && !device.relationship && device.description ? <span>·</span> : null}
             {device.description ? <span>{device.description}</span> : null}
           </Section.Description>
         ) : null}
