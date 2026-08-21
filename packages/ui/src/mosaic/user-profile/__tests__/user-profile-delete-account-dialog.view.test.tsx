@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { AlertDialog } from '../../components/alert-dialog';
 import { UserProfileDeleteAccountDialogView } from '../user-profile-delete-account-dialog.view';
 
 function Harness({ onDelete = vi.fn() }: { onDelete?: () => void }) {
@@ -11,12 +12,14 @@ function Harness({ onDelete = vi.fn() }: { onDelete?: () => void }) {
 
   return (
     <MosaicProvider>
-      <UserProfileDeleteAccountDialogView
-        open
-        state={{ confirmation, isSubmitting: false, errors: {} }}
-        onConfirmationChange={setConfirmation}
-        onDelete={onDelete}
-      />
+      <AlertDialog open>
+        <UserProfileDeleteAccountDialogView
+          state={{ confirmation, isSubmitting: false, errors: {} }}
+          onCancel={vi.fn()}
+          onConfirmationChange={setConfirmation}
+          onDelete={onDelete}
+        />
+      </AlertDialog>
     </MosaicProvider>
   );
 }
@@ -52,16 +55,18 @@ describe('UserProfileDeleteAccountDialogView', () => {
   it('renders an unattributed form error', () => {
     render(
       <MosaicProvider>
-        <UserProfileDeleteAccountDialogView
-          open
-          state={{
-            confirmation: 'Delete account',
-            isSubmitting: false,
-            errors: { form: 'Something went wrong. Please try again.' },
-          }}
-          onConfirmationChange={vi.fn()}
-          onDelete={vi.fn()}
-        />
+        <AlertDialog open>
+          <UserProfileDeleteAccountDialogView
+            state={{
+              confirmation: 'Delete account',
+              isSubmitting: false,
+              errors: { form: 'Something went wrong. Please try again.' },
+            }}
+            onCancel={vi.fn()}
+            onConfirmationChange={vi.fn()}
+            onDelete={vi.fn()}
+          />
+        </AlertDialog>
       </MosaicProvider>,
     );
 
@@ -71,12 +76,14 @@ describe('UserProfileDeleteAccountDialogView', () => {
   it('announces a pending deletion without changing the button label', () => {
     render(
       <MosaicProvider>
-        <UserProfileDeleteAccountDialogView
-          open
-          state={{ confirmation: 'Delete account', isSubmitting: true, errors: {} }}
-          onConfirmationChange={vi.fn()}
-          onDelete={vi.fn()}
-        />
+        <AlertDialog open>
+          <UserProfileDeleteAccountDialogView
+            state={{ confirmation: 'Delete account', isSubmitting: true, errors: {} }}
+            onCancel={vi.fn()}
+            onConfirmationChange={vi.fn()}
+            onDelete={vi.fn()}
+          />
+        </AlertDialog>
       </MosaicProvider>,
     );
 

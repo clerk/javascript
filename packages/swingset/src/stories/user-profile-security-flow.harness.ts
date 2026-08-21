@@ -49,6 +49,7 @@ export function useSecurityFlow({
     passwordTriggerRef: password.triggerRef,
     passkeysTriggerRef: passkeys.triggerRef,
     mfaTriggerRef: mfa.triggerRef,
+    deleteTriggerRef: deletion.triggerRef,
     hasPassword: password.hasPassword,
     passkeys: passkeys.passkeys,
     mfaMethods: mfa.mfaMethods,

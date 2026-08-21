@@ -26,6 +26,7 @@ export function useDeleteSectionFlow({ config }: { config: DeleteSectionFlowConf
   const [deleteAccount, setDeleteAccount] = useState<UserProfileDeleteAccountFlowState | null>(null);
   const [reverification, setReverification] = useState<DeleteReverificationState | null>(null);
   const verificationGate = useRef<{ resolve: (verified: boolean) => void } | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   const cancelReverification = useCallback(() => {
     verificationGate.current?.resolve(false);
@@ -58,10 +59,11 @@ export function useDeleteSectionFlow({ config }: { config: DeleteSectionFlowConf
     });
   }, []);
 
-  const openDeleteAccount = useCallback(
-    () => setDeleteAccount({ confirmation: '', isSubmitting: false, errors: {} }),
-    [],
-  );
+  const openDeleteAccount = useCallback(() => {
+    const active = document.activeElement;
+    triggerRef.current = active instanceof HTMLElement ? active : null;
+    setDeleteAccount({ confirmation: '', isSubmitting: false, errors: {} });
+  }, []);
   const updateDeleteConfirmation = useCallback((confirmation: string) => {
     setDeleteAccount(current => (current ? { ...current, confirmation, errors: {} } : current));
   }, []);
@@ -171,6 +173,7 @@ export function useDeleteSectionFlow({ config }: { config: DeleteSectionFlowConf
   }, []);
 
   return {
+    triggerRef,
     deleteAccount,
     reverification,
     openDeleteAccount,
