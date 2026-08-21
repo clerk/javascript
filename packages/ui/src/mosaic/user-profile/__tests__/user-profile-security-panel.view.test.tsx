@@ -81,6 +81,7 @@ describe('UserProfileSecurityPanelView', () => {
     const onManagePasskey = vi.fn();
     const onRemovePasskey = vi.fn();
     const onAddMfaMethod = vi.fn();
+    const onManageDevice = vi.fn();
     const onSignOutDevice = vi.fn();
     const onSignOutAllOtherDevices = vi.fn();
     const onDeleteAccount = vi.fn();
@@ -96,6 +97,7 @@ describe('UserProfileSecurityPanelView', () => {
       onManagePasskey,
       onRemovePasskey,
       onAddMfaMethod,
+      onManageDevice,
       onSignOutDevice,
       onSignOutAllOtherDevices,
       onDeleteAccount,
@@ -116,6 +118,8 @@ describe('UserProfileSecurityPanelView', () => {
 
     const otherDevices = screen.getByRole('region', { name: 'Other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
+    await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+    await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
 
     expect(onChangePassword).toHaveBeenCalledOnce();
@@ -123,6 +127,7 @@ describe('UserProfileSecurityPanelView', () => {
     expect(onManagePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onAddMfaMethod).toHaveBeenCalledWith('authenticator');
+    expect(onManageDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
     expect(onDeleteAccount).toHaveBeenCalledOnce();

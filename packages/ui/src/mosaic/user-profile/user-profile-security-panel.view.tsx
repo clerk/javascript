@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 
 import { Heading } from '../components/heading';
 import { mergeStyleProps, themeProps } from '../props';
-import type { UserProfilePasskeyCreationState } from './dialogs/flow.types';
+import type { UserProfileDeviceSignOutFlowState, UserProfilePasskeyCreationState } from './dialogs/flow.types';
 import type {
   UserProfileActiveDevicesSectionViewProps,
   UserProfileDevice,
@@ -20,12 +20,16 @@ import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
-export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
+export interface UserProfileSecurityPanelViewProps extends Omit<
+  UserProfileActiveDevicesSectionViewProps,
+  'devices' | 'signOutState'
+> {
   hasPassword?: boolean;
   /** Whether this instance allows the user to set a password. Defaults to `hasPassword`. */
   passwordAvailable?: boolean;
   passkeys?: UserProfilePasskey[];
   passkeyCreationState?: UserProfilePasskeyCreationState | null;
+  deviceSignOutState?: UserProfileDeviceSignOutFlowState | null;
   mfaMethods?: UserProfileMfaMethod[];
   mfaAddableMethods?: UserProfileMfaAddableMethod[];
   devices?: UserProfileDevice[];
@@ -48,6 +52,7 @@ export function UserProfileSecurityPanelView({
   passwordAvailable = hasPassword,
   passkeys,
   passkeyCreationState,
+  deviceSignOutState,
   mfaMethods,
   mfaAddableMethods,
   devices,
@@ -113,6 +118,7 @@ export function UserProfileSecurityPanelView({
         {devices ? (
           <UserProfileActiveDevicesSectionView
             devices={devices}
+            signOutState={deviceSignOutState}
             status={devicesStatus}
             error={devicesError}
             onManageDevice={onManageDevice}

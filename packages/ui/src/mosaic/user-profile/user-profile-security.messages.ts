@@ -87,7 +87,7 @@ export const userProfileSecurityBase = {
     thisDevice: 'This device',
     userDevice: 'User device',
     otherImpersonator: 'Other impersonator device',
-    manage: 'Manage',
+    viewDetails: 'View details',
     manageDevice: 'Manage {name}',
     details: {
       device: 'Device',
@@ -96,8 +96,6 @@ export const userProfileSecurityBase = {
       lastLocation: 'Last location',
       originalSignIn: 'Original sign in',
     },
-    confirmTitle: 'Sign out of this device?',
-    confirmDescription: 'You will need to sign in again to use your account on this device.',
     signOutPending: 'Signing out device',
     bulkTitle: 'Sign out of all other devices?',
     bulkDescription: 'You will be signed out of all devices except this one.',

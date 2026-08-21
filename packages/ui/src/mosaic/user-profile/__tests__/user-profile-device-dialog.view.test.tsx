@@ -1,17 +1,14 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
-import { AlertDialog } from '../../components/alert-dialog';
 import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import type { UserProfileDeviceDetailsFlowState } from '../dialogs/flow.types';
-import { UserProfileDeviceDialogView, UserProfileDeviceSignOutDialogView } from '../user-profile-device-dialog.view';
+import { UserProfileDeviceDialogView } from '../user-profile-device-dialog.view';
 
 const state: UserProfileDeviceDetailsFlowState = {
-  step: 'details',
   device: {
     id: 'desktop',
     title: 'Macbook Pro · Chrome',
@@ -27,38 +24,12 @@ const state: UserProfileDeviceDetailsFlowState = {
   errors: {},
 };
 
-const DeviceDialogHarness = (props: {
-  isSubmitting?: boolean;
-  errors?: UserProfileDeviceDetailsFlowState['errors'];
-  onSignOut?: () => void;
-}) => {
-  const [step, setStep] = useState<UserProfileDeviceDetailsFlowState['step']>('details');
-
-  return (
-    <MosaicProvider>
-      <DeviceDialog
-        state={{
-          ...state,
-          step,
-          isSubmitting: step === 'confirm' && Boolean(props.isSubmitting),
-          errors: step === 'confirm' ? (props.errors ?? {}) : {},
-        }}
-        onRequestSignOut={() => setStep('confirm')}
-        onCancel={() => setStep('details')}
-        onSignOut={props.onSignOut ?? vi.fn()}
-      />
-    </MosaicProvider>
-  );
-};
-
 describe('UserProfileDeviceDialogView', () => {
   it('renders the selected device details', () => {
     render(
       <MosaicProvider>
         <DeviceDialog
           state={state}
-          onRequestSignOut={vi.fn()}
-          onCancel={vi.fn()}
           onSignOut={vi.fn()}
         />
       </MosaicProvider>,
@@ -71,60 +42,39 @@ describe('UserProfileDeviceDialogView', () => {
     expect(screen.getByText('Salt Lake City, UT, United States')).toBeInTheDocument();
   });
 
-  it('requests confirmation before submitting the device sign-out', async () => {
-    const user = userEvent.setup();
-    render(<DeviceDialogHarness />);
-
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
-
-    expect(await screen.findByRole('alertdialog', { name: 'Sign out of this device?' })).toHaveAccessibleDescription(
-      'You will need to sign in again to use your account on this device.',
-    );
-  });
-
-  it('submits from the confirmation without dismissing early', async () => {
+  it('submits device sign-out directly', async () => {
     const onSignOut = vi.fn();
     const user = userEvent.setup();
-    render(<DeviceDialogHarness onSignOut={onSignOut} />);
+    render(
+      <MosaicProvider>
+        <DeviceDialog
+          state={state}
+          onSignOut={onSignOut}
+        />
+      </MosaicProvider>,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Sign out' }));
-    const confirmation = await screen.findByRole('alertdialog', { name: 'Sign out of this device?' });
-
-    await user.click(within(confirmation).getByRole('button', { name: 'Sign out' }));
-
     expect(onSignOut).toHaveBeenCalledOnce();
-    expect(screen.getByRole('alertdialog', { name: 'Sign out of this device?' })).toBeInTheDocument();
   });
 
   it('announces pending and error states', async () => {
-    const user = userEvent.setup();
     render(
-      <DeviceDialogHarness
-        isSubmitting
-        errors={{ form: 'Something went wrong. Please try again.' }}
-      />,
+      <MosaicProvider>
+        <DeviceDialog
+          state={{ ...state, isSubmitting: true, errors: { form: 'Something went wrong. Please try again.' } }}
+          onSignOut={vi.fn()}
+        />
+      </MosaicProvider>,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
-    const confirmation = await screen.findByRole('alertdialog', { name: 'Sign out of this device?' });
-
-    expect(within(confirmation).getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
-    expect(within(confirmation).getByRole('button', { name: 'Sign out' })).toHaveAttribute('aria-busy', 'true');
-    expect(within(confirmation).getByRole('progressbar', { name: 'Signing out device' })).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    expect(screen.getByRole('button', { name: 'Sign out' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('progressbar', { name: 'Signing out device' })).toBeInTheDocument();
   });
 });
 
-function DeviceDialog({
-  state,
-  onRequestSignOut,
-  onCancel,
-  onSignOut,
-}: {
-  state: UserProfileDeviceDetailsFlowState;
-  onRequestSignOut: () => void;
-  onCancel: () => void;
-  onSignOut: () => void;
-}) {
+function DeviceDialog({ state, onSignOut }: { state: UserProfileDeviceDetailsFlowState; onSignOut: () => void }) {
   return (
     <Dialog.Root
       size='card'
@@ -143,16 +93,8 @@ function DeviceDialog({
           >
             <UserProfileDeviceDialogView
               state={state}
-              isInterrupted={state.step === 'confirm'}
-              onRequestSignOut={onRequestSignOut}
+              onSignOut={onSignOut}
             />
-            <AlertDialog open={state.step === 'confirm'}>
-              <UserProfileDeviceSignOutDialogView
-                state={state}
-                onCancel={onCancel}
-                onSignOut={onSignOut}
-              />
-            </AlertDialog>
           </Dialog.Popup>
         </Dialog.Viewport>
       </Dialog.Portal>
