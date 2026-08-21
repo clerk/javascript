@@ -31,6 +31,7 @@ export const userProfileSecurityBase = {
     close: 'Close',
     continue: 'Continue',
     copy: 'Copy',
+    copyAndClose: 'Copy and close',
     copied: 'Copied',
     done: 'Done',
     download: 'Download',

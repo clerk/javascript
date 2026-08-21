@@ -8,8 +8,7 @@ export function useBackupCodesDialogStory() {
   const [state, setState] = useState<UserProfileBackupCodesFlowState | null>(null);
 
   return {
-    openBackupCodesDialog: () =>
-      setState({ step: 'codes', codes: CODES, copied: false, isSubmitting: false, errors: {} }),
+    openBackupCodesDialog: () => setState({ step: 'codes', codes: CODES, isSubmitting: false, errors: {} }),
     backupCodesDialog: (
       <Dialog.Root
         size='card'
@@ -37,12 +36,10 @@ export function useBackupCodesDialogStory() {
                   <UserProfileBackupCodesDialogView
                     state={state}
                     onCancel={() => setState(null)}
-                    onRetry={() =>
-                      setState({ step: 'codes', codes: CODES, copied: false, isSubmitting: false, errors: {} })
-                    }
-                    onCopy={() => {
+                    onRetry={() => setState({ step: 'codes', codes: CODES, isSubmitting: false, errors: {} })}
+                    onCopyAndClose={() => {
                       void navigator.clipboard?.writeText(CODES.join('\n'));
-                      setState(current => (current?.step === 'codes' ? { ...current, copied: true } : current));
+                      setState(null);
                     }}
                     onDownload={() => {
                       const url = URL.createObjectURL(new Blob([CODES.join('\n')], { type: 'text/plain' }));
@@ -52,7 +49,6 @@ export function useBackupCodesDialogStory() {
                       link.click();
                       URL.revokeObjectURL(url);
                     }}
-                    onPrint={() => window.print()}
                   />
                 ) : null}
               </Freeze>

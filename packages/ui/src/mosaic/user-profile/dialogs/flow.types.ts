@@ -486,7 +486,6 @@ export type UserProfileBackupCodesFlowState =
   | {
       step: 'codes';
       codes: string[];
-      copied: boolean;
       isSubmitting: false;
       errors: FlowErrors;
     };
@@ -494,9 +493,8 @@ export type UserProfileBackupCodesFlowState =
 export interface UserProfileBackupCodesFlowActions {
   onCancel: () => void;
   onRetry: () => void;
-  onCopy: () => void;
+  onCopyAndClose: () => void;
   onDownload: () => void;
-  onPrint: () => void;
 }
 
 export interface UserProfilePasskeyCreationState {
