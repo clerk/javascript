@@ -92,7 +92,7 @@ describe('SetPrimaryContactDialogView', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Set as primary email address' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Saving…' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Set as primary' })).toHaveAttribute('aria-busy', 'true');
   });
 });
 

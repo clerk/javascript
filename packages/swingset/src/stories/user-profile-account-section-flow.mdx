@@ -2,37 +2,36 @@ import * as Stories from './user-profile-account-section-flow.stories';
 
 # Account section flow
 
-Every action on the account section that opens a dialog — adding, verifying, removing and promoting
-an email address or a phone number, plus editing the name, username and profile picture — driven by
-a simulated backend that takes time and can fail.
+This story covers the profile picture, name, username, email, and phone actions on the account
+section. The controls can change what the instance allows, add a delay, trigger an error, or
+require an identity check.
 
-The views are pure: `AddContactDialogView` branches on `state.step` and sends events back, and
-holds no flow state of its own. Everything that decides _when_ a step changes lives in
-`user-profile-account-section-flow.harness.ts` in swingset, which is what a state machine and its
-Clerk controller will replace. Each simulated delay there becomes a machine `invoke`; each branch, a
-guard.
+The views only display the current state and report what the user did. Everything that decides
+_when_ a step changes lives in the mock controller, `user-profile-account-section-flow.harness.ts`.
+A state machine and its Clerk controller replace it later: each delay becomes an `invoke`, each
+branch a guard.
 
-Three verification strategies are covered, because the legacy `EmailForm` picks between them from
-the environment rather than from anything the user did: a code, an email link (its own waiting
-screen, a 60-second throttled resend, and four terminal outcomes), and enterprise SSO. Turning on
-**Require reverification** stacks a challenge over whichever surface raised it — the interrupted
-dialog stays mounted and inert underneath, and the flow resumes there once the challenge clears.
+## Legacy behavior covered
 
-Set-as-primary gets a confirmation it does not have today. Legacy fires it straight from the
-three-dots menu, which leaves an async call that can fail with nowhere to report the failure.
+| Area              | What this story covers                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| Profile picture   | Choosing a file, previewing it, uploading, removing, and the type and size checks that run before any request |
+| Name              | First and last name, a missing first name, and the read-only form an active enterprise account produces       |
+| Username          | Setting versus updating, names already taken, and identity checks                                             |
+| Email             | Adding, verifying by code, by link, or through enterprise SSO, resending, removing, and making primary        |
+| Phone             | Adding, verifying by code, resending, removing, and making primary                                            |
+| Instance settings | Disabling additional identifications on an enterprise connection, and immutable email and phone attributes    |
+| Identity checks   | Password and email-code methods, stacked over whichever flow raised them, resuming that flow or abandoning it |
 
-Two instance settings constrain the identifier lists, and neither is a count — **Clerk has no
-"maximum one email address" setting.** `disableAdditionalIdentifications` lives on an active
-enterprise connection and takes the Add button away; the `immutable` flag on the `email_address` or
-`phone_number` attribute is instance-level and removes both adding and deleting. With an immutable
-identifier and a single verified primary address, legacy leaves a row with no actions at all, and
-that read-only state is deliberate rather than a gap.
+Two things differ from legacy on purpose. Making an email or phone primary asks first; legacy fires
+it straight from the row menu, which leaves a failed request with nowhere to report. And the step
+that sends the code has a screen of its own; legacy runs it underneath an already-drawn code screen,
+so you only see it when it fails.
 
-The three profile fields are single-step forms rather than flows, but they are not interchangeable:
-only the **username** update is wrapped in `useReverification` upstream, so it is the one a
-challenge interrupts; only the **name** goes read-only under an enterprise connection (toggle
-**Enterprise-managed**); and the **avatar** validates type and size locally, so those two errors
-appear instantly no matter what the latency is set to.
+Clerk has no maximum-identifiers setting. Two things constrain the lists and neither is a count:
+`disableAdditionalIdentifications` on an active enterprise connection hides Add, and the `immutable`
+attribute flag hides Add and Remove. An immutable identifier with one verified primary address
+leaves a row with no actions, and that read-only state is deliberate.
 
 <Story
   name='Default'
@@ -45,34 +44,32 @@ appear instantly no matter what the latency is set to.
   ]}
 />
 
-## Every contact state
+## Dialog states
 
-The same view with no backend behind it — one snapshot in, one surface out. This is the contract
-from the machine's side, and the list a parity audit checks against the legacy flows.
+Choose a state to open the real view directly. This makes loading, errors, and each verification
+strategy easy to inspect without clicking through the full flow. It is also the contract from the
+machine's side: one snapshot in, one surface out.
 
 <Story
   name='States'
   storyModule={Stories}
 />
 
-## Every profile-field state
+## Profile field states
 
-The single-step forms, on the same terms.
+The same for the single-step forms behind the profile picture, name, and username.
 
 <Story
   name='ProfileStates'
   storyModule={Stories}
 />
 
-## Standing in for components Mosaic does not have yet
+## Temporary UI
 
-The inputs here are deliberately rough and marked with `TODO` at their definitions. The code field
-is a single input styled to look segmented, the country picker is a native `<select>`, the avatar
-file picker is a bare `<input type="file">` with no drag-and-drop, and the unattributed-error banner
-is a hand-rolled `role="alert"` box. Each is a placeholder for a real
-Mosaic component — the OTP and Select ones already have unstyled `@clerk/headless` primitives
-waiting behind them.
+The code field is a single input until the Mosaic code input is ready. The country picker is a
+native select until the Mosaic select is ready, and the profile picture uses a native file input
+with no drag and drop. Unattributed errors use a hand-rolled alert until Mosaic has one.
 
-`DialogHeader` / `DialogBody` / `DialogFooter` are the same kind of placeholder, but `DialogBody`
-is load bearing rather than cosmetic: a `prompt` clips its overflow under 48rem, so without a
-scroll region a tall form loses its submit button off the bottom of the phone sheet.
+The dialog header, body, and footer are temporary too, but the body is not only cosmetic: a prompt
+clips its overflow under 48rem, so without a scroll region a tall form loses its submit button off
+the bottom of the phone sheet.

@@ -44,7 +44,7 @@ describe('AddContactDialogView', () => {
     it('keeps submit disabled until the value is longer than a single character', async () => {
       renderView({ step: 'identifier', value: 'a', isSubmitting: false, errors: {} });
 
-      expect(screen.getByRole('button', { name: 'Add' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled();
     });
 
     it('submits the identifier', async () => {
@@ -71,7 +71,10 @@ describe('AddContactDialogView', () => {
       renderView({ step: 'identifier', value: 'new@clerk.dev', isSubmitting: true, errors: {} });
 
       expect(screen.getByRole('textbox')).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Adding…' })).toBeInTheDocument();
+      // The label stays put and the button announces itself busy, rather than swapping its text
+      // and reflowing the footer mid-request.
+      expect(screen.getByRole('button', { name: 'Add' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('progressbar', { name: 'Adding' })).toBeInTheDocument();
     });
 
     it('goes inert behind a stacked reverification challenge', () => {
@@ -81,7 +84,7 @@ describe('AddContactDialogView', () => {
       );
 
       expect(screen.getByRole('textbox')).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Add' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled();
     });
 
     it('renders a country picker alongside the number for a phone', () => {
@@ -143,7 +146,7 @@ describe('AddContactDialogView', () => {
       renderView({ ...codeState, code: '424242', status: 'verifying' });
 
       expect(screen.getByRole('textbox', { name: 'Verification code' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Verifying…' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Verify' })).toHaveAttribute('aria-busy', 'true');
     });
 
     it('resends on request', async () => {

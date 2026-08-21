@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { Avatar } from '../../components/avatar';
-import { Button } from '../../components/button';
+import { Button, SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
@@ -82,20 +82,23 @@ export function EditNameDialogView({
           <Button
             color='neutral'
             disabled={state.isSubmitting}
-            variant='ghost'
+            type='button'
+            variant='outline'
             onClick={onCancel}
+            {...stylex.props(styles.footerButton)}
           >
             Cancel
           </Button>
           {/* A read-only form keeps Cancel as its only action, as the legacy page does. */}
           {state.isReadOnly ? null : (
-            <Button
-              disabled={state.isSubmitting || isInterrupted}
-              focusableWhenDisabled
-              type='submit'
+            <SubmitButton
+              disabled={isInterrupted}
+              isPending={state.isSubmitting}
+              pendingLabel='Saving'
+              {...stylex.props(styles.footerButton)}
             >
-              {state.isSubmitting ? 'Saving…' : 'Save'}
-            </Button>
+              Save
+            </SubmitButton>
           )}
         </DialogFooter>
       </DialogForm>
@@ -144,18 +147,21 @@ export function EditUsernameDialogView({
           <Button
             color='neutral'
             disabled={state.isSubmitting}
-            variant='ghost'
+            type='button'
+            variant='outline'
             onClick={onCancel}
+            {...stylex.props(styles.footerButton)}
           >
             Cancel
           </Button>
-          <Button
-            disabled={state.isSubmitting || isInterrupted}
-            focusableWhenDisabled
-            type='submit'
+          <SubmitButton
+            disabled={isInterrupted}
+            isPending={state.isSubmitting}
+            pendingLabel='Saving'
+            {...stylex.props(styles.footerButton)}
           >
-            {state.isSubmitting ? 'Saving…' : 'Save'}
-          </Button>
+            Save
+          </SubmitButton>
         </DialogFooter>
       </DialogForm>
     </>
@@ -239,18 +245,19 @@ export function EditAvatarDialogView({
             <Button
               color='neutral'
               disabled={state.status !== 'idle'}
-              variant='ghost'
+              type='button'
+              variant='outline'
               onClick={onCancel}
             >
               Cancel
             </Button>
-            <Button
+            <SubmitButton
               disabled={busy || !state.fileName}
-              focusableWhenDisabled
-              type='submit'
+              isPending={state.status === 'uploading'}
+              pendingLabel='Uploading'
             >
-              {state.status === 'uploading' ? 'Uploading…' : 'Upload'}
-            </Button>
+              Upload
+            </SubmitButton>
           </div>
         </DialogFooter>
       </DialogForm>

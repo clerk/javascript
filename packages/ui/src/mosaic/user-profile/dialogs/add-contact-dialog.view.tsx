@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { Button } from '../../components/button';
+import { Button, SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
@@ -153,7 +153,7 @@ function IdentifierStep({
 
   return (
     <>
-      <Dialog.CloseButton />
+      <Dialog.CloseButton disabled={state.isSubmitting} />
       <DialogHeader
         description={text.hint}
         title={text.title}
@@ -195,18 +195,21 @@ function IdentifierStep({
           <Button
             color='neutral'
             disabled={state.isSubmitting}
-            variant='ghost'
+            type='button'
+            variant='outline'
             onClick={onCancel}
+            {...stylex.props(styles.footerButton)}
           >
             Cancel
           </Button>
-          <Button
+          <SubmitButton
             disabled={!canSubmit}
-            focusableWhenDisabled
-            type='submit'
+            isPending={state.isSubmitting}
+            pendingLabel='Adding'
+            {...stylex.props(styles.footerButton)}
           >
-            {state.isSubmitting ? 'Adding…' : text.submit}
-          </Button>
+            {text.submit}
+          </SubmitButton>
         </DialogFooter>
       </DialogForm>
     </>
@@ -267,18 +270,21 @@ function CodeStep({
           <Button
             color='neutral'
             disabled={state.status === 'verifying'}
-            variant='ghost'
+            type='button'
+            variant='outline'
             onClick={onCancel}
+            {...stylex.props(styles.footerButton)}
           >
             Cancel
           </Button>
-          <Button
+          <SubmitButton
             disabled={inert || state.code.length === 0}
-            focusableWhenDisabled
-            type='submit'
+            isPending={state.status === 'verifying'}
+            pendingLabel='Verifying'
+            {...stylex.props(styles.footerButton)}
           >
-            {state.status === 'verifying' ? 'Verifying…' : 'Verify'}
-          </Button>
+            Verify
+          </SubmitButton>
         </DialogFooter>
       </DialogForm>
     </>
@@ -344,7 +350,7 @@ function LinkStep({ kind, state, isInterrupted = false, onResend, onCancel }: St
         />
         <Button
           color='neutral'
-          variant='ghost'
+          variant='outline'
           onClick={onCancel}
         >
           {state.outcome ? 'Close' : 'Cancel'}
@@ -380,8 +386,9 @@ function SsoStep({ kind, state, isInterrupted = false, onOpenSsoPopup, onCancel 
       <DialogFooter>
         <Button
           color='neutral'
-          variant='ghost'
+          variant='outline'
           onClick={onCancel}
+          {...stylex.props(styles.footerButton)}
         >
           Cancel
         </Button>
@@ -389,6 +396,7 @@ function SsoStep({ kind, state, isInterrupted = false, onOpenSsoPopup, onCancel 
           disabled={isInterrupted || state.status === 'awaiting_popup'}
           focusableWhenDisabled
           onClick={onOpenSsoPopup}
+          {...stylex.props(styles.footerButton)}
         >
           {state.status === 'error' ? 'Try again' : `Continue with ${state.providerName}`}
         </Button>

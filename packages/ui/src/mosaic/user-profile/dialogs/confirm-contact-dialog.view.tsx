@@ -1,5 +1,5 @@
 import { AlertDialog } from '../../components/alert-dialog';
-import { Button } from '../../components/button';
+import { Button, SubmitButton } from '../../components/button';
 import type { ConfirmContactActionState, ContactKind } from './flow.types';
 import { FormAlert, Identifier } from './flow-dialog-chrome';
 
@@ -59,14 +59,15 @@ export function RemoveContactDialogView({
         >
           Cancel
         </Button>
-        <Button
+        <SubmitButton
           color='negative'
-          disabled={state.isSubmitting}
-          focusableWhenDisabled
+          isPending={state.isSubmitting}
+          pendingLabel='Removing'
+          type='button'
           onClick={onConfirm}
         >
-          {state.isSubmitting ? text.pending : text.action}
-        </Button>
+          {text.action}
+        </SubmitButton>
       </AlertDialog.Actions>
     </>
   );
@@ -106,13 +107,14 @@ export function SetPrimaryContactDialogView({ kind, state, onConfirm, onCancel }
         >
           Cancel
         </Button>
-        <Button
-          disabled={state.isSubmitting}
-          focusableWhenDisabled
+        <SubmitButton
+          isPending={state.isSubmitting}
+          pendingLabel='Saving'
+          type='button'
           onClick={onConfirm}
         >
-          {state.isSubmitting ? 'Saving…' : 'Set as primary'}
-        </Button>
+          Set as primary
+        </SubmitButton>
       </AlertDialog.Actions>
     </>
   );

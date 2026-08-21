@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { Button } from '../../components/button';
+import { Button, SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
@@ -103,18 +103,21 @@ export function ReverificationDialogView({
           <Button
             color='neutral'
             disabled={inert}
-            variant='ghost'
+            type='button'
+            variant='outline'
             onClick={onCancel}
+            {...stylex.props(styles.footerButton)}
           >
             Cancel
           </Button>
-          <Button
+          <SubmitButton
             disabled={!canSubmit}
-            focusableWhenDisabled
-            type='submit'
+            isPending={inert}
+            pendingLabel='Verifying'
+            {...stylex.props(styles.footerButton)}
           >
-            {inert ? 'Verifying…' : 'Continue'}
-          </Button>
+            Continue
+          </SubmitButton>
         </DialogFooter>
       </DialogForm>
     </>

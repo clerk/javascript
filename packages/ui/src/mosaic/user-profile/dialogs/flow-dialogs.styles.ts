@@ -27,6 +27,13 @@ export const styles = stylex.create({
     minHeight: 0,
     overflowY: 'auto',
   },
+  /**
+   * Footer buttons share the width evenly rather than sitting right-aligned at their natural size.
+   * Matches the security dialogs, so the two sets read as one system.
+   */
+  footerButton: {
+    flex: '1',
+  },
   // TODO: Replace with `Dialog.Footer` once Mosaic has one.
   footer: {
     gap: space['2'],

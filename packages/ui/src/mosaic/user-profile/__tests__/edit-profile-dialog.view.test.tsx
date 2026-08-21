@@ -81,7 +81,7 @@ describe('EditNameDialogView', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Saving…' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('aria-busy', 'true');
   });
 });
 
@@ -136,7 +136,7 @@ describe('EditUsernameDialogView', () => {
     );
 
     expect(screen.getByLabelText('Username')).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
   });
 });
 
@@ -156,7 +156,7 @@ describe('EditAvatarDialogView', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Upload' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
   });
 
   it('names the staged file and enables Upload', () => {
@@ -237,7 +237,11 @@ describe('EditAvatarDialogView', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
+    if (status === 'uploading') {
+      expect(screen.getByRole('button', { name: 'Upload' })).toHaveAttribute('aria-busy', 'true');
+    } else {
+      expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
+    }
     expect(screen.getByLabelText('Image file')).toBeDisabled();
   });
 });
