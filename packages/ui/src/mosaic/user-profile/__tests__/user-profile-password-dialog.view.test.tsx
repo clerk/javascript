@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
-import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import type { UserProfilePasswordMode, UserProfilePasswordValues } from '../user-profile-password-dialog.view';
 import { UserProfilePasswordDialogView } from '../user-profile-password-dialog.view';
@@ -47,11 +46,8 @@ describe('UserProfilePasswordDialogView', () => {
     render(<Harness />);
 
     const dialog = screen.getByRole('dialog', { name: 'Change password' });
-    expect(dialog).toHaveClass('cl-dialog-popup', 'cl-card-root');
+    expect(dialog).toHaveClass('cl-dialog-popup');
     expect(dialog).not.toHaveTextContent('Secured by');
-    expect(screen.getByRole('heading', { name: 'Change password' }).closest('.cl-card-header')).not.toBeNull();
-    expect(screen.getByLabelText('New password').closest('.cl-card-content')).not.toBeNull();
-    expect(screen.getByRole('button', { name: 'Change password' }).closest('.cl-card-footer')).not.toBeNull();
     expect(screen.getByLabelText('New password')).toHaveAttribute('autocomplete', 'new-password');
     expect(screen.getByLabelText('Confirm password')).toHaveAttribute('autocomplete', 'new-password');
     expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).toBeChecked();
@@ -161,23 +157,11 @@ describe('UserProfilePasswordDialogView', () => {
 
 function PasswordDialog({ children }: { children: React.ReactNode }) {
   return (
-    <Dialog.Root
-      size='card'
-      open
-    >
+    <Dialog.Root open>
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Viewport>
-          <Dialog.Popup
-            render={
-              <Card.Root
-                elevation='overlay'
-                renderBranding={false}
-              />
-            }
-          >
-            {children}
-          </Dialog.Popup>
+          <Dialog.Popup>{children}</Dialog.Popup>
         </Dialog.Viewport>
       </Dialog.Portal>
     </Dialog.Root>

@@ -226,6 +226,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         {verificationDialog('remove-passkey')}
       </AlertDialog>
       <FlowCardDialog
+        size='card'
         finalFocus={flow.mfaTriggerRef}
         open={Boolean(flow.addMfa)}
         onOpenChange={open => {
@@ -287,6 +288,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         {verificationDialog('remove-mfa')}
       </AlertDialog>
       <FlowCardDialog
+        size='card'
         finalFocus={flow.mfaTriggerRef}
         open={Boolean(flow.backupCodes)}
         onOpenChange={open => {
@@ -363,6 +365,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         {verificationDialog('sign-out-all-devices')}
       </AlertDialog>
       <FlowCardDialog
+        size='card'
         finalFocus={flow.activeDevicesTriggerRef}
         open={Boolean(flow.device)}
         onOpenChange={open => {
@@ -408,17 +411,19 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
 function FlowCardDialog({
   open,
   finalFocus,
+  size = 'prompt',
   onOpenChange,
   children,
 }: {
   open: boolean;
   finalFocus?: React.RefObject<HTMLElement | null>;
+  size?: 'prompt' | 'card';
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
 }) {
   return (
     <Dialog.Root
-      size='card'
+      size={size}
       closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
@@ -429,10 +434,12 @@ function FlowCardDialog({
           <Dialog.Popup
             finalFocus={finalFocus}
             render={
-              <Card.Root
-                elevation='overlay'
-                renderBranding={false}
-              />
+              size === 'card' ? (
+                <Card.Root
+                  elevation='overlay'
+                  renderBranding={false}
+                />
+              ) : undefined
             }
           >
             {children}
@@ -1636,6 +1643,7 @@ export function States() {
       ) : null}
       {snapshot.flow === 'add-mfa' ? (
         <FlowCardDialog
+          size='card'
           open={open}
           onOpenChange={setOpen}
         >
@@ -1674,6 +1682,7 @@ export function States() {
       ) : null}
       {snapshot.flow === 'backup-codes' ? (
         <FlowCardDialog
+          size='card'
           open={open}
           onOpenChange={setOpen}
         >
@@ -1720,6 +1729,7 @@ export function States() {
       ) : null}
       {snapshot.flow === 'device' ? (
         <FlowCardDialog
+          size='card'
           open={open}
           onOpenChange={setOpen}
         >

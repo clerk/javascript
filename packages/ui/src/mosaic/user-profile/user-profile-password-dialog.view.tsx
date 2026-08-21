@@ -1,15 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
-import { type FormEvent, useId } from 'react';
+import { useId } from 'react';
 
 import { Button, SubmitButton } from '../components/button';
-import { Card } from '../components/card';
 import { Dialog } from '../components/dialog';
 import { Field } from '../components/field';
-import { Heading } from '../components/heading';
 import { Input } from '../components/input';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
 import type { UserProfilePasswordFlowActions, UserProfilePasswordFlowState } from './dialogs/flow.types';
+import { DialogBody, DialogFooter, DialogForm, DialogHeader, FormAlert } from './dialogs/flow-dialog-chrome';
 import { passwordDialogStyles as styles } from './user-profile-password-dialog.styles';
 
 export type {
@@ -35,82 +34,70 @@ export function UserProfilePasswordDialogView({
   const { values, mode, isSubmitting, errors } = state;
   const locked = Boolean(state.isReadOnly) || isSubmitting;
   const title = mode === 'set' ? 'Set password' : 'Change password';
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submit = () => {
     if (canSubmit && !isSubmitting && !state.isReadOnly) {
       onSubmit(values);
     }
   };
 
   return (
-    <form
-      aria-hidden={isInterrupted || undefined}
-      onSubmit={submit}
-      {...mergeStyleProps(themeProps('user-profile-password-dialog-form'), stylex.props(styles.form))}
-    >
+    <div aria-hidden={isInterrupted || undefined}>
       <Dialog.CloseButton />
-      <Card.Header>
-        <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
-      </Card.Header>
-      <Card.Content>
-        <div {...mergeStyleProps(themeProps('user-profile-password-dialog-fields'), stylex.props(styles.fields))}>
-          {state.isReadOnly ? (
-            <Text color='neutral'>Your password is managed by your enterprise connection.</Text>
-          ) : null}
-          <PasswordField
-            name='newPassword'
-            label='New password'
-            autoComplete='new-password'
-            value={values.newPassword}
-            error={errors.newPassword}
-            disabled={locked}
-            onChange={value => onValueChange('newPassword', value)}
-          />
-          <PasswordField
-            name='confirmPassword'
-            label='Confirm password'
-            autoComplete='new-password'
-            value={values.confirmPassword}
-            error={errors.confirmPassword}
-            disabled={locked}
-            onChange={value => onValueChange('confirmPassword', value)}
-          />
-          <SignOutOfOtherSessionsField
-            checked={values.signOutOfOtherSessions}
-            disabled={locked}
-            onChange={checked => onValueChange('signOutOfOtherSessions', checked)}
-          />
-          {errors.form ? (
-            <Text
-              color='negative'
-              role='alert'
-            >
-              {errors.form}
-            </Text>
-          ) : null}
-        </div>
-      </Card.Content>
-      <Card.Footer {...themeProps('user-profile-password-dialog-actions')}>
-        <Button
-          {...stylex.props(styles.footerButton)}
-          type='button'
-          variant='outline'
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        {state.isReadOnly ? null : (
-          <SubmitButton
-            disabled={!canSubmit}
-            isPending={isSubmitting}
-            pendingLabel={mode === 'set' ? 'Setting password' : 'Changing password'}
+      <DialogHeader title={title} />
+      <DialogForm onSubmit={submit}>
+        <DialogBody>
+          <div {...mergeStyleProps(themeProps('user-profile-password-dialog-fields'), stylex.props(styles.fields))}>
+            {state.isReadOnly ? (
+              <Text color='neutral'>Your password is managed by your enterprise connection.</Text>
+            ) : null}
+            <PasswordField
+              name='newPassword'
+              label='New password'
+              autoComplete='new-password'
+              value={values.newPassword}
+              error={errors.newPassword}
+              disabled={locked}
+              onChange={value => onValueChange('newPassword', value)}
+            />
+            <PasswordField
+              name='confirmPassword'
+              label='Confirm password'
+              autoComplete='new-password'
+              value={values.confirmPassword}
+              error={errors.confirmPassword}
+              disabled={locked}
+              onChange={value => onValueChange('confirmPassword', value)}
+            />
+            <SignOutOfOtherSessionsField
+              checked={values.signOutOfOtherSessions}
+              disabled={locked}
+              onChange={checked => onValueChange('signOutOfOtherSessions', checked)}
+            />
+            <FormAlert>{errors.form}</FormAlert>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button
             {...stylex.props(styles.footerButton)}
+            type='button'
+            variant='outline'
+            onClick={onCancel}
           >
-            {title}
-          </SubmitButton>
-        )}
-      </Card.Footer>
-    </form>
+            Cancel
+          </Button>
+          {state.isReadOnly ? null : (
+            <SubmitButton
+              disabled={!canSubmit}
+              isPending={isSubmitting}
+              pendingLabel={mode === 'set' ? 'Setting password' : 'Changing password'}
+              {...stylex.props(styles.footerButton)}
+            >
+              {title}
+            </SubmitButton>
+          )}
+        </DialogFooter>
+      </DialogForm>
+    </div>
   );
 }
 

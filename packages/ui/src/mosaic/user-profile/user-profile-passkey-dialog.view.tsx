@@ -1,9 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
-import type { FormEvent } from 'react';
 
 import { AlertDialog } from '../components/alert-dialog';
 import { Button, SubmitButton } from '../components/button';
-import { Card } from '../components/card';
 import { Dialog } from '../components/dialog';
 import { Field } from '../components/field';
 import { Heading } from '../components/heading';
@@ -17,6 +15,7 @@ import type {
   UserProfilePasskeyRenameFlowActions,
   UserProfilePasskeyRenameFlowState,
 } from './dialogs/flow.types';
+import { DialogBody, DialogFooter, DialogForm, DialogHeader, FormAlert } from './dialogs/flow-dialog-chrome';
 import { passkeyDialogStyles as styles } from './user-profile-passkey-dialog.styles';
 
 interface PasskeyDialogProps {
@@ -33,54 +32,42 @@ export function UserProfilePasskeyAddDialogView({
   onCancel,
   onAdd,
 }: UserProfilePasskeyAddDialogViewProps) {
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submit = () => {
     if (!state.isSubmitting) {
       onAdd();
     }
   };
 
   return (
-    <form
-      aria-hidden={isInterrupted || undefined}
-      onSubmit={submit}
-      {...stylex.props(styles.form)}
-    >
+    <div aria-hidden={isInterrupted || undefined}>
       <Dialog.CloseButton />
-      <Card.Header>
-        <Dialog.Title render={<Heading size='sm' />}>Add passkey</Dialog.Title>
-        <Dialog.Description render={<Text />}>
-          Your browser or device will ask you to create a passkey for this account.
-        </Dialog.Description>
-      </Card.Header>
-      {state.errors.form ? (
-        <Card.Content>
-          <Text
-            color='negative'
-            role='alert'
+      <DialogHeader
+        title='Add passkey'
+        description='Your browser or device will ask you to create a passkey for this account.'
+      />
+      <DialogForm onSubmit={submit}>
+        <DialogBody>
+          <FormAlert>{state.errors.form}</FormAlert>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            type='button'
+            variant='outline'
+            {...stylex.props(styles.footerButton)}
+            onClick={onCancel}
           >
-            {state.errors.form}
-          </Text>
-        </Card.Content>
-      ) : null}
-      <Card.Footer>
-        <Button
-          type='button'
-          variant='outline'
-          {...stylex.props(styles.footerButton)}
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        <SubmitButton
-          isPending={state.isSubmitting}
-          pendingLabel='Adding passkey'
-          {...stylex.props(styles.footerButton)}
-        >
-          Add passkey
-        </SubmitButton>
-      </Card.Footer>
-    </form>
+            Cancel
+          </Button>
+          <SubmitButton
+            isPending={state.isSubmitting}
+            pendingLabel='Adding passkey'
+            {...stylex.props(styles.footerButton)}
+          >
+            Add passkey
+          </SubmitButton>
+        </DialogFooter>
+      </DialogForm>
+    </div>
   );
 }
 
@@ -97,68 +84,58 @@ export function UserProfilePasskeyRenameDialogView({
   onRename,
 }: UserProfilePasskeyRenameDialogViewProps) {
   const canSubmit = state.name.length > 1 && state.name !== state.originalName;
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submit = () => {
     if (canSubmit && !state.isSubmitting) {
       onRename();
     }
   };
 
   return (
-    <form
-      aria-hidden={isInterrupted || undefined}
-      onSubmit={submit}
-      {...stylex.props(styles.form)}
-    >
+    <div aria-hidden={isInterrupted || undefined}>
       <Dialog.CloseButton />
-      <Card.Header>
-        <Dialog.Title render={<Heading size='sm' />}>Rename passkey</Dialog.Title>
-        <Dialog.Description render={<Text />}>Change the passkey name to make it easier to find.</Dialog.Description>
-      </Card.Header>
-      <Card.Content>
-        <Field.Root
-          required
-          disabled={state.isSubmitting}
-          invalid={Boolean(state.errors.field)}
-          {...stylex.props(styles.field)}
-        >
-          <Field.Label>Passkey name</Field.Label>
-          <Input
-            autoComplete='off'
-            spellCheck={false}
-            value={state.name}
-            onChange={event => onNameChange(event.target.value)}
-          />
-          {state.errors.field ? <Field.Error>{state.errors.field}</Field.Error> : null}
-        </Field.Root>
-        {state.errors.form ? (
-          <Text
-            color='negative'
-            role='alert'
+      <DialogHeader
+        title='Rename passkey'
+        description='Change the passkey name to make it easier to find.'
+      />
+      <DialogForm onSubmit={submit}>
+        <DialogBody>
+          <Field.Root
+            required
+            disabled={state.isSubmitting}
+            invalid={Boolean(state.errors.field)}
+            {...stylex.props(styles.field)}
           >
-            {state.errors.form}
-          </Text>
-        ) : null}
-      </Card.Content>
-      <Card.Footer>
-        <Button
-          type='button'
-          variant='outline'
-          {...stylex.props(styles.footerButton)}
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        <SubmitButton
-          disabled={!canSubmit}
-          isPending={state.isSubmitting}
-          pendingLabel='Renaming passkey'
-          {...stylex.props(styles.footerButton)}
-        >
-          Save
-        </SubmitButton>
-      </Card.Footer>
-    </form>
+            <Field.Label>Passkey name</Field.Label>
+            <Input
+              autoComplete='off'
+              spellCheck={false}
+              value={state.name}
+              onChange={event => onNameChange(event.target.value)}
+            />
+            {state.errors.field ? <Field.Error>{state.errors.field}</Field.Error> : null}
+          </Field.Root>
+          <FormAlert>{state.errors.form}</FormAlert>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            type='button'
+            variant='outline'
+            {...stylex.props(styles.footerButton)}
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+          <SubmitButton
+            disabled={!canSubmit}
+            isPending={state.isSubmitting}
+            pendingLabel='Renaming passkey'
+            {...stylex.props(styles.footerButton)}
+          >
+            Save
+          </SubmitButton>
+        </DialogFooter>
+      </DialogForm>
+    </div>
   );
 }
 

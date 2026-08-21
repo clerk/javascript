@@ -131,7 +131,6 @@ function PasskeyDialog({
 }) {
   return (
     <Dialog.Root
-      size='card'
       closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
@@ -139,16 +138,7 @@ function PasskeyDialog({
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Viewport>
-          <Dialog.Popup
-            render={
-              <Card.Root
-                elevation='overlay'
-                renderBranding={false}
-              />
-            }
-          >
-            {children}
-          </Dialog.Popup>
+          <Dialog.Popup>{children}</Dialog.Popup>
         </Dialog.Viewport>
       </Dialog.Portal>
     </Dialog.Root>
@@ -156,5 +146,4 @@ function PasskeyDialog({
 }
 import { Freeze } from '@clerk/headless/utils';
 import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
-import { Card } from '@clerk/ui/mosaic/components/card';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
