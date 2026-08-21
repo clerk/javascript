@@ -15,7 +15,6 @@ export function useDeviceDialogStory({ onSignOut }: { onSignOut?: (id: string) =
     deviceDialog: (
       <Dialog.Root
         size='card'
-        closedBy='closerequest'
         open={Boolean(device)}
         onOpenChange={open => {
           if (!open) {

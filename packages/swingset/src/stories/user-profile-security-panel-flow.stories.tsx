@@ -382,7 +382,6 @@ function FlowCardDialog({
   return (
     <Dialog.Root
       size={size}
-      closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
     >

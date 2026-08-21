@@ -178,7 +178,6 @@ function MfaDialog({
   return (
     <Dialog.Root
       size='card'
-      closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
     >
