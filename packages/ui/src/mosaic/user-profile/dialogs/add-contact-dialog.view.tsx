@@ -5,7 +5,7 @@ import { Button } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
-import type { AddContactFlowActions, AddContactFlowState, AddContactIntent, ContactKind } from './flow.types';
+import type { AddContactFlowActions, AddContactFlowState, ContactKind } from './flow.types';
 import {
   CodeInput,
   DialogBody,
@@ -23,8 +23,6 @@ import { styles } from './flow-dialogs.styles';
 
 export interface AddContactDialogViewProps extends AddContactFlowActions {
   kind: ContactKind;
-  /** Adding another, or replacing the only one. @default 'add' */
-  intent?: AddContactIntent;
   state: AddContactFlowState;
   /**
    * True while a reverification challenge is stacked over this dialog. The step underneath stays
@@ -36,23 +34,22 @@ export interface AddContactDialogViewProps extends AddContactFlowActions {
 
 const copy = {
   email: {
-    add: { title: 'Add email address', submit: 'Add', pending: 'Adding…' },
-    // Replacing rather than adding, so the old address stops working once this one is verified.
-    update: { title: 'Update email address', submit: 'Save', pending: 'Saving…' },
+    title: 'Add email address',
     hint: 'An email address must be verified before it can be added to your account.',
     label: 'Email address',
     placeholder: 'you@example.com',
+    submit: 'Add',
     verifyTitle: 'Verify email address',
   },
   phone: {
-    add: { title: 'Add phone number', submit: 'Add', pending: 'Adding…' },
-    update: { title: 'Update phone number', submit: 'Save', pending: 'Saving…' },
+    title: 'Add phone number',
     hint: 'A text message containing a verification code will be sent to this phone number. Message and data rates may apply.',
     label: 'Phone number',
     placeholder: '201 555 0123',
+    submit: 'Add',
     verifyTitle: 'Verify phone number',
   },
-} as const;
+} as const satisfies Record<ContactKind, Record<string, string>>;
 
 /**
  * Every rendered state of adding an email address or a phone number, from identifier entry through
@@ -143,7 +140,6 @@ type StepProps<Step extends AddContactFlowState['step']> = Omit<AddContactDialog
 
 function IdentifierStep({
   kind,
-  intent = 'add',
   state,
   isInterrupted = false,
   onValueChange,
@@ -160,7 +156,7 @@ function IdentifierStep({
       <Dialog.CloseButton />
       <DialogHeader
         description={text.hint}
-        title={text[intent].title}
+        title={text.title}
       />
       <DialogForm onSubmit={onSubmitIdentifier}>
         <DialogBody>
@@ -209,7 +205,7 @@ function IdentifierStep({
             focusableWhenDisabled
             type='submit'
           >
-            {state.isSubmitting ? text[intent].pending : text[intent].submit}
+            {state.isSubmitting ? 'Adding…' : text.submit}
           </Button>
         </DialogFooter>
       </DialogForm>

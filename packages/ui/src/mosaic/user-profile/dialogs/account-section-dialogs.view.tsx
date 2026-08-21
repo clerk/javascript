@@ -121,7 +121,6 @@ export function AccountSectionDialogsView({
         <Freeze frozen={!addContact}>
           {addContact ? (
             <AddContactDialogView
-              intent={addContact.intent}
               isInterrupted={Boolean(reverification)}
               kind={addContact.kind}
               state={addContact.state}

@@ -84,18 +84,6 @@ describe('AddContactDialogView', () => {
       expect(screen.getByRole('button', { name: 'Add' })).toHaveAttribute('aria-disabled', 'true');
     });
 
-    it('names itself for replacing rather than adding when that is the intent', () => {
-      renderView(
-        { step: 'identifier', value: 'item1@clerk.dev', isSubmitting: false, errors: {} },
-        { intent: 'update' },
-      );
-
-      // The only affordance an instance permitting one address has, so it must not read as "Add".
-      expect(screen.getByRole('heading', { name: 'Update email address' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument();
-    });
-
     it('renders a country picker alongside the number for a phone', () => {
       renderView({ step: 'identifier', value: '+1', isSubmitting: false, errors: {} }, { kind: 'phone' });
 

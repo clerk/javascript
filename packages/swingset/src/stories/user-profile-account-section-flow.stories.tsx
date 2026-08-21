@@ -306,11 +306,19 @@ function Controls({
       <ControlGroup title='Instance settings'>
         <label style={controlLabel}>
           <input
-            checked={config.allowMultipleAccounts}
+            checked={config.disableAdditionalIdentifications}
             type='checkbox'
-            onChange={event => onChange({ allowMultipleAccounts: event.target.checked })}
+            onChange={event => onChange({ disableAdditionalIdentifications: event.target.checked })}
           />
-          <span style={controlName}>Allow multiple emails / phones</span>
+          <span style={controlName}>Disable additional identifications (enterprise connection)</span>
+        </label>
+        <label style={controlLabel}>
+          <input
+            checked={config.identifiersImmutable}
+            type='checkbox'
+            onChange={event => onChange({ identifiersImmutable: event.target.checked })}
+          />
+          <span style={controlName}>Email / phone immutable (attribute setting)</span>
         </label>
         <RadioGroup
           legend='Email strategy'
@@ -405,6 +413,11 @@ export function Default() {
     initialPhones: INITIAL_PHONES,
   });
 
+  // `shouldAllowIdentificationCreation && !isImmutable` and `!isImmutable`, as `AccountSections`
+  // computes them. An immutable identifier can be neither added nor removed.
+  const canAddIdentifier = !config.disableAdditionalIdentifications && !config.identifiersImmutable;
+  const canRemoveIdentifier = !config.identifiersImmutable;
+
   const confirmRecord = flow.confirm
     ? (flow.confirm.pending.kind === 'email' ? flow.emails : flow.phones).find(
         item => item.id === flow.confirm?.pending.id,
@@ -420,12 +433,14 @@ export function Default() {
       {/* The section renders the dialogs itself; the harness supplies only their state and events,
           which is what the controller will hand it once a machine drives this. */}
       <UserProfileAccountSectionView
-        allowMultipleAccounts={config.allowMultipleAccounts}
+        // Legacy always LISTS every identifier and hides only the actions — the single-row layout
+        // has no counterpart there, so the flow story renders the list and expresses both
+        // constraints by withholding callbacks, exactly as `AccountSections` withholds them.
+        allowMultipleAccounts
         addContact={
           flow.add
             ? {
                 kind: flow.add.kind,
-                intent: flow.add.intent,
                 state: flow.add.state,
                 onCancel: flow.closeAdd,
                 onCodeChange: flow.setCode,
@@ -479,25 +494,31 @@ export function Default() {
         name={`${flow.identity.firstName} ${flow.identity.lastName}`.trim()}
         phones={flow.phones}
         username={flow.identity.username}
-        onAddEmail={() => flow.openAdd('email')}
-        onAddPhone={() => flow.openAdd('phone')}
-        onManageEmail={id => flow.openManage('email', id)}
-        onManagePhone={id => flow.openManage('phone', id)}
+        onAddEmail={canAddIdentifier ? () => flow.openAdd('email') : undefined}
+        onAddPhone={canAddIdentifier ? () => flow.openAdd('phone') : undefined}
         onEditProfilePicture={() => flow.openEdit('avatar')}
         onNameChange={() => flow.openEdit('name')}
         onUsernameChange={() => flow.openEdit('username')}
-        onRemoveEmail={id => {
-          const record = flow.emails.find(email => email.id === id);
-          if (record) {
-            flow.openConfirm({ action: 'remove', kind: 'email', id }, record.value);
-          }
-        }}
-        onRemovePhone={id => {
-          const record = flow.phones.find(phone => phone.id === id);
-          if (record) {
-            flow.openConfirm({ action: 'remove', kind: 'phone', id }, record.value);
-          }
-        }}
+        onRemoveEmail={
+          canRemoveIdentifier
+            ? id => {
+                const record = flow.emails.find(email => email.id === id);
+                if (record) {
+                  flow.openConfirm({ action: 'remove', kind: 'email', id }, record.value);
+                }
+              }
+            : undefined
+        }
+        onRemovePhone={
+          canRemoveIdentifier
+            ? id => {
+                const record = flow.phones.find(phone => phone.id === id);
+                if (record) {
+                  flow.openConfirm({ action: 'remove', kind: 'phone', id }, record.value);
+                }
+              }
+            : undefined
+        }
         onSetPrimaryEmail={id => {
           const record = flow.emails.find(email => email.id === id);
           if (record) {

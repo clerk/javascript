@@ -240,18 +240,8 @@ export type ConfirmContactFlow = ConfirmContactDialogActions & {
   state: ConfirmContactActionState;
 };
 
-/**
- * Whether the flow is adding a contact or replacing the one there already is.
- *
- * An instance that permits only one email address has no Add — the single row's only affordance is
- * to change the address it shows, which is the same flow with a different name and a different
- * landing: the verified result takes the old one's place instead of joining it.
- */
-export type AddContactIntent = 'add' | 'update';
-
 export type AddContactFlow = AddContactFlowActions & {
   kind: ContactKind;
-  intent: AddContactIntent;
   state: AddContactFlowState;
 };
 

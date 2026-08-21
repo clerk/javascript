@@ -1,6 +1,5 @@
 import type {
   AddContactFlowState,
-  AddContactIntent,
   ConfirmContactActionState,
   ContactKind,
   ContactVerificationStrategy,
@@ -52,11 +51,21 @@ export interface AccountSectionFlowConfig {
   /** Fail the enterprise SSO popup instead of returning verified. */
   ssoFails: boolean;
   /**
-   * Whether the instance permits more than one email address or phone number. Off, the section
-   * collapses each to a single row showing only the primary; on, each gets its own card with an
-   * Add button and a per-row menu — which is what the add, remove and set-primary flows need.
+   * The enterprise connection's `disableAdditionalIdentifications`, as read by
+   * `shouldAllowIdentificationCreation`. Set on an ACTIVE enterprise account's connection, it takes
+   * the Add button away: the user keeps what they have and cannot attach more.
+   *
+   * Clerk has no "maximum one email address" setting — this and `identifiersImmutable` below are
+   * the only two things that constrain the list, and neither is a count.
    */
-  allowMultipleAccounts: boolean;
+  disableAdditionalIdentifications: boolean;
+  /**
+   * The `immutable` flag on the `email_address` / `phone_number` attribute. Instance-level and
+   * unrelated to enterprise. Legacy derives BOTH creation and deletion from it, so an immutable
+   * identifier can be neither added nor removed — which, for a single verified primary address,
+   * leaves a row with no actions at all. That read-only state is deliberate.
+   */
+  identifiersImmutable: boolean;
   /**
    * An account with an active enterprise connection: legacy renders the name form read-only.
    * Username and avatar stay editable.
@@ -80,7 +89,8 @@ export const DEFAULT_ACCOUNT_SECTION_FLOW_CONFIG: AccountSectionFlowConfig = {
   emailLinkOutcome: 'verified',
   emailLinkResolveMs: 6000,
   ssoFails: false,
-  allowMultipleAccounts: true,
+  disableAdditionalIdentifications: false,
+  identifiersImmutable: false,
   enterpriseManaged: false,
   takenUsernames: ['prestonxyz'],
 };
@@ -119,13 +129,7 @@ type EditState =
   | { field: 'avatar'; state: EditAvatarState };
 
 interface FlowState {
-  add: {
-    kind: ContactKind;
-    intent: AddContactIntent;
-    /** The record this flow replaces on success. Absent when it is adding one. */
-    replacingId?: string;
-    state: AddContactFlowState;
-  } | null;
+  add: { kind: ContactKind; state: AddContactFlowState } | null;
   edit: EditState | null;
   identity: ProfileIdentity;
   confirm: { pending: PendingConfirm; state: ConfirmContactActionState } | null;
@@ -136,7 +140,7 @@ interface FlowState {
 }
 
 type Action =
-  | { type: 'add.open'; kind: ContactKind; intent: AddContactIntent; replacingId?: string; value?: string }
+  | { type: 'add.open'; kind: ContactKind }
   | { type: 'add.value'; value: string }
   | { type: 'add.submitting' }
   | { type: 'add.error'; errors: { field?: string; form?: string } }
@@ -167,7 +171,7 @@ type Action =
   | { type: 'edit.error'; errors: { field?: string; form?: string; firstName?: string; lastName?: string } }
   | { type: 'edit.close' }
   | { type: 'identity.set'; identity: Partial<ProfileIdentity> }
-  | { type: 'contacts.add'; kind: ContactKind; record: ContactRecord; replacingId?: string }
+  | { type: 'contacts.add'; kind: ContactKind; record: ContactRecord }
   | { type: 'contacts.remove'; kind: ContactKind; id: string }
   | { type: 'contacts.setPrimary'; kind: ContactKind; id: string };
 
@@ -186,15 +190,7 @@ function reducer(state: FlowState, action: Action): FlowState {
         ...state,
         add: {
           kind: action.kind,
-          intent: action.intent,
-          replacingId: action.replacingId,
-          state: {
-            step: 'identifier',
-            // A manage flow starts from what is there, so the field can be edited rather than retyped.
-            value: action.value ?? (action.kind === 'phone' ? '+1' : ''),
-            isSubmitting: false,
-            errors: {},
-          },
+          state: { step: 'identifier', value: action.kind === 'phone' ? '+1' : '', isSubmitting: false, errors: {} },
         },
       };
     case 'add.value':
@@ -535,14 +531,7 @@ function reducer(state: FlowState, action: Action): FlowState {
     case 'identity.set':
       return { ...state, identity: { ...state.identity, ...action.identity } };
     case 'contacts.add':
-      return updateContacts(state, action.kind, records =>
-        action.replacingId
-          ? // The replacement keeps the old one's place and its primary flag; only the value moves.
-            records.map(record =>
-              record.id === action.replacingId ? { ...action.record, isDefault: record.isDefault } : record,
-            )
-          : [...records, action.record],
-      );
+      return updateContacts(state, action.kind, records => [...records, action.record]);
     case 'contacts.remove':
       return updateContacts(state, action.kind, records => records.filter(record => record.id !== action.id));
     case 'contacts.setPrimary':
@@ -672,12 +661,7 @@ export function useAccountSectionFlow({
     }
     const id = setTimeout(() => {
       if (settingsRef.current.emailLinkOutcome === 'verified') {
-        dispatch({
-          type: 'contacts.add',
-          kind: 'email',
-          record: makeRecord(addIdentifier, true),
-          replacingId: stateRef.current.add?.replacingId,
-        });
+        dispatch({ type: 'contacts.add', kind: 'email', record: makeRecord(addIdentifier, true) });
         dispatch({ type: 'add.success', identifier: addIdentifier });
       } else {
         dispatch({ type: 'add.linkOutcome', outcome: settingsRef.current.emailLinkOutcome });
@@ -689,30 +673,11 @@ export function useAccountSectionFlow({
   const openAdd = useCallback(
     (kind: ContactKind) => {
       captureTrigger();
-      dispatch({ type: 'add.open', kind, intent: 'add' });
+      dispatch({ type: 'add.open', kind });
     },
     [captureTrigger, dispatch],
   );
 
-  /**
-   * Change the contact that is already there, rather than add another.
-   *
-   * Same flow — the new value still has to be verified before it counts — but it lands on the old
-   * record instead of beside it. This is the only affordance an instance that permits a single
-   * email address has, so without it that row has no button at all.
-   */
-  const openManage = useCallback(
-    (kind: ContactKind, id: string) => {
-      const records = kind === 'email' ? stateRef.current.emails : stateRef.current.phones;
-      const record = records.find(item => item.id === id);
-      if (!record) {
-        return;
-      }
-      captureTrigger();
-      dispatch({ type: 'add.open', kind, intent: 'update', replacingId: id, value: record.value });
-    },
-    [captureTrigger, dispatch],
-  );
   const closeAdd = useCallback(() => {
     reverificationGate.current?.resolve(false);
     reverificationGate.current = null;
@@ -779,7 +744,7 @@ export function useAccountSectionFlow({
       return;
     }
     dispatch({ type: 'add.codeStatus', status: 'success' });
-    dispatch({ type: 'contacts.add', kind, record: makeRecord(identifier, true), replacingId: current.replacingId });
+    dispatch({ type: 'contacts.add', kind, record: makeRecord(identifier, true) });
     // Hold on the check mark before moving on, as the legacy OTP control does.
     await sleep(600);
     dispatch({ type: 'add.success', identifier });
@@ -809,12 +774,7 @@ export function useAccountSectionFlow({
       dispatch({ type: 'add.ssoStatus', status: 'error', message: 'Verification was cancelled or failed.' });
       return;
     }
-    dispatch({
-      type: 'contacts.add',
-      kind: 'email',
-      record: makeRecord(identifier, true),
-      replacingId: current.replacingId,
-    });
+    dispatch({ type: 'contacts.add', kind: 'email', record: makeRecord(identifier, true) });
     dispatch({ type: 'add.success', identifier });
   }, [dispatch, sleep]);
 
@@ -1038,7 +998,6 @@ export function useAccountSectionFlow({
     confirm: state.confirm,
     reverification: state.reverification,
     openAdd,
-    openManage,
     closeAdd,
     setIdentifier: useCallback((value: string) => dispatch({ type: 'add.value', value }), [dispatch]),
     setCode: useCallback((code: string) => dispatch({ type: 'add.code', code }), [dispatch]),
