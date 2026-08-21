@@ -148,10 +148,6 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
           {flow.password ? (
             <UserProfilePasswordDialogView
               state={flow.password}
-              canSubmit={
-                Boolean(flow.password.values.newPassword) &&
-                flow.password.values.newPassword === flow.password.values.confirmPassword
-              }
               isInterrupted={flow.reverification?.operation === 'password'}
               onCancel={flow.closePassword}
               onValueChange={flow.updatePasswordValue}
@@ -1594,7 +1590,6 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
         >
           <UserProfilePasswordDialogView
             state={snapshot.state}
-            canSubmit={Boolean(snapshot.state.values.newPassword)}
             isInterrupted={verificationOpen}
             onCancel={() => setOpen(false)}
             onValueChange={noop}

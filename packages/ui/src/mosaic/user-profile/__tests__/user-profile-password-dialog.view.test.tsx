@@ -24,14 +24,12 @@ function Harness({
   isSubmitting?: boolean;
 }) {
   const [values, setValues] = useState(emptyValues);
-  const canSubmit = Boolean(values.newPassword) && values.newPassword === values.confirmPassword;
 
   return (
     <MosaicProvider>
       <PasswordDialog>
         <UserProfilePasswordDialogView
           state={{ mode, values, isSubmitting, errors: {} }}
-          canSubmit={canSubmit}
           onCancel={vi.fn()}
           onValueChange={(field, value) => setValues(current => ({ ...current, [field]: value }))}
           onSubmit={onSubmit}
@@ -80,6 +78,33 @@ describe('UserProfilePasswordDialogView', () => {
     expect(screen.getByRole('dialog', { name: 'Set password' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Set password' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Current password')).not.toBeInTheDocument();
+  });
+
+  it('represents the non-reverification fallback and password-manager identifier', () => {
+    render(
+      <MosaicProvider>
+        <PasswordDialog>
+          <UserProfilePasswordDialogView
+            state={{
+              mode: 'change',
+              values: emptyValues,
+              requiresCurrentPassword: true,
+              signedInIdentifier: 'preston@clerk.dev',
+              minimumLength: 8,
+              isSubmitting: false,
+              errors: {},
+            }}
+            onCancel={vi.fn()}
+            onValueChange={vi.fn()}
+            onSubmit={vi.fn()}
+          />
+        </PasswordDialog>
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByLabelText('Current password')).toHaveAttribute('autocomplete', 'current-password');
+    expect(document.querySelector('input[name="identifier"]')).toHaveValue('preston@clerk.dev');
+    expect(screen.getByRole('button', { name: 'Change password' })).toBeDisabled();
   });
 
   it('announces a pending password submission without changing the button label', () => {
@@ -140,7 +165,6 @@ describe('UserProfilePasswordDialogView', () => {
         <PasswordDialog>
           <UserProfilePasswordDialogView
             state={{ mode: 'change', values: emptyValues, isReadOnly: true, isSubmitting: false, errors: {} }}
-            canSubmit
             onCancel={vi.fn()}
             onValueChange={vi.fn()}
             onSubmit={vi.fn()}
