@@ -7,7 +7,7 @@ import { styles } from './user-profile-profile-panel.styles';
 
 type UserProfileProviderIconProps = { iconUrl: string; name?: never } | { iconUrl?: never; name: IconName };
 
-// TODO: Replace this temporary user-profile wrapper with IconFrame.
+// TODO: Temporary provider-media wrapper; replace with IconFrame once that Mosaic primitive is available.
 export function UserProfileProviderIcon(props: UserProfileProviderIconProps) {
   return (
     <Section.Media

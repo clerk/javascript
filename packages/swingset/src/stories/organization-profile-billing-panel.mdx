@@ -1,0 +1,27 @@
+import * as Stories from './organization-profile-billing-panel.stories';
+
+# OrganizationProfileBillingPanel
+
+The Billing organization panel. It composes subscription, payment-method, and invoice sections.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    {
+      name: 'Subscription',
+      href: '/organization-profile/organization-profile-subscription-section',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'Payment methods',
+      href: '/organization-profile/organization-profile-payment-methods-section',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'Invoices',
+      href: '/organization-profile/organization-profile-invoices-section',
+      layer: 'Organization Profile',
+    },
+  ]}
+/>

@@ -1,0 +1,17 @@
+import * as Stories from './organization-profile-api-keys-panel.stories';
+
+# OrganizationProfileApiKeysPanel
+
+The API Keys organization panel. It composes search and creation controls with the API-key collection.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    {
+      name: 'API keys',
+      href: '/organization-profile/organization-profile-api-keys-section',
+      layer: 'Organization Profile',
+    },
+  ]}
+/>

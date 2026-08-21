@@ -1,0 +1,17 @@
+import * as Stories from './organization-profile-members-panel.stories';
+
+# OrganizationProfileMembersPanel
+
+The Members organization panel. It composes the search and invite toolbar with the member collection.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    {
+      name: 'Members collection',
+      href: '/organization-profile/organization-profile-members-section',
+      layer: 'Organization Profile',
+    },
+  ]}
+/>
