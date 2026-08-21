@@ -32,7 +32,6 @@ export const completeSignUpFlow = ({
     return handleComplete && handleComplete();
   } else if (signUp.status === 'missing_requirements') {
     if (signUp.missingFields.some(mf => mf === 'enterprise_sso')) {
-      // FAPI rejects an empty redirect url, which reaches the user as a dead end rather than the caller as a bug.
       if (!redirectUrl || !redirectUrlComplete) {
         throw new Error(
           'completeSignUpFlow: `redirectUrl` and `redirectUrlComplete` are required to continue a sign-up that is missing `enterprise_sso`.',
