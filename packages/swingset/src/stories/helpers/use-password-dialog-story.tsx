@@ -25,7 +25,6 @@ export function usePasswordDialogStory({
   const [verificationOpen, setVerificationOpen] = useState(false);
   const [code, setCode] = useState('');
   const [values, setValues] = useState(emptyValues);
-  const canSubmit = Boolean(values.newPassword) && values.newPassword === values.confirmPassword;
 
   const updateValue = <Field extends UserProfilePasswordField>(
     field: Field,
@@ -58,7 +57,6 @@ export function usePasswordDialogStory({
           <Dialog.Viewport>
             <Dialog.Popup>
               <UserProfilePasswordDialogView
-                canSubmit={canSubmit}
                 isInterrupted={verificationOpen}
                 state={{
                   mode,

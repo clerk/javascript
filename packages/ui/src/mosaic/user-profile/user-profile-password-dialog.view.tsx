@@ -19,13 +19,11 @@ export type {
 
 export interface UserProfilePasswordDialogViewProps extends UserProfilePasswordFlowActions {
   state: UserProfilePasswordFlowState;
-  canSubmit?: boolean;
   isInterrupted?: boolean;
 }
 
 export function UserProfilePasswordDialogView({
   state,
-  canSubmit = false,
   isInterrupted = false,
   onCancel,
   onValueChange,
@@ -33,6 +31,10 @@ export function UserProfilePasswordDialogView({
 }: UserProfilePasswordDialogViewProps) {
   const { values, mode, isSubmitting, errors } = state;
   const locked = Boolean(state.isReadOnly) || isSubmitting;
+  const canSubmit =
+    (!state.requiresCurrentPassword || Boolean(values.currentPassword)) &&
+    values.newPassword.length >= (state.minimumLength ?? 1) &&
+    values.newPassword === values.confirmPassword;
   const title = mode === 'set' ? 'Set password' : 'Change password';
   const submit = () => {
     if (canSubmit && !isSubmitting && !state.isReadOnly) {
@@ -46,9 +48,29 @@ export function UserProfilePasswordDialogView({
       <DialogHeader title={title} />
       <DialogForm onSubmit={submit}>
         <DialogBody>
+          {state.signedInIdentifier ? (
+            <input
+              readOnly
+              hidden
+              autoComplete='username'
+              name='identifier'
+              value={state.signedInIdentifier}
+            />
+          ) : null}
           <div {...mergeStyleProps(themeProps('user-profile-password-dialog-fields'), stylex.props(styles.fields))}>
             {state.isReadOnly ? (
               <Text color='neutral'>Your password is managed by your enterprise connection.</Text>
+            ) : null}
+            {state.requiresCurrentPassword ? (
+              <PasswordField
+                name='currentPassword'
+                label='Current password'
+                autoComplete='current-password'
+                value={values.currentPassword ?? ''}
+                error={errors.currentPassword}
+                disabled={locked}
+                onChange={value => onValueChange('currentPassword', value)}
+              />
             ) : null}
             <PasswordField
               name='newPassword'
@@ -145,9 +167,9 @@ function SignOutOfOtherSessionsField({ checked, disabled, onChange }: SignOutOfO
 }
 
 interface PasswordFieldProps {
-  name: 'newPassword' | 'confirmPassword';
+  name: 'currentPassword' | 'newPassword' | 'confirmPassword';
   label: string;
-  autoComplete: 'new-password';
+  autoComplete: 'current-password' | 'new-password';
   value: string;
   error?: string;
   disabled: boolean;

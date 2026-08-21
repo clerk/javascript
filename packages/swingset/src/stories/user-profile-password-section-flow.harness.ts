@@ -14,7 +14,9 @@ type PasswordSectionFlowConfig = Pick<
   | 'hasPassword'
   | 'latencyMs'
   | 'passwordReadOnly'
+  | 'passwordMinimumLength'
   | 'requireReverification'
+  | 'signedInIdentifier'
   | 'reverificationStrategy'
   | 'validCode'
   | 'validPassword'
@@ -26,6 +28,7 @@ interface PasswordReverificationState {
 }
 
 const EMPTY_PASSWORD_VALUES: UserProfilePasswordValues = {
+  currentPassword: '',
   newPassword: '',
   confirmPassword: '',
   signOutOfOtherSessions: true,
@@ -92,11 +95,20 @@ export function usePasswordSectionFlow({
     setPassword({
       mode: hasPassword ? 'change' : 'set',
       values: EMPTY_PASSWORD_VALUES,
+      requiresCurrentPassword: hasPassword && !config.requireReverification,
+      signedInIdentifier: config.signedInIdentifier,
+      minimumLength: config.passwordMinimumLength,
       isReadOnly: config.passwordReadOnly,
       isSubmitting: false,
       errors: {},
     });
-  }, [config.passwordReadOnly, hasPassword]);
+  }, [
+    config.passwordMinimumLength,
+    config.passwordReadOnly,
+    config.requireReverification,
+    config.signedInIdentifier,
+    hasPassword,
+  ]);
 
   const updatePasswordValue = useCallback(
     <Field extends UserProfilePasswordField>(field: Field, value: UserProfilePasswordValues[Field]) => {
@@ -110,6 +122,21 @@ export function usePasswordSectionFlow({
   const submitPassword = useCallback(() => {
     const current = password;
     if (!current || current.isReadOnly || current.isSubmitting) {
+      return;
+    }
+    if (current.requiresCurrentPassword && !current.values.currentPassword) {
+      setPassword(state => (state ? { ...state, errors: { currentPassword: 'Enter your current password.' } } : state));
+      return;
+    }
+    if (current.values.newPassword.length < (current.minimumLength ?? 1)) {
+      setPassword(state =>
+        state
+          ? {
+              ...state,
+              errors: { newPassword: `Your password must contain ${current.minimumLength} or more characters.` },
+            }
+          : state,
+      );
       return;
     }
     if (current.values.newPassword !== current.values.confirmPassword) {

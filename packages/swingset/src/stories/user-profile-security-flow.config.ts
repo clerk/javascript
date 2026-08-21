@@ -5,6 +5,8 @@ export interface SecurityFlowConfig {
   passwordAvailable: boolean;
   hasPassword: boolean;
   passwordReadOnly: boolean;
+  passwordMinimumLength: number;
+  signedInIdentifier: string;
   passkeysAvailable: boolean;
   passkeyCreationAvailable: boolean;
   hasPasskey: boolean;
@@ -29,6 +31,8 @@ export const DEFAULT_SECURITY_FLOW_CONFIG: SecurityFlowConfig = {
   passwordAvailable: true,
   hasPassword: true,
   passwordReadOnly: false,
+  passwordMinimumLength: 8,
+  signedInIdentifier: 'preston@clerk.dev',
   passkeysAvailable: true,
   passkeyCreationAvailable: true,
   hasPasskey: true,

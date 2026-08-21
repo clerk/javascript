@@ -49,10 +49,6 @@ export function PasswordSectionFlowDialogs({ flow }: { flow: PasswordFlow }) {
         {flow.password ? (
           <UserProfilePasswordDialogView
             state={flow.password}
-            canSubmit={
-              Boolean(flow.password.values.newPassword) &&
-              flow.password.values.newPassword === flow.password.values.confirmPassword
-            }
             isInterrupted={Boolean(challenge)}
             onCancel={flow.closePassword}
             onValueChange={flow.updatePasswordValue}

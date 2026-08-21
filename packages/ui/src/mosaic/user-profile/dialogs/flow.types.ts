@@ -268,6 +268,7 @@ export interface AccountSectionFlows {
 }
 
 export interface UserProfilePasswordValues {
+  currentPassword?: string;
   newPassword: string;
   confirmPassword: string;
   signOutOfOtherSessions: boolean;
@@ -279,6 +280,9 @@ export type UserProfilePasswordMode = 'change' | 'set';
 export interface UserProfilePasswordFlowState {
   mode: UserProfilePasswordMode;
   values: UserProfilePasswordValues;
+  requiresCurrentPassword?: boolean;
+  signedInIdentifier?: string;
+  minimumLength?: number;
   isReadOnly?: boolean;
   isSubmitting: boolean;
   errors: FlowErrors & Partial<Record<UserProfilePasswordField, string>>;
