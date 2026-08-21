@@ -428,10 +428,6 @@ export interface UserProfileMfaBackupCodesStep extends UserProfileMfaAddBaseStat
   copied: boolean;
 }
 
-export interface UserProfileMfaSuccessStep extends UserProfileMfaAddBaseState {
-  step: 'success';
-}
-
 export type UserProfileMfaAddFlowState =
   | UserProfileMfaPhoneSelectStep
   | UserProfileMfaPhoneStep
@@ -439,8 +435,7 @@ export type UserProfileMfaAddFlowState =
   | UserProfileMfaSmsPreparingStep
   | UserProfileMfaAuthenticatorSetupStep
   | UserProfileMfaVerificationStep
-  | UserProfileMfaBackupCodesStep
-  | UserProfileMfaSuccessStep;
+  | UserProfileMfaBackupCodesStep;
 
 export interface UserProfileMfaAddFlowActions {
   onCancel: () => void;

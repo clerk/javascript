@@ -1467,12 +1467,6 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     },
   },
   {
-    flow: 'add-mfa',
-    step: 'add authenticator',
-    variant: 'success without backup codes',
-    state: { method: 'authenticator', step: 'success', isSubmitting: false, errors: {} },
-  },
-  {
     flow: 'remove-mfa',
     step: 'remove method',
     variant: 'phone number',
