@@ -1549,10 +1549,15 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
 ];
 
 export function States() {
+  return <SecurityFlowStates />;
+}
+
+export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow'][] } = {}) {
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [verificationOpen, setVerificationOpen] = useState(false);
-  const snapshot = SNAPSHOTS[index];
+  const snapshots = flows ? SNAPSHOTS.filter(snapshot => flows.includes(snapshot.flow)) : SNAPSHOTS;
+  const snapshot = snapshots[index] ?? snapshots[0];
   const noop = () => undefined;
   const verification = snapshot.reverification ? (
     <Dialog
@@ -1574,11 +1579,11 @@ export function States() {
       <div style={controlsBar}>
         <SnapshotPicker
           selected={open ? index : null}
-          snapshots={SNAPSHOTS}
+          snapshots={snapshots}
           onSelect={nextIndex => {
             setIndex(nextIndex);
             setOpen(true);
-            setVerificationOpen(Boolean(SNAPSHOTS[nextIndex].reverification));
+            setVerificationOpen(Boolean(snapshots[nextIndex].reverification));
           }}
         />
       </div>
