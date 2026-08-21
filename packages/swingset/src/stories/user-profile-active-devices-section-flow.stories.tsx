@@ -5,9 +5,9 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { useActiveDevicesSectionFlow } from './user-profile-active-devices-section-flow.harness';
-import { ActiveDevicesSectionFlowDialogs } from './user-profile-security-section-flow-dialogs';
 import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-flow.config';
 import { SecurityFlowStates } from './user-profile-security-flows.stories';
+import { ActiveDevicesSectionFlowDialogs } from './user-profile-security-section-flow-dialogs';
 
 export { default as __source } from './user-profile-active-devices-section-flow.stories?raw';
 

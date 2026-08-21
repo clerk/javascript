@@ -4,9 +4,9 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { usePasskeysSectionFlow } from './user-profile-passkeys-section-flow.harness';
-import { PasskeysSectionFlowDialogs } from './user-profile-security-section-flow-dialogs';
 import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-flow.config';
 import { SecurityFlowStates } from './user-profile-security-flows.stories';
+import { PasskeysSectionFlowDialogs } from './user-profile-security-section-flow-dialogs';
 
 export { default as __source } from './user-profile-passkeys-section-flow.stories?raw';
 

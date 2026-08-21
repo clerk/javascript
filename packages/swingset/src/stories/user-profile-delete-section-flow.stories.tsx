@@ -4,9 +4,9 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { useDeleteSectionFlow } from './user-profile-delete-section-flow.harness';
-import { DeleteSectionFlowDialogs } from './user-profile-security-section-flow-dialogs';
 import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-flow.config';
 import { SecurityFlowStates } from './user-profile-security-flows.stories';
+import { DeleteSectionFlowDialogs } from './user-profile-security-section-flow-dialogs';
 
 export { default as __source } from './user-profile-delete-section-flow.stories?raw';
 
