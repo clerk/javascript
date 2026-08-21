@@ -830,7 +830,7 @@ export function Default() {
         onRegenerateBackupCodes={flow.openBackupCodes}
         onRemovePasskey={flow.openRemovePasskey}
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
-        onSignOutDevice={flow.openDevice}
+        onSignOutDevice={flow.openSignOutDevice}
       />
       <SecurityFlowDialogs flow={flow} />
     </div>

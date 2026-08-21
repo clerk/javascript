@@ -26,6 +26,8 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
   mfaMethods?: UserProfileMfaMethod[];
   mfaAddableMethods?: UserProfileMfaAddableMethod[];
   devices?: UserProfileDevice[];
+  devicesStatus?: 'loading' | 'ready' | 'error';
+  devicesError?: string;
   onChangePassword?: () => void;
   onAddPasskey?: () => void;
   onManagePasskey?: (id: string) => void;
@@ -45,6 +47,8 @@ export function UserProfileSecurityPanelView({
   mfaMethods,
   mfaAddableMethods,
   devices,
+  devicesStatus,
+  devicesError,
   onChangePassword,
   onAddPasskey,
   onManagePasskey,
@@ -104,6 +108,8 @@ export function UserProfileSecurityPanelView({
         {devices ? (
           <UserProfileActiveDevicesSectionView
             devices={devices}
+            status={devicesStatus}
+            error={devicesError}
             onManageDevice={onManageDevice}
             onSignOutAllOtherDevices={onSignOutAllOtherDevices}
             onSignOutDevice={onSignOutDevice}

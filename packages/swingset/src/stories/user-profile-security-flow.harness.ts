@@ -110,6 +110,7 @@ export function useSecurityFlow({
     updateDeleteConfirmation: deletion.updateDeleteConfirmation,
     submitDeleteAccount: deletion.submitDeleteAccount,
     openDevice: activeDevices.openDevice,
+    openSignOutDevice: activeDevices.openSignOutDevice,
     closeDevice: activeDevices.closeDevice,
     requestSignOutDevice: activeDevices.requestSignOutDevice,
     cancelSignOutDevice: activeDevices.cancelSignOutDevice,

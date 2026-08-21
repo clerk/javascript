@@ -66,6 +66,9 @@ export function useActiveDevicesSectionFlow({
     const errors = formError ? { form: formError } : {};
     if (operation === 'sign-out-device') {
       setDevice(current => (current ? { ...current, isSubmitting, errors } : current));
+      if (!isSubmitting) {
+        setDevices(devices => devices.map(candidate => ({ ...candidate, isRevoking: false })));
+      }
     } else {
       setSignOutAllDevices(current => (current ? { ...current, isSubmitting, errors } : current));
     }
@@ -142,6 +145,13 @@ export function useActiveDevicesSectionFlow({
     },
     [captureTrigger, devices],
   );
+  const openSignOutDevice = useCallback(
+    (id: string) => {
+      openDevice(id);
+      setDevice(current => (current ? { ...current, step: 'confirm' } : current));
+    },
+    [openDevice],
+  );
   const requestSignOutDevice = useCallback(() => {
     setDevice(current => (current ? { ...current, step: 'confirm', errors: {} } : current));
   }, []);
@@ -153,6 +163,9 @@ export function useActiveDevicesSectionFlow({
       return;
     }
     const deviceId = device.device.id;
+    setDevices(current =>
+      current.map(candidate => (candidate.id === deviceId ? { ...candidate, isRevoking: true } : candidate)),
+    );
     void runMutation('sign-out-device', () => {
       setDevices(current => current.filter(candidate => candidate.id !== deviceId));
       closeOperation('sign-out-device');
@@ -252,6 +265,7 @@ export function useActiveDevicesSectionFlow({
     signOutAllDevices,
     reverification,
     openDevice,
+    openSignOutDevice,
     closeDevice: () => closeOperation('sign-out-device'),
     requestSignOutDevice,
     cancelSignOutDevice,
