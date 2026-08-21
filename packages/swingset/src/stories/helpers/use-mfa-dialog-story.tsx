@@ -66,12 +66,7 @@ export function useMfaDialogStory({
       });
       return;
     }
-    if (
-      add.step === 'select-phone' ||
-      add.step === 'preparing' ||
-      add.step === 'backup-codes' ||
-      add.step === 'success'
-    ) {
+    if (add.step === 'select-phone' || add.step === 'preparing' || add.step === 'backup-codes') {
       return;
     }
     const nextMethod: UserProfileMfaMethod =
@@ -79,11 +74,7 @@ export function useMfaDialogStory({
         ? { id: `sms-${Date.now()}`, type: 'sms', description: add.identifier }
         : { id: `authenticator-${Date.now()}`, type: 'authenticator' };
     onChange([...methods.filter(method => add.method === 'sms' || method.type !== add.method), nextMethod]);
-    setAdd(
-      add.method === 'authenticator'
-        ? { method: 'authenticator', step: 'success', isSubmitting: false, errors: {} }
-        : null,
-    );
+    setAdd(null);
   };
 
   const openRemoveMfaDialog = (id: string) => {

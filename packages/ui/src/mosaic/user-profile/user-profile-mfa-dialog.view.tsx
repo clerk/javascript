@@ -110,7 +110,7 @@ export function UserProfileMfaAddDialogView({
               ? m.common.back
               : m.common.cancel}
           </Button>
-          {state.step === 'backup-codes' || state.step === 'success' ? (
+          {state.step === 'backup-codes' ? (
             <Button
               {...stylex.props(styles.footerButton)}
               type='button'
@@ -158,9 +158,6 @@ function AddDescription({ state }: { state: UserProfileMfaAddFlowState }) {
   }
   if (state.step === 'backup-codes') {
     return <>{m.mfa.backupDescription}</>;
-  }
-  if (state.step === 'success') {
-    return <>{m.mfa.successDescription}</>;
   }
   if (state.step === 'phone') {
     return <>{m.mfa.phoneDescription}</>;
@@ -278,10 +275,6 @@ function AddContent({
     );
   }
 
-  if (state.step === 'success') {
-    return <Text>{m.mfa.added}</Text>;
-  }
-
   if (state.step === 'phone') {
     return (
       <Field.Root
@@ -393,7 +386,7 @@ function canSubmit(state: UserProfileMfaAddFlowState) {
   if (state.step === 'preparing' || state.step === 'preparing-sms') {
     return !state.isSubmitting;
   }
-  if (state.step === 'select-phone' || state.step === 'backup-codes' || state.step === 'success') {
+  if (state.step === 'select-phone' || state.step === 'backup-codes') {
     return false;
   }
   if (state.step === 'phone') {

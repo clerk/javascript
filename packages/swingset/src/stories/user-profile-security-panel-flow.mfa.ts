@@ -210,8 +210,6 @@ export function useMfaFlowSlice({
           isSubmitting: false,
           errors: {},
         });
-      } else if (method === 'authenticator') {
-        setAddMfa({ method, step: 'success', isSubmitting: false, errors: {} });
       } else {
         closeOperation('add-mfa');
       }
