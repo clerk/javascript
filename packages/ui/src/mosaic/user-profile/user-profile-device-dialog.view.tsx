@@ -13,6 +13,7 @@ import type {
   UserProfileDeviceSignOutFlowActions,
 } from './dialogs/flow.types';
 import { deviceDialogStyles as styles } from './user-profile-device-dialog.styles';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfileDeviceDialogViewProps extends UserProfileDeviceDetailsFlowActions {
   state: UserProfileDeviceDetailsFlowState;
@@ -26,11 +27,11 @@ export function UserProfileDeviceDialogView({
 }: UserProfileDeviceDialogViewProps) {
   const { device, isSubmitting } = state;
   const details = [
-    { label: 'Device', value: device.deviceName },
-    { label: 'Browser', value: device.browserName },
-    { label: 'IP address', value: device.ipAddress },
-    { label: 'Last location', value: device.location, flag: device.locationFlag },
-    { label: 'Original sign in', value: device.originalSignInAtLabel },
+    { label: m.devices.details.device, value: device.deviceName },
+    { label: m.devices.details.browser, value: device.browserName },
+    { label: m.devices.details.ipAddress, value: device.ipAddress },
+    { label: m.devices.details.lastLocation, value: device.location, flag: device.locationFlag },
+    { label: m.devices.details.originalSignIn, value: device.originalSignInAtLabel },
   ] as const;
 
   return (
@@ -71,7 +72,7 @@ export function UserProfileDeviceDialogView({
           color='negative'
           onClick={onRequestSignOut}
         >
-          Sign out
+          {m.common.signOut}
         </Button>
       </Card.Footer>
     </div>
@@ -91,10 +92,8 @@ export function UserProfileDeviceSignOutDialogView({
 }: UserProfileDeviceSignOutDialogViewProps) {
   return (
     <div aria-hidden={isInterrupted || undefined}>
-      <AlertDialog.Title render={<Heading size='sm' />}>Sign out of this device?</AlertDialog.Title>
-      <AlertDialog.Description render={<Text />}>
-        You will need to sign in again to use your account on this device.
-      </AlertDialog.Description>
+      <AlertDialog.Title render={<Heading size='sm' />}>{m.devices.confirmTitle}</AlertDialog.Title>
+      <AlertDialog.Description render={<Text />}>{m.devices.confirmDescription}</AlertDialog.Description>
       {state.errors.form ? (
         <Text
           color='negative'
@@ -110,16 +109,16 @@ export function UserProfileDeviceSignOutDialogView({
           variant='outline'
           onClick={onCancel}
         >
-          Cancel
+          {m.common.cancel}
         </Button>
         <SubmitButton
           type='button'
           color='negative'
           isPending={state.isSubmitting}
-          pendingLabel='Signing out device'
+          pendingLabel={m.devices.signOutPending}
           onClick={onSignOut}
         >
-          Sign out
+          {m.common.signOut}
         </SubmitButton>
       </AlertDialog.Actions>
     </div>

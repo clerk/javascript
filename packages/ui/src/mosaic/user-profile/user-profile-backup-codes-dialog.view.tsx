@@ -9,6 +9,7 @@ import { Spinner } from '../components/spinner';
 import { Text } from '../components/text';
 import type { UserProfileBackupCodesFlowActions, UserProfileBackupCodesFlowState } from './dialogs/flow.types';
 import { backupCodesDialogStyles as styles } from './user-profile-backup-codes-dialog.styles';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfileBackupCodesDialogViewProps extends UserProfileBackupCodesFlowActions {
   state: UserProfileBackupCodesFlowState;
@@ -39,13 +40,13 @@ export function UserProfileBackupCodesDialogView({
     >
       <Dialog.CloseButton disabled={state.isSubmitting} />
       <Card.Header>
-        <Dialog.Title render={<Heading size='sm' />}>Backup codes</Dialog.Title>
+        <Dialog.Title render={<Heading size='sm' />}>{m.backupCodes.title}</Dialog.Title>
         <Dialog.Description render={<Text />}>
           {state.step === 'codes'
-            ? 'Save these backup codes somewhere safe. Each code can only be used once.'
+            ? m.backupCodes.readyDescription
             : state.step === 'unavailable'
-              ? 'No backup codes were returned for this account.'
-              : 'Creating a new set of backup codes.'}
+              ? m.backupCodes.unavailableDescription
+              : m.backupCodes.generatingDescription}
         </Dialog.Description>
       </Card.Header>
       <Card.Content {...stylex.props(styles.content)}>
@@ -55,13 +56,13 @@ export function UserProfileBackupCodesDialogView({
             {...stylex.props(styles.pending)}
           >
             <Spinner />
-            <Text>Generating new backup codes…</Text>
+            <Text>{m.backupCodes.generating}</Text>
           </div>
         ) : null}
         {state.step === 'codes' ? (
           <>
             <div
-              aria-label='Backup codes'
+              aria-label={m.backupCodes.title}
               {...stylex.props(styles.codes)}
             >
               {state.codes.map(code => (
@@ -80,26 +81,26 @@ export function UserProfileBackupCodesDialogView({
                 variant='outline'
                 onClick={onCopy}
               >
-                {state.copied ? 'Copied' : 'Copy'}
+                {state.copied ? m.common.copied : m.common.copy}
               </Button>
               <Button
                 type='button'
                 variant='outline'
                 onClick={onDownload}
               >
-                Download
+                {m.common.download}
               </Button>
               <Button
                 type='button'
                 variant='outline'
                 onClick={onPrint}
               >
-                Print
+                {m.common.print}
               </Button>
             </div>
           </>
         ) : null}
-        {state.step === 'unavailable' ? <Text>No backup codes are available. Try generating a new set.</Text> : null}
+        {state.step === 'unavailable' ? <Text>{m.backupCodes.unavailable}</Text> : null}
         {state.errors.form ? (
           <Text
             color='negative'
@@ -117,7 +118,7 @@ export function UserProfileBackupCodesDialogView({
               {...stylex.props(styles.footerButton)}
               onClick={onCancel}
             >
-              Done
+              {m.common.done}
             </Button>
           ) : (
             <>
@@ -127,9 +128,9 @@ export function UserProfileBackupCodesDialogView({
                 {...stylex.props(styles.footerButton)}
                 onClick={onCancel}
               >
-                Cancel
+                {m.common.cancel}
               </Button>
-              <SubmitButton {...stylex.props(styles.footerButton)}>Try again</SubmitButton>
+              <SubmitButton {...stylex.props(styles.footerButton)}>{m.common.tryAgain}</SubmitButton>
             </>
           )}
         </Card.Footer>

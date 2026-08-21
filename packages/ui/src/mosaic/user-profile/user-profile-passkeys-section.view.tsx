@@ -3,6 +3,7 @@ import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
 import { UserProfileSecurityList } from './user-profile-security-list';
+import { fill, userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfilePasskey {
   id: string;
@@ -28,10 +29,10 @@ export function UserProfilePasskeysSectionView({
 }: UserProfilePasskeysSectionViewProps) {
   return (
     <UserProfileSecurityList
-      addLabel='Add passkey'
-      emptyLabel='No passkeys added'
+      addLabel={m.passkeys.addTitle}
+      emptyLabel={m.sections.noPasskeys}
       hasItems={passkeys.length > 0}
-      label='Passkeys'
+      label={m.sections.passkeys}
       sectionTitle={sectionTitle}
       onAdd={onAdd}
     >
@@ -39,10 +40,10 @@ export function UserProfilePasskeysSectionView({
         const actions: UserProfileMenuAction[] = [];
 
         if (onManage) {
-          actions.push({ label: 'Rename', onClick: () => onManage(passkey.id) });
+          actions.push({ label: m.sections.rename, onClick: () => onManage(passkey.id) });
         }
         if (onRemove) {
-          actions.push({ label: 'Remove passkey', color: 'negative', onClick: () => onRemove(passkey.id) });
+          actions.push({ label: m.passkeys.removeTitle, color: 'negative', onClick: () => onRemove(passkey.id) });
         }
 
         return (
@@ -59,7 +60,7 @@ export function UserProfilePasskeysSectionView({
             <Section.Actions>
               <UserProfileActionMenu
                 actions={actions}
-                label={`Manage ${passkey.name}`}
+                label={fill(m.sections.manage, { name: passkey.name })}
               />
             </Section.Actions>
           </Section.Item>

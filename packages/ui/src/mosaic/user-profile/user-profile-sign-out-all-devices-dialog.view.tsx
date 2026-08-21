@@ -6,6 +6,7 @@ import type {
   UserProfileSignOutAllDevicesFlowActions,
   UserProfileSignOutAllDevicesFlowState,
 } from './dialogs/flow.types';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfileSignOutAllDevicesDialogViewProps extends UserProfileSignOutAllDevicesFlowActions {
   state: UserProfileSignOutAllDevicesFlowState;
@@ -21,10 +22,8 @@ export function UserProfileSignOutAllDevicesDialogView({
   const { isSubmitting, errors } = state;
   return (
     <div aria-hidden={isInterrupted || undefined}>
-      <AlertDialog.Title render={<Heading size='sm' />}>Sign out of all other devices?</AlertDialog.Title>
-      <AlertDialog.Description render={<Text />}>
-        You will be signed out of all devices except this one.
-      </AlertDialog.Description>
+      <AlertDialog.Title render={<Heading size='sm' />}>{m.devices.bulkTitle}</AlertDialog.Title>
+      <AlertDialog.Description render={<Text />}>{m.devices.bulkDescription}</AlertDialog.Description>
       {errors.form ? (
         <Text
           color='negative'
@@ -40,16 +39,16 @@ export function UserProfileSignOutAllDevicesDialogView({
           variant='outline'
           onClick={onCancel}
         >
-          Cancel
+          {m.common.cancel}
         </Button>
         <SubmitButton
           type='button'
           color='negative'
           isPending={isSubmitting}
-          pendingLabel='Signing out of all other devices'
+          pendingLabel={m.devices.bulkPending}
           onClick={onSignOut}
         >
-          Sign out of all other devices
+          {m.devices.signOutAllOthers}
         </SubmitButton>
       </AlertDialog.Actions>
     </div>

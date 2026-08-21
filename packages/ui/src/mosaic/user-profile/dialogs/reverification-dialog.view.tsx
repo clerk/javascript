@@ -5,6 +5,7 @@ import { Button, SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
+import { userProfileSecurityBase as m } from '../user-profile-security.messages';
 import type { ReverificationChallengeActions, ReverificationChallengeState } from './flow.types';
 import {
   CodeInput,
@@ -50,12 +51,8 @@ export function ReverificationDialogView({
       <>
         <Dialog.CloseButton />
         <DialogHeader
-          description={
-            step === 'select-second-factor'
-              ? 'Choose a second verification method to continue.'
-              : 'Choose how to verify your identity.'
-          }
-          title='Verify it’s you'
+          description={step === 'select-second-factor' ? m.reverification.chooseSecond : m.reverification.chooseFirst}
+          title={m.reverification.title}
         />
         <DialogBody>
           <FormAlert>{state.errors.form}</FormAlert>
@@ -75,7 +72,7 @@ export function ReverificationDialogView({
             variant='ghost'
             onClick={step === 'select-second-factor' ? onBack : onCancel}
           >
-            {step === 'select-second-factor' ? 'Back' : 'Cancel'}
+            {step === 'select-second-factor' ? m.common.back : m.common.cancel}
           </Button>
           {onShowHelp ? (
             <Button
@@ -83,7 +80,7 @@ export function ReverificationDialogView({
               variant='link'
               onClick={onShowHelp}
             >
-              Having trouble?
+              {m.reverification.havingTrouble}
             </Button>
           ) : null}
         </DialogFooter>
@@ -97,12 +94,12 @@ export function ReverificationDialogView({
       <>
         <Dialog.CloseButton />
         <DialogHeader
-          description='Preparing your verification method.'
-          title='Verify it’s you'
+          description={m.reverification.preparingDescription}
+          title={m.reverification.title}
         />
         <DialogBody>
-          {failed ? <FormAlert>{state.errors.form ?? 'Could not prepare verification.'}</FormAlert> : null}
-          {!failed ? <MutedText>Preparing verification…</MutedText> : null}
+          {failed ? <FormAlert>{state.errors.form ?? m.reverification.prepareError}</FormAlert> : null}
+          {!failed ? <MutedText>{m.reverification.preparing}</MutedText> : null}
         </DialogBody>
         <DialogFooter>
           <Button
@@ -110,9 +107,9 @@ export function ReverificationDialogView({
             variant='ghost'
             onClick={onBack ?? onCancel}
           >
-            Back
+            {m.common.back}
           </Button>
-          {failed ? <Button onClick={onPrepare}>Try again</Button> : null}
+          {failed ? <Button onClick={onPrepare}>{m.common.tryAgain}</Button> : null}
         </DialogFooter>
       </>
     );
@@ -124,17 +121,15 @@ export function ReverificationDialogView({
         <Dialog.CloseButton />
         <DialogHeader
           description={
-            step === 'unavailable'
-              ? 'No verification methods are available for this account.'
-              : 'Contact support if you cannot access any verification method.'
+            step === 'unavailable' ? m.reverification.unavailableDescription : m.reverification.helpDescription
           }
-          title={step === 'unavailable' ? 'Unable to verify' : 'Having trouble?'}
+          title={step === 'unavailable' ? m.reverification.unavailableTitle : m.reverification.havingTrouble}
         />
         <DialogBody>
           <FormAlert>{state.errors.form}</FormAlert>
         </DialogBody>
         <DialogFooter>
-          <Button onClick={onBack ?? onCancel}>{onBack ? 'Back' : 'Close'}</Button>
+          <Button onClick={onBack ?? onCancel}>{onBack ? m.common.back : m.common.close}</Button>
         </DialogFooter>
       </>
     );
@@ -150,30 +145,34 @@ export function ReverificationDialogView({
     if (isDeliveredCode) {
       return (
         <>
-          Enter the verification code sent to <Identifier>{state.identifier}</Identifier>
+          {m.reverification.deliveredCode} <Identifier>{state.identifier}</Identifier>
         </>
       );
     }
     if (state.strategy === 'totp') {
-      return 'Enter the code from your authenticator app.';
+      return m.reverification.totp;
     }
     if (state.strategy === 'backup_code') {
-      return 'Enter one of your backup codes.';
+      return m.reverification.backupCode;
     }
     if (isPasskey) {
-      return 'Use your passkey to verify your identity.';
+      return m.reverification.passkey;
     }
-    return 'Enter your password to continue.';
+    return m.reverification.password;
   })();
 
-  const fieldLabel = isPassword ? 'Password' : state.strategy === 'backup_code' ? 'Backup code' : 'Verification code';
+  const fieldLabel = isPassword
+    ? m.reverification.passwordLabel
+    : state.strategy === 'backup_code'
+      ? m.reverification.backupCodeLabel
+      : m.common.verificationCode;
 
   return (
     <>
       <Dialog.CloseButton />
       <DialogHeader
         description={description}
-        title='Verify it’s you'
+        title={m.reverification.title}
       />
       <DialogForm onSubmit={onSubmit}>
         <DialogBody>
@@ -206,10 +205,10 @@ export function ReverificationDialogView({
           ) : null}
           {isDeliveredCode ? (
             <div {...stylex.props(styles.resendRow)}>
-              <MutedText>Didn&apos;t receive a code?</MutedText>
+              <MutedText>{m.common.didNotReceiveCode}</MutedText>
               <ResendButton
                 disabled={inert}
-                label='Resend'
+                label={m.common.resend}
                 resend={state.resend}
                 onResend={onResend}
               />
@@ -224,7 +223,7 @@ export function ReverificationDialogView({
               variant='ghost'
               onClick={onBack}
             >
-              Use another method
+              {m.reverification.anotherMethod}
             </Button>
           ) : null}
           <Button
@@ -235,15 +234,15 @@ export function ReverificationDialogView({
             onClick={onCancel}
             {...stylex.props(styles.footerButton)}
           >
-            Cancel
+            {m.common.cancel}
           </Button>
           <SubmitButton
             disabled={!canSubmit}
             isPending={inert}
-            pendingLabel='Verifying identity'
+            pendingLabel={m.reverification.pending}
             {...stylex.props(styles.footerButton)}
           >
-            {isPasskey ? 'Verify with passkey' : 'Continue'}
+            {isPasskey ? m.reverification.withPasskey : m.common.continue}
           </SubmitButton>
         </DialogFooter>
       </DialogForm>
