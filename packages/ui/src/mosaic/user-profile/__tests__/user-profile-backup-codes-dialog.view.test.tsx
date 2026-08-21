@@ -9,9 +9,8 @@ import { UserProfileBackupCodesDialogView } from '../user-profile-backup-codes-d
 
 const actions = {
   onRetry: vi.fn(),
-  onCopy: vi.fn(),
+  onCopyAndClose: vi.fn(),
   onDownload: vi.fn(),
-  onPrint: vi.fn(),
 };
 
 describe('UserProfileBackupCodesDialogView', () => {
@@ -73,10 +72,9 @@ describe('UserProfileBackupCodesDialogView', () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
-  it('renders and exposes actions for new backup codes', async () => {
-    const onCopy = vi.fn();
+  it('renders download and copy-and-close actions for new backup codes', async () => {
+    const onCopyAndClose = vi.fn();
     const onDownload = vi.fn();
-    const onPrint = vi.fn();
     const user = userEvent.setup();
     render(
       <MosaicProvider>
@@ -85,15 +83,13 @@ describe('UserProfileBackupCodesDialogView', () => {
             state={{
               step: 'codes',
               codes: ['3k4p-7m2q', '9w6d-2x8n'],
-              copied: false,
               isSubmitting: false,
               errors: {},
             }}
             onCancel={vi.fn()}
             {...actions}
-            onCopy={onCopy}
+            onCopyAndClose={onCopyAndClose}
             onDownload={onDownload}
-            onPrint={onPrint}
           />
         </BackupCodesDialog>
       </MosaicProvider>,
@@ -101,28 +97,12 @@ describe('UserProfileBackupCodesDialogView', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Backup codes' });
     expect(within(dialog).getByText('3k4p-7m2q')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Copy' }));
     await user.click(screen.getByRole('button', { name: 'Download' }));
-    await user.click(screen.getByRole('button', { name: 'Print' }));
-    expect(onCopy).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
     expect(onDownload).toHaveBeenCalledOnce();
-    expect(onPrint).toHaveBeenCalledOnce();
-  });
-
-  it('reflects copied state', () => {
-    render(
-      <MosaicProvider>
-        <BackupCodesDialog>
-          <UserProfileBackupCodesDialogView
-            state={{ step: 'codes', codes: ['3k4p-7m2q'], copied: true, isSubmitting: false, errors: {} }}
-            onCancel={vi.fn()}
-            {...actions}
-          />
-        </BackupCodesDialog>
-      </MosaicProvider>,
-    );
-
-    expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument();
+    expect(onCopyAndClose).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('button', { name: 'Print' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument();
   });
 });
 

@@ -384,7 +384,7 @@ export function useMfaFlowSlice({
   const regenerateBackupCodes = useCallback(() => {
     setBackupCodes({ step: 'generating', isSubmitting: true, errors: {} });
     void runMutation('backup-codes', () => {
-      setBackupCodes({ step: 'codes', codes: GENERATED_BACKUP_CODES, copied: false, isSubmitting: false, errors: {} });
+      setBackupCodes({ step: 'codes', codes: GENERATED_BACKUP_CODES, isSubmitting: false, errors: {} });
     });
   }, [runMutation]);
   const openBackupCodes = useCallback(() => {
@@ -581,8 +581,6 @@ export function useMfaFlowSlice({
       }
     },
     regenerateBackupCodes,
-    markBackupCodesCopied: () =>
-      setBackupCodes(current => (current?.step === 'codes' ? { ...current, copied: true } : current)),
     updateVerificationValue,
     submitVerification,
     resendReverification,

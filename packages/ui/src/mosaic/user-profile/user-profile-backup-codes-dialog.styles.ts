@@ -19,20 +19,31 @@ export const backupCodesDialogStyles = stylex.create({
     display: 'flex',
   },
   codes: {
-    padding: space['4'],
+    borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-md'],
-    gap: space['2'],
-    backgroundColor: colorVars['--cl-color-neutral-faded'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    backgroundColor: colorVars['--cl-color-card'],
+    overflow: 'hidden',
+  },
+  codeRow: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
   },
+  rowDivider: {
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
+  },
   code: {
+    paddingBlock: space['3'],
+    paddingInline: space['4'],
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   },
-  actions: {
-    gap: space['2'],
-    display: 'flex',
-    flexWrap: 'wrap',
+  columnDivider: {
+    borderInlineStartColor: colorVars['--cl-color-border'],
+    borderInlineStartStyle: 'solid',
+    borderInlineStartWidth: '1px',
   },
   footerButton: {
     flex: '1',

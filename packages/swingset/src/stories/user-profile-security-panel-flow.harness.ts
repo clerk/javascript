@@ -117,7 +117,6 @@ export function useUserProfileSecurityPanelFlow({
     setDefaultMfa: mfa.setDefaultMfa,
     closeBackupCodes: mfa.closeBackupCodes,
     regenerateBackupCodes: mfa.regenerateBackupCodes,
-    markBackupCodesCopied: mfa.markBackupCodesCopied,
     openDeleteAccount: deletion.openDeleteAccount,
     closeDeleteAccount: deletion.closeDeleteAccount,
     updateDeleteConfirmation: deletion.updateDeleteConfirmation,

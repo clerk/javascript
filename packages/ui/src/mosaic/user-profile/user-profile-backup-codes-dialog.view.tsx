@@ -21,9 +21,8 @@ export function UserProfileBackupCodesDialogView({
   isInterrupted = false,
   onCancel,
   onRetry,
-  onCopy,
+  onCopyAndClose,
   onDownload,
-  onPrint,
 }: UserProfileBackupCodesDialogViewProps) {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -60,45 +59,26 @@ export function UserProfileBackupCodesDialogView({
           </div>
         ) : null}
         {state.step === 'codes' ? (
-          <>
-            <div
-              aria-label={m.backupCodes.title}
-              {...stylex.props(styles.codes)}
-            >
-              {state.codes.map(code => (
-                <Text
-                  key={code}
-                  {...stylex.props(styles.code)}
-                >
-                  {code}
-                </Text>
-              ))}
-            </div>
-            <div {...stylex.props(styles.actions)}>
-              <Button
-                type='button'
-                disabled={state.isSubmitting}
-                variant='outline'
-                onClick={onCopy}
+          <div
+            aria-label={m.backupCodes.title}
+            {...stylex.props(styles.codes)}
+          >
+            {Array.from({ length: Math.ceil(state.codes.length / 2) }, (_, rowIndex) => (
+              <div
+                key={rowIndex}
+                {...stylex.props(styles.codeRow, rowIndex > 0 && styles.rowDivider)}
               >
-                {state.copied ? m.common.copied : m.common.copy}
-              </Button>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={onDownload}
-              >
-                {m.common.download}
-              </Button>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={onPrint}
-              >
-                {m.common.print}
-              </Button>
-            </div>
-          </>
+                {state.codes.slice(rowIndex * 2, rowIndex * 2 + 2).map((code, columnIndex) => (
+                  <Text
+                    key={code}
+                    {...stylex.props(styles.code, columnIndex > 0 && styles.columnDivider)}
+                  >
+                    {code}
+                  </Text>
+                ))}
+              </div>
+            ))}
+          </div>
         ) : null}
         {state.step === 'unavailable' ? <Text>{m.backupCodes.unavailable}</Text> : null}
         {state.errors.form ? (
@@ -112,7 +92,25 @@ export function UserProfileBackupCodesDialogView({
       </Card.Content>
       {state.step === 'codes' || state.step === 'unavailable' || !state.isSubmitting ? (
         <Card.Footer>
-          {state.step === 'codes' || state.step === 'unavailable' ? (
+          {state.step === 'codes' ? (
+            <>
+              <Button
+                type='button'
+                variant='outline'
+                {...stylex.props(styles.footerButton)}
+                onClick={onDownload}
+              >
+                {m.common.download}
+              </Button>
+              <Button
+                type='button'
+                {...stylex.props(styles.footerButton)}
+                onClick={onCopyAndClose}
+              >
+                {m.common.copyAndClose}
+              </Button>
+            </>
+          ) : state.step === 'unavailable' ? (
             <Button
               type='button'
               {...stylex.props(styles.footerButton)}

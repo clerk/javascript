@@ -285,10 +285,10 @@ function UserProfileSecurityPanelFlowDialogs({ flow }: { flow: ReturnType<typeof
               isInterrupted={flow.reverification?.operation === 'backup-codes'}
               onCancel={flow.closeBackupCodes}
               onRetry={flow.regenerateBackupCodes}
-              onCopy={() => {
+              onCopyAndClose={() => {
                 if (flow.backupCodes?.step === 'codes') {
                   void navigator.clipboard?.writeText(flow.backupCodes.codes.join('\n'));
-                  flow.markBackupCodesCopied();
+                  flow.closeBackupCodes();
                 }
               }}
               onDownload={() => {
@@ -296,7 +296,6 @@ function UserProfileSecurityPanelFlowDialogs({ flow }: { flow: ReturnType<typeof
                   downloadBackupCodes(flow.backupCodes.codes);
                 }
               }}
-              onPrint={() => window.print()}
             />
           ) : null}
         </Freeze>
@@ -1551,7 +1550,6 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     state: {
       step: 'codes',
       codes: ['3k4p-7m2q', '9w6d-2x8n', '5t1r-8c4v', '7j3f-6h9s', '2b8m-4q1k', '6n5x-9p3d'],
-      copied: false,
       isSubmitting: false,
       errors: {},
     },
@@ -1561,18 +1559,6 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     step: 'new codes',
     variant: 'unavailable',
     state: { step: 'unavailable', isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'backup-codes',
-    step: 'new codes',
-    variant: 'copied',
-    state: {
-      step: 'codes',
-      codes: ['3k4p-7m2q', '9w6d-2x8n', '5t1r-8c4v', '7j3f-6h9s', '2b8m-4q1k', '6n5x-9p3d'],
-      copied: true,
-      isSubmitting: false,
-      errors: {},
-    },
   },
   {
     flow: 'delete-account',
@@ -1817,9 +1803,8 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
             isInterrupted={verificationOpen}
             onCancel={() => setOpen(false)}
             onRetry={noop}
-            onCopy={noop}
+            onCopyAndClose={() => setOpen(false)}
             onDownload={noop}
-            onPrint={noop}
           />
           {verification}
         </FlowCardDialog>
