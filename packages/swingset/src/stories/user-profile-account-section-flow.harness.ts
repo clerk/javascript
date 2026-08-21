@@ -1,5 +1,6 @@
 import type {
   AddContactFlowState,
+  AddContactIntent,
   ConfirmContactActionState,
   ContactKind,
   ContactVerificationStrategy,
@@ -118,7 +119,13 @@ type EditState =
   | { field: 'avatar'; state: EditAvatarState };
 
 interface FlowState {
-  add: { kind: ContactKind; state: AddContactFlowState } | null;
+  add: {
+    kind: ContactKind;
+    intent: AddContactIntent;
+    /** The record this flow replaces on success. Absent when it is adding one. */
+    replacingId?: string;
+    state: AddContactFlowState;
+  } | null;
   edit: EditState | null;
   identity: ProfileIdentity;
   confirm: { pending: PendingConfirm; state: ConfirmContactActionState } | null;
@@ -129,7 +136,7 @@ interface FlowState {
 }
 
 type Action =
-  | { type: 'add.open'; kind: ContactKind }
+  | { type: 'add.open'; kind: ContactKind; intent: AddContactIntent; replacingId?: string; value?: string }
   | { type: 'add.value'; value: string }
   | { type: 'add.submitting' }
   | { type: 'add.error'; errors: { field?: string; form?: string } }
@@ -160,7 +167,7 @@ type Action =
   | { type: 'edit.error'; errors: { field?: string; form?: string; firstName?: string; lastName?: string } }
   | { type: 'edit.close' }
   | { type: 'identity.set'; identity: Partial<ProfileIdentity> }
-  | { type: 'contacts.add'; kind: ContactKind; record: ContactRecord }
+  | { type: 'contacts.add'; kind: ContactKind; record: ContactRecord; replacingId?: string }
   | { type: 'contacts.remove'; kind: ContactKind; id: string }
   | { type: 'contacts.setPrimary'; kind: ContactKind; id: string };
 
@@ -179,7 +186,15 @@ function reducer(state: FlowState, action: Action): FlowState {
         ...state,
         add: {
           kind: action.kind,
-          state: { step: 'identifier', value: action.kind === 'phone' ? '+1' : '', isSubmitting: false, errors: {} },
+          intent: action.intent,
+          replacingId: action.replacingId,
+          state: {
+            step: 'identifier',
+            // A manage flow starts from what is there, so the field can be edited rather than retyped.
+            value: action.value ?? (action.kind === 'phone' ? '+1' : ''),
+            isSubmitting: false,
+            errors: {},
+          },
         },
       };
     case 'add.value':
@@ -520,7 +535,14 @@ function reducer(state: FlowState, action: Action): FlowState {
     case 'identity.set':
       return { ...state, identity: { ...state.identity, ...action.identity } };
     case 'contacts.add':
-      return updateContacts(state, action.kind, records => [...records, action.record]);
+      return updateContacts(state, action.kind, records =>
+        action.replacingId
+          ? // The replacement keeps the old one's place and its primary flag; only the value moves.
+            records.map(record =>
+              record.id === action.replacingId ? { ...action.record, isDefault: record.isDefault } : record,
+            )
+          : [...records, action.record],
+      );
     case 'contacts.remove':
       return updateContacts(state, action.kind, records => records.filter(record => record.id !== action.id));
     case 'contacts.setPrimary':
@@ -650,7 +672,12 @@ export function useAccountSectionFlow({
     }
     const id = setTimeout(() => {
       if (settingsRef.current.emailLinkOutcome === 'verified') {
-        dispatch({ type: 'contacts.add', kind: 'email', record: makeRecord(addIdentifier, true) });
+        dispatch({
+          type: 'contacts.add',
+          kind: 'email',
+          record: makeRecord(addIdentifier, true),
+          replacingId: stateRef.current.add?.replacingId,
+        });
         dispatch({ type: 'add.success', identifier: addIdentifier });
       } else {
         dispatch({ type: 'add.linkOutcome', outcome: settingsRef.current.emailLinkOutcome });
@@ -662,7 +689,27 @@ export function useAccountSectionFlow({
   const openAdd = useCallback(
     (kind: ContactKind) => {
       captureTrigger();
-      dispatch({ type: 'add.open', kind });
+      dispatch({ type: 'add.open', kind, intent: 'add' });
+    },
+    [captureTrigger, dispatch],
+  );
+
+  /**
+   * Change the contact that is already there, rather than add another.
+   *
+   * Same flow — the new value still has to be verified before it counts — but it lands on the old
+   * record instead of beside it. This is the only affordance an instance that permits a single
+   * email address has, so without it that row has no button at all.
+   */
+  const openManage = useCallback(
+    (kind: ContactKind, id: string) => {
+      const records = kind === 'email' ? stateRef.current.emails : stateRef.current.phones;
+      const record = records.find(item => item.id === id);
+      if (!record) {
+        return;
+      }
+      captureTrigger();
+      dispatch({ type: 'add.open', kind, intent: 'update', replacingId: id, value: record.value });
     },
     [captureTrigger, dispatch],
   );
@@ -732,7 +779,7 @@ export function useAccountSectionFlow({
       return;
     }
     dispatch({ type: 'add.codeStatus', status: 'success' });
-    dispatch({ type: 'contacts.add', kind, record: makeRecord(identifier, true) });
+    dispatch({ type: 'contacts.add', kind, record: makeRecord(identifier, true), replacingId: current.replacingId });
     // Hold on the check mark before moving on, as the legacy OTP control does.
     await sleep(600);
     dispatch({ type: 'add.success', identifier });
@@ -762,7 +809,12 @@ export function useAccountSectionFlow({
       dispatch({ type: 'add.ssoStatus', status: 'error', message: 'Verification was cancelled or failed.' });
       return;
     }
-    dispatch({ type: 'contacts.add', kind: 'email', record: makeRecord(identifier, true) });
+    dispatch({
+      type: 'contacts.add',
+      kind: 'email',
+      record: makeRecord(identifier, true),
+      replacingId: current.replacingId,
+    });
     dispatch({ type: 'add.success', identifier });
   }, [dispatch, sleep]);
 
@@ -986,6 +1038,7 @@ export function useAccountSectionFlow({
     confirm: state.confirm,
     reverification: state.reverification,
     openAdd,
+    openManage,
     closeAdd,
     setIdentifier: useCallback((value: string) => dispatch({ type: 'add.value', value }), [dispatch]),
     setCode: useCallback((code: string) => dispatch({ type: 'add.code', code }), [dispatch]),

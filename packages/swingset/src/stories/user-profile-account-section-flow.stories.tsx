@@ -70,6 +70,48 @@ const controlsBar = {
 
 const controlLabel = { alignItems: 'center', display: 'flex', gap: '0.375rem' } as const;
 
+const controlGroup = { display: 'flex', flexDirection: 'column', gap: '0.5rem' } as const;
+
+const controlGroupTitle = {
+  color: 'var(--cl-color-neutral-faded)',
+  fontSize: '0.6875rem',
+  fontWeight: 700,
+  letterSpacing: '0.06em',
+  textTransform: 'uppercase',
+} as const;
+
+const controlDivider = {
+  border: 0,
+  borderTop: '1px solid var(--cl-color-border)',
+  margin: '0.25rem 0',
+  width: '100%',
+} as const;
+
+/**
+ * A run of controls under a heading.
+ *
+ * The two kinds answer different questions and were previously indistinguishable: instance settings
+ * decide which flows exist at all, while the network mocks decide what happens partway through one.
+ */
+function ControlGroup({
+  title,
+  divided = false,
+  children,
+}: {
+  title: string;
+  /** Rules off from the group above. */
+  divided?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <>
+      {divided ? <hr style={controlDivider} /> : null}
+      <span style={controlGroupTitle}>{title}</span>
+      <div style={controlGroup}>{children}</div>
+    </>
+  );
+}
+
 /** The name of a control, so the eye can find it before reading its options. */
 const controlName = { fontWeight: 600 } as const;
 
@@ -259,81 +301,93 @@ function Controls({
 }) {
   return (
     <div style={controlsBar}>
-      <label style={controlLabel}>
-        <span style={controlName}>Latency</span>
-        <input
-          max={4000}
-          min={0}
-          step={100}
-          type='range'
-          value={config.latencyMs}
-          onChange={event => onChange({ latencyMs: Number(event.target.value) })}
+      {/* What the instance is configured to allow. These change which flows exist at all, so they
+          are what you reach for to answer "what does this look like for that customer". */}
+      <ControlGroup title='Instance settings'>
+        <label style={controlLabel}>
+          <input
+            checked={config.allowMultipleAccounts}
+            type='checkbox'
+            onChange={event => onChange({ allowMultipleAccounts: event.target.checked })}
+          />
+          <span style={controlName}>Allow multiple emails / phones</span>
+        </label>
+        <RadioGroup
+          legend='Email strategy'
+          options={EMAIL_STRATEGIES}
+          value={config.emailStrategy}
+          onChange={emailStrategy => onChange({ emailStrategy })}
         />
-        {config.latencyMs}ms
-      </label>
-      <RadioGroup
-        legend='Email strategy'
-        options={EMAIL_STRATEGIES}
-        value={config.emailStrategy}
-        onChange={emailStrategy => onChange({ emailStrategy })}
-      />
-      <RadioGroup
-        legend='Link outcome'
-        options={LINK_OUTCOMES}
-        value={config.emailLinkOutcome}
-        onChange={emailLinkOutcome => onChange({ emailLinkOutcome })}
-      />
-      <label style={controlLabel}>
-        <input
-          checked={config.requireReverification}
-          type='checkbox'
-          onChange={event => onChange({ requireReverification: event.target.checked })}
+        <label style={controlLabel}>
+          <input
+            checked={config.requireReverification}
+            type='checkbox'
+            onChange={event => onChange({ requireReverification: event.target.checked })}
+          />
+          <span style={controlName}>Require reverification</span>
+        </label>
+        <RadioGroup
+          disabled={!config.requireReverification}
+          legend='Challenge'
+          options={REVERIFICATION_STRATEGIES}
+          value={config.reverificationStrategy}
+          onChange={reverificationStrategy => onChange({ reverificationStrategy })}
         />
-        <span style={controlName}>Require reverification</span>
-      </label>
-      <RadioGroup
-        disabled={!config.requireReverification}
-        legend='Challenge'
-        options={REVERIFICATION_STRATEGIES}
-        value={config.reverificationStrategy}
-        onChange={reverificationStrategy => onChange({ reverificationStrategy })}
-      />
-      <label style={controlLabel}>
-        <input
-          checked={config.allowMultipleAccounts}
-          type='checkbox'
-          onChange={event => onChange({ allowMultipleAccounts: event.target.checked })}
+        <label style={controlLabel}>
+          <input
+            checked={config.enterpriseManaged}
+            type='checkbox'
+            onChange={event => onChange({ enterpriseManaged: event.target.checked })}
+          />
+          <span style={controlName}>Enterprise-managed (name read-only)</span>
+        </label>
+      </ControlGroup>
+
+      {/* What the simulated server does. None of these change which flows exist — they change what
+          happens partway through one. */}
+      <ControlGroup
+        divided
+        title='Network'
+      >
+        <label style={controlLabel}>
+          <span style={controlName}>Latency</span>
+          <input
+            max={4000}
+            min={0}
+            step={100}
+            type='range'
+            value={config.latencyMs}
+            onChange={event => onChange({ latencyMs: Number(event.target.value) })}
+          />
+          {config.latencyMs}ms
+        </label>
+        <RadioGroup
+          legend='Link outcome'
+          options={LINK_OUTCOMES}
+          value={config.emailLinkOutcome}
+          onChange={emailLinkOutcome => onChange({ emailLinkOutcome })}
         />
-        <span style={controlName}>Allow multiple emails / phones</span>
-      </label>
-      <label style={controlLabel}>
-        <input
-          checked={config.enterpriseManaged}
-          type='checkbox'
-          onChange={event => onChange({ enterpriseManaged: event.target.checked })}
-        />
-        <span style={controlName}>Enterprise-managed (name read-only)</span>
-      </label>
-      <label style={controlLabel}>
-        <input
-          checked={config.ssoFails}
-          type='checkbox'
-          onChange={event => onChange({ ssoFails: event.target.checked })}
-        />
-        <span style={controlName}>SSO fails</span>
-      </label>
-      <label style={controlLabel}>
-        <input
-          checked={config.failWithFormError}
-          type='checkbox'
-          onChange={event => onChange({ failWithFormError: event.target.checked })}
-        />
-        <span style={controlName}>Force server error</span>
-      </label>
-      <span style={{ opacity: 0.7 }}>
-        code <code>{config.validCode}</code> · password <code>{config.validPassword}</code> · taken{' '}
-        <code>{config.takenIdentifiers[0]}</code> · SSO domain <code>@{config.ssoDomains[0]}</code>
-      </span>
+        <label style={controlLabel}>
+          <input
+            checked={config.ssoFails}
+            type='checkbox'
+            onChange={event => onChange({ ssoFails: event.target.checked })}
+          />
+          <span style={controlName}>SSO fails</span>
+        </label>
+        <label style={controlLabel}>
+          <input
+            checked={config.failWithFormError}
+            type='checkbox'
+            onChange={event => onChange({ failWithFormError: event.target.checked })}
+          />
+          <span style={controlName}>Force server error</span>
+        </label>
+        <span style={{ opacity: 0.7 }}>
+          code <code>{config.validCode}</code> · password <code>{config.validPassword}</code> · taken{' '}
+          <code>{config.takenIdentifiers[0]}</code> · SSO domain <code>@{config.ssoDomains[0]}</code>
+        </span>
+      </ControlGroup>
     </div>
   );
 }
@@ -371,6 +425,7 @@ export function Default() {
           flow.add
             ? {
                 kind: flow.add.kind,
+                intent: flow.add.intent,
                 state: flow.add.state,
                 onCancel: flow.closeAdd,
                 onCodeChange: flow.setCode,
@@ -426,6 +481,8 @@ export function Default() {
         username={flow.identity.username}
         onAddEmail={() => flow.openAdd('email')}
         onAddPhone={() => flow.openAdd('phone')}
+        onManageEmail={id => flow.openManage('email', id)}
+        onManagePhone={id => flow.openManage('phone', id)}
         onEditProfilePicture={() => flow.openEdit('avatar')}
         onNameChange={() => flow.openEdit('name')}
         onUsernameChange={() => flow.openEdit('username')}
