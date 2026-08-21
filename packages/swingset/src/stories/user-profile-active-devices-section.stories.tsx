@@ -4,8 +4,6 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { useSignOutAllDevicesDialogStory } from './helpers/use-sign-out-all-devices-dialog-story';
-
 export { default as __source } from './user-profile-active-devices-section.stories?raw';
 
 export const meta: StoryMeta = {
@@ -38,19 +36,13 @@ export function Default() {
       type: 'desktop',
     },
   ]);
-  const { openSignOutAllDevicesDialog, signOutAllDevicesDialog } = useSignOutAllDevicesDialogStory({
-    onSignOut: () => setDevices(current => current.filter(device => device.isCurrent)),
-  });
 
   return (
-    <>
-      <UserProfileActiveDevicesSectionView
-        devices={devices}
-        onManageDevice={() => undefined}
-        onSignOutAllOtherDevices={openSignOutAllDevicesDialog}
-        onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
-      />
-      {signOutAllDevicesDialog}
-    </>
+    <UserProfileActiveDevicesSectionView
+      devices={devices}
+      onManageDevice={() => undefined}
+      onSignOutAllOtherDevices={() => setDevices(current => current.filter(device => device.isCurrent))}
+      onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
+    />
   );
 }

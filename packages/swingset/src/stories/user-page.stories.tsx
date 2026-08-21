@@ -16,11 +16,6 @@ import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { useBackupCodesDialogStory } from './helpers/use-backup-codes-dialog-story';
-import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
-import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
-import { useSignOutAllDevicesDialogStory } from './helpers/use-sign-out-all-devices-dialog-story';
-
 export { default as __source } from './user-page.stories?raw';
 
 export const meta: StoryMeta = {
@@ -50,9 +45,6 @@ const initialAPIKeys: UserProfileAPIKey[] = [
 ];
 
 export function Default() {
-  const { openBackupCodesDialog, backupCodesDialog } = useBackupCodesDialogStory();
-  const { openDeleteAccountDialog, deleteAccountDialog } = useDeleteAccountDialogStory();
-  const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
@@ -88,9 +80,6 @@ export function Default() {
       type: 'mobile',
     },
   ]);
-  const { openSignOutAllDevicesDialog, signOutAllDevicesDialog } = useSignOutAllDevicesDialogStory({
-    onSignOut: () => setDevices(current => current.filter(device => device.isCurrent)),
-  });
   const [subscription, setSubscription] = useState<UserProfileSubscription>({
     planName: 'Basic Plan',
     priceLabel: '$12 / Month',
@@ -132,7 +121,7 @@ export function Default() {
             isVerified: true,
           },
         ]),
-      onDeleteAccount: openDeleteAccountDialog,
+      onDeleteAccount: () => undefined,
       onEditProfilePicture: () => undefined,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
@@ -172,14 +161,17 @@ export function Default() {
           ...current,
           { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
         ]),
-      onChangePassword: openPasswordDialog,
-      onDeleteAccount: openDeleteAccountDialog,
+      onChangePassword: () => undefined,
+      onDeleteAccount: () => undefined,
       onManageDevice: () => undefined,
       onManagePasskey: () => undefined,
-      onRegenerateBackupCodes: openBackupCodesDialog,
+      onRegenerateBackupCodes: () =>
+        setMfaMethods(current =>
+          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
+        ),
       onRemoveMfaMethod: id => setMfaMethods(current => current.filter(method => method.id !== id)),
       onRemovePasskey: id => setPasskeys(current => current.filter(passkey => passkey.id !== id)),
-      onSignOutAllOtherDevices: openSignOutAllDevicesDialog,
+      onSignOutAllOtherDevices: () => setDevices(current => current.filter(device => device.isCurrent)),
       onSignOutDevice: id => setDevices(current => current.filter(device => device.id !== id)),
     },
     billing: {
@@ -250,16 +242,10 @@ export function Default() {
   };
 
   return (
-    <>
-      <UserPageView
-        activePanel={activePanel}
-        panels={panels}
-        onPanelChange={setActivePanel}
-      />
-      {passwordDialog}
-      {deleteAccountDialog}
-      {signOutAllDevicesDialog}
-      {backupCodesDialog}
-    </>
+    <UserPageView
+      activePanel={activePanel}
+      panels={panels}
+      onPanelChange={setActivePanel}
+    />
   );
 }

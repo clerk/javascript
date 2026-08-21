@@ -8,14 +8,6 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { useBackupCodesDialogStory } from './helpers/use-backup-codes-dialog-story';
-import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
-import { useDeviceDialogStory } from './helpers/use-device-dialog-story';
-import { useMfaDialogStory } from './helpers/use-mfa-dialog-story';
-import { usePasskeyDialogStory } from './helpers/use-passkey-dialog-story';
-import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
-import { useSignOutAllDevicesDialogStory } from './helpers/use-sign-out-all-devices-dialog-story';
-
 export { default as __source } from './user-profile-security-panel.stories?raw';
 
 export const meta: StoryMeta = {
@@ -27,9 +19,6 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const { openBackupCodesDialog, backupCodesDialog } = useBackupCodesDialogStory();
-  const { openDeleteAccountDialog, deleteAccountDialog } = useDeleteAccountDialogStory();
-  const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
   const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
     {
       id: 'passkey',
@@ -38,18 +27,10 @@ export function Default() {
       lastUsedAtLabel: 'Last used 1h ago',
     },
   ]);
-  const { addPasskey, openRenamePasskeyDialog, openRemovePasskeyDialog, passkeyDialogs } = usePasskeyDialogStory({
-    passkeys,
-    onChange: setPasskeys,
-  });
   const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>([
     { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
-    { id: 'backup-codes', type: 'backup-codes' },
+    { id: 'backup', type: 'backup-codes' },
   ]);
-  const { openAddMfaDialog, openRemoveMfaDialog, mfaDialogs } = useMfaDialogStory({
-    methods: mfaMethods,
-    onChange: setMfaMethods,
-  });
   const [devices, setDevices] = useState<UserProfileDevice[]>([
     {
       id: 'current',
@@ -69,68 +50,50 @@ export function Default() {
       name: 'Clerk App on macOS',
       description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
       type: 'desktop',
-      details: {
-        title: 'Macbook Pro · Chrome',
-        lastActiveAtLabel: 'Last active 4 days ago',
-        deviceName: 'Macbook Pro',
-        browserName: 'Chrome 150.0.0.0',
-        ipAddress: '2600:100e:b10b:787b:e8ae:6e75:fc2f:b10',
-        location: 'Salt Lake City, UT, United States',
-        locationFlag: '🇺🇸',
-        originalSignInAtLabel: 'July 5th, 2026',
-      },
     },
   ]);
-  const { openSignOutAllDevicesDialog, signOutAllDevicesDialog } = useSignOutAllDevicesDialogStory({
-    onSignOut: () => setDevices(current => current.filter(device => device.isCurrent)),
-  });
-  const { openDeviceDialog, deviceDialog } = useDeviceDialogStory({
-    onSignOut: id => setDevices(current => current.filter(device => device.id !== id)),
-  });
-  const openDevice = (id: string) => {
-    const device = devices.find(candidate => candidate.id === id);
-    if (!device) {
-      return;
-    }
-    openDeviceDialog({
-      id,
-      title: device.details?.title ?? device.name,
-      lastActiveAtLabel: device.details?.lastActiveAtLabel ?? device.description ?? 'Active now',
-      deviceName: device.details?.deviceName ?? device.name,
-      browserName: device.details?.browserName ?? 'Unknown',
-      ipAddress: device.details?.ipAddress ?? 'Unknown',
-      location: device.details?.location ?? 'Unknown',
-      locationFlag: device.details?.locationFlag,
-      originalSignInAtLabel: device.details?.originalSignInAtLabel ?? 'Unknown',
-    });
-  };
 
   return (
-    <>
-      <UserProfileSecurityPanelView
-        devices={devices}
-        hasPassword
-        mfaMethods={mfaMethods}
-        passkeys={passkeys}
-        onAddMfaMethod={openAddMfaDialog}
-        onAddPasskey={addPasskey}
-        onChangePassword={openPasswordDialog}
-        onDeleteAccount={openDeleteAccountDialog}
-        onManageDevice={openDevice}
-        onManagePasskey={openRenamePasskeyDialog}
-        onRemoveMfaMethod={openRemoveMfaDialog}
-        onRemovePasskey={openRemovePasskeyDialog}
-        onRegenerateBackupCodes={openBackupCodesDialog}
-        onSignOutAllOtherDevices={openSignOutAllDevicesDialog}
-        onSignOutDevice={openDevice}
-      />
-      {passwordDialog}
-      {deleteAccountDialog}
-      {signOutAllDevicesDialog}
-      {deviceDialog}
-      {mfaDialogs}
-      {passkeyDialogs}
-      {backupCodesDialog}
-    </>
+    <UserProfileSecurityPanelView
+      devices={devices}
+      hasPassword
+      mfaMethods={mfaMethods}
+      passkeys={passkeys}
+      onAddMfaMethod={type =>
+        setMfaMethods(current => {
+          const timestamp = Date.now();
+          return [
+            ...current,
+            {
+              id: `${type}-${timestamp}`,
+              type,
+              description: type === 'sms' ? '+1 801-555-0100' : undefined,
+            },
+            ...(current.some(method => method.type === 'backup-codes')
+              ? []
+              : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
+          ];
+        })
+      }
+      onAddPasskey={() =>
+        setPasskeys(current => [
+          ...current,
+          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
+        ])
+      }
+      onChangePassword={() => undefined}
+      onDeleteAccount={() => undefined}
+      onManageDevice={() => undefined}
+      onManagePasskey={() => undefined}
+      onRegenerateBackupCodes={() =>
+        setMfaMethods(current =>
+          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
+        )
+      }
+      onRemoveMfaMethod={id => setMfaMethods(current => current.filter(method => method.id !== id))}
+      onRemovePasskey={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
+      onSignOutAllOtherDevices={() => setDevices(current => current.filter(device => device.isCurrent))}
+      onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
+    />
   );
 }
