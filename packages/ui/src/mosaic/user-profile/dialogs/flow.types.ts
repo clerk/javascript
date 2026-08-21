@@ -1,3 +1,5 @@
+import type React from 'react';
+
 /**
  * The contract between whatever drives a user-profile flow and the views that render it.
  *
@@ -199,3 +201,64 @@ export interface EditAvatarActions {
 
 /** Which profile field a dialog is editing. */
 export type ProfileField = 'name' | 'username' | 'avatar';
+
+// =============================================================================
+// What the section view takes
+// =============================================================================
+// The view renders the dialogs; it does not decide when they are open. Each prop below is the
+// flow's snapshot plus its events, or `null` when that flow is not running — the view derives
+// both the dialog's `open` and its held exit frame from that. This mirrors the UserButton, whose
+// view renders the whole popover but forwards `open` straight through: the surface belongs to the
+// view, the state driving it does not.
+
+export interface EditProfileDialogActions {
+  onNameChange: (key: 'firstName' | 'lastName', value: string) => void;
+  onUsernameChange: (value: string) => void;
+  onSelectAvatarFile: (file: File) => void;
+  onRemoveAvatar: () => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+}
+
+export type EditProfileFlow = EditProfileDialogActions &
+  (
+    | { field: 'name'; state: EditNameState }
+    | { field: 'username'; state: EditUsernameState }
+    | { field: 'avatar'; state: EditAvatarState }
+  );
+
+export interface ConfirmContactDialogActions {
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export type ConfirmContactFlow = ConfirmContactDialogActions & {
+  action: 'remove' | 'set-primary';
+  kind: ContactKind;
+  /** Drives whether the removal warns about losing sign-in. */
+  isVerified: boolean;
+  state: ConfirmContactActionState;
+};
+
+export type AddContactFlow = AddContactFlowActions & {
+  kind: ContactKind;
+  state: AddContactFlowState;
+};
+
+export type ReverificationFlow = ReverificationChallengeActions & {
+  state: ReverificationChallengeState;
+};
+
+/** The flow half of the account section's props. Every field is optional and nullable. */
+export interface AccountSectionFlows {
+  /**
+   * Where focus returns when a dialog closes. These dialogs open from state rather than from a
+   * `Dialog.Trigger`, so without it focus lands on the body and the row is lost.
+   */
+  flowTriggerRef?: React.RefObject<HTMLElement | null>;
+  addContact?: AddContactFlow | null;
+  confirmContact?: ConfirmContactFlow | null;
+  editProfile?: EditProfileFlow | null;
+  /** Stacks over whichever flow raised it. Shared across sections; it lives here until a second one needs it. */
+  reverification?: ReverificationFlow | null;
+}

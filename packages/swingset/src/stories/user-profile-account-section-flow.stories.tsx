@@ -1,12 +1,5 @@
-import type { DialogOpenChangeDetails } from '@clerk/headless/dialog';
-import { Freeze } from '@clerk/headless/utils';
-import { AlertDialog, useConfirmedClose } from '@clerk/ui/mosaic/components/alert-dialog';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import { AddContactDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/add-contact-dialog.view';
-import {
-  RemoveContactDialogView,
-  SetPrimaryContactDialogView,
-} from '@clerk/ui/mosaic/user-profile/dialogs/confirm-contact-dialog.view';
 import {
   EditAvatarDialogView,
   EditNameDialogView,
@@ -18,9 +11,8 @@ import type {
   EditNameState,
   EditUsernameState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
-import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section.view';
-import { useId, useMemo, useRef, useState } from 'react';
+import { useId, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -55,213 +47,6 @@ const INITIAL_IDENTITY = {
   imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
 };
 
-/**
- * The dialogs a contact flow mounts, wired to the simulated backend.
- *
- * Each surface is wrapped in `Freeze`, held while its state is null. A dialog stays mounted for the
- * length of its exit transition, but the state driving it is cleared the moment it closes — so
- * without this the contents blank out and the surface visibly collapses on the way out. Freezing
- * holds the last committed frame until the dialog is actually gone.
- *
- * `AddContactDialogView` is the only surface that changes shape as the flow runs; the two
- * confirmations and the reverification challenge are each one state. The challenge is stacked over
- * whatever raised it, so its dialog is a sibling rather than a step — the interrupted surface stays
- * mounted and inert underneath, and the flow resumes there when the challenge clears.
- */
-function ContactFlowDialogs({ flow }: { flow: ReturnType<typeof useAccountSectionFlow> }) {
-  const { add, edit, confirm, reverification } = flow;
-  const initials = `${flow.identity.firstName.at(0) ?? ''}${flow.identity.lastName.at(0) ?? ''}`.toUpperCase();
-
-  // One handle per mounted dialog, not module scope: two of these sharing single-flight state
-  // would let one dialog's question answer the other's.
-  const discardConfirm = useMemo(() => AlertDialog.createConfirmHandle(), []);
-
-  /**
-   * The control that had focus inside the edit dialog when the discard question was raised, so
-   * "Keep editing" puts the caret back where it was rather than on the dialog itself.
-   *
-   * Recorded as focus moves rather than read at close time: the primitive's focus machinery runs
-   * synchronously on the close request, so by the time the question is asked the answer would
-   * already be wrong.
-   */
-  const lastEditFocus = useRef<HTMLElement | null>(null);
-  const rememberEditFocus = (event: React.FocusEvent<HTMLDivElement>) => {
-    const target = event.target;
-    // React portals bubble through the React tree, so the confirmation's own buttons reach this
-    // handler too. Recording those would return focus to a button that no longer exists.
-    if (!target.closest('[role="alertdialog"]')) {
-      lastEditFocus.current = target;
-    }
-  };
-
-  // All three profile forms share one dialog, so one guard covers them — each field just reports
-  // dirtiness its own way.
-  const isEditDirty = () => {
-    if (!edit) {
-      return false;
-    }
-    if (edit.field === 'name') {
-      return edit.state.firstName !== flow.identity.firstName || edit.state.lastName !== flow.identity.lastName;
-    }
-    if (edit.field === 'username') {
-      return edit.state.value !== flow.identity.username;
-    }
-    return Boolean(edit.state.fileName);
-  };
-
-  const onEditOpenChange: (open: boolean, details: DialogOpenChangeDetails) => void = useConfirmedClose({
-    handle: discardConfirm,
-    when: isEditDirty,
-    onOpenChange: open => {
-      if (!open) {
-        flow.closeEdit();
-      }
-    },
-    confirm: {
-      title: 'Discard changes?',
-      description: 'Your edits will be lost.',
-      actionLabel: 'Discard',
-      cancelLabel: 'Keep editing',
-      destructive: true,
-    },
-  });
-
-  const cancelEdit = () => onEditOpenChange(false, PROGRAMMATIC_CLOSE);
-  const confirmKind = confirm?.pending.kind ?? 'email';
-  const confirmRecord =
-    confirm && (confirmKind === 'email' ? flow.emails : flow.phones).find(item => item.id === confirm.pending.id);
-
-  return (
-    <>
-      <FlowDialog
-        finalFocus={flow.triggerRef}
-        open={Boolean(add)}
-        onOpenChange={open => {
-          if (!open) {
-            flow.closeAdd();
-          }
-        }}
-      >
-        <Freeze frozen={!add}>
-          {add ? (
-            <AddContactDialogView
-              isInterrupted={Boolean(reverification)}
-              kind={add.kind}
-              state={add.state}
-              onCancel={flow.closeAdd}
-              onCodeChange={flow.setCode}
-              onOpenSsoPopup={() => void flow.openSsoPopup()}
-              onResend={() => void flow.resend()}
-              onSubmitCode={() => void flow.submitCode()}
-              onSubmitIdentifier={() => void flow.submitIdentifier()}
-              onValueChange={flow.setIdentifier}
-            />
-          ) : null}
-        </Freeze>
-      </FlowDialog>
-
-      <FlowDialog
-        closedBy='closerequest'
-        finalFocus={flow.triggerRef}
-        open={Boolean(edit)}
-        onFocusCapture={rememberEditFocus}
-        onOpenChange={onEditOpenChange}
-      >
-        <Freeze frozen={!edit}>
-          {edit?.field === 'name' ? (
-            <EditNameDialogView
-              isInterrupted={Boolean(reverification)}
-              state={edit.state}
-              onCancel={cancelEdit}
-              onFirstNameChange={value => flow.setName('firstName', value)}
-              onLastNameChange={value => flow.setName('lastName', value)}
-              onSubmit={() => void flow.submitEdit()}
-            />
-          ) : null}
-          {edit?.field === 'username' ? (
-            <EditUsernameDialogView
-              isInterrupted={Boolean(reverification)}
-              state={edit.state}
-              onCancel={cancelEdit}
-              onSubmit={() => void flow.submitEdit()}
-              onValueChange={flow.setUsername}
-            />
-          ) : null}
-          {edit?.field === 'avatar' ? (
-            <EditAvatarDialogView
-              fallback={initials}
-              isInterrupted={Boolean(reverification)}
-              state={edit.state}
-              onCancel={cancelEdit}
-              onRemove={() => void flow.removeAvatar()}
-              onSelectFile={flow.selectAvatarFile}
-              onSubmit={() => void flow.submitEdit()}
-            />
-          ) : null}
-        </Freeze>
-        {/* Belongs INSIDE the dialog it guards, so the two share a floating tree, escape ordering,
-            the stacking treatment and the refcounted scroll lock. */}
-        <AlertDialog.Confirm
-          finalFocus={lastEditFocus}
-          handle={discardConfirm}
-        />
-      </FlowDialog>
-
-      <AlertDialog
-        finalFocus={flow.triggerRef}
-        open={Boolean(confirm)}
-        onOpenChange={open => {
-          if (!open) {
-            flow.closeConfirm();
-          }
-        }}
-      >
-        <Freeze frozen={!confirm}>
-          {confirm ? (
-            confirm.pending.action === 'remove' ? (
-              <RemoveContactDialogView
-                isVerified={confirmRecord?.isVerified ?? false}
-                kind={confirmKind}
-                state={confirm.state}
-                onCancel={flow.closeConfirm}
-                onConfirm={() => void flow.submitConfirm()}
-              />
-            ) : (
-              <SetPrimaryContactDialogView
-                kind={confirmKind}
-                state={confirm.state}
-                onCancel={flow.closeConfirm}
-                onConfirm={() => void flow.submitConfirm()}
-              />
-            )
-          ) : null}
-        </Freeze>
-      </AlertDialog>
-
-      <Dialog
-        open={Boolean(reverification)}
-        onOpenChange={open => {
-          if (!open) {
-            flow.cancelReverification();
-          }
-        }}
-      >
-        <Freeze frozen={!reverification}>
-          {reverification ? (
-            <ReverificationDialogView
-              state={reverification}
-              onCancel={flow.cancelReverification}
-              onResend={() => void flow.resendReverification()}
-              onSubmit={() => void flow.submitReverification()}
-              onValueChange={flow.setReverificationValue}
-            />
-          ) : null}
-        </Freeze>
-      </Dialog>
-    </>
-  );
-}
-
 // `StoryEmbed` centres a story inside `flex items-center justify-center`, so a fragment's children
 // become flex items in a row. Stories here own a column wrapper rather than leaving the controls
 // sitting beside the component.
@@ -269,52 +54,6 @@ const storyColumn = { display: 'flex', flexDirection: 'column', width: '100%' } 
 
 // One control per line: these are independent conditions rather than a related set, and a wrapped
 // row made it ambiguous which options belonged to which label.
-/** A close this code issues rather than one the user gestured, for routing Cancel through a guard. */
-const PROGRAMMATIC_CLOSE: DialogOpenChangeDetails = { trigger: null, triggerId: null, event: undefined };
-
-/**
- * A `Dialog` assembled from the compound parts, so it can take `finalFocus`.
- *
- * The `Dialog` wrapper deliberately does not forward focus props — purpose-built chrome is meant
- * to talk to `Dialog.Root` / `Dialog.Popup` directly instead of widening the generic wrapper. This
- * is that chrome, in the smallest form the story needs.
- */
-function FlowDialog({
-  open,
-  finalFocus,
-  closedBy,
-  onOpenChange,
-  onFocusCapture,
-  children,
-}: {
-  open: boolean;
-  finalFocus?: React.RefObject<HTMLElement | null>;
-  closedBy?: 'any' | 'closerequest' | 'none';
-  onOpenChange: (open: boolean, details: DialogOpenChangeDetails) => void;
-  onFocusCapture?: React.FocusEventHandler<HTMLDivElement>;
-  children: React.ReactNode;
-}) {
-  return (
-    <Dialog.Root
-      closedBy={closedBy}
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup
-            finalFocus={finalFocus}
-            onFocusCapture={onFocusCapture}
-          >
-            {children}
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-}
-
 const controlsBar = {
   alignItems: 'flex-start',
   border: '1px solid var(--cl-color-border)',
@@ -602,13 +341,73 @@ export function Default() {
     initialPhones: INITIAL_PHONES,
   });
 
+  const confirmRecord = flow.confirm
+    ? (flow.confirm.pending.kind === 'email' ? flow.emails : flow.phones).find(
+        item => item.id === flow.confirm?.pending.id,
+      )
+    : undefined;
+
   return (
     <div style={storyColumn}>
       <Controls
         config={config}
         onChange={next => setConfig(current => ({ ...current, ...next }))}
       />
+      {/* The section renders the dialogs itself; the harness supplies only their state and events,
+          which is what the controller will hand it once a machine drives this. */}
       <UserProfileAccountSectionView
+        addContact={
+          flow.add
+            ? {
+                kind: flow.add.kind,
+                state: flow.add.state,
+                onCancel: flow.closeAdd,
+                onCodeChange: flow.setCode,
+                onOpenSsoPopup: () => void flow.openSsoPopup(),
+                onResend: () => void flow.resend(),
+                onSubmitCode: () => void flow.submitCode(),
+                onSubmitIdentifier: () => void flow.submitIdentifier(),
+                onValueChange: flow.setIdentifier,
+              }
+            : null
+        }
+        confirmContact={
+          flow.confirm
+            ? {
+                action: flow.confirm.pending.action,
+                kind: flow.confirm.pending.kind,
+                isVerified: confirmRecord?.isVerified ?? false,
+                state: flow.confirm.state,
+                onCancel: flow.closeConfirm,
+                onConfirm: () => void flow.submitConfirm(),
+              }
+            : null
+        }
+        editProfile={
+          flow.edit
+            ? {
+                ...flow.edit,
+                onNameChange: flow.setName,
+                onUsernameChange: flow.setUsername,
+                onSelectAvatarFile: flow.selectAvatarFile,
+                onRemoveAvatar: () => void flow.removeAvatar(),
+                onSubmit: () => void flow.submitEdit(),
+                onCancel: flow.closeEdit,
+              }
+            : null
+        }
+        flowTriggerRef={flow.triggerRef}
+        reverification={
+          flow.reverification
+            ? {
+                state: flow.reverification,
+                onCancel: flow.cancelReverification,
+                onResend: () => void flow.resendReverification(),
+                onSubmit: () => void flow.submitReverification(),
+                onValueChange: flow.setReverificationValue,
+              }
+            : null
+        }
         emails={flow.emails}
         imageUrl={flow.identity.imageUrl}
         name={`${flow.identity.firstName} ${flow.identity.lastName}`.trim()}
@@ -646,7 +445,6 @@ export function Default() {
         onVerifyEmail={() => flow.openAdd('email')}
         onVerifyPhone={() => flow.openAdd('phone')}
       />
-      <ContactFlowDialogs flow={flow} />
     </div>
   );
 }
