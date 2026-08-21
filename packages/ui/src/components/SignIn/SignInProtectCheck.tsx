@@ -37,16 +37,10 @@ function SignInProtectCheckInternal(): JSX.Element | null {
   const ctx = useSignInContext();
   const { afterSignInUrl, navigateOnSetActive } = ctx;
 
-  // Latched at mount, BEFORE the challenge is submitted. `SignIn.fromJSON` replaces
-  // `firstFactorVerification` wholesale on every write, so the transferable marker that routed
-  // us here is not guaranteed to survive `submitProtectCheck` — and it is the only thing that
-  // distinguishes "an OAuth sign-up is in progress" from "an ordinary gated sign-in".
+  // persist the original status of whether the sign-in is pending an OAuth transfer
   const startedAsOAuthTransfer = useRef(isSignInPendingOAuthTransfer(signIn));
 
-  // Latches that a protect check existed at some point, so the resolution race
-  // (submitProtectCheck clearing protectCheck mid-navigation) isn't mistaken for a stale
-  // visit. Mirrors SignUpProtectCheck, which has had this since it shipped. State adjusted
-  // during render (guarded) rather than a ref write, which React disallows in the render body.
+  // persist that a protect check existed at some point
   const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signIn.protectCheck);
   const didStartNoCheckFallbackRef = useRef(false);
 
@@ -85,21 +79,12 @@ function SignInProtectCheckInternal(): JSX.Element | null {
       await resumeSignInAfterProtectCheck(updatedSignIn, {
         navigate,
         startedAsOAuthTransfer: startedAsOAuthTransfer.current,
-        // No isCancelled() guard around this one: completing the transfer calls setActive,
-        // which flips the withRedirectToAfterSignIn guard and blanks this card. That unmount
-        // must not abort the continuation — the router owns its navigation from here.
-        // Feature-detected: @clerk/ui ships independently of the runtime, so a newer card can meet
-        // a clerk-js without this method. Degrade to the pre-existing destination rather than throw.
         resumeOAuthContinuation: () =>
           typeof __internal_resumeAfterProtectCheck === 'function'
             ? __internal_resumeAfterProtectCheck(
                 {
                   ...buildSignInOAuthCallbackParams(ctx),
                   continuation: 'transfer_to_sign_up',
-                  // Carried for the same reason the social buttons carry it: without it a
-                  // completed transfer whose session has a pending task is routed with the
-                  // component's base URL rather than its mounted route, which lands on
-                  // `#/tasks/...` instead of `#/create/tasks/...` in the combined flow.
                   __internal_navigateOnSetActive: ctx.navigateOnSetActive,
                 },
                 navigate,

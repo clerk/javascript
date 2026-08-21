@@ -70,8 +70,6 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
   // `handleError` re-throws what it does not recognise, and this runner awaits caller code that
   // raises plain errors (a transient fetch failure, an OAuth continuation that did not complete).
-  // A throw from inside a catch escapes the void-invoked challenge run, leaving the card with no
-  // spinner, no message and no retry -- so the reporting itself must never throw.
   const reportError = (err: any) => {
     try {
       handleError(err, [], card.setError);

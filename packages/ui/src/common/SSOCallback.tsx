@@ -26,10 +26,6 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
   const bounceTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   React.useEffect(() => {
-    // Cleanup runs while `handleRedirectCallback` is still pending, so a superseded run's `.catch`
-    // fires AFTER it. Clearing a stored id cannot help -- the stale timer does not exist yet. The
-    // run has to know it was superseded and decline to schedule at all, or its bounce pulls the
-    // user off the route the newer run just reached.
     let cancelled = false;
 
     if (__internal_setActiveInProgress !== true) {
@@ -40,15 +36,6 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
           return;
         }
 
-        // Schedule the bounce FIRST, and never let the error reporting escape this handler.
-        //
-        // `handleError` re-throws anything it does not recognise, and the callback's own
-        // "did not complete" guards throw a plain `Error` — which it does not. A throw from
-        // inside this `.catch` skipped BOTH statements below, so the user got no message and
-        // no recovery: the card sat on its spinner indefinitely while the failure surfaced
-        // only as an unhandled rejection in the console. Every callback dead-end was
-        // invisible for that reason, which is a bad property for a route whose whole job is
-        // to be the last step of somebody's sign-in.
         bounceTimeoutRef.current = setTimeout(() => void navigate('../'), 4000);
         try {
           handleError(e, [], card.setError);

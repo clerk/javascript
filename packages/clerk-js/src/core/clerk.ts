@@ -2461,11 +2461,6 @@ export class Clerk implements ClerkInterface {
       signIn: SignInResource;
       signUp: SignUpResource;
       navigate: (to: string) => Promise<unknown>;
-      /**
-       * Set when this is re-entered after a verification challenge the caller has already
-       * cleared, which skips the two gate short-circuits below. Without it the resumed flow
-       * bounces straight back into the card it was resumed from.
-       */
       resuming?: boolean;
     },
   ): Promise<unknown> => {
@@ -2610,10 +2605,6 @@ export class Clerk implements ClerkInterface {
     // sign-in's challenge. We only consult `si` here unless this is explicitly a sign-up callback.
     // Transfers are unaffected: the `signIn.create({ transfer })` path below checks its own fresh
     // response for the gate.
-    //
-    // Both gate checks are skipped when `resuming`: the caller IS the challenge card, so
-    // re-checking would either bounce control back into it, or — through the sign-up arm
-    // below, on a stale gate — hand it to the wrong card entirely.
     if (!resuming && params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
       return navigateToSignInProtectCheck();
     }
@@ -2681,9 +2672,6 @@ export class Clerk implements ClerkInterface {
       return navigateToResetPassword();
     }
 
-    // `SignIn.fromJSON` replaces `firstFactorVerification` wholesale on every write, so a
-    // caller that observed the pending transfer BEFORE clearing a challenge cannot rely on
-    // the marker still being here afterwards. It tells us instead of us re-reading it.
     const userNeedsToBeCreated =
       si.firstFactorVerificationStatus === 'transferable' || params.continuation === 'transfer_to_sign_up';
 
@@ -2797,11 +2785,6 @@ export class Clerk implements ClerkInterface {
     }
     const { signIn, signUp } = this.client;
 
-    // Deliberately mirrors `handleRedirectCallback` rather than
-    // `__internal_handleResourceCallback`: the latter runs every path through
-    // `buildUrlWithAuth`, which resolves a relative path against the ORIGIN on development
-    // instances and so turns `../factor-one` into an absolute URL, losing the component
-    // router's context.
     const resolvedNavigate = customNavigate ?? params.__internal_navigate;
     const navigate = (to: string) =>
       resolvedNavigate && typeof resolvedNavigate === 'function' ? resolvedNavigate(to) : this.navigate(to);
