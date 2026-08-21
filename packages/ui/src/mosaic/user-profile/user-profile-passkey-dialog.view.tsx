@@ -10,20 +10,21 @@ import { Heading } from '../components/heading';
 import { Input } from '../components/input';
 import { Text } from '../components/text';
 import type {
+  UserProfilePasskeyAddFlowActions,
   UserProfilePasskeyAddFlowState,
+  UserProfilePasskeyRemoveFlowActions,
   UserProfilePasskeyRemoveFlowState,
+  UserProfilePasskeyRenameFlowActions,
   UserProfilePasskeyRenameFlowState,
 } from './dialogs/flow.types';
 import { passkeyDialogStyles as styles } from './user-profile-passkey-dialog.styles';
 
 interface PasskeyDialogProps {
   isInterrupted?: boolean;
-  onCancel: () => void;
 }
 
-export interface UserProfilePasskeyAddDialogViewProps extends PasskeyDialogProps {
+export interface UserProfilePasskeyAddDialogViewProps extends PasskeyDialogProps, UserProfilePasskeyAddFlowActions {
   state: UserProfilePasskeyAddFlowState;
-  onAdd: () => void;
 }
 
 export function UserProfilePasskeyAddDialogView({
@@ -83,10 +84,9 @@ export function UserProfilePasskeyAddDialogView({
   );
 }
 
-export interface UserProfilePasskeyRenameDialogViewProps extends PasskeyDialogProps {
+export interface UserProfilePasskeyRenameDialogViewProps
+  extends PasskeyDialogProps, UserProfilePasskeyRenameFlowActions {
   state: UserProfilePasskeyRenameFlowState;
-  onNameChange: (name: string) => void;
-  onRename: () => void;
 }
 
 export function UserProfilePasskeyRenameDialogView({
@@ -162,11 +162,9 @@ export function UserProfilePasskeyRenameDialogView({
   );
 }
 
-export interface UserProfilePasskeyRemoveDialogViewProps {
+export interface UserProfilePasskeyRemoveDialogViewProps extends UserProfilePasskeyRemoveFlowActions {
   state: UserProfilePasskeyRemoveFlowState;
   isInterrupted?: boolean;
-  onCancel: () => void;
-  onRemove: () => void;
 }
 
 export function UserProfilePasskeyRemoveDialogView({

@@ -7,13 +7,16 @@ import { Dialog } from '../components/dialog';
 import { Heading } from '../components/heading';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
-import type { UserProfileDeviceDetailsFlowState } from './dialogs/flow.types';
+import type {
+  UserProfileDeviceDetailsFlowActions,
+  UserProfileDeviceDetailsFlowState,
+  UserProfileDeviceSignOutFlowActions,
+} from './dialogs/flow.types';
 import { deviceDialogStyles as styles } from './user-profile-device-dialog.styles';
 
-export interface UserProfileDeviceDialogViewProps {
+export interface UserProfileDeviceDialogViewProps extends UserProfileDeviceDetailsFlowActions {
   state: UserProfileDeviceDetailsFlowState;
   isInterrupted?: boolean;
-  onRequestSignOut: () => void;
 }
 
 export function UserProfileDeviceDialogView({
@@ -74,11 +77,9 @@ export function UserProfileDeviceDialogView({
   );
 }
 
-export interface UserProfileDeviceSignOutDialogViewProps {
+export interface UserProfileDeviceSignOutDialogViewProps extends UserProfileDeviceSignOutFlowActions {
   state: UserProfileDeviceDetailsFlowState;
   isInterrupted?: boolean;
-  onCancel: () => void;
-  onSignOut: () => void;
 }
 
 export function UserProfileDeviceSignOutDialogView({

@@ -8,17 +8,14 @@ import { Heading } from '../components/heading';
 import { Input } from '../components/input';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
-import type { UserProfileDeleteAccountFlowState } from './dialogs/flow.types';
+import type { UserProfileDeleteAccountFlowActions, UserProfileDeleteAccountFlowState } from './dialogs/flow.types';
 import { deleteAccountDialogStyles as styles } from './user-profile-delete-account-dialog.styles';
 
 const confirmationText = 'Delete account';
 
-export interface UserProfileDeleteAccountDialogViewProps {
+export interface UserProfileDeleteAccountDialogViewProps extends UserProfileDeleteAccountFlowActions {
   state: UserProfileDeleteAccountFlowState;
   isInterrupted?: boolean;
-  onCancel: () => void;
-  onConfirmationChange: (value: string) => void;
-  onDelete: () => void;
 }
 
 export function UserProfileDeleteAccountDialogView({
