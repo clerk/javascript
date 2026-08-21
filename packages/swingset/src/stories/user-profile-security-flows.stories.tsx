@@ -222,76 +222,100 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         </Freeze>
         {verificationDialog('remove-passkey')}
       </AlertDialog>
-      {flow.addMfa ? (
-        <UserProfileMfaAddDialogView
-          open
-          state={flow.addMfa}
-          onOpenChange={open => {
-            if (!open) {
-              flow.closeAddMfa();
-            }
-          }}
-          onCodeChange={flow.updateMfaCode}
-          onAddPhone={flow.addNewMfaPhone}
-          onSelectPhone={flow.selectMfaPhone}
-          onPhoneNumberChange={flow.updateMfaPhoneNumber}
-          onResend={() => void flow.resendMfaCode()}
-          onSubmit={code => void flow.submitAddMfa(code)}
-          onToggleDisplayFormat={flow.toggleMfaDisplayFormat}
-          onCopyBackupCodes={() => {
-            if (flow.addMfa?.step === 'backup-codes') {
-              void navigator.clipboard?.writeText(flow.addMfa.codes.join('\n'));
-              flow.markMfaBackupCodesCopied();
-            }
-          }}
-          onDownloadBackupCodes={() => {
-            if (flow.addMfa?.step === 'backup-codes') {
-              downloadBackupCodes(flow.addMfa.codes);
-            }
-          }}
-          onPrintBackupCodes={() => window.print()}
-          onFinish={flow.finishAddMfa}
-          verificationDialog={verificationDialog('add-mfa')}
-        />
-      ) : null}
-      {flow.removeMfa ? (
-        <UserProfileMfaRemoveDialogView
-          open
-          state={flow.removeMfa}
-          onOpenChange={open => {
-            if (!open) {
-              flow.closeRemoveMfa();
-            }
-          }}
-          onRemove={flow.submitRemoveMfa}
-          verificationDialog={verificationDialog('remove-mfa')}
-        />
-      ) : null}
-      {flow.backupCodes ? (
-        <UserProfileBackupCodesDialogView
-          open
-          state={flow.backupCodes}
-          onOpenChange={open => {
-            if (!open) {
-              flow.closeBackupCodes();
-            }
-          }}
-          onRetry={flow.regenerateBackupCodes}
-          onCopy={() => {
-            if (flow.backupCodes?.step === 'codes') {
-              void navigator.clipboard?.writeText(flow.backupCodes.codes.join('\n'));
-              flow.markBackupCodesCopied();
-            }
-          }}
-          onDownload={() => {
-            if (flow.backupCodes?.step === 'codes') {
-              downloadBackupCodes(flow.backupCodes.codes);
-            }
-          }}
-          onPrint={() => window.print()}
-          verificationDialog={verificationDialog('backup-codes')}
-        />
-      ) : null}
+      <FlowCardDialog
+        finalFocus={flow.mfaTriggerRef}
+        open={Boolean(flow.addMfa)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeAddMfa();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.addMfa}>
+          {flow.addMfa ? (
+            <UserProfileMfaAddDialogView
+              state={flow.addMfa}
+              isInterrupted={flow.reverification?.operation === 'add-mfa'}
+              onCancel={flow.closeAddMfa}
+              onCodeChange={flow.updateMfaCode}
+              onAddPhone={flow.addNewMfaPhone}
+              onSelectPhone={flow.selectMfaPhone}
+              onPhoneNumberChange={flow.updateMfaPhoneNumber}
+              onResend={() => void flow.resendMfaCode()}
+              onSubmit={code => void flow.submitAddMfa(code)}
+              onToggleDisplayFormat={flow.toggleMfaDisplayFormat}
+              onCopyBackupCodes={() => {
+                if (flow.addMfa?.step === 'backup-codes') {
+                  void navigator.clipboard?.writeText(flow.addMfa.codes.join('\n'));
+                  flow.markMfaBackupCodesCopied();
+                }
+              }}
+              onDownloadBackupCodes={() => {
+                if (flow.addMfa?.step === 'backup-codes') {
+                  downloadBackupCodes(flow.addMfa.codes);
+                }
+              }}
+              onPrintBackupCodes={() => window.print()}
+              onFinish={flow.finishAddMfa}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('add-mfa')}
+      </FlowCardDialog>
+      <AlertDialog
+        finalFocus={flow.mfaTriggerRef}
+        open={Boolean(flow.removeMfa)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeRemoveMfa();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.removeMfa}>
+          {flow.removeMfa ? (
+            <UserProfileMfaRemoveDialogView
+              state={flow.removeMfa}
+              isInterrupted={flow.reverification?.operation === 'remove-mfa'}
+              onCancel={flow.closeRemoveMfa}
+              onRemove={flow.submitRemoveMfa}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('remove-mfa')}
+      </AlertDialog>
+      <FlowCardDialog
+        finalFocus={flow.mfaTriggerRef}
+        open={Boolean(flow.backupCodes)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeBackupCodes();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.backupCodes}>
+          {flow.backupCodes ? (
+            <UserProfileBackupCodesDialogView
+              state={flow.backupCodes}
+              isInterrupted={flow.reverification?.operation === 'backup-codes'}
+              onCancel={flow.closeBackupCodes}
+              onRetry={flow.regenerateBackupCodes}
+              onCopy={() => {
+                if (flow.backupCodes?.step === 'codes') {
+                  void navigator.clipboard?.writeText(flow.backupCodes.codes.join('\n'));
+                  flow.markBackupCodesCopied();
+                }
+              }}
+              onDownload={() => {
+                if (flow.backupCodes?.step === 'codes') {
+                  downloadBackupCodes(flow.backupCodes.codes);
+                }
+              }}
+              onPrint={() => window.print()}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('backup-codes')}
+      </FlowCardDialog>
       {flow.deleteAccount ? (
         <UserProfileDeleteAccountDialogView
           open
@@ -1568,44 +1592,59 @@ export function States() {
         </AlertDialog>
       ) : null}
       {snapshot.flow === 'add-mfa' ? (
-        <UserProfileMfaAddDialogView
+        <FlowCardDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onCodeChange={noop}
-          onAddPhone={noop}
-          onSelectPhone={noop}
-          onPhoneNumberChange={noop}
-          onResend={noop}
-          onSubmit={noop}
-          onToggleDisplayFormat={noop}
-          onCopyBackupCodes={noop}
-          onDownloadBackupCodes={noop}
-          onPrintBackupCodes={noop}
-          onFinish={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfileMfaAddDialogView
+            state={snapshot.state}
+            isInterrupted={verificationOpen}
+            onCancel={() => setOpen(false)}
+            onCodeChange={noop}
+            onAddPhone={noop}
+            onSelectPhone={noop}
+            onPhoneNumberChange={noop}
+            onResend={noop}
+            onSubmit={noop}
+            onToggleDisplayFormat={noop}
+            onCopyBackupCodes={noop}
+            onDownloadBackupCodes={noop}
+            onPrintBackupCodes={noop}
+            onFinish={noop}
+          />
+          {verification}
+        </FlowCardDialog>
       ) : null}
       {snapshot.flow === 'remove-mfa' ? (
-        <UserProfileMfaRemoveDialogView
+        <AlertDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onRemove={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfileMfaRemoveDialogView
+            state={snapshot.state}
+            isInterrupted={verificationOpen}
+            onCancel={() => setOpen(false)}
+            onRemove={noop}
+          />
+          {verification}
+        </AlertDialog>
       ) : null}
       {snapshot.flow === 'backup-codes' ? (
-        <UserProfileBackupCodesDialogView
+        <FlowCardDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onRetry={noop}
-          onCopy={noop}
-          onDownload={noop}
-          onPrint={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfileBackupCodesDialogView
+            state={snapshot.state}
+            isInterrupted={verificationOpen}
+            onCancel={() => setOpen(false)}
+            onRetry={noop}
+            onCopy={noop}
+            onDownload={noop}
+            onPrint={noop}
+          />
+          {verification}
+        </FlowCardDialog>
       ) : null}
       {snapshot.flow === 'delete-account' ? (
         <UserProfileDeleteAccountDialogView

@@ -64,6 +64,11 @@ export function useMfaSectionFlow({
   const [backupCodes, setBackupCodes] = useState<UserProfileBackupCodesFlowState | null>(null);
   const [reverification, setReverification] = useState<MfaReverificationState | null>(null);
   const verificationGate = useRef<{ operation: MfaOperation; resolve: (verified: boolean) => void } | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const captureTrigger = useCallback(() => {
+    const active = document.activeElement;
+    triggerRef.current = active instanceof HTMLElement ? active : null;
+  }, []);
 
   useEffect(
     () =>
@@ -223,6 +228,7 @@ export function useMfaSectionFlow({
   }, [runMutation]);
   const openAddMfa = useCallback(
     (method: UserProfileMfaMethodType) => {
+      captureTrigger();
       if (method === 'authenticator') {
         prepareAuthenticator();
       } else if (settingsRef.current.availableMfaPhone !== 'none') {
@@ -243,10 +249,11 @@ export function useMfaSectionFlow({
         setAddMfa({ method: 'sms', step: 'phone', phoneNumber: '+1', isSubmitting: false, errors: {} });
       }
     },
-    [prepareAuthenticator],
+    [captureTrigger, prepareAuthenticator],
   );
   const selectMfaPhone = useCallback(
     (id: string) => {
+      captureTrigger();
       if (!addMfa || addMfa.step !== 'select-phone') {
         return;
       }
@@ -338,7 +345,7 @@ export function useMfaSectionFlow({
         errors: {},
       });
     },
-    [mfaMethods],
+    [captureTrigger, mfaMethods],
   );
   const submitRemoveMfa = useCallback(() => {
     if (!removeMfa || removeMfa.isSubmitting) {
@@ -363,6 +370,10 @@ export function useMfaSectionFlow({
       setBackupCodes({ step: 'codes', codes: GENERATED_BACKUP_CODES, copied: false, isSubmitting: false, errors: {} });
     });
   }, [runMutation]);
+  const openBackupCodes = useCallback(() => {
+    captureTrigger();
+    regenerateBackupCodes();
+  }, [captureTrigger, regenerateBackupCodes]);
   const resendMfaCode = useCallback(async () => {
     setAddMfa(current =>
       current?.step === 'verify' ? { ...current, resend: { ...current.resend, isResending: true } } : current,
@@ -443,6 +454,7 @@ export function useMfaSectionFlow({
   }, []);
 
   return {
+    triggerRef,
     mfaMethods,
     addMfa,
     removeMfa,
@@ -471,7 +483,7 @@ export function useMfaSectionFlow({
     openRemoveMfa,
     closeRemoveMfa: () => closeOperation('remove-mfa'),
     submitRemoveMfa,
-    openBackupCodes: regenerateBackupCodes,
+    openBackupCodes,
     closeBackupCodes: () => closeOperation('backup-codes'),
     regenerateBackupCodes,
     markBackupCodesCopied: () =>

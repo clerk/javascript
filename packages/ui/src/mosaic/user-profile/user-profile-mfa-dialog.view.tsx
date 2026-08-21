@@ -1,11 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
-import type { FormEvent, ReactNode } from 'react';
+import type { FormEvent } from 'react';
 import { useId } from 'react';
 
 import { AlertDialog } from '../components/alert-dialog';
 import { Button, SubmitButton } from '../components/button';
 import { Card } from '../components/card';
-import { Dialog, type DialogProps } from '../components/dialog';
+import { Dialog } from '../components/dialog';
 import { Field } from '../components/field';
 import { Heading } from '../components/heading';
 import { Spinner } from '../components/spinner';
@@ -15,9 +15,10 @@ import type { UserProfileMfaAddFlowState, UserProfileMfaRemoveFlowState } from '
 import { CodeInput, PhoneInput, ResendButton } from './dialogs/flow-dialog-chrome';
 import { mfaDialogStyles as styles } from './user-profile-mfa-dialog.styles';
 
-export interface UserProfileMfaAddDialogViewProps extends Pick<DialogProps, 'open' | 'defaultOpen' | 'onOpenChange'> {
+export interface UserProfileMfaAddDialogViewProps {
   state: UserProfileMfaAddFlowState;
-  verificationDialog?: ReactNode;
+  isInterrupted?: boolean;
+  onCancel: () => void;
   onPhoneNumberChange: (value: string) => void;
   onAddPhone: () => void;
   onSelectPhone: (id: string) => void;
@@ -33,7 +34,8 @@ export interface UserProfileMfaAddDialogViewProps extends Pick<DialogProps, 'ope
 
 export function UserProfileMfaAddDialogView({
   state,
-  verificationDialog,
+  isInterrupted = false,
+  onCancel,
   onPhoneNumberChange,
   onAddPhone,
   onSelectPhone,
@@ -45,7 +47,6 @@ export function UserProfileMfaAddDialogView({
   onDownloadBackupCodes,
   onPrintBackupCodes,
   onFinish,
-  ...dialogProps
 }: UserProfileMfaAddDialogViewProps) {
   const title =
     state.step === 'backup-codes'
@@ -61,102 +62,79 @@ export function UserProfileMfaAddDialogView({
   };
 
   return (
-    <Dialog.Root
-      size='card'
-      closedBy='closerequest'
-      {...dialogProps}
+    <form
+      aria-hidden={isInterrupted || undefined}
+      onSubmit={submit}
+      {...stylex.props(styles.form)}
     >
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup
-            render={
-              <Card.Root
-                elevation='overlay'
-                renderBranding={false}
-              />
-            }
+      <Dialog.CloseButton />
+      <Card.Header>
+        <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
+        <Dialog.Description render={<Text />}>
+          <AddDescription state={state} />
+        </Dialog.Description>
+      </Card.Header>
+      <Card.Content {...stylex.props(styles.content)}>
+        <AddContent
+          state={state}
+          onCodeChange={onCodeChange}
+          onPhoneNumberChange={onPhoneNumberChange}
+          onSelectPhone={onSelectPhone}
+          onResend={onResend}
+          onSubmit={onSubmit}
+          onToggleDisplayFormat={onToggleDisplayFormat}
+          onCopyBackupCodes={onCopyBackupCodes}
+          onDownloadBackupCodes={onDownloadBackupCodes}
+          onPrintBackupCodes={onPrintBackupCodes}
+        />
+        {state.errors.form ? (
+          <Text
+            color='negative'
+            role='alert'
           >
-            <Dialog.CloseButton />
-            <form
-              onSubmit={submit}
-              {...stylex.props(styles.form)}
+            {state.errors.form}
+          </Text>
+        ) : null}
+      </Card.Content>
+      {state.step !== 'preparing' || !state.isSubmitting ? (
+        <Card.Footer {...themeProps('user-profile-mfa-add-dialog-actions')}>
+          <Button
+            type='button'
+            variant='outline'
+            {...stylex.props(styles.footerButton)}
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+          {state.step === 'backup-codes' || state.step === 'success' ? (
+            <Button
+              {...stylex.props(styles.footerButton)}
+              type='button'
+              onClick={onFinish}
             >
-              <Card.Header>
-                <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
-                <Dialog.Description render={<Text />}>
-                  <AddDescription state={state} />
-                </Dialog.Description>
-              </Card.Header>
-              <Card.Content {...stylex.props(styles.content)}>
-                <AddContent
-                  state={state}
-                  onCodeChange={onCodeChange}
-                  onPhoneNumberChange={onPhoneNumberChange}
-                  onSelectPhone={onSelectPhone}
-                  onResend={onResend}
-                  onSubmit={onSubmit}
-                  onToggleDisplayFormat={onToggleDisplayFormat}
-                  onCopyBackupCodes={onCopyBackupCodes}
-                  onDownloadBackupCodes={onDownloadBackupCodes}
-                  onPrintBackupCodes={onPrintBackupCodes}
-                />
-                {state.errors.form ? (
-                  <Text
-                    color='negative'
-                    role='alert'
-                  >
-                    {state.errors.form}
-                  </Text>
-                ) : null}
-              </Card.Content>
-              {state.step !== 'preparing' || !state.isSubmitting ? (
-                <Card.Footer {...themeProps('user-profile-mfa-add-dialog-actions')}>
-                  <Dialog.Close
-                    render={props => (
-                      <Button
-                        {...props}
-                        {...stylex.props(styles.footerButton)}
-                        variant='outline'
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                  />
-                  {state.step === 'backup-codes' || state.step === 'success' ? (
-                    <Button
-                      {...stylex.props(styles.footerButton)}
-                      type='button'
-                      onClick={onFinish}
-                    >
-                      Done
-                    </Button>
-                  ) : state.step === 'select-phone' ? (
-                    <Button
-                      {...stylex.props(styles.footerButton)}
-                      type='button'
-                      onClick={onAddPhone}
-                    >
-                      Add phone number
-                    </Button>
-                  ) : (
-                    <SubmitButton
-                      disabled={!canSubmit(state)}
-                      isPending={state.isSubmitting || (state.step === 'verify' && state.status === 'verifying')}
-                      pendingLabel={state.step === 'verify' ? 'Verifying code' : 'Continuing'}
-                      {...stylex.props(styles.footerButton)}
-                    >
-                      {state.step === 'verify' ? 'Verify' : state.step === 'preparing' ? 'Try again' : 'Continue'}
-                    </SubmitButton>
-                  )}
-                </Card.Footer>
-              ) : null}
-            </form>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-      {verificationDialog}
-    </Dialog.Root>
+              Done
+            </Button>
+          ) : state.step === 'select-phone' ? (
+            <Button
+              {...stylex.props(styles.footerButton)}
+              type='button'
+              onClick={onAddPhone}
+            >
+              Add phone number
+            </Button>
+          ) : (
+            <SubmitButton
+              disabled={!canSubmit(state)}
+              isPending={state.isSubmitting || (state.step === 'verify' && state.status === 'verifying')}
+              pendingLabel={state.step === 'verify' ? 'Verifying code' : 'Continuing'}
+              {...stylex.props(styles.footerButton)}
+            >
+              {state.step === 'verify' ? 'Verify' : state.step === 'preparing' ? 'Try again' : 'Continue'}
+            </SubmitButton>
+          )}
+        </Card.Footer>
+      ) : null}
+    </form>
   );
 }
 
@@ -393,57 +371,54 @@ function canSubmit(state: UserProfileMfaAddFlowState) {
 }
 
 export interface UserProfileMfaRemoveDialogViewProps {
-  open?: boolean;
   state: UserProfileMfaRemoveFlowState;
-  verificationDialog?: ReactNode;
-  onOpenChange?: (open: boolean) => void;
+  isInterrupted?: boolean;
+  onCancel: () => void;
   onRemove: () => void;
 }
 
 export function UserProfileMfaRemoveDialogView({
   state,
-  verificationDialog,
+  isInterrupted = false,
+  onCancel,
   onRemove,
-  ...dialogProps
 }: UserProfileMfaRemoveDialogViewProps) {
   const methodName = state.method === 'sms' ? 'phone number' : 'authenticator app';
 
   return (
-    <AlertDialog.Root {...dialogProps}>
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop />
-        <AlertDialog.Viewport>
-          <AlertDialog.Popup>
-            <AlertDialog.Title render={<Heading size='sm' />}>Remove {methodName}</AlertDialog.Title>
-            <AlertDialog.Description render={<Text />}>
-              {state.method === 'sms'
-                ? `${state.label} will no longer receive verification codes when you sign in.`
-                : 'Verification codes from this authenticator will no longer be required when you sign in.'}
-            </AlertDialog.Description>
-            {state.errors.form ? (
-              <Text
-                color='negative'
-                role='alert'
-              >
-                {state.errors.form}
-              </Text>
-            ) : null}
-            <AlertDialog.Actions>
-              <AlertDialog.Close render={<Button variant='outline' />}>Cancel</AlertDialog.Close>
-              <SubmitButton
-                color='negative'
-                isPending={state.isSubmitting}
-                pendingLabel={`Removing ${methodName}`}
-                type='button'
-                onClick={onRemove}
-              >
-                Remove
-              </SubmitButton>
-            </AlertDialog.Actions>
-          </AlertDialog.Popup>
-        </AlertDialog.Viewport>
-      </AlertDialog.Portal>
-      {verificationDialog}
-    </AlertDialog.Root>
+    <div aria-hidden={isInterrupted || undefined}>
+      <AlertDialog.Title render={<Heading size='sm' />}>Remove {methodName}</AlertDialog.Title>
+      <AlertDialog.Description render={<Text />}>
+        {state.method === 'sms'
+          ? `${state.label} will no longer receive verification codes when you sign in.`
+          : 'Verification codes from this authenticator will no longer be required when you sign in.'}
+      </AlertDialog.Description>
+      {state.errors.form ? (
+        <Text
+          color='negative'
+          role='alert'
+        >
+          {state.errors.form}
+        </Text>
+      ) : null}
+      <AlertDialog.Actions>
+        <Button
+          type='button'
+          variant='outline'
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+        <SubmitButton
+          color='negative'
+          isPending={state.isSubmitting}
+          pendingLabel={`Removing ${methodName}`}
+          type='button'
+          onClick={onRemove}
+        >
+          Remove
+        </SubmitButton>
+      </AlertDialog.Actions>
+    </div>
   );
 }

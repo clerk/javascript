@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { Card } from '../../components/card';
+import { Dialog } from '../../components/dialog';
 import { UserProfileBackupCodesDialogView } from '../user-profile-backup-codes-dialog.view';
 
 const actions = {
@@ -16,11 +18,13 @@ describe('UserProfileBackupCodesDialogView', () => {
   it('opens in the generating state', () => {
     render(
       <MosaicProvider>
-        <UserProfileBackupCodesDialogView
-          open
-          state={{ step: 'generating', isSubmitting: true, errors: {} }}
-          {...actions}
-        />
+        <BackupCodesDialog>
+          <UserProfileBackupCodesDialogView
+            state={{ step: 'generating', isSubmitting: true, errors: {} }}
+            onCancel={vi.fn()}
+            {...actions}
+          />
+        </BackupCodesDialog>
       </MosaicProvider>,
     );
 
@@ -34,16 +38,18 @@ describe('UserProfileBackupCodesDialogView', () => {
     const user = userEvent.setup();
     render(
       <MosaicProvider>
-        <UserProfileBackupCodesDialogView
-          open
-          state={{
-            step: 'generating',
-            isSubmitting: false,
-            errors: { form: 'Something went wrong. Please try again.' },
-          }}
-          {...actions}
-          onRetry={onRetry}
-        />
+        <BackupCodesDialog>
+          <UserProfileBackupCodesDialogView
+            state={{
+              step: 'generating',
+              isSubmitting: false,
+              errors: { form: 'Something went wrong. Please try again.' },
+            }}
+            onCancel={vi.fn()}
+            {...actions}
+            onRetry={onRetry}
+          />
+        </BackupCodesDialog>
       </MosaicProvider>,
     );
 
@@ -59,20 +65,22 @@ describe('UserProfileBackupCodesDialogView', () => {
     const user = userEvent.setup();
     render(
       <MosaicProvider>
-        <UserProfileBackupCodesDialogView
-          open
-          state={{
-            step: 'codes',
-            codes: ['3k4p-7m2q', '9w6d-2x8n'],
-            copied: false,
-            isSubmitting: false,
-            errors: {},
-          }}
-          {...actions}
-          onCopy={onCopy}
-          onDownload={onDownload}
-          onPrint={onPrint}
-        />
+        <BackupCodesDialog>
+          <UserProfileBackupCodesDialogView
+            state={{
+              step: 'codes',
+              codes: ['3k4p-7m2q', '9w6d-2x8n'],
+              copied: false,
+              isSubmitting: false,
+              errors: {},
+            }}
+            onCancel={vi.fn()}
+            {...actions}
+            onCopy={onCopy}
+            onDownload={onDownload}
+            onPrint={onPrint}
+          />
+        </BackupCodesDialog>
       </MosaicProvider>,
     );
 
@@ -89,14 +97,41 @@ describe('UserProfileBackupCodesDialogView', () => {
   it('reflects copied state', () => {
     render(
       <MosaicProvider>
-        <UserProfileBackupCodesDialogView
-          open
-          state={{ step: 'codes', codes: ['3k4p-7m2q'], copied: true, isSubmitting: false, errors: {} }}
-          {...actions}
-        />
+        <BackupCodesDialog>
+          <UserProfileBackupCodesDialogView
+            state={{ step: 'codes', codes: ['3k4p-7m2q'], copied: true, isSubmitting: false, errors: {} }}
+            onCancel={vi.fn()}
+            {...actions}
+          />
+        </BackupCodesDialog>
       </MosaicProvider>,
     );
 
     expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument();
   });
 });
+
+function BackupCodesDialog({ children }: { children: React.ReactNode }) {
+  return (
+    <Dialog.Root
+      size='card'
+      open
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            {children}
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}

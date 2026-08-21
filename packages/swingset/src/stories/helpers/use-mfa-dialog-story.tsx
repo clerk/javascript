@@ -105,58 +105,109 @@ export function useMfaDialogStory({
     openRemoveMfaDialog,
     mfaDialogs: (
       <>
-        {add ? (
-          <UserProfileMfaAddDialogView
-            open
-            state={add}
-            onOpenChange={open => {
-              if (!open) {
-                setAdd(null);
-              }
-            }}
-            onCodeChange={code =>
-              setAdd(current =>
-                current && current.step === 'verify' ? { ...current, code, status: 'idle', errors: {} } : current,
-              )
+        <MfaDialog
+          open={Boolean(add)}
+          onOpenChange={open => {
+            if (!open) {
+              setAdd(null);
             }
-            onAddPhone={() =>
-              setAdd({ method: 'sms', step: 'phone', phoneNumber: '+1', isSubmitting: false, errors: {} })
-            }
-            onSelectPhone={() => undefined}
-            onPhoneNumberChange={phoneNumber =>
-              setAdd(current => (current && current.step === 'phone' ? { ...current, phoneNumber } : current))
-            }
-            onResend={() => undefined}
-            onSubmit={submitAddMfa}
-            onToggleDisplayFormat={() =>
-              setAdd(current =>
-                current && current.step === 'setup'
-                  ? { ...current, displayFormat: current.displayFormat === 'qr' ? 'key' : 'qr' }
-                  : current,
-              )
-            }
-            onCopyBackupCodes={() => undefined}
-            onDownloadBackupCodes={() => undefined}
-            onPrintBackupCodes={() => window.print()}
-            onFinish={() => setAdd(null)}
-          />
-        ) : null}
-        {remove ? (
-          <UserProfileMfaRemoveDialogView
-            open
-            state={remove}
-            onOpenChange={open => {
-              if (!open) {
-                setRemove(null);
-              }
-            }}
-            onRemove={() => {
-              onChange(methods.filter(method => method.id !== remove.id));
+          }}
+        >
+          <Freeze frozen={!add}>
+            {add ? (
+              <UserProfileMfaAddDialogView
+                state={add}
+                onCancel={() => setAdd(null)}
+                onCodeChange={code =>
+                  setAdd(current =>
+                    current && current.step === 'verify' ? { ...current, code, status: 'idle', errors: {} } : current,
+                  )
+                }
+                onAddPhone={() =>
+                  setAdd({ method: 'sms', step: 'phone', phoneNumber: '+1', isSubmitting: false, errors: {} })
+                }
+                onSelectPhone={() => undefined}
+                onPhoneNumberChange={phoneNumber =>
+                  setAdd(current => (current && current.step === 'phone' ? { ...current, phoneNumber } : current))
+                }
+                onResend={() => undefined}
+                onSubmit={submitAddMfa}
+                onToggleDisplayFormat={() =>
+                  setAdd(current =>
+                    current && current.step === 'setup'
+                      ? { ...current, displayFormat: current.displayFormat === 'qr' ? 'key' : 'qr' }
+                      : current,
+                  )
+                }
+                onCopyBackupCodes={() => undefined}
+                onDownloadBackupCodes={() => undefined}
+                onPrintBackupCodes={() => window.print()}
+                onFinish={() => setAdd(null)}
+              />
+            ) : null}
+          </Freeze>
+        </MfaDialog>
+        <AlertDialog
+          open={Boolean(remove)}
+          onOpenChange={open => {
+            if (!open) {
               setRemove(null);
-            }}
-          />
-        ) : null}
+            }
+          }}
+        >
+          <Freeze frozen={!remove}>
+            {remove ? (
+              <UserProfileMfaRemoveDialogView
+                state={remove}
+                onCancel={() => setRemove(null)}
+                onRemove={() => {
+                  onChange(methods.filter(method => method.id !== remove.id));
+                  setRemove(null);
+                }}
+              />
+            ) : null}
+          </Freeze>
+        </AlertDialog>
       </>
     ),
   };
 }
+
+function MfaDialog({
+  open,
+  onOpenChange,
+  children,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Dialog.Root
+      size='card'
+      closedBy='closerequest'
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            {children}
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+import { Freeze } from '@clerk/headless/utils';
+import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
+import { Card } from '@clerk/ui/mosaic/components/card';
+import { Dialog } from '@clerk/ui/mosaic/components/dialog';
