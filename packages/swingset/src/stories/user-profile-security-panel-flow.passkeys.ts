@@ -1,6 +1,6 @@
 import type {
   ReverificationChallengeState,
-  UserProfilePasskeyAddFlowState,
+  UserProfilePasskeyCreationState,
   UserProfilePasskeyRemoveFlowState,
   UserProfilePasskeyRenameFlowState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
@@ -41,7 +41,7 @@ export function usePasskeysFlowSlice({
   const settingsRef = useRef(config);
   settingsRef.current = config;
   const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>(() => passkeysFromConfig(config.hasPasskey));
-  const [addPasskey, setAddPasskey] = useState<UserProfilePasskeyAddFlowState | null>(null);
+  const [passkeyCreation, setPasskeyCreation] = useState<UserProfilePasskeyCreationState | null>(null);
   const [renamePasskey, setRenamePasskey] = useState<UserProfilePasskeyRenameFlowState | null>(null);
   const [removePasskey, setRemovePasskey] = useState<UserProfilePasskeyRemoveFlowState | null>(null);
   const [reverification, setReverification] = useState<PasskeyReverificationState | null>(null);
@@ -66,7 +66,7 @@ export function usePasskeysFlowSlice({
         cancelReverification();
       }
       if (operation === 'add-passkey') {
-        setAddPasskey(null);
+        setPasskeyCreation(null);
       } else if (operation === 'rename-passkey') {
         setRenamePasskey(null);
       } else {
@@ -79,7 +79,7 @@ export function usePasskeysFlowSlice({
   const setSubmitting = useCallback((operation: PasskeyOperation, isSubmitting: boolean, formError?: string) => {
     const errors = formError ? { form: formError } : {};
     if (operation === 'add-passkey') {
-      setAddPasskey(current => (current ? { ...current, isSubmitting, errors } : current));
+      setPasskeyCreation(current => (current ? { ...current, isSubmitting, errors } : current));
     } else if (operation === 'rename-passkey') {
       setRenamePasskey(current => (current ? { ...current, isSubmitting, errors } : current));
     } else {
@@ -134,21 +134,22 @@ export function usePasskeysFlowSlice({
     [requestReverification, setSubmitting],
   );
 
-  const openAddPasskey = useCallback(() => {
+  const addPasskey = useCallback(() => {
     captureTrigger();
     const capability = settingsRef.current.passkeyCapability;
-    setAddPasskey({
+    setPasskeyCreation({
       capability,
       result: 'idle',
       isSubmitting: false,
       errors: capability === 'unsupported' ? { form: 'Passkeys are not supported by this browser or device.' } : {},
     });
-  }, [captureTrigger]);
-  const submitAddPasskey = useCallback(() => {
+    if (capability === 'unsupported') {
+      return;
+    }
     void runMutation('add-passkey', () => {
       const result = settingsRef.current.passkeyCreationResult;
       if (result !== 'success') {
-        setAddPasskey(current =>
+        setPasskeyCreation(current =>
           current
             ? {
                 ...current,
@@ -172,7 +173,7 @@ export function usePasskeysFlowSlice({
       onHasPasskeyChange?.(true);
       closeOperation('add-passkey');
     });
-  }, [closeOperation, onHasPasskeyChange, runMutation]);
+  }, [captureTrigger, closeOperation, onHasPasskeyChange, runMutation]);
 
   const openRenamePasskey = useCallback(
     (id: string) => {
@@ -292,17 +293,11 @@ export function usePasskeysFlowSlice({
   return {
     triggerRef,
     passkeys,
-    addPasskey,
+    passkeyCreation,
     renamePasskey,
     removePasskey,
     reverification,
-    openAddPasskey,
-    closeAddPasskey: () => {
-      if (!addPasskey?.isSubmitting) {
-        closeOperation('add-passkey');
-      }
-    },
-    submitAddPasskey,
+    addPasskey,
     openRenamePasskey,
     closeRenamePasskey: () => {
       if (!renamePasskey?.isSubmitting) {

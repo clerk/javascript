@@ -1,10 +1,8 @@
 import type {
-  UserProfilePasskeyAddFlowState,
   UserProfilePasskeyRemoveFlowState,
   UserProfilePasskeyRenameFlowState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import {
-  UserProfilePasskeyAddDialogView,
   UserProfilePasskeyRemoveDialogView,
   UserProfilePasskeyRenameDialogView,
 } from '@clerk/ui/mosaic/user-profile/user-profile-passkey-dialog.view';
@@ -18,7 +16,6 @@ export function usePasskeyDialogStory({
   passkeys: UserProfilePasskey[];
   onChange: (passkeys: UserProfilePasskey[]) => void;
 }) {
-  const [add, setAdd] = useState<UserProfilePasskeyAddFlowState | null>(null);
   const [rename, setRename] = useState<UserProfilePasskeyRenameFlowState | null>(null);
   const [remove, setRemove] = useState<UserProfilePasskeyRemoveFlowState | null>(null);
 
@@ -37,39 +34,19 @@ export function usePasskeyDialogStory({
   };
 
   return {
-    openAddPasskeyDialog: () => setAdd({ isSubmitting: false, errors: {} }),
+    addPasskey: () =>
+      onChange([
+        ...passkeys,
+        {
+          id: `passkey-${Date.now()}`,
+          name: `Passkey ${passkeys.length + 1}`,
+          createdAtLabel: 'Created just now',
+        },
+      ]),
     openRenamePasskeyDialog,
     openRemovePasskeyDialog,
     passkeyDialogs: (
       <>
-        <PasskeyDialog
-          open={Boolean(add)}
-          onOpenChange={open => {
-            if (!open) {
-              setAdd(null);
-            }
-          }}
-        >
-          <Freeze frozen={!add}>
-            {add ? (
-              <UserProfilePasskeyAddDialogView
-                state={add}
-                onCancel={() => setAdd(null)}
-                onAdd={() => {
-                  onChange([
-                    ...passkeys,
-                    {
-                      id: `passkey-${Date.now()}`,
-                      name: `Passkey ${passkeys.length + 1}`,
-                      createdAtLabel: 'Created just now',
-                    },
-                  ]);
-                  setAdd(null);
-                }}
-              />
-            ) : null}
-          </Freeze>
-        </PasskeyDialog>
         <PasskeyDialog
           open={Boolean(rename)}
           onOpenChange={open => {

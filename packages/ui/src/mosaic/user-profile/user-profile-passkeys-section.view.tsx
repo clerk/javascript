@@ -1,4 +1,7 @@
+import { SubmitButton } from '../components/button';
+import { Icon } from '../components/icon';
 import { Section } from '../components/section';
+import type { UserProfilePasskeyCreationState } from './dialogs/flow.types';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
@@ -15,6 +18,7 @@ export interface UserProfilePasskey {
 export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
   sectionTitle?: string;
+  creationState?: UserProfilePasskeyCreationState | null;
   onAdd?: () => void;
   onManage?: (id: string) => void;
   onRemove?: (id: string) => void;
@@ -23,18 +27,45 @@ export interface UserProfilePasskeysSectionViewProps {
 export function UserProfilePasskeysSectionView({
   passkeys,
   sectionTitle,
+  creationState,
   onAdd,
   onManage,
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
   return (
     <UserProfileSecurityList
+      addControl={
+        onAdd ? (
+          <SubmitButton
+            type='button'
+            aria-label={m.passkeys.addTitle}
+            color='neutral'
+            disabled={creationState?.capability === 'unsupported'}
+            isPending={Boolean(creationState?.isSubmitting)}
+            pendingLabel={m.passkeys.addPending}
+            size='sm'
+            variant='outline'
+            onClick={onAdd}
+          >
+            <Icon
+              name='plus'
+              placement='inline-start'
+              size='sm'
+            />
+            {m.sections.add}
+          </SubmitButton>
+        ) : null
+      }
       addLabel={m.passkeys.addTitle}
       emptyLabel={m.sections.noPasskeys}
       hasItems={passkeys.length > 0}
       label={m.sections.passkeys}
+      notice={
+        creationState?.errors.form ? (
+          <Section.Description role='alert'>{creationState.errors.form}</Section.Description>
+        ) : null
+      }
       sectionTitle={sectionTitle}
-      onAdd={onAdd}
     >
       {passkeys.map(passkey => {
         const actions: UserProfileMenuAction[] = [];

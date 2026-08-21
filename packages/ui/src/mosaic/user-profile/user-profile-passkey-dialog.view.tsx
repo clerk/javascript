@@ -8,8 +8,6 @@ import { Heading } from '../components/heading';
 import { Input } from '../components/input';
 import { Text } from '../components/text';
 import type {
-  UserProfilePasskeyAddFlowActions,
-  UserProfilePasskeyAddFlowState,
   UserProfilePasskeyRemoveFlowActions,
   UserProfilePasskeyRemoveFlowState,
   UserProfilePasskeyRenameFlowActions,
@@ -21,58 +19,6 @@ import { fill, userProfileSecurityBase as m } from './user-profile-security.mess
 
 interface PasskeyDialogProps {
   isInterrupted?: boolean;
-}
-
-export interface UserProfilePasskeyAddDialogViewProps extends PasskeyDialogProps, UserProfilePasskeyAddFlowActions {
-  state: UserProfilePasskeyAddFlowState;
-}
-
-export function UserProfilePasskeyAddDialogView({
-  state,
-  isInterrupted = false,
-  onCancel,
-  onAdd,
-}: UserProfilePasskeyAddDialogViewProps) {
-  const submit = () => {
-    if (!state.isSubmitting && state.capability !== 'unsupported') {
-      onAdd();
-    }
-  };
-
-  return (
-    <div aria-hidden={isInterrupted || undefined}>
-      <Dialog.CloseButton disabled={state.isSubmitting} />
-      <DialogHeader
-        title={m.passkeys.addTitle}
-        description={m.passkeys.addDescription}
-      />
-      <DialogForm onSubmit={submit}>
-        <DialogBody>
-          {state.capability === 'unsupported' ? <Text>{m.passkeys.unsupported}</Text> : null}
-          <FormAlert>{state.errors.form}</FormAlert>
-        </DialogBody>
-        <DialogFooter>
-          <Button
-            type='button'
-            disabled={state.isSubmitting}
-            variant='outline'
-            {...stylex.props(styles.footerButton)}
-            onClick={onCancel}
-          >
-            {m.common.cancel}
-          </Button>
-          <SubmitButton
-            disabled={state.capability === 'unsupported'}
-            isPending={state.isSubmitting}
-            pendingLabel={m.passkeys.addPending}
-            {...stylex.props(styles.footerButton)}
-          >
-            {m.passkeys.addTitle}
-          </SubmitButton>
-        </DialogFooter>
-      </DialogForm>
-    </div>
-  );
 }
 
 export interface UserProfilePasskeyRenameDialogViewProps
