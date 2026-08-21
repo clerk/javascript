@@ -7,9 +7,9 @@ import type {
 import type { UserProfilePasskey } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { SecurityFlowConfig } from './user-profile-security-flow.config';
+import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
 
-type PasskeysSectionFlowConfig = Pick<
+type PasskeysFlowSliceConfig = Pick<
   SecurityFlowConfig,
   | 'failurePoint'
   | 'hasPasskey'
@@ -31,11 +31,11 @@ interface PasskeyReverificationState {
 const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export function usePasskeysSectionFlow({
+export function usePasskeysFlowSlice({
   config,
   onHasPasskeyChange,
 }: {
-  config: PasskeysSectionFlowConfig;
+  config: PasskeysFlowSliceConfig;
   onHasPasskeyChange?: (hasPasskey: boolean) => void;
 }) {
   const settingsRef = useRef(config);

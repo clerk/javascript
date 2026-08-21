@@ -1,18 +1,18 @@
-import * as Stories from './user-profile-security-flows.stories';
+import * as Stories from './user-profile-security-panel-flow.stories';
 
-# Security flows
+# User profile security panel flow
 
 The password, two-factor enrollment and removal, delete-account, individual-device, and
-sign-out-all-devices journeys driven by a simulated backend that takes time, can fail, and can
-require a stacked reverification challenge. Two-factor enrollment is limited to phone number and
-authenticator app; backup codes are disabled for this design.
+sign-out-all-other-devices journeys driven by a simulated backend that takes time, can fail, and can
+require a stacked reverification challenge. The panel is the flow boundary; password, passkey, MFA,
+device, and deletion state remain internal slices of its single harness.
 
 The failure-point control distinguishes an initial mutation failure from a failed reverification
 attempt and a failure when the original mutation is retried. Reverification-only targets appear
 only when reverification is required.
 
 The production views render controlled state snapshots and emit events. The state transitions and
-simulated backend live only in `user-profile-security-flow.harness.ts`; a Clerk-backed controller
+simulated backend live only in `user-profile-security-panel-flow.harness.ts`; a Clerk-backed controller
 can replace that harness without changing the dialog views.
 
 <Story
@@ -36,6 +36,16 @@ failure, set-password, and nested reverification states inspectable without repl
 
 <Story
   name='States'
+  storyModule={Stories}
+/>
+
+## Panel states
+
+Configuration-derived panel states, including empty authentication methods, device loading and
+failure, impersonation labels, and filtered inactive sessions.
+
+<Story
+  name='ProfileStates'
   storyModule={Stories}
 />
 

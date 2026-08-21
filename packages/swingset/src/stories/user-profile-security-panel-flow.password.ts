@@ -6,9 +6,9 @@ import type {
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { SecurityFlowConfig } from './user-profile-security-flow.config';
+import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
 
-type PasswordSectionFlowConfig = Pick<
+type PasswordFlowSliceConfig = Pick<
   SecurityFlowConfig,
   | 'failurePoint'
   | 'hasPassword'
@@ -37,12 +37,12 @@ const EMPTY_PASSWORD_VALUES: UserProfilePasswordValues = {
 const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export function usePasswordSectionFlow({
+export function usePasswordFlowSlice({
   config,
   onHasPasswordChange,
   onSignOutOtherSessions,
 }: {
-  config: PasswordSectionFlowConfig;
+  config: PasswordFlowSliceConfig;
   onHasPasswordChange?: (hasPassword: boolean) => void;
   onSignOutOtherSessions?: () => void;
 }) {

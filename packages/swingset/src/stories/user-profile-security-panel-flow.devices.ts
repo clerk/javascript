@@ -6,9 +6,9 @@ import type {
 import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { SecurityFlowConfig } from './user-profile-security-flow.config';
+import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
 
-type ActiveDevicesSectionFlowConfig = Pick<
+type DevicesFlowSliceConfig = Pick<
   SecurityFlowConfig,
   'failurePoint' | 'latencyMs' | 'requireReverification' | 'reverificationStrategy' | 'validCode' | 'validPassword'
 >;
@@ -22,11 +22,11 @@ interface DeviceReverificationState {
 const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export function useActiveDevicesSectionFlow({
+export function useDevicesFlowSlice({
   config,
   initialDevices,
 }: {
-  config: ActiveDevicesSectionFlowConfig;
+  config: DevicesFlowSliceConfig;
   initialDevices: UserProfileDevice[];
 }) {
   const settingsRef = useRef(config);

@@ -39,15 +39,18 @@ import { useId, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import type { SecurityFlowConfig } from './user-profile-security-flow.harness';
-import { DEFAULT_SECURITY_FLOW_CONFIG, useSecurityFlow } from './user-profile-security-flow.harness';
+import type { SecurityFlowConfig } from './user-profile-security-panel-flow.harness';
+import {
+  DEFAULT_SECURITY_FLOW_CONFIG,
+  useUserProfileSecurityPanelFlow,
+} from './user-profile-security-panel-flow.harness';
 
-export { default as __source } from './user-profile-security-flows.stories?raw';
+export { default as __source } from './user-profile-security-panel-flow.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  title: 'SecurityFlows',
-  label: 'Security flows',
+  title: 'UserProfileSecurityPanelFlow',
+  label: 'Security panel',
   layout: 'wide',
   navigation: { category: 'Flows' },
   source: 'packages/ui/src/mosaic/user-profile/dialogs/flow.types.ts',
@@ -94,7 +97,7 @@ function downloadBackupCodes(codes: string[]) {
   URL.revokeObjectURL(url);
 }
 
-function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow> }) {
+function UserProfileSecurityPanelFlowDialogs({ flow }: { flow: ReturnType<typeof useUserProfileSecurityPanelFlow> }) {
   const verificationDialog = (
     operation:
       | 'password'
@@ -779,7 +782,8 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
 
 export function Default() {
   const [config, setConfig] = useState(DEFAULT_SECURITY_FLOW_CONFIG);
-  const flow = useSecurityFlow({
+  const [deleteCompletion, setDeleteCompletion] = useState<{ session: null; redirectUrl: string } | null>(null);
+  const flow = useUserProfileSecurityPanelFlow({
     config,
     initialDevices: INITIAL_DEVICES,
     onHasPasswordChange: hasPassword => setConfig(current => ({ ...current, hasPassword })),
@@ -802,6 +806,7 @@ export function Default() {
               : current.reverificationStrategy,
         };
       }),
+    onSetActive: setDeleteCompletion,
   });
 
   return (
@@ -824,15 +829,18 @@ export function Default() {
         onChangePassword={config.passwordAvailable ? flow.openPassword : undefined}
         onAddMfaMethod={config.mfaPhoneAvailable || config.mfaAuthenticatorAvailable ? flow.openAddMfa : undefined}
         onDeleteAccount={config.deleteAccountAvailable ? flow.openDeleteAccount : undefined}
+        onEnableBackupCodes={flow.openBackupCodes}
         onManageDevice={flow.openDevice}
         onManagePasskey={flow.openRenamePasskey}
         onRemoveMfaMethod={flow.openRemoveMfa}
         onRegenerateBackupCodes={flow.openBackupCodes}
+        onSetDefaultMfaMethod={flow.setDefaultMfa}
         onRemovePasskey={flow.openRemovePasskey}
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
         onSignOutDevice={flow.openSignOutDevice}
       />
-      <SecurityFlowDialogs flow={flow} />
+      <UserProfileSecurityPanelFlowDialogs flow={flow} />
+      {deleteCompletion ? <output>Active session cleared; redirect to {deleteCompletion.redirectUrl}</output> : null}
     </div>
   );
 }
@@ -1685,6 +1693,64 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
 
 export function States() {
   return <SecurityFlowStates />;
+}
+
+export function ProfileStates() {
+  return (
+    <div style={{ ...storyColumn, gap: '2rem' }}>
+      <UserProfileSecurityPanelView
+        devices={[]}
+        devicesStatus='loading'
+        hasPassword={false}
+        mfaMethods={[]}
+        passkeys={[]}
+        passwordAvailable
+      />
+      <UserProfileSecurityPanelView
+        devices={[]}
+        devicesError='Could not load active devices.'
+        devicesStatus='error'
+        hasPassword
+        mfaMethods={[]}
+        passkeys={[]}
+      />
+      <UserProfileSecurityPanelView
+        devices={[
+          {
+            id: 'current-actor',
+            name: 'Safari on macOS',
+            type: 'desktop',
+            isCurrent: true,
+            relationship: 'current-impersonating',
+            status: 'active',
+          },
+          {
+            id: 'user',
+            name: 'Chrome on macOS',
+            type: 'desktop',
+            relationship: 'user-device',
+            status: 'pending',
+          },
+          {
+            id: 'other-actor',
+            name: 'Firefox on Windows',
+            type: 'desktop',
+            relationship: 'other-impersonator',
+            status: 'active',
+            isRevoking: true,
+          },
+          { id: 'ended', name: 'Ended mobile session', type: 'mobile', status: 'ended' },
+        ]}
+        hasPassword
+        mfaMethods={[
+          { id: 'sms-primary', type: 'sms', description: '+1 801-888-8181', isDefault: true },
+          { id: 'authenticator', type: 'authenticator' },
+          { id: 'backup-codes', type: 'backup-codes' },
+        ]}
+        passkeys={[{ id: 'passkey', name: 'Chrome on macOS', createdAtLabel: 'Created today' }]}
+      />
+    </div>
+  );
 }
 
 export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow'][] } = {}) {

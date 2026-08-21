@@ -1,38 +1,52 @@
 import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 
-import { useActiveDevicesSectionFlow } from './user-profile-active-devices-section-flow.harness';
-import { useDeleteSectionFlow } from './user-profile-delete-section-flow.harness';
-import { useMfaSectionFlow } from './user-profile-mfa-section-flow.harness';
-import { usePasskeysSectionFlow } from './user-profile-passkeys-section-flow.harness';
-import { usePasswordSectionFlow } from './user-profile-password-section-flow.harness';
-import { DEFAULT_SECURITY_FLOW_CONFIG, type SecurityFlowConfig } from './user-profile-security-flow.config';
+import { DEFAULT_SECURITY_FLOW_CONFIG, type SecurityFlowConfig } from './user-profile-security-panel-flow.config';
+import { useDeleteFlowSlice } from './user-profile-security-panel-flow.delete';
+import { useDevicesFlowSlice } from './user-profile-security-panel-flow.devices';
+import { useMfaFlowSlice } from './user-profile-security-panel-flow.mfa';
+import { usePasskeysFlowSlice } from './user-profile-security-panel-flow.passkeys';
+import { usePasswordFlowSlice } from './user-profile-security-panel-flow.password';
 
-export { DEFAULT_SECURITY_FLOW_CONFIG, type SecurityFlowConfig } from './user-profile-security-flow.config';
+export { DEFAULT_SECURITY_FLOW_CONFIG, type SecurityFlowConfig } from './user-profile-security-panel-flow.config';
 
-export function useSecurityFlow({
+export function useUserProfileSecurityPanelFlow({
   config = DEFAULT_SECURITY_FLOW_CONFIG,
   initialDevices,
   onHasPasswordChange,
   onHasPasskeyChange,
   onMfaMethodChange,
   onBackupCodesChange,
+  otherSessionsCount,
+  afterSignOutUrl,
+  afterMultiSessionSingleSignOutUrl,
+  onSetActive,
 }: {
   config?: SecurityFlowConfig;
   initialDevices: UserProfileDevice[];
   onHasPasswordChange?: (hasPassword: boolean) => void;
   onHasPasskeyChange?: (hasPasskey: boolean) => void;
-  onMfaMethodChange?: Parameters<typeof useMfaSectionFlow>[0]['onMfaMethodChange'];
+  onMfaMethodChange?: Parameters<typeof useMfaFlowSlice>[0]['onMfaMethodChange'];
   onBackupCodesChange?: (enabled: boolean) => void;
+  otherSessionsCount?: number;
+  afterSignOutUrl?: string;
+  afterMultiSessionSingleSignOutUrl?: string;
+  onSetActive?: (result: { session: null; redirectUrl: string }) => void;
 }) {
-  const activeDevices = useActiveDevicesSectionFlow({ config, initialDevices });
-  const password = usePasswordSectionFlow({
+  const activeDevices = useDevicesFlowSlice({ config, initialDevices });
+  const password = usePasswordFlowSlice({
     config,
     onHasPasswordChange,
     onSignOutOtherSessions: activeDevices.signOutOtherSessions,
   });
-  const passkeys = usePasskeysSectionFlow({ config, onHasPasskeyChange });
-  const mfa = useMfaSectionFlow({ config, onMfaMethodChange, onBackupCodesChange });
-  const deletion = useDeleteSectionFlow({ config });
+  const passkeys = usePasskeysFlowSlice({ config, onHasPasskeyChange });
+  const mfa = useMfaFlowSlice({ config, onMfaMethodChange, onBackupCodesChange });
+  const deletion = useDeleteFlowSlice({
+    config,
+    otherSessionsCount,
+    afterSignOutUrl,
+    afterMultiSessionSingleSignOutUrl,
+    onSetActive,
+  });
 
   const activeReverificationFlow = password.reverification
     ? password
@@ -102,6 +116,7 @@ export function useSecurityFlow({
     closeRemoveMfa: mfa.closeRemoveMfa,
     submitRemoveMfa: mfa.submitRemoveMfa,
     openBackupCodes: mfa.openBackupCodes,
+    setDefaultMfa: mfa.setDefaultMfa,
     closeBackupCodes: mfa.closeBackupCodes,
     regenerateBackupCodes: mfa.regenerateBackupCodes,
     markBackupCodesCopied: mfa.markBackupCodesCopied,
