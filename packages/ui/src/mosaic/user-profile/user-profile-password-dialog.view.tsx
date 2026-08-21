@@ -10,6 +10,7 @@ import { mergeStyleProps, themeProps } from '../props';
 import type { UserProfilePasswordFlowActions, UserProfilePasswordFlowState } from './dialogs/flow.types';
 import { DialogBody, DialogFooter, DialogForm, DialogHeader, FormAlert } from './dialogs/flow-dialog-chrome';
 import { passwordDialogStyles as styles } from './user-profile-password-dialog.styles';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export type {
   UserProfilePasswordField,
@@ -35,7 +36,7 @@ export function UserProfilePasswordDialogView({
     (!state.requiresCurrentPassword || Boolean(values.currentPassword)) &&
     values.newPassword.length >= (state.minimumLength ?? 1) &&
     values.newPassword === values.confirmPassword;
-  const title = mode === 'set' ? 'Set password' : 'Change password';
+  const title = mode === 'set' ? m.password.addTitle : m.password.changeTitle;
   const submit = () => {
     if (canSubmit && !isSubmitting && !state.isReadOnly) {
       onSubmit(values);
@@ -58,13 +59,11 @@ export function UserProfilePasswordDialogView({
             />
           ) : null}
           <div {...mergeStyleProps(themeProps('user-profile-password-dialog-fields'), stylex.props(styles.fields))}>
-            {state.isReadOnly ? (
-              <Text color='neutral'>Your password is managed by your enterprise connection.</Text>
-            ) : null}
+            {state.isReadOnly ? <Text color='neutral'>{m.password.readOnly}</Text> : null}
             {state.requiresCurrentPassword ? (
               <PasswordField
                 name='currentPassword'
-                label='Current password'
+                label={m.password.current}
                 autoComplete='current-password'
                 value={values.currentPassword ?? ''}
                 error={errors.currentPassword}
@@ -74,7 +73,7 @@ export function UserProfilePasswordDialogView({
             ) : null}
             <PasswordField
               name='newPassword'
-              label='New password'
+              label={m.password.new}
               autoComplete='new-password'
               value={values.newPassword}
               error={errors.newPassword}
@@ -83,7 +82,7 @@ export function UserProfilePasswordDialogView({
             />
             <PasswordField
               name='confirmPassword'
-              label='Confirm password'
+              label={m.password.confirm}
               autoComplete='new-password'
               value={values.confirmPassword}
               error={errors.confirmPassword}
@@ -106,13 +105,13 @@ export function UserProfilePasswordDialogView({
             variant='outline'
             onClick={onCancel}
           >
-            Cancel
+            {m.common.cancel}
           </Button>
           {state.isReadOnly ? null : (
             <SubmitButton
               disabled={!canSubmit}
               isPending={isSubmitting}
-              pendingLabel={mode === 'set' ? 'Setting password' : 'Changing password'}
+              pendingLabel={mode === 'set' ? m.password.settingPending : m.password.changingPending}
               {...stylex.props(styles.footerButton)}
             >
               {title}
@@ -154,12 +153,12 @@ function SignOutOfOtherSessionsField({ checked, disabled, onChange }: SignOutOfO
           {...stylex.props(styles.checkbox)}
         />
         <span {...stylex.props(styles.checkboxCopy)}>
-          <span id={labelId}>Sign out of all other devices</span>
+          <span id={labelId}>{m.password.signOutOthers}</span>
           <Field.Description
             id={descriptionId}
             render={<span />}
           >
-            It is recommended to sign out of all other devices which may have used your old password.
+            {m.password.signOutOthersDescription}
           </Field.Description>
         </span>
       </Field.Label>

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export function UserProfileSecurityList({
   sectionTitle,
@@ -48,7 +49,7 @@ export function UserProfileSecurityList({
                     placement='inline-start'
                     size='sm'
                   />
-                  Add
+                  {m.sections.add}
                 </Button>
               </Section.Actions>
             ) : null}

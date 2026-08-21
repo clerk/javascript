@@ -1,5 +1,6 @@
 import { Button } from '../components/button';
 import { Section } from '../components/section';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfilePasswordSectionViewProps {
   sectionTitle?: string;
@@ -8,18 +9,18 @@ export interface UserProfilePasswordSectionViewProps {
 }
 
 export function UserProfilePasswordSectionView({
-  sectionTitle = 'Authentication',
+  sectionTitle = m.sections.authentication,
   hasPassword = true,
   onChangePassword,
 }: UserProfilePasswordSectionViewProps) {
   return (
-    <Section.Root aria-label={sectionTitle ? undefined : 'Password'}>
+    <Section.Root aria-label={sectionTitle ? undefined : m.sections.password}>
       {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
       <Section.Group>
         <Section.Row>
           <Section.Item>
             <Section.Content>
-              <Section.Label>Password</Section.Label>
+              <Section.Label>{m.sections.password}</Section.Label>
               {hasPassword ? <Section.Description>••••••••••••••••••</Section.Description> : null}
             </Section.Content>
             {onChangePassword ? (
@@ -30,7 +31,7 @@ export function UserProfilePasswordSectionView({
                   variant='outline'
                   onClick={onChangePassword}
                 >
-                  {hasPassword ? 'Change password' : 'Set password'}
+                  {hasPassword ? m.password.changeTitle : m.password.addTitle}
                 </Button>
               </Section.Actions>
             ) : null}

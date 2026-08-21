@@ -9,6 +9,7 @@ import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
 import { styles } from './user-profile-security-panel.styles';
+import { fill, plural, userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfileDevice {
   id: string;
@@ -48,12 +49,12 @@ export function UserProfileActiveDevicesSectionView({
   if (status === 'loading') {
     return (
       <Section.Root>
-        <Section.Title>Active devices</Section.Title>
+        <Section.Title>{m.devices.title}</Section.Title>
         <Section.Group>
           <Section.Row>
             <Section.Item>
               <span
-                aria-label='Loading active devices'
+                aria-label={m.devices.loading}
                 role='status'
               >
                 <Spinner />
@@ -68,12 +69,12 @@ export function UserProfileActiveDevicesSectionView({
   if (status === 'error') {
     return (
       <Section.Root>
-        <Section.Title>Active devices</Section.Title>
+        <Section.Title>{m.devices.title}</Section.Title>
         <Section.Group>
           <Section.Row>
             <Section.Item>
               <Section.Content>
-                <Section.Description>{error ?? 'Could not load active devices.'}</Section.Description>
+                <Section.Description>{error ?? m.devices.loadError}</Section.Description>
               </Section.Content>
             </Section.Item>
           </Section.Row>
@@ -85,7 +86,7 @@ export function UserProfileActiveDevicesSectionView({
   return (
     <div {...stylex.props(styles.sectionCards)}>
       <Section.Root>
-        <Section.Title>Active devices</Section.Title>
+        <Section.Title>{m.devices.title}</Section.Title>
         <Section.Group>
           {currentDevices.length > 0 ? (
             currentDevices.map(device => (
@@ -97,7 +98,7 @@ export function UserProfileActiveDevicesSectionView({
             <Section.Row>
               <Section.Item>
                 <Section.Content>
-                  <Section.Description>No current device available</Section.Description>
+                  <Section.Description>{m.devices.noCurrent}</Section.Description>
                 </Section.Content>
               </Section.Item>
             </Section.Row>
@@ -105,14 +106,12 @@ export function UserProfileActiveDevicesSectionView({
         </Section.Group>
       </Section.Root>
       {otherDevices.length > 0 ? (
-        <Section.Root aria-label='Other devices'>
+        <Section.Root aria-label={m.devices.other}>
           <Section.Group>
             <Section.Row>
               <Section.Item>
                 <Section.Content>
-                  <Section.Label>
-                    {otherDevices.length} other {otherDevices.length === 1 ? 'device' : 'devices'}
-                  </Section.Label>
+                  <Section.Label>{plural(m.devices.otherCount, otherDevices.length)}</Section.Label>
                 </Section.Content>
                 {onSignOutAllOtherDevices ? (
                   <Section.Actions>
@@ -122,7 +121,7 @@ export function UserProfileActiveDevicesSectionView({
                       variant='outline'
                       onClick={onSignOutAllOtherDevices}
                     >
-                      Sign out of all other devices
+                      {m.devices.signOutAllOthers}
                     </Button>
                   </Section.Actions>
                 ) : null}
@@ -157,10 +156,10 @@ function DeviceItem({
   const actions: UserProfileMenuAction[] = [];
 
   if (onManage && !device.isRevoking) {
-    actions.push({ label: 'Manage', onClick: () => onManage(device.id) });
+    actions.push({ label: m.devices.manage, onClick: () => onManage(device.id) });
   }
   if (onSignOut && !device.isRevoking) {
-    actions.push({ label: 'Sign out', color: 'negative', onClick: () => onSignOut(device.id) });
+    actions.push({ label: m.common.signOut, color: 'negative', onClick: () => onSignOut(device.id) });
   }
 
   return (
@@ -170,17 +169,19 @@ function DeviceItem({
         <Section.Label>
           {device.name}{' '}
           {device.relationship === 'current' || device.relationship === 'current-impersonating' ? (
-            <Badge color={device.relationship === 'current-impersonating' ? 'negative' : 'primary'}>This device</Badge>
+            <Badge color={device.relationship === 'current-impersonating' ? 'negative' : 'primary'}>
+              {m.devices.thisDevice}
+            </Badge>
           ) : null}
-          {device.relationship === 'user-device' ? <Badge color='neutral'>User device</Badge> : null}
+          {device.relationship === 'user-device' ? <Badge color='neutral'>{m.devices.userDevice}</Badge> : null}
           {device.relationship === 'other-impersonator' ? (
-            <Badge color='negative'>Other impersonator device</Badge>
+            <Badge color='negative'>{m.devices.otherImpersonator}</Badge>
           ) : null}
         </Section.Label>
         {device.isCurrent || device.description ? (
           <Section.Description {...stylex.props(styles.descriptionLine)}>
             {device.isCurrent && !device.relationship ? (
-              <span {...stylex.props(styles.currentDevice)}>This device</span>
+              <span {...stylex.props(styles.currentDevice)}>{m.devices.thisDevice}</span>
             ) : null}
             {device.isCurrent && !device.relationship && device.description ? <span>·</span> : null}
             {device.description ? <span>{device.description}</span> : null}
@@ -190,7 +191,7 @@ function DeviceItem({
       <Section.Actions>
         <UserProfileActionMenu
           actions={actions}
-          label={`Manage ${device.name}`}
+          label={fill(m.devices.manageDevice, { name: device.name })}
         />
       </Section.Actions>
     </Section.Item>

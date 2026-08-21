@@ -10,8 +10,9 @@ import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
 import type { UserProfileDeleteAccountFlowActions, UserProfileDeleteAccountFlowState } from './dialogs/flow.types';
 import { deleteAccountDialogStyles as styles } from './user-profile-delete-account-dialog.styles';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
-const confirmationText = 'Delete account';
+const confirmationText = m.deleteAccount.title;
 
 export interface UserProfileDeleteAccountDialogViewProps extends UserProfileDeleteAccountFlowActions {
   state: UserProfileDeleteAccountFlowState;
@@ -36,11 +37,8 @@ export function UserProfileDeleteAccountDialogView({
 
   return (
     <div aria-hidden={isInterrupted || undefined}>
-      <AlertDialog.Title render={<Heading size='base' />}>Delete account</AlertDialog.Title>
-      <AlertDialog.Description render={<Text />}>
-        Are you sure you want to delete your account? Some associated data may be retained. To request full data
-        deletion, please contact support.
-      </AlertDialog.Description>
+      <AlertDialog.Title render={<Heading size='base' />}>{m.deleteAccount.title}</AlertDialog.Title>
+      <AlertDialog.Description render={<Text />}>{m.deleteAccount.description}</AlertDialog.Description>
       <form
         onSubmit={submit}
         {...mergeStyleProps(themeProps('user-profile-delete-account-dialog-form'), stylex.props(styles.form))}
@@ -50,7 +48,7 @@ export function UserProfileDeleteAccountDialogView({
           disabled={isSubmitting}
           {...stylex.props(styles.field)}
         >
-          <Field.Label>Type “Delete account” below to continue</Field.Label>
+          <Field.Label>{m.deleteAccount.confirmationLabel}</Field.Label>
           <Input
             name='deleteConfirmation'
             autoComplete='off'
@@ -75,15 +73,15 @@ export function UserProfileDeleteAccountDialogView({
             variant='outline'
             onClick={onCancel}
           >
-            Cancel
+            {m.common.cancel}
           </Button>
           <SubmitButton
             color='negative'
             disabled={!canSubmit}
             isPending={isSubmitting}
-            pendingLabel='Deleting account'
+            pendingLabel={m.deleteAccount.pending}
           >
-            Delete account
+            {m.deleteAccount.title}
           </SubmitButton>
         </AlertDialog.Actions>
       </form>

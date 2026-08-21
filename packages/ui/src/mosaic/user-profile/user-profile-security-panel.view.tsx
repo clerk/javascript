@@ -15,6 +15,7 @@ import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
 import { UserProfilePasswordSectionView } from './user-profile-password-section.view';
 import { styles } from './user-profile-security-panel.styles';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
@@ -71,7 +72,7 @@ export function UserProfileSecurityPanelView({
         render={props => <h3 {...props} />}
         size='2xl'
       >
-        Security
+        {m.sections.security}
       </Heading>
       <div {...stylex.props(styles.sections)}>
         {hasAuthentication ? (
@@ -85,7 +86,7 @@ export function UserProfileSecurityPanelView({
             {passkeys !== undefined ? (
               <UserProfilePasskeysSectionView
                 passkeys={passkeys}
-                sectionTitle={passwordAvailable ? undefined : 'Authentication'}
+                sectionTitle={passwordAvailable ? undefined : m.sections.authentication}
                 onAdd={onAddPasskey}
                 onManage={onManagePasskey}
                 onRemove={onRemovePasskey}
@@ -95,7 +96,7 @@ export function UserProfileSecurityPanelView({
               <UserProfileMfaSectionView
                 methods={mfaMethods}
                 addableMethods={mfaAddableMethods}
-                sectionTitle={!passwordAvailable && passkeys === undefined ? 'Authentication' : undefined}
+                sectionTitle={!passwordAvailable && passkeys === undefined ? m.sections.authentication : undefined}
                 onAdd={onAddMfaMethod}
                 onRegenerateBackupCodes={onRegenerateBackupCodes}
                 onEnableBackupCodes={onEnableBackupCodes}

@@ -17,6 +17,7 @@ import type {
 } from './dialogs/flow.types';
 import { DialogBody, DialogFooter, DialogForm, DialogHeader, FormAlert } from './dialogs/flow-dialog-chrome';
 import { passkeyDialogStyles as styles } from './user-profile-passkey-dialog.styles';
+import { fill, userProfileSecurityBase as m } from './user-profile-security.messages';
 
 interface PasskeyDialogProps {
   isInterrupted?: boolean;
@@ -42,14 +43,12 @@ export function UserProfilePasskeyAddDialogView({
     <div aria-hidden={isInterrupted || undefined}>
       <Dialog.CloseButton disabled={state.isSubmitting} />
       <DialogHeader
-        title='Add passkey'
-        description='Your browser or device will ask you to create a passkey for this account.'
+        title={m.passkeys.addTitle}
+        description={m.passkeys.addDescription}
       />
       <DialogForm onSubmit={submit}>
         <DialogBody>
-          {state.capability === 'unsupported' ? (
-            <Text>This browser or device does not support creating passkeys.</Text>
-          ) : null}
+          {state.capability === 'unsupported' ? <Text>{m.passkeys.unsupported}</Text> : null}
           <FormAlert>{state.errors.form}</FormAlert>
         </DialogBody>
         <DialogFooter>
@@ -60,15 +59,15 @@ export function UserProfilePasskeyAddDialogView({
             {...stylex.props(styles.footerButton)}
             onClick={onCancel}
           >
-            Cancel
+            {m.common.cancel}
           </Button>
           <SubmitButton
             disabled={state.capability === 'unsupported'}
             isPending={state.isSubmitting}
-            pendingLabel='Adding passkey'
+            pendingLabel={m.passkeys.addPending}
             {...stylex.props(styles.footerButton)}
           >
-            Add passkey
+            {m.passkeys.addTitle}
           </SubmitButton>
         </DialogFooter>
       </DialogForm>
@@ -99,8 +98,8 @@ export function UserProfilePasskeyRenameDialogView({
     <div aria-hidden={isInterrupted || undefined}>
       <Dialog.CloseButton disabled={state.isSubmitting} />
       <DialogHeader
-        title='Rename passkey'
-        description='Change the passkey name to make it easier to find.'
+        title={m.passkeys.renameTitle}
+        description={m.passkeys.renameDescription}
       />
       <DialogForm onSubmit={submit}>
         <DialogBody>
@@ -110,7 +109,7 @@ export function UserProfilePasskeyRenameDialogView({
             invalid={Boolean(state.errors.field)}
             {...stylex.props(styles.field)}
           >
-            <Field.Label>Passkey name</Field.Label>
+            <Field.Label>{m.passkeys.name}</Field.Label>
             <Input
               autoComplete='off'
               spellCheck={false}
@@ -129,15 +128,15 @@ export function UserProfilePasskeyRenameDialogView({
             {...stylex.props(styles.footerButton)}
             onClick={onCancel}
           >
-            Cancel
+            {m.common.cancel}
           </Button>
           <SubmitButton
             disabled={!canSubmit}
             isPending={state.isSubmitting}
-            pendingLabel='Renaming passkey'
+            pendingLabel={m.passkeys.renamePending}
             {...stylex.props(styles.footerButton)}
           >
-            Save
+            {m.common.save}
           </SubmitButton>
         </DialogFooter>
       </DialogForm>
@@ -158,9 +157,9 @@ export function UserProfilePasskeyRemoveDialogView({
 }: UserProfilePasskeyRemoveDialogViewProps) {
   return (
     <div aria-hidden={isInterrupted || undefined}>
-      <AlertDialog.Title render={<Heading size='sm' />}>Remove passkey</AlertDialog.Title>
+      <AlertDialog.Title render={<Heading size='sm' />}>{m.passkeys.removeTitle}</AlertDialog.Title>
       <AlertDialog.Description render={<Text />}>
-        {state.name} will be removed from this account.
+        {fill(m.passkeys.removeDescription, { name: state.name })}
       </AlertDialog.Description>
       {state.errors.form ? (
         <Text
@@ -177,16 +176,16 @@ export function UserProfilePasskeyRemoveDialogView({
           variant='outline'
           onClick={onCancel}
         >
-          Cancel
+          {m.common.cancel}
         </Button>
         <SubmitButton
           color='negative'
           isPending={state.isSubmitting}
-          pendingLabel='Removing passkey'
+          pendingLabel={m.passkeys.removePending}
           type='button'
           onClick={onRemove}
         >
-          Remove
+          {m.common.remove}
         </SubmitButton>
       </AlertDialog.Actions>
     </div>

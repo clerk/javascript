@@ -7,6 +7,7 @@ import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
 import { UserProfileSecurityList } from './user-profile-security-list';
+import { fill, userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfileMfaMethod {
   id: string;
@@ -31,9 +32,9 @@ export interface UserProfileMfaSectionViewProps {
 }
 
 const labels: Record<UserProfileMfaMethod['type'], string> = {
-  sms: 'Phone number',
-  authenticator: 'Authenticator app',
-  'backup-codes': 'Backup codes',
+  sms: m.sections.phone,
+  authenticator: m.sections.authenticator,
+  'backup-codes': m.backupCodes.title,
 };
 
 const defaultAddableMethods: UserProfileMfaAddableMethod[] = ['sms', 'authenticator'];
@@ -61,7 +62,7 @@ export function UserProfileMfaSectionView({
         (onEnableBackupCodes && hasConfiguredMethod && !methods.some(method => method.type === 'backup-codes')) ? (
           <Menu.Root placement='bottom-end'>
             <Menu.Trigger
-              aria-label='Add verification method'
+              aria-label={m.sections.addVerification}
               render={props => (
                 <Button
                   color='neutral'
@@ -76,7 +77,7 @@ export function UserProfileMfaSectionView({
                 placement='inline-start'
                 size='sm'
               />
-              Add
+              {m.sections.add}
             </Menu.Trigger>
             <Menu.Content>
               {availableMethods.map(type => (
@@ -88,7 +89,7 @@ export function UserProfileMfaSectionView({
               ))}
               {onEnableBackupCodes && hasConfiguredMethod && !methods.some(method => method.type === 'backup-codes') ? (
                 <Menu.Item
-                  label='Backup codes'
+                  label={m.backupCodes.title}
                   onClick={onEnableBackupCodes}
                 />
               ) : null}
@@ -96,10 +97,10 @@ export function UserProfileMfaSectionView({
           </Menu.Root>
         ) : null
       }
-      addLabel='Add verification method'
-      emptyLabel='No verification methods added'
+      addLabel={m.sections.addVerification}
+      emptyLabel={m.sections.noVerification}
       hasItems={visibleMethods.length > 0}
-      label='2-step verification'
+      label={m.sections.twoStep}
       sectionTitle={sectionTitle}
     >
       {visibleMethods.map(method => {
@@ -109,16 +110,16 @@ export function UserProfileMfaSectionView({
         if (method.type === 'backup-codes') {
           if (onRegenerateBackupCodes) {
             actions.push({
-              label: 'Regenerate backup codes',
+              label: m.sections.regenerateBackupCodes,
               onClick: onRegenerateBackupCodes,
             });
           }
         } else {
           if (method.type === 'sms' && !method.isDefault && onSetDefault) {
-            actions.push({ label: 'Set as default', onClick: () => onSetDefault(method.id) });
+            actions.push({ label: m.sections.setDefault, onClick: () => onSetDefault(method.id) });
           }
           if (onRemove && method.removable !== false) {
-            actions.push({ label: 'Remove method', color: 'negative', onClick: () => onRemove(method.id) });
+            actions.push({ label: m.sections.removeMethod, color: 'negative', onClick: () => onRemove(method.id) });
           }
         }
 
@@ -127,14 +128,14 @@ export function UserProfileMfaSectionView({
             <UserProfileSecurityIcon name={method.type} />
             <Section.Content>
               <Section.Label>
-                {label} {method.isDefault ? <Badge color='neutral'>Default</Badge> : null}
+                {label} {method.isDefault ? <Badge color='neutral'>{m.sections.default}</Badge> : null}
               </Section.Label>
               {method.description ? <Section.Description>{method.description}</Section.Description> : null}
             </Section.Content>
             <Section.Actions>
               <UserProfileActionMenu
                 actions={actions}
-                label={`Manage ${label}`}
+                label={fill(m.sections.manage, { name: label })}
               />
             </Section.Actions>
           </Section.Item>
