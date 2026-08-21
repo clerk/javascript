@@ -76,16 +76,6 @@ export const mfaDialogStyles = stylex.create({
     justifyContent: 'center',
     width: '10rem',
   },
-  secret: {
-    padding: space['3'],
-    borderRadius: radiusVars['--cl-radius-md'],
-    backgroundColor: colorVars['--cl-color-neutral-faded'],
-    display: 'block',
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-    maxWidth: '100%',
-    overflowWrap: 'anywhere',
-    width: '100%',
-  },
   resend: {
     gap: space['1'],
     alignItems: 'center',
