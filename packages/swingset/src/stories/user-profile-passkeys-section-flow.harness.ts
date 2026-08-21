@@ -44,6 +44,11 @@ export function usePasskeysSectionFlow({
   const [removePasskey, setRemovePasskey] = useState<UserProfilePasskeyRemoveFlowState | null>(null);
   const [reverification, setReverification] = useState<PasskeyReverificationState | null>(null);
   const verificationGate = useRef<{ operation: PasskeyOperation; resolve: (verified: boolean) => void } | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const captureTrigger = useCallback(() => {
+    const active = document.activeElement;
+    triggerRef.current = active instanceof HTMLElement ? active : null;
+  }, []);
 
   useEffect(() => setPasskeys(current => passkeysFromConfig(config.hasPasskey, current)), [config.hasPasskey]);
 
@@ -127,7 +132,10 @@ export function usePasskeysSectionFlow({
     [requestReverification, setSubmitting],
   );
 
-  const openAddPasskey = useCallback(() => setAddPasskey({ isSubmitting: false, errors: {} }), []);
+  const openAddPasskey = useCallback(() => {
+    captureTrigger();
+    setAddPasskey({ isSubmitting: false, errors: {} });
+  }, [captureTrigger]);
   const submitAddPasskey = useCallback(() => {
     void runMutation('add-passkey', () => {
       setPasskeys(current => [
@@ -141,12 +149,13 @@ export function usePasskeysSectionFlow({
 
   const openRenamePasskey = useCallback(
     (id: string) => {
+      captureTrigger();
       const passkey = passkeys.find(candidate => candidate.id === id);
       if (passkey) {
         setRenamePasskey({ id, originalName: passkey.name, name: passkey.name, isSubmitting: false, errors: {} });
       }
     },
-    [passkeys],
+    [captureTrigger, passkeys],
   );
   const submitRenamePasskey = useCallback(() => {
     if (!renamePasskey || renamePasskey.name.length < 2 || renamePasskey.name === renamePasskey.originalName) {
@@ -161,12 +170,13 @@ export function usePasskeysSectionFlow({
 
   const openRemovePasskey = useCallback(
     (id: string) => {
+      captureTrigger();
       const passkey = passkeys.find(candidate => candidate.id === id);
       if (passkey) {
         setRemovePasskey({ id, name: passkey.name, isSubmitting: false, errors: {} });
       }
     },
-    [passkeys],
+    [captureTrigger, passkeys],
   );
   const submitRemovePasskey = useCallback(() => {
     if (!removePasskey) {
@@ -253,6 +263,7 @@ export function usePasskeysSectionFlow({
   }, []);
 
   return {
+    triggerRef,
     passkeys,
     addPasskey,
     renamePasskey,

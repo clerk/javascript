@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { Card } from '../../components/card';
+import { Dialog } from '../../components/dialog';
 import type { UserProfilePasswordMode, UserProfilePasswordValues } from '../user-profile-password-dialog.view';
 import { UserProfilePasswordDialogView } from '../user-profile-password-dialog.view';
 
@@ -27,13 +29,15 @@ function Harness({
 
   return (
     <MosaicProvider>
-      <UserProfilePasswordDialogView
-        open
-        state={{ mode, values, isSubmitting, errors: {} }}
-        canSubmit={canSubmit}
-        onValueChange={(field, value) => setValues(current => ({ ...current, [field]: value }))}
-        onSubmit={onSubmit}
-      />
+      <PasswordDialog>
+        <UserProfilePasswordDialogView
+          state={{ mode, values, isSubmitting, errors: {} }}
+          canSubmit={canSubmit}
+          onCancel={vi.fn()}
+          onValueChange={(field, value) => setValues(current => ({ ...current, [field]: value }))}
+          onSubmit={onSubmit}
+        />
+      </PasswordDialog>
     </MosaicProvider>
   );
 }
@@ -92,17 +96,19 @@ describe('UserProfilePasswordDialogView', () => {
   it('associates field errors with their inputs', () => {
     render(
       <MosaicProvider>
-        <UserProfilePasswordDialogView
-          open
-          state={{
-            mode: 'change',
-            values: emptyValues,
-            isSubmitting: false,
-            errors: { confirmPassword: 'Passwords do not match.' },
-          }}
-          onValueChange={vi.fn()}
-          onSubmit={vi.fn()}
-        />
+        <PasswordDialog>
+          <UserProfilePasswordDialogView
+            state={{
+              mode: 'change',
+              values: emptyValues,
+              isSubmitting: false,
+              errors: { confirmPassword: 'Passwords do not match.' },
+            }}
+            onCancel={vi.fn()}
+            onValueChange={vi.fn()}
+            onSubmit={vi.fn()}
+          />
+        </PasswordDialog>
       </MosaicProvider>,
     );
 
@@ -113,17 +119,19 @@ describe('UserProfilePasswordDialogView', () => {
   it('renders an unattributed form error', () => {
     render(
       <MosaicProvider>
-        <UserProfilePasswordDialogView
-          open
-          state={{
-            mode: 'change',
-            values: emptyValues,
-            isSubmitting: false,
-            errors: { form: 'Something went wrong. Please try again.' },
-          }}
-          onValueChange={vi.fn()}
-          onSubmit={vi.fn()}
-        />
+        <PasswordDialog>
+          <UserProfilePasswordDialogView
+            state={{
+              mode: 'change',
+              values: emptyValues,
+              isSubmitting: false,
+              errors: { form: 'Something went wrong. Please try again.' },
+            }}
+            onCancel={vi.fn()}
+            onValueChange={vi.fn()}
+            onSubmit={vi.fn()}
+          />
+        </PasswordDialog>
       </MosaicProvider>,
     );
 
@@ -133,13 +141,15 @@ describe('UserProfilePasswordDialogView', () => {
   it('renders enterprise-managed passwords as read-only', () => {
     render(
       <MosaicProvider>
-        <UserProfilePasswordDialogView
-          open
-          state={{ mode: 'change', values: emptyValues, isReadOnly: true, isSubmitting: false, errors: {} }}
-          canSubmit
-          onValueChange={vi.fn()}
-          onSubmit={vi.fn()}
-        />
+        <PasswordDialog>
+          <UserProfilePasswordDialogView
+            state={{ mode: 'change', values: emptyValues, isReadOnly: true, isSubmitting: false, errors: {} }}
+            canSubmit
+            onCancel={vi.fn()}
+            onValueChange={vi.fn()}
+            onSubmit={vi.fn()}
+          />
+        </PasswordDialog>
       </MosaicProvider>,
     );
 
@@ -148,3 +158,28 @@ describe('UserProfilePasswordDialogView', () => {
     expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
   });
 });
+
+function PasswordDialog({ children }: { children: React.ReactNode }) {
+  return (
+    <Dialog.Root
+      size='card'
+      open
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            {children}
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}

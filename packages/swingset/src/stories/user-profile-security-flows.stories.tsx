@@ -1,4 +1,5 @@
 import { Freeze } from '@clerk/headless/utils';
+import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
 import { Card } from '@clerk/ui/mosaic/components/card';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import type {
@@ -157,46 +158,70 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         </Freeze>
         {verificationDialog('password')}
       </FlowCardDialog>
-      {flow.addPasskey ? (
-        <UserProfilePasskeyAddDialogView
-          open
-          state={flow.addPasskey}
-          onOpenChange={open => {
-            if (!open) {
-              flow.closeAddPasskey();
-            }
-          }}
-          onAdd={flow.submitAddPasskey}
-          verificationDialog={verificationDialog('add-passkey')}
-        />
-      ) : null}
-      {flow.renamePasskey ? (
-        <UserProfilePasskeyRenameDialogView
-          open
-          state={flow.renamePasskey}
-          onOpenChange={open => {
-            if (!open) {
-              flow.closeRenamePasskey();
-            }
-          }}
-          onNameChange={flow.updatePasskeyName}
-          onRename={flow.submitRenamePasskey}
-          verificationDialog={verificationDialog('rename-passkey')}
-        />
-      ) : null}
-      {flow.removePasskey ? (
-        <UserProfilePasskeyRemoveDialogView
-          open
-          state={flow.removePasskey}
-          onOpenChange={open => {
-            if (!open) {
-              flow.closeRemovePasskey();
-            }
-          }}
-          onRemove={flow.submitRemovePasskey}
-          verificationDialog={verificationDialog('remove-passkey')}
-        />
-      ) : null}
+      <FlowCardDialog
+        finalFocus={flow.passkeysTriggerRef}
+        open={Boolean(flow.addPasskey)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeAddPasskey();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.addPasskey}>
+          {flow.addPasskey ? (
+            <UserProfilePasskeyAddDialogView
+              state={flow.addPasskey}
+              isInterrupted={flow.reverification?.operation === 'add-passkey'}
+              onAdd={flow.submitAddPasskey}
+              onCancel={flow.closeAddPasskey}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('add-passkey')}
+      </FlowCardDialog>
+      <FlowCardDialog
+        finalFocus={flow.passkeysTriggerRef}
+        open={Boolean(flow.renamePasskey)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeRenamePasskey();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.renamePasskey}>
+          {flow.renamePasskey ? (
+            <UserProfilePasskeyRenameDialogView
+              state={flow.renamePasskey}
+              isInterrupted={flow.reverification?.operation === 'rename-passkey'}
+              onCancel={flow.closeRenamePasskey}
+              onNameChange={flow.updatePasskeyName}
+              onRename={flow.submitRenamePasskey}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('rename-passkey')}
+      </FlowCardDialog>
+      <AlertDialog
+        finalFocus={flow.passkeysTriggerRef}
+        open={Boolean(flow.removePasskey)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeRemovePasskey();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.removePasskey}>
+          {flow.removePasskey ? (
+            <UserProfilePasskeyRemoveDialogView
+              state={flow.removePasskey}
+              isInterrupted={flow.reverification?.operation === 'remove-passkey'}
+              onCancel={flow.closeRemovePasskey}
+              onRemove={flow.submitRemovePasskey}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('remove-passkey')}
+      </AlertDialog>
       {flow.addMfa ? (
         <UserProfileMfaAddDialogView
           open
@@ -1500,32 +1525,47 @@ export function States() {
         </FlowCardDialog>
       ) : null}
       {snapshot.flow === 'add-passkey' ? (
-        <UserProfilePasskeyAddDialogView
+        <FlowCardDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onAdd={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfilePasskeyAddDialogView
+            state={snapshot.state}
+            isInterrupted={verificationOpen}
+            onAdd={noop}
+            onCancel={() => setOpen(false)}
+          />
+          {verification}
+        </FlowCardDialog>
       ) : null}
       {snapshot.flow === 'rename-passkey' ? (
-        <UserProfilePasskeyRenameDialogView
+        <FlowCardDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onNameChange={noop}
-          onRename={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfilePasskeyRenameDialogView
+            state={snapshot.state}
+            isInterrupted={verificationOpen}
+            onCancel={() => setOpen(false)}
+            onNameChange={noop}
+            onRename={noop}
+          />
+          {verification}
+        </FlowCardDialog>
       ) : null}
       {snapshot.flow === 'remove-passkey' ? (
-        <UserProfilePasskeyRemoveDialogView
+        <AlertDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onRemove={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfilePasskeyRemoveDialogView
+            state={snapshot.state}
+            isInterrupted={verificationOpen}
+            onCancel={() => setOpen(false)}
+            onRemove={noop}
+          />
+          {verification}
+        </AlertDialog>
       ) : null}
       {snapshot.flow === 'add-mfa' ? (
         <UserProfileMfaAddDialogView
