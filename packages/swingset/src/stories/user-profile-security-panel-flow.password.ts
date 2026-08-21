@@ -1,5 +1,4 @@
 import type {
-  ReverificationChallengeState,
   UserProfilePasswordField,
   UserProfilePasswordFlowState,
   UserProfilePasswordValues,
@@ -7,6 +6,7 @@ import type {
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
+import type { SecurityReverificationFlow } from './user-profile-security-panel-flow.reverification';
 
 type PasswordFlowSliceConfig = Pick<
   SecurityFlowConfig,
@@ -17,15 +17,7 @@ type PasswordFlowSliceConfig = Pick<
   | 'passwordMinimumLength'
   | 'requireReverification'
   | 'signedInIdentifier'
-  | 'reverificationStrategy'
-  | 'validCode'
-  | 'validPassword'
 >;
-
-interface PasswordReverificationState {
-  operation: 'password';
-  state: ReverificationChallengeState;
-}
 
 const EMPTY_PASSWORD_VALUES: UserProfilePasswordValues = {
   currentPassword: '',
@@ -34,15 +26,16 @@ const EMPTY_PASSWORD_VALUES: UserProfilePasswordValues = {
   signOutOfOtherSessions: true,
 };
 
-const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function usePasswordFlowSlice({
   config,
+  reverificationFlow,
   onHasPasswordChange,
   onSignOutOtherSessions,
 }: {
   config: PasswordFlowSliceConfig;
+  reverificationFlow: SecurityReverificationFlow;
   onHasPasswordChange?: (hasPassword: boolean) => void;
   onSignOutOtherSessions?: () => void;
 }) {
@@ -50,44 +43,15 @@ export function usePasswordFlowSlice({
   settingsRef.current = config;
   const [hasPassword, setHasPassword] = useState(config.hasPassword);
   const [password, setPassword] = useState<UserProfilePasswordFlowState | null>(null);
-  const [reverification, setReverification] = useState<PasswordReverificationState | null>(null);
-  const verificationGate = useRef<{ resolve: (verified: boolean) => void } | null>(null);
+  const submissionPending = useRef(false);
   const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => setHasPassword(config.hasPassword), [config.hasPassword]);
 
-  const cancelReverification = useCallback(() => {
-    verificationGate.current?.resolve(false);
-    verificationGate.current = null;
-    setReverification(null);
-  }, []);
-
   const closePassword = useCallback(() => {
-    cancelReverification();
+    reverificationFlow.cancelReverification('password');
     setPassword(null);
-  }, [cancelReverification]);
-
-  const requestReverification = useCallback(() => {
-    if (!settingsRef.current.requireReverification) {
-      return Promise.resolve(true);
-    }
-    const strategy = settingsRef.current.reverificationStrategy;
-    setReverification({
-      operation: 'password',
-      state: {
-        strategy,
-        identifier:
-          strategy === 'email_code' ? 'i••••@clerk.dev' : strategy === 'phone_code' ? '+1 ••• ••• 4242' : undefined,
-        value: '',
-        status: 'idle',
-        errors: {},
-        resend: IDLE_RESEND,
-      },
-    });
-    return new Promise<boolean>(resolve => {
-      verificationGate.current = { resolve };
-    });
-  }, []);
+  }, [reverificationFlow]);
 
   const openPassword = useCallback(() => {
     const active = document.activeElement;
@@ -121,7 +85,7 @@ export function usePasswordFlowSlice({
 
   const submitPassword = useCallback(() => {
     const current = password;
-    if (!current || current.isReadOnly || current.isSubmitting) {
+    if (!current || current.isReadOnly || current.isSubmitting || submissionPending.current) {
       return;
     }
     if (current.requiresCurrentPassword && !current.values.currentPassword) {
@@ -144,25 +108,12 @@ export function usePasswordFlowSlice({
       return;
     }
 
+    submissionPending.current = true;
     setPassword(state => (state ? { ...state, isSubmitting: true, errors: {} } : state));
     void (async () => {
-      await sleep(settingsRef.current.latencyMs);
-      if (settingsRef.current.failurePoint === 'initial-request') {
-        setPassword(state =>
-          state
-            ? { ...state, isSubmitting: false, errors: { form: 'Something went wrong. Please try again.' } }
-            : state,
-        );
-        return;
-      }
-      const verified = await requestReverification();
-      if (!verified) {
-        setPassword(state => (state ? { ...state, isSubmitting: false } : state));
-        return;
-      }
-      if (settingsRef.current.requireReverification) {
+      try {
         await sleep(settingsRef.current.latencyMs);
-        if (settingsRef.current.failurePoint === 'retried-mutation') {
+        if (settingsRef.current.failurePoint === 'initial-request') {
           setPassword(state =>
             state
               ? { ...state, isSubmitting: false, errors: { form: 'Something went wrong. Please try again.' } }
@@ -170,95 +121,38 @@ export function usePasswordFlowSlice({
           );
           return;
         }
+        const verified = await reverificationFlow.requestReverification('password');
+        if (!verified) {
+          setPassword(state => (state ? { ...state, isSubmitting: false } : state));
+          return;
+        }
+        if (settingsRef.current.requireReverification) {
+          await sleep(settingsRef.current.latencyMs);
+          if (settingsRef.current.failurePoint === 'retried-mutation') {
+            setPassword(state =>
+              state
+                ? { ...state, isSubmitting: false, errors: { form: 'Something went wrong. Please try again.' } }
+                : state,
+            );
+            return;
+          }
+        }
+        setHasPassword(true);
+        onHasPasswordChange?.(true);
+        if (current.values.signOutOfOtherSessions) {
+          onSignOutOtherSessions?.();
+        }
+        closePassword();
+      } finally {
+        submissionPending.current = false;
       }
-      setHasPassword(true);
-      onHasPasswordChange?.(true);
-      if (current.values.signOutOfOtherSessions) {
-        onSignOutOtherSessions?.();
-      }
-      closePassword();
     })();
-  }, [closePassword, onHasPasswordChange, onSignOutOtherSessions, password, requestReverification]);
-
-  const updateVerificationValue = useCallback((value: string) => {
-    setReverification(current =>
-      current ? { ...current, state: { ...current.state, value, status: 'idle', errors: {} } } : current,
-    );
-  }, []);
-
-  const submitVerification = useCallback(
-    async (completedValue?: string) => {
-      const current = reverification;
-      if (!current) {
-        return;
-      }
-      setReverification(value =>
-        value ? { ...value, state: { ...value.state, status: 'verifying', errors: {} } } : value,
-      );
-      await sleep(settingsRef.current.latencyMs);
-      if (settingsRef.current.failurePoint === 'reverification') {
-        setReverification(value =>
-          value
-            ? {
-                ...value,
-                state: { ...value.state, status: 'error', errors: { form: 'Something went wrong. Please try again.' } },
-              }
-            : value,
-        );
-        return;
-      }
-      const expected =
-        current.state.strategy === 'password'
-          ? settingsRef.current.validPassword
-          : current.state.strategy === 'passkey'
-            ? ''
-            : settingsRef.current.validCode;
-      if ((completedValue ?? current.state.value) !== expected) {
-        setReverification(value =>
-          value
-            ? {
-                ...value,
-                state: {
-                  ...value.state,
-                  value: '',
-                  status: 'error',
-                  errors: {
-                    field:
-                      value.state.strategy === 'password' ? 'Incorrect password.' : 'Incorrect code. Please try again.',
-                  },
-                },
-              }
-            : value,
-        );
-        return;
-      }
-      const gate = verificationGate.current;
-      verificationGate.current = null;
-      setReverification(null);
-      gate?.resolve(true);
-    },
-    [reverification],
-  );
-
-  const resendReverification = useCallback(async () => {
-    setReverification(current =>
-      current
-        ? { ...current, state: { ...current.state, resend: { ...current.state.resend, isResending: true } } }
-        : current,
-    );
-    await sleep(settingsRef.current.latencyMs);
-    setReverification(current =>
-      current
-        ? { ...current, state: { ...current.state, resend: { ...current.state.resend, isResending: false } } }
-        : current,
-    );
-  }, []);
+  }, [closePassword, onHasPasswordChange, onSignOutOtherSessions, password, reverificationFlow]);
 
   return {
     triggerRef,
     hasPassword,
     password,
-    reverification,
     openPassword,
     closePassword: () => {
       if (!password?.isSubmitting) {
@@ -267,9 +161,5 @@ export function usePasswordFlowSlice({
     },
     updatePasswordValue,
     submitPassword,
-    updateVerificationValue,
-    submitVerification,
-    resendReverification,
-    cancelReverification,
   };
 }

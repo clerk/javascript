@@ -1,5 +1,4 @@
 import type {
-  ReverificationChallengeState,
   UserProfilePasskeyCreationState,
   UserProfilePasskeyRemoveFlowState,
   UserProfilePasskeyRenameFlowState,
@@ -8,34 +7,22 @@ import type { UserProfilePasskey } from '@clerk/ui/mosaic/user-profile/user-prof
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
+import type { SecurityReverificationFlow } from './user-profile-security-panel-flow.reverification';
 
 type PasskeysFlowSliceConfig = Pick<
   SecurityFlowConfig,
-  | 'failurePoint'
-  | 'hasPasskey'
-  | 'latencyMs'
-  | 'passkeyCapability'
-  | 'passkeyCreationResult'
-  | 'requireReverification'
-  | 'reverificationStrategy'
-  | 'validCode'
-  | 'validPassword'
+  'failurePoint' | 'hasPasskey' | 'latencyMs' | 'passkeyCapability' | 'passkeyCreationResult' | 'requireReverification'
 >;
 type PasskeyOperation = 'add-passkey' | 'rename-passkey' | 'remove-passkey';
-
-interface PasskeyReverificationState {
-  operation: PasskeyOperation;
-  state: ReverificationChallengeState;
-}
-
-const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function usePasskeysFlowSlice({
   config,
+  reverificationFlow,
   onHasPasskeyChange,
 }: {
   config: PasskeysFlowSliceConfig;
+  reverificationFlow: SecurityReverificationFlow;
   onHasPasskeyChange?: (hasPasskey: boolean) => void;
 }) {
   const settingsRef = useRef(config);
@@ -44,8 +31,7 @@ export function usePasskeysFlowSlice({
   const [passkeyCreation, setPasskeyCreation] = useState<UserProfilePasskeyCreationState | null>(null);
   const [renamePasskey, setRenamePasskey] = useState<UserProfilePasskeyRenameFlowState | null>(null);
   const [removePasskey, setRemovePasskey] = useState<UserProfilePasskeyRemoveFlowState | null>(null);
-  const [reverification, setReverification] = useState<PasskeyReverificationState | null>(null);
-  const verificationGate = useRef<{ operation: PasskeyOperation; resolve: (verified: boolean) => void } | null>(null);
+  const pendingOperations = useRef(new Set<PasskeyOperation>());
   const triggerRef = useRef<HTMLElement | null>(null);
   const captureTrigger = useCallback(() => {
     const active = document.activeElement;
@@ -54,16 +40,10 @@ export function usePasskeysFlowSlice({
 
   useEffect(() => setPasskeys(current => passkeysFromConfig(config.hasPasskey, current)), [config.hasPasskey]);
 
-  const cancelReverification = useCallback(() => {
-    verificationGate.current?.resolve(false);
-    verificationGate.current = null;
-    setReverification(null);
-  }, []);
-
   const closeOperation = useCallback(
     (operation: PasskeyOperation) => {
-      if (verificationGate.current?.operation === operation) {
-        cancelReverification();
+      if (operation !== 'rename-passkey') {
+        reverificationFlow.cancelReverification(operation);
       }
       if (operation === 'add-passkey') {
         setPasskeyCreation(null);
@@ -73,7 +53,7 @@ export function usePasskeysFlowSlice({
         setRemovePasskey(null);
       }
     },
-    [cancelReverification],
+    [reverificationFlow],
   );
 
   const setSubmitting = useCallback((operation: PasskeyOperation, isSubmitting: boolean, formError?: string) => {
@@ -87,54 +67,44 @@ export function usePasskeysFlowSlice({
     }
   }, []);
 
-  const requestReverification = useCallback((operation: PasskeyOperation) => {
-    if (!settingsRef.current.requireReverification || operation === 'rename-passkey') {
-      return Promise.resolve(true);
-    }
-    const strategy = settingsRef.current.reverificationStrategy;
-    setReverification({
-      operation,
-      state: {
-        strategy,
-        identifier:
-          strategy === 'email_code' ? 'i••••@clerk.dev' : strategy === 'phone_code' ? '+1 ••• ••• 4242' : undefined,
-        value: '',
-        status: 'idle',
-        errors: {},
-        resend: IDLE_RESEND,
-      },
-    });
-    return new Promise<boolean>(resolve => {
-      verificationGate.current = { operation, resolve };
-    });
-  }, []);
-
   const runMutation = useCallback(
     async (operation: PasskeyOperation, onSuccess: () => void) => {
-      setSubmitting(operation, true);
-      await sleep(settingsRef.current.latencyMs);
-      if (settingsRef.current.failurePoint === 'initial-request') {
-        setSubmitting(operation, false, 'Something went wrong. Please try again.');
+      if (pendingOperations.current.has(operation)) {
         return;
       }
-      const verified = await requestReverification(operation);
-      if (!verified) {
-        setSubmitting(operation, false);
-        return;
-      }
-      if (settingsRef.current.requireReverification && operation !== 'rename-passkey') {
+      pendingOperations.current.add(operation);
+      try {
+        setSubmitting(operation, true);
         await sleep(settingsRef.current.latencyMs);
-        if (settingsRef.current.failurePoint === 'retried-mutation') {
+        if (settingsRef.current.failurePoint === 'initial-request') {
           setSubmitting(operation, false, 'Something went wrong. Please try again.');
           return;
         }
+        const verified =
+          operation === 'rename-passkey' ? true : await reverificationFlow.requestReverification(operation);
+        if (!verified) {
+          setSubmitting(operation, false);
+          return;
+        }
+        if (settingsRef.current.requireReverification && operation !== 'rename-passkey') {
+          await sleep(settingsRef.current.latencyMs);
+          if (settingsRef.current.failurePoint === 'retried-mutation') {
+            setSubmitting(operation, false, 'Something went wrong. Please try again.');
+            return;
+          }
+        }
+        onSuccess();
+      } finally {
+        pendingOperations.current.delete(operation);
       }
-      onSuccess();
     },
-    [requestReverification, setSubmitting],
+    [reverificationFlow, setSubmitting],
   );
 
   const addPasskey = useCallback(() => {
+    if (pendingOperations.current.has('add-passkey')) {
+      return;
+    }
     captureTrigger();
     const capability = settingsRef.current.passkeyCapability;
     setPasskeyCreation({
@@ -186,7 +156,13 @@ export function usePasskeysFlowSlice({
     [captureTrigger, passkeys],
   );
   const submitRenamePasskey = useCallback(() => {
-    if (!renamePasskey || renamePasskey.name.length < 2 || renamePasskey.name === renamePasskey.originalName) {
+    if (
+      !renamePasskey ||
+      renamePasskey.isSubmitting ||
+      pendingOperations.current.has('rename-passkey') ||
+      renamePasskey.name.length < 2 ||
+      renamePasskey.name === renamePasskey.originalName
+    ) {
       return;
     }
     const { id, name } = renamePasskey;
@@ -207,7 +183,7 @@ export function usePasskeysFlowSlice({
     [captureTrigger, passkeys],
   );
   const submitRemovePasskey = useCallback(() => {
-    if (!removePasskey) {
+    if (!removePasskey || removePasskey.isSubmitting || pendingOperations.current.has('remove-passkey')) {
       return;
     }
     const { id } = removePasskey;
@@ -221,82 +197,12 @@ export function usePasskeysFlowSlice({
     });
   }, [closeOperation, onHasPasskeyChange, removePasskey, runMutation]);
 
-  const updateVerificationValue = useCallback((value: string) => {
-    setReverification(current =>
-      current ? { ...current, state: { ...current.state, value, status: 'idle', errors: {} } } : current,
-    );
-  }, []);
-  const submitVerification = useCallback(
-    async (completedValue?: string) => {
-      const current = reverification;
-      if (!current) {
-        return;
-      }
-      setReverification(value =>
-        value ? { ...value, state: { ...value.state, status: 'verifying', errors: {} } } : value,
-      );
-      await sleep(settingsRef.current.latencyMs);
-      const expected =
-        current.state.strategy === 'password'
-          ? settingsRef.current.validPassword
-          : current.state.strategy === 'passkey'
-            ? ''
-            : settingsRef.current.validCode;
-      if (
-        settingsRef.current.failurePoint === 'reverification' ||
-        (completedValue ?? current.state.value) !== expected
-      ) {
-        setReverification(value =>
-          value
-            ? {
-                ...value,
-                state: {
-                  ...value.state,
-                  value: '',
-                  status: 'error',
-                  errors:
-                    settingsRef.current.failurePoint === 'reverification'
-                      ? { form: 'Something went wrong. Please try again.' }
-                      : {
-                          field:
-                            value.state.strategy === 'password'
-                              ? 'Incorrect password.'
-                              : 'Incorrect code. Please try again.',
-                        },
-                },
-              }
-            : value,
-        );
-        return;
-      }
-      const gate = verificationGate.current;
-      verificationGate.current = null;
-      setReverification(null);
-      gate?.resolve(true);
-    },
-    [reverification],
-  );
-  const resendReverification = useCallback(async () => {
-    setReverification(current =>
-      current
-        ? { ...current, state: { ...current.state, resend: { ...current.state.resend, isResending: true } } }
-        : current,
-    );
-    await sleep(settingsRef.current.latencyMs);
-    setReverification(current =>
-      current
-        ? { ...current, state: { ...current.state, resend: { ...current.state.resend, isResending: false } } }
-        : current,
-    );
-  }, []);
-
   return {
     triggerRef,
     passkeys,
     passkeyCreation,
     renamePasskey,
     removePasskey,
-    reverification,
     addPasskey,
     openRenamePasskey,
     closeRenamePasskey: () => {
@@ -314,10 +220,6 @@ export function usePasskeysFlowSlice({
       }
     },
     submitRemovePasskey,
-    updateVerificationValue,
-    submitVerification,
-    resendReverification,
-    cancelReverification,
   };
 }
 
