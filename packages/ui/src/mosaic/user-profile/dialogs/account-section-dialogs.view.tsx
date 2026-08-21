@@ -52,8 +52,13 @@ function FlowDialog({ open, finalFocus, closedBy, onOpenChange, onFocusCapture, 
 }
 
 export interface AccountSectionDialogsViewProps extends AccountSectionFlows {
-  /** The saved values, so a form can tell whether it has been edited. */
-  name: string;
+  /**
+   * The saved values, so a form can tell whether it has been edited. The name arrives as its two
+   * fields rather than as the display string: recomposing it and splitting it back is lossy for
+   * any first name that carries a space, and the form edits the fields.
+   */
+  firstName: string;
+  lastName: string;
   username: string;
   /** Initials for the avatar preview when there is no image. */
   fallback: string;
@@ -68,7 +73,8 @@ export interface AccountSectionDialogsViewProps extends AccountSectionFlows {
  * its exit transition with its contents frozen, so it does not visibly collapse on the way out.
  */
 export function AccountSectionDialogsView({
-  name,
+  firstName,
+  lastName,
   username,
   fallback,
   flowTriggerRef,
@@ -109,7 +115,14 @@ export function AccountSectionDialogsView({
 
   return (
     <>
+      {/* A challenge raised by an action that has no dialog of its own still needs a surface, or
+          the mutation waits on a prompt that was never drawn. */}
+      {host === null ? challenge : null}
+
       <FlowDialog
+        // Not `any`: past the identifier step the address already exists server-side with a code in
+        // flight, and a stray backdrop press would throw that away.
+        closedBy='closerequest'
         finalFocus={flowTriggerRef}
         open={Boolean(addContact)}
         onOpenChange={open => {
@@ -141,9 +154,10 @@ export function AccountSectionDialogsView({
         challenge={host === 'edit' ? challenge : null}
         editProfile={editProfile}
         fallback={fallback}
+        firstName={firstName}
         flowTriggerRef={flowTriggerRef}
         isInterrupted={Boolean(reverification)}
-        name={name}
+        lastName={lastName}
         username={username}
       />
 
@@ -183,16 +197,18 @@ export function AccountSectionDialogsView({
 }
 
 /** Whether the open form differs from what is saved, which is what the discard guard asks about. */
-function isDirty(editProfile: EditProfileFlow | null | undefined, name: string, username: string): boolean {
+function isDirty(
+  editProfile: EditProfileFlow | null | undefined,
+  saved: { firstName: string; lastName: string; username: string },
+): boolean {
   if (!editProfile) {
     return false;
   }
   if (editProfile.field === 'name') {
-    const [firstName = '', ...rest] = name.split(/\s+/);
-    return editProfile.state.firstName !== firstName || editProfile.state.lastName !== rest.join(' ');
+    return editProfile.state.firstName !== saved.firstName || editProfile.state.lastName !== saved.lastName;
   }
   if (editProfile.field === 'username') {
-    return editProfile.state.value !== username;
+    return editProfile.state.value !== saved.username;
   }
   return Boolean(editProfile.state.fileName);
 }
@@ -206,7 +222,8 @@ function isDirty(editProfile: EditProfileFlow | null | undefined, name: string, 
 function EditProfileDialog({
   challenge,
   editProfile,
-  name,
+  firstName,
+  lastName,
   username,
   fallback,
   flowTriggerRef,
@@ -214,7 +231,8 @@ function EditProfileDialog({
 }: {
   challenge: React.ReactNode;
   editProfile: EditProfileFlow | null | undefined;
-  name: string;
+  firstName: string;
+  lastName: string;
   username: string;
   fallback: string;
   flowTriggerRef?: React.RefObject<HTMLElement | null>;
@@ -233,16 +251,18 @@ function EditProfileDialog({
    */
   const lastFocus = React.useRef<HTMLElement | null>(null);
   const rememberFocus = (event: React.FocusEvent<HTMLDivElement>) => {
-    // React portals bubble through the React tree, so the confirmation's own buttons reach this
-    // handler too. Recording those would return focus to a button that no longer exists.
-    if (!event.target.closest('[role="alertdialog"]')) {
+    // React portals bubble through the React tree, so the confirmation and the reverification
+    // challenge stacked over this dialog reach this handler too. Recording those would return focus
+    // to a control that unmounted with them, which lands on the body. `currentTarget` is this
+    // dialog's own popup, so anything whose nearest dialog is not it belongs to a surface above.
+    if (event.target.closest('[role="dialog"],[role="alertdialog"]') === event.currentTarget) {
       lastFocus.current = event.target;
     }
   };
 
   const onOpenChange = useConfirmedClose({
     handle: discardConfirm,
-    when: () => isDirty(editProfile, name, username),
+    when: () => isDirty(editProfile, { firstName, lastName, username }),
     onOpenChange: open => {
       if (!open) {
         editProfile?.onCancel();

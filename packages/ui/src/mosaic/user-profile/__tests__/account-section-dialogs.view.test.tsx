@@ -9,6 +9,8 @@ import { UserProfileAccountSectionView } from '../user-profile-account-section.v
 
 const rows: UserProfileAccountSectionViewProps = {
   name: 'Preston Booth',
+  firstName: 'Preston',
+  lastName: 'Booth',
   username: 'prestonxyz',
   emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
   phones: [{ id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true }],
@@ -133,6 +135,51 @@ describe('UserProfileAccountSectionView flows', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Keep editing' }));
     expect(onCancel).not.toHaveBeenCalled();
     expect(screen.getByRole('heading', { name: 'Update username' })).toBeInTheDocument();
+  });
+
+  it('reads the saved name from its two fields, so a first name with a space is not dirty on open', async () => {
+    const onCancel = vi.fn();
+    render(
+      <MosaicProvider>
+        <UserProfileAccountSectionView
+          {...rows}
+          firstName='Mary Jane'
+          lastName='Booth'
+          name='Mary Jane Booth'
+          editProfile={{
+            field: 'name',
+            state: { firstName: 'Mary Jane', lastName: 'Booth', isSubmitting: false, isReadOnly: false, errors: {} },
+            ...editActions,
+            onCancel,
+          }}
+        />
+      </MosaicProvider>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('renders a challenge raised outside any flow dialog, which would otherwise have no surface', () => {
+    renderSection({
+      reverification: {
+        state: {
+          strategy: 'password',
+          value: '',
+          status: 'idle',
+          errors: {},
+          resend: { isResending: false, secondsRemaining: 0 },
+        },
+        onValueChange: vi.fn(),
+        onSubmit: vi.fn(),
+        onResend: vi.fn(),
+        onCancel: vi.fn(),
+      },
+    });
+
+    expect(screen.getByRole('heading', { name: /Verify it/ })).toBeInTheDocument();
   });
 
   it('closes without asking when the field matches what is saved', async () => {
