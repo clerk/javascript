@@ -1106,7 +1106,7 @@ export interface Clerk {
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
-   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticatewithgoogleonetap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
    *
    * @param signInOrUp - The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).
    * @param params - Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.

@@ -68,7 +68,7 @@ export type AuthFn = GetAuthFnNoRequest<SessionAuthWithRedirect, true> & {
 };
 
 /**
- * The `auth()` helper returns the [`Auth`](https://clerk.com/docs/reference/backend/types/auth-object) object of the currently active user, as well as the [`redirectToSignIn()`](https://clerk.com/docs/reference/nextjs/app-router/auth#redirect-to-sign-in) method.
+ * The `auth()` helper returns the [`Auth`](https://clerk.com/docs/reference/backend/types/auth-object) object of the currently active user, as well as the [`redirectToSignIn()`](https://clerk.com/docs/reference/nextjs/app-router/auth#redirecttosignin) method.
  *
  * - Only available for App Router.
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
