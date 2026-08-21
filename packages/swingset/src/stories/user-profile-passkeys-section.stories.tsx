@@ -1,8 +1,10 @@
-import type { UserProfilePasskey } from '@clerk/ui/mosaic/user-profile/user-profile-passkeys-section.view';
+import { SecurityPanelDialogsView } from '@clerk/ui/mosaic/user-profile/dialogs/security-panel-dialogs.view';
 import { UserProfilePasskeysSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-passkeys-section.view';
-import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-panel-flow.config';
+import { useUserProfileSecurityPanelMockController } from './user-profile-security-panel-flow.controller';
 
 export { default as __source } from './user-profile-passkeys-section.stories?raw';
 
@@ -15,45 +17,39 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
-    {
-      id: 'passkey',
-      name: 'Passkey',
-      createdAtLabel: 'Created today at 10:12 PM',
-      lastUsedAtLabel: 'Last used 1h ago',
-    },
-  ]);
+  const controller = useUserProfileSecurityPanelMockController();
 
   return (
-    <UserProfilePasskeysSectionView
-      passkeys={passkeys}
-      sectionTitle='Authentication'
-      onAdd={() =>
-        setPasskeys(current => [
-          ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ])
-      }
-      onManage={() => undefined}
-      onRemove={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
-    />
+    <>
+      <UserProfilePasskeysSectionView
+        creationState={controller.passkeyCreationState}
+        passkeys={controller.passkeys ?? []}
+        sectionTitle='Authentication'
+        onAdd={controller.onAddPasskey}
+        onManage={controller.onManagePasskey}
+        onRemove={controller.onRemovePasskey}
+      />
+      <SecurityPanelDialogsView {...controller} />
+    </>
   );
 }
 
 export function Empty() {
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([]);
+  const controller = useUserProfileSecurityPanelMockController({
+    config: { ...DEFAULT_SECURITY_FLOW_CONFIG, hasPasskey: false },
+  });
 
   return (
-    <UserProfilePasskeysSectionView
-      passkeys={passkeys}
-      sectionTitle='Authentication'
-      onAdd={() =>
-        setPasskeys(current => [
-          ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ])
-      }
-      onRemove={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
-    />
+    <>
+      <UserProfilePasskeysSectionView
+        creationState={controller.passkeyCreationState}
+        passkeys={controller.passkeys ?? []}
+        sectionTitle='Authentication'
+        onAdd={controller.onAddPasskey}
+        onManage={controller.onManagePasskey}
+        onRemove={controller.onRemovePasskey}
+      />
+      <SecurityPanelDialogsView {...controller} />
+    </>
   );
 }

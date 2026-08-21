@@ -1,6 +1,9 @@
+import { SecurityPanelDialogsView } from '@clerk/ui/mosaic/user-profile/dialogs/security-panel-dialogs.view';
 import { UserProfileDeleteSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-section.view';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { useUserProfileSecurityPanelMockController } from './user-profile-security-panel-flow.controller';
 
 export { default as __source } from './user-profile-delete-section.stories?raw';
 
@@ -13,5 +16,12 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  return <UserProfileDeleteSectionView onDelete={() => undefined} />;
+  const controller = useUserProfileSecurityPanelMockController();
+
+  return (
+    <>
+      <UserProfileDeleteSectionView onDelete={() => controller.onDeleteAccount?.()} />
+      <SecurityPanelDialogsView {...controller} />
+    </>
+  );
 }

@@ -81,6 +81,7 @@ describe('UserProfileSecurityPanelView', () => {
     const onManagePasskey = vi.fn();
     const onRemovePasskey = vi.fn();
     const onAddMfaMethod = vi.fn();
+    const onManageDevice = vi.fn();
     const onSignOutDevice = vi.fn();
     const onSignOutAllOtherDevices = vi.fn();
     const onDeleteAccount = vi.fn();
@@ -96,6 +97,7 @@ describe('UserProfileSecurityPanelView', () => {
       onManagePasskey,
       onRemovePasskey,
       onAddMfaMethod,
+      onManageDevice,
       onSignOutDevice,
       onSignOutAllOtherDevices,
       onDeleteAccount,
@@ -104,25 +106,28 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Change password' }));
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(screen.queryByRole('menuitem', { name: 'SMS verification' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
-    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    expect(screen.getByRole('menuitem', { name: 'SMS code' })).toBeInTheDocument();
+    await user.click(screen.getByRole('menuitem', { name: 'Authenticator application' }));
+    await user.click(screen.getByRole('button', { name: 'Sign out of all other devices' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
 
     const otherDevices = screen.getByRole('region', { name: 'Other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+    await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Sign out of device' }));
 
     expect(onChangePassword).toHaveBeenCalledOnce();
     expect(onAddPasskey).toHaveBeenCalledOnce();
     expect(onManagePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onAddMfaMethod).toHaveBeenCalledWith('authenticator');
+    expect(onManageDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
     expect(onDeleteAccount).toHaveBeenCalledOnce();
@@ -146,6 +151,56 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 
+  it('renders passkey creation progress and errors in the section', () => {
+    const pending = renderView({
+      passkeyCreationState: { capability: 'available', result: 'idle', isSubmitting: true, errors: {} },
+      onAddPasskey: vi.fn(),
+    });
+
+    expect(screen.getByRole('button', { name: 'Add passkey' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('progressbar', { name: 'Adding passkey' })).toBeInTheDocument();
+    pending.unmount();
+
+    renderView({
+      passkeyCreationState: {
+        capability: 'unsupported',
+        result: 'idle',
+        isSubmitting: false,
+        errors: { form: 'Passkeys are not supported by this browser or device.' },
+      },
+      onAddPasskey: vi.fn(),
+    });
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Passkeys are not supported by this browser or device.');
+    expect(screen.getByRole('button', { name: 'Add passkey' })).toBeDisabled();
+  });
+
+  it('only offers verification methods enabled by the instance', async () => {
+    const user = userEvent.setup();
+    renderView({
+      mfaMethods: [],
+      mfaAddableMethods: ['sms'],
+      onAddMfaMethod: vi.fn(),
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    expect(screen.getByRole('menuitem', { name: 'SMS code' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Authenticator application' })).not.toBeInTheDocument();
+  });
+
+  it('offers to set a password when password authentication is available', () => {
+    renderView({
+      hasPassword: false,
+      passwordAvailable: true,
+      passkeys: undefined,
+      mfaMethods: undefined,
+      onChangePassword: vi.fn(),
+    });
+
+    expect(screen.getByText('Password')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Set password' })).toBeInTheDocument();
+  });
+
   it('does not render actions for the current device', () => {
     renderView({
       onManageDevice: vi.fn(),
@@ -154,6 +209,49 @@ describe('UserProfileSecurityPanelView', () => {
 
     expect(screen.queryByRole('button', { name: 'Manage Safari on macOS' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage Safari on iOS' })).toBeInTheDocument();
+  });
+
+  it('represents device loading, errors, session filtering, and impersonation relationships', () => {
+    const loading = renderView({ devices: [], devicesStatus: 'loading' });
+    expect(screen.getByRole('status', { name: 'Loading active devices' })).toBeInTheDocument();
+    loading.unmount();
+
+    const failed = renderView({ devices: [], devicesStatus: 'error', devicesError: 'Sessions are unavailable.' });
+    expect(screen.getByText('Sessions are unavailable.')).toBeInTheDocument();
+    failed.unmount();
+
+    renderView({
+      devices: [
+        {
+          id: 'current',
+          name: 'Safari',
+          type: 'desktop',
+          isCurrent: true,
+          relationship: 'current-impersonating',
+          status: 'active',
+        },
+        {
+          id: 'user',
+          name: 'Chrome',
+          type: 'desktop',
+          relationship: 'user-device',
+          status: 'pending',
+        },
+        {
+          id: 'actor',
+          name: 'Firefox',
+          type: 'desktop',
+          relationship: 'other-impersonator',
+          status: 'active',
+        },
+        { id: 'ended', name: 'Ended session', type: 'mobile', status: 'ended' },
+      ],
+    });
+
+    expect(screen.getByText('This device')).toBeInTheDocument();
+    expect(screen.getByText('User device')).toBeInTheDocument();
+    expect(screen.getByText('Other impersonator device')).toBeInTheDocument();
+    expect(screen.queryByText('Ended session')).not.toBeInTheDocument();
   });
 
   it('only shows backup codes with another verification method and only allows regeneration', async () => {
@@ -177,14 +275,46 @@ describe('UserProfileSecurityPanelView', () => {
     });
 
     expect(screen.getByText('Backup codes')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
+    await user.click(screen.getByRole('button', { name: 'Manage Phone number' }));
     expect(screen.queryByRole('menuitem', { name: 'Manage' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
-    expect(screen.queryByRole('menuitem', { name: 'Remove method' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Remove' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
 
     expect(onRemoveMfaMethod).toHaveBeenCalledWith('sms_1');
     expect(onRegenerateBackupCodes).toHaveBeenCalledOnce();
+  });
+
+  it('offers legacy MFA actions for backup codes and the default phone', async () => {
+    const onEnableBackupCodes = vi.fn();
+    const onSetDefaultMfaMethod = vi.fn();
+    const user = userEvent.setup();
+    renderView({
+      mfaMethods: [
+        { id: 'sms_1', type: 'sms', description: '+1 801-888-8181', isDefault: true },
+        { id: 'sms_2', type: 'sms', description: '+1 801-555-0100' },
+      ],
+      onEnableBackupCodes,
+      onSetDefaultMfaMethod,
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Backup code' }));
+    await user.click(screen.getAllByRole('button', { name: 'Manage Phone number' }).at(-1)!);
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+
+    expect(screen.getByText('Default')).toBeInTheDocument();
+    expect(onEnableBackupCodes).toHaveBeenCalledOnce();
+    expect(onSetDefaultMfaMethod).toHaveBeenCalledWith('sms_2');
+  });
+
+  it('hides removal when a verification method is required', () => {
+    renderView({
+      mfaMethods: [{ id: 'sms_1', type: 'sms', removable: false }],
+      onRemoveMfaMethod: vi.fn(),
+    });
+
+    expect(screen.queryByRole('button', { name: 'Manage Phone number' })).not.toBeInTheDocument();
   });
 });

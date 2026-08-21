@@ -146,7 +146,7 @@ export interface CodeInputProps {
   disabled?: boolean;
   autoFocus?: boolean;
   /** Fired once the final digit lands, matching the legacy `onCodeEntryFinished` auto-submit. */
-  onComplete: () => void;
+  onComplete: (value: string) => void;
   onChange: (value: string) => void;
 }
 
@@ -175,7 +175,7 @@ export function CodeInput({
     onChange(digits);
     if (digits.length === length && !completedRef.current) {
       completedRef.current = true;
-      onComplete();
+      onComplete(digits);
     }
     if (digits.length < length) {
       completedRef.current = false;
