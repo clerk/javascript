@@ -1,3 +1,4 @@
+import { Card } from '@clerk/ui/mosaic/components/card';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import type {
@@ -44,7 +45,7 @@ export function usePasswordDialogStory({
   return {
     openPasswordDialog: () => setOpen(true),
     passwordDialog: (
-      <UserProfilePasswordDialogView
+      <Dialog.Root
         open={open}
         onOpenChange={nextOpen => {
           setOpen(nextOpen);
@@ -52,53 +53,70 @@ export function usePasswordDialogStory({
             setVerificationOpen(false);
           }
         }}
-        canSubmit={canSubmit}
-        state={{
-          mode,
-          values,
-          isSubmitting: false,
-          errors:
-            values.confirmPassword && values.newPassword !== values.confirmPassword
-              ? { confirmPassword: 'Passwords do not match.' }
-              : {},
-        }}
-        onValueChange={updateValue}
-        onSubmit={() => {
-          if (withVerification) {
-            setVerificationOpen(true);
-            return;
-          }
-          complete();
-        }}
-        verificationDialog={
-          withVerification ? (
-            <Dialog
-              open={verificationOpen}
-              onOpenChange={nextOpen => {
-                setVerificationOpen(nextOpen);
-                if (!nextOpen) {
-                  setCode('');
-                }
-              }}
+      >
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Viewport>
+            <Dialog.Popup
+              render={
+                <Card.Root
+                  elevation='overlay'
+                  renderBranding={false}
+                />
+              }
             >
-              <ReverificationDialogView
+              <UserProfilePasswordDialogView
+                canSubmit={canSubmit}
+                isInterrupted={verificationOpen}
                 state={{
-                  strategy: 'email_code',
-                  identifier: 'i••••@clerk.dev',
-                  value: code,
-                  status: 'idle',
-                  errors: {},
-                  resend: { isResending: false, secondsRemaining: 0 },
+                  mode,
+                  values,
+                  isSubmitting: false,
+                  errors:
+                    values.confirmPassword && values.newPassword !== values.confirmPassword
+                      ? { confirmPassword: 'Passwords do not match.' }
+                      : {},
                 }}
-                onCancel={() => setVerificationOpen(false)}
-                onResend={() => undefined}
-                onSubmit={complete}
-                onValueChange={setCode}
+                onCancel={() => setOpen(false)}
+                onValueChange={updateValue}
+                onSubmit={() => {
+                  if (withVerification) {
+                    setVerificationOpen(true);
+                    return;
+                  }
+                  complete();
+                }}
               />
-            </Dialog>
-          ) : null
-        }
-      />
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+        {withVerification ? (
+          <Dialog
+            open={verificationOpen}
+            onOpenChange={nextOpen => {
+              setVerificationOpen(nextOpen);
+              if (!nextOpen) {
+                setCode('');
+              }
+            }}
+          >
+            <ReverificationDialogView
+              state={{
+                strategy: 'email_code',
+                identifier: 'i••••@clerk.dev',
+                value: code,
+                status: 'idle',
+                errors: {},
+                resend: { isResending: false, secondsRemaining: 0 },
+              }}
+              onCancel={() => setVerificationOpen(false)}
+              onResend={() => undefined}
+              onSubmit={complete}
+              onValueChange={setCode}
+            />
+          </Dialog>
+        ) : null}
+      </Dialog.Root>
     ),
   };
 }

@@ -1,4 +1,5 @@
 import { Freeze } from '@clerk/headless/utils';
+import { Card } from '@clerk/ui/mosaic/components/card';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import type {
   ReverificationChallengeState,
@@ -119,7 +120,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
               state={challenge}
               onCancel={flow.cancelReverification}
               onResend={() => void flow.resendReverification()}
-              onSubmit={() => void flow.submitVerification()}
+              onSubmit={value => void flow.submitVerification(value)}
               onValueChange={flow.updateVerificationValue}
             />
           ) : null}
@@ -130,24 +131,32 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
 
   return (
     <>
-      {flow.password ? (
-        <UserProfilePasswordDialogView
-          open
-          state={flow.password}
-          canSubmit={
-            Boolean(flow.password.values.newPassword) &&
-            flow.password.values.newPassword === flow.password.values.confirmPassword
+      <FlowCardDialog
+        finalFocus={flow.passwordTriggerRef}
+        open={Boolean(flow.password)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closePassword();
           }
-          onOpenChange={open => {
-            if (!open) {
-              flow.closePassword();
-            }
-          }}
-          onValueChange={flow.updatePasswordValue}
-          onSubmit={flow.submitPassword}
-          verificationDialog={verificationDialog('password')}
-        />
-      ) : null}
+        }}
+      >
+        <Freeze frozen={!flow.password}>
+          {flow.password ? (
+            <UserProfilePasswordDialogView
+              state={flow.password}
+              canSubmit={
+                Boolean(flow.password.values.newPassword) &&
+                flow.password.values.newPassword === flow.password.values.confirmPassword
+              }
+              isInterrupted={flow.reverification?.operation === 'password'}
+              onCancel={flow.closePassword}
+              onValueChange={flow.updatePasswordValue}
+              onSubmit={flow.submitPassword}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('password')}
+      </FlowCardDialog>
       {flow.addPasskey ? (
         <UserProfilePasskeyAddDialogView
           open
@@ -301,6 +310,44 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         />
       ) : null}
     </>
+  );
+}
+
+function FlowCardDialog({
+  open,
+  finalFocus,
+  onOpenChange,
+  children,
+}: {
+  open: boolean;
+  finalFocus?: React.RefObject<HTMLElement | null>;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Dialog.Root
+      size='card'
+      closedBy='closerequest'
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            finalFocus={finalFocus}
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            {children}
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
@@ -1437,15 +1484,20 @@ export function States() {
         />
       </div>
       {snapshot.flow === 'password' ? (
-        <UserProfilePasswordDialogView
+        <FlowCardDialog
           open={open}
-          state={snapshot.state}
-          canSubmit={Boolean(snapshot.state.values.newPassword)}
           onOpenChange={setOpen}
-          onValueChange={noop}
-          onSubmit={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfilePasswordDialogView
+            state={snapshot.state}
+            canSubmit={Boolean(snapshot.state.values.newPassword)}
+            isInterrupted={verificationOpen}
+            onCancel={() => setOpen(false)}
+            onValueChange={noop}
+            onSubmit={noop}
+          />
+          {verification}
+        </FlowCardDialog>
       ) : null}
       {snapshot.flow === 'add-passkey' ? (
         <UserProfilePasskeyAddDialogView

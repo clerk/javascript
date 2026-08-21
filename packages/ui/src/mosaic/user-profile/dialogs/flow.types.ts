@@ -134,7 +134,7 @@ export interface ReverificationChallengeState {
 
 export interface ReverificationChallengeActions {
   onValueChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (completedValue?: string) => void;
   onResend: () => void;
   onCancel: () => void;
 }

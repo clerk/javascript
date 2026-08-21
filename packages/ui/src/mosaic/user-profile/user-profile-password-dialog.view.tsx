@@ -1,9 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
-import { type FormEvent, type ReactNode, useId } from 'react';
+import { type FormEvent, useId } from 'react';
 
 import { Button, SubmitButton } from '../components/button';
 import { Card } from '../components/card';
-import { Dialog, type DialogProps } from '../components/dialog';
+import { Dialog } from '../components/dialog';
 import { Field } from '../components/field';
 import { Heading } from '../components/heading';
 import { Input } from '../components/input';
@@ -22,11 +22,11 @@ export type {
   UserProfilePasswordValues,
 } from './dialogs/flow.types';
 
-export interface UserProfilePasswordDialogViewProps extends Pick<DialogProps, 'open' | 'defaultOpen' | 'onOpenChange'> {
+export interface UserProfilePasswordDialogViewProps {
   state: UserProfilePasswordFlowState;
   canSubmit?: boolean;
-  /** A verification prompt rendered inside the password dialog's stacking context. */
-  verificationDialog?: ReactNode;
+  isInterrupted?: boolean;
+  onCancel: () => void;
   onValueChange: <Field extends UserProfilePasswordField>(
     field: Field,
     value: UserProfilePasswordValues[Field],
@@ -37,10 +37,10 @@ export interface UserProfilePasswordDialogViewProps extends Pick<DialogProps, 'o
 export function UserProfilePasswordDialogView({
   state,
   canSubmit = false,
-  verificationDialog,
+  isInterrupted = false,
+  onCancel,
   onValueChange,
   onSubmit,
-  ...dialogProps
 }: UserProfilePasswordDialogViewProps) {
   const { values, mode, isSubmitting, errors } = state;
   const locked = Boolean(state.isReadOnly) || isSubmitting;
@@ -53,99 +53,74 @@ export function UserProfilePasswordDialogView({
   };
 
   return (
-    <Dialog.Root
-      size='card'
-      closedBy='closerequest'
-      {...dialogProps}
+    <form
+      aria-hidden={isInterrupted || undefined}
+      onSubmit={submit}
+      {...mergeStyleProps(themeProps('user-profile-password-dialog-form'), stylex.props(styles.form))}
     >
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup
-            render={
-              <Card.Root
-                elevation='overlay'
-                renderBranding={false}
-              />
-            }
-          >
-            <Dialog.CloseButton />
-            <form
-              onSubmit={submit}
-              {...mergeStyleProps(themeProps('user-profile-password-dialog-form'), stylex.props(styles.form))}
+      <Dialog.CloseButton />
+      <Card.Header>
+        <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
+      </Card.Header>
+      <Card.Content>
+        <div {...mergeStyleProps(themeProps('user-profile-password-dialog-fields'), stylex.props(styles.fields))}>
+          {state.isReadOnly ? (
+            <Text color='neutral'>Your password is managed by your enterprise connection.</Text>
+          ) : null}
+          <PasswordField
+            name='newPassword'
+            label='New password'
+            autoComplete='new-password'
+            value={values.newPassword}
+            error={errors.newPassword}
+            disabled={locked}
+            onChange={value => onValueChange('newPassword', value)}
+          />
+          <PasswordField
+            name='confirmPassword'
+            label='Confirm password'
+            autoComplete='new-password'
+            value={values.confirmPassword}
+            error={errors.confirmPassword}
+            disabled={locked}
+            onChange={value => onValueChange('confirmPassword', value)}
+          />
+          <SignOutOfOtherSessionsField
+            checked={values.signOutOfOtherSessions}
+            disabled={locked}
+            onChange={checked => onValueChange('signOutOfOtherSessions', checked)}
+          />
+          {errors.form ? (
+            <Text
+              color='negative'
+              role='alert'
             >
-              <Card.Header>
-                <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
-              </Card.Header>
-              <Card.Content>
-                <div
-                  {...mergeStyleProps(themeProps('user-profile-password-dialog-fields'), stylex.props(styles.fields))}
-                >
-                  {state.isReadOnly ? (
-                    <Text color='neutral'>Your password is managed by your enterprise connection.</Text>
-                  ) : null}
-                  <PasswordField
-                    name='newPassword'
-                    label='New password'
-                    autoComplete='new-password'
-                    value={values.newPassword}
-                    error={errors.newPassword}
-                    disabled={locked}
-                    onChange={value => onValueChange('newPassword', value)}
-                  />
-                  <PasswordField
-                    name='confirmPassword'
-                    label='Confirm password'
-                    autoComplete='new-password'
-                    value={values.confirmPassword}
-                    error={errors.confirmPassword}
-                    disabled={locked}
-                    onChange={value => onValueChange('confirmPassword', value)}
-                  />
-                  <SignOutOfOtherSessionsField
-                    checked={values.signOutOfOtherSessions}
-                    disabled={locked}
-                    onChange={checked => onValueChange('signOutOfOtherSessions', checked)}
-                  />
-                  {errors.form ? (
-                    <Text
-                      color='negative'
-                      role='alert'
-                    >
-                      {errors.form}
-                    </Text>
-                  ) : null}
-                </div>
-              </Card.Content>
-              <Card.Footer {...themeProps('user-profile-password-dialog-actions')}>
-                <Dialog.Close
-                  render={props => (
-                    <Button
-                      {...props}
-                      {...mergeStyleProps(stylex.props(styles.footerButton), props.className, props.style)}
-                      variant='outline'
-                    >
-                      Cancel
-                    </Button>
-                  )}
-                />
-                {state.isReadOnly ? null : (
-                  <SubmitButton
-                    disabled={!canSubmit}
-                    isPending={isSubmitting}
-                    pendingLabel={mode === 'set' ? 'Setting password' : 'Changing password'}
-                    {...stylex.props(styles.footerButton)}
-                  >
-                    {title}
-                  </SubmitButton>
-                )}
-              </Card.Footer>
-            </form>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-      {verificationDialog}
-    </Dialog.Root>
+              {errors.form}
+            </Text>
+          ) : null}
+        </div>
+      </Card.Content>
+      <Card.Footer {...themeProps('user-profile-password-dialog-actions')}>
+        <Button
+          {...stylex.props(styles.footerButton)}
+          type='button'
+          variant='outline'
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+        {state.isReadOnly ? null : (
+          <SubmitButton
+            disabled={!canSubmit}
+            isPending={isSubmitting}
+            pendingLabel={mode === 'set' ? 'Setting password' : 'Changing password'}
+            {...stylex.props(styles.footerButton)}
+          >
+            {title}
+          </SubmitButton>
+        )}
+      </Card.Footer>
+    </form>
   );
 }
 
