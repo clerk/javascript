@@ -49,6 +49,23 @@ describe('passkey dialog views', () => {
     expect(within(dialog).getByRole('button', { name: 'Add passkey' })).toHaveAttribute('aria-busy', 'true');
   });
 
+  it('disables passkey creation when the browser capability is unavailable', () => {
+    render(
+      <MosaicProvider>
+        <PasskeyDialog>
+          <UserProfilePasskeyAddDialogView
+            state={{ capability: 'unsupported', isSubmitting: false, errors: {} }}
+            onAdd={vi.fn()}
+            onCancel={vi.fn()}
+          />
+        </PasskeyDialog>
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByText('This browser or device does not support creating passkeys.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add passkey' })).toBeDisabled();
+  });
+
   it('only submits a changed passkey name', async () => {
     const onNameChange = vi.fn();
     const onRename = vi.fn();

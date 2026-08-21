@@ -36,6 +36,7 @@ export function UserProfileSignOutAllDevicesDialogView({
       <AlertDialog.Actions>
         <Button
           type='button'
+          disabled={state.isSubmitting}
           variant='outline'
           onClick={onCancel}
         >

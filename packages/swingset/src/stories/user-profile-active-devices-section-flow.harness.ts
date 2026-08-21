@@ -266,12 +266,20 @@ export function useActiveDevicesSectionFlow({
     reverification,
     openDevice,
     openSignOutDevice,
-    closeDevice: () => closeOperation('sign-out-device'),
+    closeDevice: () => {
+      if (!device?.isSubmitting) {
+        closeOperation('sign-out-device');
+      }
+    },
     requestSignOutDevice,
     cancelSignOutDevice,
     submitSignOutDevice,
     openSignOutAllDevices,
-    closeSignOutAllDevices: () => closeOperation('sign-out-all-devices'),
+    closeSignOutAllDevices: () => {
+      if (!signOutAllDevices?.isSubmitting) {
+        closeOperation('sign-out-all-devices');
+      }
+    },
     submitSignOutAllDevices,
     signOutOtherSessions,
     updateVerificationValue,

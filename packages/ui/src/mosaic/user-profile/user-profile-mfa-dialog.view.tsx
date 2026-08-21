@@ -63,7 +63,7 @@ export function UserProfileMfaAddDialogView({
       onSubmit={submit}
       {...stylex.props(styles.form)}
     >
-      <Dialog.CloseButton />
+      <Dialog.CloseButton disabled={state.isSubmitting} />
       <Card.Header>
         <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
         <Dialog.Description render={<Text />}>
@@ -97,6 +97,7 @@ export function UserProfileMfaAddDialogView({
         <Card.Footer {...themeProps('user-profile-mfa-add-dialog-actions')}>
           <Button
             type='button'
+            disabled={state.isSubmitting}
             variant='outline'
             {...stylex.props(styles.footerButton)}
             onClick={
@@ -424,6 +425,7 @@ export function UserProfileMfaRemoveDialogView({
       <AlertDialog.Actions>
         <Button
           type='button'
+          disabled={state.isSubmitting}
           variant='outline'
           onClick={onCancel}
         >

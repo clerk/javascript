@@ -36,6 +36,37 @@ export function Default() {
         />
         Require reverification
       </label>
+      <label style={controls}>
+        Capability
+        <select
+          value={config.passkeyCapability}
+          onChange={event =>
+            setConfig(current => ({
+              ...current,
+              passkeyCapability: event.target.value as typeof current.passkeyCapability,
+            }))
+          }
+        >
+          <option value='available'>Available</option>
+          <option value='unsupported'>Unsupported</option>
+        </select>
+      </label>
+      <label style={controls}>
+        Creation result
+        <select
+          value={config.passkeyCreationResult}
+          onChange={event =>
+            setConfig(current => ({
+              ...current,
+              passkeyCreationResult: event.target.value as typeof current.passkeyCreationResult,
+            }))
+          }
+        >
+          <option value='success'>Success</option>
+          <option value='cancelled'>Cancelled</option>
+          <option value='resource-error'>Resource error</option>
+        </select>
+      </label>
       <UserProfilePasskeysSectionView
         passkeys={flow.passkeys}
         onAdd={flow.openAddPasskey}

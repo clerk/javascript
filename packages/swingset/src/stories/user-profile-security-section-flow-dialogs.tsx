@@ -40,7 +40,7 @@ export function PasswordSectionFlowDialogs({ flow }: { flow: PasswordFlow }) {
       finalFocus={flow.triggerRef}
       open={Boolean(flow.password)}
       onOpenChange={open => {
-        if (!open) {
+        if (!open && !flow.password?.isSubmitting) {
           flow.closePassword();
         }
       }}
@@ -72,7 +72,7 @@ export function PasskeysSectionFlowDialogs({ flow }: { flow: PasskeysFlow }) {
         finalFocus={flow.triggerRef}
         open={Boolean(flow.addPasskey)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.addPasskey?.isSubmitting) {
             flow.closeAddPasskey();
           }
         }}
@@ -96,7 +96,7 @@ export function PasskeysSectionFlowDialogs({ flow }: { flow: PasskeysFlow }) {
         finalFocus={flow.triggerRef}
         open={Boolean(flow.renamePasskey)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.renamePasskey?.isSubmitting) {
             flow.closeRenamePasskey();
           }
         }}
@@ -116,7 +116,7 @@ export function PasskeysSectionFlowDialogs({ flow }: { flow: PasskeysFlow }) {
         finalFocus={flow.triggerRef}
         open={Boolean(flow.removePasskey)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.removePasskey?.isSubmitting) {
             flow.closeRemovePasskey();
           }
         }}
@@ -149,7 +149,7 @@ export function MfaSectionFlowDialogs({ flow }: { flow: MfaFlow }) {
         finalFocus={flow.triggerRef}
         open={Boolean(flow.addMfa)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.addMfa?.isSubmitting) {
             flow.closeAddMfa();
           }
         }}
@@ -194,7 +194,7 @@ export function MfaSectionFlowDialogs({ flow }: { flow: MfaFlow }) {
         finalFocus={flow.triggerRef}
         open={Boolean(flow.removeMfa)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.removeMfa?.isSubmitting) {
             flow.closeRemoveMfa();
           }
         }}
@@ -219,7 +219,7 @@ export function MfaSectionFlowDialogs({ flow }: { flow: MfaFlow }) {
         finalFocus={flow.triggerRef}
         open={Boolean(flow.backupCodes)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.backupCodes?.isSubmitting) {
             flow.closeBackupCodes();
           }
         }}
@@ -263,7 +263,7 @@ export function ActiveDevicesSectionFlowDialogs({ flow }: { flow: ActiveDevicesF
         finalFocus={flow.triggerRef}
         open={Boolean(flow.signOutAllDevices)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.signOutAllDevices?.isSubmitting) {
             flow.closeSignOutAllDevices();
           }
         }}
@@ -288,7 +288,7 @@ export function ActiveDevicesSectionFlowDialogs({ flow }: { flow: ActiveDevicesF
         finalFocus={flow.triggerRef}
         open={Boolean(flow.device)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.device?.isSubmitting) {
             flow.closeDevice();
           }
         }}
@@ -305,7 +305,7 @@ export function ActiveDevicesSectionFlowDialogs({ flow }: { flow: ActiveDevicesF
         <AlertDialog
           open={flow.device?.step === 'confirm'}
           onOpenChange={open => {
-            if (!open) {
+            if (!open && !flow.device?.isSubmitting) {
               flow.cancelSignOutDevice();
             }
           }}
@@ -337,7 +337,7 @@ export function DeleteSectionFlowDialogs({ flow }: { flow: DeleteFlow }) {
       finalFocus={flow.triggerRef}
       open={Boolean(flow.deleteAccount)}
       onOpenChange={open => {
-        if (!open) {
+        if (!open && !flow.deleteAccount?.isSubmitting) {
           flow.closeDeleteAccount();
         }
       }}

@@ -33,25 +33,29 @@ export function UserProfilePasskeyAddDialogView({
   onAdd,
 }: UserProfilePasskeyAddDialogViewProps) {
   const submit = () => {
-    if (!state.isSubmitting) {
+    if (!state.isSubmitting && state.capability !== 'unsupported') {
       onAdd();
     }
   };
 
   return (
     <div aria-hidden={isInterrupted || undefined}>
-      <Dialog.CloseButton />
+      <Dialog.CloseButton disabled={state.isSubmitting} />
       <DialogHeader
         title='Add passkey'
         description='Your browser or device will ask you to create a passkey for this account.'
       />
       <DialogForm onSubmit={submit}>
         <DialogBody>
+          {state.capability === 'unsupported' ? (
+            <Text>This browser or device does not support creating passkeys.</Text>
+          ) : null}
           <FormAlert>{state.errors.form}</FormAlert>
         </DialogBody>
         <DialogFooter>
           <Button
             type='button'
+            disabled={state.isSubmitting}
             variant='outline'
             {...stylex.props(styles.footerButton)}
             onClick={onCancel}
@@ -59,6 +63,7 @@ export function UserProfilePasskeyAddDialogView({
             Cancel
           </Button>
           <SubmitButton
+            disabled={state.capability === 'unsupported'}
             isPending={state.isSubmitting}
             pendingLabel='Adding passkey'
             {...stylex.props(styles.footerButton)}
@@ -92,7 +97,7 @@ export function UserProfilePasskeyRenameDialogView({
 
   return (
     <div aria-hidden={isInterrupted || undefined}>
-      <Dialog.CloseButton />
+      <Dialog.CloseButton disabled={state.isSubmitting} />
       <DialogHeader
         title='Rename passkey'
         description='Change the passkey name to make it easier to find.'
@@ -119,6 +124,7 @@ export function UserProfilePasskeyRenameDialogView({
         <DialogFooter>
           <Button
             type='button'
+            disabled={state.isSubmitting}
             variant='outline'
             {...stylex.props(styles.footerButton)}
             onClick={onCancel}
@@ -167,6 +173,7 @@ export function UserProfilePasskeyRemoveDialogView({
       <AlertDialog.Actions>
         <Button
           type='button'
+          disabled={state.isSubmitting}
           variant='outline'
           onClick={onCancel}
         >
