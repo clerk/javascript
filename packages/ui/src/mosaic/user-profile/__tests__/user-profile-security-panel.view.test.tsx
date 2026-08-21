@@ -214,6 +214,29 @@ describe('UserProfileSecurityPanelView', () => {
     expect(onRegenerateBackupCodes).toHaveBeenCalledOnce();
   });
 
+  it('offers legacy MFA actions for backup codes and the default phone', async () => {
+    const onEnableBackupCodes = vi.fn();
+    const onSetDefaultMfaMethod = vi.fn();
+    const user = userEvent.setup();
+    renderView({
+      mfaMethods: [
+        { id: 'sms_1', type: 'sms', description: '+1 801-888-8181', isDefault: true },
+        { id: 'sms_2', type: 'sms', description: '+1 801-555-0100' },
+      ],
+      onEnableBackupCodes,
+      onSetDefaultMfaMethod,
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Backup codes' }));
+    await user.click(screen.getAllByRole('button', { name: 'Manage Phone number' }).at(-1)!);
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+
+    expect(screen.getByText('Default')).toBeInTheDocument();
+    expect(onEnableBackupCodes).toHaveBeenCalledOnce();
+    expect(onSetDefaultMfaMethod).toHaveBeenCalledWith('sms_2');
+  });
+
   it('hides removal when a verification method is required', () => {
     renderView({
       mfaMethods: [{ id: 'sms_1', type: 'sms', removable: false }],

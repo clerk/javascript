@@ -32,6 +32,8 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
   onRemovePasskey?: (id: string) => void;
   onAddMfaMethod?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
+  onEnableBackupCodes?: () => void;
+  onSetDefaultMfaMethod?: (id: string) => void;
   onRemoveMfaMethod?: (id: string) => void;
   onDeleteAccount?: () => void;
 }
@@ -49,6 +51,8 @@ export function UserProfileSecurityPanelView({
   onRemovePasskey,
   onAddMfaMethod,
   onRegenerateBackupCodes,
+  onEnableBackupCodes,
+  onSetDefaultMfaMethod,
   onRemoveMfaMethod,
   onManageDevice,
   onSignOutDevice,
@@ -90,7 +94,9 @@ export function UserProfileSecurityPanelView({
                 sectionTitle={!passwordAvailable && passkeys === undefined ? 'Authentication' : undefined}
                 onAdd={onAddMfaMethod}
                 onRegenerateBackupCodes={onRegenerateBackupCodes}
+                onEnableBackupCodes={onEnableBackupCodes}
                 onRemove={onRemoveMfaMethod}
+                onSetDefault={onSetDefaultMfaMethod}
               />
             ) : null}
           </div>

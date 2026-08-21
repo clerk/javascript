@@ -1,3 +1,4 @@
+import { Badge } from '../components/badge';
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
 import { Menu } from '../components/menu';
@@ -13,6 +14,7 @@ export interface UserProfileMfaMethod {
   label?: string;
   description?: string;
   removable?: boolean;
+  isDefault?: boolean;
 }
 
 export type UserProfileMfaAddableMethod = Extract<UserProfileMfaMethod['type'], 'sms' | 'authenticator'>;
@@ -23,6 +25,8 @@ export interface UserProfileMfaSectionViewProps {
   sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
+  onEnableBackupCodes?: () => void;
+  onSetDefault?: (id: string) => void;
   onRemove?: (id: string) => void;
 }
 
@@ -40,6 +44,8 @@ export function UserProfileMfaSectionView({
   sectionTitle,
   onAdd,
   onRegenerateBackupCodes,
+  onEnableBackupCodes,
+  onSetDefault,
   onRemove,
 }: UserProfileMfaSectionViewProps) {
   const availableMethods = addableMethods.filter(
@@ -51,7 +57,8 @@ export function UserProfileMfaSectionView({
   return (
     <UserProfileSecurityList
       addControl={
-        onAdd && availableMethods.length > 0 ? (
+        (onAdd && availableMethods.length > 0) ||
+        (onEnableBackupCodes && hasConfiguredMethod && !methods.some(method => method.type === 'backup-codes')) ? (
           <Menu.Root placement='bottom-end'>
             <Menu.Trigger
               aria-label='Add verification method'
@@ -76,9 +83,15 @@ export function UserProfileMfaSectionView({
                 <Menu.Item
                   key={type}
                   label={labels[type]}
-                  onClick={() => onAdd(type)}
+                  onClick={() => onAdd?.(type)}
                 />
               ))}
+              {onEnableBackupCodes && hasConfiguredMethod && !methods.some(method => method.type === 'backup-codes') ? (
+                <Menu.Item
+                  label='Backup codes'
+                  onClick={onEnableBackupCodes}
+                />
+              ) : null}
             </Menu.Content>
           </Menu.Root>
         ) : null
@@ -100,15 +113,22 @@ export function UserProfileMfaSectionView({
               onClick: onRegenerateBackupCodes,
             });
           }
-        } else if (onRemove && method.removable !== false) {
-          actions.push({ label: 'Remove method', color: 'negative', onClick: () => onRemove(method.id) });
+        } else {
+          if (method.type === 'sms' && !method.isDefault && onSetDefault) {
+            actions.push({ label: 'Set as default', onClick: () => onSetDefault(method.id) });
+          }
+          if (onRemove && method.removable !== false) {
+            actions.push({ label: 'Remove method', color: 'negative', onClick: () => onRemove(method.id) });
+          }
         }
 
         return (
           <Section.Item key={method.id}>
             <UserProfileSecurityIcon name={method.type} />
             <Section.Content>
-              <Section.Label>{label}</Section.Label>
+              <Section.Label>
+                {label} {method.isDefault ? <Badge color='neutral'>Default</Badge> : null}
+              </Section.Label>
               {method.description ? <Section.Description>{method.description}</Section.Description> : null}
             </Section.Content>
             <Section.Actions>

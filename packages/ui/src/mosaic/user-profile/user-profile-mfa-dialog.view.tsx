@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import { QRCodeSVG } from 'qrcode.react';
 import type { FormEvent } from 'react';
 import { useId } from 'react';
 
@@ -40,6 +41,8 @@ export function UserProfileMfaAddDialogView({
   onDownloadBackupCodes,
   onPrintBackupCodes,
   onFinish,
+  onBack,
+  onCopySecret,
 }: UserProfileMfaAddDialogViewProps) {
   const title =
     state.step === 'backup-codes'
@@ -79,6 +82,7 @@ export function UserProfileMfaAddDialogView({
           onCopyBackupCodes={onCopyBackupCodes}
           onDownloadBackupCodes={onDownloadBackupCodes}
           onPrintBackupCodes={onPrintBackupCodes}
+          onCopySecret={onCopySecret}
         />
         {state.errors.form ? (
           <Text
@@ -89,15 +93,17 @@ export function UserProfileMfaAddDialogView({
           </Text>
         ) : null}
       </Card.Content>
-      {state.step !== 'preparing' || !state.isSubmitting ? (
+      {(state.step !== 'preparing' && state.step !== 'preparing-sms') || !state.isSubmitting ? (
         <Card.Footer {...themeProps('user-profile-mfa-add-dialog-actions')}>
           <Button
             type='button'
             variant='outline'
             {...stylex.props(styles.footerButton)}
-            onClick={onCancel}
+            onClick={
+              state.step === 'phone' || state.step === 'verify' || state.step === 'preparing-sms' ? onBack : onCancel
+            }
           >
-            Cancel
+            {state.step === 'phone' || state.step === 'verify' || state.step === 'preparing-sms' ? 'Back' : 'Cancel'}
           </Button>
           {state.step === 'backup-codes' || state.step === 'success' ? (
             <Button
@@ -138,6 +144,9 @@ function AddDescription({ state }: { state: UserProfileMfaAddFlowState }) {
   if (state.step === 'preparing') {
     return <>Preparing your authenticator setup.</>;
   }
+  if (state.step === 'preparing-sms') {
+    return <>Sending a verification code to {state.identifier}.</>;
+  }
   if (state.step === 'backup-codes') {
     return <>Store these somewhere safe. Each backup code can only be used once.</>;
   }
@@ -167,6 +176,7 @@ function AddContent({
   onCopyBackupCodes,
   onDownloadBackupCodes,
   onPrintBackupCodes,
+  onCopySecret,
 }: Pick<
   UserProfileMfaAddDialogViewProps,
   | 'state'
@@ -179,6 +189,7 @@ function AddContent({
   | 'onCopyBackupCodes'
   | 'onDownloadBackupCodes'
   | 'onPrintBackupCodes'
+  | 'onCopySecret'
 >) {
   const fieldId = useId();
 
@@ -203,14 +214,14 @@ function AddContent({
     );
   }
 
-  if (state.step === 'preparing') {
+  if (state.step === 'preparing' || state.step === 'preparing-sms') {
     return state.isSubmitting ? (
       <div
         role='status'
         {...stylex.props(styles.pending)}
       >
         <Spinner />
-        <Text>Preparing authenticator setup…</Text>
+        <Text>{state.step === 'preparing-sms' ? 'Sending verification code…' : 'Preparing authenticator setup…'}</Text>
       </div>
     ) : null;
   }
@@ -286,20 +297,38 @@ function AddContent({
     return (
       <div {...stylex.props(styles.setup)}>
         {state.displayFormat === 'qr' ? (
-          <div
+          <QRCodeSVG
             aria-label='Authenticator QR code'
             role='img'
+            size={192}
+            value={state.uri ?? state.secret}
             {...stylex.props(styles.qrPlaceholder)}
-          >
-            QR code
-          </div>
+          />
         ) : (
-          <Text
-            render={<code />}
-            {...stylex.props(styles.secret)}
-          >
-            {state.secret}
-          </Text>
+          <div>
+            <Text
+              render={<code />}
+              {...stylex.props(styles.secret)}
+            >
+              {state.secret}
+            </Text>
+            {state.uri ? (
+              <Text
+                render={<code />}
+                {...stylex.props(styles.secret)}
+              >
+                {state.uri}
+              </Text>
+            ) : null}
+            <Button
+              size='sm'
+              type='button'
+              variant='outline'
+              onClick={onCopySecret}
+            >
+              {state.copied ? 'Copied' : 'Copy setup key'}
+            </Button>
+          </div>
         )}
         <Button
           color='neutral'
@@ -348,7 +377,7 @@ function AddContent({
 }
 
 function canSubmit(state: UserProfileMfaAddFlowState) {
-  if (state.step === 'preparing') {
+  if (state.step === 'preparing' || state.step === 'preparing-sms') {
     return !state.isSubmitting;
   }
   if (state.step === 'select-phone' || state.step === 'backup-codes' || state.step === 'success') {
