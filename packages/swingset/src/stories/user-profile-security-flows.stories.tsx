@@ -139,7 +139,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.passwordTriggerRef}
         open={Boolean(flow.password)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.password?.isSubmitting) {
             flow.closePassword();
           }
         }}
@@ -161,7 +161,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.passkeysTriggerRef}
         open={Boolean(flow.addPasskey)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.addPasskey?.isSubmitting) {
             flow.closeAddPasskey();
           }
         }}
@@ -182,7 +182,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.passkeysTriggerRef}
         open={Boolean(flow.renamePasskey)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.renamePasskey?.isSubmitting) {
             flow.closeRenamePasskey();
           }
         }}
@@ -204,7 +204,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.passkeysTriggerRef}
         open={Boolean(flow.removePasskey)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.removePasskey?.isSubmitting) {
             flow.closeRemovePasskey();
           }
         }}
@@ -226,7 +226,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.mfaTriggerRef}
         open={Boolean(flow.addMfa)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.addMfa?.isSubmitting) {
             flow.closeAddMfa();
           }
         }}
@@ -268,7 +268,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.mfaTriggerRef}
         open={Boolean(flow.removeMfa)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.removeMfa?.isSubmitting) {
             flow.closeRemoveMfa();
           }
         }}
@@ -290,7 +290,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.mfaTriggerRef}
         open={Boolean(flow.backupCodes)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.backupCodes?.isSubmitting) {
             flow.closeBackupCodes();
           }
         }}
@@ -323,7 +323,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.deleteTriggerRef}
         open={Boolean(flow.deleteAccount)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.deleteAccount?.isSubmitting) {
             flow.closeDeleteAccount();
           }
         }}
@@ -345,7 +345,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.activeDevicesTriggerRef}
         open={Boolean(flow.signOutAllDevices)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.signOutAllDevices?.isSubmitting) {
             flow.closeSignOutAllDevices();
           }
         }}
@@ -367,7 +367,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         finalFocus={flow.activeDevicesTriggerRef}
         open={Boolean(flow.device)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !flow.device?.isSubmitting) {
             flow.closeDevice();
           }
         }}
@@ -384,7 +384,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         <AlertDialog
           open={flow.device?.step === 'confirm'}
           onOpenChange={open => {
-            if (!open) {
+            if (!open && !flow.device?.isSubmitting) {
               flow.cancelSignOutDevice();
             }
           }}
@@ -1127,6 +1127,28 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     step: 'add passkey',
     variant: 'submitting',
     state: { isSubmitting: true, errors: {} },
+  },
+  {
+    flow: 'add-passkey',
+    step: 'add passkey',
+    variant: 'unsupported',
+    state: {
+      capability: 'unsupported',
+      result: 'idle',
+      isSubmitting: false,
+      errors: { form: 'Passkeys are not supported by this browser or device.' },
+    },
+  },
+  {
+    flow: 'add-passkey',
+    step: 'add passkey',
+    variant: 'cancelled',
+    state: {
+      capability: 'available',
+      result: 'cancelled',
+      isSubmitting: false,
+      errors: { form: 'Passkey creation was cancelled.' },
+    },
   },
   {
     flow: 'add-passkey',

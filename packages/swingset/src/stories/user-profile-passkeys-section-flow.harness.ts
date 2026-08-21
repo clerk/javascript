@@ -14,6 +14,8 @@ type PasskeysSectionFlowConfig = Pick<
   | 'failurePoint'
   | 'hasPasskey'
   | 'latencyMs'
+  | 'passkeyCapability'
+  | 'passkeyCreationResult'
   | 'requireReverification'
   | 'reverificationStrategy'
   | 'validCode'
@@ -134,10 +136,35 @@ export function usePasskeysSectionFlow({
 
   const openAddPasskey = useCallback(() => {
     captureTrigger();
-    setAddPasskey({ isSubmitting: false, errors: {} });
+    const capability = settingsRef.current.passkeyCapability;
+    setAddPasskey({
+      capability,
+      result: 'idle',
+      isSubmitting: false,
+      errors: capability === 'unsupported' ? { form: 'Passkeys are not supported by this browser or device.' } : {},
+    });
   }, [captureTrigger]);
   const submitAddPasskey = useCallback(() => {
     void runMutation('add-passkey', () => {
+      const result = settingsRef.current.passkeyCreationResult;
+      if (result !== 'success') {
+        setAddPasskey(current =>
+          current
+            ? {
+                ...current,
+                result,
+                isSubmitting: false,
+                errors: {
+                  form:
+                    result === 'cancelled'
+                      ? 'Passkey creation was cancelled.'
+                      : 'The passkey could not be created. Please try again.',
+                },
+              }
+            : current,
+        );
+        return;
+      }
       setPasskeys(current => [
         ...current,
         { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
@@ -270,15 +297,27 @@ export function usePasskeysSectionFlow({
     removePasskey,
     reverification,
     openAddPasskey,
-    closeAddPasskey: () => closeOperation('add-passkey'),
+    closeAddPasskey: () => {
+      if (!addPasskey?.isSubmitting) {
+        closeOperation('add-passkey');
+      }
+    },
     submitAddPasskey,
     openRenamePasskey,
-    closeRenamePasskey: () => closeOperation('rename-passkey'),
+    closeRenamePasskey: () => {
+      if (!renamePasskey?.isSubmitting) {
+        closeOperation('rename-passkey');
+      }
+    },
     updatePasskeyName: (name: string) =>
       setRenamePasskey(current => (current ? { ...current, name, errors: {} } : current)),
     submitRenamePasskey,
     openRemovePasskey,
-    closeRemovePasskey: () => closeOperation('remove-passkey'),
+    closeRemovePasskey: () => {
+      if (!removePasskey?.isSubmitting) {
+        closeOperation('remove-passkey');
+      }
+    },
     submitRemovePasskey,
     updateVerificationValue,
     submitVerification,

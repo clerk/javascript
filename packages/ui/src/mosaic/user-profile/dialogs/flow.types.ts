@@ -496,6 +496,8 @@ export interface UserProfileBackupCodesFlowActions {
 }
 
 export interface UserProfilePasskeyAddFlowState {
+  capability?: 'available' | 'unsupported';
+  result?: 'idle' | 'cancelled' | 'resource-error';
   isSubmitting: boolean;
   errors: FlowErrors;
 }

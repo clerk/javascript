@@ -260,7 +260,11 @@ export function usePasswordSectionFlow({
     password,
     reverification,
     openPassword,
-    closePassword,
+    closePassword: () => {
+      if (!password?.isSubmitting) {
+        closePassword();
+      }
+    },
     updatePasswordValue,
     submitPassword,
     updateVerificationValue,

@@ -199,7 +199,11 @@ export function useDeleteSectionFlow({
     deleteAccount,
     reverification,
     openDeleteAccount,
-    closeDeleteAccount,
+    closeDeleteAccount: () => {
+      if (!deleteAccount?.isSubmitting) {
+        closeDeleteAccount();
+      }
+    },
     updateDeleteConfirmation,
     submitDeleteAccount,
     updateVerificationValue,

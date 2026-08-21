@@ -541,7 +541,11 @@ export function useMfaSectionFlow({
     backupCodes,
     reverification,
     openAddMfa,
-    closeAddMfa: () => closeOperation('add-mfa'),
+    closeAddMfa: () => {
+      if (!addMfa?.isSubmitting) {
+        closeOperation('add-mfa');
+      }
+    },
     addNewMfaPhone: () =>
       setAddMfa({ method: 'sms', step: 'phone', phoneNumber: '+1', isSubmitting: false, errors: {} }),
     selectMfaPhone,
@@ -563,11 +567,19 @@ export function useMfaSectionFlow({
       setAddMfa(current => (current?.step === 'backup-codes' ? { ...current, copied: true } : current)),
     resendMfaCode,
     openRemoveMfa,
-    closeRemoveMfa: () => closeOperation('remove-mfa'),
+    closeRemoveMfa: () => {
+      if (!removeMfa?.isSubmitting) {
+        closeOperation('remove-mfa');
+      }
+    },
     submitRemoveMfa,
     openBackupCodes,
     setDefaultMfa,
-    closeBackupCodes: () => closeOperation('backup-codes'),
+    closeBackupCodes: () => {
+      if (!backupCodes?.isSubmitting) {
+        closeOperation('backup-codes');
+      }
+    },
     regenerateBackupCodes,
     markBackupCodesCopied: () =>
       setBackupCodes(current => (current?.step === 'codes' ? { ...current, copied: true } : current)),

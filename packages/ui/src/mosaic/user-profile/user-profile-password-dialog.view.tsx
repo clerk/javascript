@@ -44,7 +44,7 @@ export function UserProfilePasswordDialogView({
 
   return (
     <div aria-hidden={isInterrupted || undefined}>
-      <Dialog.CloseButton />
+      <Dialog.CloseButton disabled={state.isSubmitting} />
       <DialogHeader title={title} />
       <DialogForm onSubmit={submit}>
         <DialogBody>
@@ -102,6 +102,7 @@ export function UserProfilePasswordDialogView({
           <Button
             {...stylex.props(styles.footerButton)}
             type='button'
+            disabled={state.isSubmitting}
             variant='outline'
             onClick={onCancel}
           >

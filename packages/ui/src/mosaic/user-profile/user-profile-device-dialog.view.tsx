@@ -67,6 +67,7 @@ export function UserProfileDeviceDialogView({
       <Card.Footer {...mergeStyleProps(themeProps('user-profile-device-dialog-actions'), stylex.props(styles.footer))}>
         <Button
           type='button'
+          disabled={state.isSubmitting}
           color='negative'
           onClick={onRequestSignOut}
         >

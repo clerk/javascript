@@ -9,6 +9,8 @@ export interface SecurityFlowConfig {
   signedInIdentifier: string;
   passkeysAvailable: boolean;
   passkeyCreationAvailable: boolean;
+  passkeyCapability: 'available' | 'unsupported';
+  passkeyCreationResult: 'success' | 'cancelled' | 'resource-error';
   hasPasskey: boolean;
   hasMfaPhone: boolean;
   hasMfaAuthenticator: boolean;
@@ -35,6 +37,8 @@ export const DEFAULT_SECURITY_FLOW_CONFIG: SecurityFlowConfig = {
   signedInIdentifier: 'preston@clerk.dev',
   passkeysAvailable: true,
   passkeyCreationAvailable: true,
+  passkeyCapability: 'available',
+  passkeyCreationResult: 'success',
   hasPasskey: true,
   hasMfaPhone: false,
   hasMfaAuthenticator: false,

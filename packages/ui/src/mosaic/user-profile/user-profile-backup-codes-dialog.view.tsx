@@ -37,7 +37,7 @@ export function UserProfileBackupCodesDialogView({
       onSubmit={submit}
       {...stylex.props(styles.form)}
     >
-      <Dialog.CloseButton />
+      <Dialog.CloseButton disabled={state.isSubmitting} />
       <Card.Header>
         <Dialog.Title render={<Heading size='sm' />}>Backup codes</Dialog.Title>
         <Dialog.Description render={<Text />}>
@@ -76,6 +76,7 @@ export function UserProfileBackupCodesDialogView({
             <div {...stylex.props(styles.actions)}>
               <Button
                 type='button'
+                disabled={state.isSubmitting}
                 variant='outline'
                 onClick={onCopy}
               >
