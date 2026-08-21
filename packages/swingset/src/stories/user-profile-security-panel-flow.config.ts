@@ -19,8 +19,12 @@ export interface SecurityFlowConfig {
   availableMfaPhone: 'none' | 'verified' | 'unverified';
   backupCodesAvailable: boolean;
   hasBackupCodes: boolean;
+  backupCodeCreationResult: 'success' | 'unavailable';
+  mfaVerificationResult: 'success' | 'server-error';
   mfaRequired: boolean;
   deleteAccountAvailable: boolean;
+  otherSessionsCount: number;
+  devicesStatus: 'loading' | 'ready' | 'error';
   requireReverification: boolean;
   reverificationStrategy: ReverificationChallengeState['strategy'];
   failurePoint: 'none' | 'initial-request' | 'reverification' | 'retried-mutation';
@@ -47,8 +51,12 @@ export const DEFAULT_SECURITY_FLOW_CONFIG: SecurityFlowConfig = {
   availableMfaPhone: 'none',
   backupCodesAvailable: false,
   hasBackupCodes: false,
+  backupCodeCreationResult: 'success',
+  mfaVerificationResult: 'success',
   mfaRequired: false,
   deleteAccountAvailable: true,
+  otherSessionsCount: 0,
+  devicesStatus: 'ready',
   requireReverification: false,
   reverificationStrategy: 'email_code',
   failurePoint: 'none',

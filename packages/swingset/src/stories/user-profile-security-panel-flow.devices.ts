@@ -1,5 +1,4 @@
 import type {
-  ReverificationChallengeState,
   UserProfileDeviceDetailsFlowState,
   UserProfileDeviceSignOutFlowState,
   UserProfileSignOutAllDevicesFlowState,
@@ -8,26 +7,19 @@ import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profi
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
+import type { SecurityReverificationFlow } from './user-profile-security-panel-flow.reverification';
 
-type DevicesFlowSliceConfig = Pick<
-  SecurityFlowConfig,
-  'failurePoint' | 'latencyMs' | 'requireReverification' | 'reverificationStrategy' | 'validCode' | 'validPassword'
->;
+type DevicesFlowSliceConfig = Pick<SecurityFlowConfig, 'failurePoint' | 'latencyMs' | 'requireReverification'>;
 type DeviceOperation = 'sign-out-device' | 'sign-out-all-devices';
-
-interface DeviceReverificationState {
-  operation: DeviceOperation;
-  state: ReverificationChallengeState;
-}
-
-const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function useDevicesFlowSlice({
   config,
+  reverificationFlow,
   initialDevices,
 }: {
   config: DevicesFlowSliceConfig;
+  reverificationFlow: SecurityReverificationFlow;
   initialDevices: UserProfileDevice[];
 }) {
   const settingsRef = useRef(config);
@@ -36,9 +28,8 @@ export function useDevicesFlowSlice({
   const [device, setDevice] = useState<UserProfileDeviceDetailsFlowState | null>(null);
   const [deviceSignOut, setDeviceSignOut] = useState<UserProfileDeviceSignOutFlowState | null>(null);
   const [signOutAllDevices, setSignOutAllDevices] = useState<UserProfileSignOutAllDevicesFlowState | null>(null);
-  const [reverification, setReverification] = useState<DeviceReverificationState | null>(null);
   const deviceSignOutIdRef = useRef<string | null>(null);
-  const verificationGate = useRef<{ operation: DeviceOperation; resolve: (verified: boolean) => void } | null>(null);
+  const pendingOperations = useRef(new Set<DeviceOperation>());
   const triggerRef = useRef<HTMLElement | null>(null);
   const captureTrigger = useCallback(() => {
     const active = document.activeElement;
@@ -47,16 +38,9 @@ export function useDevicesFlowSlice({
 
   useEffect(() => setDevices(initialDevices), [initialDevices]);
 
-  const cancelReverification = useCallback(() => {
-    verificationGate.current?.resolve(false);
-    verificationGate.current = null;
-    setReverification(null);
-  }, []);
   const closeOperation = useCallback(
     (operation: DeviceOperation) => {
-      if (verificationGate.current?.operation === operation) {
-        cancelReverification();
-      }
+      reverificationFlow.cancelReverification(operation);
       if (operation === 'sign-out-device') {
         setDeviceSignOut(null);
         deviceSignOutIdRef.current = null;
@@ -64,7 +48,7 @@ export function useDevicesFlowSlice({
         setSignOutAllDevices(null);
       }
     },
-    [cancelReverification],
+    [reverificationFlow],
   );
   const setSubmitting = useCallback((operation: DeviceOperation, isSubmitting: boolean, formError?: string) => {
     const errors = formError ? { form: formError } : {};
@@ -81,53 +65,40 @@ export function useDevicesFlowSlice({
       setSignOutAllDevices(current => (current ? { ...current, isSubmitting, errors } : current));
     }
   }, []);
-  const requestReverification = useCallback((operation: DeviceOperation) => {
-    if (!settingsRef.current.requireReverification) {
-      return Promise.resolve(true);
-    }
-    const strategy = settingsRef.current.reverificationStrategy;
-    setReverification({
-      operation,
-      state: {
-        strategy,
-        identifier:
-          strategy === 'email_code' ? 'i••••@clerk.dev' : strategy === 'phone_code' ? '+1 ••• ••• 4242' : undefined,
-        value: '',
-        status: 'idle',
-        errors: {},
-        resend: IDLE_RESEND,
-      },
-    });
-    return new Promise<boolean>(resolve => {
-      verificationGate.current = { operation, resolve };
-    });
-  }, []);
   const runMutation = useCallback(
     async (operation: DeviceOperation, onSuccess: () => void) => {
-      setSubmitting(operation, true);
-      await sleep(settingsRef.current.latencyMs);
-      if (settingsRef.current.failurePoint === 'initial-request') {
-        setSubmitting(operation, false, 'Something went wrong. Please try again.');
+      if (pendingOperations.current.has(operation)) {
         return;
       }
-      const verified = await requestReverification(operation);
-      if (!verified) {
-        setSubmitting(operation, false);
-        if (operation === 'sign-out-device') {
-          setDeviceSignOut(null);
-        }
-        return;
-      }
-      if (settingsRef.current.requireReverification) {
+      pendingOperations.current.add(operation);
+      try {
+        setSubmitting(operation, true);
         await sleep(settingsRef.current.latencyMs);
-        if (settingsRef.current.failurePoint === 'retried-mutation') {
+        if (settingsRef.current.failurePoint === 'initial-request') {
           setSubmitting(operation, false, 'Something went wrong. Please try again.');
           return;
         }
+        const verified = await reverificationFlow.requestReverification(operation);
+        if (!verified) {
+          setSubmitting(operation, false);
+          if (operation === 'sign-out-device') {
+            setDeviceSignOut(null);
+          }
+          return;
+        }
+        if (settingsRef.current.requireReverification) {
+          await sleep(settingsRef.current.latencyMs);
+          if (settingsRef.current.failurePoint === 'retried-mutation') {
+            setSubmitting(operation, false, 'Something went wrong. Please try again.');
+            return;
+          }
+        }
+        onSuccess();
+      } finally {
+        pendingOperations.current.delete(operation);
       }
-      onSuccess();
     },
-    [requestReverification, setSubmitting],
+    [reverificationFlow, setSubmitting],
   );
 
   const openDevice = useCallback(
@@ -158,7 +129,7 @@ export function useDevicesFlowSlice({
   const signOutDevice = useCallback(
     (id: string) => {
       const selected = devices.find(candidate => candidate.id === id);
-      if (!selected || selected.isCurrent || selected.isRevoking) {
+      if (!selected || selected.isCurrent || selected.isRevoking || pendingOperations.current.has('sign-out-device')) {
         return;
       }
       captureTrigger();
@@ -182,7 +153,7 @@ export function useDevicesFlowSlice({
     setSignOutAllDevices({ isSubmitting: false, errors: {} });
   }, [captureTrigger]);
   const submitSignOutAllDevices = useCallback(() => {
-    if (signOutAllDevices?.isSubmitting) {
+    if (signOutAllDevices?.isSubmitting || pendingOperations.current.has('sign-out-all-devices')) {
       return;
     }
     void runMutation('sign-out-all-devices', () => {
@@ -194,82 +165,12 @@ export function useDevicesFlowSlice({
     setDevices(current => current.filter(candidate => candidate.isCurrent));
   }, []);
 
-  const updateVerificationValue = useCallback((value: string) => {
-    setReverification(current =>
-      current ? { ...current, state: { ...current.state, value, status: 'idle', errors: {} } } : current,
-    );
-  }, []);
-  const submitVerification = useCallback(
-    async (completedValue?: string) => {
-      const current = reverification;
-      if (!current) {
-        return;
-      }
-      setReverification(value =>
-        value ? { ...value, state: { ...value.state, status: 'verifying', errors: {} } } : value,
-      );
-      await sleep(settingsRef.current.latencyMs);
-      const expected =
-        current.state.strategy === 'password'
-          ? settingsRef.current.validPassword
-          : current.state.strategy === 'passkey'
-            ? ''
-            : settingsRef.current.validCode;
-      if (
-        settingsRef.current.failurePoint === 'reverification' ||
-        (completedValue ?? current.state.value) !== expected
-      ) {
-        setReverification(value =>
-          value
-            ? {
-                ...value,
-                state: {
-                  ...value.state,
-                  value: '',
-                  status: 'error',
-                  errors:
-                    settingsRef.current.failurePoint === 'reverification'
-                      ? { form: 'Something went wrong. Please try again.' }
-                      : {
-                          field:
-                            value.state.strategy === 'password'
-                              ? 'Incorrect password.'
-                              : 'Incorrect code. Please try again.',
-                        },
-                },
-              }
-            : value,
-        );
-        return;
-      }
-      const gate = verificationGate.current;
-      verificationGate.current = null;
-      setReverification(null);
-      gate?.resolve(true);
-    },
-    [reverification],
-  );
-  const resendReverification = useCallback(async () => {
-    setReverification(current =>
-      current
-        ? { ...current, state: { ...current.state, resend: { ...current.state.resend, isResending: true } } }
-        : current,
-    );
-    await sleep(settingsRef.current.latencyMs);
-    setReverification(current =>
-      current
-        ? { ...current, state: { ...current.state, resend: { ...current.state.resend, isResending: false } } }
-        : current,
-    );
-  }, []);
-
   return {
     triggerRef,
     devices,
     device,
     deviceSignOut,
     signOutAllDevices,
-    reverification,
     openDevice,
     signOutDevice,
     closeDevice: () => {
@@ -285,9 +186,5 @@ export function useDevicesFlowSlice({
     },
     submitSignOutAllDevices,
     signOutOtherSessions,
-    updateVerificationValue,
-    submitVerification,
-    resendReverification,
-    cancelReverification,
   };
 }

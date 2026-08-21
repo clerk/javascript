@@ -1,5 +1,4 @@
 import type {
-  ReverificationChallengeState,
   UserProfileBackupCodesFlowState,
   UserProfileMfaAddFlowState,
   UserProfileMfaMethodType,
@@ -9,10 +8,12 @@ import type { UserProfileMfaMethod } from '@clerk/ui/mosaic/user-profile/user-pr
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
+import type { SecurityReverificationFlow } from './user-profile-security-panel-flow.reverification';
 
 type MfaFlowSliceConfig = Pick<
   SecurityFlowConfig,
   | 'availableMfaPhone'
+  | 'backupCodeCreationResult'
   | 'backupCodesAvailable'
   | 'failurePoint'
   | 'hasBackupCodes'
@@ -20,17 +21,11 @@ type MfaFlowSliceConfig = Pick<
   | 'hasMfaPhone'
   | 'latencyMs'
   | 'mfaRequired'
+  | 'mfaVerificationResult'
   | 'requireReverification'
-  | 'reverificationStrategy'
   | 'validCode'
-  | 'validPassword'
 >;
 type MfaOperation = 'add-mfa' | 'remove-mfa' | 'backup-codes';
-
-interface MfaReverificationState {
-  operation: MfaOperation;
-  state: ReverificationChallengeState;
-}
 
 const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const GENERATED_BACKUP_CODES = [
@@ -47,10 +42,12 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function useMfaFlowSlice({
   config,
+  reverificationFlow,
   onMfaMethodChange,
   onBackupCodesChange,
 }: {
   config: MfaFlowSliceConfig;
+  reverificationFlow: SecurityReverificationFlow;
   onMfaMethodChange?: (method: UserProfileMfaMethodType, enabled: boolean) => void;
   onBackupCodesChange?: (enabled: boolean) => void;
 }) {
@@ -62,8 +59,10 @@ export function useMfaFlowSlice({
   const [addMfa, setAddMfa] = useState<UserProfileMfaAddFlowState | null>(null);
   const [removeMfa, setRemoveMfa] = useState<UserProfileMfaRemoveFlowState | null>(null);
   const [backupCodes, setBackupCodes] = useState<UserProfileBackupCodesFlowState | null>(null);
-  const [reverification, setReverification] = useState<MfaReverificationState | null>(null);
-  const verificationGate = useRef<{ operation: MfaOperation; resolve: (verified: boolean) => void } | null>(null);
+  const pendingOperations = useRef(new Set<MfaOperation>());
+  const mfaCodeVerificationPending = useRef(false);
+  const smsPreparationPending = useRef(false);
+  const smsResendPending = useRef(false);
   const triggerRef = useRef<HTMLElement | null>(null);
   const captureTrigger = useCallback(() => {
     const active = document.activeElement;
@@ -84,16 +83,9 @@ export function useMfaFlowSlice({
     [config.hasBackupCodes, config.hasMfaAuthenticator, config.hasMfaPhone, config.mfaRequired],
   );
 
-  const cancelReverification = useCallback(() => {
-    verificationGate.current?.resolve(false);
-    verificationGate.current = null;
-    setReverification(null);
-  }, []);
   const closeOperation = useCallback(
     (operation: MfaOperation) => {
-      if (verificationGate.current?.operation === operation) {
-        cancelReverification();
-      }
+      reverificationFlow.cancelReverification(operation);
       if (operation === 'add-mfa') {
         setAddMfa(null);
       } else if (operation === 'remove-mfa') {
@@ -102,7 +94,7 @@ export function useMfaFlowSlice({
         setBackupCodes(null);
       }
     },
-    [cancelReverification],
+    [reverificationFlow],
   );
   const setSubmitting = useCallback((operation: MfaOperation, isSubmitting: boolean, formError?: string) => {
     const errors = formError ? { form: formError } : {};
@@ -123,66 +115,64 @@ export function useMfaFlowSlice({
       setBackupCodes(current => (current ? { step: 'generating', isSubmitting, errors } : current));
     }
   }, []);
-  const requestReverification = useCallback((operation: MfaOperation) => {
-    if (!settingsRef.current.requireReverification) {
-      return Promise.resolve(true);
-    }
-    const strategy = settingsRef.current.reverificationStrategy;
-    setReverification({
-      operation,
-      state: {
-        strategy,
-        identifier:
-          strategy === 'email_code' ? 'i••••@clerk.dev' : strategy === 'phone_code' ? '+1 ••• ••• 4242' : undefined,
-        value: '',
-        status: 'idle',
-        errors: {},
-        resend: IDLE_RESEND,
-      },
-    });
-    return new Promise<boolean>(resolve => {
-      verificationGate.current = { operation, resolve };
-    });
-  }, []);
   const runMutation = useCallback(
-    async (operation: MfaOperation, onSuccess: () => void) => {
-      setSubmitting(operation, true);
-      await sleep(settingsRef.current.latencyMs);
-      if (settingsRef.current.failurePoint === 'initial-request') {
-        setSubmitting(operation, false, 'Something went wrong. Please try again.');
+    async (
+      operation: MfaOperation,
+      onSuccess: () => void,
+      { closeOnReverificationCancel = false }: { closeOnReverificationCancel?: boolean } = {},
+    ) => {
+      if (pendingOperations.current.has(operation)) {
         return;
       }
-      const verified = await requestReverification(operation);
-      if (!verified) {
-        setSubmitting(operation, false);
-        if (operation === 'backup-codes') {
-          closeOperation(operation);
-        }
-        return;
-      }
-      if (settingsRef.current.requireReverification) {
+      pendingOperations.current.add(operation);
+      try {
+        setSubmitting(operation, true);
         await sleep(settingsRef.current.latencyMs);
-        if (settingsRef.current.failurePoint === 'retried-mutation') {
+        if (settingsRef.current.failurePoint === 'initial-request') {
           setSubmitting(operation, false, 'Something went wrong. Please try again.');
           return;
         }
+        const verified = await reverificationFlow.requestReverification(operation);
+        if (!verified) {
+          setSubmitting(operation, false);
+          if (operation === 'backup-codes' || closeOnReverificationCancel) {
+            closeOperation(operation);
+          }
+          return;
+        }
+        if (settingsRef.current.requireReverification) {
+          await sleep(settingsRef.current.latencyMs);
+          if (settingsRef.current.failurePoint === 'retried-mutation') {
+            setSubmitting(operation, false, 'Something went wrong. Please try again.');
+            return;
+          }
+        }
+        onSuccess();
+      } finally {
+        pendingOperations.current.delete(operation);
       }
-      onSuccess();
     },
-    [closeOperation, requestReverification, setSubmitting],
+    [closeOperation, reverificationFlow, setSubmitting],
   );
 
   const completeMfaEnrollment = useCallback(
     (method: UserProfileMfaMethodType, identifier?: string) => {
+      const hasBackupCodes = mfaMethods.some(candidate => candidate.type === 'backup-codes');
+      const generatedBackupCodes =
+        settingsRef.current.backupCodesAvailable &&
+        !hasBackupCodes &&
+        settingsRef.current.backupCodeCreationResult === 'success';
       const nextMethod: UserProfileMfaMethod =
         method === 'sms'
           ? {
               id: `sms-${Date.now()}`,
               type: 'sms',
               description: identifier,
-              isDefault: !mfaMethods.some(candidate => candidate.type === 'sms'),
+              isDefault:
+                !mfaMethods.some(candidate => candidate.type === 'authenticator') &&
+                !mfaMethods.some(candidate => candidate.type === 'sms'),
             }
-          : { id: 'authenticator', type: 'authenticator' };
+          : { id: 'authenticator', type: 'authenticator', isDefault: true };
       setMfaMethods(methods =>
         withMfaRemovalConstraints(
           [
@@ -192,15 +182,13 @@ export function useMfaFlowSlice({
                 : candidate.type !== method && candidate.type !== 'backup-codes',
             ),
             nextMethod,
-            ...(settingsRef.current.backupCodesAvailable
-              ? [{ id: 'backup-codes', type: 'backup-codes' as const }]
-              : methods.filter(candidate => candidate.type === 'backup-codes')),
+            ...(hasBackupCodes || generatedBackupCodes ? [{ id: 'backup-codes', type: 'backup-codes' as const }] : []),
           ],
           settingsRef.current.mfaRequired,
         ),
       );
       onMfaMethodChange?.(method, true);
-      if (settingsRef.current.backupCodesAvailable) {
+      if (generatedBackupCodes) {
         onBackupCodesChange?.(true);
         setAddMfa({
           method,
@@ -217,45 +205,59 @@ export function useMfaFlowSlice({
     [closeOperation, mfaMethods, onBackupCodesChange, onMfaMethodChange],
   );
   const prepareAuthenticator = useCallback(() => {
+    if (pendingOperations.current.has('add-mfa')) {
+      return;
+    }
     setAddMfa({ method: 'authenticator', step: 'preparing', isSubmitting: true, errors: {} });
-    void runMutation('add-mfa', () =>
-      setAddMfa({
-        method: 'authenticator',
-        step: 'setup',
-        displayFormat: 'qr',
-        secret: 'JBSWY3DPEHPK3PXP',
-        uri: 'otpauth://totp/Clerk:preston@clerk.dev?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
-        copied: false,
-        isSubmitting: false,
-        errors: {},
-      }),
+    void runMutation(
+      'add-mfa',
+      () =>
+        setAddMfa({
+          method: 'authenticator',
+          step: 'setup',
+          displayFormat: 'qr',
+          secret: 'JBSWY3DPEHPK3PXP',
+          uri: 'otpauth://totp/Clerk:preston@clerk.dev?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
+          copied: false,
+          isSubmitting: false,
+          errors: {},
+        }),
+      { closeOnReverificationCancel: true },
     );
   }, [runMutation]);
   const prepareSms = useCallback(async (identifier: string, returnStep: 'select-phone' | 'phone') => {
-    setAddMfa({ method: 'sms', step: 'preparing-sms', identifier, returnStep, isSubmitting: true, errors: {} });
-    await sleep(settingsRef.current.latencyMs);
-    if (settingsRef.current.failurePoint === 'initial-request') {
-      setAddMfa({
-        method: 'sms',
-        step: 'preparing-sms',
-        identifier,
-        returnStep,
-        isSubmitting: false,
-        errors: { form: 'Could not send a verification code.' },
-      });
+    if (smsPreparationPending.current) {
       return;
     }
-    setAddMfa({
-      method: 'sms',
-      step: 'verify',
-      identifier,
-      code: '',
-      status: 'idle',
-      resend: IDLE_RESEND,
-      returnStep,
-      isSubmitting: false,
-      errors: {},
-    });
+    smsPreparationPending.current = true;
+    try {
+      setAddMfa({ method: 'sms', step: 'preparing-sms', identifier, returnStep, isSubmitting: true, errors: {} });
+      await sleep(settingsRef.current.latencyMs);
+      if (settingsRef.current.failurePoint === 'initial-request') {
+        setAddMfa({
+          method: 'sms',
+          step: 'preparing-sms',
+          identifier,
+          returnStep,
+          isSubmitting: false,
+          errors: { form: 'Could not send a verification code.' },
+        });
+        return;
+      }
+      setAddMfa({
+        method: 'sms',
+        step: 'verify',
+        identifier,
+        code: '',
+        status: 'idle',
+        resend: IDLE_RESEND,
+        returnStep,
+        isSubmitting: false,
+        errors: {},
+      });
+    } finally {
+      smsPreparationPending.current = false;
+    }
   }, []);
   const openAddMfa = useCallback(
     (method: UserProfileMfaMethodType) => {
@@ -285,7 +287,7 @@ export function useMfaFlowSlice({
   const selectMfaPhone = useCallback(
     (id: string) => {
       captureTrigger();
-      if (!addMfa || addMfa.step !== 'select-phone') {
+      if (!addMfa || addMfa.step !== 'select-phone' || pendingOperations.current.has('add-mfa')) {
         return;
       }
       const phone = addMfa.phones.find(candidate => candidate.id === id);
@@ -306,7 +308,7 @@ export function useMfaFlowSlice({
   const submitAddMfa = useCallback(
     async (completedCode?: string) => {
       const current = addMfa;
-      if (!current || current.isSubmitting) {
+      if (!current || current.isSubmitting || mfaCodeVerificationPending.current) {
         return;
       }
       if (current.step === 'preparing') {
@@ -327,18 +329,34 @@ export function useMfaFlowSlice({
           errors: {},
         });
       } else if (current.step === 'verify') {
-        setAddMfa(value => (value?.step === 'verify' ? { ...value, status: 'verifying', errors: {} } : value));
-        await sleep(settingsRef.current.latencyMs);
-        if ((completedCode ?? current.code) !== settingsRef.current.validCode) {
-          setAddMfa(value =>
-            value?.step === 'verify'
-              ? { ...value, code: '', status: 'error', errors: { field: 'Incorrect code. Please try again.' } }
-              : value,
-          );
-        } else if (current.method === 'sms') {
-          void runMutation('add-mfa', () => completeMfaEnrollment('sms', current.identifier));
-        } else {
-          completeMfaEnrollment('authenticator');
+        mfaCodeVerificationPending.current = true;
+        try {
+          setAddMfa(value => (value?.step === 'verify' ? { ...value, status: 'verifying', errors: {} } : value));
+          await sleep(settingsRef.current.latencyMs);
+          if (settingsRef.current.mfaVerificationResult === 'server-error') {
+            setAddMfa(value =>
+              value?.step === 'verify'
+                ? {
+                    ...value,
+                    status: 'error',
+                    isSubmitting: false,
+                    errors: { form: 'Something went wrong. Please try again.' },
+                  }
+                : value,
+            );
+          } else if ((completedCode ?? current.code) !== settingsRef.current.validCode) {
+            setAddMfa(value =>
+              value?.step === 'verify'
+                ? { ...value, code: '', status: 'error', errors: { field: 'Incorrect code. Please try again.' } }
+                : value,
+            );
+          } else if (current.method === 'sms') {
+            void runMutation('add-mfa', () => completeMfaEnrollment('sms', current.identifier));
+          } else {
+            completeMfaEnrollment('authenticator');
+          }
+        } finally {
+          mfaCodeVerificationPending.current = false;
         }
       }
     },
@@ -363,7 +381,7 @@ export function useMfaFlowSlice({
     [captureTrigger, mfaMethods],
   );
   const submitRemoveMfa = useCallback(() => {
-    if (!removeMfa || removeMfa.isSubmitting) {
+    if (!removeMfa || removeMfa.isSubmitting || pendingOperations.current.has('remove-mfa')) {
       return;
     }
     const { id, method } = removeMfa;
@@ -380,28 +398,59 @@ export function useMfaFlowSlice({
     });
   }, [closeOperation, mfaMethods, onMfaMethodChange, removeMfa, runMutation]);
   const regenerateBackupCodes = useCallback(() => {
+    if (
+      backupCodes?.isSubmitting ||
+      pendingOperations.current.has('backup-codes') ||
+      !settingsRef.current.backupCodesAvailable
+    ) {
+      return;
+    }
     setBackupCodes({ step: 'generating', isSubmitting: true, errors: {} });
     void runMutation('backup-codes', () => {
+      if (settingsRef.current.backupCodeCreationResult === 'unavailable') {
+        setBackupCodes({ step: 'unavailable', isSubmitting: false, errors: {} });
+        return;
+      }
+      setMfaMethods(methods =>
+        methods.some(method => method.type === 'backup-codes')
+          ? methods
+          : [...methods, { id: 'backup-codes', type: 'backup-codes' }],
+      );
+      onBackupCodesChange?.(true);
       setBackupCodes({ step: 'codes', codes: GENERATED_BACKUP_CODES, isSubmitting: false, errors: {} });
     });
-  }, [runMutation]);
+  }, [backupCodes?.isSubmitting, onBackupCodesChange, runMutation]);
   const openBackupCodes = useCallback(() => {
+    if (!settingsRef.current.backupCodesAvailable) {
+      return;
+    }
     captureTrigger();
     regenerateBackupCodes();
   }, [captureTrigger, regenerateBackupCodes]);
   const setDefaultMfa = useCallback((id: string) => {
     setMfaMethods(methods =>
-      methods.map(method => (method.type === 'sms' ? { ...method, isDefault: method.id === id } : method)),
+      withMfaRemovalConstraints(
+        methods.map(method => (method.type === 'sms' ? { ...method, isDefault: method.id === id } : method)),
+        settingsRef.current.mfaRequired,
+      ),
     );
   }, []);
   const resendMfaCode = useCallback(async () => {
+    if (smsResendPending.current) {
+      return;
+    }
+    smsResendPending.current = true;
     setAddMfa(current =>
       current?.step === 'verify' ? { ...current, resend: { ...current.resend, isResending: true } } : current,
     );
-    await sleep(settingsRef.current.latencyMs);
-    setAddMfa(current =>
-      current?.step === 'verify' ? { ...current, resend: { isResending: false, secondsRemaining: 30 } } : current,
-    );
+    try {
+      await sleep(settingsRef.current.latencyMs);
+      setAddMfa(current =>
+        current?.step === 'verify' ? { ...current, resend: { isResending: false, secondsRemaining: 30 } } : current,
+      );
+    } finally {
+      smsResendPending.current = false;
+    }
   }, []);
 
   useEffect(() => {
@@ -462,82 +511,12 @@ export function useMfaFlowSlice({
     });
   }, []);
 
-  const updateVerificationValue = useCallback((value: string) => {
-    setReverification(current =>
-      current ? { ...current, state: { ...current.state, value, status: 'idle', errors: {} } } : current,
-    );
-  }, []);
-  const submitVerification = useCallback(
-    async (completedValue?: string) => {
-      const current = reverification;
-      if (!current) {
-        return;
-      }
-      setReverification(value =>
-        value ? { ...value, state: { ...value.state, status: 'verifying', errors: {} } } : value,
-      );
-      await sleep(settingsRef.current.latencyMs);
-      const expected =
-        current.state.strategy === 'password'
-          ? settingsRef.current.validPassword
-          : current.state.strategy === 'passkey'
-            ? ''
-            : settingsRef.current.validCode;
-      if (
-        settingsRef.current.failurePoint === 'reverification' ||
-        (completedValue ?? current.state.value) !== expected
-      ) {
-        setReverification(value =>
-          value
-            ? {
-                ...value,
-                state: {
-                  ...value.state,
-                  value: '',
-                  status: 'error',
-                  errors:
-                    settingsRef.current.failurePoint === 'reverification'
-                      ? { form: 'Something went wrong. Please try again.' }
-                      : {
-                          field:
-                            value.state.strategy === 'password'
-                              ? 'Incorrect password.'
-                              : 'Incorrect code. Please try again.',
-                        },
-                },
-              }
-            : value,
-        );
-        return;
-      }
-      const gate = verificationGate.current;
-      verificationGate.current = null;
-      setReverification(null);
-      gate?.resolve(true);
-    },
-    [reverification],
-  );
-  const resendReverification = useCallback(async () => {
-    setReverification(current =>
-      current
-        ? { ...current, state: { ...current.state, resend: { ...current.state.resend, isResending: true } } }
-        : current,
-    );
-    await sleep(settingsRef.current.latencyMs);
-    setReverification(current =>
-      current
-        ? { ...current, state: { ...current.state, resend: { ...current.state.resend, isResending: false } } }
-        : current,
-    );
-  }, []);
-
   return {
     triggerRef,
     mfaMethods,
     addMfa,
     removeMfa,
     backupCodes,
-    reverification,
     openAddMfa,
     closeAddMfa: () => {
       if (!addMfa?.isSubmitting) {
@@ -579,10 +558,6 @@ export function useMfaFlowSlice({
       }
     },
     regenerateBackupCodes,
-    updateVerificationValue,
-    submitVerification,
-    resendReverification,
-    cancelReverification,
   };
 }
 
@@ -601,9 +576,18 @@ function methodsFromConfig(
       ...(hasMfaPhone
         ? phones.length > 0
           ? phones
-          : [{ id: 'sms', type: 'sms' as const, description: '+1 801-888-8181', isDefault: true }]
+          : [
+              {
+                id: 'sms',
+                type: 'sms' as const,
+                description: '+1 801-888-8181',
+                isDefault: !hasMfaAuthenticator,
+              },
+            ]
         : []),
-      ...(hasMfaAuthenticator ? [authenticator ?? { id: 'authenticator', type: 'authenticator' as const }] : []),
+      ...(hasMfaAuthenticator
+        ? [authenticator ?? { id: 'authenticator', type: 'authenticator' as const, isDefault: true }]
+        : []),
       ...(hasBackupCodes && (hasMfaPhone || hasMfaAuthenticator)
         ? [backupCodes ?? { id: 'backup-codes', type: 'backup-codes' as const }]
         : []),
@@ -613,8 +597,22 @@ function methodsFromConfig(
 }
 
 function withMfaRemovalConstraints(methods: UserProfileMfaMethod[], mfaRequired: boolean) {
-  const configuredCount = methods.filter(method => method.type !== 'backup-codes').length;
-  return methods.map(method => ({
+  const hasAuthenticator = methods.some(method => method.type === 'authenticator');
+  const hasDefaultPhone = methods.some(method => method.type === 'sms' && method.isDefault);
+  let assignedPhoneDefault = false;
+  const normalizedMethods = methods.map(method => {
+    if (method.type === 'authenticator') {
+      return { ...method, isDefault: true };
+    }
+    if (method.type !== 'sms') {
+      return method;
+    }
+    const isDefault = !hasAuthenticator && !assignedPhoneDefault && (method.isDefault || !hasDefaultPhone);
+    assignedPhoneDefault ||= isDefault;
+    return { ...method, isDefault };
+  });
+  const configuredCount = normalizedMethods.filter(method => method.type !== 'backup-codes').length;
+  return normalizedMethods.map(method => ({
     ...method,
     removable: method.type === 'backup-codes' ? undefined : !mfaRequired || configuredCount > 1,
   }));

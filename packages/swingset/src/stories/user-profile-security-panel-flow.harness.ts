@@ -6,6 +6,7 @@ import { useDevicesFlowSlice } from './user-profile-security-panel-flow.devices'
 import { useMfaFlowSlice } from './user-profile-security-panel-flow.mfa';
 import { usePasskeysFlowSlice } from './user-profile-security-panel-flow.passkeys';
 import { usePasswordFlowSlice } from './user-profile-security-panel-flow.password';
+import { useSecurityReverificationFlow } from './user-profile-security-panel-flow.reverification';
 
 export { DEFAULT_SECURITY_FLOW_CONFIG, type SecurityFlowConfig } from './user-profile-security-panel-flow.config';
 
@@ -32,31 +33,24 @@ export function useUserProfileSecurityPanelFlow({
   afterMultiSessionSingleSignOutUrl?: string;
   onSetActive?: (result: { session: null; redirectUrl: string }) => void;
 }) {
-  const activeDevices = useDevicesFlowSlice({ config, initialDevices });
+  const reverificationFlow = useSecurityReverificationFlow(config);
+  const activeDevices = useDevicesFlowSlice({ config, reverificationFlow, initialDevices });
   const password = usePasswordFlowSlice({
     config,
+    reverificationFlow,
     onHasPasswordChange,
     onSignOutOtherSessions: activeDevices.signOutOtherSessions,
   });
-  const passkeys = usePasskeysFlowSlice({ config, onHasPasskeyChange });
-  const mfa = useMfaFlowSlice({ config, onMfaMethodChange, onBackupCodesChange });
+  const passkeys = usePasskeysFlowSlice({ config, reverificationFlow, onHasPasskeyChange });
+  const mfa = useMfaFlowSlice({ config, reverificationFlow, onMfaMethodChange, onBackupCodesChange });
   const deletion = useDeleteFlowSlice({
     config,
+    reverificationFlow,
     otherSessionsCount,
     afterSignOutUrl,
     afterMultiSessionSingleSignOutUrl,
     onSetActive,
   });
-
-  const activeReverificationFlow = password.reverification
-    ? password
-    : passkeys.reverification
-      ? passkeys
-      : mfa.reverification
-        ? mfa
-        : activeDevices.reverification
-          ? activeDevices
-          : deletion;
 
   return {
     config,
@@ -80,12 +74,7 @@ export function useUserProfileSecurityPanelFlow({
     device: activeDevices.device,
     deviceSignOut: activeDevices.deviceSignOut,
     signOutAllDevices: activeDevices.signOutAllDevices,
-    reverification:
-      password.reverification ??
-      passkeys.reverification ??
-      mfa.reverification ??
-      activeDevices.reverification ??
-      deletion.reverification,
+    reverification: reverificationFlow.reverification,
     openPassword: password.openPassword,
     closePassword: password.closePassword,
     updatePasswordValue: password.updatePasswordValue,
@@ -128,9 +117,9 @@ export function useUserProfileSecurityPanelFlow({
     openSignOutAllDevices: activeDevices.openSignOutAllDevices,
     closeSignOutAllDevices: activeDevices.closeSignOutAllDevices,
     submitSignOutAllDevices: activeDevices.submitSignOutAllDevices,
-    updateVerificationValue: activeReverificationFlow.updateVerificationValue,
-    submitVerification: activeReverificationFlow.submitVerification,
-    resendReverification: activeReverificationFlow.resendReverification,
-    cancelReverification: activeReverificationFlow.cancelReverification,
+    updateVerificationValue: reverificationFlow.updateVerificationValue,
+    submitVerification: reverificationFlow.submitVerification,
+    resendReverification: reverificationFlow.resendReverification,
+    cancelReverification: reverificationFlow.cancelReverification,
   };
 }
