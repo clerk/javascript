@@ -1,15 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Button } from '../components/button';
 import { Badge } from '../components/badge';
-import { Spinner } from '../components/spinner';
+import { Button } from '../components/button';
 import { Section } from '../components/section';
+import { Spinner } from '../components/spinner';
 import type { UserProfileDeviceDetails, UserProfileDeviceSignOutFlowState } from './dialogs/flow.types';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
+import { fill, plural, userProfileSecurityBase as m } from './user-profile-security.messages';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
 import { styles } from './user-profile-security-panel.styles';
-import { fill, plural, userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfileDevice {
   id: string;
@@ -165,7 +165,7 @@ function DeviceItem({
     actions.push({ label: m.devices.viewDetails, onClick: () => onManage(device.id) });
   }
   if (onSignOut && !isRevoking) {
-    actions.push({ label: m.common.signOut, color: 'negative', onClick: () => onSignOut(device.id) });
+    actions.push({ label: m.devices.signOut, color: 'negative', onClick: () => onSignOut(device.id) });
   }
 
   return (
