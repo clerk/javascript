@@ -57,6 +57,19 @@ internal fun biometricCredentialAvailabilityPayload(
     )
 }
 
+internal fun biometricCredentialEnvironmentAvailabilityPayload(
+    isInitialized: Boolean
+): Map<String, Any?>? {
+    if (isInitialized) {
+        return null
+    }
+
+    return mapOf(
+        "isAvailable" to false,
+        "unavailableReason" to "environment_unavailable"
+    )
+}
+
 internal fun biometricCredentialPayload(biometricCredential: BiometricCredential): Map<String, Any?> {
     return mapOf(
         "id" to biometricCredential.id,
@@ -574,6 +587,12 @@ class ClerkExpoModule : Module() {
         identifierHint: String?,
         promise: Promise
     ) {
+        val environmentAvailability = biometricCredentialEnvironmentAvailabilityPayload(Clerk.isInitialized.value)
+        if (environmentAvailability != null) {
+            promise.resolve(environmentAvailability)
+            return
+        }
+
         coroutineScope.launch {
             try {
                 val availability = Clerk.biometricCredentials.availability(id, identifierHint)

@@ -67,6 +67,16 @@ describe.each([
     });
   });
 
+  test('forwards undefined when enrolling without parameters', async () => {
+    const credential = { id: 'td_123' };
+    mocks.biometricCredentials.enroll.mockResolvedValue(credential);
+
+    const { result } = renderHook(() => useTrustedDevices());
+    await expect(result.current.enroll()).resolves.toBe(credential);
+
+    expect(mocks.biometricCredentials.enroll).toHaveBeenCalledWith(undefined);
+  });
+
   test('preserves the other trusted-device operations', () => {
     const { result } = renderHook(() => useTrustedDevices());
 
@@ -77,6 +87,10 @@ describe.each([
   });
 });
 
-test('keeps the trusted-device error guard as an alias', () => {
-  expect(isTrustedDeviceError).toBe(isBiometricCredentialError);
+test('keeps the trusted-device error guard behavior', () => {
+  const error = Object.assign(new Error('Unavailable'), { code: 'environment_unavailable' });
+  const nonError = { code: 'environment_unavailable' };
+
+  expect(isTrustedDeviceError(error)).toBe(isBiometricCredentialError(error));
+  expect(isTrustedDeviceError(nonError)).toBe(isBiometricCredentialError(nonError));
 });

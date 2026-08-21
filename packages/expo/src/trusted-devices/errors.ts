@@ -11,4 +11,6 @@ export type TrustedDeviceErrorCode = BiometricCredentialErrorCode;
 export type TrustedDeviceError = BiometricCredentialError;
 
 /** @deprecated Use `isBiometricCredentialError()` instead. */
-export const isTrustedDeviceError = isBiometricCredentialError;
+export function isTrustedDeviceError(error: unknown): error is TrustedDeviceError {
+  return isBiometricCredentialError(error);
+}

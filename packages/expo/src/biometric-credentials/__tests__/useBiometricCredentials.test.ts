@@ -597,11 +597,17 @@ describe('useBiometricCredentials on Android', () => {
 
 describe('useBiometricCredentials on unsupported platforms', () => {
   test('returns stable operation identities', () => {
-    expect(useBiometricCredentialsOnUnsupportedPlatform()).toBe(useBiometricCredentialsOnUnsupportedPlatform());
+    const { result, rerender } = renderHook(() => useBiometricCredentialsOnUnsupportedPlatform());
+    const biometricCredentials = result.current;
+
+    rerender();
+
+    expect(result.current).toBe(biometricCredentials);
   });
 
   test('reports unsupported availability without invoking native code', async () => {
-    const availability = await useBiometricCredentialsOnUnsupportedPlatform().getAvailability();
+    const biometricCredentials = renderBiometricCredentials(useBiometricCredentialsOnUnsupportedPlatform);
+    const availability = await biometricCredentials.getAvailability();
 
     expect(availability).toEqual({
       isAvailable: false,
@@ -610,7 +616,9 @@ describe('useBiometricCredentials on unsupported platforms', () => {
   });
 
   test('rejects operations that require the native implementation', async () => {
-    await expect(useBiometricCredentialsOnUnsupportedPlatform().enroll()).rejects.toThrow(
+    const biometricCredentials = renderBiometricCredentials(useBiometricCredentialsOnUnsupportedPlatform);
+
+    await expect(biometricCredentials.enroll()).rejects.toThrow(
       'Biometric credentials are currently only available on iOS and Android.',
     );
   });
