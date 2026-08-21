@@ -11,7 +11,6 @@ type ReverificationFlowConfig = Pick<
 export type SecurityReverificationOperation =
   | 'password'
   | 'add-passkey'
-  | 'rename-passkey'
   | 'remove-passkey'
   | 'add-mfa'
   | 'remove-mfa'
