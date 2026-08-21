@@ -59,9 +59,7 @@ export const userProfileSecurityBase = {
   },
   passkeys: {
     addTitle: 'Add passkey',
-    addDescription: 'Your browser or device will ask you to create a passkey for this account.',
     addPending: 'Adding passkey',
-    unsupported: 'This browser or device does not support creating passkeys.',
     renameTitle: 'Rename passkey',
     renameDescription: 'Change the passkey name to make it easier to find.',
     name: 'Passkey name',

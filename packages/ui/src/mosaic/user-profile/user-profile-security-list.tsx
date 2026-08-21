@@ -13,6 +13,7 @@ export function UserProfileSecurityList({
   hasItems,
   onAdd,
   addControl,
+  notice,
   children,
 }: {
   sectionTitle?: string;
@@ -22,6 +23,7 @@ export function UserProfileSecurityList({
   hasItems: boolean;
   onAdd?: () => void;
   addControl?: ReactNode;
+  notice?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -54,6 +56,11 @@ export function UserProfileSecurityList({
               </Section.Actions>
             ) : null}
           </Section.Item>
+          {notice ? (
+            <Section.Item>
+              <Section.Content>{notice}</Section.Content>
+            </Section.Item>
+          ) : null}
           <Section.Items>
             {hasItems ? (
               children

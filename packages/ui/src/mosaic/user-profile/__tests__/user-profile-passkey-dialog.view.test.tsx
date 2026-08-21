@@ -6,66 +6,11 @@ import { MosaicProvider } from '../../MosaicProvider';
 import { AlertDialog } from '../../components/alert-dialog';
 import { Dialog } from '../../components/dialog';
 import {
-  UserProfilePasskeyAddDialogView,
   UserProfilePasskeyRemoveDialogView,
   UserProfilePasskeyRenameDialogView,
 } from '../user-profile-passkey-dialog.view';
 
 describe('passkey dialog views', () => {
-  it('submits passkey creation from the dialog', async () => {
-    const onAdd = vi.fn();
-    const user = userEvent.setup();
-    render(
-      <MosaicProvider>
-        <PasskeyDialog>
-          <UserProfilePasskeyAddDialogView
-            state={{ isSubmitting: false, errors: {} }}
-            onAdd={onAdd}
-            onCancel={vi.fn()}
-          />
-        </PasskeyDialog>
-      </MosaicProvider>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-    expect(onAdd).toHaveBeenCalledOnce();
-  });
-
-  it('announces passkey creation failures and pending state', () => {
-    render(
-      <MosaicProvider>
-        <PasskeyDialog>
-          <UserProfilePasskeyAddDialogView
-            state={{ isSubmitting: true, errors: { form: 'Passkey creation was canceled.' } }}
-            onAdd={vi.fn()}
-            onCancel={vi.fn()}
-          />
-        </PasskeyDialog>
-      </MosaicProvider>,
-    );
-
-    const dialog = screen.getByRole('dialog', { name: 'Add passkey' });
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('Passkey creation was canceled.');
-    expect(within(dialog).getByRole('button', { name: 'Add passkey' })).toHaveAttribute('aria-busy', 'true');
-  });
-
-  it('disables passkey creation when the browser capability is unavailable', () => {
-    render(
-      <MosaicProvider>
-        <PasskeyDialog>
-          <UserProfilePasskeyAddDialogView
-            state={{ capability: 'unsupported', isSubmitting: false, errors: {} }}
-            onAdd={vi.fn()}
-            onCancel={vi.fn()}
-          />
-        </PasskeyDialog>
-      </MosaicProvider>,
-    );
-
-    expect(screen.getByText('This browser or device does not support creating passkeys.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add passkey' })).toBeDisabled();
-  });
-
   it('only submits a changed passkey name', async () => {
     const onNameChange = vi.fn();
     const onRename = vi.fn();

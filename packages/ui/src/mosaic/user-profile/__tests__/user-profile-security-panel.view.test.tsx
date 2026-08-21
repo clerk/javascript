@@ -146,6 +146,30 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 
+  it('renders passkey creation progress and errors in the section', () => {
+    const pending = renderView({
+      passkeyCreationState: { capability: 'available', result: 'idle', isSubmitting: true, errors: {} },
+      onAddPasskey: vi.fn(),
+    });
+
+    expect(screen.getByRole('button', { name: 'Add passkey' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('progressbar', { name: 'Adding passkey' })).toBeInTheDocument();
+    pending.unmount();
+
+    renderView({
+      passkeyCreationState: {
+        capability: 'unsupported',
+        result: 'idle',
+        isSubmitting: false,
+        errors: { form: 'Passkeys are not supported by this browser or device.' },
+      },
+      onAddPasskey: vi.fn(),
+    });
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Passkeys are not supported by this browser or device.');
+    expect(screen.getByRole('button', { name: 'Add passkey' })).toBeDisabled();
+  });
+
   it('only offers verification methods enabled by the instance', async () => {
     const user = userEvent.setup();
     renderView({

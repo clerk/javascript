@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 
 import { Heading } from '../components/heading';
 import { mergeStyleProps, themeProps } from '../props';
+import type { UserProfilePasskeyCreationState } from './dialogs/flow.types';
 import type {
   UserProfileActiveDevicesSectionViewProps,
   UserProfileDevice,
@@ -24,6 +25,7 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
   /** Whether this instance allows the user to set a password. Defaults to `hasPassword`. */
   passwordAvailable?: boolean;
   passkeys?: UserProfilePasskey[];
+  passkeyCreationState?: UserProfilePasskeyCreationState | null;
   mfaMethods?: UserProfileMfaMethod[];
   mfaAddableMethods?: UserProfileMfaAddableMethod[];
   devices?: UserProfileDevice[];
@@ -45,6 +47,7 @@ export function UserProfileSecurityPanelView({
   hasPassword = false,
   passwordAvailable = hasPassword,
   passkeys,
+  passkeyCreationState,
   mfaMethods,
   mfaAddableMethods,
   devices,
@@ -86,6 +89,7 @@ export function UserProfileSecurityPanelView({
             {passkeys !== undefined ? (
               <UserProfilePasskeysSectionView
                 passkeys={passkeys}
+                creationState={passkeyCreationState}
                 sectionTitle={passwordAvailable ? undefined : m.sections.authentication}
                 onAdd={onAddPasskey}
                 onManage={onManagePasskey}

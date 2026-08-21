@@ -495,16 +495,11 @@ export interface UserProfileBackupCodesFlowActions {
   onPrint: () => void;
 }
 
-export interface UserProfilePasskeyAddFlowState {
+export interface UserProfilePasskeyCreationState {
   capability?: 'available' | 'unsupported';
   result?: 'idle' | 'cancelled' | 'resource-error';
   isSubmitting: boolean;
   errors: FlowErrors;
-}
-
-export interface UserProfilePasskeyAddFlowActions {
-  onCancel: () => void;
-  onAdd: () => void;
 }
 
 export interface UserProfilePasskeyRenameFlowState {

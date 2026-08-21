@@ -38,8 +38,10 @@ export function Default() {
       lastUsedAtLabel: 'Last used 1h ago',
     },
   ]);
-  const { openAddPasskeyDialog, openRenamePasskeyDialog, openRemovePasskeyDialog, passkeyDialogs } =
-    usePasskeyDialogStory({ passkeys, onChange: setPasskeys });
+  const { addPasskey, openRenamePasskeyDialog, openRemovePasskeyDialog, passkeyDialogs } = usePasskeyDialogStory({
+    passkeys,
+    onChange: setPasskeys,
+  });
   const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>([
     { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
     { id: 'backup-codes', type: 'backup-codes' },
@@ -111,7 +113,7 @@ export function Default() {
         mfaMethods={mfaMethods}
         passkeys={passkeys}
         onAddMfaMethod={openAddMfaDialog}
-        onAddPasskey={openAddPasskeyDialog}
+        onAddPasskey={addPasskey}
         onChangePassword={openPasswordDialog}
         onDeleteAccount={openDeleteAccountDialog}
         onManageDevice={openDevice}
