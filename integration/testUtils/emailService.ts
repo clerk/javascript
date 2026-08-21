@@ -29,8 +29,12 @@ function isMessage(value: unknown): value is Message {
 }
 
 export const createEmailService = () => {
+  const cleanEmail = (email: string) => {
+    return email.replace(/\+.*@/, '@');
+  };
+
   const filterMessagesByAddress = async (email: string, sub?: string) => {
-    const url = new URL(`https://mailsac.com/inbox/${encodeURIComponent(email)}`);
+    const url = new URL(`https://mailsac.com/inbox/${encodeURIComponent(cleanEmail(email))}`);
     // Retry in case the email delivery is delayed
     await new Promise(res => setTimeout(res, 1500));
     for (let attempt = 0; attempt < 20; attempt++) {
@@ -48,7 +52,7 @@ export const createEmailService = () => {
         const messages = json.props?.pageProps?.seedInboxMessages ?? [];
         const normalizedSubject = sub?.toLowerCase();
         const message = messages.find(
-          value =>
+          (value): value is Message =>
             isMessage(value) &&
             !consumedMessageIds.has(value._id) &&
             (!normalizedSubject || value.subject.toLowerCase().includes(normalizedSubject)),
