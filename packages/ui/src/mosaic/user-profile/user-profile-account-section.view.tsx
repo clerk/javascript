@@ -5,6 +5,8 @@ import { Badge } from '../components/badge';
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
+import { AccountSectionDialogsView } from './dialogs/account-section-dialogs.view';
+import type { AccountSectionFlows } from './dialogs/flow.types';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { styles } from './user-profile-profile-panel.styles';
@@ -25,7 +27,15 @@ export interface UserProfilePhone {
   canRemove?: boolean;
 }
 
-export interface UserProfileAccountSectionViewProps {
+/**
+ * The section's rows, plus the dialogs those rows open.
+ *
+ * The flow props are optional: with none supplied the section renders exactly as before, so
+ * anything that wants only the rows — the profile panel, the section's own story — is unaffected.
+ * Supplying them makes the section render the surfaces too, which is where they belong. The view
+ * renders the dialogs; it does not decide when they are open. See {@link AccountSectionFlows}.
+ */
+export interface UserProfileAccountSectionViewProps extends AccountSectionFlows {
   allowMultipleAccounts?: boolean;
   imageUrl?: string;
   name: string;
@@ -49,6 +59,11 @@ export interface UserProfileAccountSectionViewProps {
 
 export function UserProfileAccountSectionView({
   allowMultipleAccounts = false,
+  flowTriggerRef,
+  addContact,
+  confirmContact,
+  editProfile,
+  reverification,
   imageUrl,
   name,
   username,
@@ -195,6 +210,16 @@ export function UserProfileAccountSectionView({
           onVerify={onVerifyPhone}
         />
       ) : null}
+      <AccountSectionDialogsView
+        addContact={addContact}
+        confirmContact={confirmContact}
+        editProfile={editProfile}
+        fallback={initials}
+        flowTriggerRef={flowTriggerRef}
+        name={name}
+        reverification={reverification}
+        username={username}
+      />
     </div>
   );
 }
