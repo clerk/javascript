@@ -106,7 +106,7 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     expect(screen.getByRole('menuitem', { name: 'Phone number' })).toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
-    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    await user.click(screen.getByRole('button', { name: 'Sign out of all other devices' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));

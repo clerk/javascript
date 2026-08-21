@@ -73,7 +73,7 @@ export function UserProfileActiveDevicesSectionView({
                       variant='outline'
                       onClick={onSignOutAllOtherDevices}
                     >
-                      Sign out of all devices
+                      Sign out of all other devices
                     </Button>
                   </Section.Actions>
                 ) : null}
