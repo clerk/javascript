@@ -21,7 +21,8 @@ export const meta: StoryMeta = {
 
 export function Default() {
   const [config, setConfig] = useState(DEFAULT_SECURITY_FLOW_CONFIG);
-  const flow = useDeleteSectionFlow({ config });
+  const [completion, setCompletion] = useState<{ session: null; redirectUrl: string } | null>(null);
+  const flow = useDeleteSectionFlow({ config, onSetActive: setCompletion });
 
   return (
     <div style={storyColumn}>
@@ -35,6 +36,7 @@ export function Default() {
       </label>
       <UserProfileDeleteSectionView onDelete={flow.openDeleteAccount} />
       <DeleteSectionFlowDialogs flow={flow} />
+      {completion ? <output>Active session cleared; redirect to {completion.redirectUrl}</output> : null}
     </div>
   );
 }

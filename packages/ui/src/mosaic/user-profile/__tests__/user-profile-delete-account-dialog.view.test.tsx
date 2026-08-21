@@ -88,6 +88,7 @@ describe('UserProfileDeleteAccountDialogView', () => {
     );
 
     expect(screen.getByRole('button', { name: 'Delete account' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
     expect(screen.getByRole('progressbar', { name: 'Deleting account' })).toBeInTheDocument();
   });
 });

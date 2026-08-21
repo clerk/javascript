@@ -71,6 +71,7 @@ export function UserProfileDeleteAccountDialogView({
         <AlertDialog.Actions>
           <Button
             type='button'
+            disabled={isSubmitting}
             variant='outline'
             onClick={onCancel}
           >
