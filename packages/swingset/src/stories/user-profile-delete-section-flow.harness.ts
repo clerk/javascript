@@ -20,7 +20,19 @@ const CONFIRMATION = 'Delete account';
 const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export function useDeleteSectionFlow({ config }: { config: DeleteSectionFlowConfig }) {
+export function useDeleteSectionFlow({
+  config,
+  otherSessionsCount = 0,
+  afterSignOutUrl = '/sign-in',
+  afterMultiSessionSingleSignOutUrl = '/select-account',
+  onSetActive,
+}: {
+  config: DeleteSectionFlowConfig;
+  otherSessionsCount?: number;
+  afterSignOutUrl?: string;
+  afterMultiSessionSingleSignOutUrl?: string;
+  onSetActive?: (result: { session: null; redirectUrl: string }) => void;
+}) {
   const settingsRef = useRef(config);
   settingsRef.current = config;
   const [deleteAccount, setDeleteAccount] = useState<UserProfileDeleteAccountFlowState | null>(null);
@@ -99,9 +111,19 @@ export function useDeleteSectionFlow({ config }: { config: DeleteSectionFlowConf
           return;
         }
       }
+      const redirectUrl = otherSessionsCount === 0 ? afterSignOutUrl : afterMultiSessionSingleSignOutUrl;
+      onSetActive?.({ session: null, redirectUrl });
       closeDeleteAccount();
     })();
-  }, [closeDeleteAccount, deleteAccount, requestReverification]);
+  }, [
+    afterMultiSessionSingleSignOutUrl,
+    afterSignOutUrl,
+    closeDeleteAccount,
+    deleteAccount,
+    onSetActive,
+    otherSessionsCount,
+    requestReverification,
+  ]);
 
   const updateVerificationValue = useCallback((value: string) => {
     setReverification(current =>
