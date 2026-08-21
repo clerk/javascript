@@ -71,6 +71,7 @@ function SignUpRoutes(): JSX.Element {
         <Route path='verify'>
           <SignUpEmailLinkFlowComplete
             redirectUrlComplete={signUpContext.afterSignUpUrl}
+            ssoCallbackUrl={signUpContext.ssoCallbackUrl}
             verifyEmailPath='../verify-email-address'
             verifyPhonePath='../verify-phone-number'
           />
