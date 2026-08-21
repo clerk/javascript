@@ -48,6 +48,7 @@ export function useBackupCodesDialogStory() {
                       link.click();
                       URL.revokeObjectURL(url);
                     }}
+                    onPrint={() => window.print()}
                   />
                 ) : null}
               </Freeze>
