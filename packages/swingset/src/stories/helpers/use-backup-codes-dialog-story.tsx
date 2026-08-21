@@ -12,7 +12,6 @@ export function useBackupCodesDialogStory() {
     backupCodesDialog: (
       <Dialog.Root
         size='card'
-        closedBy='closerequest'
         open={Boolean(state)}
         onOpenChange={open => {
           if (!open) {

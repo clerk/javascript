@@ -108,7 +108,6 @@ function PasskeyDialog({
 }) {
   return (
     <Dialog.Root
-      closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
     >
