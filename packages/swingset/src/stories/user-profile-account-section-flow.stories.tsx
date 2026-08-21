@@ -27,7 +27,9 @@ export { default as __source } from './user-profile-account-section-flow.stories
 export const meta: StoryMeta = {
   group: 'User Profile',
   title: 'UserProfileAccountSectionFlow',
-  label: 'Account',
+  // Not a component name: there is no `<UserProfileAccountSectionFlow />`, so the sidebar and the
+  // breadcrumb show this instead. `title` still drives the slug.
+  label: 'User profile account flow',
   layout: 'wide',
   navigation: { category: 'Flows' },
   source: 'packages/ui/src/mosaic/user-profile/dialogs/add-contact-dialog.view.tsx',
