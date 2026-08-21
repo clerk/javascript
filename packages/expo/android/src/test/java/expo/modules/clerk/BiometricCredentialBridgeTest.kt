@@ -13,6 +13,19 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class BiometricCredentialBridgeTest {
+    private fun keyManagerException(
+        code: BiometricCredentialKeyManagerException.Code,
+        message: String
+    ): BiometricCredentialKeyManagerException {
+        val constructor = BiometricCredentialKeyManagerException::class.java.getDeclaredConstructor(
+            BiometricCredentialKeyManagerException.Code::class.java,
+            String::class.java,
+            Throwable::class.java
+        )
+        constructor.isAccessible = true
+        return constructor.newInstance(code, message, null)
+    }
+
     @Test
     fun `requires Clerk initialization before biometric-credential operations`() {
         assertEquals(
@@ -23,6 +36,18 @@ class BiometricCredentialBridgeTest {
             biometricCredentialEnvironmentError(isInitialized = false)
         )
         assertNull(biometricCredentialEnvironmentError(isInitialized = true))
+    }
+
+    @Test
+    fun `reports unavailable biometric credentials before Clerk initialization`() {
+        assertEquals(
+            mapOf(
+                "isAvailable" to false,
+                "unavailableReason" to "environment_unavailable"
+            ),
+            biometricCredentialEnvironmentAvailabilityPayload(isInitialized = false)
+        )
+        assertNull(biometricCredentialEnvironmentAvailabilityPayload(isInitialized = true))
     }
 
     @Test
@@ -120,6 +145,39 @@ class BiometricCredentialBridgeTest {
             ),
             biometricCredentialBridgeError(
                 failure = failure,
+                fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
+                fallbackMessage = "Unable to sign in with biometric credential"
+            )
+        )
+    }
+
+    @Test
+    fun `normalizes key-manager exceptions from bridge operations`() {
+        assertEquals(
+            BiometricCredentialBridgeError(
+                code = "key_invalidated",
+                message = "The biometric credential key was invalidated."
+            ),
+            biometricCredentialBridgeError(
+                throwable = keyManagerException(
+                    BiometricCredentialKeyManagerException.Code.KEY_INVALIDATED,
+                    "The biometric credential key was invalidated."
+                ),
+                fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
+                fallbackMessage = "Unable to sign in with biometric credential"
+            )
+        )
+    }
+
+    @Test
+    fun `uses fallback details for plain bridge exceptions`() {
+        assertEquals(
+            BiometricCredentialBridgeError(
+                code = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
+                message = "Unable to sign in with biometric credential"
+            ),
+            biometricCredentialBridgeError(
+                throwable = Exception(),
                 fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
                 fallbackMessage = "Unable to sign in with biometric credential"
             )

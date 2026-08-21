@@ -54,6 +54,8 @@ Biometric credential enrollment and sign-in are supported in development builds 
 
 Biometric credential operations preserve Clerk API and native biometric error codes. Use `isBiometricCredentialError(error)` to safely inspect `error.code`; unrecognized error codes remain available for forward compatibility, while unfamiliar platform and status values are normalized to `unknown`.
 
+`useTrustedDevices()` and the trusted-device types remain available as deprecated compatibility aliases. New code should use `useBiometricCredentials()` and the biometric credential types; the previous `deviceName` enrollment option is forwarded to `name`.
+
 #### Face ID on iOS
 
 Apps that use Face ID for biometric credential enrollment or sign-in must provide `NSFaceIDUsageDescription`. You can have the Clerk config plugin add it during prebuild:
