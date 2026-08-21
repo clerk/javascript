@@ -4,7 +4,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
 import { AlertDialog } from '../../components/alert-dialog';
-import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import {
   UserProfilePasskeyAddDialogView,
@@ -112,16 +111,7 @@ function PasskeyDialog({ children }: { children: React.ReactNode }) {
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Viewport>
-          <Dialog.Popup
-            render={
-              <Card.Root
-                elevation='overlay'
-                renderBranding={false}
-              />
-            }
-          >
-            {children}
-          </Dialog.Popup>
+          <Dialog.Popup>{children}</Dialog.Popup>
         </Dialog.Viewport>
       </Dialog.Portal>
     </Dialog.Root>

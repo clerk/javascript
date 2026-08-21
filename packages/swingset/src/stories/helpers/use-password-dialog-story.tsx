@@ -1,4 +1,3 @@
-import { Card } from '@clerk/ui/mosaic/components/card';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import type {
@@ -57,14 +56,7 @@ export function usePasswordDialogStory({
         <Dialog.Portal>
           <Dialog.Backdrop />
           <Dialog.Viewport>
-            <Dialog.Popup
-              render={
-                <Card.Root
-                  elevation='overlay'
-                  renderBranding={false}
-                />
-              }
-            >
+            <Dialog.Popup>
               <UserProfilePasswordDialogView
                 canSubmit={canSubmit}
                 isInterrupted={verificationOpen}
