@@ -1,12 +1,12 @@
 'use client';
 import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
 import { InitialStateProvider } from '@clerk/shared/react';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
+import { errorThrower } from '../../server/errorThrower';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -15,14 +15,6 @@ import { invalidateCacheAction } from '../server-actions';
 import { ClerkScripts } from './ClerkScripts';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
-
-/**
- * LazyCreateKeylessApplication should only be loaded if the conditions below are met.
- * Note: Using lazy() with Suspense instead of dynamic is not possible as React will throw a hydration error when `ClerkProvider` wraps `<html><body>...`
- */
-const LazyCreateKeylessApplication = dynamic(() =>
-  import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
-);
 
 const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderProps<TUi>) => {
   const { __internal_invokeMiddlewareOnAuthStateChange = true, __internal_scriptsSlot, children } = props;
@@ -115,9 +107,5 @@ export const ClientClerkProvider = <TUi extends Ui = Ui>(
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 
-  return (
-    <LazyCreateKeylessApplication>
-      <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>
-    </LazyCreateKeylessApplication>
-  );
+  return errorThrower.throwMissingPublishableKeyError();
 };

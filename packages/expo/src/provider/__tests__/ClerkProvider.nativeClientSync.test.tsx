@@ -1564,6 +1564,11 @@ describe('ClerkProvider native client sync', () => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
     });
 
+    // Bootstrap's suppressed device token write would swallow the rotation below.
+    await act(async () => {
+      await waitForPendingJsToNativeSync();
+    });
+
     // Drop the client fetches the bootstrap already made; only the 401 handling matters here.
     fetchClient.mockClear();
 
@@ -1616,6 +1621,11 @@ describe('ClerkProvider native client sync', () => {
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    // Bootstrap fetches the client too, and that fetch fails here, so drain its retries first.
+    await act(async () => {
+      await expect(waitForPendingJsToNativeSync()).rejects.toThrow('stale session 401');
     });
 
     fetchClient.mockClear();

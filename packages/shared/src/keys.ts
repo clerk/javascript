@@ -98,6 +98,14 @@ function isValidDecodedPublishableKey(decoded: string): boolean {
   return withoutTrailing.includes('.');
 }
 
+const fatalKeyGuidance = `To create a Clerk application with valid keys, in your terminal run:
+
+  npx clerk@latest init
+
+It creates a Clerk application and writes keys to your .env file. Requires no Clerk account or login and the command is non-interactive.
+
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys (\`--instance prod\` for production keys). Or copy them from https://dashboard.clerk.com/last-active?path=api-keys.`;
+
 export function parsePublishableKey(
   key: string | undefined,
   options: ParsePublishableKeyOptions & { fatal: true },
@@ -127,12 +135,10 @@ export function parsePublishableKey(
 
   if (!key || !isPublishableKey(key)) {
     if (options.fatal && !key) {
-      throw new Error(
-        'Publishable key is missing. Ensure that your publishable key is correctly configured. Double-check your environment configuration for your keys, or access them here: https://dashboard.clerk.com/last-active?path=api-keys',
-      );
+      throw new Error(`Publishable key is missing. ${fatalKeyGuidance}`);
     }
     if (options.fatal && !isPublishableKey(key)) {
-      throw new Error('Publishable key not valid.');
+      throw new Error(`Publishable key not valid (expected format: pk_test_... or pk_live_...). ${fatalKeyGuidance}`);
     }
     return null;
   }
@@ -144,14 +150,14 @@ export function parsePublishableKey(
     decodedFrontendApi = isomorphicAtob(key.split('_')[2]);
   } catch {
     if (options.fatal) {
-      throw new Error('Publishable key not valid: Failed to decode key.');
+      throw new Error(`Publishable key not valid: Failed to decode key. ${fatalKeyGuidance}`);
     }
     return null;
   }
 
   if (!isValidDecodedPublishableKey(decodedFrontendApi)) {
     if (options.fatal) {
-      throw new Error('Publishable key not valid: Decoded key has invalid format.');
+      throw new Error(`Publishable key not valid: Decoded key has invalid format. ${fatalKeyGuidance}`);
     }
     return null;
   }

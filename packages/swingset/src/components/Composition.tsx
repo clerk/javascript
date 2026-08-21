@@ -7,13 +7,13 @@ export interface CompositionPiece {
   name: string;
   /** Route to the piece's page in swingset (e.g. `/components/button`). */
   href: string;
-  /** Which Mosaic layer the piece lives in (e.g. `User`, `Components`, `Primitives`). */
+  /** Which Mosaic layer the piece lives in (e.g. `User Button`, `Components`, `Primitives`). */
   layer: string;
 }
 
 // Mosaic layers, high → low. Drives the order the composition groups render in.
 // Matches the sidebar group names.
-const LAYER_ORDER = ['User', 'Components', 'Styles', 'Primitives'];
+const LAYER_ORDER = ['User Button', 'User Profile', 'Components', 'Styles', 'Primitives'];
 
 function layerRank(layer: string): number {
   const i = LAYER_ORDER.indexOf(layer);

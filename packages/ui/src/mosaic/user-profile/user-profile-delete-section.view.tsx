@@ -15,7 +15,7 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
             <Section.Content>
               <Section.Label>Delete account</Section.Label>
               <Section.Description>
-                Permanently delete this profile and all its data. This cannot be undone.
+                Permanently delete this account and all its data. This cannot be undone.
               </Section.Description>
             </Section.Content>
             <Section.Actions>

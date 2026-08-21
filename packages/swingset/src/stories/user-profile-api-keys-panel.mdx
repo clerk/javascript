@@ -1,0 +1,21 @@
+import * as Stories from './user-profile-api-keys-panel.stories';
+
+# UserProfileApiKeysPanel
+
+Search, selection, key metadata, row actions, and pagination composed without the surrounding navigation shell.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  ]}
+/>
+
+<Story
+  name='Empty'
+  storyModule={Stories}
+/>
