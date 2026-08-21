@@ -62,7 +62,7 @@ export const mfaDialogStyles = stylex.create({
     borderWidth: '1px',
     alignItems: 'center',
     aspectRatio: '1',
-    backgroundColor: colorVars['--cl-color-neutral-faded'],
+    backgroundColor: colorVars['--cl-color-card'],
     color: colorVars['--cl-color-neutral'],
     display: 'flex',
     fontSize: typeScaleVars['--cl-text-sm-size'],
