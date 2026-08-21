@@ -23,6 +23,7 @@ export function UserProfileBackupCodesDialogView({
   onRetry,
   onCopyAndClose,
   onDownload,
+  onPrint,
 }: UserProfileBackupCodesDialogViewProps) {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -101,6 +102,14 @@ export function UserProfileBackupCodesDialogView({
                 onClick={onDownload}
               >
                 {m.common.download}
+              </Button>
+              <Button
+                type='button'
+                variant='outline'
+                {...stylex.props(styles.footerButton)}
+                onClick={onPrint}
+              >
+                {m.common.print}
               </Button>
               <Button
                 type='button'

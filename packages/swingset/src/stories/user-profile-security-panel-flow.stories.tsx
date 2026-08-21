@@ -293,6 +293,7 @@ function UserProfileSecurityPanelFlowDialogs({ flow }: { flow: ReturnType<typeof
                   downloadBackupCodes(flow.backupCodes.codes);
                 }
               }}
+              onPrint={() => window.print()}
             />
           ) : null}
         </Freeze>
@@ -1770,6 +1771,7 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
             onRetry={noop}
             onCopyAndClose={() => setOpen(false)}
             onDownload={noop}
+            onPrint={noop}
           />
           {verification}
         </FlowCardDialog>

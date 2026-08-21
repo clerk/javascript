@@ -490,6 +490,7 @@ export interface UserProfileBackupCodesFlowActions {
   onRetry: () => void;
   onCopyAndClose: () => void;
   onDownload: () => void;
+  onPrint: () => void;
 }
 
 export interface UserProfilePasskeyCreationState {

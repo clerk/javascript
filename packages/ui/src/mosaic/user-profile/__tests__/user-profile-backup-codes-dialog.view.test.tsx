@@ -11,6 +11,7 @@ const actions = {
   onRetry: vi.fn(),
   onCopyAndClose: vi.fn(),
   onDownload: vi.fn(),
+  onPrint: vi.fn(),
 };
 
 describe('UserProfileBackupCodesDialogView', () => {
@@ -72,9 +73,10 @@ describe('UserProfileBackupCodesDialogView', () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
-  it('renders download and copy-and-close actions for new backup codes', async () => {
+  it('renders download, print, and copy-and-close actions for new backup codes', async () => {
     const onCopyAndClose = vi.fn();
     const onDownload = vi.fn();
+    const onPrint = vi.fn();
     const user = userEvent.setup();
     render(
       <MosaicProvider>
@@ -90,6 +92,7 @@ describe('UserProfileBackupCodesDialogView', () => {
             {...actions}
             onCopyAndClose={onCopyAndClose}
             onDownload={onDownload}
+            onPrint={onPrint}
           />
         </BackupCodesDialog>
       </MosaicProvider>,
@@ -98,10 +101,11 @@ describe('UserProfileBackupCodesDialogView', () => {
     const dialog = screen.getByRole('dialog', { name: 'Backup codes' });
     expect(within(dialog).getByText('3k4p-7m2q')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Download' }));
+    await user.click(screen.getByRole('button', { name: 'Print' }));
     await user.click(screen.getByRole('button', { name: 'Copy and close' }));
     expect(onDownload).toHaveBeenCalledOnce();
+    expect(onPrint).toHaveBeenCalledOnce();
     expect(onCopyAndClose).toHaveBeenCalledOnce();
-    expect(screen.queryByRole('button', { name: 'Print' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument();
   });
 });
