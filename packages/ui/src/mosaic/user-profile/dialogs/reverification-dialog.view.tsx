@@ -37,8 +37,108 @@ export function ReverificationDialogView({
   onSubmit,
   onResend,
   onCancel,
+  onSelectFactor,
+  onBack,
+  onPrepare,
+  onShowHelp,
 }: ReverificationDialogViewProps) {
   const fieldId = React.useId();
+  const step = state.step ?? 'verify';
+
+  if (step === 'select-first-factor' || step === 'select-second-factor') {
+    return (
+      <>
+        <Dialog.CloseButton />
+        <DialogHeader
+          description={
+            step === 'select-second-factor'
+              ? 'Choose a second verification method to continue.'
+              : 'Choose how to verify your identity.'
+          }
+          title='Verify it’s you'
+        />
+        <DialogBody>
+          <FormAlert>{state.errors.form}</FormAlert>
+          {state.availableFactors?.map(factor => (
+            <Button
+              key={factor.id}
+              variant='outline'
+              onClick={() => onSelectFactor?.(factor.id)}
+            >
+              {factor.label}
+            </Button>
+          ))}
+        </DialogBody>
+        <DialogFooter spread>
+          <Button
+            color='neutral'
+            variant='ghost'
+            onClick={step === 'select-second-factor' ? onBack : onCancel}
+          >
+            {step === 'select-second-factor' ? 'Back' : 'Cancel'}
+          </Button>
+          {onShowHelp ? (
+            <Button
+              color='neutral'
+              variant='link'
+              onClick={onShowHelp}
+            >
+              Having trouble?
+            </Button>
+          ) : null}
+        </DialogFooter>
+      </>
+    );
+  }
+
+  if (step === 'prepare') {
+    const failed = state.preparationStatus === 'error';
+    return (
+      <>
+        <Dialog.CloseButton />
+        <DialogHeader
+          description='Preparing your verification method.'
+          title='Verify it’s you'
+        />
+        <DialogBody>
+          {failed ? <FormAlert>{state.errors.form ?? 'Could not prepare verification.'}</FormAlert> : null}
+          {!failed ? <MutedText>Preparing verification…</MutedText> : null}
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            color='neutral'
+            variant='ghost'
+            onClick={onBack ?? onCancel}
+          >
+            Back
+          </Button>
+          {failed ? <Button onClick={onPrepare}>Try again</Button> : null}
+        </DialogFooter>
+      </>
+    );
+  }
+
+  if (step === 'unavailable' || step === 'help') {
+    return (
+      <>
+        <Dialog.CloseButton />
+        <DialogHeader
+          description={
+            step === 'unavailable'
+              ? 'No verification methods are available for this account.'
+              : 'Contact support if you cannot access any verification method.'
+          }
+          title={step === 'unavailable' ? 'Unable to verify' : 'Having trouble?'}
+        />
+        <DialogBody>
+          <FormAlert>{state.errors.form}</FormAlert>
+        </DialogBody>
+        <DialogFooter>
+          <Button onClick={onBack ?? onCancel}>{onBack ? 'Back' : 'Close'}</Button>
+        </DialogFooter>
+      </>
+    );
+  }
   const isDeliveredCode = state.strategy === 'email_code' || state.strategy === 'phone_code';
   const isCode = isDeliveredCode || state.strategy === 'totp';
   const isPasskey = state.strategy === 'passkey';
@@ -117,6 +217,16 @@ export function ReverificationDialogView({
           ) : null}
         </DialogBody>
         <DialogFooter>
+          {onBack ? (
+            <Button
+              color='neutral'
+              disabled={inert}
+              variant='ghost'
+              onClick={onBack}
+            >
+              Use another method
+            </Button>
+          ) : null}
           <Button
             color='neutral'
             disabled={inert}
