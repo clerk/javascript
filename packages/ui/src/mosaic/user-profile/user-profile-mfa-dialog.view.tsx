@@ -9,6 +9,7 @@ import { Card } from '../components/card';
 import { Dialog } from '../components/dialog';
 import { Field } from '../components/field';
 import { Heading } from '../components/heading';
+import { Input } from '../components/input';
 import { Spinner } from '../components/spinner';
 import { Text } from '../components/text';
 import { themeProps } from '../props';
@@ -314,19 +315,23 @@ function AddContent({
           />
         ) : (
           <div {...stylex.props(styles.manualSetup)}>
-            <Text
-              render={<code />}
-              {...stylex.props(styles.secret)}
-            >
-              {state.secret}
-            </Text>
+            <Field.Root>
+              <Field.Label>{m.mfa.setupKey}</Field.Label>
+              <Input
+                readOnly
+                spellCheck={false}
+                value={state.secret}
+              />
+            </Field.Root>
             {state.uri ? (
-              <Text
-                render={<code />}
-                {...stylex.props(styles.secret)}
-              >
-                {state.uri}
-              </Text>
+              <Field.Root>
+                <Field.Label>{m.mfa.totpUri}</Field.Label>
+                <Input
+                  readOnly
+                  spellCheck={false}
+                  value={state.uri}
+                />
+              </Field.Root>
             ) : null}
             <Button
               size='sm'

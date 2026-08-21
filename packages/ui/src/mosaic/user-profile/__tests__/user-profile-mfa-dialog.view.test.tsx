@@ -107,7 +107,7 @@ describe('UserProfileMfaAddDialogView', () => {
     expect(onToggleDisplayFormat).toHaveBeenCalledOnce();
   });
 
-  it('exposes the authenticator URI and copy action in manual setup', async () => {
+  it('exposes the authenticator values as read-only inputs in manual setup', async () => {
     const onCopySecret = vi.fn();
     const user = userEvent.setup();
     renderAdd(
@@ -124,7 +124,12 @@ describe('UserProfileMfaAddDialogView', () => {
       { onCopySecret },
     );
 
-    expect(screen.getByText(/otpauth:\/\/totp\/Clerk/)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Setup key' })).toHaveValue('JBSWY3DPEHPK3PXP');
+    expect(screen.getByRole('textbox', { name: 'Setup key' })).toHaveAttribute('readonly');
+    expect(screen.getByRole('textbox', { name: 'TOTP URI' })).toHaveValue(
+      'otpauth://totp/Clerk:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
+    );
+    expect(screen.getByRole('textbox', { name: 'TOTP URI' })).toHaveAttribute('readonly');
     await user.click(screen.getByRole('button', { name: 'Copy setup key' }));
     expect(onCopySecret).toHaveBeenCalledOnce();
   });
