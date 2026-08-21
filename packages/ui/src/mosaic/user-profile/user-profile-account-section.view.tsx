@@ -39,6 +39,13 @@ export interface UserProfileAccountSectionViewProps extends AccountSectionFlows 
   allowMultipleAccounts?: boolean;
   imageUrl?: string;
   name: string;
+  /**
+   * The saved name as its two fields. Required to drive {@link AccountSectionFlows.editProfile}:
+   * the edit form's discard guard compares against these, and `name` cannot be split back into
+   * them without corrupting a first name that carries a space.
+   */
+  firstName?: string;
+  lastName?: string;
   username: string;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
@@ -66,6 +73,8 @@ export function UserProfileAccountSectionView({
   reverification,
   imageUrl,
   name,
+  firstName = '',
+  lastName = '',
   username,
   emails,
   phones,
@@ -215,8 +224,9 @@ export function UserProfileAccountSectionView({
         confirmContact={confirmContact}
         editProfile={editProfile}
         fallback={initials}
+        firstName={firstName}
         flowTriggerRef={flowTriggerRef}
-        name={name}
+        lastName={lastName}
         reverification={reverification}
         username={username}
       />

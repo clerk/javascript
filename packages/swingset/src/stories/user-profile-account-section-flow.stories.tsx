@@ -497,6 +497,8 @@ export function Default() {
         }
         emails={flow.emails}
         imageUrl={flow.identity.imageUrl}
+        firstName={flow.identity.firstName}
+        lastName={flow.identity.lastName}
         name={`${flow.identity.firstName} ${flow.identity.lastName}`.trim()}
         phones={flow.phones}
         username={flow.identity.username}
