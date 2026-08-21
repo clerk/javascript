@@ -7,15 +7,20 @@ export function useSignOutAllDevicesDialogStory({ onSignOut }: { onSignOut?: () 
   return {
     openSignOutAllDevicesDialog: () => setOpen(true),
     signOutAllDevicesDialog: (
-      <UserProfileSignOutAllDevicesDialogView
+      <AlertDialog
         open={open}
-        state={{ isSubmitting: false, errors: {} }}
         onOpenChange={setOpen}
-        onSignOut={() => {
-          onSignOut?.();
-          setOpen(false);
-        }}
-      />
+      >
+        <UserProfileSignOutAllDevicesDialogView
+          state={{ isSubmitting: false, errors: {} }}
+          onCancel={() => setOpen(false)}
+          onSignOut={() => {
+            onSignOut?.();
+            setOpen(false);
+          }}
+        />
+      </AlertDialog>
     ),
   };
 }
+import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
