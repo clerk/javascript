@@ -2,7 +2,7 @@ import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user
 
 import type { StoryMeta } from '@/lib/types';
 
-import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-panel-flow.config';
+import { COMPOSED_SECURITY_FLOW_CONFIG } from './user-profile-security-panel-flow.config';
 import { useUserProfileSecurityPanelMockController } from './user-profile-security-panel-flow.controller';
 
 export { default as __source } from './user-profile-security-panel.stories?raw';
@@ -17,7 +17,7 @@ export const meta: StoryMeta = {
 
 export function Default() {
   const controller = useUserProfileSecurityPanelMockController({
-    config: { ...DEFAULT_SECURITY_FLOW_CONFIG, hasBackupCodes: true, hasMfaPhone: true },
+    config: COMPOSED_SECURITY_FLOW_CONFIG,
   });
 
   return <UserProfileSecurityPanelView {...controller} />;

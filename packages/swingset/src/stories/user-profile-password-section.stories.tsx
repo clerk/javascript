@@ -3,6 +3,7 @@ import { UserProfilePasswordSectionView } from '@clerk/ui/mosaic/user-profile/us
 
 import type { StoryMeta } from '@/lib/types';
 
+import { COMPOSED_SECURITY_FLOW_CONFIG } from './user-profile-security-panel-flow.config';
 import { useUserProfileSecurityPanelMockController } from './user-profile-security-panel-flow.controller';
 
 export { default as __source } from './user-profile-password-section.stories?raw';
@@ -16,7 +17,9 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const controller = useUserProfileSecurityPanelMockController();
+  const controller = useUserProfileSecurityPanelMockController({
+    config: COMPOSED_SECURITY_FLOW_CONFIG,
+  });
 
   return (
     <>

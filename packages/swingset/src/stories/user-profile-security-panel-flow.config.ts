@@ -64,6 +64,15 @@ export const DEFAULT_SECURITY_FLOW_CONFIG: SecurityFlowConfig = {
   validPassword: 'clerk',
 };
 
+export const COMPOSED_SECURITY_FLOW_CONFIG: SecurityFlowConfig = {
+  ...DEFAULT_SECURITY_FLOW_CONFIG,
+  backupCodesAvailable: true,
+  hasBackupCodes: true,
+  hasMfaPhone: true,
+  requireReverification: true,
+  reverificationStrategy: 'email_code',
+};
+
 export function setSecurityFlowMfaMethod(
   current: SecurityFlowConfig,
   method: 'sms' | 'authenticator',
