@@ -2,19 +2,7 @@ import { Freeze } from '@clerk/headless/utils';
 import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
 import { Card } from '@clerk/ui/mosaic/components/card';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import type {
-  ReverificationChallengeState,
-  UserProfileBackupCodesFlowState,
-  UserProfileDeleteAccountFlowState,
-  UserProfileDeviceDetailsFlowState,
-  UserProfileMfaAddFlowState,
-  UserProfileMfaRemoveFlowState,
-  UserProfilePasskeyCreationState,
-  UserProfilePasskeyRemoveFlowState,
-  UserProfilePasskeyRenameFlowState,
-  UserProfilePasswordFlowState,
-  UserProfileSignOutAllDevicesFlowState,
-} from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
+import type { ReverificationChallengeState } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import { UserProfileBackupCodesDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-backup-codes-dialog.view';
 import { UserProfileDeleteAccountDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-account-dialog.view';
@@ -41,6 +29,8 @@ import {
   DEFAULT_SECURITY_FLOW_CONFIG,
   useUserProfileSecurityPanelFlow,
 } from './user-profile-security-panel-flow.harness';
+import type { SecurityReverificationOperation } from './user-profile-security-panel-flow.reverification';
+import { SECURITY_FLOW_SNAPSHOTS, type SecuritySnapshot } from './user-profile-security-panel-flow.snapshots';
 
 export { default as __source } from './user-profile-security-panel-flow.stories?raw';
 
@@ -95,19 +85,7 @@ function downloadBackupCodes(codes: string[]) {
 }
 
 function UserProfileSecurityPanelFlowDialogs({ flow }: { flow: ReturnType<typeof useUserProfileSecurityPanelFlow> }) {
-  const verificationDialog = (
-    operation:
-      | 'password'
-      | 'add-passkey'
-      | 'rename-passkey'
-      | 'remove-passkey'
-      | 'add-mfa'
-      | 'remove-mfa'
-      | 'backup-codes'
-      | 'delete-account'
-      | 'sign-out-device'
-      | 'sign-out-all-devices',
-  ) => {
+  const verificationDialog = (operation: SecurityReverificationOperation) => {
     const challenge = flow.reverification?.operation === operation ? flow.reverification.state : null;
     return (
       <Dialog
@@ -171,14 +149,13 @@ function UserProfileSecurityPanelFlowDialogs({ flow }: { flow: ReturnType<typeof
           {flow.renamePasskey ? (
             <UserProfilePasskeyRenameDialogView
               state={flow.renamePasskey}
-              isInterrupted={flow.reverification?.operation === 'rename-passkey'}
+              isInterrupted={false}
               onCancel={flow.closeRenamePasskey}
               onNameChange={flow.updatePasskeyName}
               onRename={flow.submitRenamePasskey}
             />
           ) : null}
         </Freeze>
-        {verificationDialog('rename-passkey')}
       </FlowCardDialog>
       <AlertDialog
         finalFocus={flow.passkeysTriggerRef}
@@ -661,6 +638,13 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         />
         <span style={controlName}>Instance generates backup codes</span>
       </label>
+      <RadioGroup
+        disabled={!config.backupCodesAvailable}
+        legend='Backup code result'
+        options={['success', 'unavailable'] as const}
+        value={config.backupCodeCreationResult}
+        onChange={backupCodeCreationResult => onChange({ ...config, backupCodeCreationResult })}
+      />
       <label style={{ ...controlLabel, opacity: config.hasMfaPhone || config.hasMfaAuthenticator ? 1 : 0.5 }}>
         <input
           checked={config.hasBackupCodes}
@@ -687,6 +671,13 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         />
         <span style={controlName}>Two-step verification required</span>
       </label>
+      <RadioGroup
+        disabled={!config.mfaPhoneAvailable && !config.mfaAuthenticatorAvailable}
+        legend='MFA verification result'
+        options={['success', 'server-error'] as const}
+        value={config.mfaVerificationResult}
+        onChange={mfaVerificationResult => onChange({ ...config, mfaVerificationResult })}
+      />
       <label style={controlLabel}>
         <input
           checked={config.deleteAccountAvailable}
@@ -695,6 +686,20 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         />
         <span style={controlName}>Self-service account deletion</span>
       </label>
+      <label style={controlLabel}>
+        <input
+          checked={config.otherSessionsCount > 0}
+          type='checkbox'
+          onChange={event => onChange({ ...config, otherSessionsCount: event.target.checked ? 1 : 0 })}
+        />
+        <span style={controlName}>Another signed-in account</span>
+      </label>
+      <RadioGroup
+        legend='Active devices request'
+        options={['ready', 'loading', 'error'] as const}
+        value={config.devicesStatus}
+        onChange={devicesStatus => onChange({ ...config, devicesStatus })}
+      />
       <label style={controlLabel}>
         <input
           checked={config.requireReverification}
@@ -763,6 +768,7 @@ export function Default() {
               : current.reverificationStrategy,
         };
       }),
+    otherSessionsCount: config.otherSessionsCount,
     onSetActive: setDeleteCompletion,
   });
 
@@ -773,10 +779,16 @@ export function Default() {
         onChange={setConfig}
       />
       <UserProfileSecurityPanelView
-        devices={flow.devices}
+        devices={config.devicesStatus === 'ready' ? flow.devices : []}
+        devicesError={config.devicesStatus === 'error' ? 'Sessions are unavailable.' : undefined}
+        devicesStatus={config.devicesStatus}
         deviceSignOutState={flow.deviceSignOut}
         hasPassword={flow.hasPassword}
-        mfaMethods={flow.mfaMethods}
+        mfaMethods={
+          config.mfaPhoneAvailable || config.mfaAuthenticatorAvailable || config.backupCodesAvailable
+            ? flow.mfaMethods
+            : undefined
+        }
         mfaAddableMethods={[
           ...(config.mfaPhoneAvailable ? (['sms'] as const) : []),
           ...(config.mfaAuthenticatorAvailable ? (['authenticator'] as const) : []),
@@ -788,7 +800,7 @@ export function Default() {
         onChangePassword={config.passwordAvailable ? flow.openPassword : undefined}
         onAddMfaMethod={config.mfaPhoneAvailable || config.mfaAuthenticatorAvailable ? flow.openAddMfa : undefined}
         onDeleteAccount={config.deleteAccountAvailable ? flow.openDeleteAccount : undefined}
-        onEnableBackupCodes={flow.openBackupCodes}
+        onEnableBackupCodes={config.backupCodesAvailable ? flow.openBackupCodes : undefined}
         onManageDevice={flow.openDevice}
         onManagePasskey={flow.openRenamePasskey}
         onRemoveMfaMethod={flow.openRemoveMfa}
@@ -803,25 +815,6 @@ export function Default() {
     </div>
   );
 }
-
-interface Snapshot<State> {
-  step: string;
-  variant: string;
-  state: State;
-  reverification?: ReverificationChallengeState;
-}
-
-type SecuritySnapshot =
-  | ({ flow: 'password' } & Snapshot<UserProfilePasswordFlowState>)
-  | ({ flow: 'add-passkey' } & Snapshot<UserProfilePasskeyCreationState>)
-  | ({ flow: 'rename-passkey' } & Snapshot<UserProfilePasskeyRenameFlowState>)
-  | ({ flow: 'remove-passkey' } & Snapshot<UserProfilePasskeyRemoveFlowState>)
-  | ({ flow: 'add-mfa' } & Snapshot<UserProfileMfaAddFlowState>)
-  | ({ flow: 'remove-mfa' } & Snapshot<UserProfileMfaRemoveFlowState>)
-  | ({ flow: 'backup-codes' } & Snapshot<UserProfileBackupCodesFlowState>)
-  | ({ flow: 'delete-account' } & Snapshot<UserProfileDeleteAccountFlowState>)
-  | ({ flow: 'device' } & Snapshot<UserProfileDeviceDetailsFlowState>)
-  | ({ flow: 'sign-out-all-devices' } & Snapshot<UserProfileSignOutAllDevicesFlowState>);
 
 const snapshotPicker = { display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%' } as const;
 const snapshotRow = { alignItems: 'center', display: 'flex', gap: '0.5rem' } as const;
@@ -898,732 +891,6 @@ function SnapshotPicker({
   );
 }
 
-const passwordValues = {
-  newPassword: 'correct-horse',
-  confirmPassword: 'correct-horse',
-  signOutOfOtherSessions: true,
-};
-const idleVerification: ReverificationChallengeState = {
-  strategy: 'email_code',
-  identifier: 'i••••@clerk.dev',
-  value: '',
-  status: 'idle',
-  errors: {},
-  resend: { isResending: false, secondsRemaining: 0 },
-};
-const deviceDetails: UserProfileDeviceDetailsFlowState['device'] = {
-  id: 'desktop',
-  title: 'Macbook Pro · Chrome',
-  lastActiveAtLabel: 'Last active 4 days ago',
-  deviceName: 'Macbook Pro',
-  browserName: 'Chrome 150.0.0.0',
-  ipAddress: '2600:100e:b10b:787b:e8ae:6e75:fc2f:b10',
-  location: 'Salt Lake City, UT, United States',
-  locationFlag: '🇺🇸',
-  originalSignInAtLabel: 'July 5th, 2026',
-};
-
-const SNAPSHOTS: readonly SecuritySnapshot[] = [
-  {
-    flow: 'password',
-    step: 'password',
-    variant: 'change',
-    state: {
-      mode: 'change',
-      values: { ...passwordValues, newPassword: '', confirmPassword: '' },
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'password',
-    step: 'password',
-    variant: 'set',
-    state: {
-      mode: 'set',
-      values: { ...passwordValues, newPassword: '', confirmPassword: '' },
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'password',
-    step: 'password',
-    variant: 'mismatch',
-    state: {
-      mode: 'change',
-      values: { ...passwordValues, confirmPassword: 'different-password' },
-      isSubmitting: false,
-      errors: { confirmPassword: 'Passwords do not match.' },
-    },
-  },
-  {
-    flow: 'password',
-    step: 'password',
-    variant: 'enterprise managed',
-    state: {
-      mode: 'change',
-      values: { ...passwordValues, newPassword: '', confirmPassword: '' },
-      isReadOnly: true,
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'password',
-    step: 'password',
-    variant: 'submitting',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'password',
-    step: 'password',
-    variant: 'server error',
-    state: {
-      mode: 'change',
-      values: passwordValues,
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'password',
-    step: 'password',
-    variant: 'reverification',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: idleVerification,
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'choose first factor',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: {
-      ...idleVerification,
-      step: 'select-first-factor',
-      availableFactors: [
-        { id: 'password', strategy: 'password', label: 'Password' },
-        { id: 'email', strategy: 'email_code', label: 'Email code', identifier: 'i••••@clerk.dev' },
-        { id: 'passkey', strategy: 'passkey', label: 'Passkey' },
-      ],
-    },
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'preparing code',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: { ...idleVerification, step: 'prepare', preparationStatus: 'preparing' },
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'preparation error',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: {
-      ...idleVerification,
-      step: 'prepare',
-      preparationStatus: 'error',
-      errors: { form: 'Could not send a verification code.' },
-    },
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'choose second factor',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: {
-      ...idleVerification,
-      step: 'select-second-factor',
-      stage: 'second',
-      availableFactors: [
-        { id: 'totp', strategy: 'totp', label: 'Authenticator app' },
-        { id: 'phone', strategy: 'phone_code', label: 'Phone code', identifier: '+1 ••• ••• 4242' },
-        { id: 'backup', strategy: 'backup_code', label: 'Backup code' },
-      ],
-    },
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'no methods',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: { ...idleVerification, step: 'unavailable' },
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'having trouble',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: { ...idleVerification, step: 'help' },
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'verifying',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: { ...idleVerification, value: '424242', status: 'verifying' },
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'wrong code',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: { ...idleVerification, status: 'error', errors: { field: 'Incorrect code. Please try again.' } },
-  },
-  {
-    flow: 'password',
-    step: 'reverification',
-    variant: 'server error',
-    state: { mode: 'change', values: passwordValues, isSubmitting: true, errors: {} },
-    reverification: {
-      ...idleVerification,
-      value: '424242',
-      status: 'error',
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'add-passkey',
-    step: 'add passkey',
-    variant: 'idle',
-    state: { isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'add-passkey',
-    step: 'add passkey',
-    variant: 'submitting',
-    state: { isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'add-passkey',
-    step: 'add passkey',
-    variant: 'unsupported',
-    state: {
-      capability: 'unsupported',
-      result: 'idle',
-      isSubmitting: false,
-      errors: { form: 'Passkeys are not supported by this browser or device.' },
-    },
-  },
-  {
-    flow: 'add-passkey',
-    step: 'add passkey',
-    variant: 'cancelled',
-    state: {
-      capability: 'available',
-      result: 'cancelled',
-      isSubmitting: false,
-      errors: { form: 'Passkey creation was cancelled.' },
-    },
-  },
-  {
-    flow: 'add-passkey',
-    step: 'add passkey',
-    variant: 'server error',
-    state: { isSubmitting: false, errors: { form: 'Something went wrong. Please try again.' } },
-  },
-  {
-    flow: 'add-passkey',
-    step: 'add passkey',
-    variant: 'reverification',
-    state: { isSubmitting: true, errors: {} },
-    reverification: idleVerification,
-  },
-  {
-    flow: 'rename-passkey',
-    step: 'rename passkey',
-    variant: 'unchanged',
-    state: {
-      id: 'passkey',
-      originalName: 'Passkey',
-      name: 'Passkey',
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'rename-passkey',
-    step: 'rename passkey',
-    variant: 'ready',
-    state: {
-      id: 'passkey',
-      originalName: 'Passkey',
-      name: 'Chrome on macOS',
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'rename-passkey',
-    step: 'rename passkey',
-    variant: 'submitting',
-    state: {
-      id: 'passkey',
-      originalName: 'Passkey',
-      name: 'Chrome on macOS',
-      isSubmitting: true,
-      errors: {},
-    },
-  },
-  {
-    flow: 'rename-passkey',
-    step: 'rename passkey',
-    variant: 'server error',
-    state: {
-      id: 'passkey',
-      originalName: 'Passkey',
-      name: 'Chrome on macOS',
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'remove-passkey',
-    step: 'remove passkey',
-    variant: 'idle',
-    state: { id: 'passkey', name: 'Chrome on macOS', isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'remove-passkey',
-    step: 'remove passkey',
-    variant: 'submitting',
-    state: { id: 'passkey', name: 'Chrome on macOS', isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'remove-passkey',
-    step: 'remove passkey',
-    variant: 'server error',
-    state: {
-      id: 'passkey',
-      name: 'Chrome on macOS',
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'choose phone',
-    variant: 'existing numbers',
-    state: {
-      method: 'sms',
-      step: 'select-phone',
-      phones: [
-        { id: 'verified', label: '+1 801-888-8181', isVerified: true },
-        { id: 'unverified', label: '+1 801-555-0100', isVerified: false },
-      ],
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'choose phone',
-    variant: 'enabling existing',
-    state: {
-      method: 'sms',
-      step: 'select-phone',
-      phones: [{ id: 'verified', label: '+1 801-888-8181', isVerified: true }],
-      loadingPhoneId: 'verified',
-      isSubmitting: true,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'add phone',
-    variant: 'phone number',
-    state: { method: 'sms', step: 'phone', phoneNumber: '+1', isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'add phone',
-    variant: 'submitting',
-    state: { method: 'sms', step: 'phone', phoneNumber: '+1 801 555 0100', isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify phone',
-    variant: 'code',
-    state: {
-      method: 'sms',
-      step: 'verify',
-      identifier: '+1 801 555 0100',
-      code: '',
-      status: 'idle',
-      resend: { isResending: false, secondsRemaining: 0 },
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify phone',
-    variant: 'preparing',
-    state: {
-      method: 'sms',
-      step: 'preparing-sms',
-      identifier: '+1 801 555 0100',
-      returnStep: 'phone',
-      isSubmitting: true,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify phone',
-    variant: 'preparation error',
-    state: {
-      method: 'sms',
-      step: 'preparing-sms',
-      identifier: '+1 801 555 0100',
-      returnStep: 'phone',
-      isSubmitting: false,
-      errors: { form: 'Could not send a verification code.' },
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify phone',
-    variant: 'resend cooldown',
-    state: {
-      method: 'sms',
-      step: 'verify',
-      identifier: '+1 801 555 0100',
-      code: '',
-      status: 'idle',
-      resend: { isResending: false, secondsRemaining: 24 },
-      returnStep: 'phone',
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify phone',
-    variant: 'verifying',
-    state: {
-      method: 'sms',
-      step: 'verify',
-      identifier: '+1 801 555 0100',
-      code: '424242',
-      status: 'verifying',
-      resend: { isResending: false, secondsRemaining: 0 },
-      isSubmitting: true,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify phone',
-    variant: 'wrong code',
-    state: {
-      method: 'sms',
-      step: 'verify',
-      identifier: '+1 801 555 0100',
-      code: '',
-      status: 'error',
-      resend: { isResending: false, secondsRemaining: 0 },
-      isSubmitting: false,
-      errors: { field: 'Incorrect code. Please try again.' },
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'add authenticator',
-    variant: 'preparing',
-    state: { method: 'authenticator', step: 'preparing', isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'add authenticator',
-    variant: 'preparation error',
-    state: {
-      method: 'authenticator',
-      step: 'preparing',
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'add authenticator',
-    variant: 'QR code',
-    state: {
-      method: 'authenticator',
-      step: 'setup',
-      displayFormat: 'qr',
-      secret: 'JBSWY3DPEHPK3PXP',
-      uri: 'otpauth://totp/Clerk:preston@clerk.dev?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'add authenticator',
-    variant: 'setup key',
-    state: {
-      method: 'authenticator',
-      step: 'setup',
-      displayFormat: 'key',
-      secret: 'JBSWY3DPEHPK3PXP',
-      uri: 'otpauth://totp/Clerk:preston@clerk.dev?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
-      copied: true,
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify authenticator',
-    variant: 'code',
-    state: {
-      method: 'authenticator',
-      step: 'verify',
-      code: '',
-      status: 'idle',
-      resend: { isResending: false, secondsRemaining: 0 },
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify authenticator',
-    variant: 'wrong code',
-    state: {
-      method: 'authenticator',
-      step: 'verify',
-      code: '',
-      status: 'error',
-      resend: { isResending: false, secondsRemaining: 0 },
-      isSubmitting: false,
-      errors: { field: 'Incorrect code. Please try again.' },
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify authenticator',
-    variant: 'server error',
-    state: {
-      method: 'authenticator',
-      step: 'verify',
-      code: '424242',
-      status: 'error',
-      resend: { isResending: false, secondsRemaining: 0 },
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'add-mfa',
-    step: 'verify phone',
-    variant: 'reverification',
-    state: {
-      method: 'sms',
-      step: 'verify',
-      identifier: '+1 801 555 0100',
-      code: '424242',
-      status: 'verifying',
-      resend: { isResending: false, secondsRemaining: 0 },
-      isSubmitting: true,
-      errors: {},
-    },
-    reverification: idleVerification,
-  },
-  {
-    flow: 'add-mfa',
-    step: 'backup codes after enrollment',
-    variant: 'ready',
-    state: {
-      method: 'authenticator',
-      step: 'backup-codes',
-      codes: ['3k4p-7m2q', '9w6d-2x8n', '5t1r-8c4v', '7j3f-6h9s', '2b8m-4q1k', '6n5x-9p3d'],
-      copied: false,
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'remove-mfa',
-    step: 'remove method',
-    variant: 'phone number',
-    state: {
-      method: 'sms',
-      id: 'sms',
-      label: '+1 801-888-8181',
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'remove-mfa',
-    step: 'remove method',
-    variant: 'submitting',
-    state: {
-      method: 'authenticator',
-      id: 'authenticator',
-      label: 'Authenticator app',
-      isSubmitting: true,
-      errors: {},
-    },
-  },
-  {
-    flow: 'remove-mfa',
-    step: 'remove method',
-    variant: 'authenticator',
-    state: {
-      method: 'authenticator',
-      id: 'authenticator',
-      label: 'Authenticator app',
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'remove-mfa',
-    step: 'remove method',
-    variant: 'server error',
-    state: {
-      method: 'authenticator',
-      id: 'authenticator',
-      label: 'Authenticator app',
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'backup-codes',
-    step: 'backup codes',
-    variant: 'generating',
-    state: { step: 'generating', isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'backup-codes',
-    step: 'backup codes',
-    variant: 'server error',
-    state: {
-      step: 'generating',
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'backup-codes',
-    step: 'backup codes',
-    variant: 'reverification',
-    state: { step: 'generating', isSubmitting: true, errors: {} },
-    reverification: idleVerification,
-  },
-  {
-    flow: 'backup-codes',
-    step: 'new codes',
-    variant: 'ready',
-    state: {
-      step: 'codes',
-      codes: ['3k4p-7m2q', '9w6d-2x8n', '5t1r-8c4v', '7j3f-6h9s', '2b8m-4q1k', '6n5x-9p3d'],
-      isSubmitting: false,
-      errors: {},
-    },
-  },
-  {
-    flow: 'backup-codes',
-    step: 'new codes',
-    variant: 'unavailable',
-    state: { step: 'unavailable', isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'delete-account',
-    step: 'delete account',
-    variant: 'idle',
-    state: { confirmation: '', isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'delete-account',
-    step: 'delete account',
-    variant: 'ready',
-    state: { confirmation: 'Delete account', isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'delete-account',
-    step: 'delete account',
-    variant: 'submitting',
-    state: { confirmation: 'Delete account', isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'delete-account',
-    step: 'delete account',
-    variant: 'server error',
-    state: {
-      confirmation: 'Delete account',
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'delete-account',
-    step: 'delete account',
-    variant: 'reverification',
-    state: { confirmation: 'Delete account', isSubmitting: true, errors: {} },
-    reverification: idleVerification,
-  },
-  {
-    flow: 'device',
-    step: 'device',
-    variant: 'details',
-    state: { device: deviceDetails, isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'device',
-    step: 'device',
-    variant: 'submitting',
-    state: { device: deviceDetails, isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'device',
-    step: 'device',
-    variant: 'server error',
-    state: {
-      device: deviceDetails,
-      isSubmitting: false,
-      errors: { form: 'Something went wrong. Please try again.' },
-    },
-  },
-  {
-    flow: 'device',
-    step: 'device',
-    variant: 'reverification',
-    state: { device: deviceDetails, isSubmitting: true, errors: {} },
-    reverification: idleVerification,
-  },
-  {
-    flow: 'sign-out-all-devices',
-    step: 'sign out all',
-    variant: 'idle',
-    state: { isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'sign-out-all-devices',
-    step: 'sign out all',
-    variant: 'submitting',
-    state: { isSubmitting: true, errors: {} },
-  },
-  {
-    flow: 'sign-out-all-devices',
-    step: 'sign out all',
-    variant: 'server error',
-    state: { isSubmitting: false, errors: { form: 'Something went wrong. Please try again.' } },
-  },
-  {
-    flow: 'sign-out-all-devices',
-    step: 'sign out all',
-    variant: 'reverification',
-    state: { isSubmitting: true, errors: {} },
-    reverification: idleVerification,
-  },
-];
-
 export function States() {
   return <SecurityFlowStates />;
 }
@@ -1632,7 +899,9 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [verificationOpen, setVerificationOpen] = useState(false);
-  const snapshots = flows ? SNAPSHOTS.filter(snapshot => flows.includes(snapshot.flow)) : SNAPSHOTS;
+  const snapshots = flows
+    ? SECURITY_FLOW_SNAPSHOTS.filter(snapshot => flows.includes(snapshot.flow))
+    : SECURITY_FLOW_SNAPSHOTS;
   const snapshot = snapshots[index] ?? snapshots[0];
   const noop = () => undefined;
   const verification = snapshot.reverification ? (
