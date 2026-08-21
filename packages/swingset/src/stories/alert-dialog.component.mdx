@@ -82,6 +82,70 @@ the same reason: a corner X is a way out without answering.
 Every close request — Escape or `AlertDialog.Close` — routes through `onOpenChange`, so a controlled
 consumer can decline one by not committing the state.
 
+### Confirming a close
+
+A dialog holding unsaved work should ask before discarding it. That is three pieces: a handle, a
+hook that guards the close, and the confirmation itself.
+
+```tsx
+import { AlertDialog, createConfirmHandle, useConfirmedClose } from '@clerk/ui/mosaic/components/alert-dialog';
+
+const confirm = React.useMemo(() => createConfirmHandle(), []);
+
+const onOpenChange = useConfirmedClose({
+  handle: confirm,
+  when: () => value !== '',
+  onOpenChange: setOpen,
+  confirm: {
+    title: 'Discard changes?',
+    description: 'You have not finished adding this address.',
+    actionLabel: 'Discard',
+    cancelLabel: 'Keep editing',
+    destructive: true,
+  },
+});
+
+<Dialog open={open} onOpenChange={onOpenChange} closedBy='closerequest'>
+  {/* … */}
+  <AlertDialog.Confirm handle={confirm} finalFocus={inputRef} />
+</Dialog>
+```
+
+**Render `AlertDialog.Confirm` inside the dialog it guards** — anywhere in its children. That is
+what puts the two in one floating tree, and escape ordering, the stacking styles and the refcounted
+scroll lock all read that tree. A confirmation mounted app-globally would be a sibling of the dialog
+rather than a child of it, and all three would break.
+
+**The guarded dialog must be controlled.** A veto is the absence of a commit, and an uncontrolled
+dialog has already committed by the time `onOpenChange` runs.
+
+**What it covers is every close the dialog owns**: Escape, an outside press where `closedBy` allows
+one, `Dialog.CloseButton`, `Dialog.Close`, and the `close` the `Dialog` wrapper hands its children.
+A button wired to your own `setOpen(false)` never reaches the dialog, so it bypasses the question
+silently — route those through `Dialog.Close`.
+
+`when()` is evaluated at each close request, so a close that no longer needs guarding (the form has
+just been submitted, the field cleared) passes straight through.
+
+#### Asking without a close
+
+`show()` is the same confirmation, awaited directly — for a decision that is not about closing:
+
+```tsx
+if (await confirm.show({ title: 'Delete this key?', description: 'Applications using it stop working.' })) {
+  await deleteKey();
+}
+```
+
+It resolves `true` for the action and `false` for cancel or any dismissal. Calling it while a
+confirmation is already showing returns the in-flight promise rather than opening a second one, so
+repeated close requests ask once.
+
+**`AlertDialog.Confirm` must be mounted when `show()` is called** — it is the thing that opens, and
+a `show()` with nothing mounted to answer it never resolves. Since the confirmation lives inside the
+dialog it guards, that means asking from inside that dialog, while it is open. A confirmation that
+unmounts with a question in flight answers `false` rather than leaving the `await` hanging.
+
 ## Parts
 
 | Part                      | Slot                   | Description                                                                                                                    |
@@ -96,6 +160,7 @@ consumer can decline one by not committing the state.
 | `AlertDialog.Description` | —                      | Description; wired to the popup's `aria-describedby`. Required.                                                                |
 | `AlertDialog.Close`       | —                      | Dismisses the alert; unstyled, accepts a `render` prop.                                                                        |
 | `AlertDialog.Actions`     | `alert-dialog-actions` | The response row. Cancel first.                                                                                                |
+| `AlertDialog.Confirm`     | `dialog-popup`         | A whole confirmation rendered from a `show()` call. See [Confirming a close](#confirming-a-close).                             |
 
 Every part except `Popup` and `Actions` is `Dialog`'s own component, not a wrapper around it — one
 implementation, so the two cannot drift. `Title` and `Description` are unstyled passthroughs from the

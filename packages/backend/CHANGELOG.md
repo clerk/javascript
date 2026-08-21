@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.16.10
+
+### Patch Changes
+
+- Mark the internal `createBootstrapSignedOutState` as deprecated. It is no longer used by `@clerk/nextjs` and is kept only for older published SDK versions. ([#9493](https://github.com/clerk/javascript/pull/9493)) by [@djgould](https://github.com/djgould)
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+
+## 3.16.9
+
+### Patch Changes
+
+- Reject JWT-template tokens where a session or handshake token is expected. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token in the `Authorization` header or `__session` cookie. Tokens with no category tag, and instances configured to omit it, are unaffected. ([#9469](https://github.com/clerk/javascript/pull/9469)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 3.16.8
 
 ### Patch Changes

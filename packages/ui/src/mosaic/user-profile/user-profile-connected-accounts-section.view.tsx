@@ -1,11 +1,9 @@
-import * as stylex from '@stylexjs/stylex';
-
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
-import { styles } from './user-profile-profile-panel.styles';
+import { UserProfileProviderIcon } from './user-profile-provider-icon';
 
 export interface UserProfileConnectedAccount {
   id: string;
@@ -45,18 +43,7 @@ export function UserProfileConnectedAccountsSectionView({
           return (
             <Section.Row key={account.id}>
               <Section.Item>
-                {account.iconUrl ? (
-                  <Section.Media
-                    size='xl'
-                    {...stylex.props(styles.providerMedia)}
-                  >
-                    <img
-                      alt=''
-                      src={account.iconUrl}
-                      {...stylex.props(styles.providerIcon)}
-                    />
-                  </Section.Media>
-                ) : null}
+                {account.iconUrl ? <UserProfileProviderIcon iconUrl={account.iconUrl} /> : null}
                 <Section.Content>
                   <Section.Label>{account.provider}</Section.Label>
                   {account.identifier ? <Section.Description>{account.identifier}</Section.Description> : null}

@@ -1,3 +1,4 @@
+import type { DialogFocusTarget } from '@clerk/headless/dialog';
 import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode } from 'react';
@@ -6,6 +7,7 @@ import React from 'react';
 import { useAccessibleDescriptionWarning } from '../../hooks/useAccessibleDescriptionWarning';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { Button } from '../button';
 import type {
   DialogBackdropProps,
   DialogCloseProps,
@@ -20,8 +22,11 @@ import { Dialog } from '../dialog';
 // Deep import: the part-name context and the content resolver are how one Mosaic component wraps
 // another and are deliberately absent from `../dialog`'s public surface.
 import { DialogContent, DialogPartNameContext } from '../dialog/dialog';
+import { Heading } from '../heading';
 import { reset } from '../reset.styles';
+import { Text } from '../text';
 import { styles } from './alert-dialog.styles';
+import { type ConfirmHandle, createConfirmHandle } from './confirm-handle';
 
 /**
  * An alert dialog is a `Dialog` with three decisions already made, so the props that would make
@@ -206,6 +211,73 @@ export function AlertDialog({
   );
 }
 
+export interface AlertDialogConfirmProps {
+  /** Shared with the `show()` call, or with `useConfirmedClose`, that raises this confirmation. */
+  handle: ConfirmHandle;
+  /**
+   * Where focus goes when the confirmation closes. Worth passing: the confirmation has no trigger,
+   * so by default there is nothing for focus to return to. Point it at the field the question was
+   * about and declining puts the caret back in it.
+   */
+  finalFocus?: DialogFocusTarget;
+}
+
+/**
+ * The dialog half of {@link createConfirmHandle} — an alert dialog rendered from whatever the
+ * `show()` call asked, and closed by answering it.
+ *
+ * Render it INSIDE the dialog it guards (anywhere in its children; outside its `Portal` is fine).
+ * That is what puts the two in one floating tree, which is what escape ordering, the stacking
+ * styles and the refcounted scroll lock all read.
+ */
+function Confirm({ handle, finalFocus }: AlertDialogConfirmProps) {
+  // A question can only be answered while the thing that asks it is on screen. Going away with one
+  // in flight would leave the promise unresolved forever, and `show()` short-circuits on an
+  // in-flight question — so the handle would never open a confirmation again, and a guarded dialog
+  // whose closes route through one could no longer be closed at all.
+  React.useEffect(() => () => handle.settle(false), [handle]);
+
+  return (
+    <Root
+      handle={handle.dialog}
+      onOpenChange={open => {
+        // Every close that is not the action lands here — cancel, Escape, a programmatic close —
+        // and they all mean no. The action settles `true` BEFORE closing, and `settle` is a no-op
+        // once the question is answered, so this cannot overwrite it.
+        if (!open) {
+          handle.settle(false);
+        }
+      }}
+    >
+      {({ payload }) =>
+        payload ? (
+          <Dialog.Portal>
+            <Dialog.Backdrop />
+            <Dialog.Viewport>
+              <Popup finalFocus={finalFocus}>
+                <Dialog.Title render={<Heading size='sm' />}>{payload.title}</Dialog.Title>
+                <Dialog.Description render={<Text />}>{payload.description}</Dialog.Description>
+                <Actions>
+                  <Dialog.Close render={<Button variant='outline' />}>{payload.cancelLabel ?? 'Cancel'}</Dialog.Close>
+                  <Button
+                    color={payload.destructive ? 'negative' : undefined}
+                    onClick={() => {
+                      handle.settle(true);
+                      handle.dialog.close();
+                    }}
+                  >
+                    {payload.actionLabel ?? 'Confirm'}
+                  </Button>
+                </Actions>
+              </Popup>
+            </Dialog.Viewport>
+          </Dialog.Portal>
+        ) : null
+      }
+    </Root>
+  );
+}
+
 /**
  * Compound parts. The ones an alert dialog does not change are `Dialog`'s own — same components,
  * not wrappers around them, so there is one implementation of each and no way for the two to
@@ -223,3 +295,6 @@ AlertDialog.Title = Dialog.Title;
 AlertDialog.Description = Dialog.Description;
 AlertDialog.Close = Dialog.Close;
 AlertDialog.Actions = Actions;
+AlertDialog.Confirm = Confirm;
+/** Creates the handle pairing an awaitable `show()` with an `<AlertDialog.Confirm>`. */
+AlertDialog.createConfirmHandle = createConfirmHandle;

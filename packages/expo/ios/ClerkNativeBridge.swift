@@ -939,6 +939,7 @@ final class ClerkNativeBridge {
 
   // MARK: - Inline View Creation
 
+  @MainActor
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
@@ -958,6 +959,10 @@ final class ClerkNativeBridge {
         darkTheme: darkTheme,
         logoState: logoState,
         logoMaxHeight: logoMaxHeight
+      )
+      .environment(
+        \.clerkAuthFlowCompletionAction,
+        ClerkAuthFlowCompletionAction { onEvent(.dismissed, [:]) }
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
