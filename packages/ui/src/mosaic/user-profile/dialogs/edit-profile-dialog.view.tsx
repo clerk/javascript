@@ -219,6 +219,8 @@ export function EditAvatarDialogView({
                 type='file'
                 onChange={event => {
                   const file = event.target.files?.[0];
+                  // Cleared so re-picking the same file after a failed upload still fires `change`.
+                  event.target.value = '';
                   if (file) {
                     onSelectFile(file);
                   }
@@ -252,7 +254,7 @@ export function EditAvatarDialogView({
               Cancel
             </Button>
             <SubmitButton
-              disabled={busy || !state.fileName}
+              disabled={isInterrupted || state.status === 'removing' || !state.fileName}
               isPending={state.status === 'uploading'}
               pendingLabel='Uploading'
             >

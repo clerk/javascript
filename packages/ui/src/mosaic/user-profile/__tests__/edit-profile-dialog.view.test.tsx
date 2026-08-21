@@ -159,17 +159,38 @@ describe('EditAvatarDialogView', () => {
     expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
   });
 
-  it('names the staged file and enables Upload', () => {
+  it('names the staged file and enables Upload', async () => {
+    const handlers = avatarHandlers();
     renderDialog(
       <EditAvatarDialogView
         fallback='PB'
         state={{ ...AVATAR, fileName: 'headshot.png' }}
-        {...avatarHandlers()}
+        {...handlers}
       />,
     );
 
     expect(screen.getByText('headshot.png')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Upload' })).not.toHaveAttribute('aria-disabled', 'true');
+    const upload = screen.getByRole('button', { name: 'Upload' });
+    expect(upload).toBeEnabled();
+    expect(upload).not.toHaveAttribute('aria-disabled', 'true');
+
+    await userEvent.click(upload);
+    expect(handlers.onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it('stays focusable while the upload runs, rather than dropping out of the tab order', () => {
+    renderDialog(
+      <EditAvatarDialogView
+        fallback='PB'
+        state={{ ...AVATAR, fileName: 'headshot.png', status: 'uploading' }}
+        {...avatarHandlers()}
+      />,
+    );
+
+    const upload = screen.getByRole('button', { name: /Upload/ });
+    expect(upload).toBeEnabled();
+    expect(upload).toHaveAttribute('aria-disabled', 'true');
+    expect(upload).toHaveAttribute('aria-busy', 'true');
   });
 
   it('passes a chosen file up rather than validating it itself', async () => {

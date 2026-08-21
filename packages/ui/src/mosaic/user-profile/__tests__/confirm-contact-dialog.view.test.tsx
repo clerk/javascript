@@ -12,7 +12,7 @@ import { ReverificationDialogView } from '../dialogs/reverification-dialog.view'
 const IDLE: ConfirmContactActionState = { identifier: 'item2@clerk.dev', isSubmitting: false, errors: {} };
 
 function renderAlert(children: React.ReactNode) {
-  render(
+  return render(
     <MosaicProvider>
       <AlertDialog defaultOpen>{children}</AlertDialog>
     </MosaicProvider>,
@@ -51,18 +51,41 @@ describe('RemoveContactDialogView', () => {
 
   it('confirms, then locks both actions while the removal is in flight', async () => {
     const onConfirm = vi.fn();
-    renderAlert(
+    const onCancel = vi.fn();
+    const { rerender } = renderAlert(
       <RemoveContactDialogView
         isVerified
         kind='phone'
         state={IDLE}
-        onCancel={vi.fn()}
+        onCancel={onCancel}
         onConfirm={onConfirm}
       />,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Remove' }));
     expect(onConfirm).toHaveBeenCalledOnce();
+
+    rerender(
+      <MosaicProvider>
+        <AlertDialog defaultOpen>
+          <RemoveContactDialogView
+            isVerified
+            kind='phone'
+            state={{ ...IDLE, isSubmitting: true }}
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+          />
+        </AlertDialog>
+      </MosaicProvider>,
+    );
+
+    // Remove keeps the tab order — it goes inert through `aria-disabled` so focus survives the
+    // action it just started — while Cancel, which has no pending state of its own, goes disabled.
+    const remove = screen.getByRole('button', { name: /Remove/ });
+    expect(remove).toHaveAttribute('aria-disabled', 'true');
+    await userEvent.click(remove);
+    expect(onConfirm).toHaveBeenCalledOnce();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
   });
 
   it('reports a failure that has no field to land in', () => {

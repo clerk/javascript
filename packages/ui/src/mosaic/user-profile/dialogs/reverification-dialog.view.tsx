@@ -41,17 +41,19 @@ export function ReverificationDialogView({
   const fieldId = React.useId();
   const isCode = state.strategy !== 'password';
   const inert = state.status === 'verifying';
-  const canSubmit = state.value.length > 0 && !inert;
+  const canSubmit = state.value.length > 0;
 
   return (
     <>
       <Dialog.CloseButton />
       <DialogHeader
         description={
-          isCode ? (
+          isCode && state.identifier ? (
             <>
               Enter the verification code sent to <Identifier>{state.identifier}</Identifier>
             </>
+          ) : isCode ? (
+            'Enter the verification code we sent you.'
           ) : (
             'Enter your password to continue.'
           )

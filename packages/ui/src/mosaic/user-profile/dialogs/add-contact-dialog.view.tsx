@@ -148,8 +148,10 @@ function IdentifierStep({
 }: StepProps<'identifier'>) {
   const text = copy[kind];
   const fieldId = React.useId();
-  // Matches the legacy guard: anything past a single character, and never the current username.
-  const canSubmit = state.value.trim().length > 1 && !state.isSubmitting && !isInterrupted;
+  // Matches the legacy guard: anything past a single character. A phone value is seeded with its
+  // dial code, so it counts digits instead — otherwise Add is live over an empty number.
+  const hasValue = kind === 'phone' ? state.value.replace(/\D/g, '').length > 1 : state.value.trim().length > 1;
+  const canSubmit = hasValue && !isInterrupted;
 
   return (
     <>
@@ -278,7 +280,7 @@ function CodeStep({
             Cancel
           </Button>
           <SubmitButton
-            disabled={inert || state.code.length === 0}
+            disabled={isInterrupted || state.status === 'success' || state.code.length === 0}
             isPending={state.status === 'verifying'}
             pendingLabel='Verifying'
             {...stylex.props(styles.footerButton)}
