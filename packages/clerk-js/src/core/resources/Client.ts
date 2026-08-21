@@ -157,7 +157,11 @@ export class Client extends BaseResource implements ClientResource {
         return session;
       });
 
-      if (data.sign_up && this.signUp instanceof SignUp && this.signUp.id === data.sign_up.id) {
+      if (data.sign_up && this.signUp instanceof SignUp && (this.signUp.id === data.sign_up.id || !this.signUp.id)) {
+        // Update in-place when ids match OR when the existing signUp has no id yet
+        // (e.g. an SSO sign-in that transitions to a sign-up flow). Reusing the same
+        // SignUp instance preserves any SignUpFuture references held by hooks so they
+        // remain valid and reflect the correct id after the transition.
         this.signUp.__internal_updateFromJSON(data.sign_up);
       } else {
         this.signUp = new SignUp(data.sign_up);
