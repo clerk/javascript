@@ -9,6 +9,9 @@ Errors can happen on the first request, during the identity check, or when the o
 tried again. The mock controller handles these steps. The views only display the current state and
 report what the user did.
 
+The same mock controller drives the full panel and the individual section stories, including their
+real dialogs.
+
 ## Legacy behavior covered
 
 | Area             | What this story covers                                                                                                                         |
@@ -37,6 +40,19 @@ Destructive confirmation dialogs do not.
     { name: 'Alert dialog', href: '/components/alert-dialog', layer: 'Components' },
   ]}
 />
+
+## Usage
+
+The controller returns the complete set of props for the panel. Pass them directly to the view:
+
+```tsx
+const security = useUserProfileSecurityPanelMockController({ config });
+
+return <UserProfileSecurityPanelView {...security} />;
+```
+
+The mock controller is only for Swingset. A Clerk-backed controller can return the same view props
+without changing the panel or its dialogs.
 
 ## Dialog states
 

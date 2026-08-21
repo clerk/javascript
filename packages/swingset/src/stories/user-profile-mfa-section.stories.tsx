@@ -1,8 +1,10 @@
-import type { UserProfileMfaMethod } from '@clerk/ui/mosaic/user-profile/user-profile-mfa-section.view';
+import { SecurityPanelDialogsView } from '@clerk/ui/mosaic/user-profile/dialogs/security-panel-dialogs.view';
 import { UserProfileMfaSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-mfa-section.view';
-import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-panel-flow.config';
+import { useUserProfileSecurityPanelMockController } from './user-profile-security-panel-flow.controller';
 
 export { default as __source } from './user-profile-mfa-section.stories?raw';
 
@@ -15,70 +17,48 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const [methods, setMethods] = useState<UserProfileMfaMethod[]>([
-    { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
-    { id: 'backup', type: 'backup-codes' },
-  ]);
+  const controller = useUserProfileSecurityPanelMockController({
+    config: {
+      ...DEFAULT_SECURITY_FLOW_CONFIG,
+      backupCodesAvailable: true,
+      hasBackupCodes: true,
+      hasMfaPhone: true,
+    },
+  });
 
   return (
-    <UserProfileMfaSectionView
-      methods={methods}
-      sectionTitle='Authentication'
-      onAdd={type =>
-        setMethods(current => {
-          const timestamp = Date.now();
-          return [
-            ...current,
-            {
-              id: `${type}-${timestamp}`,
-              type,
-              description: type === 'sms' ? '+1 801-555-0100' : undefined,
-            },
-            ...(current.some(method => method.type === 'backup-codes')
-              ? []
-              : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
-          ];
-        })
-      }
-      onRegenerateBackupCodes={() =>
-        setMethods(current =>
-          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
-        )
-      }
-      onRemove={id => setMethods(current => current.filter(method => method.id !== id))}
-    />
+    <>
+      <UserProfileMfaSectionView
+        addableMethods={controller.mfaAddableMethods}
+        methods={controller.mfaMethods ?? []}
+        sectionTitle='Authentication'
+        onAdd={controller.onAddMfaMethod}
+        onEnableBackupCodes={controller.onEnableBackupCodes}
+        onRegenerateBackupCodes={controller.onRegenerateBackupCodes}
+        onRemove={controller.onRemoveMfaMethod}
+        onSetDefault={controller.onSetDefaultMfaMethod}
+      />
+      <SecurityPanelDialogsView {...controller} />
+    </>
   );
 }
 
 export function Empty() {
-  const [methods, setMethods] = useState<UserProfileMfaMethod[]>([]);
+  const controller = useUserProfileSecurityPanelMockController();
 
   return (
-    <UserProfileMfaSectionView
-      methods={methods}
-      sectionTitle='Authentication'
-      onAdd={type =>
-        setMethods(current => {
-          const timestamp = Date.now();
-          return [
-            ...current,
-            {
-              id: `${type}-${timestamp}`,
-              type,
-              description: type === 'sms' ? '+1 801-555-0100' : undefined,
-            },
-            ...(current.some(method => method.type === 'backup-codes')
-              ? []
-              : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
-          ];
-        })
-      }
-      onRegenerateBackupCodes={() =>
-        setMethods(current =>
-          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
-        )
-      }
-      onRemove={id => setMethods(current => current.filter(method => method.id !== id))}
-    />
+    <>
+      <UserProfileMfaSectionView
+        addableMethods={controller.mfaAddableMethods}
+        methods={controller.mfaMethods ?? []}
+        sectionTitle='Authentication'
+        onAdd={controller.onAddMfaMethod}
+        onEnableBackupCodes={controller.onEnableBackupCodes}
+        onRegenerateBackupCodes={controller.onRegenerateBackupCodes}
+        onRemove={controller.onRemoveMfaMethod}
+        onSetDefault={controller.onSetDefaultMfaMethod}
+      />
+      <SecurityPanelDialogsView {...controller} />
+    </>
   );
 }

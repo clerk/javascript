@@ -10,6 +10,19 @@ import { useSecurityReverificationFlow } from './user-profile-security-panel-flo
 
 export { DEFAULT_SECURITY_FLOW_CONFIG, type SecurityFlowConfig } from './user-profile-security-panel-flow.config';
 
+export interface UserProfileSecurityPanelFlowOptions {
+  config?: SecurityFlowConfig;
+  initialDevices: UserProfileDevice[];
+  onHasPasswordChange?: (hasPassword: boolean) => void;
+  onHasPasskeyChange?: (hasPasskey: boolean) => void;
+  onMfaMethodChange?: Parameters<typeof useMfaFlowSlice>[0]['onMfaMethodChange'];
+  onBackupCodesChange?: (enabled: boolean) => void;
+  otherSessionsCount?: number;
+  afterSignOutUrl?: string;
+  afterMultiSessionSingleSignOutUrl?: string;
+  onSetActive?: (result: { session: null; redirectUrl: string }) => void;
+}
+
 export function useUserProfileSecurityPanelFlow({
   config = DEFAULT_SECURITY_FLOW_CONFIG,
   initialDevices,
@@ -21,18 +34,7 @@ export function useUserProfileSecurityPanelFlow({
   afterSignOutUrl,
   afterMultiSessionSingleSignOutUrl,
   onSetActive,
-}: {
-  config?: SecurityFlowConfig;
-  initialDevices: UserProfileDevice[];
-  onHasPasswordChange?: (hasPassword: boolean) => void;
-  onHasPasskeyChange?: (hasPasskey: boolean) => void;
-  onMfaMethodChange?: Parameters<typeof useMfaFlowSlice>[0]['onMfaMethodChange'];
-  onBackupCodesChange?: (enabled: boolean) => void;
-  otherSessionsCount?: number;
-  afterSignOutUrl?: string;
-  afterMultiSessionSingleSignOutUrl?: string;
-  onSetActive?: (result: { session: null; redirectUrl: string }) => void;
-}) {
+}: UserProfileSecurityPanelFlowOptions) {
   const reverificationFlow = useSecurityReverificationFlow(config);
   const activeDevices = useDevicesFlowSlice({ config, reverificationFlow, initialDevices });
   const password = usePasswordFlowSlice({

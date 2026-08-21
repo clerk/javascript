@@ -63,3 +63,25 @@ export const DEFAULT_SECURITY_FLOW_CONFIG: SecurityFlowConfig = {
   validCode: '424242',
   validPassword: 'clerk',
 };
+
+export function setSecurityFlowMfaMethod(
+  current: SecurityFlowConfig,
+  method: 'sms' | 'authenticator',
+  enabled: boolean,
+): SecurityFlowConfig {
+  const hasMfaPhone = method === 'sms' ? enabled : current.hasMfaPhone;
+  const hasMfaAuthenticator = method === 'authenticator' ? enabled : current.hasMfaAuthenticator;
+  const hasMfaMethod = hasMfaPhone || hasMfaAuthenticator;
+  const removedReverificationMethod =
+    !enabled && current.reverificationStrategy === (method === 'sms' ? 'phone_code' : 'totp');
+  const removedLastMethodUsingBackupCodes = !hasMfaMethod && current.reverificationStrategy === 'backup_code';
+
+  return {
+    ...current,
+    hasMfaPhone,
+    hasMfaAuthenticator,
+    hasBackupCodes: hasMfaMethod && current.hasBackupCodes,
+    reverificationStrategy:
+      removedReverificationMethod || removedLastMethodUsingBackupCodes ? 'email_code' : current.reverificationStrategy,
+  };
+}
