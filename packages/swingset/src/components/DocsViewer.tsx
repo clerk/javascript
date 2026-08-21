@@ -16,6 +16,13 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-profile': {
     'user-page': dynamic(() => import('../stories/user-page.mdx')),
     'user-profile-account-section-flow': dynamic(() => import('../stories/user-profile-account-section-flow.mdx')),
+    'user-profile-password-section-flow': dynamic(() => import('../stories/user-profile-password-section-flow.mdx')),
+    'user-profile-passkeys-section-flow': dynamic(() => import('../stories/user-profile-passkeys-section-flow.mdx')),
+    'user-profile-mfa-section-flow': dynamic(() => import('../stories/user-profile-mfa-section-flow.mdx')),
+    'user-profile-active-devices-section-flow': dynamic(
+      () => import('../stories/user-profile-active-devices-section-flow.mdx'),
+    ),
+    'user-profile-delete-section-flow': dynamic(() => import('../stories/user-profile-delete-section-flow.mdx')),
     'security-flows': dynamic(() => import('../stories/user-profile-security-flows.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
