@@ -72,6 +72,8 @@ const controlLabel = { alignItems: 'center', display: 'flex', gap: '0.375rem' } 
 
 const controlGroup = { display: 'flex', flexDirection: 'column', gap: '0.5rem' } as const;
 
+const controlHint = { color: 'var(--cl-color-neutral-faded)', fontSize: '0.75rem' } as const;
+
 const controlGroupTitle = {
   color: 'var(--cl-color-neutral-faded)',
   fontSize: '0.6875rem',
@@ -382,6 +384,10 @@ function Controls({
             onChange={event => onChange({ ssoFails: event.target.checked })}
           />
           <span style={controlName}>SSO fails</span>
+          {/* The only path that reaches this, and nothing else on screen says so. */}
+          <span style={controlHint}>
+            add an email at <code>@{config.ssoDomains[0]}</code> to route through enterprise SSO
+          </span>
         </label>
         <label style={controlLabel}>
           <input
@@ -391,9 +397,9 @@ function Controls({
           />
           <span style={controlName}>Force server error</span>
         </label>
-        <span style={{ opacity: 0.7 }}>
+        <span style={controlHint}>
           code <code>{config.validCode}</code> · password <code>{config.validPassword}</code> · taken{' '}
-          <code>{config.takenIdentifiers[0]}</code> · SSO domain <code>@{config.ssoDomains[0]}</code>
+          <code>{config.takenIdentifiers[0]}</code> · taken username <code>{config.takenUsernames[0]}</code>
         </span>
       </ControlGroup>
     </div>
