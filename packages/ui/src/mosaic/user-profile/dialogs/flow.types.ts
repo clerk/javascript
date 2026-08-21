@@ -108,10 +108,7 @@ export interface AddContactFlowActions {
   onCancel: () => void;
 }
 
-/**
- * A destructive confirmation. `messageLine2` is only present for a verified contact — legacy
- * suppresses the "you will no longer be able to sign in" line on an unverified one.
- */
+/** A destructive confirmation, awaiting the user's answer. */
 export interface ConfirmContactActionState {
   identifier: string;
   isSubmitting: boolean;

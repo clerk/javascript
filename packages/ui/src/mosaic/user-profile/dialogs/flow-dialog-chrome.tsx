@@ -146,7 +146,8 @@ export interface CodeInputProps {
   disabled?: boolean;
   autoFocus?: boolean;
   /** Fired once the final digit lands, matching the legacy `onCodeEntryFinished` auto-submit. */
-  onComplete: () => void;
+  /** Fired once the final digit lands, matching the legacy `onCodeEntryFinished` auto-submit. */
+  onComplete: (value: string) => void;
   onChange: (value: string) => void;
 }
 
@@ -168,17 +169,20 @@ export function CodeInput({
 }: CodeInputProps) {
   // No `maxLength`: it would truncate a pasted value before the non-digit strip below runs, so
   // `42-4242` would lose its last digit rather than its separator. The handler owns the length.
-  const completedRef = React.useRef(false);
+  // The last value auto-submitted, rather than a latched boolean: a boolean only clears when the
+  // code gets shorter, so replacing a full code wholesale — pasting over a selection, or retyping
+  // after a rejected one — would never reach `length` again and never auto-submit.
+  const completedRef = React.useRef<string | null>(null);
 
   const handleChange = (next: string) => {
     const digits = next.replace(/\D/g, '').slice(0, length);
     onChange(digits);
-    if (digits.length === length && !completedRef.current) {
-      completedRef.current = true;
-      onComplete();
+    if (digits.length === length && completedRef.current !== digits) {
+      completedRef.current = digits;
+      onComplete(digits);
     }
     if (digits.length < length) {
-      completedRef.current = false;
+      completedRef.current = null;
     }
   };
 
