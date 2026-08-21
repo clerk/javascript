@@ -1255,6 +1255,7 @@ export const koKR: LocalizationResource = {
       actionText: '이 방법이 없나요?',
       blockButton__backupCode: '백업 코드 사용',
       blockButton__emailCode: '{{identifier}}로 이메일 코드 보내기',
+      blockButton__emailLink: undefined,
       blockButton__passkey: '패스키 사용하기',
       blockButton__password: '비밀번호로 계속',
       blockButton__phoneCode: '{{identifier}}로 SMS 코드 보내기',
@@ -1276,6 +1277,29 @@ export const koKR: LocalizationResource = {
       resendButton: '코드를 받지 못하셨나요? 다시 보내기',
       subtitle: '이메일로 전송된 코드를 입력해 주세요',
       title: '인증이 필요해요',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: '인증을 진행할 수 없어요. 설정된 인증 수단이 없어요.',

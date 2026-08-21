@@ -13,13 +13,16 @@ import {
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '@clerk/shared/internal/clerk-js/passkeys';
+import { Poller } from '@clerk/shared/poller';
 import { retry } from '@clerk/shared/retry';
 import type {
   ActClaim,
   AgentActClaim,
   CheckAuthorization,
   ClientResource,
+  CreateEmailLinkFlowReturn,
   EmailCodeConfig,
+  EmailLinkConfig,
   EnterpriseSSOConfig,
   GetToken,
   GetTokenOptions,
@@ -27,6 +30,7 @@ import type {
   SessionJSON,
   SessionJSONSnapshot,
   SessionResource,
+  SessionStartEmailLinkFlowParams,
   SessionStatus,
   SessionTask,
   SessionTouchParams,
@@ -261,6 +265,12 @@ export class Session extends BaseResource implements SessionResource {
       case 'email_code':
         config = { emailAddressId: factor.emailAddressId } as EmailCodeConfig;
         break;
+      case 'email_link':
+        config = {
+          emailAddressId: factor.emailAddressId,
+          redirectUrl: factor.redirectUrl,
+        } as EmailLinkConfig;
+        break;
       case 'phone_code':
         config = {
           phoneNumberId: factor.phoneNumberId,
@@ -289,6 +299,53 @@ export class Session extends BaseResource implements SessionResource {
           ...config,
           strategy: factor.strategy,
         } as any,
+      })
+    )?.response as unknown as SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SessionStartEmailLinkFlowParams, SessionVerificationResource> => {
+    const { run, stop } = Poller();
+
+    const startEmailLinkFlow = async ({
+      emailAddressId,
+      redirectUrl,
+    }: SessionStartEmailLinkFlowParams): Promise<SessionVerificationResource> => {
+      await this.prepareFirstFactorVerification({ strategy: 'email_link', emailAddressId, redirectUrl });
+
+      return new Promise((resolve, reject) => {
+        void run(() => {
+          return this.#readVerification()
+            .then(res => {
+              const verificationStatus = res.firstFactorVerification.status;
+              if (
+                res.status === 'complete' ||
+                res.status === 'needs_second_factor' ||
+                verificationStatus === 'verified' ||
+                verificationStatus === 'expired' ||
+                verificationStatus === 'failed'
+              ) {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
+      });
+    };
+
+    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
+  };
+
+  #readVerification = async (): Promise<SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'GET',
+        path: `/client/sessions/${this.id}/verify`,
       })
     )?.response as unknown as SessionVerificationJSON;
 

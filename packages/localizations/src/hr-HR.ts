@@ -1265,6 +1265,7 @@ export const hrHR: LocalizationResource = {
       actionText: 'Nemate ništa od ovoga?',
       blockButton__backupCode: 'Koristite rezervni kod',
       blockButton__emailCode: 'Pošalji kod e-poštom na {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Koristite svoj pristupni ključ',
       blockButton__password: 'Nastavite s vašom lozinkom',
       blockButton__phoneCode: 'Pošalji SMS kod na {{identifier}}',
@@ -1287,6 +1288,29 @@ export const hrHR: LocalizationResource = {
       resendButton: 'Niste primili kod? Pošalji ponovno',
       subtitle: 'Unesite kod poslan na vašu e-poštu za nastavak',
       title: 'Potrebna verifikacija',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Ne može se nastaviti s verifikacijom. Nema dostupnog faktora autentifikacije.',

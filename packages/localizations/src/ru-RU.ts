@@ -1264,6 +1264,7 @@ export const ruRU: LocalizationResource = {
       actionText: 'У вас нет ничего из этого?',
       blockButton__backupCode: 'Использовать резервный код',
       blockButton__emailCode: 'Отправить код на {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Продолжить с вашим паролем',
       blockButton__phoneCode: 'Отправить SMS код на {{identifier}}',
@@ -1286,6 +1287,29 @@ export const ruRU: LocalizationResource = {
       resendButton: 'Не получили код? Отправить повторно',
       subtitle: 'для продолжения {{applicationName}}',
       title: 'Проверьте вашу почту',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Невозможно продолжить верификацию. Нет доступного фактора аутентификации.',

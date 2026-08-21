@@ -1267,6 +1267,7 @@ export const teIN: LocalizationResource = {
       actionText: 'వీటిలో ఏవీ లేవా?',
       blockButton__backupCode: 'బ్యాకప్ కోడ్‌ను ఉపయోగించండి',
       blockButton__emailCode: '{{identifier}}కి ఇమెయిల్ కోడ్',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'మీ పాస్‌కీని ఉపయోగించండి',
       blockButton__password: 'మీ పాస్‌వర్డ్‌తో కొనసాగించండి',
       blockButton__phoneCode: '{{identifier}}కి SMS కోడ్‌ను పంపండి',
@@ -1289,6 +1290,29 @@ export const teIN: LocalizationResource = {
       resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'కొనసాగించడానికి మీ ఇమెయిల్‌కి పంపిన కోడ్‌ను నమోదు చేయండి',
       title: 'ధృవీకరణ అవసరం',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'ధృవీకరణతో కొనసాగలేము. సరైన ప్రమాణీకరణ కారకం కాన్ఫిగర్ చేయబడలేదు',

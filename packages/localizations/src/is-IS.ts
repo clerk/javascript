@@ -1266,6 +1266,7 @@ export const isIS: LocalizationResource = {
       actionText: 'Ertu ekki með neitt af þessu?',
       blockButton__backupCode: 'Nota öryggiskóða',
       blockButton__emailCode: 'Senda kóða á {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Nota lykilinn þinn',
       blockButton__password: 'Halda áfram með lykilorði',
       blockButton__phoneCode: 'Senda SMS kóða á {{identifier}}',
@@ -1288,6 +1289,29 @@ export const isIS: LocalizationResource = {
       resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Sláðu inn kóðann sem sendur var á netfangið þitt til að halda áfram',
       title: 'Staðfesting nauðsynleg',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Ekki er hægt að halda áfram með staðfestingu. Engin viðeigandi auðkenningaraðferð er stillt.',

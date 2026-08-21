@@ -1264,6 +1264,7 @@ export const viVN: LocalizationResource = {
       actionText: 'Không có bất kỳ phương thức nào?',
       blockButton__backupCode: 'Sử dụng mã dự phòng',
       blockButton__emailCode: 'Email mã đến {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Đăng nhập với mã passkey',
       blockButton__password: 'Tiếp tục với mật khẩu của bạn',
       blockButton__phoneCode: 'Gửi mã SMS đến {{identifier}}',
@@ -1286,6 +1287,29 @@ export const viVN: LocalizationResource = {
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Nhập mã đã gửi đến email của bạn để tiếp tục',
       title: 'Xác minh yêu cầu',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Không thể tiếp tục với xác minh. Không có yếu tố xác thực phù hợp được cấu hình',

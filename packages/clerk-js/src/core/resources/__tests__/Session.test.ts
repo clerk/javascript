@@ -1,8 +1,8 @@
 import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
-import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
+import type { InstanceType, OrganizationJSON, SessionJSON, SessionVerificationJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { clerkMock, createUser, mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import { clerkMock, createSession, createUser, mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
 import {
   restoreDocument,
   setDocument,
@@ -2520,6 +2520,134 @@ describe('Session', () => {
         client.fromJSON(clientJSON(null));
         expect(client.sessions[0]?.lastActiveToken).toBeNull();
       });
+    });
+  });
+
+  describe('createEmailLinkFlow()', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    const createSessionVerificationResponse = (
+      sessionJSON: SessionJSON,
+      status: 'needs_first_factor' | 'complete',
+      verificationStatus: 'unverified' | 'verified' | 'expired' | 'failed',
+    ) => ({
+      response: {
+        id: 'session_verification_1',
+        object: 'session_verification',
+        status,
+        level: 'first_factor',
+        session: sessionJSON,
+        first_factor_verification: {
+          id: 'verification_1',
+          object: 'verification_email_link',
+          strategy: 'email_link',
+          status: verificationStatus,
+          verified_at_client: verificationStatus === 'verified' ? 'client_1' : '',
+          attempts: 0,
+          expire_at: Date.now() / 1_000 + 600,
+          error: { code: '', message: '' },
+        },
+        second_factor_verification: null,
+        supported_first_factors:
+          status === 'complete'
+            ? null
+            : [
+                {
+                  strategy: 'email_link',
+                  email_address_id: 'idn_email',
+                  safe_identifier: 'test@example.com',
+                  primary: true,
+                },
+              ],
+        supported_second_factors: null,
+      } satisfies SessionVerificationJSON,
+    });
+
+    const startEmailLinkFlow = (session: Session) =>
+      session.createEmailLinkFlow().startEmailLinkFlow({
+        emailAddressId: 'idn_email',
+        redirectUrl: 'https://app.example.com/protected-action',
+      });
+
+    it('prepares email-link reverification and resolves after the callback completes the active step-up', async () => {
+      BaseResource.clerk = clerkMock();
+      const sessionJSON = createSession({ id: 'session_1', factor_verification_age: [99999, -1] });
+      const session = new Session(sessionJSON);
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch');
+
+      fetchSpy
+        .mockResolvedValueOnce(createSessionVerificationResponse(sessionJSON, 'needs_first_factor', 'unverified'))
+        .mockResolvedValueOnce(createSessionVerificationResponse(sessionJSON, 'needs_first_factor', 'unverified'))
+        .mockResolvedValueOnce(createSessionVerificationResponse(sessionJSON, 'complete', 'verified'));
+
+      const resultPromise = startEmailLinkFlow(session);
+      await vi.advanceTimersByTimeAsync(0);
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(1_000);
+      const result = await resultPromise;
+
+      expect(result.status).toBe('complete');
+      expect(result.firstFactorVerification.strategy).toBe('email_link');
+      expect(fetchSpy).toHaveBeenNthCalledWith(1, {
+        method: 'POST',
+        path: '/client/sessions/session_1/verify/prepare_first_factor',
+        body: {
+          emailAddressId: 'idn_email',
+          redirectUrl: 'https://app.example.com/protected-action',
+          strategy: 'email_link',
+        },
+      });
+      expect(fetchSpy).toHaveBeenNthCalledWith(2, {
+        method: 'GET',
+        path: '/client/sessions/session_1/verify',
+      });
+      expect(fetchSpy).toHaveBeenNthCalledWith(3, {
+        method: 'GET',
+        path: '/client/sessions/session_1/verify',
+      });
+    });
+
+    it.each(['expired', 'failed'] as const)('resolves when the email-link verification is %s', async status => {
+      BaseResource.clerk = clerkMock();
+      const sessionJSON = createSession({ id: 'session_1', factor_verification_age: [99999, -1] });
+      const session = new Session(sessionJSON);
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch');
+
+      fetchSpy
+        .mockResolvedValueOnce(createSessionVerificationResponse(sessionJSON, 'needs_first_factor', 'unverified'))
+        .mockResolvedValueOnce(createSessionVerificationResponse(sessionJSON, 'needs_first_factor', status));
+
+      const resultPromise = startEmailLinkFlow(session);
+      await vi.advanceTimersByTimeAsync(0);
+      const result = await resultPromise;
+
+      expect(result.firstFactorVerification.status).toBe(status);
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('stops reading the active step-up after the email-link flow is cancelled', async () => {
+      BaseResource.clerk = clerkMock();
+      const sessionJSON = createSession({ id: 'session_1', factor_verification_age: [99999, -1] });
+      const session = new Session(sessionJSON);
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch');
+      const response = createSessionVerificationResponse(sessionJSON, 'needs_first_factor', 'unverified');
+
+      fetchSpy.mockResolvedValue(response);
+
+      const { startEmailLinkFlow, cancelEmailLinkFlow } = session.createEmailLinkFlow();
+      void startEmailLinkFlow({
+        emailAddressId: 'idn_email',
+        redirectUrl: 'https://app.example.com/protected-action',
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+      cancelEmailLinkFlow();
+      await vi.advanceTimersByTimeAsync(1_000);
+
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
     });
   });
 });
