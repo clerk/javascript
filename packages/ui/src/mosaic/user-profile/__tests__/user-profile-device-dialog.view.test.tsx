@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { AlertDialog } from '../../components/alert-dialog';
+import { Card } from '../../components/card';
+import { Dialog } from '../../components/dialog';
 import type { UserProfileDeviceDetailsFlowState } from '../dialogs/flow.types';
-import { UserProfileDeviceDialogView } from '../user-profile-device-dialog.view';
+import { UserProfileDeviceDialogView, UserProfileDeviceSignOutDialogView } from '../user-profile-device-dialog.view';
 
 const state: UserProfileDeviceDetailsFlowState = {
   step: 'details',
@@ -33,8 +36,7 @@ const DeviceDialogHarness = (props: {
 
   return (
     <MosaicProvider>
-      <UserProfileDeviceDialogView
-        open
+      <DeviceDialog
         state={{
           ...state,
           step,
@@ -42,7 +44,7 @@ const DeviceDialogHarness = (props: {
           errors: step === 'confirm' ? (props.errors ?? {}) : {},
         }}
         onRequestSignOut={() => setStep('confirm')}
-        onCancelSignOut={() => setStep('details')}
+        onCancel={() => setStep('details')}
         onSignOut={props.onSignOut ?? vi.fn()}
       />
     </MosaicProvider>
@@ -53,11 +55,10 @@ describe('UserProfileDeviceDialogView', () => {
   it('renders the selected device details', () => {
     render(
       <MosaicProvider>
-        <UserProfileDeviceDialogView
-          open
+        <DeviceDialog
           state={state}
           onRequestSignOut={vi.fn()}
-          onCancelSignOut={vi.fn()}
+          onCancel={vi.fn()}
           onSignOut={vi.fn()}
         />
       </MosaicProvider>,
@@ -112,3 +113,49 @@ describe('UserProfileDeviceDialogView', () => {
     expect(within(confirmation).getByRole('progressbar', { name: 'Signing out device' })).toBeInTheDocument();
   });
 });
+
+function DeviceDialog({
+  state,
+  onRequestSignOut,
+  onCancel,
+  onSignOut,
+}: {
+  state: UserProfileDeviceDetailsFlowState;
+  onRequestSignOut: () => void;
+  onCancel: () => void;
+  onSignOut: () => void;
+}) {
+  return (
+    <Dialog.Root
+      size='card'
+      open
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            <UserProfileDeviceDialogView
+              state={state}
+              isInterrupted={state.step === 'confirm'}
+              onRequestSignOut={onRequestSignOut}
+            />
+            <AlertDialog open={state.step === 'confirm'}>
+              <UserProfileDeviceSignOutDialogView
+                state={state}
+                onCancel={onCancel}
+                onSignOut={onSignOut}
+              />
+            </AlertDialog>
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}

@@ -36,6 +36,11 @@ export function useActiveDevicesSectionFlow({
   const [signOutAllDevices, setSignOutAllDevices] = useState<UserProfileSignOutAllDevicesFlowState | null>(null);
   const [reverification, setReverification] = useState<DeviceReverificationState | null>(null);
   const verificationGate = useRef<{ operation: DeviceOperation; resolve: (verified: boolean) => void } | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const captureTrigger = useCallback(() => {
+    const active = document.activeElement;
+    triggerRef.current = active instanceof HTMLElement ? active : null;
+  }, []);
 
   useEffect(() => setDevices(initialDevices), [initialDevices]);
 
@@ -113,6 +118,7 @@ export function useActiveDevicesSectionFlow({
 
   const openDevice = useCallback(
     (id: string) => {
+      captureTrigger();
       const selected = devices.find(candidate => candidate.id === id);
       if (!selected || selected.isCurrent) {
         return;
@@ -134,7 +140,7 @@ export function useActiveDevicesSectionFlow({
         errors: {},
       });
     },
-    [devices],
+    [captureTrigger, devices],
   );
   const requestSignOutDevice = useCallback(() => {
     setDevice(current => (current ? { ...current, step: 'confirm', errors: {} } : current));
@@ -154,8 +160,9 @@ export function useActiveDevicesSectionFlow({
   }, [closeOperation, device, runMutation]);
 
   const openSignOutAllDevices = useCallback(() => {
+    captureTrigger();
     setSignOutAllDevices({ isSubmitting: false, errors: {} });
-  }, []);
+  }, [captureTrigger]);
   const submitSignOutAllDevices = useCallback(() => {
     if (signOutAllDevices?.isSubmitting) {
       return;
@@ -239,6 +246,7 @@ export function useActiveDevicesSectionFlow({
   }, []);
 
   return {
+    triggerRef,
     devices,
     device,
     signOutAllDevices,

@@ -18,7 +18,10 @@ import type {
 import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import { UserProfileBackupCodesDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-backup-codes-dialog.view';
 import { UserProfileDeleteAccountDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-account-dialog.view';
-import { UserProfileDeviceDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-device-dialog.view';
+import {
+  UserProfileDeviceDialogView,
+  UserProfileDeviceSignOutDialogView,
+} from '@clerk/ui/mosaic/user-profile/user-profile-device-dialog.view';
 import {
   UserProfileMfaAddDialogView,
   UserProfileMfaRemoveDialogView,
@@ -338,34 +341,66 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         </Freeze>
         {verificationDialog('delete-account')}
       </AlertDialog>
-      {flow.signOutAllDevices ? (
-        <UserProfileSignOutAllDevicesDialogView
-          open
-          state={flow.signOutAllDevices}
+      <AlertDialog
+        finalFocus={flow.activeDevicesTriggerRef}
+        open={Boolean(flow.signOutAllDevices)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeSignOutAllDevices();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.signOutAllDevices}>
+          {flow.signOutAllDevices ? (
+            <UserProfileSignOutAllDevicesDialogView
+              state={flow.signOutAllDevices}
+              isInterrupted={flow.reverification?.operation === 'sign-out-all-devices'}
+              onCancel={flow.closeSignOutAllDevices}
+              onSignOut={flow.submitSignOutAllDevices}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('sign-out-all-devices')}
+      </AlertDialog>
+      <FlowCardDialog
+        finalFocus={flow.activeDevicesTriggerRef}
+        open={Boolean(flow.device)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeDevice();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.device}>
+          {flow.device ? (
+            <UserProfileDeviceDialogView
+              state={flow.device}
+              isInterrupted={flow.device.step === 'confirm'}
+              onRequestSignOut={flow.requestSignOutDevice}
+            />
+          ) : null}
+        </Freeze>
+        <AlertDialog
+          open={flow.device?.step === 'confirm'}
           onOpenChange={open => {
             if (!open) {
-              flow.closeSignOutAllDevices();
+              flow.cancelSignOutDevice();
             }
           }}
-          onSignOut={flow.submitSignOutAllDevices}
-          verificationDialog={verificationDialog('sign-out-all-devices')}
-        />
-      ) : null}
-      {flow.device ? (
-        <UserProfileDeviceDialogView
-          open
-          state={flow.device}
-          onOpenChange={open => {
-            if (!open) {
-              flow.closeDevice();
-            }
-          }}
-          onRequestSignOut={flow.requestSignOutDevice}
-          onCancelSignOut={flow.cancelSignOutDevice}
-          onSignOut={flow.submitSignOutDevice}
-          verificationDialog={verificationDialog('sign-out-device')}
-        />
-      ) : null}
+        >
+          <Freeze frozen={flow.device?.step !== 'confirm'}>
+            {flow.device?.step === 'confirm' ? (
+              <UserProfileDeviceSignOutDialogView
+                state={flow.device}
+                isInterrupted={flow.reverification?.operation === 'sign-out-device'}
+                onCancel={flow.cancelSignOutDevice}
+                onSignOut={flow.submitSignOutDevice}
+              />
+            ) : null}
+          </Freeze>
+          {verificationDialog('sign-out-device')}
+        </AlertDialog>
+      </FlowCardDialog>
     </>
   );
 }
@@ -1670,24 +1705,39 @@ export function States() {
         </AlertDialog>
       ) : null}
       {snapshot.flow === 'sign-out-all-devices' ? (
-        <UserProfileSignOutAllDevicesDialogView
+        <AlertDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onSignOut={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfileSignOutAllDevicesDialogView
+            state={snapshot.state}
+            isInterrupted={verificationOpen}
+            onCancel={() => setOpen(false)}
+            onSignOut={noop}
+          />
+          {verification}
+        </AlertDialog>
       ) : null}
       {snapshot.flow === 'device' ? (
-        <UserProfileDeviceDialogView
+        <FlowCardDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onRequestSignOut={noop}
-          onCancelSignOut={noop}
-          onSignOut={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfileDeviceDialogView
+            state={snapshot.state}
+            isInterrupted={snapshot.state.step === 'confirm'}
+            onRequestSignOut={noop}
+          />
+          <AlertDialog open={snapshot.state.step === 'confirm'}>
+            <UserProfileDeviceSignOutDialogView
+              state={snapshot.state}
+              isInterrupted={verificationOpen}
+              onCancel={noop}
+              onSignOut={noop}
+            />
+            {verification}
+          </AlertDialog>
+        </FlowCardDialog>
       ) : null}
     </div>
   );
