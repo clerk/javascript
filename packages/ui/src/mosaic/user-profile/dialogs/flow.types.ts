@@ -521,3 +521,79 @@ export interface UserProfilePasskeyRemoveFlowActions {
   onCancel: () => void;
   onRemove: () => void;
 }
+
+// =============================================================================
+// What the security panel view takes
+// =============================================================================
+
+export type UserProfilePasswordFlow = UserProfilePasswordFlowActions & {
+  state: UserProfilePasswordFlowState;
+};
+
+export type UserProfilePasskeyRenameFlow = UserProfilePasskeyRenameFlowActions & {
+  state: UserProfilePasskeyRenameFlowState;
+};
+
+export type UserProfilePasskeyRemoveFlow = UserProfilePasskeyRemoveFlowActions & {
+  state: UserProfilePasskeyRemoveFlowState;
+};
+
+export type UserProfileMfaAddFlow = UserProfileMfaAddFlowActions & {
+  state: UserProfileMfaAddFlowState;
+};
+
+export type UserProfileMfaRemoveFlow = UserProfileMfaRemoveFlowActions & {
+  state: UserProfileMfaRemoveFlowState;
+};
+
+export type UserProfileBackupCodesFlow = UserProfileBackupCodesFlowActions & {
+  state: UserProfileBackupCodesFlowState;
+};
+
+export type UserProfileDeleteAccountFlow = UserProfileDeleteAccountFlowActions & {
+  state: UserProfileDeleteAccountFlowState;
+};
+
+export type UserProfileSignOutAllDevicesFlow = UserProfileSignOutAllDevicesFlowActions & {
+  state: UserProfileSignOutAllDevicesFlowState;
+};
+
+export type UserProfileDeviceDetailsFlow = UserProfileDeviceDetailsFlowActions & {
+  state: UserProfileDeviceDetailsFlowState;
+  onCancel: () => void;
+};
+
+export type UserProfileSecurityReverificationOperation =
+  | 'password'
+  | 'add-passkey'
+  | 'remove-passkey'
+  | 'add-mfa'
+  | 'remove-mfa'
+  | 'backup-codes'
+  | 'sign-out-device'
+  | 'sign-out-all-devices'
+  | 'delete-account';
+
+export type UserProfileSecurityReverificationFlow = ReverificationChallengeActions & {
+  operation: UserProfileSecurityReverificationOperation;
+  state: ReverificationChallengeState;
+};
+
+/** Controlled dialog flows rendered by the security panel. */
+export interface UserProfileSecurityPanelFlows {
+  passwordTriggerRef?: React.RefObject<HTMLElement | null>;
+  passkeysTriggerRef?: React.RefObject<HTMLElement | null>;
+  mfaTriggerRef?: React.RefObject<HTMLElement | null>;
+  deleteTriggerRef?: React.RefObject<HTMLElement | null>;
+  activeDevicesTriggerRef?: React.RefObject<HTMLElement | null>;
+  password?: UserProfilePasswordFlow | null;
+  renamePasskey?: UserProfilePasskeyRenameFlow | null;
+  removePasskey?: UserProfilePasskeyRemoveFlow | null;
+  addMfa?: UserProfileMfaAddFlow | null;
+  removeMfa?: UserProfileMfaRemoveFlow | null;
+  backupCodes?: UserProfileBackupCodesFlow | null;
+  deleteAccount?: UserProfileDeleteAccountFlow | null;
+  device?: UserProfileDeviceDetailsFlow | null;
+  signOutAllDevices?: UserProfileSignOutAllDevicesFlow | null;
+  reverification?: UserProfileSecurityReverificationFlow | null;
+}

@@ -3,7 +3,12 @@ import type { ReactElement } from 'react';
 
 import { Heading } from '../components/heading';
 import { mergeStyleProps, themeProps } from '../props';
-import type { UserProfileDeviceSignOutFlowState, UserProfilePasskeyCreationState } from './dialogs/flow.types';
+import type {
+  UserProfileDeviceSignOutFlowState,
+  UserProfilePasskeyCreationState,
+  UserProfileSecurityPanelFlows,
+} from './dialogs/flow.types';
+import { SecurityPanelDialogsView } from './dialogs/security-panel-dialogs.view';
 import type {
   UserProfileActiveDevicesSectionViewProps,
   UserProfileDevice,
@@ -15,15 +20,13 @@ import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
 import { UserProfilePasswordSectionView } from './user-profile-password-section.view';
-import { styles } from './user-profile-security-panel.styles';
 import { userProfileSecurityBase as m } from './user-profile-security.messages';
+import { styles } from './user-profile-security-panel.styles';
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
-export interface UserProfileSecurityPanelViewProps extends Omit<
-  UserProfileActiveDevicesSectionViewProps,
-  'devices' | 'signOutState'
-> {
+export interface UserProfileSecurityPanelViewProps
+  extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices' | 'signOutState'>, UserProfileSecurityPanelFlows {
   hasPassword?: boolean;
   /** Whether this instance allows the user to set a password. Defaults to `hasPassword`. */
   passwordAvailable?: boolean;
@@ -48,6 +51,21 @@ export interface UserProfileSecurityPanelViewProps extends Omit<
 }
 
 export function UserProfileSecurityPanelView({
+  passwordTriggerRef,
+  passkeysTriggerRef,
+  mfaTriggerRef,
+  deleteTriggerRef,
+  activeDevicesTriggerRef,
+  password,
+  renamePasskey,
+  removePasskey,
+  addMfa,
+  removeMfa,
+  backupCodes,
+  deleteAccount,
+  device,
+  signOutAllDevices,
+  reverification,
   hasPassword = false,
   passwordAvailable = hasPassword,
   passkeys,
@@ -128,6 +146,23 @@ export function UserProfileSecurityPanelView({
         ) : null}
         {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
       </div>
+      <SecurityPanelDialogsView
+        activeDevicesTriggerRef={activeDevicesTriggerRef}
+        addMfa={addMfa}
+        backupCodes={backupCodes}
+        deleteAccount={deleteAccount}
+        deleteTriggerRef={deleteTriggerRef}
+        device={device}
+        mfaTriggerRef={mfaTriggerRef}
+        passkeysTriggerRef={passkeysTriggerRef}
+        password={password}
+        passwordTriggerRef={passwordTriggerRef}
+        removeMfa={removeMfa}
+        removePasskey={removePasskey}
+        renamePasskey={renamePasskey}
+        reverification={reverification}
+        signOutAllDevices={signOutAllDevices}
+      />
     </div>
   );
 }
