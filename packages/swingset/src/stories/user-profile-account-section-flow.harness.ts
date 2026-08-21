@@ -605,10 +605,34 @@ export function useAccountSectionFlow({
   const triggerRef = useRef<HTMLElement | null>(null);
   const captureTrigger = useCallback(() => {
     const active = document.activeElement;
-    triggerRef.current = active instanceof HTMLElement ? active : null;
+    if (!(active instanceof HTMLElement)) {
+      triggerRef.current = null;
+      return;
+    }
+    // A row action is dispatched from a menu item, and the menu unmounts as it closes — returning
+    // focus to that item puts it on a detached node, which is the body. The menu's trigger outlives
+    // it, and is where focus would have gone anyway had the menu closed on its own.
+    const menu = active.closest('[role="menu"]');
+    const opener = menu?.id ? document.querySelector<HTMLElement>(`[aria-controls="${CSS.escape(menu.id)}"]`) : null;
+    triggerRef.current = opener ?? active;
   }, []);
 
   const sleep = useCallback((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)), []);
+
+  /**
+   * The object URL for the staged avatar, so it can be released.
+   *
+   * `URL.createObjectURL` pins the blob for the life of the document, so a preview that is replaced
+   * or abandoned leaks until the page goes away. Only the one that reached `identity` is kept.
+   */
+  const stagedAvatarUrl = useRef<string | null>(null);
+  const releaseStagedAvatar = useCallback(() => {
+    const staged = stagedAvatarUrl.current;
+    stagedAvatarUrl.current = null;
+    if (staged && staged !== stateRef.current.identity.imageUrl) {
+      URL.revokeObjectURL(staged);
+    }
+  }, []);
 
   /** Runs the reverification gate, if configured, and reports whether the caller may proceed. */
   const gate = useCallback(async () => {
@@ -743,6 +767,11 @@ export function useAccountSectionFlow({
       dispatch({ type: 'add.codeStatus', status: 'error', message: 'Incorrect code. Please try again.' });
       return;
     }
+    // The flow reducer ignores `add.*` once the dialog is closed, but `contacts.add` is not scoped
+    // to it — without this, cancelling mid-request still adds the identifier.
+    if (stateRef.current.add?.state.step !== 'code') {
+      return;
+    }
     dispatch({ type: 'add.codeStatus', status: 'success' });
     dispatch({ type: 'contacts.add', kind, record: makeRecord(identifier, true) });
     // Hold on the check mark before moving on, as the legacy OTP control does.
@@ -774,6 +803,9 @@ export function useAccountSectionFlow({
       dispatch({ type: 'add.ssoStatus', status: 'error', message: 'Verification was cancelled or failed.' });
       return;
     }
+    if (stateRef.current.add?.state.step !== 'sso') {
+      return;
+    }
     dispatch({ type: 'contacts.add', kind: 'email', record: makeRecord(identifier, true) });
     dispatch({ type: 'add.success', identifier });
   }, [dispatch, sleep]);
@@ -797,9 +829,10 @@ export function useAccountSectionFlow({
   const closeEdit = useCallback(() => {
     reverificationGate.current?.resolve(false);
     reverificationGate.current = null;
+    releaseStagedAvatar();
     dispatch({ type: 'reverification.close' });
     dispatch({ type: 'edit.close' });
-  }, [dispatch]);
+  }, [dispatch, releaseStagedAvatar]);
 
   const submitEdit = useCallback(async () => {
     const current = stateRef.current.edit;
@@ -823,6 +856,9 @@ export function useAccountSectionFlow({
       }
       if (!firstName.trim()) {
         dispatch({ type: 'edit.error', errors: { firstName: 'Enter a first name.' } });
+        return;
+      }
+      if (stateRef.current.edit?.field !== 'name') {
         return;
       }
       dispatch({ type: 'identity.set', identity: { firstName: firstName.trim(), lastName: lastName.trim() } });
@@ -859,6 +895,9 @@ export function useAccountSectionFlow({
         dispatch({ type: 'edit.error', errors: { field: 'That username is taken. Please try another.' } });
         return;
       }
+      if (stateRef.current.edit?.field !== 'username') {
+        return;
+      }
       dispatch({ type: 'identity.set', identity: { username: trimmed } });
       dispatch({ type: 'edit.close' });
       return;
@@ -875,9 +914,13 @@ export function useAccountSectionFlow({
       dispatch({ type: 'edit.error', errors: { form: 'Something went wrong. Please try again.' } });
       return;
     }
+    if (stateRef.current.edit?.field !== 'avatar') {
+      return;
+    }
     dispatch({ type: 'identity.set', identity: { imageUrl: nextUrl } });
+    releaseStagedAvatar();
     dispatch({ type: 'edit.close' });
-  }, [dispatch, gate, sleep]);
+  }, [dispatch, gate, releaseStagedAvatar, sleep]);
 
   /**
    * Type and size are checked before anything is sent, matching the legacy uploader — a rejected
@@ -893,9 +936,12 @@ export function useAccountSectionFlow({
         dispatch({ type: 'edit.error', errors: { field: 'That image is larger than 10MB.' } });
         return;
       }
-      dispatch({ type: 'edit.avatarFile', fileName: file.name, previewUrl: URL.createObjectURL(file) });
+      releaseStagedAvatar();
+      const previewUrl = URL.createObjectURL(file);
+      stagedAvatarUrl.current = previewUrl;
+      dispatch({ type: 'edit.avatarFile', fileName: file.name, previewUrl });
     },
-    [dispatch],
+    [dispatch, releaseStagedAvatar],
   );
 
   const removeAvatar = useCallback(async () => {
@@ -910,9 +956,13 @@ export function useAccountSectionFlow({
       dispatch({ type: 'edit.error', errors: { form: 'Something went wrong. Please try again.' } });
       return;
     }
+    if (stateRef.current.edit?.field !== 'avatar') {
+      return;
+    }
     dispatch({ type: 'identity.set', identity: { imageUrl: undefined } });
+    releaseStagedAvatar();
     dispatch({ type: 'edit.close' });
-  }, [dispatch, sleep]);
+  }, [dispatch, releaseStagedAvatar, sleep]);
 
   const openConfirm = useCallback(
     (pending: PendingConfirm, identifier: string) => {
@@ -942,6 +992,9 @@ export function useAccountSectionFlow({
 
     if (settingsRef.current.failWithFormError) {
       dispatch({ type: 'confirm.error', message: 'Something went wrong. Please try again.' });
+      return;
+    }
+    if (!stateRef.current.confirm) {
       return;
     }
     const { pending } = current;
