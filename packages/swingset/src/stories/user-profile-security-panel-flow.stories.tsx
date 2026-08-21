@@ -3,17 +3,18 @@ import type {
   UserProfileSecurityPanelFlows,
   UserProfileSecurityReverificationOperation,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
-import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { useId, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import type { SecurityFlowConfig } from './user-profile-security-panel-flow.harness';
+import { setSecurityFlowMfaMethod } from './user-profile-security-panel-flow.config';
 import {
-  DEFAULT_SECURITY_FLOW_CONFIG,
-  useUserProfileSecurityPanelFlow,
-} from './user-profile-security-panel-flow.harness';
+  SECURITY_FLOW_DEVICES,
+  useUserProfileSecurityPanelMockController,
+} from './user-profile-security-panel-flow.controller';
+import type { SecurityFlowConfig } from './user-profile-security-panel-flow.harness';
+import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-panel-flow.harness';
 import { SECURITY_FLOW_SNAPSHOTS, type SecuritySnapshot } from './user-profile-security-panel-flow.snapshots';
 
 export { default as __source } from './user-profile-security-panel-flow.stories?raw';
@@ -21,171 +22,13 @@ export { default as __source } from './user-profile-security-panel-flow.stories?
 export const meta: StoryMeta = {
   group: 'User Profile',
   title: 'UserProfileSecurityPanelFlow',
-  label: 'Security panel',
+  // Not a component name: there is no `<UserProfileSecurityPanelFlow />`, so the sidebar and the
+  // breadcrumb show this instead. `title` still drives the slug.
+  label: 'User profile security flow',
   layout: 'wide',
   navigation: { category: 'Flows' },
   source: 'packages/ui/src/mosaic/user-profile/dialogs/flow.types.ts',
 };
-
-const INITIAL_DEVICES: UserProfileDevice[] = [
-  {
-    id: 'current',
-    name: 'Safari on macOS',
-    description: 'Salt Lake City, UT, United States',
-    type: 'desktop',
-    isCurrent: true,
-  },
-  {
-    id: 'mobile',
-    name: 'Safari on iOS',
-    description: 'Last seen 2 weeks ago · Orem, UT, United States',
-    type: 'mobile',
-  },
-  {
-    id: 'desktop',
-    name: 'Clerk App on macOS',
-    description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
-    type: 'desktop',
-    details: {
-      title: 'Macbook Pro · Chrome',
-      lastActiveAtLabel: 'Last active 4 days ago',
-      deviceName: 'Macbook Pro',
-      browserName: 'Chrome 150.0.0.0',
-      ipAddress: '2600:100e:b10b:787b:e8ae:6e75:fc2f:b10',
-      location: 'Salt Lake City, UT, United States',
-      locationFlag: '🇺🇸',
-      originalSignInAtLabel: 'July 5th, 2026',
-    },
-  },
-];
-
-function downloadBackupCodes(codes: string[]) {
-  const url = URL.createObjectURL(new Blob([codes.join('\n')], { type: 'text/plain' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'clerk-backup-codes.txt';
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function securityPanelFlows(flow: ReturnType<typeof useUserProfileSecurityPanelFlow>): UserProfileSecurityPanelFlows {
-  return {
-    passwordTriggerRef: flow.passwordTriggerRef,
-    passkeysTriggerRef: flow.passkeysTriggerRef,
-    mfaTriggerRef: flow.mfaTriggerRef,
-    deleteTriggerRef: flow.deleteTriggerRef,
-    activeDevicesTriggerRef: flow.activeDevicesTriggerRef,
-    password: flow.password
-      ? {
-          state: flow.password,
-          onCancel: flow.closePassword,
-          onValueChange: flow.updatePasswordValue,
-          onSubmit: flow.submitPassword,
-        }
-      : null,
-    renamePasskey: flow.renamePasskey
-      ? {
-          state: flow.renamePasskey,
-          onCancel: flow.closeRenamePasskey,
-          onNameChange: flow.updatePasskeyName,
-          onRename: flow.submitRenamePasskey,
-        }
-      : null,
-    removePasskey: flow.removePasskey
-      ? {
-          state: flow.removePasskey,
-          onCancel: flow.closeRemovePasskey,
-          onRemove: flow.submitRemovePasskey,
-        }
-      : null,
-    addMfa: flow.addMfa
-      ? {
-          state: flow.addMfa,
-          onCancel: flow.closeAddMfa,
-          onCodeChange: flow.updateMfaCode,
-          onAddPhone: flow.addNewMfaPhone,
-          onSelectPhone: flow.selectMfaPhone,
-          onPhoneNumberChange: flow.updateMfaPhoneNumber,
-          onResend: () => void flow.resendMfaCode(),
-          onBack: flow.backAddMfa,
-          onSubmit: code => void flow.submitAddMfa(code),
-          onToggleDisplayFormat: flow.toggleMfaDisplayFormat,
-          onCopySecret: flow.copyMfaSecret,
-          onCopyBackupCodes: () => {
-            if (flow.addMfa?.step === 'backup-codes') {
-              void navigator.clipboard?.writeText(flow.addMfa.codes.join('\n'));
-              flow.markMfaBackupCodesCopied();
-            }
-          },
-          onDownloadBackupCodes: () => {
-            if (flow.addMfa?.step === 'backup-codes') {
-              downloadBackupCodes(flow.addMfa.codes);
-            }
-          },
-          onPrintBackupCodes: () => window.print(),
-          onFinish: flow.finishAddMfa,
-        }
-      : null,
-    removeMfa: flow.removeMfa
-      ? {
-          state: flow.removeMfa,
-          onCancel: flow.closeRemoveMfa,
-          onRemove: flow.submitRemoveMfa,
-        }
-      : null,
-    backupCodes: flow.backupCodes
-      ? {
-          state: flow.backupCodes,
-          onCancel: flow.closeBackupCodes,
-          onRetry: flow.regenerateBackupCodes,
-          onCopyAndClose: () => {
-            if (flow.backupCodes?.step === 'codes') {
-              void navigator.clipboard?.writeText(flow.backupCodes.codes.join('\n'));
-              flow.closeBackupCodes();
-            }
-          },
-          onDownload: () => {
-            if (flow.backupCodes?.step === 'codes') {
-              downloadBackupCodes(flow.backupCodes.codes);
-            }
-          },
-          onPrint: () => window.print(),
-        }
-      : null,
-    deleteAccount: flow.deleteAccount
-      ? {
-          state: flow.deleteAccount,
-          onCancel: flow.closeDeleteAccount,
-          onConfirmationChange: flow.updateDeleteConfirmation,
-          onDelete: flow.submitDeleteAccount,
-        }
-      : null,
-    signOutAllDevices: flow.signOutAllDevices
-      ? {
-          state: flow.signOutAllDevices,
-          onCancel: flow.closeSignOutAllDevices,
-          onSignOut: flow.submitSignOutAllDevices,
-        }
-      : null,
-    device: flow.device
-      ? {
-          state: flow.device,
-          onCancel: flow.closeDevice,
-          onSignOut: () => flow.signOutDevice(flow.device?.device.id ?? ''),
-        }
-      : null,
-    reverification: flow.reverification
-      ? {
-          operation: flow.reverification.operation,
-          state: flow.reverification.state,
-          onCancel: flow.cancelReverification,
-          onResend: () => void flow.resendReverification(),
-          onSubmit: value => void flow.submitVerification(value),
-          onValueChange: flow.updateVerificationValue,
-        }
-      : null,
-  };
-}
 
 const storyColumn = { display: 'flex', flexDirection: 'column', width: '100%' } as const;
 const controlsBar = {
@@ -380,19 +223,7 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         <input
           checked={config.hasMfaPhone}
           type='checkbox'
-          onChange={event =>
-            onChange({
-              ...config,
-              hasMfaPhone: event.target.checked,
-              hasBackupCodes: event.target.checked || config.hasMfaAuthenticator ? config.hasBackupCodes : false,
-              reverificationStrategy:
-                !event.target.checked &&
-                (config.reverificationStrategy === 'phone_code' ||
-                  (!config.hasMfaAuthenticator && config.reverificationStrategy === 'backup_code'))
-                  ? 'email_code'
-                  : config.reverificationStrategy,
-            })
-          }
+          onChange={event => onChange(setSecurityFlowMfaMethod(config, 'sms', event.target.checked))}
         />
         <span style={controlName}>Phone number verification</span>
       </label>
@@ -400,19 +231,7 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
         <input
           checked={config.hasMfaAuthenticator}
           type='checkbox'
-          onChange={event =>
-            onChange({
-              ...config,
-              hasMfaAuthenticator: event.target.checked,
-              hasBackupCodes: event.target.checked || config.hasMfaPhone ? config.hasBackupCodes : false,
-              reverificationStrategy:
-                !event.target.checked &&
-                (config.reverificationStrategy === 'totp' ||
-                  (!config.hasMfaPhone && config.reverificationStrategy === 'backup_code'))
-                  ? 'email_code'
-                  : config.reverificationStrategy,
-            })
-          }
+          onChange={event => onChange(setSecurityFlowMfaMethod(config, 'authenticator', event.target.checked))}
         />
         <span style={controlName}>Authenticator app</span>
       </label>
@@ -547,29 +366,13 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
 export function Default() {
   const [config, setConfig] = useState(DEFAULT_SECURITY_FLOW_CONFIG);
   const [deleteCompletion, setDeleteCompletion] = useState<{ session: null; redirectUrl: string } | null>(null);
-  const flow = useUserProfileSecurityPanelFlow({
+  const controller = useUserProfileSecurityPanelMockController({
     config,
-    initialDevices: INITIAL_DEVICES,
+    initialDevices: SECURITY_FLOW_DEVICES,
     onHasPasswordChange: hasPassword => setConfig(current => ({ ...current, hasPassword })),
     onHasPasskeyChange: hasPasskey => setConfig(current => ({ ...current, hasPasskey })),
     onBackupCodesChange: hasBackupCodes => setConfig(current => ({ ...current, hasBackupCodes })),
-    onMfaMethodChange: (method, enabled) =>
-      setConfig(current => {
-        const hasMfaPhone = method === 'sms' ? enabled : current.hasMfaPhone;
-        const hasMfaAuthenticator = method === 'authenticator' ? enabled : current.hasMfaAuthenticator;
-        return {
-          ...current,
-          hasMfaPhone,
-          hasMfaAuthenticator,
-          hasBackupCodes: hasMfaPhone || hasMfaAuthenticator ? current.hasBackupCodes : false,
-          reverificationStrategy:
-            !enabled &&
-            (current.reverificationStrategy === (method === 'sms' ? 'phone_code' : 'totp') ||
-              (!hasMfaPhone && !hasMfaAuthenticator && current.reverificationStrategy === 'backup_code'))
-              ? 'email_code'
-              : current.reverificationStrategy,
-        };
-      }),
+    onMfaMethodChange: (method, enabled) => setConfig(current => setSecurityFlowMfaMethod(current, method, enabled)),
     otherSessionsCount: config.otherSessionsCount,
     onSetActive: setDeleteCompletion,
   });
@@ -580,39 +383,7 @@ export function Default() {
         config={config}
         onChange={setConfig}
       />
-      <UserProfileSecurityPanelView
-        {...securityPanelFlows(flow)}
-        devices={config.devicesStatus === 'ready' ? flow.devices : []}
-        devicesError={config.devicesStatus === 'error' ? 'Sessions are unavailable.' : undefined}
-        devicesStatus={config.devicesStatus}
-        deviceSignOutState={flow.deviceSignOut}
-        hasPassword={flow.hasPassword}
-        mfaMethods={
-          config.mfaPhoneAvailable || config.mfaAuthenticatorAvailable || config.backupCodesAvailable
-            ? flow.mfaMethods
-            : undefined
-        }
-        mfaAddableMethods={[
-          ...(config.mfaPhoneAvailable ? (['sms'] as const) : []),
-          ...(config.mfaAuthenticatorAvailable ? (['authenticator'] as const) : []),
-        ]}
-        passkeys={config.passkeysAvailable ? flow.passkeys : undefined}
-        passwordAvailable={config.passwordAvailable}
-        passkeyCreationState={flow.passkeyCreation}
-        onAddPasskey={config.passkeysAvailable && config.passkeyCreationAvailable ? flow.addPasskey : undefined}
-        onChangePassword={config.passwordAvailable ? flow.openPassword : undefined}
-        onAddMfaMethod={config.mfaPhoneAvailable || config.mfaAuthenticatorAvailable ? flow.openAddMfa : undefined}
-        onDeleteAccount={config.deleteAccountAvailable ? flow.openDeleteAccount : undefined}
-        onEnableBackupCodes={config.backupCodesAvailable ? flow.openBackupCodes : undefined}
-        onManageDevice={flow.openDevice}
-        onManagePasskey={flow.openRenamePasskey}
-        onRemoveMfaMethod={flow.openRemoveMfa}
-        onRegenerateBackupCodes={flow.openBackupCodes}
-        onSetDefaultMfaMethod={flow.setDefaultMfa}
-        onRemovePasskey={flow.openRemovePasskey}
-        onSignOutAllOtherDevices={flow.openSignOutAllDevices}
-        onSignOutDevice={flow.signOutDevice}
-      />
+      <UserProfileSecurityPanelView {...controller} />
       {deleteCompletion ? <output>Active session cleared; redirect to {deleteCompletion.redirectUrl}</output> : null}
     </div>
   );
@@ -851,7 +622,7 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
           () => setOpen(false),
           () => setVerificationOpen(false),
         )}
-        devices={isDeviceFlow ? INITIAL_DEVICES : undefined}
+        devices={isDeviceFlow ? SECURITY_FLOW_DEVICES : undefined}
         hasPassword
         mfaMethods={isMfaFlow ? [] : undefined}
         passkeyCreationState={snapshot.flow === 'add-passkey' && open ? snapshot.state : null}
