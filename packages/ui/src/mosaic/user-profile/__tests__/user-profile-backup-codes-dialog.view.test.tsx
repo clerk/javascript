@@ -15,6 +15,21 @@ const actions = {
 };
 
 describe('UserProfileBackupCodesDialogView', () => {
+  it('renders the unavailable result', () => {
+    render(
+      <MosaicProvider>
+        <BackupCodesDialog>
+          <UserProfileBackupCodesDialogView
+            state={{ step: 'unavailable', isSubmitting: false, errors: {} }}
+            onCancel={vi.fn()}
+            {...actions}
+          />
+        </BackupCodesDialog>
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByText('No backup codes are available. Try generating a new set.')).toBeInTheDocument();
+  });
   it('opens in the generating state', () => {
     render(
       <MosaicProvider>

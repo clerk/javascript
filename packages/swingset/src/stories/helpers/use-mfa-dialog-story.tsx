@@ -131,6 +131,7 @@ export function useMfaDialogStory({
                   setAdd(current => (current && current.step === 'phone' ? { ...current, phoneNumber } : current))
                 }
                 onResend={() => undefined}
+                onBack={() => undefined}
                 onSubmit={submitAddMfa}
                 onToggleDisplayFormat={() =>
                   setAdd(current =>
@@ -140,6 +141,7 @@ export function useMfaDialogStory({
                   )
                 }
                 onCopyBackupCodes={() => undefined}
+                onCopySecret={() => undefined}
                 onDownloadBackupCodes={() => undefined}
                 onPrintBackupCodes={() => window.print()}
                 onFinish={() => setAdd(null)}

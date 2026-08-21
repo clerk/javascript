@@ -366,6 +366,7 @@ export interface UserProfileMfaPhoneOption {
   id: string;
   label: string;
   isVerified: boolean;
+  isDefault?: boolean;
 }
 
 interface UserProfileMfaAddBaseState {
@@ -397,6 +398,15 @@ export interface UserProfileMfaAuthenticatorSetupStep extends UserProfileMfaAddB
   step: 'setup';
   displayFormat: 'qr' | 'key';
   secret: string;
+  uri?: string;
+  copied?: boolean;
+}
+
+export interface UserProfileMfaSmsPreparingStep extends UserProfileMfaAddBaseState {
+  method: 'sms';
+  step: 'preparing-sms';
+  identifier: string;
+  returnStep?: 'select-phone' | 'phone';
 }
 
 export interface UserProfileMfaVerificationStep extends UserProfileMfaAddBaseState {
@@ -405,6 +415,7 @@ export interface UserProfileMfaVerificationStep extends UserProfileMfaAddBaseSta
   code: string;
   status: 'idle' | 'verifying' | 'error';
   resend: ResendState;
+  returnStep?: 'select-phone' | 'phone' | 'setup';
 }
 
 export interface UserProfileMfaBackupCodesStep extends UserProfileMfaAddBaseState {
@@ -421,6 +432,7 @@ export type UserProfileMfaAddFlowState =
   | UserProfileMfaPhoneSelectStep
   | UserProfileMfaPhoneStep
   | UserProfileMfaAuthenticatorPreparingStep
+  | UserProfileMfaSmsPreparingStep
   | UserProfileMfaAuthenticatorSetupStep
   | UserProfileMfaVerificationStep
   | UserProfileMfaBackupCodesStep
@@ -439,6 +451,8 @@ export interface UserProfileMfaAddFlowActions {
   onDownloadBackupCodes: () => void;
   onPrintBackupCodes: () => void;
   onFinish: () => void;
+  onBack: () => void;
+  onCopySecret: () => void;
 }
 
 export interface UserProfileMfaRemoveFlowState {
@@ -458,6 +472,11 @@ export type UserProfileBackupCodesFlowState =
   | {
       step: 'generating';
       isSubmitting: boolean;
+      errors: FlowErrors;
+    }
+  | {
+      step: 'unavailable';
+      isSubmitting: false;
       errors: FlowErrors;
     }
   | {

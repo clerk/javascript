@@ -176,7 +176,12 @@ export function useMfaSectionFlow({
     (method: UserProfileMfaMethodType, identifier?: string) => {
       const nextMethod: UserProfileMfaMethod =
         method === 'sms'
-          ? { id: `sms-${Date.now()}`, type: 'sms', description: identifier }
+          ? {
+              id: `sms-${Date.now()}`,
+              type: 'sms',
+              description: identifier,
+              isDefault: !mfaMethods.some(candidate => candidate.type === 'sms'),
+            }
           : { id: 'authenticator', type: 'authenticator' };
       setMfaMethods(methods =>
         withMfaRemovalConstraints(
@@ -211,7 +216,7 @@ export function useMfaSectionFlow({
         closeOperation('add-mfa');
       }
     },
-    [closeOperation, onBackupCodesChange, onMfaMethodChange],
+    [closeOperation, mfaMethods, onBackupCodesChange, onMfaMethodChange],
   );
   const prepareAuthenticator = useCallback(() => {
     setAddMfa({ method: 'authenticator', step: 'preparing', isSubmitting: true, errors: {} });
@@ -221,11 +226,39 @@ export function useMfaSectionFlow({
         step: 'setup',
         displayFormat: 'qr',
         secret: 'JBSWY3DPEHPK3PXP',
+        uri: 'otpauth://totp/Clerk:preston@clerk.dev?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
+        copied: false,
         isSubmitting: false,
         errors: {},
       }),
     );
   }, [runMutation]);
+  const prepareSms = useCallback(async (identifier: string, returnStep: 'select-phone' | 'phone') => {
+    setAddMfa({ method: 'sms', step: 'preparing-sms', identifier, returnStep, isSubmitting: true, errors: {} });
+    await sleep(settingsRef.current.latencyMs);
+    if (settingsRef.current.failurePoint === 'initial-request') {
+      setAddMfa({
+        method: 'sms',
+        step: 'preparing-sms',
+        identifier,
+        returnStep,
+        isSubmitting: false,
+        errors: { form: 'Could not send a verification code.' },
+      });
+      return;
+    }
+    setAddMfa({
+      method: 'sms',
+      step: 'verify',
+      identifier,
+      code: '',
+      status: 'idle',
+      resend: IDLE_RESEND,
+      returnStep,
+      isSubmitting: false,
+      errors: {},
+    });
+  }, []);
   const openAddMfa = useCallback(
     (method: UserProfileMfaMethodType) => {
       captureTrigger();
@@ -262,16 +295,7 @@ export function useMfaSectionFlow({
         return;
       }
       if (!phone.isVerified) {
-        setAddMfa({
-          method: 'sms',
-          step: 'verify',
-          identifier: phone.label,
-          code: '',
-          status: 'idle',
-          resend: IDLE_RESEND,
-          isSubmitting: false,
-          errors: {},
-        });
+        void prepareSms(phone.label, 'select-phone');
         return;
       }
       setAddMfa(current =>
@@ -279,7 +303,7 @@ export function useMfaSectionFlow({
       );
       void runMutation('add-mfa', () => completeMfaEnrollment('sms', phone.label));
     },
-    [addMfa, completeMfaEnrollment, runMutation],
+    [addMfa, completeMfaEnrollment, prepareSms, runMutation],
   );
   const submitAddMfa = useCallback(
     async (completedCode?: string) => {
@@ -289,19 +313,10 @@ export function useMfaSectionFlow({
       }
       if (current.step === 'preparing') {
         prepareAuthenticator();
+      } else if (current.step === 'preparing-sms') {
+        void prepareSms(current.identifier, current.returnStep ?? 'phone');
       } else if (current.step === 'phone') {
-        setAddMfa({ ...current, isSubmitting: true, errors: {} });
-        await sleep(settingsRef.current.latencyMs);
-        setAddMfa({
-          method: 'sms',
-          step: 'verify',
-          identifier: current.phoneNumber,
-          code: '',
-          status: 'idle',
-          resend: IDLE_RESEND,
-          isSubmitting: false,
-          errors: {},
-        });
+        void prepareSms(current.phoneNumber, 'phone');
       } else if (current.step === 'setup') {
         setAddMfa({
           method: 'authenticator',
@@ -309,6 +324,7 @@ export function useMfaSectionFlow({
           code: '',
           status: 'idle',
           resend: IDLE_RESEND,
+          returnStep: 'setup',
           isSubmitting: false,
           errors: {},
         });
@@ -328,7 +344,7 @@ export function useMfaSectionFlow({
         }
       }
     },
-    [addMfa, completeMfaEnrollment, prepareAuthenticator, runMutation],
+    [addMfa, completeMfaEnrollment, prepareAuthenticator, prepareSms, runMutation],
   );
 
   const openRemoveMfa = useCallback(
@@ -337,6 +353,7 @@ export function useMfaSectionFlow({
       if (!method || method.type === 'backup-codes' || method.removable === false) {
         return;
       }
+      captureTrigger();
       setRemoveMfa({
         method: method.type,
         id: method.id,
@@ -374,14 +391,77 @@ export function useMfaSectionFlow({
     captureTrigger();
     regenerateBackupCodes();
   }, [captureTrigger, regenerateBackupCodes]);
+  const setDefaultMfa = useCallback((id: string) => {
+    setMfaMethods(methods =>
+      methods.map(method => (method.type === 'sms' ? { ...method, isDefault: method.id === id } : method)),
+    );
+  }, []);
   const resendMfaCode = useCallback(async () => {
     setAddMfa(current =>
       current?.step === 'verify' ? { ...current, resend: { ...current.resend, isResending: true } } : current,
     );
     await sleep(settingsRef.current.latencyMs);
     setAddMfa(current =>
-      current?.step === 'verify' ? { ...current, resend: { ...current.resend, isResending: false } } : current,
+      current?.step === 'verify' ? { ...current, resend: { isResending: false, secondsRemaining: 30 } } : current,
     );
+  }, []);
+
+  useEffect(() => {
+    if (addMfa?.step !== 'verify' || addMfa.resend.secondsRemaining <= 0) {
+      return;
+    }
+    const timer = window.setInterval(() => {
+      setAddMfa(current =>
+        current?.step === 'verify'
+          ? {
+              ...current,
+              resend: { ...current.resend, secondsRemaining: Math.max(0, current.resend.secondsRemaining - 1) },
+            }
+          : current,
+      );
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [addMfa]);
+
+  const backAddMfa = useCallback(() => {
+    setAddMfa(current => {
+      if (!current) {
+        return current;
+      }
+      if (current.step === 'verify' || current.step === 'preparing-sms') {
+        if (current.returnStep === 'select-phone') {
+          return {
+            method: 'sms',
+            step: 'select-phone',
+            phones: [{ id: 'existing-phone', label: '+1 801-888-8181', isVerified: false }],
+            isSubmitting: false,
+            errors: {},
+          };
+        }
+        if (current.returnStep === 'phone') {
+          return {
+            method: 'sms',
+            step: 'phone',
+            phoneNumber: current.identifier ?? '+1',
+            isSubmitting: false,
+            errors: {},
+          };
+        }
+        if (current.returnStep === 'setup') {
+          return {
+            method: 'authenticator',
+            step: 'setup',
+            displayFormat: 'qr',
+            secret: 'JBSWY3DPEHPK3PXP',
+            uri: 'otpauth://totp/Clerk:preston@clerk.dev?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
+            copied: false,
+            isSubmitting: false,
+            errors: {},
+          };
+        }
+      }
+      return current;
+    });
   }, []);
 
   const updateVerificationValue = useCallback((value: string) => {
@@ -475,6 +555,8 @@ export function useMfaSectionFlow({
           ? { ...current, displayFormat: current.displayFormat === 'qr' ? 'key' : 'qr' }
           : current,
       ),
+    copyMfaSecret: () => setAddMfa(current => (current?.step === 'setup' ? { ...current, copied: true } : current)),
+    backAddMfa,
     submitAddMfa,
     finishAddMfa: () => closeOperation('add-mfa'),
     markMfaBackupCodesCopied: () =>
@@ -484,6 +566,7 @@ export function useMfaSectionFlow({
     closeRemoveMfa: () => closeOperation('remove-mfa'),
     submitRemoveMfa,
     openBackupCodes,
+    setDefaultMfa,
     closeBackupCodes: () => closeOperation('backup-codes'),
     regenerateBackupCodes,
     markBackupCodesCopied: () =>
@@ -510,7 +593,7 @@ function methodsFromConfig(
       ...(hasMfaPhone
         ? phones.length > 0
           ? phones
-          : [{ id: 'sms', type: 'sms' as const, description: '+1 801-888-8181' }]
+          : [{ id: 'sms', type: 'sms' as const, description: '+1 801-888-8181', isDefault: true }]
         : []),
       ...(hasMfaAuthenticator ? [authenticator ?? { id: 'authenticator', type: 'authenticator' as const }] : []),
       ...(hasBackupCodes && (hasMfaPhone || hasMfaAuthenticator)

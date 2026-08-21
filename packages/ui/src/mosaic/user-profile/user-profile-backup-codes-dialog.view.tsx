@@ -43,7 +43,9 @@ export function UserProfileBackupCodesDialogView({
         <Dialog.Description render={<Text />}>
           {state.step === 'codes'
             ? 'Save these backup codes somewhere safe. Each code can only be used once.'
-            : 'Creating a new set of backup codes.'}
+            : state.step === 'unavailable'
+              ? 'No backup codes were returned for this account.'
+              : 'Creating a new set of backup codes.'}
         </Dialog.Description>
       </Card.Header>
       <Card.Content {...stylex.props(styles.content)}>
@@ -96,6 +98,7 @@ export function UserProfileBackupCodesDialogView({
             </div>
           </>
         ) : null}
+        {state.step === 'unavailable' ? <Text>No backup codes are available. Try generating a new set.</Text> : null}
         {state.errors.form ? (
           <Text
             color='negative'
@@ -105,9 +108,9 @@ export function UserProfileBackupCodesDialogView({
           </Text>
         ) : null}
       </Card.Content>
-      {state.step === 'codes' || !state.isSubmitting ? (
+      {state.step === 'codes' || state.step === 'unavailable' || !state.isSubmitting ? (
         <Card.Footer>
-          {state.step === 'codes' ? (
+          {state.step === 'codes' || state.step === 'unavailable' ? (
             <Button
               type='button'
               {...stylex.props(styles.footerButton)}

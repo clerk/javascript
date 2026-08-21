@@ -44,8 +44,10 @@ export function Default() {
       <UserProfileMfaSectionView
         methods={flow.mfaMethods}
         onAdd={flow.openAddMfa}
+        onEnableBackupCodes={flow.openBackupCodes}
         onRegenerateBackupCodes={flow.openBackupCodes}
         onRemove={flow.openRemoveMfa}
+        onSetDefault={flow.setDefaultMfa}
       />
       <MfaSectionFlowDialogs flow={flow} />
     </div>

@@ -165,8 +165,10 @@ export function MfaSectionFlowDialogs({ flow }: { flow: MfaFlow }) {
               onSelectPhone={flow.selectMfaPhone}
               onPhoneNumberChange={flow.updateMfaPhoneNumber}
               onResend={() => void flow.resendMfaCode()}
+              onBack={flow.backAddMfa}
               onSubmit={code => void flow.submitAddMfa(code)}
               onToggleDisplayFormat={flow.toggleMfaDisplayFormat}
+              onCopySecret={flow.copyMfaSecret}
               onCopyBackupCodes={() => {
                 if (flow.addMfa?.step === 'backup-codes') {
                   void navigator.clipboard?.writeText(flow.addMfa.codes.join('\n'));

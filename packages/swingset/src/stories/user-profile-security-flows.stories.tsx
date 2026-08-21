@@ -242,8 +242,10 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
               onSelectPhone={flow.selectMfaPhone}
               onPhoneNumberChange={flow.updateMfaPhoneNumber}
               onResend={() => void flow.resendMfaCode()}
+              onBack={flow.backAddMfa}
               onSubmit={code => void flow.submitAddMfa(code)}
               onToggleDisplayFormat={flow.toggleMfaDisplayFormat}
+              onCopySecret={flow.copyMfaSecret}
               onCopyBackupCodes={() => {
                 if (flow.addMfa?.step === 'backup-codes') {
                   void navigator.clipboard?.writeText(flow.addMfa.codes.join('\n'));
@@ -1268,6 +1270,48 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
   {
     flow: 'add-mfa',
     step: 'verify phone',
+    variant: 'preparing',
+    state: {
+      method: 'sms',
+      step: 'preparing-sms',
+      identifier: '+1 801 555 0100',
+      returnStep: 'phone',
+      isSubmitting: true,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify phone',
+    variant: 'preparation error',
+    state: {
+      method: 'sms',
+      step: 'preparing-sms',
+      identifier: '+1 801 555 0100',
+      returnStep: 'phone',
+      isSubmitting: false,
+      errors: { form: 'Could not send a verification code.' },
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify phone',
+    variant: 'resend cooldown',
+    state: {
+      method: 'sms',
+      step: 'verify',
+      identifier: '+1 801 555 0100',
+      code: '',
+      status: 'idle',
+      resend: { isResending: false, secondsRemaining: 24 },
+      returnStep: 'phone',
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify phone',
     variant: 'verifying',
     state: {
       method: 'sms',
@@ -1321,6 +1365,7 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
       step: 'setup',
       displayFormat: 'qr',
       secret: 'JBSWY3DPEHPK3PXP',
+      uri: 'otpauth://totp/Clerk:preston@clerk.dev?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
       isSubmitting: false,
       errors: {},
     },
@@ -1334,6 +1379,8 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
       step: 'setup',
       displayFormat: 'key',
       secret: 'JBSWY3DPEHPK3PXP',
+      uri: 'otpauth://totp/Clerk:preston@clerk.dev?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
+      copied: true,
       isSubmitting: false,
       errors: {},
     },
@@ -1497,6 +1544,12 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
       isSubmitting: false,
       errors: {},
     },
+  },
+  {
+    flow: 'backup-codes',
+    step: 'new codes',
+    variant: 'unavailable',
+    state: { step: 'unavailable', isSubmitting: false, errors: {} },
   },
   {
     flow: 'backup-codes',
@@ -1720,8 +1773,10 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
             onSelectPhone={noop}
             onPhoneNumberChange={noop}
             onResend={noop}
+            onBack={noop}
             onSubmit={noop}
             onToggleDisplayFormat={noop}
+            onCopySecret={noop}
             onCopyBackupCodes={noop}
             onDownloadBackupCodes={noop}
             onPrintBackupCodes={noop}

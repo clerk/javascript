@@ -92,6 +92,8 @@ export function useSecurityFlow({
     updateMfaPhoneNumber: mfa.updateMfaPhoneNumber,
     updateMfaCode: mfa.updateMfaCode,
     toggleMfaDisplayFormat: mfa.toggleMfaDisplayFormat,
+    copyMfaSecret: mfa.copyMfaSecret,
+    backAddMfa: mfa.backAddMfa,
     submitAddMfa: mfa.submitAddMfa,
     finishAddMfa: mfa.finishAddMfa,
     markMfaBackupCodesCopied: mfa.markMfaBackupCodesCopied,

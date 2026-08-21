@@ -17,7 +17,9 @@ const actions = {
   onCodeChange: vi.fn(),
   onSubmit: vi.fn(),
   onResend: vi.fn(),
+  onBack: vi.fn(),
   onToggleDisplayFormat: vi.fn(),
+  onCopySecret: vi.fn(),
   onCopyBackupCodes: vi.fn(),
   onDownloadBackupCodes: vi.fn(),
   onPrintBackupCodes: vi.fn(),
@@ -93,6 +95,7 @@ describe('UserProfileMfaAddDialogView', () => {
         step: 'setup',
         displayFormat: 'qr',
         secret: 'JBSWY3DPEHPK3PXP',
+        uri: 'otpauth://totp/Clerk:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
         isSubmitting: false,
         errors: {},
       },
@@ -102,6 +105,47 @@ describe('UserProfileMfaAddDialogView', () => {
     expect(screen.getByRole('img', { name: 'Authenticator QR code' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: "Can't scan the QR code?" }));
     expect(onToggleDisplayFormat).toHaveBeenCalledOnce();
+  });
+
+  it('exposes the authenticator URI and copy action in manual setup', async () => {
+    const onCopySecret = vi.fn();
+    const user = userEvent.setup();
+    renderAdd(
+      {
+        method: 'authenticator',
+        step: 'setup',
+        displayFormat: 'key',
+        secret: 'JBSWY3DPEHPK3PXP',
+        uri: 'otpauth://totp/Clerk:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Clerk',
+        copied: false,
+        isSubmitting: false,
+        errors: {},
+      },
+      { onCopySecret },
+    );
+
+    expect(screen.getByText(/otpauth:\/\/totp\/Clerk/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Copy setup key' }));
+    expect(onCopySecret).toHaveBeenCalledOnce();
+  });
+
+  it('shows SMS preparation and returns to the previous step', async () => {
+    const onBack = vi.fn();
+    const user = userEvent.setup();
+    renderAdd(
+      {
+        method: 'sms',
+        step: 'preparing-sms',
+        identifier: '+1 801-888-8181',
+        returnStep: 'select-phone',
+        isSubmitting: false,
+        errors: { form: 'Could not send a verification code.' },
+      },
+      { onBack },
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    expect(onBack).toHaveBeenCalledOnce();
   });
 
   it('submits a verification code with a pending submit button', () => {
