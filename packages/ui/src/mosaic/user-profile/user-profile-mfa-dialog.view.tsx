@@ -12,7 +12,7 @@ import { Spinner } from '../components/spinner';
 import { Text } from '../components/text';
 import { themeProps } from '../props';
 import type { UserProfileMfaAddFlowState, UserProfileMfaRemoveFlowState } from './dialogs/flow.types';
-import { CodeInput, PhoneInput, ResendButton } from './dialogs/security-dialog-chrome';
+import { CodeInput, PhoneInput, ResendButton } from './dialogs/flow-dialog-chrome';
 import { mfaDialogStyles as styles } from './user-profile-mfa-dialog.styles';
 
 export interface UserProfileMfaAddDialogViewProps extends Pick<DialogProps, 'open' | 'defaultOpen' | 'onOpenChange'> {
