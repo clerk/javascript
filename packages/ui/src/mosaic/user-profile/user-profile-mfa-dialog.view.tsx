@@ -313,7 +313,7 @@ function AddContent({
             {...stylex.props(styles.qrPlaceholder)}
           />
         ) : (
-          <div>
+          <div {...stylex.props(styles.manualSetup)}>
             <Text
               render={<code />}
               {...stylex.props(styles.secret)}
