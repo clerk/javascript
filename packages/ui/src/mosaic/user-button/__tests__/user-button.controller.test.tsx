@@ -44,6 +44,12 @@ function Harness({ model, ...options }: { model: UserButtonModel } & UserButtonC
       </button>
       <button
         type='button'
+        onClick={() => c.onOpenChange?.(false)}
+      >
+        close
+      </button>
+      <button
+        type='button'
         onClick={() => c.onSelectOrganization?.('org_1')}
       >
         select-org
@@ -143,6 +149,101 @@ describe('useUserButtonController', () => {
     fireEvent.click(screen.getByText('Documentation'));
 
     expect(onClick).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('open')).toHaveTextContent('false');
+  });
+
+  it('starts closed and opens and closes', () => {
+    render(<Harness model={ready()} />);
+    expect(screen.getByTestId('open')).toHaveTextContent('false');
+
+    fireEvent.click(screen.getByText('open'));
+    expect(screen.getByTestId('open')).toHaveTextContent('true');
+
+    fireEvent.click(screen.getByText('close'));
+    expect(screen.getByTestId('open')).toHaveTextContent('false');
+  });
+
+  it('holds the popup open when an action fails, even one that would have closed it', async () => {
+    const onSelectOrganization = vi.fn(() => Promise.reject(new Error('cannot switch')));
+    render(<Harness model={ready({ onSelectOrganization })} />);
+
+    fireEvent.click(screen.getByText('open'));
+    fireEvent.click(screen.getByText('select-org'));
+
+    await act(async () => {
+      await tick();
+    });
+    expect(screen.getByTestId('open')).toHaveTextContent('true');
+    expect(screen.getByTestId('pending')).toHaveTextContent('');
+  });
+
+  it('lets the row be clicked again after a failure', async () => {
+    const onSelectOrganization = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('boom'))
+      .mockResolvedValueOnce(undefined);
+    render(<Harness model={ready({ onSelectOrganization })} />);
+
+    fireEvent.click(screen.getByText('open'));
+    fireEvent.click(screen.getByText('select-org'));
+    await act(async () => {
+      await tick();
+    });
+
+    fireEvent.click(screen.getByText('select-org'));
+    expect(onSelectOrganization).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      await tick();
+    });
+    expect(screen.getByTestId('open')).toHaveTextContent('false');
+  });
+
+  it('refuses a second action while one is in flight', async () => {
+    const pending = deferred<unknown>();
+    const onSelectOrganization = vi.fn(() => pending.promise);
+    const onSwitchSession = vi.fn(() => Promise.resolve());
+    render(<Harness model={ready({ onSelectOrganization, onSwitchSession })} />);
+
+    fireEvent.click(screen.getByText('open'));
+    fireEvent.click(screen.getByText('select-org'));
+    await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('select-org:org_1'));
+
+    fireEvent.click(screen.getByText('switch'));
+    expect(onSwitchSession).not.toHaveBeenCalled();
+
+    await act(async () => {
+      pending.resolve(undefined);
+      await tick();
+    });
+  });
+
+  it('refuses an action while the popup is closed', () => {
+    const onSelectOrganization = vi.fn(() => Promise.resolve());
+    render(<Harness model={ready({ onSelectOrganization })} />);
+
+    fireEvent.click(screen.getByText('select-org'));
+
+    expect(onSelectOrganization).not.toHaveBeenCalled();
+    expect(screen.getByTestId('open')).toHaveTextContent('false');
+  });
+
+  it('abandons an action dismissed mid-flight rather than reopening on its result', async () => {
+    const pending = deferred<unknown>();
+    const onSwitchSession = vi.fn(() => pending.promise);
+    render(<Harness model={ready({ onSwitchSession })} />);
+
+    fireEvent.click(screen.getByText('open'));
+    fireEvent.click(screen.getByText('switch'));
+    await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('switch:sess_2'));
+
+    fireEvent.click(screen.getByText('close'));
+    expect(screen.getByTestId('open')).toHaveTextContent('false');
+
+    await act(async () => {
+      pending.resolve(undefined);
+      await tick();
+    });
     expect(screen.getByTestId('open')).toHaveTextContent('false');
   });
 

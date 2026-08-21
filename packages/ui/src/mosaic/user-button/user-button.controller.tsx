@@ -9,7 +9,7 @@ import { userButtonBusyKeys } from './user-button.view';
 /** The model once Clerk has answered, which is the only shape an action can start from. */
 export type UserButtonReadyModel = Extract<UserButtonModel, { status: 'ready' }>;
 
-export interface UserButtonMachineContext {
+interface UserButtonMachineContext {
   /** Which action is currently pending. */
   pendingKey: string | null;
   /**
@@ -24,7 +24,7 @@ export interface UserButtonMachineContext {
   closeOnSuccess: boolean;
 }
 
-export type UserButtonMachineEvent =
+type UserButtonMachineEvent =
   | { type: 'OPEN' }
   | { type: 'CLOSE' }
   | {
@@ -39,7 +39,7 @@ const { createMachine, assign, fromPromise } = setup<UserButtonMachineContext, U
 
 const settled = { pendingKey: null, frozen: null };
 
-export const userButtonMachine = createMachine({
+const userButtonMachine = createMachine({
   id: 'userButton',
   initial: 'closed',
   context: {
