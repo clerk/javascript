@@ -4,9 +4,9 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { useMfaSectionFlow } from './user-profile-mfa-section-flow.harness';
-import { MfaSectionFlowDialogs } from './user-profile-security-section-flow-dialogs';
 import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-flow.config';
 import { SecurityFlowStates } from './user-profile-security-flows.stories';
+import { MfaSectionFlowDialogs } from './user-profile-security-section-flow-dialogs';
 
 export { default as __source } from './user-profile-mfa-section-flow.stories?raw';
 

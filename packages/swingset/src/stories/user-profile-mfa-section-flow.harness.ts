@@ -303,7 +303,7 @@ export function useMfaSectionFlow({
       );
       void runMutation('add-mfa', () => completeMfaEnrollment('sms', phone.label));
     },
-    [addMfa, completeMfaEnrollment, prepareSms, runMutation],
+    [addMfa, captureTrigger, completeMfaEnrollment, prepareSms, runMutation],
   );
   const submitAddMfa = useCallback(
     async (completedCode?: string) => {
