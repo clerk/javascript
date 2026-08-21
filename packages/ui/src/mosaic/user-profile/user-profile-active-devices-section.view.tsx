@@ -4,7 +4,7 @@ import { Button } from '../components/button';
 import { Badge } from '../components/badge';
 import { Spinner } from '../components/spinner';
 import { Section } from '../components/section';
-import type { UserProfileDeviceDetails } from './dialogs/flow.types';
+import type { UserProfileDeviceDetails, UserProfileDeviceSignOutFlowState } from './dialogs/flow.types';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
@@ -28,6 +28,7 @@ export interface UserProfileActiveDevicesSectionViewProps {
   onManageDevice?: (id: string) => void;
   onSignOutDevice?: (id: string) => void;
   onSignOutAllOtherDevices?: () => void;
+  signOutState?: UserProfileDeviceSignOutFlowState | null;
   status?: 'loading' | 'ready' | 'error';
   error?: string;
 }
@@ -37,6 +38,7 @@ export function UserProfileActiveDevicesSectionView({
   onManageDevice,
   onSignOutDevice,
   onSignOutAllOtherDevices,
+  signOutState,
   status = 'ready',
   error,
 }: UserProfileActiveDevicesSectionViewProps) {
@@ -131,6 +133,7 @@ export function UserProfileActiveDevicesSectionView({
                   <DeviceItem
                     key={device.id}
                     device={device}
+                    signOutState={signOutState?.id === device.id ? signOutState : null}
                     onManage={onManageDevice}
                     onSignOut={onSignOutDevice}
                   />
@@ -148,22 +151,25 @@ function DeviceItem({
   device,
   onManage,
   onSignOut,
+  signOutState,
 }: {
   device: UserProfileDevice;
   onManage?: (id: string) => void;
   onSignOut?: (id: string) => void;
+  signOutState?: UserProfileDeviceSignOutFlowState | null;
 }) {
   const actions: UserProfileMenuAction[] = [];
+  const isRevoking = device.isRevoking || signOutState?.isSubmitting;
 
-  if (onManage && !device.isRevoking) {
-    actions.push({ label: m.devices.manage, onClick: () => onManage(device.id) });
+  if (onManage && !isRevoking) {
+    actions.push({ label: m.devices.viewDetails, onClick: () => onManage(device.id) });
   }
-  if (onSignOut && !device.isRevoking) {
+  if (onSignOut && !isRevoking) {
     actions.push({ label: m.common.signOut, color: 'negative', onClick: () => onSignOut(device.id) });
   }
 
   return (
-    <Section.Item aria-disabled={device.isRevoking || undefined}>
+    <Section.Item aria-disabled={isRevoking || undefined}>
       <UserProfileSecurityIcon name={device.type} />
       <Section.Content>
         <Section.Label>
@@ -186,6 +192,9 @@ function DeviceItem({
             {device.isCurrent && !device.relationship && device.description ? <span>·</span> : null}
             {device.description ? <span>{device.description}</span> : null}
           </Section.Description>
+        ) : null}
+        {signOutState?.errors.form ? (
+          <Section.Description role='alert'>{signOutState.errors.form}</Section.Description>
         ) : null}
       </Section.Content>
       <Section.Actions>

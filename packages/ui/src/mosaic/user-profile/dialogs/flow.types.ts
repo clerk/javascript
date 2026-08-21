@@ -345,19 +345,19 @@ export interface UserProfileDeviceDetails {
 }
 
 export interface UserProfileDeviceDetailsFlowState {
-  step: 'details' | 'confirm';
   device: UserProfileDeviceDetails;
   isSubmitting: boolean;
   errors: FlowErrors;
 }
 
 export interface UserProfileDeviceDetailsFlowActions {
-  onRequestSignOut: () => void;
+  onSignOut: () => void;
 }
 
-export interface UserProfileDeviceSignOutFlowActions {
-  onCancel: () => void;
-  onSignOut: () => void;
+export interface UserProfileDeviceSignOutFlowState {
+  id: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
 }
 
 export type UserProfileMfaMethodType = 'sms' | 'authenticator';

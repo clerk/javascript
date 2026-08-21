@@ -18,10 +18,7 @@ import type {
 import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import { UserProfileBackupCodesDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-backup-codes-dialog.view';
 import { UserProfileDeleteAccountDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-account-dialog.view';
-import {
-  UserProfileDeviceDialogView,
-  UserProfileDeviceSignOutDialogView,
-} from '@clerk/ui/mosaic/user-profile/user-profile-device-dialog.view';
+import { UserProfileDeviceDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-device-dialog.view';
 import {
   UserProfileMfaAddDialogView,
   UserProfileMfaRemoveDialogView,
@@ -358,32 +355,13 @@ function UserProfileSecurityPanelFlowDialogs({ flow }: { flow: ReturnType<typeof
           {flow.device ? (
             <UserProfileDeviceDialogView
               state={flow.device}
-              isInterrupted={flow.device.step === 'confirm'}
-              onRequestSignOut={flow.requestSignOutDevice}
+              isInterrupted={flow.reverification?.operation === 'sign-out-device'}
+              onSignOut={() => flow.signOutDevice(flow.device?.device.id ?? '')}
             />
           ) : null}
         </Freeze>
-        <AlertDialog
-          open={flow.device?.step === 'confirm'}
-          onOpenChange={open => {
-            if (!open && !flow.device?.isSubmitting) {
-              flow.cancelSignOutDevice();
-            }
-          }}
-        >
-          <Freeze frozen={flow.device?.step !== 'confirm'}>
-            {flow.device?.step === 'confirm' ? (
-              <UserProfileDeviceSignOutDialogView
-                state={flow.device}
-                isInterrupted={flow.reverification?.operation === 'sign-out-device'}
-                onCancel={flow.cancelSignOutDevice}
-                onSignOut={flow.submitSignOutDevice}
-              />
-            ) : null}
-          </Freeze>
-          {verificationDialog('sign-out-device')}
-        </AlertDialog>
       </FlowCardDialog>
+      {verificationDialog('sign-out-device')}
     </>
   );
 }
@@ -796,6 +774,7 @@ export function Default() {
       />
       <UserProfileSecurityPanelView
         devices={flow.devices}
+        deviceSignOutState={flow.deviceSignOut}
         hasPassword={flow.hasPassword}
         mfaMethods={flow.mfaMethods}
         mfaAddableMethods={[
@@ -817,7 +796,7 @@ export function Default() {
         onSetDefaultMfaMethod={flow.setDefaultMfa}
         onRemovePasskey={flow.openRemovePasskey}
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
-        onSignOutDevice={flow.openSignOutDevice}
+        onSignOutDevice={flow.signOutDevice}
       />
       <UserProfileSecurityPanelFlowDialogs flow={flow} />
       {deleteCompletion ? <output>Active session cleared; redirect to {deleteCompletion.redirectUrl}</output> : null}
@@ -1593,19 +1572,13 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     flow: 'device',
     step: 'device',
     variant: 'details',
-    state: { step: 'details', device: deviceDetails, isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'device',
-    step: 'device',
-    variant: 'confirm',
-    state: { step: 'confirm', device: deviceDetails, isSubmitting: false, errors: {} },
+    state: { device: deviceDetails, isSubmitting: false, errors: {} },
   },
   {
     flow: 'device',
     step: 'device',
     variant: 'submitting',
-    state: { step: 'confirm', device: deviceDetails, isSubmitting: true, errors: {} },
+    state: { device: deviceDetails, isSubmitting: true, errors: {} },
   },
   {
     flow: 'device',
@@ -1613,7 +1586,6 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     variant: 'server error',
     state: {
       device: deviceDetails,
-      step: 'confirm',
       isSubmitting: false,
       errors: { form: 'Something went wrong. Please try again.' },
     },
@@ -1622,7 +1594,7 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     flow: 'device',
     step: 'device',
     variant: 'reverification',
-    state: { step: 'confirm', device: deviceDetails, isSubmitting: true, errors: {} },
+    state: { device: deviceDetails, isSubmitting: true, errors: {} },
     reverification: idleVerification,
   },
   {
@@ -1840,18 +1812,10 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
         >
           <UserProfileDeviceDialogView
             state={snapshot.state}
-            isInterrupted={snapshot.state.step === 'confirm'}
-            onRequestSignOut={noop}
+            isInterrupted={verificationOpen}
+            onSignOut={noop}
           />
-          <AlertDialog open={snapshot.state.step === 'confirm'}>
-            <UserProfileDeviceSignOutDialogView
-              state={snapshot.state}
-              isInterrupted={verificationOpen}
-              onCancel={noop}
-              onSignOut={noop}
-            />
-            {verification}
-          </AlertDialog>
+          {verification}
         </FlowCardDialog>
       ) : null}
     </div>

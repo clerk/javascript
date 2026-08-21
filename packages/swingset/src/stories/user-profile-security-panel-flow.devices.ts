@@ -1,6 +1,7 @@
 import type {
   ReverificationChallengeState,
   UserProfileDeviceDetailsFlowState,
+  UserProfileDeviceSignOutFlowState,
   UserProfileSignOutAllDevicesFlowState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
@@ -33,8 +34,10 @@ export function useDevicesFlowSlice({
   settingsRef.current = config;
   const [devices, setDevices] = useState(initialDevices);
   const [device, setDevice] = useState<UserProfileDeviceDetailsFlowState | null>(null);
+  const [deviceSignOut, setDeviceSignOut] = useState<UserProfileDeviceSignOutFlowState | null>(null);
   const [signOutAllDevices, setSignOutAllDevices] = useState<UserProfileSignOutAllDevicesFlowState | null>(null);
   const [reverification, setReverification] = useState<DeviceReverificationState | null>(null);
+  const deviceSignOutIdRef = useRef<string | null>(null);
   const verificationGate = useRef<{ operation: DeviceOperation; resolve: (verified: boolean) => void } | null>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const captureTrigger = useCallback(() => {
@@ -55,7 +58,8 @@ export function useDevicesFlowSlice({
         cancelReverification();
       }
       if (operation === 'sign-out-device') {
-        setDevice(null);
+        setDeviceSignOut(null);
+        deviceSignOutIdRef.current = null;
       } else {
         setSignOutAllDevices(null);
       }
@@ -65,10 +69,14 @@ export function useDevicesFlowSlice({
   const setSubmitting = useCallback((operation: DeviceOperation, isSubmitting: boolean, formError?: string) => {
     const errors = formError ? { form: formError } : {};
     if (operation === 'sign-out-device') {
-      setDevice(current => (current ? { ...current, isSubmitting, errors } : current));
-      if (!isSubmitting) {
-        setDevices(devices => devices.map(candidate => ({ ...candidate, isRevoking: false })));
-      }
+      const deviceId = deviceSignOutIdRef.current;
+      setDeviceSignOut(current => (current ? { ...current, isSubmitting, errors } : current));
+      setDevice(current =>
+        current && current.device.id === deviceId ? { ...current, isSubmitting, errors } : current,
+      );
+      setDevices(devices =>
+        devices.map(candidate => (candidate.id === deviceId ? { ...candidate, isRevoking: isSubmitting } : candidate)),
+      );
     } else {
       setSignOutAllDevices(current => (current ? { ...current, isSubmitting, errors } : current));
     }
@@ -105,6 +113,9 @@ export function useDevicesFlowSlice({
       const verified = await requestReverification(operation);
       if (!verified) {
         setSubmitting(operation, false);
+        if (operation === 'sign-out-device') {
+          setDeviceSignOut(null);
+        }
         return;
       }
       if (settingsRef.current.requireReverification) {
@@ -127,7 +138,6 @@ export function useDevicesFlowSlice({
         return;
       }
       setDevice({
-        step: 'details',
         device: {
           id: selected.id,
           title: selected.details?.title ?? selected.name,
@@ -145,32 +155,27 @@ export function useDevicesFlowSlice({
     },
     [captureTrigger, devices],
   );
-  const openSignOutDevice = useCallback(
+  const signOutDevice = useCallback(
     (id: string) => {
-      openDevice(id);
-      setDevice(current => (current ? { ...current, step: 'confirm' } : current));
+      const selected = devices.find(candidate => candidate.id === id);
+      if (!selected || selected.isCurrent || selected.isRevoking) {
+        return;
+      }
+      captureTrigger();
+      deviceSignOutIdRef.current = id;
+      setDeviceSignOut({ id, isSubmitting: true, errors: {} });
+      setDevice(current => (current?.device.id === id ? { ...current, isSubmitting: true, errors: {} } : current));
+      setDevices(current =>
+        current.map(candidate => (candidate.id === id ? { ...candidate, isRevoking: true } : candidate)),
+      );
+      void runMutation('sign-out-device', () => {
+        setDevices(current => current.filter(candidate => candidate.id !== id));
+        setDevice(current => (current?.device.id === id ? null : current));
+        closeOperation('sign-out-device');
+      });
     },
-    [openDevice],
+    [captureTrigger, closeOperation, devices, runMutation],
   );
-  const requestSignOutDevice = useCallback(() => {
-    setDevice(current => (current ? { ...current, step: 'confirm', errors: {} } : current));
-  }, []);
-  const cancelSignOutDevice = useCallback(() => {
-    setDevice(current => (current ? { ...current, step: 'details', errors: {} } : current));
-  }, []);
-  const submitSignOutDevice = useCallback(() => {
-    if (!device || device.isSubmitting) {
-      return;
-    }
-    const deviceId = device.device.id;
-    setDevices(current =>
-      current.map(candidate => (candidate.id === deviceId ? { ...candidate, isRevoking: true } : candidate)),
-    );
-    void runMutation('sign-out-device', () => {
-      setDevices(current => current.filter(candidate => candidate.id !== deviceId));
-      closeOperation('sign-out-device');
-    });
-  }, [closeOperation, device, runMutation]);
 
   const openSignOutAllDevices = useCallback(() => {
     captureTrigger();
@@ -262,18 +267,16 @@ export function useDevicesFlowSlice({
     triggerRef,
     devices,
     device,
+    deviceSignOut,
     signOutAllDevices,
     reverification,
     openDevice,
-    openSignOutDevice,
+    signOutDevice,
     closeDevice: () => {
       if (!device?.isSubmitting) {
-        closeOperation('sign-out-device');
+        setDevice(null);
       }
     },
-    requestSignOutDevice,
-    cancelSignOutDevice,
-    submitSignOutDevice,
     openSignOutAllDevices,
     closeSignOutAllDevices: () => {
       if (!signOutAllDevices?.isSubmitting) {

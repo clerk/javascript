@@ -1,17 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { AlertDialog } from '../components/alert-dialog';
-import { Button, SubmitButton } from '../components/button';
+import { SubmitButton } from '../components/button';
 import { Card } from '../components/card';
 import { Dialog } from '../components/dialog';
 import { Heading } from '../components/heading';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
-import type {
-  UserProfileDeviceDetailsFlowActions,
-  UserProfileDeviceDetailsFlowState,
-  UserProfileDeviceSignOutFlowActions,
-} from './dialogs/flow.types';
+import type { UserProfileDeviceDetailsFlowActions, UserProfileDeviceDetailsFlowState } from './dialogs/flow.types';
 import { deviceDialogStyles as styles } from './user-profile-device-dialog.styles';
 import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
@@ -23,7 +18,7 @@ export interface UserProfileDeviceDialogViewProps extends UserProfileDeviceDetai
 export function UserProfileDeviceDialogView({
   state,
   isInterrupted = false,
-  onRequestSignOut,
+  onSignOut,
 }: UserProfileDeviceDialogViewProps) {
   const { device, isSubmitting } = state;
   const details = [
@@ -64,53 +59,17 @@ export function UserProfileDeviceDialogView({
             </div>
           ))}
         </dl>
+        {state.errors.form ? (
+          <Text
+            color='negative'
+            role='alert'
+            {...stylex.props(styles.error)}
+          >
+            {state.errors.form}
+          </Text>
+        ) : null}
       </Card.Content>
       <Card.Footer {...mergeStyleProps(themeProps('user-profile-device-dialog-actions'), stylex.props(styles.footer))}>
-        <Button
-          type='button'
-          disabled={state.isSubmitting}
-          color='negative'
-          onClick={onRequestSignOut}
-        >
-          {m.common.signOut}
-        </Button>
-      </Card.Footer>
-    </div>
-  );
-}
-
-export interface UserProfileDeviceSignOutDialogViewProps extends UserProfileDeviceSignOutFlowActions {
-  state: UserProfileDeviceDetailsFlowState;
-  isInterrupted?: boolean;
-}
-
-export function UserProfileDeviceSignOutDialogView({
-  state,
-  isInterrupted = false,
-  onCancel,
-  onSignOut,
-}: UserProfileDeviceSignOutDialogViewProps) {
-  return (
-    <div aria-hidden={isInterrupted || undefined}>
-      <AlertDialog.Title render={<Heading size='sm' />}>{m.devices.confirmTitle}</AlertDialog.Title>
-      <AlertDialog.Description render={<Text />}>{m.devices.confirmDescription}</AlertDialog.Description>
-      {state.errors.form ? (
-        <Text
-          color='negative'
-          role='alert'
-          {...stylex.props(styles.error)}
-        >
-          {state.errors.form}
-        </Text>
-      ) : null}
-      <AlertDialog.Actions>
-        <Button
-          type='button'
-          variant='outline'
-          onClick={onCancel}
-        >
-          {m.common.cancel}
-        </Button>
         <SubmitButton
           type='button'
           color='negative'
@@ -120,7 +79,7 @@ export function UserProfileDeviceSignOutDialogView({
         >
           {m.common.signOut}
         </SubmitButton>
-      </AlertDialog.Actions>
+      </Card.Footer>
     </div>
   );
 }

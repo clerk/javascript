@@ -78,6 +78,7 @@ export function useUserProfileSecurityPanelFlow({
     backupCodes: mfa.backupCodes,
     deleteAccount: deletion.deleteAccount,
     device: activeDevices.device,
+    deviceSignOut: activeDevices.deviceSignOut,
     signOutAllDevices: activeDevices.signOutAllDevices,
     reverification:
       password.reverification ??
@@ -122,11 +123,8 @@ export function useUserProfileSecurityPanelFlow({
     updateDeleteConfirmation: deletion.updateDeleteConfirmation,
     submitDeleteAccount: deletion.submitDeleteAccount,
     openDevice: activeDevices.openDevice,
-    openSignOutDevice: activeDevices.openSignOutDevice,
+    signOutDevice: activeDevices.signOutDevice,
     closeDevice: activeDevices.closeDevice,
-    requestSignOutDevice: activeDevices.requestSignOutDevice,
-    cancelSignOutDevice: activeDevices.cancelSignOutDevice,
-    submitSignOutDevice: activeDevices.submitSignOutDevice,
     openSignOutAllDevices: activeDevices.openSignOutAllDevices,
     closeSignOutAllDevices: activeDevices.closeSignOutAllDevices,
     submitSignOutAllDevices: activeDevices.submitSignOutAllDevices,
