@@ -284,15 +284,35 @@ export interface UserProfilePasswordFlowState {
   errors: FlowErrors & Partial<Record<UserProfilePasswordField, string>>;
 }
 
+export interface UserProfilePasswordFlowActions {
+  onCancel: () => void;
+  onValueChange: <Field extends UserProfilePasswordField>(
+    field: Field,
+    value: UserProfilePasswordValues[Field],
+  ) => void;
+  onSubmit: (values: UserProfilePasswordValues) => void;
+}
+
 export interface UserProfileDeleteAccountFlowState {
   confirmation: string;
   isSubmitting: boolean;
   errors: FlowErrors;
 }
 
+export interface UserProfileDeleteAccountFlowActions {
+  onCancel: () => void;
+  onConfirmationChange: (value: string) => void;
+  onDelete: () => void;
+}
+
 export interface UserProfileSignOutAllDevicesFlowState {
   isSubmitting: boolean;
   errors: FlowErrors;
+}
+
+export interface UserProfileSignOutAllDevicesFlowActions {
+  onCancel: () => void;
+  onSignOut: () => void;
 }
 
 export interface UserProfileDeviceDetails {
@@ -312,6 +332,15 @@ export interface UserProfileDeviceDetailsFlowState {
   device: UserProfileDeviceDetails;
   isSubmitting: boolean;
   errors: FlowErrors;
+}
+
+export interface UserProfileDeviceDetailsFlowActions {
+  onRequestSignOut: () => void;
+}
+
+export interface UserProfileDeviceSignOutFlowActions {
+  onCancel: () => void;
+  onSignOut: () => void;
 }
 
 export type UserProfileMfaMethodType = 'sms' | 'authenticator';
@@ -380,12 +409,32 @@ export type UserProfileMfaAddFlowState =
   | UserProfileMfaBackupCodesStep
   | UserProfileMfaSuccessStep;
 
+export interface UserProfileMfaAddFlowActions {
+  onCancel: () => void;
+  onPhoneNumberChange: (value: string) => void;
+  onAddPhone: () => void;
+  onSelectPhone: (id: string) => void;
+  onCodeChange: (value: string) => void;
+  onSubmit: (completedCode?: string) => void;
+  onResend: () => void;
+  onToggleDisplayFormat: () => void;
+  onCopyBackupCodes: () => void;
+  onDownloadBackupCodes: () => void;
+  onPrintBackupCodes: () => void;
+  onFinish: () => void;
+}
+
 export interface UserProfileMfaRemoveFlowState {
   method: UserProfileMfaMethodType;
   id: string;
   label: string;
   isSubmitting: boolean;
   errors: FlowErrors;
+}
+
+export interface UserProfileMfaRemoveFlowActions {
+  onCancel: () => void;
+  onRemove: () => void;
 }
 
 export type UserProfileBackupCodesFlowState =
@@ -402,9 +451,22 @@ export type UserProfileBackupCodesFlowState =
       errors: FlowErrors;
     };
 
+export interface UserProfileBackupCodesFlowActions {
+  onCancel: () => void;
+  onRetry: () => void;
+  onCopy: () => void;
+  onDownload: () => void;
+  onPrint: () => void;
+}
+
 export interface UserProfilePasskeyAddFlowState {
   isSubmitting: boolean;
   errors: FlowErrors;
+}
+
+export interface UserProfilePasskeyAddFlowActions {
+  onCancel: () => void;
+  onAdd: () => void;
 }
 
 export interface UserProfilePasskeyRenameFlowState {
@@ -415,9 +477,20 @@ export interface UserProfilePasskeyRenameFlowState {
   errors: FlowErrors;
 }
 
+export interface UserProfilePasskeyRenameFlowActions {
+  onCancel: () => void;
+  onNameChange: (name: string) => void;
+  onRename: () => void;
+}
+
 export interface UserProfilePasskeyRemoveFlowState {
   id: string;
   name: string;
   isSubmitting: boolean;
   errors: FlowErrors;
+}
+
+export interface UserProfilePasskeyRemoveFlowActions {
+  onCancel: () => void;
+  onRemove: () => void;
 }

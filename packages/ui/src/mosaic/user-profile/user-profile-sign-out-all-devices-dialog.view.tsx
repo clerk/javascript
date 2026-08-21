@@ -2,13 +2,14 @@ import { AlertDialog } from '../components/alert-dialog';
 import { Button, SubmitButton } from '../components/button';
 import { Heading } from '../components/heading';
 import { Text } from '../components/text';
-import type { UserProfileSignOutAllDevicesFlowState } from './dialogs/flow.types';
+import type {
+  UserProfileSignOutAllDevicesFlowActions,
+  UserProfileSignOutAllDevicesFlowState,
+} from './dialogs/flow.types';
 
-export interface UserProfileSignOutAllDevicesDialogViewProps {
+export interface UserProfileSignOutAllDevicesDialogViewProps extends UserProfileSignOutAllDevicesFlowActions {
   state: UserProfileSignOutAllDevicesFlowState;
   isInterrupted?: boolean;
-  onCancel: () => void;
-  onSignOut: () => void;
 }
 
 export function UserProfileSignOutAllDevicesDialogView({

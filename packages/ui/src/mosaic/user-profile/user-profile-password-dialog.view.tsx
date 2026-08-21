@@ -9,11 +9,7 @@ import { Heading } from '../components/heading';
 import { Input } from '../components/input';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
-import type {
-  UserProfilePasswordField,
-  UserProfilePasswordFlowState,
-  UserProfilePasswordValues,
-} from './dialogs/flow.types';
+import type { UserProfilePasswordFlowActions, UserProfilePasswordFlowState } from './dialogs/flow.types';
 import { passwordDialogStyles as styles } from './user-profile-password-dialog.styles';
 
 export type {
@@ -22,16 +18,10 @@ export type {
   UserProfilePasswordValues,
 } from './dialogs/flow.types';
 
-export interface UserProfilePasswordDialogViewProps {
+export interface UserProfilePasswordDialogViewProps extends UserProfilePasswordFlowActions {
   state: UserProfilePasswordFlowState;
   canSubmit?: boolean;
   isInterrupted?: boolean;
-  onCancel: () => void;
-  onValueChange: <Field extends UserProfilePasswordField>(
-    field: Field,
-    value: UserProfilePasswordValues[Field],
-  ) => void;
-  onSubmit: (values: UserProfilePasswordValues) => void;
 }
 
 export function UserProfilePasswordDialogView({

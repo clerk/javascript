@@ -11,25 +11,18 @@ import { Heading } from '../components/heading';
 import { Spinner } from '../components/spinner';
 import { Text } from '../components/text';
 import { themeProps } from '../props';
-import type { UserProfileMfaAddFlowState, UserProfileMfaRemoveFlowState } from './dialogs/flow.types';
+import type {
+  UserProfileMfaAddFlowActions,
+  UserProfileMfaAddFlowState,
+  UserProfileMfaRemoveFlowActions,
+  UserProfileMfaRemoveFlowState,
+} from './dialogs/flow.types';
 import { CodeInput, PhoneInput, ResendButton } from './dialogs/flow-dialog-chrome';
 import { mfaDialogStyles as styles } from './user-profile-mfa-dialog.styles';
 
-export interface UserProfileMfaAddDialogViewProps {
+export interface UserProfileMfaAddDialogViewProps extends UserProfileMfaAddFlowActions {
   state: UserProfileMfaAddFlowState;
   isInterrupted?: boolean;
-  onCancel: () => void;
-  onPhoneNumberChange: (value: string) => void;
-  onAddPhone: () => void;
-  onSelectPhone: (id: string) => void;
-  onCodeChange: (value: string) => void;
-  onSubmit: (completedCode?: string) => void;
-  onResend: () => void;
-  onToggleDisplayFormat: () => void;
-  onCopyBackupCodes: () => void;
-  onDownloadBackupCodes: () => void;
-  onPrintBackupCodes: () => void;
-  onFinish: () => void;
 }
 
 export function UserProfileMfaAddDialogView({
@@ -370,11 +363,9 @@ function canSubmit(state: UserProfileMfaAddFlowState) {
   return true;
 }
 
-export interface UserProfileMfaRemoveDialogViewProps {
+export interface UserProfileMfaRemoveDialogViewProps extends UserProfileMfaRemoveFlowActions {
   state: UserProfileMfaRemoveFlowState;
   isInterrupted?: boolean;
-  onCancel: () => void;
-  onRemove: () => void;
 }
 
 export function UserProfileMfaRemoveDialogView({

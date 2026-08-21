@@ -7,17 +7,12 @@ import { Dialog } from '../components/dialog';
 import { Heading } from '../components/heading';
 import { Spinner } from '../components/spinner';
 import { Text } from '../components/text';
-import type { UserProfileBackupCodesFlowState } from './dialogs/flow.types';
+import type { UserProfileBackupCodesFlowActions, UserProfileBackupCodesFlowState } from './dialogs/flow.types';
 import { backupCodesDialogStyles as styles } from './user-profile-backup-codes-dialog.styles';
 
-export interface UserProfileBackupCodesDialogViewProps {
+export interface UserProfileBackupCodesDialogViewProps extends UserProfileBackupCodesFlowActions {
   state: UserProfileBackupCodesFlowState;
   isInterrupted?: boolean;
-  onCancel: () => void;
-  onRetry: () => void;
-  onCopy: () => void;
-  onDownload: () => void;
-  onPrint: () => void;
 }
 
 export function UserProfileBackupCodesDialogView({
