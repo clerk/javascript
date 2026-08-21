@@ -194,7 +194,7 @@ export function useUserProfileSecurityPanelMockController({
       ? {
           operation: flow.reverification.operation,
           state: flow.reverification.state,
-          onCancel: flow.cancelReverification,
+          onCancel: () => flow.cancelReverification(),
           onResend: () => void flow.resendReverification(),
           onSubmit: value => void flow.submitVerification(value),
           onValueChange: flow.updateVerificationValue,
