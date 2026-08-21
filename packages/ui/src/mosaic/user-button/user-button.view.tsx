@@ -38,7 +38,7 @@ import type {
 import { applyOrder } from './user-button.utils';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
-// what the controller and the view agree on, so neither file owns them.
+// what the model and the view agree on, so neither file owns them.
 export type * from './user-button.types';
 
 /**
