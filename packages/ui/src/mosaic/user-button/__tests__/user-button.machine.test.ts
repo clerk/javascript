@@ -1,13 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/createActor';
-import type { UserButtonReadyController } from '../user-button.machine';
-import { userButtonMachine } from '../user-button.machine';
+import type { UserButtonReadyModel } from '../user-button.controller';
+import { userButtonMachine } from '../user-button.controller';
 
 const tick = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
-const ready: UserButtonReadyController = {
+const ready: UserButtonReadyModel = {
   status: 'ready',
+  organizationsEnabled: true,
   activeSession: { sessionId: 'sess_1', name: 'Alice', identifier: 'alice@example.com' },
   activeOrganization: null,
   hasOrganizations: false,
@@ -22,7 +23,7 @@ const run = (
 ): {
   type: 'RUN';
   key: string;
-  frozen: UserButtonReadyController;
+  frozen: UserButtonReadyModel;
   run: () => Promise<unknown>;
   closeOnSuccess: boolean;
 } => ({
