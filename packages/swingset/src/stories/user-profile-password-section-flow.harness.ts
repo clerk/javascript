@@ -49,6 +49,7 @@ export function usePasswordSectionFlow({
   const [password, setPassword] = useState<UserProfilePasswordFlowState | null>(null);
   const [reverification, setReverification] = useState<PasswordReverificationState | null>(null);
   const verificationGate = useRef<{ resolve: (verified: boolean) => void } | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => setHasPassword(config.hasPassword), [config.hasPassword]);
 
@@ -86,6 +87,8 @@ export function usePasswordSectionFlow({
   }, []);
 
   const openPassword = useCallback(() => {
+    const active = document.activeElement;
+    triggerRef.current = active instanceof HTMLElement ? active : null;
     setPassword({
       mode: hasPassword ? 'change' : 'set',
       values: EMPTY_PASSWORD_VALUES,
@@ -225,6 +228,7 @@ export function usePasswordSectionFlow({
   }, []);
 
   return {
+    triggerRef,
     hasPassword,
     password,
     reverification,

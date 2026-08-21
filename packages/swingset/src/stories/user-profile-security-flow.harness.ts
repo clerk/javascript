@@ -46,6 +46,7 @@ export function useSecurityFlow({
 
   return {
     config,
+    passwordTriggerRef: password.triggerRef,
     hasPassword: password.hasPassword,
     passkeys: passkeys.passkeys,
     mfaMethods: mfa.mfaMethods,
