@@ -25,6 +25,13 @@ export const mfaDialogStyles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
   },
+  manualSetup: {
+    gap: space['3'],
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: 0,
+    width: '100%',
+  },
   pending: {
     gap: space['2'],
     alignItems: 'center',
@@ -73,7 +80,9 @@ export const mfaDialogStyles = stylex.create({
     padding: space['3'],
     borderRadius: radiusVars['--cl-radius-md'],
     backgroundColor: colorVars['--cl-color-neutral-faded'],
+    display: 'block',
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+    maxWidth: '100%',
     overflowWrap: 'anywhere',
     width: '100%',
   },
