@@ -14,6 +14,8 @@ import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 export type EmailLinkVerifyProps = {
   redirectUrlComplete?: string;
   redirectUrl?: string;
+  /** SSO callback url, required only when the verified sign-up still has to hand off to an enterprise connection. */
+  ssoCallbackUrl?: string;
   verifyEmailPath?: string;
   verifyPhonePath?: string;
   continuePath?: string;
@@ -21,7 +23,7 @@ export type EmailLinkVerifyProps = {
 };
 
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
-  const { redirectUrl, redirectUrlComplete, verifyEmailPath, verifyPhonePath, continuePath } = props;
+  const { redirectUrl, redirectUrlComplete, ssoCallbackUrl, verifyEmailPath, verifyPhonePath, continuePath } = props;
   const { handleEmailLinkVerification } = useClerk();
   const { navigate } = useRouter();
   const signUp = useCoreSignUp();
@@ -50,6 +52,8 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
         protectCheckPath: '../protect-check',
         continuePath,
         navigate,
+        redirectUrl: ssoCallbackUrl,
+        redirectUrlComplete: redirectUrlComplete || '/',
       });
     } catch (err: any) {
       if (
