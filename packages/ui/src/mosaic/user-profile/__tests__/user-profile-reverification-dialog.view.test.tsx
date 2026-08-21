@@ -89,4 +89,60 @@ describe('ReverificationDialogView', () => {
     await user.click(screen.getByRole('button', { name: 'Verify with passkey' }));
     expect(onSubmit).toHaveBeenCalledOnce();
   });
+
+  it('represents factor selection, second-factor routing, and recovery states', async () => {
+    const onSelectFactor = vi.fn();
+    const user = userEvent.setup();
+    const view = render(
+      <MosaicProvider>
+        <Dialog open>
+          <ReverificationDialogView
+            state={{
+              strategy: 'password',
+              step: 'select-first-factor',
+              availableFactors: [
+                { id: 'password', strategy: 'password', label: 'Password' },
+                { id: 'email', strategy: 'email_code', label: 'Email code' },
+              ],
+              value: '',
+              status: 'idle',
+              errors: {},
+              resend: { isResending: false, secondsRemaining: 0 },
+            }}
+            onCancel={vi.fn()}
+            onResend={vi.fn()}
+            onSelectFactor={onSelectFactor}
+            onSubmit={vi.fn()}
+            onValueChange={vi.fn()}
+          />
+        </Dialog>
+      </MosaicProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Email code' }));
+    expect(onSelectFactor).toHaveBeenCalledWith('email');
+
+    view.rerender(
+      <MosaicProvider>
+        <Dialog open>
+          <ReverificationDialogView
+            state={{
+              strategy: 'email_code',
+              step: 'unavailable',
+              value: '',
+              status: 'idle',
+              errors: {},
+              resend: { isResending: false, secondsRemaining: 0 },
+            }}
+            onCancel={vi.fn()}
+            onResend={vi.fn()}
+            onSubmit={vi.fn()}
+            onValueChange={vi.fn()}
+          />
+        </Dialog>
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Unable to verify' })).toBeInTheDocument();
+  });
 });

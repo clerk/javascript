@@ -125,8 +125,21 @@ export interface ConfirmContactActionState {
  * A reverification challenge raised mid-mutation. Rendered stacked over the flow it interrupted,
  * which stays open and pending behind it; on success the original flow resumes where it left off.
  */
+export type ReverificationStrategy = 'password' | 'email_code' | 'phone_code' | 'passkey' | 'totp' | 'backup_code';
+
+export interface ReverificationFactor {
+  id: string;
+  strategy: ReverificationStrategy;
+  label: string;
+  identifier?: string;
+}
+
 export interface ReverificationChallengeState {
-  strategy: 'password' | 'email_code' | 'phone_code' | 'passkey' | 'totp' | 'backup_code';
+  strategy: ReverificationStrategy;
+  step?: 'select-first-factor' | 'prepare' | 'verify' | 'select-second-factor' | 'unavailable' | 'help';
+  stage?: 'first' | 'second';
+  availableFactors?: ReverificationFactor[];
+  preparationStatus?: 'preparing' | 'error';
   /** The address or number a code was sent to. Absent for the password strategy. */
   identifier?: string;
   value: string;
@@ -141,6 +154,10 @@ export interface ReverificationChallengeActions {
   onSubmit: (completedValue?: string) => void;
   onResend: () => void;
   onCancel: () => void;
+  onSelectFactor?: (factorId: string) => void;
+  onBack?: () => void;
+  onPrepare?: () => void;
+  onShowHelp?: () => void;
 }
 
 // =============================================================================
