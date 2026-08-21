@@ -13,21 +13,26 @@ export function useDeleteAccountDialogStory({ onDelete }: { onDelete?: () => voi
   return {
     openDeleteAccountDialog: () => setOpen(true),
     deleteAccountDialog: (
-      <UserProfileDeleteAccountDialogView
+      <AlertDialog
         open={open}
-        state={{ confirmation, isSubmitting: false, errors: {} }}
         onOpenChange={nextOpen => {
           setOpen(nextOpen);
           if (!nextOpen) {
             setConfirmation('');
           }
         }}
-        onConfirmationChange={setConfirmation}
-        onDelete={() => {
-          onDelete?.();
-          close();
-        }}
-      />
+      >
+        <UserProfileDeleteAccountDialogView
+          state={{ confirmation, isSubmitting: false, errors: {} }}
+          onCancel={close}
+          onConfirmationChange={setConfirmation}
+          onDelete={() => {
+            onDelete?.();
+            close();
+          }}
+        />
+      </AlertDialog>
     ),
   };
 }
+import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';

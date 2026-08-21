@@ -316,20 +316,28 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
         </Freeze>
         {verificationDialog('backup-codes')}
       </FlowCardDialog>
-      {flow.deleteAccount ? (
-        <UserProfileDeleteAccountDialogView
-          open
-          state={flow.deleteAccount}
-          onOpenChange={open => {
-            if (!open) {
-              flow.closeDeleteAccount();
-            }
-          }}
-          onConfirmationChange={flow.updateDeleteConfirmation}
-          onDelete={flow.submitDeleteAccount}
-          verificationDialog={verificationDialog('delete-account')}
-        />
-      ) : null}
+      <AlertDialog
+        finalFocus={flow.deleteTriggerRef}
+        open={Boolean(flow.deleteAccount)}
+        onOpenChange={open => {
+          if (!open) {
+            flow.closeDeleteAccount();
+          }
+        }}
+      >
+        <Freeze frozen={!flow.deleteAccount}>
+          {flow.deleteAccount ? (
+            <UserProfileDeleteAccountDialogView
+              state={flow.deleteAccount}
+              isInterrupted={flow.reverification?.operation === 'delete-account'}
+              onCancel={flow.closeDeleteAccount}
+              onConfirmationChange={flow.updateDeleteConfirmation}
+              onDelete={flow.submitDeleteAccount}
+            />
+          ) : null}
+        </Freeze>
+        {verificationDialog('delete-account')}
+      </AlertDialog>
       {flow.signOutAllDevices ? (
         <UserProfileSignOutAllDevicesDialogView
           open
@@ -1647,14 +1655,19 @@ export function States() {
         </FlowCardDialog>
       ) : null}
       {snapshot.flow === 'delete-account' ? (
-        <UserProfileDeleteAccountDialogView
+        <AlertDialog
           open={open}
-          state={snapshot.state}
           onOpenChange={setOpen}
-          onConfirmationChange={noop}
-          onDelete={noop}
-          verificationDialog={verification}
-        />
+        >
+          <UserProfileDeleteAccountDialogView
+            state={snapshot.state}
+            isInterrupted={verificationOpen}
+            onCancel={() => setOpen(false)}
+            onConfirmationChange={noop}
+            onDelete={noop}
+          />
+          {verification}
+        </AlertDialog>
       ) : null}
       {snapshot.flow === 'sign-out-all-devices' ? (
         <UserProfileSignOutAllDevicesDialogView
