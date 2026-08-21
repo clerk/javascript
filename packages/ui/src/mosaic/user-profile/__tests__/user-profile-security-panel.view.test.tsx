@@ -106,21 +106,21 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Change password' }));
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(screen.getByRole('menuitem', { name: 'Phone number' })).toBeInTheDocument();
-    await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
+    expect(screen.getByRole('menuitem', { name: 'SMS code' })).toBeInTheDocument();
+    await user.click(screen.getByRole('menuitem', { name: 'Authenticator application' }));
     await user.click(screen.getByRole('button', { name: 'Sign out of all other devices' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
 
     const otherDevices = screen.getByRole('region', { name: 'Other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Sign out of device' }));
 
     expect(onChangePassword).toHaveBeenCalledOnce();
     expect(onAddPasskey).toHaveBeenCalledOnce();
@@ -184,8 +184,8 @@ describe('UserProfileSecurityPanelView', () => {
     });
 
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(screen.getByRole('menuitem', { name: 'Phone number' })).toBeInTheDocument();
-    expect(screen.queryByRole('menuitem', { name: 'Authenticator app' })).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'SMS code' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Authenticator application' })).not.toBeInTheDocument();
   });
 
   it('offers to set a password when password authentication is available', () => {
@@ -277,10 +277,10 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByText('Backup codes')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Manage Phone number' }));
     expect(screen.queryByRole('menuitem', { name: 'Manage' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
-    expect(screen.queryByRole('menuitem', { name: 'Remove method' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('menuitem', { name: 'Regenerate backup codes' }));
+    expect(screen.queryByRole('menuitem', { name: 'Remove' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
 
     expect(onRemoveMfaMethod).toHaveBeenCalledWith('sms_1');
     expect(onRegenerateBackupCodes).toHaveBeenCalledOnce();
@@ -300,7 +300,7 @@ describe('UserProfileSecurityPanelView', () => {
     });
 
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Backup codes' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Backup code' }));
     await user.click(screen.getAllByRole('button', { name: 'Manage Phone number' }).at(-1)!);
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
 

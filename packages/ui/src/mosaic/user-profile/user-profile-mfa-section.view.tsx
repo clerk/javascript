@@ -5,9 +5,9 @@ import { Menu } from '../components/menu';
 import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
+import { fill, userProfileSecurityBase as m } from './user-profile-security.messages';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
 import { UserProfileSecurityList } from './user-profile-security-list';
-import { fill, userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfileMfaMethod {
   id: string;
@@ -35,6 +35,12 @@ const labels: Record<UserProfileMfaMethod['type'], string> = {
   sms: m.sections.phone,
   authenticator: m.sections.authenticator,
   'backup-codes': m.backupCodes.title,
+};
+
+const addLabels: Record<UserProfileMfaMethod['type'], string> = {
+  sms: m.sections.smsCode,
+  authenticator: m.sections.authenticatorApplication,
+  'backup-codes': m.sections.backupCode,
 };
 
 const defaultAddableMethods: UserProfileMfaAddableMethod[] = ['sms', 'authenticator'];
@@ -83,13 +89,13 @@ export function UserProfileMfaSectionView({
               {availableMethods.map(type => (
                 <Menu.Item
                   key={type}
-                  label={labels[type]}
+                  label={addLabels[type]}
                   onClick={() => onAdd?.(type)}
                 />
               ))}
               {onEnableBackupCodes && hasConfiguredMethod && !methods.some(method => method.type === 'backup-codes') ? (
                 <Menu.Item
-                  label={m.backupCodes.title}
+                  label={addLabels['backup-codes']}
                   onClick={onEnableBackupCodes}
                 />
               ) : null}

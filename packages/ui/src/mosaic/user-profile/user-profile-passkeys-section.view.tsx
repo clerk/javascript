@@ -4,9 +4,9 @@ import { Section } from '../components/section';
 import type { UserProfilePasskeyCreationState } from './dialogs/flow.types';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
+import { fill, userProfileSecurityBase as m } from './user-profile-security.messages';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
 import { UserProfileSecurityList } from './user-profile-security-list';
-import { fill, userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfilePasskey {
   id: string;
@@ -74,7 +74,7 @@ export function UserProfilePasskeysSectionView({
           actions.push({ label: m.sections.rename, onClick: () => onManage(passkey.id) });
         }
         if (onRemove) {
-          actions.push({ label: m.passkeys.removeTitle, color: 'negative', onClick: () => onRemove(passkey.id) });
+          actions.push({ label: m.common.remove, color: 'negative', onClick: () => onRemove(passkey.id) });
         }
 
         return (
