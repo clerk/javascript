@@ -8,9 +8,9 @@ import type {
 import type { UserProfileMfaMethod } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { SecurityFlowConfig } from './user-profile-security-flow.config';
+import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
 
-type MfaSectionFlowConfig = Pick<
+type MfaFlowSliceConfig = Pick<
   SecurityFlowConfig,
   | 'availableMfaPhone'
   | 'backupCodesAvailable'
@@ -45,12 +45,12 @@ const GENERATED_BACKUP_CODES = [
 ];
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export function useMfaSectionFlow({
+export function useMfaFlowSlice({
   config,
   onMfaMethodChange,
   onBackupCodesChange,
 }: {
-  config: MfaSectionFlowConfig;
+  config: MfaFlowSliceConfig;
   onMfaMethodChange?: (method: UserProfileMfaMethodType, enabled: boolean) => void;
   onBackupCodesChange?: (enabled: boolean) => void;
 }) {

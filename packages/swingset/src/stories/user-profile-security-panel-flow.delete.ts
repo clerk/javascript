@@ -4,9 +4,9 @@ import type {
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import { useCallback, useRef, useState } from 'react';
 
-import type { SecurityFlowConfig } from './user-profile-security-flow.config';
+import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
 
-type DeleteSectionFlowConfig = Pick<
+type DeleteFlowSliceConfig = Pick<
   SecurityFlowConfig,
   'failurePoint' | 'latencyMs' | 'requireReverification' | 'reverificationStrategy' | 'validCode' | 'validPassword'
 >;
@@ -20,14 +20,14 @@ const CONFIRMATION = 'Delete account';
 const IDLE_RESEND = { isResending: false, secondsRemaining: 0 };
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export function useDeleteSectionFlow({
+export function useDeleteFlowSlice({
   config,
   otherSessionsCount = 0,
   afterSignOutUrl = '/sign-in',
   afterMultiSessionSingleSignOutUrl = '/select-account',
   onSetActive,
 }: {
-  config: DeleteSectionFlowConfig;
+  config: DeleteFlowSliceConfig;
   otherSessionsCount?: number;
   afterSignOutUrl?: string;
   afterMultiSessionSingleSignOutUrl?: string;

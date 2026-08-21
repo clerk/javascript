@@ -118,11 +118,6 @@ import {
   meta as userProfileActiveDevicesSectionMeta,
 } from '../stories/user-profile-active-devices-section.stories';
 import {
-  Default as UserProfileActiveDevicesSectionFlowDefault,
-  meta as userProfileActiveDevicesSectionFlowMeta,
-  States as UserProfileActiveDevicesSectionFlowStates,
-} from '../stories/user-profile-active-devices-section-flow.stories';
-import {
   Default as UserProfileApiKeysPanelDefault,
   Empty as UserProfileApiKeysPanelEmpty,
   meta as userProfileApiKeysPanelMeta,
@@ -145,39 +140,19 @@ import {
   meta as userProfileDeleteSectionMeta,
 } from '../stories/user-profile-delete-section.stories';
 import {
-  Default as UserProfileDeleteSectionFlowDefault,
-  meta as userProfileDeleteSectionFlowMeta,
-  States as UserProfileDeleteSectionFlowStates,
-} from '../stories/user-profile-delete-section-flow.stories';
-import {
   Default as UserProfileMfaSectionDefault,
   Empty as UserProfileMfaSectionEmpty,
   meta as userProfileMfaSectionMeta,
 } from '../stories/user-profile-mfa-section.stories';
-import {
-  Default as UserProfileMfaSectionFlowDefault,
-  meta as userProfileMfaSectionFlowMeta,
-  States as UserProfileMfaSectionFlowStates,
-} from '../stories/user-profile-mfa-section-flow.stories';
 import {
   Default as UserProfilePasskeysSectionDefault,
   Empty as UserProfilePasskeysSectionEmpty,
   meta as userProfilePasskeysSectionMeta,
 } from '../stories/user-profile-passkeys-section.stories';
 import {
-  Default as UserProfilePasskeysSectionFlowDefault,
-  meta as userProfilePasskeysSectionFlowMeta,
-  States as UserProfilePasskeysSectionFlowStates,
-} from '../stories/user-profile-passkeys-section-flow.stories';
-import {
   Default as UserProfilePasswordSectionDefault,
   meta as userProfilePasswordSectionMeta,
 } from '../stories/user-profile-password-section.stories';
-import {
-  Default as UserProfilePasswordSectionFlowDefault,
-  meta as userProfilePasswordSectionFlowMeta,
-  States as UserProfilePasswordSectionFlowStates,
-} from '../stories/user-profile-password-section-flow.stories';
 import {
   Default as UserProfilePaymentMethodsSectionDefault,
   Empty as UserProfilePaymentMethodsSectionEmpty,
@@ -188,14 +163,15 @@ import {
   meta as userProfileProfilePanelMeta,
 } from '../stories/user-profile-profile-panel.stories';
 import {
-  Default as UserProfileSecurityFlowsDefault,
-  meta as userProfileSecurityFlowsMeta,
-  States as UserProfileSecurityFlowsStates,
-} from '../stories/user-profile-security-flows.stories';
-import {
   Default as UserProfileSecurityPanelDefault,
   meta as userProfileSecurityPanelMeta,
 } from '../stories/user-profile-security-panel.stories';
+import {
+  Default as UserProfileSecurityPanelFlowDefault,
+  meta as userProfileSecurityPanelFlowMeta,
+  ProfileStates as UserProfileSecurityPanelFlowProfileStates,
+  States as UserProfileSecurityPanelFlowStates,
+} from '../stories/user-profile-security-panel-flow.stories';
 import {
   Default as UserProfileSubscriptionSectionDefault,
   meta as userProfileSubscriptionSectionMeta,
@@ -333,32 +309,6 @@ const userProfileAccountSectionFlowModule: StoryModule = {
   States: UserProfileAccountSectionFlowStates,
   ProfileStates: UserProfileAccountSectionFlowProfileStates,
 };
-const userProfilePasswordSectionFlowModule: StoryModule = {
-  meta: userProfilePasswordSectionFlowMeta,
-  Default: UserProfilePasswordSectionFlowDefault,
-  States: UserProfilePasswordSectionFlowStates,
-};
-const userProfilePasskeysSectionFlowModule: StoryModule = {
-  meta: userProfilePasskeysSectionFlowMeta,
-  Default: UserProfilePasskeysSectionFlowDefault,
-  States: UserProfilePasskeysSectionFlowStates,
-};
-const userProfileMfaSectionFlowModule: StoryModule = {
-  meta: userProfileMfaSectionFlowMeta,
-  Default: UserProfileMfaSectionFlowDefault,
-  States: UserProfileMfaSectionFlowStates,
-};
-const userProfileActiveDevicesSectionFlowModule: StoryModule = {
-  meta: userProfileActiveDevicesSectionFlowMeta,
-  Default: UserProfileActiveDevicesSectionFlowDefault,
-  States: UserProfileActiveDevicesSectionFlowStates,
-};
-const userProfileDeleteSectionFlowModule: StoryModule = {
-  meta: userProfileDeleteSectionFlowMeta,
-  Default: UserProfileDeleteSectionFlowDefault,
-  States: UserProfileDeleteSectionFlowStates,
-};
-
 const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
@@ -420,10 +370,11 @@ const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
 };
-const userProfileSecurityFlowsModule: StoryModule = {
-  meta: userProfileSecurityFlowsMeta,
-  Default: UserProfileSecurityFlowsDefault,
-  States: UserProfileSecurityFlowsStates,
+const userProfileSecurityPanelFlowModule: StoryModule = {
+  meta: userProfileSecurityPanelFlowMeta,
+  Default: UserProfileSecurityPanelFlowDefault,
+  States: UserProfileSecurityPanelFlowStates,
+  ProfileStates: UserProfileSecurityPanelFlowProfileStates,
 };
 
 export const registry: StoryModule[] = [
@@ -432,12 +383,7 @@ export const registry: StoryModule[] = [
   // User Profile
   userPageModule,
   userProfileAccountSectionFlowModule,
-  userProfilePasswordSectionFlowModule,
-  userProfilePasskeysSectionFlowModule,
-  userProfileMfaSectionFlowModule,
-  userProfileActiveDevicesSectionFlowModule,
-  userProfileDeleteSectionFlowModule,
-  userProfileSecurityFlowsModule,
+  userProfileSecurityPanelFlowModule,
   // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
