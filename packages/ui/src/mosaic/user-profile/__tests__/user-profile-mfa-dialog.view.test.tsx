@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { AlertDialog } from '../../components/alert-dialog';
+import { Card } from '../../components/card';
+import { Dialog } from '../../components/dialog';
 import type { UserProfileMfaAddFlowState } from '../dialogs/flow.types';
 import { UserProfileMfaAddDialogView, UserProfileMfaRemoveDialogView } from '../user-profile-mfa-dialog.view';
 
@@ -24,12 +27,14 @@ const actions = {
 function renderAdd(state: UserProfileMfaAddFlowState, overrides: Partial<typeof actions> = {}) {
   return render(
     <MosaicProvider>
-      <UserProfileMfaAddDialogView
-        open
-        state={state}
-        {...actions}
-        {...overrides}
-      />
+      <MfaDialog>
+        <UserProfileMfaAddDialogView
+          state={state}
+          onCancel={vi.fn()}
+          {...actions}
+          {...overrides}
+        />
+      </MfaDialog>
     </MosaicProvider>,
   );
 }
@@ -122,21 +127,23 @@ describe('UserProfileMfaAddDialogView', () => {
       const [code, setCode] = useState('');
       return (
         <MosaicProvider>
-          <UserProfileMfaAddDialogView
-            open
-            state={{
-              method: 'authenticator',
-              step: 'verify',
-              code,
-              status: 'idle',
-              resend: { isResending: false, secondsRemaining: 0 },
-              isSubmitting: false,
-              errors: {},
-            }}
-            {...actions}
-            onCodeChange={setCode}
-            onSubmit={onSubmit}
-          />
+          <MfaDialog>
+            <UserProfileMfaAddDialogView
+              state={{
+                method: 'authenticator',
+                step: 'verify',
+                code,
+                status: 'idle',
+                resend: { isResending: false, secondsRemaining: 0 },
+                isSubmitting: false,
+                errors: {},
+              }}
+              onCancel={vi.fn()}
+              {...actions}
+              onCodeChange={setCode}
+              onSubmit={onSubmit}
+            />
+          </MfaDialog>
         </MosaicProvider>
       );
     };
@@ -179,11 +186,13 @@ describe('UserProfileMfaRemoveDialogView', () => {
     const user = userEvent.setup();
     render(
       <MosaicProvider>
-        <UserProfileMfaRemoveDialogView
-          open
-          state={{ method, id: method, label, isSubmitting: false, errors: {} }}
-          onRemove={onRemove}
-        />
+        <AlertDialog open>
+          <UserProfileMfaRemoveDialogView
+            state={{ method, id: method, label, isSubmitting: false, errors: {} }}
+            onCancel={vi.fn()}
+            onRemove={onRemove}
+          />
+        </AlertDialog>
       </MosaicProvider>,
     );
 
@@ -192,3 +201,28 @@ describe('UserProfileMfaRemoveDialogView', () => {
     expect(onRemove).toHaveBeenCalledOnce();
   });
 });
+
+function MfaDialog({ children }: { children: React.ReactNode }) {
+  return (
+    <Dialog.Root
+      size='card'
+      open
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            {children}
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
