@@ -11,7 +11,7 @@ import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { DEFAULT_SECURITY_FLOW_CONFIG } from './user-profile-security-panel-flow.config';
+import { COMPOSED_SECURITY_FLOW_CONFIG } from './user-profile-security-panel-flow.config';
 import { useUserProfileSecurityPanelMockController } from './user-profile-security-panel-flow.controller';
 
 export { default as __source } from './user-page.stories?raw';
@@ -45,12 +45,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
 export function Default() {
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
   const securityController = useUserProfileSecurityPanelMockController({
-    config: {
-      ...DEFAULT_SECURITY_FLOW_CONFIG,
-      backupCodesAvailable: true,
-      hasBackupCodes: true,
-      hasMfaPhone: true,
-    },
+    config: COMPOSED_SECURITY_FLOW_CONFIG,
   });
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
