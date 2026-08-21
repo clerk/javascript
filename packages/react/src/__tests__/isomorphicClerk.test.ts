@@ -178,6 +178,70 @@ describe('isomorphicClerk', () => {
     expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
   });
 
+  // Regression: a call queued before clerk-js loads is replayed by
+  // `replayInterceptedInvocations`, whose loop discards whatever its callbacks
+  // return. The queued copy therefore has no caller left to reject to -- the
+  // original `await` resolved the moment the call was queued -- so without its
+  // own rejection handler a failed resume becomes an unhandled rejection in the
+  // host app. Asserting that `catch` is attached, rather than waiting for the
+  // symptom, keeps the check deterministic under fake timers.
+  it('attaches a rejection handler to __internal_resumeAfterProtectCheck when it is queued until clerk-js has loaded', async () => {
+    const params = { continuation: 'transfer_to_sign_up' } as const;
+    const catchSpy = vi.fn();
+    const resumeAfterProtectCheck = vi.fn().mockReturnValue({ catch: catchSpy });
+    const clerkjs = {
+      addListener: vi.fn(),
+      loaded: true,
+      __internal_resumeAfterProtectCheck: resumeAfterProtectCheck,
+    } as unknown as BrowserClerk;
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    const customNavigate = vi.fn();
+
+    await isomorphicClerk.__internal_resumeAfterProtectCheck(params, customNavigate);
+
+    expect(resumeAfterProtectCheck).not.toHaveBeenCalled();
+
+    (isomorphicClerk as any).replayInterceptedInvocations(clerkjs);
+
+    expect(resumeAfterProtectCheck).toHaveBeenCalledWith(params, customNavigate);
+    expect(catchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('attaches a rejection handler to __internal_resumeAfterProtectCheck after clerk-js has loaded', async () => {
+    const params = { continuation: 'transfer_to_sign_up' } as const;
+    const catchSpy = vi.fn();
+    const resumeAfterProtectCheck = vi.fn().mockReturnValue({ catch: catchSpy });
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    (isomorphicClerk as any).clerkjs = {
+      loaded: true,
+      __internal_resumeAfterProtectCheck: resumeAfterProtectCheck,
+    } as unknown as BrowserClerk;
+
+    const customNavigate = vi.fn();
+
+    await isomorphicClerk.__internal_resumeAfterProtectCheck(params, customNavigate);
+
+    // The navigator is the component router's; dropping it falls back to Clerk.navigate,
+    // which resolves component-relative destinations against the origin instead.
+    expect(resumeAfterProtectCheck).toHaveBeenCalledWith(params, customNavigate);
+    expect(catchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  // This wrapper is always defined on IsomorphicClerk, so it cannot itself signal whether the
+  // loaded runtime supports the call. An older clerk-js has no such method, and calling straight
+  // through would throw a TypeError at a host caller instead of doing nothing.
+  it('does nothing when the loaded clerk-js predates __internal_resumeAfterProtectCheck', async () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    (isomorphicClerk as any).clerkjs = { loaded: true } as unknown as BrowserClerk;
+
+    await expect(
+      isomorphicClerk.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' }),
+    ).resolves.toBeUndefined();
+  });
+
   it('calls __internal_handleResourceCallback immediately after clerk-js has loaded', async () => {
     const signInOrUp = {} as unknown as SignInResource;
     const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };
