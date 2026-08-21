@@ -1676,64 +1676,6 @@ export function States() {
   return <SecurityFlowStates />;
 }
 
-export function ProfileStates() {
-  return (
-    <div style={{ ...storyColumn, gap: '2rem' }}>
-      <UserProfileSecurityPanelView
-        devices={[]}
-        devicesStatus='loading'
-        hasPassword={false}
-        mfaMethods={[]}
-        passkeys={[]}
-        passwordAvailable
-      />
-      <UserProfileSecurityPanelView
-        devices={[]}
-        devicesError='Could not load active devices.'
-        devicesStatus='error'
-        hasPassword
-        mfaMethods={[]}
-        passkeys={[]}
-      />
-      <UserProfileSecurityPanelView
-        devices={[
-          {
-            id: 'current-actor',
-            name: 'Safari on macOS',
-            type: 'desktop',
-            isCurrent: true,
-            relationship: 'current-impersonating',
-            status: 'active',
-          },
-          {
-            id: 'user',
-            name: 'Chrome on macOS',
-            type: 'desktop',
-            relationship: 'user-device',
-            status: 'pending',
-          },
-          {
-            id: 'other-actor',
-            name: 'Firefox on Windows',
-            type: 'desktop',
-            relationship: 'other-impersonator',
-            status: 'active',
-            isRevoking: true,
-          },
-          { id: 'ended', name: 'Ended mobile session', type: 'mobile', status: 'ended' },
-        ]}
-        hasPassword
-        mfaMethods={[
-          { id: 'sms-primary', type: 'sms', description: '+1 801-888-8181', isDefault: true },
-          { id: 'authenticator', type: 'authenticator' },
-          { id: 'backup-codes', type: 'backup-codes' },
-        ]}
-        passkeys={[{ id: 'passkey', name: 'Chrome on macOS', createdAtLabel: 'Created today' }]}
-      />
-    </div>
-  );
-}
-
 export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow'][] } = {}) {
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);

@@ -169,7 +169,6 @@ import {
 import {
   Default as UserProfileSecurityPanelFlowDefault,
   meta as userProfileSecurityPanelFlowMeta,
-  ProfileStates as UserProfileSecurityPanelFlowProfileStates,
   States as UserProfileSecurityPanelFlowStates,
 } from '../stories/user-profile-security-panel-flow.stories';
 import {
@@ -374,7 +373,6 @@ const userProfileSecurityPanelFlowModule: StoryModule = {
   meta: userProfileSecurityPanelFlowMeta,
   Default: UserProfileSecurityPanelFlowDefault,
   States: UserProfileSecurityPanelFlowStates,
-  ProfileStates: UserProfileSecurityPanelFlowProfileStates,
 };
 
 export const registry: StoryModule[] = [
