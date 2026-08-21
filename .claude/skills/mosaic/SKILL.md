@@ -1,8 +1,8 @@
 ---
 name: mosaic
 description: >-
-  Work on Mosaic UI: styling a component with slot recipes (`defineSlotRecipe` /
-  `useRecipe` / slots / variants), or building a flow — authoring a state machine
+  Work on Mosaic UI: styling a component with StyleX (`stylex.create`, `--cl-*`
+  tokens, `themeProps`), or building a flow — authoring a state machine
   (`setup`, states/guards/`invoke`, wiring to React with `useMachine`/`useActor`/
   `useSelector`), writing the controller (Clerk adapter) or view (rendering) layer,
   testing any of those layers, or migrating a legacy / pre-Mosaic component into the
@@ -15,9 +15,10 @@ description: >-
 
 Two things live under Mosaic, and this skill covers the how-to for both:
 
-- **Styled components** are authored with **slot recipes** — one recipe owns a
-  part's slot identity (`data-cl-slot`), variants, state, and appearance
-  cascade; `useRecipe` resolves it and hands back per-slot props to spread.
+- **Styled components** are authored with **StyleX** — `stylex.create` declares
+  the styles, `themeProps` emits the part's public identity (the `.cl-<slot>`
+  class plus `data-<axis>` attrs), and `mergeStyleProps` fuses the two with the
+  consumer's `className`/`style`.
 - **Flows** follow a **machine → controller → view** split that keeps Clerk
   resource logic out of visual components and makes behavior testable without a
   running Clerk app:
@@ -35,25 +36,24 @@ view        Rendering only: receives a snapshot plus explicit props, renders UI,
 ```
 
 `references/mosaic-architecture.md` (repo root, read by all agents) is the
-canonical contract for the whole design system — tokens, theme delivery, the
-`data-cl-*` styling API, slot recipes, appearance/cascade/scope, and the "Flow
-and data architecture" section that defines the split. Read it for the _what_;
-this skill is the _how-to_.
+canonical contract for the whole design system — the `--cl-*` tokens, the
+`.cl-<slot>` + `data-<axis>` styling API, the CSS build, and the "Flow and data
+architecture" section that defines the split. Read it for the _what_; this skill
+is the _how-to_.
 
 ## Which reference to read
 
-| You are…                                                             | Read                                                   |
-| -------------------------------------------------------------------- | ------------------------------------------------------ |
-| Building on / authoring a headless primitive (`@clerk/headless`)     | `references/headless.md`                               |
-| Styling a component with StyleX (tokens, `stylex.create`, CSS build) | `references/stylex.md`                                 |
-| Building an enter/exit transition, or any motion that reads as wrong | `references/motion.md`                                 |
-| Styling a component the legacy way (slot recipes, `useRecipe`)       | `references/styling.md`                                |
-| Authoring or debugging a state machine, or wiring one to React       | `references/machines.md` → in-tree `machine/README.md` |
-| Writing the controller (Clerk adapter, permissions, revalidate)      | `references/controllers.md`                            |
-| Writing the view (rendering a snapshot, sending events)              | `references/views.md`                                  |
-| Testing a machine, controller, or view                               | `references/testing.md`                                |
-| Migrating a legacy component into Mosaic (the end-to-end workflow)   | `references/migration.md`                              |
-| Running the parity audit that guards a migration                     | `references/parity-audit.md`                           |
+| You are…                                                               | Read                                                   |
+| ---------------------------------------------------------------------- | ------------------------------------------------------ |
+| Building on / authoring a headless primitive (`@clerk/headless`)       | `references/headless.md`                               |
+| Styling a component (tokens, `stylex.create`, `themeProps`, CSS build) | `references/stylex.md`                                 |
+| Building an enter/exit transition, or any motion that reads as wrong   | `references/motion.md`                                 |
+| Authoring or debugging a state machine, or wiring one to React         | `references/machines.md` → in-tree `machine/README.md` |
+| Writing the controller (Clerk adapter, permissions, revalidate)        | `references/controllers.md`                            |
+| Writing the view (rendering a snapshot, sending events)                | `references/views.md`                                  |
+| Testing a machine, controller, or view                                 | `references/testing.md`                                |
+| Migrating a legacy component into Mosaic (the end-to-end workflow)     | `references/migration.md`                              |
+| Running the parity audit that guards a migration                       | `references/parity-audit.md`                           |
 
 The migration workflow (`migration.md`) ties the flow references together: it
 treats the legacy component as the spec and drives you through the machine,

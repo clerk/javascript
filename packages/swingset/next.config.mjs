@@ -26,9 +26,6 @@ const withMDX = createMDX({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['tsx', 'ts', 'mdx'],
-  compiler: {
-    emotion: true,
-  },
   webpack(config) {
     // `import src from './foo.stories.tsx?raw'` must return the file's *untransformed* text.
     // Next's SWC loader matches by extension and ignores the `?raw` query, so on its own it

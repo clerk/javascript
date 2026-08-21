@@ -132,8 +132,9 @@ gate from `checkAuthorization`, `loading` until Clerk is loaded, and that
 
 Build a plain `snapshot` object and pass a `vi.fn()` `send`. Assert what renders
 per `snapshot.value` and that interactions send the right event. **Wrap the view
-in `<MosaicProvider>`** — it's not a Clerk provider; it supplies the theme
-context that `useRecipe`/`useSlot` read. No Clerk providers or fixtures.
+in `<MosaicProvider>`** — it's not a Clerk provider; it supplies the icon-override
+context, and wrapping keeps the test tree matching production. No Clerk providers
+or fixtures.
 
 ```tsx
 import { fireEvent, render, screen } from '@testing-library/react';

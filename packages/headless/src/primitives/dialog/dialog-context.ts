@@ -31,6 +31,14 @@ export interface DialogContextValue {
    * cases coincide in practice.
    */
   isNested: boolean;
+  /**
+   * Whether this dialog is layered over an open DIALOG — the signal the stacking styles key on,
+   * where `isNested` is too broad to use. A stacked dialog drops its own backdrop so the stack
+   * shows one scrim rather than compositing a darker one per level.
+   */
+  isStacked: boolean;
+  /** How many open dialogs are stacked directly on this one. See `useDialogNesting`. */
+  stackedChildCount: number;
   labelId: string;
   descriptionId: string;
   mounted: boolean;

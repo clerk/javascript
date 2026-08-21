@@ -1747,6 +1747,7 @@ export const daDK: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Adgangskoden er forkert.',
     form_password_length_too_short: 'Adgangskoden er for kort.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Adgangskoden er ikke stærk nok.',
     form_password_or_identifier_incorrect:
       'Adgangskoden eller e-mailadressen er forkert. Prøv igen eller brug en anden metode.',

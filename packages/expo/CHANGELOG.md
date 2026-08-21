@@ -1,5 +1,150 @@
 # Change Log
 
+## 4.5.2
+
+### Patch Changes
+
+- Fix `AuthView`'s `onDismiss` never firing on iOS when `isDismissible` is `false`. The callback now runs once the auth flow completes, matching Android, so an app-owned modal or screen wrapping the view can close after sign-in. ([#9501](https://github.com/clerk/javascript/pull/9501)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-ios` SDK from `1.4.0` to `1.4.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.4.1. ([#9513](https://github.com/clerk/javascript/pull/9513)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+  - @clerk/clerk-js@6.29.3
+  - @clerk/react@6.14.5
+
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/react@6.14.4
+  - @clerk/clerk-js@6.29.2
+
+## 4.5.0
+
+### Minor Changes
+
+- Add iOS and Android APIs for biometric trusted-device enrollment, sign-in, availability, listing, and revocation, including structured native error codes. Trusted-device sign-in synchronizes the JS client before resolving and returns the JS sign-in resource and `setActive()` so apps can continue second-factor, new-password, or client-trust steps. Add `useAuthViewState()` for keeping a non-dismissible root `<AuthView />` mounted through an optional trusted-device enrollment prompt, and support configuring the Face ID permission message through the Expo config plugin. ([#9257](https://github.com/clerk/javascript/pull/9257)) by [@seanperez29](https://github.com/seanperez29)
+
+  ```tsx
+  import { useTrustedDevices } from '@clerk/expo';
+
+  export function useBiometricSignIn(identifierHint: string) {
+    const { enroll, getAvailability, signIn } = useTrustedDevices();
+
+    // Call after the user completes a normal sign-in.
+    const enableBiometricSignIn = () =>
+      enroll({
+        identifierHint,
+        reason: 'Use biometrics to sign in next time.',
+      });
+
+    // Call when the user returns to sign in.
+    const signInWithBiometrics = async () => {
+      const { isAvailable } = await getAvailability({ identifierHint });
+
+      if (!isAvailable) {
+        return null;
+      }
+
+      const result = await signIn({
+        identifierHint,
+        reason: 'Use biometrics to sign in.',
+      });
+
+      // Continue any remaining steps through result.signIn.
+      return result;
+    };
+
+    return { enableBiometricSignIn, signInWithBiometrics };
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.29.2
+
+## 4.4.0
+
+### Minor Changes
+
+- Surface Android Google Sign-In provider failures instead of silently treating them as a cancelled sign-in. ([#9464](https://github.com/clerk/javascript/pull/9464)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Android's Credential Manager reports failures such as an unregistered OAuth client through the same cancellation exception it uses for a dismissed account chooser, so `startGoogleAuthenticationFlow()` resolved with no session and no error. Those failures now reject with a `GOOGLE_SIGN_IN_ERROR`, while dismissing the chooser still resolves with `createdSessionId: null`.
+
+  If you call `startGoogleAuthenticationFlow()` without a `try`/`catch`, add one to handle the rejection.
+
+- Add push-only `customDestinations` to the native `UserProfileView` and `UserButton`, allowing custom profile pages to navigate forward without adding another row to the profile root. ([#9463](https://github.com/clerk/javascript/pull/9463)) by [@seanperez29](https://github.com/seanperez29)
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.2` to `1.1.3`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.3. ([#9472](https://github.com/clerk/javascript/pull/9472)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.9` to `1.4.0`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.4.0. ([#9473](https://github.com/clerk/javascript/pull/9473)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Preserve native user profile custom pages across tab switches and display their labels as native navigation titles on iOS. ([#9463](https://github.com/clerk/javascript/pull/9463)) by [@seanperez29](https://github.com/seanperez29)
+
+- Fix email link sign-in never completing on iOS. Callback URLs opened by the "Return to App" button are now forwarded to the native SDK, including on a cold launch, so a flow started from `<AuthView />` signs the user in instead of leaving them signed out with no error. ([#9470](https://github.com/clerk/javascript/pull/9470)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+  - @clerk/react@6.14.4
+  - @clerk/clerk-js@6.29.2
+
+## 4.3.0
+
+### Minor Changes
+
+- Add custom user profile pages to the native `UserProfileView` and `UserButton` components. Use `content` to render a React Native screen or `href` to open an external URL. ([#9448](https://github.com/clerk/javascript/pull/9448)) by [@swolfand](https://github.com/swolfand)
+
+  ```tsx
+  import { UserButton, UserProfileView } from '@clerk/expo/native';
+  import type { UserProfileCustomPage } from '@clerk/expo/native';
+
+  const customPages: UserProfileCustomPage[] = [
+    {
+      path: 'api-keys',
+      label: 'API keys',
+      icon: 'key',
+      content: <APIKeysView />,
+    },
+    {
+      path: 'docs',
+      label: 'Docs',
+      icon: 'book',
+      href: 'https://clerk.com/docs',
+    },
+  ];
+
+  <UserProfileView customPages={customPages} />;
+
+  <UserButton userProfileProps={{ customPages }} />;
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`7f5c294`](https://github.com/clerk/javascript/commit/7f5c2947e2b3b2ac9677116ff7eede61a1dab649)]:
+  - @clerk/shared@4.29.1
+  - @clerk/clerk-js@6.29.1
+  - @clerk/react@6.14.3
+
+## 4.2.8
+
+### Patch Changes
+
+- Fix a race on Android where the native module refreshed the client every time the app returned to the foreground, which could mint a duplicate client during browser SSO completion and cause `401 authentication_invalid` errors right after signing in. The native SDK is now initialized with its foreground client refresh disabled, since the JavaScript layer owns client state. Session token refresh and shared session sync are unaffected. ([#9438](https://github.com/clerk/javascript/pull/9438)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.0` to `1.1.2`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.2. ([#9445](https://github.com/clerk/javascript/pull/9445)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.8` to `1.3.9`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.9. ([#9423](https://github.com/clerk/javascript/pull/9423)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`81840b3`](https://github.com/clerk/javascript/commit/81840b3b28bf89fdd6afcc155a84bc641dcd3b69), [`b7fb564`](https://github.com/clerk/javascript/commit/b7fb56455a657b209c0bb292bf05145e6dcde790), [`44edcc9`](https://github.com/clerk/javascript/commit/44edcc961664e83b8ff7d3c946b880fbb5a7d897)]:
+  - @clerk/shared@4.29.0
+  - @clerk/clerk-js@6.29.0
+  - @clerk/react@6.14.2
+
 ## 4.2.7
 
 ### Patch Changes

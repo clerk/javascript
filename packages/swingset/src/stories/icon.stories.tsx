@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import type { IconProps } from '@clerk/ui/mosaic/components/icon';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { iconRegistry } from '@clerk/ui/mosaic/icons/registry';
@@ -14,7 +13,6 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Icon',
   source: 'packages/ui/src/mosaic/components/icon/icon.tsx',
-  styleEngine: 'stylex',
   styles: {
     _variants: {
       size: { sm: {}, md: {}, lg: {} },
@@ -84,26 +82,24 @@ export function Names() {
 
 export function Override() {
   return (
+    // Overrides are elements, not render functions: Mosaic injects its sizing className and
+    // `data-size` into the element via cloneElement, so the replacement only supplies its own
+    // content and need not be an `svg`. Passing an element (vs a function) also lets overrides
+    // be supplied from a Server Component, since elements serialize across the RSC boundary.
     <MosaicProvider
-      appearance={{
-        // Overrides are elements, not render functions: Mosaic injects its sizing className and
-        // `data-size` into the element via cloneElement, so the replacement only supplies its own
-        // content and need not be an `svg`. Passing an element (vs a function) also lets overrides
-        // be supplied from a Server Component, since elements serialize across the RSC boundary.
-        icons: {
-          'chevron-right': (
-            <svg
-              viewBox='0 0 20 20'
-              fill='currentColor'
-            >
-              <circle
-                cx={10}
-                cy={10}
-                r={6}
-              />
-            </svg>
-          ),
-        },
+      icons={{
+        'chevron-right': (
+          <svg
+            viewBox='0 0 20 20'
+            fill='currentColor'
+          >
+            <circle
+              cx={10}
+              cy={10}
+              r={6}
+            />
+          </svg>
+        ),
       }}
     >
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

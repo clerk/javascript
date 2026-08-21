@@ -2,16 +2,14 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import type { MosaicAppearance } from '../../appearance';
+import type { MosaicIconOverrides } from '../../icons/overrides';
 import { MosaicProvider } from '../../MosaicProvider';
 import { Icon } from './icon';
 
-const wrap = (ui: React.ReactElement, appearance?: MosaicAppearance) =>
-  render(<MosaicProvider appearance={appearance}>{ui}</MosaicProvider>);
+const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
+  render(<MosaicProvider icons={icons}>{ui}</MosaicProvider>);
 
-const override: MosaicAppearance = {
-  icons: { 'chevron-right': <span data-testid='override' /> },
-};
+const override: MosaicIconOverrides = { 'chevron-right': <span data-testid='override' /> };
 
 describe('Mosaic Icon', () => {
   it('renders the default glyph for a known name', () => {
@@ -19,6 +17,28 @@ describe('Mosaic Icon', () => {
     const svg = container.querySelector('svg.cl-icon');
     expect(svg).not.toBeNull();
     expect(svg?.querySelector('path')).not.toBeNull();
+  });
+
+  it.each(['security-phone', 'security-lock-square', 'security-passkey'] as const)(
+    'renders the %s glyph on its 18px canvas',
+    name => {
+      const { container } = wrap(<Icon name={name} />);
+      const svg = container.querySelector('svg');
+
+      expect(svg).toHaveAttribute('viewBox', '0 0 18 18');
+      expect(svg?.querySelector('path')).toHaveAttribute('fill', 'currentColor');
+    },
+  );
+
+  it.each([
+    ['device-phone', ['#646464', '#646464', '#343434', '#575757', '#171717', 'black']],
+    ['device-laptop', ['black', '#575757', 'black', '#444444', '#171717']],
+  ] as const)('preserves the supplied %s palette', (name, palette) => {
+    const { container } = wrap(<Icon name={name} />);
+    const paths = Array.from(container.querySelectorAll('path'));
+
+    expect(container.querySelector('svg')).toHaveAttribute('viewBox', '0 0 18 18');
+    expect(paths.map(path => path.getAttribute('fill'))).toEqual(palette);
   });
 
   it('applies the default size when none is passed', () => {
@@ -105,14 +125,12 @@ describe('Mosaic Icon', () => {
         className='call-site'
       />,
       {
-        icons: {
-          'chevron-right': (
-            <span
-              data-testid='override'
-              className='consumer-glyph'
-            />
-          ),
-        },
+        'chevron-right': (
+          <span
+            data-testid='override'
+            className='consumer-glyph'
+          />
+        ),
       },
     );
     expect(getByTestId('override')).toHaveClass('cl-icon', 'call-site', 'consumer-glyph');
@@ -131,7 +149,7 @@ describe('Mosaic Icon', () => {
 
   it('falls through to the default when a different name is overridden', () => {
     const { container, queryByTestId } = wrap(<Icon name='chevron-right' />, {
-      icons: { 'chevron-left': <span data-testid='override' /> },
+      'chevron-left': <span data-testid='override' />,
     });
     expect(queryByTestId('override')).toBeNull();
     expect(container.querySelector('svg.cl-icon')).not.toBeNull();

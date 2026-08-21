@@ -37,12 +37,19 @@ export type KnobValues = Record<string, string | boolean | number>;
 export interface StoryMeta {
   group: string;
   title: string;
+  /** Controls the documentation canvas width. Wide compositions still keep prose at a readable measure. */
+  layout?: 'default' | 'wide';
   /**
    * Optional human-friendly label shown in the sidebar. Falls back to `title` when
    * omitted. Use this when the desired sidebar text differs from the component name
    * (which still drives the slug and the `<Title />` tag).
    */
   label?: string;
+  navigation?: {
+    family?: string;
+    category?: string;
+    order?: number;
+  };
   /**
    * Path to the file that exports the documented component, relative to the monorepo
    * root (e.g. `packages/ui/src/mosaic/components/button.tsx`). Rendered as a "View
@@ -50,11 +57,9 @@ export interface StoryMeta {
    */
   source?: string;
   /**
-   * Which styling engine the documented component is built on. Drives the prop rows that
-   * are engine-specific: Emotion components take `sx`, StyleX components take `className`
-   * and `style`. Defaults to `'emotion'` — set `'stylex'` once a component is migrated.
+   * The component's variant surface, described by hand. Drives the playground knobs and
+   * the `<PropTable>` rows. StyleX has no runtime recipe to derive this from.
    */
-  styleEngine?: 'emotion' | 'stylex';
   styles?: {
     _variants: Record<string, Record<string, unknown>>;
     _defaultVariants?: Record<string, unknown>;

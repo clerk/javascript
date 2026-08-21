@@ -1745,6 +1745,7 @@ export const koKR: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: '비밀번호가 너무 짧아요. 최소 8자 이상이어야 해요.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: '비밀번호가 충분히 안전하지 않아요.',
     form_password_or_identifier_incorrect:
       '비밀번호 또는 이메일 주소가 올바르지 않아요. 다시 시도하거나 다른 방법을 사용해 보세요.',

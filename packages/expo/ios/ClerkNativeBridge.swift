@@ -42,8 +42,376 @@ final class ClerkInlineAuthLogoState {
   }
 }
 
+@MainActor
+@Observable
+final class ClerkUserProfileCustomPageState {
+  typealias InactiveResetAction = @MainActor () -> Void
+  typealias PostInactiveReset = (@escaping InactiveResetAction) -> Void
+
+  private struct PagePresentation {
+    let path: String
+    let navigationDepth: Int?
+  }
+
+  private(set) var views: [UIView] = []
+  @ObservationIgnored private var navigateBackAction: (() -> Void)?
+  @ObservationIgnored private var popToRootAction: (() -> Void)?
+  @ObservationIgnored private var pushAction: ((String) -> Void)?
+  @ObservationIgnored private var pageEventHandler: ((String, String) -> Void)?
+  @ObservationIgnored private var pagePresentation: PagePresentation?
+  @ObservationIgnored private var retainedNavigationPath = NavigationPath()
+  @ObservationIgnored private var retainedCustomPagePathsByDepth: [Int: String] = [:]
+  @ObservationIgnored private var retainedNavigatorPaths: [String] = []
+  @ObservationIgnored private var navigatorResetGeneration = 0
+  @ObservationIgnored private var hasObservedUserID = false
+  @ObservationIgnored private var observedUserID: String?
+  private let postInactiveReset: PostInactiveReset
+
+  init(
+    postInactiveReset: @escaping PostInactiveReset = { action in
+      Task { @MainActor in
+        await Task.yield()
+        action()
+      }
+    }
+  ) {
+    self.postInactiveReset = postInactiveReset
+  }
+
+  func insertView(_ view: UIView, at index: Int) {
+    view.removeFromSuperview()
+    views.insert(view, at: min(max(index, 0), views.count))
+  }
+
+  func removeView(_ view: UIView) {
+    guard let index = views.firstIndex(where: { $0 === view }) else { return }
+    view.removeFromSuperview()
+    views.remove(at: index)
+  }
+
+  func configureNavigation(
+    _ navigator: UserProfileNavigator<String>,
+    navigateBack: @escaping () -> Void
+  ) {
+    configureNavigation(
+      navigateBack: navigateBack,
+      popToRoot: navigator.popToRoot,
+      push: navigator.push
+    )
+  }
+
+  func configureNavigation(_ navigationPath: Binding<NavigationPath>) {
+    configureNavigation(
+      navigateBack: {
+        guard !navigationPath.wrappedValue.isEmpty else { return }
+        navigationPath.wrappedValue.removeLast()
+      },
+      popToRoot: {
+        navigationPath.wrappedValue = NavigationPath()
+      },
+      push: {
+        navigationPath.wrappedValue.append($0)
+      }
+    )
+  }
+
+  func setPageEventHandler(_ handler: @escaping (String, String) -> Void) {
+    pageEventHandler = handler
+  }
+
+  func pageDidPresent(path: String, navigationDepth: Int? = nil) {
+    if navigationDepth == nil {
+      cancelPendingNavigatorReset()
+      retainNavigatorPath(path)
+    }
+    pagePresentation = PagePresentation(path: path, navigationDepth: navigationDepth)
+    if let navigationDepth {
+      retainedCustomPagePathsByDepth[navigationDepth] = path
+    }
+    pageEventHandler?("presented", path)
+  }
+
+  func pageDidDismiss(path: String) {
+    guard pagePresentation?.path == path else { return }
+    let usesNavigator = pagePresentation?.navigationDepth == nil
+    if usesNavigator, retainedNavigatorPaths.last == path {
+      retainedNavigatorPaths.removeLast()
+      scheduleNavigatorResetIfInactive()
+    }
+    dismissPage(path)
+  }
+
+  func navigationDepthDidChange(_ navigationDepth: Int) {
+    let removedPaths = retainedCustomPagePathsByDepth
+      .filter { $0.key > navigationDepth }
+      .sorted { $0.key > $1.key }
+      .map(\.value)
+    let remainingPathsByDepth = retainedCustomPagePathsByDepth.filter {
+      $0.key <= navigationDepth
+    }
+    let remainingPaths = Set(remainingPathsByDepth.values)
+    retainedCustomPagePathsByDepth = remainingPathsByDepth
+
+    var dismissedPaths = Set<String>()
+    for path in removedPaths where !remainingPaths.contains(path) && dismissedPaths.insert(path).inserted {
+      dismissPage(path)
+    }
+
+    if let pagePresentation,
+       let presentedDepth = pagePresentation.navigationDepth,
+       navigationDepth < presentedDepth
+    {
+      self.pagePresentation = nil
+    }
+  }
+
+  /// Expo can rebuild its hosting controller when a tab detaches. The live path starts
+  /// empty in each new controller so ClerkKitUI captures the correct zero-depth baseline,
+  /// while this retained snapshot is restored after that first appearance.
+  func navigationPathForRestoration() -> NavigationPath {
+    retainedNavigationPath
+  }
+
+  func navigationPathDidChange(_ navigationPath: NavigationPath) {
+    retainedNavigationPath = navigationPath
+    navigationDepthDidChange(navigationPath.count)
+  }
+
+  func userDidChange(to userID: String?) {
+    guard hasObservedUserID else {
+      observedUserID = userID
+      hasObservedUserID = true
+      return
+    }
+
+    guard observedUserID != userID else { return }
+    observedUserID = userID
+    invalidateNavigation()
+  }
+
+  func reconcileCustomPagePaths(_ validPaths: Set<String>) {
+    var retainedPaths = Set(retainedCustomPagePathsByDepth.values)
+    retainedPaths.formUnion(retainedNavigatorPaths)
+    if let presentedPath = pagePresentation?.path {
+      retainedPaths.insert(presentedPath)
+    }
+    guard !retainedPaths.isSubset(of: validPaths) else { return }
+
+    invalidateNavigation()
+  }
+
+  func navigate(action: String, routeKey: String?) {
+    switch action {
+    case "back":
+      navigateBackAction?()
+    case "popToRoot":
+      popToRootAction?()
+    case "push":
+      if let routeKey {
+        guard !retainedCustomPagePathsByDepth.values.contains(routeKey),
+              !retainedNavigatorPaths.contains(routeKey)
+        else { return }
+        if let pagePresentation, pagePresentation.navigationDepth == nil {
+          retainNavigatorPath(routeKey)
+        }
+        pushAction?(routeKey)
+      }
+    default:
+      break
+    }
+  }
+
+  private func configureNavigation(
+    navigateBack: @escaping () -> Void,
+    popToRoot: @escaping () -> Void,
+    push: @escaping (String) -> Void
+  ) {
+    navigateBackAction = navigateBack
+    popToRootAction = popToRoot
+    pushAction = push
+  }
+
+  private func invalidateNavigation() {
+    var dismissedPaths = retainedCustomPagePathsByDepth
+      .sorted { $0.key > $1.key }
+      .map(\.value)
+    dismissedPaths.append(contentsOf: retainedNavigatorPaths.reversed())
+    if let presentedPath = pagePresentation?.path,
+       !dismissedPaths.contains(presentedPath)
+    {
+      dismissedPaths.insert(presentedPath, at: 0)
+    }
+
+    retainedNavigationPath = NavigationPath()
+    retainedCustomPagePathsByDepth.removeAll()
+    retainedNavigatorPaths.removeAll()
+    cancelPendingNavigatorReset()
+    popToRootAction?()
+    var uniqueDismissedPaths: [String] = []
+    for path in dismissedPaths where !uniqueDismissedPaths.contains(path) {
+      uniqueDismissedPaths.append(path)
+    }
+    for path in uniqueDismissedPaths {
+      dismissPage(path)
+    }
+  }
+
+  private func retainNavigatorPath(_ path: String) {
+    guard let retainedIndex = retainedNavigatorPaths.lastIndex(of: path) else {
+      retainedNavigatorPaths.append(path)
+      return
+    }
+
+    let removedPaths = Array(retainedNavigatorPaths.suffix(from: retainedIndex + 1).reversed())
+    retainedNavigatorPaths.removeSubrange((retainedIndex + 1)..<retainedNavigatorPaths.endIndex)
+    for removedPath in removedPaths {
+      dismissPage(removedPath)
+    }
+  }
+
+  private func scheduleNavigatorResetIfInactive() {
+    navigatorResetGeneration += 1
+    let generation = navigatorResetGeneration
+    postInactiveReset { [weak self] in
+      guard let self, generation == navigatorResetGeneration else { return }
+      resetInactiveNavigatorPaths()
+    }
+  }
+
+  private func cancelPendingNavigatorReset() {
+    navigatorResetGeneration += 1
+  }
+
+  private func resetInactiveNavigatorPaths() {
+    guard pagePresentation == nil else { return }
+
+    let dismissedPaths = retainedNavigatorPaths.reversed()
+    retainedNavigatorPaths.removeAll()
+    navigateBackAction = nil
+    popToRootAction = nil
+    pushAction = nil
+    for path in dismissedPaths {
+      dismissPage(path)
+    }
+  }
+
+  private func dismissPage(_ path: String) {
+    if pagePresentation?.path == path {
+      pagePresentation = nil
+    }
+    pageEventHandler?("dismissed", path)
+  }
+}
+
+struct ClerkUserProfileCustomRowConfig: Decodable {
+  struct Placement: Decodable {
+    let type: String
+    let section: String?
+    let row: String?
+  }
+
+  let path: String
+  let label: String
+  let icon: String
+  let placement: Placement
+  let showAsRow: Bool?
+
+  var shouldShowAsRow: Bool {
+    showAsRow ?? true
+  }
+
+  var nativeRow: UserProfileCustomRow<String> {
+    UserProfileCustomRow(
+      route: path,
+      title: label,
+      icon: .system(name: systemIconName),
+      placement: nativePlacement
+    )
+  }
+
+  private var systemIconName: String {
+    switch icon {
+    case "user": "person"
+    case "profile": "person.crop.circle"
+    case "security": "shield"
+    case "billing": "creditcard"
+    case "key": "key"
+    case "lock": "lock"
+    case "email": "envelope"
+    case "phone": "phone"
+    case "add": "plus"
+    case "switch": "arrow.left.arrow.right"
+    case "users": "person.2"
+    case "warning": "exclamationmark.triangle"
+    case "info": "info.circle"
+    case "globe": "globe"
+    case "folder": "folder"
+    case "book": "book"
+    default: "gearshape"
+    }
+  }
+
+  private var nativePlacement: UserProfileCustomRowPlacement {
+    switch placement.type {
+    case "sectionStart": .sectionStart(nativeSection)
+    case "before": .before(nativeAnchorRow)
+    case "after": .after(nativeAnchorRow)
+    default: .sectionEnd(nativeSection)
+    }
+  }
+
+  private var nativeSection: UserProfileSection {
+    placement.section == "account" ? .account : .profile
+  }
+
+  private var nativeAnchorRow: UserProfileRow {
+    switch placement.row {
+    case "security": .security
+    case "switchAccount": .switchAccount
+    case "addAccount": .addAccount
+    case "signOut": .signOut
+    default: .manageAccount
+    }
+  }
+}
+
+func decodeUserProfileCustomPages(_ json: String) -> [ClerkUserProfileCustomRowConfig] {
+  guard let data = json.data(using: .utf8),
+        let rows = try? JSONDecoder().decode([ClerkUserProfileCustomRowConfig].self, from: data)
+  else {
+    return []
+  }
+  return rows
+}
+
+func parseUserProfileCustomPages(_ json: String, pageCount: Int) -> [ClerkUserProfileCustomRowConfig] {
+  Array(decodeUserProfileCustomPages(json).prefix(pageCount))
+}
+
+func userProfileCustomPageLabel(
+  for path: String,
+  rows: [ClerkUserProfileCustomRowConfig]
+) -> String {
+  rows.first(where: { $0.path == path })?.label ?? ""
+}
+
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
+private var clerkNativeAuthFlowChangedEmitter: (([String: Any]?) -> Void)?
 private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
+
+struct ClerkNativeErrorDescriptor {
+  let code: String
+  let message: String
+}
+
+private struct ClerkExpoTrustedDeviceError: LocalizedError {
+  let code: String
+  let message: String
+
+  var errorDescription: String? {
+    message
+  }
+}
 
 private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
   private static var hostSdkVersion: String? {
@@ -74,14 +442,23 @@ final class ClerkNativeBridge {
 
   private var clientObservationGeneration = 0
   private var lastObservedClientState: ClientStateSnapshot?
+  private var authFlowObservationGeneration = 0
+  private var lastObservedAuthFlowState: AuthFlowStateSnapshot?
   private var configurationDepth = 0
   private var jsOriginatedClientSyncDepth = 0
+  private var pendingURL: URL?
+  private var shouldFlushPendingURL = false
 
   private init() {}
 
   private struct ClientStateSnapshot: Equatable {
     let client: Client?
     let deviceToken: String?
+  }
+
+  private struct AuthFlowStateSnapshot: Equatable {
+    let isLoaded: Bool
+    let isAuthFlowComplete: Bool
   }
 
   private struct ClientStateChanges {
@@ -105,7 +482,17 @@ final class ClerkNativeBridge {
     configurationDepth += 1
     defer {
       lastObservedClientState = Self.clerkConfigured ? Self.clientStateSnapshot() : nil
+      let authFlowState = Self.authFlowStateSnapshot()
+      lastObservedAuthFlowState = authFlowState
       configurationDepth = max(0, configurationDepth - 1)
+      Self.emitAuthFlowChanged(Self.authFlowStatePayload(authFlowState))
+
+      // Overlapping calls can finish out of order, so replay once the last one settles and any
+      // of them succeeded. A batch where every call threw keeps the URL for the next attempt.
+      if configurationDepth == 0, shouldFlushPendingURL {
+        shouldFlushPendingURL = false
+        flushPendingURL()
+      }
     }
 
     loadThemes()
@@ -115,15 +502,18 @@ final class ClerkNativeBridge {
       Self.clerkConfigured = true
       Self.configuredPublishableKey = publishableKey
       startClientObserver(reset: true)
+      startAuthFlowObserver(reset: true)
 
       let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
       Self.postConfiguredNotification()
+      shouldFlushPendingURL = true
       return
     }
 
     if Self.clerkConfigured {
       startClientObserver()
+      startAuthFlowObserver()
       let didUpdateDeviceToken = try await Self.syncTokenState(bearerToken: bearerToken)
       if didUpdateDeviceToken {
         await Self.waitForLoadedClient()
@@ -133,6 +523,7 @@ final class ClerkNativeBridge {
         _ = try await Clerk.shared.refreshClient()
         await Self.waitForLoadedClient()
       }
+      shouldFlushPendingURL = true
       return
     }
 
@@ -140,10 +531,37 @@ final class ClerkNativeBridge {
     Self.configuredPublishableKey = publishableKey
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
     startClientObserver()
+    startAuthFlowObserver()
 
     let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
     Self.postConfiguredNotification()
+    shouldFlushPendingURL = true
+  }
+
+  @MainActor
+  private func flushPendingURL() {
+    guard let url = pendingURL else { return }
+    pendingURL = nil
+    handle(url: url)
+  }
+
+  /// `AuthView` only reaches `Clerk.handle(_:)` from `.onOpenURL`, which never fires for a UIKit-hosted controller.
+  @MainActor
+  func handle(url: URL) {
+    // A cold launch delivers the callback before, or partway through, JS calling `configure`.
+    guard Self.clerkConfigured, configurationDepth == 0 else {
+      pendingURL = url
+      return
+    }
+
+    Task { @MainActor in
+      do {
+        try await Clerk.shared.handle(url)
+      } catch {
+        NSLog("[Clerk] Failed to handle callback URL: \(error.localizedDescription)")
+      }
+    }
   }
 
   @MainActor
@@ -185,6 +603,60 @@ final class ClerkNativeBridge {
         self.observeClient(generation: generation)
       }
     }
+  }
+
+  @MainActor
+  private func startAuthFlowObserver(reset: Bool = false) {
+    guard reset || authFlowObservationGeneration == 0 else {
+      return
+    }
+
+    authFlowObservationGeneration += 1
+    let generation = authFlowObservationGeneration
+    lastObservedAuthFlowState = Self.authFlowStateSnapshot()
+    observeAuthFlow(generation: generation)
+  }
+
+  @MainActor
+  private func observeAuthFlow(generation: Int) {
+    withObservationTracking {
+      _ = Self.authFlowStateSnapshot()
+    } onChange: { [weak self] in
+      Task { @MainActor [weak self] in
+        await Task.yield()
+
+        guard let self, generation == self.authFlowObservationGeneration else { return }
+
+        let newState = Self.authFlowStateSnapshot()
+        if let previousState = self.lastObservedAuthFlowState, newState != previousState {
+          self.lastObservedAuthFlowState = newState
+          if self.configurationDepth == 0 {
+            Self.emitAuthFlowChanged(Self.authFlowStatePayload(newState))
+          }
+        }
+
+        self.observeAuthFlow(generation: generation)
+      }
+    }
+  }
+
+  @MainActor
+  private static func authFlowStateSnapshot() -> AuthFlowStateSnapshot {
+    guard clerkConfigured else {
+      return AuthFlowStateSnapshot(isLoaded: false, isAuthFlowComplete: false)
+    }
+
+    return AuthFlowStateSnapshot(
+      isLoaded: Clerk.shared.isLoaded,
+      isAuthFlowComplete: Clerk.shared.isAuthFlowComplete
+    )
+  }
+
+  private static func authFlowStatePayload(_ state: AuthFlowStateSnapshot) -> [String: Any] {
+    [
+      "isLoaded": state.isLoaded,
+      "isAuthFlowComplete": state.isAuthFlowComplete,
+    ]
   }
 
   @MainActor
@@ -264,8 +736,210 @@ final class ClerkNativeBridge {
     return Clerk.shared.deviceToken
   }
 
+  @MainActor
+  func getAuthFlowState() -> [String: Any] {
+    Self.authFlowStatePayload(Self.authFlowStateSnapshot())
+  }
+
+  // MARK: - Trusted devices
+
+  @MainActor
+  func getTrustedDeviceAvailability(id: String?, identifierHint: String?) async throws -> [String: Any] {
+    guard Self.clerkConfigured else {
+      return [
+        "isAvailable": false,
+        "unavailableReason": "environment_unavailable",
+      ]
+    }
+
+    let availability = try await Clerk.shared.trustedDevices.availability(
+      id: id,
+      identifierHint: identifierHint
+    )
+
+    return [
+      "isAvailable": availability.isAvailable,
+      "unavailableReason": availability.unavailableReason
+        .map(Self.trustedDeviceUnavailableReason) ?? NSNull(),
+    ]
+  }
+
+  @MainActor
+  func listTrustedDevices() async throws -> [[String: Any]] {
+    try Self.requireTrustedDeviceEnvironment()
+    let trustedDevices = try await Clerk.shared.trustedDevices.list()
+    return trustedDevices.map(Self.trustedDevicePayload)
+  }
+
+  @MainActor
+  func enrollTrustedDevice(
+    deviceName: String?,
+    identifierHint: String?,
+    reason: String?,
+    policy: String
+  ) async throws -> [String: Any] {
+    try Self.requireTrustedDeviceEnvironment()
+
+    guard let trustedDevicePolicy = TrustedDevicePolicy(rawValue: policy) else {
+      throw ClerkExpoTrustedDeviceError(
+        code: "invalid_trusted_device_policy",
+        message: "Invalid trusted-device policy: \(policy)."
+      )
+    }
+
+    let trustedDevice = try await Clerk.shared.trustedDevices.enroll(
+      deviceName: deviceName,
+      identifierHint: identifierHint,
+      reason: reason,
+      policy: trustedDevicePolicy
+    )
+    return Self.trustedDevicePayload(trustedDevice)
+  }
+
+  @MainActor
+  func revokeTrustedDevice(id: String) async throws -> [String: Any] {
+    try Self.requireTrustedDeviceEnvironment()
+    let trustedDevice = try await Clerk.shared.trustedDevices.revoke(id: id)
+    return Self.trustedDevicePayload(trustedDevice)
+  }
+
+  @MainActor
+  func signInWithTrustedDevice(
+    id: String?,
+    identifierHint: String?,
+    reason: String?
+  ) async throws -> [String: Any] {
+    try Self.requireTrustedDeviceEnvironment()
+    let signIn = try await Clerk.shared.auth.signInWithTrustedDevice(
+      id: id,
+      identifierHint: identifierHint,
+      reason: reason
+    )
+
+    return [
+      "id": signIn.id,
+      "status": signIn.status.rawValue,
+      "createdSessionId": Self.bridgeValue(signIn.createdSessionId),
+    ]
+  }
+
+  @MainActor
+  private static func requireTrustedDeviceEnvironment() throws {
+    guard clerkConfigured else {
+      throw ClerkExpoTrustedDeviceError(
+        code: "environment_unavailable",
+        message: "Trusted-device operations are unavailable until Clerk finishes configuring."
+      )
+    }
+  }
+
+  private static func trustedDevicePayload(_ trustedDevice: TrustedDevice) -> [String: Any] {
+    [
+      "id": trustedDevice.id,
+      "object": trustedDevice.object,
+      "platform": trustedDevice.platform.rawValue,
+      "appIdentifier": trustedDevice.appIdentifier,
+      "name": bridgeValue(trustedDevice.name),
+      "algorithm": trustedDevice.algorithm.rawValue,
+      "status": trustedDevice.status.rawValue,
+      "createdAt": millisecondsSince1970(trustedDevice.createdAt),
+      "updatedAt": millisecondsSince1970(trustedDevice.updatedAt),
+      "lastUsedAt": optionalMillisecondsSince1970(trustedDevice.lastUsedAt),
+      "revokedAt": optionalMillisecondsSince1970(trustedDevice.revokedAt),
+    ]
+  }
+
+  private static func trustedDeviceUnavailableReason(
+    _ reason: TrustedDeviceAvailability.UnavailableReason
+  ) -> String {
+    snakeCase(reason.rawValue)
+  }
+
+  static func trustedDeviceErrorDescriptor(
+    _ error: Error,
+    fallbackCode: String
+  ) -> ClerkNativeErrorDescriptor {
+    if let error = error as? ClerkExpoTrustedDeviceError {
+      return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
+    }
+
+    if let error = error as? ClerkAPIError {
+      return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
+    }
+
+    if let error = error as? TrustedDeviceKeyManagerError {
+      return ClerkNativeErrorDescriptor(
+        code: trustedDeviceKeyManagerErrorCode(error),
+        message: error.localizedDescription
+      )
+    }
+
+    return ClerkNativeErrorDescriptor(code: fallbackCode, message: error.localizedDescription)
+  }
+
+  private static func trustedDeviceKeyManagerErrorCode(
+    _ error: TrustedDeviceKeyManagerError
+  ) -> String {
+    switch error {
+    case .unsupportedPlatform:
+      "unsupported_platform"
+    case .biometricAuthenticationUnavailable:
+      "biometric_authentication_unavailable"
+    case .biometricAuthenticationCanceled:
+      "biometric_authentication_canceled"
+    case .biometricAuthenticationFailed:
+      "biometric_authentication_failed"
+    case .keyGenerationFailed:
+      "key_generation_failed"
+    case .keyNotFound:
+      "key_not_found"
+    case .invalidPublicKey:
+      "invalid_public_key"
+    case .publicKeyExportFailed:
+      "public_key_export_failed"
+    case .unsupportedAlgorithm:
+      "unsupported_algorithm"
+    case .signingFailed:
+      "signing_failed"
+    case .deletionFailed:
+      "key_deletion_failed"
+    @unknown default:
+      "trusted_device_key_manager_error"
+    }
+  }
+
+  private static func snakeCase(_ value: String) -> String {
+    value
+      .replacingOccurrences(
+        of: "([A-Z]+)([A-Z][a-z])",
+        with: "$1_$2",
+        options: .regularExpression
+      )
+      .replacingOccurrences(
+        of: "([a-z0-9])([A-Z])",
+        with: "$1_$2",
+        options: .regularExpression
+      )
+      .lowercased()
+  }
+
+  private static func millisecondsSince1970(_ date: Date) -> Double {
+    date.timeIntervalSince1970 * 1_000
+  }
+
+  private static func optionalMillisecondsSince1970(_ date: Date?) -> Any {
+    guard let date else { return NSNull() }
+    return millisecondsSince1970(date)
+  }
+
+  private static func bridgeValue<Value>(_ value: Value?) -> Any {
+    guard let value else { return NSNull() }
+    return value
+  }
+
   // MARK: - Inline View Creation
 
+  @MainActor
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
@@ -285,13 +959,20 @@ final class ClerkNativeBridge {
         darkTheme: darkTheme,
         logoState: logoState,
         logoMaxHeight: logoMaxHeight
+      )
+      .environment(
+        \.clerkAuthFlowCompletionAction,
+        ClerkAuthFlowCompletionAction { onEvent(.dismissed, [:]) }
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
 
+  @MainActor
   func makeUserProfileViewController(
     dismissible: Bool,
+    customRows: [ClerkUserProfileCustomRowConfig],
+    customPageState: ClerkUserProfileCustomPageState,
     hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
@@ -302,20 +983,30 @@ final class ClerkNativeBridge {
         dismissible: dismissible,
         hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
         lightTheme: lightTheme,
-        darkTheme: darkTheme
-      ),
+        darkTheme: darkTheme,
+        customRows: customRows,
+        customPageState: customPageState
+      )
+      .environment(Clerk.shared),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
 
-  func makeUserButtonViewController() -> UIViewController? {
+  @MainActor
+  func makeUserButtonViewController(
+    customRows: [ClerkUserProfileCustomRowConfig],
+    customPageState: ClerkUserProfileCustomPageState
+  ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
 
     return makeHostingController(
       rootView: ClerkInlineUserButtonWrapperView(
         lightTheme: lightTheme,
-        darkTheme: darkTheme
+        darkTheme: darkTheme,
+        customRows: customRows,
+        customPageState: customPageState
       )
+      .environment(Clerk.shared)
     )
   }
 
@@ -387,6 +1078,19 @@ final class ClerkNativeBridge {
     clerkNativeClientEventQueue.sync {
       clerkNativeClientChangedEmitter = emitter
     }
+  }
+
+  static func setAuthFlowChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
+    clerkNativeClientEventQueue.sync {
+      clerkNativeAuthFlowChangedEmitter = emitter
+    }
+  }
+
+  static func emitAuthFlowChanged(_ body: [String: Any]? = nil) {
+    let emitter = clerkNativeClientEventQueue.sync {
+      clerkNativeAuthFlowChangedEmitter
+    }
+    emitter?(body)
   }
 
   /// Requests that ClerkProvider reload the JS client from native client state.
@@ -509,14 +1213,28 @@ final class ClerkNativeBridge {
 // MARK: - Inline User Button Wrapper (for embedded rendering)
 
 struct ClerkInlineUserButtonWrapperView: View {
+  @Environment(Clerk.self) private var clerk
+  @Environment(\.colorScheme) private var colorScheme
+
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let customRows: [ClerkUserProfileCustomRowConfig]
+  let customPageState: ClerkUserProfileCustomPageState
 
-  @Environment(\.colorScheme) private var colorScheme
+  private var userID: String? {
+    clerk.user?.id
+  }
 
   var body: some View {
     let view = UserButton()
-      .environment(Clerk.shared)
+      .userProfileRows(customRows.filter(\.shouldShowAsRow).map(\.nativeRow))
+      .userProfileDestination { routeKey in
+        ClerkReactUserProfileCustomPage(
+          path: routeKey,
+          rows: customRows,
+          state: customPageState
+        )
+      }
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -527,6 +1245,12 @@ struct ClerkInlineUserButtonWrapperView: View {
     }
     themedView
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+      .onAppear {
+        customPageState.userDidChange(to: userID)
+      }
+      .onChange(of: userID) { _, newUserID in
+        customPageState.userDidChange(to: newUserID)
+      }
   }
 }
 
@@ -576,16 +1300,16 @@ struct ClerkInlineAuthWrapperView: View {
 private struct ClerkReactLogoView: UIViewRepresentable {
   let view: UIView
 
-  func makeUIView(context: Context) -> ClerkReactLogoContainerView {
-    return ClerkReactLogoContainerView(contentView: view)
+  func makeUIView(context: Context) -> ClerkReactContentContainerView {
+    return ClerkReactContentContainerView(contentView: view)
   }
 
-  func updateUIView(_ uiView: ClerkReactLogoContainerView, context: Context) {
+  func updateUIView(_ uiView: ClerkReactContentContainerView, context: Context) {
     uiView.setContentView(view)
   }
 }
 
-private final class ClerkReactLogoContainerView: UIView {
+private final class ClerkReactContentContainerView: UIView {
   private var contentView: UIView?
 
   init(contentView: UIView) {
@@ -640,17 +1364,40 @@ private final class ClerkNativeHostingController<Content: View>: UIHostingContro
 // MARK: - Inline Profile View Wrapper (for embedded rendering)
 
 struct ClerkInlineProfileWrapperView: View {
+  @Environment(Clerk.self) private var clerk
+  @Environment(\.colorScheme) private var colorScheme
+
   let dismissible: Bool
   let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let customRows: [ClerkUserProfileCustomRowConfig]
+  let customPageState: ClerkUserProfileCustomPageState
 
-  @Environment(\.colorScheme) private var colorScheme
+  @State private var navigationPath = NavigationPath()
+  @State private var didRestoreNavigation = false
+
+  private var userID: String? {
+    clerk.user?.id
+  }
 
   var body: some View {
-    let view = UserProfileView(isDismissible: dismissible)
-      .environment(Clerk.shared)
-      .environment(\.clerkHostBackAction, hostBackAction)
+    let view = NavigationStack(path: $navigationPath) {
+      UserProfileView(
+        isDismissible: dismissible,
+        navigationPath: $navigationPath
+      )
+      .userProfileRows(customRows.filter(\.shouldShowAsRow).map(\.nativeRow))
+      .navigationDestination(for: String.self) { routeKey in
+        ClerkReactEmbeddedUserProfileCustomPage(
+          path: routeKey,
+          rows: customRows,
+          state: customPageState,
+          navigationPath: $navigationPath
+        )
+      }
+    }
+    .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -660,5 +1407,93 @@ struct ClerkInlineProfileWrapperView: View {
       }
     }
     themedView
+      .onAppear {
+        customPageState.configureNavigation($navigationPath)
+        customPageState.userDidChange(to: userID)
+      }
+      .onChange(of: navigationPath.count) { _, _ in
+        customPageState.navigationPathDidChange(navigationPath)
+      }
+      .onChange(of: userID) { _, newUserID in
+        customPageState.userDidChange(to: newUserID)
+      }
+      .task(restoreNavigationIfNeeded)
+  }
+
+  @MainActor
+  private func restoreNavigationIfNeeded() async {
+    guard !didRestoreNavigation else { return }
+    await Task.yield()
+    guard !Task.isCancelled else { return }
+    navigationPath = customPageState.navigationPathForRestoration()
+    didRestoreNavigation = true
+  }
+}
+
+private struct ClerkReactUserProfileCustomPage: View {
+  @Environment(UserProfileNavigator<String>.self) private var navigator
+  @Environment(\.dismiss) private var dismiss
+
+  let path: String
+  let rows: [ClerkUserProfileCustomRowConfig]
+  let state: ClerkUserProfileCustomPageState
+
+  var body: some View {
+    ClerkReactUserProfileCustomPageContent(path: path, rows: rows, state: state)
+      .onAppear {
+        state.configureNavigation(navigator) {
+          dismiss()
+        }
+        state.pageDidPresent(path: path)
+      }
+      .onDisappear {
+        state.pageDidDismiss(path: path)
+      }
+  }
+}
+
+private struct ClerkReactEmbeddedUserProfileCustomPage: View {
+  let path: String
+  let rows: [ClerkUserProfileCustomRowConfig]
+  let state: ClerkUserProfileCustomPageState
+  @Binding var navigationPath: NavigationPath
+
+  var body: some View {
+    ClerkReactUserProfileCustomPageContent(path: path, rows: rows, state: state)
+      .onAppear {
+        state.configureNavigation($navigationPath)
+        state.pageDidPresent(path: path, navigationDepth: navigationPath.count)
+      }
+  }
+}
+
+private struct ClerkReactUserProfileCustomPageContent: View {
+  let path: String
+  let rows: [ClerkUserProfileCustomRowConfig]
+  let state: ClerkUserProfileCustomPageState
+
+  var body: some View {
+    Group {
+      if let index = rows.firstIndex(where: { $0.path == path }),
+         state.views.indices.contains(index)
+      {
+        ClerkReactCustomPageView(view: state.views[index])
+      }
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .navigationTitle(userProfileCustomPageLabel(for: path, rows: rows))
+    .navigationBarTitleDisplayMode(.inline)
+  }
+}
+
+private struct ClerkReactCustomPageView: UIViewRepresentable {
+  let view: UIView
+
+  func makeUIView(context: Context) -> ClerkReactContentContainerView {
+    ClerkReactContentContainerView(contentView: view)
+  }
+
+  func updateUIView(_ uiView: ClerkReactContentContainerView, context: Context) {
+    uiView.setContentView(view)
   }
 }

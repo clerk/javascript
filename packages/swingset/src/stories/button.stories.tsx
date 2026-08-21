@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import type { ButtonProps } from '@clerk/ui/mosaic/components/button';
 import { Button, SubmitButton } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
@@ -14,7 +13,6 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Button',
   source: 'packages/ui/src/mosaic/components/button/button.tsx',
-  styleEngine: 'stylex',
   styles: {
     _variants: {
       color: { primary: {}, neutral: {}, negative: {} },

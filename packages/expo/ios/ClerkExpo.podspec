@@ -18,7 +18,7 @@ else
 end
 
 clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
-clerk_ios_version = '1.3.9'
+clerk_ios_version = '1.4.1'
 
 Pod::Spec.new do |s|
   s.name           = 'ClerkExpo'
@@ -52,6 +52,7 @@ Pod::Spec.new do |s|
   end
 
   s.source_files = "ClerkNativeBridge.swift",
+                   "ClerkAppDelegateSubscriber.swift",
                    "ClerkExpoModule.swift",
                    "ClerkNativeViewHost.swift",
                    "ClerkAuthNativeView.swift",

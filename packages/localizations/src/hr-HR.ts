@@ -1774,6 +1774,7 @@ export const hrHR: LocalizationResource = {
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti. Molimo resetirajte svoju lozinku.',
     form_password_incorrect: 'Netočna lozinka. Pokušajte ponovno.',
     form_password_length_too_short: 'Vaša lozinka je prekratka. Mora sadržavati najmanje 8 znakova.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
     form_password_or_identifier_incorrect:
       'Lozinka ili e-mail adresa nisu točne. Pokušajte ponovno ili koristite drugu metodu.',
