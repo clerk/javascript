@@ -14,7 +14,6 @@ import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 export type EmailLinkVerifyProps = {
   redirectUrlComplete?: string;
   redirectUrl?: string;
-  /** SSO callback url, required only when the verified sign-up still has to hand off to an enterprise connection. */
   ssoCallbackUrl?: string;
   verifyEmailPath?: string;
   verifyPhonePath?: string;
