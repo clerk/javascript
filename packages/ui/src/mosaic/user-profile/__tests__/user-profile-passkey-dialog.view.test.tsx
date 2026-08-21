@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { AlertDialog } from '../../components/alert-dialog';
+import { Card } from '../../components/card';
+import { Dialog } from '../../components/dialog';
 import {
   UserProfilePasskeyAddDialogView,
   UserProfilePasskeyRemoveDialogView,
@@ -15,11 +18,13 @@ describe('passkey dialog views', () => {
     const user = userEvent.setup();
     render(
       <MosaicProvider>
-        <UserProfilePasskeyAddDialogView
-          open
-          state={{ isSubmitting: false, errors: {} }}
-          onAdd={onAdd}
-        />
+        <PasskeyDialog>
+          <UserProfilePasskeyAddDialogView
+            state={{ isSubmitting: false, errors: {} }}
+            onAdd={onAdd}
+            onCancel={vi.fn()}
+          />
+        </PasskeyDialog>
       </MosaicProvider>,
     );
 
@@ -30,11 +35,13 @@ describe('passkey dialog views', () => {
   it('announces passkey creation failures and pending state', () => {
     render(
       <MosaicProvider>
-        <UserProfilePasskeyAddDialogView
-          open
-          state={{ isSubmitting: true, errors: { form: 'Passkey creation was canceled.' } }}
-          onAdd={vi.fn()}
-        />
+        <PasskeyDialog>
+          <UserProfilePasskeyAddDialogView
+            state={{ isSubmitting: true, errors: { form: 'Passkey creation was canceled.' } }}
+            onAdd={vi.fn()}
+            onCancel={vi.fn()}
+          />
+        </PasskeyDialog>
       </MosaicProvider>,
     );
 
@@ -49,24 +56,28 @@ describe('passkey dialog views', () => {
     const user = userEvent.setup();
     const view = render(
       <MosaicProvider>
-        <UserProfilePasskeyRenameDialogView
-          open
-          state={{ id: 'passkey', originalName: 'Passkey', name: 'Passkey', isSubmitting: false, errors: {} }}
-          onNameChange={onNameChange}
-          onRename={onRename}
-        />
+        <PasskeyDialog>
+          <UserProfilePasskeyRenameDialogView
+            state={{ id: 'passkey', originalName: 'Passkey', name: 'Passkey', isSubmitting: false, errors: {} }}
+            onCancel={vi.fn()}
+            onNameChange={onNameChange}
+            onRename={onRename}
+          />
+        </PasskeyDialog>
       </MosaicProvider>,
     );
 
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     view.rerender(
       <MosaicProvider>
-        <UserProfilePasskeyRenameDialogView
-          open
-          state={{ id: 'passkey', originalName: 'Passkey', name: 'Chrome on macOS', isSubmitting: false, errors: {} }}
-          onNameChange={onNameChange}
-          onRename={onRename}
-        />
+        <PasskeyDialog>
+          <UserProfilePasskeyRenameDialogView
+            state={{ id: 'passkey', originalName: 'Passkey', name: 'Chrome on macOS', isSubmitting: false, errors: {} }}
+            onCancel={vi.fn()}
+            onNameChange={onNameChange}
+            onRename={onRename}
+          />
+        </PasskeyDialog>
       </MosaicProvider>,
     );
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -78,11 +89,13 @@ describe('passkey dialog views', () => {
     const user = userEvent.setup();
     render(
       <MosaicProvider>
-        <UserProfilePasskeyRemoveDialogView
-          open
-          state={{ id: 'passkey', name: 'Chrome on macOS', isSubmitting: false, errors: {} }}
-          onRemove={onRemove}
-        />
+        <AlertDialog open>
+          <UserProfilePasskeyRemoveDialogView
+            state={{ id: 'passkey', name: 'Chrome on macOS', isSubmitting: false, errors: {} }}
+            onCancel={vi.fn()}
+            onRemove={onRemove}
+          />
+        </AlertDialog>
       </MosaicProvider>,
     );
 
@@ -92,3 +105,25 @@ describe('passkey dialog views', () => {
     expect(onRemove).toHaveBeenCalledOnce();
   });
 });
+
+function PasskeyDialog({ children }: { children: React.ReactNode }) {
+  return (
+    <Dialog.Root open>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            {children}
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}

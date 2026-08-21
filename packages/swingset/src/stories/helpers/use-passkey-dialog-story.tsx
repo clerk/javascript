@@ -42,62 +42,119 @@ export function usePasskeyDialogStory({
     openRemovePasskeyDialog,
     passkeyDialogs: (
       <>
-        {add ? (
-          <UserProfilePasskeyAddDialogView
-            open
-            state={add}
-            onOpenChange={open => {
-              if (!open) {
-                setAdd(null);
-              }
-            }}
-            onAdd={() => {
-              onChange([
-                ...passkeys,
-                {
-                  id: `passkey-${Date.now()}`,
-                  name: `Passkey ${passkeys.length + 1}`,
-                  createdAtLabel: 'Created just now',
-                },
-              ]);
+        <PasskeyDialog
+          open={Boolean(add)}
+          onOpenChange={open => {
+            if (!open) {
               setAdd(null);
-            }}
-          />
-        ) : null}
-        {rename ? (
-          <UserProfilePasskeyRenameDialogView
-            open
-            state={rename}
-            onOpenChange={open => {
-              if (!open) {
-                setRename(null);
-              }
-            }}
-            onNameChange={name => setRename(current => (current ? { ...current, name, errors: {} } : current))}
-            onRename={() => {
-              onChange(
-                passkeys.map(passkey => (passkey.id === rename.id ? { ...passkey, name: rename.name } : passkey)),
-              );
+            }
+          }}
+        >
+          <Freeze frozen={!add}>
+            {add ? (
+              <UserProfilePasskeyAddDialogView
+                state={add}
+                onCancel={() => setAdd(null)}
+                onAdd={() => {
+                  onChange([
+                    ...passkeys,
+                    {
+                      id: `passkey-${Date.now()}`,
+                      name: `Passkey ${passkeys.length + 1}`,
+                      createdAtLabel: 'Created just now',
+                    },
+                  ]);
+                  setAdd(null);
+                }}
+              />
+            ) : null}
+          </Freeze>
+        </PasskeyDialog>
+        <PasskeyDialog
+          open={Boolean(rename)}
+          onOpenChange={open => {
+            if (!open) {
               setRename(null);
-            }}
-          />
-        ) : null}
-        {remove ? (
-          <UserProfilePasskeyRemoveDialogView
-            open
-            state={remove}
-            onOpenChange={open => {
-              if (!open) {
-                setRemove(null);
-              }
-            }}
-            onRemove={() => {
-              onChange(passkeys.filter(passkey => passkey.id !== remove.id));
+            }
+          }}
+        >
+          <Freeze frozen={!rename}>
+            {rename ? (
+              <UserProfilePasskeyRenameDialogView
+                state={rename}
+                onCancel={() => setRename(null)}
+                onNameChange={name => setRename(current => (current ? { ...current, name, errors: {} } : current))}
+                onRename={() => {
+                  onChange(
+                    passkeys.map(passkey => (passkey.id === rename.id ? { ...passkey, name: rename.name } : passkey)),
+                  );
+                  setRename(null);
+                }}
+              />
+            ) : null}
+          </Freeze>
+        </PasskeyDialog>
+        <AlertDialog
+          open={Boolean(remove)}
+          onOpenChange={open => {
+            if (!open) {
               setRemove(null);
-            }}
-          />
-        ) : null}
+            }
+          }}
+        >
+          <Freeze frozen={!remove}>
+            {remove ? (
+              <UserProfilePasskeyRemoveDialogView
+                state={remove}
+                onCancel={() => setRemove(null)}
+                onRemove={() => {
+                  onChange(passkeys.filter(passkey => passkey.id !== remove.id));
+                  setRemove(null);
+                }}
+              />
+            ) : null}
+          </Freeze>
+        </AlertDialog>
       </>
     ),
   };
 }
+
+function PasskeyDialog({
+  open,
+  onOpenChange,
+  children,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Dialog.Root
+      size='card'
+      closedBy='closerequest'
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            {children}
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+import { Freeze } from '@clerk/headless/utils';
+import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
+import { Card } from '@clerk/ui/mosaic/components/card';
+import { Dialog } from '@clerk/ui/mosaic/components/dialog';
