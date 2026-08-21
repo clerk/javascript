@@ -1,25 +1,10 @@
-import { Freeze } from '@clerk/headless/utils';
-import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import type { ReverificationChallengeState } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
-import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
-import { UserProfileBackupCodesDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-backup-codes-dialog.view';
-import { UserProfileDeleteAccountDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-account-dialog.view';
-import { UserProfileDeviceDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-device-dialog.view';
-import {
-  UserProfileMfaAddDialogView,
-  UserProfileMfaRemoveDialogView,
-} from '@clerk/ui/mosaic/user-profile/user-profile-mfa-dialog.view';
-import {
-  UserProfilePasskeyRemoveDialogView,
-  UserProfilePasskeyRenameDialogView,
-} from '@clerk/ui/mosaic/user-profile/user-profile-passkey-dialog.view';
-import { UserProfilePasskeysSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-passkeys-section.view';
-import { UserProfilePasswordDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-password-dialog.view';
+import type {
+  ReverificationChallengeState,
+  UserProfileSecurityPanelFlows,
+  UserProfileSecurityReverificationOperation,
+} from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
-import { UserProfileSignOutAllDevicesDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-sign-out-all-devices-dialog.view';
 import { useId, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -29,7 +14,6 @@ import {
   DEFAULT_SECURITY_FLOW_CONFIG,
   useUserProfileSecurityPanelFlow,
 } from './user-profile-security-panel-flow.harness';
-import type { SecurityReverificationOperation } from './user-profile-security-panel-flow.reverification';
 import { SECURITY_FLOW_SNAPSHOTS, type SecuritySnapshot } from './user-profile-security-panel-flow.snapshots';
 
 export { default as __source } from './user-profile-security-panel-flow.stories?raw';
@@ -84,305 +68,123 @@ function downloadBackupCodes(codes: string[]) {
   URL.revokeObjectURL(url);
 }
 
-function UserProfileSecurityPanelFlowDialogs({ flow }: { flow: ReturnType<typeof useUserProfileSecurityPanelFlow> }) {
-  const verificationDialog = (operation: SecurityReverificationOperation) => {
-    const challenge = flow.reverification?.operation === operation ? flow.reverification.state : null;
-    return (
-      <Dialog
-        open={Boolean(challenge)}
-        onOpenChange={open => {
-          if (!open) {
-            flow.cancelReverification();
-          }
-        }}
-      >
-        <Freeze frozen={!challenge}>
-          {challenge ? (
-            <ReverificationDialogView
-              state={challenge}
-              onCancel={flow.cancelReverification}
-              onResend={() => void flow.resendReverification()}
-              onSubmit={value => void flow.submitVerification(value)}
-              onValueChange={flow.updateVerificationValue}
-            />
-          ) : null}
-        </Freeze>
-      </Dialog>
-    );
-  };
-
-  return (
-    <>
-      <FlowCardDialog
-        finalFocus={flow.passwordTriggerRef}
-        open={Boolean(flow.password)}
-        onOpenChange={open => {
-          if (!open && !flow.password?.isSubmitting) {
-            flow.closePassword();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.password}>
-          {flow.password ? (
-            <UserProfilePasswordDialogView
-              state={flow.password}
-              isInterrupted={flow.reverification?.operation === 'password'}
-              onCancel={flow.closePassword}
-              onValueChange={flow.updatePasswordValue}
-              onSubmit={flow.submitPassword}
-            />
-          ) : null}
-        </Freeze>
-        {verificationDialog('password')}
-      </FlowCardDialog>
-      {verificationDialog('add-passkey')}
-      <FlowCardDialog
-        finalFocus={flow.passkeysTriggerRef}
-        open={Boolean(flow.renamePasskey)}
-        onOpenChange={open => {
-          if (!open && !flow.renamePasskey?.isSubmitting) {
-            flow.closeRenamePasskey();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.renamePasskey}>
-          {flow.renamePasskey ? (
-            <UserProfilePasskeyRenameDialogView
-              state={flow.renamePasskey}
-              isInterrupted={false}
-              onCancel={flow.closeRenamePasskey}
-              onNameChange={flow.updatePasskeyName}
-              onRename={flow.submitRenamePasskey}
-            />
-          ) : null}
-        </Freeze>
-      </FlowCardDialog>
-      <AlertDialog
-        finalFocus={flow.passkeysTriggerRef}
-        open={Boolean(flow.removePasskey)}
-        onOpenChange={open => {
-          if (!open && !flow.removePasskey?.isSubmitting) {
-            flow.closeRemovePasskey();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.removePasskey}>
-          {flow.removePasskey ? (
-            <UserProfilePasskeyRemoveDialogView
-              state={flow.removePasskey}
-              isInterrupted={flow.reverification?.operation === 'remove-passkey'}
-              onCancel={flow.closeRemovePasskey}
-              onRemove={flow.submitRemovePasskey}
-            />
-          ) : null}
-        </Freeze>
-        {verificationDialog('remove-passkey')}
-      </AlertDialog>
-      <FlowCardDialog
-        size='card'
-        finalFocus={flow.mfaTriggerRef}
-        open={Boolean(flow.addMfa)}
-        onOpenChange={open => {
-          if (!open && !flow.addMfa?.isSubmitting) {
-            flow.closeAddMfa();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.addMfa}>
-          {flow.addMfa ? (
-            <UserProfileMfaAddDialogView
-              state={flow.addMfa}
-              isInterrupted={flow.reverification?.operation === 'add-mfa'}
-              onCancel={flow.closeAddMfa}
-              onCodeChange={flow.updateMfaCode}
-              onAddPhone={flow.addNewMfaPhone}
-              onSelectPhone={flow.selectMfaPhone}
-              onPhoneNumberChange={flow.updateMfaPhoneNumber}
-              onResend={() => void flow.resendMfaCode()}
-              onBack={flow.backAddMfa}
-              onSubmit={code => void flow.submitAddMfa(code)}
-              onToggleDisplayFormat={flow.toggleMfaDisplayFormat}
-              onCopySecret={flow.copyMfaSecret}
-              onCopyBackupCodes={() => {
-                if (flow.addMfa?.step === 'backup-codes') {
-                  void navigator.clipboard?.writeText(flow.addMfa.codes.join('\n'));
-                  flow.markMfaBackupCodesCopied();
-                }
-              }}
-              onDownloadBackupCodes={() => {
-                if (flow.addMfa?.step === 'backup-codes') {
-                  downloadBackupCodes(flow.addMfa.codes);
-                }
-              }}
-              onPrintBackupCodes={() => window.print()}
-              onFinish={flow.finishAddMfa}
-            />
-          ) : null}
-        </Freeze>
-        {verificationDialog('add-mfa')}
-      </FlowCardDialog>
-      <AlertDialog
-        finalFocus={flow.mfaTriggerRef}
-        open={Boolean(flow.removeMfa)}
-        onOpenChange={open => {
-          if (!open && !flow.removeMfa?.isSubmitting) {
-            flow.closeRemoveMfa();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.removeMfa}>
-          {flow.removeMfa ? (
-            <UserProfileMfaRemoveDialogView
-              state={flow.removeMfa}
-              isInterrupted={flow.reverification?.operation === 'remove-mfa'}
-              onCancel={flow.closeRemoveMfa}
-              onRemove={flow.submitRemoveMfa}
-            />
-          ) : null}
-        </Freeze>
-        {verificationDialog('remove-mfa')}
-      </AlertDialog>
-      <FlowCardDialog
-        size='card'
-        finalFocus={flow.mfaTriggerRef}
-        open={Boolean(flow.backupCodes)}
-        onOpenChange={open => {
-          if (!open && !flow.backupCodes?.isSubmitting) {
-            flow.closeBackupCodes();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.backupCodes}>
-          {flow.backupCodes ? (
-            <UserProfileBackupCodesDialogView
-              state={flow.backupCodes}
-              isInterrupted={flow.reverification?.operation === 'backup-codes'}
-              onCancel={flow.closeBackupCodes}
-              onRetry={flow.regenerateBackupCodes}
-              onCopyAndClose={() => {
-                if (flow.backupCodes?.step === 'codes') {
-                  void navigator.clipboard?.writeText(flow.backupCodes.codes.join('\n'));
-                  flow.closeBackupCodes();
-                }
-              }}
-              onDownload={() => {
-                if (flow.backupCodes?.step === 'codes') {
-                  downloadBackupCodes(flow.backupCodes.codes);
-                }
-              }}
-              onPrint={() => window.print()}
-            />
-          ) : null}
-        </Freeze>
-        {verificationDialog('backup-codes')}
-      </FlowCardDialog>
-      <AlertDialog
-        finalFocus={flow.deleteTriggerRef}
-        open={Boolean(flow.deleteAccount)}
-        onOpenChange={open => {
-          if (!open && !flow.deleteAccount?.isSubmitting) {
-            flow.closeDeleteAccount();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.deleteAccount}>
-          {flow.deleteAccount ? (
-            <UserProfileDeleteAccountDialogView
-              state={flow.deleteAccount}
-              isInterrupted={flow.reverification?.operation === 'delete-account'}
-              onCancel={flow.closeDeleteAccount}
-              onConfirmationChange={flow.updateDeleteConfirmation}
-              onDelete={flow.submitDeleteAccount}
-            />
-          ) : null}
-        </Freeze>
-        {verificationDialog('delete-account')}
-      </AlertDialog>
-      <AlertDialog
-        finalFocus={flow.activeDevicesTriggerRef}
-        open={Boolean(flow.signOutAllDevices)}
-        onOpenChange={open => {
-          if (!open && !flow.signOutAllDevices?.isSubmitting) {
-            flow.closeSignOutAllDevices();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.signOutAllDevices}>
-          {flow.signOutAllDevices ? (
-            <UserProfileSignOutAllDevicesDialogView
-              state={flow.signOutAllDevices}
-              isInterrupted={flow.reverification?.operation === 'sign-out-all-devices'}
-              onCancel={flow.closeSignOutAllDevices}
-              onSignOut={flow.submitSignOutAllDevices}
-            />
-          ) : null}
-        </Freeze>
-        {verificationDialog('sign-out-all-devices')}
-      </AlertDialog>
-      <FlowCardDialog
-        size='card'
-        finalFocus={flow.activeDevicesTriggerRef}
-        open={Boolean(flow.device)}
-        onOpenChange={open => {
-          if (!open && !flow.device?.isSubmitting) {
-            flow.closeDevice();
-          }
-        }}
-      >
-        <Freeze frozen={!flow.device}>
-          {flow.device ? (
-            <UserProfileDeviceDialogView
-              state={flow.device}
-              isInterrupted={flow.reverification?.operation === 'sign-out-device'}
-              onSignOut={() => flow.signOutDevice(flow.device?.device.id ?? '')}
-            />
-          ) : null}
-        </Freeze>
-      </FlowCardDialog>
-      {verificationDialog('sign-out-device')}
-    </>
-  );
-}
-
-function FlowCardDialog({
-  open,
-  finalFocus,
-  size = 'prompt',
-  onOpenChange,
-  children,
-}: {
-  open: boolean;
-  finalFocus?: React.RefObject<HTMLElement | null>;
-  size?: 'prompt' | 'card';
-  onOpenChange: (open: boolean) => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <Dialog.Root
-      size={size}
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup
-            finalFocus={finalFocus}
-            render={
-              size === 'card' ? (
-                <Card.Root
-                  elevation='overlay'
-                  renderBranding={false}
-                />
-              ) : undefined
+function securityPanelFlows(flow: ReturnType<typeof useUserProfileSecurityPanelFlow>): UserProfileSecurityPanelFlows {
+  return {
+    passwordTriggerRef: flow.passwordTriggerRef,
+    passkeysTriggerRef: flow.passkeysTriggerRef,
+    mfaTriggerRef: flow.mfaTriggerRef,
+    deleteTriggerRef: flow.deleteTriggerRef,
+    activeDevicesTriggerRef: flow.activeDevicesTriggerRef,
+    password: flow.password
+      ? {
+          state: flow.password,
+          onCancel: flow.closePassword,
+          onValueChange: flow.updatePasswordValue,
+          onSubmit: flow.submitPassword,
+        }
+      : null,
+    renamePasskey: flow.renamePasskey
+      ? {
+          state: flow.renamePasskey,
+          onCancel: flow.closeRenamePasskey,
+          onNameChange: flow.updatePasskeyName,
+          onRename: flow.submitRenamePasskey,
+        }
+      : null,
+    removePasskey: flow.removePasskey
+      ? {
+          state: flow.removePasskey,
+          onCancel: flow.closeRemovePasskey,
+          onRemove: flow.submitRemovePasskey,
+        }
+      : null,
+    addMfa: flow.addMfa
+      ? {
+          state: flow.addMfa,
+          onCancel: flow.closeAddMfa,
+          onCodeChange: flow.updateMfaCode,
+          onAddPhone: flow.addNewMfaPhone,
+          onSelectPhone: flow.selectMfaPhone,
+          onPhoneNumberChange: flow.updateMfaPhoneNumber,
+          onResend: () => void flow.resendMfaCode(),
+          onBack: flow.backAddMfa,
+          onSubmit: code => void flow.submitAddMfa(code),
+          onToggleDisplayFormat: flow.toggleMfaDisplayFormat,
+          onCopySecret: flow.copyMfaSecret,
+          onCopyBackupCodes: () => {
+            if (flow.addMfa?.step === 'backup-codes') {
+              void navigator.clipboard?.writeText(flow.addMfa.codes.join('\n'));
+              flow.markMfaBackupCodesCopied();
             }
-          >
-            {children}
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
+          },
+          onDownloadBackupCodes: () => {
+            if (flow.addMfa?.step === 'backup-codes') {
+              downloadBackupCodes(flow.addMfa.codes);
+            }
+          },
+          onPrintBackupCodes: () => window.print(),
+          onFinish: flow.finishAddMfa,
+        }
+      : null,
+    removeMfa: flow.removeMfa
+      ? {
+          state: flow.removeMfa,
+          onCancel: flow.closeRemoveMfa,
+          onRemove: flow.submitRemoveMfa,
+        }
+      : null,
+    backupCodes: flow.backupCodes
+      ? {
+          state: flow.backupCodes,
+          onCancel: flow.closeBackupCodes,
+          onRetry: flow.regenerateBackupCodes,
+          onCopyAndClose: () => {
+            if (flow.backupCodes?.step === 'codes') {
+              void navigator.clipboard?.writeText(flow.backupCodes.codes.join('\n'));
+              flow.closeBackupCodes();
+            }
+          },
+          onDownload: () => {
+            if (flow.backupCodes?.step === 'codes') {
+              downloadBackupCodes(flow.backupCodes.codes);
+            }
+          },
+          onPrint: () => window.print(),
+        }
+      : null,
+    deleteAccount: flow.deleteAccount
+      ? {
+          state: flow.deleteAccount,
+          onCancel: flow.closeDeleteAccount,
+          onConfirmationChange: flow.updateDeleteConfirmation,
+          onDelete: flow.submitDeleteAccount,
+        }
+      : null,
+    signOutAllDevices: flow.signOutAllDevices
+      ? {
+          state: flow.signOutAllDevices,
+          onCancel: flow.closeSignOutAllDevices,
+          onSignOut: flow.submitSignOutAllDevices,
+        }
+      : null,
+    device: flow.device
+      ? {
+          state: flow.device,
+          onCancel: flow.closeDevice,
+          onSignOut: () => flow.signOutDevice(flow.device?.device.id ?? ''),
+        }
+      : null,
+    reverification: flow.reverification
+      ? {
+          operation: flow.reverification.operation,
+          state: flow.reverification.state,
+          onCancel: flow.cancelReverification,
+          onResend: () => void flow.resendReverification(),
+          onSubmit: value => void flow.submitVerification(value),
+          onValueChange: flow.updateVerificationValue,
+        }
+      : null,
+  };
 }
 
 const storyColumn = { display: 'flex', flexDirection: 'column', width: '100%' } as const;
@@ -779,6 +581,7 @@ export function Default() {
         onChange={setConfig}
       />
       <UserProfileSecurityPanelView
+        {...securityPanelFlows(flow)}
         devices={config.devicesStatus === 'ready' ? flow.devices : []}
         devicesError={config.devicesStatus === 'error' ? 'Sessions are unavailable.' : undefined}
         devicesStatus={config.devicesStatus}
@@ -810,7 +613,6 @@ export function Default() {
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
         onSignOutDevice={flow.signOutDevice}
       />
-      <UserProfileSecurityPanelFlowDialogs flow={flow} />
       {deleteCompletion ? <output>Active session cleared; redirect to {deleteCompletion.redirectUrl}</output> : null}
     </div>
   );
@@ -895,6 +697,127 @@ export function States() {
   return <SecurityFlowStates />;
 }
 
+const noop = () => undefined;
+
+function snapshotOperation(flow: SecuritySnapshot['flow']): UserProfileSecurityReverificationOperation | null {
+  if (flow === 'rename-passkey') {
+    return null;
+  }
+  return flow === 'device' ? 'sign-out-device' : flow;
+}
+
+function snapshotPanelFlows(
+  snapshot: SecuritySnapshot,
+  open: boolean,
+  verificationOpen: boolean,
+  onClose: () => void,
+  onVerificationClose: () => void,
+): UserProfileSecurityPanelFlows {
+  if (!open) {
+    return {};
+  }
+
+  const operation = snapshotOperation(snapshot.flow);
+  const reverification =
+    verificationOpen && snapshot.reverification && operation
+      ? {
+          operation,
+          state: snapshot.reverification,
+          onCancel: onVerificationClose,
+          onResend: noop,
+          onSubmit: noop,
+          onValueChange: noop,
+        }
+      : null;
+
+  switch (snapshot.flow) {
+    case 'password':
+      return {
+        reverification,
+        password: {
+          state: snapshot.state,
+          onCancel: onClose,
+          onSubmit: noop,
+          onValueChange: noop,
+        },
+      };
+    case 'add-passkey':
+      return { reverification };
+    case 'rename-passkey':
+      return {
+        renamePasskey: {
+          state: snapshot.state,
+          onCancel: onClose,
+          onNameChange: noop,
+          onRename: noop,
+        },
+      };
+    case 'remove-passkey':
+      return {
+        reverification,
+        removePasskey: { state: snapshot.state, onCancel: onClose, onRemove: noop },
+      };
+    case 'add-mfa':
+      return {
+        reverification,
+        addMfa: {
+          state: snapshot.state,
+          onAddPhone: noop,
+          onBack: noop,
+          onCancel: onClose,
+          onCodeChange: noop,
+          onCopyBackupCodes: noop,
+          onCopySecret: noop,
+          onDownloadBackupCodes: noop,
+          onFinish: noop,
+          onPhoneNumberChange: noop,
+          onPrintBackupCodes: noop,
+          onResend: noop,
+          onSelectPhone: noop,
+          onSubmit: noop,
+          onToggleDisplayFormat: noop,
+        },
+      };
+    case 'remove-mfa':
+      return {
+        reverification,
+        removeMfa: { state: snapshot.state, onCancel: onClose, onRemove: noop },
+      };
+    case 'backup-codes':
+      return {
+        reverification,
+        backupCodes: {
+          state: snapshot.state,
+          onCancel: onClose,
+          onCopyAndClose: onClose,
+          onDownload: noop,
+          onPrint: noop,
+          onRetry: noop,
+        },
+      };
+    case 'delete-account':
+      return {
+        reverification,
+        deleteAccount: {
+          state: snapshot.state,
+          onCancel: onClose,
+          onConfirmationChange: noop,
+          onDelete: noop,
+        },
+      };
+    case 'sign-out-all-devices':
+      return {
+        reverification,
+        signOutAllDevices: { state: snapshot.state, onCancel: onClose, onSignOut: noop },
+      };
+    case 'device':
+      return {
+        reverification,
+        device: { state: snapshot.state, onCancel: onClose, onSignOut: noop },
+      };
+  }
+}
+
 export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow'][] } = {}) {
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
@@ -903,21 +826,9 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
     ? SECURITY_FLOW_SNAPSHOTS.filter(snapshot => flows.includes(snapshot.flow))
     : SECURITY_FLOW_SNAPSHOTS;
   const snapshot = snapshots[index] ?? snapshots[0];
-  const noop = () => undefined;
-  const verification = snapshot.reverification ? (
-    <Dialog
-      open={verificationOpen}
-      onOpenChange={setVerificationOpen}
-    >
-      <ReverificationDialogView
-        state={snapshot.reverification}
-        onCancel={() => setVerificationOpen(false)}
-        onResend={noop}
-        onSubmit={noop}
-        onValueChange={noop}
-      />
-    </Dialog>
-  ) : null;
+  const isPasskeyFlow = snapshot.flow === 'add-passkey' || snapshot.flow.endsWith('-passkey');
+  const isMfaFlow = snapshot.flow.endsWith('-mfa') || snapshot.flow === 'backup-codes';
+  const isDeviceFlow = snapshot.flow === 'device' || snapshot.flow === 'sign-out-all-devices';
 
   return (
     <div style={storyColumn}>
@@ -932,162 +843,26 @@ export function SecurityFlowStates({ flows }: { flows?: SecuritySnapshot['flow']
           }}
         />
       </div>
-      {snapshot.flow === 'password' ? (
-        <FlowCardDialog
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfilePasswordDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onCancel={() => setOpen(false)}
-            onValueChange={noop}
-            onSubmit={noop}
-          />
-          {verification}
-        </FlowCardDialog>
-      ) : null}
-      {snapshot.flow === 'add-passkey' ? (
-        <div style={{ width: '100%' }}>
-          <UserProfilePasskeysSectionView
-            creationState={snapshot.state}
-            passkeys={[]}
-            onAdd={noop}
-          />
-          {verification}
-        </div>
-      ) : null}
-      {snapshot.flow === 'rename-passkey' ? (
-        <FlowCardDialog
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfilePasskeyRenameDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onCancel={() => setOpen(false)}
-            onNameChange={noop}
-            onRename={noop}
-          />
-          {verification}
-        </FlowCardDialog>
-      ) : null}
-      {snapshot.flow === 'remove-passkey' ? (
-        <AlertDialog
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfilePasskeyRemoveDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onCancel={() => setOpen(false)}
-            onRemove={noop}
-          />
-          {verification}
-        </AlertDialog>
-      ) : null}
-      {snapshot.flow === 'add-mfa' ? (
-        <FlowCardDialog
-          size='card'
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfileMfaAddDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onCancel={() => setOpen(false)}
-            onCodeChange={noop}
-            onAddPhone={noop}
-            onSelectPhone={noop}
-            onPhoneNumberChange={noop}
-            onResend={noop}
-            onBack={noop}
-            onSubmit={noop}
-            onToggleDisplayFormat={noop}
-            onCopySecret={noop}
-            onCopyBackupCodes={noop}
-            onDownloadBackupCodes={noop}
-            onPrintBackupCodes={noop}
-            onFinish={noop}
-          />
-          {verification}
-        </FlowCardDialog>
-      ) : null}
-      {snapshot.flow === 'remove-mfa' ? (
-        <AlertDialog
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfileMfaRemoveDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onCancel={() => setOpen(false)}
-            onRemove={noop}
-          />
-          {verification}
-        </AlertDialog>
-      ) : null}
-      {snapshot.flow === 'backup-codes' ? (
-        <FlowCardDialog
-          size='card'
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfileBackupCodesDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onCancel={() => setOpen(false)}
-            onRetry={noop}
-            onCopyAndClose={() => setOpen(false)}
-            onDownload={noop}
-            onPrint={noop}
-          />
-          {verification}
-        </FlowCardDialog>
-      ) : null}
-      {snapshot.flow === 'delete-account' ? (
-        <AlertDialog
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfileDeleteAccountDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onCancel={() => setOpen(false)}
-            onConfirmationChange={noop}
-            onDelete={noop}
-          />
-          {verification}
-        </AlertDialog>
-      ) : null}
-      {snapshot.flow === 'sign-out-all-devices' ? (
-        <AlertDialog
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfileSignOutAllDevicesDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onCancel={() => setOpen(false)}
-            onSignOut={noop}
-          />
-          {verification}
-        </AlertDialog>
-      ) : null}
-      {snapshot.flow === 'device' ? (
-        <FlowCardDialog
-          size='card'
-          open={open}
-          onOpenChange={setOpen}
-        >
-          <UserProfileDeviceDialogView
-            state={snapshot.state}
-            isInterrupted={verificationOpen}
-            onSignOut={noop}
-          />
-          {verification}
-        </FlowCardDialog>
-      ) : null}
+      <UserProfileSecurityPanelView
+        {...snapshotPanelFlows(
+          snapshot,
+          open,
+          verificationOpen,
+          () => setOpen(false),
+          () => setVerificationOpen(false),
+        )}
+        devices={isDeviceFlow ? INITIAL_DEVICES : undefined}
+        hasPassword
+        mfaMethods={isMfaFlow ? [] : undefined}
+        passkeyCreationState={snapshot.flow === 'add-passkey' && open ? snapshot.state : null}
+        passkeys={isPasskeyFlow ? [] : undefined}
+        passwordAvailable={snapshot.flow === 'password'}
+        onAddMfaMethod={isMfaFlow ? noop : undefined}
+        onAddPasskey={isPasskeyFlow ? noop : undefined}
+        onChangePassword={snapshot.flow === 'password' ? noop : undefined}
+        onDeleteAccount={snapshot.flow === 'delete-account' ? noop : undefined}
+        onSignOutAllOtherDevices={isDeviceFlow ? noop : undefined}
+      />
     </div>
   );
 }

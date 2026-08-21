@@ -1,4 +1,7 @@
-import type { ReverificationChallengeState } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
+import type {
+  ReverificationChallengeState,
+  UserProfileSecurityReverificationOperation,
+} from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import { useCallback, useRef, useState } from 'react';
 
 import type { SecurityFlowConfig } from './user-profile-security-panel-flow.config';
@@ -8,16 +11,7 @@ type ReverificationFlowConfig = Pick<
   'failurePoint' | 'latencyMs' | 'requireReverification' | 'reverificationStrategy' | 'validCode' | 'validPassword'
 >;
 
-export type SecurityReverificationOperation =
-  | 'password'
-  | 'add-passkey'
-  | 'remove-passkey'
-  | 'add-mfa'
-  | 'remove-mfa'
-  | 'backup-codes'
-  | 'sign-out-device'
-  | 'sign-out-all-devices'
-  | 'delete-account';
+export type SecurityReverificationOperation = UserProfileSecurityReverificationOperation;
 
 interface SecurityReverificationState {
   operation: SecurityReverificationOperation;
