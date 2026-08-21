@@ -123,7 +123,26 @@ describe('AddContactDialogView', () => {
       await userEvent.paste('424242');
 
       expect(handlers.onCodeChange).toHaveBeenCalledWith('424242');
-      expect(handlers.onSubmitCode).toHaveBeenCalledOnce();
+      // The completed code rides along: a driver holding it in ordinary React state cannot read
+      // what it just set, so the value has to arrive with the event.
+      expect(handlers.onSubmitCode).toHaveBeenCalledWith('424242');
+    });
+
+    it('re-arms after a rejected code is replaced wholesale', async () => {
+      const handlers = renderView(codeState);
+      const field = screen.getByRole('textbox', { name: 'Verification code' });
+
+      await userEvent.click(field);
+      await userEvent.paste('111111');
+      expect(handlers.onSubmitCode).toHaveBeenCalledWith('111111');
+
+      // Selecting all and pasting over never shortens the value, so a latched boolean would
+      // never let this fire again.
+      await userEvent.clear(field);
+      await userEvent.paste('424242');
+
+      expect(handlers.onSubmitCode).toHaveBeenCalledWith('424242');
+      expect(handlers.onSubmitCode).toHaveBeenCalledTimes(2);
     });
 
     it('ignores non-digits and stops at the code length', async () => {

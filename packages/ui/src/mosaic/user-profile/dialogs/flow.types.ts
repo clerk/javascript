@@ -102,7 +102,13 @@ export interface AddContactFlowActions {
   onValueChange: (value: string) => void;
   onSubmitIdentifier: () => void;
   onCodeChange: (code: string) => void;
-  onSubmitCode: () => void;
+  /**
+   * The completed code is passed when the final digit fires this, and omitted when the button
+   * does. Optional rather than required so a machine, whose context is already current by the
+   * time this arrives, can keep ignoring it — while a driver holding the code in ordinary React
+   * state, which cannot read what it just set, has the value to hand.
+   */
+  onSubmitCode: (completedCode?: string) => void;
   onResend: () => void;
   onOpenSsoPopup: () => void;
   onCancel: () => void;
@@ -131,7 +137,8 @@ export interface ReverificationChallengeState {
 
 export interface ReverificationChallengeActions {
   onValueChange: (value: string) => void;
-  onSubmit: () => void;
+  /** Carries the completed code on auto-submit, as {@link AddContactFlowActions.onSubmitCode} does. */
+  onSubmit: (completedValue?: string) => void;
   onResend: () => void;
   onCancel: () => void;
 }

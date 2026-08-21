@@ -752,32 +752,38 @@ export function useAccountSectionFlow({
     dispatch({ type: 'add.verify', identifier, strategy, providerName: settingsRef.current.ssoProviderName });
   }, [dispatch, gate, resolveStrategy, sleep]);
 
-  const submitCode = useCallback(async () => {
-    const current = stateRef.current.add;
-    if (current?.state.step !== 'code' || current.state.status === 'verifying') {
-      return;
-    }
-    const { code, identifier } = current.state;
-    const { kind } = current;
+  const submitCode = useCallback(
+    async (completedCode?: string) => {
+      const current = stateRef.current.add;
+      if (current?.state.step !== 'code' || current.state.status === 'verifying') {
+        return;
+      }
+      const { identifier } = current.state;
+      const { kind } = current;
+      // Prefer what the input handed up. The shadow state is current too, but only because this
+      // harness keeps one — a driver on ordinary React state would read a digit short here.
+      const code = completedCode ?? current.state.code;
 
-    dispatch({ type: 'add.codeStatus', status: 'verifying' });
-    await sleep(settingsRef.current.latencyMs);
+      dispatch({ type: 'add.codeStatus', status: 'verifying' });
+      await sleep(settingsRef.current.latencyMs);
 
-    if (code !== settingsRef.current.validCode) {
-      dispatch({ type: 'add.codeStatus', status: 'error', message: 'Incorrect code. Please try again.' });
-      return;
-    }
-    // The flow reducer ignores `add.*` once the dialog is closed, but `contacts.add` is not scoped
-    // to it — without this, cancelling mid-request still adds the identifier.
-    if (stateRef.current.add?.state.step !== 'code') {
-      return;
-    }
-    dispatch({ type: 'add.codeStatus', status: 'success' });
-    dispatch({ type: 'contacts.add', kind, record: makeRecord(identifier, true) });
-    // Hold on the check mark before moving on, as the legacy OTP control does.
-    await sleep(600);
-    dispatch({ type: 'add.success', identifier });
-  }, [dispatch, sleep]);
+      if (code !== settingsRef.current.validCode) {
+        dispatch({ type: 'add.codeStatus', status: 'error', message: 'Incorrect code. Please try again.' });
+        return;
+      }
+      // The flow reducer ignores `add.*` once the dialog is closed, but `contacts.add` is not scoped
+      // to it — without this, cancelling mid-request still adds the identifier.
+      if (stateRef.current.add?.state.step !== 'code') {
+        return;
+      }
+      dispatch({ type: 'add.codeStatus', status: 'success' });
+      dispatch({ type: 'contacts.add', kind, record: makeRecord(identifier, true) });
+      // Hold on the check mark before moving on, as the legacy OTP control does.
+      await sleep(600);
+      dispatch({ type: 'add.success', identifier });
+    },
+    [dispatch, sleep],
+  );
 
   const resend = useCallback(async () => {
     const current = stateRef.current.add;
@@ -1006,28 +1012,32 @@ export function useAccountSectionFlow({
     dispatch({ type: 'confirm.close' });
   }, [dispatch, gate, sleep]);
 
-  const submitReverification = useCallback(async () => {
-    const current = stateRef.current.reverification;
-    if (!current || current.status === 'verifying') {
-      return;
-    }
-    dispatch({ type: 'reverification.status', status: 'verifying' });
-    await sleep(settingsRef.current.latencyMs);
+  const submitReverification = useCallback(
+    async (completedValue?: string) => {
+      const current = stateRef.current.reverification;
+      if (!current || current.status === 'verifying') {
+        return;
+      }
+      const value = completedValue ?? current.value;
+      dispatch({ type: 'reverification.status', status: 'verifying' });
+      await sleep(settingsRef.current.latencyMs);
 
-    const expected =
-      current.strategy === 'password' ? settingsRef.current.validPassword : settingsRef.current.validCode;
-    if (current.value !== expected) {
-      dispatch({
-        type: 'reverification.status',
-        status: 'error',
-        message: current.strategy === 'password' ? 'Incorrect password.' : 'Incorrect code. Please try again.',
-      });
-      return;
-    }
-    dispatch({ type: 'reverification.close' });
-    reverificationGate.current?.resolve(true);
-    reverificationGate.current = null;
-  }, [dispatch, sleep]);
+      const expected =
+        current.strategy === 'password' ? settingsRef.current.validPassword : settingsRef.current.validCode;
+      if (value !== expected) {
+        dispatch({
+          type: 'reverification.status',
+          status: 'error',
+          message: current.strategy === 'password' ? 'Incorrect password.' : 'Incorrect code. Please try again.',
+        });
+        return;
+      }
+      dispatch({ type: 'reverification.close' });
+      reverificationGate.current?.resolve(true);
+      reverificationGate.current = null;
+    },
+    [dispatch, sleep],
+  );
 
   const cancelReverification = useCallback(() => {
     dispatch({ type: 'reverification.close' });

@@ -146,7 +146,6 @@ export interface CodeInputProps {
   disabled?: boolean;
   autoFocus?: boolean;
   /** Fired once the final digit lands, matching the legacy `onCodeEntryFinished` auto-submit. */
-  /** Fired once the final digit lands, matching the legacy `onCodeEntryFinished` auto-submit. */
   onComplete: (value: string) => void;
   onChange: (value: string) => void;
 }

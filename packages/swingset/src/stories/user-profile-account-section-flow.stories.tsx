@@ -452,7 +452,7 @@ export function Default() {
                 onCodeChange: flow.setCode,
                 onOpenSsoPopup: () => void flow.openSsoPopup(),
                 onResend: () => void flow.resend(),
-                onSubmitCode: () => void flow.submitCode(),
+                onSubmitCode: code => void flow.submitCode(code),
                 onSubmitIdentifier: () => void flow.submitIdentifier(),
                 onValueChange: flow.setIdentifier,
               }
@@ -490,7 +490,7 @@ export function Default() {
                 state: flow.reverification,
                 onCancel: flow.cancelReverification,
                 onResend: () => void flow.resendReverification(),
-                onSubmit: () => void flow.submitReverification(),
+                onSubmit: value => void flow.submitReverification(value),
                 onValueChange: flow.setReverificationValue,
               }
             : null
