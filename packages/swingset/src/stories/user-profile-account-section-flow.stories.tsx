@@ -300,6 +300,14 @@ function Controls({
       />
       <label style={controlLabel}>
         <input
+          checked={config.allowMultipleAccounts}
+          type='checkbox'
+          onChange={event => onChange({ allowMultipleAccounts: event.target.checked })}
+        />
+        <span style={controlName}>Allow multiple emails / phones</span>
+      </label>
+      <label style={controlLabel}>
+        <input
           checked={config.enterpriseManaged}
           type='checkbox'
           onChange={event => onChange({ enterpriseManaged: event.target.checked })}
@@ -358,6 +366,7 @@ export function Default() {
       {/* The section renders the dialogs itself; the harness supplies only their state and events,
           which is what the controller will hand it once a machine drives this. */}
       <UserProfileAccountSectionView
+        allowMultipleAccounts={config.allowMultipleAccounts}
         addContact={
           flow.add
             ? {

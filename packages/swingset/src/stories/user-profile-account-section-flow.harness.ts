@@ -51,6 +51,12 @@ export interface AccountSectionFlowConfig {
   /** Fail the enterprise SSO popup instead of returning verified. */
   ssoFails: boolean;
   /**
+   * Whether the instance permits more than one email address or phone number. Off, the section
+   * collapses each to a single row showing only the primary; on, each gets its own card with an
+   * Add button and a per-row menu — which is what the add, remove and set-primary flows need.
+   */
+  allowMultipleAccounts: boolean;
+  /**
    * An account with an active enterprise connection: legacy renders the name form read-only.
    * Username and avatar stay editable.
    */
@@ -73,6 +79,7 @@ export const DEFAULT_ACCOUNT_SECTION_FLOW_CONFIG: AccountSectionFlowConfig = {
   emailLinkOutcome: 'verified',
   emailLinkResolveMs: 6000,
   ssoFails: false,
+  allowMultipleAccounts: true,
   enterpriseManaged: false,
   takenUsernames: ['prestonxyz'],
 };
