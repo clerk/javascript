@@ -250,6 +250,49 @@ describe('executeProtectCheck', () => {
       expect(settled).toBe(true);
     });
 
+    // An abort mid-load has to settle the operation, not leave it pending for the whole bound
+    // holding its closures and timer, and it is a cancellation rather than a load failure.
+    it('settles as an abort when the caller aborts during a stalled load', async () => {
+      vi.doMock('https://protect.example.com/sdk-hangs-3.js', () => new Promise(() => {}));
+
+      const controller = new AbortController();
+      const running = executeProtectCheck(
+        protectCheck({ sdkUrl: 'https://protect.example.com/sdk-hangs-3.js' }),
+        fakeContainer(),
+        { signal: controller.signal },
+      );
+      const assertion = expect(running).rejects.toMatchObject({ code: 'protect_check_aborted' });
+
+      controller.abort();
+      // No timer advanced: the abort alone must settle it, well before the load bound.
+      await assertion;
+    });
+
+    // setTimeout stores its delay in a signed 32-bit int, so an oversized value overflows and
+    // fires immediately — failing every load instantly, the opposite of what was configured.
+    it('clamps an oversized loadTimeoutMs instead of overflowing the timer', async () => {
+      vi.doMock('https://protect.example.com/sdk-hangs-4.js', () => new Promise(() => {}));
+
+      const running = executeProtectCheck(
+        protectCheck({ sdkUrl: 'https://protect.example.com/sdk-hangs-4.js' }),
+        fakeContainer(),
+        { loadTimeoutMs: 2_147_483_648 },
+      );
+      let settled = false;
+      const watch = running.then(
+        () => (settled = true),
+        () => (settled = true),
+      );
+
+      // An overflowed timer would already have fired by now.
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(settled).toBe(false);
+
+      await vi.advanceTimersByTimeAsync(600_000);
+      await watch;
+      expect(settled).toBe(true);
+    });
+
     // The point of the whole change: the challenge owns its own duration. A challenge running far
     // longer than any load bound must still resolve — proof-of-transfer moves a server-chosen
     // number of bytes, and a host-side wall would abort it as a "timeout".

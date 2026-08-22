@@ -47,8 +47,19 @@ export interface ExecuteProtectCheckOptions {
  */
 export const DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS = 60_000;
 
+/**
+ * Ceiling on the configured load bound. `setTimeout` stores its delay in a signed 32-bit int, so a
+ * larger value overflows and fires immediately — which would make every load fail instantly, the
+ * exact opposite of what an operator asking for a long timeout wanted. Clamping rather than
+ * rejecting keeps a fat-fingered config from breaking sign-in.
+ */
+const MAX_PROTECT_CHECK_LOAD_TIMEOUT_MS = 600_000;
+
 function resolveLoadTimeoutMs(configured: number | undefined): number {
-  return typeof configured === 'number' && configured > 0 ? configured : DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS;
+  if (typeof configured !== 'number' || !Number.isFinite(configured) || configured <= 0) {
+    return DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS;
+  }
+  return Math.min(configured, MAX_PROTECT_CHECK_LOAD_TIMEOUT_MS);
 }
 
 /**
@@ -61,14 +72,36 @@ function resolveLoadTimeoutMs(configured: number | undefined): number {
  * about — waiting on a person, or moving a server-chosen number of bytes over an unknown link. A
  * host-side wall over execution aborts legitimate challenges and reports them as timeouts, and
  * since a re-run restarts the work, retrying cannot win on any connection slow enough to trip it.
+ *
+ * The abort signal is raced too. A stalled import cannot itself be cancelled, but without this the
+ * caller's abort would not settle anything: an unmounted component would keep this promise, its
+ * closures and its timer alive for the whole load bound, and then report a load failure for what
+ * was really a cancellation.
  */
-function importWithTimeout(url: string, timeoutMs: number): Promise<Record<string, unknown>> {
+function importWithTimeout(
+  url: string,
+  timeoutMs: number,
+  signal: AbortSignal | undefined,
+): Promise<Record<string, unknown>> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  let onAbort: (() => void) | undefined;
+
   const expiry = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => reject(new Error('Protect check script load timed out')), timeoutMs);
   });
-  return Promise.race([import(/* webpackIgnore: true */ url), expiry]).finally(() => {
+  const aborted = new Promise<never>((_, reject) => {
+    if (!signal) {
+      return;
+    }
+    onAbort = () => reject(new Error('Protect check aborted during load'));
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
+
+  return Promise.race([import(/* webpackIgnore: true */ url), expiry, aborted]).finally(() => {
     clearTimeout(timeoutId);
+    if (signal && onAbort) {
+      signal.removeEventListener('abort', onAbort);
+    }
   }) as Promise<Record<string, unknown>>;
 }
 
@@ -154,8 +187,14 @@ export async function executeProtectCheck(
 
   let mod: Record<string, unknown>;
   try {
-    mod = await importWithTimeout(validated.toString(), resolveLoadTimeoutMs(loadTimeoutMs));
+    mod = await importWithTimeout(validated.toString(), resolveLoadTimeoutMs(loadTimeoutMs), signal);
   } catch {
+    // An abort that landed mid-load is a cancellation, not a load failure. Checked first so the
+    // caller gets the same contract it does everywhere else: if you aborted, you never see
+    // anything but `protect_check_aborted`.
+    if (signal?.aborted) {
+      throw new ClerkRuntimeError('Protect check aborted by caller', { code: 'protect_check_aborted' });
+    }
     // Surface a generic message and deliberately omit the original error: Chromium/Firefox embed
     // the sdk_url in the dynamic-import failure text, which a tampered response could plant in the UI.
     throw new ClerkRuntimeError(

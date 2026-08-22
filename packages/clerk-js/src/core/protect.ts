@@ -56,10 +56,16 @@ export class Protect {
     const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
 
     // Read off the applied set, before any of them run: this only describes config, so a loader
-    // that later fails to be placed has still spoken for the browser it was assigned to. First
-    // one that asks for it wins.
+    // that later fails to be placed has still spoken for the browser it was assigned to.
+    //
+    // First one that asks for it wins, and the instance-wide value applies only when none does —
+    // the precedence is across the applied set rather than per loader, because there is no single
+    // "the" loader once more than one is live. Documented on the field.
     this.#challengeLoadTimeoutMs = loaders.find(
-      loader => typeof loader.challenge_load_timeout_ms === 'number' && loader.challenge_load_timeout_ms > 0,
+      loader =>
+        typeof loader.challenge_load_timeout_ms === 'number' &&
+        Number.isFinite(loader.challenge_load_timeout_ms) &&
+        loader.challenge_load_timeout_ms > 0,
     )?.challenge_load_timeout_ms;
 
     // Only an instance whose loaders reference the correlation id gets a session, so an instance
