@@ -1,0 +1,75 @@
+import * as Stories from './user-profile-account-section-flow.stories';
+
+# Account section flow
+
+This story covers the profile picture, name, username, email, and phone actions on the account
+section. The controls can change what the instance allows, add a delay, trigger an error, or
+require an identity check.
+
+The views only display the current state and report what the user did. Everything that decides
+_when_ a step changes lives in the mock controller, `user-profile-account-section-flow.harness.ts`.
+A state machine and its Clerk controller replace it later: each delay becomes an `invoke`, each
+branch a guard.
+
+## Legacy behavior covered
+
+| Area              | What this story covers                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| Profile picture   | Choosing a file, previewing it, uploading, removing, and the type and size checks that run before any request |
+| Name              | First and last name, a missing first name, and the read-only form an active enterprise account produces       |
+| Username          | Setting versus updating, names already taken, and identity checks                                             |
+| Email             | Adding, verifying by code, by link, or through enterprise SSO, resending, removing, and making primary        |
+| Phone             | Adding, verifying by code, resending, removing, and making primary                                            |
+| Instance settings | Disabling additional identifications on an enterprise connection, and immutable email and phone attributes    |
+| Identity checks   | Password and email-code methods, stacked over whichever flow raised them, resuming that flow or abandoning it |
+
+Two things differ from legacy on purpose. Making an email or phone primary asks first; legacy fires
+it straight from the row menu, which leaves a failed request with nowhere to report. And the step
+that sends the code has a screen of its own; legacy runs it underneath an already-drawn code screen,
+so you only see it when it fails.
+
+Clerk has no maximum-identifiers setting. Two things constrain the lists and neither is a count:
+`disableAdditionalIdentifications` on an active enterprise connection hides Add, and the `immutable`
+attribute flag hides Add and Remove. An immutable identifier with one verified primary address
+leaves a row with no actions, and that read-only state is deliberate.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Account section', href: '/user-profile/user-profile-account-section', layer: 'User Profile' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Alert dialog', href: '/components/alert-dialog', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+  ]}
+/>
+
+## Dialog states
+
+Choose a state to open the real view directly. This makes loading, errors, and each verification
+strategy easy to inspect without clicking through the full flow. It is also the contract from the
+machine's side: one snapshot in, one surface out.
+
+<Story
+  name='States'
+  storyModule={Stories}
+/>
+
+## Profile field states
+
+The same for the single-step forms behind the profile picture, name, and username.
+
+<Story
+  name='ProfileStates'
+  storyModule={Stories}
+/>
+
+## Temporary UI
+
+The code field is a single input until the Mosaic code input is ready. The country picker is a
+native select until the Mosaic select is ready, and the profile picture uses a native file input
+with no drag and drop. Unattributed errors use a hand-rolled alert until Mosaic has one.
+
+The dialog header, body, and footer are temporary too, but the body is not only cosmetic: a prompt
+clips its overflow under 48rem, so without a scroll region a tall form loses its submit button off
+the bottom of the phone sheet.
