@@ -4,4 +4,4 @@
 '@clerk/ui': patch
 ---
 
-Bound loading the verification module rather than running it. The SDK no longer imposes a time limit on a verification once it has started, since how long one legitimately takes depends on the verification itself. The load timeout can be set per loader, falling back to a per-instance value and then to the default.
+Fix an issue where a verification that was still progressing normally could be cancelled and reported to the user as having timed out.
