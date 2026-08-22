@@ -26,6 +26,50 @@ export interface ExecuteProtectCheckOptions {
    * Scripts that don't honor the signal will continue to run; this is best-effort by design.
    */
   signal?: AbortSignal;
+  /**
+   * Overrides how long to wait for the challenge module to LOAD. Per-instance and per-loader
+   * config, since the right value depends on the population an instance serves; a non-positive
+   * or non-numeric value falls back to {@link DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS}.
+   *
+   * Bounds the handoff only — never the challenge. See the note on the constant.
+   */
+  loadTimeoutMs?: number;
+}
+
+/**
+ * Default bound on LOADING the challenge module.
+ *
+ * Its only job is a network that accepts a connection and then never answers, because every
+ * other load failure — a CSP block, DNS, a 404, a body that isn't a valid module — rejects the
+ * dynamic import on its own and needs no timer to notice. That makes a generous value the safe
+ * one: nothing legitimate is waiting on this timer, while a value tight enough to fire on a
+ * genuinely slow connection would fail a load that was going to succeed.
+ */
+export const DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS = 60_000;
+
+function resolveLoadTimeoutMs(configured: number | undefined): number {
+  return typeof configured === 'number' && configured > 0 ? configured : DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS;
+}
+
+/**
+ * Races the dynamic import against `timeoutMs`, always clearing the timer so a fast load does not
+ * leave one pending.
+ *
+ * The bound stops at the import on purpose. Once `mod.default` is called the challenge owns its
+ * own deadline and the host imposes none: the host cannot know an honest duration for a challenge
+ * whose type is chosen server-side, per decision, and whose work it deliberately knows nothing
+ * about — waiting on a person, or moving a server-chosen number of bytes over an unknown link. A
+ * host-side wall over execution aborts legitimate challenges and reports them as timeouts, and
+ * since a re-run restarts the work, retrying cannot win on any connection slow enough to trip it.
+ */
+function importWithTimeout(url: string, timeoutMs: number): Promise<Record<string, unknown>> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const expiry = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error('Protect check script load timed out')), timeoutMs);
+  });
+  return Promise.race([import(/* webpackIgnore: true */ url), expiry]).finally(() => {
+    clearTimeout(timeoutId);
+  }) as Promise<Record<string, unknown>>;
 }
 
 interface ScriptInitOptions {
@@ -99,7 +143,7 @@ export async function executeProtectCheck(
   container: HTMLDivElement,
   options: ExecuteProtectCheckOptions = {},
 ): Promise<string> {
-  const { signal, setWidgetVisible } = options;
+  const { signal, setWidgetVisible, loadTimeoutMs } = options;
   const { sdkUrl, token, uiHints } = protectCheck;
 
   const validated = assertValidSdkUrl(sdkUrl);
@@ -110,7 +154,7 @@ export async function executeProtectCheck(
 
   let mod: Record<string, unknown>;
   try {
-    mod = await import(/* webpackIgnore: true */ validated.toString());
+    mod = await importWithTimeout(validated.toString(), resolveLoadTimeoutMs(loadTimeoutMs));
   } catch {
     // Surface a generic message and deliberately omit the original error: Chromium/Firefox embed
     // the sdk_url in the dynamic-import failure text, which a tampered response could plant in the UI.

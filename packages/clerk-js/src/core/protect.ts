@@ -8,6 +8,21 @@ import type { Environment } from './resources';
 export class Protect {
   #initialized: boolean = false;
   #session?: ProtectSession;
+  #challengeLoadTimeoutMs?: number;
+
+  /**
+   * The verification-module LOAD timeout asked for by the loader this browser was assigned, or
+   * undefined when none asked for one — in which case the caller falls back to the instance-wide
+   * value and then to the SDK default.
+   *
+   * Resolved from the APPLIED loaders rather than from the config, because rollout is decided by
+   * a random draw per page load: a loader being ramped can carry its own value without changing
+   * anything for browsers still on the loader it replaces, and which one a browser got cannot be
+   * recomputed afterwards.
+   */
+  get challengeLoadTimeoutMs(): number | undefined {
+    return this.#challengeLoadTimeoutMs;
+  }
 
   load(env: Environment): void {
     const config = env?.protectConfig;
@@ -39,6 +54,13 @@ export class Protect {
     // Rollout is decided before anything else, because the session is only meaningful for the
     // loaders we are actually going to apply.
     const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
+
+    // Read off the applied set, before any of them run: this only describes config, so a loader
+    // that later fails to be placed has still spoken for the browser it was assigned to. First
+    // one that asks for it wins.
+    this.#challengeLoadTimeoutMs = loaders.find(
+      loader => typeof loader.challenge_load_timeout_ms === 'number' && loader.challenge_load_timeout_ms > 0,
+    )?.challenge_load_timeout_ms;
 
     // Only an instance whose loaders reference the correlation id gets a session, so an instance
     // not using it is unaffected and stores nothing in the browser.

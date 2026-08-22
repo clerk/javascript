@@ -327,6 +327,16 @@ export class Clerk implements ClerkInterface {
     return this.#oauthTransport;
   }
 
+  /**
+   * The verification-module load timeout asked for by the loader THIS browser was assigned, or
+   * undefined when it asked for nothing. Exposed because the assignment is a random draw per page
+   * load and cannot be recomputed from the environment config; callers fall back to the
+   * instance-wide value on that config, and then to the SDK default.
+   */
+  get __internal_protectChallengeLoadTimeoutMs(): number | undefined {
+    return this.#protect?.challengeLoadTimeoutMs;
+  }
+
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
     | undefined;
