@@ -12,8 +12,6 @@ function App() {
     <ClerkProvider
       publishableKey={PUBLISHABLE_KEY}
       __internal_clerkUIUrl={CLERK_UI_URL}
-      routerPush={() => {}}
-      routerReplace={() => {}}
     >
       <main data-testid='electron-app'>
         <Show when='signed-out'>
