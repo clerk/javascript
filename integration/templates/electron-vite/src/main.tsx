@@ -12,6 +12,8 @@ function App() {
     <ClerkProvider
       publishableKey={PUBLISHABLE_KEY}
       __internal_clerkUIUrl={CLERK_UI_URL}
+      routerPush={(to: string) => window.history.pushState(null, '', to)}
+      routerReplace={(to: string) => window.history.replaceState(null, '', to)}
     >
       <main data-testid='electron-app'>
         <Show when='signed-out'>
