@@ -92,6 +92,21 @@ describe('buildSignInOAuthTransportCallbackParams', () => {
     expect(params.signUpProtectCheckUrl).toBe(`${origin}/CLERK-ROUTER/VIRTUAL/sign-up/protect-check`);
   });
 
+  it('drops a hash fragment from signUpUrl when building sign-up step URLs', () => {
+    const ctx = {
+      signUpUrl: '/sign-up#/continue',
+      signInUrl: '/sign-in',
+    } as any;
+
+    const params = buildSignInOAuthTransportCallbackParams(ctx);
+    const origin = window.location.origin;
+
+    expect(params.continueSignUpUrl).toBe(`${origin}/sign-up/continue`);
+    expect(params.verifyEmailAddressUrl).toBe(`${origin}/sign-up/verify-email-address`);
+    expect(params.verifyPhoneNumberUrl).toBe(`${origin}/sign-up/verify-phone-number`);
+    expect(params.signUpProtectCheckUrl).toBe(`${origin}/sign-up/protect-check`);
+  });
+
   it('targets the embedded create subtree in the combined flow', () => {
     const ctx = {
       signUpUrl: '/sign-in#/create',
