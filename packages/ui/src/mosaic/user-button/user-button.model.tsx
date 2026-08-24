@@ -32,13 +32,13 @@ export type UserButtonModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | (UserButtonData &
-      Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-      UserButtonAsyncCallbacks &
-      UserButtonBrandingProps & {
-        status: 'ready';
-        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
-        organizationsEnabled: boolean;
-      });
+    Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
+    UserButtonAsyncCallbacks &
+    UserButtonBrandingProps & {
+      status: 'ready';
+      /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
+      organizationsEnabled: boolean;
+    });
 
 // Mirrors the `<OrganizationSwitcher>` `afterSelectOrganizationUrl` prop: a full URL/path, a `:token`
 // path template resolved against the organization, or a builder function.
@@ -143,14 +143,18 @@ export function useUserButtonModel(
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const { isLoaded: isOrgLoaded, organization } = useOrganization();
-  const { userMemberships, userInvitations, userSuggestions, ref } = useOrganizationListInView();
-
   const clerk = useClerk();
   const router = useMosaicRouter();
   // An app can mount the button inside its own dialog or popover; the modal has to portal into that
   // same root or it renders behind the surface that opened it.
   const getContainer = usePortalRoot();
   const environment = useMosaicEnvironment();
+  // Don't fetch orgsLists until we know orgs are enabled.
+  // This wont delay rendering of the trigger, or even the popup shell, since the "ready" status
+  // does not depend on this.
+  const { userMemberships, userInvitations, userSuggestions, ref } = useOrganizationListInView({
+    enabled: Boolean(environment?.organizationSettings.enabled),
+  });
 
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
@@ -212,15 +216,15 @@ export function useUserButtonModel(
   const invitations: UserButtonInvitation[] = invitationData.flatMap(i =>
     i.status === 'pending' || i.status === 'accepted'
       ? [
-          {
-            kind: 'invitation',
-            id: i.id,
-            status: i.status,
-            organizationId: i.publicOrganizationData.id,
-            organizationName: i.publicOrganizationData.name,
-            imageUrl: i.publicOrganizationData.imageUrl || undefined,
-          },
-        ]
+        {
+          kind: 'invitation',
+          id: i.id,
+          status: i.status,
+          organizationId: i.publicOrganizationData.id,
+          organizationName: i.publicOrganizationData.name,
+          imageUrl: i.publicOrganizationData.imageUrl || undefined,
+        },
+      ]
       : [],
   );
 

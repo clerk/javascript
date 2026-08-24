@@ -3,6 +3,7 @@ import type { CustomPage } from '@clerk/shared/types';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { useOrganizationListInView } from '../../../hooks/useOrganizationListInView';
 import type { UserButtonModelOptions } from '../user-button.model';
 import { useUserButtonModel } from '../user-button.model';
 
@@ -104,7 +105,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
 // The model reads its three paginated lists through the shared in-view helper, so the fetch
 // boundary is stubbed there rather than at `useOrganizationList`.
 vi.mock('../../../hooks/useOrganizationListInView', () => ({
-  useOrganizationListInView: () => ({ userMemberships, userInvitations, userSuggestions, ref: pagingRef }),
+  useOrganizationListInView: vi.fn(() => ({ userMemberships, userInvitations, userSuggestions, ref: pagingRef })),
 }));
 
 function acceptable(
@@ -332,11 +333,23 @@ describe('useUserButtonModel', () => {
   it('reports whether the instance has organizations at all', () => {
     render(<Harness />);
     expect(screen.getByTestId('orgs-enabled')).toHaveTextContent('true');
+    expect(useOrganizationListInView).toHaveBeenCalledWith({ enabled: true });
 
     cleanup();
     organizationsEnabled = false;
     render(<Harness />);
     expect(screen.getByTestId('orgs-enabled')).toHaveTextContent('false');
+    expect(useOrganizationListInView).toHaveBeenCalledWith({ enabled: false });
+  });
+
+  it('does not fetch the organization lists until the environment says they are on', () => {
+    environmentHydrated = false;
+    const { rerender } = render(<Harness />);
+    expect(useOrganizationListInView).toHaveBeenCalledWith({ enabled: false });
+
+    environmentHydrated = true;
+    rerender(<Harness />);
+    expect(useOrganizationListInView).toHaveBeenCalledWith({ enabled: true });
   });
 
   it('is hidden when loaded but there is no active user', () => {
