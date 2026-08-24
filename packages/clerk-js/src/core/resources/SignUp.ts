@@ -76,6 +76,12 @@ declare global {
   }
 }
 
+const withoutTimezone = <T extends object>(params: T): Omit<T, 'timezone'> => {
+  const body = { ...params } as T & { timezone?: unknown };
+  delete body.timezone;
+  return body;
+};
+
 export class SignUp extends BaseResource implements SignUpResource {
   pathRoot = '/client/sign_ups';
 
@@ -194,7 +200,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   prepareVerification = (params: PrepareVerificationParams): Promise<this> => {
     debugLogger.debug('SignUp.prepareVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
-      body: params,
+      body: withoutTimezone(params),
       action: 'prepare_verification',
       coalesce: true,
     });
@@ -203,7 +209,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   attemptVerification = (params: AttemptVerificationParams): Promise<SignUpResource> => {
     debugLogger.debug('SignUp.attemptVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
-      body: params,
+      body: withoutTimezone(params),
       action: 'attempt_verification',
     });
   };
@@ -510,7 +516,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
     return this._basePatch({
-      body: normalizeUnsafeMetadata(params),
+      body: normalizeUnsafeMetadata(withoutTimezone(params)),
     });
   };
 
@@ -953,7 +959,7 @@ class SignUpFuture implements SignUpFutureResource {
   async update(params: SignUpFutureUpdateParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       const body: Record<string, unknown> = {
-        ...params,
+        ...withoutTimezone(params),
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
@@ -970,7 +976,7 @@ class SignUpFuture implements SignUpFutureResource {
         captchaToken,
         captchaWidgetType,
         captchaError,
-        ...params,
+        ...withoutTimezone(params),
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
@@ -980,7 +986,7 @@ class SignUpFuture implements SignUpFutureResource {
         // Inject browser locale and timezone only when creating the sign-up, so an existing
         // sign-up's values are not overwritten on update.
         body.locale = params.locale ?? getBrowserLocale();
-        const timezone = params.timezone ?? getBrowserTimezone();
+        const timezone = getBrowserTimezone();
         if (timezone !== null) {
           body.timezone = timezone;
         }
@@ -1083,7 +1089,6 @@ class SignUpFuture implements SignUpFutureResource {
       emailAddress,
       popup,
       locale,
-      timezone,
     } = params;
     return runAsyncResourceTask(this.#resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken({ strategy });
@@ -1121,7 +1126,6 @@ class SignUpFuture implements SignUpFutureResource {
           captchaWidgetType,
           captchaError,
           locale,
-          ...(timezone !== undefined ? { timezone } : {}),
         };
         if (this.#resource.id) {
           return this.#resource.__internal_basePatch({ body });
@@ -1129,7 +1133,7 @@ class SignUpFuture implements SignUpFutureResource {
         // Inject browser locale and timezone only when creating the sign-up, so an existing
         // sign-up's values are not overwritten on update.
         body.locale = locale ?? getBrowserLocale();
-        const browserTimezone = timezone ?? getBrowserTimezone();
+        const browserTimezone = getBrowserTimezone();
         if (browserTimezone !== null) {
           body.timezone = browserTimezone;
         }
@@ -1160,7 +1164,7 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   async web3(params: SignUpFutureWeb3Params): Promise<{ error: ClerkError | null }> {
-    const { strategy, unsafeMetadata, legalAccepted, firstName, lastName, locale, timezone } = params;
+    const { strategy, unsafeMetadata, legalAccepted, firstName, lastName, locale } = params;
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
     return runAsyncResourceTask(this.#resource, async () => {
@@ -1189,7 +1193,7 @@ class SignUpFuture implements SignUpFutureResource {
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const web3Wallet = identifier || this.#resource.web3wallet!;
-      await this._create({ web3Wallet, unsafeMetadata, legalAccepted, firstName, lastName, locale, timezone });
+      await this._create({ web3Wallet, unsafeMetadata, legalAccepted, firstName, lastName, locale });
       await this.#resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',
@@ -1244,7 +1248,7 @@ class SignUpFuture implements SignUpFutureResource {
 
   async ticket(params?: SignUpFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
-    return this.create({ ...params, strategy: 'ticket', ticket: ticket ?? undefined });
+    return this.create({ ...withoutTimezone(params ?? {}), strategy: 'ticket', ticket: ticket ?? undefined });
   }
 
   async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
