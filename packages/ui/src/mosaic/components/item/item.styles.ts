@@ -15,7 +15,7 @@ export const item = stylex.create({
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
     },
-    paddingInline: space['2'],
+    paddingInline: space['1.5'],
     alignItems: 'center',
     color: colorVars['--cl-color-neutral-faded'],
     display: 'flex',
@@ -64,7 +64,7 @@ export const item = stylex.create({
 
   xs: {
     gap: space['2'],
-    height: space['8'],
+    height: space['9'],
   },
   md: {
     gap: space['3'],
@@ -81,7 +81,7 @@ export const media = stylex.create({
     justifyContent: 'center',
   },
 
-  xs: { width: space['5'] },
+  xs: { width: space['6'] },
   md: { width: space['9'] },
 });
 

@@ -87,9 +87,11 @@ const scrollClasses = stylex.props(...scrollAreaViewport('auto')).className?.spl
 /** The workspace list: the one group in the popup that scrolls. */
 const workspaceList = () => groups().find(group => scrollClasses.every(name => group.classList.contains(name)));
 
-/** The accounts group: the one whose rows are titled by identifier rather than by workspace name. */
-const accountsList = () =>
-  groups().find(group => group !== workspaceList() && labels(group).some(label => label.includes('@')));
+/** Opens the accounts flyout at the foot, and hands back the menu it opens. */
+async function openAccounts(act: ReturnType<typeof userEvent.setup>) {
+  await act.click(screen.getByRole('button', { name: 'Switch account' }));
+  return screen.findByRole('menu');
+}
 
 describe('UserButtonView, user mode', () => {
   function renderUserMode(props: Partial<UserButtonProps> = {}) {
@@ -148,18 +150,17 @@ describe('UserButtonView, user mode', () => {
     expect(button.querySelector('.cl-spinner')).not.toBeNull();
   });
 
-  it('lists only the accounts to switch to, with no heading above them', () => {
+  it('opens the accounts from the foot rather than listing them inline', async () => {
     renderUserMode();
 
-    expect(labels(accountsList())).toEqual(['bob@example.com']);
-    expect(screen.queryByText('Accounts')).toBeNull();
-  });
+    expect(screen.queryByRole('button', { name: 'bob@example.com' })).toBeNull();
 
-  it('takes "Add account" at the foot rather than into an account menu', () => {
-    renderUserMode();
+    const items = within(await openAccounts(userEvent.setup())).getAllByRole('menuitem');
 
-    expect(screen.getByRole('button', { name: 'Add account' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Account actions' })).toBeNull();
+    expect(items).toHaveLength(3);
+    expect(items[0]).toHaveAccessibleName('alice@example.com');
+    expect(items[1]).toHaveAccessibleName('bob@example.com');
+    expect(items[2]).toHaveAccessibleName('Add account');
   });
 
   it('signs out of every account at the foot', () => {
@@ -217,8 +218,7 @@ describe('UserButtonView, organization mode', () => {
   it('carries no account rows, not even the one it belongs to', () => {
     renderOrganizationMode();
 
-    expect(accountsList()).toBeUndefined();
-    expect(screen.queryByText('Accounts')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Switch account' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'bob@example.com' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Actions for alice@example.com' })).toBeNull();
     // Nothing carries "Sign out" either: with no row to hang it off, the header would be the only
@@ -281,35 +281,37 @@ describe('UserButtonView, combined mode', () => {
     expect(screen.queryByRole('button', { name: 'Sign out' })).toBeNull();
   });
 
-  it('heads the other accounts under "Accounts", listing the one it is on', () => {
-    renderCombined();
+  it('switches account from the flyout, checking the one it is already on', async () => {
+    const onSwitchSession = vi.fn();
+    const act = userEvent.setup();
+    renderCombined({ onSwitchSession });
 
-    expect(labels(accountsList())).toEqual(['alice@example.com', 'bob@example.com']);
-    expect(screen.getByText('Accounts')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'alice@example.com' })).toBeNull();
+    const menu = await openAccounts(act);
+    const active = within(menu).getByRole('menuitem', { name: 'alice@example.com' });
+    const other = within(menu).getByRole('menuitem', { name: 'bob@example.com' });
+
+    expect(active).toHaveAttribute('aria-current', 'true');
+    expect(other).not.toHaveAttribute('aria-current');
+
+    await act.click(other);
+
+    expect(onSwitchSession).toHaveBeenCalledWith('sess_2');
   });
 
-  it('names the account it is on as the current one', () => {
+  it('keeps "Add account" in the flyout rather than at the foot', async () => {
     renderCombined();
 
-    expect(row(accountsList(), 'alice@example.com')).toHaveAttribute('aria-current', 'true');
-    expect(row(accountsList(), 'bob@example.com')).not.toHaveAttribute('aria-current');
-  });
-
-  it('keeps "Add account" in the Accounts heading rather than at the foot', async () => {
-    renderCombined();
-
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Account actions' }));
-
-    expect(await screen.findByRole('menuitem', { name: 'Add account' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Add account' })).toBeNull();
+
+    const menu = await openAccounts(userEvent.setup());
+
+    expect(within(menu).getByRole('menuitem', { name: 'Add account' })).toBeInTheDocument();
   });
 
-  it('takes "Add account" at the foot where there is no heading to carry it', () => {
+  it('takes "Add account" at the foot where there is no second account to switch to', () => {
     renderCombined({ additionalSessions: [] });
 
-    expect(accountsList()).toBeUndefined();
-    expect(screen.queryByText('Accounts')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Switch account' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Add account' })).toBeInTheDocument();
   });
 
@@ -567,11 +569,11 @@ describe('UserButtonView, the foot', () => {
       node => node.textContent ?? '',
     );
 
-  // The order the existing UserButton lists them in, above "Add account".
+  // The order the existing UserButton lists them in, above the account rows.
   it('leads with the custom rows', () => {
     renderView({ customMenuItems: [action(), support] });
 
-    expect(footActions()).toEqual(['Terms of service', 'Support', 'Sign out of all accounts']);
+    expect(footActions()).toEqual(['Terms of service', 'Support', 'Switch account', 'Sign out of all accounts']);
   });
 
   it('runs a custom action on press', async () => {
@@ -598,7 +600,7 @@ describe('UserButtonView, the foot', () => {
   it('orders the rows by the ids it is given', () => {
     renderView({ customMenuItems: [action(), support], menuItemOrder: ['signOutAll', 'support'] });
 
-    expect(footActions()).toEqual(['Sign out of all accounts', 'Support', 'Terms of service']);
+    expect(footActions()).toEqual(['Sign out of all accounts', 'Support', 'Terms of service', 'Switch account']);
   });
 
   // Only some of the built-in actions are rows at all, and which of those a surface carries depends
@@ -606,13 +608,17 @@ describe('UserButtonView, the foot', () => {
   it('drops an id no row answers to', () => {
     renderView({ customMenuItems: [action()], menuItemOrder: ['manageAccount', 'signOutAll', 'nonsense'] });
 
-    expect(footActions()).toEqual(['Sign out of all accounts', 'Terms of service']);
+    expect(footActions()).toEqual(['Sign out of all accounts', 'Terms of service', 'Switch account']);
   });
 
-  it('orders "Add account" where the foot is what carries it', () => {
-    renderView({ additionalSessions: [], customMenuItems: [action()], menuItemOrder: ['addAccount', 'terms'] });
+  // The accounts slot answers to both ids, so an order set once places it whichever way it resolves.
+  it.each([
+    ['Switch account', [bob]],
+    ['Add account', []],
+  ])('orders the accounts slot ahead of a custom row as "%s"', (label, additionalSessions) => {
+    renderView({ additionalSessions, customMenuItems: [action()], menuItemOrder: ['switchAccount', 'addAccount'] });
 
-    expect(footActions()).toEqual(['Add account', 'Terms of service']);
+    expect(footActions()[0]).toBe(label);
   });
 
   it('carries the custom rows on an org-only surface too', () => {
@@ -693,7 +699,6 @@ describe('UserButtonView, one action at a time', () => {
   it.each([
     ['a workspace row', 'Other Co'],
     ['the personal row', 'Personal account'],
-    ['an account row', 'bob@example.com'],
     ['an action row', 'Sign out of all accounts'],
   ])('holds %s in place, aria-disabled and still focusable, while another action runs', (_name, label) => {
     const { rerender } = render(surface(null));
@@ -731,7 +736,7 @@ describe('UserButtonView, one action at a time', () => {
   // the row would drop its trailing edge for the length of the action and get it back after.
   it.each([
     ['the account menu', 'Actions for alice@example.com'],
-    ['the accounts menu', 'Account actions'],
+    ['the accounts flyout', 'Switch account'],
   ])('holds %s in place, disabled, while another action runs', (_name, label) => {
     const { rerender } = render(surface(null));
     const row = screen.getByRole('button', { name: label });
@@ -743,11 +748,18 @@ describe('UserButtonView, one action at a time', () => {
     expect(stoodDown).toBeDisabled();
   });
 
+  // The flyout closes on pick, so the row that opened it is what is left to report the switch.
+  it('reports a switch on the row that opened the flyout', () => {
+    render(surface(userButtonBusyKeys.switchSession('sess_2')));
+
+    expect(screen.getByRole('button', { name: 'Switch account' }).querySelector('.cl-spinner')).not.toBeNull();
+  });
+
   // `aria-disabled` is advisory, so the row has to drop the press itself.
   it('ignores a press on a row that is standing down', async () => {
-    const onSwitchSession = vi.fn();
-    render(surface(userButtonBusyKeys.selectOrganization('org_2'), { onSwitchSession }));
-    const row = screen.getByRole('button', { name: 'bob@example.com' });
+    const onSelectOrganization = vi.fn();
+    render(surface(userButtonBusyKeys.switchSession('sess_9'), { onSelectOrganization }));
+    const row = screen.getByRole('button', { name: 'Other Co' });
 
     // The popup takes its own initial focus a frame after it opens. Waiting for that lets the row
     // hold the focus it takes next, rather than losing it to a steal that lands mid-press.
@@ -756,7 +768,7 @@ describe('UserButtonView, one action at a time', () => {
     row.focus();
     await userEvent.click(row);
 
-    expect(onSwitchSession).not.toHaveBeenCalled();
+    expect(onSelectOrganization).not.toHaveBeenCalled();
     expect(row).toHaveFocus();
   });
 });

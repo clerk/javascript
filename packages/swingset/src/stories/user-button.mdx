@@ -4,9 +4,9 @@ import * as UserButtonStories from './user-button.stories';
 
 The account & organization switcher behind the user avatar. The active organization heads the surface,
 carrying a **gear** and **Invite**. The account's workspaces sit under it: every organization, plus
-**suggested** and **invited** ones it can Join. Every signed-in account sits under an **Accounts**
-heading — the active one checked, the rest a click away — so an account never reads as a workspace.
-The foot signs out of everything. `mode` narrows all of it, and `modePriority` picks what heads it;
+**suggested** and **invited** ones it can Join. **Switch account** at the foot opens the signed-in
+accounts as a flyout — the active one checked — so an account never reads as a workspace. With
+nobody to switch to, that row is **Add account** instead. The foot signs out of everything. `mode` narrows all of it, and `modePriority` picks what heads it;
 see [Modes](#modes).
 
 Only the active account's organizations are listed. Not a design choice: org requests are scoped to
@@ -128,9 +128,8 @@ unrendered.
 
 ### User
 
-The account heads it, with **Sign out** in **Invite**'s slot and the gear (**Manage account**). The
-header is the active account, so the list holds only the accounts to switch to — no heading over
-them, and **Add account** moves to the foot the way **Create organization** does. An org is active;
+The account heads it, with **Sign out** in **Invite**'s slot and the gear (**Manage account**). No
+workspaces are listed at all, so **Switch account** at the foot is the whole of it. An org is active;
 this mode ignores it, down to the trigger.
 
 <Story
@@ -156,7 +155,7 @@ Reopen the popup to watch it again.
 
 An instance in single-session mode holds one account at a time, so there is nothing to switch to and
 no second account to add. It hands the view an empty `additionalSessions` and leaves `onAddAccount`
-and `onSignOutAll` off — the surface withholds the Accounts group, **Add account**, and **Sign out of
+and `onSignOutAll` off — the surface withholds **Switch account**, **Add account**, and **Sign out of
 all accounts** together. The account's own `⋯` still carries **Sign out**, which is all "all
 accounts" ever meant here.
 
@@ -173,14 +172,14 @@ on its own, so it stays followable while another action is in flight. The `icon`
 without one still holds the column, so labels stay in line.
 
 `menuItemOrder` names the foot's rows by id, and whatever it leaves out follows what it named. The
-ids it knows are `createOrganization`, `addAccount`, `signOutAll`, and each custom item's `id`. Those
-are the only actions the foot lists as rows; the rest live in the header or behind a `⋯`, where
-there is no list for an order to run in.
+ids it knows are `createOrganization`, `switchAccount`, `addAccount`, `signOutAll`, and each custom
+item's `id`. Those are the only actions the foot lists as rows; the rest live in the header or behind
+a `⋯`, where there is no list for an order to run in.
 
-Which of the three the foot carries depends on the surface, not just the mode: `createOrganization`
-is a row only on an org-only surface, and `addAccount` only where no Accounts heading holds it — an
-account with nobody to switch to. So an id the surface has not got is ignored rather than an error,
-and one order can cover every mode.
+Which of them the foot carries depends on the surface, not just the mode: `createOrganization` is a
+row only on an org-only surface, and the accounts row is `switchAccount` where there is somebody to
+switch to and `addAccount` where there is not. Name both to place that row whichever way it resolves.
+An id the surface has not got is ignored rather than an error, so one order can cover every mode.
 
 <Story
   name='CustomMenuItems'
@@ -193,4 +192,4 @@ and one order can cover every mode.
 | ------------------- | ---------------------------------------------------------------------------- |
 | `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`. |
 | `UserButtonTrigger` | The trigger: the active workspace's avatar, and what it is called.           |
-| `UserButtonPopup`   | The popover surface: header, workspace list, additional accounts, footer.    |
+| `UserButtonPopup`   | The popover surface: header, workspace list, footer.                         |
