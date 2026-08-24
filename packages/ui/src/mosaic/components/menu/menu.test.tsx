@@ -153,6 +153,65 @@ describe('Mosaic Menu', () => {
     expect(screen.getByRole('menuitem', { name: 'Sign out' })).toHaveClass('cl-menu-item', 'my-item');
   });
 
+  it('renders the media slot as a span, so it is valid inside the item button', () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Content>
+          <Menu.Item label='Add workspace'>
+            <Menu.Media>
+              <svg data-testid='add-icon' />
+            </Menu.Media>
+            Add workspace
+          </Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    const media = screen.getByTestId('add-icon').parentElement;
+    expect(media?.tagName).toBe('SPAN');
+    expect(media).toHaveClass('cl-menu-media');
+    expect(media?.parentElement).toHaveClass('cl-menu-item');
+  });
+
+  it('holds the media column even where an item leads with nothing', () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Content>
+          <Menu.Item label='Sign out'>
+            <Menu.Media />
+            Sign out
+          </Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    // The empty slot must not name the item, or every unillustrated row would read differently.
+    expect(screen.getByRole('menuitem', { name: 'Sign out' }).querySelector('.cl-menu-media')).toBeInTheDocument();
+  });
+
+  it('forwards the media ref and swaps its element via render', () => {
+    const ref = React.createRef<HTMLSpanElement>();
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Content>
+          <Menu.Item label='Sign out'>
+            <Menu.Media
+              ref={ref}
+              render={props => <i {...props} />}
+            />
+            Sign out
+          </Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    expect(ref.current?.tagName).toBe('I');
+    expect(ref.current).toHaveClass('cl-menu-media');
+  });
+
   it('forwards the trigger ref', () => {
     const ref = React.createRef<HTMLButtonElement>();
     render(

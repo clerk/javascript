@@ -700,12 +700,14 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
       // Picking what is already picked does nothing, so the active item only closes the flyout.
       onClick={active || !switchSession ? undefined : () => switchSession(session.sessionId)}
     >
-      <RowAvatar
-        name={session.name}
-        imageUrl={session.imageUrl}
-        shape='circle'
-        size='xs'
-      />
+      <Menu.Media>
+        <RowAvatar
+          name={session.name}
+          imageUrl={session.imageUrl}
+          shape='circle'
+          size='fit'
+        />
+      </Menu.Media>
       <span {...stylex.props(styles.accountName, truncationStyles.singleLine)}>{session.identifier}</span>
       {active ? (
         <Icon
@@ -783,10 +785,12 @@ function SwitchAccountRow() {
             label={m.accounts.add}
             onClick={addAccount}
           >
-            <Icon
-              name='plus'
-              size='sm'
-            />
+            <Menu.Media>
+              <Icon
+                name='plus'
+                size='sm'
+              />
+            </Menu.Media>
             {m.accounts.add}
           </Menu.Item>
         ) : null}

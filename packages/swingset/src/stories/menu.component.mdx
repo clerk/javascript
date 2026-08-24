@@ -78,6 +78,22 @@ never fires. Activating an item closes the menu; pass `closeOnClick={false}` to 
 </Menu.Item>
 ```
 
+### Media
+
+`Menu.Media` is a square leading column that centers whatever it holds — an icon, an image, an
+avatar. Items that lead with marks of differing widths need it: without it each row sets its own
+text start, and the labels no longer line up. Leave it empty on an item that leads with nothing and
+that row keeps the column. It renders a `span`, since the item it sits in is a button.
+
+```tsx
+<Menu.Item label='colin@clerk.dev'>
+  <Menu.Media>
+    <Avatar.Root size='fit'>…</Avatar.Root>
+  </Menu.Media>
+  colin@clerk.dev
+</Menu.Item>
+```
+
 ### Placement
 
 `Menu.Root` takes `placement` and `sideOffset`; the popup flips and shifts automatically to stay in
@@ -113,6 +129,7 @@ const [open, setOpen] = useState(false);
 | `Menu.Trigger`   | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis. |
 | `Menu.Content`   | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                    |
 | `Menu.Item`      | `menu-item`                      | A single action whose content is composed through children.           |
+| `Menu.Media`     | `menu-media`                     | Square leading column that centers an item's icon, image, or avatar.  |
 | `Menu.Separator` | `menu-separator`                 | Full-bleed divider between groups of items.                           |
 
 ## Styling

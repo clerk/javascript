@@ -53,7 +53,7 @@ export const styles = stylex.create({
     gap: space['1'],
     outline: 'none',
     paddingBlock: space['1'],
-    paddingInline: space['2'],
+    paddingInline: space['1'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
@@ -76,7 +76,7 @@ export const styles = stylex.create({
       '@media (prefers-reduced-motion: reduce)': '0.01ms',
     },
     transitionProperty: 'background-color',
-    height: space['7'],
+    height: space['8'],
     width: '100%',
     '::before': {
       insetBlock: `calc(-1 * ${space['0.5']})`,
@@ -95,6 +95,15 @@ export const styles = stylex.create({
       },
     },
     color: colorVars['--cl-color-negative'],
+  },
+
+  media: {
+    alignItems: 'center',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['6'],
   },
 
   separator: {

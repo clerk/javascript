@@ -6,6 +6,7 @@ import type {
   MenuSeparatorProps,
 } from '@clerk/headless/menu';
 import { Menu as Primitive } from '@clerk/headless/menu';
+import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -105,6 +106,28 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
   );
 });
 
+/** `span`, not `div`: the item this sits in is a button, so its children are phrasing content. */
+export type MenuMediaProps = MosaicComponentProps<'span'>;
+
+/**
+ * Square leading column that centers its media (icon, image, or avatar), so every item's
+ * text starts on the same line whatever each one leads with.
+ */
+export const MenuMedia = React.forwardRef<HTMLSpanElement, MenuMediaProps>(function MosaicMenuMedia(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('menu-media'), stylex.props(reset.base, styles.media), className, style),
+      ...rest,
+    },
+  });
+});
+
 /** A full-bleed divider between groups of items. */
 export function MenuSeparator({ className, style, ...rest }: MenuSeparatorProps): React.ReactElement {
   return (
@@ -122,5 +145,6 @@ export const Menu = {
   Trigger: MenuTrigger,
   Content: MenuContent,
   Item: MenuItem,
+  Media: MenuMedia,
   Separator: MenuSeparator,
 };
