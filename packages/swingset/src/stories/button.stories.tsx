@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import type { ButtonProps } from '@clerk/ui/mosaic/components/button';
 import { Button, SubmitButton } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
@@ -14,7 +13,6 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Button',
   source: 'packages/ui/src/mosaic/components/button/button.tsx',
-  styleEngine: 'stylex',
   styles: {
     _variants: {
       color: { primary: {}, neutral: {}, negative: {} },
@@ -299,6 +297,36 @@ export function Disabled(props: Record<string, unknown>) {
     >
       Disabled
     </Button>
+  );
+}
+
+// Two rows so the difference is reachable from the keyboard: tab through each and watch where
+// focus lands. The neighbours are the point — the middle button is the one that changes.
+export function FocusableWhenDisabled(props: Record<string, unknown>) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Button variant='outline'>Before</Button>
+        <Button
+          {...knobsAsProps(props)}
+          disabled
+        >
+          Skipped
+        </Button>
+        <Button variant='outline'>After</Button>
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Button variant='outline'>Before</Button>
+        <Button
+          {...knobsAsProps(props)}
+          disabled
+          focusableWhenDisabled
+        >
+          Focusable
+        </Button>
+        <Button variant='outline'>After</Button>
+      </div>
+    </div>
   );
 }
 

@@ -852,6 +852,9 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
      */
     amount: BillingMoneyAmount;
   };
+  /**
+   * The credits applied to this subscription item.
+   */
   credits?: BillingCredits;
   /**
    * The active discount applied to this subscription item.
@@ -994,21 +997,63 @@ export interface BillingMoneyAmount {
   currencySymbol: string;
 }
 
+/**
+ * Contains details about a proration credit, including the remaining portion of the billing cycle.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export interface BillingProrationCreditDetail {
+  /**
+   * The monetary value of the proration credit.
+   */
   amount: BillingMoneyAmount;
+  /**
+   * The number of days remaining in the current billing cycle.
+   */
   cycleDaysRemaining: number;
+  /**
+   * The total number of days in the billing cycle.
+   */
   cycleDaysTotal: number;
+  /**
+   * The percentage of the billing cycle that remains.
+   */
   cycleRemainingPercent: number;
 }
 
+/**
+ * Contains details about the payer's available credit and the amount applied to the transaction.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export interface BillingPayerCredit {
+  /**
+   * The payer's credit balance remaining after the transaction.
+   */
   remainingBalance: BillingMoneyAmount;
+  /**
+   * The amount of payer credit applied to the transaction.
+   */
   appliedAmount: BillingMoneyAmount;
 }
 
+/**
+ * The `BillingCredits` type represents the credits applied to a checkout or payment.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export interface BillingCredits {
+  /**
+   * The credit for the unused portion of the current billing cycle. `null` when no proration credit applies.
+   */
   proration: BillingProrationCreditDetail | null;
+  /**
+   * The payer credit applied to the transaction. `null` when no payer credit applies.
+   */
   payer: BillingPayerCredit | null;
+  /**
+   * The total monetary value of all credits applied to the transaction.
+   */
   total: BillingMoneyAmount;
 }
 
@@ -1043,14 +1088,45 @@ export interface BillingProrationDiscount {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingAppliedDiscount {
+  /**
+   * The monetary value of the discount applied to the transaction.
+   */
   amount: BillingMoneyAmount;
+  /**
+   * The unique identifier of the discount.
+   */
   discountId: string;
+  /**
+   * The display name of the discount.
+   */
   name: string;
+  /**
+   * Whether the discount subtracts a percentage or a fixed amount.
+   */
   effect: 'percentage' | 'fixed_amount';
+  /**
+   * The percentage deducted when `effect` is `'percentage'`.
+   */
   percentOff?: number;
+  /**
+   * The configured fixed amount off when `effect` is `'fixed_amount'`. This is the discount's configured value, which
+   * can differ from the `amount` actually applied to the transaction.
+   */
   amountOff?: BillingMoneyAmount;
+  /**
+   * The promotion code used to apply the discount.
+   */
   promoCode?: string;
+  /**
+   * The number of billing cycles for which the discount remains active. `null` means the discount does not expire
+   * after a fixed number of cycles.
+   */
   cyclesRemaining: number | null;
+  /**
+   * The originally configured duration in billing cycles. `null` means the discount does not expire after a fixed
+   * number of cycles.
+   */
+  durationInCycles?: number | null;
 }
 
 /**
@@ -1059,20 +1135,67 @@ export interface BillingAppliedDiscount {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingDiscountRedemption {
+  /**
+   * The unique identifier of the discount redemption.
+   */
   id: string;
+  /**
+   * The unique identifier of the subscription item receiving the discount.
+   */
   subscriptionItemId: string;
+  /**
+   * The unique identifier of the redeemed discount.
+   */
   discountId: string;
+  /**
+   * The display name of the discount.
+   */
   name: string;
+  /**
+   * How the discount was applied to the subscription item.
+   */
   source: 'promotion' | 'manual' | 'promo_code';
+  /**
+   * The promotion code used to redeem the discount.
+   */
   promoCode?: string;
+  /**
+   * Whether the discount subtracts a percentage or a fixed amount.
+   */
   effect?: 'percentage' | 'fixed_amount';
+  /**
+   * The percentage deducted when `effect` is `'percentage'`.
+   */
   percentOff?: number;
+  /**
+   * The configured fixed amount off when `effect` is `'fixed_amount'`. This is the discount's configured value, which
+   * can differ from the `amount` actually applied to the transaction.
+   */
   amountOff?: BillingMoneyAmount;
+  /**
+   * The monetary value of the discount applied to the subscription item.
+   */
   amount?: BillingMoneyAmount;
+  /**
+   * The number of billing cycles for which the discount remains active. `null` means the discount does not expire
+   * after a fixed number of cycles.
+   */
   cyclesRemaining: number | null;
+  /**
+   * The number of billing cycles to which the discount has already been applied.
+   */
   cyclesApplied: number;
+  /**
+   * The current status of the discount redemption.
+   */
   status?: 'active' | 'exhausted' | 'removed';
+  /**
+   * The date and time when the discount was redeemed.
+   */
   redeemedAt: Date;
+  /**
+   * The identifier of the user who redeemed the discount. `null` if no user was recorded.
+   */
   redeemedBy: string | null;
 }
 
@@ -1231,6 +1354,9 @@ export interface BillingCheckoutTotals {
    * Any credits (like account balance or promo credits) that are being applied to the checkout.
    */
   credit: BillingMoneyAmount | null;
+  /**
+   * The credits applied to the checkout. `null` when no credits apply.
+   */
   credits: BillingCredits | null;
   /**
    * Any outstanding amount from previous unpaid invoices that is being collected as part of the checkout.
@@ -1301,16 +1427,20 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type UpdateCheckoutParams = WithOptionalOrgType<{
+export type UpdateCheckoutParams = {
   /**
    * The unique identifier for the checkout session.
    */
   id: string;
   /**
+   * The Organization ID to perform the request on.
+   */
+  orgId?: string;
+  /**
    * The promo code to apply. Use an empty string to remove the applied promo code.
    */
   promoCode: string;
-}>;
+};
 
 /**
  * The `confirm()` method accepts the following parameters. **Only one of `paymentMethodId`, `paymentToken`, or `useTestCard` should be provided.**
@@ -1391,7 +1521,7 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   totals: BillingTotals;
   /**
-   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](https://clerk.com/docs/reference/types/billing-checkout-resource#confirm)
    */
   confirm: (params: ConfirmCheckoutParams) => Promise<BillingCheckoutResource>;
   /**
@@ -1541,12 +1671,12 @@ export interface CheckoutFlowFinalizeParams {
  */
 interface CheckoutFlowMethods {
   /**
-   * Updates the current checkout. Use an empty promo code to remove the applied promo code.
+   * Updates the current checkout. Use an empty promo code to remove the applied promo code. [Learn more.](https://clerk.com/docs/reference/types/billing-checkout-resource#update)
    */
   update: (params: Pick<UpdateCheckoutParams, 'promoCode'>) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](https://clerk.com/docs/reference/types/billing-checkout-resource#confirm)
    */
   confirm: (params: ConfirmCheckoutParams) => Promise<{ error: ClerkError | null }>;
 

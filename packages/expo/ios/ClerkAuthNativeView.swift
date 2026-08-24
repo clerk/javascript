@@ -44,9 +44,8 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     onAuthEvent(["type": type.rawValue])
   }
 
-  private func sendDismissIfNeeded() {
-    // SwiftUI dismissals detach the hosted view without calling UIKit dismiss().
-    guard currentDismissible, !didSendDismiss else { return }
+  private func sendDismiss() {
+    guard !didSendDismiss else { return }
     didSendDismiss = true
     sendAuthEvent(type: .dismissed)
   }
@@ -56,7 +55,11 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   }
 
   override func hostedViewDidDetachFromWindow() {
-    sendDismissIfNeeded()
+    // SwiftUI dismissals detach the hosted view without calling UIKit dismiss().
+    // A non-dismissible view never self-dismisses, so a detach there is the host
+    // tearing the view down rather than a dismissal to report.
+    guard currentDismissible else { return }
+    sendDismiss()
   }
 
   override public func layoutSubviews() {
@@ -119,7 +122,7 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
       hostBackAction: hostBackAction,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
-          self?.sendDismissIfNeeded()
+          self?.sendDismiss()
         }
       }
     )

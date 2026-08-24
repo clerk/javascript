@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import {
   userButtonBusyKeys,
@@ -9,7 +8,7 @@ import {
   type UserButtonSuggestion,
   UserButtonView,
 } from '@clerk/ui/mosaic/user-button/user-button.view';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -18,8 +17,9 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-button.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Button',
   title: 'UserButton',
+  label: 'User button',
   source: 'packages/ui/src/mosaic/user-button/user-button.view.tsx',
 };
 
@@ -363,6 +363,36 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
         },
       ]}
       menuItemOrder={['docs', 'addAccount', 'signOutAll', 'settings']}
+    />
+  );
+}
+
+// Longer than the action latency above: this one is there to be caught, not to be got past.
+const ORGANIZATIONS_LATENCY_MS = 2500;
+
+/**
+ * The workspace list's first page landing under a popup that is already open. The other examples
+ * are handed their organizations on the first render, so the placeholder they would show has
+ * nothing to show it. The wait restarts on every open, so it can be watched more than once.
+ */
+export function LoadingOrganizations(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+  const [organizationsLoading, setOrganizationsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!prototype.open) {
+      return;
+    }
+    setOrganizationsLoading(true);
+    const timer = setTimeout(() => setOrganizationsLoading(false), ORGANIZATIONS_LATENCY_MS);
+    return () => clearTimeout(timer);
+  }, [prototype.open]);
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      organizationsLoading={organizationsLoading}
     />
   );
 }

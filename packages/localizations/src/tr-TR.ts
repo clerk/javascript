@@ -1752,6 +1752,7 @@ export const trTR: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Şifre yanlış.',
     form_password_length_too_short: 'Şifre çok kısa.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Şifreniz yeterince güçlü değil.',
     form_password_or_identifier_incorrect:
       'Şifre veya e-posta adresi yanlış. Tekrar deneyin veya başka bir yöntem kullanın.',

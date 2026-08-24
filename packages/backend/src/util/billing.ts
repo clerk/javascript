@@ -62,6 +62,7 @@ const billingAppliedDiscountFromJSON = (discount: BillingAppliedDiscountJSON): B
   amountOff: discount.amount_off ? billingMoneyAmountFromJSON(discount.amount_off) : undefined,
   promoCode: discount.promo_code,
   cyclesRemaining: discount.cycles_remaining,
+  durationInCycles: discount.duration_in_cycles,
 });
 
 const billingDiscountsFromJSON = (discounts: BillingDiscountsJSON): BillingDiscounts => ({

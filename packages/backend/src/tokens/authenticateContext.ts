@@ -386,6 +386,11 @@ class AuthenticateContext implements AuthenticateContext {
     if (errors) {
       return false;
     }
+    // `decodeJwt` only JSON-parses the payload, so `iss` is an unvalidated attacker-supplied
+    // value here — this runs before any signature verification.
+    if (typeof data.payload.iss !== 'string') {
+      return false;
+    }
     const tokenIssuer = data.payload.iss.replace(/https?:\/\//gi, '');
     // Use original frontend API for token validation since tokens are issued by the actual Clerk API, not proxy
     return this.originalFrontendApi === tokenIssuer;

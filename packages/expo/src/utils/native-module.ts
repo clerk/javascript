@@ -1,10 +1,11 @@
 import { Platform } from 'react-native';
 
 import NativeClerkModule from '../specs/NativeClerkModule';
+import type { NativeAuthFlowModule, NativeTrustedDeviceModule } from '../specs/NativeClerkModule.types';
 
 export const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
-type ClerkExpoNativeModule = {
+export type ClerkExpoNativeModule = {
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
   getClientToken(): Promise<string | null>;
@@ -14,7 +15,7 @@ type ClerkExpoNativeModule = {
     didChangeClient: boolean,
     didChangeDeviceToken: boolean,
   ): Promise<void>;
-};
+} & Partial<NativeAuthFlowModule & NativeTrustedDeviceModule>;
 
 function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   if (!module || typeof module !== 'object') {

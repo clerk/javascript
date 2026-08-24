@@ -14,12 +14,12 @@ import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
+import { JWT_CATEGORY_M2M_TOKEN } from './jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import {
   API_KEY_PREFIX,
   isJwtFormat,
-  JWT_CATEGORY_M2M_TOKEN,
   M2M_SUBJECT_PREFIX,
   M2M_TOKEN_PREFIX,
   OAUTH_ACCESS_TOKEN_TYPES,

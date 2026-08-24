@@ -10,25 +10,32 @@ import { ViewSource } from './ViewSource';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
-  user: {
+  'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
-  organization: {
-    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
-    'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
-    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
-    'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
-    'organization-profile-profile-section': dynamic(
-      () => import('../stories/organization-profile-profile-section.mdx'),
+  'user-profile': {
+    'user-page': dynamic(() => import('../stories/user-page.mdx')),
+    'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
+    'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
+    'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
+    'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
+    'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
+    'user-profile-password-section': dynamic(() => import('../stories/user-profile-password-section.mdx')),
+    'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
+    'user-profile-mfa-section': dynamic(() => import('../stories/user-profile-mfa-section.mdx')),
+    'user-profile-active-devices-section': dynamic(() => import('../stories/user-profile-active-devices-section.mdx')),
+    'user-profile-subscription-section': dynamic(() => import('../stories/user-profile-subscription-section.mdx')),
+    'user-profile-payment-methods-section': dynamic(
+      () => import('../stories/user-profile-payment-methods-section.mdx'),
     ),
-    'organization-profile-domains-section': dynamic(
-      () => import('../stories/organization-profile-domains-section.mdx'),
+    'user-profile-billing-history-section': dynamic(
+      () => import('../stories/user-profile-billing-history-section.mdx'),
     ),
-    'organization-profile-leave-section': dynamic(() => import('../stories/organization-profile-leave-section.mdx')),
-    'organization-profile-delete-section': dynamic(() => import('../stories/organization-profile-delete-section.mdx')),
-  },
-  blocks: {
-    destructive: dynamic(() => import('../stories/destructive.mdx')),
+    'user-profile-connected-accounts-section': dynamic(
+      () => import('../stories/user-profile-connected-accounts-section.mdx'),
+    ),
+    'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
+    'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
@@ -38,12 +45,14 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     input: dynamic(() => import('../stories/input.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
+    'alert-dialog': dynamic(() => import('../stories/alert-dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
-    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
+    section: dynamic(() => import('../stories/section.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
+    field: dynamic(() => import('../stories/field.component.mdx')),
   },
   primitives: {
     // Headless primitives — alphabetical.
@@ -91,7 +100,9 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       key={`${group}/${slug}`}
       meta={meta}
     >
-      <article className='prose relative mx-auto w-full min-w-0 max-w-3xl p-8'>
+      <article
+        className={`prose relative mx-auto w-full min-w-0 p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+      >
         {meta?.source ? (
           <div className='absolute right-8 top-8'>
             <ViewSource source={meta.source} />

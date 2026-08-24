@@ -1770,6 +1770,7 @@ export const deDE: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Passwort nicht stark genug.',
     form_password_or_identifier_incorrect:
       'Passwort oder E-Mail-Adresse ist falsch. Versuchen Sie es erneut oder verwenden Sie eine andere Methode.',

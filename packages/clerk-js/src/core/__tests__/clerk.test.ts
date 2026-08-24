@@ -1888,6 +1888,220 @@ describe('Clerk singleton', () => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
+    describe('__internal_resumeAfterProtectCheck', () => {
+      // A verification challenge can interrupt an OAuth callback partway through routing. The
+      // challenge card clears it and hands control back here, from a page that is no longer
+      // the callback route, so the remaining routing has to run rather than start over.
+
+      const gatedTransferableSignIn = (extra: Record<string, unknown> = {}) =>
+        new SignIn({
+          status: 'needs_identifier',
+          first_factor_verification: {
+            status: 'transferable',
+            strategy: 'oauth_google',
+            external_verification_redirect_url: '',
+            error: {
+              code: 'external_account_not_found',
+              long_message: 'The External Account was not found.',
+              message: 'Invalid external account',
+            },
+          },
+          second_factor_verification: null,
+          identifier: '',
+          user_data: null,
+          created_session_id: null,
+          created_user_id: null,
+          ...extra,
+        } as any as SignInJSON);
+
+      const loadEnvironment = () =>
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            authConfig: {},
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            onWindowLocationHost: () => false,
+          }),
+        );
+
+      it('completes the transfer as a SIGN-UP and activates the created session', async () => {
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn(),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSetActive = vi.fn();
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = mockSetActive;
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() => {
+          expect(mockSignUpCreate).toHaveBeenCalledTimes(1);
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined });
+          expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: '123' }));
+        });
+      });
+
+      it('completes the transfer even when the cleared response dropped the transferable marker', async () => {
+        // `SignIn.fromJSON` replaces `firstFactorVerification` wholesale on every write, so the
+        // caller latches the continuation before running the challenge and passes it explicitly.
+        // Re-reading it here would silently fall back to returning the user to sign-in.
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: new SignIn({
+              status: 'needs_identifier',
+              first_factor_verification: null,
+              second_factor_verification: null,
+              identifier: '',
+              user_data: null,
+              created_session_id: null,
+              created_user_id: null,
+            } as any as SignInJSON),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() =>
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
+        );
+      });
+
+      it('does not divert to the sign-up card when a stale gate is on the sign-up resource', async () => {
+        // The sign-in variant below covers the first short-circuit; `resuming` skips a second one
+        // keyed on the SIGN-UP resource, and that is the arm that sends the user to a different
+        // card entirely rather than back to this one.
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn(),
+            signUp: new SignUp({
+              protect_check: { status: 'pending', token: 'stale-signup-token', sdk_url: 'https://example.com/sdk.js' },
+            } as any),
+          }),
+        );
+
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() =>
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
+        );
+        expect(mockNavigate.mock.calls.some(([to]) => typeof to === 'string' && to.includes('protect-check'))).toBe(
+          false,
+        );
+      });
+
+      it('does not bounce back into the challenge when a stale gate is still on the resource', async () => {
+        // This is the test that proves `resuming` is load-bearing rather than decorative. The
+        // caller IS the challenge card; re-checking the gate here would hand control straight
+        // back to it, or — through the sign-up arm — to the wrong card entirely.
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn({
+              protect_check: { status: 'pending', token: 'stale-token', sdk_url: 'https://example.com/sdk.js' },
+            }),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() =>
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
+        );
+        expect(mockNavigate.mock.calls.some(([to]) => typeof to === 'string' && to.includes('protect-check'))).toBe(
+          false,
+        );
+      });
+
+      it('still honours transferable: false', async () => {
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn(),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSignUpCreate = vi.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({
+          continuation: 'transfer_to_sign_up',
+          transferable: false,
+        });
+
+        await waitFor(() => expect(mockSignUpCreate).not.toHaveBeenCalled());
+      });
+    });
+
     it('does not initiate the transfer flow when transferable: false is passed', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({

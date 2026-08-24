@@ -1,0 +1,14 @@
+import * as Stories from './user-profile-delete-section.stories';
+
+# UserProfileDeleteSection
+
+The terminal destructive action for deleting the current user account.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>

@@ -4,6 +4,7 @@ import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Icon } from '../icon';
 import { Avatar } from './avatar';
 
 // React reads this off the global object and ships no typing for it.
@@ -11,12 +12,13 @@ declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean | undefined;
 }
 
-// jsdom never fires load/error on images, so drive `new window.Image()` manually.
-// Each instance resolves to the outcome keyed by its `src`. A `cached` src reports `complete`
-// the moment it is assigned, the way a browser does for an image it already holds.
+// jsdom never fires load/error on images, so drive `new window.Image()` manually. A `cached` src
+// reports `complete` the moment it is assigned, the way a browser does for an image it already
+// holds; an `unresolved` one fires neither event, holding the avatar mid-load.
 type Outcome = 'load' | 'error';
 let outcomes: Record<string, Outcome> = {};
 let cached = new Set<string>();
+let unresolved = new Set<string>();
 
 class MockImage {
   complete = false;
@@ -25,6 +27,9 @@ class MockImage {
   set src(value: string) {
     if (cached.has(value)) {
       this.complete = true;
+      return;
+    }
+    if (unresolved.has(value)) {
       return;
     }
     queueMicrotask(() => {
@@ -42,6 +47,7 @@ vi.stubGlobal('Image', MockImage);
 afterEach(() => {
   outcomes = {};
   cached = new Set();
+  unresolved = new Set();
 });
 
 describe('Mosaic Avatar', () => {
@@ -80,8 +86,7 @@ describe('Mosaic Avatar', () => {
         <Avatar.Fallback>CN</Avatar.Fallback>
       </Avatar.Root>,
     );
-    const fallback = screen.getByText('CN');
-    expect(fallback).toHaveClass('cl-avatar-fallback');
+    expect(screen.getByText('CN').closest('.cl-avatar-fallback')).toBeInTheDocument();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
@@ -219,6 +224,45 @@ describe('Mosaic Avatar', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
+  it('holds the fallback content in a slot of its own rather than painting it', () => {
+    render(
+      <Avatar.Root>
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByTestId('fallback')).toHaveTextContent('CN');
+    expect(screen.getByText('CN')).toHaveClass('cl-avatar-fallback-content');
+  });
+
+  it('pulses only while an image is still resolving', async () => {
+    unresolved.add('https://example.com/slow.png');
+    const { rerender } = render(
+      <Avatar.Root>
+        <Avatar.Image src='https://example.com/slow.png' />
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByTestId('fallback')).toHaveAttribute('data-pending', '');
+
+    outcomes['https://example.com/bad.png'] = 'error';
+    rerender(
+      <Avatar.Root>
+        <Avatar.Image src='https://example.com/bad.png' />
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    await waitFor(() => expect(screen.getByTestId('fallback')).not.toHaveAttribute('data-pending'));
+  });
+
+  it('holds still when there is no image to wait for', () => {
+    render(
+      <Avatar.Root>
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByTestId('fallback')).not.toHaveAttribute('data-pending');
+  });
+
   it('wires consumer className/style/ref through to the root', () => {
     const ref = React.createRef<HTMLSpanElement>();
     render(
@@ -237,9 +281,37 @@ describe('Mosaic Avatar', () => {
     expect(avatar).toHaveStyle({ marginTop: '8px' });
   });
 
+  it('composes its root onto another element and renders an icon affordance', () => {
+    const ref = React.createRef<HTMLSpanElement>();
+    render(
+      <Avatar.Root
+        ref={ref}
+        size='lg'
+        render={
+          <button
+            type='button'
+            aria-label='Edit profile picture'
+          />
+        }
+      >
+        <Avatar.Fallback>CN</Avatar.Fallback>
+        <Avatar.Icon>
+          <Icon name='pen' />
+        </Avatar.Icon>
+      </Avatar.Root>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Edit profile picture' });
+    expect(button).toHaveClass('cl-avatar');
+    expect(button).toHaveAttribute('data-size', 'lg');
+    expect(ref.current).toBe(button);
+    expect(button.querySelector('.cl-avatar-icon')).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('throws when a part is rendered outside <Avatar.Root>', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Avatar.Fallback>CN</Avatar.Fallback>)).toThrow(/must be rendered inside <Avatar.Root>/);
+    expect(() => render(<Avatar.Icon />)).toThrow(/must be rendered inside <Avatar.Root>/);
     spy.mockRestore();
   });
 });
