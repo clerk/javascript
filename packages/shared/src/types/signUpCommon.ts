@@ -136,6 +136,7 @@ export type SignUpCreateParams = Partial<
     oidcLoginHint: string;
     channel: PhoneCodeChannel;
     locale?: string;
+    timezone?: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 

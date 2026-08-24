@@ -9,6 +9,8 @@ import type { Web3Provider } from './web3';
 
 /** @generateWithEmptyComment */
 export interface SignInFutureCreateParams {
+  /** The timezone to assign to the user. If omitted, defaults to the browser's timezone. */
+  timezone?: string;
   /**
    * The authentication identifier for the sign-in. This can be the value of the user's email address, phone number, username, or Web3 wallet address.
    */
@@ -50,6 +52,8 @@ export type SignInFuturePasswordParams = {
    * [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
    */
   password: string;
+  /** The timezone to assign when this starts a new sign-in. If omitted, defaults to the browser's timezone. */
+  timezone?: string;
 } & (
   | {
       /**

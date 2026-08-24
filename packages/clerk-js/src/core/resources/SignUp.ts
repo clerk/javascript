@@ -50,7 +50,7 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
-import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
+import { getBrowserLocale, getBrowserTimezone, getClerkQueryParam, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -101,6 +101,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
   locale: string | null = null;
+  timezone: string | null = null;
 
   /**
    * The current status of the sign-up process.
@@ -165,6 +166,13 @@ export class SignUp extends BaseResource implements SignUpResource {
       const browserLocale = getBrowserLocale();
       if (browserLocale) {
         finalParams.locale = browserLocale;
+      }
+    }
+
+    if (finalParams.timezone === undefined) {
+      const browserTimezone = getBrowserTimezone();
+      if (browserTimezone) {
+        finalParams.timezone = browserTimezone;
       }
     }
 
@@ -550,6 +558,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
       this.locale = data.locale;
+      this.timezone = data.timezone ?? null;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -592,6 +601,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       web3_wallet: this.web3wallet,
       legal_accepted_at: this.legalAcceptedAt,
       locale: this.locale,
+      timezone: this.timezone,
       external_account: this.externalAccount,
       external_account_strategy: this.externalAccount?.strategy,
     };
@@ -825,6 +835,10 @@ class SignUpFuture implements SignUpFutureResource {
     return this.#resource.locale;
   }
 
+  get timezone() {
+    return this.#resource.timezone;
+  }
+
   get unverifiedFields() {
     return this.#resource.unverifiedFields;
   }
@@ -914,6 +928,7 @@ class SignUpFuture implements SignUpFutureResource {
 
   private async _create(params: SignUpFutureCreateParams): Promise<void> {
     const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
+    const timezone = params.timezone ?? getBrowserTimezone();
 
     const body: Record<string, unknown> = {
       transfer: params.transfer,
@@ -923,6 +938,7 @@ class SignUpFuture implements SignUpFutureResource {
       ...params,
       unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       locale: params.locale ?? getBrowserLocale(),
+      ...(timezone !== null ? { timezone } : {}),
     };
 
     await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
@@ -961,9 +977,13 @@ class SignUpFuture implements SignUpFutureResource {
       if (this.#resource.id) {
         await this.#resource.__internal_basePatch({ body });
       } else {
-        // Inject browser locale only when creating the sign-up, so an existing
-        // sign-up's locale is not overwritten on update.
+        // Inject browser locale and timezone only when creating the sign-up, so an existing
+        // sign-up's values are not overwritten on update.
         body.locale = params.locale ?? getBrowserLocale();
+        const timezone = params.timezone ?? getBrowserTimezone();
+        if (timezone !== null) {
+          body.timezone = timezone;
+        }
         await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       }
     });
@@ -1063,6 +1083,7 @@ class SignUpFuture implements SignUpFutureResource {
       emailAddress,
       popup,
       locale,
+      timezone,
     } = params;
     return runAsyncResourceTask(this.#resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken({ strategy });
@@ -1100,13 +1121,18 @@ class SignUpFuture implements SignUpFutureResource {
           captchaWidgetType,
           captchaError,
           locale,
+          ...(timezone !== undefined ? { timezone } : {}),
         };
         if (this.#resource.id) {
           return this.#resource.__internal_basePatch({ body });
         }
-        // Inject browser locale only when creating the sign-up, so an existing
-        // sign-up's locale is not overwritten on update.
+        // Inject browser locale and timezone only when creating the sign-up, so an existing
+        // sign-up's values are not overwritten on update.
         body.locale = locale ?? getBrowserLocale();
+        const browserTimezone = timezone ?? getBrowserTimezone();
+        if (browserTimezone !== null) {
+          body.timezone = browserTimezone;
+        }
         return this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       };
 
@@ -1134,7 +1160,7 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   async web3(params: SignUpFutureWeb3Params): Promise<{ error: ClerkError | null }> {
-    const { strategy, unsafeMetadata, legalAccepted, firstName, lastName, locale } = params;
+    const { strategy, unsafeMetadata, legalAccepted, firstName, lastName, locale, timezone } = params;
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
     return runAsyncResourceTask(this.#resource, async () => {
@@ -1163,7 +1189,7 @@ class SignUpFuture implements SignUpFutureResource {
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const web3Wallet = identifier || this.#resource.web3wallet!;
-      await this._create({ web3Wallet, unsafeMetadata, legalAccepted, firstName, lastName, locale });
+      await this._create({ web3Wallet, unsafeMetadata, legalAccepted, firstName, lastName, locale, timezone });
       await this.#resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',

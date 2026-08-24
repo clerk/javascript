@@ -99,6 +99,7 @@ export class User extends BaseResource implements UserResource {
   legalAcceptedAt: Date | null = null;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
+  timezone: string | null = null;
 
   private cachedSessionsWithActivities: SessionWithActivities[] | null = null;
 
@@ -456,6 +457,7 @@ export class User extends BaseResource implements UserResource {
     this.createOrganizationEnabled = data.create_organization_enabled || false;
     this.createOrganizationsLimit = data.create_organizations_limit || null;
     this.deleteSelfEnabled = data.delete_self_enabled || false;
+    this.timezone = data.timezone ?? null;
 
     if (data.last_sign_in_at) {
       this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);
@@ -504,6 +506,7 @@ export class User extends BaseResource implements UserResource {
       legal_accepted_at: this.legalAcceptedAt?.getTime() || null,
       updated_at: this.updatedAt?.getTime() || null,
       created_at: this.createdAt?.getTime() || null,
+      timezone: this.timezone,
     };
   }
 }
