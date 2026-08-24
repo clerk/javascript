@@ -81,6 +81,21 @@ describe('SignUp', () => {
       await Promise.all([first, second]);
     });
 
+    it('does not forward timezone during legacy verification continuation', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+      await signUp.prepareVerification({ strategy: 'email_code', timezone: 'Europe/Paris' } as any);
+      await signUp.attemptVerification({ strategy: 'email_code', code: '123456', timezone: 'Europe/Paris' } as any);
+
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
+      expect(mockFetch.mock.calls[1][0].body).not.toHaveProperty('timezone');
+    });
+
     it('does not coalesce preparations for different verifications', async () => {
       const mockFetch = vi.fn().mockResolvedValue({
         client: null,
@@ -301,7 +316,7 @@ describe('SignUp', () => {
       );
     });
 
-    it('does not inject timezone when updating an existing sign-up', async () => {
+    it('does not forward an explicitly supplied timezone when updating an existing sign-up', async () => {
       vi.stubGlobal('Intl', {
         DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
       });
@@ -311,7 +326,7 @@ describe('SignUp', () => {
       });
       BaseResource._fetch = mockFetch;
 
-      await new SignUp({ id: 'signup_123' } as any).update({ firstName: 'Ada' });
+      await new SignUp({ id: 'signup_123' } as any).update({ firstName: 'Ada', timezone: 'Europe/Paris' } as any);
 
       expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
     });
@@ -493,6 +508,24 @@ describe('SignUp', () => {
         expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
+      it('preserves an explicitly supplied timezone when creating a sign-up', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        await new SignUp().__internal_future.create({
+          emailAddress: 'user@example.com',
+          timezone: 'Europe/Paris',
+        });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'Europe/Paris');
+      });
+
       it('returns error property on success', async () => {
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,
@@ -671,7 +704,7 @@ describe('SignUp', () => {
         );
       });
 
-      it('omits timezone when updating an existing sign-up', async () => {
+      it('does not forward an explicitly supplied timezone when updating an existing sign-up', async () => {
         vi.stubGlobal('Intl', {
           DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
         });
@@ -682,7 +715,7 @@ describe('SignUp', () => {
         BaseResource._fetch = mockFetch;
         const signUp = new SignUp({ id: 'signup_123' } as any);
 
-        await signUp.__internal_future.update({ firstName: 'Ada' });
+        await signUp.__internal_future.update({ firstName: 'Ada', timezone: 'Europe/Paris' } as any);
 
         expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
       });
@@ -1091,7 +1124,7 @@ describe('SignUp', () => {
         );
       });
 
-      it('does not inject browser locale when continuing an existing signup', async () => {
+      it('does not forward locale defaults or an explicit timezone when continuing an existing signup', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
         vi.stubGlobal('navigator', { language: 'fr-FR' });
 
@@ -1124,7 +1157,8 @@ describe('SignUp', () => {
           strategy: 'oauth_google',
           redirectUrl: '/complete',
           redirectCallbackUrl: '/sso-callback',
-        });
+          timezone: 'Europe/Paris',
+        } as any);
 
         expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -1135,6 +1169,7 @@ describe('SignUp', () => {
             }),
           }),
         );
+        expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
       });
 
       it('continues an existing sign up via the resource URL', async () => {
@@ -1694,7 +1729,10 @@ describe('SignUp', () => {
         vi.unstubAllGlobals();
       });
 
-      it('creates signup with password when no existing signup', async () => {
+      it('ignores an explicit timezone and detects the browser timezone when creating with a password', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,
           response: { id: 'signup_123', status: 'missing_requirements' },
@@ -1702,7 +1740,10 @@ describe('SignUp', () => {
         BaseResource._fetch = mockFetch;
 
         const signUp = new SignUp();
-        await signUp.__internal_future.password({ password: 'test-password-123' });
+        await signUp.__internal_future.password({
+          password: 'test-password-123',
+          timezone: 'Europe/Paris',
+        } as any);
 
         expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -1714,9 +1755,10 @@ describe('SignUp', () => {
             }),
           }),
         );
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
-      it('updates existing signup when already created', async () => {
+      it('does not forward an explicitly supplied timezone when updating an existing signup with a password', async () => {
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,
           response: { id: 'signup_123', status: 'missing_requirements' },
@@ -1724,7 +1766,10 @@ describe('SignUp', () => {
         BaseResource._fetch = mockFetch;
 
         const signUp = new SignUp({ id: 'signup_123' } as any);
-        await signUp.__internal_future.password({ password: 'test-password-123' });
+        await signUp.__internal_future.password({
+          password: 'test-password-123',
+          timezone: 'Europe/Paris',
+        } as any);
 
         // Should use PATCH to update existing signup, not POST to create a new one
         expect(mockFetch).toHaveBeenCalledWith(
@@ -1737,6 +1782,7 @@ describe('SignUp', () => {
             }),
           }),
         );
+        expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
       });
 
       it('returns error property on success', async () => {
