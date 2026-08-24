@@ -6,28 +6,37 @@ import type { UserButtonController } from '../user-button.controller';
 
 let controller: UserButtonController;
 
+vi.mock('../user-button.model', () => ({
+  useUserButtonModel: () => ({ status: 'loading' }),
+}));
+
 vi.mock('../user-button.controller', () => ({
   useUserButtonController: () => controller,
 }));
 
-// The container's own job is which of the three controller states renders what, so the surface is
+// The custom pages outlive the popup, so the wrapper renders their portals in every state.
+vi.mock('../user-button.pages', () => ({
+  useUserProfilePages: () => [],
+  useCustomPages: () => ({
+    customPages: undefined,
+    portals: [
+      <output
+        key='p'
+        data-testid='portal'
+      />,
+    ],
+  }),
+}));
+
+// The wrapper's own job is which of the three controller states renders what, so the surface is
 // stubbed out and the view's own tests cover it.
 vi.mock('../user-button.view', () => ({
-  userButtonBusyKeys: {
-    selectOrganization: () => 'select-organization',
-    switchSession: () => 'switch-session',
-    signOutSession: () => 'sign-out-session',
-    signOutAll: () => 'sign-out-all',
-    acceptSuggestion: () => 'accept-suggestion',
-    acceptInvitation: () => 'accept-invitation',
-  },
   UserButtonView: () => <output data-testid='view' />,
 }));
 
 function ready(): UserButtonController {
   return {
     status: 'ready',
-    organizationsEnabled: true,
     renderBranding: true,
     activeSession: { sessionId: 'sess_1', name: 'Alice Smith', identifier: 'alice@example.com' },
     activeOrganization: null,
@@ -68,8 +77,23 @@ describe('UserButton', () => {
     expect(screen.queryByTestId('fallback')).not.toBeInTheDocument();
   });
 
-  it('renders nothing while loading when no fallback is given', () => {
-    const { container } = render(<UserButton />);
-    expect(container).toBeEmptyDOMElement();
+  it('renders no fallback while loading when none is given', () => {
+    render(<UserButton />);
+    expect(screen.queryByTestId('fallback')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('view')).not.toBeInTheDocument();
+  });
+
+  // The profile can be open in clerk-js's own root while the button itself has nothing to render.
+  it('keeps the custom page portals mounted in every state', () => {
+    const { rerender } = render(<UserButton />);
+    expect(screen.getByTestId('portal')).toBeInTheDocument();
+
+    controller = { status: 'hidden' };
+    rerender(<UserButton />);
+    expect(screen.getByTestId('portal')).toBeInTheDocument();
+
+    controller = ready();
+    rerender(<UserButton />);
+    expect(screen.getByTestId('portal')).toBeInTheDocument();
   });
 });
