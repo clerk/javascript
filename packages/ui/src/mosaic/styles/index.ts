@@ -66,10 +66,11 @@ export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
 export type {
-  MenuContentProps,
   MenuItemProps,
   MenuLabelProps,
   MenuMediaProps,
+  MenuMediaSize,
+  MenuPopupProps,
   MenuProps,
   MenuSeparatorProps,
   MenuTriggerProps,

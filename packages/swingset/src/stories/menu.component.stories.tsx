@@ -18,7 +18,7 @@ export function Default() {
   return (
     <Menu.Root>
       <Menu.Trigger />
-      <Menu.Content>
+      <Menu.Popup>
         <Menu.Item label='Add workspace'>
           <Menu.Media>
             <Icon name='plus' />
@@ -40,7 +40,7 @@ export function Default() {
           </Menu.Media>
           <Menu.Label>Delete user</Menu.Label>
         </Menu.Item>
-      </Menu.Content>
+      </Menu.Popup>
     </Menu.Root>
   );
 }
@@ -54,7 +54,7 @@ export function Accounts() {
   return (
     <Menu.Root>
       <Menu.Trigger>Switch account</Menu.Trigger>
-      <Menu.Content>
+      <Menu.Popup>
         {accounts.map(account => (
           <Menu.Item
             key={account.identifier}
@@ -77,7 +77,7 @@ export function Accounts() {
             ) : null}
           </Menu.Item>
         ))}
-      </Menu.Content>
+      </Menu.Popup>
     </Menu.Root>
   );
 }

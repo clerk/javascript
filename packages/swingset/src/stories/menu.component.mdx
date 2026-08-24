@@ -23,7 +23,7 @@ import { Menu } from '@clerk/ui/mosaic/components/menu';
 
 <Menu.Root>
   <Menu.Trigger />
-  <Menu.Content>
+  <Menu.Popup>
     <Menu.Item label='Add workspace'>
       <Menu.Media>
         <Icon name='plus' />
@@ -49,11 +49,12 @@ import { Menu } from '@clerk/ui/mosaic/components/menu';
       </Menu.Media>
       <Menu.Label>Delete user</Menu.Label>
     </Menu.Item>
-  </Menu.Content>
+  </Menu.Popup>
 </Menu.Root>;
 ```
 
-`Menu.Content` composes the portal, positioner, and popup, so items are the only children you write.
+`Menu.Popup` renders the portal and the floating positioner itself — neither is a part you compose
+— so items are the only children you write.
 
 ### Trigger
 
@@ -69,15 +70,21 @@ props (ARIA attributes, click and keyboard handlers) to spread.
 
 ### Items
 
-`label` drives typeahead and is used as the visible text when `children` is omitted — enough for a
-plain text row. Compose anything more from `Menu.Media` and `Menu.Label`, which lay the row out; a
-bare icon and text as children do not line up across rows and do not truncate. Use
+`label` names the item for typeahead and for assistive technology. What the row shows is composed
+from `Menu.Media` and `Menu.Label`, and those children are required: text dropped straight into the
+item is not a flex child the row can size, so it neither lines up with the other rows nor
+truncates. A row with nothing to lead it is `Menu.Label` alone. Use
 `color='negative'` for destructive actions; the color is inherited by the children. `disabled` items
 are skipped by keyboard navigation and their `onClick` never fires. Activating an item closes the
 menu; pass `closeOnClick={false}` to keep it open.
 
 ```tsx
-<Menu.Item label='Revoke' color='negative' />
+<Menu.Item
+  label='Revoke'
+  color='negative'
+>
+  <Menu.Label>Revoke</Menu.Label>
+</Menu.Item>
 
 <Menu.Item
   label='Delete'
@@ -96,6 +103,17 @@ menu; pass `closeOnClick={false}` to keep it open.
 avatar. Items that lead with marks of differing widths need it: without it each row sets its own
 text start, and the labels no longer line up. Leave it empty on an item that leads with nothing and
 that row keeps the column. It renders a `span`, since the item it sits in is a button.
+
+`size` is the column's width: `sm` (the default) fits an icon or an avatar, `xs` a bare glyph. The
+row has no height of its own, so it takes whatever the media asks for. That makes the size a
+per-menu decision rather than a per-item one: give every item in one menu the same value, or their
+text no longer starts on one line.
+
+```tsx
+<Menu.Media size='xs'>
+  <Icon name='check' />
+</Menu.Media>
+```
 
 ### Label
 
@@ -175,7 +193,7 @@ const [open, setOpen] = useState(false);
 | ---------------- | -------------------------------- | ------------------------------------------------------------------------------- |
 | `Menu.Root`      | —                                | State provider; owns open/close, placement, and keyboard navigation.            |
 | `Menu.Trigger`   | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis.           |
-| `Menu.Content`   | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                              |
+| `Menu.Popup`     | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                              |
 | `Menu.Item`      | `menu-item`                      | A single action whose content is composed through children.                     |
 | `Menu.Media`     | `menu-media`                     | Square leading column that centers an item's icon, image, or avatar.            |
 | `Menu.Label`     | `menu-label`                     | The item's text. Fills the row between media and trailing marks, and truncates. |

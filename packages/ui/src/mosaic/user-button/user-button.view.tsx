@@ -427,16 +427,18 @@ function ActionMenu({ label, actions, disabled }: { label: string; actions: RowA
           aria-label={label}
           disabled={disabled}
         />
-        <Menu.Content>
+        <Menu.Popup>
           {actions.map(a => (
             <Menu.Item
               key={a.label}
               label={a.label}
               color={a.color}
               onClick={a.onClick}
-            />
+            >
+              <Menu.Label>{a.label}</Menu.Label>
+            </Menu.Item>
           ))}
-        </Menu.Content>
+        </Menu.Popup>
       </Menu.Root>
     </Trailing>
   );
@@ -710,10 +712,12 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
       </Menu.Media>
       <Menu.Label>{session.identifier}</Menu.Label>
       {active ? (
-        <Icon
-          name='check'
-          size='sm'
-        />
+        <Menu.Media>
+          <Icon
+            name='check'
+            size='sm'
+          />
+        </Menu.Media>
       ) : null}
     </Menu.Item>
   );
@@ -766,7 +770,7 @@ function SwitchAccountRow() {
           <Item.Label variant='secondary'>{m.accounts.switch}</Item.Label>
         </Item.Content>
       </Menu.Trigger>
-      <Menu.Content>
+      <Menu.Popup>
         {/* The account it is on leads, checked: the flyout is the full set of accounts rather than
             a list of somewhere else to go. */}
         <SessionMenuItem
@@ -794,7 +798,7 @@ function SwitchAccountRow() {
             <Menu.Label>{m.accounts.add}</Menu.Label>
           </Menu.Item>
         ) : null}
-      </Menu.Content>
+      </Menu.Popup>
     </Menu.Root>
   );
 }

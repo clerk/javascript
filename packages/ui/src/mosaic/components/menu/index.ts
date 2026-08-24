@@ -1,9 +1,10 @@
-export { Menu, MenuContent, MenuItem, MenuLabel, MenuMedia, MenuSeparator, MenuTrigger } from './menu';
+export { Menu, MenuItem, MenuLabel, MenuMedia, MenuPopup, MenuSeparator, MenuTrigger } from './menu';
 export type {
-  MenuContentProps,
   MenuItemProps,
   MenuLabelProps,
   MenuMediaProps,
+  MenuMediaSize,
+  MenuPopupProps,
   MenuProps,
   MenuSeparatorProps,
   MenuTriggerProps,

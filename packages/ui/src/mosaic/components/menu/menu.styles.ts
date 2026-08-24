@@ -2,15 +2,17 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-export const styles = stylex.create({
-  // Positioning is applied inline by the headless positioner; this only clears the
-  // focus outline it receives. No z-index: the portalled, fixed positioner already
-  // paints above page content, and consumers own their own stacking order.
-  positioner: {
+// Positioning is applied inline by the headless positioner; this only clears the
+// focus outline it receives. No z-index: the portalled, fixed positioner already
+// paints above page content, and consumers own their own stacking order.
+export const positioner = stylex.create({
+  base: {
     outline: 'none',
   },
+});
 
-  popup: {
+export const popup = stylex.create({
+  base: {
     borderRadius: radiusVars['--cl-radius-lg'],
     gap: space['0.5'],
     outline: 'none',
@@ -46,13 +48,14 @@ export const styles = stylex.create({
     minWidth: '12.5rem',
     overflowY: 'auto',
   },
+});
 
-  item: {
+export const item = stylex.create({
+  base: {
     borderRadius: '0.375rem',
     borderStyle: 'none',
     gap: space['1'],
     outline: 'none',
-    paddingBlock: space['1'],
     paddingInline: space['1'],
     alignItems: 'center',
     backgroundColor: {
@@ -76,7 +79,7 @@ export const styles = stylex.create({
       '@media (prefers-reduced-motion: reduce)': '0.01ms',
     },
     transitionProperty: 'background-color',
-    height: space['8'],
+    height: space['7'],
     width: '100%',
     '::before': {
       insetBlock: `calc(-1 * ${space['0.5']})`,
@@ -86,7 +89,7 @@ export const styles = stylex.create({
     },
   },
 
-  itemNegative: {
+  negative: {
     backgroundColor: {
       default: 'transparent',
       ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
@@ -96,25 +99,33 @@ export const styles = stylex.create({
     },
     color: colorVars['--cl-color-negative'],
   },
+});
 
-  media: {
+export const media = stylex.create({
+  base: {
     alignItems: 'center',
     aspectRatio: '1/1',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    width: space['6'],
   },
+  xs: { width: space['4'] },
+  sm: { width: space['6'] },
+});
 
-  // The item lays its children out in one flat row, so the label is what has to take the space
-  // between the media and whatever trails it, rather than the row spacing the three evenly.
-  // `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
-  label: {
+// The item lays its children out in one flat row, so the label is what has to take the space
+// between the media and whatever trails it, rather than the row spacing the three evenly.
+// `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
+export const label = stylex.create({
+  base: {
+    paddingInline: space['1'],
     flexGrow: 1,
     minWidth: 0,
   },
+});
 
-  separator: {
+export const separator = stylex.create({
+  base: {
     // Full-bleed across the popup: cancel the popup's inline padding.
     marginBlock: space['0.5'],
     marginInline: `calc(-1 * ${space['0.5']})`,
