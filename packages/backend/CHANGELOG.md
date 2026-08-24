@@ -1,5 +1,21 @@
 # Change Log
 
+## 3.16.11
+
+### Patch Changes
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+
+## 3.16.10
+
+### Patch Changes
+
+- Mark the internal `createBootstrapSignedOutState` as deprecated. It is no longer used by `@clerk/nextjs` and is kept only for older published SDK versions. ([#9493](https://github.com/clerk/javascript/pull/9493)) by [@djgould](https://github.com/djgould)
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+
 ## 3.16.9
 
 ### Patch Changes

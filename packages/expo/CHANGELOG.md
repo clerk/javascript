@@ -1,5 +1,27 @@
 # Change Log
 
+## 4.5.3
+
+### Patch Changes
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+  - @clerk/clerk-js@6.30.0
+  - @clerk/react@6.14.6
+
+## 4.5.2
+
+### Patch Changes
+
+- Fix `AuthView`'s `onDismiss` never firing on iOS when `isDismissible` is `false`. The callback now runs once the auth flow completes, matching Android, so an app-owned modal or screen wrapping the view can close after sign-in. ([#9501](https://github.com/clerk/javascript/pull/9501)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-ios` SDK from `1.4.0` to `1.4.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.4.1. ([#9513](https://github.com/clerk/javascript/pull/9513)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+  - @clerk/clerk-js@6.29.3
+  - @clerk/react@6.14.5
+
 ## 4.5.1
 
 ### Patch Changes

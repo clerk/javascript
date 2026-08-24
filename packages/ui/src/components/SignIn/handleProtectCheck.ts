@@ -36,3 +36,43 @@ export function navigateOnSignInProtectGate(
   }
   return false;
 }
+
+/**
+ * Whether this sign-in is waiting to become a sign-up.
+ */
+export function isSignInPendingOAuthTransfer(signIn: SignInResource): boolean {
+  return signIn.firstFactorVerification?.status === 'transferable';
+}
+
+export function resumeSignInAfterProtectCheck(
+  signIn: SignInResource,
+  {
+    navigate,
+    resumeOAuthContinuation,
+    startedAsOAuthTransfer,
+  }: {
+    navigate: (to: string) => Promise<unknown>;
+    resumeOAuthContinuation: () => Promise<unknown>;
+    startedAsOAuthTransfer: boolean;
+  },
+): Promise<unknown> {
+  // A chained gate: stay on this route so the new challenge runs on the next render.
+  if (isSignInProtectGated(signIn)) {
+    return navigate('.');
+  }
+
+  switch (signIn.status) {
+    case 'needs_first_factor':
+      return navigate('../factor-one');
+    case 'needs_second_factor':
+      return navigate('../factor-two');
+    case 'needs_client_trust':
+      return navigate('../client-trust');
+    case 'needs_new_password':
+      return navigate('../reset-password');
+    default:
+      return startedAsOAuthTransfer || isSignInPendingOAuthTransfer(signIn)
+        ? resumeOAuthContinuation()
+        : navigate('..');
+  }
+}

@@ -1,4 +1,4 @@
-import type { AccountlessApplication, AuthObject, ClerkClient } from '@clerk/backend';
+import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type {
   AuthenticatedState,
   AuthenticateRequestOptions,
@@ -12,11 +12,9 @@ import type {
 import {
   AuthStatus,
   constants,
-  createBootstrapSignedOutState,
   createClerkRequest,
   createRedirect,
   getAuthObjectForAcceptedToken,
-  isMachineTokenByPrefix,
   isTokenTypeAccepted,
   makeAuthObjectSerializable,
   TokenType,
@@ -35,13 +33,10 @@ import type { GetAuthOptions } from '../server/createGetAuth';
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import type { Logger, LoggerNoCommit } from '../utils/debugLogger';
 import { withLogger } from '../utils/debugLogger';
-import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
 import { errorThrower } from './errorThrower';
-import { getHeader } from './headers-utils';
-import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
   isNextjsNotFoundError,
@@ -151,14 +146,11 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? await params(request) : params;
 
-      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
-
-      const publishableKey = assertKey(
-        resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
-        () => errorThrower.throwMissingPublishableKeyError(),
+      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
+        errorThrower.throwMissingPublishableKeyError(),
       );
 
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () =>
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
         errorThrower.throwMissingSecretKeyError(),
       );
 
@@ -240,93 +232,19 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         handler,
         options,
         resolvedParams,
-        keyless,
         logger,
       });
     });
-
-    /**
-     * Runs the user's handler against a synthetic signed-out `RequestState` during the keyless
-     * bootstrap window, so authorization fails closed until a publishable key is provisioned.
-     */
-    const bootstrapNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
-      const resolvedParams = typeof params === 'function' ? await params(request) : params;
-      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
-
-      const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL || '';
-      const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL || '';
-
-      const options = {
-        publishableKey: '',
-        secretKey: '',
-        signInUrl,
-        signUpUrl,
-        ...resolvedParams,
-      };
-
-      clerkMiddlewareRequestDataStore.set('requestData', options);
-
-      if (options.debug) {
-        logger.enable();
-      }
-
-      const clerkRequest = createClerkRequest(request);
-      logger.debug('keyless bootstrap (no publishable key)', () => ({ signInUrl, signUpUrl }));
-      logger.debug('url', () => clerkRequest.toJSON());
-
-      const requestState = createBootstrapSignedOutState({ signInUrl, signUpUrl });
-
-      return runHandlerWithRequestState({
-        clerkRequest,
-        request,
-        event,
-        requestState,
-        handler,
-        options,
-        resolvedParams,
-        keyless,
-        logger,
-      });
-    });
-
-    const keylessMiddleware: NextMiddleware = async (request, event) => {
-      /**
-       * This mechanism replaces a full-page reload. Ensures that middleware will re-run and authenticate the request properly without the secret key or publishable key to be missing.
-       */
-      if (isKeylessSyncRequest(request)) {
-        return returnBackFromKeylessSync(request);
-      }
-
-      const resolvedParams = typeof params === 'function' ? await params(request) : params;
-      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
-
-      const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
-      const authHeader = getHeader(request, constants.Headers.Authorization)?.replace('Bearer ', '') ?? '';
-
-      if (isMissingPublishableKey && !isMachineTokenByPrefix(authHeader)) {
-        return bootstrapNextMiddleware(request, event);
-      }
-
-      return baseNextMiddleware(request, event);
-    };
-
-    const nextMiddleware: NextMiddleware = async (request, event) => {
-      if (canUseKeyless) {
-        return keylessMiddleware(request, event);
-      }
-
-      return baseNextMiddleware(request, event);
-    };
 
     // If we have a request and event, we're being called as a middleware directly
     // eg, export default clerkMiddleware;
     if (request && event) {
-      return nextMiddleware(request, event);
+      return baseNextMiddleware(request, event);
     }
 
     // Otherwise, return a middleware that can be called with a request and event
     // eg, export default clerkMiddleware(auth => { ... });
-    return nextMiddleware;
+    return baseNextMiddleware;
   });
 
   return middleware;
@@ -359,15 +277,12 @@ type RunHandlerWithRequestStateArgs = {
     signUpUrl: string;
   };
   resolvedParams: ClerkMiddlewareOptions;
-  keyless: AccountlessApplication | undefined;
   logger: LoggerNoCommit<Logger>;
 };
 
 /**
  * Drives the post-authentication pipeline: handler invocation, CSP, redirects, header propagation,
- * and response decoration. Accepts a pre-computed `requestState` so callers can supply either a
- * real authentication result from `authenticateRequest()` or a synthetic signed-out state
- * (e.g. during keyless bootstrap when no publishable key is available yet).
+ * and response decoration.
  */
 async function runHandlerWithRequestState({
   clerkRequest,
@@ -377,10 +292,9 @@ async function runHandlerWithRequestState({
   handler,
   options,
   resolvedParams,
-  keyless,
   logger,
 }: RunHandlerWithRequestStateArgs): Promise<Response> {
-  const { publishableKey, secretKey } = options;
+  const { publishableKey } = options;
 
   logger.debug('requestState', () => ({
     status: requestState.status,
@@ -470,37 +384,17 @@ async function runHandlerWithRequestState({
     setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
   }
 
-  const keylessKeysForRequestData =
-    // Only pass keyless credentials when there are no explicit keys
-    secretKey === keyless?.secretKey
-      ? {
-          publishableKey: keyless?.publishableKey,
-          secretKey: keyless?.secretKey,
-        }
-      : {};
-
   decorateRequest(
     clerkRequest,
     handlerResult,
     requestState,
     resolvedParams,
-    keylessKeysForRequestData,
+    {},
     authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
   );
 
   return handlerResult;
 }
-
-const isKeylessSyncRequest = (request: NextMiddlewareRequestParam) =>
-  request.nextUrl.pathname === '/clerk-sync-keyless';
-
-const returnBackFromKeylessSync = (request: NextMiddlewareRequestParam) => {
-  const returnUrl = request.nextUrl.searchParams.get('returnUrl');
-  const url = new URL(request.url);
-  url.pathname = '';
-
-  return NextResponse.redirect(returnUrl || url.toString());
-};
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
 

@@ -1,8 +1,26 @@
 const DefaultMessages = Object.freeze({
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
-  InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
-  MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
-  MissingSecretKeyErrorMessage: `Missing secretKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
+  InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid (key={{key}}, expected format: pk_test_... or pk_live_...). To create a Clerk application with valid keys, in your terminal run:
+
+npx clerk@latest init
+
+\`npx clerk@latest init\` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.
+
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys (\`--instance prod\` for production keys). Or copy its Publishable key from https://dashboard.clerk.com/last-active?path=api-keys.`,
+  MissingPublishableKeyErrorMessage: `Missing publishableKey. To set up Clerk for this project, in your terminal run:
+
+npx clerk@latest init
+
+\`npx clerk@latest init\` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.
+
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys. Or copy them from https://dashboard.clerk.com/last-active?path=api-keys. Deploy a production instance by running \`npx clerk@latest deploy\`, or \`npx clerk@latest env pull --instance prod\` to use an existing one.`,
+  MissingSecretKeyErrorMessage: `Missing secretKey. To set up Clerk for this project, in your terminal run:
+
+npx clerk@latest init
+
+\`npx clerk@latest init\` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.
+
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys. Or copy them from https://dashboard.clerk.com/last-active?path=api-keys. Deploy a production instance by running \`npx clerk@latest deploy\`, or \`npx clerk@latest env pull --instance prod\` to use an existing one.`,
   MissingClerkProvider: `{{source}} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
 });
 

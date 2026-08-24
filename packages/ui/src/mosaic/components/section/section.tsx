@@ -77,7 +77,7 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
       ref={ref}
       id={id}
       render={render ?? (props => <h4 {...props} />)}
-      size='sm'
+      size='base'
       {...mergeStyleProps(themeProps('section-title'), stylex.props(styles.title), className, style)}
       {...rest}
     />
@@ -94,21 +94,6 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
     ref,
     props: {
       ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group), className, style),
-      ...rest,
-    },
-  });
-});
-
-const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow(
-  { render, className, style, ...rest },
-  ref,
-) {
-  return useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(themeProps('section-row'), stylex.props(reset.base, styles.row), className, style),
       ...rest,
     },
   });
@@ -136,6 +121,21 @@ const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function Secti
   return <SectionItemsContext.Provider value>{element}</SectionItemsContext.Provider>;
 });
 
+const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('section-row'), stylex.props(reset.base, styles.row), className, style),
+      ...rest,
+    },
+  });
+});
+
 const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem(
   { render, className, style, ...rest },
   ref,
@@ -149,7 +149,7 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
     props: {
       ...mergeStyleProps(
         themeProps('section-item', { nested }),
-        stylex.props(reset.base, styles.item, nested && styles.nestedItem),
+        stylex.props(reset.base, styles.item),
         className,
         style,
       ),
