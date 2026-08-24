@@ -156,6 +156,7 @@ export function useField<TFormData extends object, Name extends FieldName<TFormD
   const { form, name } = options;
   const field = useMemo(
     () => createField(form, options),
+    // Field options are read at registration; identity is keyed by name.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [form, name],
   );

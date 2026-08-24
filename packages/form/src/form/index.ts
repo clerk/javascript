@@ -72,11 +72,8 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
 
   const fieldInfo = new Map<string, FieldOptions<TFormData, FieldName<TFormData>>>();
   const fields = new Map<string, FieldApi<TFormData, FieldName<TFormData>>>();
-  /**
-   * One unit of in-flight async work, keyed by `${scope}:${slot}` (or
-   * `L:${scope}:${key}` for listeners). `scope` is a field name or `FORM_SCOPE`,
-   * and is what `disposeScope` tears down by.
-   */
+  // Keyed by `${scope}:${slot}`, or `L:${scope}:${key}` for listeners. `scope`
+  // is a field name or `FORM_SCOPE`, and is what `disposeScope` tears down by.
   interface AsyncWork {
     scope: string;
     timer?: ReturnType<typeof setTimeout>;
@@ -237,7 +234,6 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
     pending.clear();
   }
 
-  /** Run `fire` now, or after `debounce`, replacing any pending run for `key`. */
   function debounceWork(key: string, scope: string, debounce: number, fire: () => void): void {
     cancelWork(key);
     if (debounce > 0) {
@@ -247,7 +243,6 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
     }
   }
 
-  /** Publish the validating flag for a scope to whichever store owns it. */
   function setValidating(scope: string, isValidating: boolean): void {
     if (scope === FORM_SCOPE) {
       $formMeta.set({ ...$formMeta.get(), isFormValidating: isValidating });

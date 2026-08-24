@@ -1,9 +1,8 @@
 import type { FieldName, FormApi } from '../types';
 
 /**
- * Array field operations as standalone, tree-shakeable functions (in the
- * nanostores spirit of free functions over stores, e.g. `listenKeys($store)`).
- * Import only the ones you use; the base form does not bundle them.
+ * Array field operations as standalone, tree-shakeable functions. Import only
+ * the ones you use; the base form does not bundle them.
  *
  * Each is built on `form.setFieldValue`, so it triggers the array field's own
  * validation, listeners, and dynamic dependents. Structural operations
