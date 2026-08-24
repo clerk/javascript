@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.30.1
+
+### Patch Changes
+
+- Fix an issue where a verification that was still progressing normally could be cancelled and reported to the user as having timed out. ([#9527](https://github.com/clerk/javascript/pull/9527)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
 ## 4.30.0
 
 ### Minor Changes
