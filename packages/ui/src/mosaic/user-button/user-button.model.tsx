@@ -32,13 +32,13 @@ export type UserButtonModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | (UserButtonData &
-    Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-    UserButtonAsyncCallbacks &
-    UserButtonBrandingProps & {
-      status: 'ready';
-      /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
-      organizationsEnabled: boolean;
-    });
+      Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
+      UserButtonAsyncCallbacks &
+      UserButtonBrandingProps & {
+        status: 'ready';
+        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
+        organizationsEnabled: boolean;
+      });
 
 // Mirrors the `<OrganizationSwitcher>` `afterSelectOrganizationUrl` prop: a full URL/path, a `:token`
 // path template resolved against the organization, or a builder function.
@@ -142,7 +142,10 @@ export function useUserButtonModel(
 ): UserButtonModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
-  const { isLoaded: isOrgLoaded, organization } = useOrganization();
+  // The active org names the trigger. That is not a request to turn Organizations on.
+  const { isLoaded: isOrgLoaded, organization } = useOrganization({
+    __internal_skipAttemptToEnableOrganizations: true,
+  });
   const clerk = useClerk();
   const router = useMosaicRouter();
   // An app can mount the button inside its own dialog or popover; the modal has to portal into that
@@ -216,15 +219,15 @@ export function useUserButtonModel(
   const invitations: UserButtonInvitation[] = invitationData.flatMap(i =>
     i.status === 'pending' || i.status === 'accepted'
       ? [
-        {
-          kind: 'invitation',
-          id: i.id,
-          status: i.status,
-          organizationId: i.publicOrganizationData.id,
-          organizationName: i.publicOrganizationData.name,
-          imageUrl: i.publicOrganizationData.imageUrl || undefined,
-        },
-      ]
+          {
+            kind: 'invitation',
+            id: i.id,
+            status: i.status,
+            organizationId: i.publicOrganizationData.id,
+            organizationName: i.publicOrganizationData.name,
+            imageUrl: i.publicOrganizationData.imageUrl || undefined,
+          },
+        ]
       : [],
   );
 

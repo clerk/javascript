@@ -1,4 +1,5 @@
 import type * as SharedReact from '@clerk/shared/react';
+import { useOrganization } from '@clerk/shared/react';
 import type { CustomPage } from '@clerk/shared/types';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -78,7 +79,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useUser: () => ({ isLoaded: isUserLoaded, user }),
     useSession: () => ({ isLoaded: isSessionLoaded, session }),
-    useOrganization: () => ({ isLoaded: isOrgLoaded, organization }),
+    useOrganization: vi.fn(() => ({ isLoaded: isOrgLoaded, organization })),
     // Stubbed with a sentinel so the assertion is that this exact function reaches Clerk, rather
     // than that some function did.
     usePortalRoot: () => getContainer,
@@ -350,6 +351,13 @@ describe('useUserButtonModel', () => {
     environmentHydrated = true;
     rerender(<Harness />);
     expect(useOrganizationListInView).toHaveBeenCalledWith({ enabled: true });
+  });
+
+  it('does not treat reading the active organization as a request to enable them', () => {
+    render(<Harness />);
+    expect(useOrganization).toHaveBeenCalledWith({
+      __internal_skipAttemptToEnableOrganizations: true,
+    });
   });
 
   it('is hidden when loaded but there is no active user', () => {
