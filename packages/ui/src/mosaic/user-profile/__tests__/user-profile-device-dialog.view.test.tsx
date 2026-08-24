@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
 import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
+import { MosaicProvider } from '../../MosaicProvider';
 import type { UserProfileDeviceDetailsFlowState } from '../dialogs/flow.types';
 import { UserProfileDeviceDialogView } from '../user-profile-device-dialog.view';
 

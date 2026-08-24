@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
 import { AlertDialog } from '../../components/alert-dialog';
+import { MosaicProvider } from '../../MosaicProvider';
 import { UserProfileDeleteAccountDialogView } from '../user-profile-delete-account-dialog.view';
 
 function Harness({ onDelete = vi.fn() }: { onDelete?: () => void }) {

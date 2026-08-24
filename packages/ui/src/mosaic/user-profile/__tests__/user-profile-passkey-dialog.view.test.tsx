@@ -2,9 +2,9 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
 import { AlertDialog } from '../../components/alert-dialog';
 import { Dialog } from '../../components/dialog';
+import { MosaicProvider } from '../../MosaicProvider';
 import {
   UserProfilePasskeyRemoveDialogView,
   UserProfilePasskeyRenameDialogView,

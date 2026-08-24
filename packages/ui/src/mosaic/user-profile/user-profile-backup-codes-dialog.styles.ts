@@ -23,8 +23,8 @@ export const backupCodesDialogStyles = stylex.create({
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
     borderWidth: '1px',
-    backgroundColor: colorVars['--cl-color-card'],
     overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-card'],
   },
   codeRow: {
     display: 'grid',

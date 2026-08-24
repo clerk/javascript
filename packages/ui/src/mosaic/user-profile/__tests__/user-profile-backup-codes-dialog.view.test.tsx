@@ -2,9 +2,9 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
 import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
+import { MosaicProvider } from '../../MosaicProvider';
 import { UserProfileBackupCodesDialogView } from '../user-profile-backup-codes-dialog.view';
 
 const actions = {

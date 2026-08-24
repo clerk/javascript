@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
 import { Dialog } from '../../components/dialog';
+import { MosaicProvider } from '../../MosaicProvider';
 import type { UserProfilePasswordMode, UserProfilePasswordValues } from '../user-profile-password-dialog.view';
 import { UserProfilePasswordDialogView } from '../user-profile-password-dialog.view';
 
