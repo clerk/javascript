@@ -45,6 +45,9 @@ export const popup = stylex.create({
     transitionProperty: 'opacity, scale',
     transitionTimingFunction: 'ease-out',
     maxHeight: 'var(--cl-available-height)',
+    // Capped, or the popup grows to whatever its longest item says and `Menu.Label` never
+    // reaches the width it has to truncate at.
+    maxWidth: 'min(18rem, calc(100vw - 2rem))',
     minWidth: '12.5rem',
     overflowY: 'auto',
   },
