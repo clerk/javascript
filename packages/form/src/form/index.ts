@@ -33,6 +33,9 @@ function freshFormMeta(): FormMetaBase {
   };
 }
 
+/** Scope key for form-level async work. `#` cannot appear in a field path, so it never collides with a field named `form`. */
+const FORM_SCOPE = '#form';
+
 /** Which validator slots run for a given trigger cause. */
 interface Slot {
   sync: keyof FieldValidators<unknown, never>;
@@ -40,29 +43,10 @@ interface Slot {
   debounce?: keyof FieldValidators<unknown, never>;
 }
 
-function fieldSlotsFor(cause: ValidationCause): Slot[] {
+function slotsFor(cause: ValidationCause): Slot[] {
   switch (cause) {
     case 'change':
     case 'dynamic':
-      return [{ sync: 'onChange', async: 'onChangeAsync', debounce: 'onChangeAsyncDebounceMs' }];
-    case 'blur':
-      return [{ sync: 'onBlur', async: 'onBlurAsync', debounce: 'onBlurAsyncDebounceMs' }];
-    case 'mount':
-      return [{ sync: 'onMount' }];
-    case 'submit':
-      return [
-        { sync: 'onChange', async: 'onChangeAsync' },
-        { sync: 'onBlur', async: 'onBlurAsync' },
-        { sync: 'onSubmit', async: 'onSubmitAsync' },
-      ];
-    default:
-      return [];
-  }
-}
-
-function formSlotsFor(cause: ValidationCause): Slot[] {
-  switch (cause) {
-    case 'change':
       return [{ sync: 'onChange', async: 'onChangeAsync', debounce: 'onChangeAsyncDebounceMs' }];
     case 'blur':
       return [{ sync: 'onBlur', async: 'onBlurAsync', debounce: 'onBlurAsyncDebounceMs' }];
@@ -88,12 +72,19 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
 
   const fieldInfo = new Map<string, FieldOptions<TFormData, FieldName<TFormData>>>();
   const fields = new Map<string, FieldApi<TFormData, FieldName<TFormData>>>();
-  // Async bookkeeping, keyed by `${name}:${slot}`.
-  const controllers = new Map<string, AbortController>();
-  const timers = new Map<string, ReturnType<typeof setTimeout>>();
-  const listenerTimers = new Map<string, ReturnType<typeof setTimeout>>();
-  const pending = new Map<string, number>(); // in-flight async validators per field
-  const settlers = new Map<string, () => void>(); // settles the promise of the schedule owning each key
+  /**
+   * One unit of in-flight async work, keyed by `${scope}:${slot}` (or
+   * `L:${scope}:${key}` for listeners). `scope` is a field name or `FORM_SCOPE`,
+   * and is what `disposeScope` tears down by.
+   */
+  interface AsyncWork {
+    scope: string;
+    timer?: ReturnType<typeof setTimeout>;
+    controller?: AbortController;
+    settle?: () => void;
+  }
+  const work = new Map<string, AsyncWork>();
+  const pending = new Map<string, number>(); // in-flight async validators per scope
 
   const $state = computed([$values, $fieldMeta, $formMeta], (values, fieldMetaMap, formMeta): FormState<TFormData> => {
     const fieldMeta: Record<string, FieldMeta> = {};
@@ -205,79 +196,83 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
     $formMeta.set({ ...prev, errorMap });
   }
 
-  function freshController(key: string): AbortController {
-    controllers.get(key)?.abort();
+  function freshController(key: string, scope: string): AbortController {
+    const prev = work.get(key);
+    prev?.controller?.abort();
     const controller = new AbortController();
-    controllers.set(key, controller);
+    work.set(key, { ...prev, scope, controller });
     return controller;
   }
 
   /**
-   * Tears down every async record for one key. The settler runs last so the
-   * schedule it belongs to always releases its pending count and resolves its
-   * promise, even when a timer is cancelled before its task ever runs.
+   * Tears down one unit of async work. `settle` runs last so the schedule it
+   * belongs to always releases its pending count and resolves its promise, even
+   * when a timer is cancelled before its task ever runs.
    */
-  function cancelKey(key: string): void {
-    clearTimeout(timers.get(key));
-    timers.delete(key);
-    clearTimeout(listenerTimers.get(key));
-    listenerTimers.delete(key);
-    controllers.get(key)?.abort();
-    controllers.delete(key);
-    settlers.get(key)?.();
-  }
-
-  function keysFor(prefixes: string[]): string[] {
-    const all = new Set([...timers.keys(), ...listenerTimers.keys(), ...controllers.keys(), ...settlers.keys()]);
-    return [...all].filter(key => prefixes.some(prefix => key.startsWith(prefix)));
-  }
-
-  function disposeField(name: string): void {
-    for (const key of keysFor([`${name}:`, `L:${name}:`])) {
-      cancelKey(key);
+  function cancelWork(key: string): void {
+    const entry = work.get(key);
+    if (!entry) {
+      return;
     }
-    pending.delete(name);
+    work.delete(key);
+    clearTimeout(entry.timer);
+    entry.controller?.abort();
+    entry.settle?.();
+  }
+
+  function disposeScope(scope: string): void {
+    for (const [key, entry] of work) {
+      if (entry.scope === scope) {
+        cancelWork(key);
+      }
+    }
+    pending.delete(scope);
   }
 
   function disposeAll(): void {
-    for (const key of keysFor([''])) {
-      cancelKey(key);
+    for (const key of [...work.keys()]) {
+      cancelWork(key);
     }
-    formPending = 0;
-    timers.clear();
-    listenerTimers.clear();
-    controllers.clear();
-    settlers.clear();
+    work.clear();
     pending.clear();
   }
 
-  function incPending(name: string): void {
-    pending.set(name, (pending.get(name) ?? 0) + 1);
-    patchMeta(name, { isValidating: true });
-  }
-
-  function decPending(name: string): void {
-    const next = (pending.get(name) ?? 1) - 1;
-    pending.set(name, next);
-    if (next <= 0) {
-      patchMeta(name, { isValidating: false });
+  /** Run `fire` now, or after `debounce`, replacing any pending run for `key`. */
+  function debounceWork(key: string, scope: string, debounce: number, fire: () => void): void {
+    cancelWork(key);
+    if (debounce > 0) {
+      work.set(key, { scope, timer: setTimeout(fire, debounce) });
+    } else {
+      fire();
     }
   }
 
-  // Counted rather than a bare flag: form-level slots overlap, so the last one
-  // to finish must be the one that clears `isFormValidating`.
-  let formPending = 0;
-
-  function incFormPending(): void {
-    formPending += 1;
-    $formMeta.set({ ...$formMeta.get(), isFormValidating: true });
+  /** Publish the validating flag for a scope to whichever store owns it. */
+  function setValidating(scope: string, isValidating: boolean): void {
+    if (scope === FORM_SCOPE) {
+      $formMeta.set({ ...$formMeta.get(), isFormValidating: isValidating });
+    } else {
+      patchMeta(scope, { isValidating });
+    }
   }
 
-  function decFormPending(): void {
-    formPending -= 1;
-    if (formPending <= 0) {
-      formPending = 0;
-      $formMeta.set({ ...$formMeta.get(), isFormValidating: false });
+  // Counted, not a bare flag: slots within a scope overlap, so only the last one
+  // to finish may clear the flag.
+  function incPending(scope: string): void {
+    const next = (pending.get(scope) ?? 0) + 1;
+    pending.set(scope, next);
+    if (next === 1) {
+      setValidating(scope, true);
+    }
+  }
+
+  function decPending(scope: string): void {
+    const next = (pending.get(scope) ?? 1) - 1;
+    if (next <= 0) {
+      pending.delete(scope);
+      setValidating(scope, false);
+    } else {
+      pending.set(scope, next);
     }
   }
 
@@ -294,12 +289,12 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
     const promises: Promise<void>[] = [];
     const noDebounce = cause === 'submit' || cause === 'mount';
 
-    for (const slot of fieldSlotsFor(cause)) {
+    for (const slot of slotsFor(cause)) {
       const record = validators as Record<string, unknown>;
       const syncValidator = record[slot.sync];
       if (syncValidator) {
         const key = `${name}:${slot.sync}`;
-        const controller = freshController(key);
+        const controller = freshController(key, name);
         const ctx = {
           value: getFieldValue(name),
           fieldApi: getField(name),
@@ -342,8 +337,8 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
 
   function scheduleAsync(name: string, slot: string, validator: unknown, debounceMs: number): Promise<void> {
     const key = `${name}:${slot}`;
-    cancelKey(key);
-    const controller = freshController(key);
+    cancelWork(key);
+    const controller = new AbortController();
     incPending(name);
     return new Promise<void>(resolve => {
       let settled = false;
@@ -352,11 +347,11 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
           return;
         }
         settled = true;
-        settlers.delete(key);
         decPending(name);
         resolve();
       };
-      settlers.set(key, settle);
+      const entry: AsyncWork = { scope: name, controller, settle };
+      work.set(key, entry);
       const run = () =>
         void task(async () => {
           try {
@@ -374,7 +369,7 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
           }
         });
       if (debounceMs > 0) {
-        timers.set(key, setTimeout(run, debounceMs));
+        entry.timer = setTimeout(run, debounceMs);
       } else {
         run();
       }
@@ -402,27 +397,28 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
 
   function validateForm(cause: ValidationCause): Promise<void> {
     const validators = options.validators;
-    if (!validators) {
+    // `dynamic` re-runs a dependent field only; the form has nothing extra to do.
+    if (!validators || cause === 'dynamic') {
       return Promise.resolve();
     }
 
     const promises: Promise<void>[] = [];
     const noDebounce = cause === 'submit' || cause === 'mount';
 
-    for (const slot of formSlotsFor(cause)) {
+    for (const slot of slotsFor(cause)) {
       const record = validators as Record<string, unknown>;
       const syncValidator = record[slot.sync];
       if (syncValidator) {
         const ctx = { value: $values.get(), formApi: api, signal: new AbortController().signal };
         const result = runFormValidator(syncValidator as never, ctx);
         if (result instanceof Promise) {
-          incFormPending();
+          incPending(FORM_SCOPE);
           promises.push(
             (async () => {
               try {
                 applyFormErrors(slot.sync, await result);
               } finally {
-                decFormPending();
+                decPending(FORM_SCOPE);
               }
             })(),
           );
@@ -447,10 +443,10 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
   }
 
   function scheduleFormAsync(slot: string, validator: unknown, debounceMs: number): Promise<void> {
-    const key = `form:${slot}`;
-    cancelKey(key);
-    const controller = freshController(key);
-    incFormPending();
+    const key = `${FORM_SCOPE}:${slot}`;
+    cancelWork(key);
+    const controller = new AbortController();
+    incPending(FORM_SCOPE);
     return new Promise<void>(resolve => {
       let settled = false;
       const settle = () => {
@@ -458,11 +454,11 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
           return;
         }
         settled = true;
-        settlers.delete(key);
-        decFormPending();
+        decPending(FORM_SCOPE);
         resolve();
       };
-      settlers.set(key, settle);
+      const entry: AsyncWork = { scope: FORM_SCOPE, controller, settle };
+      work.set(key, entry);
       const run = () =>
         void task(async () => {
           try {
@@ -476,7 +472,7 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
           }
         });
       if (debounceMs > 0) {
-        timers.set(key, setTimeout(run, debounceMs));
+        entry.timer = setTimeout(run, debounceMs);
       } else {
         run();
       }
@@ -497,19 +493,12 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
     if (!listener) {
       return;
     }
-    const debounce = listeners?.[debounceKey] ?? 0;
-    const tkey = `L:${name}:${key}`;
-    clearTimeout(listenerTimers.get(tkey));
     const fire = () =>
       (listener as (ctx: { value: unknown; fieldApi: FieldApi<TFormData, FieldName<TFormData>> }) => void)({
         value: getFieldValue(name),
         fieldApi: getField(name),
       });
-    if (debounce > 0) {
-      listenerTimers.set(tkey, setTimeout(fire, debounce));
-    } else {
-      fire();
-    }
+    debounceWork(`L:${name}:${key}`, name, listeners?.[debounceKey] ?? 0, fire);
   }
 
   function runFormListener(key: 'onChange', debounceKey: 'onChangeDebounceMs'): void {
@@ -517,15 +506,8 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
     if (!listener) {
       return;
     }
-    const debounce = options.listeners?.[debounceKey] ?? 0;
-    const tkey = `L:form:${key}`;
-    clearTimeout(listenerTimers.get(tkey));
     const fire = () => listener({ formApi: api });
-    if (debounce > 0) {
-      listenerTimers.set(tkey, setTimeout(fire, debounce));
-    } else {
-      fire();
-    }
+    debounceWork(`L:${FORM_SCOPE}:${key}`, FORM_SCOPE, options.listeners?.[debounceKey] ?? 0, fire);
   }
 
   function triggerDynamic(sourceName: string): void {
@@ -653,7 +635,7 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
     deleteField(name) {
       // Dispose before dropping the meta: settling a pending validator calls
       // `decPending`, which would otherwise re-create the entry we just removed.
-      disposeField(name);
+      disposeScope(name);
       // `setPath(..., undefined)` removes the key (object) or splices it (array).
       setRawValue(name, undefined);
       const current = $fieldMeta.get();
@@ -689,7 +671,7 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
       void validateField(name, 'mount');
       fieldInfo.get(name)?.listeners?.onMount?.({ fieldApi: getField(name) as never });
       return () => {
-        disposeField(name);
+        disposeScope(name);
       };
     },
     _handleBlur(name) {
