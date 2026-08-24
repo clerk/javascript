@@ -268,9 +268,50 @@ describe('createForm async bookkeeping', () => {
       defaultValues: { email: '' },
       validators: { onSubmit: () => Promise.reject(new Error('boom')) },
     });
-    await expect(form.handleSubmit()).rejects.toThrow('boom');
+    await form.handleSubmit();
     await allTasks();
     expect(form.state.isValidating).toBe(false);
+  });
+
+  it('records a rejected async field validator as a field error', async () => {
+    const form = createForm({ defaultValues: { email: '' } });
+    createField(form, {
+      name: 'email',
+      validators: { onChangeAsync: () => Promise.reject(new Error('network down')) },
+    });
+    form.setFieldValue('email', 'a');
+    await allTasks();
+    expect(form.state.fieldMeta.email.errors).toContain('network down');
+    expect(form.state.isValidating).toBe(false);
+  });
+
+  it('records a field validator that throws synchronously as a field error', async () => {
+    const form = createForm({ defaultValues: { email: '' } });
+    createField(form, {
+      name: 'email',
+      validators: {
+        onChange: () => {
+          throw new Error('bad validator');
+        },
+      },
+    });
+    form.setFieldValue('email', 'a');
+    await allTasks();
+    expect(form.state.fieldMeta.email.errors).toContain('bad validator');
+  });
+
+  it('records a rejected form validator as a form error and blocks submit', async () => {
+    const onSubmit = vi.fn();
+    const form = createForm({
+      defaultValues: { email: 'a@b.c' },
+      validators: { onSubmit: () => Promise.reject(new Error('boom')) },
+      onSubmit,
+    });
+    await form.handleSubmit();
+    await allTasks();
+    expect(form.state.errors).toContain('boom');
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(form.state.isSubmitting).toBe(false);
   });
 
   it('does not recreate field meta when a pending validator settles after deleteField', async () => {

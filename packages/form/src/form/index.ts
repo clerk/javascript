@@ -33,6 +33,14 @@ function freshFormMeta(): FormMetaBase {
   };
 }
 
+/**
+ * A validator that throws is not evidence the value is valid, so the throw is
+ * recorded as an error on the slot that produced it rather than propagated.
+ */
+function thrownError(error: unknown): string[] {
+  return [error instanceof Error ? error.message : String(error)];
+}
+
 /** Scope key for form-level async work. `#` cannot appear in a field path, so it never collides with a field named `form`. */
 const FORM_SCOPE = '#form';
 
@@ -295,15 +303,26 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
           fieldApi: getField(name),
           signal: controller.signal,
         } as FieldValidatorContext<TFormData, FieldName<TFormData>>;
-        const result = runFieldValidator(syncValidator as never, ctx);
+        let result: string[] | Promise<string[]>;
+        try {
+          result = runFieldValidator(syncValidator as never, ctx);
+        } catch (error) {
+          setSlotErrors(name, slot.sync, thrownError(error));
+          continue;
+        }
         if (result instanceof Promise) {
+          const pendingResult = result;
           incPending(name);
           promises.push(
             task(async () => {
               try {
-                const errors = await result;
+                const errors = await pendingResult;
                 if (!controller.signal.aborted) {
                   setSlotErrors(name, slot.sync, errors);
+                }
+              } catch (error) {
+                if (!controller.signal.aborted) {
+                  setSlotErrors(name, slot.sync, thrownError(error));
                 }
               } finally {
                 decPending(name);
@@ -359,6 +378,10 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
             if (!controller.signal.aborted) {
               setSlotErrors(name, slot, errors);
             }
+          } catch (error) {
+            if (!controller.signal.aborted) {
+              setSlotErrors(name, slot, thrownError(error));
+            }
           } finally {
             settle();
           }
@@ -405,13 +428,22 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
       const syncValidator = record[slot.sync];
       if (syncValidator) {
         const ctx = { value: $values.get(), formApi: api, signal: new AbortController().signal };
-        const result = runFormValidator(syncValidator as never, ctx);
+        let result: FormErrors | Promise<FormErrors>;
+        try {
+          result = runFormValidator(syncValidator as never, ctx);
+        } catch (error) {
+          applyFormErrors(slot.sync, { form: thrownError(error), fields: {} });
+          continue;
+        }
         if (result instanceof Promise) {
+          const pendingResult = result;
           incPending(FORM_SCOPE);
           promises.push(
             (async () => {
               try {
-                applyFormErrors(slot.sync, await result);
+                applyFormErrors(slot.sync, await pendingResult);
+              } catch (error) {
+                applyFormErrors(slot.sync, { form: thrownError(error), fields: {} });
               } finally {
                 decPending(FORM_SCOPE);
               }
@@ -461,6 +493,10 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
             const errors = await runFormValidator(validator as never, ctx);
             if (!controller.signal.aborted) {
               applyFormErrors(slot, errors);
+            }
+          } catch (error) {
+            if (!controller.signal.aborted) {
+              applyFormErrors(slot, { form: thrownError(error), fields: {} });
             }
           } finally {
             settle();
@@ -572,13 +608,20 @@ export function createForm<TFormData extends object>(options: FormOptions<TFormD
         isSubmitSuccessful: false,
         submissionAttempts: start.submissionAttempts + 1,
       });
-      for (const name of fieldInfo.keys()) {
-        patchMeta(name, { isTouched: true });
+      try {
+        for (const name of fieldInfo.keys()) {
+          patchMeta(name, { isTouched: true });
+        }
+        await Promise.all([...fieldInfo.keys()].map(name => validateField(name, 'submit')));
+        await validateForm('submit');
+        await allTasks();
+      } catch (error) {
+        // Validator throws are recorded as errors, so reaching here means user
+        // code outside a validator failed (a store subscriber, say). Release the
+        // submit lock before rethrowing, or `canSubmit` stays false forever.
+        $formMeta.set({ ...$formMeta.get(), isSubmitting: false, isSubmitted: true, isSubmitSuccessful: false });
+        throw error;
       }
-
-      await Promise.all([...fieldInfo.keys()].map(name => validateField(name, 'submit')));
-      await validateForm('submit');
-      await allTasks();
 
       const state = $state.get();
       const value = $values.get();
