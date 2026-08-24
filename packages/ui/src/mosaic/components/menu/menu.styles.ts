@@ -106,6 +106,14 @@ export const styles = stylex.create({
     width: space['6'],
   },
 
+  // The item lays its children out in one flat row, so the label is what has to take the space
+  // between the media and whatever trails it, rather than the row spacing the three evenly.
+  // `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
+  label: {
+    flexGrow: 1,
+    minWidth: 0,
+  },
+
   separator: {
     // Full-bleed across the popup: cancel the popup's inline padding.
     marginBlock: space['0.5'],

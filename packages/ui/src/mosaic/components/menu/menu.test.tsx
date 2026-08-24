@@ -212,6 +212,24 @@ describe('Mosaic Menu', () => {
     expect(ref.current).toHaveClass('cl-menu-media');
   });
 
+  it('renders the label as a span inside the item, and names it', () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Content>
+          <Menu.Item label='colin@clerk.dev'>
+            <Menu.Media />
+            <Menu.Label>colin@clerk.dev</Menu.Label>
+          </Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    const label = screen.getByRole('menuitem', { name: 'colin@clerk.dev' }).querySelector('.cl-menu-label');
+    expect(label?.tagName).toBe('SPAN');
+    expect(label).toHaveTextContent('colin@clerk.dev');
+  });
+
   it('forwards the trigger ref', () => {
     const ref = React.createRef<HTMLButtonElement>();
     render(

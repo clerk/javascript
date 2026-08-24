@@ -41,13 +41,6 @@ export const styles = stylex.create({
     maxHeight: '18rem',
   },
 
-  // A menu item lays its children out in one flat row, so the account's identifier is what has to
-  // take the space between its avatar and the check rather than the menu spacing the three evenly.
-  accountName: {
-    flexGrow: 1,
-    minWidth: 0,
-  },
-
   // The trailing column is as wide as the `⋯` menu button that owns it, so whatever stands in
   // that button's place — the active check, a spinner — lands on the same centre line and the
   // right edge of every row holds still as rows change state.

@@ -15,6 +15,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { reset } from '../reset.styles';
+import { truncationStyles } from '../typography.styles';
 import { styles } from './menu.styles';
 
 export type { MenuProps, MenuSeparatorProps };
@@ -128,6 +129,34 @@ export const MenuMedia = React.forwardRef<HTMLSpanElement, MenuMediaProps>(funct
   });
 });
 
+/** `span`, not `div`: the item this sits in is a button, so its children are phrasing content. */
+export type MenuLabelProps = MosaicComponentProps<'span'>;
+
+/**
+ * The item's text. Takes the space between the media and whatever trails it, and truncates to one
+ * line rather than pushing the menu wide. Items whose text is a name — an account, a workspace —
+ * need it; a fixed action label ("Sign out") can be a plain child.
+ */
+export const MenuLabel = React.forwardRef<HTMLSpanElement, MenuLabelProps>(function MosaicMenuLabel(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('menu-label'),
+        stylex.props(reset.base, styles.label, truncationStyles.singleLine),
+        className,
+        style,
+      ),
+      ...rest,
+    },
+  });
+});
+
 /** A full-bleed divider between groups of items. */
 export function MenuSeparator({ className, style, ...rest }: MenuSeparatorProps): React.ReactElement {
   return (
@@ -146,5 +175,6 @@ export const Menu = {
   Content: MenuContent,
   Item: MenuItem,
   Media: MenuMedia,
+  Label: MenuLabel,
   Separator: MenuSeparator,
 };

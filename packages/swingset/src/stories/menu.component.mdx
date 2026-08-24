@@ -90,9 +90,15 @@ that row keeps the column. It renders a `span`, since the item it sits in is a b
   <Menu.Media>
     <Avatar.Root size='fit'>…</Avatar.Root>
   </Menu.Media>
-  colin@clerk.dev
+  <Menu.Label>colin@clerk.dev</Menu.Label>
 </Menu.Item>
 ```
+
+### Label
+
+`Menu.Label` takes the space between the media and whatever trails it, and truncates its text to one
+line. Items whose text is a name — an account, a workspace — need it, or a long name widens the menu
+instead of ellipsing. A fixed action label (`Sign out`) can stay a plain child.
 
 ### Placement
 
@@ -130,6 +136,7 @@ const [open, setOpen] = useState(false);
 | `Menu.Content`   | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                    |
 | `Menu.Item`      | `menu-item`                      | A single action whose content is composed through children.           |
 | `Menu.Media`     | `menu-media`                     | Square leading column that centers an item's icon, image, or avatar.  |
+| `Menu.Label`     | `menu-label`                     | The item's text. Fills the row between media and trailing marks.      |
 | `Menu.Separator` | `menu-separator`                 | Full-bleed divider between groups of items.                           |
 
 ## Styling

@@ -708,7 +708,7 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
           size='fit'
         />
       </Menu.Media>
-      <span {...stylex.props(styles.accountName, truncationStyles.singleLine)}>{session.identifier}</span>
+      <Menu.Label>{session.identifier}</Menu.Label>
       {active ? (
         <Icon
           name='check'
@@ -791,7 +791,7 @@ function SwitchAccountRow() {
                 size='sm'
               />
             </Menu.Media>
-            {m.accounts.add}
+            <Menu.Label>{m.accounts.add}</Menu.Label>
           </Menu.Item>
         ) : null}
       </Menu.Content>

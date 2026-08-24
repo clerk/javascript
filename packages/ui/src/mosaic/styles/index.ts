@@ -68,6 +68,7 @@ export { Menu } from '../components/menu';
 export type {
   MenuContentProps,
   MenuItemProps,
+  MenuLabelProps,
   MenuMediaProps,
   MenuProps,
   MenuSeparatorProps,
