@@ -3,11 +3,12 @@ type WaitForServerArgsType = {
   delayInMs?: number;
   maxAttempts?: number;
   shouldExit?: () => boolean;
+  acceptAnyResponse?: boolean;
 };
 
 // Poll a url until it returns a 200 status code
 export const waitForServer = async (url: string, opts: WaitForServerArgsType) => {
-  const { log, delayInMs = 1000, maxAttempts = 20, shouldExit = () => false } = opts;
+  const { log, delayInMs = 1000, maxAttempts = 20, shouldExit = () => false, acceptAnyResponse = false } = opts;
   let attempts = 0;
   while (attempts < maxAttempts) {
     if (shouldExit()) {
@@ -17,7 +18,7 @@ export const waitForServer = async (url: string, opts: WaitForServerArgsType) =>
     try {
       log(`Polling ${url}...`);
       const res = await fetch(url);
-      if (res.ok) {
+      if (res.ok || acceptAnyResponse) {
         return Promise.resolve();
       }
     } catch {

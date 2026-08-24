@@ -1,6 +1,6 @@
-/** @jsxImportSource @emotion/react */
 import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
+import { Icon } from '@clerk/ui/mosaic/components/icon';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -17,7 +17,7 @@ export const meta: StoryMeta = {
   styles: {
     _variants: {
       shape: { circle: {}, square: {} },
-      size: { lg: {}, md: {}, sm: {}, xs: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {}, xl: {} },
     },
     _defaultVariants: {
       shape: 'circle',
@@ -33,6 +33,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 }
 
 const IMAGE_SRC = 'https://github.com/clerk.png';
+const COLIN_IMAGE_SRC = 'https://avatars.githubusercontent.com/u/51144033?v=4';
 
 export function Primary(props: Record<string, unknown>) {
   return (
@@ -70,10 +71,34 @@ export function Fallback(props: Record<string, unknown>) {
   );
 }
 
+export function Interactive(props: Record<string, unknown>) {
+  return (
+    <Avatar.Root
+      {...knobsAsProps(props)}
+      size='xl'
+      render={
+        <button
+          type='button'
+          aria-label='Edit profile picture'
+        />
+      }
+    >
+      <Avatar.Image
+        src={COLIN_IMAGE_SRC}
+        alt='Colin'
+      />
+      <Avatar.Fallback>CL</Avatar.Fallback>
+      <Avatar.Icon>
+        <Icon name='pen' />
+      </Avatar.Icon>
+    </Avatar.Root>
+  );
+}
+
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(size => (
         <Avatar.Root
           key={size}
           {...knobsAsProps(props)}

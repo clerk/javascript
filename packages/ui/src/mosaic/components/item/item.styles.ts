@@ -95,12 +95,23 @@ export const content = stylex.create({
   },
 });
 
-export const title = stylex.create({
+export const label = stylex.create({
   base: {
+    fontWeight: fontWeightVars['--cl-font-medium'],
+  },
+
+  primary: {
     color: colorVars['--cl-color-neutral'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+  },
+  // Declares no color, so `reset`'s `inherit` stands and the row's own color reaches it. That is
+  // what carries it through the hover promotion on an interactive row, which a fixed color would
+  // freeze. It has to stay undeclared here rather than restated: StyleX resolves a property to the
+  // last style that declares it, so `base` cannot hold a color either.
+  secondary: {
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
 });
 
@@ -109,14 +120,6 @@ export const description = stylex.create({
     color: colorVars['--cl-color-neutral-faded'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-normal'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-  },
-});
-
-export const label = stylex.create({
-  base: {
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
 });

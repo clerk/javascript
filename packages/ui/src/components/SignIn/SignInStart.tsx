@@ -60,10 +60,12 @@ const useAutoFillPasskey = () => {
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const { userSettings } = useEnvironment();
   const { passkeySettings, attributes } = userSettings;
+  // @ts-expect-error - This is not a public API
+  const { __internal_isWebAuthnAutofillSupported } = useClerk();
 
   useEffect(() => {
     async function runAutofillPasskey() {
-      const _isSupported = await isWebAuthnAutofillSupported();
+      const _isSupported = await (__internal_isWebAuthnAutofillSupported ?? isWebAuthnAutofillSupported)();
       setIsSupported(_isSupported);
       if (!_isSupported) {
         return;
@@ -105,7 +107,9 @@ function SignInStartInternal(): JSX.Element {
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const onSecondFactor = () => navigate('factor-two');
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
-  const isWebSupported = isWebAuthnSupported();
+  // @ts-expect-error - This is not a public API
+  const { __internal_isWebAuthnSupported } = clerk;
+  const isWebSupported = (__internal_isWebAuthnSupported ?? isWebAuthnSupported)();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);

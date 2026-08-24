@@ -13,6 +13,7 @@ import { Icon } from './icon';
 import { Input } from './input';
 import { Item } from './item';
 import { reset } from './reset.styles';
+import { Section } from './section';
 import { Text } from './text';
 
 // StyleX generates the same atom for the same property+value across separate `create` calls, so a
@@ -60,6 +61,17 @@ const cases: Array<[string, React.ReactElement]> = [
   ['Item', <Item.Root key='item' />],
   ['Item.Group', <Item.Group key='item-group' />],
   ['Item.Separator', <Item.Separator key='item-separator' />],
+  ['Section', <Section.Root key='section' />],
+  ['Section.Title', <Section.Title key='section-title'>Account</Section.Title>],
+  ['Section.Group', <Section.Group key='section-group' />],
+  ['Section.Row', <Section.Row key='section-row' />],
+  ['Section.Items', <Section.Items key='section-items' />],
+  ['Section.Item', <Section.Item key='section-item' />],
+  ['Section.Media', <Section.Media key='section-media' />],
+  ['Section.Content', <Section.Content key='section-content' />],
+  ['Section.Label', <Section.Label key='section-label' />],
+  ['Section.Description', <Section.Description key='section-description' />],
+  ['Section.Actions', <Section.Actions key='section-actions' />],
   ['Text', <Text key='text'>Body copy</Text>],
 ];
 

@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
@@ -32,7 +31,7 @@ export function Default() {
         </Avatar.Root>
       </Item.Media>
       <Item.Content>
-        <Item.Title>Test Organization</Item.Title>
+        <Item.Label>Test Organization</Item.Label>
         <Item.Description>Member</Item.Description>
       </Item.Content>
       <Item.Actions>
@@ -68,7 +67,7 @@ export function Interactive() {
         </Avatar.Root>
       </Item.Media>
       <Item.Content>
-        <Item.Title>Test Organization</Item.Title>
+        <Item.Label>Test Organization</Item.Label>
         <Item.Description>Member</Item.Description>
       </Item.Content>
     </Item.Root>
@@ -92,7 +91,7 @@ export function Sizes() {
             </Avatar.Root>
           </Item.Media>
           <Item.Content>
-            <Item.Title>Test Organization</Item.Title>
+            <Item.Label>Test Organization</Item.Label>
           </Item.Content>
         </Item.Root>
       ))}
@@ -114,7 +113,7 @@ export function Group() {
             </Avatar.Root>
           </Item.Media>
           <Item.Content>
-            <Item.Title>Cameron Walker</Item.Title>
+            <Item.Label>Cameron Walker</Item.Label>
             <Item.Description>cameron@clerk.com</Item.Description>
           </Item.Content>
           <Item.Actions>
@@ -158,7 +157,7 @@ export function Group() {
             </Avatar.Root>
           </Item.Media>
           <Item.Content>
-            <Item.Title>Clerk</Item.Title>
+            <Item.Label>Clerk</Item.Label>
           </Item.Content>
           <Icon
             name='check'
@@ -189,7 +188,7 @@ export function Group() {
             </Avatar.Root>
           </Item.Media>
           <Item.Content>
-            <Item.Title>Clerk</Item.Title>
+            <Item.Label>Clerk</Item.Label>
           </Item.Content>
         </Item.Root>
       </Item.Group>
@@ -215,7 +214,7 @@ export function Group() {
             </Avatar.Root>
           </Item.Media>
           <Item.Content>
-            <Item.Title>DesignCloud</Item.Title>
+            <Item.Label>DesignCloud</Item.Label>
           </Item.Content>
         </Item.Root>
       </Item.Group>
@@ -239,7 +238,7 @@ export function Group() {
             />
           </Item.Media>
           <Item.Content>
-            <Item.Label>Add account</Item.Label>
+            <Item.Label variant='secondary'>Add account</Item.Label>
           </Item.Content>
         </Item.Root>
         <Item.Root
@@ -260,7 +259,7 @@ export function Group() {
             />
           </Item.Media>
           <Item.Content>
-            <Item.Label>Sign out of all accounts</Item.Label>
+            <Item.Label variant='secondary'>Sign out of all accounts</Item.Label>
           </Item.Content>
         </Item.Root>
       </Item.Group>
@@ -324,7 +323,7 @@ export function Scrolling() {
               </Avatar.Root>
             </Item.Media>
             <Item.Content>
-              <Item.Title>{name}</Item.Title>
+              <Item.Label>{name}</Item.Label>
             </Item.Content>
           </Item.Root>
         ))}

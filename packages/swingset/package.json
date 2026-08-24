@@ -1,6 +1,6 @@
 {
   "name": "@clerk/swingset",
-  "version": "0.0.33",
+  "version": "0.0.38",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,6 @@
     "@base-ui/react": "^1.5.0",
     "@clerk/headless": "workspace:*",
     "@clerk/ui": "workspace:*",
-    "@emotion/react": "^11.11.1",
     "@stylexjs/stylex": "0.19.0",
     "@tailwindcss/typography": "^0.5.19",
     "class-variance-authority": "^0.7.1",

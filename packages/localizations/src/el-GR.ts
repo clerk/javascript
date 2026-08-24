@@ -1765,6 +1765,7 @@ export const elGR: LocalizationResource = {
     form_password_incorrect: 'Ο κωδικός πρόσβασης δεν είναι σωστός.',
     form_password_length_too_short:
       'Ο κωδικός πρόσβασής σας πρέπει να αποτελείται από τουλάχιστον {{length}} χαρακτήρες.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Ο κωδικός πρόσβασής σας δεν είναι αρκετά ισχυρός.',
     form_password_or_identifier_incorrect:
       'Ο κωδικός πρόσβασης ή η διεύθυνση email είναι λανθασμένη. Δοκιμάστε ξανά ή χρησιμοποιήστε άλλη μέθοδο.',
