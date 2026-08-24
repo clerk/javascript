@@ -73,6 +73,20 @@ describe('isomorphicClerk', () => {
     expect(isomorphicClerk.__internal_moduleManager).toBe(mm);
   });
 
+  it('exposes the inner clerk-js Protect challenge load timeout', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    expect(isomorphicClerk.__internal_protectChallengeLoadTimeoutMs).toBeUndefined();
+
+    const innerClerk: any = {
+      addListener: vi.fn(),
+      __internal_protectChallengeLoadTimeoutMs: 25_000,
+    };
+    (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
+
+    expect(isomorphicClerk.__internal_protectChallengeLoadTimeoutMs).toBe(25_000);
+  });
+
   it('updates props asynchronously after clerkjs has loaded', async () => {
     const propsHistory: any[] = [];
     const dummyClerkJS = {
