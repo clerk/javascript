@@ -387,6 +387,11 @@ export interface SignInFutureResource {
   readonly identifier: string | null;
 
   /**
+   * The timezone associated with the current sign-in, or `null` if not set.
+   */
+  readonly timezone: string | null;
+
+  /**
    * The ID of the session that was created upon completion of the current sign-in. The value of this property is `null` if the sign-in status is not `'complete'`.
    */
   readonly createdSessionId: string | null;

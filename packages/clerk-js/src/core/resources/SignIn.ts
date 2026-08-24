@@ -816,6 +816,10 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.identifier;
   }
 
+  get timezone() {
+    return this.#resource.timezone;
+  }
+
   get createdSessionId() {
     return this.#resource.createdSessionId;
   }
