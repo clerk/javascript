@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "4.29.3",
+  "version": "4.30.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
