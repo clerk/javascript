@@ -41,6 +41,20 @@ describe('SignIn', () => {
     expect(snapshot).toBeDefined();
   });
 
+  it('keeps a null timezone across JSON, resource, and snapshot representations', () => {
+    const signIn = new SignIn({ timezone: null } as any);
+
+    expect(signIn.timezone).toBeNull();
+    expect(signIn.__internal_toSnapshot().timezone).toBeNull();
+  });
+
+  it('defaults a missing timezone from an older snapshot to null', () => {
+    const signIn = new SignIn({ id: 'signin_123' } as any);
+
+    expect(signIn.timezone).toBeNull();
+    expect(signIn.__internal_toSnapshot().timezone).toBeNull();
+  });
+
   describe('prepareSecondFactor', () => {
     afterEach(() => {
       vi.clearAllMocks();
@@ -429,9 +443,7 @@ describe('SignIn', () => {
 
       await signIn.create({ identifier: 'user@example.com' });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.objectContaining({ body: expect.not.objectContaining({ timezone: expect.anything() }) }),
-      );
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
     });
 
     it('preserves an explicitly supplied timezone when creating a sign-in', async () => {
@@ -469,9 +481,7 @@ describe('SignIn', () => {
 
       await signIn.prepareFirstFactor({ strategy: 'email_code', emailAddressId: 'email_123' });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.objectContaining({ body: expect.not.objectContaining({ timezone: expect.anything() }) }),
-      );
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
     });
 
     it('includes captcha params when signUpIfMissing is true', async () => {
@@ -572,6 +582,12 @@ describe('SignIn', () => {
       const signIn = new SignIn();
       const snapshot = JSON.stringify(signIn.__internal_future);
       expect(snapshot).toBeDefined();
+    });
+
+    it('exposes the sign-in timezone', () => {
+      const signIn = new SignIn({ timezone: 'America/New_York' } as any);
+
+      expect(signIn.__internal_future.timezone).toBe('America/New_York');
     });
 
     describe('selectFirstFactor', () => {
@@ -714,6 +730,21 @@ describe('SignIn', () => {
             identifier: 'user@example.com',
           },
         });
+      });
+
+      it('includes the detected timezone when creating a sign-in', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        await new SignIn().__internal_future.create({ identifier: 'user@example.com' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
       it('returns error property on success', async () => {
@@ -958,6 +989,22 @@ describe('SignIn', () => {
             locale: 'de-DE',
           },
         });
+      });
+
+      it('omits timezone when continuing an existing sign-in', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor', identifier: 'user@example.com' },
+        });
+        BaseResource._fetch = mockFetch;
+        const signIn = new SignIn({ id: 'signin_123', identifier: 'user@example.com' } as any);
+
+        await signIn.__internal_future.password({ password: 'password123' });
+
+        expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
       });
 
       it('uses previous identifier when no identifier parameter is provided', async () => {
