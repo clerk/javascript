@@ -42,6 +42,20 @@ describe('SignUp', () => {
     expect(snapshot).toBeDefined();
   });
 
+  it('keeps a null timezone across JSON, resource, and snapshot representations', () => {
+    const signUp = new SignUp({ timezone: null } as any);
+
+    expect(signUp.timezone).toBeNull();
+    expect(signUp.__internal_toSnapshot().timezone).toBeNull();
+  });
+
+  it('defaults a missing timezone from an older snapshot to null', () => {
+    const signUp = new SignUp({ id: 'signup_123' } as any);
+
+    expect(signUp.timezone).toBeNull();
+    expect(signUp.__internal_toSnapshot().timezone).toBeNull();
+  });
+
   describe('prepareVerification', () => {
     afterEach(() => {
       vi.clearAllMocks();
@@ -267,9 +281,7 @@ describe('SignUp', () => {
 
       await new SignUp().create({ emailAddress: 'user@example.com' });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.objectContaining({ body: expect.not.objectContaining({ timezone: expect.anything() }) }),
-      );
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
     });
 
     it('preserves an explicitly supplied timezone when creating a sign-up', async () => {
@@ -301,9 +313,7 @@ describe('SignUp', () => {
 
       await new SignUp({ id: 'signup_123' } as any).update({ firstName: 'Ada' });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.objectContaining({ body: expect.not.objectContaining({ timezone: expect.anything() }) }),
-      );
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
     });
 
     it.each([
@@ -466,6 +476,21 @@ describe('SignUp', () => {
             }),
           }),
         );
+      });
+
+      it('includes the detected timezone when creating a sign-up', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        await new SignUp().__internal_future.create({ emailAddress: 'user@example.com' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
       it('returns error property on success', async () => {
@@ -644,6 +669,22 @@ describe('SignUp', () => {
             }),
           }),
         );
+      });
+
+      it('omits timezone when updating an existing sign-up', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', first_name: 'Ada' },
+        });
+        BaseResource._fetch = mockFetch;
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+
+        await signUp.__internal_future.update({ firstName: 'Ada' });
+
+        expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
       });
     });
 
