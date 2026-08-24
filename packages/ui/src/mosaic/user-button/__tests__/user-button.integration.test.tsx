@@ -9,8 +9,8 @@ import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
 
 // End-to-end wiring test for the connected UserButton: it renders the real view through the real
-// controller against a mocked Clerk, then drives the real popover DOM. Unlike the controller test
-// (controller -> Clerk), this proves the layers compose, including what closes the popover:
+// model and controller against a mocked Clerk, then drives the real popover DOM. Unlike the model
+// test (model -> Clerk), this proves the layers compose, including what closes the popover:
 // selecting a workspace closes on success in the machine, and anything that opens a modal or
 // navigates closes before it hands off.
 
@@ -308,7 +308,7 @@ describe('UserButton (connected)', () => {
 
     await act.click(screen.getByRole('button', { name: 'bob@example.com' }));
 
-    expect(setActive).toHaveBeenCalledWith({ session: 'sess_2', redirectUrl: '/after-switch' });
+    expect(setActive).toHaveBeenCalledWith({ session: 'sess_2', navigate: expect.any(Function) });
     await waitFor(() => expect(spinner()).toBeNull());
     expect(popup()).toBeInTheDocument();
   });

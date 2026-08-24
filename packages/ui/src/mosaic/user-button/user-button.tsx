@@ -2,16 +2,14 @@
 
 import type { ReactElement, ReactNode } from 'react';
 
-import { useSpinDelay } from '../hooks/useSpinDelay';
-import { useMachine } from '../machine/useMachine';
-import type { UserButtonControllerOptions } from './user-button.controller';
 import { useUserButtonController } from './user-button.controller';
-import { userButtonMachine } from './user-button.machine';
+import type { UserButtonModelOptions } from './user-button.model';
+import { useUserButtonModel } from './user-button.model';
 import type { CustomProfileItem, UserProfilePageId } from './user-button.pages';
 import { useCustomPages, useUserProfilePages } from './user-button.pages';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonTriggerProps } from './user-button.view';
-import { userButtonBusyKeys, UserButtonView } from './user-button.view';
+import { UserButtonView } from './user-button.view';
 
 /** Configures the UserProfile this button opens. */
 export interface UserButtonUserProfileProps {
@@ -25,22 +23,18 @@ export interface UserButtonUserProfileProps {
   pageOrder?: (UserProfilePageId | (string & {}))[];
 }
 
-/**
- * Everything `<UserButton />` takes: where its profile surfaces open (`UserButtonControllerOptions`),
- * what the trigger shows (`UserButtonTriggerProps`), the app's own rows at the foot of the menu
- * (`UserButtonMenuProps`), and the profile it opens (`UserButtonUserProfileProps`).
- */
-export type UserButtonProps = UserButtonControllerOptions &
+/** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profile it opens. */
+export type UserButtonProps = UserButtonModelOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
   UserButtonModeProps & {
+    userProfileProps?: UserButtonUserProfileProps;
     /**
      * Stands in while Clerk is still answering, so the space the button will take is held rather
      * than appearing under whatever is beside it. Dropped once nobody is signed in, since that is
      * an answer and not a wait.
      */
     fallback?: ReactNode;
-    userProfileProps?: UserButtonUserProfileProps;
   };
 
 /**
@@ -107,7 +101,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   const {
     renderTriggerLabel,
     renderTriggerBadge,
-    mode: requestedMode,
+    mode,
     modePriority,
     userProfileProps,
     customMenuItems,
@@ -117,126 +111,38 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   } = props;
   // The profile opens in clerk-js's own React root, so its custom pages reach it as portals rendered
   // from here. They have to outlive the popover that opened it, and the button's own data with it,
-  // which is why they hang off the container rather than anything the popover renders.
+  // which is why they hang off the wrapper rather than anything the popover renders.
   const builtInPages = useUserProfilePages();
   const { customPages, portals } = useCustomPages({
     items: userProfileProps?.customPages,
     order: userProfileProps?.pageOrder,
     builtInPages,
   });
-  const controller = useUserButtonController(options, customPages);
-  // The popover's open state and the one action in flight are the same flow: an action that ends the
-  // interaction closes the surface, so they settle together or not at all.
-  const [{ value, context }, send] = useMachine(userButtonMachine);
+  const model = useUserButtonModel(options, customPages);
+  const controller = useUserButtonController(model, { mode, modePriority, customMenuItems, menuItemOrder });
 
-  // Every action here is a network round trip, so there is nothing to debounce and the click gets
-  // its spinner at once. The hook is still what steadies it, holding it up long enough to read.
-  const displayPendingKey = useSpinDelay(context.pendingKey, {
-    delay: 0,
-    // Holding it steadies a surface still on screen. An action that closes the popup leaves none,
-    // so the hold would outlive it and stiffen the next open instead.
-    minDuration: context.closeOnSuccess ? 0 : undefined,
-  });
-
-  // If controller ever goes back into loading, we want to preserve the portals
   if (controller.status === 'loading') {
-    return <>{fallback}{portals}</>;
+    return (
+      <>
+        {fallback}
+        {portals}
+      </>
+    );
   }
 
-  if (controller.status !== 'ready') {
+  // Signed out is an answer, so the placeholder goes too rather than promising a button.
+  if (controller.status === 'hidden') {
     return <>{portals}</>;
   }
 
-  const close = () => send({ type: 'CLOSE' });
-
-  // Whatever the app's action opens takes over from here, so the popover goes with it. Links navigate away.
-  const menuItems = customMenuItems?.map(item =>
-    item.href === undefined
-      ? {
-        ...item,
-        onClick: () => {
-          close();
-          item.onClick();
-        },
-      }
-      : item,
-  );
-
-  // Only an action that ends the interaction closes the popover; the rest resolve into it.
-  const runAction = <Args extends unknown[]>(
-    keyFor: (...args: Args) => string,
-    fn: ((...args: Args) => void | Promise<unknown>) | undefined,
-    closeOnSuccess = false,
-  ) =>
-    fn
-      ? (...args: Args) =>
-        send({
-          type: 'RUN',
-          key: keyFor(...args),
-          frozen: controller,
-          run: async () => fn(...args),
-          closeOnSuccess,
-        })
-      : undefined;
-
-  // A modal or another page takes over from here, so there is nothing left for the popover to show;
-  // left up, it would sit over the very surface it just opened.
-  const handOff = (fn: (() => void) | undefined) =>
-    fn
-      ? () => {
-        close();
-        fn();
-      }
-      : undefined;
-
-  // Rendering the controller the action froze on holds the popup still while it runs; the result
-  // lands in one step when it settles. See `frozen` in the machine for why.
-  const {
-    status: _status,
-    organizationsEnabled,
-    onSelectOrganization,
-    onSwitchSession,
-    onSignOutSession,
-    onSignOutAll,
-    onAcceptSuggestion,
-    onAcceptInvitation,
-    onManageAccount,
-    onManageOrganization,
-    onInviteMembers,
-    onCreateOrganization,
-    onAddAccount,
-    ...data
-  } = context.frozen ?? controller;
-
-  // Organizations off at the instance leaves nothing for an organization surface to lead with or
-  // list, so the button is the account's whatever mode asked for. clerk-js withholds its own
-  // `<OrganizationSwitcher>` at the mount boundary; nothing mounts this one, so the gate lives here.
-  const mode = organizationsEnabled ? requestedMode : 'user';
+  const { status: _status, ...viewController } = controller;
 
   return (
     <>
       <UserButtonView
-        {...data}
+        {...viewController}
         renderTriggerLabel={renderTriggerLabel}
         renderTriggerBadge={renderTriggerBadge}
-        mode={mode}
-        modePriority={modePriority}
-        customMenuItems={menuItems}
-        menuItemOrder={menuItemOrder}
-        open={value !== 'closed'}
-        onOpenChange={next => send(next ? { type: 'OPEN' } : { type: 'CLOSE' })}
-        pendingKey={displayPendingKey}
-        onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true)}
-        onSwitchSession={runAction(userButtonBusyKeys.switchSession, onSwitchSession)}
-        onSignOutSession={runAction(userButtonBusyKeys.signOutSession, onSignOutSession)}
-        onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
-        onAcceptSuggestion={runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion)}
-        onAcceptInvitation={runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation)}
-        onManageAccount={handOff(onManageAccount)}
-        onManageOrganization={handOff(onManageOrganization)}
-        onInviteMembers={handOff(onInviteMembers)}
-        onCreateOrganization={handOff(onCreateOrganization)}
-        onAddAccount={handOff(onAddAccount)}
       />
       {portals}
     </>
