@@ -140,7 +140,7 @@ export type SignUpCreateParams = Partial<
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
-export type SignUpUpdateParams = SignUpCreateParams;
+export type SignUpUpdateParams = Omit<SignUpCreateParams, 'timezone'>;
 
 /**
  * @deprecated Use `SignUpAuthenticateWithWeb3Params` instead.
