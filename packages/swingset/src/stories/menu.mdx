@@ -82,13 +82,19 @@ props. `Menu.Portal` is optional.
 
 ### `Menu.Root`
 
-| Prop                      | Type                                 | Default                     | Description                                                     |
-| ------------------------- | ------------------------------------ | --------------------------- | --------------------------------------------------------------- |
-| <code>open</code>         | <code>boolean</code>                 | —                           | Controlled open state                                           |
-| <code>defaultOpen</code>  | <code>boolean</code>                 | <code>false</code>          | Initial open state (uncontrolled)                               |
-| <code>onOpenChange</code> | <code>(open: boolean) => void</code> | —                           | Called when the open state changes                              |
-| <code>placement</code>    | <code>Placement</code>               | <code>'bottom-start'</code> | Placement relative to the trigger (`'right-start'` when nested) |
-| <code>sideOffset</code>   | <code>number</code>                  | <code>4</code>              | Gap in px between the trigger and the popup (`0` when nested)   |
+| Prop                            | Type                                 | Default                     | Description                                                     |
+| ------------------------------- | ------------------------------------ | --------------------------- | --------------------------------------------------------------- |
+| <code>open</code>               | <code>boolean</code>                 | —                           | Controlled open state                                           |
+| <code>defaultOpen</code>        | <code>boolean</code>                 | <code>false</code>          | Initial open state (uncontrolled)                               |
+| <code>onOpenChange</code>       | <code>(open: boolean) => void</code> | —                           | Called when the open state changes                              |
+| <code>placement</code>          | <code>Placement</code>               | <code>'bottom-start'</code> | Placement relative to the trigger (`'right-start'` when nested) |
+| <code>sideOffset</code>         | <code>SideOffset</code>              | <code>4</code>              | Gap in px between the trigger and the popup (`0` when nested)   |
+| <code>fallbackPlacements</code> | <code>Placement[]</code>             | opposite side               | Where the popup goes when `placement` does not fit, in order    |
+
+`SideOffset` is <code>number \| { x: number; y: number }</code>. One number covers every placement;
+`{ x, y }` gives the horizontal and vertical placements a gap each, which a popup that can flip
+between the two axes wants. `fallbackPlacements` is for a menu opened from inside another floating
+surface: the opposite side is that surface, so it has to be given somewhere else to land.
 
 ### `Menu.Item`
 
