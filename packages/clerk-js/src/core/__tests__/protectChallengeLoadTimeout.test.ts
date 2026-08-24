@@ -63,15 +63,29 @@ describe('Protect.challengeLoadTimeoutMs', () => {
     expect(protect.challengeLoadTimeoutMs).toBe(25_000);
   });
 
-  it('ignores a non-positive or non-numeric value rather than passing it on', () => {
+  it('ignores a non-positive, non-finite, or non-numeric value rather than passing it on', () => {
     const protect = new Protect();
     protect.load(
       environment([
         loader({ challenge_load_timeout_ms: 0 }),
+        loader({ challenge_load_timeout_ms: Number.POSITIVE_INFINITY }),
         loader({ challenge_load_timeout_ms: 'soon' as unknown as number }),
       ]),
     );
 
     expect(protect.challengeLoadTimeoutMs).toBeUndefined();
+  });
+
+  it('reports the first finite, positive value from the applied loaders', () => {
+    const protect = new Protect();
+    protect.load(
+      environment([
+        loader({ challenge_load_timeout_ms: 0 }),
+        loader({ challenge_load_timeout_ms: 25_000 }),
+        loader({ challenge_load_timeout_ms: 45_000 }),
+      ]),
+    );
+
+    expect(protect.challengeLoadTimeoutMs).toBe(25_000);
   });
 });

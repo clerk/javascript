@@ -44,10 +44,11 @@ export interface ProtectLoader {
    * Per loader because loaders roll out gradually: while a new one ramps, two are live for the
    * same instance at once, and the new one may need a different value from the one it replaces.
    *
-   * Precedence is across the APPLIED SET, not per loader: the first applied loader that specifies
-   * one wins, and the instance-wide value applies only when none of them does. An instance running
-   * two loaders at once should therefore either set this on both or on neither — setting it on one
-   * makes it apply to browsers that got the other, which is rarely what is meant.
+   * Precedence is across the APPLIED SET, not per loader: the first applied loader with a finite,
+   * positive value wins, and the instance-wide value applies only when no applied loader specifies
+   * such a value. An instance running two loaders at once should therefore either set this on both
+   * or on neither — setting it on one makes it apply to browsers that got the other, which is rarely
+   * what is meant.
    */
   challenge_load_timeout_ms?: number;
 }

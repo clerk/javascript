@@ -55,12 +55,9 @@ export class Protect {
     // loaders we are actually going to apply.
     const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
 
-    // Read off the applied set, before any of them run: this only describes config, so a loader
-    // that later fails to be placed has still spoken for the browser it was assigned to.
-    //
-    // First one that asks for it wins, and the instance-wide value applies only when none does —
-    // the precedence is across the applied set rather than per loader, because there is no single
-    // "the" loader once more than one is live. Documented on the field.
+    // Load timeout applies to a single event and we only need one, so we pick the first valid one.
+    // This happens before applying the loaders since we want to use the value even if the loader
+    // later fails to apply.
     this.#challengeLoadTimeoutMs = loaders.find(
       loader =>
         typeof loader.challenge_load_timeout_ms === 'number' &&

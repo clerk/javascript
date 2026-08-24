@@ -72,6 +72,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   // changing anything for browsers still on the loader it replaces. Undefined at both levels
   // leaves the SDK default in force. Read here rather than inside the effect so the effect keeps
   // depending on primitives.
+  // Older clerk-js versions omit this getter; undefined preserves the instance/default fallback.
   const loaderTimeoutMs = useClerk().__internal_protectChallengeLoadTimeoutMs;
   const instanceTimeoutMs = useEnvironment().protectConfig?.challenge_load_timeout_ms;
   const loadTimeoutMs = loaderTimeoutMs ?? instanceTimeoutMs;
