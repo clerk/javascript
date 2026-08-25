@@ -5,8 +5,8 @@ import React from 'react';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../reset.styles';
-import { truncationStyles } from '../typography.styles';
+import { reset } from '../../utils/reset.styles';
+import { truncationStyles } from '../../utils/typography.styles';
 import { iconSizes, sizes, styles, variants } from './button.styles';
 
 export interface ButtonProps extends MosaicElementProps<'button'> {

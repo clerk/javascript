@@ -6,7 +6,7 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../reset.styles';
+import { reset } from '../../utils/reset.styles';
 import { shapes, sizes, styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';

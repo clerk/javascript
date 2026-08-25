@@ -6,12 +6,12 @@ import React from 'react';
 
 import { ClerkLogo } from './components/clerk-logo';
 import { Icon } from './components/icon';
-import { reset } from './components/reset.styles';
 import type { IconName } from './icons/registry';
 import { styles } from './profile-page.styles';
 import type { MosaicComponentProps } from './props';
 import { mergeStyleProps, themeProps } from './props';
 import { focusOutline } from './utils/focus-outline.styles';
+import { reset } from './utils/reset.styles';
 
 export interface ProfilePageItem {
   value: string;

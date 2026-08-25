@@ -5,8 +5,8 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../reset.styles';
-import { truncationStyles } from '../typography.styles';
+import { reset } from '../../utils/reset.styles';
+import { truncationStyles } from '../../utils/typography.styles';
 import * as slots from './item.styles';
 
 /** The row's height and gap, and the width of the media column inside it. */

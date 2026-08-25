@@ -17,15 +17,16 @@ conventions to follow by hand, not guarantees the toolchain makes for you.
 
 ## File layout & the `.stylex.ts` convention
 
-| File                              | Holds                                                           |
-| --------------------------------- | --------------------------------------------------------------- |
-| `tokens.stylex.ts`                | `defineVars` / `defineConsts` only (the tokens)                 |
-| `<comp>/<comp>.styles.ts`         | `stylex.create({...})` — this component's atoms                 |
-| `<family>.styles.ts`              | **shared** atoms imported by a whole component family           |
-| `<comp>/<comp>.markers.stylex.ts` | `stylex.defineMarker()` results for scoped ancestor states      |
-| `<comp>/<comp>.tsx`               | component; spreads `stylex.props(...)` via `mergeStyleProps`    |
-| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`) + `mergeStyleProps` |
-| `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                 |
+| File                              | Holds                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------ |
+| `tokens.stylex.ts`                | `defineVars` / `defineConsts` only (the tokens)                                            |
+| `<comp>/<comp>.styles.ts`         | `stylex.create({...})` — this component's atoms                                            |
+| `utils/<family>.styles.ts`        | **shared** atoms composed by many components (`reset`, `focusOutline`, `truncationStyles`) |
+| `utils/`                          | everything shared across components — styles and non-style helpers alike                   |
+| `<comp>/<comp>.markers.stylex.ts` | `stylex.defineMarker()` results for scoped ancestor states                                 |
+| `<comp>/<comp>.tsx`               | component; spreads `stylex.props(...)` via `mergeStyleProps`                               |
+| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`) + `mergeStyleProps`                            |
+| `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                                            |
 
 The `@stylexjs` eslint rules run on `src/mosaic/**`. The `enforce-extension`
 rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
@@ -47,12 +48,15 @@ rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
   `create` inline in the component; we don't.
 - **DON'T** inline `stylex.create` in a `.tsx`. No "it's only a few atoms"
   exception — small components get a `.styles.ts` too.
-- **DO** hoist atoms into a shared `<family>.styles.ts` when several siblings
-  render the same visual surface — e.g. inputs (`TextInput`, `NumberInput`, date
-  fields, `Selector`) sharing one `inputWrapper` / `inputStatusBorder` /
-  `inputStatusFocusWithin` set instead of redefining the border/focus treatment
-  five times. `utils/focus-outline.styles.ts` is the one that exists today: it
-  carries the keyboard focus ring for the whole system.
+- **DO** hoist atoms into a shared `utils/<family>.styles.ts` when several
+  components render the same visual surface — e.g. inputs (`TextInput`,
+  `NumberInput`, date fields, `Selector`) sharing one `inputWrapper` /
+  `inputStatusBorder` / `inputStatusFocusWithin` set instead of redefining the
+  border/focus treatment five times. Three exist today: `reset.styles.ts`,
+  `typography.styles.ts` and `focus-outline.styles.ts`.
+- **DON'T** put a shared style file under `components/`. That directory holds one
+  subdirectory per component and nothing else, so a loose file there reads as a
+  component that lost its folder.
 - **DON'T** copy a slot's atoms between siblings. A repeated style object is the
   same signal as a repeated conditional: extract the shared concept.
 

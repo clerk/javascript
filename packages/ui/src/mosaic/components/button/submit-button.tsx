@@ -4,7 +4,7 @@ import React from 'react';
 import type { SpinDelayOptions } from '../../hooks/useSpinDelay';
 import { useSpinDelay } from '../../hooks/useSpinDelay';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../reset.styles';
+import { reset } from '../../utils/reset.styles';
 import { Spinner } from '../spinner';
 import type { ButtonProps } from './button';
 import { Button, withTruncatableLabel } from './button';
