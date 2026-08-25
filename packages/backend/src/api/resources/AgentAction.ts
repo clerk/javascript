@@ -1,8 +1,10 @@
 import type { AgentActionEffect, AgentActionEvaluation, AgentActionStatusValue } from './Enums';
 import type {
+  AgentActionApprovalJSON,
   AgentActionDecisionJSON,
   AgentActionEvaluationErrorJSON,
   AgentActionJSON,
+  AgentActionResolutionJSON,
   AgentActionStatusJSON,
 } from './JSON';
 
@@ -26,21 +28,24 @@ export type AgentActionParametersDisplay = {
  *
  * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type AgentActionEvaluationError = {
-  /** The id of the rule that failed to evaluate. */
-  ruleId: string;
-  /** The reason the rule was skipped. */
-  message: string;
-};
+export class AgentActionEvaluationError {
+  constructor(
+    /** The id of the rule that failed to evaluate. */
+    readonly ruleId: string,
+    /** The reason the rule was skipped. */
+    readonly message: string,
+  ) {}
 
-/**
- * Both the decision record and the slim status view carry the same skipped-rule list, so
- * the wire-to-camelCase mapping and the "absent means `null`" rule live in one place.
- */
+  static fromJSON(data: AgentActionEvaluationErrorJSON): AgentActionEvaluationError {
+    return new AgentActionEvaluationError(data.rule_id, data.message);
+  }
+}
+
+/** Shared by the decision record and the slim status view; an absent list means `null`, not `undefined`. */
 function toEvaluationErrors(
   data: AgentActionEvaluationErrorJSON[] | null | undefined,
 ): AgentActionEvaluationError[] | null {
-  return data?.map(error => ({ ruleId: error.rule_id, message: error.message })) ?? null;
+  return data?.map(error => AgentActionEvaluationError.fromJSON(error)) ?? null;
 }
 
 /**
@@ -50,14 +55,20 @@ function toEvaluationErrors(
  *
  * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type AgentActionApproval = {
-  /** The organization role key routed to review this action, or `null` when the subject is the reviewer. */
-  role: string | null;
-  /** The URL a human visits to review the action. Derived at serialization time from the instance's current accounts host, so it is not stable across an accounts-domain change. */
-  url: string;
-  /** The Unix timestamp (in milliseconds) when the approval window closes. */
-  expiresAt: number;
-};
+export class AgentActionApproval {
+  constructor(
+    /** The organization role key routed to review this action, or `null` when the subject is the reviewer. */
+    readonly role: string | null,
+    /** The URL a human visits to review the action. Derived at serialization time from the instance's current accounts host, so it is not stable across an accounts-domain change. */
+    readonly url: string,
+    /** The Unix timestamp (in milliseconds) when the approval window closes. */
+    readonly expiresAt: number,
+  ) {}
+
+  static fromJSON(data: AgentActionApprovalJSON): AgentActionApproval {
+    return new AgentActionApproval(data.role, data.url, data.expires_at);
+  }
+}
 
 /**
  * Who answered a pending Agent Action and when. The answer itself is carried by
@@ -65,14 +76,20 @@ export type AgentActionApproval = {
  *
  * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type AgentActionResolution = {
-  /** The ID of the user who resolved the action. */
-  resolvedByUserId: string;
-  /** The Unix timestamp (in milliseconds) when the action was resolved. */
-  resolvedAt: number;
-  /** The reviewer's comment, visible to the application but never to the agent. */
-  resolutionComment: string | null;
-};
+export class AgentActionResolution {
+  constructor(
+    /** The ID of the user who resolved the action. */
+    readonly resolvedByUserId: string,
+    /** The Unix timestamp (in milliseconds) when the action was resolved. */
+    readonly resolvedAt: number,
+    /** The reviewer's comment, visible to the application but never to the agent. */
+    readonly resolutionComment: string | null,
+  ) {}
+
+  static fromJSON(data: AgentActionResolutionJSON): AgentActionResolution {
+    return new AgentActionResolution(data.resolved_by_user_id, data.resolved_at, data.resolution_comment);
+  }
+}
 
 /**
  * The Backend `AgentActionDecision` object is the immutable record of what the policy
@@ -188,16 +205,10 @@ export class AgentAction {
       data.operation,
       data.parameters,
       data.description,
-      (data.parameters_display ?? []).map(entry => ({ key: entry.key, label: entry.label, value: entry.value })),
+      data.parameters_display,
       data.idempotency_key,
-      data.approval ? { role: data.approval.role, url: data.approval.url, expiresAt: data.approval.expires_at } : null,
-      data.resolution
-        ? {
-            resolvedByUserId: data.resolution.resolved_by_user_id,
-            resolvedAt: data.resolution.resolved_at,
-            resolutionComment: data.resolution.resolution_comment,
-          }
-        : null,
+      data.approval && AgentActionApproval.fromJSON(data.approval),
+      data.resolution && AgentActionResolution.fromJSON(data.resolution),
       AgentActionDecision.fromJSON(data.decision),
       data.created_at,
       data.updated_at,
@@ -219,7 +230,7 @@ export class AgentActionStatus {
     readonly actionId: string,
     /** Where the action stands. Loop while this is `pending`; act when it is anything else. */
     readonly status: AgentActionStatusValue,
-    /** What the policy engine decided. */
+    /** What the policy engine decided. Never branch control flow on this — branch on `status` above. */
     readonly effect: AgentActionEffect,
     /** The deny rule's stated reason, or the engine-generated cause of a fail-closed downgrade. */
     readonly reason: string | null,

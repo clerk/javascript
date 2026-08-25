@@ -70,8 +70,7 @@ describe('AgentAction', () => {
         parameters: { refundAmount: 25000, refund_amount: 100, 'Customer-Id': 'cus_9x', nested: { keepMe: true } },
       });
 
-      // The spelling used at check time is the spelling the field registry and every
-      // policy leaf must use, so camelCasing here would silently unmatch a rule.
+      // camelCasing here would silently unmatch a policy leaf keyed on the check-time spelling.
       expect(action.parameters).toEqual({
         refundAmount: 25000,
         refund_amount: 100,
@@ -85,8 +84,7 @@ describe('AgentAction', () => {
       const action = AgentAction.fromJSON({
         ...actionJSON,
         parameters_display: [
-          // A snake_case key is the direction that matters: the package camelCases
-          // everything else, and this is the one field §3.2 forbids it on.
+          // snake_case is the direction that matters: §3.2 forbids the camelCasing applied everywhere else.
           { key: 'refund_amount', label: 'Refund amount', value: '$250.00' },
           { key: 'refundAmount', label: 'Refund amount (raw)', value: 25000 },
           { key: 'Customer-Id', label: 'Customer', value: 'cus_9x' },
@@ -128,9 +126,7 @@ describe('AgentAction', () => {
         resolvedAt: 1755658800000,
         resolutionComment: 'Duplicate confirmed.',
       });
-      // api-contracts-v1 §3: the approval block survives resolution, and `expires_at`
-      // becomes historical rather than being cleared. `status` is what says the action
-      // is terminal.
+      // api-contracts-v1 §3: the approval block survives resolution rather than being cleared.
       expect(action.approval).toEqual({
         role: 'org:support_manager',
         url: 'https://accounts.example.com/action-approval/agtact_2mK',
@@ -288,8 +284,7 @@ describe('AgentActionStatus', () => {
     });
 
     it('maps an absent evaluation_errors to null, not undefined', () => {
-      // The contract always sends the key, so this asserts the mapper's own floor: a
-      // caller checking `evaluationErrors === null` must not be defeated by an omission.
+      // The contract always sends the key; this pins the mapper's own floor of null over undefined.
       const { evaluation_errors: _omitted, ...withoutErrors } = statusJSON;
       const status = AgentActionStatus.fromJSON(withoutErrors as AgentActionStatusJSON);
 
