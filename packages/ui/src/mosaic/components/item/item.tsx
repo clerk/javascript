@@ -4,8 +4,9 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../reset.styles';
-import { truncationStyles } from '../typography.styles';
+import { focusOutline } from '../../utils/focus-outline.styles';
+import { reset } from '../../utils/reset.styles';
+import { truncationStyles } from '../../utils/typography.styles';
 import * as slots from './item.styles';
 
 /** The row's height and gap, and the width of the media column inside it. */
@@ -50,7 +51,13 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
     props: {
       ...mergeStyleProps(
         themeProps('item', { interactive, size }),
-        stylex.props(reset.base, slots.item.base, slots.item[size], interactive && slots.item.interactive),
+        stylex.props(
+          reset.base,
+          focusOutline.visible,
+          slots.item.base,
+          slots.item[size],
+          interactive && slots.item.interactive,
+        ),
         className,
         style,
       ),

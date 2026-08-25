@@ -7,6 +7,7 @@ import React from 'react';
 import { useAccessibleDescriptionWarning } from '../../hooks/useAccessibleDescriptionWarning';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import type {
   DialogBackdropProps,
@@ -23,7 +24,6 @@ import { Dialog } from '../dialog';
 // another and are deliberately absent from `../dialog`'s public surface.
 import { DialogContent, DialogPartNameContext } from '../dialog/dialog';
 import { Heading } from '../heading';
-import { reset } from '../reset.styles';
 import { Text } from '../text';
 import { styles } from './alert-dialog.styles';
 import { type ConfirmHandle, createConfirmHandle } from './confirm-handle';

@@ -4,9 +4,9 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
+import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { Icon } from '../icon';
-import { reset } from '../reset.styles';
-import { sizes as typographySizes, styles as typographyStyles } from '../typography.styles';
 import { FieldProvider, useOptionalFieldContext, useRegisterFieldPartId } from './field.context';
 import { styles } from './field.styles';
 

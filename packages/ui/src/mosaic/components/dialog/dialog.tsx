@@ -7,9 +7,9 @@ import React from 'react';
 import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
-import { reset } from '../reset.styles';
 import { backdropMotion, closeInsets, popupMotion, sizes, styles, viewportSizes } from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
