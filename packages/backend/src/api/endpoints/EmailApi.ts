@@ -127,9 +127,27 @@ export class EmailApi extends AbstractAPI {
    * the SDK version to avoid breaking changes.
    *
    * Sends a transactional email.
+   *
+   * @param params - The recipient, sender, subject, and content of the email.
+   * @param options - Optional request settings, including an idempotency key.
+   * @returns The stored email and its current send status.
+   * @throws If the idempotency key does not match the supported format.
+   * @example
+   * ```ts
+   * const email = await clerkClient.emails.create(
+   *   {
+   *     to: { address: 'customer@example.com' },
+   *     from: { address: 'support@example.com' },
+   *     subject: 'Your receipt',
+   *     html: '<p>Thanks for your order.</p>',
+   *   },
+   *   { idempotencyKey: 'order_123_receipt' },
+   * );
+   * ```
    */
   public async create(params: CreateEmailParams, options: CreateEmailOptions = {}): Promise<Email> {
-    if (options.idempotencyKey && !idempotencyKeyPattern.test(options.idempotencyKey)) {
+    const { idempotencyKey } = options;
+    if (idempotencyKey !== undefined && !idempotencyKeyPattern.test(idempotencyKey)) {
       throw new Error(
         'Idempotency key must contain only ASCII letters, digits, underscores, and hyphens and cannot exceed 255 characters.',
       );
@@ -139,7 +157,7 @@ export class EmailApi extends AbstractAPI {
       method: 'POST',
       path: basePath,
       bodyParams: params,
-      ...(options.idempotencyKey ? { headerParams: { 'Idempotency-Key': options.idempotencyKey } } : {}),
+      ...(idempotencyKey !== undefined ? { headerParams: { 'Idempotency-Key': idempotencyKey } } : {}),
       options: {
         // Snakecase nested keys too, so a `to: { userId }` recipient is sent as
         // `to: { user_id }` on the wire (the default only snakecases top-level
@@ -152,6 +170,14 @@ export class EmailApi extends AbstractAPI {
   /**
    * Returns Clerk's stored send state for a transactional email. `accepted`
    * means the provider accepted the request; it does not prove delivery.
+   *
+   * @param emailId - The ID returned when the email was created.
+   * @returns The stored email and its current send status.
+   * @throws If `emailId` is empty.
+   * @example
+   * ```ts
+   * const email = await clerkClient.emails.get('ema_123');
+   * ```
    */
   public async get(emailId: string): Promise<Email> {
     this.requireId(emailId);

@@ -84,6 +84,7 @@ describe('EmailApi', () => {
   });
 
   it.each([
+    ['an empty value', ''],
     ['unsupported characters', 'campaign:123'],
     ['more than 255 characters', 'a'.repeat(256)],
   ])('rejects idempotency keys with %s before sending a request', async (_, idempotencyKey) => {
