@@ -83,6 +83,32 @@ describe('EmailApi', () => {
     );
   });
 
+  it.each([
+    ['unsupported characters', 'campaign:123'],
+    ['more than 255 characters', 'a'.repeat(256)],
+  ])('rejects idempotency keys with %s before sending a request', async (_, idempotencyKey) => {
+    let requestCount = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email', () => {
+        requestCount += 1;
+        return HttpResponse.json(mockEmail);
+      }),
+    );
+
+    await expect(
+      apiClient.emails.create(
+        {
+          to: { address: 'admin@acme.com' },
+          from: { address: 'noreply@acme.com' },
+          subject: 'Hello',
+          html: '<p>hi</p>',
+        },
+        { idempotencyKey },
+      ),
+    ).rejects.toThrow('Idempotency key must contain only ASCII letters, digits, underscores, and hyphens');
+    expect(requestCount).toBe(0);
+  });
+
   it('gets the stored provider-acceptance status', async () => {
     server.use(
       http.get(
@@ -94,6 +120,19 @@ describe('EmailApi', () => {
     const response = await apiClient.emails.get('ema_123');
     expect(response.id).toBe('ema_123');
     expect(response.status).toBe('accepted');
+  });
+
+  it('rejects an empty email ID before sending a request', async () => {
+    let requestCount = 0;
+    server.use(
+      http.get('https://api.clerk.test/v1/email/:emailId', () => {
+        requestCount += 1;
+        return HttpResponse.json(mockEmail);
+      }),
+    );
+
+    await expect(apiClient.emails.get('')).rejects.toThrow('A valid resource ID is required.');
+    expect(requestCount).toBe(0);
   });
 
   it('sends a transactional email with a text body', async () => {

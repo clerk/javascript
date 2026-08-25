@@ -2,6 +2,7 @@ import type { Email } from '../resources/Email';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/email';
+const idempotencyKeyPattern = /^[a-zA-Z0-9_-]{1,255}$/;
 
 /**
  * A subset of mailbox object as specified in RFC 5322 §3.4. Specifically, a
@@ -127,7 +128,13 @@ export class EmailApi extends AbstractAPI {
    *
    * Sends a transactional email.
    */
-  public async create(params: CreateEmailParams, options: CreateEmailOptions = {}) {
+  public async create(params: CreateEmailParams, options: CreateEmailOptions = {}): Promise<Email> {
+    if (options.idempotencyKey && !idempotencyKeyPattern.test(options.idempotencyKey)) {
+      throw new Error(
+        'Idempotency key must contain only ASCII letters, digits, underscores, and hyphens and cannot exceed 255 characters.',
+      );
+    }
+
     return this.request<Email>({
       method: 'POST',
       path: basePath,
@@ -146,7 +153,7 @@ export class EmailApi extends AbstractAPI {
    * Returns Clerk's stored send state for a transactional email. `accepted`
    * means the provider accepted the request; it does not prove delivery.
    */
-  public async get(emailId: string) {
+  public async get(emailId: string): Promise<Email> {
     this.requireId(emailId);
     return this.request<Email>({
       method: 'GET',
