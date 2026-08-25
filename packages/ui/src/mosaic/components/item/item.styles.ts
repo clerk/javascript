@@ -135,7 +135,7 @@ export const actions = stylex.create({
 
 export const group = stylex.create({
   base: {
-    padding: space['2'],
+    padding: space['1.5'],
     width: '100%',
   },
 });
