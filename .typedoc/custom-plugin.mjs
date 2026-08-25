@@ -50,10 +50,10 @@ const FILES_WITHOUT_HEADINGS = [
 const LINK_REPLACEMENTS = [
   ['set-active-params', '/docs/reference/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/types/clerk-paginated-response'],
-  ['paginated-resources', '#paginated-resources'],
-  ['use-checkout-options', '#use-checkout-options'],
-  ['needs-reverification-parameters', '#needs-reverification-parameters'],
-  ['create-organization-params', '#create-organization-params'],
+  ['paginated-resources', '#paginatedresources'],
+  ['use-checkout-options', '#usecheckoutoptions'],
+  ['needs-reverification-parameters', '#needsreverificationparameters'],
+  ['create-organization-params', '#createorganizationparams'],
   ['session-resource', '/docs/reference/objects/session'],
   ['signed-in-session-resource', '/docs/reference/objects/session'],
   ['sign-in-resource', '/docs/reference/objects/sign-in'],
@@ -75,13 +75,13 @@ const LINK_REPLACEMENTS = [
   ['o-auth-application-namespace', '/docs/reference/types/oauth-application'],
   ['o-auth-consent-info', '/docs/reference/types/oauth-consent-info'],
   ['o-auth-consent-scope', '/docs/reference/types/oauth-consent-scope'],
-  ['o-auth-strategy', '/docs/reference/types/sso#o-auth-strategy'],
-  ['o-auth-provider', '/docs/reference/types/sso#o-auth-provider'],
+  ['o-auth-strategy', '/docs/reference/types/sso#oauthstrategy'],
+  ['o-auth-provider', '/docs/reference/types/sso#oauthprovider'],
   ['session', '/docs/reference/backend/types/backend-session'],
   ['session-activity', '/docs/reference/backend/types/backend-session-activity'],
   ['organization', '/docs/reference/backend/types/backend-organization'],
   ['public-organization-data-json', '#public-organization-data-json'],
-  ['organization-membership-public-user-data', '#organization-membership-public-user-data'],
+  ['organization-membership-public-user-data', '#organizationmembershippublicuserdata'],
   ['identification-link', '/docs/reference/backend/types/backend-identification-link'],
   ['verification', '/docs/reference/backend/types/backend-verification'],
   ['email-address', '/docs/reference/backend/types/backend-email-address'],
@@ -146,8 +146,8 @@ const LINK_REPLACEMENTS = [
   ['billing-statement-totals', '/docs/reference/types/billing-statement-totals'],
   ['billing-payment-resource', '/docs/reference/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/types/deleted-object-resource'],
-  ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
-  ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
+  ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkoutflowresource'],
+  ['organization-creation-defaults-resource', '#organizationcreationdefaultsresource'],
   ['billing-namespace', '/docs/reference/objects/billing'],
   ['api-keys-namespace', '/docs/reference/objects/api-keys'],
   ['client-resource', '/docs/reference/objects/client'],
@@ -158,9 +158,9 @@ const LINK_REPLACEMENTS = [
   ['session-status', '/docs/reference/types/session-status'],
   [
     'create-organization-invitation-params',
-    '/docs/reference/backend/organization/create-organization-invitation#create-organization-invitation-params',
+    '/docs/reference/backend/organization/create-organization-invitation#createorganizationinvitationparams',
   ],
-  ['create-organization-domain-params', '#create-organization-domain-params'],
+  ['create-organization-domain-params', '#createorganizationdomainparams'],
   ['organization-domain-verification', '/docs/reference/types/organization-domain-resource'],
 ];
 
@@ -223,7 +223,7 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![#])\(CreateOrganizationParams\)/g,
-      replace: '([CreateOrganizationParams](#create-organization-params))',
+      replace: '([CreateOrganizationParams](#createorganizationparams))',
     },
     {
       pattern: /(?<![\[\w`#])`?EmailAddressResource`?(?![\]\w`])/g,
@@ -313,7 +313,7 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![\[\w`#])`?SignUpUnsafeMetadata`?(?![\]\w`])/g,
-      replace: '[SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
+      replace: '[SignUpUnsafeMetadata](/docs/reference/types/metadata#signupunsafemetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?SignUpFutureResource`?(?![\]\w`])/g,
@@ -325,11 +325,11 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![\[\w`#])`?OAuthStrategy`?(?![\]\w`])/g,
-      replace: '[OAuthStrategy](/docs/reference/types/sso#o-auth-strategy)',
+      replace: '[OAuthStrategy](/docs/reference/types/sso#oauthstrategy)',
     },
     {
       pattern: /(?<![\[\w`#])`?OAuthProvider`?(?![\]\w`])/g,
-      replace: '[OAuthProvider](/docs/reference/types/sso#o-auth-provider)',
+      replace: '[OAuthProvider](/docs/reference/types/sso#oauthprovider)',
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationResource`?(?![\]\w`])/g,
@@ -337,43 +337,43 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationPrivateMetadata`?(?![\]\w`])/g,
-      replace: '[OrganizationPrivateMetadata](/docs/reference/types/metadata#organization-private-metadata)',
+      replace: '[OrganizationPrivateMetadata](/docs/reference/types/metadata#organizationprivatemetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationPublicMetadata`?(?![\]\w`])/g,
-      replace: '[OrganizationPublicMetadata](/docs/reference/types/metadata#organization-public-metadata)',
+      replace: '[OrganizationPublicMetadata](/docs/reference/types/metadata#organizationpublicmetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationInvitationPrivateMetadata`?(?![\]\w`])/g,
       replace:
-        '[OrganizationInvitationPrivateMetadata](/docs/reference/types/metadata#organization-invitation-private-metadata)',
+        '[OrganizationInvitationPrivateMetadata](/docs/reference/types/metadata#organizationinvitationprivatemetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationInvitationPublicMetadata`?(?![\]\w`])/g,
       replace:
-        '[OrganizationInvitationPublicMetadata](/docs/reference/types/metadata#organization-invitation-public-metadata)',
+        '[OrganizationInvitationPublicMetadata](/docs/reference/types/metadata#organizationinvitationpublicmetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationMembershipPrivateMetadata`?(?![\]\w`])/g,
       replace:
-        '[OrganizationMembershipPrivateMetadata](/docs/reference/types/metadata#organization-membership-private-metadata)',
+        '[OrganizationMembershipPrivateMetadata](/docs/reference/types/metadata#organizationmembershipprivatemetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?OrganizationMembershipPublicMetadata`?(?![\]\w`])/g,
       replace:
-        '[OrganizationMembershipPublicMetadata](/docs/reference/types/metadata#organization-membership-public-metadata)',
+        '[OrganizationMembershipPublicMetadata](/docs/reference/types/metadata#organizationmembershippublicmetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?UserPrivateMetadata`?(?![\]\w`])/g,
-      replace: '[UserPrivateMetadata](/docs/reference/types/metadata#user-private-metadata)',
+      replace: '[UserPrivateMetadata](/docs/reference/types/metadata#userprivatemetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?UserPublicMetadata`?(?![\]\w`])/g,
-      replace: '[UserPublicMetadata](/docs/reference/types/metadata#user-public-metadata)',
+      replace: '[UserPublicMetadata](/docs/reference/types/metadata#userpublicmetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?UserUnsafeMetadata`?(?![\]\w`])/g,
-      replace: '[UserUnsafeMetadata](/docs/reference/types/metadata#user-unsafe-metadata)',
+      replace: '[UserUnsafeMetadata](/docs/reference/types/metadata#userunsafemetadata)',
     },
     {
       pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,

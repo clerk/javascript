@@ -344,7 +344,7 @@ export interface SignInFutureResource {
    * <li>`'complete'` - The sign-in process has been completed successfully.</li>
    * <li>`'needs_client_trust'` - The user is signing in from a new device and must complete a [second factor verification](!second-factor-verification) to establish [Device Trust](https://clerk.com/docs/guides/secure/device-trust). See the [Device Trust custom flow guide](https://clerk.com/docs/guides/development/custom-flows/authentication/device-trust) for more information.</li>
    * <li>`'needs_identifier'` - The user's identifier (e.g., email address, phone number, username) hasn't been provided.</li>
-   * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy), or `'enterprise_sso'`.</li>
+   * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#oauthstrategy), or `'enterprise_sso'`.</li>
    * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.</li>
    * <li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](/docs/guides/development/custom-flows/authentication/forgot-password) guide for more information.</li>
    * <li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. Run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. The pre-built components handle this automatically.</li>
@@ -436,7 +436,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFutureEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a code sent with the [`emailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#email-code-send-code) method.
+     * Verifies a code sent with the [`emailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#emailcode-sendcode) method.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
@@ -482,7 +482,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a code sent with the [`phoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phone-code-send-code) method.
+     * Verifies a code sent with the [`phoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phonecode-sendcode) method.
      */
     verifyCode: (params: SignInFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
@@ -495,7 +495,7 @@ export interface SignInFutureResource {
     sendCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a password reset code sent with the [`resetPasswordEmailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-submit-password) method to complete the password reset flow.
+     * Verifies a password reset code sent with the [`resetPasswordEmailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#resetpasswordemailcode-sendcode) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#resetpasswordemailcode-submitpassword) method to complete the password reset flow.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -513,7 +513,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFutureResetPasswordPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a password reset code sent with the [`resetPasswordPhoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-submit-password) method to complete the password reset flow.
+     * Verifies a password reset code sent with the [`resetPasswordPhoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#resetpasswordphonecode-sendcode) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#resetpasswordphonecode-submitpassword) method to complete the password reset flow.
      */
     verifyCode: (params: SignInFutureResetPasswordPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -536,7 +536,7 @@ export interface SignInFutureResource {
     sendPhoneCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a phone code sent with the [`mfa.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-phone-code) method.
+     * Verifies a phone code sent with the [`mfa.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-sendphonecode) method.
      */
     verifyPhoneCode: (params: SignInFutureMFAPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -546,7 +546,7 @@ export interface SignInFutureResource {
     sendEmailCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies an email code sent with the [`mfa.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-email-code) method.
+     * Verifies an email code sent with the [`mfa.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-sendemailcode) method.
      */
     verifyEmailCode: (params: SignInFutureMFAEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
