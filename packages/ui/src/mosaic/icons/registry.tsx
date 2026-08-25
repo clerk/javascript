@@ -286,6 +286,20 @@ const Users = glyph(
   />,
 );
 
+const Building = glyph(
+  <path
+    d='M2.75 13.25H3.75M3.75 13.25V3.75C3.75 3.19772 4.19772 2.75 4.75 2.75H11.25C11.8023 2.75 12.25 3.19772 12.25 3.75V13.25M3.75 13.25H12.25M12.25 13.25H13.25M6.75 13.25V10.75H9.25V13.25M6.75 6.25V5.75M9.25 6.25V5.75'
+    {...strokeProps}
+  />,
+);
+
+const Copy = glyph(
+  <path
+    d='M5.61364 5.61364H4.65909C3.60473 5.61364 2.75 6.46837 2.75 7.52273V11.3409C2.75 12.3953 3.60473 13.25 4.65909 13.25H8.47727C9.53163 13.25 10.3864 12.3953 10.3864 11.3409V10.3864M5.61364 5.61364V8.47727C5.61364 9.53163 6.46837 10.3864 7.52273 10.3864H10.3864M5.61364 5.61364V4.65909C5.61364 3.60473 6.46837 2.75 7.52273 2.75H11.3409C12.3953 2.75 13.25 3.60473 13.25 4.65909V8.47727C13.25 9.53163 12.3953 10.3864 11.3409 10.3864H10.3864'
+    {...strokeProps}
+  />,
+);
+
 const AlertCircle = glyph(
   <>
     <circle
@@ -305,6 +319,7 @@ const AlertCircle = glyph(
 export const iconRegistry = {
   'alert-circle': AlertCircle,
   'arrow-right-top': ArrowRightTop,
+  building: Building,
   'chevron-right': ChevronRight,
   'chevron-left': ChevronLeft,
   'chevron-down': ChevronDown,
@@ -313,6 +328,7 @@ export const iconRegistry = {
   check: Check,
   close: Close,
   code: Code,
+  copy: Copy,
   'credit-card': CreditCard,
   ellipsis: Ellipsis,
   pen: Pen,

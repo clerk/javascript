@@ -3,15 +3,12 @@ import type { ReactElement } from 'react';
 
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
-import { Heading } from '../components/heading';
 import { Icon } from '../components/icon';
-import { Input } from '../components/input';
-import { Menu } from '../components/menu';
 import { toggleVisibleSelection } from '../profile-selection';
 import { mergeStyleProps, themeProps } from '../props';
-import { styles } from './user-profile-api-keys-panel.styles';
+import { styles } from './organization-profile-api-keys-section.styles';
 
-export interface UserProfileAPIKey {
+export interface OrganizationProfileApiKey {
   id: string;
   name: string;
   expirationLabel: string;
@@ -20,38 +17,32 @@ export interface UserProfileAPIKey {
   isExpired?: boolean;
 }
 
-export interface UserProfileAPIKeysPagination {
+export interface OrganizationProfileApiKeysPagination {
   page: number;
   pageCount: number;
   pageSize: number;
   pageSizeOptions?: readonly number[];
 }
 
-export interface UserProfileApiKeysPanelViewProps {
-  apiKeys: UserProfileAPIKey[];
-  pagination?: UserProfileAPIKeysPagination;
-  searchValue: string;
+export interface OrganizationProfileApiKeysSectionViewProps {
+  apiKeys: OrganizationProfileApiKey[];
   selectedIds: readonly string[];
-  onCreate?: () => void;
+  pagination?: OrganizationProfileApiKeysPagination;
+  onManage?: (id: string) => void;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
-  onRevoke?: (id: string) => void;
-  onSearchChange: (value: string) => void;
   onSelectionChange: (ids: string[]) => void;
 }
 
-export function UserProfileApiKeysPanelView({
+export function OrganizationProfileApiKeysSectionView({
   apiKeys,
-  pagination,
-  searchValue,
   selectedIds,
-  onCreate,
+  pagination,
+  onManage,
   onPageChange,
   onPageSizeChange,
-  onRevoke,
-  onSearchChange,
   onSelectionChange,
-}: UserProfileApiKeysPanelViewProps): ReactElement {
+}: OrganizationProfileApiKeysSectionViewProps): ReactElement {
   const allSelected = apiKeys.length > 0 && apiKeys.every(apiKey => selectedIds.includes(apiKey.id));
 
   const toggleAll = () => {
@@ -70,35 +61,10 @@ export function UserProfileApiKeysPanelView({
   };
 
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(styles.root))}>
-      <Heading
-        render={props => <h3 {...props} />}
-        size='2xl'
-      >
-        API Keys
-      </Heading>
-      <div {...stylex.props(styles.toolbar)}>
-        {/* TODO: Temporary search composition; replace with Mosaic InputGroup while preserving the icon and controlled value. */}
-        <div {...stylex.props(styles.searchWrapper)}>
-          <Icon
-            aria-hidden
-            name='search'
-            size='sm'
-            {...stylex.props(styles.searchIcon)}
-          />
-          <Input
-            aria-label='Search API keys'
-            autoComplete='off'
-            placeholder='Search'
-            size='sm'
-            type='search'
-            value={searchValue}
-            {...stylex.props(styles.search)}
-            onChange={event => onSearchChange(event.currentTarget.value)}
-          />
-        </div>
-        {onCreate ? <Button onClick={onCreate}>Create API key</Button> : null}
-      </div>
+    <section
+      aria-label='API keys'
+      {...mergeStyleProps(themeProps('organization-profile-api-keys-section'), stylex.props(styles.root))}
+    >
       {/* TODO: Temporary inline table; replace with Mosaic Table while preserving the key columns and overflow. */}
       <div {...stylex.props(styles.tableShell)}>
         <div {...stylex.props(styles.tableScroller)}>
@@ -169,17 +135,18 @@ export function UserProfileApiKeysPanelView({
                     <td {...stylex.props(styles.cell)}>{apiKey.createdAtLabel}</td>
                     <td {...stylex.props(styles.cell)}>{apiKey.lastUsedAtLabel}</td>
                     <td {...stylex.props(styles.cell, styles.actionCell)}>
-                      {onRevoke ? (
-                        <Menu.Root placement='bottom-end'>
-                          <Menu.Trigger aria-label={`Manage ${apiKey.name}`} />
-                          <Menu.Content>
-                            <Menu.Item
-                              color='negative'
-                              label='Revoke'
-                              onClick={() => onRevoke(apiKey.id)}
-                            />
-                          </Menu.Content>
-                        </Menu.Root>
+                      {onManage ? (
+                        <Button
+                          aria-label={`Manage ${apiKey.name}`}
+                          color='neutral'
+                          shape='square'
+                          size='sm'
+                          touchTarget={false}
+                          variant='ghost'
+                          onClick={() => onManage(apiKey.id)}
+                        >
+                          <Icon name='ellipsis' />
+                        </Button>
                       ) : null}
                     </td>
                   </tr>
@@ -259,6 +226,6 @@ export function UserProfileApiKeysPanelView({
           </label>
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }

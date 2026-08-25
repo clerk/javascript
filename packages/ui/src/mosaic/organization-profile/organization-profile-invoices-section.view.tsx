@@ -1,13 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
+import type { ReactElement } from 'react';
 
 import type { BadgeProps } from '../components/badge';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
-import { styles } from './user-profile-billing-history-section.styles';
+import { styles } from './organization-profile-billing.styles';
 
-export interface UserProfileBillingHistoryItem {
+export interface OrganizationProfileInvoice {
   id: string;
   dateLabel: string;
   invoiceLabel: string;
@@ -16,31 +17,45 @@ export interface UserProfileBillingHistoryItem {
   statusColor?: BadgeProps['color'];
 }
 
-export interface UserProfileBillingHistoryPagination {
+export interface OrganizationProfileInvoicesPagination {
   page: number;
   pageCount: number;
   pageSize: number;
   pageSizeOptions?: readonly number[];
 }
 
-export interface UserProfileBillingHistorySectionViewProps {
-  items: UserProfileBillingHistoryItem[];
-  pagination?: UserProfileBillingHistoryPagination;
+export interface OrganizationProfileInvoicesSectionViewProps {
+  invoices: OrganizationProfileInvoice[];
+  pagination?: OrganizationProfileInvoicesPagination;
+  onDownloadAll?: () => void;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onView?: (id: string) => void;
 }
 
-export function UserProfileBillingHistorySectionView({
-  items,
+export function OrganizationProfileInvoicesSectionView({
+  invoices,
   pagination,
+  onDownloadAll,
   onPageChange,
   onPageSizeChange,
   onView,
-}: UserProfileBillingHistorySectionViewProps) {
+}: OrganizationProfileInvoicesSectionViewProps): ReactElement {
   return (
-    <Section.Root aria-label='Billing history'>
-      <Section.Title>History</Section.Title>
+    <Section.Root>
+      <div {...stylex.props(styles.sectionHeading)}>
+        <Section.Title>Invoices</Section.Title>
+        {onDownloadAll ? (
+          <Button
+            color='neutral'
+            size='sm'
+            variant='outline'
+            onClick={onDownloadAll}
+          >
+            Download all
+          </Button>
+        ) : null}
+      </div>
       <div {...stylex.props(styles.shell)}>
         {/* TODO: Temporary inline table; replace with Mosaic Table while preserving the invoice columns and overflow. */}
         <div {...stylex.props(styles.tableScroller)}>
@@ -73,19 +88,19 @@ export function UserProfileBillingHistorySectionView({
               </tr>
             </thead>
             <tbody>
-              {items.length > 0 ? (
-                items.map(item => (
+              {invoices.length > 0 ? (
+                invoices.map(invoice => (
                   <tr
-                    key={item.id}
+                    key={invoice.id}
                     {...stylex.props(styles.row)}
                   >
                     <td {...stylex.props(styles.cell)}>
-                      <div {...stylex.props(styles.invoiceLabel)}>{item.dateLabel}</div>
-                      <div {...stylex.props(styles.invoiceId)}>{item.invoiceLabel}</div>
+                      <div {...stylex.props(styles.invoiceLabel)}>{invoice.dateLabel}</div>
+                      <div {...stylex.props(styles.invoiceId)}>{invoice.invoiceLabel}</div>
                     </td>
-                    <td {...stylex.props(styles.cell, styles.amountCell)}>{item.amountLabel}</td>
+                    <td {...stylex.props(styles.cell, styles.amountCell)}>{invoice.amountLabel}</td>
                     <td {...stylex.props(styles.cell)}>
-                      <Badge color={item.statusColor ?? 'positive'}>{item.statusLabel}</Badge>
+                      <Badge color={invoice.statusColor ?? 'positive'}>{invoice.statusLabel}</Badge>
                     </td>
                     <td {...stylex.props(styles.cell, styles.actionCell)}>
                       {onView ? (
@@ -93,7 +108,7 @@ export function UserProfileBillingHistorySectionView({
                           color='neutral'
                           size='sm'
                           variant='link'
-                          onClick={() => onView(item.id)}
+                          onClick={() => onView(invoice.id)}
                         >
                           View
                         </Button>
@@ -130,17 +145,9 @@ export function UserProfileBillingHistorySectionView({
               >
                 <Icon name='chevron-left' />
               </Button>
-              <Button
-                aria-current='page'
-                aria-label={`Invoice page ${pagination.page}`}
-                color='neutral'
-                shape='square'
-                size='sm'
-                touchTarget={false}
-                variant='ghost'
-              >
-                {pagination.page}
-              </Button>
+              <span {...stylex.props(styles.pageCount)}>
+                {pagination.page} of {pagination.pageCount}
+              </span>
               <Button
                 aria-label='Next invoice page'
                 color='neutral'

@@ -1,0 +1,201 @@
+import * as stylex from '@stylexjs/stylex';
+
+import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
+
+export const styles = stylex.create({
+  actionCell: {
+    textAlign: 'end',
+  },
+  amountCell: {
+    color: colorVars['--cl-color-card-foreground'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+  },
+  cell: {
+    paddingBlock: space['3'],
+    paddingInline: space['4'],
+    verticalAlign: 'middle',
+  },
+  emptyCell: {
+    paddingBlock: space['6'],
+    color: colorVars['--cl-color-neutral-faded'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    textAlign: 'center',
+  },
+  header: {
+    backgroundColor: colorVars['--cl-color-border-faded'],
+  },
+  headerCell: {
+    paddingBlock: space['2.5'],
+    paddingInline: space['4'],
+    color: colorVars['--cl-color-neutral-faded'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    textAlign: 'start',
+  },
+  icon: {
+    display: 'block',
+    height: space['5'],
+    width: space['5'],
+  },
+  iconFrame: {
+    borderColor: 'light-dark(var(--cl-color-border-faded), var(--cl-color-background))',
+    borderRadius: radiusVars['--cl-radius-lg'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-background'],
+  },
+  invoiceColumn: {
+    width: '40%',
+  },
+  invoiceId: {
+    overflow: 'hidden',
+    color: colorVars['--cl-color-neutral-faded'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    marginBlockStart: space['0.5'],
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  invoiceLabel: {
+    color: colorVars['--cl-color-card-foreground'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+  },
+  lineItem: {
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  lineItemAmount: {
+    color: colorVars['--cl-color-card-foreground'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+  },
+  lineItems: {
+    gap: space['2'],
+    display: 'flex',
+    flexDirection: 'column',
+    marginBlockStart: space['4'],
+  },
+  pageCount: {
+    color: colorVars['--cl-color-neutral-faded'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    textAlign: 'center',
+    minWidth: space['10'],
+  },
+  pageSizeLabel: {
+    gap: space['2'],
+    alignItems: 'center',
+    color: colorVars['--cl-color-neutral-faded'],
+    display: 'flex',
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+  },
+  pageSizeSelect: {
+    borderColor: colorVars['--cl-color-border'],
+    borderRadius: radiusVars['--cl-radius-md'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    paddingBlock: space['1'],
+    paddingInline: space['2'],
+    backgroundColor: colorVars['--cl-color-card'],
+    color: colorVars['--cl-color-card-foreground'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+  },
+  pagination: {
+    gap: space['2'],
+    paddingBlock: space['2'],
+    paddingInline: space['3'],
+    alignItems: 'center',
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  paginationControls: {
+    gap: space['1'],
+    alignItems: 'center',
+    display: 'flex',
+  },
+  planLabel: {
+    gap: space['2'],
+    alignItems: 'center',
+    display: 'flex',
+  },
+  root: {
+    gap: space['8'],
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  },
+  row: {
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
+  },
+  seats: {
+    width: '100%',
+  },
+  seatsActions: {
+    gap: space['3'],
+    alignItems: 'center',
+    display: 'flex',
+  },
+  seatsHeader: {
+    gap: space['4'],
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  seatsUsage: {
+    color: colorVars['--cl-color-neutral-faded'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    whiteSpace: 'nowrap',
+  },
+  sectionHeading: {
+    gap: space['4'],
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  sections: {
+    gap: space['8'],
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  },
+  shell: {
+    borderColor: colorVars['--cl-color-border'],
+    borderRadius: radiusVars['--cl-radius-xl'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-card'],
+    width: '100%',
+  },
+  statusColumn: {
+    width: '18%',
+  },
+  table: {
+    borderCollapse: 'collapse',
+    tableLayout: 'fixed',
+    width: '100%',
+  },
+  tableScroller: {
+    overflowX: 'auto',
+    width: '100%',
+  },
+  viewColumn: {
+    width: '12%',
+  },
+});

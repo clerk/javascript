@@ -1,0 +1,37 @@
+import * as Stories from './organization-page.stories';
+
+# OrganizationPage
+
+The Organization profile shell. It owns the organization navigation and composes independent panels.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    {
+      name: 'General panel',
+      href: '/organization-profile/organization-profile-general-panel',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'Members panel',
+      href: '/organization-profile/organization-profile-members-panel',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'Security panel',
+      href: '/organization-profile/organization-profile-security-panel',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'Billing panel',
+      href: '/organization-profile/organization-profile-billing-panel',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'API Keys panel',
+      href: '/organization-profile/organization-profile-api-keys-panel',
+      layer: 'Organization Profile',
+    },
+  ]}
+/>

@@ -1,0 +1,22 @@
+import * as Stories from './organization-profile-security-panel.stories';
+
+# OrganizationProfileSecurityPanel
+
+The Security organization panel. It composes SSO authentication and verified-domain access settings.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    {
+      name: 'SSO',
+      href: '/organization-profile/organization-profile-sso-section',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'Verified domains',
+      href: '/organization-profile/organization-profile-verified-domains-section',
+      layer: 'Organization Profile',
+    },
+  ]}
+/>

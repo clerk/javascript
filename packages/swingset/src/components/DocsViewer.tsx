@@ -10,6 +10,37 @@ import { ViewSource } from './ViewSource';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
+  'organization-profile': {
+    'organization-page': dynamic(() => import('../stories/organization-page.mdx')),
+    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+    'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
+    'organization-profile-billing-panel': dynamic(() => import('../stories/organization-profile-billing-panel.mdx')),
+    'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
+    'organization-profile-security-panel': dynamic(() => import('../stories/organization-profile-security-panel.mdx')),
+    'organization-profile-details-section': dynamic(
+      () => import('../stories/organization-profile-details-section.mdx'),
+    ),
+    'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
+    'organization-profile-api-keys-section': dynamic(
+      () => import('../stories/organization-profile-api-keys-section.mdx'),
+    ),
+    'organization-profile-members-section': dynamic(
+      () => import('../stories/organization-profile-members-section.mdx'),
+    ),
+    'organization-profile-invoices-section': dynamic(
+      () => import('../stories/organization-profile-invoices-section.mdx'),
+    ),
+    'organization-profile-payment-methods-section': dynamic(
+      () => import('../stories/organization-profile-payment-methods-section.mdx'),
+    ),
+    'organization-profile-sso-section': dynamic(() => import('../stories/organization-profile-sso-section.mdx')),
+    'organization-profile-subscription-section': dynamic(
+      () => import('../stories/organization-profile-subscription-section.mdx'),
+    ),
+    'organization-profile-verified-domains-section': dynamic(
+      () => import('../stories/organization-profile-verified-domains-section.mdx'),
+    ),
+  },
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
