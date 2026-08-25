@@ -63,6 +63,7 @@ import type {
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
+  AgentActionApprovalProps,
   APIKeysNamespace,
   APIKeysProps,
   AuthenticateWithBaseParams,
@@ -1528,6 +1529,25 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountOAuthConsent = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  public __experimental_mountAgentActionApproval = (node: HTMLDivElement, props?: AgentActionApprovalProps) => {
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'AgentActionApproval';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: '__experimental_agentActionApproval',
+          node,
+          props,
+        }),
+      );
+  };
+
+  public __experimental_unmountAgentActionApproval = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 

@@ -834,6 +834,23 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts the experimental agent action approval component.
+   *
+   * @param targetNode - Target node to mount the component into.
+   * @param props - Agent action approval configuration.
+   * @experimental
+   */
+  __experimental_mountAgentActionApproval: (targetNode: HTMLDivElement, props?: AgentActionApprovalProps) => void;
+
+  /**
+   * Unmounts the experimental agent action approval component.
+   *
+   * @param targetNode - Target node to unmount the component from.
+   * @experimental
+   */
+  __experimental_unmountAgentActionApproval: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.

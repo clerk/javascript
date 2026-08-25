@@ -1,5 +1,6 @@
 import type {
   __internal_OAuthConsentProps,
+  AgentActionApprovalProps,
   APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -670,6 +671,34 @@ export const OAuthConsent = withClerk(
     );
   },
   { component: 'OAuthConsent', renderWhileLoading: true },
+);
+
+export const AgentActionApproval = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<AgentActionApprovalProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.__experimental_mountAgentActionApproval}
+            unmount={clerk.__experimental_unmountAgentActionApproval}
+            updateProps={(clerk as any).__internal_updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'AgentActionApproval', renderWhileLoading: true },
 );
 
 export const UserAvatar = withClerk(
