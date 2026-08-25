@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../reset.styles';
 import { truncationStyles } from '../typography.styles';
 import { iconSizes, sizes, styles, variants } from './button.styles';
@@ -119,6 +120,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
         themeProps('button', { color, variant, size, shape, fullWidth, disabled }),
         stylex.props(
           reset.base,
+          // one ring for every color and variant — it reads as focus, not as the button's color
+          focusOutline.visible,
           styles.base,
           sizes[size],
           variants[`${variant}-${color}`],

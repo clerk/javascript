@@ -67,10 +67,6 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '0px',
     gap: space['2'],
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
     paddingBlock: space['2'],
     paddingInline: space['2.5'],
     alignItems: 'center',
@@ -93,7 +89,6 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    outlineOffset: '2px',
     textAlign: 'start',
     whiteSpace: 'nowrap',
     minHeight: {
@@ -119,14 +114,9 @@ export const styles = stylex.create({
   },
   brandingLink: {
     borderRadius: radiusVars['--cl-radius-sm'],
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
     alignItems: 'center',
     color: 'inherit',
     display: 'inline-flex',
-    outlineOffset: '2px',
     height: space['4'],
   },
   main: { minWidth: 0 },

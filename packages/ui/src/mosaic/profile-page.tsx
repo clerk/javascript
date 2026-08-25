@@ -11,6 +11,7 @@ import type { IconName } from './icons/registry';
 import { styles } from './profile-page.styles';
 import type { MosaicComponentProps } from './props';
 import { mergeStyleProps, themeProps } from './props';
+import { focusOutline } from './utils/focus-outline.styles';
 
 export interface ProfilePageItem {
   value: string;
@@ -87,7 +88,7 @@ const ProfilePageSidebar = React.forwardRef<HTMLElement, ProfilePageSidebarProps
                   value={item.value}
                   {...mergeStyleProps(
                     themeProps('profile-page-navigation-item'),
-                    stylex.props(reset.base, styles.navigationItem),
+                    stylex.props(reset.base, styles.navigationItem, focusOutline.visible),
                   )}
                 >
                   <Icon
@@ -110,7 +111,7 @@ const ProfilePageSidebar = React.forwardRef<HTMLElement, ProfilePageSidebarProps
                 target='_blank'
                 {...mergeStyleProps(
                   themeProps('profile-page-branding-link'),
-                  stylex.props(reset.base, styles.brandingLink),
+                  stylex.props(reset.base, styles.brandingLink, focusOutline.visible),
                 )}
               >
                 <ClerkLogo height={12} />

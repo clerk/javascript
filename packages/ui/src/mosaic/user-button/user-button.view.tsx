@@ -20,6 +20,7 @@ import { Spinner } from '../components/spinner';
 import { truncationStyles } from '../components/typography.styles';
 import type { IconName } from '../icons/registry';
 import { fontWeightVars } from '../tokens.stylex';
+import { focusOutline } from '../utils/focus-outline.styles';
 import type { UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
 import { fill, plural, userButtonBase as m } from './user-button.messages';
@@ -980,7 +981,12 @@ export function UserButtonTrigger({
   return (
     <Popover.Trigger
       aria-label={fill(m.trigger.open, { name })}
-      {...stylex.props(styles.trigger, renderTriggerLabel ? styles.triggerLabelled : null, triggerShapes[shape])}
+      {...stylex.props(
+        focusOutline.visible,
+        styles.trigger,
+        renderTriggerLabel ? styles.triggerLabelled : null,
+        triggerShapes[shape],
+      )}
     >
       <RowAvatar
         name={name}

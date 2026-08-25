@@ -51,8 +51,8 @@ rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
   render the same visual surface — e.g. inputs (`TextInput`, `NumberInput`, date
   fields, `Selector`) sharing one `inputWrapper` / `inputStatusBorder` /
   `inputStatusFocusWithin` set instead of redefining the border/focus treatment
-  five times. (The shared-surface pattern to reach for when it appears; no shared
-  styles file exists in Mosaic yet.)
+  five times. `utils/focus-outline.styles.ts` is the one that exists today: it
+  carries the keyboard focus ring for the whole system.
 - **DON'T** copy a slot's atoms between siblings. A repeated style object is the
   same signal as a repeated conditional: extract the shared concept.
 
@@ -86,6 +86,10 @@ export const colorVars = stylex.defineVars(colorDefaults);
   `--cl-color-primary-hover-12`.
 - **DON'T** mint a per-step derivative token for something a `calc()`/`color-mix()`
   can express from an existing token.
+- **DON'T** give one value two public names. The focus ring's colour is
+  `--cl-color-ring` and nothing else — a `--cl-focus-outline-color` alias beside it
+  would let a consumer override one and not the other, and the ring's appearance
+  would then depend on which they picked.
 - **DO** build a fill that sits _on top of_ an unknown backdrop — a hover or pressed
   wash on a transparent `outline`/`ghost` control — as a **scrim**: an opacity of
   black-on-light / white-on-dark over `transparent`, not a percentage of a gray token.
@@ -318,29 +322,38 @@ device, while touch devices look correct.
 
 Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
 
-- **DO** use `:focus-visible` for focus rings (never bare `:focus`). For a
-  **container** that should ring when a child is focused, use
-  `:has(:focus-visible)` — **not** `:focus-within`. `:focus-within` matches any
-  descendant focus, including a mouse click, so the container ring would flash on
-  click; `:has(:focus-visible)` matches only keyboard-visible focus, so the
-  container ring tracks the same modality as the element's own. `:has(:focus-visible)`
-  is a plain conditional-value key, no special API:
+- **DON'T** write a focus ring by hand. Compose `focusOutline` from
+  `utils/focus-outline.styles.ts` into the element's `stylex.props(...)`:
+  `focusOutline.visible` for the element's own keyboard focus, `focusOutline.within`
+  for a **container** that should ring when a child is focused. The ring is one
+  decision for the whole system — width, style, colour and offset all come from
+  `--cl-focus-outline-*` and `--cl-color-ring`, so a theme retargets every ring at
+  once.
 
-  ```ts
-  // container.styles.ts — the wrapper rings only on keyboard focus of a child
-  outline:       { default: null, ':has(:focus-visible)': `2px solid ${colorVars['--cl-color-primary']}` },
-  outlineOffset: { default: null, ':has(:focus-visible)': space['0.5'] },
+  ```tsx
+  // item.tsx — the ring is an atom in the chain, not a property in the styles file
+  stylex.props(reset.base, focusOutline.visible, slots.item.base, slots.item[size]);
   ```
 
-  Reach for `:focus-within` only when you genuinely want an any-modality reaction
-  (keep an affordance visible while a descendant is focused), never for a ring.
+  It uses `:focus-visible`, never bare `:focus`, and `:has(:focus-visible)` for the
+  container form — **not** `:focus-within`, which matches any descendant focus
+  including a mouse click, so the container ring would flash on click. Reach for
+  `:focus-within` only when you genuinely want an any-modality reaction (keep an
+  affordance visible while a descendant is focused), never for a ring.
+
+  The ring is written as **longhands**, not the `outline` shorthand: StyleX ranks a
+  longhand above a shorthand regardless of argument order, so it survives a
+  component or consumer style carrying `outline: 'none'`, and a component can
+  re-colour its ring without restating the width and style.
+
+  `Input` is the deliberate exception — it marks focus with a border and box-shadow
+  rather than a ring, and keeps an outline only under `forced-colors`.
 
 - **DO** use `default: null` when a property exists **only** in a pseudo/state
   branch, so the atom doesn't emit a base value that would clobber a merged style:
 
   ```ts
-  outline:       { default: null, ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}` },
-  outlineOffset: { default: null, ':focus-visible': space['0.5'] },
+  boxShadow: { default: null, ':focus-visible': focusShadow },
   ```
 
 - **DO** take durations from `durationVars` (`--cl-duration-instant` / `-fast` /
