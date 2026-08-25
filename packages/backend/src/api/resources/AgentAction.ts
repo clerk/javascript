@@ -144,9 +144,6 @@ export class AgentActionDecision {
  * was asked, how they answered. Every `check()` creates one, including operations the
  * policy immediately allows.
  *
- * Not to be confused with {@link AgentTask}, an unrelated session-creation affordance that
- * only sorts next to this object alphabetically.
- *
  * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export class AgentAction {

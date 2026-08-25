@@ -2,8 +2,6 @@ import type { AgentTaskJSON } from './JSON';
 
 /**
  * The Backend `AgentTask` object represents an Agent Task resource. Agent Tasks are used for testing purposes and allow creating sessions for users without requiring full authentication flows.
- *
- * Not to be confused with {@link AgentAction}, an unrelated record of an agent operation awaiting a policy decision.
  */
 export class AgentTask {
   constructor(

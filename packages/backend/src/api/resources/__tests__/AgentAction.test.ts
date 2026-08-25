@@ -84,7 +84,6 @@ describe('AgentAction', () => {
       const action = AgentAction.fromJSON({
         ...actionJSON,
         parameters_display: [
-          // snake_case is the direction that matters: §3.2 forbids the camelCasing applied everywhere else.
           { key: 'refund_amount', label: 'Refund amount', value: '$250.00' },
           { key: 'refundAmount', label: 'Refund amount (raw)', value: 25000 },
           { key: 'Customer-Id', label: 'Customer', value: 'cus_9x' },
@@ -126,7 +125,6 @@ describe('AgentAction', () => {
         resolvedAt: 1755658800000,
         resolutionComment: 'Duplicate confirmed.',
       });
-      // api-contracts-v1 §3: the approval block survives resolution rather than being cleared.
       expect(action.approval).toEqual({
         role: 'org:support_manager',
         url: 'https://accounts.example.com/action-approval/agtact_2mK',
@@ -143,7 +141,6 @@ describe('AgentAction', () => {
         decision: { ...decisionJSON, effect: 'require_approval', reason: 'missing_subject_for_approval' },
       });
 
-      // The five-part wire signature from api-contracts-v1 §3.
       expect(action.status).toBe('denied');
       expect(action.approval).toBeNull();
       expect(action.decision.effect).toBe('require_approval');

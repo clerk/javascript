@@ -148,7 +148,6 @@ function jsonToObject(item: any): any {
       return ActorToken.fromJSON(item);
     case ObjectType.AgentAction:
       return AgentAction.fromJSON(item);
-    // No AgentActionDecision arm: a decision only ever arrives embedded in an agent_action.
     case ObjectType.AgentActionStatus:
       return AgentActionStatus.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
