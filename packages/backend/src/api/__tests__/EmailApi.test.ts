@@ -59,6 +59,43 @@ describe('EmailApi', () => {
     expect(response.deliveredByClerk).toBe(true);
   });
 
+  it('sends an idempotency key without adding it to the body', async () => {
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/email',
+        validateHeaders(async ({ request }) => {
+          expect(request.headers.get('Idempotency-Key')).toBe('campaign-123-contact-456');
+          const body = await request.json();
+          expect(body).not.toHaveProperty('idempotency_key');
+          return HttpResponse.json(mockEmail);
+        }),
+      ),
+    );
+
+    await apiClient.emails.create(
+      {
+        to: { address: 'admin@acme.com' },
+        from: { address: 'noreply@acme.com' },
+        subject: 'Hello',
+        html: '<p>hi</p>',
+      },
+      { idempotencyKey: 'campaign-123-contact-456' },
+    );
+  });
+
+  it('gets the stored provider-acceptance status', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/email/ema_123',
+        validateHeaders(() => HttpResponse.json({ ...mockEmail, status: 'accepted' })),
+      ),
+    );
+
+    const response = await apiClient.emails.get('ema_123');
+    expect(response.id).toBe('ema_123');
+    expect(response.status).toBe('accepted');
+  });
+
   it('sends a transactional email with a text body', async () => {
     server.use(
       http.post(

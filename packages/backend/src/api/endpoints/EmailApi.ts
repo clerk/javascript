@@ -103,8 +103,21 @@ export type CreateEmailParams = {
    */
   replyTo?: Mailbox;
 
+  /** Maximum 998 characters. */
   subject: string;
 } & EmailContent;
+
+export type CreateEmailOptions = {
+  /**
+   * Deduplicates retries of the same logical send. Reuse a key only when the
+   * recipient and content are identical; use one stable key per recipient
+   * when fanning out a batch. The server replay window is 24 hours; keep a
+   * durable logical-send record if duplicates after that window matter. Keys
+   * may contain only ASCII letters, digits, underscores, and hyphens, up to
+   * 255 characters.
+   */
+  idempotencyKey?: string;
+};
 
 export class EmailApi extends AbstractAPI {
   /**
@@ -114,17 +127,30 @@ export class EmailApi extends AbstractAPI {
    *
    * Sends a transactional email.
    */
-  public async create(params: CreateEmailParams) {
+  public async create(params: CreateEmailParams, options: CreateEmailOptions = {}) {
     return this.request<Email>({
       method: 'POST',
       path: basePath,
       bodyParams: params,
+      ...(options.idempotencyKey ? { headerParams: { 'Idempotency-Key': options.idempotencyKey } } : {}),
       options: {
         // Snakecase nested keys too, so a `to: { userId }` recipient is sent as
         // `to: { user_id }` on the wire (the default only snakecases top-level
         // keys, which would leave the nested `userId` untouched).
         deepSnakecaseBodyParamKeys: true,
       },
+    });
+  }
+
+  /**
+   * Returns Clerk's stored send state for a transactional email. `accepted`
+   * means the provider accepted the request; it does not prove delivery.
+   */
+  public async get(emailId: string) {
+    this.requireId(emailId);
+    return this.request<Email>({
+      method: 'GET',
+      path: `${basePath}/${emailId}`,
     });
   }
 }
