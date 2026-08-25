@@ -118,6 +118,7 @@ function SignInRoutes(): JSX.Element {
               <SignUpEmailLinkFlowComplete
                 redirectUrlComplete={signUpContext.afterSignUpUrl}
                 ssoCallbackUrl={signUpContext.ssoCallbackUrl}
+                oidcPrompt={signInContext.oidcPrompt}
                 verifyEmailPath='../verify-email-address'
                 verifyPhonePath='../verify-phone-number'
                 continuePath='../continue'
