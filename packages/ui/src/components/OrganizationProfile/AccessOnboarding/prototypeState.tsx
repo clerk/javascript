@@ -20,6 +20,8 @@ export type ProtoAuthentication =
 
 export type ProtoOwnership = 'unverified' | 'verified' | 'waived';
 
+export type ProtoNonDirectoryFallback = 'block' | 'request_access';
+
 export type ProtoDomain = {
   id: string;
   name: string;
@@ -29,7 +31,41 @@ export type ProtoDomain = {
   ownership: ProtoOwnership;
   txtRecordName: string;
   txtRecordValue: string;
+  /** Restrict-only extras the C2 can demand on top of the app baseline. */
+  twoStepRequired: boolean;
+  sessionLifetimeHours: number;
+  /** Only read when enrollment is directory_synced. */
+  nonDirectoryFallback: ProtoNonDirectoryFallback;
+  /**
+   * Set by the C1, never by the C2 (crosses the org boundary into the
+   * application's tenancy model) — surfaces here as a read-only fact.
+   */
+  membershipRequired?: boolean;
 };
+
+/*
+ * Mirrors the dashboard prototype's application defaults: a rule can require
+ * re-verification more often than the application setting, never less.
+ */
+export const APP_SESSION_LIFETIME_HOURS = 12;
+export const SESSION_LIFETIME_OPTIONS = [1, 8, 12] as const;
+export const formatSessionLifetime = (hours: number) => (hours === 1 ? '1 hour' : `${hours} hours`);
+
+export const NON_DIRECTORY_FALLBACK_LABELS: Record<ProtoNonDirectoryFallback, { label: string; description: string }> =
+  {
+    block: {
+      label: 'Block them',
+      description: 'The directory is the only way in. They see an error telling them to contact an admin.',
+    },
+    request_access: {
+      label: 'Let them request access',
+      description: 'An admin approves them one by one. Useful when the directory only covers part of the company.',
+    },
+  };
+
+/** The recommendation tracks who is vouching, same as the dashboard wizard. */
+export const recommendedEnrollmentFor = (signInMode: 'default' | 'sso'): ProtoEnrollment =>
+  signInMode === 'sso' ? 'join_automatically' : 'request_access';
 
 export const ENROLLMENT_LABELS: Record<ProtoEnrollment, { label: string; description: string }> = {
   join_automatically: {
@@ -46,7 +82,7 @@ export const ENROLLMENT_LABELS: Record<ProtoEnrollment, { label: string; descrip
   },
   directory_synced: {
     label: 'Sync from a directory',
-    description: 'Members are created and removed by your directory over SCIM.',
+    description: 'Members are created and removed by the directory. Nobody joins on their own.',
   },
 };
 
@@ -70,6 +106,11 @@ const SEED_DOMAINS: ProtoDomain[] = [
     authentication: { mode: 'sso', provider: 'saml_okta', status: 'active' },
     affiliationVerified: true,
     ownership: 'verified',
+    twoStepRequired: false,
+    sessionLifetimeHours: APP_SESSION_LIFETIME_HOURS,
+    nonDirectoryFallback: 'block',
+    // Seeded so the read-only membership fact has something to show.
+    membershipRequired: true,
     ...txtRecordFor('acme.com'),
   },
   {
@@ -79,6 +120,9 @@ const SEED_DOMAINS: ProtoDomain[] = [
     authentication: { mode: 'default' },
     affiliationVerified: true,
     ownership: 'unverified',
+    twoStepRequired: false,
+    sessionLifetimeHours: APP_SESSION_LIFETIME_HOURS,
+    nonDirectoryFallback: 'block',
     ...txtRecordFor('contractors.acme.com'),
   },
 ];
@@ -88,6 +132,15 @@ type ProtoAction =
   | { type: 'markAffiliationVerified'; id: string }
   | { type: 'markOwnershipVerified'; id: string }
   | { type: 'setEnrollment'; id: string; enrollment: ProtoEnrollment }
+  | {
+      type: 'configureRule';
+      id: string;
+      enrollment: ProtoEnrollment;
+      twoStepRequired: boolean;
+      sessionLifetimeHours: number;
+      nonDirectoryFallback: ProtoNonDirectoryFallback;
+      ssoProvider: ProtoProvider | null;
+    }
   | { type: 'setSsoProvider'; id: string; provider: ProtoProvider }
   | { type: 'completeSsoSetup'; id: string }
   | { type: 'simulateFirstSignIn'; id: string }
@@ -109,6 +162,9 @@ const reducer = (domains: ProtoDomain[], action: ProtoAction): ProtoDomain[] => 
           authentication: { mode: 'default' },
           affiliationVerified: false,
           ownership: 'unverified',
+          twoStepRequired: false,
+          sessionLifetimeHours: APP_SESSION_LIFETIME_HOURS,
+          nonDirectoryFallback: 'block',
           ...txtRecordFor(name),
         },
       ];
@@ -119,6 +175,16 @@ const reducer = (domains: ProtoDomain[], action: ProtoAction): ProtoDomain[] => 
       return patch(domains, action.id, { ownership: 'verified' });
     case 'setEnrollment':
       return patch(domains, action.id, { enrollment: action.enrollment });
+    case 'configureRule':
+      return patch(domains, action.id, {
+        enrollment: action.enrollment,
+        twoStepRequired: action.twoStepRequired,
+        sessionLifetimeHours: action.sessionLifetimeHours,
+        nonDirectoryFallback: action.nonDirectoryFallback,
+        authentication: action.ssoProvider
+          ? { mode: 'sso', provider: action.ssoProvider, status: 'setting_up' }
+          : { mode: 'default' },
+      });
     case 'setSsoProvider':
       return patch(domains, action.id, {
         authentication: { mode: 'sso', provider: action.provider, status: 'setting_up' },

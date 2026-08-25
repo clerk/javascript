@@ -30,7 +30,9 @@ type SetUpSsoFormProps = {
 export const SetUpSsoForm = withCardStateProvider(({ domain, onClose }: SetUpSsoFormProps) => {
   const { dispatch } = useAccessOnboarding();
   const wizard = useWizard({ defaultStep: hasOwnership(domain) ? 1 : 0 });
-  const [provider, setProvider] = useState<ProtoProvider>('saml_okta');
+  const [provider, setProvider] = useState<ProtoProvider>(
+    domain.authentication.mode === 'sso' ? domain.authentication.provider : 'saml_okta',
+  );
   const [isVerifying, setIsVerifying] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
 
