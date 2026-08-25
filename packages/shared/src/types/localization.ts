@@ -1374,6 +1374,24 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue<'applicationName'>;
     };
   };
+  agentActionApproval: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    requestedBy: LocalizationValue<'agent' | 'createdAt'>;
+    commentLabel: LocalizationValue;
+    commentPlaceholder: LocalizationValue;
+    expiresIn: LocalizationValue<'remaining'>;
+    action__approve: LocalizationValue;
+    action__reject: LocalizationValue;
+    terminal: {
+      approvedTitle: LocalizationValue;
+      approvedSubtitle: LocalizationValue;
+      rejectedTitle: LocalizationValue;
+      rejectedSubtitle: LocalizationValue;
+      expiredTitle: LocalizationValue;
+      expiredSubtitle: LocalizationValue;
+    };
+  };
   unstable__errors: UnstableErrors;
   dates: {
     previous6Days: LocalizationValue<'date'>;

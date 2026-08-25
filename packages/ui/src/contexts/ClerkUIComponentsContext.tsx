@@ -148,6 +148,8 @@ export function ComponentContextProvider({
         </OAuthConsentContext.Provider>
       );
     }
+    case 'AgentActionApproval':
+      return children;
     case 'TaskChooseOrganization':
       return (
         <TaskChooseOrganizationContext.Provider

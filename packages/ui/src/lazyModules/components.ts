@@ -32,6 +32,8 @@ const componentImportPaths = {
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   ConfigureSSO: () => import(/* webpackChunkName: "configureSSO" */ '../components/ConfigureSSO/ConfigureSSO'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
+  AgentActionApproval: () =>
+    import(/* webpackChunkName: "agentActionApproval" */ '../components/AgentActionApproval/AgentActionApproval'),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
 } as const;
@@ -156,6 +158,10 @@ export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
 );
 
+export const AgentActionApproval = lazy(() =>
+  componentImportPaths.AgentActionApproval().then(module => ({ default: module.AgentActionApproval })),
+);
+
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTasks })),
 );
@@ -193,6 +199,7 @@ export const ClerkComponents = {
   APIKeys,
   ConfigureSSO,
   OAuthConsent,
+  AgentActionApproval,
   SubscriptionDetails,
   TaskChooseOrganization,
   TaskResetPassword,

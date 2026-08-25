@@ -2770,6 +2770,20 @@ export type OAuthConsentProps = {
   onDeny?: () => void;
 };
 
+/**
+ * Properties for the experimental agent action approval component.
+ *
+ * @interface
+ *
+ * @experimental
+ */
+export type AgentActionApprovalProps = {
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided).
+   */
+  appearance?: ClerkAppearanceTheme;
+};
+
 /** @deprecated Use OAuthConsentProps instead. */
 export type __internal_OAuthConsentProps = OAuthConsentProps;
 

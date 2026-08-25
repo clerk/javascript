@@ -978,6 +978,25 @@ export const enUS: LocalizationResource = {
     warning:
       'Make sure that you trust {{applicationName}} ({{domainAction}}). You may be sharing sensitive data with this site or app.',
   },
+  agentActionApproval: {
+    action__approve: 'Approve',
+    action__reject: 'Reject',
+    commentLabel: 'Comment (optional)',
+    commentPlaceholder: 'Add context for the requesting application',
+    expiresIn: 'Approval window closes in {{remaining}}',
+    requestedBy: 'Requested by {{agent}} · {{createdAt}}',
+    subtitle: 'Review the details before allowing this action to continue.',
+    terminal: {
+      approvedSubtitle: 'You can close this window, return to your agent, and retry the request.',
+      approvedTitle: 'Agent is now authorized to continue',
+      expiredSubtitle:
+        'The approval window closed. No action was taken. You can close this window and return to your agent.',
+      expiredTitle: 'Approval window closed',
+      rejectedSubtitle: 'No action was taken. You can close this window and return to your agent.',
+      rejectedTitle: 'Action rejected',
+    },
+    title: 'Approve agent action',
+  },
   organizationList: {
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',

@@ -3,6 +3,7 @@ import type {
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
+  AgentActionApprovalProps,
   APIKeysProps,
   ClerkAppearanceTheme,
   ConfigureSSOProps,
@@ -33,6 +34,7 @@ import type { MutableRefObject } from 'react';
 import type { WithInternalRouting } from './internal';
 
 export type {
+  AgentActionApprovalProps,
   OAuthConsentProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
@@ -67,6 +69,7 @@ export type AvailableComponentProps =
   | APIKeysProps
   | ConfigureSSOProps
   | OAuthConsentProps
+  | AgentActionApprovalProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
   | TaskSetupMFAProps;
@@ -227,6 +230,10 @@ export type OAuthConsentCtx = {
   appearance?: ClerkAppearanceTheme;
 };
 
+export type AgentActionApprovalCtx = AgentActionApprovalProps & {
+  componentName: 'AgentActionApproval';
+};
+
 export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
   componentName: 'SubscriptionDetails';
 };
@@ -253,6 +260,7 @@ export type AvailableComponentCtx =
   | APIKeysCtx
   | ConfigureSSOCtx
   | OAuthConsentCtx
+  | AgentActionApprovalCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
   | TaskChooseOrganizationCtx
