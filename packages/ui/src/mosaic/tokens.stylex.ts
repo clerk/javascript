@@ -55,11 +55,7 @@ const colorDefaults = {
   '--cl-color-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
   '--cl-color-border-faded': 'light-dark(oklch(0.9702 0 0), oklch(0.296 0.0126 285.61))',
 
-  // The keyboard focus ring. Its own name rather than `--cl-color-primary` at the use
-  // site, so a theme can pull the ring off the brand colour — a primary that lands close
-  // to a surface leaves the ring invisible against it — without moving the brand. Written
-  // by hand rather than read off `colorVars`, which the group being defined can't see.
-  '--cl-color-ring': 'var(--cl-color-primary)',
+  '--cl-color-ring': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
 } as const;
 
 export const colorVars = stylex.defineVars(colorDefaults);
