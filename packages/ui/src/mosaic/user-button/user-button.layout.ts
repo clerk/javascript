@@ -52,7 +52,7 @@ interface ModeLayout {
 const modes = {
   combined: {
     header: ['inviteMembers', 'manageLead'],
-    organizations: { heading: ['manageAccount', 'signOut'], footer: ['createOrganization'] },
+    organizations: { heading: ['createOrganization', 'manageAccount', 'signOut'], footer: ['createOrganization'] },
     footer: ['switchAccount', 'signOutAll'],
   },
   // Not about the account, so it heads its workspaces with nothing and offers no other account.

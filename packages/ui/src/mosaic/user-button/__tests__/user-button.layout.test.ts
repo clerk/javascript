@@ -28,7 +28,7 @@ describe('resolveUserButtonLayout, where each action lands', () => {
   it('spreads them across all four slots in combined mode', () => {
     expect(resolve('combined').actions).toEqual({
       header: ['inviteMembers', 'manageLead'],
-      organizationsHeading: ['manageAccount', 'signOut'],
+      organizationsHeading: ['createOrganization', 'manageAccount', 'signOut'],
       organizationsFooter: ['createOrganization'],
       footer: ['switchAccount', 'signOutAll'],
     });

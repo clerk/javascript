@@ -269,6 +269,7 @@ describe('UserButtonView, combined mode', () => {
     await act.click(screen.getByRole('button', { name: 'Actions for alice@example.com' }));
 
     expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Add organization' })).toBeInTheDocument();
     await act.click(screen.getByRole('menuitem', { name: 'Sign out' }));
 
     expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
