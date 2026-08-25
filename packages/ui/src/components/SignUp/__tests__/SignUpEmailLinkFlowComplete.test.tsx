@@ -42,8 +42,8 @@ describe('SignUpEmailLinkFlowComplete', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
       });
-      (fixtures.signUp as any).status = 'missing_requirements';
-      (fixtures.signUp as any).missingFields = ['enterprise_sso'];
+      fixtures.signUp.status = 'missing_requirements';
+      fixtures.signUp.missingFields = ['enterprise_sso'];
 
       render(
         <SignUpEmailLinkFlowComplete
