@@ -11,7 +11,7 @@ import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './u
  *  │ alice@x.com           [⋯]  │ │                          │ │                            │ organizationsHeading
  *  │ Personal account           │ │ Personal account         │ │                            │ ┐
  *  │ ✓ Foundry                  │ │ ✓ Foundry                │ │                            │ ┘ organization rows
- *  │ + Add organization         │ │ + Add organization       │ │                            │ organizationsFooter
+ *  │ + Create organization      │ │ + Create organization    │ │                            │ organizationsFooter
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
  *  │ ⇄ Switch account        ›  │ │                          │ │ ⇄ Switch account        ›  │ ┐
  *  │ ⤴ Sign out of all accounts │ │                          │ │ ⤴ Sign out of all accounts │ ┘ footer

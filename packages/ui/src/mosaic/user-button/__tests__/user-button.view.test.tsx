@@ -128,7 +128,7 @@ describe('UserButtonView, user mode', () => {
     expect(workspaceList()).toBeUndefined();
     expect(screen.queryByText('Personal account')).toBeNull();
     expect(screen.queryByText('Gamma')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Add organization' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
   });
 
   it('signs out of the account from the header, beside the gear', async () => {
@@ -226,10 +226,10 @@ describe('UserButtonView, organization mode', () => {
     expect(screen.queryByRole('button', { name: 'Sign out' })).toBeNull();
   });
 
-  it('trails the workspaces with "Add organization", in place of the account actions', () => {
+  it('trails the workspaces with "Create organization", in place of the account actions', () => {
     renderOrganizationMode();
 
-    expect(within(workspaceList()).getByRole('button', { name: 'Add organization' })).toBeInTheDocument();
+    expect(within(workspaceList()).getByRole('button', { name: 'Create organization' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Add account' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Sign out of all accounts' })).toBeNull();
   });
@@ -269,20 +269,20 @@ describe('UserButtonView, combined mode', () => {
     await act.click(screen.getByRole('button', { name: 'Actions for alice@example.com' }));
 
     expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Add organization' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument();
     await act.click(screen.getByRole('menuitem', { name: 'Sign out' }));
 
     expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
   });
 
-  it('trails the workspaces with "Add organization", below the last of them', async () => {
+  it('trails the workspaces with "Create organization", below the last of them', async () => {
     const onCreateOrganization = vi.fn();
     renderCombined({ onCreateOrganization });
 
     // Not `labels`: the row is an action rather than a workspace, so its label is the secondary one.
     const rows = Array.from(workspaceList()?.querySelectorAll('.cl-item-label') ?? []);
-    expect(rows.at(-1)?.textContent).toBe('Add organization');
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Add organization' }));
+    expect(rows.at(-1)?.textContent).toBe('Create organization');
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Create organization' }));
 
     expect(onCreateOrganization).toHaveBeenCalled();
   });

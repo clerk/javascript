@@ -140,7 +140,7 @@ const LATENCY_MS = 800;
  * instant — each action is a network round trip against Clerk, so the prototype fakes one: the
  * clicked row spins, the rest stand down, and the surface stays open so you land back on the result.
  * Only picking a workspace closes it, because that is the one action the surface exists to perform.
- * The actions that would navigate somewhere in a real app (Manage, Invite, Add organization, Add
+ * The actions that would navigate somewhere in a real app (Manage, Invite, Create organization, Add
  * account) have nowhere to go here, so they only close the popover.
  */
 function usePrototype(): Omit<UserButtonProps, 'mode'> {

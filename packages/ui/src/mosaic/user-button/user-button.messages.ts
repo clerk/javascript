@@ -17,7 +17,6 @@ export const userButtonBase = {
     personal: 'Personal account',
     loading: 'Loading organizations…',
     members: { one: '{count} member', other: '{count} members' },
-    add: 'Add organization',
     accept: 'Accept',
     join: 'Join',
     requested: 'Requested',
@@ -35,6 +34,7 @@ export const userButtonBase = {
     invite: 'Invite',
     account: 'Manage account',
     organization: 'Manage organization',
+    createOrganization: 'Create organization',
   },
 };
 

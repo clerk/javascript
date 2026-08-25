@@ -22,7 +22,7 @@ it with `useUserButtonController()` and needs no props.
 A working prototype over mock accounts — try it. Nothing is instant: the clicked row spins, the rest
 stand down, and the surface stays open so you land on the result. Only picking a workspace closes it.
 `pendingKey` drives that, and the connected `UserButton` sets it from the action in flight. Actions
-that would navigate (Manage, Invite, Add organization, Add account) only close the popover here.
+that would navigate (Manage, Invite, Create organization, Add account) only close the popover here.
 
 <Story
   name='Combined'
@@ -117,7 +117,7 @@ only by `mode`.
 
 ### Organizations
 
-The org heads it, with **Invite** and the gear (**Manage organization**). **Add organization** trails
+The org heads it, with **Invite** and the gear (**Manage organization**). **Create organization** trails
 the workspaces the way it does on a combined surface, and nothing else is on offer, so the popup ends
 there. The extra account is in the props, deliberately unrendered.
 

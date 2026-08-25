@@ -459,7 +459,7 @@ function OrganizationsHeading() {
   const actions: RowAction[] = [];
   for (const action of data.layout.actions.organizationsHeading) {
     if (action === 'createOrganization' && data.onCreateOrganization) {
-      actions.push({ label: m.workspaces.add, onClick: data.onCreateOrganization });
+      actions.push({ label: m.manage.createOrganization, onClick: data.onCreateOrganization });
     }
     if (action === 'manageAccount' && data.onManageAccount) {
       actions.push({ label: m.manage.account, onClick: data.onManageAccount });
@@ -842,7 +842,7 @@ function OrganizationSection() {
               size='sm'
             />
           }
-          label={m.workspaces.add}
+          label={m.manage.createOrganization}
           onClick={data.onCreateOrganization}
         />,
       );
