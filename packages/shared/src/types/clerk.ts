@@ -332,6 +332,16 @@ export interface Clerk {
    */
   __internal_moduleManager: ModuleManager | undefined;
 
+  /**
+   * The verification-module load timeout asked for by the loader this browser was assigned, or
+   * undefined when it asked for nothing. The assignment is randomized per page load, so it cannot
+   * be recomputed from the environment config; callers fall back to the instance-wide value on
+   * that config, and then to the SDK default.
+   *
+   * @internal
+   */
+  __internal_protectChallengeLoadTimeoutMs?: number;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */

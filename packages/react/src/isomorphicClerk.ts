@@ -302,6 +302,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.__internal_moduleManager;
   }
 
+  public get __internal_protectChallengeLoadTimeoutMs(): number | undefined {
+    return this.clerkjs?.__internal_protectChallengeLoadTimeoutMs;
+  }
+
   constructor(options: IsomorphicClerkOptions) {
     this.#publishableKey = options?.publishableKey;
     this.#proxyUrl = options?.proxyUrl;
