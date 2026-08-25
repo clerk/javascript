@@ -38,9 +38,10 @@ test.describe('Keyless mode @astro', () => {
   }) => {
     const response = await page.goto(`${app.serverUrl}/`);
     expect(response?.status()).toBe(500);
-    const content = await page.content();
-    expect(content).toContain('Publishable key is missing');
-    expect(content).toContain('npx clerk@latest init');
+    // The Astro dev error overlay renders inside shadow DOM, which page.content() does not
+    // include — locators pierce open shadow roots.
+    await expect(page.getByText('Publishable key is missing').first()).toBeVisible();
+    await expect(page.getByText('npx clerk@latest init').first()).toBeVisible();
   });
 
   test('Claimed application with keys inside .env renders without the keyless popover.', async ({ page, context }) => {
