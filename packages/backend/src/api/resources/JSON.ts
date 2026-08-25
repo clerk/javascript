@@ -605,7 +605,7 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface AgentActionParametersDisplayJSON {
   key: string;
@@ -614,7 +614,7 @@ export interface AgentActionParametersDisplayJSON {
 }
 
 /**
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface AgentActionEvaluationErrorJSON {
   rule_id: string;
@@ -622,7 +622,7 @@ export interface AgentActionEvaluationErrorJSON {
 }
 
 /**
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface AgentActionApprovalJSON {
   role: string | null;
@@ -631,7 +631,7 @@ export interface AgentActionApprovalJSON {
 }
 
 /**
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface AgentActionResolutionJSON {
   resolved_by_user_id: string;
@@ -640,7 +640,7 @@ export interface AgentActionResolutionJSON {
 }
 
 /**
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface AgentActionDecisionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AgentActionDecision;
@@ -656,7 +656,7 @@ export interface AgentActionDecisionJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface AgentActionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AgentAction;
@@ -681,7 +681,7 @@ export interface AgentActionJSON extends ClerkResourceJSON {
  * The slim status view returned by the resolution-delivery endpoint. It carries no
  * `id` of its own: it is a projection of the Agent Action named by `action_id`.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface AgentActionStatusJSON {
   object: typeof ObjectType.AgentActionStatus;

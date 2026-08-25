@@ -128,6 +128,14 @@ describe('AgentAction', () => {
         resolvedAt: 1755658800000,
         resolutionComment: 'Duplicate confirmed.',
       });
+      // api-contracts-v1 §3: the approval block survives resolution, and `expires_at`
+      // becomes historical rather than being cleared. `status` is what says the action
+      // is terminal.
+      expect(action.approval).toEqual({
+        role: 'org:support_manager',
+        url: 'https://accounts.example.com/action-approval/agtact_2mK',
+        expiresAt: 1755741600000,
+      });
     });
 
     it('keeps status and decision.effect on separate axes for a fail-closed downgrade', () => {
@@ -186,6 +194,19 @@ describe('AgentActionDecision', () => {
       expect(decision.effect).toBe('allow');
     });
 
+    it('maps a deny decision, where the reason is the rule author’s', () => {
+      const decision = AgentActionDecision.fromJSON({
+        ...decisionJSON,
+        rule_id: 'rule_refunds_over_limit',
+        effect: 'deny',
+        reason: 'Refunds above $100 are not delegated to agents.',
+      });
+
+      expect(decision.effect).toBe('deny');
+      expect(decision.ruleId).toBe('rule_refunds_over_limit');
+      expect(decision.reason).toBe('Refunds above $100 are not delegated to agents.');
+    });
+
     it('maps evaluation errors in priority order', () => {
       const decision = AgentActionDecision.fromJSON({
         ...decisionJSON,
@@ -242,6 +263,20 @@ describe('AgentActionStatus', () => {
       expect(status.resolvedAt).toBeNull();
     });
 
+    it('leaves expiresAt null for an action that was never pending', () => {
+      const status = AgentActionStatus.fromJSON({
+        ...statusJSON,
+        status: 'allowed',
+        effect: 'allow',
+        expires_at: null,
+        resolved_at: null,
+      });
+
+      expect(status.status).toBe('allowed');
+      expect(status.expiresAt).toBeNull();
+      expect(status.resolvedAt).toBeNull();
+    });
+
     it('maps evaluation errors', () => {
       const status = AgentActionStatus.fromJSON({
         ...statusJSON,
@@ -250,6 +285,15 @@ describe('AgentActionStatus', () => {
       });
 
       expect(status.evaluationErrors).toEqual([{ ruleId: 'rule_a', message: 'unknown field' }]);
+    });
+
+    it('maps an absent evaluation_errors to null, not undefined', () => {
+      // The contract always sends the key, so this asserts the mapper's own floor: a
+      // caller checking `evaluationErrors === null` must not be defeated by an omission.
+      const { evaluation_errors: _omitted, ...withoutErrors } = statusJSON;
+      const status = AgentActionStatus.fromJSON(withoutErrors as AgentActionStatusJSON);
+
+      expect(status.evaluationErrors).toBeNull();
     });
   });
 });

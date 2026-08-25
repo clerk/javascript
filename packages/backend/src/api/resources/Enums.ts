@@ -73,7 +73,7 @@ export type WaitlistEntryStatus = 'pending' | 'invited' | 'completed' | 'rejecte
  * and the approval review surface cannot drift. The local name disambiguates it from the
  * `AgentActionStatus` resource class, which is the slim status view, not a status value.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  * @inline
  */
 export type AgentActionStatusValue = SharedAgentActionStatus;
@@ -82,7 +82,7 @@ export type AgentActionStatusValue = SharedAgentActionStatus;
  * What the policy engine decided. Distinct from the lifecycle status: a fail-closed
  * downgrade produces `require_approval` on an Agent Action whose status is `denied`.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  * @inline
  */
 export type AgentActionEffect = 'allow' | 'deny' | 'require_approval';
@@ -91,7 +91,7 @@ export type AgentActionEffect = 'allow' | 'deny' | 'require_approval';
  * Whether the policy document evaluated cleanly. `error` means at least one rule
  * was skipped, and the reasons are listed in `evaluationErrors`.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  * @inline
  */
 export type AgentActionEvaluation = 'ok' | 'error';

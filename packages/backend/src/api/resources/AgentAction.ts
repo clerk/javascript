@@ -1,11 +1,16 @@
 import type { AgentActionEffect, AgentActionEvaluation, AgentActionStatusValue } from './Enums';
-import type { AgentActionDecisionJSON, AgentActionJSON, AgentActionStatusJSON } from './JSON';
+import type {
+  AgentActionDecisionJSON,
+  AgentActionEvaluationErrorJSON,
+  AgentActionJSON,
+  AgentActionStatusJSON,
+} from './JSON';
 
 /**
  * One row of the reviewer-facing rendering of an Agent Action's parameters. `value` is
  * formatted server-side from the field registry's declared display format.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type AgentActionParametersDisplay = {
   /** The parameter key, in the exact spelling the check was made with. */
@@ -19,7 +24,7 @@ export type AgentActionParametersDisplay = {
 /**
  * A single rule that could not be evaluated. Present only when `evaluation` is `'error'`.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type AgentActionEvaluationError = {
   /** The id of the rule that failed to evaluate. */
@@ -29,11 +34,21 @@ export type AgentActionEvaluationError = {
 };
 
 /**
+ * Both the decision record and the slim status view carry the same skipped-rule list, so
+ * the wire-to-camelCase mapping and the "absent means `null`" rule live in one place.
+ */
+function toEvaluationErrors(
+  data: AgentActionEvaluationErrorJSON[] | null | undefined,
+): AgentActionEvaluationError[] | null {
+  return data?.map(error => ({ ruleId: error.rule_id, message: error.message })) ?? null;
+}
+
+/**
  * The approval stamp applied when an Agent Action is created `pending`. It survives
  * resolution as an audit record, so do not infer liveness from it — `status` is
  * authoritative once the action is terminal.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type AgentActionApproval = {
   /** The organization role key routed to review this action, or `null` when the subject is the reviewer. */
@@ -48,7 +63,7 @@ export type AgentActionApproval = {
  * Who answered a pending Agent Action and when. The answer itself is carried by
  * `status` (`approved` or `rejected`), not by this block.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type AgentActionResolution = {
   /** The ID of the user who resolved the action. */
@@ -62,10 +77,9 @@ export type AgentActionResolution = {
 /**
  * The Backend `AgentActionDecision` object is the immutable record of what the policy
  * engine decided for an Agent Action, written once and never updated. The human's answer
- * lives on the [`AgentAction`](#agentaction) as a resolution; the engine's lives here as
- * an effect.
+ * lives on the {@link AgentAction} as a resolution; the engine's lives here as an effect.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export class AgentActionDecision {
   constructor(
@@ -79,7 +93,7 @@ export class AgentActionDecision {
     readonly policyRevision: number | null,
     /** The author-chosen ID of the deciding rule. `null` when the policy's `default_effect` decided. */
     readonly ruleId: string | null,
-    /** What the engine decided. Never branch control flow on this — see [`AgentAction.status`](#agentaction). */
+    /** What the engine decided. Never branch control flow on this — branch on `status` on the {@link AgentAction} instead. */
     readonly effect: AgentActionEffect,
     /** The deny rule's stated reason, or, on a fail-closed downgrade, the engine-generated cause naming the missing party or unresolvable role. */
     readonly reason: string | null,
@@ -101,7 +115,7 @@ export class AgentActionDecision {
       data.effect,
       data.reason,
       data.evaluation,
-      data.evaluation_errors?.map(error => ({ ruleId: error.rule_id, message: error.message })) ?? null,
+      toEvaluationErrors(data.evaluation_errors),
       data.created_at,
     );
   }
@@ -113,10 +127,10 @@ export class AgentActionDecision {
  * was asked, how they answered. Every `check()` creates one, including operations the
  * policy immediately allows.
  *
- * Not to be confused with [`AgentTask`](#agenttask), an unrelated session-creation
- * affordance that only sorts next to this object alphabetically.
+ * Not to be confused with {@link AgentTask}, an unrelated session-creation affordance that
+ * only sorts next to this object alphabetically.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export class AgentAction {
   constructor(
@@ -174,14 +188,16 @@ export class AgentAction {
       data.operation,
       data.parameters,
       data.description,
-      data.parameters_display.map(entry => ({ key: entry.key, label: entry.label, value: entry.value })),
+      (data.parameters_display ?? []).map(entry => ({ key: entry.key, label: entry.label, value: entry.value })),
       data.idempotency_key,
-      data.approval && { role: data.approval.role, url: data.approval.url, expiresAt: data.approval.expires_at },
-      data.resolution && {
-        resolvedByUserId: data.resolution.resolved_by_user_id,
-        resolvedAt: data.resolution.resolved_at,
-        resolutionComment: data.resolution.resolution_comment,
-      },
+      data.approval ? { role: data.approval.role, url: data.approval.url, expiresAt: data.approval.expires_at } : null,
+      data.resolution
+        ? {
+            resolvedByUserId: data.resolution.resolved_by_user_id,
+            resolvedAt: data.resolution.resolved_at,
+            resolutionComment: data.resolution.resolution_comment,
+          }
+        : null,
       AgentActionDecision.fromJSON(data.decision),
       data.created_at,
       data.updated_at,
@@ -193,9 +209,9 @@ export class AgentAction {
  * The Backend `AgentActionStatus` object is the slim view of an Agent Action returned by
  * the resolution-delivery endpoint — the fields that change while a human decides. The
  * reviewer's identity and comment are deliberately absent, because this response flows
- * into an agent's context; read them from [`AgentAction`](#agentaction) instead.
+ * into an agent's context; read them from {@link AgentAction} instead.
  *
- * @experimental This is an experimental API and is subject to change.
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export class AgentActionStatus {
   constructor(
@@ -226,7 +242,7 @@ export class AgentActionStatus {
       data.effect,
       data.reason,
       data.evaluation,
-      data.evaluation_errors?.map(error => ({ ruleId: error.rule_id, message: error.message })) ?? null,
+      toEvaluationErrors(data.evaluation_errors),
       data.expires_at,
       data.resolved_at,
       data.created_at,
