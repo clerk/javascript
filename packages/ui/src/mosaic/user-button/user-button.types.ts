@@ -161,7 +161,7 @@ export interface UserButtonBusyState {
  * where there is more than one, and the row it would have opened onto where there is not. Name both
  * to place that slot whichever way it resolves.
  */
-export type UserButtonMenuItemId = 'createOrganization' | 'switchAccount' | 'addAccount' | 'signOutAll';
+export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll';
 
 interface UserButtonMenuItemBase {
   /** Identifies the row, for ordering. */

@@ -458,9 +458,6 @@ function OrganizationsHeading() {
 
   const actions: RowAction[] = [];
   for (const action of data.layout.actions.organizationsHeading) {
-    if (action === 'createOrganization' && data.onCreateOrganization) {
-      actions.push({ label: m.manage.createOrganization, onClick: data.onCreateOrganization });
-    }
     if (action === 'manageAccount' && data.onManageAccount) {
       actions.push({ label: m.manage.account, onClick: data.onManageAccount });
     }
@@ -830,7 +827,26 @@ function OrganizationSection() {
   const data = useUserButtonContext();
   const { showOrganizations, showOrganizationsHeading } = data.layout;
 
-  if (!showOrganizations && !showOrganizationsHeading) {
+  const actions: ReactNode[] = [];
+  for (const action of data.layout.actions.organizationsFooter) {
+    if (action === 'createOrganization' && data.onCreateOrganization) {
+      actions.push(
+        <ActionRow
+          key='createOrganization'
+          icon={
+            <Icon
+              name='plus'
+              size='sm'
+            />
+          }
+          label={m.workspaces.add}
+          onClick={data.onCreateOrganization}
+        />,
+      );
+    }
+  }
+
+  if (!showOrganizations && !showOrganizationsHeading && actions.length === 0) {
     return null;
   }
 
@@ -859,6 +875,9 @@ function OrganizationSection() {
               {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
             </>
           ))}
+        {/* Trails the rows rather than sitting at the foot of the surface: what it offers is one
+            more of the workspaces above it, not an action on the account. */}
+        {actions}
       </Item.Group>
     </>
   );
@@ -874,15 +893,6 @@ interface FooterRow {
 function Footer() {
   const data = useUserButtonContext();
 
-  // "Create organization" and "Add account" both make something new, and the foot is where a mode
-  // ends up putting whichever of them it has nowhere else for, so they share the icon.
-  const plus = (
-    <Icon
-      name='plus'
-      size='sm'
-    />
-  );
-
   const builtIn: FooterRow[] = [];
   for (const action of data.layout.actions.footer) {
     // The only foot row that is not a plain action: it opens rather than doing, so it brings its
@@ -890,24 +900,17 @@ function Footer() {
     if (action === 'switchAccount') {
       builtIn.push({ id: 'switchAccount', node: <SwitchAccountRow /> });
     }
-    if (action === 'createOrganization' && data.onCreateOrganization) {
-      builtIn.push({
-        id: 'createOrganization',
-        node: (
-          <ActionRow
-            icon={plus}
-            label={m.manage.createOrganization}
-            onClick={data.onCreateOrganization}
-          />
-        ),
-      });
-    }
     if (action === 'addAccount' && data.onAddAccount) {
       builtIn.push({
         id: 'addAccount',
         node: (
           <ActionRow
-            icon={plus}
+            icon={
+              <Icon
+                name='plus'
+                size='sm'
+              />
+            }
             label={m.accounts.add}
             onClick={data.onAddAccount}
           />

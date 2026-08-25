@@ -11,8 +11,9 @@ import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './u
  *  │ alice@x.com           [⋯]  │ │                          │ │                            │ organizationsHeading
  *  │ Personal account           │ │ Personal account         │ │                            │ ┐
  *  │ ✓ Foundry                  │ │ ✓ Foundry                │ │                            │ ┘ organization rows
+ *  │ + Add organization         │ │ + Add organization       │ │                            │ organizationsFooter
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
- *  │ ⇄ Switch account        ›  │ │ + Create organization    │ │ ⇄ Switch account        ›  │ ┐
+ *  │ ⇄ Switch account        ›  │ │                          │ │ ⇄ Switch account        ›  │ ┐
  *  │ ⤴ Sign out of all accounts │ │                          │ │ ⤴ Sign out of all accounts │ ┘ footer
  *  └────────────────────────────┘ └──────────────────────────┘ └────────────────────────────┘
  *
@@ -21,8 +22,8 @@ import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './u
  * row at the foot that opens a flyout of them, so the surface stays about the workspace it is on.
  */
 
-/** The three places an action can land. Every mode has a header and a footer; the heading varies. */
-export type UserButtonSlot = 'header' | 'organizationsHeading' | 'footer';
+/** The four places an action can land. Every mode has a header and a footer; the list's two vary. */
+export type UserButtonSlot = 'header' | 'organizationsHeading' | 'organizationsFooter' | 'footer';
 
 export type UserButtonAction =
   | 'addAccount'
@@ -42,22 +43,23 @@ interface ModeLayout {
   /**
    * The workspaces the active account switches between: its own, plus the organizations it is in.
    * `false` is a list the mode does not carry at all; `heading: false` runs the rows unheaded.
+   * `footer` trails the rows, inside the list, since what it offers is one more workspace.
    */
-  organizations: { heading: readonly UserButtonAction[] | false } | false;
+  organizations: { heading: readonly UserButtonAction[] | false; footer: readonly UserButtonAction[] } | false;
   footer: readonly UserButtonAction[];
 }
 
 const modes = {
   combined: {
     header: ['inviteMembers', 'manageLead'],
-    organizations: { heading: ['createOrganization', 'manageAccount', 'signOut'] },
+    organizations: { heading: ['manageAccount', 'signOut'], footer: ['createOrganization'] },
     footer: ['switchAccount', 'signOutAll'],
   },
   // Not about the account, so it heads its workspaces with nothing and offers no other account.
   organization: {
     header: ['inviteMembers', 'manageLead'],
-    organizations: { heading: false },
-    footer: ['createOrganization'],
+    organizations: { heading: false, footer: ['createOrganization'] },
+    footer: [],
   },
   // No workspaces at all, so the header takes the account's own actions and the foot is the
   // accounts flyout and what acts across every one of them.
@@ -93,6 +95,7 @@ export function resolveUserButtonLayout(
 ): UserButtonLayout {
   const declared: ModeLayout = modes[mode];
   const organizationsHeading = declared.organizations === false ? false : declared.organizations.heading;
+  const organizationsFooter = declared.organizations === false ? [] : declared.organizations.footer;
 
   const hasOtherSessions = data.additionalSessions.length > 0;
   // A pending invitation or suggestion counts: it has to be reachable before there is a membership.
@@ -130,6 +133,7 @@ export function resolveUserButtonLayout(
     actions: {
       header: slot(declared.header),
       organizationsHeading: organizationsHeading === false ? [] : slot(organizationsHeading),
+      organizationsFooter: slot(organizationsFooter),
       footer: slot(declared.footer),
     },
   };

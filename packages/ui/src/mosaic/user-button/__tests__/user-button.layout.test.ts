@@ -25,10 +25,11 @@ function resolve(
 }
 
 describe('resolveUserButtonLayout, where each action lands', () => {
-  it('spreads them across all three slots in combined mode', () => {
+  it('spreads them across all four slots in combined mode', () => {
     expect(resolve('combined').actions).toEqual({
       header: ['inviteMembers', 'manageLead'],
-      organizationsHeading: ['createOrganization', 'manageAccount', 'signOut'],
+      organizationsHeading: ['manageAccount', 'signOut'],
+      organizationsFooter: ['createOrganization'],
       footer: ['switchAccount', 'signOutAll'],
     });
   });
@@ -37,7 +38,8 @@ describe('resolveUserButtonLayout, where each action lands', () => {
     expect(resolve('organization').actions).toEqual({
       header: ['inviteMembers', 'manageLead'],
       organizationsHeading: [],
-      footer: ['createOrganization'],
+      organizationsFooter: ['createOrganization'],
+      footer: [],
     });
   });
 
@@ -45,6 +47,7 @@ describe('resolveUserButtonLayout, where each action lands', () => {
     expect(resolve('user').actions).toEqual({
       header: ['signOut', 'manageLead'],
       organizationsHeading: [],
+      organizationsFooter: [],
       footer: ['switchAccount', 'signOutAll'],
     });
   });

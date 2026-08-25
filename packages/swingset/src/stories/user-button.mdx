@@ -22,7 +22,7 @@ it with `useUserButtonController()` and needs no props.
 A working prototype over mock accounts — try it. Nothing is instant: the clicked row spins, the rest
 stand down, and the surface stays open so you land on the result. Only picking a workspace closes it.
 `pendingKey` drives that, and the connected `UserButton` sets it from the action in flight. Actions
-that would navigate (Manage, Invite, Create organization, Add account) only close the popover here.
+that would navigate (Manage, Invite, Add organization, Add account) only close the popover here.
 
 <Story
   name='Combined'
@@ -117,9 +117,9 @@ only by `mode`.
 
 ### Organizations
 
-The org heads it, with **Invite** and the gear (**Manage organization**). With no account menu to
-hold it, **Create organization** moves to the foot. The extra account is in the props, deliberately
-unrendered.
+The org heads it, with **Invite** and the gear (**Manage organization**). **Add organization** trails
+the workspaces the way it does on a combined surface, and nothing else is on offer, so the popup ends
+there. The extra account is in the props, deliberately unrendered.
 
 <Story
   name='Organizations'
@@ -172,14 +172,13 @@ on its own, so it stays followable while another action is in flight. The `icon`
 without one still holds the column, so labels stay in line.
 
 `menuItemOrder` names the foot's rows by id, and whatever it leaves out follows what it named. The
-ids it knows are `createOrganization`, `switchAccount`, `addAccount`, `signOutAll`, and each custom
-item's `id`. Those are the only actions the foot lists as rows; the rest live in the header or behind
-a `⋯`, where there is no list for an order to run in.
+ids it knows are `switchAccount`, `addAccount`, `signOutAll`, and each custom item's `id`. Those are
+the only actions the foot lists as rows; the rest live in the header, behind a `⋯`, or with the
+workspaces, where there is no list for an order to run in.
 
-Which of them the foot carries depends on the surface, not just the mode: `createOrganization` is a
-row only on an org-only surface, and the accounts row is `switchAccount` where there is somebody to
-switch to and `addAccount` where there is not. Name both to place that row whichever way it resolves.
-An id the surface has not got is ignored rather than an error, so one order can cover every mode.
+The accounts row is `switchAccount` where there is somebody to switch to and `addAccount` where there
+is not. Name both to place that row whichever way it resolves. An id the surface has not got is
+ignored rather than an error, so one order can cover every mode.
 
 <Story
   name='CustomMenuItems'
