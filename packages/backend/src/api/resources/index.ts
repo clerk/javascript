@@ -1,4 +1,5 @@
 export * from './AccountlessApplication';
+export * from './AgentAction';
 export * from './AgentTask';
 export * from './ActorToken';
 export * from './AllowlistIdentifier';
@@ -13,6 +14,9 @@ export * from './Email';
 export * from './EmailAddress';
 
 export type {
+  AgentActionEffect,
+  AgentActionEvaluation,
+  AgentActionStatusValue,
   InvitationStatus,
   OAuthProvider,
   OAuthStrategy,
