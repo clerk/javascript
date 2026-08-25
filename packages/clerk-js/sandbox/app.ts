@@ -35,6 +35,7 @@ const AVAILABLE_COMPONENTS = [
   'apiKeys',
   'configureSSO',
   'oauthConsent',
+  'agentActionApproval',
   'taskChooseOrganization',
   'taskResetPassword',
   'taskSetupMFA',
@@ -154,6 +155,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   apiKeys: buildComponentControls('apiKeys'),
   configureSSO: buildComponentControls('configureSSO'),
   oauthConsent: buildComponentControls('oauthConsent'),
+  agentActionApproval: buildComponentControls('agentActionApproval'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
   taskSetupMFA: buildComponentControls('taskSetupMFA'),
@@ -425,6 +427,10 @@ void (async () => {
     '/pricing-table': { mount: 'mountPricingTable', component: 'pricingTable' },
     '/api-keys': { mount: 'mountAPIKeys', component: 'apiKeys' },
     '/configure-sso': { mount: '__internal_mountConfigureSSO', component: 'configureSSO' },
+    '/agent-action-approval': {
+      mount: '__experimental_mountAgentActionApproval',
+      component: 'agentActionApproval',
+    },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',
       component: 'taskChooseOrganization',
