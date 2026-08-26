@@ -9,7 +9,6 @@ export const root = stylex.create({
     flexDirection: 'column',
     width: '100%',
   },
-
   card: {
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
@@ -18,7 +17,6 @@ export const root = stylex.create({
                 0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
                 0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
   },
-  // Paints nothing of its own: the surface it sits on is already the card the eye reads.
   flush: {
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'visible',
@@ -45,7 +43,6 @@ export const header = stylex.create({
     flexDirection: 'row-reverse',
     paddingBlockStart: space['4'],
   },
-  /** Stacks the title and description, and takes the width the dismiss button leaves. */
   content: {
     display: 'flex',
     flexDirection: 'column',
@@ -93,7 +90,6 @@ export const footer = stylex.create({
   },
 });
 
-/** The signature is one unit with no public slot, so its three elements share a create. */
 export const branding = stylex.create({
   base: {
     paddingBlock: space['3'],
