@@ -11,40 +11,42 @@ import { deleteKeylessAction } from '../keyless-actions';
 export async function getKeylessStatus(
   params: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange' | 'children'>,
 ) {
-  let [shouldRunAsKeyless, runningWithClaimedKeys, locallyStoredPublishableKey] = [false, false, ''];
-  if (canUseKeyless) {
-    locallyStoredPublishableKey = await import('../../server/keyless-node.js')
-      .then(mod => mod.keyless().readKeys()?.publishableKey || '')
-      .catch(() => '');
-
-    runningWithClaimedKeys = Boolean(params.publishableKey) && params.publishableKey === locallyStoredPublishableKey;
-    shouldRunAsKeyless = !params.publishableKey || runningWithClaimedKeys;
+  if (!canUseKeyless) {
+    return { runningWithClaimedKeys: false };
   }
 
-  return {
-    shouldRunAsKeyless,
-    runningWithClaimedKeys,
-  };
+  const storedKeys = await import('../../server/keyless-node.js')
+    .then(mod => mod.keyless().readKeys() ?? null)
+    .catch(() => null);
+  if (!storedKeys) {
+    return { runningWithClaimedKeys: false };
+  }
+
+  if (!params.publishableKey) {
+    const { clerkDevelopmentCache } = await import('../../server/keyless-log-cache.js');
+    clerkDevelopmentCache?.log({
+      cacheKey: `${storedKeys.publishableKey}_stored`,
+      msg: `[Clerk]: Found existing keyless-mode keys in .clerk/.tmp/keyless.json. Copy the publishableKey and secretKey into .env.local (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY / CLERK_SECRET_KEY) to keep using that application, or claim it at ${storedKeys.claimUrl}`,
+    });
+    return { runningWithClaimedKeys: false };
+  }
+
+  return { runningWithClaimedKeys: params.publishableKey === storedKeys.publishableKey };
 }
 
 type KeylessProviderProps = PropsWithChildren<{
   rest: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange' | 'children'>;
-  runningWithClaimedKeys: boolean;
   __internal_scriptsSlot?: React.ReactNode;
 }>;
 
 export const KeylessProvider = async (props: KeylessProviderProps) => {
-  const { rest, runningWithClaimedKeys, __internal_scriptsSlot, children } = props;
+  const { rest, __internal_scriptsSlot, children } = props;
 
-  // Read-only: the SDK no longer mints keyless applications, it only reads claimed keys from disk.
-  const newOrReadKeys = await import('../../server/keyless-node.js')
+  const storedKeys = await import('../../server/keyless-node.js')
     .then(mod => mod.keyless().readKeys() ?? null)
     .catch(() => null);
 
-  const { clerkDevelopmentCache, createConfirmationMessage } = await import('../../server/keyless-log-cache.js');
-
-  if (!newOrReadKeys) {
-    // When case keyless should run, but keys are not available, then fallback to throwing for missing keys
+  if (!storedKeys) {
     return (
       <ClientClerkProvider
         {...mergeNextClerkPropsWithEnv(rest)}
@@ -56,46 +58,25 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
     );
   }
 
-  const clientProvider = (
+  try {
+    const keylessService = await import('../../server/keyless-node.js').then(mod => mod.keyless());
+    const { completeClaimedOnboarding } = await import('@clerk/shared/keyless');
+    await completeClaimedOnboarding(storedKeys.publishableKey, keylessService);
+  } catch {
+    // noop
+  }
+
+  return (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv({
         ...rest,
-        publishableKey: newOrReadKeys.publishableKey,
-        __internal_keyless_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
-        __internal_keyless_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
-        // Explicitly use `null` instead of `undefined` here to avoid persisting `deleteKeylessAction` during merging of options.
-        __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : null,
+        __internal_keyless_claimKeylessApplicationUrl: storedKeys.claimUrl,
+        __internal_keyless_copyInstanceKeysUrl: storedKeys.apiKeysUrl,
+        __internal_keyless_dismissPrompt: deleteKeylessAction,
       })}
       __internal_scriptsSlot={__internal_scriptsSlot}
     >
       {children}
     </ClientClerkProvider>
   );
-
-  if (runningWithClaimedKeys) {
-    try {
-      const keylessService = await import('../../server/keyless-node.js').then(mod => mod.keyless());
-
-      /**
-       * Notifying the dashboard should run once. We are controlling this behaviour by caching the result of the request.
-       * If the request fails, it will be considered stale after 10 minutes, otherwise it is cached for 24 hours.
-       */
-      await clerkDevelopmentCache?.run(() => keylessService.completeOnboarding(), {
-        cacheKey: `${newOrReadKeys.publishableKey}_complete`,
-        onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
-      });
-    } catch {
-      // noop
-    }
-
-    /**
-     * Notify developers.
-     */
-    clerkDevelopmentCache?.log({
-      cacheKey: `${newOrReadKeys.publishableKey}_claimed`,
-      msg: createConfirmationMessage(),
-    });
-  }
-
-  return clientProvider;
 };

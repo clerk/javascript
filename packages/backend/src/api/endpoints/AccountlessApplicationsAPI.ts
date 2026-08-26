@@ -10,18 +10,6 @@ type AccountlessApplicationParams = {
 };
 
 export class AccountlessApplicationAPI extends AbstractAPI {
-  public async createAccountlessApplication(params?: AccountlessApplicationParams): Promise<AccountlessApplication> {
-    const headerParams = params?.requestHeaders ? Object.fromEntries(params.requestHeaders.entries()) : undefined;
-    return this.request<AccountlessApplication>({
-      method: 'POST',
-      path: basePath,
-      headerParams,
-      queryParams: {
-        source: params?.source,
-      },
-    });
-  }
-
   public async completeAccountlessApplicationOnboarding(
     params?: AccountlessApplicationParams,
   ): Promise<AccountlessApplication> {

@@ -37,7 +37,6 @@ const mockRequest = (params: MockRequestParams) => {
   if (machineAuthObject) {
     const encryptedData = encryptClerkRequestData(
       {}, // requestData
-      {}, // keylessModeKeys
       // @ts-expect-error - mock machine auth object
       machineAuthObject,
     );

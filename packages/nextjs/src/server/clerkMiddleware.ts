@@ -389,7 +389,6 @@ async function runHandlerWithRequestState({
     handlerResult,
     requestState,
     resolvedParams,
-    {},
     authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
   );
 

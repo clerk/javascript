@@ -12,8 +12,3 @@ export interface AccountlessApplication {
   readonly claimUrl: string;
   readonly apiKeysUrl: string;
 }
-
-/**
- * Public-facing keyless application data (without secret key).
- */
-export type PublicKeylessApplication = Omit<AccountlessApplication, 'secretKey'>;

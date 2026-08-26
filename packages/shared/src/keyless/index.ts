@@ -1,9 +1,4 @@
-export {
-  clerkDevelopmentCache,
-  createClerkDevCache,
-  createConfirmationMessage,
-  createKeylessModeMessage,
-} from './devCache';
+export { clerkDevelopmentCache, createConfirmationMessage } from './devCache';
 export type { ClerkDevCache } from './devCache';
 
 export { createNodeFileStorage } from './nodeFileStorage';
@@ -12,15 +7,6 @@ export type { FileSystemAdapter, NodeFileStorageOptions, PathAdapter } from './n
 export { completeClaimedOnboarding } from './completeClaimedOnboarding';
 
 export { createKeylessService } from './service';
-export type {
-  KeylessAPI,
-  KeylessCompletionAPI,
-  KeylessService,
-  KeylessServiceOptions,
-  KeylessStorage,
-} from './service';
+export type { KeylessAPI, KeylessService, KeylessServiceOptions, KeylessStorage } from './service';
 
-export { resolveKeysWithKeylessFallback } from './resolveKeysWithKeylessFallback';
-export type { KeylessResult } from './resolveKeysWithKeylessFallback';
-
-export type { AccountlessApplication, PublicKeylessApplication } from './types';
+export type { AccountlessApplication } from './types';

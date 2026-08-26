@@ -53,7 +53,6 @@ export function decorateRequest(
   res: Response,
   requestState: RequestState,
   requestData: AuthenticateRequestOptions,
-  keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
   machineAuthObject: AuthObject | null,
 ): Response {
   const { reason, message, status, token } = requestState;
@@ -89,13 +88,13 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    const clerkRequestData = encryptClerkRequestData(requestData, keylessMode, machineAuthObject);
+    const clerkRequestData = encryptClerkRequestData(requestData, machineAuthObject);
 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
       [constants.Headers.AuthToken]: token || '',
       [constants.Headers.AuthSignature]: token
-        ? createTokenSignature(token, requestData?.secretKey || SECRET_KEY || keylessMode.secretKey || '')
+        ? createTokenSignature(token, requestData?.secretKey || SECRET_KEY || '')
         : '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
@@ -208,7 +207,6 @@ const KEYLESS_ENCRYPTION_KEY = 'clerk_keyless_dummy_key';
  **/
 export function encryptClerkRequestData(
   requestData: Partial<AuthenticateRequestOptions>,
-  keylessModeKeys: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
   machineAuthObject: AuthObject | null,
 ) {
   const isEmpty = (obj: Record<string, any> | undefined) => {
@@ -218,7 +216,7 @@ export function encryptClerkRequestData(
     return !Object.values(obj).some(v => v !== undefined);
   };
 
-  if (isEmpty(requestData) && isEmpty(keylessModeKeys) && !machineAuthObject) {
+  if (isEmpty(requestData) && !machineAuthObject) {
     return;
   }
 
@@ -231,7 +229,7 @@ export function encryptClerkRequestData(
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
   return AES.encrypt(
-    JSON.stringify({ ...keylessModeKeys, ...requestData, machineAuthObject: machineAuthObject ?? undefined }),
+    JSON.stringify({ ...requestData, machineAuthObject: machineAuthObject ?? undefined }),
     maybeKeylessEncryptionKey,
   ).toString();
 }

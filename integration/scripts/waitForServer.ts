@@ -6,7 +6,7 @@ type WaitForServerArgsType = {
   acceptAnyResponse?: boolean;
 };
 
-// Poll a url until it returns a 200 status code
+// Poll a url until it returns 2xx (or any HTTP response when acceptAnyResponse is set)
 export const waitForServer = async (url: string, opts: WaitForServerArgsType) => {
   const { log, delayInMs = 1000, maxAttempts = 20, shouldExit = () => false, acceptAnyResponse = false } = opts;
   let attempts = 0;
