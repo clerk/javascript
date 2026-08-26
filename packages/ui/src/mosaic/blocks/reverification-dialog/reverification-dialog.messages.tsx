@@ -3,9 +3,7 @@ export const reverificationDialogMessages = {
   chooseFirst: 'Choose how to verify your identity.',
   chooseSecond: 'Choose a second verification method to continue.',
   havingTrouble: 'Having trouble?',
-  preparingDescription: 'Preparing your verification method.',
-  preparing: 'Preparing verification…',
-  prepareError: 'Could not prepare verification.',
+  genericError: 'Something went wrong. Please try again.',
   unavailableTitle: 'Unable to verify',
   unavailableDescription: 'No verification methods are available for this account.',
   helpDescription: 'Contact support if you cannot access any verification method.',
@@ -26,5 +24,4 @@ export const reverificationDialogMessages = {
   cancel: 'Cancel',
   close: 'Close',
   continue: 'Continue',
-  tryAgain: 'Try again',
 };

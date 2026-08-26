@@ -1,344 +1,194 @@
-import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
+import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
+import { Heading } from '../../components/heading';
 import { Input } from '../../components/input';
-import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { Text } from '../../components/text';
 import { reverificationDialogMessages as m } from './reverification-dialog.messages';
-import type { ReverificationDialogResendState, ReverificationDialogViewProps } from './reverification-dialog.types';
-
-const styles = stylex.create({
-  header: {
-    gap: space['1'],
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  body: {
-    margin: '-0.25rem',
-    padding: '0.25rem',
-    gap: space['4'],
-    display: 'flex',
-    flexDirection: 'column',
-    flexGrow: 1,
-    minHeight: 0,
-    overflowY: 'auto',
-  },
-  footer: {
-    gap: space['2'],
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  footerSpread: {
-    justifyContent: 'space-between',
-  },
-  footerButton: {
-    flexGrow: 1,
-  },
-  form: {
-    gap: space['5'],
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: 0,
-  },
-  alert: {
-    borderColor: colorVars['--cl-color-negative'],
-    borderRadius: radiusVars['--cl-radius-md'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    paddingBlock: space['2'],
-    paddingInline: space['3'],
-    backgroundColor: colorVars['--cl-color-negative-faded'],
-    color: colorVars['--cl-color-negative'],
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-  },
-  codeInput: {
-    borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-md'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    paddingBlock: space['3'],
-    paddingInline: space['4'],
-    backgroundColor: colorVars['--cl-color-input'],
-    fontFamily: 'monospace',
-    fontSize: typeScaleVars['--cl-text-xl-size'],
-    letterSpacing: '0.5em',
-    textAlign: 'center',
-    width: '100%',
-  },
-  codeInputInvalid: {
-    borderColor: colorVars['--cl-color-negative'],
-  },
-  muted: {
-    color: colorVars['--cl-color-neutral-faded'],
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-  },
-  identifier: {
-    color: colorVars['--cl-color-neutral'],
-    fontWeight: 600,
-    overflowWrap: 'anywhere',
-  },
-  resendRow: {
-    gap: space['2'],
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-});
+import type {
+  ReverificationDialogResendState,
+  ReverificationDialogSelectViewProps,
+  ReverificationDialogVerifyViewProps,
+  ReverificationDialogViewProps,
+  ReverificationFactor,
+} from './reverification-dialog.types';
 
 function DialogHeader({ title, description }: { title: React.ReactNode; description?: React.ReactNode }) {
   return (
-    <div {...stylex.props(styles.header)}>
-      <Dialog.Title>{title}</Dialog.Title>
-      {description ? <Dialog.Description>{description}</Dialog.Description> : null}
-    </div>
+    <Card.Header>
+      <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
+      {description ? <Dialog.Description render={<Text />}>{description}</Dialog.Description> : null}
+    </Card.Header>
   );
 }
 
-function DialogBody({ children }: { children: React.ReactNode }) {
-  return <div {...stylex.props(styles.body)}>{children}</div>;
-}
-
-function DialogFooter({ children, spread = false }: { children: React.ReactNode; spread?: boolean }) {
-  return <div {...stylex.props(styles.footer, spread && styles.footerSpread)}>{children}</div>;
-}
-
-function DialogForm({ children, onSubmit }: { children: React.ReactNode; onSubmit: () => void }) {
-  return (
-    <form
-      noValidate
-      {...stylex.props(styles.form)}
-      onSubmit={event => {
-        event.preventDefault();
-        onSubmit();
-      }}
-    >
-      {children}
-    </form>
-  );
-}
-
-function FormAlert({ children }: { children?: React.ReactNode }) {
+function FormError({ children }: { children?: React.ReactNode }) {
   return children ? (
-    <p
+    <Text
       role='alert'
-      {...stylex.props(styles.alert)}
+      color='negative'
     >
       {children}
-    </p>
+    </Text>
   ) : null;
 }
 
-function MutedText({ children }: { children: React.ReactNode }) {
-  return <p {...stylex.props(styles.muted)}>{children}</p>;
-}
-
-function Identifier({ children }: { children?: React.ReactNode }) {
-  return <span {...stylex.props(styles.identifier)}>{children}</span>;
+function CancelButton({ label = m.cancel }: { label?: string }) {
+  return (
+    <Dialog.Close
+      render={props => (
+        <Button
+          {...props}
+          color='neutral'
+          variant='outline'
+        />
+      )}
+    >
+      {label}
+    </Dialog.Close>
+  );
 }
 
 function ResendButton({
   disabled = false,
-  label,
   resend,
   onResend,
 }: {
   disabled?: boolean;
-  label: string;
   resend: ReverificationDialogResendState;
-  onResend: () => void;
+  onResend?: () => void;
 }) {
   const waiting = resend.secondsRemaining > 0;
 
   return (
     <Button
       color='neutral'
-      disabled={disabled || waiting || resend.isResending}
+      disabled={disabled || waiting || resend.isResending || !onResend}
       focusableWhenDisabled
       size='sm'
       variant='link'
       onClick={onResend}
     >
-      {waiting ? `${label} (${resend.secondsRemaining}s)` : label}
+      {waiting ? `${m.resend} (${resend.secondsRemaining}s)` : m.resend}
     </Button>
   );
 }
 
 function CodeInput({
   id,
-  status,
+  disabled,
   value,
   onChange,
-  onComplete,
 }: {
   id: string;
-  status: 'idle' | 'verifying' | 'error';
+  disabled: boolean;
   value: string;
   onChange: (value: string) => void;
-  onComplete: (value: string) => void;
 }) {
-  const completedValueRef = React.useRef<string | undefined>(undefined);
-
-  React.useEffect(() => {
-    if (value.length === 6 && completedValueRef.current !== value) {
-      completedValueRef.current = value;
-      onComplete(value);
-    }
-
-    if (value.length < 6) {
-      completedValueRef.current = undefined;
-    }
-  }, [onComplete, value]);
-
   return (
     <Input
       autoComplete='one-time-code'
-      disabled={status === 'verifying'}
+      disabled={disabled}
       id={id}
       inputMode='numeric'
       maxLength={6}
       placeholder='••••••'
+      size='lg'
       value={value}
-      onChange={event => onChange(event.target.value.replace(/\D/g, '').slice(0, 6))}
-      {...stylex.props(styles.codeInput, status === 'error' && styles.codeInputInvalid)}
+      onChange={event => onChange(event.target.value)}
     />
   );
 }
 
-type ReverificationDialogContentProps = Omit<ReverificationDialogViewProps, 'open' | 'onOpenChange'> & {
-  onCancel: () => void;
-};
-
-function ReverificationDialogContent({
-  strategy,
-  step = 'verify',
+function SelectFactorContent({
+  stage,
   availableFactors,
-  preparationStatus,
-  identifier,
-  value,
-  isVerifying = false,
-  fieldError,
   formError,
-  isResending = false,
-  resendSecondsRemaining = 0,
-  onValueChange,
-  onSubmit,
-  onResend,
-  onCancel,
   onSelectFactor,
   onBack,
-  onPrepare,
   onShowHelp,
-}: ReverificationDialogContentProps) {
-  const fieldId = React.useId();
-
-  if (step === 'select-first-factor' || step === 'select-second-factor') {
-    return (
-      <>
-        <Dialog.CloseButton />
-        <DialogHeader
-          description={step === 'select-second-factor' ? m.chooseSecond : m.chooseFirst}
-          title={m.title}
-        />
-        <DialogBody>
-          <FormAlert>{formError}</FormAlert>
-          {availableFactors?.map(factor => (
-            <Button
-              key={factor.id}
-              variant='outline'
-              onClick={() => onSelectFactor?.(factor.id)}
-            >
-              {factor.label}
-            </Button>
-          ))}
-        </DialogBody>
-        <DialogFooter spread>
+}: ReverificationDialogSelectViewProps) {
+  return (
+    <>
+      <Dialog.CloseButton aria-label={m.close} />
+      <DialogHeader
+        description={stage === 'second' ? m.chooseSecond : m.chooseFirst}
+        title={m.title}
+      />
+      <Card.Content>
+        <FormError>{formError}</FormError>
+        {availableFactors.map(factor => (
           <Button
-            color='neutral'
-            variant='ghost'
-            onClick={step === 'select-second-factor' ? onBack : onCancel}
+            key={factor.id}
+            fullWidth
+            variant='outline'
+            onClick={() => onSelectFactor(factor.id)}
           >
-            {step === 'select-second-factor' ? m.back : m.cancel}
+            {factor.label}
           </Button>
-          {onShowHelp ? (
-            <Button
-              color='neutral'
-              variant='link'
-              onClick={onShowHelp}
-            >
-              {m.havingTrouble}
-            </Button>
-          ) : null}
-        </DialogFooter>
-      </>
-    );
-  }
-
-  if (step === 'prepare') {
-    const failed = preparationStatus === 'error';
-    return (
-      <>
-        <Dialog.CloseButton />
-        <DialogHeader
-          description={m.preparingDescription}
-          title={m.title}
-        />
-        <DialogBody>
-          {failed ? <FormAlert>{formError ?? m.prepareError}</FormAlert> : null}
-          {!failed ? <MutedText>{m.preparing}</MutedText> : null}
-        </DialogBody>
-        <DialogFooter>
+        ))}
+      </Card.Content>
+      <Card.Footer>
+        {onBack ? (
           <Button
             color='neutral'
-            variant='ghost'
-            onClick={onBack ?? onCancel}
+            variant='outline'
+            onClick={onBack}
           >
             {m.back}
           </Button>
-          {failed ? <Button onClick={onPrepare}>{m.tryAgain}</Button> : null}
-        </DialogFooter>
-      </>
-    );
-  }
+        ) : (
+          <CancelButton />
+        )}
+        <Button
+          color='neutral'
+          variant='link'
+          onClick={onShowHelp}
+        >
+          {m.havingTrouble}
+        </Button>
+      </Card.Footer>
+    </>
+  );
+}
 
-  if (step === 'unavailable' || step === 'help') {
-    return (
-      <>
-        <Dialog.CloseButton />
-        <DialogHeader
-          description={step === 'unavailable' ? m.unavailableDescription : m.helpDescription}
-          title={step === 'unavailable' ? m.unavailableTitle : m.havingTrouble}
-        />
-        <DialogBody>
-          <FormAlert>{formError}</FormAlert>
-        </DialogBody>
-        <DialogFooter>
-          <Button onClick={onBack ?? onCancel}>{onBack ? m.back : m.close}</Button>
-        </DialogFooter>
-      </>
-    );
-  }
+const safeIdentifierFrom = (factor: ReverificationFactor) =>
+  'safeIdentifier' in factor ? factor.safeIdentifier : undefined;
 
-  const isDeliveredCode = strategy === 'email_code' || strategy === 'phone_code';
-  const isCode = isDeliveredCode || strategy === 'totp';
-  const isPasskey = strategy === 'passkey';
-  const isPassword = strategy === 'password';
-  const canSubmit = isPasskey || value.length > 0;
-
+function VerifyContent({
+  factor,
+  value,
+  canSubmit,
+  isInputDisabled,
+  isVerifying,
+  fieldError,
+  formError,
+  resend,
+  onValueChange,
+  onResend,
+  onShowAlternatives,
+  onShowHelp,
+}: ReverificationDialogVerifyViewProps) {
+  const fieldId = React.useId();
+  const isDeliveredCode = factor.strategy === 'email_code' || factor.strategy === 'phone_code';
+  const isCode = isDeliveredCode || factor.strategy === 'totp';
+  const isPasskey = factor.strategy === 'passkey';
+  const isPassword = factor.strategy === 'password';
   const description = (() => {
     if (isDeliveredCode) {
       return (
         <>
-          {m.deliveredCode} <Identifier>{identifier}</Identifier>
+          {m.deliveredCode} <strong>{safeIdentifierFrom(factor)}</strong>
         </>
       );
     }
-    if (strategy === 'totp') {
+    if (factor.strategy === 'totp') {
       return m.totp;
     }
-    if (strategy === 'backup_code') {
+    if (factor.strategy === 'backup_code') {
       return m.backupCode;
     }
     if (isPasskey) {
@@ -346,100 +196,172 @@ function ReverificationDialogContent({
     }
     return m.password;
   })();
-
-  const fieldLabel = isPassword ? m.passwordLabel : strategy === 'backup_code' ? m.backupCodeLabel : m.verificationCode;
+  const fieldLabel = isPassword
+    ? m.passwordLabel
+    : factor.strategy === 'backup_code'
+      ? m.backupCodeLabel
+      : m.verificationCode;
 
   return (
     <>
-      <Dialog.CloseButton />
+      <Dialog.CloseButton aria-label={m.close} />
       <DialogHeader
         description={description}
         title={m.title}
       />
-      <DialogForm onSubmit={onSubmit}>
-        <DialogBody>
-          <FormAlert>{formError}</FormAlert>
-          {!isPasskey ? (
-            <Field.Root invalid={Boolean(fieldError)}>
-              <Field.Label htmlFor={fieldId}>{fieldLabel}</Field.Label>
-              {isCode ? (
-                <CodeInput
-                  id={fieldId}
-                  status={fieldError ? 'error' : isVerifying ? 'verifying' : 'idle'}
-                  value={value}
-                  onChange={onValueChange}
-                  onComplete={onSubmit}
-                />
-              ) : (
-                <Input
-                  autoComplete={isPassword ? 'current-password' : 'one-time-code'}
-                  disabled={isVerifying}
-                  id={fieldId}
-                  type={isPassword ? 'password' : 'text'}
-                  value={value}
-                  onChange={event => onValueChange(event.target.value)}
-                />
-              )}
-              {fieldError ? <Field.Error>{fieldError}</Field.Error> : null}
-            </Field.Root>
-          ) : null}
-          {isDeliveredCode ? (
-            <div {...stylex.props(styles.resendRow)}>
-              <MutedText>{m.didNotReceiveCode}</MutedText>
-              <ResendButton
-                disabled={isVerifying}
-                label={m.resend}
-                resend={{ isResending, secondsRemaining: resendSecondsRemaining }}
-                onResend={onResend}
+      <Card.Content>
+        <FormError>{formError}</FormError>
+        {!isPasskey ? (
+          <Field.Root invalid={Boolean(fieldError)}>
+            <Field.Label htmlFor={fieldId}>{fieldLabel}</Field.Label>
+            {isCode ? (
+              <CodeInput
+                id={fieldId}
+                disabled={isInputDisabled || isVerifying}
+                value={value}
+                onChange={onValueChange}
               />
-            </div>
-          ) : null}
-        </DialogBody>
-        <DialogFooter>
-          {onBack ? (
-            <Button
-              color='neutral'
+            ) : (
+              <Input
+                autoComplete={isPassword ? 'current-password' : 'one-time-code'}
+                disabled={isInputDisabled || isVerifying}
+                id={fieldId}
+                spellCheck={false}
+                type={isPassword ? 'password' : 'text'}
+                value={value}
+                onChange={event => onValueChange(event.target.value)}
+              />
+            )}
+            {fieldError ? <Field.Error>{fieldError}</Field.Error> : null}
+          </Field.Root>
+        ) : null}
+        {resend ? (
+          <>
+            <Text size='xs'>{m.didNotReceiveCode}</Text>
+            <ResendButton
               disabled={isVerifying}
-              variant='ghost'
-              onClick={onBack}
-            >
-              {m.anotherMethod}
-            </Button>
-          ) : null}
+              resend={resend}
+              onResend={onResend}
+            />
+          </>
+        ) : null}
+      </Card.Content>
+      <Card.Footer>
+        {onShowAlternatives ? (
           <Button
             color='neutral'
             disabled={isVerifying}
-            type='button'
-            variant='outline'
-            onClick={onCancel}
-            {...stylex.props(styles.footerButton)}
+            variant='ghost'
+            onClick={onShowAlternatives}
           >
-            {m.cancel}
+            {m.anotherMethod}
           </Button>
-          <SubmitButton
-            disabled={!canSubmit}
-            isPending={isVerifying}
-            pendingLabel={m.pending}
-            {...stylex.props(styles.footerButton)}
+        ) : onShowHelp ? (
+          <Button
+            color='neutral'
+            disabled={isVerifying}
+            variant='ghost'
+            onClick={onShowHelp}
           >
-            {isPasskey ? m.withPasskey : m.continue}
-          </SubmitButton>
-        </DialogFooter>
-      </DialogForm>
+            {m.havingTrouble}
+          </Button>
+        ) : null}
+        <Dialog.Close
+          render={props => (
+            <Button
+              {...props}
+              color='neutral'
+              disabled={isVerifying}
+              fullWidth
+              variant='outline'
+            />
+          )}
+        >
+          {m.cancel}
+        </Dialog.Close>
+        <SubmitButton
+          disabled={!canSubmit}
+          fullWidth
+          isPending={isVerifying}
+          pendingLabel={m.pending}
+        >
+          {isPasskey ? m.withPasskey : m.continue}
+        </SubmitButton>
+      </Card.Footer>
     </>
   );
 }
 
-export function ReverificationDialogView({ open, onOpenChange, ...props }: ReverificationDialogViewProps) {
+function DialogContent(props: ReverificationDialogViewProps) {
+  switch (props.step) {
+    case 'select-factor':
+      return <SelectFactorContent {...props} />;
+    case 'verify':
+      return <VerifyContent {...props} />;
+    case 'help':
+      return (
+        <>
+          <Dialog.CloseButton aria-label={m.close} />
+          <DialogHeader
+            description={m.helpDescription}
+            title={m.havingTrouble}
+          />
+          <Card.Footer>
+            <Button onClick={props.onBack}>{m.back}</Button>
+          </Card.Footer>
+        </>
+      );
+    case 'unavailable':
+      return (
+        <>
+          <Dialog.CloseButton aria-label={m.close} />
+          <DialogHeader
+            description={m.unavailableDescription}
+            title={m.unavailableTitle}
+          />
+          <Card.Footer>
+            <CancelButton label={m.close} />
+          </Card.Footer>
+        </>
+      );
+  }
+}
+
+export function ReverificationDialogView(props: ReverificationDialogViewProps) {
+  const handleSubmit = props.step === 'verify' ? props.onSubmit : undefined;
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
+    <Dialog.Root
+      closedBy='closerequest'
+      open={props.open}
+      size='card'
+      onOpenChange={nextOpen => props.onOpenChange(nextOpen)}
     >
-      <ReverificationDialogContent
-        {...props}
-        onCancel={() => onOpenChange(false)}
-      />
-    </Dialog>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                render={
+                  handleSubmit ? (
+                    <form
+                      noValidate
+                      onSubmit={event => {
+                        event.preventDefault();
+                        handleSubmit();
+                      }}
+                    />
+                  ) : undefined
+                }
+                renderBranding={false}
+              />
+            }
+          >
+            <DialogContent {...props} />
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

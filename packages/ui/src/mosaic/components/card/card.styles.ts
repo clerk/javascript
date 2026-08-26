@@ -17,8 +17,11 @@ export const styles = stylex.create({
     paddingBlockStart: space['5'],
   },
   content: {
+    gap: space['4'],
     paddingInline: space['4'],
+    display: 'flex',
     flexBasis: 'auto',
+    flexDirection: 'column',
     flexGrow: '1',
     flexShrink: '1',
     paddingBlockEnd: space['5'],

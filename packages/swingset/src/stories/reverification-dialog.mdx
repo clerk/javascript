@@ -1,0 +1,53 @@
+import * as ReverificationDialogStories from './reverification-dialog.stories';
+
+# ReverificationDialog
+
+A triggerless identity-verification block with a prop-driven view and an external workflow machine.
+The machine accepts a normalized first- or second-factor challenge; a future controller can translate
+Clerk resources and operations into that interface.
+
+## Example
+
+The launch buttons are showcase controls, not part of the block. Each scenario creates a fresh actor.
+Once open, factor selection, preparation, input, automatic code submission, errors, resend cooldown,
+completion, and cancellation are all machine-driven.
+
+<Story
+  name='Default'
+  storyModule={ReverificationDialogStories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Heading', href: '/components/heading', layer: 'Components' },
+    { name: 'Text', href: '/components/text', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+The view is controlled through flat props. Until controllers exist, a caller can inject normalized
+operations into the machine and project its snapshot into view props.
+
+```tsx
+import {
+  getReverificationDialogViewProps,
+  reverificationDialogMachine,
+} from '@clerk/ui/mosaic/blocks/reverification-dialog/reverification-dialog.machine';
+import { ReverificationDialogView } from '@clerk/ui/mosaic/blocks/reverification-dialog/reverification-dialog.view';
+import { useMachine } from '@clerk/ui/mosaic/machine/useMachine';
+
+const [snapshot, send] = useMachine(reverificationDialogMachine, {
+  context: {
+    initialChallenge: challenge,
+    prepare,
+    attempt,
+    complete,
+    cancel,
+  },
+});
+
+return <ReverificationDialogView {...getReverificationDialogViewProps(snapshot, send)} />;
+```
