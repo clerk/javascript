@@ -13,7 +13,22 @@ The Mosaic `Otp` is the verification-code field: one styled box per character, b
 
 ## Props
 
-<PropTable meta={OtpStories.meta} />
+<PropTable
+  meta={OtpStories.meta}
+  extra={[
+    { name: 'length', type: 'number', default: '— (required)' },
+    { name: 'value', type: 'string', default: '—' },
+    { name: 'defaultValue', type: 'string', default: "''" },
+    { name: 'onValueChange', type: '(value: string) => void', default: '—' },
+    { name: 'onComplete', type: '(value: string) => void', default: '—' },
+    { name: 'pattern', type: "'numeric' | 'alpha' | 'alphanumeric'", default: "'numeric'" },
+    { name: 'mask', type: 'boolean', default: 'false' },
+    { name: 'name', type: 'string', default: '—' },
+    { name: 'disabled', type: 'boolean', default: 'false' },
+  ]}
+/>
+
+Every prop of the headless [OTP primitive](/primitives/otp) passes through.
 
 ## Usage
 
@@ -26,6 +41,19 @@ import { Otp } from '@clerk/ui/mosaic/components/otp';
   length={6}
   aria-label='Verification code'
   onComplete={code => verify(code)}
+/>;
+```
+
+The value is uncontrolled by default. Pass `value` with `onValueChange` to control it. There is no `onChange`: the boxes are separate inputs, so the whole code is reported as one string.
+
+```tsx
+const [code, setCode] = useState('');
+
+<Otp
+  length={6}
+  value={code}
+  onValueChange={setCode}
+  aria-label='Verification code'
 />;
 ```
 

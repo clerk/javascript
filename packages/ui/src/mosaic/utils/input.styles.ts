@@ -2,10 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, durationVars, easingVars } from '../tokens.stylex';
 
-// The border + focus treatment shared by every Mosaic text-entry surface (`Input`,
-// `Otp`). Focus is marked with a border colour change and a soft box-shadow rather
-// than the system focus ring, so an entry field reads as a field rather than a
-// control; the ring only comes back under `forced-colors`.
+// Focus is marked with a border colour change and a soft box-shadow rather than the
+// system focus ring, so a text-entry field reads as a field rather than a control.
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
 const focusShadow = '0 0 0 3px light-dark(rgb(23 23 23 / 8%), rgb(255 255 255 / 8%))';
 const invalidFocusShadow = `0 0 0 3px light-dark(
@@ -14,7 +12,7 @@ const invalidFocusShadow = `0 0 0 3px light-dark(
 )`;
 const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
 
-export const inputSurface = stylex.create({
+export const inputStyles = stylex.create({
   base: {
     borderColor: {
       default: colorVars['--cl-color-border'],

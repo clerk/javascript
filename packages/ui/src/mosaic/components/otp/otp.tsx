@@ -4,7 +4,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
-import { inputSurface } from '../../utils/input-surface.styles';
+import { inputStyles } from '../../utils/input.styles';
 import { reset } from '../../utils/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { rootSizes, slotSizes, styles } from './otp.styles';
@@ -32,12 +32,12 @@ function OtpSlots({ size, status }: { size: OtpSize; status: OtpStatus }) {
         themeProps('otp-slot', { size, status, disabled }),
         stylex.props(
           reset.base,
-          inputSurface.base,
+          inputStyles.base,
           styles.slot,
           styles.touchTarget,
           slotSizes[size],
           status === 'success' && styles.success,
-          disabled && inputSurface.disabled,
+          disabled && inputStyles.disabled,
         ),
       )}
     />
