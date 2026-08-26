@@ -167,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className='gap-0'>
         {groups.map(({ group, groupSlug, components }) => (
           <React.Fragment key={group}>
-            {group === 'Components' && <SidebarSeparator className='data-horizontal:w-auto my-1' />}
+            {group === 'Blocks' && <SidebarSeparator className='data-horizontal:w-auto my-1' />}
             <Collapsible
               defaultOpen={!COLLAPSED_BY_DEFAULT.has(group)}
               className='group/collapsible'

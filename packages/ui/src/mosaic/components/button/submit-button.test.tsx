@@ -67,6 +67,21 @@ describe('Mosaic SubmitButton', () => {
     expect(button).not.toHaveAttribute('data-pending');
   });
 
+  it('keeps the focusable-disabled marking when the button is disabled but not pending', () => {
+    render(
+      <SubmitButton
+        disabled
+        focusableWhenDisabled
+      >
+        Save
+      </SubmitButton>,
+    );
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).not.toHaveAttribute('disabled');
+    expect(button).not.toHaveAttribute('aria-busy');
+  });
+
   it('renders the spinner and reflects the pending state', () => {
     render(<SubmitButton isPending>Save</SubmitButton>);
     const button = screen.getByRole('button');

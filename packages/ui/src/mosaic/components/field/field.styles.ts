@@ -3,6 +3,11 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  root: {
+    gap: space['2'],
+    display: 'flex',
+    flexDirection: 'column',
+  },
   label: {
     color: colorVars['--cl-color-primary'],
     fontWeight: fontWeightVars['--cl-font-medium'],

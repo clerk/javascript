@@ -34,7 +34,7 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base), className, style),
+      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root), className, style),
       ...rest,
     },
   });

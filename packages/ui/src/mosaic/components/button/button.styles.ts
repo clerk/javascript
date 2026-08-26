@@ -172,7 +172,7 @@ export const styles = stylex.create({
   },
 
   // state / modifiers
-  fullWidth: { width: '100%' },
+  fullWidth: { flex: '1', width: '100%' },
   disabled: { cursor: 'not-allowed', opacity: 0.5 },
 });
 
