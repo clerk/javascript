@@ -62,7 +62,7 @@ const Root = React.forwardRef<HTMLDivElement, BannerRootProps>(function MosaicBa
 });
 
 /** Props for the banner's headline. */
-export type BannerLabelProps = MosaicComponentProps<'span'>;
+export type BannerLabelProps = MosaicComponentProps<'p'>;
 
 const Label = React.forwardRef<HTMLSpanElement, BannerLabelProps>(function MosaicBannerLabel(
   { render, className, style, ...rest },
