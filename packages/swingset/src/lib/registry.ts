@@ -27,6 +27,11 @@ import {
   meta as cardComponentMeta,
 } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import {
+  Default as DestructiveDefault,
+  meta as destructiveMeta,
+  WithError as DestructiveWithError,
+} from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
@@ -140,6 +145,7 @@ import {
 import {
   Default as UserProfileDeleteSectionDefault,
   meta as userProfileDeleteSectionMeta,
+  WithError as UserProfileDeleteSectionWithError,
 } from '../stories/user-profile-delete-section.stories';
 import {
   Default as UserProfileMfaSectionDefault,
@@ -369,6 +375,13 @@ const userProfileWeb3WalletsSectionModule: StoryModule = {
 const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
+  WithError: UserProfileDeleteSectionWithError,
+};
+
+const destructiveModule: StoryModule = {
+  meta: destructiveMeta,
+  Default: DestructiveDefault,
+  WithError: DestructiveWithError,
 };
 
 export const registry: StoryModule[] = [
@@ -393,6 +406,8 @@ export const registry: StoryModule[] = [
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  // Blocks — flows assembled from components, wired by the caller's machine.
+  destructiveModule,
   // Components
   avatarModule,
   badgeModule,
