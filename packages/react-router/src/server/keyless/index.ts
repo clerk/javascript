@@ -13,18 +13,6 @@ export function keyless(args: DataFunctionArgs, options?: ClerkMiddlewareOptions
     keylessServiceInstance = createKeylessService({
       storage: createFileStorage(),
       api: {
-        async createAccountlessApplication(requestHeaders?: Headers, source?: string) {
-          try {
-            return await clerkClient(args, options).__experimental_accountlessApplications.createAccountlessApplication(
-              {
-                requestHeaders,
-                source,
-              },
-            );
-          } catch {
-            return null;
-          }
-        },
         async completeOnboarding(requestHeaders?: Headers, source?: string) {
           try {
             return await clerkClient(

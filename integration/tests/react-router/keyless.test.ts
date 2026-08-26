@@ -1,12 +1,11 @@
-import { test } from '@playwright/test';
+import * as path from 'node:path';
+
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import {
-  testClaimedAppWithMissingKeys,
-  testKeylessRemovedAfterEnvAndRestart,
-  testToggleCollapsePopoverAndClaim,
-} from '../../testUtils/keylessHelpers';
+import { fs } from '../../scripts';
+import { createTestUtils } from '../../testUtils';
 
 const commonSetup = appConfigs.reactRouter.reactRouterNode.clone();
 
@@ -21,35 +20,52 @@ test.describe('Keyless mode @react-router', () => {
   });
 
   let app: Application;
-  let dashboardUrl = 'https://dashboard.clerk.com/';
 
   test.beforeAll(async () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    if (appConfigs.envs.withKeyless.privateVariables.get('CLERK_API_URL')?.includes('clerkstage')) {
-      dashboardUrl = 'https://dashboard.clerkstage.dev/';
-    }
-    await app.dev();
+    // Without keys the app 500s on every request, so readiness can't wait for a 2xx
+    await app.dev({ acceptAnyResponse: true });
   });
 
   test.afterAll(async () => {
-    // Keep files for debugging
     await app?.teardown();
   });
 
-  test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'react-router' });
-  });
-
-  test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
+  test('Without keys, requests fail with the missing env vars error instead of keyless bootstrap.', async ({
     page,
-    context,
   }) => {
-    await testClaimedAppWithMissingKeys({ page, context, app, dashboardUrl });
+    const response = await page.goto(`${app.serverUrl}/`);
+    expect(response?.status()).toBe(500);
+    await expect(page.getByText('Publishable key is missing').first()).toBeVisible();
+    await expect(page.getByText('npx clerk@latest init').first()).toBeVisible();
   });
 
-  test('Keyless popover is removed after adding keys to .env and restarting.', async ({ page, context }) => {
-    await testKeylessRemovedAfterEnvAndRestart({ page, context, app });
+  test('Claimed application with keys inside .env boots and serves the app.', async ({ page, context }) => {
+    /**
+     * Seed claimed keyless state directly: the SDK no longer mints keys, so write the
+     * keys fixture to `.clerk/.tmp/keyless.json` and configure the matching environment
+     * (keys AND api url, so the server-side onboarding-completion call targets the right
+     * instance). The completion request itself is BAPI-bound from the server, invisible
+     * to Playwright — its logic is covered by packages/react-router keyless unit tests.
+     */
+    const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+    const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
+    await fs.ensureDir(path.join(app.appDir, '.clerk', '.tmp'));
+    await fs.writeJSON(path.join(app.appDir, '.clerk', '.tmp', 'keyless.json'), {
+      publishableKey,
+      secretKey,
+      claimUrl: 'https://dashboard.clerk.com/apps/claim',
+      apiKeysUrl: 'https://dashboard.clerk.com/last-active?path=api-keys',
+    });
+    await app.withEnv(appConfigs.envs.withEmailCodes);
+    // Restart the dev server to pick up new env vars
+    await app.restart();
+
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
   });
 });

@@ -7,8 +7,9 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { MiddlewareFunction } from 'react-router';
 import { createContext } from 'react-router';
 
+import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
-import { resolveKeysWithKeylessFallback } from './keyless/utils';
+import { completeOnboardingIfClaimed } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { AdditionalStateOptions, ClerkMiddlewareOptions } from './types';
 
@@ -36,18 +37,12 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
 
-    const {
-      publishableKey,
-      secretKey,
-      claimUrl: __keylessClaimUrl,
-      apiKeysUrl: __keylessApiKeysUrl,
-    } = await resolveKeysWithKeylessFallback(loadedOptions.publishableKey, loadedOptions.secretKey, args, options);
-
-    if (publishableKey) {
-      loadedOptions.publishableKey = publishableKey;
-    }
-    if (secretKey) {
-      loadedOptions.secretKey = secretKey;
+    if (canUseKeyless) {
+      try {
+        await completeOnboardingIfClaimed(loadedOptions.publishableKey, args, options);
+      } catch {
+        // Silently fail - claimed-keys onboarding must not break requests
+      }
     }
 
     // Pick only the properties needed by authenticateRequest.
@@ -102,8 +97,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
     args.context.set(requestStateContext, {
       requestState,
       additionalState: {
-        __keylessClaimUrl,
-        __keylessApiKeysUrl,
         signInForceRedirectUrl: loadedOptions.signInForceRedirectUrl,
         signUpForceRedirectUrl: loadedOptions.signUpForceRedirectUrl,
         signInFallbackRedirectUrl: loadedOptions.signInFallbackRedirectUrl,
