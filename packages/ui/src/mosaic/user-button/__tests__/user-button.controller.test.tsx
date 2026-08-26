@@ -282,4 +282,26 @@ describe('useUserButtonController', () => {
     expect(screen.getByTestId('active-org')).toHaveTextContent('org_1');
     expect(screen.getByTestId('open')).toHaveTextContent('true');
   });
+
+  // `setActive` emits a transitive state while it routes, which takes the live model back to
+  // `loading`. Answering that mid-action would drop the surface for the fallback and put it back.
+  it('holds the surface through a model that goes back to loading mid-action', async () => {
+    const pending = deferred<unknown>();
+    const onSwitchSession = vi.fn(() => pending.promise);
+    const { rerender } = render(<Harness model={ready({ onSwitchSession })} />);
+
+    fireEvent.click(screen.getByText('open'));
+    fireEvent.click(screen.getByText('switch'));
+
+    rerender(<Harness model={{ status: 'loading' }} />);
+    expect(screen.getByTestId('status')).toHaveTextContent('ready');
+    expect(screen.getByTestId('open')).toHaveTextContent('true');
+
+    // Once the action settles there is nothing left to hold, so the live model answers again.
+    await act(async () => {
+      pending.resolve(undefined);
+      await tick();
+    });
+    expect(screen.getByTestId('status')).toHaveTextContent('loading');
+  });
 });

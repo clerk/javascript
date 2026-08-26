@@ -114,8 +114,13 @@ export function useUserButtonController(
     minDuration: context.closeOnSuccess ? 0 : undefined,
   });
 
-  if (model.status !== 'ready') {
-    return { status: model.status };
+  // The model an action is holding outranks the live one, which `setActive` takes back to `loading`
+  // while it routes. Answering that mid-action would drop the surface for the fallback and put it
+  // straight back. Nothing is held outside an action, so the live model answers the rest of the time.
+  const active = context.frozen ?? (model.status === 'ready' ? model : null);
+
+  if (!active) {
+    return { status: model.status === 'hidden' ? 'hidden' : 'loading' };
   }
 
   const close = () => send({ type: 'CLOSE' });
@@ -144,7 +149,7 @@ export function useUserButtonController(
           send({
             type: 'RUN',
             key: keyFor(...args),
-            frozen: model,
+            frozen: active,
             run: async () => fn(...args),
             closeOnSuccess,
           })
@@ -176,10 +181,10 @@ export function useUserButtonController(
     onCreateOrganization,
     onAddAccount,
     ...data
-  } = context.frozen ?? model;
+  } = active;
 
   // Force user mode if organizations are disabled
-  const mode = model.organizationsEnabled ? requestedMode : 'user';
+  const mode = organizationsEnabled ? requestedMode : 'user';
 
   return {
     status: 'ready',
