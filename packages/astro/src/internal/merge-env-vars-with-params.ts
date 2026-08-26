@@ -1,7 +1,7 @@
 import type { InternalClerkScriptProps } from '@clerk/shared/types';
 import { isTruthy } from '@clerk/shared/underscore';
 
-import type { AstroClerkIntegrationParams, InternalRuntimeOptions } from '../types';
+import type { AstroClerkIntegrationParams } from '../types';
 
 /**
  * Merges `prefetchUI` param with env vars.
@@ -27,7 +27,7 @@ function mergePrefetchUIConfig(paramPrefetchUI: AstroClerkIntegrationParams['pre
  * @internal
  */
 const mergeEnvVarsWithParams = (
-  params?: AstroClerkIntegrationParams & InternalRuntimeOptions & InternalClerkScriptProps,
+  params?: AstroClerkIntegrationParams & { publishableKey?: string } & InternalClerkScriptProps,
 ) => {
   const {
     signInUrl: paramSignIn,
@@ -46,16 +46,13 @@ const mergeEnvVarsWithParams = (
     ...rest
   } = params || {};
 
-  const internalOptions = params;
-
   return {
     signInUrl: paramSignIn || import.meta.env.PUBLIC_CLERK_SIGN_IN_URL,
     signUpUrl: paramSignUp || import.meta.env.PUBLIC_CLERK_SIGN_UP_URL,
     isSatellite: paramSatellite || import.meta.env.PUBLIC_CLERK_IS_SATELLITE,
     proxyUrl: paramProxy || import.meta.env.PUBLIC_CLERK_PROXY_URL,
     domain: paramDomain || import.meta.env.PUBLIC_CLERK_DOMAIN,
-    publishableKey:
-      paramPublishableKey || internalOptions?.publishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
+    publishableKey: paramPublishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     __internal_clerkJSUrl: paramClerkJSUrl || import.meta.env.PUBLIC_CLERK_JS_URL,
     __internal_clerkJSVersion: paramClerkJSVersion || import.meta.env.PUBLIC_CLERK_JS_VERSION,
     __internal_clerkUIUrl: paramClerkUIUrl || import.meta.env.PUBLIC_CLERK_UI_URL,

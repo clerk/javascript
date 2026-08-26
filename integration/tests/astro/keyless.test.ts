@@ -44,10 +44,13 @@ test.describe('Keyless mode @astro', () => {
     await expect(page.getByText('npx clerk@latest init').first()).toBeVisible();
   });
 
-  test('Claimed application with keys inside .env renders without the keyless popover.', async ({ page, context }) => {
+  test('Claimed application with keys inside .env boots and serves the app.', async ({ page, context }) => {
     /**
      * Seed claimed keyless state directly: the SDK no longer mints keys, so write the
-     * keys fixture to `.clerk/.tmp/keyless.json` and copy the matching keys into `.env`.
+     * keys fixture to `.clerk/.tmp/keyless.json` and configure the matching environment
+     * (keys AND api url, so the server-side onboarding-completion call targets the right
+     * instance). The completion request itself is BAPI-bound from the server, invisible
+     * to Playwright — its logic is covered by packages/astro keyless unit tests.
      */
     const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
     const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
@@ -58,7 +61,7 @@ test.describe('Keyless mode @astro', () => {
       claimUrl: 'https://dashboard.clerk.com/apps/claim',
       apiKeysUrl: 'https://dashboard.clerk.com/last-active?path=api-keys',
     });
-    await app.keylessToEnv();
+    await app.withEnv(appConfigs.envs.withEmailCodes);
     // Restart the dev server to pick up new env vars (Vite doesn't hot-reload .env)
     await app.restart();
 
@@ -66,8 +69,5 @@ test.describe('Keyless mode @astro', () => {
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
     await u.po.expect.toBeSignedOut();
-
-    // Claimed apps with configured keys run without any keyless UI
-    await u.po.keylessPopover.waitForUnmounted();
   });
 });

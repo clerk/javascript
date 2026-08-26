@@ -43,17 +43,6 @@ type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegration
     publishableKey: string;
   };
 
-/**
- * @internal
- * Internal runtime options injected by the server.
- */
-export type InternalRuntimeOptions = {
-  /**
-   * Server-injected publishable key from the request context environment
-   */
-  publishableKey?: string;
-};
-
 // Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: ClerkOptions) => Promise<void>;
