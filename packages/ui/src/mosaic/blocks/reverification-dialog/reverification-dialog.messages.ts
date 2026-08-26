@@ -1,15 +1,3 @@
-/**
- * Every string the surface renders. Shaped the way `@clerk/i18n` takes a base definition, so
- * localizing this component is a matter of registering the namespace and swapping the reads for
- * `useMessages('reverification', reverificationDialogBase)`, not of hunting the literals down first.
- *
- * The `reverification.*` keys mirror the namespace already shipping in `@clerk/localizations`, and
- * the flat keys below them mirror the root-level keys the legacy flow shares with the rest of the
- * UI. Keeping both sets verbatim is what makes the eventual swap a rename rather than a retranslation.
- *
- * A plural message is its forms, the way `count()` takes them; a parameterized one is its template,
- * the way `params()` takes it. `plural` and `fill` below resolve them until that layer lands.
- */
 export const reverificationDialogBase = {
   alternativeMethods: {
     actionLink: 'Get help',
