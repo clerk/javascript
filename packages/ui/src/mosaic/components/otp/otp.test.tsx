@@ -29,6 +29,21 @@ describe('Mosaic Otp', () => {
     }
   });
 
+  it('marks every slot invalid when aria-invalid is passed directly', () => {
+    render(
+      <Otp
+        aria-invalid
+        length={3}
+        aria-label='Code'
+      />,
+    );
+
+    expect(screen.getByRole('group', { name: 'Code' })).toHaveAttribute('data-status', 'error');
+    for (const slot of slots()) {
+      expect(slot).toHaveAttribute('aria-invalid', 'true');
+    }
+  });
+
   it('defaults to six slots', () => {
     render(<Otp aria-label='Verification code' />);
 

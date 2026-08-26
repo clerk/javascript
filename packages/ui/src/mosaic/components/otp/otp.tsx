@@ -55,17 +55,20 @@ export function Otp({
   size = 'md',
   status: statusProp,
   disabled: disabledProp,
+  'aria-invalid': ariaInvalidProp,
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
   ...rest
 }: OtpProps): React.ReactElement {
   const fieldProps = useOptionalFieldControlProps({
     disabled: disabledProp,
+    ariaInvalid: ariaInvalidProp,
     ariaLabelledBy,
     ariaDescribedBy,
   });
   const disabled = fieldProps?.disabled ?? disabledProp ?? false;
-  const status = statusProp ?? (fieldProps?.['aria-invalid'] === true ? 'error' : 'neutral');
+  const ariaInvalid = fieldProps?.['aria-invalid'] ?? ariaInvalidProp;
+  const status = statusProp ?? (ariaInvalid === true || ariaInvalid === 'true' ? 'error' : 'neutral');
 
   return (
     <Primitive.Root
