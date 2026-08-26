@@ -14,7 +14,9 @@ export type OtpStatus = 'neutral' | 'success' | 'error';
 
 export type OtpSize = 'sm' | 'md' | 'lg';
 
-export interface OtpProps extends Omit<PrimitiveOtpProps, 'children'> {
+export interface OtpProps extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style'> {
+  /** The number of boxes in the code. @default 6 */
+  length?: number;
   size?: OtpSize;
   /** Colours every slot for the verification outcome. Defaults to the enclosing `Field`'s validity. */
   status?: OtpStatus;
@@ -49,11 +51,10 @@ function OtpSlots({ size, status }: { size: OtpSize; status: OtpStatus }) {
  * advancing as the code is typed and a pasted code spread across the boxes.
  */
 export function Otp({
+  length = 6,
   size = 'md',
   status: statusProp,
   disabled: disabledProp,
-  className,
-  style,
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
   ...rest
@@ -68,14 +69,13 @@ export function Otp({
 
   return (
     <Primitive.Root
+      {...rest}
+      length={length}
       disabled={disabled}
       {...mergeStyleProps(
         themeProps('otp', { size, status, disabled }),
         stylex.props(reset.base, styles.root, rootSizes[size]),
-        className,
-        style,
       )}
-      {...rest}
       aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
     >

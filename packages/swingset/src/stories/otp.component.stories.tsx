@@ -38,7 +38,6 @@ export function Default(props: Record<string, unknown>) {
   return (
     <Otp
       {...knobsAsProps(props)}
-      length={6}
       aria-label='Verification code'
     />
   );
@@ -48,19 +47,16 @@ export function Sizes() {
   return (
     <div style={{ display: 'grid', gap: 16, justifyItems: 'start' }}>
       <Otp
-        length={6}
         size='sm'
         defaultValue='123'
         aria-label='Small code'
       />
       <Otp
-        length={6}
         size='md'
         defaultValue='123'
         aria-label='Medium code'
       />
       <Otp
-        length={6}
         size='lg'
         defaultValue='123'
         aria-label='Large code'
@@ -73,7 +69,6 @@ export function Success() {
   return (
     <Field.Root style={stackStyles}>
       <Otp
-        length={6}
         status='success'
         defaultValue='123456'
         aria-label='Verification code'
@@ -90,7 +85,6 @@ export function Error() {
       style={stackStyles}
     >
       <Otp
-        length={6}
         defaultValue='123456'
         aria-label='Verification code'
       />
@@ -102,7 +96,6 @@ export function Error() {
 export function Disabled() {
   return (
     <Otp
-      length={6}
       disabled
       defaultValue='123'
       aria-label='Verification code'

@@ -29,6 +29,12 @@ describe('Mosaic Otp', () => {
     }
   });
 
+  it('defaults to six slots', () => {
+    render(<Otp aria-label='Verification code' />);
+
+    expect(slots()).toHaveLength(6);
+  });
+
   it.each(['sm', 'md', 'lg'] as const)('reflects the %s size on the group and every slot', size => {
     render(
       <Otp
@@ -134,20 +140,6 @@ describe('Mosaic Otp', () => {
     );
     const group = screen.getByRole('group', { name: 'Verification code' });
     expect(group).toHaveAccessibleDescription('Check your email.');
-  });
-
-  it('merges consumer className and inline styles onto the group', () => {
-    render(
-      <Otp
-        length={3}
-        className='my-otp'
-        style={{ marginTop: '8px' }}
-        aria-label='Code'
-      />,
-    );
-    const group = screen.getByRole('group', { name: 'Code' });
-    expect(group).toHaveClass('cl-otp', 'my-otp');
-    expect(group).toHaveStyle({ marginTop: '8px' });
   });
 
   it('submits the combined value under the given name', () => {

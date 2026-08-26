@@ -15,8 +15,9 @@ The Mosaic `Otp` is the verification-code field: one styled box per character, b
 
 <PropTable
   meta={OtpStories.meta}
+  styleProps={false}
   extra={[
-    { name: 'length', type: 'number', default: '— (required)' },
+    { name: 'length', type: 'number', default: '6' },
     { name: 'value', type: 'string', default: '—' },
     { name: 'defaultValue', type: 'string', default: "''" },
     { name: 'onValueChange', type: '(value: string) => void', default: '—' },
@@ -28,17 +29,16 @@ The Mosaic `Otp` is the verification-code field: one styled box per character, b
   ]}
 />
 
-Every prop of the headless [OTP primitive](/primitives/otp) passes through.
+Every prop of the headless [OTP primitive](/primitives/otp) passes through. The boxes are styled through their `.cl-otp` and `.cl-otp-slot` classes, so `Otp` takes no `className` or `style`.
 
 ## Usage
 
-`length` is the only required prop. Give the group an accessible name with `aria-label`, or place it in a `Field.Root` with a `Field.Label`.
+`length` defaults to `6`. Give the group an accessible name with `aria-label`, or place it in a `Field.Root` with a `Field.Label`.
 
 ```tsx
 import { Otp } from '@clerk/ui/mosaic/components/otp';
 
 <Otp
-  length={6}
   aria-label='Verification code'
   onComplete={code => verify(code)}
 />;
@@ -50,7 +50,6 @@ The value is uncontrolled by default. Pass `value` with `onValueChange` to contr
 const [code, setCode] = useState('');
 
 <Otp
-  length={6}
   value={code}
   onValueChange={setCode}
   aria-label='Verification code'
@@ -62,10 +61,7 @@ Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes,
 ```tsx
 <Field.Root invalid={Boolean(error)}>
   <Field.Label>Verification code</Field.Label>
-  <Otp
-    length={6}
-    name='code'
-  />
+  <Otp name='code' />
   {error ? <Field.Error>{error}</Field.Error> : <Field.Description>Didn’t receive a code? Resend</Field.Description>}
 </Field.Root>
 ```
