@@ -30,7 +30,7 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  // In keyless mode, don't throw if secretKey is missing - ClerkProvider will handle it
+  // In development, defer missing-key errors to authenticateRequest so the CLI-pointing message surfaces
   if (!secretKey && !canUseKeyless) {
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: no secret key provided');
