@@ -84,10 +84,13 @@ export interface ReverificationDialogVerifyProps extends ReverificationDialogBas
   secondary?: ReverificationDialogAction;
 }
 
-/** A dead end with one way out: help, or no methods to offer. */
+/** A dead end: help, or no methods to offer. */
 export interface ReverificationDialogMessageProps extends ReverificationDialogBaseProps {
   step: 'message';
+  /** The way forward from a dead end — reaching a human. */
   action: ReverificationDialogAction;
+  /** Returns where the user came from. Absent where there is nothing to go back to. */
+  back?: ReverificationDialogAction;
 }
 
 export type ReverificationDialogProps =
@@ -367,7 +370,7 @@ function VerifyStep({
   );
 }
 
-function MessageStep({ action }: ReverificationDialogMessageProps) {
+function MessageStep({ action, back }: ReverificationDialogMessageProps) {
   return (
     <Card.Footer>
       <Button
@@ -376,6 +379,16 @@ function MessageStep({ action }: ReverificationDialogMessageProps) {
       >
         {action.label}
       </Button>
+      {back ? (
+        <Button
+          color='neutral'
+          fullWidth
+          variant='outline'
+          onClick={back.onClick}
+        >
+          {back.label}
+        </Button>
+      ) : null}
     </Card.Footer>
   );
 }

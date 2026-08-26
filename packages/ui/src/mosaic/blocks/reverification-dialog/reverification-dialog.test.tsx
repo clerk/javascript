@@ -59,7 +59,7 @@ const messageProps = (overrides: Partial<ReverificationDialogMessageProps> = {})
   step: 'message',
   title: 'Get help',
   description: 'Email us and we will work with you to restore access.',
-  action: { label: 'Back', onClick: vi.fn() },
+  action: { label: 'Email support', onClick: vi.fn() },
   ...overrides,
 });
 
@@ -192,13 +192,28 @@ describe('ReverificationDialog', () => {
     expect(onResend).not.toHaveBeenCalled();
   });
 
-  it('gives a dead end exactly one way out', async () => {
+  it('leads a dead end with the way forward, not the way back', async () => {
     const onClick = vi.fn();
-    renderBlock(messageProps({ action: { label: 'Back', onClick } }));
+    renderBlock(messageProps({ action: { label: 'Email support', onClick } }));
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Back' }));
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Email support' }));
 
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('offers a way back from a dead end only when the caller supplies one', async () => {
+    const onClick = vi.fn();
+    const { rerender } = renderBlock(messageProps());
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
+
+    rerender(
+      <MosaicProvider>
+        <ReverificationDialog {...messageProps({ back: { label: 'Back', onClick } })} />
+      </MosaicProvider>,
+    );
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Back' }));
     expect(onClick).toHaveBeenCalledOnce();
   });
 });

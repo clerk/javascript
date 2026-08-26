@@ -39,7 +39,11 @@ export interface ReverificationDialogMachineContext {
   returnState: ReverificationDialogReturnState;
   prepare: (factor: ReverificationPreparationFactor) => Promise<void>;
   attempt: (attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>;
-  complete: () => void;
+  /**
+   * The verification landed. Awaited, so the dialog stays up while the caller activates the
+   * session — legacy did the same before handing back to whatever asked for reverification.
+   */
+  complete: () => Promise<void>;
   cancel: () => void;
 }
 
@@ -146,7 +150,7 @@ export const reverificationDialogMachine = createMachine({
     returnState: 'selectingFactor',
     prepare: () => Promise.resolve(),
     attempt: () => Promise.resolve({ status: 'complete' }),
-    complete: () => {},
+    complete: () => Promise.resolve(),
     cancel: () => {},
   },
   states: {
@@ -292,7 +296,7 @@ export const reverificationDialogMachine = createMachine({
       invoke: fromPromise(context => context.attempt(attemptFrom(context)), {
         onDone: [
           {
-            target: 'completed',
+            target: 'completing',
             guard: (_, event) => event.output.status === 'complete',
           },
           {
@@ -360,10 +364,21 @@ export const reverificationDialogMachine = createMachine({
       },
     },
     unavailable: { on: { CANCEL: 'cancelled' } },
-    completed: {
-      type: 'final',
-      entry: context => context.complete(),
+    completing: {
+      invoke: fromPromise(context => context.complete(), {
+        onDone: 'completed',
+        // The code was right but the session did not activate. Legacy surfaced that on the card
+        // the user was already looking at, so the flow returns there rather than closing.
+        onError: ({ context, event }) => ({
+          target: context.resendSecondsRemaining > 0 ? 'verifyingCooldown' : 'verifying',
+          context: {
+            value: '',
+            error: errorFrom(event.error, attemptErrorLocation(context)),
+          },
+        }),
+      }),
     },
+    completed: { type: 'final' },
     cancelled: {
       type: 'final',
       entry: context => context.cancel(),

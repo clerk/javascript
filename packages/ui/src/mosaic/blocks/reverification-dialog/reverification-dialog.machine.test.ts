@@ -16,14 +16,12 @@ import type {
 
 const passwordFactor: ReverificationPasswordFactor = {
   id: 'password',
-  label: 'Password',
   stage: 'first',
   strategy: 'password',
 };
 
 const emailFactor: ReverificationEmailCodeFactor = {
   id: 'email_1',
-  label: 'Email code to a••••@clerk.dev',
   stage: 'first',
   strategy: 'email_code',
   emailAddressId: 'email_1',
@@ -32,7 +30,6 @@ const emailFactor: ReverificationEmailCodeFactor = {
 
 const phoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
   id: 'phone_1',
-  label: 'SMS code to ••••1234',
   stage: 'first',
   strategy: 'phone_code',
   phoneNumberId: 'phone_1',
@@ -41,14 +38,12 @@ const phoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
 
 const totpFactor: ReverificationTOTPFactor = {
   id: 'totp',
-  label: 'Authenticator app',
   stage: 'second',
   strategy: 'totp',
 };
 
 const secondPhoneFactor: ReverificationSecondFactorPhoneCodeFactor = {
   id: 'phone_2',
-  label: 'SMS code to ••••5678',
   stage: 'second',
   strategy: 'phone_code',
   phoneNumberId: 'phone_2',
@@ -69,13 +64,13 @@ function start({
   attempt = vi
     .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
     .mockResolvedValue({ status: 'complete' }),
-  complete = vi.fn(),
+  complete = vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
   cancel = vi.fn(),
 }: {
   challenge?: ReverificationChallenge;
   prepare?: (factor: ReverificationPreparationFactor) => Promise<void>;
   attempt?: (attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>;
-  complete?: () => void;
+  complete?: () => Promise<void>;
   cancel?: () => void;
 } = {}) {
   const actor = createActor(reverificationDialogMachine, {
@@ -125,6 +120,41 @@ describe('reverificationDialogMachine', () => {
     expect(attempt).toHaveBeenCalledWith({ factor: passwordFactor, password: 'secret' });
     expect(complete).toHaveBeenCalledOnce();
     expect(actor.getSnapshot().status).toBe('done');
+  });
+
+  it('stays open and pending until the caller finishes completing', async () => {
+    let finish = () => {};
+    const complete = vi.fn<() => Promise<void>>().mockReturnValue(
+      new Promise<void>(resolve => {
+        finish = resolve;
+      }),
+    );
+    const { actor } = start({ complete });
+
+    actor.send({ type: 'CHANGE_VALUE', value: 'secret' });
+    actor.send({ type: 'SUBMIT' });
+
+    // The attempt has landed but the session is not active yet, so the flow is not done with it.
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('completing'));
+    expect(actor.getSnapshot().status).toBe('active');
+
+    finish();
+    await vi.waitFor(() => expect(actor.getSnapshot().status).toBe('done'));
+  });
+
+  it('returns to the factor when completion fails, so the reason is not lost', async () => {
+    const complete = vi.fn<() => Promise<void>>().mockRejectedValue(new Error('Could not activate the session.'));
+    const { actor } = start({ complete });
+
+    actor.send({ type: 'CHANGE_VALUE', value: 'secret' });
+    actor.send({ type: 'SUBMIT' });
+
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifying'));
+    expect(actor.getSnapshot().context).toMatchObject({
+      value: '',
+      error: { message: 'Could not activate the session.' },
+    });
+    expect(actor.getSnapshot().status).toBe('active');
   });
 
   it('prepares a delivered-code factor and automatically submits six normalized digits', async () => {

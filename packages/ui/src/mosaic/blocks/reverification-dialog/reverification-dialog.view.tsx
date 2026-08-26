@@ -19,10 +19,15 @@ export interface ReverificationDialogViewProps {
   prepare: (factor: ReverificationPreparationFactor) => Promise<void>;
   /** Submits the user's answer. Resolving `needs_second_factor` moves the flow on to 2FA. */
   attempt: (attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>;
-  /** The user proved who they are. */
-  onComplete: () => void;
+  /**
+   * The user proved who they are. Awaited: the dialog stays up, pending, until this resolves,
+   * so a caller can activate the session before the flow hands back.
+   */
+  onComplete: () => Promise<void>;
   /** The user gave up, or closed the dialog. */
   onCancel: () => void;
+  /** Address behind the support action on a dead end. From Clerk's `useSupportEmail`. */
+  supportEmail: string;
 }
 
 /**
@@ -93,6 +98,7 @@ export function ReverificationDialogView({
   attempt,
   onComplete,
   onCancel,
+  supportEmail,
 }: ReverificationDialogViewProps) {
   const [snapshot, send, actor] = useMachine(reverificationDialogMachine, {
     context: { initialChallenge: challenge, prepare, attempt, complete: onComplete, cancel: onCancel },
@@ -104,6 +110,15 @@ export function ReverificationDialogView({
   if (snapshot.value === 'initializing') {
     return null;
   }
+
+  // The one thing a user with no working method can still do. A navigation rather than a
+  // callback, the way the legacy error card did it.
+  const emailSupport = {
+    label: m.alternativeMethods.getHelp.blockButton__emailSupport,
+    onClick: () => {
+      window.location.href = `mailto:${supportEmail}`;
+    },
+  };
 
   const base = {
     open: snapshot.status === 'active',
@@ -117,13 +132,14 @@ export function ReverificationDialogView({
   };
 
   const props = ((): ReverificationDialogProps => {
+    // Legacy gave this card no way back — there is no method to go back to.
     if (snapshot.value === 'unavailable') {
       return {
         ...base,
         step: 'message',
         title: m.noAvailableMethods.title,
         description: m.noAvailableMethods.message,
-        action: { label: m.closeButton, onClick: () => send({ type: 'CANCEL' }) },
+        action: emailSupport,
       };
     }
 
@@ -133,7 +149,8 @@ export function ReverificationDialogView({
         step: 'message',
         title: m.alternativeMethods.getHelp.title,
         description: m.alternativeMethods.getHelp.content,
-        action: { label: m.backButton, onClick: () => send({ type: 'BACK' }) },
+        action: emailSupport,
+        back: { label: m.backButton, onClick: () => send({ type: 'BACK' }) },
       };
     }
 
@@ -161,13 +178,13 @@ export function ReverificationDialogView({
         step: 'message',
         title: m.noAvailableMethods.title,
         description: m.noAvailableMethods.message,
-        action: { label: m.closeButton, onClick: () => send({ type: 'CANCEL' }) },
+        action: emailSupport,
       };
     }
 
     const copy = copyFor(factor);
     const { resendButton } = copy;
-    const isPending = snapshot.value === 'submitting';
+    const isPending = snapshot.value === 'submitting' || snapshot.value === 'completing';
     // Only these two states accept a keystroke; anywhere else the field would swallow one.
     const isEditable = snapshot.value === 'verifying' || snapshot.value === 'verifyingCooldown';
 

@@ -21,6 +21,7 @@ export const reverificationDialogBase = {
     blockButton__phoneCode: 'Send SMS code to {identifier}',
     blockButton__totp: 'Use your authenticator app',
     getHelp: {
+      blockButton__emailSupport: 'Email support',
       content:
         'If you have trouble verifying your account, email us and we will work with you to restore access as soon as possible.',
       title: 'Get help',

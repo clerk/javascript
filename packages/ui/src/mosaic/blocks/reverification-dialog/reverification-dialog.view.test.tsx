@@ -16,14 +16,12 @@ import { ReverificationDialogView } from './reverification-dialog.view';
 
 const passwordFactor: ReverificationPasswordFactor = {
   id: 'password',
-  label: 'Password',
   stage: 'first',
   strategy: 'password',
 };
 
 const emailFactor: ReverificationEmailCodeFactor = {
   id: 'email_1',
-  label: 'Email code',
   stage: 'first',
   strategy: 'email_code',
   emailAddressId: 'email_1',
@@ -32,7 +30,6 @@ const emailFactor: ReverificationEmailCodeFactor = {
 
 const passkeyFactor: ReverificationPasskeyFactor = {
   id: 'passkey',
-  label: 'Passkey',
   stage: 'first',
   strategy: 'passkey',
 };
@@ -47,8 +44,9 @@ function renderView({
   attempt = vi
     .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
     .mockResolvedValue({ status: 'complete' }),
-  onComplete = vi.fn(),
+  onComplete = vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
   onCancel = vi.fn(),
+  supportEmail = 'support@clerk.dev',
 } = {}) {
   render(
     <MosaicProvider>
@@ -58,10 +56,11 @@ function renderView({
         attempt={attempt}
         onComplete={onComplete}
         onCancel={onCancel}
+        supportEmail={supportEmail}
       />
     </MosaicProvider>,
   );
-  return { prepare, attempt, onComplete, onCancel };
+  return { prepare, attempt, onComplete, onCancel, supportEmail };
 }
 
 /** The code field is a group of single-character slots, not one input. */
@@ -198,6 +197,45 @@ describe('ReverificationDialogView', () => {
     await user.click(await screen.findByRole('button', { name: 'Get help' }));
 
     expect(screen.getByText(/email us and we will work with you/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Email support' })).toBeInTheDocument();
+  });
+
+  it('sends a stuck user to support, the only thing left that can help them', async () => {
+    const location = { href: '' };
+    Object.defineProperty(window, 'location', { value: location, writable: true });
+    renderView({ challenge: { status: 'needs_first_factor', factors: [] } });
+
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Email support' }));
+
+    expect(location.href).toBe('mailto:support@clerk.dev');
+  });
+
+  it('leaves no way back from a dead end with no method to go back to', async () => {
+    renderView({ challenge: { status: 'needs_first_factor', factors: [] } });
+
+    expect(await screen.findByRole('button', { name: 'Email support' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
+  });
+
+  it('holds the dialog open and pending while the caller completes', async () => {
+    let finish = () => {};
+    const onComplete = vi.fn<() => Promise<void>>().mockReturnValue(
+      new Promise<void>(resolve => {
+        finish = resolve;
+      }),
+    );
+    renderView({ onComplete });
+    const user = userEvent.setup();
+
+    await user.type(await screen.findByLabelText('Password'), 'secret');
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await waitFor(() => expect(onComplete).toHaveBeenCalled());
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+
+    finish();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('says so when the account has no method to offer', async () => {

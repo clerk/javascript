@@ -1,6 +1,5 @@
 interface ReverificationFactorBase {
   id: string;
-  label: string;
 }
 
 export interface ReverificationPasswordFactor extends ReverificationFactorBase {

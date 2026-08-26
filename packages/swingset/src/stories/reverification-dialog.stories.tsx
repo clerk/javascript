@@ -27,14 +27,12 @@ export const meta: StoryMeta = {
 
 const passwordFactor: ReverificationPasswordFactor = {
   id: 'password',
-  label: 'Password',
   stage: 'first',
   strategy: 'password',
 };
 
 const emailFactor: ReverificationEmailCodeFactor = {
   id: 'email_1',
-  label: 'Email code to a••••@clerk.dev',
   stage: 'first',
   strategy: 'email_code',
   emailAddressId: 'email_1',
@@ -43,7 +41,6 @@ const emailFactor: ReverificationEmailCodeFactor = {
 
 const firstPhoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
   id: 'phone_1',
-  label: 'SMS code to ••••4242',
   stage: 'first',
   strategy: 'phone_code',
   phoneNumberId: 'phone_1',
@@ -52,14 +49,12 @@ const firstPhoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
 
 const passkeyFactor: ReverificationPasskeyFactor = {
   id: 'passkey',
-  label: 'Passkey',
   stage: 'first',
   strategy: 'passkey',
 };
 
 const secondPhoneFactor: ReverificationSecondFactorPhoneCodeFactor = {
   id: 'phone_2',
-  label: 'SMS code to ••••8675',
   stage: 'second',
   strategy: 'phone_code',
   phoneNumberId: 'phone_2',
@@ -68,11 +63,22 @@ const secondPhoneFactor: ReverificationSecondFactorPhoneCodeFactor = {
 
 const secondFactors: ReverificationSecondFactor[] = [
   secondPhoneFactor,
-  { id: 'totp', label: 'Authenticator app', stage: 'second', strategy: 'totp' },
-  { id: 'backup_code', label: 'Backup code', stage: 'second', strategy: 'backup_code' },
+  { id: 'totp', stage: 'second', strategy: 'totp' },
+  { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
 ];
 
 const firstFactors: ReverificationFirstFactor[] = [passwordFactor, emailFactor, firstPhoneFactor, passkeyFactor];
+
+// Only the launch buttons need these. The dialog names a method from its own messages.
+const factorNames: Record<string, string> = {
+  password: 'password',
+  email_1: 'email code',
+  phone_1: 'SMS code',
+  passkey: 'passkey',
+  phone_2: 'SMS code',
+  totp: 'authenticator app',
+  backup_code: 'backup code',
+};
 
 interface Scenario {
   id: string;
@@ -89,7 +95,7 @@ const scenarios: Scenario[] = [
   },
   ...firstFactors.map(factor => ({
     id: `first-${factor.id}`,
-    label: `First factor — ${factor.label}`,
+    label: `First factor — ${factorNames[factor.id]}`,
     challenge: { status: 'needs_first_factor' as const, factors: firstFactors, initialFactorId: factor.id },
   })),
   {
@@ -105,7 +111,7 @@ const scenarios: Scenario[] = [
   },
   ...secondFactors.map(factor => ({
     id: `second-${factor.id}`,
-    label: `Second factor — ${factor.label}`,
+    label: `Second factor — ${factorNames[factor.id]}`,
     challenge: { status: 'needs_second_factor' as const, factors: secondFactors, initialFactorId: factor.id },
   })),
 ];
@@ -127,16 +133,22 @@ function MachineDrivenDialog({ scenario, onFinished }: { scenario: Scenario; onF
     [scenario.continuesToSecondFactor],
   );
   // The view finishes in a final state, so the story unmounts it to make the demo repeatable.
-  // Deferred a tick because the machine reports completion from inside its own transition.
+  // Deferred a tick because the machine reports cancellation from inside its own transition.
   const finish = React.useCallback(() => window.setTimeout(onFinished, 0), [onFinished]);
+  // Stands in for activating the session, which the dialog waits out before it closes.
+  const complete = React.useCallback(async () => {
+    await settleAfter(800);
+    finish();
+  }, [finish]);
 
   return (
     <ReverificationDialogView
       challenge={scenario.challenge}
       prepare={prepare}
       attempt={attempt}
-      onComplete={finish}
+      onComplete={complete}
       onCancel={finish}
+      supportEmail='support@clerk.dev'
     />
   );
 }
