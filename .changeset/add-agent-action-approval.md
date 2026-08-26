@@ -1,7 +1,7 @@
 ---
 '@clerk/shared': minor
-'@clerk/clerk-js': patch
-'@clerk/ui': patch
+'@clerk/clerk-js': minor
+'@clerk/ui': minor
 '@clerk/react': minor
 '@clerk/react-router': minor
 '@clerk/nextjs': minor
