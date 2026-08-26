@@ -42,6 +42,7 @@ export class IdPOAuthAccessToken {
       data.expiration,
       data.created_at,
       data.updated_at,
+      data.aud,
     );
   }
 
