@@ -51,6 +51,8 @@ minimumReleaseAgeExclude:
   - astro@6.1.6
   # Renovate security update: vite@6.4.2
   - vite@6.4.2
+  # Renovate security update: fast-uri@3.1.5
+  - fast-uri@3.1.5
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
