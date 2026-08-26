@@ -1,0 +1,70 @@
+import * as Stories from './user-profile-security-panel-flow.stories';
+
+# Security panel flow
+
+This story covers password, passkey, two-step verification, device, and account deletion actions.
+The controls can add a delay, trigger an error, or require an identity check.
+
+Errors can happen on the first request, during the identity check, or when the original request is
+tried again. The mock controller handles these steps. The views only display the current state and
+report what the user did.
+
+The same mock controller drives the full panel and the individual section stories, including their
+real dialogs.
+
+## Legacy behavior covered
+
+| Area             | What this story covers                                                                                                                         |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Panel            | Which sections and actions are available, plus device loading and error states                                                                 |
+| Password         | Setting or changing a password, password rules, mismatched passwords, read-only passwords, and signing out other devices                       |
+| Passkeys         | Creating a passkey right away, unsupported browsers, cancelled and failed requests, renaming, removal, and identity checks                     |
+| Two-step         | Adding phone or authenticator methods, entering and resending codes, QR and setup keys, backup codes, defaults, removal rules, and errors      |
+| Devices          | Active and pending devices, current and impersonated sessions, signing out one device, and the added “sign out all other devices” confirmation |
+| Account deletion | Confirmation text, identity checks, failed requests, and where the user goes after deleting an account                                         |
+| Identity checks  | Password, email, phone, passkey, authenticator, and backup-code methods, including selection, loading, help, and error states                  |
+
+“Sign out all other devices” is an added flow. Regular dialogs close when clicking outside them.
+Destructive confirmation dialogs do not.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Security panel', href: '/user-profile/user-profile-security-panel', layer: 'User Profile' },
+    { name: 'Password section', href: '/user-profile/user-profile-password-section', layer: 'User Profile' },
+    { name: '2-step verification', href: '/user-profile/user-profile-mfa-section', layer: 'User Profile' },
+    { name: 'Active devices', href: '/user-profile/user-profile-active-devices-section', layer: 'User Profile' },
+    { name: 'Danger zone', href: '/user-profile/user-profile-delete-section', layer: 'User Profile' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Alert dialog', href: '/components/alert-dialog', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+The controller returns the complete set of props for the panel. Pass them directly to the view:
+
+```tsx
+const security = useUserProfileSecurityPanelMockController({ config });
+
+return <UserProfileSecurityPanelView {...security} />;
+```
+
+The mock controller is only for Swingset. A Clerk-backed controller can return the same view props
+without changing the panel or its dialogs.
+
+## Dialog states
+
+Choose a state to open the real view directly. This makes loading, errors, password setup, and
+identity checks easy to inspect without clicking through the full flow.
+
+<Story
+  name='States'
+  storyModule={Stories}
+/>
+
+## Temporary UI
+
+The identity-check code field is temporary until the Mosaic code input is ready. The password form
+uses a native checkbox until the Mosaic checkbox is ready.

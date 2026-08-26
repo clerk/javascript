@@ -167,6 +167,11 @@ import {
   meta as userProfileSecurityPanelMeta,
 } from '../stories/user-profile-security-panel.stories';
 import {
+  Default as UserProfileSecurityPanelFlowDefault,
+  meta as userProfileSecurityPanelFlowMeta,
+  States as UserProfileSecurityPanelFlowStates,
+} from '../stories/user-profile-security-panel-flow.stories';
+import {
   Default as UserProfileSubscriptionSectionDefault,
   meta as userProfileSubscriptionSectionMeta,
 } from '../stories/user-profile-subscription-section.stories';
@@ -365,6 +370,11 @@ const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
 };
+const userProfileSecurityPanelFlowModule: StoryModule = {
+  meta: userProfileSecurityPanelFlowMeta,
+  Default: UserProfileSecurityPanelFlowDefault,
+  States: UserProfileSecurityPanelFlowStates,
+};
 
 export const registry: StoryModule[] = [
   // User Button
@@ -372,6 +382,7 @@ export const registry: StoryModule[] = [
   // User Profile
   userPageModule,
   userProfileAccountSectionFlowModule,
+  userProfileSecurityPanelFlowModule,
   // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,

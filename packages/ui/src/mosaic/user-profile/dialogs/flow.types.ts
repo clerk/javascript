@@ -125,8 +125,21 @@ export interface ConfirmContactActionState {
  * A reverification challenge raised mid-mutation. Rendered stacked over the flow it interrupted,
  * which stays open and pending behind it; on success the original flow resumes where it left off.
  */
+export type ReverificationStrategy = 'password' | 'email_code' | 'phone_code' | 'passkey' | 'totp' | 'backup_code';
+
+export interface ReverificationFactor {
+  id: string;
+  strategy: ReverificationStrategy;
+  label: string;
+  identifier?: string;
+}
+
 export interface ReverificationChallengeState {
-  strategy: 'password' | 'email_code' | 'phone_code';
+  strategy: ReverificationStrategy;
+  step?: 'select-first-factor' | 'prepare' | 'verify' | 'select-second-factor' | 'unavailable' | 'help';
+  stage?: 'first' | 'second';
+  availableFactors?: ReverificationFactor[];
+  preparationStatus?: 'preparing' | 'error';
   /** The address or number a code was sent to. Absent for the password strategy. */
   identifier?: string;
   value: string;
@@ -141,6 +154,10 @@ export interface ReverificationChallengeActions {
   onSubmit: (completedValue?: string) => void;
   onResend: () => void;
   onCancel: () => void;
+  onSelectFactor?: (factorId: string) => void;
+  onBack?: () => void;
+  onPrepare?: () => void;
+  onShowHelp?: () => void;
 }
 
 // =============================================================================
@@ -265,4 +282,322 @@ export interface AccountSectionFlows {
   editProfile?: EditProfileFlow | null;
   /** Stacks over whichever flow raised it. Shared across sections; it lives here until a second one needs it. */
   reverification?: ReverificationFlow | null;
+}
+
+export interface UserProfilePasswordValues {
+  currentPassword?: string;
+  newPassword: string;
+  confirmPassword: string;
+  signOutOfOtherSessions: boolean;
+}
+
+export type UserProfilePasswordField = keyof UserProfilePasswordValues;
+export type UserProfilePasswordMode = 'change' | 'set';
+
+export interface UserProfilePasswordFlowState {
+  mode: UserProfilePasswordMode;
+  values: UserProfilePasswordValues;
+  requiresCurrentPassword?: boolean;
+  signedInIdentifier?: string;
+  minimumLength?: number;
+  isReadOnly?: boolean;
+  isSubmitting: boolean;
+  errors: FlowErrors & Partial<Record<UserProfilePasswordField, string>>;
+}
+
+export interface UserProfilePasswordFlowActions {
+  onCancel: () => void;
+  onValueChange: <Field extends UserProfilePasswordField>(
+    field: Field,
+    value: UserProfilePasswordValues[Field],
+  ) => void;
+  onSubmit: (values: UserProfilePasswordValues) => void;
+}
+
+export interface UserProfileDeleteAccountFlowState {
+  confirmation: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfileDeleteAccountFlowActions {
+  onCancel: () => void;
+  onConfirmationChange: (value: string) => void;
+  onDelete: () => void;
+}
+
+export interface UserProfileSignOutAllDevicesFlowState {
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfileSignOutAllDevicesFlowActions {
+  onCancel: () => void;
+  onSignOut: () => void;
+}
+
+export interface UserProfileDeviceDetails {
+  id: string;
+  title: string;
+  lastActiveAtLabel: string;
+  deviceName: string;
+  browserName: string;
+  ipAddress: string;
+  location: string;
+  locationFlag?: string;
+  originalSignInAtLabel: string;
+}
+
+export interface UserProfileDeviceDetailsFlowState {
+  device: UserProfileDeviceDetails;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfileDeviceDetailsFlowActions {
+  onSignOut: () => void;
+}
+
+export interface UserProfileDeviceSignOutFlowState {
+  id: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export type UserProfileMfaMethodType = 'sms' | 'authenticator';
+
+export interface UserProfileMfaPhoneOption {
+  id: string;
+  label: string;
+  isVerified: boolean;
+  isDefault?: boolean;
+}
+
+interface UserProfileMfaAddBaseState {
+  method: UserProfileMfaMethodType;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfileMfaPhoneStep extends UserProfileMfaAddBaseState {
+  method: 'sms';
+  step: 'phone';
+  phoneNumber: string;
+}
+
+export interface UserProfileMfaPhoneSelectStep extends UserProfileMfaAddBaseState {
+  method: 'sms';
+  step: 'select-phone';
+  phones: UserProfileMfaPhoneOption[];
+  loadingPhoneId?: string;
+}
+
+export interface UserProfileMfaAuthenticatorPreparingStep extends UserProfileMfaAddBaseState {
+  method: 'authenticator';
+  step: 'preparing';
+}
+
+export interface UserProfileMfaAuthenticatorSetupStep extends UserProfileMfaAddBaseState {
+  method: 'authenticator';
+  step: 'setup';
+  displayFormat: 'qr' | 'key';
+  secret: string;
+  uri?: string;
+  copied?: boolean;
+}
+
+export interface UserProfileMfaSmsPreparingStep extends UserProfileMfaAddBaseState {
+  method: 'sms';
+  step: 'preparing-sms';
+  identifier: string;
+  returnStep?: 'select-phone' | 'phone';
+}
+
+export interface UserProfileMfaVerificationStep extends UserProfileMfaAddBaseState {
+  step: 'verify';
+  identifier?: string;
+  code: string;
+  status: 'idle' | 'verifying' | 'error';
+  resend: ResendState;
+  returnStep?: 'select-phone' | 'phone' | 'setup';
+}
+
+export interface UserProfileMfaBackupCodesStep extends UserProfileMfaAddBaseState {
+  step: 'backup-codes';
+  codes: string[];
+  copied: boolean;
+}
+
+export type UserProfileMfaAddFlowState =
+  | UserProfileMfaPhoneSelectStep
+  | UserProfileMfaPhoneStep
+  | UserProfileMfaAuthenticatorPreparingStep
+  | UserProfileMfaSmsPreparingStep
+  | UserProfileMfaAuthenticatorSetupStep
+  | UserProfileMfaVerificationStep
+  | UserProfileMfaBackupCodesStep;
+
+export interface UserProfileMfaAddFlowActions {
+  onCancel: () => void;
+  onPhoneNumberChange: (value: string) => void;
+  onAddPhone: () => void;
+  onSelectPhone: (id: string) => void;
+  onCodeChange: (value: string) => void;
+  onSubmit: (completedCode?: string) => void;
+  onResend: () => void;
+  onToggleDisplayFormat: () => void;
+  onCopyBackupCodes: () => void;
+  onDownloadBackupCodes: () => void;
+  onPrintBackupCodes: () => void;
+  onFinish: () => void;
+  onBack: () => void;
+  onCopySecret: () => void;
+}
+
+export interface UserProfileMfaRemoveFlowState {
+  method: UserProfileMfaMethodType;
+  id: string;
+  label: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfileMfaRemoveFlowActions {
+  onCancel: () => void;
+  onRemove: () => void;
+}
+
+export type UserProfileBackupCodesFlowState =
+  | {
+      step: 'generating';
+      isSubmitting: boolean;
+      errors: FlowErrors;
+    }
+  | {
+      step: 'unavailable';
+      isSubmitting: false;
+      errors: FlowErrors;
+    }
+  | {
+      step: 'codes';
+      codes: string[];
+      isSubmitting: false;
+      errors: FlowErrors;
+    };
+
+export interface UserProfileBackupCodesFlowActions {
+  onCancel: () => void;
+  onRetry: () => void;
+  onCopyAndClose: () => void;
+  onDownload: () => void;
+  onPrint: () => void;
+}
+
+export interface UserProfilePasskeyCreationState {
+  capability?: 'available' | 'unsupported';
+  result?: 'idle' | 'cancelled' | 'resource-error';
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfilePasskeyRenameFlowState {
+  id: string;
+  originalName: string;
+  name: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfilePasskeyRenameFlowActions {
+  onCancel: () => void;
+  onNameChange: (name: string) => void;
+  onRename: () => void;
+}
+
+export interface UserProfilePasskeyRemoveFlowState {
+  id: string;
+  name: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfilePasskeyRemoveFlowActions {
+  onCancel: () => void;
+  onRemove: () => void;
+}
+
+// =============================================================================
+// What the security panel view takes
+// =============================================================================
+
+export type UserProfilePasswordFlow = UserProfilePasswordFlowActions & {
+  state: UserProfilePasswordFlowState;
+};
+
+export type UserProfilePasskeyRenameFlow = UserProfilePasskeyRenameFlowActions & {
+  state: UserProfilePasskeyRenameFlowState;
+};
+
+export type UserProfilePasskeyRemoveFlow = UserProfilePasskeyRemoveFlowActions & {
+  state: UserProfilePasskeyRemoveFlowState;
+};
+
+export type UserProfileMfaAddFlow = UserProfileMfaAddFlowActions & {
+  state: UserProfileMfaAddFlowState;
+};
+
+export type UserProfileMfaRemoveFlow = UserProfileMfaRemoveFlowActions & {
+  state: UserProfileMfaRemoveFlowState;
+};
+
+export type UserProfileBackupCodesFlow = UserProfileBackupCodesFlowActions & {
+  state: UserProfileBackupCodesFlowState;
+};
+
+export type UserProfileDeleteAccountFlow = UserProfileDeleteAccountFlowActions & {
+  state: UserProfileDeleteAccountFlowState;
+};
+
+export type UserProfileSignOutAllDevicesFlow = UserProfileSignOutAllDevicesFlowActions & {
+  state: UserProfileSignOutAllDevicesFlowState;
+};
+
+export type UserProfileDeviceDetailsFlow = UserProfileDeviceDetailsFlowActions & {
+  state: UserProfileDeviceDetailsFlowState;
+  onCancel: () => void;
+};
+
+export type UserProfileSecurityReverificationOperation =
+  | 'password'
+  | 'add-passkey'
+  | 'remove-passkey'
+  | 'add-mfa'
+  | 'remove-mfa'
+  | 'backup-codes'
+  | 'sign-out-device'
+  | 'sign-out-all-devices'
+  | 'delete-account';
+
+export type UserProfileSecurityReverificationFlow = ReverificationChallengeActions & {
+  operation: UserProfileSecurityReverificationOperation;
+  state: ReverificationChallengeState;
+};
+
+/** Controlled dialog flows rendered by the security panel. */
+export interface UserProfileSecurityPanelFlows {
+  passwordTriggerRef?: React.RefObject<HTMLElement | null>;
+  passkeysTriggerRef?: React.RefObject<HTMLElement | null>;
+  mfaTriggerRef?: React.RefObject<HTMLElement | null>;
+  deleteTriggerRef?: React.RefObject<HTMLElement | null>;
+  activeDevicesTriggerRef?: React.RefObject<HTMLElement | null>;
+  password?: UserProfilePasswordFlow | null;
+  renamePasskey?: UserProfilePasskeyRenameFlow | null;
+  removePasskey?: UserProfilePasskeyRemoveFlow | null;
+  addMfa?: UserProfileMfaAddFlow | null;
+  removeMfa?: UserProfileMfaRemoveFlow | null;
+  backupCodes?: UserProfileBackupCodesFlow | null;
+  deleteAccount?: UserProfileDeleteAccountFlow | null;
+  device?: UserProfileDeviceDetailsFlow | null;
+  signOutAllDevices?: UserProfileSignOutAllDevicesFlow | null;
+  reverification?: UserProfileSecurityReverificationFlow | null;
 }

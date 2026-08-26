@@ -1,5 +1,6 @@
 import { Button } from '../components/button';
 import { Section } from '../components/section';
+import { userProfileSecurityBase as m } from './user-profile-security.messages';
 
 export interface UserProfileDeleteSectionViewProps {
   onDelete: () => void;
@@ -8,15 +9,13 @@ export interface UserProfileDeleteSectionViewProps {
 export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSectionViewProps) {
   return (
     <Section.Root>
-      <Section.Title>Danger zone</Section.Title>
+      <Section.Title>{m.sections.dangerZone}</Section.Title>
       <Section.Group>
         <Section.Row>
           <Section.Item>
             <Section.Content>
-              <Section.Label>Delete account</Section.Label>
-              <Section.Description>
-                Permanently delete this account and all its data. This cannot be undone.
-              </Section.Description>
+              <Section.Label>{m.deleteAccount.title}</Section.Label>
+              <Section.Description>{m.sections.deleteDescription}</Section.Description>
             </Section.Content>
             <Section.Actions>
               <Button
@@ -25,7 +24,7 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
                 variant='outline'
                 onClick={onDelete}
               >
-                Delete account
+                {m.deleteAccount.title}
               </Button>
             </Section.Actions>
           </Section.Item>
