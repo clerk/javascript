@@ -1,20 +1,16 @@
-import * as ReverificationDialogStories from './reverification-dialog.stories';
+import * as Stories from './reverification-dialog.stories';
 
 # ReverificationDialog
 
-A triggerless identity-verification block with a prop-driven view and an external workflow machine.
-The machine accepts a normalized first- or second-factor challenge; a future controller can translate
-Clerk resources and operations into that interface.
+The dialog that asks a user to prove who they are before a sensitive action. It renders one of three steps — pick a method, satisfy it, or a dead end — and owns none of the flow between them.
 
 ## Example
 
-The launch buttons are showcase controls, not part of the block. Each scenario creates a fresh actor.
-Once open, factor selection, preparation, input, automatic code submission, errors, resend cooldown,
-completion, and cancellation are all machine-driven.
+The launch buttons are showcase controls, not part of the block. Each one mounts `ReverificationDialogView`, which drives the block from a state machine, so method selection, code delivery, automatic submission, errors, the resend cooldown, completion, and cancellation all run for real against stubbed operations.
 
 <Story
   name='Default'
-  storyModule={ReverificationDialogStories}
+  storyModule={Stories}
   composition={[
     { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
     { name: 'Card', href: '/components/card', layer: 'Components' },
@@ -28,26 +24,87 @@ completion, and cancellation are all machine-driven.
 
 ## Usage
 
-The view is controlled through flat props. Until controllers exist, a caller can inject normalized
-operations into the machine and project its snapshot into view props.
+The block holds nothing. Every label, every enabled/disabled decision, and `open` itself belong to the caller, so a step renders identically whether it was reached from a machine or from a story. `step` picks which one is showing.
 
 ```tsx
-import {
-  getReverificationDialogViewProps,
-  reverificationDialogMachine,
-} from '@clerk/ui/mosaic/blocks/reverification-dialog/reverification-dialog.machine';
-import { ReverificationDialogView } from '@clerk/ui/mosaic/blocks/reverification-dialog/reverification-dialog.view';
-import { useMachine } from '@clerk/ui/mosaic/machine/useMachine';
+import { ReverificationDialog } from '@clerk/ui/mosaic/blocks/reverification-dialog';
 
-const [snapshot, send] = useMachine(reverificationDialogMachine, {
-  context: {
-    initialChallenge: challenge,
-    prepare,
-    attempt,
-    complete,
-    cancel,
-  },
-});
+<ReverificationDialog
+  step='verify'
+  open={open}
+  onOpenChange={setOpen}
+  title='Verification required'
+  description='Enter your current password to continue'
+  closeLabel='Close'
+  field={{ label: 'Password', kind: 'password', value, disabled: false, onChange: setValue }}
+  submitLabel='Continue'
+  pendingLabel='Verifying'
+  canSubmit={value.length > 0}
+  isPending={isPending}
+  onSubmit={submit}
+  cancelLabel='Cancel'
+/>;
+```
 
-return <ReverificationDialogView {...getReverificationDialogViewProps(snapshot, send)} />;
+The action sits in the footer, outside the field's form, so pressing Enter in the field submits the same way the button does.
+
+## Props
+
+Shared by every step:
+
+| Prop           | Type                                | Description                                                                            |
+| -------------- | ----------------------------------- | -------------------------------------------------------------------------------------- |
+| `step`         | `'choose' \| 'verify' \| 'message'` | Which step is showing. Picks the rest of the props.                                    |
+| `open`         | `boolean`                           | Whether the dialog is showing. Controlled, the way any dialog is.                      |
+| `onOpenChange` | `(open: boolean) => void`           | Asks to open or close. Fired by Cancel, Escape, and the backdrop.                      |
+| `title`        | `string`                            | Names what is being asked.                                                             |
+| `description`  | `string`                            | Spells out what the user has to do.                                                    |
+| `closeLabel`   | `string`                            | Accessible name for the corner close button.                                           |
+| `error`        | `string`                            | Optional. A failure that belongs to the step rather than to a field. Read as an alert. |
+
+`step='choose'` — pick a method:
+
+| Prop             | Type                   | Description                                                          |
+| ---------------- | ---------------------- | -------------------------------------------------------------------- |
+| `methods`        | `{ id, label }[]`      | The methods to offer. `id` is opaque and handed straight back.       |
+| `onSelectMethod` | `(id: string) => void` | Asks the caller to switch to that method.                            |
+| `back`           | `{ label, onClick }`   | Optional. Returns to the method the user came from. Replaces Cancel. |
+| `cancelLabel`    | `string`               | Label for Cancel, shown when there is nothing to go back to.         |
+| `help`           | `{ label, onClick }`   | The way out for a user who has none of these methods.                |
+
+`step='verify'` — satisfy one method:
+
+| Prop           | Type                                                 | Description                                                                                                      |
+| -------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `identifier`   | `string`                                             | Optional. Where the code went, e.g. a redacted phone number.                                                     |
+| `field`        | `{ label, kind, value, disabled, error?, onChange }` | Optional. Omit for a method with nothing to type, such as a passkey. `kind` is `'code' \| 'password' \| 'text'`. |
+| `resend`       | `{ label, disabled, onResend }`                      | Optional. The caller composes the label, countdown included.                                                     |
+| `submitLabel`  | `string`                                             | The primary button's label.                                                                                      |
+| `pendingLabel` | `string`                                             | Accessible name for the pending indicator on that button.                                                        |
+| `canSubmit`    | `boolean`                                            | Holds the action inert until the caller says the answer is submittable.                                          |
+| `isPending`    | `boolean`                                            | Renders the action pending and blocks a second submit.                                                           |
+| `onSubmit`     | `() => void`                                         | Asks the caller to check the answer. Reached by the button or by Enter.                                          |
+| `cancelLabel`  | `string`                                             | The dismiss button's label.                                                                                      |
+| `secondary`    | `{ label, onClick }`                                 | Optional. The one escape this step offers — another method, or help.                                             |
+
+`step='message'` — a dead end:
+
+| Prop     | Type                 | Description                         |
+| -------- | -------------------- | ----------------------------------- |
+| `action` | `{ label, onClick }` | The single way out: back, or close. |
+
+## Driving it from a machine
+
+`ReverificationDialogView` wires the block to `reverificationDialogMachine`, which holds every rule about what happens next: which method starts, when a code is sent, when six digits submit on their own, how long resend stays inert, and where a first-factor success leads. The Clerk work arrives as `prepare` and `attempt`, so the whole flow runs against plain promises in a test or a story.
+
+```tsx
+import { ReverificationDialogView } from '@clerk/ui/mosaic/blocks/reverification-dialog';
+
+<ReverificationDialogView
+  challenge={{ status: 'needs_first_factor', factors, initialFactorId }}
+  prepare={factor => session.prepareFirstFactorVerification(factor)}
+  attempt={attempt => session.attemptFirstFactorVerification(attempt)}
+  onComplete={afterVerification}
+  onCancel={closeModal}
+/>;
 ```

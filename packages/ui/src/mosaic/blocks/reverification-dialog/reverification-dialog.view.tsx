@@ -1,367 +1,212 @@
-import React from 'react';
-
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import { Dialog } from '../../components/dialog';
-import { Field } from '../../components/field';
-import { Heading } from '../../components/heading';
-import { Input } from '../../components/input';
-import { Text } from '../../components/text';
-import { reverificationDialogMessages as m } from './reverification-dialog.messages';
+import { useMachine } from '../../machine/useMachine';
+import type { ReverificationDialogMethod, ReverificationDialogProps } from './reverification-dialog';
+import { ReverificationDialog } from './reverification-dialog';
+import type { ReverificationDialogMachineContext } from './reverification-dialog.machine';
+import { reverificationDialogMachine } from './reverification-dialog.machine';
+import { fill, reverificationDialogBase as m } from './reverification-dialog.messages';
 import type {
-  ReverificationDialogResendState,
-  ReverificationDialogSelectViewProps,
-  ReverificationDialogVerifyViewProps,
-  ReverificationDialogViewProps,
+  ReverificationAttempt,
+  ReverificationAttemptResult,
+  ReverificationChallenge,
   ReverificationFactor,
+  ReverificationPreparationFactor,
 } from './reverification-dialog.types';
 
-function DialogHeader({ title, description }: { title: React.ReactNode; description?: React.ReactNode }) {
-  return (
-    <Card.Header>
-      <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
-      {description ? <Dialog.Description render={<Text />}>{description}</Dialog.Description> : null}
-    </Card.Header>
-  );
+export interface ReverificationDialogViewProps {
+  /** The methods this attempt may use, and which one to open on. */
+  challenge: ReverificationChallenge;
+  /** Sends a code for a method that delivers one. Reject to keep the user on the code step. */
+  prepare: (factor: ReverificationPreparationFactor) => Promise<void>;
+  /** Submits the user's answer. Resolving `needs_second_factor` moves the flow on to 2FA. */
+  attempt: (attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>;
+  /** The user proved who they are. */
+  onComplete: () => void;
+  /** The user gave up, or closed the dialog. */
+  onCancel: () => void;
 }
 
-function FormError({ children }: { children?: React.ReactNode }) {
-  return children ? (
-    <Text
-      role='alert'
-      color='negative'
-    >
-      {children}
-    </Text>
-  ) : null;
-}
-
-function CancelButton({ label = m.cancel }: { label?: string }) {
-  return (
-    <Dialog.Close
-      render={props => (
-        <Button
-          {...props}
-          color='neutral'
-          variant='outline'
-        />
-      )}
-    >
-      {label}
-    </Dialog.Close>
-  );
-}
-
-function ResendButton({
-  disabled = false,
-  resend,
-  onResend,
-}: {
-  disabled?: boolean;
-  resend: ReverificationDialogResendState;
-  onResend?: () => void;
-}) {
-  const waiting = resend.secondsRemaining > 0;
-
-  return (
-    <Button
-      color='neutral'
-      disabled={disabled || waiting || resend.isResending || !onResend}
-      focusableWhenDisabled
-      size='sm'
-      variant='link'
-      onClick={onResend}
-    >
-      {waiting ? `${m.resend} (${resend.secondsRemaining}s)` : m.resend}
-    </Button>
-  );
-}
-
-function CodeInput({
-  id,
-  disabled,
-  value,
-  onChange,
-}: {
-  id: string;
-  disabled: boolean;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <Input
-      autoComplete='one-time-code'
-      disabled={disabled}
-      id={id}
-      inputMode='numeric'
-      maxLength={6}
-      placeholder='••••••'
-      size='lg'
-      value={value}
-      onChange={event => onChange(event.target.value)}
-    />
-  );
-}
-
-function SelectFactorContent({
-  stage,
-  availableFactors,
-  formError,
-  onSelectFactor,
-  onBack,
-  onShowHelp,
-}: ReverificationDialogSelectViewProps) {
-  return (
-    <>
-      <Dialog.CloseButton aria-label={m.close} />
-      <DialogHeader
-        description={stage === 'second' ? m.chooseSecond : m.chooseFirst}
-        title={m.title}
-      />
-      <Card.Content>
-        <FormError>{formError}</FormError>
-        {availableFactors.map(factor => (
-          <Button
-            key={factor.id}
-            fullWidth
-            variant='outline'
-            onClick={() => onSelectFactor(factor.id)}
-          >
-            {factor.label}
-          </Button>
-        ))}
-      </Card.Content>
-      <Card.Footer>
-        {onBack ? (
-          <Button
-            color='neutral'
-            variant='outline'
-            onClick={onBack}
-          >
-            {m.back}
-          </Button>
-        ) : (
-          <CancelButton />
-        )}
-        <Button
-          color='neutral'
-          variant='link'
-          onClick={onShowHelp}
-        >
-          {m.havingTrouble}
-        </Button>
-      </Card.Footer>
-    </>
-  );
-}
-
-const safeIdentifierFrom = (factor: ReverificationFactor) =>
-  'safeIdentifier' in factor ? factor.safeIdentifier : undefined;
-
-function VerifyContent({
-  factor,
-  value,
-  canSubmit,
-  isInputDisabled,
-  isVerifying,
-  fieldError,
-  formError,
-  resend,
-  onValueChange,
-  onResend,
-  onShowAlternatives,
-  onShowHelp,
-}: ReverificationDialogVerifyViewProps) {
-  const fieldId = React.useId();
-  const isDeliveredCode = factor.strategy === 'email_code' || factor.strategy === 'phone_code';
-  const isCode = isDeliveredCode || factor.strategy === 'totp';
-  const isPasskey = factor.strategy === 'passkey';
-  const isPassword = factor.strategy === 'password';
-  const description = (() => {
-    if (isDeliveredCode) {
-      return (
-        <>
-          {m.deliveredCode} <strong>{safeIdentifierFrom(factor)}</strong>
-        </>
-      );
-    }
-    if (factor.strategy === 'totp') {
-      return m.totp;
-    }
-    if (factor.strategy === 'backup_code') {
-      return m.backupCode;
-    }
-    if (isPasskey) {
+/**
+ * Title, subtitle, field label, and resend copy for a method — keyed the way
+ * `@clerk/localizations` keys it. `field` is absent for a method with nothing to type, and
+ * `resendButton` for one that delivers no code.
+ */
+function copyFor(factor: ReverificationFactor): {
+  title: string;
+  subtitle: string;
+  field?: { label: string; kind: 'code' | 'password' | 'text' };
+  resendButton?: string;
+} {
+  switch (factor.strategy) {
+    case 'password':
+      return { ...m.password, field: { label: m.formFieldLabel__password, kind: 'password' } };
+    case 'passkey':
       return m.passkey;
+    case 'email_code':
+      return { ...m.emailCode, field: { label: m.emailCode.formTitle, kind: 'code' } };
+    case 'phone_code': {
+      const copy = factor.stage === 'second' ? m.phoneCodeMfa : m.phoneCode;
+      return { ...copy, field: { label: copy.formTitle, kind: 'code' } };
     }
-    return m.password;
-  })();
-  const fieldLabel = isPassword
-    ? m.passwordLabel
-    : factor.strategy === 'backup_code'
-      ? m.backupCodeLabel
-      : m.verificationCode;
-
-  return (
-    <>
-      <Dialog.CloseButton aria-label={m.close} />
-      <DialogHeader
-        description={description}
-        title={m.title}
-      />
-      <Card.Content>
-        <FormError>{formError}</FormError>
-        {!isPasskey ? (
-          <Field.Root invalid={Boolean(fieldError)}>
-            <Field.Label htmlFor={fieldId}>{fieldLabel}</Field.Label>
-            {isCode ? (
-              <CodeInput
-                id={fieldId}
-                disabled={isInputDisabled || isVerifying}
-                value={value}
-                onChange={onValueChange}
-              />
-            ) : (
-              <Input
-                autoComplete={isPassword ? 'current-password' : 'one-time-code'}
-                disabled={isInputDisabled || isVerifying}
-                id={fieldId}
-                spellCheck={false}
-                type={isPassword ? 'password' : 'text'}
-                value={value}
-                onChange={event => onValueChange(event.target.value)}
-              />
-            )}
-            {fieldError ? <Field.Error>{fieldError}</Field.Error> : null}
-          </Field.Root>
-        ) : null}
-        {resend ? (
-          <>
-            <Text size='xs'>{m.didNotReceiveCode}</Text>
-            <ResendButton
-              disabled={isVerifying}
-              resend={resend}
-              onResend={onResend}
-            />
-          </>
-        ) : null}
-      </Card.Content>
-      <Card.Footer>
-        {onShowAlternatives ? (
-          <Button
-            color='neutral'
-            disabled={isVerifying}
-            variant='ghost'
-            onClick={onShowAlternatives}
-          >
-            {m.anotherMethod}
-          </Button>
-        ) : onShowHelp ? (
-          <Button
-            color='neutral'
-            disabled={isVerifying}
-            variant='ghost'
-            onClick={onShowHelp}
-          >
-            {m.havingTrouble}
-          </Button>
-        ) : null}
-        <Dialog.Close
-          render={props => (
-            <Button
-              {...props}
-              color='neutral'
-              disabled={isVerifying}
-              fullWidth
-              variant='outline'
-            />
-          )}
-        >
-          {m.cancel}
-        </Dialog.Close>
-        <SubmitButton
-          disabled={!canSubmit}
-          fullWidth
-          isPending={isVerifying}
-          pendingLabel={m.pending}
-        >
-          {isPasskey ? m.withPasskey : m.continue}
-        </SubmitButton>
-      </Card.Footer>
-    </>
-  );
-}
-
-function DialogContent(props: ReverificationDialogViewProps) {
-  switch (props.step) {
-    case 'select-factor':
-      return <SelectFactorContent {...props} />;
-    case 'verify':
-      return <VerifyContent {...props} />;
-    case 'help':
-      return (
-        <>
-          <Dialog.CloseButton aria-label={m.close} />
-          <DialogHeader
-            description={m.helpDescription}
-            title={m.havingTrouble}
-          />
-          <Card.Footer>
-            <Button onClick={props.onBack}>{m.back}</Button>
-          </Card.Footer>
-        </>
-      );
-    case 'unavailable':
-      return (
-        <>
-          <Dialog.CloseButton aria-label={m.close} />
-          <DialogHeader
-            description={m.unavailableDescription}
-            title={m.unavailableTitle}
-          />
-          <Card.Footer>
-            <CancelButton label={m.close} />
-          </Card.Footer>
-        </>
-      );
+    case 'totp':
+      return { ...m.totpMfa, field: { label: m.totpMfa.formTitle, kind: 'code' } };
+    case 'backup_code':
+      return { ...m.backupCodeMfa, field: { label: m.formFieldLabel__backupCode, kind: 'text' } };
   }
 }
 
-export function ReverificationDialogView(props: ReverificationDialogViewProps) {
-  const handleSubmit = props.step === 'verify' ? props.onSubmit : undefined;
-  return (
-    <Dialog.Root
-      closedBy='closerequest'
-      open={props.open}
-      size='card'
-      onOpenChange={nextOpen => props.onOpenChange(nextOpen)}
-    >
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup
-            render={
-              <Card.Root
-                elevation='overlay'
-                render={
-                  handleSubmit ? (
-                    <form
-                      noValidate
-                      onSubmit={event => {
-                        event.preventDefault();
-                        handleSubmit();
-                      }}
-                    />
-                  ) : undefined
-                }
-                renderBranding={false}
-              />
-            }
-          >
-            <DialogContent {...props} />
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
+function methodLabel(factor: ReverificationFactor): string {
+  const alternatives = m.alternativeMethods;
+  switch (factor.strategy) {
+    case 'password':
+      return alternatives.blockButton__password;
+    case 'passkey':
+      return alternatives.blockButton__passkey;
+    case 'email_code':
+      return fill(alternatives.blockButton__emailCode, { identifier: factor.safeIdentifier });
+    case 'phone_code':
+      return fill(alternatives.blockButton__phoneCode, { identifier: factor.safeIdentifier });
+    case 'totp':
+      return alternatives.blockButton__totp;
+    case 'backup_code':
+      return alternatives.blockButton__backupCode;
+  }
+}
+
+const asMethod = (factor: ReverificationFactor): ReverificationDialogMethod => ({
+  id: factor.id,
+  label: methodLabel(factor),
+});
+
+const alternativesTo = (context: ReverificationDialogMachineContext) =>
+  context.challenge.factors.filter(factor => factor.id !== context.currentFactor?.id);
+
+/**
+ * Drives {@link ReverificationDialog} with {@link reverificationDialogMachine}.
+ *
+ * Every decision about what the flow does next lives in the machine; this layer only turns a
+ * snapshot into the block's props and the block's callbacks into events. The Clerk work arrives
+ * as `prepare` and `attempt`, so the whole flow runs against plain promises in a test or a story.
+ */
+export function ReverificationDialogView({
+  challenge,
+  prepare,
+  attempt,
+  onComplete,
+  onCancel,
+}: ReverificationDialogViewProps) {
+  const [snapshot, send, actor] = useMachine(reverificationDialogMachine, {
+    context: { initialChallenge: challenge, prepare, attempt, complete: onComplete, cancel: onCancel },
+  });
+  const { context } = snapshot;
+
+  // `useMachine` starts the actor in an effect, so the first render still sees the pre-start
+  // state, before `initialChallenge` has been read. Nothing truthful can be drawn from it.
+  if (snapshot.value === 'initializing') {
+    return null;
+  }
+
+  const base = {
+    open: snapshot.status === 'active',
+    onOpenChange: (open: boolean) => {
+      if (!open) {
+        send({ type: 'CANCEL' });
+      }
+    },
+    closeLabel: m.closeButton,
+    error: context.error?.location === 'form' ? context.error.message : undefined,
+  };
+
+  const props = ((): ReverificationDialogProps => {
+    if (snapshot.value === 'unavailable') {
+      return {
+        ...base,
+        step: 'message',
+        title: m.noAvailableMethods.title,
+        description: m.noAvailableMethods.message,
+        action: { label: m.closeButton, onClick: () => send({ type: 'CANCEL' }) },
+      };
+    }
+
+    if (snapshot.value === 'help') {
+      return {
+        ...base,
+        step: 'message',
+        title: m.alternativeMethods.getHelp.title,
+        description: m.alternativeMethods.getHelp.content,
+        action: { label: m.backButton, onClick: () => send({ type: 'BACK' }) },
+      };
+    }
+
+    if (snapshot.value === 'selectingFactor') {
+      const methods = context.currentFactor ? alternativesTo(context) : context.challenge.factors;
+      return {
+        ...base,
+        step: 'choose',
+        title: m.alternativeMethods.title,
+        description: m.alternativeMethods.subtitle,
+        methods: methods.map(asMethod),
+        onSelectMethod: factorId => send({ type: 'SELECT_FACTOR', factorId }),
+        back: actor.can({ type: 'BACK' }) ? { label: m.backButton, onClick: () => send({ type: 'BACK' }) } : undefined,
+        cancelLabel: m.formButtonReset,
+        help: { label: m.alternativeMethods.actionLink, onClick: () => send({ type: 'SHOW_HELP' }) },
+      };
+    }
+
+    // Every remaining state is the flow working on the current method, so the step stays
+    // mounted while a code is sent or an answer is checked.
+    const factor = context.currentFactor;
+    if (!factor) {
+      return {
+        ...base,
+        step: 'message',
+        title: m.noAvailableMethods.title,
+        description: m.noAvailableMethods.message,
+        action: { label: m.closeButton, onClick: () => send({ type: 'CANCEL' }) },
+      };
+    }
+
+    const copy = copyFor(factor);
+    const { resendButton } = copy;
+    const isPending = snapshot.value === 'submitting';
+    // Only these two states accept a keystroke; anywhere else the field would swallow one.
+    const isEditable = snapshot.value === 'verifying' || snapshot.value === 'verifyingCooldown';
+
+    return {
+      ...base,
+      step: 'verify',
+      title: copy.title,
+      description: copy.subtitle,
+      identifier: 'safeIdentifier' in factor ? factor.safeIdentifier : undefined,
+      field: copy.field
+        ? {
+            ...copy.field,
+            value: context.value,
+            disabled: !isEditable,
+            error: context.error?.location === 'field' ? context.error.message : undefined,
+            onChange: value => send({ type: 'CHANGE_VALUE', value }),
+          }
+        : undefined,
+      resend: resendButton
+        ? {
+            label:
+              context.resendSecondsRemaining > 0 ? `${resendButton} (${context.resendSecondsRemaining})` : resendButton,
+            disabled: !actor.can({ type: 'RESEND' }),
+            onResend: () => send({ type: 'RESEND' }),
+          }
+        : undefined,
+      submitLabel: factor.strategy === 'passkey' ? m.passkey.blockButton__passkey : m.formButtonPrimary,
+      pendingLabel: m.verifying,
+      canSubmit: actor.can({ type: 'SUBMIT' }),
+      isPending,
+      onSubmit: () => send({ type: 'SUBMIT' }),
+      cancelLabel: m.formButtonReset,
+      secondary: actor.can({ type: 'SHOW_ALTERNATIVES' })
+        ? { label: m.footerActionLink__useAnotherMethod, onClick: () => send({ type: 'SHOW_ALTERNATIVES' }) }
+        : actor.can({ type: 'SHOW_HELP' })
+          ? { label: m.alternativeMethods.actionLink, onClick: () => send({ type: 'SHOW_HELP' }) }
+          : undefined,
+    };
+  })();
+
+  return <ReverificationDialog {...props} />;
 }

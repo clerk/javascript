@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createActor } from '../../../machine/createActor';
-import { getReverificationDialogViewProps, reverificationDialogMachine } from '../reverification-dialog.machine';
+import { createActor } from '../../machine/createActor';
+import { reverificationDialogMachine } from './reverification-dialog.machine';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
@@ -12,7 +12,7 @@ import type {
   ReverificationPreparationFactor,
   ReverificationSecondFactorPhoneCodeFactor,
   ReverificationTOTPFactor,
-} from '../reverification-dialog.types';
+} from './reverification-dialog.types';
 
 const passwordFactor: ReverificationPasswordFactor = {
   id: 'password',
@@ -93,12 +93,8 @@ describe('reverificationDialogMachine', () => {
     const { actor } = start({ challenge: firstFactorChallenge() });
 
     expect(actor.getSnapshot().value).toBe('selectingFactor');
-    expect(getReverificationDialogViewProps(actor.getSnapshot(), actor.send)).toMatchObject({
-      step: 'select-factor',
-      stage: 'first',
-      availableFactors: [passwordFactor, emailFactor, phoneFactor],
-      onBack: undefined,
-    });
+    expect(actor.getSnapshot().context.challenge.factors).toEqual([passwordFactor, emailFactor, phoneFactor]);
+    expect(actor.can({ type: 'BACK' })).toBe(false);
 
     actor.send({ type: 'SELECT_FACTOR', factorId: passwordFactor.id });
     expect(actor.getSnapshot()).toMatchObject({
@@ -194,10 +190,9 @@ describe('reverificationDialogMachine', () => {
       },
     });
 
-    expect(getReverificationDialogViewProps(actor.getSnapshot(), actor.send)).toMatchObject({
-      step: 'select-factor',
-      stage: 'second',
-      availableFactors: [totpFactor, secondPhoneFactor],
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'selectingFactor',
+      context: { challenge: { status: 'needs_second_factor', factors: [totpFactor, secondPhoneFactor] } },
     });
   });
 
@@ -205,20 +200,15 @@ describe('reverificationDialogMachine', () => {
     const { actor: passwordActor } = start({
       challenge: firstFactorChallenge({ factors: [passwordFactor], initialFactorId: passwordFactor.id }),
     });
-    expect(getReverificationDialogViewProps(passwordActor.getSnapshot(), passwordActor.send)).toMatchObject({
-      step: 'verify',
-      onShowHelp: expect.any(Function),
-    });
+    expect(passwordActor.getSnapshot().value).toBe('verifying');
+    expect(passwordActor.can({ type: 'SHOW_HELP' })).toBe(true);
 
     const { actor: emailActor } = start({
       challenge: firstFactorChallenge({ factors: [emailFactor], initialFactorId: emailFactor.id }),
     });
     await vi.waitFor(() => expect(emailActor.getSnapshot().value).toBe('verifyingCooldown'));
-    expect(getReverificationDialogViewProps(emailActor.getSnapshot(), emailActor.send)).toMatchObject({
-      step: 'verify',
-      onShowHelp: undefined,
-      onShowAlternatives: undefined,
-    });
+    expect(emailActor.can({ type: 'SHOW_HELP' })).toBe(false);
+    expect(emailActor.can({ type: 'SHOW_ALTERNATIVES' })).toBe(false);
 
     emailActor.send({ type: 'SHOW_HELP' });
     expect(emailActor.getSnapshot().value).toBe('verifyingCooldown');
@@ -233,9 +223,9 @@ describe('reverificationDialogMachine', () => {
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifyingCooldown'));
 
     actor.send({ type: 'SHOW_ALTERNATIVES' });
-    expect(getReverificationDialogViewProps(actor.getSnapshot(), actor.send)).toMatchObject({
-      step: 'select-factor',
-      availableFactors: [passwordFactor, phoneFactor],
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'selectingFactor',
+      context: { currentFactor: emailFactor },
     });
 
     actor.send({ type: 'BACK' });
@@ -263,7 +253,7 @@ describe('reverificationDialogMachine', () => {
     expect(prepare).toHaveBeenNthCalledWith(3, emailFactor);
   });
 
-  it('keeps preparation and its retry inside the code-verification view', async () => {
+  it('stays on the current factor when preparation fails, and retries through resend', async () => {
     const prepare = vi
       .fn<(factor: ReverificationPreparationFactor) => Promise<void>>()
       .mockRejectedValueOnce(new Error('Could not send the code.'))
@@ -273,25 +263,21 @@ describe('reverificationDialogMachine', () => {
       prepare,
     });
 
-    expect(getReverificationDialogViewProps(actor.getSnapshot(), actor.send)).toMatchObject({
-      step: 'verify',
-      factor: emailFactor,
-      isInputDisabled: true,
-      resend: { isResending: true, secondsRemaining: 0 },
-      onResend: undefined,
-      onShowAlternatives: expect.any(Function),
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'preparing',
+      context: { currentFactor: emailFactor, resendSecondsRemaining: 0 },
     });
+    expect(actor.can({ type: 'RESEND' })).toBe(false);
+    expect(actor.can({ type: 'SHOW_ALTERNATIVES' })).toBe(true);
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('preparationFailed'));
-    expect(getReverificationDialogViewProps(actor.getSnapshot(), actor.send)).toMatchObject({
-      step: 'verify',
-      factor: emailFactor,
-      isInputDisabled: true,
-      formError: 'Could not send the code.',
-      resend: { isResending: false, secondsRemaining: 0 },
-      onResend: expect.any(Function),
-      onShowAlternatives: expect.any(Function),
+    expect(actor.getSnapshot().context).toMatchObject({
+      currentFactor: emailFactor,
+      error: { location: 'form', message: 'Could not send the code.' },
+      resendSecondsRemaining: 0,
     });
+    expect(actor.can({ type: 'RESEND' })).toBe(true);
+    expect(actor.can({ type: 'SHOW_ALTERNATIVES' })).toBe(true);
 
     actor.send({ type: 'RESEND' });
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifyingCooldown'));
@@ -381,6 +367,6 @@ describe('reverificationDialogMachine', () => {
 
     expect(cancel).toHaveBeenCalledOnce();
     expect(actor.getSnapshot()).toMatchObject({ value: 'cancelled', status: 'done' });
-    expect(getReverificationDialogViewProps(actor.getSnapshot(), actor.send).open).toBe(false);
+    expect(actor.getSnapshot().status).toBe('done');
   });
 });

@@ -1,0 +1,231 @@
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+
+import { MosaicProvider } from '../../MosaicProvider';
+import type {
+  ReverificationAttempt,
+  ReverificationAttemptResult,
+  ReverificationChallenge,
+  ReverificationEmailCodeFactor,
+  ReverificationPasskeyFactor,
+  ReverificationPasswordFactor,
+  ReverificationPreparationFactor,
+} from './reverification-dialog.types';
+import { ReverificationDialogView } from './reverification-dialog.view';
+
+const passwordFactor: ReverificationPasswordFactor = {
+  id: 'password',
+  label: 'Password',
+  stage: 'first',
+  strategy: 'password',
+};
+
+const emailFactor: ReverificationEmailCodeFactor = {
+  id: 'email_1',
+  label: 'Email code',
+  stage: 'first',
+  strategy: 'email_code',
+  emailAddressId: 'email_1',
+  safeIdentifier: 'a••••@clerk.dev',
+};
+
+const passkeyFactor: ReverificationPasskeyFactor = {
+  id: 'passkey',
+  label: 'Passkey',
+  stage: 'first',
+  strategy: 'passkey',
+};
+
+function renderView({
+  challenge = {
+    status: 'needs_first_factor',
+    factors: [passwordFactor, emailFactor],
+    initialFactorId: passwordFactor.id,
+  } as ReverificationChallenge,
+  prepare = vi.fn<(factor: ReverificationPreparationFactor) => Promise<void>>().mockResolvedValue(undefined),
+  attempt = vi
+    .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
+    .mockResolvedValue({ status: 'complete' }),
+  onComplete = vi.fn(),
+  onCancel = vi.fn(),
+} = {}) {
+  render(
+    <MosaicProvider>
+      <ReverificationDialogView
+        challenge={challenge}
+        prepare={prepare}
+        attempt={attempt}
+        onComplete={onComplete}
+        onCancel={onCancel}
+      />
+    </MosaicProvider>,
+  );
+  return { prepare, attempt, onComplete, onCancel };
+}
+
+/** The code field is a group of single-character slots, not one input. */
+const codeSlots = () => within(screen.getByRole('group', { name: 'Verification code' })).getAllByRole('textbox');
+
+describe('ReverificationDialogView', () => {
+  it('opens on the starting method and carries its answer to the attempt', async () => {
+    const { attempt, onComplete } = renderView();
+    const user = userEvent.setup();
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    await user.type(screen.getByLabelText('Password'), 'secret');
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await waitFor(() => expect(attempt).toHaveBeenCalledWith({ factor: passwordFactor, password: 'secret' }));
+    expect(onComplete).toHaveBeenCalledOnce();
+  });
+
+  it('sends the code behind the code step and submits six digits without a press', async () => {
+    const { prepare, attempt } = renderView({
+      challenge: {
+        status: 'needs_first_factor',
+        factors: [passwordFactor, emailFactor],
+        initialFactorId: emailFactor.id,
+      },
+    });
+
+    await waitFor(() => expect(prepare).toHaveBeenCalledWith(emailFactor));
+    expect(await screen.findByText('Enter the code sent to your email to continue')).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.click(codeSlots()[0]);
+    // Typed as keystrokes rather than into one slot: the primitive walks focus along as it fills.
+    await user.keyboard('123456');
+
+    await waitFor(() => expect(attempt).toHaveBeenCalledWith({ factor: emailFactor, code: '123456' }));
+  });
+
+  it('holds the code field inert while the code is still being sent', async () => {
+    let release = () => {};
+    const prepare = vi.fn<(factor: ReverificationPreparationFactor) => Promise<void>>().mockReturnValue(
+      new Promise<void>(resolve => {
+        release = resolve;
+      }),
+    );
+    renderView({
+      challenge: {
+        status: 'needs_first_factor',
+        factors: [passwordFactor, emailFactor],
+        initialFactorId: emailFactor.id,
+      },
+      prepare,
+    });
+
+    // The machine takes no keystroke until the code is out, so an editable-looking field would
+    // swallow one.
+    await waitFor(() => expect(codeSlots()[0]).toBeDisabled());
+
+    release();
+    await waitFor(() => expect(codeSlots()[0]).toBeEnabled());
+  });
+
+  it('lists the other methods by their localized labels, current one excluded', async () => {
+    renderView();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Use another method' }));
+
+    expect(screen.getByRole('button', { name: 'Email code to a••••@clerk.dev' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Continue with your password' })).not.toBeInTheDocument();
+  });
+
+  it('switches to the method the user picks', async () => {
+    const { prepare } = renderView();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Use another method' }));
+    await user.click(screen.getByRole('button', { name: 'Email code to a••••@clerk.dev' }));
+
+    await waitFor(() => expect(prepare).toHaveBeenCalledWith(emailFactor));
+  });
+
+  it('keeps the code step when the code could not be sent, and resends from there', async () => {
+    const prepare = vi
+      .fn<(factor: ReverificationPreparationFactor) => Promise<void>>()
+      .mockRejectedValueOnce(new Error('Could not send the code.'))
+      .mockResolvedValue(undefined);
+    renderView({
+      challenge: {
+        status: 'needs_first_factor',
+        factors: [passwordFactor, emailFactor],
+        initialFactorId: emailFactor.id,
+      },
+      prepare,
+    });
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not send the code.');
+    expect(codeSlots()).toHaveLength(6);
+
+    await userEvent.setup().click(screen.getByRole('button', { name: /Resend/ }));
+
+    await waitFor(() => expect(prepare).toHaveBeenCalledTimes(2));
+  });
+
+  it('counts the resend cooldown down in the label and holds the button inert', async () => {
+    renderView({
+      challenge: {
+        status: 'needs_first_factor',
+        factors: [passwordFactor, emailFactor],
+        initialFactorId: emailFactor.id,
+      },
+    });
+
+    const resend = await screen.findByRole('button', { name: 'Didn’t receive a code? Resend (30)' });
+    expect(resend).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('renders a passkey as an action with nothing to type', async () => {
+    renderView({
+      challenge: { status: 'needs_first_factor', factors: [passkeyFactor], initialFactorId: passkeyFactor.id },
+    });
+
+    expect(await screen.findByRole('button', { name: 'Use your passkey' })).toBeEnabled();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('offers help instead of alternatives when there is only one method', async () => {
+    renderView({
+      challenge: { status: 'needs_first_factor', factors: [passwordFactor], initialFactorId: passwordFactor.id },
+    });
+    const user = userEvent.setup();
+
+    expect(screen.queryByRole('button', { name: 'Use another method' })).not.toBeInTheDocument();
+    await user.click(await screen.findByRole('button', { name: 'Get help' }));
+
+    expect(screen.getByText(/email us and we will work with you/i)).toBeInTheDocument();
+  });
+
+  it('says so when the account has no method to offer', async () => {
+    renderView({ challenge: { status: 'needs_first_factor', factors: [] } });
+
+    expect(await screen.findByText('Cannot verify your account')).toBeInTheDocument();
+  });
+
+  it('reports the failure against the field and lets the user try again', async () => {
+    const attempt = vi
+      .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
+      .mockRejectedValue(new Error('Incorrect password.'));
+    renderView({ attempt });
+    const user = userEvent.setup();
+
+    await user.type(await screen.findByLabelText('Password'), 'nope');
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Incorrect password.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password')).toBeEnabled();
+  });
+
+  it('closes and reports cancellation when the user backs out', async () => {
+    const { onCancel } = renderView();
+
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Cancel' }));
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+});

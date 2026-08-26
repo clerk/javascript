@@ -1,7 +1,3 @@
-import {
-  getReverificationDialogViewProps,
-  reverificationDialogMachine,
-} from '@clerk/ui/mosaic/blocks/reverification-dialog/reverification-dialog.machine';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
@@ -14,10 +10,9 @@ import type {
   ReverificationPreparationFactor,
   ReverificationSecondFactor,
   ReverificationSecondFactorPhoneCodeFactor,
-} from '@clerk/ui/mosaic/blocks/reverification-dialog/reverification-dialog.types';
-import { ReverificationDialogView } from '@clerk/ui/mosaic/blocks/reverification-dialog/reverification-dialog.view';
+} from '@clerk/ui/mosaic/blocks/reverification-dialog';
+import { ReverificationDialogView } from '@clerk/ui/mosaic/blocks/reverification-dialog';
 import { Button } from '@clerk/ui/mosaic/components/button';
-import { useMachine } from '@clerk/ui/mosaic/machine/useMachine';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -131,18 +126,19 @@ function MachineDrivenDialog({ scenario, onFinished }: { scenario: Scenario; onF
     },
     [scenario.continuesToSecondFactor],
   );
+  // The view finishes in a final state, so the story unmounts it to make the demo repeatable.
+  // Deferred a tick because the machine reports completion from inside its own transition.
   const finish = React.useCallback(() => window.setTimeout(onFinished, 0), [onFinished]);
-  const [snapshot, send] = useMachine(reverificationDialogMachine, {
-    context: {
-      initialChallenge: scenario.challenge,
-      prepare,
-      attempt,
-      complete: finish,
-      cancel: finish,
-    },
-  });
 
-  return <ReverificationDialogView {...getReverificationDialogViewProps(snapshot, send)} />;
+  return (
+    <ReverificationDialogView
+      challenge={scenario.challenge}
+      prepare={prepare}
+      attempt={attempt}
+      onComplete={finish}
+      onCancel={finish}
+    />
+  );
 }
 
 export function Default() {

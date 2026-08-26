@@ -1,15 +1,23 @@
 import { setup } from '../../machine/setup';
 import type { Snapshot } from '../../machine/types';
-import { reverificationDialogMessages as m } from './reverification-dialog.messages';
+import { reverificationDialogBase as m } from './reverification-dialog.messages';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
   ReverificationChallenge,
-  ReverificationDialogError,
-  ReverificationDialogViewProps,
   ReverificationFactor,
   ReverificationPreparationFactor,
 } from './reverification-dialog.types';
+
+/**
+ * A failed attempt, and where the message belongs. `location` is the machine deciding a
+ * rendering question, which is why it is keyed off the strategy rather than off the error —
+ * legacy's `handleError` read the error's own shape to choose between the field and the card.
+ */
+export interface ReverificationDialogError {
+  location: 'field' | 'form';
+  message: string;
+}
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -91,7 +99,7 @@ const canSubmit = (context: ReverificationDialogMachineContext) => {
 const attemptFrom = (context: ReverificationDialogMachineContext): ReverificationAttempt => {
   const factor = context.currentFactor;
   if (!factor) {
-    throw new Error(m.genericError);
+    throw new Error(m.unstable__errors__generic);
   }
   if (factor.strategy === 'password') {
     return { factor, password: context.value };
@@ -104,7 +112,7 @@ const attemptFrom = (context: ReverificationDialogMachineContext): Reverificatio
 
 const errorFrom = (error: unknown, location: ReverificationDialogError['location']): ReverificationDialogError => ({
   location,
-  message: error instanceof Error ? error.message : m.genericError,
+  message: error instanceof Error ? error.message : m.unstable__errors__generic,
 });
 
 const attemptErrorLocation = (context: ReverificationDialogMachineContext): ReverificationDialogError['location'] =>
@@ -204,7 +212,7 @@ export const reverificationDialogMachine = createMachine({
       invoke: fromPromise(
         context => {
           if (!requiresPreparation(context.currentFactor)) {
-            return Promise.reject(new Error(m.genericError));
+            return Promise.reject(new Error(m.unstable__errors__generic));
           }
           return context.prepare(context.currentFactor);
         },
@@ -318,7 +326,7 @@ export const reverificationDialogMachine = createMachine({
       invoke: fromPromise(
         context => {
           if (!requiresPreparation(context.currentFactor)) {
-            return Promise.reject(new Error(m.genericError));
+            return Promise.reject(new Error(m.unstable__errors__generic));
           }
           return context.prepare(context.currentFactor);
         },
@@ -364,96 +372,3 @@ export const reverificationDialogMachine = createMachine({
 });
 
 export type ReverificationDialogMachineSnapshot = Snapshot<ReverificationDialogMachineContext>;
-
-export function getReverificationDialogViewProps(
-  snapshot: ReverificationDialogMachineSnapshot,
-  send: (event: ReverificationDialogMachineEvent) => void,
-): ReverificationDialogViewProps {
-  const context =
-    snapshot.value === 'initializing'
-      ? { ...snapshot.context, challenge: snapshot.context.initialChallenge }
-      : snapshot.context;
-  const open = snapshot.status === 'active';
-  const base = {
-    open,
-    onOpenChange: (nextOpen: boolean) => {
-      if (!nextOpen) {
-        send({ type: 'CANCEL' });
-      }
-    },
-  };
-  const formError = context.error?.location === 'form' ? context.error.message : undefined;
-
-  if (snapshot.value === 'unavailable') {
-    return { ...base, step: 'unavailable' };
-  }
-
-  if (snapshot.value === 'help') {
-    return {
-      ...base,
-      step: 'help',
-      onBack: () => send({ type: 'BACK' }),
-    };
-  }
-
-  if (snapshot.value === 'selectingFactor') {
-    return {
-      ...base,
-      step: 'select-factor',
-      stage: context.challenge.status === 'needs_first_factor' ? 'first' : 'second',
-      availableFactors: context.currentFactor ? alternativesFrom(context) : factorsFrom(context),
-      formError,
-      onSelectFactor: factorId => send({ type: 'SELECT_FACTOR', factorId }),
-      onBack: context.currentFactor ? () => send({ type: 'BACK' }) : undefined,
-      onShowHelp: () => send({ type: 'SHOW_HELP' }),
-    };
-  }
-
-  const factor = context.currentFactor ?? initialFactorFrom(context.challenge);
-  if (!factor) {
-    if (factorsFrom(context).length > 0) {
-      return {
-        ...base,
-        step: 'select-factor',
-        stage: context.challenge.status === 'needs_first_factor' ? 'first' : 'second',
-        availableFactors: factorsFrom(context),
-        onSelectFactor: factorId => send({ type: 'SELECT_FACTOR', factorId }),
-        onShowHelp: () => send({ type: 'SHOW_HELP' }),
-      };
-    }
-    return { ...base, step: 'unavailable' };
-  }
-
-  const isVerifying = snapshot.value === 'submitting';
-  const isResending = snapshot.value === 'resending';
-  const isInteractive = snapshot.value === 'verifying' || snapshot.value === 'verifyingCooldown';
-  const isPreparing = snapshot.value === 'preparing';
-  const preparationFailed = snapshot.value === 'preparationFailed';
-  const canResend = (snapshot.value === 'verifying' || preparationFailed) && requiresPreparation(factor);
-  const canShowAlternatives =
-    (isInteractive || isPreparing || preparationFailed || isResending) && hasAlternatives(context);
-  const canShowHelp = isInteractive && factor.strategy === 'password' && !hasAlternatives(context);
-
-  return {
-    ...base,
-    step: 'verify',
-    factor,
-    value: context.value,
-    canSubmit: isInteractive && canSubmit(context),
-    isInputDisabled: !isInteractive,
-    isVerifying,
-    fieldError: context.error?.location === 'field' ? context.error.message : undefined,
-    formError,
-    resend: requiresPreparation(factor)
-      ? {
-          isResending: isResending || isPreparing,
-          secondsRemaining: context.resendSecondsRemaining,
-        }
-      : undefined,
-    onValueChange: value => send({ type: 'CHANGE_VALUE', value }),
-    onSubmit: () => send({ type: 'SUBMIT' }),
-    onResend: canResend ? () => send({ type: 'RESEND' }) : undefined,
-    onShowAlternatives: canShowAlternatives ? () => send({ type: 'SHOW_ALTERNATIVES' }) : undefined,
-    onShowHelp: canShowHelp ? () => send({ type: 'SHOW_HELP' }) : undefined,
-  };
-}
