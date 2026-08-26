@@ -1,5 +1,5 @@
 ---
-'@clerk/shared': patch
+'@clerk/shared': minor
 '@clerk/backend': patch
 ---
 
