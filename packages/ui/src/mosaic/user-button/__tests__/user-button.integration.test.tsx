@@ -535,7 +535,7 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  // `setActive` swaps the active organization mid-flight. See `frozen` in the machine.
+  // `setActive` swaps the active organization mid-flight. See `frozenModel` in the machine.
   it('holds the surface on the data it started with until the action settles', async () => {
     const deferred = createDeferred();
     setActive.mockReturnValueOnce(deferred.promise);

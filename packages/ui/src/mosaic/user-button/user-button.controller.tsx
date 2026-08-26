@@ -17,7 +17,7 @@ interface UserButtonMachineContext {
    * promise is still in flight, so the live model would rearrange the popup mid-action.
    * The view renders this instead until the action settles.
    */
-  frozen: UserButtonReadyModel | null;
+  frozenModel: UserButtonReadyModel | null;
   /** Injected per-action effect — the model callback the clicked row runs. */
   run: () => Promise<unknown>;
   /** Whether succeeding ends the interaction, and the popup with it. */
@@ -30,21 +30,21 @@ type UserButtonMachineEvent =
   | {
       type: 'RUN';
       key: string;
-      frozen: UserButtonReadyModel;
+      frozenModel: UserButtonReadyModel;
       run: () => Promise<unknown>;
       closeOnSuccess: boolean;
     };
 
 const { createMachine, assign, fromPromise } = setup<UserButtonMachineContext, UserButtonMachineEvent>();
 
-const settled = { pendingKey: null, frozen: null };
+const settled = { pendingKey: null, frozenModel: null };
 
 const userButtonMachine = createMachine({
   id: 'userButton',
   initial: 'closed',
   context: {
     pendingKey: null,
-    frozen: null,
+    frozenModel: null,
     run: () => Promise.resolve(),
     closeOnSuccess: false,
   },
@@ -59,7 +59,7 @@ const userButtonMachine = createMachine({
           target: 'busy',
           actions: assign((_, event) => ({
             pendingKey: event.key,
-            frozen: event.frozen,
+            frozenModel: event.frozenModel,
             run: event.run,
             closeOnSuccess: event.closeOnSuccess,
           })),
@@ -144,7 +144,7 @@ export function useUserButtonController(
           send({
             type: 'RUN',
             key: keyFor(...args),
-            frozen: model,
+            frozenModel: model,
             run: async () => fn(...args),
             closeOnSuccess,
           })
@@ -160,7 +160,7 @@ export function useUserButtonController(
       : undefined;
 
   // Rendering the model the action froze on holds the popup still while it runs; the result
-  // lands in one step when it settles. See `frozen` in the machine for why.
+  // lands in one step when it settles. See `frozenModel` in the machine for why.
   const {
     status: _status,
     organizationsEnabled,
@@ -176,7 +176,7 @@ export function useUserButtonController(
     onCreateOrganization,
     onAddAccount,
     ...data
-  } = context.frozen ?? model;
+  } = context.frozenModel ?? model;
 
   // Force user mode if organizations are disabled
   const mode = model.organizationsEnabled ? requestedMode : 'user';
