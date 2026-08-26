@@ -136,9 +136,15 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     }
 
     if (requestState.headers) {
+      const setCookieHeaders = requestState.headers.getSetCookie();
       requestState.headers.forEach((value, key) => {
-        setResponseHeader(event, key, value);
+        if (key.toLowerCase() !== 'set-cookie') {
+          setResponseHeader(event, key, value);
+        }
       });
+      if (setCookieHeaders.length > 0) {
+        setResponseHeader(event, 'set-cookie', setCookieHeaders);
+      }
     }
 
     const authObjectFn = (opts?: PendingSessionOptions) => requestState.toAuth(opts);
