@@ -1,9 +1,8 @@
+import type { JwtPayload } from '@clerk/shared/types';
 import { describe, expectTypeOf, it } from 'vitest';
 
-import type { JwtPayload } from '@clerk/shared/types';
-
-import { decodeJwt, verifyJwt } from '../index';
-import { decodeJwt as decodeJwtResult, verifyJwt as verifyJwtResult } from '../verifyJwt';
+import type { decodeJwt, verifyJwt } from '../index';
+import type { decodeJwt as decodeJwtResult, verifyJwt as verifyJwtResult } from '../verifyJwt';
 
 describe('decodeJwt and verifyJwt audience claim types', () => {
   it('exposes the same optional RFC 7519 aud type on JwtPayload', () => {

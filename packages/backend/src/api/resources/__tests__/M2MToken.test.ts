@@ -105,6 +105,21 @@ describe('M2MToken', () => {
       expect(token.scopes).toEqual(['scope1', 'scope2', 'scope3']);
     });
 
+    it('seeds scopes from a string aud claim', () => {
+      const payload = {
+        sub: 'mch_test',
+        exp: 1666648550,
+        iat: 1666648250,
+        jti: 'mt_test',
+        aud: 'https://my-resource.example.com',
+      };
+
+      const token = M2MToken.fromJwtPayload(payload);
+
+      expect(token.scopes).toEqual(['https://my-resource.example.com']);
+      expect(token.claims).toEqual({ aud: 'https://my-resource.example.com' });
+    });
+
     it('returns empty scopes when neither aud nor scopes present', () => {
       const payload = {
         sub: 'mch_test',
