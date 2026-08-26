@@ -1,0 +1,86 @@
+import * as BannerStories from './banner.stories';
+
+# Banner
+
+Banner annotates the surface it sits on with a status message. It is a compound component: `Banner.Root` sets the semantic `color` and renders the matching icon itself, and `Banner.Label` and `Banner.Description` carry the copy. It ships no ARIA role, so a banner that appears in response to something the user did needs `role='status'` (or `role='alert'` for an error) to be announced.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={BannerStories}
+/>
+
+## Props
+
+<PropTable meta={BannerStories.meta} />
+
+## Usage
+
+```tsx
+import { Banner } from '@clerk/ui/mosaic/components/banner';
+
+<Banner.Root color='negative'>
+  <Banner.Label>Error banner</Banner.Label>
+  <Banner.Description>Renew now to avoid service interruption.</Banner.Description>
+</Banner.Root>;
+```
+
+`color` lives on `Banner.Root` only; `Banner.Label` and `Banner.Description` read it from context, so they never need it passed again. The description is optional — a `Banner.Root` with just a label renders as a single line.
+
+## Parts
+
+| Part                 | Stable slot class        | Description                                                     |
+| -------------------- | ------------------------ | --------------------------------------------------------------- |
+| `Banner.Root`        | `.cl-banner-root`        | Tinted `div` surface. Owns `color` and renders the icon for it. |
+| `Banner.Label`       | `.cl-banner-label`       | The headline `span`, in the root's color at medium weight.      |
+| `Banner.Description` | `.cl-banner-description` | Supporting `p` beneath the label.                               |
+
+`Banner.Root` also wraps its children in a `.cl-banner-content` column so the copy aligns past the icon. Every part accepts `render` for polymorphism and forwards its ref.
+
+## Styling
+
+Each part carries its stable slot class alongside the generated StyleX atoms and reflects the active color as `data-color`. Override a `.cl-banner-*` class from a CSS layer that wins over `@clerk/ui/styles.css`:
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+@layer overrides {
+  .cl-banner-root[data-color='negative'] {
+    border-radius: 0;
+  }
+}
+```
+
+| Part                 | `data-color`                         |
+| -------------------- | ------------------------------------ |
+| `Banner.Root`        | `neutral` \| `warning` \| `negative` |
+| `Banner.Label`       | `neutral` \| `warning` \| `negative` |
+| `Banner.Description` | `neutral` \| `warning` \| `negative` |
+
+The fill is a 4% mix of the color's token rather than its `-faded` surface, so a banner tints whatever it sits on instead of painting over it, and it inverts with the token in dark mode. Retheme a color by overriding the token it reads — `--cl-color-negative`, `--cl-color-warning`, or `--cl-color-neutral` (plus `--cl-color-border`, which draws the neutral hairline) — and the fill, border, icon, and copy all move together.
+
+---
+
+## Examples
+
+### Colors
+
+<Story
+  name='Colors'
+  storyModule={BannerStories}
+/>
+
+### Label only
+
+<Story
+  name='LabelOnly'
+  storyModule={BannerStories}
+/>
+
+### Announced
+
+<Story
+  name='Announced'
+  storyModule={BannerStories}
+/>

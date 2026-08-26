@@ -20,6 +20,13 @@ import {
   Primary as BadgePrimary,
   WithIcon as BadgeWithIcon,
 } from '../stories/badge.stories';
+import {
+  Announced as BannerAnnounced,
+  Colors as BannerColors,
+  Default as BannerDefault,
+  LabelOnly as BannerLabelOnly,
+  meta as bannerMeta,
+} from '../stories/banner.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import {
   Centered as CardCentered,
@@ -204,6 +211,14 @@ const badgeModule: StoryModule = {
   WithIcon: BadgeWithIcon,
 };
 
+const bannerModule: StoryModule = {
+  meta: bannerMeta,
+  Default: BannerDefault,
+  Colors: BannerColors,
+  LabelOnly: BannerLabelOnly,
+  Announced: BannerAnnounced,
+};
+
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
@@ -379,6 +394,7 @@ export const registry: StoryModule[] = [
   // Components
   avatarModule,
   badgeModule,
+  bannerModule,
   buttonModule,
   cardComponentModule,
   inputModule,
