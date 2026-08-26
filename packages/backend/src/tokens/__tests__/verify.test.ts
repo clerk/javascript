@@ -22,7 +22,7 @@ import { JWT_CATEGORY_M2M_TOKEN } from '../jwtCategories';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
 async function createSignedOAuthJwt(
-  payload = mockOAuthAccessTokenJwtPayload,
+  payload: Record<string, unknown> = mockOAuthAccessTokenJwtPayload,
   typ: 'at+jwt' | 'application/at+jwt' | 'JWT' = 'at+jwt',
 ) {
   const { data } = await signJwt(payload, signingJwks, {
@@ -558,7 +558,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
           payload.sub = sub;
         }
 
-        const oauthJwt = await createSignedOAuthJwt(payload as typeof mockOAuthAccessTokenJwtPayload, 'at+jwt');
+        const oauthJwt = await createSignedOAuthJwt(payload, 'at+jwt');
 
         const result = await verifyMachineAuthToken(oauthJwt, {
           apiUrl: 'https://api.clerk.test',
@@ -569,6 +569,60 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         expect(result.tokenType).toBe('oauth_token');
       },
     );
+
+    it('verifies OAuth JWT with a matching RFC 8707 resource audience', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const audience = 'https://my-resource.example.com';
+      const oauthJwt = await createSignedOAuthJwt({
+        ...mockOAuthAccessTokenJwtPayload,
+        aud: audience,
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience,
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeDefined();
+      expect(result.errors).toBeUndefined();
+    });
+
+    it('rejects OAuth JWT with a mismatched RFC 8707 resource audience', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const oauthJwt = await createSignedOAuthJwt({
+        ...mockOAuthAccessTokenJwtPayload,
+        aud: 'https://attacker.example.com',
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience: 'https://my-resource.example.com',
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.[0].message).toContain('Invalid JWT audience claim');
+    });
   });
 
   describe('verifyM2MToken with JWT', () => {
