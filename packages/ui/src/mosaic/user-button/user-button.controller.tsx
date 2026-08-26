@@ -193,8 +193,13 @@ export function useUserButtonController(
     pendingKey: displayPendingKey,
     onSelectOrganization: runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true),
     onSwitchSession: runAction(userButtonBusyKeys.switchSession, onSwitchSession),
-    onSignOutSession: runAction(userButtonBusyKeys.signOutSession, onSignOutSession),
-    onSignOutAll: runAction(userButtonBusyKeys.signOutAll, onSignOutAll),
+    // Last-account and all-accounts sign-out unmount the button. Staying `open` would reopen the menu on the next sign-in.
+    onSignOutSession: runAction(
+      userButtonBusyKeys.signOutSession,
+      onSignOutSession,
+      data.additionalSessions.length === 0,
+    ),
+    onSignOutAll: runAction(userButtonBusyKeys.signOutAll, onSignOutAll, true),
     onAcceptSuggestion: runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion),
     onAcceptInvitation: runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation),
     onManageAccount: handOff(onManageAccount),

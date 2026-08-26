@@ -178,15 +178,31 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-function renderUserButton(props: UserButtonProps = {}) {
-  return render(
+function tree(props: UserButtonProps = {}) {
+  return (
     <MosaicProvider>
       {/* The button portals its popup out, so this host holds only what it renders in place. */}
       <div data-testid='host'>
         <UserButton {...props} />
       </div>
-    </MosaicProvider>,
+    </MosaicProvider>
   );
+}
+
+function renderUserButton(props: UserButtonProps = {}) {
+  return render(tree(props));
+}
+
+/** Sign-out unmounts the button (`hidden`). If the machine stayed `open`, the next ready render would show the menu. */
+function signedOutThenIn(rerender: (ui: React.ReactElement) => void, props: UserButtonProps = {}) {
+  const signedInUser = user;
+  const signedInSession = session;
+  user = null;
+  session = null;
+  rerender(tree(props));
+  user = signedInUser;
+  session = signedInSession;
+  rerender(tree(props));
 }
 
 const host = () => screen.getByTestId('host');
@@ -313,7 +329,7 @@ describe('UserButton (connected)', () => {
     expect(popup()).toBeInTheDocument();
   });
 
-  it('signing out of the active account calls signOut with its session id', async () => {
+  it('signing out of the active account calls signOut with its session id and stays open', async () => {
     renderUserButton();
     const act = await open();
 
@@ -321,15 +337,33 @@ describe('UserButton (connected)', () => {
 
     // Another account stays signed in, so this is a single sign out, not a full one.
     expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_1', redirectUrl: '/after-single-sign-out' });
+    await waitFor(() => expect(spinner()).toBeNull());
+    expect(popup()).toBeInTheDocument();
   });
 
-  it('signing out of all accounts calls signOut with the after-sign-out url', async () => {
-    renderUserButton();
+  it('does not reopen after signing out of the last account and signing back in', async () => {
+    signedInSessions = signedInSessions.slice(0, 1);
+    const { rerender } = renderUserButton();
+    const act = await open();
+
+    await accountAction(act, 'Sign out');
+    expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_1', redirectUrl: '/after-sign-out' });
+
+    signedOutThenIn(rerender);
+    expect(trigger()).toBeInTheDocument();
+    expect(popup()).toBeNull();
+  });
+
+  it('does not reopen after signing out of all accounts and signing back in', async () => {
+    const { rerender } = renderUserButton();
     const act = await open();
 
     await act.click(screen.getByRole('button', { name: 'Sign out of all accounts' }));
-
     expect(signOut).toHaveBeenCalledWith({ redirectUrl: '/after-sign-out' });
+
+    signedOutThenIn(rerender);
+    expect(trigger()).toBeInTheDocument();
+    expect(popup()).toBeNull();
   });
 
   it('accepting an invitation accepts it, revalidates, and stays open', async () => {
