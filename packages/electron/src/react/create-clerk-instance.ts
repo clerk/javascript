@@ -27,6 +27,7 @@ export function createClerkInstance(publishableKey: string, passkeys?: PasskeySu
   }
 
   const clerk = new Clerk(publishableKey);
+  let clientJwt: string | null = null;
 
   if (passkeys) {
     attachPasskeys(clerk, passkeys);
@@ -37,7 +38,7 @@ export function createClerkInstance(publishableKey: string, passkeys?: PasskeySu
     request.url?.searchParams.append('_is_native', '1');
     request.url?.searchParams.append('_electron_sdk_version', PACKAGE_VERSION);
 
-    const token = await window.__clerk_internal_electron?.tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+    const token = clientJwt ?? (await window.__clerk_internal_electron?.tokenCache.getToken(CLERK_CLIENT_JWT_KEY));
     if (token) {
       const headers = new Headers(request.headers);
       headers.set('Authorization', `Bearer ${token}`);
@@ -52,6 +53,7 @@ export function createClerkInstance(publishableKey: string, passkeys?: PasskeySu
     }
 
     const token = authorization.startsWith('Bearer ') ? authorization.slice('Bearer '.length) : authorization;
+    clientJwt = token;
     await window.__clerk_internal_electron?.tokenCache.saveToken(CLERK_CLIENT_JWT_KEY, token);
   });
 

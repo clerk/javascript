@@ -347,4 +347,76 @@ describe('Electron ClerkProvider', () => {
 
     expect(tokenCache.saveToken).toHaveBeenCalledWith('__clerk_client_jwt', 'updated-client-jwt');
   });
+
+  it('reuses response tokens when the Electron token cache cannot persist them', async () => {
+    tokenCache.getToken.mockResolvedValue(null);
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_unavailable_persistence'>App</ClerkProvider>);
+
+    const firstRequest = {
+      headers: new Headers(),
+      url: new URL('https://api.clerk.test/v1/client/sign_ins'),
+    };
+    await beforeRequest?.(firstRequest);
+    expect(firstRequest.headers.has('Authorization')).toBe(false);
+
+    await afterResponse?.(
+      {},
+      new Response(null, {
+        headers: {
+          Authorization: 'Bearer client-jwt-from-response',
+        },
+      }),
+    );
+
+    const nextRequest = {
+      headers: new Headers(),
+      url: new URL('https://api.clerk.test/v1/client/sign_ins/attempt/prepare_verification'),
+    };
+    await beforeRequest?.(nextRequest);
+
+    expect(nextRequest.headers.get('Authorization')).toBe('Bearer client-jwt-from-response');
+    expect(tokenCache.getToken).toHaveBeenCalledTimes(1);
+
+    await afterResponse?.(
+      {},
+      new Response(null, {
+        headers: {
+          Authorization: 'Bearer rotated-client-jwt',
+        },
+      }),
+    );
+
+    const requestAfterRotation = {
+      headers: new Headers(),
+      url: new URL('https://api.clerk.test/v1/client'),
+    };
+    await beforeRequest?.(requestAfterRotation);
+
+    expect(requestAfterRotation.headers.get('Authorization')).toBe('Bearer rotated-client-jwt');
+    expect(tokenCache.getToken).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not reuse response tokens across publishable keys', async () => {
+    tokenCache.getToken.mockResolvedValue(null);
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_first_instance'>App</ClerkProvider>);
+
+    await afterResponse?.(
+      {},
+      new Response(null, {
+        headers: {
+          Authorization: 'Bearer first-instance-client-jwt',
+        },
+      }),
+    );
+
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_second_instance'>App</ClerkProvider>);
+    const request = {
+      headers: new Headers(),
+      url: new URL('https://api.clerk.test/v1/client'),
+    };
+    await beforeRequest?.(request);
+
+    expect(request.headers.has('Authorization')).toBe(false);
+    expect(tokenCache.getToken).toHaveBeenCalledTimes(1);
+  });
 });
