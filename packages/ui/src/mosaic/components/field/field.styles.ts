@@ -23,6 +23,7 @@ export const styles = stylex.create({
     alignItems: 'flex-start',
     color: colorVars['--cl-color-negative'],
     display: 'flex',
+    textWrap: 'pretty',
   },
   errorIcon: {
     flexShrink: 0,
