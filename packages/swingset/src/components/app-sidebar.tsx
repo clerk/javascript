@@ -24,7 +24,7 @@ import { getSidebarGroups } from '@/lib/registry';
 
 const groups = getSidebarGroups();
 
-const COLLAPSED_BY_DEFAULT = new Set(['Primitives', 'Components', 'Styles', 'Hooks']);
+const COLLAPSED_BY_DEFAULT = new Set(['Blocks', 'Primitives', 'Components', 'Styles', 'Hooks']);
 
 type SidebarEntry = ReturnType<typeof getSidebarGroups>[number]['components'][number];
 
