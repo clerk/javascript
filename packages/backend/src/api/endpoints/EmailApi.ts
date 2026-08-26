@@ -147,7 +147,10 @@ export class EmailApi extends AbstractAPI {
    */
   public async create(params: CreateEmailParams, options: CreateEmailOptions = {}): Promise<Email> {
     const { idempotencyKey } = options;
-    if (idempotencyKey !== undefined && !idempotencyKeyPattern.test(idempotencyKey)) {
+    if (
+      idempotencyKey !== undefined &&
+      (typeof idempotencyKey !== 'string' || !idempotencyKeyPattern.test(idempotencyKey))
+    ) {
       throw new Error(
         'Idempotency key must contain only ASCII letters, digits, underscores, and hyphens and cannot exceed 255 characters.',
       );

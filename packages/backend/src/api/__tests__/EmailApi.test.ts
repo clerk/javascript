@@ -85,6 +85,8 @@ describe('EmailApi', () => {
 
   it.each([
     ['an empty value', ''],
+    ['a null value', null],
+    ['a numeric value', 123],
     ['unsupported characters', 'campaign:123'],
     ['more than 255 characters', 'a'.repeat(256)],
   ])('rejects idempotency keys with %s before sending a request', async (_, idempotencyKey) => {
@@ -104,7 +106,8 @@ describe('EmailApi', () => {
           subject: 'Hello',
           html: '<p>hi</p>',
         },
-        { idempotencyKey },
+        // Exercise the runtime boundary that exists for JavaScript consumers.
+        { idempotencyKey: idempotencyKey as string },
       ),
     ).rejects.toThrow('Idempotency key must contain only ASCII letters, digits, underscores, and hyphens');
     expect(requestCount).toBe(0);
