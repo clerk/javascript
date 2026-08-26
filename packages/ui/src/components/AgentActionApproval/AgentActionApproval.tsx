@@ -15,9 +15,9 @@ import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Divider } from '@/ui/elements/Divider';
 import { Header } from '@/ui/elements/Header';
+import { LineItems } from '@/ui/elements/LineItems';
 import { Textarea } from '@/ui/primitives';
 
-import { ParameterStamp } from './ParameterStamp';
 import { TerminalCard, type TerminalStatus } from './TerminalCard';
 import { formatRemainingTime, useCountdown } from './useCountdown';
 
@@ -87,7 +87,17 @@ function ApprovalScreen() {
             </Col>
             <Text colorScheme='secondary'>{mockAction.description}</Text>
           </Col>
-          <ParameterStamp parameters={mockAction.parameters} />
+          <LineItems.Root>
+            {mockAction.parameters.map(parameter => (
+              <LineItems.Group
+                key={parameter.key}
+                variant='secondary'
+              >
+                <LineItems.Title title={parameter.label} />
+                <LineItems.Description text={String(parameter.value)} />
+              </LineItems.Group>
+            ))}
+          </LineItems.Root>
         </Col>
         <Col
           gap={2}
