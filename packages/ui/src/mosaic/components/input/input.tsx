@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { inputSurface } from '../../utils/input-surface.styles';
 import { reset } from '../../utils/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { sizes, styles } from './input.styles';
@@ -52,7 +53,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
       'aria-describedby': fieldProps?.['aria-describedby'] ?? ariaDescribedBy,
       ...mergeStyleProps(
         themeProps('input', { size, disabled }),
-        stylex.props(reset.base, styles.base, sizes[size], disabled && styles.disabled),
+        stylex.props(reset.base, inputSurface.base, styles.base, sizes[size], disabled && inputSurface.disabled),
         className,
         style,
       ),

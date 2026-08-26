@@ -61,6 +61,14 @@ import {
 } from '../stories/item.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OtpComponentDefault,
+  Disabled as OtpComponentDisabled,
+  Error as OtpComponentError,
+  meta as otpComponentMeta,
+  Sizes as OtpComponentSizes,
+  Success as OtpComponentSuccess,
+} from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -239,6 +247,15 @@ const headingModule: StoryModule = {
 
 const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
 
+const otpComponentModule: StoryModule = {
+  meta: otpComponentMeta,
+  Default: OtpComponentDefault,
+  Sizes: OtpComponentSizes,
+  Success: OtpComponentSuccess,
+  Error: OtpComponentError,
+  Disabled: OtpComponentDisabled,
+};
+
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
 const fieldModule: StoryModule = {
@@ -388,6 +405,7 @@ export const registry: StoryModule[] = [
   headingModule,
   iconModule,
   menuComponentModule,
+  otpComponentModule,
   popoverComponentModule,
   sectionModule,
   textModule,
