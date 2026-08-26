@@ -1,4 +1,5 @@
 import { UserProfileDeleteSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-section/user-profile-delete-section.view';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -17,7 +18,21 @@ export const meta: StoryMeta = {
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 export function Default() {
-  return <UserProfileDeleteSectionView onDelete={() => settleAfter(2000)} />;
+  const [runId, setRunId] = useState(0);
+
+  // Deleting is terminal: the real flow signs the user out and the section goes away with the
+  // page. Nothing unmounts it here, so the story remounts it to make the demo repeatable.
+  const handleDelete = async () => {
+    await settleAfter(2000);
+    setRunId(current => current + 1);
+  };
+
+  return (
+    <UserProfileDeleteSectionView
+      key={runId}
+      onDelete={handleDelete}
+    />
+  );
 }
 
 export function WithError() {
