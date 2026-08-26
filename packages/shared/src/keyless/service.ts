@@ -1,5 +1,3 @@
-import { completeClaimedOnboarding } from './completeClaimedOnboarding';
-import { clerkDevelopmentCache, createKeylessModeMessage } from './devCache';
 import type { AccountlessApplication } from './types';
 
 const KEYLESS_SOURCE_FALLBACK = 'javascript';
@@ -35,21 +33,10 @@ export interface KeylessStorage {
 }
 
 /**
- * API adapter for SDKs that only complete onboarding for already-claimed keyless
- * applications and no longer mint new ones.
+ * API adapter for keyless mode operations on already-claimed applications.
  * This abstraction allows the service to work without depending on @clerk/backend.
  */
-export interface KeylessCompletionAPI {
-  /**
-   * Creates a new accountless application.
-   * Omitted by SDKs that no longer mint keyless applications.
-   *
-   * @param requestHeaders - Optional headers to include with the request.
-   * @param source - Optional source value to include with the request.
-   * @returns The created AccountlessApplication or null if failed.
-   */
-  createAccountlessApplication?(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
-
+export interface KeylessAPI {
   /**
    * Notifies the backend that onboarding is complete (instance has been claimed).
    *
@@ -58,13 +45,6 @@ export interface KeylessCompletionAPI {
    * @returns The updated AccountlessApplication or null if failed.
    */
   completeOnboarding(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
-}
-
-/**
- * API adapter for keyless mode operations, for SDKs that can still mint keyless applications.
- */
-export interface KeylessAPI extends KeylessCompletionAPI {
-  createAccountlessApplication(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
 }
 
 /**
@@ -77,9 +57,9 @@ export interface KeylessServiceOptions {
   storage: KeylessStorage;
 
   /**
-   * API adapter for keyless operations (complete onboarding, optionally create application).
+   * API adapter for keyless operations (complete onboarding).
    */
-  api: KeylessCompletionAPI;
+  api: KeylessAPI;
 
   /**
    * Optional: Framework name for metadata (e.g., 'Next.js', 'TanStack Start').
@@ -93,24 +73,9 @@ export interface KeylessServiceOptions {
 }
 
 /**
- * Result type for key resolution.
- */
-export interface KeylessResult {
-  publishableKey: string | undefined;
-  secretKey: string | undefined;
-  claimUrl: string | undefined;
-  apiKeysUrl: string | undefined;
-}
-
-/**
  * The keyless service interface.
  */
 export interface KeylessService {
-  /**
-   * Gets existing keyless keys or creates new ones via the API.
-   */
-  getOrCreateKeys: () => Promise<AccountlessApplication | null>;
-
   /**
    * Reads existing keyless keys without creating new ones.
    */
@@ -126,23 +91,6 @@ export interface KeylessService {
    * This should be called once when the user claims their instance.
    */
   completeOnboarding: () => Promise<AccountlessApplication | null>;
-
-  /**
-   * Logs a keyless mode message to the console (throttled to once per process).
-   */
-  logKeylessMessage: (claimUrl: string) => void;
-
-  /**
-   * Resolves Clerk keys, falling back to keyless mode if configured keys are missing.
-   *
-   * @param configuredPublishableKey - The publishable key from options or environment
-   * @param configuredSecretKey - The secret key from options or environment
-   * @returns The resolved keys (either configured or from keyless mode)
-   */
-  resolveKeysWithKeylessFallback: (
-    configuredPublishableKey: string | undefined,
-    configuredSecretKey: string | undefined,
-  ) => Promise<KeylessResult>;
 }
 
 /**
@@ -172,8 +120,8 @@ function createSource(framework?: string): string {
 }
 
 /**
- * Creates a keyless service that handles accountless application creation and storage.
- * This provides a simple API for frameworks to integrate keyless mode.
+ * Creates a keyless service that reads stored keyless keys and completes onboarding
+ * for claimed applications.
  *
  * @param options - Configuration for the service including storage and API adapters
  * @returns A keyless service instance
@@ -184,20 +132,16 @@ function createSource(framework?: string): string {
  *
  * const keylessService = createKeylessService({
  *   storage: createFileStorage(),
- *   api: createKeylessAPI({ secretKey }),
+ *   api: { completeOnboarding },
  *   framework: 'TanStack Start',
  * });
  *
- * const keys = await keylessService.getOrCreateKeys(request);
- * if (keys) {
- *   console.log('Publishable Key:', keys.publishableKey);
- * }
+ * const keys = keylessService.readKeys();
  * ```
  */
 export function createKeylessService(options: KeylessServiceOptions): KeylessService {
   const { storage, api, framework, frameworkVersion } = options;
 
-  let hasLoggedKeylessMessage = false;
   const source = createSource(framework);
 
   const safeParseConfig = (): AccountlessApplication | undefined => {
@@ -213,30 +157,6 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
   };
 
   return {
-    async getOrCreateKeys(): Promise<AccountlessApplication | null> {
-      // Check for existing config first
-      const existingConfig = safeParseConfig();
-      if (existingConfig?.publishableKey && existingConfig?.secretKey) {
-        return existingConfig;
-      }
-
-      if (!api.createAccountlessApplication) {
-        return null;
-      }
-
-      // Create metadata headers
-      const headers = createMetadataHeaders(framework, frameworkVersion);
-
-      // Create new keys via the API
-      const accountlessApplication = await api.createAccountlessApplication(headers, source);
-
-      if (accountlessApplication) {
-        storage.write(JSON.stringify(accountlessApplication));
-      }
-
-      return accountlessApplication;
-    },
-
     readKeys(): AccountlessApplication | undefined {
       return safeParseConfig();
     },
@@ -248,57 +168,6 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
     async completeOnboarding(): Promise<AccountlessApplication | null> {
       const headers = createMetadataHeaders(framework, frameworkVersion);
       return api.completeOnboarding(headers, source);
-    },
-
-    logKeylessMessage(claimUrl: string): void {
-      if (!hasLoggedKeylessMessage) {
-        hasLoggedKeylessMessage = true;
-        console.log(`[Clerk]: Running in keyless mode. Claim your keys at: ${claimUrl}`);
-      }
-    },
-
-    async resolveKeysWithKeylessFallback(
-      configuredPublishableKey: string | undefined,
-      configuredSecretKey: string | undefined,
-    ): Promise<KeylessResult> {
-      let publishableKey = configuredPublishableKey;
-      let secretKey = configuredSecretKey;
-      let claimUrl: string | undefined;
-      let apiKeysUrl: string | undefined;
-
-      try {
-        const locallyStoredKeys = safeParseConfig();
-
-        // Check if running with claimed keys (configured keys match locally stored keyless keys)
-        const runningWithClaimedKeys =
-          Boolean(configuredPublishableKey) && configuredPublishableKey === locallyStoredKeys?.publishableKey;
-
-        if (runningWithClaimedKeys && locallyStoredKeys) {
-          await completeClaimedOnboarding(locallyStoredKeys.publishableKey, this);
-          return { publishableKey, secretKey, claimUrl, apiKeysUrl };
-        }
-
-        // In keyless mode, try to read/create keys from the file system
-        if (!publishableKey && !secretKey) {
-          const keylessApp: AccountlessApplication | null = await this.getOrCreateKeys();
-
-          if (keylessApp) {
-            publishableKey = keylessApp.publishableKey;
-            secretKey = keylessApp.secretKey;
-            claimUrl = keylessApp.claimUrl;
-            apiKeysUrl = keylessApp.apiKeysUrl;
-
-            clerkDevelopmentCache?.log({
-              cacheKey: keylessApp.publishableKey,
-              msg: createKeylessModeMessage(keylessApp),
-            });
-          }
-        }
-      } catch {
-        // noop - fall through to return whatever keys we have
-      }
-
-      return { publishableKey, secretKey, claimUrl, apiKeysUrl };
     },
   };
 }

@@ -1,5 +1,4 @@
 import { isDevelopmentEnvironment } from '../utils/runtimeEnvironment';
-import type { AccountlessApplication, PublicKeylessApplication } from './types';
 
 // 10 minutes in milliseconds
 const THROTTLE_DURATION_MS = 10 * 60 * 1000;
@@ -82,16 +81,6 @@ export function createClerkDevCache(): ClerkDevCache | undefined {
   }
 
   return globalThis.__clerk_internal_keyless_logger;
-}
-
-/**
- * Creates the console message shown when running in keyless mode.
- *
- * @param keys - The keyless application keys
- * @returns Formatted console message
- */
-export function createKeylessModeMessage(keys: AccountlessApplication | PublicKeylessApplication): string {
-  return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running in keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
 }
 
 /**

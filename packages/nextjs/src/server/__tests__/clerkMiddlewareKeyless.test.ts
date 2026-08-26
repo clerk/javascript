@@ -3,8 +3,7 @@ import type { NextFetchEvent } from 'next/server';
 import { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// The mock SHOULD exist before the imports: unlike clerkMiddleware.test.ts, keys are empty so the
-// missing-key error path is reachable.
+// The mock SHOULD exist before the imports. Keys are intentionally empty so the missing-key error path is reachable.
 vi.mock(import('../constants.js'), async importOriginal => {
   const actual = await importOriginal();
   return {

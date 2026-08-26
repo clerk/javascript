@@ -5,6 +5,7 @@ import React, { Suspense } from 'react';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import { errorThrower } from '../../server/errorThrower';
 import type { NextClerkProviderProps } from '../../types';
+import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { DynamicClerkScripts } from './DynamicClerkScripts';
@@ -32,7 +33,7 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
     initialState: statePromiseOrValue as InitialState | undefined,
   });
 
-  const { shouldRunAsKeyless, runningWithClaimedKeys } = await getKeylessStatus(propsWithEnvs);
+  const { runningWithClaimedKeys } = await getKeylessStatus(propsWithEnvs);
 
   // When dynamic mode is enabled, render scripts in a Suspense boundary to isolate
   // the nonce fetching (which calls headers()) from the rest of the page.
@@ -52,14 +53,14 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
     </Suspense>
   ) : undefined;
 
-  if (shouldRunAsKeyless) {
-    if (!propsWithEnvs.publishableKey) {
-      errorThrower.throwMissingPublishableKeyError();
-    }
+  if (canUseKeyless && !propsWithEnvs.publishableKey) {
+    errorThrower.throwMissingPublishableKeyError();
+  }
+
+  if (runningWithClaimedKeys) {
     return (
       <KeylessProvider
         rest={propsWithEnvs}
-        runningWithClaimedKeys={runningWithClaimedKeys}
         __internal_scriptsSlot={scriptsSlot}
       >
         {children}
