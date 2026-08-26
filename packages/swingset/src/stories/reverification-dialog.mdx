@@ -48,6 +48,14 @@ import { ReverificationDialog } from '@clerk/ui/mosaic/blocks/reverification-dia
 ```
 
 The action sits in the footer, outside the field's form, so pressing Enter in the field submits the same way the button does.
+A reverification is raised by something the user has already started — deleting an account, revoking a session — so it
+opens over the dialog that asked, not over the page. That makes it a stacked surface, and per the
+[Dialog](/components/dialog) page's "Nested dialogs and stacks", the thing that opens is always a `prompt`.
+
+This block is `size='card'`, which is a root-level surface. Opened inside another dialog it warns in development and
+takes the nested treatment — its own scrim over the host's, with the surface beneath neither dimming nor receding, and
+both surfaces at the same width so the one underneath is hidden rather than showing behind. Until the size is a prop,
+compose it at the root only.
 
 ## Props
 
