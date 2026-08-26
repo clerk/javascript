@@ -5,19 +5,11 @@ import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
   ReverificationChallenge,
+  ReverificationCompleteResult,
+  ReverificationError,
   ReverificationFactor,
   ReverificationPreparationFactor,
 } from './reverification-dialog.types';
-
-/**
- * A failed attempt, and where the message belongs. `location` is the machine deciding a
- * rendering question, which is why it is keyed off the strategy rather than off the error —
- * legacy's `handleError` read the error's own shape to choose between the field and the card.
- */
-export interface ReverificationDialogError {
-  location: 'field' | 'form';
-  message: string;
-}
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -26,24 +18,30 @@ const emptyChallenge: ReverificationChallenge = {
   factors: [],
 };
 
-type ReverificationDialogReturnState = 'selectingFactor' | 'routingFactor';
-
 export interface ReverificationDialogMachineContext {
+  /** The challenge injected by the view and captured when the actor starts. */
   initialChallenge: ReverificationChallenge;
+  /** The active challenge, replaced when first-factor verification requires a second factor. */
   challenge: ReverificationChallenge;
+  /** The factor currently being prepared or verified. */
   currentFactor: ReverificationFactor | null;
+  /** The answer entered for the current factor. */
   value: string;
-  error: ReverificationDialogError | null;
-  preparedFactorId: string | null;
+  /** Why the last operation failed and whether it belongs to the answer or the flow. */
+  error: ReverificationError | null;
+  /** The delivered-code factor most recently prepared. */
+  preparedFactorKey: string | null;
+  /** The successful verification retained while completion runs or retries. */
+  verification: ReverificationCompleteResult | null;
+  /** Seconds until another delivered code may be requested. */
   resendSecondsRemaining: number;
-  returnState: ReverificationDialogReturnState;
+  /** Sends a code. Injected by the view from its `prepare` prop. */
   prepare: (factor: ReverificationPreparationFactor) => Promise<void>;
+  /** Checks an answer. Injected by the view from its `attempt` prop. */
   attempt: (attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>;
-  /**
-   * The verification landed. Awaited, so the dialog stays up while the caller activates the
-   * session — legacy did the same before handing back to whatever asked for reverification.
-   */
-  complete: () => Promise<void>;
+  /** Activates the verified session. Injected by the view from its `onComplete` prop. */
+  complete: (result: ReverificationCompleteResult) => Promise<void>;
+  /** Reports cancellation. Injected by the view from its `onCancel` prop. */
   cancel: () => void;
 }
 
@@ -52,10 +50,11 @@ export type ReverificationDialogMachineEvent =
   | { type: 'SUBMIT' }
   | { type: 'RESEND' }
   | { type: 'CANCEL' }
-  | { type: 'SELECT_FACTOR'; factorId: string }
+  | { type: 'SELECT_FACTOR'; factorKey: string }
   | { type: 'SHOW_ALTERNATIVES' }
   | { type: 'SHOW_HELP' }
-  | { type: 'BACK' };
+  | { type: 'BACK' }
+  | { type: 'RETRY_COMPLETE' };
 
 const { createMachine, assign, fromPromise } = setup<
   ReverificationDialogMachineContext,
@@ -64,16 +63,41 @@ const { createMachine, assign, fromPromise } = setup<
 
 const factorsFrom = (context: ReverificationDialogMachineContext): ReverificationFactor[] => context.challenge.factors;
 
-const factorFrom = (context: ReverificationDialogMachineContext, factorId: string) =>
-  factorsFrom(context).find(factor => factor.id === factorId);
+export const reverificationFactorKey = (factor: ReverificationFactor): string => {
+  switch (factor.strategy) {
+    case 'email_code':
+      return `email_code:${factor.emailAddressId}`;
+    case 'phone_code':
+      return `phone_code:${factor.phoneNumberId}`;
+    default:
+      return factor.strategy;
+  }
+};
 
-const initialFactorFrom = (challenge: ReverificationChallenge): ReverificationFactor | null =>
-  challenge.initialFactorId
-    ? (challenge.factors.find(factor => factor.id === challenge.initialFactorId) ?? null)
-    : null;
+const assertValidChallenge = (challenge: ReverificationChallenge) => {
+  const keys = challenge.factors.map(reverificationFactorKey);
+  if (new Set(keys).size !== keys.length) {
+    throw new Error('Reverification factors must have unique identities.');
+  }
+};
+
+const factorFrom = (context: ReverificationDialogMachineContext, factorKey: string) =>
+  factorsFrom(context).find(factor => reverificationFactorKey(factor) === factorKey);
+
+const initialFactorFrom = (challenge: ReverificationChallenge): ReverificationFactor | null => {
+  const initialFactor = challenge.initialFactor;
+  if (!initialFactor) {
+    return null;
+  }
+  const initialFactorKey = reverificationFactorKey(initialFactor);
+  return challenge.factors.find(factor => reverificationFactorKey(factor) === initialFactorKey) ?? null;
+};
 
 const alternativesFrom = (context: ReverificationDialogMachineContext) =>
-  factorsFrom(context).filter(factor => factor.id !== context.currentFactor?.id);
+  factorsFrom(context).filter(
+    factor =>
+      !context.currentFactor || reverificationFactorKey(factor) !== reverificationFactorKey(context.currentFactor),
+  );
 
 const hasAlternatives = (context: ReverificationDialogMachineContext) => alternativesFrom(context).length > 0;
 
@@ -114,13 +138,19 @@ const attemptFrom = (context: ReverificationDialogMachineContext): Reverificatio
   return { factor, code: context.value };
 };
 
-const errorFrom = (error: unknown, location: ReverificationDialogError['location']): ReverificationDialogError => ({
-  location,
-  message: error instanceof Error ? error.message : m.unstable__errors__generic,
-});
-
-const attemptErrorLocation = (context: ReverificationDialogMachineContext): ReverificationDialogError['location'] =>
-  context.currentFactor?.strategy === 'passkey' ? 'form' : 'field';
+const errorFrom = (error: unknown): ReverificationError => {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'scope' in error &&
+    (error.scope === 'answer' || error.scope === 'flow') &&
+    'message' in error &&
+    typeof error.message === 'string'
+  ) {
+    return { scope: error.scope, message: error.message };
+  }
+  return { scope: 'flow', message: error instanceof Error ? error.message : m.unstable__errors__generic };
+};
 
 const changeValue = ({
   context,
@@ -145,28 +175,34 @@ export const reverificationDialogMachine = createMachine({
     currentFactor: null,
     value: '',
     error: null,
-    preparedFactorId: null,
+    preparedFactorKey: null,
+    verification: null,
     resendSecondsRemaining: 0,
-    returnState: 'selectingFactor',
     prepare: () => Promise.resolve(),
-    attempt: () => Promise.resolve({ status: 'complete' }),
+    attempt: () => Promise.resolve({ status: 'complete', sessionId: '' }),
     complete: () => Promise.resolve(),
     cancel: () => {},
   },
   states: {
     initializing: {
-      entry: assign(context => ({ challenge: context.initialChallenge })),
+      entry: assign(context => {
+        assertValidChallenge(context.initialChallenge);
+        return { challenge: context.initialChallenge };
+      }),
       always: 'starting',
     },
     starting: {
-      entry: assign(context => ({
-        currentFactor: initialFactorFrom(context.challenge),
-        value: '',
-        error: null,
-        preparedFactorId: null,
-        resendSecondsRemaining: 0,
-        returnState: 'selectingFactor',
-      })),
+      entry: assign(context => {
+        assertValidChallenge(context.challenge);
+        return {
+          currentFactor: initialFactorFrom(context.challenge),
+          value: '',
+          error: null,
+          preparedFactorKey: null,
+          verification: null,
+          resendSecondsRemaining: 0,
+        };
+      }),
       always: [
         { target: 'unavailable', guard: context => factorsFrom(context).length === 0 },
         { target: 'routingFactor', guard: context => Boolean(context.currentFactor) },
@@ -177,12 +213,12 @@ export const reverificationDialogMachine = createMachine({
       on: {
         SELECT_FACTOR: {
           target: 'routingFactor',
-          guard: (context, event) => Boolean(factorFrom(context, event.factorId)),
+          guard: (context, event) => Boolean(factorFrom(context, event.factorKey)),
           actions: assign((context, event) => ({
-            currentFactor: factorFrom(context, event.factorId) ?? context.currentFactor,
+            currentFactor: factorFrom(context, event.factorKey) ?? context.currentFactor,
             value: '',
             error: null,
-            preparedFactorId: null,
+            preparedFactorKey: null,
             resendSecondsRemaining: 0,
           })),
         },
@@ -191,8 +227,7 @@ export const reverificationDialogMachine = createMachine({
           guard: context => Boolean(context.currentFactor),
         },
         SHOW_HELP: {
-          target: 'help',
-          actions: assign(() => ({ returnState: 'selectingFactor' })),
+          target: 'helpFromSelection',
         },
         CANCEL: 'cancelled',
       },
@@ -203,7 +238,8 @@ export const reverificationDialogMachine = createMachine({
         {
           target: 'preparing',
           guard: context =>
-            requiresPreparation(context.currentFactor) && context.preparedFactorId !== context.currentFactor.id,
+            requiresPreparation(context.currentFactor) &&
+            context.preparedFactorKey !== reverificationFactorKey(context.currentFactor),
         },
         {
           target: 'verifyingCooldown',
@@ -224,14 +260,14 @@ export const reverificationDialogMachine = createMachine({
           onDone: {
             target: 'verifyingCooldown',
             actions: assign(context => ({
-              preparedFactorId: context.currentFactor?.id ?? null,
+              preparedFactorKey: context.currentFactor ? reverificationFactorKey(context.currentFactor) : null,
               resendSecondsRemaining: RESEND_COOLDOWN_SECONDS,
               error: null,
             })),
           },
           onError: {
             target: 'preparationFailed',
-            actions: assign((_, event) => ({ error: errorFrom(event.error, 'form') })),
+            actions: assign((_, event) => ({ error: errorFrom(event.error) })),
           },
         },
       ),
@@ -257,9 +293,8 @@ export const reverificationDialogMachine = createMachine({
         RESEND: { target: 'resending', guard: context => requiresPreparation(context.currentFactor) },
         SHOW_ALTERNATIVES: { target: 'selectingFactor', guard: hasAlternatives },
         SHOW_HELP: {
-          target: 'help',
+          target: 'helpFromFactor',
           guard: context => context.currentFactor?.strategy === 'password' && !hasAlternatives(context),
-          actions: assign(() => ({ returnState: 'routingFactor' })),
         },
         CANCEL: 'cancelled',
       },
@@ -270,9 +305,8 @@ export const reverificationDialogMachine = createMachine({
         SUBMIT: { target: 'submitting', guard: canSubmit },
         SHOW_ALTERNATIVES: { target: 'selectingFactor', guard: hasAlternatives },
         SHOW_HELP: {
-          target: 'help',
+          target: 'helpFromFactor',
           guard: context => context.currentFactor?.strategy === 'password' && !hasAlternatives(context),
-          actions: assign(() => ({ returnState: 'routingFactor' })),
         },
         CANCEL: 'cancelled',
       },
@@ -298,6 +332,10 @@ export const reverificationDialogMachine = createMachine({
           {
             target: 'completing',
             guard: (_, event) => event.output.status === 'complete',
+            actions: assign((_, event) => ({
+              verification: event.output.status === 'complete' ? event.output : null,
+              error: null,
+            })),
           },
           {
             target: 'starting',
@@ -310,7 +348,7 @@ export const reverificationDialogMachine = createMachine({
                 challenge: {
                   status: 'needs_second_factor',
                   factors: event.output.factors,
-                  initialFactorId: event.output.initialFactorId,
+                  initialFactor: event.output.initialFactor,
                 },
               };
             }),
@@ -320,7 +358,7 @@ export const reverificationDialogMachine = createMachine({
           target: context.resendSecondsRemaining > 0 ? 'verifyingCooldown' : 'verifying',
           context: {
             value: '',
-            error: errorFrom(event.error, attemptErrorLocation(context)),
+            error: errorFrom(event.error),
           },
         }),
       }),
@@ -338,7 +376,7 @@ export const reverificationDialogMachine = createMachine({
           onDone: {
             target: 'verifyingCooldown',
             actions: assign(context => ({
-              preparedFactorId: context.currentFactor?.id ?? null,
+              preparedFactorKey: context.currentFactor ? reverificationFactorKey(context.currentFactor) : null,
               resendSecondsRemaining: RESEND_COOLDOWN_SECONDS,
               error: null,
             })),
@@ -347,7 +385,7 @@ export const reverificationDialogMachine = createMachine({
             target: 'verifying',
             actions: assign((_, event) => ({
               resendSecondsRemaining: 0,
-              error: errorFrom(event.error, 'form'),
+              error: errorFrom(event.error),
             })),
           },
         },
@@ -357,26 +395,41 @@ export const reverificationDialogMachine = createMachine({
         CANCEL: 'cancelled',
       },
     },
-    help: {
+    helpFromSelection: {
       on: {
-        BACK: ({ context }) => ({ target: context.returnState }),
+        BACK: 'selectingFactor',
+        CANCEL: 'cancelled',
+      },
+    },
+    helpFromFactor: {
+      on: {
+        BACK: 'routingFactor',
         CANCEL: 'cancelled',
       },
     },
     unavailable: { on: { CANCEL: 'cancelled' } },
     completing: {
-      invoke: fromPromise(context => context.complete(), {
-        onDone: 'completed',
-        // The code was right but the session did not activate. Legacy surfaced that on the card
-        // the user was already looking at, so the flow returns there rather than closing.
-        onError: ({ context, event }) => ({
-          target: context.resendSecondsRemaining > 0 ? 'verifyingCooldown' : 'verifying',
-          context: {
-            value: '',
-            error: errorFrom(event.error, attemptErrorLocation(context)),
+      invoke: fromPromise(
+        context => {
+          if (!context.verification) {
+            return Promise.reject(new Error(m.unstable__errors__generic));
+          }
+          return context.complete(context.verification);
+        },
+        {
+          onDone: 'completed',
+          onError: {
+            target: 'completionFailed',
+            actions: assign((_, event) => ({ error: errorFrom(event.error) })),
           },
-        }),
-      }),
+        },
+      ),
+    },
+    completionFailed: {
+      on: {
+        RETRY_COMPLETE: 'completing',
+        CANCEL: 'cancelled',
+      },
     },
     completed: { type: 'final' },
     cancelled: {

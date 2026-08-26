@@ -9,7 +9,7 @@ export type {
   ReverificationDialogResend,
   ReverificationDialogVerifyProps,
 } from './reverification-dialog';
-export { reverificationDialogMachine } from './reverification-dialog.machine';
+export { reverificationDialogMachine, reverificationFactorKey } from './reverification-dialog.machine';
 export type {
   ReverificationDialogMachineContext,
   ReverificationDialogMachineEvent,

@@ -13,6 +13,7 @@ import { ReverificationDialog } from './reverification-dialog';
 const base = {
   open: true as const,
   onOpenChange: vi.fn(),
+  dismissible: true,
   closeLabel: 'Close',
 };
 
@@ -68,6 +69,17 @@ describe('ReverificationDialog', () => {
     renderBlock(verifyProps({ open: false }));
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('removes every close request while the caller says it is not dismissible', async () => {
+    const onOpenChange = vi.fn();
+    renderBlock(verifyProps({ dismissible: false, onOpenChange }));
+
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+
+    await userEvent.setup().keyboard('{Escape}');
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 
   it('hands back the id of the chosen method', async () => {
@@ -209,7 +221,7 @@ describe('ReverificationDialog', () => {
 
     rerender(
       <MosaicProvider>
-        <ReverificationDialog {...messageProps({ back: { label: 'Back', onClick } })} />
+        <ReverificationDialog {...messageProps({ secondary: { label: 'Back', onClick } })} />
       </MosaicProvider>,
     );
 

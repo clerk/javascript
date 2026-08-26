@@ -1,11 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/createActor';
-import { reverificationDialogMachine } from './reverification-dialog.machine';
+import { reverificationDialogMachine, reverificationFactorKey } from './reverification-dialog.machine';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
   ReverificationChallenge,
+  ReverificationCompleteResult,
   ReverificationEmailCodeFactor,
   ReverificationFirstFactorPhoneCodeFactor,
   ReverificationPasswordFactor,
@@ -15,13 +16,11 @@ import type {
 } from './reverification-dialog.types';
 
 const passwordFactor: ReverificationPasswordFactor = {
-  id: 'password',
   stage: 'first',
   strategy: 'password',
 };
 
 const emailFactor: ReverificationEmailCodeFactor = {
-  id: 'email_1',
   stage: 'first',
   strategy: 'email_code',
   emailAddressId: 'email_1',
@@ -29,7 +28,6 @@ const emailFactor: ReverificationEmailCodeFactor = {
 };
 
 const phoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
-  id: 'phone_1',
   stage: 'first',
   strategy: 'phone_code',
   phoneNumberId: 'phone_1',
@@ -37,13 +35,11 @@ const phoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
 };
 
 const totpFactor: ReverificationTOTPFactor = {
-  id: 'totp',
   stage: 'second',
   strategy: 'totp',
 };
 
 const secondPhoneFactor: ReverificationSecondFactorPhoneCodeFactor = {
-  id: 'phone_2',
   stage: 'second',
   strategy: 'phone_code',
   phoneNumberId: 'phone_2',
@@ -59,18 +55,18 @@ const firstFactorChallenge = (
 });
 
 function start({
-  challenge = firstFactorChallenge({ initialFactorId: passwordFactor.id }),
+  challenge = firstFactorChallenge({ initialFactor: passwordFactor }),
   prepare = vi.fn<(factor: ReverificationPreparationFactor) => Promise<void>>().mockResolvedValue(undefined),
   attempt = vi
     .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
-    .mockResolvedValue({ status: 'complete' }),
-  complete = vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+    .mockResolvedValue({ status: 'complete', sessionId: 'sess_1' }),
+  complete = vi.fn<(result: ReverificationCompleteResult) => Promise<void>>().mockResolvedValue(undefined),
   cancel = vi.fn(),
 }: {
   challenge?: ReverificationChallenge;
   prepare?: (factor: ReverificationPreparationFactor) => Promise<void>;
   attempt?: (attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>;
-  complete?: () => Promise<void>;
+  complete?: (result: ReverificationCompleteResult) => Promise<void>;
   cancel?: () => void;
 } = {}) {
   const actor = createActor(reverificationDialogMachine, {
@@ -91,7 +87,7 @@ describe('reverificationDialogMachine', () => {
     expect(actor.getSnapshot().context.challenge.factors).toEqual([passwordFactor, emailFactor, phoneFactor]);
     expect(actor.can({ type: 'BACK' })).toBe(false);
 
-    actor.send({ type: 'SELECT_FACTOR', factorId: passwordFactor.id });
+    actor.send({ type: 'SELECT_FACTOR', factorKey: reverificationFactorKey(passwordFactor) });
     expect(actor.getSnapshot()).toMatchObject({
       value: 'verifying',
       context: { currentFactor: passwordFactor },
@@ -99,16 +95,30 @@ describe('reverificationDialogMachine', () => {
   });
 
   it('treats an invalid initial factor as no selection', () => {
-    const { actor } = start({ challenge: firstFactorChallenge({ initialFactorId: 'missing' }) });
+    const { actor } = start({
+      challenge: firstFactorChallenge({
+        initialFactor: { ...emailFactor, emailAddressId: 'missing' },
+      }),
+    });
 
     expect(actor.getSnapshot().value).toBe('selectingFactor');
     expect(actor.getSnapshot().context.currentFactor).toBeNull();
   });
 
+  it('rejects factors whose derived identities collide', () => {
+    expect(() =>
+      start({
+        challenge: firstFactorChallenge({
+          factors: [emailFactor, { ...emailFactor, safeIdentifier: 'b••••@clerk.dev' }],
+        }),
+      }),
+    ).toThrow('Reverification factors must have unique identities.');
+  });
+
   it('submits the selected password and completes the attempt', async () => {
     const attempt = vi
       .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
-      .mockResolvedValue({ status: 'complete' });
+      .mockResolvedValue({ status: 'complete', sessionId: 'sess_1' });
     const complete = vi.fn();
     const { actor } = start({ attempt, complete });
 
@@ -118,13 +128,13 @@ describe('reverificationDialogMachine', () => {
     expect(actor.getSnapshot().value).toBe('submitting');
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('completed'));
     expect(attempt).toHaveBeenCalledWith({ factor: passwordFactor, password: 'secret' });
-    expect(complete).toHaveBeenCalledOnce();
+    expect(complete).toHaveBeenCalledWith({ status: 'complete', sessionId: 'sess_1' });
     expect(actor.getSnapshot().status).toBe('done');
   });
 
   it('stays open and pending until the caller finishes completing', async () => {
     let finish = () => {};
-    const complete = vi.fn<() => Promise<void>>().mockReturnValue(
+    const complete = vi.fn<(result: ReverificationCompleteResult) => Promise<void>>().mockReturnValue(
       new Promise<void>(resolve => {
         finish = resolve;
       }),
@@ -137,33 +147,63 @@ describe('reverificationDialogMachine', () => {
     // The attempt has landed but the session is not active yet, so the flow is not done with it.
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('completing'));
     expect(actor.getSnapshot().status).toBe('active');
+    expect(actor.can({ type: 'CANCEL' })).toBe(false);
 
     finish();
     await vi.waitFor(() => expect(actor.getSnapshot().status).toBe('done'));
   });
 
-  it('returns to the factor when completion fails, so the reason is not lost', async () => {
-    const complete = vi.fn<() => Promise<void>>().mockRejectedValue(new Error('Could not activate the session.'));
-    const { actor } = start({ complete });
+  it('retries completion with the verified result without repeating the attempt', async () => {
+    const complete = vi
+      .fn<(result: ReverificationCompleteResult) => Promise<void>>()
+      .mockRejectedValueOnce(new Error('Could not activate the session.'))
+      .mockResolvedValue(undefined);
+    const { actor, attempt } = start({ complete });
 
     actor.send({ type: 'CHANGE_VALUE', value: 'secret' });
     actor.send({ type: 'SUBMIT' });
 
-    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifying'));
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('completionFailed'));
     expect(actor.getSnapshot().context).toMatchObject({
-      value: '',
-      error: { message: 'Could not activate the session.' },
+      value: 'secret',
+      verification: { status: 'complete', sessionId: 'sess_1' },
+      error: { scope: 'flow', message: 'Could not activate the session.' },
     });
     expect(actor.getSnapshot().status).toBe('active');
+    expect(actor.can({ type: 'CANCEL' })).toBe(true);
+
+    actor.send({ type: 'RETRY_COMPLETE' });
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('completed'));
+
+    expect(attempt).toHaveBeenCalledOnce();
+    expect(complete).toHaveBeenCalledTimes(2);
+    expect(complete).toHaveBeenNthCalledWith(1, { status: 'complete', sessionId: 'sess_1' });
+    expect(complete).toHaveBeenNthCalledWith(2, { status: 'complete', sessionId: 'sess_1' });
+  });
+
+  it('allows cancellation after completion fails', async () => {
+    const complete = vi
+      .fn<(result: ReverificationCompleteResult) => Promise<void>>()
+      .mockRejectedValue(new Error('Could not activate the session.'));
+    const { actor, cancel } = start({ complete });
+
+    actor.send({ type: 'CHANGE_VALUE', value: 'secret' });
+    actor.send({ type: 'SUBMIT' });
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('completionFailed'));
+
+    actor.send({ type: 'CANCEL' });
+
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(actor.getSnapshot()).toMatchObject({ value: 'cancelled', status: 'done' });
   });
 
   it('prepares a delivered-code factor and automatically submits six normalized digits', async () => {
     const prepare = vi.fn<(factor: ReverificationPreparationFactor) => Promise<void>>().mockResolvedValue(undefined);
     const attempt = vi
       .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
-      .mockResolvedValue({ status: 'complete' });
+      .mockResolvedValue({ status: 'complete', sessionId: 'sess_1' });
     const { actor } = start({
-      challenge: firstFactorChallenge({ initialFactorId: emailFactor.id }),
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
       prepare,
       attempt,
     });
@@ -180,13 +220,13 @@ describe('reverificationDialogMachine', () => {
   });
 
   it('continues from first-factor success into a normalized second-factor challenge', async () => {
-    const initialChallenge = firstFactorChallenge({ initialFactorId: passwordFactor.id });
+    const initialChallenge = firstFactorChallenge({ initialFactor: passwordFactor });
     const attempt = vi
       .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
       .mockResolvedValue({
         status: 'needs_second_factor',
         factors: [totpFactor, secondPhoneFactor],
-        initialFactorId: totpFactor.id,
+        initialFactor: totpFactor,
       });
     const { actor } = start({ challenge: initialChallenge, attempt });
 
@@ -202,7 +242,7 @@ describe('reverificationDialogMachine', () => {
 
     actor.setContext({ initialChallenge });
     actor.send({ type: 'SHOW_ALTERNATIVES' });
-    actor.send({ type: 'SELECT_FACTOR', factorId: secondPhoneFactor.id });
+    actor.send({ type: 'SELECT_FACTOR', factorKey: reverificationFactorKey(secondPhoneFactor) });
     expect(actor.getSnapshot()).toMatchObject({
       value: 'preparing',
       context: {
@@ -228,13 +268,13 @@ describe('reverificationDialogMachine', () => {
 
   it('matches legacy help visibility outside factor selection', async () => {
     const { actor: passwordActor } = start({
-      challenge: firstFactorChallenge({ factors: [passwordFactor], initialFactorId: passwordFactor.id }),
+      challenge: firstFactorChallenge({ factors: [passwordFactor], initialFactor: passwordFactor }),
     });
     expect(passwordActor.getSnapshot().value).toBe('verifying');
     expect(passwordActor.can({ type: 'SHOW_HELP' })).toBe(true);
 
     const { actor: emailActor } = start({
-      challenge: firstFactorChallenge({ factors: [emailFactor], initialFactorId: emailFactor.id }),
+      challenge: firstFactorChallenge({ factors: [emailFactor], initialFactor: emailFactor }),
     });
     await vi.waitFor(() => expect(emailActor.getSnapshot().value).toBe('verifyingCooldown'));
     expect(emailActor.can({ type: 'SHOW_HELP' })).toBe(false);
@@ -244,10 +284,26 @@ describe('reverificationDialogMachine', () => {
     expect(emailActor.getSnapshot().value).toBe('verifyingCooldown');
   });
 
+  it('returns from help to the state that opened it without storing a goto', () => {
+    const { actor: selectionActor } = start({ challenge: firstFactorChallenge() });
+    selectionActor.send({ type: 'SHOW_HELP' });
+    expect(selectionActor.getSnapshot().value).toBe('helpFromSelection');
+    selectionActor.send({ type: 'BACK' });
+    expect(selectionActor.getSnapshot().value).toBe('selectingFactor');
+
+    const { actor: factorActor } = start({
+      challenge: firstFactorChallenge({ factors: [passwordFactor], initialFactor: passwordFactor }),
+    });
+    factorActor.send({ type: 'SHOW_HELP' });
+    expect(factorActor.getSnapshot().value).toBe('helpFromFactor');
+    factorActor.send({ type: 'BACK' });
+    expect(factorActor.getSnapshot().value).toBe('verifying');
+  });
+
   it('returns from alternatives without preparing the unchanged factor again', async () => {
     const prepare = vi.fn<(factor: ReverificationPreparationFactor) => Promise<void>>().mockResolvedValue(undefined);
     const { actor } = start({
-      challenge: firstFactorChallenge({ initialFactorId: emailFactor.id }),
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
       prepare,
     });
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifyingCooldown'));
@@ -266,16 +322,16 @@ describe('reverificationDialogMachine', () => {
   it('prepares a code factor again after it was replaced and selected again', async () => {
     const prepare = vi.fn<(factor: ReverificationPreparationFactor) => Promise<void>>().mockResolvedValue(undefined);
     const { actor } = start({
-      challenge: firstFactorChallenge({ initialFactorId: emailFactor.id }),
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
       prepare,
     });
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifyingCooldown'));
 
     actor.send({ type: 'SHOW_ALTERNATIVES' });
-    actor.send({ type: 'SELECT_FACTOR', factorId: phoneFactor.id });
+    actor.send({ type: 'SELECT_FACTOR', factorKey: reverificationFactorKey(phoneFactor) });
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifyingCooldown'));
     actor.send({ type: 'SHOW_ALTERNATIVES' });
-    actor.send({ type: 'SELECT_FACTOR', factorId: emailFactor.id });
+    actor.send({ type: 'SELECT_FACTOR', factorKey: reverificationFactorKey(emailFactor) });
     await vi.waitFor(() => expect(prepare).toHaveBeenCalledTimes(3));
 
     expect(prepare).toHaveBeenNthCalledWith(1, emailFactor);
@@ -289,7 +345,7 @@ describe('reverificationDialogMachine', () => {
       .mockRejectedValueOnce(new Error('Could not send the code.'))
       .mockResolvedValue(undefined);
     const { actor } = start({
-      challenge: firstFactorChallenge({ initialFactorId: emailFactor.id }),
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
       prepare,
     });
 
@@ -303,7 +359,7 @@ describe('reverificationDialogMachine', () => {
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('preparationFailed'));
     expect(actor.getSnapshot().context).toMatchObject({
       currentFactor: emailFactor,
-      error: { location: 'form', message: 'Could not send the code.' },
+      error: { scope: 'flow', message: 'Could not send the code.' },
       resendSecondsRemaining: 0,
     });
     expect(actor.can({ type: 'RESEND' })).toBe(true);
@@ -317,7 +373,7 @@ describe('reverificationDialogMachine', () => {
   it('returns verification failures to the field and clears them on input', async () => {
     const attempt = vi
       .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
-      .mockRejectedValue(new Error('Incorrect password.'));
+      .mockRejectedValue({ scope: 'answer', message: 'Incorrect password.' });
     const { actor } = start({ attempt });
 
     actor.send({ type: 'CHANGE_VALUE', value: 'wrong' });
@@ -326,7 +382,7 @@ describe('reverificationDialogMachine', () => {
 
     expect(actor.getSnapshot().context).toMatchObject({
       value: '',
-      error: { location: 'field', message: 'Incorrect password.' },
+      error: { scope: 'answer', message: 'Incorrect password.' },
     });
     actor.send({ type: 'CHANGE_VALUE', value: 'new value' });
     expect(actor.getSnapshot().context.error).toBeNull();
@@ -336,7 +392,7 @@ describe('reverificationDialogMachine', () => {
     vi.useFakeTimers();
     const prepare = vi.fn<(factor: ReverificationPreparationFactor) => Promise<void>>().mockResolvedValue(undefined);
     const { actor } = start({
-      challenge: firstFactorChallenge({ initialFactorId: emailFactor.id }),
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
       prepare,
     });
     await vi.runAllTicks();
@@ -368,7 +424,7 @@ describe('reverificationDialogMachine', () => {
       .mockRejectedValueOnce(new Error('Rate limited.'))
       .mockResolvedValue(undefined);
     const { actor } = start({
-      challenge: firstFactorChallenge({ initialFactorId: emailFactor.id }),
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
       prepare,
     });
     await vi.runAllTicks();
@@ -380,7 +436,7 @@ describe('reverificationDialogMachine', () => {
       value: 'verifying',
       context: {
         resendSecondsRemaining: 0,
-        error: { location: 'form', message: 'Rate limited.' },
+        error: { scope: 'flow', message: 'Rate limited.' },
       },
     });
 

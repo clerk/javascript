@@ -33,6 +33,11 @@ export const reverificationDialogBase = {
     subtitle: 'Enter the backup code you received when setting up two-step authentication',
     title: 'Enter a backup code',
   },
+  completionFailed: {
+    message: 'Your identity was verified, but we couldn’t finish setting up your session.',
+    retryButton: 'Try again',
+    title: 'Couldn’t complete verification',
+  },
   emailCode: {
     formTitle: 'Verification code',
     resendButton: 'Didn’t receive a code? Resend',

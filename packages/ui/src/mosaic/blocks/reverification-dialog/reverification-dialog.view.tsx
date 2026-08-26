@@ -2,28 +2,29 @@ import { useMachine } from '../../machine/useMachine';
 import type { ReverificationDialogMethod, ReverificationDialogProps } from './reverification-dialog';
 import { ReverificationDialog } from './reverification-dialog';
 import type { ReverificationDialogMachineContext } from './reverification-dialog.machine';
-import { reverificationDialogMachine } from './reverification-dialog.machine';
+import { reverificationDialogMachine, reverificationFactorKey } from './reverification-dialog.machine';
 import { fill, reverificationDialogBase as m } from './reverification-dialog.messages';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
   ReverificationChallenge,
+  ReverificationCompleteResult,
   ReverificationFactor,
   ReverificationPreparationFactor,
 } from './reverification-dialog.types';
 
 export interface ReverificationDialogViewProps {
-  /** The methods this attempt may use, and which one to open on. */
-  challenge: ReverificationChallenge;
+  /** The methods this run may use, captured when the machine starts. */
+  initialChallenge: ReverificationChallenge;
   /** Sends a code for a method that delivers one. Reject to keep the user on the code step. */
   prepare: (factor: ReverificationPreparationFactor) => Promise<void>;
-  /** Submits the user's answer. Resolving `needs_second_factor` moves the flow on to 2FA. */
+  /** Submits the user's answer. Reject with `ReverificationError` to place the message semantically. */
   attempt: (attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>;
   /**
    * The user proved who they are. Awaited: the dialog stays up, pending, until this resolves,
    * so a caller can activate the session before the flow hands back.
    */
-  onComplete: () => Promise<void>;
+  onComplete: (result: ReverificationCompleteResult) => Promise<void>;
   /** The user gave up, or closed the dialog. */
   onCancel: () => void;
   /** Address behind the support action on a dead end. From Clerk's `useSupportEmail`. */
@@ -78,12 +79,15 @@ function methodLabel(factor: ReverificationFactor): string {
 }
 
 const asMethod = (factor: ReverificationFactor): ReverificationDialogMethod => ({
-  id: factor.id,
+  id: reverificationFactorKey(factor),
   label: methodLabel(factor),
 });
 
 const alternativesTo = (context: ReverificationDialogMachineContext) =>
-  context.challenge.factors.filter(factor => factor.id !== context.currentFactor?.id);
+  context.challenge.factors.filter(
+    factor =>
+      !context.currentFactor || reverificationFactorKey(factor) !== reverificationFactorKey(context.currentFactor),
+  );
 
 /**
  * Drives {@link ReverificationDialog} with {@link reverificationDialogMachine}.
@@ -93,7 +97,7 @@ const alternativesTo = (context: ReverificationDialogMachineContext) =>
  * as `prepare` and `attempt`, so the whole flow runs against plain promises in a test or a story.
  */
 export function ReverificationDialogView({
-  challenge,
+  initialChallenge,
   prepare,
   attempt,
   onComplete,
@@ -101,7 +105,7 @@ export function ReverificationDialogView({
   supportEmail,
 }: ReverificationDialogViewProps) {
   const [snapshot, send, actor] = useMachine(reverificationDialogMachine, {
-    context: { initialChallenge: challenge, prepare, attempt, complete: onComplete, cancel: onCancel },
+    context: { initialChallenge, prepare, attempt, complete: onComplete, cancel: onCancel },
   });
   const { context } = snapshot;
 
@@ -120,15 +124,17 @@ export function ReverificationDialogView({
     },
   };
 
+  const canCancel = actor.can({ type: 'CANCEL' });
   const base = {
     open: snapshot.status === 'active',
+    dismissible: canCancel,
     onOpenChange: (open: boolean) => {
       if (!open) {
         send({ type: 'CANCEL' });
       }
     },
     closeLabel: m.closeButton,
-    error: context.error?.location === 'form' ? context.error.message : undefined,
+    error: context.error?.scope === 'flow' ? context.error.message : undefined,
   };
 
   const props = ((): ReverificationDialogProps => {
@@ -143,14 +149,14 @@ export function ReverificationDialogView({
       };
     }
 
-    if (snapshot.value === 'help') {
+    if (snapshot.value === 'helpFromSelection' || snapshot.value === 'helpFromFactor') {
       return {
         ...base,
         step: 'message',
         title: m.alternativeMethods.getHelp.title,
         description: m.alternativeMethods.getHelp.content,
         action: emailSupport,
-        back: { label: m.backButton, onClick: () => send({ type: 'BACK' }) },
+        secondary: { label: m.backButton, onClick: () => send({ type: 'BACK' }) },
       };
     }
 
@@ -162,10 +168,21 @@ export function ReverificationDialogView({
         title: m.alternativeMethods.title,
         description: m.alternativeMethods.subtitle,
         methods: methods.map(asMethod),
-        onSelectMethod: factorId => send({ type: 'SELECT_FACTOR', factorId }),
+        onSelectMethod: factorKey => send({ type: 'SELECT_FACTOR', factorKey }),
         back: actor.can({ type: 'BACK' }) ? { label: m.backButton, onClick: () => send({ type: 'BACK' }) } : undefined,
         cancelLabel: m.formButtonReset,
         help: { label: m.alternativeMethods.actionLink, onClick: () => send({ type: 'SHOW_HELP' }) },
+      };
+    }
+
+    if (snapshot.value === 'completionFailed') {
+      return {
+        ...base,
+        step: 'message',
+        title: m.completionFailed.title,
+        description: m.completionFailed.message,
+        action: { label: m.completionFailed.retryButton, onClick: () => send({ type: 'RETRY_COMPLETE' }) },
+        secondary: { label: m.formButtonReset, onClick: () => send({ type: 'CANCEL' }) },
       };
     }
 
@@ -199,7 +216,7 @@ export function ReverificationDialogView({
             ...copy.field,
             value: context.value,
             disabled: !isEditable,
-            error: context.error?.location === 'field' ? context.error.message : undefined,
+            error: context.error?.scope === 'answer' ? context.error.message : undefined,
             onChange: value => send({ type: 'CHANGE_VALUE', value }),
           }
         : undefined,

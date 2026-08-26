@@ -2,6 +2,7 @@ import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
   ReverificationChallenge,
+  ReverificationCompleteResult,
   ReverificationEmailCodeFactor,
   ReverificationFirstFactor,
   ReverificationFirstFactorPhoneCodeFactor,
@@ -26,13 +27,11 @@ export const meta: StoryMeta = {
 };
 
 const passwordFactor: ReverificationPasswordFactor = {
-  id: 'password',
   stage: 'first',
   strategy: 'password',
 };
 
 const emailFactor: ReverificationEmailCodeFactor = {
-  id: 'email_1',
   stage: 'first',
   strategy: 'email_code',
   emailAddressId: 'email_1',
@@ -40,7 +39,6 @@ const emailFactor: ReverificationEmailCodeFactor = {
 };
 
 const firstPhoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
-  id: 'phone_1',
   stage: 'first',
   strategy: 'phone_code',
   phoneNumberId: 'phone_1',
@@ -48,13 +46,11 @@ const firstPhoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
 };
 
 const passkeyFactor: ReverificationPasskeyFactor = {
-  id: 'passkey',
   stage: 'first',
   strategy: 'passkey',
 };
 
 const secondPhoneFactor: ReverificationSecondFactorPhoneCodeFactor = {
-  id: 'phone_2',
   stage: 'second',
   strategy: 'phone_code',
   phoneNumberId: 'phone_2',
@@ -63,21 +59,26 @@ const secondPhoneFactor: ReverificationSecondFactorPhoneCodeFactor = {
 
 const secondFactors: ReverificationSecondFactor[] = [
   secondPhoneFactor,
-  { id: 'totp', stage: 'second', strategy: 'totp' },
-  { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
+  { stage: 'second', strategy: 'totp' },
+  { stage: 'second', strategy: 'backup_code' },
 ];
 
 const firstFactors: ReverificationFirstFactor[] = [passwordFactor, emailFactor, firstPhoneFactor, passkeyFactor];
 
 // Only the launch buttons need these. The dialog names a method from its own messages.
-const factorNames: Record<string, string> = {
-  password: 'password',
-  email_1: 'email code',
-  phone_1: 'SMS code',
-  passkey: 'passkey',
-  phone_2: 'SMS code',
-  totp: 'authenticator app',
-  backup_code: 'backup code',
+const factorStoryDetails = (factor: ReverificationFirstFactor | ReverificationSecondFactor) => {
+  switch (factor.strategy) {
+    case 'email_code':
+      return { id: factor.emailAddressId, name: 'email code' };
+    case 'phone_code':
+      return { id: factor.phoneNumberId, name: 'SMS code' };
+    case 'totp':
+      return { id: factor.strategy, name: 'authenticator app' };
+    case 'backup_code':
+      return { id: factor.strategy, name: 'backup code' };
+    default:
+      return { id: factor.strategy, name: factor.strategy };
+  }
 };
 
 interface Scenario {
@@ -93,15 +94,18 @@ const scenarios: Scenario[] = [
     label: 'First factor — choose method',
     challenge: { status: 'needs_first_factor', factors: firstFactors },
   },
-  ...firstFactors.map(factor => ({
-    id: `first-${factor.id}`,
-    label: `First factor — ${factorNames[factor.id]}`,
-    challenge: { status: 'needs_first_factor' as const, factors: firstFactors, initialFactorId: factor.id },
-  })),
+  ...firstFactors.map(factor => {
+    const details = factorStoryDetails(factor);
+    return {
+      id: `first-${details.id}`,
+      label: `First factor — ${details.name}`,
+      challenge: { status: 'needs_first_factor' as const, factors: firstFactors, initialFactor: factor },
+    };
+  }),
   {
     id: 'first-then-second',
     label: 'First factor → second factor',
-    challenge: { status: 'needs_first_factor', factors: firstFactors, initialFactorId: passwordFactor.id },
+    challenge: { status: 'needs_first_factor', factors: firstFactors, initialFactor: passwordFactor },
     continuesToSecondFactor: true,
   },
   {
@@ -109,11 +113,14 @@ const scenarios: Scenario[] = [
     label: 'Second factor — choose method',
     challenge: { status: 'needs_second_factor', factors: secondFactors },
   },
-  ...secondFactors.map(factor => ({
-    id: `second-${factor.id}`,
-    label: `Second factor — ${factorNames[factor.id]}`,
-    challenge: { status: 'needs_second_factor' as const, factors: secondFactors, initialFactorId: factor.id },
-  })),
+  ...secondFactors.map(factor => {
+    const details = factorStoryDetails(factor);
+    return {
+      id: `second-${details.id}`,
+      label: `Second factor — ${details.name}`,
+      challenge: { status: 'needs_second_factor' as const, factors: secondFactors, initialFactor: factor },
+    };
+  }),
 ];
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => window.setTimeout(resolve, ms));
@@ -128,7 +135,7 @@ function MachineDrivenDialog({ scenario, onFinished }: { scenario: Scenario; onF
       if (scenario.continuesToSecondFactor && attemptValue.factor.stage === 'first') {
         return { status: 'needs_second_factor', factors: secondFactors };
       }
-      return { status: 'complete' };
+      return { status: 'complete', sessionId: 'sess_story' };
     },
     [scenario.continuesToSecondFactor],
   );
@@ -136,17 +143,20 @@ function MachineDrivenDialog({ scenario, onFinished }: { scenario: Scenario; onF
   // Deferred a tick because the machine reports cancellation from inside its own transition.
   const finish = React.useCallback(() => window.setTimeout(onFinished, 0), [onFinished]);
   // Stands in for activating the session, which the dialog waits out before it closes.
-  const complete = React.useCallback(async () => {
-    await settleAfter(800);
-    finish();
-  }, [finish]);
+  const onComplete = React.useCallback(
+    async (_result: ReverificationCompleteResult) => {
+      await settleAfter(800);
+      finish();
+    },
+    [finish],
+  );
 
   return (
     <ReverificationDialogView
-      challenge={scenario.challenge}
+      initialChallenge={scenario.challenge}
       prepare={prepare}
       attempt={attempt}
-      onComplete={complete}
+      onComplete={onComplete}
       onCancel={finish}
       supportEmail='support@clerk.dev'
     />

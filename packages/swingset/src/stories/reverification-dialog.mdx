@@ -33,6 +33,7 @@ import { ReverificationDialog } from '@clerk/ui/mosaic/blocks/reverification-dia
   step='verify'
   open={open}
   onOpenChange={setOpen}
+  dismissible={!isPending}
   title='Verification required'
   description='Enter your current password to continue'
   closeLabel='Close'
@@ -56,7 +57,8 @@ Shared by every step:
 | -------------- | ----------------------------------- | -------------------------------------------------------------------------------------- |
 | `step`         | `'choose' \| 'verify' \| 'message'` | Which step is showing. Picks the rest of the props.                                    |
 | `open`         | `boolean`                           | Whether the dialog is showing. Controlled, the way any dialog is.                      |
-| `onOpenChange` | `(open: boolean) => void`           | Asks to open or close. Fired by Cancel, Escape, and the backdrop.                      |
+| `onOpenChange` | `(open: boolean) => void`           | Asks to open or close through an allowed close control or request.                     |
+| `dismissible`  | `boolean`                           | Enables close controls and close requests.                                             |
 | `title`        | `string`                            | Names what is being asked.                                                             |
 | `description`  | `string`                            | Spells out what the user has to do.                                                    |
 | `closeLabel`   | `string`                            | Accessible name for the corner close button.                                           |
@@ -89,26 +91,26 @@ Shared by every step:
 
 `step='message'` — a dead end:
 
-| Prop     | Type                 | Description                                                                           |
-| -------- | -------------------- | ------------------------------------------------------------------------------------- |
-| `action` | `{ label, onClick }` | The way forward — reaching a human. The primary button.                               |
-| `back`   | `{ label, onClick }` | Optional. Returns where the user came from. Omit when there is nothing to go back to. |
+| Prop        | Type                 | Description                                                   |
+| ----------- | -------------------- | ------------------------------------------------------------- |
+| `action`    | `{ label, onClick }` | The way forward — reaching a human. The primary button.       |
+| `secondary` | `{ label, onClick }` | Optional. A secondary action such as returning or cancelling. |
 
 ## Driving it from a machine
 
 `ReverificationDialogView` wires the block to `reverificationDialogMachine`, which holds every rule about what happens next: which method starts, when a code is sent, when six digits submit on their own, how long resend stays inert, and where a first-factor success leads. The Clerk work arrives as `prepare` and `attempt`, so the whole flow runs against plain promises in a test or a story.
 
-`onComplete` is awaited: the dialog stays up and pending until it resolves, so the session is active before whatever asked for reverification runs again. Reject and the user lands back on the method they just satisfied, with the reason.
+`onComplete` is awaited: the dialog stays up and pending until it resolves, so the session is active before whatever asked for reverification runs again. If it rejects, the verified result is retained and the user can retry completion without answering the factor again.
 
 ```tsx
 import { ReverificationDialogView } from '@clerk/ui/mosaic/blocks/reverification-dialog';
 
 <ReverificationDialogView
-  challenge={{ status: 'needs_first_factor', factors, initialFactorId }}
+  initialChallenge={{ status: 'needs_first_factor', factors, initialFactor }}
   prepare={factor => session.prepareFirstFactorVerification(factor)}
   attempt={attempt => session.attemptFirstFactorVerification(attempt)}
-  onComplete={async () => {
-    await setActive({ session: sessionId });
+  onComplete={async result => {
+    await setActive({ session: result.sessionId });
     afterVerification();
   }}
   onCancel={closeModal}

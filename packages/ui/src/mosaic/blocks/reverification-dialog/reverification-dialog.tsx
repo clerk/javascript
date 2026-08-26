@@ -44,6 +44,8 @@ interface ReverificationDialogBaseProps {
   open: boolean;
   /** Callback when open state changes */
   onOpenChange: (open: boolean) => void;
+  /** Whether close requests and explicit close controls may dismiss the dialog. */
+  dismissible: boolean;
   /** Dialog heading */
   title: string;
   /** What is being asked of the user */
@@ -89,8 +91,8 @@ export interface ReverificationDialogMessageProps extends ReverificationDialogBa
   step: 'message';
   /** The way forward from a dead end — reaching a human. */
   action: ReverificationDialogAction;
-  /** Returns where the user came from. Absent where there is nothing to go back to. */
-  back?: ReverificationDialogAction;
+  /** An optional secondary action, such as returning or cancelling. */
+  secondary?: ReverificationDialogAction;
 }
 
 export type ReverificationDialogProps =
@@ -133,6 +135,7 @@ function CodeSlots({ baseId, invalid }: { baseId: string; invalid: boolean }) {
  *   step='verify'
  *   open={snapshot.value !== 'cancelled'}
  *   onOpenChange={open => !open && send({ type: 'CANCEL' })}
+ *   dismissible={snapshot.can({ type: 'CANCEL' })}
  *   title='Verification required'
  *   description='Enter the code sent to your email to continue'
  *   closeLabel='Close'
@@ -146,12 +149,12 @@ function CodeSlots({ baseId, invalid }: { baseId: string; invalid: boolean }) {
  * />
  */
 export function ReverificationDialog(props: ReverificationDialogProps) {
-  const { open, onOpenChange, title, description, closeLabel, error } = props;
+  const { open, onOpenChange, dismissible, title, description, closeLabel, error } = props;
 
   return (
     <Dialog.Root
       size='card'
-      closedBy='closerequest'
+      closedBy={dismissible ? 'closerequest' : 'none'}
       open={open}
       onOpenChange={onOpenChange}
     >
@@ -166,7 +169,7 @@ export function ReverificationDialog(props: ReverificationDialogProps) {
               />
             }
           >
-            <Dialog.CloseButton aria-label={closeLabel} />
+            {dismissible ? <Dialog.CloseButton aria-label={closeLabel} /> : null}
             <Card.Header>
               <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
               <Dialog.Description render={<Text />}>{description}</Dialog.Description>
@@ -200,7 +203,14 @@ function StepContent(props: ReverificationDialogProps) {
   }
 }
 
-function ChooseStep({ methods, onSelectMethod, back, cancelLabel, help }: ReverificationDialogChooseProps) {
+function ChooseStep({
+  methods,
+  onSelectMethod,
+  back,
+  cancelLabel,
+  help,
+  dismissible,
+}: ReverificationDialogChooseProps) {
   return (
     <>
       <Card.Content>
@@ -230,6 +240,7 @@ function ChooseStep({ methods, onSelectMethod, back, cancelLabel, help }: Reveri
             render={
               <Button
                 color='neutral'
+                disabled={!dismissible}
                 fullWidth
                 variant='outline'
               />
@@ -261,6 +272,7 @@ function VerifyStep({
   onSubmit,
   cancelLabel,
   secondary,
+  dismissible,
 }: ReverificationDialogVerifyProps) {
   const formId = useId();
   const fieldId = useId();
@@ -347,7 +359,7 @@ function VerifyStep({
           render={
             <Button
               color='neutral'
-              disabled={isPending}
+              disabled={!dismissible}
               fullWidth
               variant='outline'
             />
@@ -370,7 +382,7 @@ function VerifyStep({
   );
 }
 
-function MessageStep({ action, back }: ReverificationDialogMessageProps) {
+function MessageStep({ action, secondary }: ReverificationDialogMessageProps) {
   return (
     <Card.Footer>
       <Button
@@ -379,14 +391,14 @@ function MessageStep({ action, back }: ReverificationDialogMessageProps) {
       >
         {action.label}
       </Button>
-      {back ? (
+      {secondary ? (
         <Button
           color='neutral'
           fullWidth
           variant='outline'
-          onClick={back.onClick}
+          onClick={secondary.onClick}
         >
-          {back.label}
+          {secondary.label}
         </Button>
       ) : null}
     </Card.Footer>
