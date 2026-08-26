@@ -11,6 +11,12 @@ export const PRESERVED_QUERYSTRING_PARAMS = [
   'sign_up_fallback_redirect_url',
 ];
 
+/**
+ * Search param set when navigating to the sign-in start page to add another
+ * account. Bypasses the redirect to the account switcher that otherwise fires
+ * when signed-in sessions already exist on the client.
+ */
+export const CLERK_ADD_ACCOUNT = '__clerk_add_account';
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
 export const CLERK_SYNCED = '__clerk_synced';
 export const CLERK_SYNCED_STATUS = {

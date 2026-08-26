@@ -1,9 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
+import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import { SignInAccountSwitcher } from '../SignInAccountSwitcher';
+
+vi.mock('@/ui/utils/windowNavigate', () => ({ clerkWindowNavigate: vi.fn() }));
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
@@ -36,12 +39,14 @@ describe('SignInAccountSwitcher', () => {
     expect(fixtures.clerk.setActive).toHaveBeenCalled();
   });
 
-  // this one uses the windowNavigate method. we need to mock it correctly
-  it.skip('navigates to SignInStart component if user clicks on "Add account" button', async () => {
-    const { wrapper, fixtures } = await createFixtures(initConfig);
+  it('navigates to sign-in with the add-account param when "Add account" is clicked', async () => {
+    const { wrapper } = await createFixtures(initConfig);
     const { userEvent, getByText } = render(<SignInAccountSwitcher />, { wrapper });
     await userEvent.click(getByText('Add account'));
-    expect(fixtures.router.navigate).toHaveBeenCalled();
+    expect(clerkWindowNavigate).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining('__clerk_add_account=true'),
+    );
   });
 
   it('signs out when user clicks on "Sign out of all accounts"', async () => {

@@ -1,5 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
-import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
+import { CLERK_ADD_ACCOUNT, ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
@@ -11,6 +11,7 @@ import type {
   SignInResource,
 } from '@clerk/shared/types';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import type { ComponentType } from 'react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -796,6 +797,42 @@ const InstantPasswordRow = ({
   );
 };
 
+/**
+ * On multi-session instances, a visit to the sign-in start screen with
+ * accounts already signed in renders the account switcher (the `choose`
+ * route) instead of the identifier form. Navigations that intend to add
+ * another account opt out via [CLERK_ADD_ACCOUNT].
+ *
+ * Single-session instances are unaffected: `withRedirectToAfterSignIn`
+ * redirects their signed-in visitors before this guard runs.
+ */
+function withRedirectToAccountSwitcher<P extends object>(Component: ComponentType<P>): ComponentType<P> {
+  const HOC = (props: P) => {
+    const clerk = useClerk();
+    const { authConfig } = useEnvironment();
+    const { navigate, queryParams } = useRouter();
+
+    const shouldShowSwitcher =
+      !authConfig.singleSessionMode &&
+      clerk.client.signedInSessions.length > 0 &&
+      queryParams[CLERK_ADD_ACCOUNT] === undefined;
+
+    useEffect(() => {
+      if (shouldShowSwitcher) {
+        void navigate('choose');
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [shouldShowSwitcher]);
+
+    if (shouldShowSwitcher) {
+      return null;
+    }
+    return <Component {...props} />;
+  };
+  HOC.displayName = `withRedirectToAccountSwitcher(${Component.displayName || Component.name || 'Component'})`;
+  return HOC;
+}
+
 export const SignInStart = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
+  withRedirectToAfterSignIn(withRedirectToAccountSwitcher(withCardStateProvider(SignInStartInternal))),
 );

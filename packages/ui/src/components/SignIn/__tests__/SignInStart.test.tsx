@@ -66,6 +66,43 @@ describe('SignInStart', () => {
     screen.getAllByText(/sign in to .*/i);
   });
 
+  describe('account switcher redirect', () => {
+    it('redirects to the account switcher when signed-in sessions exist on a multi-session instance', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withMultiSessionMode();
+        f.withUser({ email_addresses: ['test1@clerk.com'] });
+      });
+      render(<SignInStart />, { wrapper });
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('choose'));
+      expect(screen.queryByText(/sign in to .*/i)).toBeNull();
+    });
+
+    it('renders the identifier form when the add-account param is set', async () => {
+      const { createFixtures: createFixturesWithAddAccount } = bindCreateFixtures('SignIn', {
+        router: { queryParams: { __clerk_add_account: 'true' } },
+      });
+      const { wrapper, fixtures } = await createFixturesWithAddAccount(f => {
+        f.withEmailAddress();
+        f.withMultiSessionMode();
+        f.withUser({ email_addresses: ['test1@clerk.com'] });
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getAllByText(/sign in to .*/i);
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+    });
+
+    it('does not redirect when no signed-in sessions exist', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withMultiSessionMode();
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getAllByText(/sign in to .*/i);
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+    });
+  });
+
   describe('Login Methods', () => {
     it('enables login with email address', async () => {
       const { wrapper } = await createFixtures(f => {

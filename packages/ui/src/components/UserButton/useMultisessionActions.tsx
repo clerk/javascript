@@ -1,3 +1,4 @@
+import { CLERK_ADD_ACCOUNT } from '@clerk/shared/internal/clerk-js/constants';
 import { navigateIfTaskExists } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { useClerk, usePortalRoot } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/shared/types';
@@ -102,7 +103,17 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleAddAccountClicked = () => {
-    clerkWindowNavigate(clerk, opts.signInUrl || window.location.href);
+    const url = new URL(opts.signInUrl || window.location.href, window.location.origin);
+    // Keep an in-flight destination (e.g. an OAuth consent screen) so the
+    // newly added account continues where the flow left off.
+    const redirectUrl = new URLSearchParams(window.location.search).get('redirect_url');
+    if (redirectUrl && !url.searchParams.has('redirect_url')) {
+      url.searchParams.set('redirect_url', redirectUrl);
+    }
+    // The sign-in start screen redirects to the account switcher when
+    // signed-in sessions exist; this param tells it to show the form instead.
+    url.searchParams.set(CLERK_ADD_ACCOUNT, 'true');
+    clerkWindowNavigate(clerk, url.toString());
     return sleep(2000);
   };
 
