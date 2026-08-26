@@ -276,8 +276,12 @@ export function useUserButtonModel(
             await router.navigate(buildTaskUrl(task, { base: clerk.buildSignInUrl() }));
             return;
           }
-          // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
-          await router.navigate(decorateUrl(displayConfig.afterSwitchSessionUrl));
+          // The instance leaves this empty unless it was configured, and navigating to an empty URL
+          // reloads the page the account just switched on.
+          if (displayConfig.afterSwitchSessionUrl) {
+            // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
+            await router.navigate(decorateUrl(displayConfig.afterSwitchSessionUrl));
+          }
         },
       }),
     onSignOutSession: sessionId =>

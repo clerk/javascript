@@ -48,6 +48,7 @@ let pagingRef: (element: HTMLElement | null) => void;
 let singleSessionMode: boolean;
 let branded: boolean;
 let forceOrganizationSelection: boolean;
+let afterSwitchSessionUrl: string;
 let organizationsEnabled: boolean;
 // False stands for the window before clerk-js has hydrated it, which the model has to sit out.
 let environmentHydrated: boolean;
@@ -56,7 +57,7 @@ let environmentHydrated: boolean;
 function environment() {
   return environmentHydrated
     ? {
-        displayConfig: { afterSwitchSessionUrl: '/after-switch', branded },
+        displayConfig: { afterSwitchSessionUrl, branded },
         authConfig: { singleSessionMode },
         organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
       }
@@ -160,6 +161,7 @@ beforeEach(() => {
   singleSessionMode = false;
   branded = true;
   forceOrganizationSelection = false;
+  afterSwitchSessionUrl = '/after-switch';
   organizationsEnabled = true;
   environmentHydrated = true;
   signedInSessions = [
@@ -819,6 +821,21 @@ describe('useUserButtonModel', () => {
     expect(suggestion.accept).toHaveBeenCalledTimes(1);
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
     expect(userMemberships.revalidate).toHaveBeenCalledTimes(1);
+  });
+
+  // `afterSwitchSessionUrl` is empty unless the instance sets one, and navigating to an empty URL
+  // reloads the page the account just switched on.
+  it('leaves the page alone on a session switch with no after-switch URL', async () => {
+    afterSwitchSessionUrl = '';
+    render(<Harness />);
+    fireEvent.click(screen.getByText('switch'));
+
+    const navigateOnSetActive = setActive.mock.calls[0][0].navigate;
+    await act(async () => {
+      await navigateOnSetActive({ session: { currentTask: null }, decorateUrl: (url: string) => url });
+    });
+
+    expect(navigate).not.toHaveBeenCalled();
   });
 
   // An accept is not done until the lists it changed have caught up. Settling first puts the row
