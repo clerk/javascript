@@ -593,7 +593,24 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       });
 
       expect(result.tokenType).toBe('oauth_token');
-      expect(result.data).toBeDefined();
+      expect(result.data).toMatchInlineSnapshot(`
+        IdPOAuthAccessToken {
+          "clientId": "client_2VTWUzvGC5UhdJCNx6xG1D98edc",
+          "createdAt": 1666648250000,
+          "expiration": 1666648550000,
+          "expired": false,
+          "id": "oat_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE",
+          "revocationReason": null,
+          "revoked": false,
+          "scopes": [
+            "read:foo",
+            "write:bar",
+          ],
+          "subject": "user_2vYVtestTESTtestTESTtestTESTtest",
+          "type": "oauth_token",
+          "updatedAt": 1666648250000,
+        }
+      `);
       expect(result.errors).toBeUndefined();
     });
 
@@ -620,8 +637,10 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
       expect(result.tokenType).toBe('oauth_token');
       expect(result.data).toBeUndefined();
-      expect(result.errors).toBeDefined();
-      expect(result.errors?.[0].message).toContain('Invalid JWT audience claim');
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors![0]).toMatchInlineSnapshot(
+        `[MachineTokenVerificationError: Invalid JWT audience claim (aud) "https://attacker.example.com". Is not included in "["https://my-resource.example.com"]".]`,
+      );
     });
   });
 
