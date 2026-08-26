@@ -5,7 +5,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useOrganizationListInView } from '../../../hooks/useOrganizationListInView';
-import type { UserButtonModelOptions } from '../user-button.model';
+import type { UserButtonModel, UserButtonModelOptions } from '../user-button.model';
 import { useUserButtonModel } from '../user-button.model';
 
 interface FakeUser {
@@ -31,7 +31,7 @@ interface FakeList {
   count: number;
   hasNextPage: boolean;
   isLoading: boolean;
-  revalidate: ReturnType<typeof vi.fn>;
+  revalidate: ReturnType<typeof vi.fn<() => Promise<void>>>;
 }
 
 let isUserLoaded: boolean;
@@ -128,7 +128,13 @@ function membership(orgId: string, name: string, membersCount: number) {
 }
 
 function list(data: unknown[], count: number, hasNextPage = false, isLoading = false): FakeList {
-  return { data, count, hasNextPage, isLoading, revalidate: vi.fn().mockResolvedValue(undefined) };
+  return {
+    data,
+    count,
+    hasNextPage,
+    isLoading,
+    revalidate: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+  };
 }
 
 beforeEach(() => {
@@ -186,8 +192,20 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
+// Actions are promises the controller waits on, so the tests need the model itself and not only
+// the buttons that fire and forget it.
+let latest: UserButtonModel = { status: 'loading' };
+
+function readyModel() {
+  if (latest.status !== 'ready') {
+    throw new Error(`model is ${latest.status}`);
+  }
+  return latest;
+}
+
 function Harness({ customPages, ...options }: UserButtonModelOptions & { customPages?: CustomPage[] } = {}) {
   const c = useUserButtonModel(options, customPages);
+  latest = c;
   if (c.status !== 'ready') {
     return <output data-testid='status'>{c.status}</output>;
   }
@@ -801,5 +819,38 @@ describe('useUserButtonModel', () => {
     expect(suggestion.accept).toHaveBeenCalledTimes(1);
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
     expect(userMemberships.revalidate).toHaveBeenCalledTimes(1);
+  });
+
+  // An accept is not done until the lists it changed have caught up. Settling first puts the row
+  // back to offering a join for a workspace already joined, and lets the accept run a second time.
+  it('waits for the revalidations before an accept settles', async () => {
+    let release = () => {};
+    userMemberships.revalidate.mockImplementation(() => new Promise<void>(resolve => (release = resolve)));
+    render(<Harness />);
+
+    let settled = false;
+    const accepting = Promise.resolve(readyModel().onAcceptInvitation?.('inv_1')).then(() => {
+      settled = true;
+    });
+
+    await act(async () => {});
+    expect(settled).toBe(false);
+
+    await act(async () => {
+      release();
+      await accepting;
+    });
+    expect(settled).toBe(true);
+  });
+
+  // A stale list is not a failed accept: the invitation was accepted either way, and failing the
+  // action would re-offer a row for a workspace already joined.
+  it('keeps an accept successful when a revalidation fails', async () => {
+    userMemberships.revalidate.mockRejectedValue(new Error('offline'));
+    render(<Harness />);
+
+    await act(async () => {
+      await expect(readyModel().onAcceptInvitation?.('inv_1')).resolves.toBeUndefined();
+    });
   });
 });

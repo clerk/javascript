@@ -96,6 +96,15 @@ function openOrNavigate({
   return resolved === 'navigation' ? () => void navigate(url ?? buildUrl()) : () => openModal();
 }
 
+/**
+ * An accept is not done until the lists it changed have caught up, or the row it was clicked on
+ * re-offers a workspace already joined. A stale list is not a failed accept, so a revalidation
+ * that fails does not fail the action with it.
+ */
+function revalidateAll(...lists: ((() => Promise<unknown>) | undefined)[]): Promise<unknown> {
+  return Promise.all(lists.map(async revalidate => revalidate?.().catch(() => undefined)));
+}
+
 const INVITE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
 
 function displayName(user: UserResource): string {
@@ -289,15 +298,14 @@ export function useUserButtonModel(
     onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
     onAcceptSuggestion: suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
-      return Promise.resolve(suggestion?.accept()).finally(() => void userSuggestions.revalidate?.());
+      return Promise.resolve(suggestion?.accept()).finally(() => revalidateAll(userSuggestions.revalidate));
     },
     // Accepting joins the organization, so memberships are stale too. A suggestion joins nothing.
     onAcceptInvitation: invitationId => {
       const invitation = invitationData.find(i => i.id === invitationId);
-      return Promise.resolve(invitation?.accept()).finally(() => {
-        void userInvitations.revalidate?.();
-        void userMemberships.revalidate?.();
-      });
+      return Promise.resolve(invitation?.accept()).finally(() =>
+        revalidateAll(userInvitations.revalidate, userMemberships.revalidate),
+      );
     },
   };
 }
