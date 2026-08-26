@@ -1,4 +1,4 @@
-import type { FormEvent, ReactNode } from 'react';
+import type { FormEvent } from 'react';
 import { useEffect, useId, useState } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
@@ -11,44 +11,38 @@ import { Input } from '../../components/input';
 import { Text } from '../../components/text';
 
 export interface DestructiveProps {
-  /** Whether the confirmation is showing. Controlled, the way any dialog is. */
+  /** Whether the dialog is open */
   open: boolean;
+  /** Callback when open state changes */
   onOpenChange: (open: boolean) => void;
-  /** Renders the button that asks to open the dialog. Omit to open it some other way. */
+  /** Element that opens the dialog */
   trigger?: DialogProps['trigger'];
-  /** Names what is about to be destroyed, e.g. `Delete account?`. */
-  title: ReactNode;
-  /** Spells out what is lost. Sits above the confirmation field. */
-  description: ReactNode;
-  /** Labels the confirmation field, e.g. `Type “Delete account” below to continue`. */
-  fieldLabel: ReactNode;
-  /**
-   * The phrase the user has to type back. Also the field's placeholder. The block holds
-   * what is typed and compares it, so no flow has to carry a keystroke through a machine
-   * to find out whether two strings match.
-   */
+  /** Dialog heading */
+  title: string;
+  /** What the action destroys */
+  description: string;
+  /** Label above the confirmation input */
+  fieldLabel: string;
+  /** Phrase the user must type to confirm. Also the input's placeholder */
   confirmationValue: string;
-  actionLabel: ReactNode;
-  /** @default 'Cancel' */
-  cancelLabel?: ReactNode;
-  /**
-   * Asks the caller to run the action. Reached by pressing the action or by Enter in the
-   * confirmation field, and only once the typed phrase matches.
-   */
+  /** Text of the delete button */
+  actionLabel: string;
+  /** Text of the cancel button (default: "Cancel") */
+  cancelLabel?: string;
+  /** Callback when delete is confirmed, by button or by Enter */
   onDelete: () => void;
-  /** Keeps the dialog inert and the action pending while the caller works. */
+  /** Whether the delete action is in progress */
   isDeleting?: boolean;
-  /** Why the last attempt failed. Marks the field invalid and renders under it. */
+  /** Error message to display if the delete action fails */
   errorMessage?: string;
 }
 
 /**
- * Type-to-confirm dialog for an action that cannot be undone: the destructive button stays
- * inert until the typed phrase matches `confirmationValue`.
+ * Type-to-confirm dialog for an action that cannot be undone. The delete button stays inert
+ * until the typed phrase matches `confirmationValue`.
  *
- * The block owns one thing, the typed phrase, because nothing outside it can use a
- * half-typed string. Everything with a consequence stays with the caller: `open` closes the
- * dialog, `isDeleting` marks it busy, `error` explains a failure.
+ * Controlled: the caller owns `open`, `isDeleting`, and `errorMessage`. The block holds only
+ * the typed phrase.
  *
  * @example
  * <Destructive

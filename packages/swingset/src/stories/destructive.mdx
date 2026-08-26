@@ -62,20 +62,20 @@ A failed attempt leaves the dialog up. Pass the sentence the user should read as
 
 ## Props
 
-| Prop                | Type                      | Description                                                                      |
-| ------------------- | ------------------------- | -------------------------------------------------------------------------------- |
-| `open`              | `boolean`                 | Whether the confirmation is showing. Controlled, the way any dialog is.          |
-| `onOpenChange`      | `(open: boolean) => void` | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.   |
-| `trigger`           | `ReactNode`               | Optional. The button that asks to open the dialog.                               |
-| `title`             | `ReactNode`               | Names what is about to be destroyed.                                             |
-| `description`       | `ReactNode`               | Spells out what is lost. Sits above the confirmation field.                      |
-| `fieldLabel`        | `ReactNode`               | Labels the confirmation field.                                                   |
-| `confirmationValue` | `string`                  | The phrase the user has to type back. Also the field's placeholder.              |
-| `actionLabel`       | `ReactNode`               | The destructive button's label.                                                  |
-| `cancelLabel`       | `ReactNode`               | Optional. Defaults to `Cancel`.                                                  |
-| `onDelete`          | `() => void`              | Asks the caller to run the action. Only reachable once the typed phrase matches. |
-| `isDeleting`        | `boolean`                 | Optional. Disables the field and renders the action pending.                     |
-| `errorMessage`      | `string`                  | Optional. Marks the field invalid and renders under it.                          |
+| Prop                | Type                      | Description                                                                                                       |
+| ------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `open`              | `boolean`                 | Whether the confirmation is showing. Controlled, the way any dialog is.                                           |
+| `onOpenChange`      | `(open: boolean) => void` | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.                                    |
+| `trigger`           | `ReactNode`               | Optional. The button that asks to open the dialog.                                                                |
+| `title`             | `string`                  | Names what is about to be destroyed.                                                                              |
+| `description`       | `string`                  | Spells out what is lost. Sits above the confirmation field.                                                       |
+| `fieldLabel`        | `string`                  | Labels the confirmation field.                                                                                    |
+| `confirmationValue` | `string`                  | The phrase the user has to type back. Also the field's placeholder.                                               |
+| `actionLabel`       | `string`                  | The destructive button's label.                                                                                   |
+| `cancelLabel`       | `string`                  | Optional. Defaults to `Cancel`.                                                                                   |
+| `onDelete`          | `() => void`              | Asks the caller to run the action. Reached by the button or by Enter in the field, once the typed phrase matches. |
+| `isDeleting`        | `boolean`                 | Optional. Disables the field and renders the action pending.                                                      |
+| `errorMessage`      | `string`                  | Optional. Marks the field invalid and renders under it.                                                           |
 
 ## Driving it from a machine
 
