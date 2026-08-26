@@ -1,8 +1,7 @@
 import { Destructive } from '../../blocks/destructive';
 import { Button } from '../../components/button';
 import { Section } from '../../components/section';
-import { useMachine } from '../../machine/useMachine';
-import { userProfileDeleteSectionMachine } from './user-profile-delete-section.machine';
+import { useUserProfileDeleteSectionController } from './user-profile-delete-section.controller';
 import { fill, userProfileDeleteSectionBase as m } from './user-profile-delete-section.messages';
 
 export interface UserProfileDeleteSectionViewProps {
@@ -14,8 +13,8 @@ export interface UserProfileDeleteSectionViewProps {
 }
 
 export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSectionViewProps) {
-  const [snapshot, send] = useMachine(userProfileDeleteSectionMachine, {
-    context: { deleteAccount: onDelete },
+  const { isOpen, onOpenChange, onConfirm, isDeleting, errorMessage } = useUserProfileDeleteSectionController({
+    onDelete,
   });
 
   return (
@@ -30,8 +29,8 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
             </Section.Content>
             <Section.Actions>
               <Destructive
-                open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
-                onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
+                open={isOpen}
+                onOpenChange={onOpenChange}
                 trigger={
                   <Button
                     color='negative'
@@ -47,9 +46,9 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
                 confirmationValue={m.fieldPlaceholder}
                 actionLabel={m.actionLabel}
                 cancelLabel={m.cancelLabel}
-                onDelete={() => send({ type: 'CONFIRM' })}
-                isDeleting={snapshot.value === 'deleting'}
-                errorMessage={snapshot.context.errorMessage}
+                onDelete={onConfirm}
+                isDeleting={isDeleting}
+                errorMessage={errorMessage}
               />
             </Section.Actions>
           </Section.Item>

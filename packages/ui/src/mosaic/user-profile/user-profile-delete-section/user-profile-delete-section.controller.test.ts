@@ -1,7 +1,11 @@
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/createActor';
-import { userProfileDeleteSectionMachine } from './user-profile-delete-section.machine';
+import {
+  userProfileDeleteSectionMachine,
+  useUserProfileDeleteSectionController,
+} from './user-profile-delete-section.controller';
 
 function start(deleteAccount: () => Promise<void>) {
   const actor = createActor(userProfileDeleteSectionMachine, { context: { deleteAccount } }).start();
@@ -46,5 +50,31 @@ describe('userProfileDeleteSectionMachine', () => {
 
     expect(actor.getSnapshot().value).toBe('idle');
     expect(actor.getSnapshot().context.errorMessage).toBeUndefined();
+  });
+});
+
+describe('useUserProfileDeleteSectionController', () => {
+  it('holds the dialog open across confirming and deleting', async () => {
+    const { result } = renderHook(() => useUserProfileDeleteSectionController({ onDelete: () => Promise.resolve() }));
+    expect(result.current.isOpen).toBe(false);
+
+    act(() => result.current.onOpenChange(true));
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.isDeleting).toBe(false);
+
+    act(() => result.current.onConfirm());
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.isDeleting).toBe(true);
+
+    await waitFor(() => expect(result.current.isOpen).toBe(false));
+  });
+
+  it('cancels on close', () => {
+    const { result } = renderHook(() => useUserProfileDeleteSectionController({ onDelete: () => Promise.resolve() }));
+    act(() => result.current.onOpenChange(true));
+
+    act(() => result.current.onOpenChange(false));
+
+    expect(result.current.isOpen).toBe(false);
   });
 });
