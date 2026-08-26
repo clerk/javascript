@@ -104,6 +104,11 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'alternativeMethodsBlockButtonArrow',
 
   'checkoutFormLineItemsRoot',
+  'checkoutFormPromoCodeRoot',
+  'checkoutFormPromoCodeInput',
+  'checkoutFormPromoCodeApplyButton',
+  'checkoutFormPromoCodeErrorText',
+  'checkoutFormPromoCodeRemoveButton',
   'checkoutFormElementsRoot',
 
   'checkoutSuccessRoot',

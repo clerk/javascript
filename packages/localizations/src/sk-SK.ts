@@ -100,8 +100,11 @@ export const skSK: LocalizationResource = {
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      discount: undefined,
       downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
@@ -116,6 +119,8 @@ export const skSK: LocalizationResource = {
       },
       pastDueNotice: undefined,
       perMonth: undefined,
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
@@ -126,6 +131,9 @@ export const skSK: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Bezplatne',
     getStarted: 'Začať',
     highlightedPlanBadge: undefined,
@@ -137,6 +145,7 @@ export const skSK: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -215,6 +224,7 @@ export const skSK: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -936,6 +946,7 @@ export const skSK: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1745,6 +1756,7 @@ export const skSK: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Heslo je nesprávne. Skontrolujte a skúste to znova.',
     form_password_length_too_short: 'Heslo musí mať aspoň 8 znakov.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Vaše heslo nie je dostatočne silné.',
     form_password_or_identifier_incorrect:
       'Heslo alebo e-mailová adresa je nesprávna. Skúste to znova alebo použite inú metódu.',

@@ -100,8 +100,11 @@ export const mnMN: LocalizationResource = {
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      discount: undefined,
       downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
@@ -116,6 +119,8 @@ export const mnMN: LocalizationResource = {
       },
       pastDueNotice: undefined,
       perMonth: undefined,
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
@@ -126,6 +131,9 @@ export const mnMN: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: undefined,
     getStarted: undefined,
     highlightedPlanBadge: undefined,
@@ -137,6 +145,7 @@ export const mnMN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -215,6 +224,7 @@ export const mnMN: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -936,6 +946,7 @@ export const mnMN: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1740,6 +1751,7 @@ export const mnMN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Нууц үг буруу байна.',
     form_password_length_too_short: 'Нууц үгийн урт хэт богино байна.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Таны нууц үг хангалттай хүчтэй биш байна.',
     form_password_or_identifier_incorrect:
       'Нууц үг эсвэл имэйл хаяг буруу байна. Дахин оролдох эсвэл өөр арга ашиглана уу.',

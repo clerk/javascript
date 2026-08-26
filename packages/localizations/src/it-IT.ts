@@ -104,8 +104,11 @@ export const itIT: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Non puoi abbonarti a questo piano. Il tuo abbonamento esistente è più costoso di questo piano.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Il pagamento è andato a buon fine.',
       description__subscriptionSuccessful: 'Il tuo nuovo abbonamento è pronto.',
+      discount: undefined,
       downgradeNotice:
         'Manterrai il tuo abbonamento attuale e le sue funzionalità fino alla fine del ciclo di fatturazione, quindi passerai a questo abbonamento.',
       emailForm: {
@@ -122,6 +125,8 @@ export const itIT: LocalizationResource = {
       },
       pastDueNotice: 'Il tuo precedente abbonamento era scaduto, senza alcun pagamento.',
       perMonth: 'al mese',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Checkout',
       title__paymentSuccessful: 'Pagamento riuscito!',
       title__subscriptionSuccessful: 'Successo!',
@@ -132,6 +137,9 @@ export const itIT: LocalizationResource = {
     credit: 'Credito',
     creditRemainder: 'Credito per il resto del tuo abbonamento attuale.',
     defaultFreePlanActive: 'Attualmente sei sul piano Gratuito',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuito',
     getStarted: 'Inizia',
     highlightedPlanBadge: 'Popolare',
@@ -143,6 +151,7 @@ export const itIT: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensile',
+    months: undefined,
     pastDue: 'Scaduto',
     pay: 'Paga {{amount}}',
     payerCreditRemainder: undefined,
@@ -221,6 +230,7 @@ export const itIT: LocalizationResource = {
     year: 'Anno',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -943,6 +953,7 @@ export const itIT: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1748,6 +1759,7 @@ export const itIT: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Password errata.',
     form_password_length_too_short: 'La password deve avere almeno 8 caratteri.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'La tua password non è abbastanza forte.',
     form_password_or_identifier_incorrect: "La password o l'indirizzo email è errato. Riprova o usa un altro metodo.",
     form_password_pwned: 'Questa password è stata trovata in una violazione dei dati. Scegli una password diversa.',

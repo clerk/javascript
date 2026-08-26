@@ -137,6 +137,39 @@ describe('Mosaic Card', () => {
     expect(footerRef.current).toHaveClass('cl-card-footer');
   });
 
+  // The logo names the link, so the mark is what a screen reader reaches rather than an unnamed link.
+  it('signs the card with Clerk, in a tab of its own', () => {
+    render(
+      <Card.Root data-testid='root'>
+        <Card.Content>Content</Card.Content>
+      </Card.Root>,
+    );
+
+    // The mark closes the card out. Held by position rather than by a class: the branding
+    // carries no slot for a consumer to reach, so a test has none to reach for either.
+    const branding = screen.getByTestId('root').lastElementChild;
+    expect(branding).toHaveTextContent('Secured by');
+
+    const logo = screen.getByRole('link', { name: 'Clerk' });
+    expect(branding).toContainElement(logo);
+    expect(logo).toHaveAttribute('href', 'https://go.clerk.com/components');
+    expect(logo).toHaveAttribute('target', '_blank');
+    expect(logo).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  // An instance that has paid the branding off carries none of it, so the caller reading
+  // `displayConfig.branded` turns the signature off rather than the card assuming it.
+  it('withholds the branding where the caller turns it off', () => {
+    render(
+      <Card.Root renderBranding={false}>
+        <Card.Content>Content</Card.Content>
+      </Card.Root>,
+    );
+
+    expect(screen.queryByText('Secured by')).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
+  });
+
   it('supports custom elements through render on every slot', () => {
     render(
       <Card.Root render={props => <section {...props} />}>

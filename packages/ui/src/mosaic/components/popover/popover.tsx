@@ -3,9 +3,10 @@ import { Popover as Primitive } from '@clerk/headless/popover';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../reset.styles';
+import { reset } from '../../utils/reset.styles';
 import { sizes, styles } from './popover.styles';
 
 export type PopoverSize = 'sm' | 'md' | 'lg';
@@ -25,10 +26,14 @@ export type PopoverTitleProps = MosaicComponentProps<'h2'>;
 export type PopoverDescriptionProps = MosaicComponentProps<'p'>;
 
 /** The anchor. Renders a `<button>`; `render` swaps in another element. */
-const Trigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(function PopoverTrigger(props, ref) {
+const Trigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(function PopoverTrigger(
+  { className, style, ...props },
+  ref,
+) {
   return (
     <Primitive.Trigger
       ref={ref}
+      {...mergeStyleProps(themeProps('popover-trigger'), className, style)}
       {...props}
     />
   );
@@ -86,40 +91,9 @@ const Description = React.forwardRef<HTMLParagraphElement, PopoverDescriptionPro
  * wiring.
  */
 
-/**
- * The headless positioner is always `role="dialog"`, but it only gains
- * `aria-labelledby` once a `Popover.Title` mounts — so a popover with neither a
- * Title nor an `aria-label` is an unnamed dialog. The check has to run after mount
- * and read the DOM: `hasTitle` starts `false` in the primitive's root state, so a
- * render-time check would warn on every popover that does use a Title.
- */
-function useAccessibleNameWarning(node: HTMLElement | null) {
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !node) {
-      return;
-    }
-    // Deferred by a task, not checked inline: `Popover.Title` reports itself through an
-    // effect, so on the commit that mounts the positioner the label is legitimately not
-    // there yet. Checking immediately would warn on every popover that does have a Title.
-    const timer = setTimeout(() => {
-      if (!node.isConnected || node.getAttribute('role') !== 'dialog') {
-        return;
-      }
-      if (node.hasAttribute('aria-label') || node.hasAttribute('aria-labelledby')) {
-        return;
-      }
-      console.warn(
-        '[clerk] <Popover.Popup> renders a dialog with no accessible name. Pass `aria-label`, or render a `<Popover.Title>` inside it.',
-      );
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, [node]);
-}
-
 function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof Primitive.Positioner>) {
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node);
+  useAccessibleNameWarning(node, 'Popover');
 
   return (
     <Primitive.Positioner

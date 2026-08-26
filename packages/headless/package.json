@@ -1,6 +1,6 @@
 {
   "name": "@clerk/headless",
-  "version": "0.0.21",
+  "version": "0.0.29",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -8,6 +8,10 @@
     "./accordion": {
       "import": "./dist/primitives/accordion/index.js",
       "types": "./dist/primitives/accordion/index.d.ts"
+    },
+    "./button": {
+      "import": "./dist/primitives/button/index.js",
+      "types": "./dist/primitives/button/index.d.ts"
     },
     "./tabs": {
       "import": "./dist/primitives/tabs/index.js",

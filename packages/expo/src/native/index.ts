@@ -31,6 +31,19 @@
 export { AuthView } from './AuthView';
 export type { AuthViewProps, AuthViewMode } from './AuthView.types';
 export type { EmbeddedNavigationProps } from './EmbeddedNavigation.types';
+export { useAuthViewState } from './useAuthViewState';
+export type { UseAuthViewStateReturn } from './useAuthViewState';
 export { UserButton } from './UserButton';
+export type { UserButtonProps, UserButtonUserProfileProps } from './UserButton';
+export { useUserProfileCustomPageNavigation } from './UserProfileCustomPages';
+export type {
+  UserProfileCustomPageNavigation,
+  UserProfileCustomDestination,
+  UserProfileCustomPage,
+  UserProfileCustomPageIcon,
+  UserProfileCustomPagePlacement,
+  UserProfileRow,
+  UserProfileSection,
+} from './UserProfileCustomPages';
 export { UserProfileView } from './UserProfileView';
 export type { UserProfileViewProps } from './UserProfileView';

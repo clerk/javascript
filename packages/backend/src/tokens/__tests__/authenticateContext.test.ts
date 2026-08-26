@@ -212,6 +212,24 @@ describe('AuthenticateContext', () => {
         expect(context.clientUat.toString()).toBe('0');
       });
     });
+
+    describe('malformed un-suffixed session token', () => {
+      it('falls back to suffixed cookies when the token has a non-string issuer', async () => {
+        const headers = new Headers({
+          cookie: createCookieHeader({
+            __session: createJwt({ payload: { iss: 123 as unknown as string } }),
+            __client_uat_MqCvchyS: suffixedClientUat,
+            __session_MqCvchyS: suffixedSession,
+          }),
+        });
+        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
+
+        const context = await createAuthenticateContext(clerkRequest, { publishableKey: pkLive });
+
+        expect(context.usesSuffixedCookies()).toBe(true);
+        expect(context.sessionTokenInCookie).toBe(suffixedSession);
+      });
+    });
   });
 
   describe('relative proxyUrl resolution', () => {

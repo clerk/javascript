@@ -4,7 +4,8 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../reset.styles';
+import { reset } from '../../utils/reset.styles';
+import { useOptionalFieldControlProps } from '../field/field.context';
 import { sizes, styles } from './input.styles';
 
 export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> {
@@ -12,15 +13,43 @@ export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> 
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(function MosaicInput(
-  { size = 'md', disabled = false, render, className, style, ...rest },
+  {
+    size = 'md',
+    disabled: disabledProp,
+    required: requiredProp,
+    render,
+    className,
+    style,
+    id,
+    'aria-invalid': ariaInvalid,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    ...rest
+  },
   ref,
 ) {
+  const fieldProps = useOptionalFieldControlProps({
+    id,
+    disabled: disabledProp,
+    required: requiredProp,
+    ariaInvalid,
+    ariaLabelledBy,
+    ariaDescribedBy,
+  });
+  const disabled = fieldProps?.disabled ?? disabledProp ?? false;
+  const required = fieldProps?.required ?? requiredProp;
+
   return useRender({
     defaultTagName: 'input',
     render,
     ref,
     props: {
       disabled,
+      required,
+      id: fieldProps?.id ?? id,
+      'aria-invalid': fieldProps?.['aria-invalid'] ?? ariaInvalid,
+      'aria-labelledby': fieldProps?.['aria-labelledby'] ?? ariaLabelledBy,
+      'aria-describedby': fieldProps?.['aria-describedby'] ?? ariaDescribedBy,
       ...mergeStyleProps(
         themeProps('input', { size, disabled }),
         stylex.props(reset.base, styles.base, sizes[size], disabled && styles.disabled),

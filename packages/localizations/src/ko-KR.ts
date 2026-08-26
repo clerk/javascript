@@ -104,8 +104,11 @@ export const koKR: LocalizationResource = {
     cannotSubscribeMonthly: '이 플랜은 월간 결제가 불가해요. 연간 결제를 선택해 주세요.',
     cannotSubscribeUnrecoverable: '이 플랜으로 구독할 수 없어요. 현재 구독이 더 높은 요금제예요.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: '결제가 완료됐어요.',
       description__subscriptionSuccessful: '새 구독이 준비됐어요.',
+      discount: undefined,
       downgradeNotice: '현재 구독은 결제 주기 종료까지 유지되고, 이후 이 구독으로 전환돼요.',
       emailForm: {
         subtitle: '결제를 완료하려면 영수증을 받을 이메일 주소를 추가해야 해요.',
@@ -120,6 +123,8 @@ export const koKR: LocalizationResource = {
       },
       pastDueNotice: '이전 구독이 연체되어 결제가 되지 않았어요.',
       perMonth: '월',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: '결제',
       title__paymentSuccessful: '결제가 완료됐어요!',
       title__subscriptionSuccessful: '성공!',
@@ -130,6 +135,9 @@ export const koKR: LocalizationResource = {
     credit: '크레딧',
     creditRemainder: '현재 구독 남은 기간에 대한 크레딧',
     defaultFreePlanActive: '현재 무료 플랜을 사용 중이에요',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '무료',
     getStarted: '시작하기',
     highlightedPlanBadge: '인기',
@@ -141,6 +149,7 @@ export const koKR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: '월간',
+    months: undefined,
     pastDue: '연체',
     pay: '{{amount}} 결제',
     payerCreditRemainder: undefined,
@@ -219,6 +228,7 @@ export const koKR: LocalizationResource = {
     year: '년',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -938,6 +948,7 @@ export const koKR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1734,6 +1745,7 @@ export const koKR: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: '비밀번호가 너무 짧아요. 최소 8자 이상이어야 해요.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: '비밀번호가 충분히 안전하지 않아요.',
     form_password_or_identifier_incorrect:
       '비밀번호 또는 이메일 주소가 올바르지 않아요. 다시 시도하거나 다른 방법을 사용해 보세요.',

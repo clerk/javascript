@@ -106,8 +106,11 @@ export const teIN: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'మీరు ఈ ప్లాన్‌కు సబ్‌స్క్రైబ్ చేయలేరు. మీ ప్రస్తుత సబ్‌స్క్రిప్షన్ ఈ ప్లాన్ కంటే ఖరీదైనది.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'మీ చెల్లింపు విజయవంతమైంది.',
       description__subscriptionSuccessful: 'మీ కొత్త సబ్‌స్క్రిప్షన్ పూర్తిగా సిద్ధంగా ఉంది.',
+      discount: undefined,
       downgradeNotice:
         'బిల్లింగ్ చక్రం ముగిసే వరకు మీరు మీ ప్రస్తుత సబ్‌స్క్రిప్షన్‌ను మరియు దాని ఫీచర్లను ఉంచుకుంటారు, ఆ తర్వాత మీరు ఈ సబ్‌స్క్రిప్షన్‌కు మార్చబడతారు.',
       emailForm: {
@@ -123,6 +126,8 @@ export const teIN: LocalizationResource = {
       },
       pastDueNotice: 'మీ మునుపటి సబ్‌స్క్రిప్షన్ చెల్లింపు లేకుండా బకాయిగా ఉంది.',
       perMonth: 'నెలకు',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'చెక్అవుట్',
       title__paymentSuccessful: 'చెల్లింపు విజయవంతమైంది!',
       title__subscriptionSuccessful: 'విజయం!',
@@ -133,6 +138,9 @@ export const teIN: LocalizationResource = {
     credit: 'క్రెడిట్',
     creditRemainder: 'మీ ప్రస్తుత సబ్‌స్క్రిప్షన్ యొక్క మిగిలిన కాలానికి క్రెడిట్.',
     defaultFreePlanActive: 'మీరు ప్రస్తుతం ఉచిత ప్లాన్‌లో ఉన్నారు',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'ఉచితం',
     getStarted: 'ప్రారంభించండి',
     highlightedPlanBadge: 'ప్రసిద్ధ',
@@ -144,6 +152,7 @@ export const teIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'నెలవారీ',
+    months: undefined,
     pastDue: 'బకాయి',
     pay: '{{amount}} చెల్లించు',
     payerCreditRemainder: undefined,
@@ -222,6 +231,7 @@ export const teIN: LocalizationResource = {
     year: 'సంవత్సరం',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -942,6 +952,7 @@ export const teIN: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1762,6 +1773,7 @@ export const teIN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
     form_password_or_identifier_incorrect:
       'పాస్‌వర్డ్ లేదా ఇమెయిల్ చిరునామా తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి లేదా మరొక పద్ధతిని ఉపయోగించండి.',

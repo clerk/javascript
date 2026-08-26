@@ -11,9 +11,9 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
-import { reset } from '../reset.styles';
 import { styles } from './menu.styles';
 
 export type { MenuProps, MenuSeparatorProps };

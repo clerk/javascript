@@ -1,5 +1,96 @@
 # Change Log
 
+## 3.1.76
+
+### Patch Changes
+
+- Updated dependencies [[`dbaa95a`](https://github.com/clerk/javascript/commit/dbaa95a4e9e2ebd0a6b7fdb266024490a35b7caf)]:
+  - @clerk/clerk-js@6.30.1
+  - @clerk/react@6.14.7
+  - @clerk/shared@4.30.1
+  - @clerk/ui@1.30.8
+
+## 3.1.75
+
+### Patch Changes
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+  - @clerk/ui@1.30.7
+  - @clerk/clerk-js@6.30.0
+  - @clerk/react@6.14.6
+
+## 3.1.74
+
+### Patch Changes
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+  - @clerk/clerk-js@6.29.3
+  - @clerk/react@6.14.5
+  - @clerk/ui@1.30.6
+
+## 3.1.73
+
+### Patch Changes
+
+- Updated dependencies [[`a52d486`](https://github.com/clerk/javascript/commit/a52d486ee6399a23a8506aa87477cdb352c6802f)]:
+  - @clerk/ui@1.30.5
+  - @clerk/react@6.14.4
+  - @clerk/clerk-js@6.29.2
+
+## 3.1.72
+
+### Patch Changes
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+  - @clerk/ui@1.30.4
+  - @clerk/react@6.14.4
+  - @clerk/clerk-js@6.29.2
+
+## 3.1.71
+
+### Patch Changes
+
+- Updated dependencies [[`7f5c294`](https://github.com/clerk/javascript/commit/7f5c2947e2b3b2ac9677116ff7eede61a1dab649), [`4b2b688`](https://github.com/clerk/javascript/commit/4b2b688ebe27a80fadb150dd01c1300dc870b01a)]:
+  - @clerk/shared@4.29.1
+  - @clerk/ui@1.30.3
+  - @clerk/clerk-js@6.29.1
+  - @clerk/react@6.14.3
+
+## 3.1.70
+
+### Patch Changes
+
+- Add the `/legacy` entry point for the legacy `useSignIn()` and `useSignUp()` hooks. ([#9434](https://github.com/clerk/javascript/pull/9434)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`81840b3`](https://github.com/clerk/javascript/commit/81840b3b28bf89fdd6afcc155a84bc641dcd3b69), [`b7fb564`](https://github.com/clerk/javascript/commit/b7fb56455a657b209c0bb292bf05145e6dcde790), [`44edcc9`](https://github.com/clerk/javascript/commit/44edcc961664e83b8ff7d3c946b880fbb5a7d897)]:
+  - @clerk/shared@4.29.0
+  - @clerk/clerk-js@6.29.0
+  - @clerk/ui@1.30.2
+  - @clerk/react@6.14.2
+
+## 3.1.69
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/clerk-js@6.28.1
+  - @clerk/shared@4.28.1
+  - @clerk/ui@1.30.1
+  - @clerk/react@6.14.1
+
+## 3.1.68
+
+### Patch Changes
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`8c61153`](https://github.com/clerk/javascript/commit/8c61153bc69b3e677613ab3e1e4c45948cf93405), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/clerk-js@6.28.0
+  - @clerk/shared@4.28.0
+  - @clerk/ui@1.30.0
+  - @clerk/react@6.14.0
+
 ## 3.1.67
 
 ### Patch Changes

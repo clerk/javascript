@@ -118,6 +118,33 @@ describe('getClerkUIEntryChunk', () => {
     expect(loadCall.ui.ClerkUI).toBeUndefined();
   });
 
+  it('logs load() rejections to the console and does not mount components', async () => {
+    const loadError = new Error('ClerkJS failed to load');
+    mockLoadClerkJSScript.mockImplementation(() => {
+      (window as any).Clerk = {
+        load: vi.fn().mockRejectedValue(loadError),
+        addListener: vi.fn(),
+      };
+      return Promise.resolve(null);
+    });
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const { createClerkInstance } = await import('../create-clerk-instance');
+    const { $csrState } = await import('../../stores/internal');
+    const { mountAllClerkAstroJSComponents } = await import('../mount-clerk-astro-js-components');
+
+    await createClerkInstance({
+      publishableKey: 'pk_test_xxx',
+      prefetchUI: false,
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(loadError.stack);
+    expect($csrState.setKey).not.toHaveBeenCalledWith('isLoaded', true);
+    expect(mountAllClerkAstroJSComponents).not.toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
+  });
+
   it('does not pass a ClerkUI promise when ui is a marker object without a constructor', async () => {
     const mockLoad = vi.fn().mockResolvedValue(undefined);
 

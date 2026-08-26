@@ -105,8 +105,11 @@ export const viVN: LocalizationResource = {
       'Bạn không thể đăng ký gói này bằng cách thanh toán hàng tháng. Để đăng ký gói này, bạn cần chọn thanh toán hàng năm.',
     cannotSubscribeUnrecoverable: 'Bạn không thể đăng ký gói này. Gói đăng ký hiện tại của bạn đắt hơn gói này.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Thanh toán của bạn đã thành công.',
       description__subscriptionSuccessful: 'Đăng ký mới của bạn đã được thiết lập.',
+      discount: undefined,
       downgradeNotice:
         'Bạn sẽ giữ đăng ký hiện tại và các tính năng của nó cho đến cuối chu kỳ thanh toán, sau đó bạn sẽ được chuyển sang đăng ký này.',
       emailForm: {
@@ -122,6 +125,8 @@ export const viVN: LocalizationResource = {
       },
       pastDueNotice: 'Đăng ký trước của bạn đã quá hạn và chưa thanh toán.',
       perMonth: 'hàng tháng',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Thanh toán',
       title__paymentSuccessful: 'Thanh toán thành công!',
       title__subscriptionSuccessful: 'Thành công!',
@@ -132,6 +137,9 @@ export const viVN: LocalizationResource = {
     credit: 'Tín dụng',
     creditRemainder: 'Tín dụng cho phần còn lại của đăng ký hiện tại.',
     defaultFreePlanActive: 'Bạn hiện đang trên gói Miễn phí',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Miễn phí',
     getStarted: 'Bắt đầu',
     highlightedPlanBadge: 'Phổ biến',
@@ -143,6 +151,7 @@ export const viVN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Hàng tháng',
+    months: undefined,
     pastDue: 'Quá hạn',
     pay: 'Thanh toán {{amount}}',
     payerCreditRemainder: undefined,
@@ -221,6 +230,7 @@ export const viVN: LocalizationResource = {
     year: 'Năm',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -942,6 +952,7 @@ export const viVN: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1756,6 +1767,7 @@ export const viVN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
     form_password_or_identifier_incorrect:
       'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',

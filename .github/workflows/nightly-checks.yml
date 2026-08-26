@@ -57,6 +57,13 @@ jobs:
           pnpm init
           pkglab add @clerk/ui
 
+      - name: Configure test run cleanup
+        run: echo "INTEGRATION_TEST_RUN_KEY=${RUN_ID}-${RUN_ATTEMPT}-nightly-${TEST_NAME}" >> "$GITHUB_ENV"
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          TEST_NAME: ${{ matrix.test-name }}
+
       - name: Run Integration Tests
         id: integration_tests
         continue-on-error: true
@@ -71,6 +78,8 @@ jobs:
           fi
           echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
         env:
+          CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
+          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           # Don't set E2E_CLERK_JS_VERSION - let it use '*' (via linkPackage)
@@ -117,6 +126,14 @@ jobs:
             /tmp/.temp_integration/
             test-results/
           retention-days: 7
+
+      - name: Delete integration-test resources
+        if: ${{ always() && steps.integration_tests.outcome != 'skipped' }}
+        timeout-minutes: 4
+        run: pnpm test:integration:cleanup
+        env:
+          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
 
       - name: Report Status
         if: always()

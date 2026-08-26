@@ -106,8 +106,11 @@ export const hrHR: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Ne možete se pretplatiti na ovaj plan. Vaša postojeća pretplata je skuplja od ovog plana.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Vaše plaćanje je uspješno.',
       description__subscriptionSuccessful: 'Vaša nova pretplata je spremna.',
+      discount: undefined,
       downgradeNotice:
         'Zadržat ćete svoju trenutnu pretplatu i njezine značajke do kraja obračunskog razdoblja, nakon čega ćete biti prebačeni na ovu pretplatu.',
       emailForm: {
@@ -123,6 +126,8 @@ export const hrHR: LocalizationResource = {
       },
       pastDueNotice: 'Vaša prethodna pretplata je bila dospjela, bez plaćanja.',
       perMonth: 'mjesečno',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Naplata',
       title__paymentSuccessful: 'Plaćanje je uspjelo!',
       title__subscriptionSuccessful: 'Uspjeh!',
@@ -133,6 +138,9 @@ export const hrHR: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit za preostalo razdoblje vaše trenutne pretplate.',
     defaultFreePlanActive: 'Trenutno ste na besplatnom planu',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Besplatno',
     getStarted: 'Započnite',
     highlightedPlanBadge: 'Popularno',
@@ -144,6 +152,7 @@ export const hrHR: LocalizationResource = {
     monthAbbreviation: 'mj',
     monthPerUnit: 'Mjesec po {{unitName}}',
     monthly: 'Mjesečno',
+    months: undefined,
     pastDue: 'Dospjelo',
     pay: 'Plati {{amount}}',
     payerCreditRemainder: 'Kredit sa stanja računa.',
@@ -222,6 +231,7 @@ export const hrHR: LocalizationResource = {
     year: 'Godina',
     yearAbbreviation: 'god',
     yearPerUnit: 'Godina po {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -942,6 +952,7 @@ export const hrHR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1763,6 +1774,7 @@ export const hrHR: LocalizationResource = {
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti. Molimo resetirajte svoju lozinku.',
     form_password_incorrect: 'Netočna lozinka. Pokušajte ponovno.',
     form_password_length_too_short: 'Vaša lozinka je prekratka. Mora sadržavati najmanje 8 znakova.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
     form_password_or_identifier_incorrect:
       'Lozinka ili e-mail adresa nisu točne. Pokušajte ponovno ili koristite drugu metodu.',

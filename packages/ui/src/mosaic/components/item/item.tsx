@@ -4,9 +4,9 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../reset.styles';
-import { truncationStyles } from '../typography.styles';
-import { itemScope } from './item.markers.stylex';
+import { focusOutline } from '../../utils/focus-outline.styles';
+import { reset } from '../../utils/reset.styles';
+import { truncationStyles } from '../../utils/typography.styles';
 import * as slots from './item.styles';
 
 /** The row's height and gap, and the width of the media column inside it. */
@@ -35,7 +35,7 @@ export type ItemProps = MosaicComponentProps<'div'> & {
  * @example
  * <Item.Root size='xs' render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
  *   <Item.Media><Avatar.Root size='fit'>…</Avatar.Root></Item.Media>
- *   <Item.Content><Item.Title>Clerk</Item.Title></Item.Content>
+ *   <Item.Content><Item.Label>Clerk</Item.Label></Item.Content>
  * </Item.Root>
  */
 const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
@@ -51,7 +51,13 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
     props: {
       ...mergeStyleProps(
         themeProps('item', { interactive, size }),
-        stylex.props(reset.base, itemScope, slots.item.base, slots.item[size], interactive && slots.item.interactive),
+        stylex.props(
+          reset.base,
+          focusOutline.visible,
+          slots.item.base,
+          slots.item[size],
+          interactive && slots.item.interactive,
+        ),
         className,
         style,
       ),
@@ -88,7 +94,7 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
-/** Vertical stack (title + description) that grows to fill the row between media and actions. */
+/** Vertical stack (label + description) that grows to fill the row between media and actions. */
 const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemContent(
   { render, className, style, ...rest },
   ref,
@@ -104,9 +110,27 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
   });
 });
 
-/** Primary label. Truncates to a single line. */
-const Title = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemTitle(
-  { render, className, style, ...rest },
+/** Where the label sits in the row's hierarchy. */
+type LabelVariant = 'primary' | 'secondary';
+
+const DEFAULT_LABEL_VARIANT: LabelVariant = 'primary';
+
+export type ItemLabelProps = MosaicComponentProps<'div'> & {
+  /**
+   * `primary` names the row's subject (a person, an organization) and holds its
+   * own strength. `secondary` is quieter and takes its color from the row rather
+   * than setting one, so on an interactive row it brightens with the row on
+   * hover instead of staying fixed. Use it where the text is the row itself
+   * (`Add account`, `Sign out`) or a group heading, not a subject the row names.
+   *
+   * @default 'primary'
+   */
+  variant?: LabelVariant;
+};
+
+/** The row's label. Truncates to a single line. */
+const Label = React.forwardRef<HTMLDivElement, ItemLabelProps>(function MosaicItemLabel(
+  { variant = DEFAULT_LABEL_VARIANT, render, className, style, ...rest },
   ref,
 ) {
   return useRender({
@@ -115,8 +139,8 @@ const Title = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('item-title'),
-        stylex.props(reset.base, slots.title.base, truncationStyles.singleLine),
+        themeProps('item-label', { variant }),
+        stylex.props(reset.base, slots.label.base, slots.label[variant], truncationStyles.singleLine),
         className,
         style,
       ),
@@ -125,7 +149,7 @@ const Title = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
-/** Secondary text beneath the title. Truncates to a single line. */
+/** Secondary text beneath the label. Truncates to a single line. */
 const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemDescription(
   { render, className, style, ...rest },
   ref,
@@ -138,31 +162,6 @@ const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>
       ...mergeStyleProps(
         themeProps('item-description'),
         stylex.props(reset.base, slots.description.base, truncationStyles.singleLine),
-        className,
-        style,
-      ),
-      ...rest,
-    },
-  });
-});
-
-/**
- * Sole label on an action row (`Add account`, `Sign out`), used in place of a
- * title. Dimmed until the row is hovered, so it reads as an affordance rather
- * than as content.
- */
-const Label = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemLabel(
-  { render, className, style, ...rest },
-  ref,
-) {
-  return useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('item-label'),
-        stylex.props(reset.base, slots.label.base, truncationStyles.singleLine),
         className,
         style,
       ),
@@ -227,7 +226,7 @@ const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(fu
 /**
  * Mosaic `Item` — a row for lists of accounts, organizations, and settings.
  * Composed via dot syntax: `Item.Root`, `Item.Media`, `Item.Content`,
- * `Item.Title`, `Item.Description`, `Item.Label`, `Item.Actions`, `Item.Group`,
+ * `Item.Label`, `Item.Description`, `Item.Actions`, `Item.Group`,
  * `Item.Separator`. Every part takes a `render` prop and forwards a ref.
  *
  * `size` is set once on `Item.Root` and reaches `Item.Media` through context, so
@@ -237,9 +236,8 @@ export const Item = {
   Root,
   Media,
   Content,
-  Title,
-  Description,
   Label,
+  Description,
   Actions,
   Group,
   Separator,

@@ -25,6 +25,7 @@ import type { OAuthTransport } from './oauthTransport';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
+import type { ProtectAssertion } from './protectConfig';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
@@ -294,6 +295,20 @@ export interface Clerk {
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
   /**
+   * Sets the Protect assertion attached to subsequent sign-in and sign-up requests, replacing
+   * any value supplied via the `protectAssertion` option. Pass `undefined` to clear it.
+   *
+   * Use this when the token is not available at `Clerk.load()` time — for example when your
+   * app fetches one from your backend after the page has started. Passing a function instead
+   * of a string has it re-read for each request, which is what you want if the token is
+   * refreshed while the page is open.
+   *
+   * @param assertion - A token minted by your backend, a function returning one, or
+   * `undefined`.
+   */
+  setProtectAssertion: (assertion?: ProtectAssertion) => void;
+
+  /**
    * @internal
    * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
    * By default the resolved URL is validated against the customer-supplied
@@ -316,6 +331,16 @@ export interface Clerk {
    * @internal
    */
   __internal_moduleManager: ModuleManager | undefined;
+
+  /**
+   * The verification-module load timeout asked for by the loader this browser was assigned, or
+   * undefined when it asked for nothing. The assignment is randomized per page load, so it cannot
+   * be recomputed from the environment config; callers fall back to the instance-wide value on
+   * that config, and then to the SDK default.
+   *
+   * @internal
+   */
+  __internal_protectChallengeLoadTimeoutMs?: number;
 
   frontendApi: string;
 
@@ -1141,6 +1166,22 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
+   * Resumes redirect-callback routing after a verification challenge has been cleared, from
+   * a page that is no longer the callback route.
+   *
+   * A challenge can interrupt a callback partway through routing, on a step whose
+   * continuation is not one of the interactive sign-in cards — an OAuth sign-in that has to
+   * become a sign-up, for instance. Once the challenge clears, the flow has to pick up where
+   * the callback left off rather than start over.
+   *
+   * @internal
+   */
+  __internal_resumeAfterProtectCheck: (
+    params?: ResumeAfterProtectCheckParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
    *
    * @param params - Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution.
@@ -1325,9 +1366,42 @@ export type HandleOAuthCallbackParams = TransferableOption &
       redirectUrl: string;
       decorateUrl: (url: string) => string;
     }) => Promise<unknown>;
+    /**
+     * Internal navigation hook used by Clerk UI to keep intermediate OAuth callback navigations
+     * (continue, factor steps, sign-in/sign-up switches) inside the component's own router when the
+     * callback completes in-process (transport flows). Not set by the web redirect/popup paths.
+     *
+     * @internal
+     */
+    __internal_navigate?: (to: string) => Promise<unknown>;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
+
+/**
+ * The continuation a caller observed on the resource *before* it ran a verification
+ * challenge. Supplied explicitly, because resolving a challenge re-serializes the sign-in
+ * and sign-up resources and can drop the marker the router would otherwise read back off
+ * them.
+ *
+ * @internal
+ */
+export type ProtectCheckContinuation = 'transfer_to_sign_up';
+
+/**
+ * Params for resuming a redirect callback that a Protect challenge interrupted.
+ *
+ * @internal
+ */
+export type ResumeAfterProtectCheckParams = HandleOAuthCallbackParams & {
+  /**
+   * What the flow was doing before the challenge interrupted it. See
+   * {@link ProtectCheckContinuation}.
+   *
+   * @internal
+   */
+  continuation?: ProtectCheckContinuation;
+};
 
 /**
  * A function used to navigate to a given URL after certain steps in the Clerk processes.
@@ -1426,6 +1500,18 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * An object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
+    /**
+     * A Clerk Protect assertion — a short-lived, signed token you mint from your own backend
+     * with the Clerk Backend API — carrying key/value pairs your Protect rules can read. Clerk
+     * attaches it to sign-in and sign-up requests.
+     *
+     * Pass a string if you already have one, or a function to have it re-read for each request.
+     * Prefer the function when a page can outlive the token: assertions are short-lived by
+     * design, and a string captured here stops applying once it expires.
+     *
+     * Can also be set later with `Clerk.setProtectAssertion()`.
+     */
+    protectAssertion?: ProtectAssertion;
     /**
      * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
      *

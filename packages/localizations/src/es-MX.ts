@@ -101,8 +101,11 @@ export const esMX: LocalizationResource = {
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      discount: undefined,
       downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
@@ -117,6 +120,8 @@ export const esMX: LocalizationResource = {
       },
       pastDueNotice: undefined,
       perMonth: undefined,
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: undefined,
       title__paymentSuccessful: '¡Pago exitoso!',
       title__subscriptionSuccessful: '¡Éxito!',
@@ -127,6 +132,9 @@ export const esMX: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratis',
     getStarted: 'Empezar',
     highlightedPlanBadge: undefined,
@@ -138,6 +146,7 @@ export const esMX: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -216,6 +225,7 @@ export const esMX: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -938,6 +948,7 @@ export const esMX: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1749,6 +1760,7 @@ export const esMX: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Contraseña incorrecta.',
     form_password_length_too_short: 'La contraseña es muy corta.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'La contraseña no es suficientemente segura.',
     form_password_or_identifier_incorrect:
       'La contraseña o la dirección de correo electrónico es incorrecta. Inténtalo de nuevo o usa otro método.',

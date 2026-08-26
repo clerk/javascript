@@ -22,27 +22,25 @@ These require reading several files together; the `README.md` covers the step-by
 
 - **Consumes Mosaic from source, not build.** `@clerk/ui/mosaic` is aliased to `../ui/src/mosaic` in *two* places that must stay in sync: `next.config.mjs` (webpack `resolve.alias`) and `tsconfig.json` (`paths`). Editing Mosaic source in `packages/ui` reflects live in swingset's dev server — no rebuild of `@clerk/ui` needed.
 
-- **Knobs are generated from CVA metadata, not hand-written.** A story's `meta.styles` is a Mosaic CVA style object exposing `_variants` / `_defaultVariants`. `lib/generateKnobs.ts` turns each variant into a control: variants whose keys are only `true`/`false` become boolean toggles, everything else becomes a select. Knob values are passed as props straight into the story component. This is why story functions take `Record<string, unknown>` and cast to the real prop type.
+- **Knobs are generated from a story's declared variant surface.** A story's `meta.styles` is a hand-written `{ _variants, _defaultVariants }` object describing the component's variant props — StyleX compiles its styles away, so there is no runtime recipe to derive this from. `lib/generateKnobs.ts` turns each variant into a control: variants whose keys are only `true`/`false` become boolean toggles, everything else becomes a select. Knob values are passed as props straight into the story component. This is why story functions take `Record<string, unknown>` and cast to the real prop type.
 
 - **`lib/registry.ts` is the single source of truth for which components exist**, and they are imported *explicitly* (never `import *`) so sidebar order is deterministic. `getSidebarGroups`, `getModuleBySlug`, and slugging (`lib/slug.ts`, from `meta.title`) read from it. Adding a component touches up to three wiring points: `registry.ts` (sidebar entry + per-page playground lookup), `DocsViewer.tsx`'s `docModules` map (MDX docs), and the hardcoded redirect in `app/page.tsx`.
   - ⚠️ **Add each new import and its first usage in the same edit.** The on-save lint-fix (`unused-imports/no-unused-imports` is an `error`) deletes any import that isn't referenced yet, so importing a story export in `registry.ts` (or a component in a `*.stories.tsx`) *before* the code that uses it silently drops the import and you get `X is not defined` at runtime. After wiring, `grep` the new symbol to confirm both the import and its use survived. (Repo-wide footgun; see `clerk-monorepo` skill `references/setup-and-footguns.md`.)
 
-- **Routing.** Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives *inside* the overview. `app/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (Emotion / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
+- **Routing.** Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives *inside* the overview. `app/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (client components / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
 
-- **Shared playground state.** `DocsViewer` wraps each overview in a `PlaygroundProvider` (`PlaygroundContext.tsx`), keyed by slug and seeded from the component's `meta` via `getModuleBySlug`. It owns the knob values (props) and live `MosaicVariables`. The `<Preview>` and the interactive `<PropTable>` both read/write this single context, so editing a prop in the table updates the preview above it.
+- **Shared playground state.** `DocsViewer` wraps each overview in a `PlaygroundProvider` (`PlaygroundContext.tsx`), keyed by slug and seeded from the component's `meta` via `getModuleBySlug`. It owns the knob values (props). The `<Preview>` and the interactive `<PropTable>` both read/write this single context, so editing a prop in the table updates the preview above it.
 
-- **Every story renders inside `MosaicProvider`.** `StoryPreview` (the MDX `<Preview>`) renders a named story with the playground's knob values as props, applies the variable overrides, and exposes a Reset button plus a collapsible `VariablesPanel` attached to the preview. `StoryEmbed` (the MDX `<Story>`) renders a single static variation with default knob values and no controls.
+- **Every story renders inside `MosaicProvider`.** `StoryPreview` (the MDX `<Preview>`) renders a named story with the playground's knob values as props and exposes a Reset button. `StoryEmbed` (the MDX `<Story>`) renders a single static variation with default knob values and no controls.
 
-- **The prop table is the knob surface.** `PropTable` (MDX `<PropTable>`) derives rows from `meta.styles._variants`/`_defaultVariants`, then appends the escape-hatch rows for the component's styling engine (`meta.styleEngine`): Emotion components get `sx`, StyleX components get `className` + `style`. Each variant row renders a `KnobControl` in its **Value** column, seeded with the prop's default and bound to the playground context. The engine rows and `extra` stay static.
-
-- **Variables live in the preview.** The `VariablesPanel` is a collapsible attached to `StoryPreview` (toggled from the preview's header), bound to the shared playground context so editing a Mosaic token override immediately re-themes the story rendered above it.
+- **The prop table is the knob surface.** `PropTable` (MDX `<PropTable>`) derives rows from `meta.styles._variants`/`_defaultVariants`, then appends the `className` + `style` escape-hatch rows every Mosaic component accepts. Each variant row renders a `KnobControl` in its **Value** column, seeded with the prop's default and bound to the playground context. The escape-hatch rows and `extra` stay static.
 
 - **MDX.** `mdx-components.tsx` injects custom components into all MDX: `<Preview>` (→ `StoryPreview`), `<Story>` (→ `StoryEmbed`, static), `<PropTable>` (→ interactive `PropTable`), `<Usage>` (→ `UsageBlock`, a live code snippet that reflects the current knob values), and a `<pre>` override routing fenced code through Shiki (`CodeBlock`). `next.config.mjs` configures `remark-gfm` and `rehype-raw` (with MDX node pass-through) so raw HTML in tables works.
 
 - **`<Story>` examples can show their source in a collapsible code footer.** When a story module exposes its own source as `__source` — via a `?raw` self-import (`export { default as __source } from './x.stories?raw'`) — `StoryEmbed` runs `extractStorySource` (`lib/extractStorySource.ts`) to pull the *previewed story function's* source out of that raw text, then `toUsageSnippet` (`lib/exampleSnippet.ts`) to reduce that knob harness to a clean usage snippet (unwraps `export function …() { return (…) }` down to the returned JSX and strips the `{...knobsAsProps(props)}` / `{...props}` knob plumbing), and renders a `CodeFooter` (`CodeFooter.tsx`): a "View code" toggle that's collapsed by default and reveals the snippet with a height animation (Base UI's `--collapsible-panel-height` + `data-starting/ending-style`). It's **opt-in per module** — only modules that export `__source` get a footer, and it's keyed to whichever story `name` the `<Story>` renders, so each example shows its own code. Shiki highlighting is shared with the `<pre>`/`CodeBlock` path through the `useShikiHtml` hook. A `<Story>` can carry both a code footer and a `composition` footer; they stack under the preview.
   - The `?raw` query is wired in `next.config.mjs`: an `asset/source` rule handles `?raw` imports, and — crucially — a recursive `excludeRawQuery` pass adds `resourceQuery: { not: [/raw/] }` to every *other* loader so Next's SWC loader doesn't compile the file first (otherwise `__source` would contain `_jsxDEV(…)` output instead of the authored source).
 
-- **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's *own* chrome (sidebar, tabs, inputs). The components being *documented* come from `@clerk/ui/mosaic`. Don't confuse the two. Mosaic stories use Emotion (`/** @jsxImportSource @emotion/react */` pragma; `compiler.emotion` enabled in Next).
+- **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's *own* chrome (sidebar, tabs, inputs). The components being *documented* come from `@clerk/ui/mosaic`. Don't confuse the two.
 
 ## Documenting Mosaic components
 
@@ -57,29 +55,27 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 ### Layers
 
-`meta.group` places an entry in one of these layers. Sidebar order follows the `registry` array; group order follows first appearance there. Use these exact group strings:
+`meta.group` places an entry in one of these layers. Sidebar order follows the `registry` array; group order follows first appearance there. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
 
 | Group        | What lives here                                                | Archetype |
 | ------------ | -------------------------------------------------------------- | --------- |
-| `AIO`        | All-in-one flows (e.g. `OrganizationProfile`)                  | C         |
-| `Panels`     | A pane within a flow (e.g. `OrganizationProfileGeneral`)       | C         |
-| `Sections`   | Self-contained feature sections (e.g. `DeleteOrganization`)    | C         |
-| `Blocks`     | Reusable composite UI (e.g. `Destructive`)                     | C         |
-| `Components` | Styled Mosaic components — simple CVA recipe (`Button`, `Input`) or compound/slot-based (`Dialog`, `Tabs`) | A         |
+| `User Button` | Composed flow UI (e.g. `UserButton`)                          | C         |
+| `User Profile` | Composed flow UI (e.g. `UserProfileProfilePanel`)             | C         |
+| `Components` | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A         |
 | `Primitives` | Headless `@clerk/headless` primitives (`Accordion`)            | B         |
 | `Styles`     | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`) | B (adapted) |
 | `Hooks`      | Headless hooks (`useDataTable`)                                | B (adapted) |
 
-`AIO` → `Panels` → `Sections` → `Blocks` → `Components` → `Primitives` runs roughly high-level-composition → low-level-primitive. Composed layers (AIO/Panels/Sections/Blocks) are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
+`User Button` / `User Profile` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
 
 `Styles` and `Hooks` are the non-component layers: there is no element to knob, so they follow
 archetype B's shape (Example → Usage → Parts → Styling) with `Props` replaced by whatever the export
 actually surfaces — an argument table for a style function, a return-value table for a hook. A
-`Styles` entry documents the theme tokens its atoms read, since those tokens _are_ its API; the
+`Styles` entry documents the tokens its atoms read, since those tokens _are_ its API; the
 `Hooks` entry (`use-data-table.stories.tsx`) is `meta` alone, with no story exports at all, which is
 the minimum a section entry needs.
 
-Archetype A has two forms, chosen by whether the component exposes a single flat CVA recipe: **simple** components (`Button`, `Input`) are knob-driven; **compound** components built from slot recipes (`Dialog`, `Tabs`) have no flat variant props to knob, so they're documented like a primitive but themed. Both are detailed under Archetype A below.
+Archetype A has two forms, chosen by whether the component exposes a single flat set of variant props: **simple** components (`Button`, `Input`) are knob-driven; **compound** components (`Card`, `Field`, `Menu`, `Popover`) have no flat variant props to knob, so they're documented like a primitive but themed. Both are detailed under Archetype A below.
 
 ### `meta` conventions (all archetypes)
 
@@ -88,22 +84,24 @@ export const meta: StoryMeta = {
   group: 'Components', // exact group string from the table
   title: 'Button', // drives slug + the page <h1>
   label: 'Delete Org', // optional friendlier sidebar text
-  source: 'packages/ui/src/mosaic/components/button.tsx', // repo-root path → "View source"
-  styleEngine: 'stylex', // set on migrated components; defaults to 'emotion'
-  styles: buttonRecipe, // CVA recipe — archetype A · simple only
+  source: 'packages/ui/src/mosaic/components/button/button.tsx', // repo-root path → "View source"
+  styles: {
+    // Hand-written variant surface — archetype A · simple only
+    _variants: { variant: { primary: {}, outline: {} }, size: { sm: {}, md: {} } },
+    _defaultVariants: { variant: 'primary', size: 'md' },
+  },
 };
 ```
 
 - `title` is the component's export name; it produces the slug and is what readers match against code. Set `label` only when the sidebar should read differently (the slug and page heading still come from `title`).
 - `source` is always a path **relative to the monorepo root**, pointing at the file that exports the documented component. Always set it — it powers the "View source" link.
-- `styleEngine` names the styling engine behind the component. It only affects which escape-hatch row the `<PropTable>` appends (`sx` vs `className` + `style`), so it matters for archetype A. Set `'stylex'` on migrated components; leave it off for Emotion ones.
-- `styles` is the component's CVA recipe/style object and is **required for archetype A's simple (knob-driven) form** (it generates the knobs and the `<PropTable>`). Omit it for compound A components, and for B and C.
+- `styles` declares the component's variant props and is **required for archetype A's simple (knob-driven) form** (it generates the knobs and the `<PropTable>`). Keep it in sync with the component's real prop union by hand — StyleX compiles its styles away, so nothing derives it for you. Omit it for compound A components, and for B and C.
 
-Story files that render styled Mosaic components must start with the Emotion pragma `/** @jsxImportSource @emotion/react */`. Headless-primitive demos render raw and don't need it. Always import the component and its recipe explicitly — never `import *`.
+Always import the component explicitly — never `import *`.
 
 ### Archetype A — styled component (`Components`)
 
-A styled Mosaic component. Which of the two forms below applies is decided by the component's shape, not by preference: if it exposes a single flat CVA recipe (`meta.styles`), use the **simple** form; if it's compound — built from slot recipes with no flat variant props (`Dialog`, `Tabs`) — use the **compound** form.
+A styled Mosaic component. Which of the two forms below applies is decided by the component's shape, not by preference: if it exposes a single flat set of variant props (declared as `meta.styles`), use the **simple** form; if it's compound — a set of parts with no flat variant props (`Card`, `Field`, `Menu`, `Popover`) — use the **compound** form.
 
 **Every `Components`-layer story file exposes its source so each `<Story>` example renders a code footer.** Add the self-import once, right after the imports:
 
@@ -115,9 +113,9 @@ export { default as __source } from './<name>.stories?raw';
 
 That's all the wiring needed — `StoryEmbed` picks `__source` up automatically and renders a collapsible "View code" footer keyed to each example's story function (see the `<Story>` code-footer architecture note above). No MDX change is required; keep authoring `<Story name='…' storyModule={…} />` as before. This applies to both A forms (simple and compound) and to every example a Components page ships.
 
-#### A · simple — single CVA recipe (`Button`, `Input`)
+#### A · simple — flat variant props (`Button`, `Input`)
 
-Has a CVA recipe, so the page is **knob-driven**: an interactive canvas plus an auto-generated prop table. Required MDX section order:
+Has a declared variant surface, so the page is **knob-driven**: an interactive canvas plus a generated prop table. Required MDX section order:
 
 ```mdx
 import * as ButtonStories from './button.stories';
@@ -167,25 +165,25 @@ import * as ButtonStories from './button.stories';
 
 - **Playground / Props / Usage are mandatory and always in this order.** The three share one playground state: editing a row in `<PropTable>` re-renders `<Preview>` above it and regenerates the `<Usage>` snippet below it.
 - The story file exports a primary demo (rendered by `<Preview>`) plus one named export per variation under **Examples**. Each story takes `props: Record<string, unknown>` and casts through a local `knobsAsProps` helper — knobs are dynamically typed, the component isn't.
-- Use `<PropTable>`'s `extra` for documenting non-variant props; the styling escape hatch is appended for you (`sx`, or `className` + `style` when `meta.styleEngine` is `'stylex'`).
+- Use `<PropTable>`'s `extra` for documenting non-variant props; the `className` + `style` escape-hatch rows are appended for you.
 - Use `<Usage props={{…}}>` to pin static, non-knob props in the generated snippet.
-- `<PropTable>` renders `Prop | Type | Default | Value`: the **Default** column is filled automatically from the recipe's `_defaultVariants`, and the **Value** column is the live knob seeded with that default. No manual default annotation is needed; see _Document the default value_ under Archetype B.
+- `<PropTable>` renders `Prop | Type | Default | Value`: the **Default** column is filled from `meta.styles._defaultVariants`, and the **Value** column is the live knob seeded with that default. No per-row default annotation is needed; see _Document the default value_ under Archetype B.
 
-#### A · compound — slot recipes, no flat CVA (`Dialog`, `Tabs`)
+#### A · compound — parts, no flat variant props (`Card`, `Field`, `Menu`, `Popover`)
 
-A compound styled component (`Dialog.Root`/`Dialog.Popup`/…) has no single flat prop interface to knob, so there's no `<Preview>` or `<PropTable>`. Document it like a primitive (archetype B) but themed — the difference is the **Styling** section, which describes the Mosaic recipe and per-slot `appearance.elements` overrides rather than "bring your own CSS". Required MDX section order:
+A compound styled component (`Popover.Root`/`Popover.Popup`/…) has no single flat prop interface to knob, so there's no `<Preview>` or `<PropTable>`. Document it like a primitive (archetype B) but themed — the difference is the **Styling** section, which lists each part's `.cl-<slot>` class and `data-<axis>` attributes rather than saying "bring your own CSS". Required MDX section order:
 
 ```mdx
-import * as DialogStories from './dialog.component.stories';
+import * as PopoverStories from './popover.component.stories';
 
-# Dialog
+# Popover
 
-<!-- Intro: state it's the styled Mosaic component composed from the `@clerk/headless`
-     primitive + slot recipes, and that it inherits the primitive's behavior/ARIA. -->
+<!-- Intro: state it's the styled Mosaic component built on the `@clerk/headless`
+     primitive, and that it inherits the primitive's behavior/ARIA. -->
 
 ## Example
 
-<Story name='Default' storyModule={DialogStories} />
+<Story name='Default' storyModule={PopoverStories} />
 
 ## Usage
 
@@ -193,19 +191,19 @@ import * as DialogStories from './dialog.component.stories';
 
 ## Parts
 
-<!-- Table: part | slot (`data-cl-slot`) | description. -->
+<!-- Table: part | class (`.cl-<slot>`) | description. -->
 
 ## Styling
 
-<!-- How the Mosaic recipe themes each slot, and how to override per slot via
-     `appearance.elements` (e.g. `{ 'dialog-popup': { borderRadius: 24 } }`). -->
+<!-- Each part's `.cl-<slot>` class and the `data-<axis>` attributes it reflects, plus
+     the `--cl-*` tokens it reads, with a CSS example. -->
 ```
 
-The story is `meta` (no `styles`) plus a single `Default` export that renders the composed parts. The file pair is named `<name>.component.stories.tsx` / `<name>.component.mdx` so it doesn't collide with the headless `Primitives` entry of the same title (e.g. `Dialog`, `Tabs` exist in both layers); the `docModules` map disambiguates by group.
+The story is `meta` (no `styles`) plus a single `Default` export that renders the composed parts. The file pair is named `<name>.component.stories.tsx` / `<name>.component.mdx` so it doesn't collide with the headless `Primitives` entry of the same title (e.g. `Menu`, `Popover` exist in both layers); the `docModules` map disambiguates by group.
 
 ### Archetype B — headless primitive (`Primitives`)
 
-No styles, so there's no knob canvas. The single demo renders the primitive **raw (unstyled)** to show only behavior, state, and ARIA wiring. The prop/styling tables are **hand-written** (there's no CVA recipe to derive them). Required MDX section order:
+No styles, so there's no knob canvas. The single demo renders the primitive **raw (unstyled)** to show only behavior, state, and ARIA wiring. The prop/styling tables are **hand-written** (there is no variant surface to derive them from). Required MDX section order:
 
 ```mdx
 # Accordion
@@ -238,29 +236,29 @@ No styles, so there's no knob canvas. The single demo renders the primitive **ra
      custom properties (e.g. `--cl-accordion-panel-height`) with a CSS example. -->
 ```
 
-The story is `meta` (no `styles`) plus a single `Default` export that renders the primitive unstyled. Don't add a `<Preview>` or `<PropTable>` — primitives have neither knobs nor a CVA recipe to drive them.
+The story is `meta` (no `styles`) plus a single `Default` export that renders the primitive unstyled. Don't add a `<Preview>` or `<PropTable>` — primitives have neither knobs nor a variant surface to drive them.
 
-**Document the default value for every prop in a dedicated Default column.** Every props table — auto and hand-written — has a **Default** column; the `Type` stays a plain union/enum and the default is named in its own column (the convention every component-doc site and TypeDoc's `@default` tag follow), never inlined into the type. The auto `<PropTable>` renders `Prop | Type | Default | Value` and fills Default from the recipe's `_defaultVariants` (the **Value** column is the live knob seeded with that default); hand-written tables render `Prop | Type | Default | Description` and fill it by hand. Name the default member (`'base'`, `'multiple'`, `'bottom-start'`); use `—` when there is no default (a controlled-only or required prop) and append `(required)` for required props; when the default is behavioral rather than a literal, state it in words (`inherits Root`, `falls back to value`).
+**Document the default value for every prop in a dedicated Default column.** Every props table — auto and hand-written — has a **Default** column; the `Type` stays a plain union/enum and the default is named in its own column (the convention every component-doc site and TypeDoc's `@default` tag follow), never inlined into the type. The auto `<PropTable>` renders `Prop | Type | Default | Value` and fills Default from `meta.styles._defaultVariants` (the **Value** column is the live knob seeded with that default); hand-written tables render `Prop | Type | Default | Description` and fill it by hand. Name the default member (`'base'`, `'multiple'`, `'bottom-start'`); use `—` when there is no default (a controlled-only or required prop) and append `(required)` for required props; when the default is behavioral rather than a literal, state it in words (`inherits Root`, `falls back to value`).
 
-### Archetype C — composed layer (`AIO` / `Panels` / `Sections` / `Blocks`)
+### Archetype C — composed layer (`User Button`, `User Profile`)
 
 These compose lower layers, so the docs lead with the composition rather than knobs. Required MDX:
 
 ```mdx
-import * as DeleteOrganizationStories from './delete-organization.stories';
+import * as UserButtonStories from './user-button.stories';
 
-# Delete Organization
+# UserButton
 
 <!-- One paragraph: what state this owns and which lower-layer pieces it wires together. -->
 
 <Story
   name='Default'
-  storyModule={DeleteOrganizationStories}
+  storyModule={UserButtonStories}
   composition={[
-    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
-    { name: 'Button', href: '/components/button', layer: 'Components' },
-    { name: 'Input', href: '/components/input', layer: 'Components' },
-    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Popover', href: '/components/popover', layer: 'Components' },
   ]}
 />
 ```
@@ -277,9 +275,9 @@ import * as DeleteOrganizationStories from './delete-organization.stories';
 ### Before you finish
 
 - [ ] `meta.source` is set to a repo-root-relative path.
-- [ ] Story renders (Emotion pragma present for styled components).
+- [ ] Story renders.
 - [ ] `Components`-layer story files export `__source` (the `?raw` self-import) so every `<Story>` example gets a "View code" footer.
 - [ ] MDX sections match the archetype's required order exactly.
-- [ ] Every props-table row states its default in the **Default** column (auto `<PropTable>` fills it from `_defaultVariants`; `—` / `(required)` when none).
+- [ ] Every props-table row states its default in the **Default** column (auto `<PropTable>` fills it from `meta.styles._defaultVariants`; `—` / `(required)` when none).
 - [ ] Wiring done per `README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/page.tsx` redirect if this is now the first component.
 - [ ] `pnpm format --filter @clerk/swingset` is clean.

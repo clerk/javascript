@@ -106,8 +106,11 @@ export const msMY: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Anda tidak boleh melanggan pelan ini. Langganan sedia ada anda lebih mahal daripada pelan ini.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Pembayaran anda berjaya.',
       description__subscriptionSuccessful: 'Langganan baharu anda telah sedia.',
+      discount: undefined,
       downgradeNotice:
         'Anda akan mengekalkan langganan semasa anda dan cirinya sehingga akhir kitaran pengebilan, kemudian anda akan ditukar kepada langganan ini.',
       emailForm: {
@@ -124,6 +127,8 @@ export const msMY: LocalizationResource = {
       },
       pastDueNotice: 'Langganan anda sebelum ini tertunggak, tanpa pembayaran.',
       perMonth: 'sebulan',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pembayaran',
       title__paymentSuccessful: 'Pembayaran berjaya!',
       title__subscriptionSuccessful: 'Berjaya!',
@@ -134,6 +139,9 @@ export const msMY: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit untuk baki langganan semasa anda.',
     defaultFreePlanActive: 'Anda kini menggunakan pelan Percuma',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Percuma',
     getStarted: 'Mulakan',
     highlightedPlanBadge: 'Popular',
@@ -145,6 +153,7 @@ export const msMY: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Bulanan',
+    months: undefined,
     pastDue: 'Tertunggak',
     pay: 'Bayar {{amount}}',
     payerCreditRemainder: undefined,
@@ -223,6 +232,7 @@ export const msMY: LocalizationResource = {
     year: 'Tahun',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -944,6 +954,7 @@ export const msMY: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -1765,6 +1776,7 @@ export const msMY: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
     form_password_or_identifier_incorrect:
       'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
