@@ -9,12 +9,12 @@ export type {
   ReverificationDialogResend,
   ReverificationDialogVerifyProps,
 } from './reverification-dialog';
-export { reverificationDialogMachine, reverificationFactorKey } from './reverification-dialog.machine';
+export { reverificationDialogController, reverificationFactorKey } from './reverification-dialog.controller';
 export type {
-  ReverificationDialogMachineContext,
-  ReverificationDialogMachineEvent,
-  ReverificationDialogMachineSnapshot,
-} from './reverification-dialog.machine';
+  ReverificationDialogControllerContext,
+  ReverificationDialogControllerEvent,
+  ReverificationDialogControllerSnapshot,
+} from './reverification-dialog.controller';
 export type * from './reverification-dialog.types';
 export { ReverificationDialogView } from './reverification-dialog.view';
 export type { ReverificationDialogViewProps } from './reverification-dialog.view';

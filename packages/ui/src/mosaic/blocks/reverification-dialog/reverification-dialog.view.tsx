@@ -1,8 +1,8 @@
 import { useMachine } from '../../machine/useMachine';
 import type { ReverificationDialogMethod, ReverificationDialogProps } from './reverification-dialog';
 import { ReverificationDialog } from './reverification-dialog';
-import type { ReverificationDialogMachineContext } from './reverification-dialog.machine';
-import { reverificationDialogMachine, reverificationFactorKey } from './reverification-dialog.machine';
+import type { ReverificationDialogControllerContext } from './reverification-dialog.controller';
+import { reverificationDialogController, reverificationFactorKey } from './reverification-dialog.controller';
 import { fill, reverificationDialogBase as m } from './reverification-dialog.messages';
 import type {
   ReverificationAttempt,
@@ -14,7 +14,7 @@ import type {
 } from './reverification-dialog.types';
 
 export interface ReverificationDialogViewProps {
-  /** The methods this run may use, captured when the machine starts. */
+  /** The methods this run may use, captured when the controller starts. */
   initialChallenge: ReverificationChallenge;
   /** Sends a code for a method that delivers one. Reject to keep the user on the code step. */
   prepare: (factor: ReverificationPreparationFactor) => Promise<void>;
@@ -83,16 +83,16 @@ const asMethod = (factor: ReverificationFactor): ReverificationDialogMethod => (
   label: methodLabel(factor),
 });
 
-const alternativesTo = (context: ReverificationDialogMachineContext) =>
+const alternativesTo = (context: ReverificationDialogControllerContext) =>
   context.challenge.factors.filter(
     factor =>
       !context.currentFactor || reverificationFactorKey(factor) !== reverificationFactorKey(context.currentFactor),
   );
 
 /**
- * Drives {@link ReverificationDialog} with {@link reverificationDialogMachine}.
+ * Drives {@link ReverificationDialog} with {@link reverificationDialogController}.
  *
- * Every decision about what the flow does next lives in the machine; this layer only turns a
+ * Every decision about what the flow does next lives in the controller; this layer only turns a
  * snapshot into the block's props and the block's callbacks into events. The Clerk work arrives
  * as `prepare` and `attempt`, so the whole flow runs against plain promises in a test or a story.
  */
@@ -104,7 +104,7 @@ export function ReverificationDialogView({
   onCancel,
   supportEmail,
 }: ReverificationDialogViewProps) {
-  const [snapshot, send, actor] = useMachine(reverificationDialogMachine, {
+  const [snapshot, send, actor] = useMachine(reverificationDialogController, {
     context: { initialChallenge, prepare, attempt, complete: onComplete, cancel: onCancel },
   });
   const { context } = snapshot;

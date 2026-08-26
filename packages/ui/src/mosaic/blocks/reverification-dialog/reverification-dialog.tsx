@@ -100,7 +100,7 @@ export type ReverificationDialogProps =
   | ReverificationDialogVerifyProps
   | ReverificationDialogMessageProps;
 
-/** Every code this dialog asks for is six characters, the length the flow's machine normalizes to. */
+/** Every code this dialog asks for is six characters, the length the flow's controller normalizes to. */
 const CODE_LENGTH = 6;
 
 /**
@@ -128,7 +128,7 @@ function CodeSlots({ baseId, invalid }: { baseId: string; invalid: boolean }) {
  *
  * Controlled and stateless: every label, every enabled/disabled decision, and `open` itself
  * belong to the caller. The block holds nothing, so a step renders identically whether it was
- * reached from a machine or from a story.
+ * reached from a controller or from a story.
  *
  * @example
  * <ReverificationDialog

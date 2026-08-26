@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/createActor';
-import { reverificationDialogMachine, reverificationFactorKey } from './reverification-dialog.machine';
+import { reverificationDialogController, reverificationFactorKey } from './reverification-dialog.controller';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
@@ -69,7 +69,7 @@ function start({
   complete?: (result: ReverificationCompleteResult) => Promise<void>;
   cancel?: () => void;
 } = {}) {
-  const actor = createActor(reverificationDialogMachine, {
+  const actor = createActor(reverificationDialogController, {
     context: { initialChallenge: challenge, prepare, attempt, complete, cancel },
   }).start();
   return { actor, prepare, attempt, complete, cancel };
@@ -79,7 +79,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('reverificationDialogMachine', () => {
+describe('reverificationDialogController', () => {
   it('starts at factor selection when no initial factor is provided', () => {
     const { actor } = start({ challenge: firstFactorChallenge() });
 

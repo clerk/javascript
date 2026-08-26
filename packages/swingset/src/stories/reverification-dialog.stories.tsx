@@ -125,7 +125,7 @@ const scenarios: Scenario[] = [
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => window.setTimeout(resolve, ms));
 
-function MachineDrivenDialog({ scenario, onFinished }: { scenario: Scenario; onFinished: () => void }) {
+function ControllerDrivenDialog({ scenario, onFinished }: { scenario: Scenario; onFinished: () => void }) {
   const prepare = React.useCallback(async (_factor: ReverificationPreparationFactor) => {
     await settleAfter(600);
   }, []);
@@ -140,7 +140,7 @@ function MachineDrivenDialog({ scenario, onFinished }: { scenario: Scenario; onF
     [scenario.continuesToSecondFactor],
   );
   // The view finishes in a final state, so the story unmounts it to make the demo repeatable.
-  // Deferred a tick because the machine reports cancellation from inside its own transition.
+  // Deferred a tick because the controller reports cancellation from inside its own transition.
   const finish = React.useCallback(() => window.setTimeout(onFinished, 0), [onFinished]);
   // Stands in for activating the session, which the dialog waits out before it closes.
   const onComplete = React.useCallback(
@@ -187,7 +187,7 @@ export function Default() {
         ))}
       </div>
       {active ? (
-        <MachineDrivenDialog
+        <ControllerDrivenDialog
           key={active.runId}
           scenario={active.scenario}
           onFinished={() => setActive(null)}

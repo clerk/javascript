@@ -16,9 +16,9 @@ integration caller
         |
         v
 actor-owning view
-  creates the machine actor, renders snapshots, emits events
+  creates the controller actor, renders snapshots, emits events
         |
-        +----------> pure machine
+        +----------> pure controller
         |
         v
 controlled renderer
@@ -37,13 +37,13 @@ The reverification implementation follows the same shape:
 
 - `ReverificationDialogView` accepts an initial challenge plus `prepare`, `attempt`, `onComplete`, and `onCancel`; it
   owns the actor and derives `actor.can(...)` values.
-- `reverificationDialogMachine` owns factor selection, preparation, submission, resend, help, completion, and
+- `reverificationDialogController` owns factor selection, preparation, submission, resend, help, completion, and
   cancellation transitions.
-- `ReverificationDialog` is the block's controlled, stateless renderer. The answer belongs to the machine because
+- `ReverificationDialog` is the block's controlled, stateless renderer. The answer belongs to the controller because
   guards and attempts use it.
 
-The machine, actor-owning view, renderer, messages, and shared vocabulary are internal roles of one cohesive block
-module. They are colocated behind one `index.ts`; a future controller belongs in the same directory.
+The controller, actor-owning view, renderer, messages, and shared vocabulary are internal roles of one cohesive block
+module. They are colocated behind one `index.ts`.
 
 No separate controller is required to match that precedent. Before the flow becomes reachable, it will still need a
 production integration wrapper that translates Clerk resources into the plain interface above. That wrapper is an
@@ -146,7 +146,7 @@ message.
 
 | Legacy behavior                                                                               | Status               | Current Mosaic evidence or gap                                                                                                                                                                                                       |
 | --------------------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Machine-owned selection, preparation, attempt, resend, and cancellation                       | Migrated             | Explicit machine states and injected `prepare` / `attempt` operations.                                                                                                                                                               |
+| Controller-owned selection, preparation, attempt, resend, and cancellation                    | Migrated             | Explicit controller states and injected `prepare` / `attempt` operations.                                                                                                                                                            |
 | First-factor success can continue to second factor                                            | Migrated             | `needs_second_factor` replaces the challenge and returns through `starting`.                                                                                                                                                         |
 | Six-digit email, phone, and TOTP codes submit automatically                                   | Migrated             | `CHANGE_VALUE` normalizes to six digits and targets `submitting`.                                                                                                                                                                    |
 | The unchanged prepared factor is not prepared again after opening alternatives and going Back | Migrated             | The module-derived `preparedFactorKey` survives `SHOW_ALTERNATIVES` / `BACK`.                                                                                                                                                        |
@@ -154,7 +154,7 @@ message.
 | Start verification, loading, level default, and cache lifecycle                               | Deferred             | The view starts from an already-built `ReverificationChallenge`; no Clerk integration exists.                                                                                                                                        |
 | Filter, capability-check, sort, and choose the starting factor                                | Deferred             | The caller supplies ordered factors and an optional `initialFactor`; the module derives and validates identities.                                                                                                                    |
 | Preserve Clerk preparation data                                                               | Deferred             | The custom first-factor phone type omits `default`; an adapter must retain or look up the original factor.                                                                                                                           |
-| Field error versus card error based on Clerk error metadata                                   | Deferred integration | The machine accepts semantic `answer` / `flow` errors. The future adapter must normalize Clerk error metadata into that vocabulary.                                                                                                  |
+| Field error versus card error based on Clerk error metadata                                   | Deferred integration | The controller accepts semantic `answer` / `flow` errors. The future adapter must normalize Clerk error metadata into that vocabulary.                                                                                               |
 | Activate the completed session before retrying the protected action                           | Migrated contract    | A complete attempt retains its `sessionId`; `completing` awaits `complete(result)` before entering the final state.                                                                                                                  |
 | Update and invalidate the verification cache                                                  | Deferred             | No integration layer exists.                                                                                                                                                                                                         |
 | Close without cancellation, then retry the protected operation once                           | Deferred             | `onComplete` / `onCancel` remain injected operations until the integration adapter exists.                                                                                                                                           |
@@ -170,19 +170,19 @@ message.
 
 ## Interface review
 
-The machine/view/renderer split is sound, but the current external interface is shallower than the delete-account
+The controller/view/renderer split is sound, but the current external interface is shallower than the delete-account
 precedent. Delete account asks its caller for one operation. Reverification asks its caller to understand factor IDs,
 stage tags, initial-factor policy, lossy resource translation, preparation, attempt result normalization, activation,
 and modal completion semantics.
 
 Before production integration:
 
-1. Add one integration wrapper that owns Clerk hooks/resources and translates them into the existing plain machine
+1. Add one integration wrapper that owns Clerk hooks/resources and translates them into the existing plain controller
    dependencies. It does not need to be named or factored as a controller.
 2. Make challenge construction one reusable function so filtering, capability checks, ordering, and initial-factor
    selection cannot drift across callers or tests. Factor identities are already derived and duplicate identities
-   are rejected by the machine.
-3. Normalize Clerk errors into the machine's `answer` / `flow` vocabulary. Plain rejected errors deliberately fall
+   are rejected by the controller.
+3. Normalize Clerk errors into the controller's `answer` / `flow` vocabulary. Plain rejected errors deliberately fall
    back to flow-level messages rather than inferring placement from strategy.
 4. Implement `onComplete(result)` by activating `result.sessionId`, then retrying the protected operation. A failed
    completion now enters `completionFailed`; retry invokes only `complete(result)`, never the successful attempt.
@@ -194,7 +194,7 @@ moving any of this policy would not.
 
 ## Verification snapshot
 
-On the current branch, the three targeted files contain 49 tests: 19 machine, 16 actor-owning view, and 14 block tests.
+On the current branch, the three targeted files contain 49 tests: 19 controller, 16 actor-owning view, and 14 block tests.
 The targeted Vitest run passes all 49. The run reports that Vite did not exit within its
 10-second close timeout, although Vitest reports the tests themselves closed successfully.
 

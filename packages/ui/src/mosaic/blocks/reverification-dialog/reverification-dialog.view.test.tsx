@@ -113,7 +113,7 @@ describe('ReverificationDialogView', () => {
       prepare,
     });
 
-    // The machine takes no keystroke until the code is out, so an editable-looking field would
+    // The controller accepts no keystroke until the code is out, so an editable-looking field would
     // swallow one.
     await waitFor(() => expect(codeSlots()[0]).toBeDisabled());
 
