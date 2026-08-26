@@ -595,6 +595,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.tokenType).toBe('oauth_token');
       expect(result.data).toMatchInlineSnapshot(`
         IdPOAuthAccessToken {
+          "aud": "https://my-resource.example.com",
           "clientId": "client_2VTWUzvGC5UhdJCNx6xG1D98edc",
           "createdAt": 1666648250000,
           "expiration": 1666648550000,
@@ -611,6 +612,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
           "updatedAt": 1666648250000,
         }
       `);
+      expect((result.data as IdPOAuthAccessToken).aud).toBe(audience);
       expect(result.errors).toBeUndefined();
     });
 
