@@ -70,7 +70,7 @@ const Label = React.forwardRef<HTMLSpanElement, BannerLabelProps>(function Mosai
 ) {
   const color = React.useContext(BannerColorContext);
   return useRender({
-    defaultTagName: 'span',
+    defaultTagName: 'p',
     render,
     ref,
     props: {

@@ -14,7 +14,7 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     gap: space['1.5'],
-    paddingBlock: space['1.5'],
+    paddingBlock: space['2'],
     paddingInline: space['3'],
     alignItems: 'flex-start',
     display: 'flex',
@@ -36,7 +36,6 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   description: {
-    margin: 0,
     textWrap: 'pretty',
   },
 });
