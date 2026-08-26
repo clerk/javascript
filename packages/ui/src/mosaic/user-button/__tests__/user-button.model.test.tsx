@@ -129,13 +129,7 @@ function membership(orgId: string, name: string, membersCount: number) {
 }
 
 function list(data: unknown[], count: number, hasNextPage = false, isLoading = false): FakeList {
-  return {
-    data,
-    count,
-    hasNextPage,
-    isLoading,
-    revalidate: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
-  };
+  return { data, count, hasNextPage, isLoading, revalidate: vi.fn<() => Promise<void>>().mockResolvedValue(undefined) };
 }
 
 beforeEach(() => {
@@ -247,6 +241,12 @@ function Harness({ customPages, ...options }: UserButtonModelOptions & { customP
       </button>
       <button
         type='button'
+        onClick={() => void c.onSelectOrganization?.('org_3')}
+      >
+        select-invited-org
+      </button>
+      <button
+        type='button'
         onClick={() => void c.onSwitchSession?.('sess_2')}
       >
         switch
@@ -315,6 +315,19 @@ function memberships() {
 
 function invitations() {
   return JSON.parse(screen.getByTestId('invitations').textContent ?? '[]');
+}
+
+// A configured after-select URL routes through `setActive`'s navigate callback, so what it does with
+// the session `setActive` settles on is the assertion.
+async function expectNavigatedAfterSelect(url: string) {
+  const navigateOnSetActive = setActive.mock.calls.at(-1)?.[0].navigate;
+  await act(async () => {
+    await navigateOnSetActive({
+      session: { user: { ...(user as FakeUser), organizationMemberships: userMemberships.data } },
+      decorateUrl: (to: string) => to,
+    });
+  });
+  expect(navigate).toHaveBeenCalledWith(url);
 }
 
 function activeOrganization() {
@@ -535,19 +548,20 @@ describe('useUserButtonModel', () => {
     expect(screen.getByTestId('can-invite')).toHaveTextContent('false');
   });
 
-  it('selects an organization via setActive, with no redirect unless one is configured', () => {
+  it('selects an organization via setActive, with no redirect unless one is configured', async () => {
     const { rerender } = render(<Harness />);
 
     fireEvent.click(screen.getByText('select-org'));
-    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: undefined });
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9' });
 
     rerender(<Harness afterSelectOrganizationUrl='/orgs/:id' />);
     fireEvent.click(screen.getByText('select-org'));
-    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/orgs/org_9' });
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', navigate: expect.any(Function) });
+    await expectNavigatedAfterSelect('/orgs/org_9');
 
     rerender(<Harness afterSelectOrganizationUrl={org => `/o/${org.name}`} />);
     fireEvent.click(screen.getByText('select-org'));
-    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/Other' });
+    await expectNavigatedAfterSelect('/o/Other');
   });
 
   // `null` is Clerk's own name for the personal workspace, and there is no organization for
@@ -556,18 +570,19 @@ describe('useUserButtonModel', () => {
     render(<Harness afterSelectOrganizationUrl='/orgs/:id' />);
 
     fireEvent.click(screen.getByText('select-personal'));
-    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: undefined });
+    expect(setActive).toHaveBeenCalledWith({ organization: null });
   });
 
-  it('redirects the personal workspace to the configured afterSelectPersonalUrl', () => {
+  it('redirects the personal workspace to the configured afterSelectPersonalUrl', async () => {
     const { rerender } = render(<Harness afterSelectPersonalUrl='/u/:id' />);
 
     fireEvent.click(screen.getByText('select-personal'));
-    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: '/u/user_1' });
+    expect(setActive).toHaveBeenCalledWith({ organization: null, navigate: expect.any(Function) });
+    await expectNavigatedAfterSelect('/u/user_1');
 
     rerender(<Harness afterSelectPersonalUrl={u => `/u/${u.username}`} />);
     fireEvent.click(screen.getByText('select-personal'));
-    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: '/u/alice' });
+    await expectNavigatedAfterSelect('/u/alice');
   });
 
   // The two are configured apart, so routing the personal workspace leaves the organizations alone.
@@ -575,7 +590,7 @@ describe('useUserButtonModel', () => {
     render(<Harness afterSelectPersonalUrl='/u/:id' />);
 
     fireEvent.click(screen.getByText('select-org'));
-    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: undefined });
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9' });
   });
 
   // An instance that requires an organization has no personal workspace: clerk-js refuses
@@ -821,6 +836,29 @@ describe('useUserButtonModel', () => {
     expect(suggestion.accept).toHaveBeenCalledTimes(1);
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
     expect(userMemberships.revalidate).toHaveBeenCalledTimes(1);
+  });
+
+  // Accepting an invitation joins the organization before the membership list has caught up, so the
+  // row for one is only ever clicked while the list the popup was rendered from is behind. The
+  // organization is resolved from the session `setActive` settles on instead.
+  it('routes a selected organization the membership list has yet to catch up with', async () => {
+    render(<Harness afterSelectOrganizationUrl={org => `/o/${org.name}`} />);
+
+    fireEvent.click(screen.getByText('select-invited-org'));
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_3', navigate: expect.any(Function) });
+
+    const navigateOnSetActive = setActive.mock.calls[0][0].navigate;
+    const decorateUrl = vi.fn((url: string) => url);
+    await act(async () => {
+      await navigateOnSetActive({
+        session: { user: { ...(user as FakeUser), organizationMemberships: [membership('org_3', 'Gamma', 2)] } },
+        decorateUrl,
+      });
+    });
+
+    expect(navigate).toHaveBeenCalledWith('/o/Gamma');
+    // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
+    expect(decorateUrl).toHaveBeenCalledWith('/o/Gamma');
   });
 
   // `afterSwitchSessionUrl` is empty unless the instance sets one, and navigating to an empty URL

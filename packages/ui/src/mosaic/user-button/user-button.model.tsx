@@ -236,13 +236,23 @@ export function useUserButtonModel(
     return [toSession(s.id, sessionUser)];
   });
 
-  const afterSelectUrl = (organizationId: string | null): string | undefined => {
+  // Resolved against the account `setActive` settled on rather than the one the popup was rendered
+  // from: a just-accepted invitation is a workspace before it is a membership, and its row is only
+  // ever clicked in that window, so the list here has yet to name the organization it selects.
+  const afterSelectUrl = (organizationId: string | null, settledUser: UserResource): string | undefined => {
     if (!organizationId) {
-      return resolveAfterSelectUrl(options?.afterSelectPersonalUrl, user);
+      return resolveAfterSelectUrl(options?.afterSelectPersonalUrl, settledUser);
     }
-    const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
+    const selected = [...settledUser.organizationMemberships, ...membershipData].find(
+      m => m.organization.id === organizationId,
+    )?.organization;
     return selected ? resolveAfterSelectUrl(options?.afterSelectOrganizationUrl, selected) : undefined;
   };
+
+  // A `navigate` callback is what puts clerk-js into its navigating state, so it goes out only where
+  // there is somewhere to route to. Without one, selecting a workspace leaves the page alone.
+  const routesAfterSelect = (organizationId: string | null) =>
+    Boolean(organizationId ? options?.afterSelectOrganizationUrl : options?.afterSelectPersonalUrl);
 
   return {
     status: 'ready',
@@ -264,7 +274,18 @@ export function useUserButtonModel(
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
     onSelectOrganization: organizationId =>
-      clerk.setActive({ organization: organizationId, redirectUrl: afterSelectUrl(organizationId) }),
+      clerk.setActive({
+        organization: organizationId,
+        ...(routesAfterSelect(organizationId) && {
+          navigate: async ({ session: settled, decorateUrl }) => {
+            const url = afterSelectUrl(organizationId, settled.user ?? user);
+            if (url) {
+              // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
+              await router.navigate(decorateUrl(url));
+            }
+          },
+        }),
+      }),
     // The session switched to can carry a task of its own, and a plain `redirectUrl` routes past it.
     // App-level `taskUrls` outrank this callback, so it only answers for an app that set none.
     onSwitchSession: sessionId =>
