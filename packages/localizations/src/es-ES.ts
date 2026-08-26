@@ -14,6 +14,24 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
+  agentActionApproval: {
+    action__approve: undefined,
+    action__reject: undefined,
+    commentLabel: undefined,
+    commentPlaceholder: undefined,
+    expiresIn: undefined,
+    requestedBy: undefined,
+    subtitle: undefined,
+    terminal: {
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      rejectedSubtitle: undefined,
+      rejectedTitle: undefined,
+    },
+    title: undefined,
+  },
   apiKeys: {
     action__add: undefined,
     action__search: undefined,

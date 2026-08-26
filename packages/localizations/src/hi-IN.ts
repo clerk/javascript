@@ -14,6 +14,24 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hiIN: LocalizationResource = {
   locale: 'hi-IN',
+  agentActionApproval: {
+    action__approve: undefined,
+    action__reject: undefined,
+    commentLabel: undefined,
+    commentPlaceholder: undefined,
+    expiresIn: undefined,
+    requestedBy: undefined,
+    subtitle: undefined,
+    terminal: {
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      rejectedSubtitle: undefined,
+      rejectedTitle: undefined,
+    },
+    title: undefined,
+  },
   apiKeys: {
     action__add: 'नई कुंजी जोड़ें',
     action__search: 'कुंजियाँ खोजें',

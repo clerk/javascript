@@ -673,6 +673,11 @@ export const OAuthConsent = withClerk(
   { component: 'OAuthConsent', renderWhileLoading: true },
 );
 
+/**
+ * Renders an approval flow for an action requested by an agent.
+ *
+ * @experimental This component is experimental and may change in future releases.
+ */
 export const AgentActionApproval = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<AgentActionApprovalProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
