@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/createActor';
-import { reverificationDialogController, reverificationFactorKey } from './reverification-dialog.controller';
+import { reverificationController, reverificationFactorKey } from './reverification.controller';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
@@ -13,7 +13,7 @@ import type {
   ReverificationPreparationFactor,
   ReverificationSecondFactorPhoneCodeFactor,
   ReverificationTOTPFactor,
-} from './reverification-dialog.types';
+} from './reverification.types';
 
 const passwordFactor: ReverificationPasswordFactor = {
   stage: 'first',
@@ -69,7 +69,7 @@ function start({
   complete?: (result: ReverificationCompleteResult) => Promise<void>;
   cancel?: () => void;
 } = {}) {
-  const actor = createActor(reverificationDialogController, {
+  const actor = createActor(reverificationController, {
     context: { initialChallenge: challenge, prepare, attempt, complete, cancel },
   }).start();
   return { actor, prepare, attempt, complete, cancel };
@@ -79,7 +79,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('reverificationDialogController', () => {
+describe('reverificationController', () => {
   it('starts at factor selection when no initial factor is provided', () => {
     const { actor } = start({ challenge: firstFactorChallenge() });
 

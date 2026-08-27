@@ -1,6 +1,6 @@
 import { setup } from '../../machine/setup';
 import type { Snapshot } from '../../machine/types';
-import { reverificationDialogBase as m } from './reverification-dialog.messages';
+import { reverificationBase as m } from './reverification.messages';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
@@ -9,7 +9,7 @@ import type {
   ReverificationError,
   ReverificationFactor,
   ReverificationPreparationFactor,
-} from './reverification-dialog.types';
+} from './reverification.types';
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -18,7 +18,7 @@ const emptyChallenge: ReverificationChallenge = {
   factors: [],
 };
 
-export interface ReverificationDialogControllerContext {
+export interface ReverificationControllerContext {
   /** The challenge injected by the view and captured when the actor starts. */
   initialChallenge: ReverificationChallenge;
   /** The active challenge, replaced when first-factor verification requires a second factor. */
@@ -45,7 +45,7 @@ export interface ReverificationDialogControllerContext {
   cancel: () => void;
 }
 
-export type ReverificationDialogControllerEvent =
+export type ReverificationControllerEvent =
   | { type: 'CHANGE_VALUE'; value: string }
   | { type: 'SUBMIT' }
   | { type: 'RESEND' }
@@ -56,13 +56,9 @@ export type ReverificationDialogControllerEvent =
   | { type: 'BACK' }
   | { type: 'RETRY_COMPLETE' };
 
-const { createMachine, assign, fromPromise } = setup<
-  ReverificationDialogControllerContext,
-  ReverificationDialogControllerEvent
->();
+const { createMachine, assign, fromPromise } = setup<ReverificationControllerContext, ReverificationControllerEvent>();
 
-const factorsFrom = (context: ReverificationDialogControllerContext): ReverificationFactor[] =>
-  context.challenge.factors;
+const factorsFrom = (context: ReverificationControllerContext): ReverificationFactor[] => context.challenge.factors;
 
 export const reverificationFactorKey = (factor: ReverificationFactor): string => {
   switch (factor.strategy) {
@@ -82,7 +78,7 @@ const assertValidChallenge = (challenge: ReverificationChallenge) => {
   }
 };
 
-const factorFrom = (context: ReverificationDialogControllerContext, factorKey: string) =>
+const factorFrom = (context: ReverificationControllerContext, factorKey: string) =>
   factorsFrom(context).find(factor => reverificationFactorKey(factor) === factorKey);
 
 const initialFactorFrom = (challenge: ReverificationChallenge): ReverificationFactor | null => {
@@ -94,13 +90,13 @@ const initialFactorFrom = (challenge: ReverificationChallenge): ReverificationFa
   return challenge.factors.find(factor => reverificationFactorKey(factor) === initialFactorKey) ?? null;
 };
 
-const alternativesFrom = (context: ReverificationDialogControllerContext) =>
+const alternativesFrom = (context: ReverificationControllerContext) =>
   factorsFrom(context).filter(
     factor =>
       !context.currentFactor || reverificationFactorKey(factor) !== reverificationFactorKey(context.currentFactor),
   );
 
-const hasAlternatives = (context: ReverificationDialogControllerContext) => alternativesFrom(context).length > 0;
+const hasAlternatives = (context: ReverificationControllerContext) => alternativesFrom(context).length > 0;
 
 const requiresPreparation = (factor: ReverificationFactor | null): factor is ReverificationPreparationFactor =>
   factor?.strategy === 'email_code' || factor?.strategy === 'phone_code';
@@ -111,7 +107,7 @@ const isFixedLengthCode = (factor: ReverificationFactor | null) =>
 const normalizeValue = (factor: ReverificationFactor | null, value: string) =>
   isFixedLengthCode(factor) ? value.replace(/\D/g, '').slice(0, 6) : value;
 
-const canSubmit = (context: ReverificationDialogControllerContext) => {
+const canSubmit = (context: ReverificationControllerContext) => {
   const factor = context.currentFactor;
   if (!factor) {
     return false;
@@ -125,7 +121,7 @@ const canSubmit = (context: ReverificationDialogControllerContext) => {
   return context.value.trim().length > 0;
 };
 
-const attemptFrom = (context: ReverificationDialogControllerContext): ReverificationAttempt => {
+const attemptFrom = (context: ReverificationControllerContext): ReverificationAttempt => {
   const factor = context.currentFactor;
   if (!factor) {
     throw new Error(m.unstable__errors__generic);
@@ -157,8 +153,8 @@ const changeValue = ({
   context,
   event,
 }: {
-  context: ReverificationDialogControllerContext;
-  event: Extract<ReverificationDialogControllerEvent, { type: 'CHANGE_VALUE' }>;
+  context: ReverificationControllerContext;
+  event: Extract<ReverificationControllerEvent, { type: 'CHANGE_VALUE' }>;
 }) => {
   const value = normalizeValue(context.currentFactor, event.value);
   return {
@@ -167,8 +163,8 @@ const changeValue = ({
   };
 };
 
-export const reverificationDialogController = createMachine({
-  id: 'reverificationDialog',
+export const reverificationController = createMachine({
+  id: 'reverification',
   initial: 'initializing',
   context: {
     initialChallenge: emptyChallenge,
@@ -440,4 +436,4 @@ export const reverificationDialogController = createMachine({
   },
 });
 
-export type ReverificationDialogControllerSnapshot = Snapshot<ReverificationDialogControllerContext>;
+export type ReverificationControllerSnapshot = Snapshot<ReverificationControllerContext>;

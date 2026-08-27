@@ -1,4 +1,4 @@
-export const reverificationDialogBase = {
+export const reverificationBase = {
   alternativeMethods: {
     actionLink: 'Get help',
     actionText: 'Don’t have any of these?',

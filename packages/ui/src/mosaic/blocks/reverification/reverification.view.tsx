@@ -1,9 +1,10 @@
+import { Card } from '../../components/card';
+import { Dialog } from '../../components/dialog';
 import { useMachine } from '../../machine/useMachine';
-import type { ReverificationDialogMethod, ReverificationDialogProps } from './reverification-dialog';
-import { ReverificationDialog } from './reverification-dialog';
-import type { ReverificationDialogControllerContext } from './reverification-dialog.controller';
-import { reverificationDialogController, reverificationFactorKey } from './reverification-dialog.controller';
-import { fill, reverificationDialogBase as m } from './reverification-dialog.messages';
+import type { ReverificationMethod } from './reverification';
+import type { ReverificationControllerContext } from './reverification.controller';
+import { reverificationController, reverificationFactorKey } from './reverification.controller';
+import { fill, reverificationBase as m } from './reverification.messages';
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
@@ -11,9 +12,11 @@ import type {
   ReverificationCompleteResult,
   ReverificationFactor,
   ReverificationPreparationFactor,
-} from './reverification-dialog.types';
+} from './reverification.types';
+import type { ReverificationDialogContentProps } from './reverification-dialog-content';
+import { ReverificationDialogContent } from './reverification-dialog-content';
 
-export interface ReverificationDialogViewProps {
+export interface ReverificationViewProps {
   /** The methods this run may use, captured when the controller starts. */
   initialChallenge: ReverificationChallenge;
   /** Sends a code for a method that delivers one. Reject to keep the user on the code step. */
@@ -78,33 +81,33 @@ function methodLabel(factor: ReverificationFactor): string {
   }
 }
 
-const asMethod = (factor: ReverificationFactor): ReverificationDialogMethod => ({
+const asMethod = (factor: ReverificationFactor): ReverificationMethod => ({
   id: reverificationFactorKey(factor),
   label: methodLabel(factor),
 });
 
-const alternativesTo = (context: ReverificationDialogControllerContext) =>
+const alternativesTo = (context: ReverificationControllerContext) =>
   context.challenge.factors.filter(
     factor =>
       !context.currentFactor || reverificationFactorKey(factor) !== reverificationFactorKey(context.currentFactor),
   );
 
 /**
- * Drives {@link ReverificationDialog} with {@link reverificationDialogController}.
+ * Drives {@link ReverificationDialogContent} with {@link reverificationController}.
  *
  * Every decision about what the flow does next lives in the controller; this layer only turns a
  * snapshot into the block's props and the block's callbacks into events. The Clerk work arrives
  * as `prepare` and `attempt`, so the whole flow runs against plain promises in a test or a story.
  */
-export function ReverificationDialogView({
+export function ReverificationView({
   initialChallenge,
   prepare,
   attempt,
   onComplete,
   onCancel,
   supportEmail,
-}: ReverificationDialogViewProps) {
-  const [snapshot, send, actor] = useMachine(reverificationDialogController, {
+}: ReverificationViewProps) {
+  const [snapshot, send, actor] = useMachine(reverificationController, {
     context: { initialChallenge, prepare, attempt, complete: onComplete, cancel: onCancel },
   });
   const { context } = snapshot;
@@ -126,18 +129,12 @@ export function ReverificationDialogView({
 
   const canCancel = actor.can({ type: 'CANCEL' });
   const base = {
-    open: snapshot.status === 'active',
     dismissible: canCancel,
-    onOpenChange: (open: boolean) => {
-      if (!open) {
-        send({ type: 'CANCEL' });
-      }
-    },
     closeLabel: m.closeButton,
     error: context.error?.scope === 'flow' ? context.error.message : undefined,
   };
 
-  const props = ((): ReverificationDialogProps => {
+  const props = ((): ReverificationDialogContentProps => {
     // Legacy gave this card no way back — there is no method to go back to.
     if (snapshot.value === 'unavailable') {
       return {
@@ -170,8 +167,10 @@ export function ReverificationDialogView({
         methods: methods.map(asMethod),
         onSelectMethod: factorKey => send({ type: 'SELECT_FACTOR', factorKey }),
         back: actor.can({ type: 'BACK' }) ? { label: m.backButton, onClick: () => send({ type: 'BACK' }) } : undefined,
-        cancelLabel: m.formButtonReset,
-        help: { label: m.alternativeMethods.actionLink, onClick: () => send({ type: 'SHOW_HELP' }) },
+        help: {
+          text: m.alternativeMethods.actionText,
+          action: { label: m.alternativeMethods.actionLink, onClick: () => send({ type: 'SHOW_HELP' }) },
+        },
       };
     }
 
@@ -234,13 +233,44 @@ export function ReverificationDialogView({
       isPending,
       onSubmit: () => send({ type: 'SUBMIT' }),
       cancelLabel: m.formButtonReset,
-      secondary: actor.can({ type: 'SHOW_ALTERNATIVES' })
+      alternative: actor.can({ type: 'SHOW_ALTERNATIVES' })
         ? { label: m.footerActionLink__useAnotherMethod, onClick: () => send({ type: 'SHOW_ALTERNATIVES' }) }
-        : actor.can({ type: 'SHOW_HELP' })
-          ? { label: m.alternativeMethods.actionLink, onClick: () => send({ type: 'SHOW_HELP' }) }
-          : undefined,
+        : undefined,
+      help: actor.can({ type: 'SHOW_HELP' })
+        ? {
+            text: m.alternativeMethods.actionText,
+            action: { label: m.alternativeMethods.actionLink, onClick: () => send({ type: 'SHOW_HELP' }) },
+          }
+        : undefined,
     };
   })();
 
-  return <ReverificationDialog {...props} />;
+  return (
+    <Dialog.Root
+      size='card'
+      closedBy={canCancel ? 'closerequest' : 'none'}
+      open={snapshot.status === 'active'}
+      onOpenChange={open => {
+        if (!open) {
+          send({ type: 'CANCEL' });
+        }
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup
+            render={
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              />
+            }
+          >
+            <ReverificationDialogContent {...props} />
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
 }

@@ -12,8 +12,8 @@ import type {
   ReverificationPasskeyFactor,
   ReverificationPasswordFactor,
   ReverificationPreparationFactor,
-} from './reverification-dialog.types';
-import { ReverificationDialogView } from './reverification-dialog.view';
+} from './reverification.types';
+import { ReverificationView } from './reverification.view';
 
 const passwordFactor: ReverificationPasswordFactor = {
   stage: 'first',
@@ -48,7 +48,7 @@ function renderView({
 } = {}) {
   render(
     <MosaicProvider>
-      <ReverificationDialogView
+      <ReverificationView
         initialChallenge={initialChallenge}
         prepare={prepare}
         attempt={attempt}
@@ -64,7 +64,7 @@ function renderView({
 /** The code field is a group of single-character slots, not one input. */
 const codeSlots = () => within(screen.getByRole('group', { name: 'Verification code' })).getAllByRole('textbox');
 
-describe('ReverificationDialogView', () => {
+describe('ReverificationView', () => {
   it('opens on the starting method and carries its answer to the attempt', async () => {
     const { attempt, onComplete } = renderView();
     const user = userEvent.setup();

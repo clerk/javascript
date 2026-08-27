@@ -4,7 +4,7 @@ This document records the legacy reverification behavior that the Mosaic replace
 deliberately change. It also records the architecture used by the current Mosaic work.
 
 The legacy implementation is under `packages/ui/src/components/UserVerification/`. The Mosaic implementation is one
-block module under `packages/ui/src/mosaic/blocks/reverification-dialog/`.
+block module under `packages/ui/src/mosaic/blocks/reverification/`.
 
 ## Architecture decision
 
@@ -21,8 +21,12 @@ actor-owning view
         +----------> pure controller
         |
         v
-controlled renderer
-  renders props; owns only transient state no outer layer can use
+standalone interaction
+  renders the reverification body from controlled props
+        |
+        v
+dialog content
+  adds dialog header and footer chrome without owning the root
 ```
 
 This is the pattern implemented by `origin/carp/mosaic-user-profile-delete-account`:
@@ -35,14 +39,14 @@ This is the pattern implemented by `origin/carp/mosaic-user-profile-delete-accou
 
 The reverification implementation follows the same shape:
 
-- `ReverificationDialogView` accepts an initial challenge plus `prepare`, `attempt`, `onComplete`, and `onCancel`; it
+- `ReverificationView` accepts an initial challenge plus `prepare`, `attempt`, `onComplete`, and `onCancel`; it
   owns the actor and derives `actor.can(...)` values.
-- `reverificationDialogController` owns factor selection, preparation, submission, resend, help, completion, and
+- `reverificationController` owns factor selection, preparation, submission, resend, help, completion, and
   cancellation transitions.
-- `ReverificationDialog` is the block's controlled, stateless renderer. The answer belongs to the controller because
+- `Reverification` is the block's standalone interaction and `ReverificationDialogContent` composes it with dialog chrome. The answer belongs to the controller because
   guards and attempts use it.
 
-The controller, actor-owning view, renderer, messages, and shared vocabulary are internal roles of one cohesive block
+The controller, actor-owning view, standalone interaction, dialog content, messages, and shared vocabulary are internal roles of one cohesive block
 module. They are colocated behind one `index.ts`.
 
 No separate controller is required to match that precedent. Before the flow becomes reachable, it will still need a
@@ -170,7 +174,7 @@ message.
 
 ## Interface review
 
-The controller/view/renderer split is sound, but the current external interface is shallower than the delete-account
+The controller/view/interaction split is sound, but the current external interface is shallower than the delete-account
 precedent. Delete account asks its caller for one operation. Reverification asks its caller to understand factor IDs,
 stage tags, initial-factor policy, lossy resource translation, preparation, attempt result normalization, activation,
 and modal completion semantics.
@@ -194,8 +198,8 @@ moving any of this policy would not.
 
 ## Verification snapshot
 
-On the current branch, the three targeted files contain 49 tests: 19 controller, 16 actor-owning view, and 14 block tests.
-The targeted Vitest run passes all 49. The run reports that Vite did not exit within its
+On the current branch, the four targeted files contain 51 tests: 19 controller, 16 actor-owning view, 14 dialog-content,
+and 2 standalone interaction tests. The targeted Vitest run passes all 51. The run reports that Vite did not exit within its
 10-second close timeout, although Vitest reports the tests themselves closed successfully.
 
 Browser QA was not performed as part of this review.

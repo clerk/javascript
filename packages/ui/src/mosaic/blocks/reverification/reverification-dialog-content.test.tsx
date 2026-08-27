@@ -2,30 +2,48 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Card } from '../../components/card';
+import { Dialog } from '../../components/dialog';
 import { MosaicProvider } from '../../MosaicProvider';
-import type {
-  ReverificationDialogChooseProps,
-  ReverificationDialogMessageProps,
-  ReverificationDialogVerifyProps,
-} from './reverification-dialog';
-import { ReverificationDialog } from './reverification-dialog';
+import type { ReverificationDialogContentProps } from './reverification-dialog-content';
+import { ReverificationDialogContent } from './reverification-dialog-content';
 
 const base = {
-  open: true as const,
-  onOpenChange: vi.fn(),
   dismissible: true,
   closeLabel: 'Close',
 };
 
-function renderBlock(props: Parameters<typeof ReverificationDialog>[0]) {
+type TestProps = ReverificationDialogContentProps & {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
+type ChooseProps = Extract<TestProps, { step: 'choose' }>;
+type VerifyProps = Extract<TestProps, { step: 'verify' }>;
+type MessageProps = Extract<TestProps, { step: 'message' }>;
+
+function renderBlock({ open = true, onOpenChange = vi.fn(), ...props }: TestProps) {
   return render(
     <MosaicProvider>
-      <ReverificationDialog {...props} />
+      <Dialog.Root
+        size='card'
+        closedBy={props.dismissible ? 'closerequest' : 'none'}
+        open={open}
+        onOpenChange={onOpenChange}
+      >
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Viewport>
+            <Dialog.Popup render={<Card.Root />}>
+              <ReverificationDialogContent {...props} />
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+      </Dialog.Root>
     </MosaicProvider>,
   );
 }
 
-const chooseProps = (overrides: Partial<ReverificationDialogChooseProps> = {}): ReverificationDialogChooseProps => ({
+const chooseProps = (overrides: Partial<ChooseProps> = {}): ChooseProps => ({
   ...base,
   step: 'choose',
   title: 'Use another method',
@@ -35,12 +53,11 @@ const chooseProps = (overrides: Partial<ReverificationDialogChooseProps> = {}): 
     { id: 'email_1', label: 'Email code to a••••@clerk.dev' },
   ],
   onSelectMethod: vi.fn(),
-  cancelLabel: 'Cancel',
-  help: { label: 'Get help', onClick: vi.fn() },
+  help: { text: 'Don’t have any of these?', action: { label: 'Get help', onClick: vi.fn() } },
   ...overrides,
 });
 
-const verifyProps = (overrides: Partial<ReverificationDialogVerifyProps> = {}): ReverificationDialogVerifyProps => ({
+const verifyProps = (overrides: Partial<VerifyProps> = {}): VerifyProps => ({
   ...base,
   step: 'verify',
   title: 'Verification required',
@@ -55,7 +72,7 @@ const verifyProps = (overrides: Partial<ReverificationDialogVerifyProps> = {}): 
   ...overrides,
 });
 
-const messageProps = (overrides: Partial<ReverificationDialogMessageProps> = {}): ReverificationDialogMessageProps => ({
+const messageProps = (overrides: Partial<MessageProps> = {}): MessageProps => ({
   ...base,
   step: 'message',
   title: 'Get help',
@@ -64,7 +81,7 @@ const messageProps = (overrides: Partial<ReverificationDialogMessageProps> = {})
   ...overrides,
 });
 
-describe('ReverificationDialog', () => {
+describe('ReverificationDialogContent', () => {
   it('renders nothing until the caller opens it', () => {
     renderBlock(verifyProps({ open: false }));
 
@@ -91,19 +108,20 @@ describe('ReverificationDialog', () => {
     expect(onSelectMethod).toHaveBeenCalledWith('email_1');
   });
 
-  it('offers back in place of cancel only when the caller supplies it', () => {
-    const { rerender } = renderBlock(chooseProps());
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  it('keeps back with the methods and help in the card footer', () => {
+    const { unmount } = renderBlock(chooseProps());
     expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
 
-    rerender(
-      <MosaicProvider>
-        <ReverificationDialog {...chooseProps({ back: { label: 'Back', onClick: vi.fn() } })} />
-      </MosaicProvider>,
-    );
+    unmount();
+    renderBlock(chooseProps({ back: { label: 'Back', onClick: vi.fn() } }));
 
-    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
+    const method = screen.getByRole('button', { name: 'Continue with your password' });
+    const back = screen.getByRole('button', { name: 'Back' });
+    const help = screen.getByRole('button', { name: 'Get help' });
+
+    expect(back.parentElement).toBe(method.parentElement);
+    expect(help.parentElement).not.toBe(method.parentElement);
+    expect(within(help.parentElement as HTMLElement).getByText('Don’t have any of these?')).toBeInTheDocument();
   });
 
   it('submits the field with Enter, since the action sits outside the form', async () => {
@@ -216,14 +234,11 @@ describe('ReverificationDialog', () => {
 
   it('offers a way back from a dead end only when the caller supplies one', async () => {
     const onClick = vi.fn();
-    const { rerender } = renderBlock(messageProps());
+    const { unmount } = renderBlock(messageProps());
     expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
 
-    rerender(
-      <MosaicProvider>
-        <ReverificationDialog {...messageProps({ secondary: { label: 'Back', onClick } })} />
-      </MosaicProvider>,
-    );
+    unmount();
+    renderBlock(messageProps({ secondary: { label: 'Back', onClick } }));
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Back' }));
     expect(onClick).toHaveBeenCalledOnce();
