@@ -228,6 +228,12 @@ async function accountAction(act: ReturnType<typeof userEvent.setup>, label: str
   await act.click(await screen.findByRole('menuitem', { name: label }));
 }
 
+/** Opens the accounts flyout at the foot, and hands back the menu it opens. */
+async function openAccounts(act: ReturnType<typeof userEvent.setup>) {
+  await act.click(screen.getByRole('button', { name: 'Switch account' }));
+  return screen.findByRole('menu');
+}
+
 describe('UserButton (connected)', () => {
   // Nothing stands in for the button before Clerk answers, in any mode: until it does, a signed-out
   // visitor is indistinguishable from a session still resolving, so a placeholder here would be
@@ -254,7 +260,7 @@ describe('UserButton (connected)', () => {
 
       // The account heads the surface, rather than the organization that is active regardless.
       expect(screen.getByRole('button', { name: 'Open account menu for Alice Smith' })).toBeInTheDocument();
-      await open();
+      const act = await open();
 
       for (const name of ['Acme', 'Other', 'Beta', 'Gamma', 'Personal account']) {
         expect(screen.queryByText(name)).toBeNull();
@@ -264,7 +270,8 @@ describe('UserButton (connected)', () => {
 
       // Everything the account itself carries is still on offer.
       expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'bob@example.com' })).toBeInTheDocument();
+      const menu = await openAccounts(act);
+      expect(within(menu).getByRole('menuitem', { name: 'bob@example.com' })).toBeInTheDocument();
     });
   });
 
@@ -331,17 +338,19 @@ describe('UserButton (connected)', () => {
   // the account-only surface is otherwise indistinguishable from an account with no organizations.
   it('forwards mode to the view, so an account-only surface lists no organizations', async () => {
     renderUserButton({ mode: 'user' });
-    await open();
+    const act = await open();
 
     expect(screen.queryByRole('button', { name: 'Other' })).toBeNull();
-    expect(screen.getByRole('button', { name: 'bob@example.com' })).toBeInTheDocument();
+    const menu = await openAccounts(act);
+    expect(within(menu).getByRole('menuitem', { name: 'bob@example.com' })).toBeInTheDocument();
   });
 
   it('switching to another account calls setActive with the session and stays open', async () => {
     renderUserButton();
     const act = await open();
 
-    await act.click(screen.getByRole('button', { name: 'bob@example.com' }));
+    const menu = await openAccounts(act);
+    await act.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
 
     expect(setActive).toHaveBeenCalledWith({ session: 'sess_2', navigate: expect.any(Function) });
     await waitFor(() => expect(spinner()).toBeNull());
@@ -565,7 +574,7 @@ describe('UserButton (connected)', () => {
     // keeps its place in the tab order. Dropping it to a static row would remount it, and with it
     // the avatar it carries.
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('button', { name: 'bob@example.com' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Switch account' })).toBeDisabled();
     expect(popup()).toBeInTheDocument();
 
     deferred.resolve();
@@ -668,7 +677,8 @@ describe('UserButton (connected)', () => {
     renderUserButton();
     const act = await open();
 
-    await act.click(screen.getByRole('button', { name: 'bob@example.com' }));
+    const menu = await openAccounts(act);
+    await act.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
     expect(spinner()).toBeInTheDocument();
 
     await act.click(trigger());
@@ -677,9 +687,9 @@ describe('UserButton (connected)', () => {
     await new Promise(resolve => setTimeout(resolve, 250));
     await act.click(trigger());
 
-    const bob = screen.getByRole('button', { name: 'bob@example.com' });
+    const switchAccount = screen.getByRole('button', { name: 'Switch account' });
     expect(popup()).toBeInTheDocument();
-    expect(bob).toHaveAttribute('aria-busy', 'true');
+    expect(switchAccount.querySelector('.cl-spinner')).not.toBeNull();
     expect(spinner()).toBeInTheDocument();
 
     await act.click(screen.getByRole('button', { name: 'Other' }));
