@@ -99,6 +99,8 @@ export type OAuthProviders = {
 export type EnterpriseSSOSettings = {
   enabled: boolean;
   self_serve_sso: boolean;
+  /** Whether end-users may manage Directory Sync for their enterprise connections. Absent from older backends, which means `false`. */
+  self_serve_directory_sync: boolean;
 };
 
 export type AttributesJSON = {

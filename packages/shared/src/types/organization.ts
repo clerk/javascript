@@ -1,6 +1,13 @@
 import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type {
+  CreateDirectorySyncParams,
+  DirectorySyncResource,
+  DirectorySyncUserResource,
+  GetDirectorySyncUsersParams,
+  UpdateDirectorySyncParams,
+} from './directorySync';
+import type {
   CreateOrganizationEnterpriseConnectionParams,
   EnterpriseConnectionResource,
   UpdateOrganizationEnterpriseConnectionParams,
@@ -221,6 +228,44 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
     enterpriseConnectionId: string,
     params?: GetEnterpriseConnectionTestRunsParams,
   ) => Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>>;
+  /**
+   * Gets the Directory Sync directory bound to the given enterprise connection. The returned resource never carries
+   * the SCIM bearer token.
+   */
+  getDirectorySync: (enterpriseConnectionId: string) => Promise<DirectorySyncResource>;
+  /**
+   * Provisions Directory Sync for the given enterprise connection. The returned resource is the only place the SCIM
+   * bearer token (`apiKey`) is ever available; rotate it to obtain a new one.
+   */
+  createDirectorySync: (
+    enterpriseConnectionId: string,
+    params?: CreateDirectorySyncParams,
+  ) => Promise<DirectorySyncResource>;
+  /**
+   * Updates the Directory Sync directory bound to the given enterprise connection, e.g. to activate or deactivate
+   * provisioning.
+   */
+  updateDirectorySync: (
+    enterpriseConnectionId: string,
+    params: UpdateDirectorySyncParams,
+  ) => Promise<DirectorySyncResource>;
+  /**
+   * Mints a new SCIM bearer token for the directory, expiring the previous one after a short grace period. The
+   * returned resource is the only place the new token is available.
+   */
+  rotateDirectorySyncToken: (enterpriseConnectionId: string) => Promise<DirectorySyncResource>;
+  /**
+   * Deletes the connection's directory and stops provisioning. Previously provisioned members keep their
+   * memberships.
+   */
+  deleteDirectorySync: (enterpriseConnectionId: string) => Promise<DeletedObjectResource>;
+  /**
+   * Gets the users the identity provider has provisioned into the connection's directory.
+   */
+  getDirectorySyncUsers: (
+    enterpriseConnectionId: string,
+    params?: GetDirectorySyncUsersParams,
+  ) => Promise<ClerkPaginatedResponse<DirectorySyncUserResource>>;
   /**
    * Deletes the Organization. Only administrators can delete an Organization.
    *

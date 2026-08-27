@@ -344,4 +344,147 @@ describe('Organization', () => {
       expect(result.data[0].connectionType).toBe('saml');
     });
   });
+
+  describe('directory sync', () => {
+    const DIRECTORY_PATH = `/organizations/${ORG_ID}/enterprise_connections/ec_123/directory`;
+
+    const directoryJSON = {
+      object: 'directory' as const,
+      id: 'scimdir_1',
+      name: 'Acme Okta',
+      enterprise_connection_id: 'ec_123',
+      endpoint_url: 'https://api.example.com/scim/v2',
+      provider: 'okta' as const,
+      enabled: false,
+      group_role_mapping_enabled: false,
+      attribute_mapping: { 'name.givenName': 'first_name' },
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+
+    it('fetches the directory from the connection-scoped path', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: directoryJSON }));
+
+      const organization = createOrganization();
+      const result = await organization.getDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: DIRECTORY_PATH });
+      expect(result.id).toBe('scimdir_1');
+      expect(result.endpointUrl).toBe('https://api.example.com/scim/v2');
+      expect(result.provider).toBe('okta');
+      expect(result.attributeMapping).toEqual({ 'name.givenName': 'first_name' });
+      expect(result.apiKey).toBeNull();
+    });
+
+    it('creates the directory and exposes the show-once token', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, api_key: 'ak_secret' } }));
+
+      const organization = createOrganization();
+      const result = await organization.createDirectorySync('ec_123', { name: 'Acme Okta' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: DIRECTORY_PATH,
+        body: { name: 'Acme Okta' },
+      });
+      expect(result.apiKey).toBe('ak_secret');
+      expect(result.__internal_toSnapshot()).not.toHaveProperty('api_key');
+    });
+
+    it('updates the directory, serializing the attribute mapping as JSON', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: { ...directoryJSON, enabled: true } }));
+
+      const organization = createOrganization();
+      const result = await organization.updateDirectorySync('ec_123', {
+        enabled: true,
+        attributeMapping: { 'name.familyName': 'last_name', 'name.givenName': null },
+      });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'PATCH',
+        path: DIRECTORY_PATH,
+        body: {
+          enabled: true,
+          attribute_mapping: JSON.stringify({ 'name.familyName': 'last_name', 'name.givenName': null }),
+        },
+      });
+      expect(result.enabled).toBe(true);
+    });
+
+    it('rotates the bearer token', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, api_key: 'ak_new' } }));
+
+      const organization = createOrganization();
+      const result = await organization.rotateDirectorySyncToken('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'POST', path: `${DIRECTORY_PATH}/rotate_api_key` });
+      expect(result.apiKey).toBe('ak_new');
+    });
+
+    it('deletes the directory', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ response: { object: 'directory', id: 'scimdir_1', deleted: true } }));
+
+      const organization = createOrganization();
+      const result = await organization.deleteDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'DELETE', path: DIRECTORY_PATH });
+      expect(result.id).toBe('scimdir_1');
+      expect(result.deleted).toBe(true);
+    });
+
+    it('lists provisioned directory users with pagination', async () => {
+      const paginated = {
+        data: [
+          {
+            object: 'directory_user' as const,
+            id: 'scimdu_1',
+            user_id: 'user_1',
+            first_name: 'Ada',
+            last_name: 'Lovelace',
+            identifier: 'ada@example.com',
+            image_url: '',
+            has_image: false,
+            active: true,
+            provisioned_at: 1700000000000,
+            updated_at: 1700000000000,
+          },
+        ],
+        total_count: 1,
+      };
+
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: paginated }));
+
+      const organization = createOrganization();
+      const result = await organization.getDirectorySyncUsers('ec_123', { initialPage: 2, pageSize: 10 });
+
+      // @ts-ignore
+      const call = BaseResource._fetch.mock.calls[0][0];
+      expect(call.method).toBe('GET');
+      expect(call.path).toBe(`${DIRECTORY_PATH}/users`);
+      expect(call.search.get('limit')).toBe('10');
+      expect(call.search.get('offset')).toBe('10');
+
+      expect(result.total_count).toBe(1);
+      expect(result.data[0].userId).toBe('user_1');
+      expect(result.data[0].identifier).toBe('ada@example.com');
+      expect(result.data[0].active).toBe(true);
+    });
+  });
 });

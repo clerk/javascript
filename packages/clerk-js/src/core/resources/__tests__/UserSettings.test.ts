@@ -25,6 +25,14 @@ describe('UserSettings', () => {
     });
   });
 
+  it('treats an absent self_serve_directory_sync as disabled', function () {
+    const sut = new UserSettings({
+      enterprise_sso: { enabled: true, self_serve_sso: true },
+    } as any);
+
+    expect(sut.enterpriseSSO).toEqual({ enabled: true, self_serve_sso: true, self_serve_directory_sync: false });
+  });
+
   it('returns enabled web3 first factors', function () {
     const sut = new UserSettings({
       attributes: {
