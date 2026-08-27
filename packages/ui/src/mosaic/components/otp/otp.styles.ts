@@ -22,7 +22,6 @@ export const styles = stylex.create({
     width: 'fit-content',
   },
   slot: {
-    padding: 0,
     caretColor: colorVars['--cl-color-primary'],
     color: colorVars['--cl-color-card-foreground'],
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
