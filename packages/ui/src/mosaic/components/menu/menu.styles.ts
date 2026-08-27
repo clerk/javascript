@@ -48,7 +48,6 @@ export const popup = stylex.create({
     // reaches the width it has to truncate at.
     maxWidth: 'min(18rem, calc(100vw - 2rem))',
     minWidth: '12.5rem',
-    overflowX: 'visible',
     overflowY: 'auto',
   },
 });
@@ -83,7 +82,7 @@ export const item = stylex.create({
       '@media (prefers-reduced-motion: reduce)': '0.01ms',
     },
     transitionProperty: 'background-color',
-    height: space['7'],
+    height: space['8'],
     width: '100%',
     '::before': {
       insetBlock: `calc(-1 * ${space['0.5']})`,
