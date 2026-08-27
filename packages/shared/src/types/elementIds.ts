@@ -63,6 +63,7 @@ export type ProfileSectionId =
   | 'subscriptionsList'
   | 'paymentMethods'
   | 'sso'
+  | 'directorySync'
   | 'ssoStatus'
   | 'enableSso'
   | 'ssoDomain'

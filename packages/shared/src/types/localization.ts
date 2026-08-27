@@ -1206,6 +1206,23 @@ export type __internal_LocalizationResource = {
         tooltip__noRole: LocalizationValue;
         tooltipLabel: LocalizationValue;
       };
+      directorySyncSection: {
+        title: LocalizationValue;
+        badge__unconfigured: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        description: LocalizationValue;
+        primaryButton__startConfiguration: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+        removeDialog: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          confirmButton: LocalizationValue;
+        };
+      };
     };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;

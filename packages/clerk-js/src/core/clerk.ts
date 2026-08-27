@@ -16,6 +16,7 @@ import {
   disabledEmailAddressAttribute,
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledSelfServeDirectorySyncFeature,
   disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   isSignedInAndSingleSessionModeEnabled,
@@ -1709,6 +1710,76 @@ export class Clerk implements ClerkInterface {
    * @hidden
    */
   public __internal_unmountConfigureSSO = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * Mount the Directory Sync onboarding component at the target element.
+   * Directory Sync rides on the self-serve SSO gates: it provisions through
+   * the organization's SSO connection, so the same preconditions apply.
+   *
+   * @param targetNode Target to mount the ConfigureDirectorySync component.
+   * @param props Configuration parameters.
+   * @hidden
+   */
+  public __internal_mountConfigureDirectorySync = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'ConfigureDirectorySync',
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('ConfigureDirectorySync'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
+      return;
+    }
+
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('ConfigureDirectorySync'), {
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledSelfServeDirectorySyncFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureDirectorySyncComponentWhenDisabled, {
+          code: CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureDirectorySync';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'configureSSO',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  /**
+   * Unmount the Directory Sync onboarding component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ConfigureDirectorySync component from.
+   * @hidden
+   */
+  public __internal_unmountConfigureDirectorySync = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 

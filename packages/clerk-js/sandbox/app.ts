@@ -34,6 +34,7 @@ const AVAILABLE_COMPONENTS = [
   'pricingTable',
   'apiKeys',
   'configureSSO',
+  'configureDirectorySync',
   'oauthConsent',
   'oauthDeviceVerification',
   'taskChooseOrganization',
@@ -154,6 +155,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
   configureSSO: buildComponentControls('configureSSO'),
+  configureDirectorySync: buildComponentControls('configureDirectorySync'),
   oauthConsent: buildComponentControls('oauthConsent'),
   oauthDeviceVerification: buildComponentControls('oauthDeviceVerification'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
@@ -430,6 +432,9 @@ void (async () => {
     '/oauth-device-verification': {
       mount: '__internal_mountOAuthDeviceVerification',
       component: 'oauthDeviceVerification',
+    '/configure-directory-sync': {
+      mount: '__internal_mountConfigureDirectorySync',
+      component: 'configureDirectorySync',
     },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',
