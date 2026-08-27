@@ -80,6 +80,9 @@ export const item = stylex.create({
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
     display: 'flex',
+    // The viewport is a height-capped flex column: without this the rows squash to fit the cap
+    // instead of overflowing it, and the menu silently loses both its row height and its scroll.
+    flexShrink: 0,
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
@@ -145,5 +148,6 @@ export const separator = stylex.create({
     marginInline: `calc(-1 * ${space['0.5']})`,
     backgroundColor: colorVars['--cl-color-border'],
     blockSize: '1px',
+    flexShrink: 0,
   },
 });
