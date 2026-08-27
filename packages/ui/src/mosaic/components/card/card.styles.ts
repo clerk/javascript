@@ -8,6 +8,7 @@ export const root = stylex.create({
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
+    maxWidth: '26.25rem',
     width: '100%',
   },
   card: {
