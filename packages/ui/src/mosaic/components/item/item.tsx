@@ -134,9 +134,9 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
 });
 
 /** Where the label sits in the row's hierarchy. */
-type LabelVariant = 'primary' | 'secondary';
+type LabelVariant = 'default' | 'interactive';
 
-const DEFAULT_LABEL_VARIANT: LabelVariant = 'primary';
+const DEFAULT_LABEL_VARIANT: LabelVariant = 'default';
 
 export type ItemLabelProps = MosaicComponentProps<'div'> & {
   /**
