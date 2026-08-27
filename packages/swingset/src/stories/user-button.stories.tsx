@@ -153,9 +153,7 @@ function usePrototype({
   const [open, setOpen] = useState(false);
   const [accounts, setAccounts] = useState(() =>
     startWithoutOrganization
-      ? initialAccounts.map(a =>
-          a.session.sessionId === colin.sessionId ? { ...a, activeOrganizationId: null } : a,
-        )
+      ? initialAccounts.map(a => (a.session.sessionId === colin.sessionId ? { ...a, activeOrganizationId: null } : a))
       : initialAccounts,
   );
   const [activeSessionId, setActiveSessionId] = useState(colin.sessionId);
