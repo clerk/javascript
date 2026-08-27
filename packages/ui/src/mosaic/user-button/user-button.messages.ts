@@ -24,9 +24,8 @@ export const userButtonBase = {
     pending: 'pending',
   },
   accounts: {
-    heading: 'Accounts',
-    menu: 'Account actions',
     actionsFor: 'Actions for {identifier}',
+    switch: 'Switch account',
     add: 'Add account',
     signOut: 'Sign out',
     signOutAll: 'Sign out of all accounts',
