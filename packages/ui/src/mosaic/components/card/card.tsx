@@ -93,7 +93,6 @@ function HeaderCloseButton() {
           {...props}
         />
       )}
-      {...themeProps('card-close-button')}
     >
       <Icon name='close' />
     </Dialog.Close>
