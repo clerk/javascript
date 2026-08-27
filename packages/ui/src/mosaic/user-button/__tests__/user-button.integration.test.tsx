@@ -379,6 +379,24 @@ describe('UserButton (connected)', () => {
     expect(popup()).toBeInTheDocument();
   });
 
+  it('stays busy until the invitation lists have revalidated', async () => {
+    const deferred = createDeferred();
+    userInvitations.revalidate.mockReturnValueOnce(deferred.promise);
+    renderUserButton();
+    const act = await open();
+
+    await act.click(screen.getByRole('button', { name: 'Accept' }));
+    await waitFor(() => expect(userInvitations.revalidate).toHaveBeenCalledTimes(1));
+
+    // Longer than the spinner's minDuration, so a fire-and-forget refresh would have cleared it.
+    await new Promise(resolve => setTimeout(resolve, 250));
+    expect(spinner()).toBeInTheDocument();
+
+    deferred.resolve();
+    await waitFor(() => expect(spinner()).toBeNull());
+    expect(popup()).toBeInTheDocument();
+  });
+
   it('accepting a suggestion accepts it, revalidates, and stays open', async () => {
     renderUserButton();
     const act = await open();

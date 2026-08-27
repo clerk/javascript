@@ -1,7 +1,7 @@
 import type * as SharedReact from '@clerk/shared/react';
 import { useOrganization } from '@clerk/shared/react';
 import type { CustomPage } from '@clerk/shared/types';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useOrganizationListInView } from '../../../hooks/useOrganizationListInView';
@@ -56,10 +56,10 @@ let environmentHydrated: boolean;
 function environment() {
   return environmentHydrated
     ? {
-        displayConfig: { afterSwitchSessionUrl: '/after-switch', branded },
-        authConfig: { singleSessionMode },
-        organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
-      }
+      displayConfig: { afterSwitchSessionUrl: '/after-switch', branded },
+      authConfig: { singleSessionMode },
+      organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
+    }
     : null;
 }
 
@@ -801,5 +801,18 @@ describe('useUserButtonModel', () => {
     expect(suggestion.accept).toHaveBeenCalledTimes(1);
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
     expect(userMemberships.revalidate).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not treat a failed list refresh as a failed accept', async () => {
+    userInvitations.revalidate.mockRejectedValueOnce(new Error('stale'));
+    userMemberships.revalidate.mockRejectedValueOnce(new Error('stale'));
+    userSuggestions.revalidate.mockRejectedValueOnce(new Error('stale'));
+    const { result } = renderHook(() => useUserButtonModel());
+    if (result.current.status !== 'ready') {
+      throw new Error('expected ready');
+    }
+
+    await expect(result.current.onAcceptInvitation?.('inv_1')).resolves.toBeUndefined();
+    await expect(result.current.onAcceptSuggestion?.('sug_1')).resolves.toBeUndefined();
   });
 });

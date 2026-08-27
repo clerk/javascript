@@ -31,13 +31,13 @@ export type UserButtonModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | (UserButtonData &
-      Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-      UserButtonAsyncCallbacks &
-      UserButtonBrandingProps & {
-        status: 'ready';
-        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
-        organizationsEnabled: boolean;
-      });
+    Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
+    UserButtonAsyncCallbacks &
+    UserButtonBrandingProps & {
+      status: 'ready';
+      /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
+      organizationsEnabled: boolean;
+    });
 
 // Mirrors `<OrganizationSwitcher>`: a URL, a `:token` template resolved against the entity, or a builder.
 type AfterSelectUrl<T> = ((entity: T) => string) | string;
@@ -206,15 +206,15 @@ export function useUserButtonModel(
   const invitations: UserButtonInvitation[] = invitationData.flatMap(i =>
     i.status === 'pending' || i.status === 'accepted'
       ? [
-          {
-            kind: 'invitation',
-            id: i.id,
-            status: i.status,
-            organizationId: i.publicOrganizationData.id,
-            organizationName: i.publicOrganizationData.name,
-            imageUrl: i.publicOrganizationData.imageUrl || undefined,
-          },
-        ]
+        {
+          kind: 'invitation',
+          id: i.id,
+          status: i.status,
+          organizationId: i.publicOrganizationData.id,
+          organizationName: i.publicOrganizationData.name,
+          imageUrl: i.publicOrganizationData.imageUrl || undefined,
+        },
+      ]
       : [],
   );
 
@@ -287,17 +287,25 @@ export function useUserButtonModel(
     // Covers both restricted instances and users at their creation limit.
     onCreateOrganization: user.createOrganizationEnabled ? createOrganization : undefined,
     onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
-    onAcceptSuggestion: suggestionId => {
+    onAcceptSuggestion: async suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
-      return Promise.resolve(suggestion?.accept()).finally(() => void userSuggestions.revalidate?.());
+      try {
+        await suggestion?.accept();
+      } finally {
+        // We always revalidate, a failed accept might be because of old state
+        // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
+        await Promise.allSettled([userSuggestions.revalidate?.()]);
+      }
     },
-    // Accepting joins the organization, so memberships are stale too. A suggestion joins nothing.
-    onAcceptInvitation: invitationId => {
+    onAcceptInvitation: async invitationId => {
       const invitation = invitationData.find(i => i.id === invitationId);
-      return Promise.resolve(invitation?.accept()).finally(() => {
-        void userInvitations.revalidate?.();
-        void userMemberships.revalidate?.();
-      });
+      try {
+        await invitation?.accept();
+      } finally {
+        // We always revalidate, a failed accept might be because of old state
+        // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
+        await Promise.allSettled([userInvitations.revalidate?.(), userMemberships.revalidate?.()]);
+      }
     },
   };
 }
