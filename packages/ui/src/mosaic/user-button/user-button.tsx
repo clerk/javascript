@@ -30,9 +30,10 @@ export type UserButtonProps = UserButtonModelOptions &
   UserButtonModeProps & {
     userProfileProps?: UserButtonUserProfileProps;
     /**
-     * Stands in while Clerk is still answering, so the space the button will take is held rather
-     * than appearing under whatever is beside it. Dropped once nobody is signed in, since that is
-     * an answer and not a wait.
+     * Fallback while loading.
+     *
+     * Note that the UserButton renders nothing when the user is signed out, so using this on
+     * pages that are reachable while both signed-out and signed-in can result in Fallback->Nothing.
      */
     fallback?: ReactNode;
   };
