@@ -13,11 +13,10 @@ export const positioner = stylex.create({
 
 export const popup = stylex.create({
   base: {
+    padding: space['0.5'],
     borderRadius: radiusVars['--cl-radius-lg'],
     gap: space['0.5'],
     outline: 'none',
-    paddingBlock: space['0.5'],
-    paddingInline: space['0.5'],
     backgroundColor: colorVars['--cl-color-card'],
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
                 0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
@@ -49,6 +48,7 @@ export const popup = stylex.create({
     // reaches the width it has to truncate at.
     maxWidth: 'min(18rem, calc(100vw - 2rem))',
     minWidth: '12.5rem',
+    overflowX: 'visible',
     overflowY: 'auto',
   },
 });
@@ -75,6 +75,7 @@ export const item = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
+    outlineOffset: 0,
     position: 'relative',
     textAlign: 'start',
     transitionDuration: {

@@ -1,9 +1,9 @@
 import type {
-  MenuItemProps as PrimitiveMenuItemProps,
-  MenuPopupProps as PrimitiveMenuPopupProps,
   MenuPortalProps,
   MenuProps,
   MenuSeparatorProps,
+  MenuItemProps as PrimitiveMenuItemProps,
+  MenuPopupProps as PrimitiveMenuPopupProps,
 } from '@clerk/headless/menu';
 import { Menu as Primitive } from '@clerk/headless/menu';
 import { useRender } from '@clerk/headless/utils';
@@ -12,6 +12,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { truncationStyles } from '../../utils/typography.styles';
 import { Button } from '../button';
@@ -175,7 +176,7 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
       label={label}
       {...mergeStyleProps(
         themeProps('menu-item', { color }),
-        stylex.props(reset.base, slots.item.base, color === 'negative' && slots.item.negative),
+        stylex.props(reset.base, focusOutline.visible, slots.item.base, color === 'negative' && slots.item.negative),
         className,
         style,
       )}
