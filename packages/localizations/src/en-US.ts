@@ -1232,6 +1232,26 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: 'Active',
+        badge__inactive: 'Inactive',
+        badge__ssoRequired: 'SSO Required',
+        badge__unconfigured: 'Unconfigured',
+        description:
+          "Automatically add, update, and remove organization members from your identity provider's directory. Requires an SSO connection.",
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__startConfiguration: 'Start configuration',
+        removeDialog: {
+          confirmButton: 'Remove Directory Sync',
+          subtitle:
+            'Are you sure you want to remove Directory Sync? This action is irreversible: the directory and its bearer token are deleted and your identity provider will no longer be able to provision members. Existing members keep their memberships.',
+          title: 'Remove Directory Sync',
+        },
+        title: 'Directory Sync',
+      },
       removeDialog: {
         confirmButton: 'Remove connection',
         subtitle:

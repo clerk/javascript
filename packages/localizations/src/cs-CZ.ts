@@ -1210,6 +1210,24 @@ export const csCZ: LocalizationResource = {
       title: 'Odebrat doménu',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
