@@ -71,6 +71,11 @@ export const item = stylex.create({
     gap: space['3'],
     height: space['13'],
   },
+  lg: {
+    gap: space['3'],
+    paddingInline: space['3'],
+    height: space['16'],
+  },
 });
 
 export const media = stylex.create({
@@ -83,7 +88,8 @@ export const media = stylex.create({
   },
 
   xs: { width: space['6'] },
-  md: { width: space['10'] },
+  md: { width: space['9.5'] },
+  lg: { width: space['9.5'] },
 });
 
 export const content = stylex.create({

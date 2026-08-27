@@ -76,7 +76,7 @@ export function Interactive() {
 export function Sizes() {
   return (
     <div className='w-full'>
-      {(['md', 'xs'] as const).map(size => (
+      {(['lg', 'md', 'xs'] as const).map(size => (
         <Item.Root
           key={size}
           size={size}
@@ -271,7 +271,10 @@ export function Group() {
 
 export function Outline() {
   return (
-    <Item.Root variant='outline'>
+    <Item.Root
+      variant='outline'
+      size='lg'
+    >
       <Item.Media>
         <Avatar.Root
           shape='square'
@@ -300,7 +303,7 @@ export function OutlineGroup() {
   return (
     <div className='w-full'>
       <Item.Group variant='outline'>
-        <Item.Root>
+        <Item.Root size='lg'>
           <Item.Media>
             <Avatar.Root
               size='fit'
@@ -327,6 +330,7 @@ export function OutlineGroup() {
           </Item.Actions>
         </Item.Root>
         <Item.Root
+          size='lg'
           render={({ children, ...props }) => (
             <a
               {...props}
