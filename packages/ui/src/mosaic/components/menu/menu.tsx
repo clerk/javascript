@@ -1,9 +1,9 @@
 import type {
+  MenuItemProps as PrimitiveMenuItemProps,
+  MenuPopupProps as PrimitiveMenuPopupProps,
   MenuPortalProps,
   MenuProps,
   MenuSeparatorProps,
-  MenuItemProps as PrimitiveMenuItemProps,
-  MenuPopupProps as PrimitiveMenuPopupProps,
 } from '@clerk/headless/menu';
 import { Menu as Primitive } from '@clerk/headless/menu';
 import { useRender } from '@clerk/headless/utils';
