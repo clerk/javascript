@@ -47,6 +47,16 @@ export type {
 } from './useOrganizationEnterpriseConnections';
 export { __internal_useOrganizationDomains } from './useOrganizationDomains';
 export type { UseOrganizationDomainsParams, UseOrganizationDomainsReturn } from './useOrganizationDomains';
+export { __internal_useOrganizationDirectorySync } from './useOrganizationDirectorySync';
+export type {
+  UseOrganizationDirectorySyncParams,
+  UseOrganizationDirectorySyncReturn,
+} from './useOrganizationDirectorySync';
+export { __internal_useOrganizationDirectorySyncUsers } from './useOrganizationDirectorySyncUsers';
+export type {
+  UseOrganizationDirectorySyncUsersParams,
+  UseOrganizationDirectorySyncUsersReturn,
+} from './useOrganizationDirectorySyncUsers';
 export { __internal_useOrganizationEnterpriseConnectionTestRuns } from './useOrganizationEnterpriseConnectionTestRuns';
 export type {
   UseOrganizationEnterpriseConnectionTestRunsParams,
