@@ -55,6 +55,8 @@ minimumReleaseAgeExclude:
   - fast-uri@3.1.5
   # Renovate security update: hono@4.12.34
   - hono@4.12.34
+  # Renovate security update: next@15.5.21
+  - next@15.5.21
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
