@@ -61,6 +61,8 @@ export type UserButtonModelOptions = UserProfileMode &
     afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
     /** Where selecting the personal workspace lands. Resolved against the user, not an organization. */
     afterSelectPersonalUrl?: AfterSelectUrl<UserResource>;
+    /** Where switching account lands. The instance URL is used when this is omitted. */
+    afterSwitchSessionUrl?: string;
     /**
      * Leaves the personal workspace out. An instance that forces organization selection withholds it
      * either way, so this cannot opt back in.
@@ -267,8 +269,12 @@ export function useUserButtonModel(
             await router.navigate(buildTaskUrl(task, { base: clerk.buildSignInUrl() }));
             return;
           }
+          const afterSwitchSessionUrl = options?.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
+          if (!afterSwitchSessionUrl) {
+            return;
+          }
           // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
-          await router.navigate(decorateUrl(displayConfig.afterSwitchSessionUrl));
+          await router.navigate(decorateUrl(afterSwitchSessionUrl));
         },
       }),
     onSignOutSession: sessionId =>

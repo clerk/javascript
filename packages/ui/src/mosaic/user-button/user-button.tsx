@@ -65,12 +65,13 @@ export type UserButtonProps = UserButtonModelOptions &
  * @example
  * Passing a URL routes to a page of your own instead of opening Clerk's modal; that is the whole
  * opt-in. `afterSelectOrganizationUrl` is where switching organization lands, and takes a `:param`
- * template, a plain path, or a function.
+ * template, a plain path, or a function. `afterSwitchSessionUrl` is where switching account lands.
  * ```tsx
  * <UserButton
  *   userProfileUrl='/account'
  *   organizationProfileUrl='/settings/organization'
  *   afterSelectOrganizationUrl='/orgs/:slug'
+ *   afterSwitchSessionUrl='/dashboard'
  * />
  * ```
  *

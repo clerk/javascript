@@ -49,6 +49,7 @@ let singleSessionMode: boolean;
 let branded: boolean;
 let forceOrganizationSelection: boolean;
 let organizationsEnabled: boolean;
+let afterSwitchSessionUrl: string;
 // False stands for the window before clerk-js has hydrated it, which the model has to sit out.
 let environmentHydrated: boolean;
 
@@ -56,10 +57,10 @@ let environmentHydrated: boolean;
 function environment() {
   return environmentHydrated
     ? {
-      displayConfig: { afterSwitchSessionUrl: '/after-switch', branded },
-      authConfig: { singleSessionMode },
-      organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
-    }
+        displayConfig: { afterSwitchSessionUrl, branded },
+        authConfig: { singleSessionMode },
+        organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
+      }
     : null;
 }
 
@@ -155,6 +156,7 @@ beforeEach(() => {
   branded = true;
   forceOrganizationSelection = false;
   organizationsEnabled = true;
+  afterSwitchSessionUrl = '/after-switch';
   environmentHydrated = true;
   signedInSessions = [
     { id: 'sess_1', user: user },
@@ -621,6 +623,35 @@ describe('useUserButtonModel', () => {
     expect(navigate).toHaveBeenCalledWith('/after-switch');
     // `redirectUrl` was decorated for us; taking the callback takes the Safari ITP refresh with it.
     expect(decorateUrl).toHaveBeenCalledWith('/after-switch');
+  });
+
+  it('does not navigate after a session switch when no after-switch URL is set', async () => {
+    afterSwitchSessionUrl = '';
+    render(<Harness />);
+    fireEvent.click(screen.getByText('switch'));
+
+    const navigateOnSetActive = setActive.mock.calls[0][0].navigate;
+    const decorateUrl = vi.fn((url: string) => url);
+    await act(async () => {
+      await navigateOnSetActive({ session: { currentTask: null }, decorateUrl });
+    });
+
+    expect(navigate).not.toHaveBeenCalled();
+    expect(decorateUrl).not.toHaveBeenCalled();
+  });
+
+  it('prefers the afterSwitchSessionUrl prop over the instance URL', async () => {
+    render(<Harness afterSwitchSessionUrl='/app-switch' />);
+    fireEvent.click(screen.getByText('switch'));
+
+    const navigateOnSetActive = setActive.mock.calls[0][0].navigate;
+    const decorateUrl = vi.fn((url: string) => url);
+    await act(async () => {
+      await navigateOnSetActive({ session: { currentTask: null }, decorateUrl });
+    });
+
+    expect(navigate).toHaveBeenCalledWith('/app-switch');
+    expect(decorateUrl).toHaveBeenCalledWith('/app-switch');
   });
 
   // An instance can restrict who may open an organization, and a user at their creation limit is
