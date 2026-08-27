@@ -23,6 +23,11 @@ export interface ClerkAPIErrorJSON {
     is_plan_upgrade_possible?: boolean;
     seats_quantity_to_add?: number;
     seats_quantity?: number;
+    trace_id?: string;
+    title?: string;
+    description?: string;
+    link_url?: string;
+    link_text?: string;
   };
 }
 
@@ -67,6 +72,35 @@ export interface ClerkAPIError {
     isPlanUpgradePossible?: boolean;
     seatsQuantityToAdd?: number;
     seatsQuantity?: number;
+    /**
+     * A short reference for the request that produced this error. It is shown to
+     * the end user so they can quote it when contacting support.
+     *
+     * Treat it as an opaque string: do not parse it, reformat it, or assume a
+     * length.
+     */
+    traceId?: string;
+    /**
+     * A heading for the error, configured by the application's owner.
+     *
+     * Plain text. Render it as text, never as HTML or markdown.
+     */
+    title?: string;
+    /**
+     * A description of the error, configured by the application's owner.
+     *
+     * Plain text. Render it as text, never as HTML or markdown.
+     */
+    description?: string;
+    /**
+     * An `https` URL the end user can follow for help, configured by the
+     * application's owner. Verify the scheme before using it as an `href`.
+     */
+    linkUrl?: string;
+    /**
+     * The label for `linkUrl`. Only ever set when `linkUrl` is set.
+     */
+    linkText?: string;
   };
 }
 

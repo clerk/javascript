@@ -17,7 +17,7 @@ import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { createUsernameError } from '@/ui/utils/usernameUtils';
 
-import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
+import { ActionBlockedCard, useActionBlocked, withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
@@ -34,6 +34,10 @@ import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 function SignUpStartInternal(): JSX.Element {
   const card = useCardState();
+  // A blocked request is terminal, so it replaces the card rather than showing
+  // an inline error beside a form the user cannot resubmit. setErrorOrBlock
+  // passes everything else through untouched.
+  const { blockedDetails, setErrorOrBlock } = useActionBlocked(card.setError);
   const clerk = useClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
@@ -168,7 +172,7 @@ function SignUpStartInternal(): JSX.Element {
       .catch(err => {
         /* Clear ticket values when an error occurs in the initial sign up attempt */
         formState.ticket.setValue('');
-        handleError(err, [], card.setError);
+        handleError(err, [], setErrorOrBlock);
       })
       .finally(() => {
         // Keep the card in loading state during SSO redirect to prevent UI flicker
@@ -211,7 +215,7 @@ function SignUpStartInternal(): JSX.Element {
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
           case ERROR_CODES.USER_BANNED:
           case ERROR_CODES.USER_DEACTIVATED:
-            card.setError(error);
+            setErrorOrBlock(error);
             break;
           default:
             // Error from server may be too much information for the end user, so set a generic error
@@ -350,7 +354,7 @@ function SignUpStartInternal(): JSX.Element {
           return navigate('./enterprise-connections');
         }
 
-        return handleError(err, fieldsToSubmit, card.setError);
+        return handleError(err, fieldsToSubmit, setErrorOrBlock);
       })
       .finally(() => card.setIdle());
   };
@@ -387,6 +391,10 @@ function SignUpStartInternal(): JSX.Element {
 
   if (mode !== SIGN_UP_MODES.PUBLIC && !(hasTicket || hasExistingSignUpWithTicket)) {
     return <SignUpRestrictedAccess />;
+  }
+
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
   }
 
   return (

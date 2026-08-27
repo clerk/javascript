@@ -26,8 +26,10 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import type { SignInStartIdentifier } from '../../common';
 import {
+  ActionBlockedCard,
   getIdentifierControlDisplayValues,
   groupIdentifiers,
+  useActionBlocked,
   withRedirectToAfterSignIn,
   withRedirectToSignInTask,
 } from '../../common';
@@ -86,6 +88,10 @@ const useAutoFillPasskey = () => {
 
 function SignInStartInternal(): JSX.Element {
   const card = useCardState();
+  // A blocked request is terminal, so it replaces the card rather than showing
+  // an inline error beside a form the user cannot resubmit. setErrorOrBlock
+  // passes everything else through untouched.
+  const { blockedDetails, setErrorOrBlock } = useActionBlocked(card.setError);
   const clerk = useClerk();
   const status = useLoadingStatus();
   const { userSettings, authConfig } = useEnvironment();
@@ -312,7 +318,7 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
           case ERROR_CODES.USER_BANNED:
           case ERROR_CODES.USER_DEACTIVATED:
-            card.setError(error);
+            setErrorOrBlock(error);
             break;
           default:
             defaultErrorHandler();
@@ -527,7 +533,7 @@ function SignInStartInternal(): JSX.Element {
       return handleCombinedFlowTransfer({
         afterSignUpUrl: ctx.afterSignUpUrl || '/',
         clerk,
-        handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
+        handleError: e => handleError(e, [identifierField, instantPasswordField], setErrorOrBlock),
         identifierAttribute: attribute,
         identifierValue: identifierField.value,
         navigate,
@@ -547,7 +553,7 @@ function SignInStartInternal(): JSX.Element {
         unsafeMetadata: ctx.unsafeMetadata,
       });
     } else {
-      handleError(e, [identifierField, instantPasswordField], card.setError);
+      handleError(e, [identifierField, instantPasswordField], setErrorOrBlock);
     }
   };
 
@@ -592,6 +598,10 @@ function SignInStartInternal(): JSX.Element {
     lastAuthenticationStrategy && totalEnabledAuthMethods > 1
       ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
       : false;
+
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
+  }
 
   return (
     <Flow.Part part='start'>

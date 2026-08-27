@@ -141,7 +141,8 @@ export type FlowMetadata = {
     | 'configureMapAttributes'
     | 'testSso'
     | 'ssoActivate'
-    | 'protectCheck';
+    | 'protectCheck'
+    | 'actionBlocked';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

@@ -2,6 +2,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  actionBlocked: {
+    subtitle: 'For your security, this request could not be completed.',
+    title: "We couldn't complete this request",
+    traceIdLabel: 'Reference',
+  },
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
