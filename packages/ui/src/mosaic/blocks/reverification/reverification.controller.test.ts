@@ -5,6 +5,7 @@ import { reverificationController, reverificationFactorKey } from './reverificat
 import type {
   ReverificationAttempt,
   ReverificationAttemptResult,
+  ReverificationBackupCodeFactor,
   ReverificationChallenge,
   ReverificationCompleteResult,
   ReverificationEmailCodeFactor,
@@ -37,6 +38,11 @@ const phoneFactor: ReverificationFirstFactorPhoneCodeFactor = {
 const totpFactor: ReverificationTOTPFactor = {
   stage: 'second',
   strategy: 'totp',
+};
+
+const backupCodeFactor: ReverificationBackupCodeFactor = {
+  stage: 'second',
+  strategy: 'backup_code',
 };
 
 const secondPhoneFactor: ReverificationSecondFactorPhoneCodeFactor = {
@@ -339,7 +345,8 @@ describe('reverificationController', () => {
     expect(prepare).toHaveBeenNthCalledWith(3, emailFactor);
   });
 
-  it('stays on the current factor when preparation fails, and retries through resend', async () => {
+  it('holds the send cooldown when preparation fails, and retries through resend', async () => {
+    vi.useFakeTimers();
     const prepare = vi
       .fn<(factor: ReverificationPreparationFactor) => Promise<void>>()
       .mockRejectedValueOnce(new Error('Could not send the code.'))
@@ -351,26 +358,95 @@ describe('reverificationController', () => {
 
     expect(actor.getSnapshot()).toMatchObject({
       value: 'preparing',
-      context: { currentFactor: emailFactor, resendSecondsRemaining: 0 },
+      context: { currentFactor: emailFactor, resendSecondsRemaining: 30 },
     });
     expect(actor.can({ type: 'RESEND' })).toBe(false);
     expect(actor.can({ type: 'SHOW_ALTERNATIVES' })).toBe(true);
 
-    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('preparationFailed'));
-    expect(actor.getSnapshot().context).toMatchObject({
-      currentFactor: emailFactor,
-      error: { scope: 'flow', message: 'Could not send the code.' },
-      resendSecondsRemaining: 0,
+    await vi.runAllTicks();
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'verifyingCooldown',
+      context: {
+        currentFactor: emailFactor,
+        error: { scope: 'flow', message: 'Could not send the code.' },
+        resendSecondsRemaining: 30,
+      },
     });
-    expect(actor.can({ type: 'RESEND' })).toBe(true);
-    expect(actor.can({ type: 'SHOW_ALTERNATIVES' })).toBe(true);
+    expect(actor.can({ type: 'RESEND' })).toBe(false);
 
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(actor.getSnapshot().value).toBe('verifying');
     actor.send({ type: 'RESEND' });
-    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifyingCooldown'));
+    await vi.runAllTicks();
+    expect(actor.getSnapshot().value).toBe('verifyingCooldown');
     expect(prepare).toHaveBeenCalledTimes(2);
   });
 
-  it('returns verification failures to the field and clears them on input', async () => {
+  it('does not resend inside the cooldown when alternatives are opened after a failed send', async () => {
+    vi.useFakeTimers();
+    const prepare = vi
+      .fn<(factor: ReverificationPreparationFactor) => Promise<void>>()
+      .mockRejectedValueOnce(new Error('Could not send the code.'))
+      .mockResolvedValue(undefined);
+    const { actor } = start({
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
+      prepare,
+    });
+    await vi.runAllTicks();
+    await vi.advanceTimersByTimeAsync(10_000);
+
+    actor.send({ type: 'SHOW_ALTERNATIVES' });
+    expect(actor.getSnapshot().value).toBe('selectingFactor');
+    actor.send({ type: 'BACK' });
+    await vi.runAllTicks();
+
+    // The factor is still unprepared, but the cooldown from the failed send outranks that.
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'verifyingCooldown',
+      context: { preparedFactorKey: null, resendSecondsRemaining: 20 },
+    });
+    expect(prepare).toHaveBeenCalledOnce();
+
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(actor.getSnapshot().value).toBe('verifying');
+    expect(prepare).toHaveBeenCalledOnce();
+  });
+
+  it('throttles from when the send was issued, not from when it landed', async () => {
+    vi.useFakeTimers();
+    const prepare = vi
+      .fn<(factor: ReverificationPreparationFactor) => Promise<void>>()
+      .mockImplementation(() => new Promise<void>(resolve => setTimeout(resolve, 5_000)));
+    const { actor } = start({
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
+      prepare,
+    });
+    expect(actor.getSnapshot().value).toBe('preparing');
+
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'verifyingCooldown',
+      context: { resendSecondsRemaining: 25 },
+    });
+
+    await vi.advanceTimersByTimeAsync(25_000);
+    expect(actor.getSnapshot().value).toBe('verifying');
+  });
+
+  it('clears a half-entered code when a new one is sent', async () => {
+    vi.useFakeTimers();
+    const { actor } = start({ challenge: firstFactorChallenge({ initialFactor: emailFactor }) });
+    await vi.runAllTicks();
+    await vi.advanceTimersByTimeAsync(30_000);
+
+    actor.send({ type: 'CHANGE_VALUE', value: '123' });
+    expect(actor.getSnapshot().context.value).toBe('123');
+
+    actor.send({ type: 'RESEND' });
+    expect(actor.getSnapshot().context.value).toBe('');
+  });
+
+  it('keeps a rejected password in the field and clears the error on input', async () => {
     const attempt = vi
       .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
       .mockRejectedValue({ scope: 'answer', message: 'Incorrect password.' });
@@ -381,11 +457,54 @@ describe('reverificationController', () => {
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifying'));
 
     expect(actor.getSnapshot().context).toMatchObject({
-      value: '',
+      value: 'wrong',
       error: { scope: 'answer', message: 'Incorrect password.' },
     });
     actor.send({ type: 'CHANGE_VALUE', value: 'new value' });
     expect(actor.getSnapshot().context.error).toBeNull();
+  });
+
+  it('keeps a rejected backup code in the field', async () => {
+    const attempt = vi
+      .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
+      .mockRejectedValue({ scope: 'answer', message: 'Incorrect backup code.' });
+    const { actor } = start({
+      challenge: {
+        status: 'needs_second_factor',
+        factors: [backupCodeFactor],
+        initialFactor: backupCodeFactor,
+      },
+      attempt,
+    });
+
+    actor.send({ type: 'CHANGE_VALUE', value: 'abcd-efgh' });
+    actor.send({ type: 'SUBMIT' });
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifying'));
+
+    expect(actor.getSnapshot().context).toMatchObject({
+      value: 'abcd-efgh',
+      error: { scope: 'answer', message: 'Incorrect backup code.' },
+    });
+  });
+
+  it('clears a rejected one-time code so the next one can be typed', async () => {
+    vi.useFakeTimers();
+    const attempt = vi
+      .fn<(attempt: ReverificationAttempt) => Promise<ReverificationAttemptResult>>()
+      .mockRejectedValue({ scope: 'answer', message: 'Incorrect code.' });
+    const { actor } = start({
+      challenge: firstFactorChallenge({ initialFactor: emailFactor }),
+      attempt,
+    });
+    await vi.runAllTicks();
+
+    actor.send({ type: 'CHANGE_VALUE', value: '123456' });
+    await vi.runAllTicks();
+
+    expect(actor.getSnapshot().context).toMatchObject({
+      value: '',
+      error: { scope: 'answer', message: 'Incorrect code.' },
+    });
   });
 
   it('owns resend cooldown and only retries after it expires', async () => {
@@ -407,7 +526,7 @@ describe('reverificationController', () => {
     await vi.advanceTimersByTimeAsync(30_000);
     expect(actor.getSnapshot().value).toBe('verifying');
     actor.send({ type: 'RESEND' });
-    expect(actor.getSnapshot().value).toBe('resending');
+    expect(actor.getSnapshot().value).toBe('preparing');
     await vi.runAllTicks();
     expect(actor.getSnapshot()).toMatchObject({
       value: 'verifyingCooldown',
@@ -416,7 +535,7 @@ describe('reverificationController', () => {
     expect(prepare).toHaveBeenCalledTimes(2);
   });
 
-  it('allows immediate resend retry after a resend failure', async () => {
+  it('holds the cooldown after a failed resend', async () => {
     vi.useFakeTimers();
     const prepare = vi
       .fn<(factor: ReverificationPreparationFactor) => Promise<void>>()
@@ -433,15 +552,19 @@ describe('reverificationController', () => {
     actor.send({ type: 'RESEND' });
     await vi.runAllTicks();
     expect(actor.getSnapshot()).toMatchObject({
-      value: 'verifying',
+      value: 'verifyingCooldown',
       context: {
-        resendSecondsRemaining: 0,
+        resendSecondsRemaining: 30,
         error: { scope: 'flow', message: 'Rate limited.' },
       },
     });
 
+    expect(actor.can({ type: 'RESEND' })).toBe(false);
+    expect(prepare).toHaveBeenCalledTimes(2);
+
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(actor.getSnapshot().value).toBe('verifying');
     actor.send({ type: 'RESEND' });
-    expect(actor.getSnapshot().value).toBe('resending');
     expect(prepare).toHaveBeenCalledTimes(3);
   });
 

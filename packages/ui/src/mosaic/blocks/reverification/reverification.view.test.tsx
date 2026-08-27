@@ -141,7 +141,7 @@ describe('ReverificationView', () => {
     await waitFor(() => expect(prepare).toHaveBeenCalledWith(emailFactor));
   });
 
-  it('keeps the code step when the code could not be sent, and resends from there', async () => {
+  it('keeps the code step usable when the code could not be sent, and holds the resend', async () => {
     const prepare = vi
       .fn<(factor: ReverificationPreparationFactor) => Promise<void>>()
       .mockRejectedValueOnce(new Error('Could not send the code.'))
@@ -156,11 +156,13 @@ describe('ReverificationView', () => {
     });
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not send the code.');
+
+    // Legacy showed the failure on the code card rather than replacing it: an earlier code
+    // stays submittable, and the resend sits behind the cooldown the failed send started.
     expect(codeSlots()).toHaveLength(6);
-
-    await userEvent.setup().click(screen.getByRole('button', { name: /Resend/ }));
-
-    await waitFor(() => expect(prepare).toHaveBeenCalledTimes(2));
+    expect(codeSlots()[0]).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Resend/ })).toHaveAttribute('aria-disabled', 'true');
+    expect(prepare).toHaveBeenCalledOnce();
   });
 
   it('counts the resend cooldown down in the label and holds the button inert', async () => {

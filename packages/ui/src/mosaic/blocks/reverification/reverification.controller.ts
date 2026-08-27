@@ -33,7 +33,9 @@ export interface ReverificationControllerContext {
   preparedFactorKey: string | null;
   /** The successful verification retained while completion runs or retries. */
   verification: ReverificationCompleteResult | null;
-  /** Seconds until another delivered code may be requested. */
+  /** Timestamp after which another delivered code may be requested. */
+  resendAvailableAt: number | null;
+  /** Seconds left on {@link ReverificationControllerContext.resendAvailableAt}, for display. */
   resendSecondsRemaining: number;
   /** Sends a code. Injected by the view from its `prepare` prop. */
   prepare: (factor: ReverificationPreparationFactor) => Promise<void>;
@@ -59,6 +61,11 @@ export type ReverificationControllerEvent =
 const { createMachine, assign, fromPromise } = setup<ReverificationControllerContext, ReverificationControllerEvent>();
 
 const factorsFrom = (context: ReverificationControllerContext): ReverificationFactor[] => context.challenge.factors;
+
+const secondsUntilResend = (context: ReverificationControllerContext) =>
+  context.resendAvailableAt === null ? 0 : Math.max(0, Math.ceil((context.resendAvailableAt - Date.now()) / 1000));
+
+const isCoolingDown = (context: ReverificationControllerContext) => secondsUntilResend(context) > 0;
 
 export const reverificationFactorKey = (factor: ReverificationFactor): string => {
   switch (factor.strategy) {
@@ -174,6 +181,7 @@ export const reverificationController = createMachine({
     error: null,
     preparedFactorKey: null,
     verification: null,
+    resendAvailableAt: null,
     resendSecondsRemaining: 0,
     prepare: () => Promise.resolve(),
     attempt: () => Promise.resolve({ status: 'complete', sessionId: '' }),
@@ -197,6 +205,7 @@ export const reverificationController = createMachine({
           error: null,
           preparedFactorKey: null,
           verification: null,
+          resendAvailableAt: null,
           resendSecondsRemaining: 0,
         };
       }),
@@ -216,6 +225,7 @@ export const reverificationController = createMachine({
             value: '',
             error: null,
             preparedFactorKey: null,
+            resendAvailableAt: null,
             resendSecondsRemaining: 0,
           })),
         },
@@ -232,20 +242,28 @@ export const reverificationController = createMachine({
     routingFactor: {
       always: [
         { target: 'unavailable', guard: context => !context.currentFactor },
+        // Ahead of the preparation guard: a failed send leaves the factor unprepared, and
+        // routing straight back into `preparing` would resend inside its own cooldown.
+        { target: 'verifyingCooldown', guard: isCoolingDown },
         {
           target: 'preparing',
           guard: context =>
             requiresPreparation(context.currentFactor) &&
             context.preparedFactorKey !== reverificationFactorKey(context.currentFactor),
         },
-        {
-          target: 'verifyingCooldown',
-          guard: context => context.resendSecondsRemaining > 0,
-        },
         { target: 'verifying' },
       ],
     },
     preparing: {
+      // The cooldown is committed when the request goes out, not when it lands, so a slow or
+      // failing send cannot be retried sooner than a fast one. Matches legacy's TimerButton,
+      // which disabled itself on click rather than on response.
+      entry: assign(() => ({
+        resendAvailableAt: Date.now() + RESEND_COOLDOWN_SECONDS * 1000,
+        resendSecondsRemaining: RESEND_COOLDOWN_SECONDS,
+        value: '',
+        error: null,
+      })),
       invoke: fromPromise(
         context => {
           if (!requiresPreparation(context.currentFactor)) {
@@ -258,12 +276,13 @@ export const reverificationController = createMachine({
             target: 'verifyingCooldown',
             actions: assign(context => ({
               preparedFactorKey: context.currentFactor ? reverificationFactorKey(context.currentFactor) : null,
-              resendSecondsRemaining: RESEND_COOLDOWN_SECONDS,
               error: null,
             })),
           },
+          // Legacy had no failure screen: the error lands on the code card the user is already
+          // looking at, and an earlier code stays submittable.
           onError: {
-            target: 'preparationFailed',
+            target: 'verifyingCooldown',
             actions: assign((_, event) => ({ error: errorFrom(event.error) })),
           },
         },
@@ -273,21 +292,11 @@ export const reverificationController = createMachine({
         CANCEL: 'cancelled',
       },
     },
-    preparationFailed: {
-      on: {
-        RESEND: 'preparing',
-        SHOW_ALTERNATIVES: {
-          target: 'selectingFactor',
-          guard: hasAlternatives,
-        },
-        CANCEL: 'cancelled',
-      },
-    },
     verifying: {
       on: {
         CHANGE_VALUE: changeValue,
         SUBMIT: { target: 'submitting', guard: canSubmit },
-        RESEND: { target: 'resending', guard: context => requiresPreparation(context.currentFactor) },
+        RESEND: { target: 'preparing', guard: context => requiresPreparation(context.currentFactor) },
         SHOW_ALTERNATIVES: { target: 'selectingFactor', guard: hasAlternatives },
         SHOW_HELP: {
           target: 'helpFromFactor',
@@ -297,6 +306,7 @@ export const reverificationController = createMachine({
       },
     },
     verifyingCooldown: {
+      entry: assign(context => ({ resendSecondsRemaining: secondsUntilResend(context) })),
       on: {
         CHANGE_VALUE: changeValue,
         SUBMIT: { target: 'submitting', guard: canSubmit },
@@ -309,17 +319,8 @@ export const reverificationController = createMachine({
       },
       after: {
         1000: [
-          {
-            target: 'verifyingCooldown',
-            guard: context => context.resendSecondsRemaining > 1,
-            actions: assign(context => ({
-              resendSecondsRemaining: context.resendSecondsRemaining - 1,
-            })),
-          },
-          {
-            target: 'verifying',
-            actions: assign(() => ({ resendSecondsRemaining: 0 })),
-          },
+          { target: 'verifyingCooldown', guard: isCoolingDown },
+          { target: 'verifying', actions: assign(() => ({ resendSecondsRemaining: 0 })) },
         ],
       },
     },
@@ -351,46 +352,16 @@ export const reverificationController = createMachine({
             }),
           },
         ],
+        // Legacy reset only the OTP control; password and backup code kept what was typed.
         onError: ({ context, event }) => ({
-          target: context.resendSecondsRemaining > 0 ? 'verifyingCooldown' : 'verifying',
+          target: isCoolingDown(context) ? 'verifyingCooldown' : 'verifying',
           context: {
-            value: '',
+            value: isFixedLengthCode(context.currentFactor) ? '' : context.value,
             error: errorFrom(event.error),
           },
         }),
       }),
       on: { CANCEL: 'cancelled' },
-    },
-    resending: {
-      invoke: fromPromise(
-        context => {
-          if (!requiresPreparation(context.currentFactor)) {
-            return Promise.reject(new Error(m.unstable__errors__generic));
-          }
-          return context.prepare(context.currentFactor);
-        },
-        {
-          onDone: {
-            target: 'verifyingCooldown',
-            actions: assign(context => ({
-              preparedFactorKey: context.currentFactor ? reverificationFactorKey(context.currentFactor) : null,
-              resendSecondsRemaining: RESEND_COOLDOWN_SECONDS,
-              error: null,
-            })),
-          },
-          onError: {
-            target: 'verifying',
-            actions: assign((_, event) => ({
-              resendSecondsRemaining: 0,
-              error: errorFrom(event.error),
-            })),
-          },
-        },
-      ),
-      on: {
-        SHOW_ALTERNATIVES: { target: 'selectingFactor', guard: hasAlternatives },
-        CANCEL: 'cancelled',
-      },
     },
     helpFromSelection: {
       on: {
