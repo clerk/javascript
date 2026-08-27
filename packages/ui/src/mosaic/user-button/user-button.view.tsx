@@ -86,23 +86,42 @@ function useBusy(key?: string): { busy: boolean; disabled: boolean } {
   return { busy: pendingKey === key, disabled: pendingKey !== key };
 }
 
-interface ActiveWorkspace {
-  name: string;
-  imageUrl?: string;
-  shape: 'circle' | 'square';
-  /** Absent when the personal account is what's active. */
-  organization?: UserButtonMembership;
-}
+type ActiveWorkspace =
+  | {
+      kind: 'organization';
+      name: string;
+      imageUrl?: string;
+      shape: 'square';
+      organization: UserButtonMembership;
+    }
+  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle' }
+  | { kind: 'none'; name: string; imageUrl?: string; shape: 'square' };
 
 /**
  * What the surface leads with: named in the trigger and headed in the popup, so the two always
- * agree. Only an organization-led surface with an organization actually active resolves to one.
+ * agree. An organization-led surface with no org and no personal workspace is no selection.
  */
-function leadWorkspace({ layout, activeOrganization, activeSession }: UserButtonContextValue): ActiveWorkspace {
-  const organization = layout.leadWith === 'organization' ? activeOrganization : null;
-  return organization
-    ? { name: organization.name, imageUrl: organization.imageUrl, shape: 'square', organization }
-    : { name: activeSession.name, imageUrl: activeSession.imageUrl, shape: 'circle' };
+function leadWorkspace({
+  layout,
+  activeOrganization,
+  activeSession,
+  hidePersonal,
+}: UserButtonContextValue): ActiveWorkspace {
+  if (layout.leadWith === 'organization') {
+    if (activeOrganization) {
+      return {
+        kind: 'organization',
+        name: activeOrganization.name,
+        imageUrl: activeOrganization.imageUrl,
+        shape: 'square',
+        organization: activeOrganization,
+      };
+    }
+    if (hidePersonal) {
+      return { kind: 'none', name: m.workspaces.notSelected, shape: 'square' };
+    }
+  }
+  return { kind: 'user', name: activeSession.name, imageUrl: activeSession.imageUrl, shape: 'circle' };
 }
 
 function membershipSubtitle(membership: UserButtonMembership): string {
@@ -351,10 +370,18 @@ function Header() {
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
   const { sessionId, identifier } = data.activeSession;
-  const { name, imageUrl, shape, organization } = leadWorkspace(data);
+  const workspace = leadWorkspace(data);
+  const { name, imageUrl, shape } = workspace;
+  const organization = workspace.kind === 'organization' ? workspace.organization : undefined;
   // An account with no name is titled by its identifier, and repeating it underneath says nothing.
+  // No selection is not the account, so it carries no identifier line either.
   const accountSubtitle = identifier === name ? '' : identifier;
-  const subtitle = organization ? membershipSubtitle(organization) : accountSubtitle;
+  const subtitle =
+    workspace.kind === 'organization'
+      ? membershipSubtitle(workspace.organization)
+      : workspace.kind === 'user'
+        ? accountSubtitle
+        : '';
 
   const actions: HeaderAction[] = [];
   for (const action of data.layout.actions.header) {
@@ -1026,7 +1053,8 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
 export interface UserButtonTriggerProps {
   /**
    * Names the active workspace beside its avatar — the organization wherever one heads the
-   * trigger, the account otherwise. Turn it off for the avatar alone.
+   * trigger, no selection when personal is hidden and none is active, the account otherwise.
+   * Turn it off for the avatar alone.
    *
    * @default true
    */
@@ -1046,8 +1074,10 @@ export function UserButtonTrigger({
   renderTriggerBadge = true,
 }: UserButtonTriggerProps = {}): ReactElement {
   const data = useUserButtonContext();
-  const { name, imageUrl, shape, organization } = leadWorkspace(data);
-  const planLabel = renderTriggerBadge ? organization?.planLabel : undefined;
+  const workspace = leadWorkspace(data);
+  const { name, imageUrl, shape } = workspace;
+  const planLabel =
+    renderTriggerBadge && workspace.kind === 'organization' ? workspace.organization.planLabel : undefined;
 
   return (
     <Popover.Trigger

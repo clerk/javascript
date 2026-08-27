@@ -51,6 +51,7 @@ let signedInSessions: FakeSession[];
 let pagingRef: ReturnType<typeof vi.fn>;
 let singleSessionMode: boolean;
 let organizationsEnabled: boolean;
+let forceOrganizationSelection: boolean;
 
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
@@ -85,7 +86,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       __internal_environment: {
         displayConfig: { afterSwitchSessionUrl: '/after-switch' },
         authConfig: { singleSessionMode },
-        organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection: false },
+        organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
         commerceSettings: { billing: { user: { enabled: false } } },
         apiKeysSettings: { user_api_keys_enabled: false },
       },
@@ -149,6 +150,7 @@ beforeEach(() => {
   pagingRef = vi.fn();
   singleSessionMode = false;
   organizationsEnabled = true;
+  forceOrganizationSelection = false;
   signedInSessions = [
     { id: 'sess_1', user },
     {
@@ -306,6 +308,23 @@ describe('UserButton (connected)', () => {
 
     expect(screen.queryByText('Personal account')).toBeNull();
     expect(screen.getByRole('button', { name: 'Other' })).toBeInTheDocument();
+  });
+
+  it('names no organization selected when the instance forces one and none is active', async () => {
+    forceOrganizationSelection = true;
+    organization = null;
+    renderUserButton();
+
+    expect(screen.getByRole('button', { name: /No organization selected/ })).toBeInTheDocument();
+    await open();
+
+    const surface = popup();
+    if (!surface) {
+      throw new Error('expected the popover to be open');
+    }
+    expect(within(surface).getByText('No organization selected')).toBeInTheDocument();
+    expect(screen.queryByText('Personal account')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
   });
 
   // `mode` is the view's own prop; this only proves the connected component hands it down, since

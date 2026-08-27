@@ -143,9 +143,21 @@ const LATENCY_MS = 800;
  * The actions that would navigate somewhere in a real app (Manage, Invite, Create organization, Add
  * account) have nowhere to go here, so they only close the popover.
  */
-function usePrototype(): Omit<UserButtonProps, 'mode'> {
+function usePrototype({
+  hidePersonal = false,
+  startWithoutOrganization = false,
+}: {
+  hidePersonal?: boolean;
+  startWithoutOrganization?: boolean;
+} = {}): Omit<UserButtonProps, 'mode'> {
   const [open, setOpen] = useState(false);
-  const [accounts, setAccounts] = useState(initialAccounts);
+  const [accounts, setAccounts] = useState(() =>
+    startWithoutOrganization
+      ? initialAccounts.map(a =>
+          a.session.sessionId === colin.sessionId ? { ...a, activeOrganizationId: null } : a,
+        )
+      : initialAccounts,
+  );
   const [activeSessionId, setActiveSessionId] = useState(colin.sessionId);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
 
@@ -196,6 +208,7 @@ function usePrototype(): Omit<UserButtonProps, 'mode'> {
     suggestions: account.suggestions,
     invitations: account.invitations,
     additionalSessions: accounts.filter(a => a.session.sessionId !== activeSessionId).map(a => a.session),
+    hidePersonal,
     // Selecting an organization only ever acts on the active account, and is the one action that
     // closes the surface behind it.
     onSelectOrganization: organizationId =>
@@ -296,6 +309,19 @@ export function User(_args: Record<string, unknown>) {
     <UserButtonView
       {...prototype}
       mode='user'
+    />
+  );
+}
+
+export function NoOrganizationSelected(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true, startWithoutOrganization: true });
+
+  // Personal is withheld and nothing is active, so the lead is no selection — not the account.
+  // Picking an organization leaves it.
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
     />
   );
 }

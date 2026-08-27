@@ -51,7 +51,8 @@ export interface UserButtonData {
   activeSession: UserButtonSession;
   /**
    * The active organization, described whole rather than found in `memberships`, so the surface
-   * names it while the list it belongs to is still loading. `null` => the personal workspace.
+   * names it while the list it belongs to is still loading. `null` means none is active: the
+   * personal workspace when one exists, and no selection otherwise.
    */
   activeOrganization: UserButtonMembership | null;
   /**
