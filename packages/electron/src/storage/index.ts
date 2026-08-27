@@ -128,6 +128,7 @@ export function storage(options: StorageOptions = {}): TokenStorage {
     ...(options.path ? { cwd: options.path } : {}),
   });
   const memoryFallback = new Map<string, string>();
+  // IPC requests can resolve out of order, so only the latest mutation may update storage.
   const mutationVersions = new Map<string, number>();
 
   const beginMutation = (key: string) => {
