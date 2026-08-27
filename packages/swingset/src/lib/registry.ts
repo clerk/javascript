@@ -74,7 +74,6 @@ import {
   Disabled as OtpComponentDisabled,
   Error as OtpComponentError,
   meta as otpComponentMeta,
-  Sizes as OtpComponentSizes,
   Success as OtpComponentSuccess,
 } from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
@@ -292,7 +291,6 @@ const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: Men
 const otpComponentModule: StoryModule = {
   meta: otpComponentMeta,
   Default: OtpComponentDefault,
-  Sizes: OtpComponentSizes,
   Success: OtpComponentSuccess,
   Error: OtpComponentError,
   Disabled: OtpComponentDisabled,

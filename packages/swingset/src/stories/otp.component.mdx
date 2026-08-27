@@ -72,13 +72,6 @@ Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes,
 
 ## Examples
 
-### Sizes
-
-<Story
-  name='Sizes'
-  storyModule={OtpStories}
-/>
-
 ### Success
 
 <Story
@@ -107,4 +100,4 @@ Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes,
 | Root | `.cl-otp`         | The `role="group"` holding the boxes.          |
 | Slot | `.cl-otp-slot`    | One `input` per character, one box in the row. |
 
-Both carry `data-size` and `data-status`, plus `data-disabled` when disabled. Each slot additionally carries the primitive's `data-active` (holds focus) and `data-filled` (holds a character).
+Both carry `data-status`, plus `data-disabled` when disabled. Each slot additionally carries the primitive's `data-active` (holds focus) and `data-filled` (holds a character).
