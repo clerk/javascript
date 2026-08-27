@@ -118,8 +118,8 @@ function list(data: unknown[], count: number, hasNextPage = false, isLoading = f
 
 /** A promise whose settling is controlled by the test, to hold an async action in flight. */
 function createDeferred() {
-  let resolve: () => void = () => {};
-  let reject: (reason?: unknown) => void = () => {};
+  let resolve: () => void = () => { };
+  let reject: (reason?: unknown) => void = () => { };
   const promise = new Promise<void>((res, rej) => {
     resolve = res;
     reject = rej;
@@ -554,6 +554,36 @@ describe('UserButton (connected)', () => {
     // Still the organization the surface opened on: heading it and listed under it, unclickable.
     expect(within(surface).getAllByText('Acme')).toHaveLength(2);
     expect(screen.queryByRole('button', { name: 'Acme' })).toBeNull();
+
+    deferred.resolve();
+    await waitFor(() => expect(popup()).toBeNull());
+  });
+
+  // `setActive` with a navigation puts Clerk in transitive state: hooks report `isLoaded: false`
+  // and the live model goes `loading`. The frozen model is the one the action started from, so
+  // the surface has to keep it rather than flashing the fallback
+  it('does not render the fallback when Clerk resources reverts to loading', async () => {
+    const deferred = createDeferred();
+    setActive.mockReturnValueOnce(deferred.promise);
+    const props = { fallback: <output data-testid='fallback'>Loading</output> };
+    const { rerender } = renderUserButton(props);
+    const act = await open();
+
+    await act.click(screen.getByRole('button', { name: 'Other' }));
+    await waitFor(() => expect(spinner()).toBeInTheDocument());
+
+    // Mock the transitive state
+    isUserLoaded = false;
+    isSessionLoaded = false;
+    isOrgLoaded = false;
+    rerender(tree(props));
+
+    expect(screen.queryByTestId('fallback')).not.toBeInTheDocument();
+    const surface = popup();
+    if (!surface) {
+      throw new Error('expected the popover to be open');
+    }
+    expect(within(surface).getAllByText('Acme')).toHaveLength(2);
 
     deferred.resolve();
     await waitFor(() => expect(popup()).toBeNull());

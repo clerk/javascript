@@ -28,12 +28,12 @@ type UserButtonMachineEvent =
   | { type: 'OPEN' }
   | { type: 'CLOSE' }
   | {
-      type: 'RUN';
-      key: string;
-      frozenModel: UserButtonReadyModel;
-      run: () => Promise<unknown>;
-      closeOnSuccess: boolean;
-    };
+    type: 'RUN';
+    key: string;
+    frozenModel: UserButtonReadyModel;
+    run: () => Promise<unknown>;
+    closeOnSuccess: boolean;
+  };
 
 const { createMachine, assign, fromPromise } = setup<UserButtonMachineContext, UserButtonMachineEvent>();
 
@@ -114,8 +114,12 @@ export function useUserButtonController(
     minDuration: context.closeOnSuccess ? 0 : undefined,
   });
 
-  if (model.status !== 'ready') {
-    return { status: model.status };
+  // If an action is pending and the model is frozen, we use the status of the frozen model.
+  // This prevents the fallback from showing when we revert from ready->loading during Clerks
+  // transitive state.
+  const resolvedModel = context.frozenModel ?? model;
+  if (resolvedModel.status !== 'ready') {
+    return { status: resolvedModel.status };
   }
 
   const close = () => send({ type: 'CLOSE' });
@@ -123,13 +127,13 @@ export function useUserButtonController(
   const menuItems = customMenuItems?.map(item =>
     item.href === undefined
       ? {
-          ...item,
-          onClick: () => {
-            // Always close the menu for custom actions
-            close();
-            item.onClick();
-          },
-        }
+        ...item,
+        onClick: () => {
+          // Always close the menu for custom actions
+          close();
+          item.onClick();
+        },
+      }
       : item,
   );
 
@@ -141,22 +145,27 @@ export function useUserButtonController(
   ) =>
     fn
       ? (...args: Args) =>
-          send({
-            type: 'RUN',
-            key: keyFor(...args),
-            frozenModel: model,
-            run: async () => fn(...args),
-            closeOnSuccess,
-          })
+        send({
+          type: 'RUN',
+          key: keyFor(...args),
+          // RUN can only happen from a idle state, so this should always
+          // resolve the actual current model, not a previously frozen
+          // one. If the logic later changes so RUN can happen outside of
+          // idle, using the resolvedModel here means we keep using the
+          // first captured frozen model until all actions settle.
+          frozenModel: resolvedModel,
+          run: async () => fn(...args),
+          closeOnSuccess,
+        })
       : undefined;
 
   // A callback that wraps a callback so it always closes the popup when done
   const handOff = (fn: (() => void) | undefined) =>
     fn
       ? () => {
-          close();
-          fn();
-        }
+        close();
+        fn();
+      }
       : undefined;
 
   // Rendering the model the action froze on holds the popup still while it runs; the result
@@ -176,10 +185,10 @@ export function useUserButtonController(
     onCreateOrganization,
     onAddAccount,
     ...data
-  } = context.frozenModel ?? model;
+  } = resolvedModel;
 
   // Force user mode if organizations are disabled
-  const mode = model.organizationsEnabled ? requestedMode : 'user';
+  const mode = organizationsEnabled ? requestedMode : 'user';
 
   return {
     status: 'ready',
