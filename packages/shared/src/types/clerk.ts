@@ -1967,6 +1967,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
     | 'ConfigureSSO'
+    | 'ConfigureDirectorySync'
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;

@@ -152,6 +152,11 @@ export type ConfigureSSOCtx = ConfigureSSOProps & {
   mode?: ComponentMode;
 };
 
+export type ConfigureDirectorySyncCtx = ConfigureSSOProps & {
+  componentName: 'ConfigureDirectorySync';
+  mode?: ComponentMode;
+};
+
 export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
@@ -252,6 +257,7 @@ export type AvailableComponentCtx =
   | CheckoutCtx
   | APIKeysCtx
   | ConfigureSSOCtx
+  | ConfigureDirectorySyncCtx
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx

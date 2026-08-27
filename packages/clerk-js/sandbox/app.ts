@@ -34,6 +34,7 @@ const AVAILABLE_COMPONENTS = [
   'pricingTable',
   'apiKeys',
   'configureSSO',
+  'configureDirectorySync',
   'oauthConsent',
   'taskChooseOrganization',
   'taskResetPassword',
@@ -153,6 +154,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
   configureSSO: buildComponentControls('configureSSO'),
+  configureDirectorySync: buildComponentControls('configureDirectorySync'),
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
@@ -425,6 +427,10 @@ void (async () => {
     '/pricing-table': { mount: 'mountPricingTable', component: 'pricingTable' },
     '/api-keys': { mount: 'mountAPIKeys', component: 'apiKeys' },
     '/configure-sso': { mount: '__internal_mountConfigureSSO', component: 'configureSSO' },
+    '/configure-directory-sync': {
+      mount: '__internal_mountConfigureDirectorySync',
+      component: 'configureDirectorySync',
+    },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',
       component: 'taskChooseOrganization',
