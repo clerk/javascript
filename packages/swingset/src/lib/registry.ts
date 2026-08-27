@@ -74,10 +74,7 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
-import {
-  Default as ReverificationDialogDefault,
-  meta as reverificationDialogMeta,
-} from '../stories/reverification-dialog.stories';
+import { Default as ReverificationDefault, meta as reverificationMeta } from '../stories/reverification.stories';
 import {
   Default as ScrollAreaDefault,
   Gutter as ScrollAreaGutter,
@@ -292,9 +289,9 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
-const reverificationDialogModule: StoryModule = {
-  meta: reverificationDialogMeta,
-  Default: ReverificationDialogDefault,
+const reverificationModule: StoryModule = {
+  meta: reverificationMeta,
+  Default: ReverificationDefault,
 };
 
 const userProfileApiKeysPanelModule: StoryModule = {
@@ -400,7 +397,7 @@ export const registry: StoryModule[] = [
   userProfileDeleteSectionModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   destructiveModule,
-  reverificationDialogModule,
+  reverificationModule,
   // Components
   avatarModule,
   badgeModule,

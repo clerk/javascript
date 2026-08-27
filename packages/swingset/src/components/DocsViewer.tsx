@@ -39,7 +39,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   blocks: {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
-    'reverification-dialog': dynamic(() => import('../stories/reverification-dialog.mdx')),
+    reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),

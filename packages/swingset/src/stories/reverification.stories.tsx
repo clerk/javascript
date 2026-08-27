@@ -11,19 +11,19 @@ import type {
   ReverificationPreparationFactor,
   ReverificationSecondFactor,
   ReverificationSecondFactorPhoneCodeFactor,
-} from '@clerk/ui/mosaic/blocks/reverification-dialog';
-import { ReverificationDialogView } from '@clerk/ui/mosaic/blocks/reverification-dialog';
+} from '@clerk/ui/mosaic/blocks/reverification';
+import { ReverificationView } from '@clerk/ui/mosaic/blocks/reverification';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-export { default as __source } from './reverification-dialog.stories?raw';
+export { default as __source } from './reverification.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Blocks',
-  title: 'ReverificationDialog',
-  source: 'packages/ui/src/mosaic/blocks/reverification-dialog/reverification-dialog.view.tsx',
+  title: 'Reverification',
+  source: 'packages/ui/src/mosaic/blocks/reverification/reverification.view.tsx',
 };
 
 const passwordFactor: ReverificationPasswordFactor = {
@@ -152,7 +152,7 @@ function ControllerDrivenDialog({ scenario, onFinished }: { scenario: Scenario; 
   );
 
   return (
-    <ReverificationDialogView
+    <ReverificationView
       initialChallenge={scenario.challenge}
       prepare={prepare}
       attempt={attempt}
