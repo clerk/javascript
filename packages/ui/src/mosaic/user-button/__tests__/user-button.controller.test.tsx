@@ -235,7 +235,7 @@ describe('useUserButtonController', () => {
     expect(screen.getByTestId('open')).toHaveTextContent('false');
   });
 
-  it('abandons an action dismissed mid-flight rather than reopening on its result', async () => {
+  it('stays closed when a dismissed action settles', async () => {
     const pending = deferred<unknown>();
     const onSwitchSession = vi.fn(() => pending.promise);
     render(<Harness model={ready({ onSwitchSession })} />);

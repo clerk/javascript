@@ -660,6 +660,56 @@ describe('UserButton (connected)', () => {
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeEnabled();
   });
 
+  // Closing must not drop the invoke: reopen should find the same row still pending, and a second
+  // action must not start. Wait out the spinner hold so a stale minDuration cannot fake this.
+  it('still shows the in-flight action when the popover is reopened before it settles', async () => {
+    const deferred = createDeferred();
+    setActive.mockReturnValueOnce(deferred.promise);
+    renderUserButton();
+    const act = await open();
+
+    await act.click(screen.getByRole('button', { name: 'bob@example.com' }));
+    expect(spinner()).toBeInTheDocument();
+
+    await act.click(trigger());
+    expect(popup()).toBeNull();
+
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await act.click(trigger());
+
+    const bob = screen.getByRole('button', { name: 'bob@example.com' });
+    expect(popup()).toBeInTheDocument();
+    expect(bob).toHaveAttribute('aria-busy', 'true');
+    expect(spinner()).toBeInTheDocument();
+
+    await act.click(screen.getByRole('button', { name: 'Other' }));
+    expect(setActive).toHaveBeenCalledTimes(1);
+
+    deferred.resolve();
+    await waitFor(() => expect(spinner()).toBeNull());
+    expect(popup()).toBeInTheDocument();
+  });
+
+  it('closes on success even if the popover was dismissed and reopened while the action ran', async () => {
+    const deferred = createDeferred();
+    setActive.mockReturnValueOnce(deferred.promise);
+    renderUserButton();
+    const act = await open();
+
+    await act.click(screen.getByRole('button', { name: 'Other' }));
+    expect(spinner()).toBeInTheDocument();
+
+    await act.click(trigger());
+    expect(popup()).toBeNull();
+
+    await act.click(trigger());
+    expect(popup()).toBeInTheDocument();
+    expect(spinner()).toBeInTheDocument();
+
+    deferred.resolve();
+    await waitFor(() => expect(popup()).toBeNull());
+  });
+
   // The spinner is held up for a minimum so it cannot flicker off. That hold is for a surface still
   // on screen, so an action that closes the surface must not carry it: reopening inside the window
   // would otherwise find the popup spinning over rows that are all stood down, for nothing.

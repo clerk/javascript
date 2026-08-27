@@ -10,6 +10,8 @@ import { userButtonBusyKeys } from './user-button.view';
 export type UserButtonReadyModel = Extract<UserButtonModel, { status: 'ready' }>;
 
 interface UserButtonMachineContext {
+  /** Independent of the action: dismissing must not abandon an in-flight invoke. */
+  open: boolean;
   /** Which action is currently pending. */
   pendingKey: string | null;
   /**
@@ -41,22 +43,22 @@ const settled = { pendingKey: null, frozenModel: null };
 
 const userButtonMachine = createMachine({
   id: 'userButton',
-  initial: 'closed',
+  initial: 'idle',
   context: {
+    open: false,
     pendingKey: null,
     frozenModel: null,
     run: () => Promise.resolve(),
     closeOnSuccess: false,
   },
   states: {
-    closed: {
-      on: { OPEN: 'open' },
-    },
-    open: {
+    idle: {
       on: {
-        CLOSE: 'closed',
+        OPEN: { actions: assign(() => ({ open: true })) },
+        CLOSE: { actions: assign(() => ({ open: false })) },
         RUN: {
           target: 'busy',
+          guard: context => context.open,
           actions: assign((_, event) => ({
             pendingKey: event.key,
             frozenModel: event.frozenModel,
@@ -66,20 +68,23 @@ const userButtonMachine = createMachine({
         },
       },
     },
-    // Reached only from `open`, so a busy popup that is not open is unrepresentable, and RUN going
-    // unhandled here is what stops a second action starting while one is in flight. Dismissing the
-    // popup abandons the action: the request finishes, but nothing is left for its result to land in.
+    // OPEN/CLOSE have no target so they do not leave this state and abandon the invoke.
     busy: {
-      on: { CLOSE: { target: 'closed', actions: assign(() => settled) } },
+      on: {
+        OPEN: { actions: assign(() => ({ open: true })) },
+        CLOSE: { actions: assign(() => ({ open: false })) },
+      },
       invoke: fromPromise(context => context.run(), {
         onDone: [
-          { target: 'closed', guard: context => context.closeOnSuccess, actions: assign(() => settled) },
-          { target: 'open', actions: assign(() => settled) },
+          {
+            target: 'idle',
+            guard: context => context.closeOnSuccess,
+            actions: assign(() => ({ ...settled, open: false })),
+          },
+          { target: 'idle', actions: assign(() => settled) },
         ],
-        // The popup stays up on a failure so the row can be clicked again. Nothing reports what went
-        // wrong yet; the error surface is its own change, and carrying a message before one exists
-        // would mean shipping an untranslated string nobody reads.
-        onError: { target: 'open', actions: assign(() => settled) },
+        // Leave `open` as the user left it. The error surface is a later change.
+        onError: { target: 'idle', actions: assign(() => settled) },
       }),
     },
   },
@@ -103,9 +108,7 @@ export function useUserButtonController(
   options: UserButtonControllerOptions = {},
 ): UserButtonController {
   const { mode: requestedMode, modePriority, customMenuItems, menuItemOrder } = options;
-  // The popover's open state and the one action in flight are the same flow: an action that ends the
-  // interaction closes the surface, so they settle together or not at all.
-  const [{ value, context }, send] = useMachine(userButtonMachine);
+  const [{ context }, send] = useMachine(userButtonMachine);
 
   // Every action here is a network round trip, so we can start the
   // pending state immediately, we use this for the minDuration
@@ -197,7 +200,7 @@ export function useUserButtonController(
     modePriority,
     customMenuItems: menuItems,
     menuItemOrder,
-    open: value !== 'closed',
+    open: context.open,
     onOpenChange: next => send(next ? { type: 'OPEN' } : { type: 'CLOSE' }),
     pendingKey: displayPendingKey,
     onSelectOrganization: runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true),
