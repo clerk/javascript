@@ -10,15 +10,40 @@ The view renders a snapshot and emits events. Nothing else.
   `canSubmit`) are passed in — the view never re-implements a machine guard.
 
 ```tsx
+<Form onSubmit={() => send({ type: 'SUBMIT' })}>
+  <Input
+    value={snapshot.context.name}
+    disabled={snapshot.value === 'saving'}
+    onChange={event => send({ type: 'TYPE_NAME', value: event.target.value })}
+  />
+  <SubmitButton
+    isPending={snapshot.value === 'saving'}
+    disabled={!canSubmit}
+  >
+    Save
+  </SubmitButton>
+</Form>
+```
+
+A **block** takes the flow's state as props. It owns only what nothing outside
+it can use. `Destructive` is the example: it holds the half-typed confirmation
+phrase and compares it, while `open`, `isDeleting`, and `errorMessage` come from
+the machine, because those are what decide whether the dialog closes or explains
+itself.
+
+```tsx
 <Destructive
   open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
-  resourceName={snapshot.context.organizationName}
-  confirmationValue={snapshot.context.confirmationValue}
-  onConfirmationValueChange={value => send({ type: 'TYPE_CONFIRMATION', value })}
+  onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
+  trigger={<Button color='negative'>Delete organization</Button>}
+  title='Delete organization?'
+  description="All of this organization's data will be permanently deleted."
+  fieldLabel='Type the organization name below to continue'
+  confirmationValue={organizationName}
+  actionLabel='Delete organization'
   onDelete={() => send({ type: 'CONFIRM' })}
-  canSubmit={canSubmit}
   isDeleting={snapshot.value === 'deleting'}
-  error={snapshot.context.error}
+  errorMessage={snapshot.context.errorMessage}
 />
 ```
 

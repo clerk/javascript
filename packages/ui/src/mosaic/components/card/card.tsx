@@ -4,8 +4,9 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../utils/focus-outline.styles';
+import { reset } from '../../utils/reset.styles';
 import { ClerkLogo } from '../clerk-logo';
-import { reset } from '../reset.styles';
 import { TextContext } from '../text';
 import { elevations, headerAlignments, styles } from './card.styles';
 
@@ -30,7 +31,7 @@ function Branding() {
           href='https://go.clerk.com/components'
           target='_blank'
           rel='noopener noreferrer'
-          {...stylex.props(reset.base, styles.brandingLink)}
+          {...stylex.props(reset.base, styles.brandingLink, focusOutline.visible)}
         >
           <ClerkLogo height={14} />
         </a>

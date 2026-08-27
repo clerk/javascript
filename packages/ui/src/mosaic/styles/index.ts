@@ -108,6 +108,7 @@ import {
   colorVars,
   durationVars,
   easingVars,
+  focusVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -123,6 +124,7 @@ export {
   colorVars,
   durationVars,
   easingVars,
+  focusVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -140,6 +142,7 @@ export {
 export type ColorVarName = keyof typeof colorVars;
 export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;
+export type FocusVarName = keyof typeof focusVars;
 export type FontFamilyVarName = keyof typeof fontFamilyVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;

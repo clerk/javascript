@@ -53,14 +53,9 @@ export const styles = stylex.create({
   },
   brandingLink: {
     borderRadius: radiusVars['--cl-radius-sm'],
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
     alignItems: 'center',
     color: 'inherit',
     display: 'inline-flex',
-    outlineOffset: '2px',
     verticalAlign: 'top',
     height: space['4'],
   },

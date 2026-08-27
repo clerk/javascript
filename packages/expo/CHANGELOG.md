@@ -1,5 +1,29 @@
 # Change Log
 
+## 4.6.0
+
+### Minor Changes
+
+- Add `useBiometricCredentials()` and biometric credential types for enrollment, management, and biometric sign-in, backed by [`clerk-ios` 1.5.0](https://github.com/clerk/clerk-ios/releases/tag/1.5.0) and [`clerk-android` 1.1.4](https://github.com/clerk/clerk-android/releases/tag/v1.1.4). The previous trusted-device exports, including `useTrustedDevices()`, remain available as deprecated aliases and will be removed in the next major release. ([#9519](https://github.com/clerk/javascript/pull/9519)) by [@seanperez29](https://github.com/seanperez29)
+
+## 4.5.4
+
+### Patch Changes
+
+- Updated dependencies [[`dbaa95a`](https://github.com/clerk/javascript/commit/dbaa95a4e9e2ebd0a6b7fdb266024490a35b7caf)]:
+  - @clerk/clerk-js@6.30.1
+  - @clerk/react@6.14.7
+  - @clerk/shared@4.30.1
+
+## 4.5.3
+
+### Patch Changes
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+  - @clerk/clerk-js@6.30.0
+  - @clerk/react@6.14.6
+
 ## 4.5.2
 
 ### Patch Changes

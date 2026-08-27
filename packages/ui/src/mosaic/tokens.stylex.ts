@@ -54,6 +54,8 @@ const colorDefaults = {
 
   '--cl-color-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
   '--cl-color-border-faded': 'light-dark(oklch(0.9702 0 0), oklch(0.296 0.0126 285.61))',
+
+  '--cl-color-ring': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
 } as const;
 
 export const colorVars = stylex.defineVars(colorDefaults);
@@ -391,3 +393,22 @@ const easingDefaults = {
 } as const;
 
 export const easingVars = stylex.defineVars(easingDefaults);
+
+// =============================================================================
+// Focus Tokens
+// =============================================================================
+// The keyboard focus ring, as one definition for the whole system. Components read
+// these through `utils/focus-outline.styles.ts`; the `:focus-visible` condition stays
+// there, so a theme can restyle the ring but cannot show it to pointer users.
+//
+// The colour is NOT restated here: it is `--cl-color-ring`, which lives with the other
+// colours. A `--cl-focus-outline-color` alias would be a second public name for the same
+// value, and the two would drift the moment a consumer overrode one of them.
+
+const focusDefaults = {
+  '--cl-focus-outline-width': '2px',
+  '--cl-focus-outline-style': 'solid',
+  '--cl-focus-outline-offset': '2px',
+} as const;
+
+export const focusVars = stylex.defineVars(focusDefaults);

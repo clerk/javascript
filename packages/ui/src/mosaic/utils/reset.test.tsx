@@ -3,18 +3,18 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { Avatar } from './avatar';
-import { Badge } from './badge';
-import { Button } from './button';
-import { Card } from './card';
-import { Field } from './field';
-import { Heading } from './heading';
-import { Icon } from './icon';
-import { Input } from './input';
-import { Item } from './item';
+import { Avatar } from '../components/avatar';
+import { Badge } from '../components/badge';
+import { Button } from '../components/button';
+import { Card } from '../components/card';
+import { Field } from '../components/field';
+import { Heading } from '../components/heading';
+import { Icon } from '../components/icon';
+import { Input } from '../components/input';
+import { Item } from '../components/item';
+import { Section } from '../components/section';
+import { Text } from '../components/text';
 import { reset } from './reset.styles';
-import { Section } from './section';
-import { Text } from './text';
 
 // StyleX generates the same atom for the same property+value across separate `create` calls, so a
 // local probe names the atoms to assert on without hardcoding hashes that a StyleX upgrade rewrites.

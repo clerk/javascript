@@ -5,9 +5,9 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
 import type { HeadingProps } from '../heading';
 import { Heading } from '../heading';
-import { reset } from '../reset.styles';
 import { sectionItemsMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
