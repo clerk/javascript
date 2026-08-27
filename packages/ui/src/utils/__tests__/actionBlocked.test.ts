@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getActionBlockedDetails, safeHref } from '../ActionBlockedCard';
+import { actionBlockedDetailsFrom, getActionBlockedDetails, safeHref } from '../actionBlocked';
 
 describe('safeHref', () => {
   it('allows https', () => {
@@ -89,5 +89,44 @@ describe('getActionBlockedDetails', () => {
         meta: { linkText: 'Contact support' },
       } as any),
     ).toBeNull();
+  });
+});
+
+// This is what card state calls on every error, so it decides whether ANY card
+// shows the terminal screen. It must be exact about the code: a false positive
+// would replace a correctable form error with a dead end.
+describe('actionBlockedDetailsFrom', () => {
+  it('detects a blocked request carrying details', () => {
+    expect(
+      actionBlockedDetailsFrom({
+        code: 'action_blocked',
+        message: 'Action blocked',
+        meta: { traceId: '7Q8ikxgt' },
+      }),
+    ).toEqual({
+      traceId: '7Q8ikxgt',
+      title: undefined,
+      description: undefined,
+      linkUrl: undefined,
+      linkText: undefined,
+    });
+  });
+
+  it('ignores every other error', () => {
+    expect(actionBlockedDetailsFrom({ code: 'form_param_nil', meta: { traceId: 'x' } })).toBeNull();
+    expect(actionBlockedDetailsFrom({ code: 'form_password_incorrect' })).toBeNull();
+  });
+
+  // A blocked request from an older backend carries no meta. It must fall
+  // through to the inline error rather than rendering an empty screen.
+  it('ignores a blocked request with no details', () => {
+    expect(actionBlockedDetailsFrom({ code: 'action_blocked', message: 'Action blocked' })).toBeNull();
+  });
+
+  it('ignores non-errors', () => {
+    expect(actionBlockedDetailsFrom(undefined)).toBeNull();
+    expect(actionBlockedDetailsFrom(null)).toBeNull();
+    expect(actionBlockedDetailsFrom('a plain string message')).toBeNull();
+    expect(actionBlockedDetailsFrom(42)).toBeNull();
   });
 });

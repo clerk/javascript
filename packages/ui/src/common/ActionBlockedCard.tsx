@@ -1,65 +1,11 @@
-import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
-import type { ClerkAPIError } from '@clerk/shared/types';
-import React from 'react';
-
 import { Col, descriptors, Flex, Flow, Icon, localizationKeys, Text } from '../customizables';
 import { Card } from '../elements/Card';
 import { Header } from '../elements/Header';
 import { ExclamationTriangle } from '../icons';
+import type { ActionBlockedDetails } from '../utils/actionBlocked';
+import { safeHref } from '../utils/actionBlocked';
 
-/**
- * The details an application can attach to a blocked request. Every field is
- * optional; when none are present the card falls back to its own wording and
- * shows only the reference.
- *
- * The text fields are plain text and are rendered as text nodes. They are
- * written by the application's owner, so they are treated as content, never as
- * markup.
- */
-export type ActionBlockedDetails = {
-  traceId?: string;
-  title?: string;
-  description?: string;
-  linkUrl?: string;
-  linkText?: string;
-};
-
-/**
- * Reads the details off an API error, or returns null when the error carries
- * none — which is also what happens against an older backend that does not send
- * them. Callers use the null to fall back to the previous inline error, so a
- * missing field degrades rather than rendering a blank screen.
- */
-export const getActionBlockedDetails = (error: ClerkAPIError | undefined): ActionBlockedDetails | null => {
-  const meta = error?.meta as ActionBlockedDetails | undefined;
-  if (!meta) {
-    return null;
-  }
-  const { traceId, title, description, linkUrl, linkText } = meta;
-  if (!traceId && !title && !description && !linkUrl) {
-    return null;
-  }
-  return { traceId, title, description, linkUrl, linkText };
-};
-
-/**
- * Only `https` links are rendered.
- *
- * The URL is already checked before it is sent, so this is a second, local
- * check rather than the only one: it is what stands between a value that
- * reached the browser anyway and a `javascript:` or `data:` URI becoming an
- * `href`. A link that fails is dropped and the rest of the card still renders.
- */
-export const safeHref = (url: string | undefined): string | null => {
-  if (!url) {
-    return null;
-  }
-  try {
-    return new URL(url).protocol === 'https:' ? url : null;
-  } catch {
-    return null;
-  }
-};
+export type { ActionBlockedDetails };
 
 type ActionBlockedCardProps = {
   details: ActionBlockedDetails;
@@ -171,36 +117,4 @@ export const ActionBlockedCard = (props: ActionBlockedCardProps) => {
       </Card.Root>
     </Flow.Part>
   );
-};
-
-/**
- * Intercepts a blocked-request error on its way to the card's inline error slot
- * and turns it into the terminal screen instead.
- *
- * Every error in these flows funnels through `card.setError`, so wrapping that
- * one function catches both the form-submit path and the OAuth-callback path
- * without either having to know about this.
- *
- * Anything that is not a blocked request — or that is, but carries no details,
- * which is what an older backend sends — passes straight through and still
- * renders as the inline error it always did.
- */
-export const useActionBlocked = (setError: (e: any) => void) => {
-  const [blockedDetails, setBlockedDetails] = React.useState<ActionBlockedDetails | null>(null);
-
-  const setErrorOrBlock = React.useCallback(
-    (e: any) => {
-      if (e && typeof e === 'object' && e.code === ERROR_CODES.FRAUD_ACTION_BLOCKED) {
-        const details = getActionBlockedDetails(e as ClerkAPIError);
-        if (details) {
-          setBlockedDetails(details);
-          return;
-        }
-      }
-      setError(e);
-    },
-    [setError],
-  );
-
-  return { blockedDetails, setErrorOrBlock };
 };

@@ -29,7 +29,6 @@ import {
   ActionBlockedCard,
   getIdentifierControlDisplayValues,
   groupIdentifiers,
-  useActionBlocked,
   withRedirectToAfterSignIn,
   withRedirectToSignInTask,
 } from '../../common';
@@ -88,10 +87,6 @@ const useAutoFillPasskey = () => {
 
 function SignInStartInternal(): JSX.Element {
   const card = useCardState();
-  // A blocked request is terminal, so it replaces the card rather than showing
-  // an inline error beside a form the user cannot resubmit. setErrorOrBlock
-  // passes everything else through untouched.
-  const { blockedDetails, setErrorOrBlock } = useActionBlocked(card.setError);
   const clerk = useClerk();
   const status = useLoadingStatus();
   const { userSettings, authConfig } = useEnvironment();
@@ -318,7 +313,7 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
           case ERROR_CODES.USER_BANNED:
           case ERROR_CODES.USER_DEACTIVATED:
-            setErrorOrBlock(error);
+            card.setError(error);
             break;
           default:
             defaultErrorHandler();
@@ -533,7 +528,7 @@ function SignInStartInternal(): JSX.Element {
       return handleCombinedFlowTransfer({
         afterSignUpUrl: ctx.afterSignUpUrl || '/',
         clerk,
-        handleError: e => handleError(e, [identifierField, instantPasswordField], setErrorOrBlock),
+        handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
         identifierAttribute: attribute,
         identifierValue: identifierField.value,
         navigate,
@@ -553,7 +548,7 @@ function SignInStartInternal(): JSX.Element {
         unsafeMetadata: ctx.unsafeMetadata,
       });
     } else {
-      handleError(e, [identifierField, instantPasswordField], setErrorOrBlock);
+      handleError(e, [identifierField, instantPasswordField], card.setError);
     }
   };
 
@@ -599,8 +594,12 @@ function SignInStartInternal(): JSX.Element {
       ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
       : false;
 
-  if (blockedDetails) {
-    return <ActionBlockedCard details={blockedDetails} />;
+  // A blocked request is terminal — no field to correct, no retry that helps —
+  // so it replaces the card rather than showing an inline error beside a form
+  // the user cannot resubmit. Detection lives in card state, so every path
+  // that reports an error here is covered.
+  if (card.blockedDetails) {
+    return <ActionBlockedCard details={card.blockedDetails} />;
   }
 
   return (

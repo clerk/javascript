@@ -6,10 +6,18 @@ import React from 'react';
 import { useRouter } from '@/ui/router';
 
 import { useLocalizations } from '../../customizables';
+import type { ActionBlockedDetails } from '../../utils/actionBlocked';
+import { actionBlockedDetailsFrom } from '../../utils/actionBlocked';
 
 type Status = 'idle' | 'loading' | 'error';
 type Metadata = string | undefined;
-type State = { status: Status; metadata: Metadata; error: string | undefined };
+type State = {
+  status: Status;
+  metadata: Metadata;
+  error: string | undefined;
+  /** Set when the request was blocked and there is nothing to retry. */
+  blockedDetails?: ActionBlockedDetails | undefined;
+};
 type CardStateCtxValue = {
   state: State;
   setState: React.Dispatch<React.SetStateAction<State>>;
@@ -44,8 +52,29 @@ export const useCardState = () => {
   const { translateError } = useLocalizations();
 
   const setIdle = (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata }));
-  const setError = (metadata: ClerkRuntimeError | ClerkAPIError | Metadata | string) =>
+  /**
+   * Sets the card's inline error — unless the request was BLOCKED, which is
+   * terminal and gets its own screen instead.
+   *
+   * Detected here rather than in each card because every error in these flows
+   * funnels through this one function: the form submit, the OAuth callback, and
+   * a challenge submission that is then denied all arrive here. A card that
+   * rendered this as an inline error would offer a Retry for something that
+   * cannot succeed.
+   *
+   * It must happen BEFORE translateError, which flattens the error to a string
+   * and discards the meta the screen is built from. Anything that is not a
+   * blocked request, or that carries no details (an older backend), falls
+   * through unchanged.
+   */
+  const setError = (metadata: ClerkRuntimeError | ClerkAPIError | Metadata | string) => {
+    const blocked = actionBlockedDetailsFrom(metadata);
+    if (blocked) {
+      setState(s => ({ ...s, blockedDetails: blocked, error: undefined }));
+      return;
+    }
     setState(s => ({ ...s, error: translateError(metadata) }));
+  };
   const setLoading = (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata }));
   const runAsync = async <T = unknown,>(cb: Promise<T> | (() => Promise<T>), metadata?: Metadata) => {
     setLoading(metadata);
@@ -63,6 +92,12 @@ export const useCardState = () => {
     runAsync,
     loadingMetadata: state.status === 'loading' ? state.metadata : undefined,
     error: state.error ? state.error : undefined,
+    /**
+     * Set when the request was blocked and there is nothing to retry. A card
+     * that can render the terminal screen checks this FIRST and returns it
+     * instead of its normal body.
+     */
+    blockedDetails: state.blockedDetails,
     isLoading: state.status === 'loading',
     isIdle: state.status === 'idle',
     state,
