@@ -161,6 +161,9 @@ export function Group() {
           <Icon
             name='check'
             size='md'
+            style={{
+              width: space['7'],
+            }}
           />
         </Item.Root>
         <Item.Root
