@@ -21,11 +21,7 @@ import {
   WithIcon as BadgeWithIcon,
 } from '../stories/badge.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
-import {
-  Centered as CardCentered,
-  Default as CardDefault,
-  meta as cardComponentMeta,
-} from '../stories/card.component.stories';
+import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import {
   Default as DestructiveDefault,
@@ -192,7 +188,7 @@ const alertDialogComponentModule: StoryModule = {
   DiscardChanges: AlertDialogDiscardChanges,
 };
 
-const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
+const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
 
 const avatarModule: StoryModule = {
   meta: avatarMeta,
