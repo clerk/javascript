@@ -88,8 +88,8 @@ export const media = stylex.create({
   },
 
   xs: { width: space['6'] },
-  md: { width: space['9.5'] },
-  lg: { width: space['9.5'] },
+  md: { width: space['10'] },
+  lg: { width: space['10'] },
 });
 
 export const content = stylex.create({
