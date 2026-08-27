@@ -11,10 +11,6 @@ export const item = stylex.create({
     // last style that declares it, so the two can't merge.
     '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
     borderRadius: radiusVars['--cl-radius-lg'],
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
     paddingInline: space['1.5'],
     alignItems: 'center',
     color: colorVars['--cl-color-neutral-faded'],
@@ -22,7 +18,6 @@ export const item = stylex.create({
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    outlineOffset: '2px',
     textAlign: 'start',
     width: '100%',
   },

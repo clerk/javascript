@@ -37,6 +37,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
   },
+  blocks: {
+    destructive: dynamic(() => import('../stories/destructive.mdx')),
+  },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),

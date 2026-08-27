@@ -12,10 +12,10 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
+import { truncationStyles } from '../../utils/typography.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
-import { reset } from '../reset.styles';
-import { truncationStyles } from '../typography.styles';
 import * as slots from './menu.styles';
 
 export type { MenuProps, MenuSeparatorProps };

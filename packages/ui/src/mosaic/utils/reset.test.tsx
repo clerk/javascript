@@ -2,8 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Button } from './button';
-import { Heading } from './heading';
+import { Button } from '../components/button';
+import { Heading } from '../components/heading';
 import { reset } from './reset.styles';
 
 // StyleX generates the same atom for the same property+value across separate `create` calls, so a
