@@ -586,7 +586,6 @@ export function OutsideScroll() {
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup render={<Card.Root elevation='overlay' />}>
-            <Dialog.CloseButton />
             <Card.Header>
               <Dialog.Title render={<Heading size='sm' />}>Terms of service</Dialog.Title>
               <Dialog.Description render={<Text />}>
