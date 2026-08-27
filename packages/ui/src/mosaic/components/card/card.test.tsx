@@ -217,8 +217,9 @@ describe('Mosaic Card', () => {
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Review terms');
   });
 
-  // An explicit id is the caller overruling the surface, so it has to survive the merge.
-  it('prefers an explicit id over the one the dialog offers', () => {
+  // The id is load-bearing inside a dialog: the popup points `aria-labelledby` at it, so a caller
+  // id that displaced it would silently leave the dialog unnamed.
+  it('keeps the dialog id over an explicit one, and stays named', () => {
     render(
       <Dialog defaultOpen>
         <Card.Root>
@@ -228,8 +229,36 @@ describe('Mosaic Card', () => {
           >
             Review terms
           </Card.Title>
+          <Card.Description
+            id='custom-description'
+            data-testid='description'
+          >
+            Read them before you continue.
+          </Card.Description>
         </Card.Root>
       </Dialog>,
+    );
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(screen.getByTestId('title')).not.toHaveAttribute('id', 'custom-title');
+    expect(screen.getByTestId('description')).not.toHaveAttribute('id', 'custom-description');
+    expect(dialog).toHaveAttribute('aria-labelledby', screen.getByTestId('title').id);
+    expect(dialog).toHaveAttribute('aria-describedby', screen.getByTestId('description').id);
+    expect(dialog).toHaveAccessibleName('Review terms');
+    expect(dialog).toHaveAccessibleDescription('Read them before you continue.');
+  });
+
+  it('takes an explicit id outside a dialog, where no surface claims one', () => {
+    render(
+      <Card.Root>
+        <Card.Title
+          id='custom-title'
+          data-testid='title'
+        >
+          Review terms
+        </Card.Title>
+      </Card.Root>,
     );
 
     expect(screen.getByTestId('title')).toHaveAttribute('id', 'custom-title');
@@ -263,21 +292,6 @@ describe('Mosaic Card', () => {
           <Card.Title>Review terms</Card.Title>
         </Card.Header>
       </Card.Root>,
-    );
-
-    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
-  });
-
-  // A dialog that places its own `Dialog.CloseButton` would otherwise show two.
-  it('withholds the dismiss button where the header turns it off', () => {
-    render(
-      <Dialog defaultOpen>
-        <Card.Root>
-          <Card.Header renderCloseButton={false}>
-            <Card.Title>Review terms</Card.Title>
-          </Card.Header>
-        </Card.Root>
-      </Dialog>,
     );
 
     expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();

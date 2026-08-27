@@ -99,19 +99,8 @@ function HeaderCloseButton() {
   );
 }
 
-export interface CardHeaderProps extends MosaicComponentProps<'div'> {
-  /**
-   * Carries the dialog's dismiss affordance, for a card that is the content of a dialog. Has no
-   * effect outside one, so the same card composition serves both surfaces. Pass `false` where the
-   * dialog already places its own `Dialog.CloseButton`.
-   *
-   * @default true
-   */
-  renderCloseButton?: boolean;
-}
-
-const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHeader(
-  { renderCloseButton = true, render, className, style, children, ...rest },
+const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
+  { render, className, style, children, ...rest },
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
@@ -126,7 +115,7 @@ const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHe
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag. */}
-          {dialog && renderCloseButton ? <HeaderCloseButton /> : null}
+          {dialog ? <HeaderCloseButton /> : null}
           <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
             {children}
           </div>
@@ -151,8 +140,10 @@ const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(f
     ref,
     props: {
       ...mergeStyleProps(themeProps('card-title'), stylex.props(reset.base, slots.header.title), className, style),
-      id: dialog?.labelId,
       ...rest,
+      // The popup points `aria-labelledby` at this id, so the surface outranks the caller: an id
+      // that displaced it would leave the dialog with no accessible name.
+      ...(dialog && { id: dialog.labelId }),
     },
   });
 });
@@ -174,8 +165,8 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
         className,
         style,
       ),
-      id: dialog?.descriptionId,
       ...rest,
+      ...(dialog && { id: dialog.descriptionId }),
     },
   });
 });
