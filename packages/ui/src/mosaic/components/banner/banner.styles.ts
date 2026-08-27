@@ -24,7 +24,7 @@ export const styles = stylex.create({
   },
   icon: {
     flexShrink: 0,
-    height: space['5'],
+    height: '1lh',
   },
   content: {
     gap: space['1'],
