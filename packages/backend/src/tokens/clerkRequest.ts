@@ -94,12 +94,11 @@ class ClerkRequest extends Request {
   }
 
   private parseCookies(req: Request) {
-    const cookiesRecord = parse(this.decodeCookieValue(req.headers.get('cookie') || ''));
+    // Hand the raw header to `parse`, which splits on the RFC 6265 delimiters before
+    // percent-decoding each value. Decoding the header first would promote an encoded
+    // `;`/`=` inside one value into a delimiter, forging additional cookies.
+    const cookiesRecord = parse(req.headers.get('cookie') || '');
     return new Map(Object.entries(cookiesRecord));
-  }
-
-  private decodeCookieValue(str: string) {
-    return str ? str.replace(/(%[0-9A-Z]{2})+/g, decodeURIComponent) : str;
   }
 }
 

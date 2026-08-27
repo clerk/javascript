@@ -11,7 +11,6 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Field',
   source: 'packages/ui/src/mosaic/components/field/field.tsx',
-  styleEngine: 'stylex',
 };
 
 const stackStyles = {

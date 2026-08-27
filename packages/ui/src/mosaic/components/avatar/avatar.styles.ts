@@ -27,16 +27,11 @@ export const styles = stylex.create({
     background: 'transparent',
     // An avatar used as a native button has no border shrinking the avatar inside it.
     borderWidth: 0,
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
     appearance: 'none',
     cursor: {
       default: 'pointer',
       ':is(:disabled, [aria-disabled="true"])': 'not-allowed',
     },
-    outlineOffset: '2px',
   },
 
   // Carries the root's radius rather than leaning on the clip alone, so a part that paints its own
@@ -110,6 +105,7 @@ export const sizes = stylex.create({
   xs: { fontSize: '0.5rem', height: space['5'], width: space['5'] },
   sm: { fontSize: '0.6875rem', height: space['7'], width: space['7'] },
   md: { fontSize: '0.875rem', height: space['9'], width: space['9'] },
-  lg: { fontSize: '1rem', height: space['12'], width: space['12'] },
+  lg: { fontSize: '1rem', height: space['10'], width: space['10'] },
+  xl: { fontSize: '1rem', height: space['12'], width: space['12'] },
   fit: { fontSize: '0.75rem', height: '100%', width: '100%' },
 });

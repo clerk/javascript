@@ -7,9 +7,9 @@ import React from 'react';
 import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
-import { reset } from '../reset.styles';
 import { backdropMotion, closeInsets, popupMotion, sizes, styles, viewportSizes } from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
@@ -28,6 +28,32 @@ export interface DialogRootProps<Payload = unknown> extends HeadlessDialogProps<
  * tree; Dialog's parts are siblings, so the Root is the only place both can read.
  */
 const DialogSizeContext = React.createContext<DialogSize>('prompt');
+
+/**
+ * The size of the dialog this one was opened from, which is what decides whether the two form a
+ * STACK — successive prompts — or a nested dialog over a `panel` or `card`. The two want opposite
+ * backdrops, so the distinction has to be reachable from the parts.
+ *
+ * Read from `DialogSizeContext` before a root overwrites it with its own size. Meaningless on its
+ * own, since a root-level dialog reads the context default: pair it with the headless `isStacked`,
+ * which is what reports that there is a dialog above at all.
+ */
+const DialogParentSizeContext = React.createContext<DialogSize>('prompt');
+
+/**
+ * The compound component the popup's dev warnings speak in. `AlertDialog` is composed from these
+ * same parts, so a message hardcoded to `Dialog` would name parts that do not exist at the call
+ * site it is complaining about. Not exported from the folder's `index.ts`: it is how one Mosaic
+ * component wraps another, not something a consumer sets.
+ */
+export const DialogPartNameContext = React.createContext('Dialog');
+
+/** Whether this dialog is a prompt stacked on a prompt — see {@link DialogParentSizeContext}. */
+function useIsStacked() {
+  const { isStacked } = useDialogContext();
+  const parentSize = React.useContext(DialogParentSizeContext);
+  return isStacked && parentSize === 'prompt';
+}
 
 /**
  * The headless parts type their props (and the `render` callback's argument) against
@@ -74,10 +100,13 @@ export type DialogPopupProps = MosaicComponentProps<'div'> & {
 
 /** Owns the open state and the size both the backdrop and the popup read. */
 function Root<Payload = unknown>({ size = 'prompt', children, ...rest }: DialogRootProps<Payload>) {
+  const parentSize = React.useContext(DialogSizeContext);
   return (
-    <DialogSizeContext.Provider value={size}>
-      <Primitive.Root<Payload> {...rest}>{children}</Primitive.Root>
-    </DialogSizeContext.Provider>
+    <DialogParentSizeContext.Provider value={parentSize}>
+      <DialogSizeContext.Provider value={size}>
+        <Primitive.Root<Payload> {...rest}>{children}</Primitive.Root>
+      </DialogSizeContext.Provider>
+    </DialogParentSizeContext.Provider>
   );
 }
 
@@ -167,12 +196,15 @@ const Backdrop = React.forwardRef<HTMLDivElement, DialogBackdropProps>(function 
   ref,
 ) {
   const size = React.useContext(DialogSizeContext);
+  const isStacked = useIsStacked();
   return (
     <Primitive.Backdrop
       ref={ref}
       {...mergeStyleProps(
         themeProps('dialog-backdrop'),
-        stylex.props(reset.base, styles.backdrop, backdropMotion[size]),
+        // `backdropStacked` rides the same `stylex.props` call so its `backgroundColor` replaces
+        // the one above outright — across two calls both would emit and the cascade would decide.
+        stylex.props(reset.base, styles.backdrop, isStacked && styles.backdropStacked, backdropMotion[size]),
         className,
         style,
       )}
@@ -206,16 +238,42 @@ const Viewport = React.forwardRef<HTMLDivElement, DialogViewportProps>(function 
   );
 });
 
+/**
+ * Warns when a dialog opened inside another dialog is not a `prompt`.
+ *
+ * `panel` and `card` are root-level surfaces: they host what opens over them and are never the
+ * thing that opens. A `panel` inside a dialog renders at a size that assumes it owns the viewport,
+ * over a surface it was meant to replace.
+ *
+ * One rule stated on the child covers every case — panel-in-panel, card-in-panel — without having
+ * to enumerate which sizes may host what.
+ */
+function useNestedSizeWarning(isNestedInDialog: boolean, size: DialogSize) {
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || size === 'prompt') {
+      return;
+    }
+    console.warn(
+      `[clerk] a Dialog opened inside another Dialog should be size="prompt", but this one is size="${size}". ` +
+        'Only prompts are meant to open over another dialog; the rest are root-level surfaces.',
+    );
+  }, [isNestedInDialog, size]);
+}
+
 /** The dialog surface: `role="dialog"`, focus-trapped, and the element that paints. */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
   { className, style, ...rest },
   ref,
 ) {
   const size = React.useContext(DialogSizeContext);
+  // The headless flag, not `useIsStacked` — the rule is about opening a dialog inside ANY dialog,
+  // which is broader than the prompt-on-prompt case the stacking styles cover.
+  const { isStacked: isNestedInDialog } = useDialogContext();
   // Observed through state rather than a plain ref, because the warning has to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog');
+  useAccessibleNameWarning(node, React.useContext(DialogPartNameContext));
+  useNestedSizeWarning(isNestedInDialog, size);
 
   const mergedRef = React.useCallback(
     (element: HTMLDivElement | null) => {
@@ -257,7 +315,15 @@ export interface DialogProps extends Pick<
   size?: DialogSize;
 }
 
-function DialogContent({ children }: { children: DialogProps['children'] }) {
+/**
+ * Resolves the render-prop form of `children`. Shared with `AlertDialog`, which offers the same
+ * `close` contract and would otherwise carry a second implementation of it. Not exported from the
+ * folder's `index.ts`, for the same reason as {@link DialogPartNameContext}.
+ *
+ * Routed through the primitive's close funnel, so a controlled consumer's `onOpenChange` sees this
+ * close the same as Escape does — and can decline it.
+ */
+export function DialogContent({ children }: { children: DialogProps['children'] }) {
   const { setOpen } = useDialogContext();
   if (typeof children !== 'function') {
     return <>{children}</>;

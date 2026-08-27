@@ -1761,6 +1761,7 @@ export const faIR: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'رمز عبور نادرست است.',
     form_password_length_too_short: 'رمز عبور شما خیلی کوتاه است. باید حداقل ۸ کاراکتر داشته باشد.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'رمز عبور شما به اندازه کافی قوی نیست.',
     form_password_or_identifier_incorrect:
       'رمز عبور یا آدرس ایمیل نادرست است. دوباره تلاش کنید یا از روش دیگری استفاده کنید.',

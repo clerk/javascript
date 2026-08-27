@@ -5,7 +5,32 @@
 // as components migrate.
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
+export { ProfilePage } from '../profile-page';
+export type {
+  ProfilePageContentProps,
+  ProfilePageItem,
+  ProfilePagePanelProps,
+  ProfilePageRootProps,
+  ProfilePageSidebarProps,
+} from '../profile-page';
 
+export { AlertDialog, createConfirmHandle, useConfirmedClose } from '../components/alert-dialog';
+export type {
+  ConfirmHandle,
+  ConfirmOptions,
+  UseConfirmedCloseOptions,
+  AlertDialogActionsProps,
+  AlertDialogBackdropProps,
+  AlertDialogCloseProps,
+  AlertDialogConfirmProps,
+  AlertDialogDescriptionProps,
+  AlertDialogPopupProps,
+  AlertDialogProps,
+  AlertDialogRootProps,
+  AlertDialogTitleProps,
+  AlertDialogTriggerProps,
+  AlertDialogViewportProps,
+} from '../components/alert-dialog';
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
@@ -34,6 +59,7 @@ export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
 export type { IconProps } from '../components/icon';
+export type { MosaicIconOverride, MosaicIconOverrides } from '../icons/overrides';
 export { Input } from '../components/input';
 export type { InputProps } from '../components/input';
 export { Item } from '../components/item';
@@ -48,21 +74,21 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
-export { Settings, settingsVars } from '../components/settings';
+export { Section } from '../components/section';
 export type {
-  SettingsActionsProps,
-  SettingsContentProps,
-  SettingsDescriptionProps,
-  SettingsGroupProps,
-  SettingsItemProps,
-  SettingsItemsProps,
-  SettingsLabelProps,
-  SettingsMediaProps,
-  SettingsMediaSize,
-  SettingsRootProps,
-  SettingsRowProps,
-  SettingsTitleProps,
-} from '../components/settings';
+  SectionActionsProps,
+  SectionContentProps,
+  SectionDescriptionProps,
+  SectionGroupProps,
+  SectionItemProps,
+  SectionItemsProps,
+  SectionLabelProps,
+  SectionMediaProps,
+  SectionMediaSize,
+  SectionRootProps,
+  SectionRowProps,
+  SectionTitleProps,
+} from '../components/section';
 export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
@@ -82,6 +108,7 @@ import {
   colorVars,
   durationVars,
   easingVars,
+  focusVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -97,6 +124,7 @@ export {
   colorVars,
   durationVars,
   easingVars,
+  focusVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -114,6 +142,7 @@ export {
 export type ColorVarName = keyof typeof colorVars;
 export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;
+export type FocusVarName = keyof typeof focusVars;
 export type FontFamilyVarName = keyof typeof fontFamilyVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;

@@ -98,7 +98,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCancellation(promise, e)
       } catch (e: NoCredentialException) {
         promise.reject("NO_SAVED_CREDENTIAL_FOUND", "No saved credential found", e)
       } catch (e: GetCredentialException) {
@@ -145,7 +145,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCancellation(promise, e)
       } catch (e: NoCredentialException) {
         promise.reject("NO_SAVED_CREDENTIAL_FOUND", "No saved credential found", e)
       } catch (e: GetCredentialException) {
@@ -191,7 +191,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCancellation(promise, e)
       } catch (e: GetCredentialException) {
         promise.reject("GOOGLE_SIGN_IN_ERROR", e.message ?: "Unknown error", e)
       } catch (e: Exception) {
@@ -214,6 +214,12 @@ class ClerkGoogleSignInModule : Module() {
   }
 
   // MARK: - Helpers
+
+  // Credential Manager also reports provider failures through this exception, so the underlying
+  // message has to reach JS for @clerk/expo to tell them apart from a dismissed chooser.
+  private fun rejectCancellation(promise: Promise, exception: GetCredentialCancellationException) {
+    promise.reject("SIGN_IN_CANCELLED", exception.message ?: "User cancelled the sign-in flow", exception)
+  }
 
   private fun handleSignInResult(result: GetCredentialResponse, promise: Promise) {
     when (val credential = result.credential) {

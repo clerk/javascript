@@ -1737,6 +1737,7 @@ export const zhTW: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: '您的密碼太短。長度必須至少為 8 個字元。',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: '您的密碼強度不足。',
     form_password_or_identifier_incorrect: '密碼或電子郵件地址不正確。請重試或使用其他方法。',
     form_password_pwned: '此密碼已在已知的資料外洩事件中出現，請改用其他密碼。',

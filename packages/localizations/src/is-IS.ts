@@ -1773,6 +1773,7 @@ export const isIS: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Lykilorðið þitt er of stutt. Það verður að vera að minnsta kosti 8 stafir.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Lykilorðið þitt er ekki nógu sterkt.',
     form_password_or_identifier_incorrect: 'Lykilorðið eða netfangið er rangt. Reyndu aftur eða notaðu aðra aðferð.',
     form_password_pwned:

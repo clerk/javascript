@@ -4,9 +4,9 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
+import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { Icon } from '../icon';
-import { reset } from '../reset.styles';
-import { sizes as typographySizes, styles as typographyStyles } from '../typography.styles';
 import { FieldProvider, useOptionalFieldContext, useRegisterFieldPartId } from './field.context';
 import { styles } from './field.styles';
 
@@ -34,7 +34,7 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base), className, style),
+      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root), className, style),
       ...rest,
     },
   });

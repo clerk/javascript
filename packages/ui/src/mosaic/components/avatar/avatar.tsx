@@ -5,7 +5,8 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../reset.styles';
+import { focusOutline } from '../../utils/focus-outline.styles';
+import { reset } from '../../utils/reset.styles';
 import { shapes, sizes, styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
@@ -27,7 +28,7 @@ function useAvatarContext(part: string): AvatarContextValue {
 
 export interface AvatarProps extends MosaicComponentProps<'span'> {
   shape?: 'circle' | 'square';
-  size?: 'fit' | 'lg' | 'md' | 'sm' | 'xs';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'fit';
 }
 
 const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatarRoot(
@@ -44,7 +45,14 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
     props: {
       ...mergeStyleProps(
         themeProps('avatar', { shape, size }),
-        stylex.props(reset.base, styles.base, shapes[shape], sizes[size], interactive && styles.interactive),
+        stylex.props(
+          reset.base,
+          styles.base,
+          shapes[shape],
+          sizes[size],
+          interactive && styles.interactive,
+          interactive && focusOutline.visible,
+        ),
         className,
         style,
       ),
