@@ -24,6 +24,8 @@ export interface UserButtonUserProfileProps {
 }
 
 /** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profile it opens. */
+// TODO: Possibly missing, verify these before GA:
+// defaultOpen, signInUrl, userProfileProps.additionalOAuthScopes, userProfileProps.apiKeysProps, userProfileProps.appearance, customMenuItems open/startPath, afterCreateOrganizationUrl, skipInvitationScreen, afterLeaveOrganizationUrl, organizationProfileProps
 export type UserButtonProps = UserButtonModelOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
