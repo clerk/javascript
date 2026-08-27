@@ -15,6 +15,7 @@ export const userButtonBase = {
   },
   workspaces: {
     personal: 'Personal account',
+    notSelected: 'No organization selected',
     loading: 'Loading organizations…',
     members: { one: '{count} member', other: '{count} members' },
     accept: 'Accept',

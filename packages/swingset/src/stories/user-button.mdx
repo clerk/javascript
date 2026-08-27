@@ -74,7 +74,7 @@ Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use 
 ## Trigger
 
 The active workspace's avatar and what it is called: the org and its plan wherever one heads the
-trigger, the account otherwise.
+trigger, no selection when personal is hidden and none is active, the account otherwise.
 
 `renderTriggerLabel={false}` leaves the avatar alone.
 
@@ -161,6 +161,18 @@ accounts" ever meant here.
 
 <Story
   name='SingleSession'
+  storyModule={UserButtonStories}
+/>
+
+## No organization selected
+
+`hidePersonal` withholds the personal workspace — the instance does this when it forces an
+organization, or the app does it itself. With no org active either, the lead is not the account:
+trigger and header say **No organization selected**, the mark is square, and the gear is **Manage
+account**.
+
+<Story
+  name='NoOrganizationSelected'
   storyModule={UserButtonStories}
 />
 

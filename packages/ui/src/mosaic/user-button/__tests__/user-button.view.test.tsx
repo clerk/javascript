@@ -199,6 +199,17 @@ describe('UserButtonView, organization mode', () => {
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
   });
 
+  // `hidePersonal` withholds the workspace, so a missing org is no selection — not the account.
+  it('names no organization selected where personal is hidden and none is active', () => {
+    renderOrganizationMode({ hidePersonal: true, activeOrganization: null });
+
+    expect(within(groups()[0]).getByText('No organization selected')).toBeInTheDocument();
+    expect(screen.queryByText('Alice Smith')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
+  });
+
   // The header acts on the active organization, which is known whole before the list it belongs to
   // lands. Invite and the gear act on the same organization, so they answer together.
   it('offers to invite while the membership list is still in flight', () => {
@@ -809,6 +820,20 @@ describe('UserButtonTrigger', () => {
 
     expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     expect(screen.queryByText('Pro')).toBeNull();
+  });
+
+  it('names no organization selected where personal is hidden and none is active', () => {
+    renderTrigger({ mode: 'organization', hidePersonal: true, activeOrganization: null });
+
+    expect(screen.getByText('No organization selected')).toBeInTheDocument();
+    expect(screen.queryByText('Alice Smith')).toBeNull();
+  });
+
+  it('still names the account in user mode when personal is hidden and none is active', () => {
+    renderTrigger({ mode: 'user', hidePersonal: true, activeOrganization: null });
+
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    expect(screen.queryByText('No organization selected')).toBeNull();
   });
 
   it('names the active organization in combined mode', () => {
