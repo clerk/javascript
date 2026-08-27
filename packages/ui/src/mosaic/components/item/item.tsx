@@ -17,6 +17,14 @@ const DEFAULT_SIZE: Size = 'md';
 /** Carries `Item.Root`'s size down to the parts it scales (`Item.Media`). */
 const ItemContext = React.createContext<Size>(DEFAULT_SIZE);
 
+/** How a group presents its rows: as one continuous list, or as separated bordered rows. */
+type GroupVariant = 'default' | 'outline';
+
+const DEFAULT_GROUP_VARIANT: GroupVariant = 'default';
+
+/** Carries `Item.Group`'s variant down to the rows it borders (`Item.Root`). */
+const ItemGroupContext = React.createContext<GroupVariant>(DEFAULT_GROUP_VARIANT);
+
 export type ItemProps = MosaicComponentProps<'div'> & {
   /**
    * Row height and gap. Also sizes a nested `Item.Media`, which reads this from
@@ -30,7 +38,8 @@ export type ItemProps = MosaicComponentProps<'div'> & {
 /**
  * Root row. Renders a `<div>`, or a custom element (link/button) via `render`,
  * which also opts the row into hover and cursor affordances. Provides its `size`
- * to the parts nested within it.
+ * to the parts nested within it, and takes its border from the `variant` of the
+ * enclosing `Item.Group`.
  *
  * @example
  * <Item.Root size='xs' render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
@@ -44,18 +53,20 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
 ) {
   // A custom render (link/button row) opts into hover + cursor affordances.
   const interactive = Boolean(render);
+  const variant = React.useContext(ItemGroupContext);
   const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('item', { interactive, size }),
+        themeProps('item', { interactive, size, variant }),
         stylex.props(
           reset.base,
           focusOutline.visible,
           slots.item.base,
           slots.item[size],
+          variant === 'outline' && slots.item.outline,
           interactive && slots.item.interactive,
         ),
         className,
@@ -186,20 +197,42 @@ const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
   });
 });
 
-/** Vertical wrapper around a set of rows. Layout only; the rows carry their own semantics. */
-const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemGroup(
-  { render, className, style, ...rest },
+export type ItemGroupProps = MosaicComponentProps<'div'> & {
+  /**
+   * `default` keeps the rows on one continuous surface, inset by the group's own
+   * gutter. `outline` gives each row a border and reads them as separate cards,
+   * so the group drops its gutter and spaces the rows apart instead. Reaches the
+   * rows through context rather than a prop on each one.
+   *
+   * @default 'default'
+   */
+  variant?: GroupVariant;
+};
+
+/**
+ * Vertical wrapper around a set of rows. Layout only; the rows carry their own
+ * semantics. Provides its `variant` to the rows nested within it.
+ */
+const Group = React.forwardRef<HTMLDivElement, ItemGroupProps>(function MosaicItemGroup(
+  { variant = DEFAULT_GROUP_VARIANT, render, className, style, ...rest },
   ref,
 ) {
-  return useRender({
+  const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-group'), stylex.props(reset.base, slots.group.base), className, style),
+      ...mergeStyleProps(
+        themeProps('item-group', { variant }),
+        stylex.props(reset.base, slots.group.base, slots.group[variant]),
+        className,
+        style,
+      ),
       ...rest,
     },
   });
+
+  return <ItemGroupContext.Provider value={variant}>{element}</ItemGroupContext.Provider>;
 });
 
 /** Thin divider (`<hr>`) between rows or groups. */
@@ -230,7 +263,8 @@ const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(fu
  * `Item.Separator`. Every part takes a `render` prop and forwards a ref.
  *
  * `size` is set once on `Item.Root` and reaches `Item.Media` through context, so
- * a row scales as a unit rather than per part.
+ * a row scales as a unit rather than per part. `variant` is set once on
+ * `Item.Group` and reaches its rows the same way.
  */
 export const Item = {
   Root,

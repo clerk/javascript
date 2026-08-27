@@ -3,9 +3,8 @@ import { Button } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { radiusVars } from '@clerk/ui/mosaic/styles';
+import { radiusVars, space } from '@clerk/ui/mosaic/styles';
 import * as stylex from '@stylexjs/stylex';
-import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -261,6 +260,71 @@ export function Group() {
           <Item.Content>
             <Item.Label variant='secondary'>Sign out of all accounts</Item.Label>
           </Item.Content>
+        </Item.Root>
+      </Item.Group>
+    </div>
+  );
+}
+
+export function OutlineGroup() {
+  return (
+    <div className='w-full'>
+      <Item.Group variant='outline'>
+        <Item.Root>
+          <Item.Media>
+            <Avatar.Root
+              size='fit'
+              shape='square'
+            >
+              <Avatar.Image
+                src='https://github.com/clerk.png'
+                alt='Clerk'
+              />
+              <Avatar.Fallback>C</Avatar.Fallback>
+            </Avatar.Root>
+          </Item.Media>
+          <Item.Content>
+            <Item.Label>Clerk</Item.Label>
+            <Item.Description>Admin</Item.Description>
+          </Item.Content>
+          <Item.Actions>
+            <Button
+              variant='outline'
+              size='sm'
+            >
+              Manage
+            </Button>
+          </Item.Actions>
+        </Item.Root>
+        <Item.Root
+          render={({ children, ...props }) => (
+            <a
+              {...props}
+              href='#designcloud'
+            >
+              {children}
+            </a>
+          )}
+        >
+          <Item.Media>
+            <Avatar.Root
+              size='fit'
+              shape='square'
+            >
+              <Avatar.Fallback>D</Avatar.Fallback>
+            </Avatar.Root>
+          </Item.Media>
+          <Item.Content>
+            <Item.Label>DesignCloud</Item.Label>
+            <Item.Description>Member</Item.Description>
+          </Item.Content>
+          <Icon
+            name='chevron-right'
+            size='md'
+            style={{
+              width: space['7'],
+            }}
+          />
         </Item.Root>
       </Item.Group>
     </div>

@@ -57,6 +57,12 @@ export const item = stylex.create({
     },
   },
 
+  outline: {
+    borderColor: colorVars['--cl-color-border'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+  },
+
   xs: {
     gap: space['2'],
     height: space['9'],
@@ -130,8 +136,19 @@ export const actions = stylex.create({
 
 export const group = stylex.create({
   base: {
-    padding: space['1.5'],
     width: '100%',
+  },
+
+  // The gutter belongs to the variant rather than `base`: `outline` has none, and holding it here
+  // keeps the two from overriding each other.
+  default: {
+    padding: space['1.5'],
+  },
+  // Bordered rows read as separate cards, so the group drops its gutter and spaces them instead.
+  outline: {
+    gap: space['2'],
+    display: 'flex',
+    flexDirection: 'column',
   },
 });
 

@@ -148,6 +148,48 @@ describe('Mosaic Item', () => {
     expect(screen.getByTestId('sep')).toHaveClass('cl-item-separator');
   });
 
+  it('reflects the group variant as a data attribute, defaulting to default', () => {
+    const { rerender } = render(<Item.Group data-testid='group'>One</Item.Group>);
+    expect(screen.getByTestId('group')).toHaveAttribute('data-variant', 'default');
+    rerender(
+      <Item.Group
+        data-testid='group'
+        variant='outline'
+      >
+        One
+      </Item.Group>,
+    );
+    expect(screen.getByTestId('group')).toHaveAttribute('data-variant', 'outline');
+  });
+
+  it('reads the variant from the group in its rows', () => {
+    render(
+      <Item.Group variant='outline'>
+        <Item.Root>Outlined</Item.Root>
+      </Item.Group>,
+    );
+    expect(screen.getByText('Outlined')).toHaveAttribute('data-variant', 'outline');
+  });
+
+  it('falls back to the default variant when a row renders outside a group', () => {
+    render(<Item.Root>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'default');
+  });
+
+  it('gives an outlined row a border atom a default row does not carry', () => {
+    render(
+      <>
+        <Item.Root>Plain</Item.Root>
+        <Item.Group variant='outline'>
+          <Item.Root>Outlined</Item.Root>
+        </Item.Group>
+      </>,
+    );
+
+    const atoms = (text: string) => screen.getByText(text).className.split(' ');
+    expect(atoms('Outlined').filter(atom => !atoms('Plain').includes(atom))).not.toHaveLength(0);
+  });
+
   it('forwards the ref to the root element', () => {
     const ref = React.createRef<HTMLDivElement>();
     render(<Item.Root ref={ref}>Hi</Item.Root>);
