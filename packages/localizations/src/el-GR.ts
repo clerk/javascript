@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Προσθήκη',
     action__search: 'Αναζήτηση',

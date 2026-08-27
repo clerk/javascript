@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: '新增金鑰',
     action__search: '搜尋金鑰',
