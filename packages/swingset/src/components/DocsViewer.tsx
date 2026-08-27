@@ -52,6 +52,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
+    otp: dynamic(() => import('../stories/otp.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
