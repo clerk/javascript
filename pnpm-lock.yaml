@@ -103,7 +103,7 @@ overrides:
   socket.io-parser@>=4.0.0 <4.2.6: 4.2.6
   svgo@>=3.0.0 <3.3.3: 3.3.3
   tar@<7.5.11: 7.5.11
-  tmp@<0.2.6: 0.2.6
+  tmp@<0.2.6: 0.2.7
   undici-types@<7.16.0: 7.24.8
   utf-8-validate: 5.0.10
 
@@ -14284,8 +14284,8 @@ packages:
     resolution: {integrity: sha512-+Zg3vWhRUv8B1maGSTFdev9mjoo8Etn2Ayfs4cnjlD3CsGkxXX4QyW3j2WJ0wdjYcYmy7Lx2RDsZMhgCWafKIw==}
     hasBin: true
 
-  tmp@0.2.6:
-    resolution: {integrity: sha512-5sJPdPjfI5Kx+qbrDesxkglRBxW//g7hCsqspEjwkewGvBMGIKMOTKzLt1hFVJzyadba3lDUN20O9qhvbQUSTA==}
+  tmp@0.2.7:
+    resolution: {integrity: sha512-e0votIpp4Uo2AJYSzVHV6xCcawuiez3DzqDAbrTc3YxBkplN6e+dM13ZeIcZnDg/QpSuU2zfZ3rzwY8ukEnaXw==}
     engines: {node: '>=14.14'}
 
   tmpl@1.0.5:
@@ -23960,7 +23960,7 @@ snapshots:
       request-progress: 3.0.0
       semver: 7.7.4
       supports-color: 8.1.1
-      tmp: 0.2.6
+      tmp: 0.2.7
       tree-kill: 1.2.2
       untildify: 4.0.0
       yauzl: 2.10.0
@@ -26689,7 +26689,7 @@ snapshots:
       neo-async: 2.6.2
       picocolors: 1.1.1
       recast: 0.23.11
-      tmp: 0.2.6
+      tmp: 0.2.7
       write-file-atomic: 5.0.1
     optionalDependencies:
       '@babel/preset-env': 7.28.5(@babel/core@7.29.7)
@@ -31290,7 +31290,7 @@ snapshots:
     dependencies:
       tldts-core: 7.0.28
 
-  tmp@0.2.6: {}
+  tmp@0.2.7: {}
 
   tmpl@1.0.5: {}
 
