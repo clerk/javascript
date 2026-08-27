@@ -10,20 +10,20 @@ import { truncationStyles } from '../../utils/typography.styles';
 import * as slots from './item.styles';
 
 /** The row's height and gap, and the width of the media column inside it. */
-type Size = 'xs' | 'md';
+type Size = 'xs' | 'md' | 'lg';
 
 const DEFAULT_SIZE: Size = 'md';
 
 /** Carries `Item.Root`'s size down to the parts it scales (`Item.Media`). */
 const ItemContext = React.createContext<Size>(DEFAULT_SIZE);
 
-/** How a group presents its rows: as one continuous list, or as separated bordered rows. */
-type GroupVariant = 'default' | 'outline';
+/** How a row presents itself: seated on a shared surface, or bordered as its own card. */
+type Variant = 'default' | 'outline';
 
-const DEFAULT_GROUP_VARIANT: GroupVariant = 'default';
+const DEFAULT_VARIANT: Variant = 'default';
 
 /** Carries `Item.Group`'s variant down to the rows it borders (`Item.Root`). */
-const ItemGroupContext = React.createContext<GroupVariant>(DEFAULT_GROUP_VARIANT);
+const ItemGroupContext = React.createContext<Variant>(DEFAULT_VARIANT);
 
 export type ItemProps = MosaicComponentProps<'div'> & {
   /**
@@ -33,13 +33,22 @@ export type ItemProps = MosaicComponentProps<'div'> & {
    * @default 'md'
    */
   size?: Size;
+  /**
+   * `outline` borders the row so it reads as its own card. Set it here for a row
+   * standing on its own, or on `Item.Group` to border a whole set at once — a
+   * row set here wins over the group either way, so a row can opt out of an
+   * outlined group with `default`.
+   *
+   * @default the enclosing `Item.Group`'s variant, or `'default'`
+   */
+  variant?: Variant;
 };
 
 /**
  * Root row. Renders a `<div>`, or a custom element (link/button) via `render`,
  * which also opts the row into hover and cursor affordances. Provides its `size`
- * to the parts nested within it, and takes its border from the `variant` of the
- * enclosing `Item.Group`.
+ * to the parts nested within it, and takes its `variant` from the enclosing
+ * `Item.Group` unless it sets one of its own.
  *
  * @example
  * <Item.Root size='xs' render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
@@ -48,12 +57,15 @@ export type ItemProps = MosaicComponentProps<'div'> & {
  * </Item.Root>
  */
 const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
-  { size = DEFAULT_SIZE, render, className, style, ...rest },
+  { size = DEFAULT_SIZE, variant: variantProp, render, className, style, ...rest },
   ref,
 ) {
   // A custom render (link/button row) opts into hover + cursor affordances.
   const interactive = Boolean(render);
-  const variant = React.useContext(ItemGroupContext);
+  // The group is the default, not the authority: a row that names a variant keeps it, which is what
+  // lets one row opt out of an outlined group.
+  const groupVariant = React.useContext(ItemGroupContext);
+  const variant = variantProp ?? groupVariant;
   const element = useRender({
     defaultTagName: 'div',
     render,
@@ -202,11 +214,12 @@ export type ItemGroupProps = MosaicComponentProps<'div'> & {
    * `default` keeps the rows on one continuous surface, inset by the group's own
    * gutter. `outline` gives each row a border and reads them as separate cards,
    * so the group drops its gutter and spaces the rows apart instead. Reaches the
-   * rows through context rather than a prop on each one.
+   * rows through context, so a row only needs its own `variant` to disagree with
+   * the group.
    *
    * @default 'default'
    */
-  variant?: GroupVariant;
+  variant?: Variant;
 };
 
 /**
@@ -214,7 +227,7 @@ export type ItemGroupProps = MosaicComponentProps<'div'> & {
  * semantics. Provides its `variant` to the rows nested within it.
  */
 const Group = React.forwardRef<HTMLDivElement, ItemGroupProps>(function MosaicItemGroup(
-  { variant = DEFAULT_GROUP_VARIANT, render, className, style, ...rest },
+  { variant = DEFAULT_VARIANT, render, className, style, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -263,8 +276,8 @@ const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(fu
  * `Item.Separator`. Every part takes a `render` prop and forwards a ref.
  *
  * `size` is set once on `Item.Root` and reaches `Item.Media` through context, so
- * a row scales as a unit rather than per part. `variant` is set once on
- * `Item.Group` and reaches its rows the same way.
+ * a row scales as a unit rather than per part. `variant` is set on a row, or
+ * once on `Item.Group` to reach every row in it.
  */
 export const Item = {
   Root,

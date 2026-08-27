@@ -190,6 +190,26 @@ describe('Mosaic Item', () => {
     expect(atoms('Outlined').filter(atom => !atoms('Plain').includes(atom))).not.toHaveLength(0);
   });
 
+  it('takes a variant of its own, outside any group', () => {
+    render(<Item.Root variant='outline'>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'outline');
+  });
+
+  it('lets a row override the variant its group provides, in both directions', () => {
+    render(
+      <>
+        <Item.Group variant='outline'>
+          <Item.Root variant='default'>Opted out</Item.Root>
+        </Item.Group>
+        <Item.Group>
+          <Item.Root variant='outline'>Opted in</Item.Root>
+        </Item.Group>
+      </>,
+    );
+    expect(screen.getByText('Opted out')).toHaveAttribute('data-variant', 'default');
+    expect(screen.getByText('Opted in')).toHaveAttribute('data-variant', 'outline');
+  });
+
   it('forwards the ref to the root element', () => {
     const ref = React.createRef<HTMLDivElement>();
     render(<Item.Root ref={ref}>Hi</Item.Root>);

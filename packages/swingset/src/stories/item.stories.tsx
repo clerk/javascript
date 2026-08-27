@@ -269,6 +269,33 @@ export function Group() {
   );
 }
 
+export function Outline() {
+  return (
+    <Item.Root variant='outline'>
+      <Item.Media>
+        <Avatar.Root
+          shape='square'
+          size='fit'
+        >
+          <Avatar.Fallback>T</Avatar.Fallback>
+        </Avatar.Root>
+      </Item.Media>
+      <Item.Content>
+        <Item.Label>Test Organization</Item.Label>
+        <Item.Description>Member</Item.Description>
+      </Item.Content>
+      <Item.Actions>
+        <Button
+          variant='outline'
+          size='sm'
+        >
+          Manage
+        </Button>
+      </Item.Actions>
+    </Item.Root>
+  );
+}
+
 export function OutlineGroup() {
   return (
     <div className='w-full'>
