@@ -119,8 +119,8 @@ function list(data: unknown[], count: number, hasNextPage = false, isLoading = f
 
 /** A promise whose settling is controlled by the test, to hold an async action in flight. */
 function createDeferred() {
-  let resolve: () => void = () => { };
-  let reject: (reason?: unknown) => void = () => { };
+  let resolve: () => void = () => {};
+  let reject: (reason?: unknown) => void = () => {};
   const promise = new Promise<void>((res, rej) => {
     resolve = res;
     reject = rej;

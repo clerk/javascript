@@ -31,13 +31,13 @@ export type UserButtonModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | (UserButtonData &
-    Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-    UserButtonAsyncCallbacks &
-    UserButtonBrandingProps & {
-      status: 'ready';
-      /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
-      organizationsEnabled: boolean;
-    });
+      Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
+      UserButtonAsyncCallbacks &
+      UserButtonBrandingProps & {
+        status: 'ready';
+        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
+        organizationsEnabled: boolean;
+      });
 
 // Mirrors `<OrganizationSwitcher>`: a URL, a `:token` template resolved against the entity, or a builder.
 type AfterSelectUrl<T> = ((entity: T) => string) | string;
@@ -208,15 +208,15 @@ export function useUserButtonModel(
   const invitations: UserButtonInvitation[] = invitationData.flatMap(i =>
     i.status === 'pending' || i.status === 'accepted'
       ? [
-        {
-          kind: 'invitation',
-          id: i.id,
-          status: i.status,
-          organizationId: i.publicOrganizationData.id,
-          organizationName: i.publicOrganizationData.name,
-          imageUrl: i.publicOrganizationData.imageUrl || undefined,
-        },
-      ]
+          {
+            kind: 'invitation',
+            id: i.id,
+            status: i.status,
+            organizationId: i.publicOrganizationData.id,
+            organizationName: i.publicOrganizationData.name,
+            imageUrl: i.publicOrganizationData.imageUrl || undefined,
+          },
+        ]
       : [],
   );
 
