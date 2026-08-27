@@ -769,6 +769,12 @@ function SwitchAccountRow() {
         <Item.Content>
           <Item.Label variant='secondary'>{m.accounts.switch}</Item.Label>
         </Item.Content>
+        <Item.Actions>
+          <Icon
+            name='chevron-right'
+            size='sm'
+          />
+        </Item.Actions>
       </Menu.Trigger>
       <Menu.Popup>
         {/* The account it is on leads, checked: the flyout is the full set of accounts rather than
