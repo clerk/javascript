@@ -15,7 +15,7 @@ interface ExtraProp {
 interface PropTableProps {
   meta: StoryMeta;
   extra?: ExtraProp[];
-  /** Set for a component that does not forward `className`/`style`. @default true */
+  /** Set false for a component that styles itself and does not want `className`/`style` advertised. */
   styleProps?: boolean;
 }
 

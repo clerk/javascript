@@ -20,6 +20,13 @@ import {
   Primary as BadgePrimary,
   WithIcon as BadgeWithIcon,
 } from '../stories/badge.stories';
+import {
+  Announced as BannerAnnounced,
+  Colors as BannerColors,
+  Default as BannerDefault,
+  LabelOnly as BannerLabelOnly,
+  meta as bannerMeta,
+} from '../stories/banner.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
@@ -212,6 +219,14 @@ const badgeModule: StoryModule = {
   Primary: BadgePrimary,
   Colors: BadgeColors,
   WithIcon: BadgeWithIcon,
+};
+
+const bannerModule: StoryModule = {
+  meta: bannerMeta,
+  Default: BannerDefault,
+  Colors: BannerColors,
+  LabelOnly: BannerLabelOnly,
+  Announced: BannerAnnounced,
 };
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
@@ -407,6 +422,7 @@ export const registry: StoryModule[] = [
   // Components
   avatarModule,
   badgeModule,
+  bannerModule,
   buttonModule,
   cardComponentModule,
   inputModule,

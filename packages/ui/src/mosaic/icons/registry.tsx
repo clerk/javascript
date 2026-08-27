@@ -65,6 +65,21 @@ const Close = glyph(
   />,
 );
 
+const InfoCircle = glyph(
+  <>
+    <circle
+      cx='8'
+      cy='8'
+      r='5.25'
+      {...strokeProps}
+    />
+    <path
+      d='M8 10.75V7.5M8 5.25H8.008'
+      {...strokeProps}
+    />
+  </>,
+);
+
 const Ellipsis = glyph(
   <path
     d='M4 8h.008M8 8h.008M12 8h.008'
@@ -322,6 +337,7 @@ export const iconRegistry = {
   code: Code,
   'credit-card': CreditCard,
   ellipsis: Ellipsis,
+  'info-circle': InfoCircle,
   pen: Pen,
   plus: Plus,
   search: Search,
