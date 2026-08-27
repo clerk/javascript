@@ -34,6 +34,16 @@ vi.mock('electron-store', () => ({
 const ss = safeStorage as unknown as Record<string, unknown>;
 const asyncSafeStorage = safeStorage as typeof safeStorage & AsyncSafeStorage;
 
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((promiseResolve, promiseReject) => {
+    resolve = promiseResolve;
+    reject = promiseReject;
+  });
+  return { promise, reject, resolve };
+}
+
 /** Installs the synchronous `safeStorage` API. */
 function installSync({ available = true }: { available?: boolean } = {}) {
   ss.isEncryptionAvailable = vi.fn(() => available);
@@ -160,6 +170,24 @@ describe('getItem', () => {
       expect(storeSet).toHaveBeenCalledWith('token-key', `enc:${Buffer.from('enc(jwt)').toString('base64')}`);
     });
 
+    it('does not re-save a rotated token after it is removed', async () => {
+      installSync();
+      installAsync();
+      const encryption = deferred<Buffer>();
+      storeGet.mockReturnValue(`enc:${Buffer.from('old-cipher').toString('base64')}`);
+      vi.mocked(asyncSafeStorage.decryptStringAsync).mockResolvedValue({ result: 'jwt', shouldReEncrypt: true });
+      vi.mocked(asyncSafeStorage.encryptStringAsync).mockReturnValue(encryption.promise);
+      const adapter = storage();
+
+      const read = adapter.getItem('token-key');
+      await vi.waitFor(() => expect(asyncSafeStorage.encryptStringAsync).toHaveBeenCalledWith('jwt'));
+      await adapter.removeItem('token-key');
+      encryption.resolve(Buffer.from('re-encrypted'));
+
+      await expect(read).resolves.toBe('jwt');
+      expect(storeSet).not.toHaveBeenCalled();
+    });
+
     it('returns null without deleting the entry when decryption rejects', async () => {
       installSync();
       installAsync();
@@ -214,6 +242,45 @@ describe('setItem', () => {
 
     expect(asyncSafeStorage.encryptStringAsync).toHaveBeenCalledWith('jwt');
     expect(storeSet).toHaveBeenCalledWith('token-key', `enc:${Buffer.from('enc(jwt)').toString('base64')}`);
+  });
+
+  it('does not persist a pending write after the token is removed', async () => {
+    installSync();
+    installAsync();
+    const encryption = deferred<Buffer>();
+    vi.mocked(asyncSafeStorage.encryptStringAsync).mockReturnValue(encryption.promise);
+    const adapter = storage();
+
+    const write = adapter.setItem('token-key', 'jwt');
+    await vi.waitFor(() => expect(asyncSafeStorage.encryptStringAsync).toHaveBeenCalledWith('jwt'));
+    await adapter.removeItem('token-key');
+    encryption.resolve(Buffer.from('enc(jwt)'));
+    await write;
+
+    expect(storeSet).not.toHaveBeenCalled();
+    await expect(adapter.getItem('token-key')).resolves.toBeNull();
+  });
+
+  it('does not let an older failed write replace a newer token', async () => {
+    installSync();
+    installAsync();
+    const olderEncryption = deferred<Buffer>();
+    vi.mocked(asyncSafeStorage.encryptStringAsync).mockImplementation(value => {
+      return value === 'old-jwt' ? olderEncryption.promise : Promise.resolve(Buffer.from(`enc(${value})`));
+    });
+    storeGet.mockReturnValue(`enc:${Buffer.from('new-cipher').toString('base64')}`);
+    vi.mocked(asyncSafeStorage.decryptStringAsync).mockResolvedValue({ result: 'new-jwt', shouldReEncrypt: false });
+    const adapter = storage();
+
+    const olderWrite = adapter.setItem('token-key', 'old-jwt');
+    await vi.waitFor(() => expect(asyncSafeStorage.encryptStringAsync).toHaveBeenCalledWith('old-jwt'));
+    await adapter.setItem('token-key', 'new-jwt');
+    olderEncryption.reject(new Error('encrypt failed'));
+    await olderWrite;
+
+    await expect(adapter.getItem('token-key')).resolves.toBe('new-jwt');
+    expect(storeSet).toHaveBeenCalledOnce();
+    expect(storeSet).toHaveBeenCalledWith('token-key', `enc:${Buffer.from('enc(new-jwt)').toString('base64')}`);
   });
 
   it('falls back to the sync API (never calling the async crypto) when async encryption is unavailable', async () => {

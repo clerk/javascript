@@ -128,6 +128,14 @@ export function storage(options: StorageOptions = {}): TokenStorage {
     ...(options.path ? { cwd: options.path } : {}),
   });
   const memoryFallback = new Map<string, string>();
+  const mutationVersions = new Map<string, number>();
+
+  const beginMutation = (key: string) => {
+    const version = (mutationVersions.get(key) ?? 0) + 1;
+    mutationVersions.set(key, version);
+    return version;
+  };
+  const isCurrentMutation = (key: string, version: number) => (mutationVersions.get(key) ?? 0) === version;
 
   let cachedCipher: Cipher | null = null;
   let resolving: Promise<Cipher | null> | null = null;
@@ -172,6 +180,7 @@ export function storage(options: StorageOptions = {}): TokenStorage {
       }
 
       if (stored.startsWith(ENCRYPTED_PREFIX)) {
+        const mutationVersion = mutationVersions.get(key) ?? 0;
         const cipher = await getCipher();
 
         // No usable OS encryption, preserve entry.
@@ -187,7 +196,10 @@ export function storage(options: StorageOptions = {}): TokenStorage {
           if (shouldReEncrypt) {
             // OS key has rotated, persist with new value
             try {
-              store.set(key, ENCRYPTED_PREFIX + (await cipher.encrypt(value)));
+              const encrypted = await cipher.encrypt(value);
+              if (isCurrentMutation(key, mutationVersion)) {
+                store.set(key, ENCRYPTED_PREFIX + encrypted);
+              }
             } catch {
               // keep the existing payload; it still decrypts for now
             }
@@ -205,7 +217,12 @@ export function storage(options: StorageOptions = {}): TokenStorage {
       return null;
     },
     async setItem(key, value) {
+      const mutationVersion = beginMutation(key);
       const cipher = await getCipher();
+
+      if (!isCurrentMutation(key, mutationVersion)) {
+        return;
+      }
 
       if (!cipher) {
         if (options.unencryptedFallback) {
@@ -229,14 +246,22 @@ export function storage(options: StorageOptions = {}): TokenStorage {
       }
 
       try {
-        store.set(key, ENCRYPTED_PREFIX + (await cipher.encrypt(value)));
+        const encrypted = await cipher.encrypt(value);
+        if (!isCurrentMutation(key, mutationVersion)) {
+          return;
+        }
+        store.set(key, ENCRYPTED_PREFIX + encrypted);
         memoryFallback.delete(key);
       } catch {
+        if (!isCurrentMutation(key, mutationVersion)) {
+          return;
+        }
         memoryFallback.set(key, value);
         warnOnce('Clerk: failed to securely persist a token; it will only be available until the app exits.');
       }
     },
     removeItem(key) {
+      beginMutation(key);
       memoryFallback.delete(key);
       store.delete(key);
     },
