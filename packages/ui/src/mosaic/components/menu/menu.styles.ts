@@ -2,20 +2,21 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-export const styles = stylex.create({
-  // Positioning is applied inline by the headless positioner; this only clears the
-  // focus outline it receives. No z-index: the portalled, fixed positioner already
-  // paints above page content, and consumers own their own stacking order.
-  positioner: {
+// Positioning is applied inline by the headless positioner; this only clears the
+// focus outline it receives. No z-index: the portalled, fixed positioner already
+// paints above page content, and consumers own their own stacking order.
+export const positioner = stylex.create({
+  base: {
     outline: 'none',
   },
+});
 
-  popup: {
+export const popup = stylex.create({
+  base: {
+    padding: space['0.5'],
     borderRadius: radiusVars['--cl-radius-lg'],
     gap: space['0.5'],
     outline: 'none',
-    paddingBlock: space['0.5'],
-    paddingInline: space['0.5'],
     backgroundColor: colorVars['--cl-color-card'],
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
                 0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
@@ -43,17 +44,22 @@ export const styles = stylex.create({
     transitionProperty: 'opacity, scale',
     transitionTimingFunction: 'ease-out',
     maxHeight: 'var(--cl-available-height)',
+    // Capped, or the popup grows to whatever its longest item says and `Menu.Label` never
+    // reaches the width it has to truncate at.
+    maxWidth: 'min(18rem, calc(100vw - 2rem))',
     minWidth: '12.5rem',
+    overflowX: 'visible',
     overflowY: 'auto',
   },
+});
 
-  item: {
+export const item = stylex.create({
+  base: {
     borderRadius: '0.375rem',
     borderStyle: 'none',
     gap: space['1'],
     outline: 'none',
-    paddingBlock: space['1'],
-    paddingInline: space['2'],
+    paddingInline: space['1'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
@@ -69,6 +75,7 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
+    outlineOffset: 0,
     position: 'relative',
     textAlign: 'start',
     transitionDuration: {
@@ -86,7 +93,7 @@ export const styles = stylex.create({
     },
   },
 
-  itemNegative: {
+  negative: {
     backgroundColor: {
       default: 'transparent',
       ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
@@ -96,8 +103,33 @@ export const styles = stylex.create({
     },
     color: colorVars['--cl-color-negative'],
   },
+});
 
-  separator: {
+export const media = stylex.create({
+  base: {
+    alignItems: 'center',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+  },
+  xs: { width: space['4'] },
+  sm: { width: space['6'] },
+});
+
+// The item lays its children out in one flat row, so the label is what has to take the space
+// between the media and whatever trails it, rather than the row spacing the three evenly.
+// `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
+export const label = stylex.create({
+  base: {
+    paddingInline: space['1'],
+    flexGrow: 1,
+    minWidth: 0,
+  },
+});
+
+export const separator = stylex.create({
+  base: {
     // Full-bleed across the popup: cancel the popup's inline padding.
     marginBlock: space['0.5'],
     marginInline: `calc(-1 * ${space['0.5']})`,

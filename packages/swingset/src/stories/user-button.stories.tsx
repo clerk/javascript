@@ -325,8 +325,8 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
     <UserButtonView
       {...prototype}
       mode='combined'
-      // With another account to switch to, the Accounts heading carries "Add account" instead of the
-      // foot. One account leaves both built-in rows here, which is what there is to order.
+      // One account resolves the accounts row to "Add account", which is the form `menuItemOrder`
+      // names by either id.
       additionalSessions={[]}
       customMenuItems={[
         {

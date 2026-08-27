@@ -156,8 +156,12 @@ export interface UserButtonBusyState {
  * A built-in action the foot of the popup lists as a row of its own, named by the id `menuItemOrder`
  * knows it by. The surface's other actions live in its header or behind a `⋯`, where there is no
  * list for an order to run in.
+ *
+ * `switchAccount` and `addAccount` share a slot: the foot carries the flyout of signed-in accounts
+ * where there is more than one, and the row it would have opened onto where there is not. Name both
+ * to place that slot whichever way it resolves.
  */
-export type UserButtonMenuItemId = 'createOrganization' | 'addAccount' | 'signOutAll';
+export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll';
 
 interface UserButtonMenuItemBase {
   /** Identifies the row, for ordering. */
