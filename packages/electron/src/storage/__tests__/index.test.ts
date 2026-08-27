@@ -194,6 +194,18 @@ describe('setItem', () => {
     expect(storeSet).toHaveBeenCalledWith('token-key', `enc:${Buffer.from('enc(jwt)').toString('base64')}`);
   });
 
+  it('continues reading persisted storage after a successful write', async () => {
+    installSync();
+    storeGet.mockReturnValue(`enc:${Buffer.from('cipher').toString('base64')}`);
+    vi.mocked(safeStorage.decryptString).mockReturnValue('persisted-jwt');
+    const adapter = storage();
+
+    await adapter.setItem('token-key', 'jwt');
+
+    await expect(adapter.getItem('token-key')).resolves.toBe('persisted-jwt');
+    expect(storeGet).toHaveBeenCalledWith('token-key');
+  });
+
   it('encrypts tokens before storing them (async backend)', async () => {
     installSync();
     installAsync();
@@ -218,10 +230,13 @@ describe('setItem', () => {
   it('does not persist when no encryption is available and no fallback is configured', async () => {
     installSync({ available: false });
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const adapter = storage();
 
-    await storage().setItem('token-key', 'jwt');
+    await adapter.setItem('token-key', 'jwt');
 
     expect(storeSet).not.toHaveBeenCalled();
+    await expect(adapter.getItem('token-key')).resolves.toBe('jwt');
+    expect(storeGet).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalledOnce();
 
     warn.mockRestore();
@@ -234,6 +249,23 @@ describe('setItem', () => {
     await storage({ unencryptedFallback: true }).setItem('token-key', 'jwt');
 
     expect(storeSet).toHaveBeenCalledWith('token-key', 'raw:jwt');
+    expect(warn).toHaveBeenCalledOnce();
+
+    warn.mockRestore();
+  });
+
+  it('retains tokens in memory when unencrypted persistence fails', async () => {
+    installSync({ available: false });
+    storeSet.mockImplementationOnce(() => {
+      throw new Error('write failed');
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const adapter = storage({ unencryptedFallback: true });
+
+    await adapter.setItem('token-key', 'jwt');
+
+    await expect(adapter.getItem('token-key')).resolves.toBe('jwt');
+    expect(storeGet).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalledOnce();
 
     warn.mockRestore();
@@ -262,9 +294,12 @@ describe('setItem', () => {
 
     // Even with the fallback enabled, a *failed encrypt* (vs. unavailable encryption) must not be
     // persisted in the clear.
-    await storage({ unencryptedFallback: true }).setItem('token-key', 'jwt');
+    const adapter = storage({ unencryptedFallback: true });
+    await adapter.setItem('token-key', 'jwt');
 
     expect(storeSet).not.toHaveBeenCalled();
+    await expect(adapter.getItem('token-key')).resolves.toBe('jwt');
+    expect(storeGet).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalledOnce();
 
     warn.mockRestore();
@@ -281,9 +316,14 @@ describe('setItem', () => {
 
     await adapter.setItem('token-key', 'jwt');
     expect(storeSet).not.toHaveBeenCalled(); // not persisted while unavailable
+    await expect(adapter.getItem('token-key')).resolves.toBe('jwt');
 
     await adapter.setItem('token-key', 'jwt');
     expect(storeSet).toHaveBeenCalledWith('token-key', `enc:${Buffer.from('enc(jwt)').toString('base64')}`);
+
+    storeGet.mockReturnValue(`enc:${Buffer.from('cipher').toString('base64')}`);
+    vi.mocked(safeStorage.decryptString).mockReturnValue('persisted-jwt');
+    await expect(adapter.getItem('token-key')).resolves.toBe('persisted-jwt');
 
     warn.mockRestore();
   });
@@ -308,5 +348,21 @@ describe('removeItem', () => {
     await storage().removeItem('token-key');
 
     expect(storeDelete).toHaveBeenCalledWith('token-key');
+  });
+
+  it('removes tokens retained after persistence is unavailable', async () => {
+    installSync({ available: false });
+    storeGet.mockReturnValue(undefined);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const adapter = storage();
+
+    await adapter.setItem('token-key', 'jwt');
+    await adapter.removeItem('token-key');
+
+    await expect(adapter.getItem('token-key')).resolves.toBeNull();
+    expect(storeDelete).toHaveBeenCalledWith('token-key');
+    expect(storeGet).toHaveBeenCalledWith('token-key');
+
+    warn.mockRestore();
   });
 });

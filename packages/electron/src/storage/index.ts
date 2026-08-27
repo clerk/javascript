@@ -127,6 +127,7 @@ export function storage(options: StorageOptions = {}): TokenStorage {
     name: options.name ?? 'clerk-tokens',
     ...(options.path ? { cwd: options.path } : {}),
   });
+  const memoryFallback = new Map<string, string>();
 
   let cachedCipher: Cipher | null = null;
   let resolving: Promise<Cipher | null> | null = null;
@@ -155,6 +156,11 @@ export function storage(options: StorageOptions = {}): TokenStorage {
 
   return {
     async getItem(key) {
+      const fallback = memoryFallback.get(key);
+      if (fallback !== undefined) {
+        return fallback;
+      }
+
       const stored = store.get(key);
 
       if (!stored) {
@@ -203,11 +209,18 @@ export function storage(options: StorageOptions = {}): TokenStorage {
 
       if (!cipher) {
         if (options.unencryptedFallback) {
-          warnOnce(
-            'Clerk: OS encryption is unavailable; falling back to unencrypted storage. Session tokens are being stored unencrypted on local disk.',
-          );
-          store.set(key, RAW_PREFIX + value);
+          try {
+            store.set(key, RAW_PREFIX + value);
+            memoryFallback.delete(key);
+            warnOnce(
+              'Clerk: OS encryption is unavailable; falling back to unencrypted storage. Tokens are being stored unencrypted on local disk.',
+            );
+          } catch {
+            memoryFallback.set(key, value);
+            warnOnce('Clerk: failed to persist a token; it will only be available until the app exits.');
+          }
         } else {
+          memoryFallback.set(key, value);
           warnOnce(
             'Clerk: OS encryption is unavailable and unencryptedFallback is not enabled, so tokens are not being persisted. The user will be signed out on the next launch. Pass `storage({ unencryptedFallback: true })` to persist unencrypted (less secure).',
           );
@@ -217,12 +230,14 @@ export function storage(options: StorageOptions = {}): TokenStorage {
 
       try {
         store.set(key, ENCRYPTED_PREFIX + (await cipher.encrypt(value)));
+        memoryFallback.delete(key);
       } catch {
-        // Encryption is available but encryption failed
-        warnOnce('Clerk: failed to encrypt the session token; it was not persisted.');
+        memoryFallback.set(key, value);
+        warnOnce('Clerk: failed to securely persist a token; it will only be available until the app exits.');
       }
     },
     removeItem(key) {
+      memoryFallback.delete(key);
       store.delete(key);
     },
   };
