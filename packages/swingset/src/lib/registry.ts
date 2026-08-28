@@ -39,6 +39,7 @@ import {
   VisuallyHiddenLabel as FieldVisuallyHiddenLabel,
 } from '../stories/field.component.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
+import { Default as FlowDefault, meta as flowComponentMeta } from '../stories/flow.component.stories';
 import { meta as flowMeta } from '../stories/flow.stories';
 import {
   Colors as HeadingColors,
@@ -93,30 +94,26 @@ import {
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import {
-  Default as ReverificationBackupCodeDefault,
-  meta as reverificationBackupCodeMeta,
-} from '../stories/reverification-backup-code.stories';
-import {
-  Default as ReverificationHelpDefault,
-  meta as reverificationHelpMeta,
-} from '../stories/reverification-help.stories';
-import {
-  Default as ReverificationMethodPickerDefault,
-  meta as reverificationMethodPickerMeta,
-} from '../stories/reverification-method-picker.stories';
-import {
-  Authenticator as ReverificationOTPAuthenticator,
-  Default as ReverificationOTPDefault,
-  meta as reverificationOTPMeta,
-} from '../stories/reverification-otp.stories';
-import {
-  Default as ReverificationPasskeyDefault,
-  meta as reverificationPasskeyMeta,
-} from '../stories/reverification-passkey.stories';
-import {
-  Default as ReverificationPasswordDefault,
-  meta as reverificationPasswordMeta,
-} from '../stories/reverification-password.stories';
+  AuthenticatorOTP as ReverificationAuthenticatorOTP,
+  BackupCode as ReverificationBackupCode,
+  BackupCodeError as ReverificationBackupCodeError,
+  BackupCodePending as ReverificationBackupCodePending,
+  Default as ReverificationDefault,
+  Help as ReverificationHelp,
+  meta as reverificationMeta,
+  MethodPicker as ReverificationMethodPicker,
+  MethodPickerPending as ReverificationMethodPickerPending,
+  OTP as ReverificationOTP,
+  OTPError as ReverificationOTPError,
+  OTPPending as ReverificationOTPPending,
+  OTPResending as ReverificationOTPResending,
+  Passkey as ReverificationPasskey,
+  PasskeyError as ReverificationPasskeyError,
+  PasskeyPending as ReverificationPasskeyPending,
+  Password as ReverificationPassword,
+  PasswordError as ReverificationPasswordError,
+  PasswordPending as ReverificationPasswordPending,
+} from '../stories/reverification.stories';
 import {
   Default as ScrollAreaDefault,
   Gutter as ScrollAreaGutter,
@@ -319,6 +316,11 @@ const visuallyHiddenModule: StoryModule = {
   LiveRegion: VisuallyHiddenLiveRegion,
 };
 
+const flowComponentModule: StoryModule = {
+  meta: flowComponentMeta,
+  Default: FlowDefault,
+};
+
 const iconModule: StoryModule = {
   meta: iconMeta,
   Default: IconDefault,
@@ -444,30 +446,26 @@ const destructiveModule: StoryModule = {
   WithError: DestructiveWithError,
 };
 
-const reverificationPasswordModule: StoryModule = {
-  meta: reverificationPasswordMeta,
-  Default: ReverificationPasswordDefault,
-};
-const reverificationPasskeyModule: StoryModule = {
-  meta: reverificationPasskeyMeta,
-  Default: ReverificationPasskeyDefault,
-};
-const reverificationOTPModule: StoryModule = {
-  meta: reverificationOTPMeta,
-  Default: ReverificationOTPDefault,
-  Authenticator: ReverificationOTPAuthenticator,
-};
-const reverificationBackupCodeModule: StoryModule = {
-  meta: reverificationBackupCodeMeta,
-  Default: ReverificationBackupCodeDefault,
-};
-const reverificationMethodPickerModule: StoryModule = {
-  meta: reverificationMethodPickerMeta,
-  Default: ReverificationMethodPickerDefault,
-};
-const reverificationHelpModule: StoryModule = {
-  meta: reverificationHelpMeta,
-  Default: ReverificationHelpDefault,
+const reverificationModule: StoryModule = {
+  meta: reverificationMeta,
+  Default: ReverificationDefault,
+  Password: ReverificationPassword,
+  PasswordPending: ReverificationPasswordPending,
+  PasswordError: ReverificationPasswordError,
+  Passkey: ReverificationPasskey,
+  PasskeyPending: ReverificationPasskeyPending,
+  PasskeyError: ReverificationPasskeyError,
+  OTP: ReverificationOTP,
+  AuthenticatorOTP: ReverificationAuthenticatorOTP,
+  OTPPending: ReverificationOTPPending,
+  OTPError: ReverificationOTPError,
+  OTPResending: ReverificationOTPResending,
+  BackupCode: ReverificationBackupCode,
+  BackupCodePending: ReverificationBackupCodePending,
+  BackupCodeError: ReverificationBackupCodeError,
+  MethodPicker: ReverificationMethodPicker,
+  MethodPickerPending: ReverificationMethodPickerPending,
+  Help: ReverificationHelp,
 };
 export const registry: StoryModule[] = [
   // User Button
@@ -493,18 +491,14 @@ export const registry: StoryModule[] = [
   userProfileDeleteSectionModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   destructiveModule,
-  reverificationPasswordModule,
-  reverificationPasskeyModule,
-  reverificationOTPModule,
-  reverificationBackupCodeModule,
-  reverificationMethodPickerModule,
-  reverificationHelpModule,
+  reverificationModule,
   // Components
   avatarModule,
   badgeModule,
   bannerModule,
   buttonModule,
   cardComponentModule,
+  flowComponentModule,
   inputModule,
   itemModule,
   dialogComponentModule,

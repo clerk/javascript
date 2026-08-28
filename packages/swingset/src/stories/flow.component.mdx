@@ -1,0 +1,38 @@
+import * as FlowStories from './flow.component.stories';
+
+# Flow
+
+`Flow` is a controlled Mosaic screen compositor. It treats `state` as opaque and renders the `Flow.Step` whose `ids` contain its `value`, establishing the seam where screen transitions can later retain outgoing and incoming state.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={FlowStories}
+/>
+
+## Usage
+
+```tsx
+import { Flow } from '@clerk/ui/mosaic/components/flow';
+
+<Flow.Root render={<Card.Root />} value={model.status} state={model}>
+  {state => (
+    <>
+      <Flow.Step ids={['details', 'details-pending']}>{state.details}</Flow.Step>
+      <Flow.Step ids={['confirm']}>{state.confirmation}</Flow.Step>
+    </>
+  )}
+</Flow.Root>
+```
+
+## Parts
+
+| Part        | Class           | Description                                                   |
+| ----------- | --------------- | ------------------------------------------------------------- |
+| `Flow.Root` | `.cl-flow-root` | Receives the controlled value and opaque state.               |
+| `Flow.Step` | `.cl-flow-step` | Renders when its `ids` include the root's controlled `value`. |
+
+## Styling
+
+`Flow.Root` reflects its controlled value through `data-value`. The active `Flow.Step` carries `data-active` and reflects the first grouped id through `data-step`. Both parts accept `className`, `style`, and the Mosaic `render` prop.
