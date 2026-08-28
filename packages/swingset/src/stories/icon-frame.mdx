@@ -2,7 +2,7 @@ import * as IconFrameStories from './icon-frame.stories';
 
 # IconFrame
 
-IconFrame places an icon or other visual in a square Mosaic surface. The child owns its size and artwork, while the frame adds padding, border, radius, centering, and a default background. Customize the surface through native `style` or `className` overrides.
+IconFrame centers an icon or other visual in a square Mosaic surface. `bordered` and `filled` are independent treatments, while `size` controls the frame dimensions. The default is a bordered 40px frame; the filled treatment uses a 6% black scrim in light mode and a 6% white scrim in dark mode.
 
 ## Playground
 
@@ -22,15 +22,13 @@ IconFrame places an icon or other visual in a square Mosaic surface. The child o
 
 ```tsx
 import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
-import { colorVars } from '@clerk/ui/mosaic/styles';
 
 <IconFrame
-  style={{
-    backgroundColor: colorVars['--cl-color-primary'],
-    color: colorVars['--cl-color-primary-foreground'],
-  }}
+  bordered={false}
+  filled
+  size='lg'
 >
-  <Icon name='check' size='lg' />
+  <Icon name='check' />
 </IconFrame>
 ```
 
@@ -38,25 +36,29 @@ import { colorVars } from '@clerk/ui/mosaic/styles';
 
 ## Examples
 
-### Icon sizes
+### Sizes
 
 <Story
-  name='IconSizes'
+  name='Sizes'
   storyModule={IconFrameStories}
   composition={[{ name: 'Icon', href: '/components/icon', layer: 'Components' }]}
 />
+
+`sm`, `md`, `lg`, and `xl` map to 28px, 32px, 36px, and 40px respectively.
+
+### Treatments
+
+<Story
+  name='Treatments'
+  storyModule={IconFrameStories}
+/>
+
+`bordered` and `filled` can be used separately, together, or both disabled for a centered bare icon.
 
 ### Custom surface
 
 <Story
   name='CustomSurface'
-  storyModule={IconFrameStories}
-/>
-
-### Multiple treatments
-
-<Story
-  name='MultipleTreatments'
   storyModule={IconFrameStories}
 />
 

@@ -1,3 +1,4 @@
+import type { IconFrameProps } from '@clerk/ui/mosaic/components/icon';
 import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
 import { colorVars, space } from '@clerk/ui/mosaic/styles';
 
@@ -21,37 +22,87 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'IconFrame',
   source: 'packages/ui/src/mosaic/components/icon/icon-frame.tsx',
-  styleEngine: 'stylex',
+  styles: {
+    _variants: {
+      bordered: { true: {}, false: {} },
+      filled: { true: {}, false: {} },
+      size: { sm: {}, md: {}, lg: {}, xl: {} },
+    },
+    _defaultVariants: {
+      bordered: true,
+      filled: false,
+      size: 'xl',
+    },
+  },
 };
 
-export function Default() {
+function knobsAsProps(props: Record<string, unknown>) {
+  return props as unknown as IconFrameProps;
+}
+
+export function Default(props: Record<string, unknown>) {
   return (
-    <IconFrame>
+    <IconFrame {...knobsAsProps(props)}>
       <Icon name='check' />
     </IconFrame>
   );
 }
 
-export function IconSizes() {
+export function Sizes() {
   return (
     <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
-      <IconFrame>
+      <IconFrame size='sm'>
         <Icon
           name='check'
           size='sm'
         />
       </IconFrame>
-      <IconFrame>
+      <IconFrame size='md'>
         <Icon
           name='check'
           size='md'
         />
       </IconFrame>
-      <IconFrame>
+      <IconFrame size='lg'>
+        <Icon
+          name='check'
+          size='md'
+        />
+      </IconFrame>
+      <IconFrame size='xl'>
         <Icon
           name='check'
           size='lg'
         />
+      </IconFrame>
+    </div>
+  );
+}
+
+export function Treatments() {
+  return (
+    <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <IconFrame
+        aria-label='Unframed'
+        bordered={false}
+      >
+        <Icon name='check' />
+      </IconFrame>
+      <IconFrame aria-label='Bordered'>
+        <Icon name='check' />
+      </IconFrame>
+      <IconFrame
+        aria-label='Filled'
+        bordered={false}
+        filled
+      >
+        <Icon name='check' />
+      </IconFrame>
+      <IconFrame
+        aria-label='Bordered and filled'
+        filled
+      >
+        <Icon name='check' />
       </IconFrame>
     </div>
   );
@@ -73,60 +124,14 @@ export function CustomSurface() {
   );
 }
 
-export function MultipleTreatments() {
-  return (
-    <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-      <IconFrame aria-label='Default'>
-        <Icon name='check' />
-      </IconFrame>
-      <IconFrame
-        aria-label='Neutral'
-        style={{
-          backgroundColor: colorVars['--cl-color-neutral-faded'],
-          color: colorVars['--cl-color-neutral'],
-        }}
-      >
-        <Icon name='check' />
-      </IconFrame>
-      <IconFrame
-        aria-label='Positive'
-        style={{
-          backgroundColor: colorVars['--cl-color-positive-faded'],
-          color: colorVars['--cl-color-positive'],
-        }}
-      >
-        <Icon name='check' />
-      </IconFrame>
-      <IconFrame
-        aria-label='Warning'
-        style={{
-          backgroundColor: colorVars['--cl-color-warning-faded'],
-          color: colorVars['--cl-color-warning'],
-        }}
-      >
-        <Icon name='alert-circle' />
-      </IconFrame>
-      <IconFrame
-        aria-label='Negative'
-        style={{
-          backgroundColor: colorVars['--cl-color-negative-faded'],
-          color: colorVars['--cl-color-negative'],
-        }}
-      >
-        <Icon name='close' />
-      </IconFrame>
-    </div>
-  );
-}
-
 export function BrandIcons() {
   return (
     <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
-      <IconFrame aria-label='Apple'>
-        <ProviderLogo provider='apple' />
+      <IconFrame aria-label='Google'>
+        <ProviderLogo provider='google' />
       </IconFrame>
-      <IconFrame aria-label='GitHub'>
-        <ProviderLogo provider='github' />
+      <IconFrame aria-label='MetaMask'>
+        <ProviderLogo provider='metamask' />
       </IconFrame>
     </div>
   );

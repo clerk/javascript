@@ -57,9 +57,9 @@ import {
   BrandIcons as IconFrameBrandIcons,
   CustomSurface as IconFrameCustomSurface,
   Default as IconFrameDefault,
-  IconSizes as IconFrameIconSizes,
   meta as iconFrameMeta,
-  MultipleTreatments as IconFrameMultipleTreatments,
+  Sizes as IconFrameSizes,
+  Treatments as IconFrameTreatments,
 } from '../stories/icon-frame.stories';
 import {
   Default,
@@ -301,9 +301,9 @@ const iconModule: StoryModule = {
 const iconFrameModule: StoryModule = {
   meta: iconFrameMeta,
   Default: IconFrameDefault,
-  IconSizes: IconFrameIconSizes,
+  Sizes: IconFrameSizes,
+  Treatments: IconFrameTreatments,
   CustomSurface: IconFrameCustomSurface,
-  MultipleTreatments: IconFrameMultipleTreatments,
   BrandIcons: IconFrameBrandIcons,
 };
 
