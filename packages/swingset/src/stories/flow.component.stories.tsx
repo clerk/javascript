@@ -23,47 +23,48 @@ export function Default(): JSX.Element {
   };
 
   return (
-    <Flow.Root
-      render={<Card.Root />}
-      value={step}
-      direction={direction}
-      state={{ step }}
-    >
-      {state => (
-        <>
-          <Flow.Step ids={['details', 'details-pending']}>
-            <Card.Header>
-              <Card.Title>Account details</Card.Title>
-              <Card.Description>Current controller state: {state.step}</Card.Description>
-            </Card.Header>
-            <Card.Footer>
-              <Button
-                fullWidth
-                onClick={() => navigate('confirm', 1)}
-              >
-                Continue
-              </Button>
-            </Card.Footer>
-          </Flow.Step>
-          <Flow.Step ids={['confirm']}>
-            <Card.Header>
-              <Card.Title>Confirm changes</Card.Title>
-              <Card.Description>Review the final step before submitting.</Card.Description>
-            </Card.Header>
-            <Card.Footer>
-              <Button
-                fullWidth
-                variant='outline'
-                color='neutral'
-                onClick={() => navigate('details', -1)}
-              >
-                Back
-              </Button>
-              <Button fullWidth>Submit</Button>
-            </Card.Footer>
-          </Flow.Step>
-        </>
-      )}
-    </Flow.Root>
+    <Card.Root>
+      <Flow.Root
+        value={step}
+        direction={direction}
+        state={{ step }}
+      >
+        {state => (
+          <>
+            <Flow.Step ids={['details', 'details-pending']}>
+              <Card.Header>
+                <Card.Title>Account details</Card.Title>
+                <Card.Description>Current controller state: {state.step}</Card.Description>
+              </Card.Header>
+              <Card.Footer>
+                <Button
+                  fullWidth
+                  onClick={() => navigate('confirm', 1)}
+                >
+                  Continue
+                </Button>
+              </Card.Footer>
+            </Flow.Step>
+            <Flow.Step ids={['confirm']}>
+              <Card.Header>
+                <Card.Title>Confirm changes</Card.Title>
+                <Card.Description>Review the final step before submitting.</Card.Description>
+              </Card.Header>
+              <Card.Footer>
+                <Button
+                  fullWidth
+                  variant='outline'
+                  color='neutral'
+                  onClick={() => navigate('details', -1)}
+                >
+                  Back
+                </Button>
+                <Button fullWidth>Submit</Button>
+              </Card.Footer>
+            </Flow.Step>
+          </>
+        )}
+      </Flow.Root>
+    </Card.Root>
   );
 }
