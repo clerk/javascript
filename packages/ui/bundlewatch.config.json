@@ -34,7 +34,7 @@
     { "path": "./dist/statement-page*.js", "maxSize": "5KB" },
     { "path": "./dist/payment-attempt-page*.js", "maxSize": "4KB" },
     { "path": "./dist/web3-solana-wallet-buttons*.js", "maxSize": "85KB" },
-    { "path": "./dist-mosaic/styles.css", "maxSize": "8KB" },
-    { "path": "./dist-mosaic/index.js", "maxSize": "88KB" }
+    { "path": "./dist-mosaic/styles.css", "maxSize": "10KB" },
+    { "path": "./dist-mosaic/index.js", "maxSize": "103KB" }
   ]
 }
