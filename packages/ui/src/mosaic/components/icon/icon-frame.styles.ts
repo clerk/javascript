@@ -2,7 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
-const neutralScrim = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 6%, transparent)`;
+// Figma uses the 'page faded' token
+const filledBackground = 'light-dark(oklch(0.9702 0 0), oklch(0.2393 0 0))';
 
 export const styles = stylex.create({
   base: {
@@ -22,7 +23,7 @@ export const styles = stylex.create({
     borderColor: colorVars['--cl-color-border'],
   },
   filled: {
-    backgroundColor: neutralScrim,
+    backgroundColor: filledBackground,
   },
 });
 
