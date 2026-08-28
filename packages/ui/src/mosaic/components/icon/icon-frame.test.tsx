@@ -11,6 +11,25 @@ describe('Mosaic IconFrame', () => {
     const frame = screen.getByText('Framed');
     expect(frame.tagName).toBe('SPAN');
     expect(frame).toHaveClass('cl-icon-frame');
+    expect(frame).toHaveAttribute('data-bordered', '');
+    expect(frame).not.toHaveAttribute('data-filled');
+    expect(frame).toHaveAttribute('data-size', 'xl');
+  });
+
+  it('reflects its treatment and size', () => {
+    render(
+      <IconFrame
+        bordered={false}
+        filled
+        size='sm'
+      >
+        Framed
+      </IconFrame>,
+    );
+    const frame = screen.getByText('Framed');
+    expect(frame).not.toHaveAttribute('data-bordered');
+    expect(frame).toHaveAttribute('data-filled', '');
+    expect(frame).toHaveAttribute('data-size', 'sm');
   });
 
   it('composes with an Icon', () => {

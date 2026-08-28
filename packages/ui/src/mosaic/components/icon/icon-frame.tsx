@@ -5,12 +5,16 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
-import { styles } from './icon-frame.styles';
+import { sizes, styles } from './icon-frame.styles';
 
-export type IconFrameProps = MosaicComponentProps<'span'>;
+export interface IconFrameProps extends MosaicComponentProps<'span'> {
+  bordered?: boolean;
+  filled?: boolean;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+}
 
 export const IconFrame = React.forwardRef<HTMLSpanElement, IconFrameProps>(function MosaicIconFrame(
-  { render, className, style, ...rest },
+  { bordered = true, filled = false, size = 'xl', render, className, style, ...rest },
   ref,
 ) {
   return useRender({
@@ -18,7 +22,12 @@ export const IconFrame = React.forwardRef<HTMLSpanElement, IconFrameProps>(funct
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('icon-frame'), stylex.props(reset.base, styles.base), className, style),
+      ...mergeStyleProps(
+        themeProps('icon-frame', { bordered, filled, size }),
+        stylex.props(reset.base, styles.base, sizes[size], bordered && styles.bordered, filled && styles.filled),
+        className,
+        style,
+      ),
       ...rest,
     },
   });
