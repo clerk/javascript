@@ -14,11 +14,9 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/otp/otp.tsx',
   styles: {
     _variants: {
-      size: { sm: {}, md: {}, lg: {} },
       status: { neutral: {}, success: {}, error: {} },
     },
     _defaultVariants: {
-      size: 'md',
       status: 'neutral',
     },
   },
@@ -40,28 +38,6 @@ export function Default(props: Record<string, unknown>) {
       {...knobsAsProps(props)}
       aria-label='Verification code'
     />
-  );
-}
-
-export function Sizes() {
-  return (
-    <div style={{ display: 'grid', gap: 16, justifyItems: 'start' }}>
-      <Otp
-        size='sm'
-        defaultValue='123'
-        aria-label='Small code'
-      />
-      <Otp
-        size='md'
-        defaultValue='123'
-        aria-label='Medium code'
-      />
-      <Otp
-        size='lg'
-        defaultValue='123'
-        aria-label='Large code'
-      />
-    </div>
   );
 }
 

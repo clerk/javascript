@@ -74,7 +74,6 @@ import {
   Disabled as OtpComponentDisabled,
   Error as OtpComponentError,
   meta as otpComponentMeta,
-  Sizes as OtpComponentSizes,
   Success as OtpComponentSuccess,
 } from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
@@ -85,6 +84,31 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import {
+  Default as ReverificationBackupCodeDefault,
+  meta as reverificationBackupCodeMeta,
+} from '../stories/reverification-backup-code.stories';
+import {
+  Default as ReverificationHelpDefault,
+  meta as reverificationHelpMeta,
+} from '../stories/reverification-help.stories';
+import {
+  Default as ReverificationMethodPickerDefault,
+  meta as reverificationMethodPickerMeta,
+} from '../stories/reverification-method-picker.stories';
+import {
+  Authenticator as ReverificationOTPAuthenticator,
+  Default as ReverificationOTPDefault,
+  meta as reverificationOTPMeta,
+} from '../stories/reverification-otp.stories';
+import {
+  Default as ReverificationPasskeyDefault,
+  meta as reverificationPasskeyMeta,
+} from '../stories/reverification-passkey.stories';
+import {
+  Default as ReverificationPasswordDefault,
+  meta as reverificationPasswordMeta,
+} from '../stories/reverification-password.stories';
 import {
   Default as ScrollAreaDefault,
   Gutter as ScrollAreaGutter,
@@ -267,7 +291,6 @@ const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: Men
 const otpComponentModule: StoryModule = {
   meta: otpComponentMeta,
   Default: OtpComponentDefault,
-  Sizes: OtpComponentSizes,
   Success: OtpComponentSuccess,
   Error: OtpComponentError,
   Disabled: OtpComponentDisabled,
@@ -395,6 +418,31 @@ const destructiveModule: StoryModule = {
   WithError: DestructiveWithError,
 };
 
+const reverificationPasswordModule: StoryModule = {
+  meta: reverificationPasswordMeta,
+  Default: ReverificationPasswordDefault,
+};
+const reverificationPasskeyModule: StoryModule = {
+  meta: reverificationPasskeyMeta,
+  Default: ReverificationPasskeyDefault,
+};
+const reverificationOTPModule: StoryModule = {
+  meta: reverificationOTPMeta,
+  Default: ReverificationOTPDefault,
+  Authenticator: ReverificationOTPAuthenticator,
+};
+const reverificationBackupCodeModule: StoryModule = {
+  meta: reverificationBackupCodeMeta,
+  Default: ReverificationBackupCodeDefault,
+};
+const reverificationMethodPickerModule: StoryModule = {
+  meta: reverificationMethodPickerMeta,
+  Default: ReverificationMethodPickerDefault,
+};
+const reverificationHelpModule: StoryModule = {
+  meta: reverificationHelpMeta,
+  Default: ReverificationHelpDefault,
+};
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -419,6 +467,12 @@ export const registry: StoryModule[] = [
   userProfileDeleteSectionModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   destructiveModule,
+  reverificationPasswordModule,
+  reverificationPasskeyModule,
+  reverificationOTPModule,
+  reverificationBackupCodeModule,
+  reverificationMethodPickerModule,
+  reverificationHelpModule,
   // Components
   avatarModule,
   badgeModule,
