@@ -21,8 +21,12 @@ const isDev = process.env.NODE_ENV !== 'production';
 // `runtimeInjection` (see `next.config.mjs`) injects the *fresh* atom at runtime under a new
 // content hash, which HMR tracks. The stale extracted atom is dead CSS; the `:root` token
 // defaults never change mid-session, so they stay correct.
+//
+// `include` names the Mosaic source explicitly: the plugin's auto-discovery ignores
+// `devDependencies`, which is where `@clerk/ui` keeps `@stylexjs/stylex`.
 const stylexExtraction = {
   '@stylexjs/postcss-plugin': {
+    include: ['src/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}', `${uiRoot}/src/mosaic/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}`],
     useCSSLayers: true,
     babelConfig: {
       babelrc: false,
