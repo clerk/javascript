@@ -67,7 +67,7 @@ export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
 export { Otp } from '../components/otp';
-export type { OtpProps, OtpSize, OtpStatus } from '../components/otp';
+export type { OtpProps, OtpStatus } from '../components/otp';
 export type {
   MenuItemProps,
   MenuLabelProps,
