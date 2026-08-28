@@ -73,7 +73,12 @@ export const useCardState = () => {
       setState(s => ({ ...s, blockedDetails: blocked, error: undefined }));
       return;
     }
-    setState(s => ({ ...s, error: translateError(metadata) }));
+    // Clearing blockedDetails here is what keeps setError the single owner of
+    // BOTH fields. Without it the blocked screen latches: every caller that
+    // clears an error passes undefined or '' first — handleClerkApiError does,
+    // and so does the protect-check runner — so a card that had once been
+    // blocked could never show anything again, including the next real error.
+    setState(s => ({ ...s, error: translateError(metadata), blockedDetails: undefined }));
   };
   const setLoading = (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata }));
   const runAsync = async <T = unknown,>(cb: Promise<T> | (() => Promise<T>), metadata?: Metadata) => {
