@@ -40,6 +40,7 @@ import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
 import { Default as FieldDefault, meta as fieldMeta } from '../stories/field.component.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
+import { meta as flowMeta } from '../stories/flow.stories';
 import {
   Colors as HeadingColors,
   Default as HeadingDefault,
@@ -320,6 +321,7 @@ const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
+const flowModule: StoryModule = { meta: flowMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
@@ -498,6 +500,7 @@ export const registry: StoryModule[] = [
   dialogModule,
   drawerModule,
   fileUploadModule,
+  flowModule,
   menuModule,
   otpModule,
   popoverModule,
