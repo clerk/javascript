@@ -92,7 +92,7 @@ describe('Reverification', () => {
     const passwordStep = screen.getByLabelText('Password').closest('.cl-flow-step');
 
     expect(card).not.toBeNull();
-    expect(flow).toBe(card);
+    expect(card).toContainElement(flow);
     expect(flow).toHaveAttribute('data-value', 'password');
 
     const pendingPassword = state('password');

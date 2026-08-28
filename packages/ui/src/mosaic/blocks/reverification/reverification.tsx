@@ -33,39 +33,40 @@ export interface ReverificationProps {
 
 export function Reverification({ state, direction }: ReverificationProps): JSX.Element {
   return (
-    <Flow.Root
-      render={<Card.Root />}
-      value={state.status}
-      direction={direction}
-      state={state}
-    >
-      {current => (
-        <>
-          <Flow.Step ids={['password']}>
-            <ReverificationPassword {...current.password} />
-          </Flow.Step>
+    <Card.Root>
+      <Flow.Root
+        value={state.status}
+        direction={direction}
+        state={state}
+      >
+        {current => (
+          <>
+            <Flow.Step ids={['password']}>
+              <ReverificationPassword {...current.password} />
+            </Flow.Step>
 
-          <Flow.Step ids={['passkey']}>
-            <ReverificationPasskey {...current.passkey} />
-          </Flow.Step>
+            <Flow.Step ids={['passkey']}>
+              <ReverificationPasskey {...current.passkey} />
+            </Flow.Step>
 
-          <Flow.Step ids={['otp']}>
-            <ReverificationOTP {...current.otp} />
-          </Flow.Step>
+            <Flow.Step ids={['otp']}>
+              <ReverificationOTP {...current.otp} />
+            </Flow.Step>
 
-          <Flow.Step ids={['backup-code']}>
-            <ReverificationBackupCode {...current.backupCode} />
-          </Flow.Step>
+            <Flow.Step ids={['backup-code']}>
+              <ReverificationBackupCode {...current.backupCode} />
+            </Flow.Step>
 
-          <Flow.Step ids={['method-picker']}>
-            <ReverificationMethodPicker {...current.methodPicker} />
-          </Flow.Step>
+            <Flow.Step ids={['method-picker']}>
+              <ReverificationMethodPicker {...current.methodPicker} />
+            </Flow.Step>
 
-          <Flow.Step ids={['help']}>
-            <ReverificationHelp {...current.help} />
-          </Flow.Step>
-        </>
-      )}
-    </Flow.Root>
+            <Flow.Step ids={['help']}>
+              <ReverificationHelp {...current.help} />
+            </Flow.Step>
+          </>
+        )}
+      </Flow.Root>
+    </Card.Root>
   );
 }
