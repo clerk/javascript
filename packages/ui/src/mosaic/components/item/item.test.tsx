@@ -44,22 +44,22 @@ describe('Mosaic Item', () => {
     expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'md');
   });
 
-  it('reflects the label variant as a data attribute, defaulting to primary', () => {
+  it('reflects the label variant as a data attribute, defaulting to default', () => {
     const { rerender } = render(<Item.Label>Clerk</Item.Label>);
-    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'primary');
-    rerender(<Item.Label variant='secondary'>Clerk</Item.Label>);
-    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'secondary');
+    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'default');
+    rerender(<Item.Label variant='interactive'>Clerk</Item.Label>);
+    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'interactive');
   });
 
   // StyleX keeps only the last atom that declares a property, so the reset's `color: inherit`
-  // survives on the variant that declares no color of its own. That is what puts the secondary
+  // survives on the variant that declares no color of its own. That is what puts the interactive
   // label on the row's color and carries it through the row's hover promotion. `Item.Content`
   // declares no color either, so it stands in for the untouched reset.
-  it('lets the row color the secondary label, and not the primary one', () => {
+  it('lets the row color the interactive label, and not the default one', () => {
     render(
       <Item.Content data-testid='reset-only'>
-        <Item.Label>Primary</Item.Label>
-        <Item.Label variant='secondary'>Secondary</Item.Label>
+        <Item.Label>Default</Item.Label>
+        <Item.Label variant='interactive'>Interactive</Item.Label>
       </Item.Content>,
     );
 
@@ -67,7 +67,7 @@ describe('Mosaic Item', () => {
     const resetAtoms = atoms(screen.getByTestId('reset-only'));
     const inherited = (text: string) => resetAtoms.filter(atom => atoms(screen.getByText(text)).includes(atom));
 
-    expect(inherited('Secondary')).toHaveLength(inherited('Primary').length + 1);
+    expect(inherited('Interactive')).toHaveLength(inherited('Default').length + 1);
   });
 
   it('wires consumer className/style through to the element', () => {

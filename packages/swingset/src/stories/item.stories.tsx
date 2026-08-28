@@ -240,7 +240,7 @@ export function Group() {
             />
           </Item.Media>
           <Item.Content>
-            <Item.Label variant='secondary'>Add account</Item.Label>
+            <Item.Label variant='interactive'>Add account</Item.Label>
           </Item.Content>
         </Item.Root>
         <Item.Root
@@ -261,7 +261,7 @@ export function Group() {
             />
           </Item.Media>
           <Item.Content>
-            <Item.Label variant='secondary'>Sign out of all accounts</Item.Label>
+            <Item.Label variant='interactive'>Sign out of all accounts</Item.Label>
           </Item.Content>
         </Item.Root>
       </Item.Group>

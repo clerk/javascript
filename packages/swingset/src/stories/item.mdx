@@ -108,7 +108,7 @@ import { Item } from '@clerk/ui/mosaic/components/item';
 </Item.Group>;
 ```
 
-Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an `Icon`. A row whose text _is_ the row, rather than naming a subject, uses `Item.Label` with `variant='secondary'`:
+Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an `Icon`. A row whose text _is_ the row, rather than naming a subject, uses `Item.Label` with `variant='interactive'`:
 
 ```tsx
 <Item.Root size='xs' render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
@@ -116,7 +116,7 @@ Media sizes itself from the row, so give it a child that fills its column — an
     <Icon name='log-out' size='sm' />
   </Item.Media>
   <Item.Content>
-    <Item.Label variant='secondary'>Sign out of all accounts</Item.Label>
+    <Item.Label variant='interactive'>Sign out of all accounts</Item.Label>
   </Item.Content>
 </Item.Root>;
 ```
@@ -140,11 +140,11 @@ Every part accepts a `render` prop for element polymorphism and forwards a ref.
 
 The row carries the text color and, through `--_cl-icon-color`, the strength of any `Icon` inside it: faded at rest, full-strength while hovered. Only interactive rows promote — a static row isn't pointing at anything, so its icon holds its resting color. A `Button` in `Item.Actions` sets its own icon color and is unaffected.
 
-`Item.Label` chooses whether it joins that promotion. `variant='primary'` sets its own color and holds it, so a subject the row names reads at full strength either way. `variant='secondary'` sets none and inherits the row's, so it fades and brightens with the row:
+`Item.Label` chooses whether it joins that promotion. `variant='default'` sets its own color and holds it, so a subject the row names reads at full strength either way. `variant='interactive'` sets none and inherits the row's, so it fades and brightens with the row:
 
-| Prop      | Attribute      | Values                   | Default   |
-| --------- | -------------- | ------------------------ | --------- |
-| `variant` | `data-variant` | `primary` \| `secondary` | `primary` |
+| Prop      | Attribute      | Values                     | Default   |
+| --------- | -------------- | -------------------------- | --------- |
+| `variant` | `data-variant` | `default` \| `interactive` | `default` |
 
 `variant` decides whether a row is bordered. It sits on both `Item.Root` and `Item.Group`: set it on
 the group and every row inside it takes it through context, with the group dropping its gutter and
@@ -155,7 +155,7 @@ The root reflects its state as `data-*` attributes on `.cl-item`, so consumers c
 
 | Prop      | Attribute          | Values                              | Default     |
 | --------- | ------------------ | ----------------------------------- | ----------- |
-| `size`    | `data-size`        | `xs` \| `md`                        | `md`        |
+| `size`    | `data-size`        | `xs` \| `md` \| `lg`                | `md`        |
 | `variant` | `data-variant`     | `default` \| `outline`              | its group's |
 | `render`  | `data-interactive` | present when a `render` is provided | —           |
 

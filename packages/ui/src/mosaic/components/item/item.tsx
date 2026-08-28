@@ -140,13 +140,13 @@ const DEFAULT_LABEL_VARIANT: LabelVariant = 'default';
 
 export type ItemLabelProps = MosaicComponentProps<'div'> & {
   /**
-   * `primary` names the row's subject (a person, an organization) and holds its
-   * own strength. `secondary` is quieter and takes its color from the row rather
-   * than setting one, so on an interactive row it brightens with the row on
-   * hover instead of staying fixed. Use it where the text is the row itself
-   * (`Add account`, `Sign out`) or a group heading, not a subject the row names.
+   * `default` names the row's subject (a person, an organization) and sets its
+   * own color, so it holds that strength whatever the row does. `interactive`
+   * sets no color and takes the row's, so on an interactive row it brightens
+   * with the row on hover instead of staying fixed. Use it where the text is
+   * the row itself (`Add account`, `Sign out`), not a subject the row names.
    *
-   * @default 'primary'
+   * @default 'default'
    */
   variant?: LabelVariant;
 };
