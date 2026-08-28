@@ -92,6 +92,20 @@ export const TestSyncStep = (): JSX.Element => {
             Users appear here as your identity provider provisions them, most recent activity first.
           </Text>
 
+          <Text
+            as='p'
+            colorScheme='secondary'
+          >
+            <Text
+              as='span'
+              colorScheme='secondary'
+              sx={t => ({ fontWeight: t.fontWeights.$medium })}
+            >
+              Note:
+            </Text>{' '}
+            only users with an email address from a configured domain will be processed.
+          </Text>
+
           {rows.length === 0 ? (
             <Flex
               align='center'
