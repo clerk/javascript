@@ -1,6 +1,6 @@
 {
   "name": "@clerk/headless",
-  "version": "0.0.29",
+  "version": "0.0.30",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -52,6 +52,10 @@
     "./file-upload": {
       "import": "./dist/primitives/file-upload/index.js",
       "types": "./dist/primitives/file-upload/index.d.ts"
+    },
+    "./flow": {
+      "import": "./dist/primitives/flow/index.js",
+      "types": "./dist/primitives/flow/index.d.ts"
     },
     "./otp": {
       "import": "./dist/primitives/otp/index.js",

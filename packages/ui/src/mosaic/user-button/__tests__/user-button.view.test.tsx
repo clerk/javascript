@@ -74,12 +74,12 @@ const popup = () => screen.getByRole('dialog', { name: 'Account' });
 // popup's sections rather than an implementation detail.
 const groups = () => Array.from(popup().querySelectorAll<HTMLElement>('.cl-item-group'));
 const labels = (group: HTMLElement | undefined) =>
-  Array.from(group?.querySelectorAll(".cl-item-label[data-variant='primary']") ?? []).map(
+  Array.from(group?.querySelectorAll(".cl-item-label[data-variant='default']") ?? []).map(
     node => node.textContent ?? '',
   );
 const row = (group: HTMLElement | undefined, label: string) =>
   Array.from(group?.querySelectorAll<HTMLElement>('.cl-item') ?? []).find(
-    node => node.querySelector(".cl-item-label[data-variant='primary']")?.textContent === label,
+    node => node.querySelector(".cl-item-label[data-variant='default']")?.textContent === label,
   );
 
 const scrollClasses = stylex.props(...scrollAreaViewport('auto')).className?.split(' ') ?? [];
@@ -199,6 +199,17 @@ describe('UserButtonView, organization mode', () => {
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
   });
 
+  // `hidePersonal` withholds the workspace, so a missing org is no selection — not the account.
+  it('names no organization selected where personal is hidden and none is active', () => {
+    renderOrganizationMode({ hidePersonal: true, activeOrganization: null });
+
+    expect(within(groups()[0]).getByText('No organization selected')).toBeInTheDocument();
+    expect(screen.queryByText('Alice Smith')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
+  });
+
   // The header acts on the active organization, which is known whole before the list it belongs to
   // lands. Invite and the gear act on the same organization, so they answer together.
   it('offers to invite while the membership list is still in flight', () => {
@@ -279,7 +290,7 @@ describe('UserButtonView, combined mode', () => {
     const onCreateOrganization = vi.fn();
     renderCombined({ onCreateOrganization });
 
-    // Not `labels`: the row is an action rather than a workspace, so its label is the secondary one.
+    // Not `labels`: the row is an action rather than a workspace, so its label is the interactive one.
     const rows = Array.from(workspaceList()?.querySelectorAll('.cl-item-label') ?? []);
     expect(rows.at(-1)?.textContent).toBe('Create organization');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Create organization' }));
@@ -577,7 +588,7 @@ describe('UserButtonView, the foot', () => {
 
   /** The foot's rows, in the order it lists them. It is the last group in the popup. */
   const footActions = () =>
-    Array.from(groups().at(-1)?.querySelectorAll(".cl-item-label[data-variant='secondary']") ?? []).map(
+    Array.from(groups().at(-1)?.querySelectorAll(".cl-item-label[data-variant='interactive']") ?? []).map(
       node => node.textContent ?? '',
     );
 
@@ -809,6 +820,20 @@ describe('UserButtonTrigger', () => {
 
     expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     expect(screen.queryByText('Pro')).toBeNull();
+  });
+
+  it('names no organization selected where personal is hidden and none is active', () => {
+    renderTrigger({ mode: 'organization', hidePersonal: true, activeOrganization: null });
+
+    expect(screen.getByText('No organization selected')).toBeInTheDocument();
+    expect(screen.queryByText('Alice Smith')).toBeNull();
+  });
+
+  it('still names the account in user mode when personal is hidden and none is active', () => {
+    renderTrigger({ mode: 'user', hidePersonal: true, activeOrganization: null });
+
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    expect(screen.queryByText('No organization selected')).toBeNull();
   });
 
   it('names the active organization in combined mode', () => {

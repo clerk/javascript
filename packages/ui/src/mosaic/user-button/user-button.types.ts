@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
-// Session-backed, discriminated resource rows. 1:1 with `useUserButtonController()`'s output, so the
-// controller and the view agree on a shape neither one owns.
+// Session-backed, discriminated resource rows. 1:1 with `useUserButtonModel()`'s output, so the
+// model and the view agree on a shape neither one owns.
 
 export interface UserButtonSession {
   sessionId: string;
@@ -51,7 +51,8 @@ export interface UserButtonData {
   activeSession: UserButtonSession;
   /**
    * The active organization, described whole rather than found in `memberships`, so the surface
-   * names it while the list it belongs to is still loading. `null` => the personal workspace.
+   * names it while the list it belongs to is still loading. `null` means none is active: the
+   * personal workspace when one exists, and no selection otherwise.
    */
   activeOrganization: UserButtonMembership | null;
   /**
