@@ -74,6 +74,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     dialog: dynamic(() => import('../stories/dialog.mdx')),
     drawer: dynamic(() => import('../stories/drawer.mdx')),
     'file-upload': dynamic(() => import('../stories/file-upload.mdx')),
+    flow: dynamic(() => import('../stories/flow.mdx')),
     menu: dynamic(() => import('../stories/menu.mdx')),
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),
