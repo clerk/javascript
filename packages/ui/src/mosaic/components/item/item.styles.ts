@@ -11,18 +11,13 @@ export const item = stylex.create({
     // last style that declares it, so the two can't merge.
     '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
     borderRadius: radiusVars['--cl-radius-lg'],
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
-    paddingInline: space['2'],
+    paddingInline: space['1.5'],
     alignItems: 'center',
     color: colorVars['--cl-color-neutral-faded'],
     display: 'flex',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    outlineOffset: '2px',
     textAlign: 'start',
     width: '100%',
   },
@@ -64,7 +59,7 @@ export const item = stylex.create({
 
   xs: {
     gap: space['2'],
-    height: space['8'],
+    height: space['9'],
   },
   md: {
     gap: space['3'],
@@ -81,8 +76,8 @@ export const media = stylex.create({
     justifyContent: 'center',
   },
 
-  xs: { width: space['5'] },
-  md: { width: space['9'] },
+  xs: { width: space['6'] },
+  md: { width: space['10'] },
 });
 
 export const content = stylex.create({
@@ -135,7 +130,7 @@ export const actions = stylex.create({
 
 export const group = stylex.create({
   base: {
-    padding: space['2'],
+    padding: space['1.5'],
     width: '100%',
   },
 });

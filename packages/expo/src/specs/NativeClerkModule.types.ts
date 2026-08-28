@@ -1,6 +1,6 @@
 import type { SignInStatus } from '@clerk/shared/types';
 
-import type { TrustedDeviceAvailability, TrustedDevicePolicy } from '../trusted-devices/types';
+import type { BiometricCredentialAvailability, BiometricCredentialPolicy } from '../biometric-credentials/types';
 
 export type NativeAuthFlowState = {
   isLoaded: boolean;
@@ -11,7 +11,7 @@ export type NativeAuthFlowModule = {
   getAuthFlowState(): Promise<NativeAuthFlowState>;
 };
 
-export type NativeTrustedDevice = {
+export type NativeBiometricCredential = {
   id: string;
   object: 'trusted_device';
   platform: string;
@@ -25,25 +25,28 @@ export type NativeTrustedDevice = {
   revokedAt: number | null;
 };
 
-export type NativeTrustedDeviceSignInResult = {
+export type NativeBiometricSignInResult = {
   id: string;
   status: SignInStatus | (string & {});
   createdSessionId: string | null;
 };
 
-export type NativeTrustedDeviceModule = {
-  getTrustedDeviceAvailability(id: string | null, identifierHint: string | null): Promise<TrustedDeviceAvailability>;
-  listTrustedDevices(): Promise<NativeTrustedDevice[]>;
+export type NativeBiometricCredentialModule = {
+  getTrustedDeviceAvailability(
+    id: string | null,
+    identifierHint: string | null,
+  ): Promise<BiometricCredentialAvailability>;
+  listTrustedDevices(): Promise<NativeBiometricCredential[]>;
   enrollTrustedDevice(
     deviceName: string | null,
     identifierHint: string | null,
     reason: string | null,
-    policy: TrustedDevicePolicy,
-  ): Promise<NativeTrustedDevice>;
-  revokeTrustedDevice(id: string): Promise<NativeTrustedDevice>;
+    policy: BiometricCredentialPolicy,
+  ): Promise<NativeBiometricCredential>;
+  revokeTrustedDevice(id: string): Promise<NativeBiometricCredential>;
   signInWithTrustedDevice(
     id: string | null,
     identifierHint: string | null,
     reason: string | null,
-  ): Promise<NativeTrustedDeviceSignInResult>;
+  ): Promise<NativeBiometricSignInResult>;
 };

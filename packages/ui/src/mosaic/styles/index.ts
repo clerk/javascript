@@ -35,6 +35,8 @@ export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
+export { Banner } from '../components/banner';
+export type { BannerDescriptionProps, BannerLabelProps, BannerRootProps } from '../components/banner';
 export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
@@ -65,9 +67,14 @@ export type { InputProps } from '../components/input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
+export { Otp } from '../components/otp';
+export type { OtpProps, OtpSize, OtpStatus } from '../components/otp';
 export type {
-  MenuContentProps,
   MenuItemProps,
+  MenuLabelProps,
+  MenuMediaProps,
+  MenuMediaSize,
+  MenuPopupProps,
   MenuProps,
   MenuSeparatorProps,
   MenuTriggerProps,
@@ -108,6 +115,7 @@ import {
   colorVars,
   durationVars,
   easingVars,
+  focusVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -123,6 +131,7 @@ export {
   colorVars,
   durationVars,
   easingVars,
+  focusVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -140,6 +149,7 @@ export {
 export type ColorVarName = keyof typeof colorVars;
 export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;
+export type FocusVarName = keyof typeof focusVars;
 export type FontFamilyVarName = keyof typeof fontFamilyVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;

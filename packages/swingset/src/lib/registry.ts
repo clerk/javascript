@@ -20,13 +20,21 @@ import {
   Primary as BadgePrimary,
   WithIcon as BadgeWithIcon,
 } from '../stories/badge.stories';
-import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import {
-  Centered as CardCentered,
-  Default as CardDefault,
-  meta as cardComponentMeta,
-} from '../stories/card.component.stories';
+  Announced as BannerAnnounced,
+  Colors as BannerColors,
+  Default as BannerDefault,
+  LabelOnly as BannerLabelOnly,
+  meta as bannerMeta,
+} from '../stories/banner.stories';
+import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import {
+  Default as DestructiveDefault,
+  meta as destructiveMeta,
+  WithError as DestructiveWithError,
+} from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
@@ -61,6 +69,14 @@ import {
 } from '../stories/item.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OtpComponentDefault,
+  Disabled as OtpComponentDisabled,
+  Error as OtpComponentError,
+  meta as otpComponentMeta,
+  Sizes as OtpComponentSizes,
+  Success as OtpComponentSuccess,
+} from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -132,6 +148,7 @@ import {
 import {
   Default as UserProfileDeleteSectionDefault,
   meta as userProfileDeleteSectionMeta,
+  WithError as UserProfileDeleteSectionWithError,
 } from '../stories/user-profile-delete-section.stories';
 import {
   Default as UserProfileMfaSectionDefault,
@@ -186,7 +203,7 @@ const alertDialogComponentModule: StoryModule = {
   DiscardChanges: AlertDialogDiscardChanges,
 };
 
-const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
+const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
 
 const avatarModule: StoryModule = {
   meta: avatarMeta,
@@ -202,6 +219,14 @@ const badgeModule: StoryModule = {
   Primary: BadgePrimary,
   Colors: BadgeColors,
   WithIcon: BadgeWithIcon,
+};
+
+const bannerModule: StoryModule = {
+  meta: bannerMeta,
+  Default: BannerDefault,
+  Colors: BannerColors,
+  LabelOnly: BannerLabelOnly,
+  Announced: BannerAnnounced,
 };
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
@@ -238,6 +263,15 @@ const headingModule: StoryModule = {
 };
 
 const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
+
+const otpComponentModule: StoryModule = {
+  meta: otpComponentMeta,
+  Default: OtpComponentDefault,
+  Sizes: OtpComponentSizes,
+  Success: OtpComponentSuccess,
+  Error: OtpComponentError,
+  Disabled: OtpComponentDisabled,
+};
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
@@ -352,6 +386,13 @@ const userProfileWeb3WalletsSectionModule: StoryModule = {
 const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
+  WithError: UserProfileDeleteSectionWithError,
+};
+
+const destructiveModule: StoryModule = {
+  meta: destructiveMeta,
+  Default: DestructiveDefault,
+  WithError: DestructiveWithError,
 };
 
 export const registry: StoryModule[] = [
@@ -376,9 +417,12 @@ export const registry: StoryModule[] = [
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  // Blocks — flows assembled from components, wired by the caller's machine.
+  destructiveModule,
   // Components
   avatarModule,
   badgeModule,
+  bannerModule,
   buttonModule,
   cardComponentModule,
   inputModule,
@@ -388,6 +432,7 @@ export const registry: StoryModule[] = [
   headingModule,
   iconModule,
   menuComponentModule,
+  otpComponentModule,
   popoverComponentModule,
   sectionModule,
   textModule,

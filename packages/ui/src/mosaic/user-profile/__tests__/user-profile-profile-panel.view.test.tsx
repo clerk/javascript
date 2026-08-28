@@ -139,7 +139,7 @@ describe('UserProfileProfilePanelView', () => {
   it('renders connected accounts and the danger zone when provided', async () => {
     const onConnectAccount = vi.fn();
     const onManageConnectedAccount = vi.fn();
-    const onDeleteAccount = vi.fn();
+    const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
     renderView({
       connectedAccounts: [
@@ -165,6 +165,9 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
     await user.click(screen.getByRole('button', { name: 'Connect' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
+    const deleteDialog = screen.getByRole('dialog');
+    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
+    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
     expect(onManageConnectedAccount).toHaveBeenCalledWith('google');
     expect(onConnectAccount).toHaveBeenCalledWith('apple');
