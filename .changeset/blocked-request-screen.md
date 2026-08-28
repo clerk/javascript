@@ -10,6 +10,8 @@ A blocked request is terminal — there is no field to correct and no retry that
 
 The screen shows a short reference for the request, which the end user can quote when contacting support. When the application supplies its own wording, the screen renders that instead of the default: `title`, `description`, and an optional `https` link with a label are read from the error's `meta`.
 
+The error's `meta` also carries `kind` — a tag naming why the request was blocked — and `data`, an arbitrary bag of scalars the application's owner attached. Neither is rendered by the built-in screen: they are there so an application can switch on `kind` and render its own UI instead.
+
 Also adds the `actionBlocked` localization keys (`title`, `subtitle`, `traceIdLabel`) and appearance descriptors for the new elements, so both the copy and the styling are customizable.
 
 This is additive and degrades safely: the error's `code`, `message` and `long_message` are unchanged, and a response without the new `meta` renders exactly as before.

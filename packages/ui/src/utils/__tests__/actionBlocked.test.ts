@@ -130,3 +130,34 @@ describe('actionBlockedDetailsFrom', () => {
     expect(actionBlockedDetailsFrom(42)).toBeNull();
   });
 });
+
+// kind and data are CARRIED, never rendered. A rule configured with only a kind
+// is one whose application draws its own screen, so treating it as "nothing to
+// show" would take the feature away from exactly that integration.
+describe('kind and data', () => {
+  it('reads them off the meta', () => {
+    const details = getActionBlockedDetails({
+      code: 'action_blocked',
+      message: 'Action blocked',
+      meta: {
+        traceId: '7Q8ikxgt',
+        kind: 'vpn_detected',
+        data: { region: 'EU', retryAfter: 3600, appeal: true },
+      },
+    } as any);
+    expect(details?.kind).toBe('vpn_detected');
+    expect(details?.data).toEqual({ region: 'EU', retryAfter: 3600, appeal: true });
+  });
+
+  it('treats a kind on its own as something to show', () => {
+    expect(
+      getActionBlockedDetails({ code: 'action_blocked', message: 'x', meta: { kind: 'vpn_detected' } } as any),
+    ).not.toBeNull();
+  });
+
+  it('treats data on its own as something to show', () => {
+    expect(
+      getActionBlockedDetails({ code: 'action_blocked', message: 'x', meta: { data: { a: 1 } } } as any),
+    ).not.toBeNull();
+  });
+});

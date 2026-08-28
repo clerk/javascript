@@ -12,10 +12,22 @@ import type { ClerkAPIError } from '@clerk/shared/types';
  */
 export type ActionBlockedDetails = {
   traceId?: string;
+  /**
+   * Why the request was blocked, as the application's owner tagged it. Opaque
+   * and NEVER rendered by this screen — an application switches on it to render
+   * its own UI instead.
+   */
+  kind?: string;
   title?: string;
   description?: string;
   linkUrl?: string;
   linkText?: string;
+  /**
+   * Arbitrary values the application's owner attached. Carried so an
+   * application can read them; NEVER rendered here. Rendering them would put
+   * somebody's internal keys in front of an end user.
+   */
+  data?: Record<string, string | number | boolean>;
 };
 
 /**
@@ -29,11 +41,14 @@ export const getActionBlockedDetails = (error: ClerkAPIError | undefined): Actio
   if (!meta) {
     return null;
   }
-  const { traceId, title, description, linkUrl, linkText } = meta;
-  if (!traceId && !title && !description && !linkUrl) {
+  const { traceId, kind, title, description, linkUrl, linkText, data } = meta;
+  // `kind` and `data` count: a rule configured with only a kind is one whose
+  // application renders its own screen, and treating that as "nothing to show"
+  // would take the feature away from exactly that integration.
+  if (!traceId && !kind && !title && !description && !linkUrl && !data) {
     return null;
   }
-  return { traceId, title, description, linkUrl, linkText };
+  return { traceId, kind, title, description, linkUrl, linkText, data };
 };
 
 /**

@@ -14,10 +14,12 @@ describe('blocked request error meta', () => {
     long_message: 'This action was detected as suspicious and has been blocked.',
     meta: {
       trace_id: '7Q8ikxgt',
+      kind: 'vpn_detected',
       title: 'We could not verify this sign-in',
       description: 'Try again from a different network.',
       link_url: 'https://help.example.com/blocked?ref=7Q8ikxgt',
       link_text: 'Contact support',
+      data: { region: 'EU', retryAfter: 3600, appeal: true },
     },
   };
 
@@ -25,10 +27,12 @@ describe('blocked request error meta', () => {
     const error = new ClerkAPIError(json as any);
     expect(error.meta).toMatchObject({
       traceId: '7Q8ikxgt',
+      kind: 'vpn_detected',
       title: 'We could not verify this sign-in',
       description: 'Try again from a different network.',
       linkUrl: 'https://help.example.com/blocked?ref=7Q8ikxgt',
       linkText: 'Contact support',
+      data: { region: 'EU', retryAfter: 3600, appeal: true },
     });
   });
 
@@ -39,10 +43,12 @@ describe('blocked request error meta', () => {
     const roundTripped = new ClerkAPIError(errorToJSON(new ClerkAPIError(json as any)) as any);
     expect(roundTripped.meta).toMatchObject({
       traceId: '7Q8ikxgt',
+      kind: 'vpn_detected',
       title: 'We could not verify this sign-in',
       description: 'Try again from a different network.',
       linkUrl: 'https://help.example.com/blocked?ref=7Q8ikxgt',
       linkText: 'Contact support',
+      data: { region: 'EU', retryAfter: 3600, appeal: true },
     });
   });
 
