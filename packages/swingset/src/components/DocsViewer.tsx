@@ -39,6 +39,12 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   blocks: {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
+    'reverification-password': dynamic(() => import('../stories/reverification-password.mdx')),
+    'reverification-passkey': dynamic(() => import('../stories/reverification-passkey.mdx')),
+    'reverification-otp': dynamic(() => import('../stories/reverification-otp.mdx')),
+    'reverification-backup-code': dynamic(() => import('../stories/reverification-backup-code.mdx')),
+    'reverification-method-picker': dynamic(() => import('../stories/reverification-method-picker.mdx')),
+    'reverification-help': dynamic(() => import('../stories/reverification-help.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),

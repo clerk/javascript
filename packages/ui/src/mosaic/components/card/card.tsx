@@ -10,6 +10,7 @@ import { Button } from '../button';
 import { ClerkLogo } from '../clerk-logo';
 import { Dialog, DialogContext } from '../dialog';
 import { Icon } from '../icon';
+import { cardContentMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
 
 type CardElevation = 'card' | 'flush' | 'overlay';
@@ -180,7 +181,12 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-content'), stylex.props(reset.base, slots.content.base), className, style),
+      ...mergeStyleProps(
+        themeProps('card-content'),
+        stylex.props(reset.base, slots.content.base, cardContentMarker),
+        className,
+        style,
+      ),
       ...rest,
     },
   });
