@@ -105,8 +105,11 @@ export const ukUA: LocalizationResource = {
       'Ви не можете оформити цей план зі щомісячною оплатою. Щоб підписатися на цей план, виберіть щорічну оплату.',
     cannotSubscribeUnrecoverable: 'Ви не можете підписатися на цей план. Ваша поточна підписка дорожча за цей план.',
     checkout: {
+      addPromoCode: 'Додати промокод',
+      applyPromoCode: 'Застосувати',
       description__paymentSuccessful: 'Ваш платіж успішно виконано.',
       description__subscriptionSuccessful: 'Вашу нову підписку оформлено.',
+      discount: 'Знижка',
       downgradeNotice:
         'Ваша поточна підписка та її функції діятимуть до кінця розрахункового періоду, після чого вас буде переведено на цю підписку.',
       emailForm: {
@@ -122,6 +125,8 @@ export const ukUA: LocalizationResource = {
       },
       pastDueNotice: 'Ваша попередня підписка була прострочена без оплати.',
       perMonth: 'на місяць',
+      promoCodePlaceholder: 'Введіть промокод',
+      removePromoCode: 'Видалити промокод',
       title: 'Оформлення замовлення',
       title__paymentSuccessful: 'Платіж успішно виконано!',
       title__subscriptionSuccessful: 'Готово!',
@@ -132,6 +137,9 @@ export const ukUA: LocalizationResource = {
     credit: 'Кредит',
     creditRemainder: 'Кредит за залишок вашої поточної підписки.',
     defaultFreePlanActive: 'Наразі ви користуєтеся безкоштовним планом',
+    discountAmount: 'Знижка {{amount}}',
+    discountCyclesRemaining: 'Залишилось: {{cycles}} {{period}}',
+    discountDuration: 'Знижка {{amount}} на початковий період ({{cycles}} {{period}})',
     free: 'Безкоштовно',
     getStarted: 'Розпочати',
     highlightedPlanBadge: 'Популярний',
@@ -143,6 +151,7 @@ export const ukUA: LocalizationResource = {
     monthAbbreviation: 'міс',
     monthPerUnit: 'Місяць за {{unitName}}',
     monthly: 'Щомісячно',
+    months: 'міс.',
     pastDue: 'Прострочено',
     pay: 'Сплатити {{amount}}',
     payerCreditRemainder: 'Кредит із балансу рахунку.',
@@ -221,6 +230,7 @@ export const ukUA: LocalizationResource = {
     year: 'Рік',
     yearAbbreviation: 'р',
     yearPerUnit: 'Рік за {{unitName}}',
+    years: 'р.',
   },
   configureSSO: {
     activate: {
@@ -976,7 +986,8 @@ export const ukUA: LocalizationResource = {
       title: 'URL перенаправлення',
     },
     scopeList: {
-      privateMetadata: undefined,
+      privateMetadata:
+        'Ваші приватні метадані, встановлені {{applicationName}}, які можуть містити конфіденційну інформацію',
       title: 'Це надасть {{applicationName}} доступ до:',
     },
     subtitle: 'запитує доступ до {{applicationName}} від імені {{identifier}}',
@@ -1802,6 +1813,8 @@ export const ukUA: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Ваш пароль занадто короткий. Він має містити щонайменше 8 символів.',
+    form_password_matches_identifier:
+      'Пароль не може збігатися з вашою адресою електронної пошти, номером телефону або іменем користувача. Задля безпеки облікового запису використайте інший пароль.',
     form_password_not_strong_enough: 'Ваш пароль недостатньо надійний.',
     form_password_or_identifier_incorrect:
       'Пароль або адреса електронної пошти невірні. Спробуйте ще раз або використайте інший метод.',

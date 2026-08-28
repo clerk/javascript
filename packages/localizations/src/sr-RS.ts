@@ -100,8 +100,11 @@ export const srRS: LocalizationResource = {
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      discount: undefined,
       downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
@@ -116,6 +119,8 @@ export const srRS: LocalizationResource = {
       },
       pastDueNotice: undefined,
       perMonth: undefined,
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
@@ -126,6 +131,9 @@ export const srRS: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: undefined,
     getStarted: undefined,
     highlightedPlanBadge: undefined,
@@ -137,6 +145,7 @@ export const srRS: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -215,6 +224,7 @@ export const srRS: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1738,6 +1748,7 @@ export const srRS: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Lozinka je netačna.',
     form_password_length_too_short: 'Lozinka je prekratka.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Tvoja lozinka nije dovoljno jaka.',
     form_password_or_identifier_incorrect:
       'Лозинка или адреса е-поште је нетачна. Покушај поново или користи други метод.',

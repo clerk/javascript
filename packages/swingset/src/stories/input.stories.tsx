@@ -11,7 +11,6 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Input',
   source: 'packages/ui/src/mosaic/components/input/input.tsx',
-  styleEngine: 'stylex',
   styles: {
     _variants: {
       size: { sm: {}, md: {}, lg: {} },

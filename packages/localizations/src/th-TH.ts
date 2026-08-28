@@ -103,8 +103,11 @@ export const thTH: LocalizationResource = {
     cannotSubscribeMonthly: 'คุณไม่สามารถสมัครแผนนี้โดยการชำระรายเดือน หากต้องการสมัครแผนนี้ คุณต้องเลือกชำระรายปี',
     cannotSubscribeUnrecoverable: 'คุณไม่สามารถสมัครแผนนี้ได้ การสมัครสมาชิกปัจจุบันของคุณมีราคาแพงกว่าแผนนี้',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'การชำระเงินของคุณสำเร็จ',
       description__subscriptionSuccessful: 'การสมัครสมาชิกใหม่ของคุณพร้อมแล้ว',
+      discount: undefined,
       downgradeNotice:
         'คุณจะยังคงใช้การสมัครสมาชิกปัจจุบันและฟีเจอร์ของมันจนจบรอบบิล จากนั้นคุณจะถูกเปลี่ยนไปใช้การสมัครสมาชิกนี้',
       emailForm: {
@@ -120,6 +123,8 @@ export const thTH: LocalizationResource = {
       },
       pastDueNotice: 'การสมัครสมาชิกก่อนหน้าของคุณเกินกำหนดและไม่มีการชำระเงิน',
       perMonth: 'ต่อเดือน',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'ชำระเงิน',
       title__paymentSuccessful: 'ชำระเงินสำเร็จ!',
       title__subscriptionSuccessful: 'สำเร็จ!',
@@ -130,6 +135,9 @@ export const thTH: LocalizationResource = {
     credit: 'เครดิต',
     creditRemainder: 'เครดิตสำหรับส่วนที่เหลือของการสมัครสมาชิกปัจจุบันของคุณ',
     defaultFreePlanActive: 'คุณกำลังใช้แผนฟรีอยู่',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'ฟรี',
     getStarted: 'เริ่มต้นใช้งาน',
     highlightedPlanBadge: 'ยอดนิยม',
@@ -141,6 +149,7 @@ export const thTH: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'รายเดือน',
+    months: undefined,
     pastDue: 'เกินกำหนด',
     pay: 'ชำระ {{amount}}',
     payerCreditRemainder: undefined,
@@ -219,6 +228,7 @@ export const thTH: LocalizationResource = {
     year: 'ปี',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1738,6 +1748,7 @@ export const thTH: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'รหัสผ่านของคุณสั้นเกินไป ต้องมีความยาวอย่างน้อย 8 ตัวอักษร',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'รหัสผ่านของคุณไม่แข็งแกร่งพอ',
     form_password_or_identifier_incorrect: 'รหัสผ่านหรือที่อยู่อีเมลไม่ถูกต้อง ลองอีกครั้งหรือใช้วิธีอื่น',
     form_password_pwned:

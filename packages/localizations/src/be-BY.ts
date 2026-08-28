@@ -100,8 +100,11 @@ export const beBY: LocalizationResource = {
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      discount: undefined,
       downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
@@ -116,6 +119,8 @@ export const beBY: LocalizationResource = {
       },
       pastDueNotice: undefined,
       perMonth: undefined,
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
@@ -126,6 +131,9 @@ export const beBY: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: undefined,
     getStarted: undefined,
     highlightedPlanBadge: undefined,
@@ -137,6 +145,7 @@ export const beBY: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -215,6 +224,7 @@ export const beBY: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1747,6 +1757,7 @@ export const beBY: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Невірны пароль.',
     form_password_length_too_short: 'Пароль занадта кароткі.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Ваш пароль недастаткова надзейны.',
     form_password_or_identifier_incorrect:
       'Пароль або адрас электроннай пошты няправільны. Паспрабуйце яшчэ раз або выкарыстоўвайце іншы метад.',

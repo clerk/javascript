@@ -106,8 +106,11 @@ export const huHU: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Nem tudsz előfizetni erre a csomagra. A jelenlegi előfizetésed drágább, mint ez a csomag.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'A fizetés sikeres volt.',
       description__subscriptionSuccessful: 'Az új előfizetésed beállítva.',
+      discount: undefined,
       downgradeNotice:
         'A jelenlegi előfizetésed és funkciói a számlázási ciklus végéig megmaradnak, ezután átváltunk erre az előfizetésre.',
       emailForm: {
@@ -123,6 +126,8 @@ export const huHU: LocalizationResource = {
       },
       pastDueNotice: 'Az előző előfizetésed lejárt, fizetés nélkül.',
       perMonth: 'havonta',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pénztár',
       title__paymentSuccessful: 'Sikeres fizetés!',
       title__subscriptionSuccessful: 'Sikeres!',
@@ -133,6 +138,9 @@ export const huHU: LocalizationResource = {
     credit: 'Jóváírás',
     creditRemainder: 'Jóváírás a jelenlegi előfizetésed hátralévő idejére.',
     defaultFreePlanActive: 'Jelenleg az Ingyenes csomagot használod',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Ingyenes',
     getStarted: 'Kezdés',
     highlightedPlanBadge: 'Népszerű',
@@ -144,6 +152,7 @@ export const huHU: LocalizationResource = {
     monthAbbreviation: 'hó',
     monthPerUnit: 'Hónap / {{unitName}}',
     monthly: 'Havi',
+    months: undefined,
     pastDue: 'Lejárt',
     pay: '{{amount}} fizetése',
     payerCreditRemainder: 'Jóváírás a fiók egyenlegből.',
@@ -222,6 +231,7 @@ export const huHU: LocalizationResource = {
     year: 'Év',
     yearAbbreviation: 'év',
     yearPerUnit: 'Év / {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1764,6 +1774,7 @@ export const huHU: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'A jelszavad túl rövid. Legalább 8 karakter hosszúnak kell lennie.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',
     form_password_or_identifier_incorrect:
       'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',

@@ -1,15 +1,17 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
+import { Popover } from '../popover';
 import { Dialog } from './index';
 
 afterEach(() => cleanup());
 
-// Headless parts no longer emit `data-cl-slot` — slot identity is applied by the styled
-// (mosaic) layer. Tests locate the surface-only parts (backdrop, viewport, trigger) via
-// `data-testid` and everything else via its accessible role or text.
+// Headless parts carry no slot identity — that is applied by the styled (mosaic) layer.
+// Tests locate the surface-only parts (backdrop, viewport, trigger) via `data-testid` and
+// everything else via its accessible role or text.
 function renderDialog(props: Partial<React.ComponentProps<typeof Dialog.Root>> = {}) {
   return render(
     <Dialog.Root {...props}>
@@ -61,7 +63,7 @@ describe('Dialog', () => {
       expect(trigger).toHaveAttribute('data-closed', '');
     });
 
-    it('calls onOpenChange when toggled', async () => {
+    it('calls onOpenChange with details naming the trigger', async () => {
       const onOpenChange = vi.fn();
       const user = userEvent.setup();
       renderDialog({ onOpenChange });
@@ -69,7 +71,20 @@ describe('Dialog', () => {
       const trigger = screen.getByRole('button', { name: 'Open dialog' });
       await user.click(trigger);
 
-      expect(onOpenChange).toHaveBeenCalledWith(true);
+      expect(onOpenChange).toHaveBeenCalledWith(
+        true,
+        expect.objectContaining({ trigger, triggerId: expect.any(String) }),
+      );
+    });
+
+    it('calls onOpenChange with a null trigger on dismissal', async () => {
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true, onOpenChange });
+
+      await user.keyboard('{Escape}');
+
+      expect(onOpenChange).toHaveBeenCalledWith(false, expect.objectContaining({ trigger: null, triggerId: null }));
     });
   });
 
@@ -271,6 +286,66 @@ describe('Dialog', () => {
     });
   });
 
+  describe('closedBy', () => {
+    // The viewport is the element outside the popup that a light dismiss lands on.
+    const pressOutside = async (user: ReturnType<typeof userEvent.setup>) =>
+      user.click(screen.getByTestId('dialog-viewport'));
+
+    it('defaults to dismissing on both Escape and outside press', async () => {
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true });
+
+      await pressOutside(user);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await user.keyboard('{Escape}');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closerequest dismisses on Escape but not outside press', async () => {
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true, closedBy: 'closerequest' });
+
+      await pressOutside(user);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('none dismisses on neither', async () => {
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true, closedBy: 'none' });
+
+      await pressOutside(user);
+      await user.keyboard('{Escape}');
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('leaves the Close button working regardless of closedBy', async () => {
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true, closedBy: 'none' });
+
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('leaves controlled open authoritative regardless of closedBy', async () => {
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      renderDialog({ open: true, closedBy: 'none', onOpenChange });
+
+      await pressOutside(user);
+      await user.keyboard('{Escape}');
+
+      expect(onOpenChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
+
   describe('focus management', () => {
     it('moves focus into dialog on open', async () => {
       const user = userEvent.setup();
@@ -305,6 +380,601 @@ describe('Dialog', () => {
       await user.click(screen.getByRole('button', { name: 'Close' }));
 
       expect(document.activeElement).toBe(trigger);
+    });
+  });
+
+  describe('detached triggers (createHandle)', () => {
+    it('opens a root from a trigger rendered outside it', async () => {
+      const user = userEvent.setup();
+      const handle = Dialog.createHandle();
+      render(
+        <>
+          <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
+          <Dialog.Root handle={handle}>
+            <Dialog.Popup>
+              <Dialog.Title>Detached</Dialog.Title>
+              <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Open detached' });
+      expect(trigger).toHaveAttribute('data-closed', '');
+
+      await user.click(trigger);
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      // Queried by text: the open modal marks everything outside itself inert.
+      expect(screen.getByText('Open detached')).toHaveAttribute('data-open', '');
+    });
+
+    it('returns focus to the detached trigger on Escape', async () => {
+      const user = userEvent.setup();
+      const handle = Dialog.createHandle();
+      render(
+        <>
+          <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
+          <Dialog.Root handle={handle}>
+            <Dialog.Popup>
+              <Dialog.Title>Detached</Dialog.Title>
+              <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Open detached' });
+      await user.click(trigger);
+      await user.keyboard('{Escape}');
+
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it('supports imperative open and close, ignored while no root is attached', () => {
+      const handle = Dialog.createHandle();
+
+      // No root mounted: ignored, no crash.
+      handle.open();
+      expect(handle.isOpen).toBe(false);
+
+      render(
+        <Dialog.Root handle={handle}>
+          <Dialog.Popup>
+            <Dialog.Title>Imperative</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Root>,
+      );
+
+      act(() => handle.open());
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(handle.isOpen).toBe(true);
+
+      act(() => handle.close());
+      expect(handle.isOpen).toBe(false);
+    });
+  });
+
+  describe('multiple triggers and payload', () => {
+    function renderMultiTrigger(rootProps: Partial<React.ComponentProps<typeof Dialog.Root<string>>> = {}) {
+      const handle = Dialog.createHandle<string>();
+      render(
+        <>
+          <Dialog.Trigger
+            handle={handle}
+            id='trigger-a'
+            payload='payload-a'
+          >
+            Open A
+          </Dialog.Trigger>
+          <Dialog.Trigger
+            handle={handle}
+            id='trigger-b'
+            payload='payload-b'
+          >
+            Open B
+          </Dialog.Trigger>
+          <Dialog.Root
+            handle={handle}
+            {...rootProps}
+          >
+            {({ payload }) => (
+              <Dialog.Popup>
+                <Dialog.Title>{payload ?? 'no payload'}</Dialog.Title>
+                <Dialog.Close>Close</Dialog.Close>
+              </Dialog.Popup>
+            )}
+          </Dialog.Root>
+        </>,
+      );
+      return handle;
+    }
+
+    it('renders per-trigger content from the payload', async () => {
+      const user = userEvent.setup();
+      renderMultiTrigger();
+
+      await user.click(screen.getByRole('button', { name: 'Open A' }));
+      expect(screen.getByRole('dialog', { name: 'payload-a' })).toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      await user.click(screen.getByRole('button', { name: 'Open B' }));
+      expect(screen.getByRole('dialog', { name: 'payload-b' })).toBeInTheDocument();
+    });
+
+    it('attributes the open to the activated trigger only', async () => {
+      const user = userEvent.setup();
+      renderMultiTrigger();
+
+      await user.click(screen.getByRole('button', { name: 'Open A' }));
+
+      // Queried by text: the open modal marks everything outside itself inert.
+      expect(screen.getByText('Open A')).toHaveAttribute('data-open', '');
+      expect(screen.getByText('Open B')).toHaveAttribute('data-closed', '');
+    });
+
+    it('reports the activated trigger id through onOpenChange details', async () => {
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      renderMultiTrigger({ onOpenChange });
+
+      await user.click(screen.getByRole('button', { name: 'Open B' }));
+
+      expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ triggerId: 'trigger-b' }));
+    });
+
+    it('resolves the payload from a controlled triggerId on programmatic open', () => {
+      renderMultiTrigger({ open: true, triggerId: 'trigger-b' });
+
+      expect(screen.getByRole('dialog', { name: 'payload-b' })).toBeInTheDocument();
+    });
+
+    // The programmatic counterpart of a trigger's payload, for an open that no element initiated —
+    // a confirmation raised by a close request, say, which has to say what it is asking.
+    describe('handle.open(payload)', () => {
+      function renderDetached() {
+        const handle = Dialog.createHandle<string>();
+        render(
+          <Dialog.Root handle={handle}>
+            {({ payload }) => (
+              <>
+                <Dialog.Trigger id='trigger-a'>Open A</Dialog.Trigger>
+                <Dialog.Trigger
+                  id='trigger-b'
+                  payload='from-trigger-b'
+                >
+                  Open B
+                </Dialog.Trigger>
+                <Dialog.Portal>
+                  <Dialog.Viewport>
+                    <Dialog.Popup>
+                      <Dialog.Title>{payload ?? 'no payload'}</Dialog.Title>
+                    </Dialog.Popup>
+                  </Dialog.Viewport>
+                </Dialog.Portal>
+              </>
+            )}
+          </Dialog.Root>,
+        );
+        return handle;
+      }
+
+      it('delivers it to the children render function', () => {
+        const handle = renderDetached();
+
+        act(() => handle.open('from-handle'));
+
+        expect(screen.getByRole('dialog', { name: 'from-handle' })).toBeInTheDocument();
+      });
+
+      it('survives the registry lookup that runs once the dialog is open', async () => {
+        const handle = renderDetached();
+
+        act(() => handle.open('from-handle'));
+        // The lookup effect re-runs on `open`; without a fallback it would resolve to `undefined`
+        // a commit later and blank the dialog.
+        await act(async () => {
+          await Promise.resolve();
+        });
+
+        expect(screen.getByRole('dialog', { name: 'from-handle' })).toBeInTheDocument();
+      });
+
+      it('is superseded by a trigger, which names its own payload', async () => {
+        const user = userEvent.setup();
+        const handle = renderDetached();
+
+        act(() => handle.open('from-handle'));
+        act(() => handle.close());
+        await user.click(screen.getByRole('button', { name: 'Open A' }));
+
+        expect(screen.getByRole('dialog', { name: 'no payload' })).toBeInTheDocument();
+      });
+
+      it('supersedes the trigger that opened the dialog last', async () => {
+        const user = userEvent.setup();
+        const handle = renderDetached();
+
+        // `activeTriggerId` is never reset on close, so without an explicit precedence the
+        // registry lookup would hand this open the previous trigger's payload back.
+        await user.click(screen.getByRole('button', { name: 'Open B' }));
+        act(() => handle.close());
+        act(() => handle.open('from-handle'));
+        await act(async () => {
+          await Promise.resolve();
+        });
+
+        expect(screen.getByRole('dialog', { name: 'from-handle' })).toBeInTheDocument();
+      });
+
+      it('survives a `handle.close()` for the length of the exit transition', () => {
+        // Keep an animation pending so the popup stays mounted after the close.
+        const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+        (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [
+          { finished: new Promise<void>(() => {}) },
+        ];
+        try {
+          const handle = renderDetached();
+
+          act(() => handle.open('from-handle'));
+          act(() => handle.close());
+
+          // `close()` carries no payload; blanking it here would render the dialog empty on its
+          // way out, or throw in a children function that dereferences it.
+          expect(screen.getByRole('dialog', { name: 'from-handle' })).toBeInTheDocument();
+        } finally {
+          if (original) {
+            (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+          } else {
+            delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+          }
+        }
+      });
+    });
+  });
+
+  describe('initialFocus', () => {
+    type InitialFocus = React.ComponentProps<typeof Dialog.Popup>['initialFocus'];
+
+    function InitialFocusFixture({
+      initialFocus,
+      useInputRef,
+    }: {
+      initialFocus?: InitialFocus;
+      useInputRef?: boolean;
+    }) {
+      const inputRef = React.useRef<HTMLInputElement | null>(null);
+      return (
+        <Dialog.Root>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Popup initialFocus={useInputRef ? inputRef : initialFocus}>
+            <Dialog.Title>Title</Dialog.Title>
+            <button type='button'>First</button>
+            <input
+              ref={inputRef}
+              aria-label='Name'
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      );
+    }
+
+    const settleFocus = () => new Promise(r => requestAnimationFrame(r));
+
+    it('focuses a ref target instead of the first tabbable', async () => {
+      const user = userEvent.setup();
+      render(<InitialFocusFixture useInputRef />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await settleFocus();
+
+      expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Name' }));
+    });
+
+    it('does not move focus when false', async () => {
+      const user = userEvent.setup();
+      render(<InitialFocusFixture initialFocus={false} />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await settleFocus();
+
+      expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(false);
+    });
+
+    it('passes the interaction type to a function form', async () => {
+      const user = userEvent.setup();
+      const initialFocus = vi.fn(() => undefined);
+      render(<InitialFocusFixture initialFocus={initialFocus} />);
+
+      const trigger = screen.getByRole('button', { name: 'Open dialog' });
+      trigger.focus();
+      await user.keyboard('{Enter}');
+      await settleFocus();
+
+      expect(initialFocus).toHaveBeenCalledWith('keyboard');
+    });
+  });
+
+  describe('finalFocus', () => {
+    type FinalFocus = React.ComponentProps<typeof Dialog.Popup>['finalFocus'];
+
+    function FinalFocusFixture({ finalFocus, useTargetRef }: { finalFocus?: FinalFocus; useTargetRef?: boolean }) {
+      const targetRef = React.useRef<HTMLButtonElement | null>(null);
+      return (
+        <>
+          <button
+            type='button'
+            ref={targetRef}
+          >
+            Elsewhere
+          </button>
+          <Dialog.Root>
+            <Dialog.Trigger>Open dialog</Dialog.Trigger>
+            <Dialog.Popup finalFocus={useTargetRef ? targetRef : finalFocus}>
+              <Dialog.Title>Title</Dialog.Title>
+              <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </>
+      );
+    }
+
+    it('restores focus to a ref target on close', async () => {
+      const user = userEvent.setup();
+      render(<FinalFocusFixture useTargetRef />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await user.keyboard('{Escape}');
+
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Elsewhere' }));
+    });
+
+    it('resolves a function form with the close interaction type', async () => {
+      const user = userEvent.setup();
+      const finalFocus = vi.fn(() => undefined);
+      render(<FinalFocusFixture finalFocus={finalFocus} />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await user.keyboard('{Escape}');
+
+      expect(finalFocus).toHaveBeenCalledWith('keyboard');
+      // Default behaviour on `undefined`: back to the trigger.
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open dialog' }));
+    });
+
+    it('resolves the function form with the forwarded interaction type on Close press', async () => {
+      const user = userEvent.setup();
+      const finalFocus = vi.fn(() => undefined);
+      render(<FinalFocusFixture finalFocus={finalFocus} />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+
+      expect(finalFocus).toHaveBeenCalledWith('mouse');
+      // A Close press is not a dismissal, so the default still returns focus to the trigger.
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open dialog' }));
+    });
+
+    it('resolves the function form with an empty type on programmatic close', () => {
+      const handle = Dialog.createHandle();
+      const finalFocus = vi.fn(() => undefined);
+      render(
+        <Dialog.Root
+          handle={handle}
+          defaultOpen
+        >
+          <Dialog.Popup finalFocus={finalFocus}>
+            <Dialog.Title>Title</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Root>,
+      );
+
+      act(() => handle.close());
+
+      expect(finalFocus).toHaveBeenCalledWith('');
+    });
+  });
+
+  describe('role', () => {
+    it('renders role=alertdialog when asked', () => {
+      renderDialog({ defaultOpen: true, role: 'alertdialog' });
+
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('stacking', () => {
+    // Two dialogs, the inner one rendered inside the outer's popup. `outer`/`inner` prefixes on
+    // the test ids because both levels render the same parts.
+    function renderStack({ outerOpen = true, innerOpen = true }: { outerOpen?: boolean; innerOpen?: boolean } = {}) {
+      return render(
+        <Dialog.Root open={outerOpen}>
+          <Dialog.Backdrop data-testid='outer-backdrop' />
+          <Dialog.Viewport>
+            <Dialog.Popup data-testid='outer-popup'>
+              <Dialog.Title>Outer</Dialog.Title>
+              <Dialog.Root open={innerOpen}>
+                <Dialog.Backdrop data-testid='inner-backdrop' />
+                <Dialog.Viewport>
+                  <Dialog.Popup data-testid='inner-popup'>
+                    <Dialog.Title>Inner</Dialog.Title>
+                  </Dialog.Popup>
+                </Dialog.Viewport>
+              </Dialog.Root>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Root>,
+      );
+    }
+
+    it('marks the dialog on top stacked and the one beneath a stack base', () => {
+      renderStack();
+
+      expect(screen.getByTestId('inner-popup')).toHaveAttribute('data-stacked', '');
+      expect(screen.getByTestId('inner-popup')).not.toHaveAttribute('data-stack-base');
+      expect(screen.getByTestId('outer-popup')).toHaveAttribute('data-stack-base', '');
+      expect(screen.getByTestId('outer-popup')).not.toHaveAttribute('data-stacked');
+    });
+
+    it('marks the stacked backdrop, so only one scrim in the stack paints', () => {
+      renderStack();
+
+      expect(screen.getByTestId('inner-backdrop')).toHaveAttribute('data-stacked', '');
+      expect(screen.getByTestId('outer-backdrop')).not.toHaveAttribute('data-stacked');
+    });
+
+    it('drops the stack base marking when the dialog on top closes', () => {
+      const { rerender } = renderStack();
+      expect(screen.getByTestId('outer-popup')).toHaveAttribute('data-stack-base', '');
+
+      rerender(
+        <Dialog.Root open>
+          <Dialog.Viewport>
+            <Dialog.Popup data-testid='outer-popup'>
+              <Dialog.Title>Outer</Dialog.Title>
+              <Dialog.Root open={false}>
+                <Dialog.Viewport>
+                  <Dialog.Popup data-testid='inner-popup'>
+                    <Dialog.Title>Inner</Dialog.Title>
+                  </Dialog.Popup>
+                </Dialog.Viewport>
+              </Dialog.Root>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Root>,
+      );
+
+      expect(screen.getByTestId('outer-popup')).not.toHaveAttribute('data-stack-base');
+    });
+
+    it('stays stacked while the dialog beneath is exiting', () => {
+      // Keep an animation pending so the one beneath stays mounted for its exit instead of
+      // unmounting in the same commit.
+      const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [
+        { finished: new Promise<void>(() => {}) },
+      ];
+      try {
+        const { rerender } = renderStack();
+
+        // The one beneath closes first. Its backdrop is still on screen for the length of the
+        // exit, so the one on top has to keep suppressing its own scrim rather than paint a
+        // second one over the fading original.
+        rerender(
+          <Dialog.Root open={false}>
+            <Dialog.Backdrop data-testid='outer-backdrop' />
+            <Dialog.Viewport>
+              <Dialog.Popup data-testid='outer-popup'>
+                <Dialog.Title>Outer</Dialog.Title>
+                <Dialog.Root open>
+                  <Dialog.Backdrop data-testid='inner-backdrop' />
+                  <Dialog.Viewport>
+                    <Dialog.Popup data-testid='inner-popup'>
+                      <Dialog.Title>Inner</Dialog.Title>
+                    </Dialog.Popup>
+                  </Dialog.Viewport>
+                </Dialog.Root>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Root>,
+        );
+
+        expect(screen.getByTestId('outer-backdrop')).toBeInTheDocument();
+        expect(screen.getByTestId('inner-backdrop')).toHaveAttribute('data-stacked', '');
+      } finally {
+        if (original) {
+          (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+        } else {
+          delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+        }
+      }
+    });
+
+    it('is not stacked on a dialog that is closed', () => {
+      // A confirmation root mounted beside its dialog's portal is inside the root but outlives
+      // the open state; on its own it owns the scrim like any root-level dialog.
+      render(
+        <Dialog.Root open={false}>
+          <Dialog.Root open>
+            <Dialog.Backdrop data-testid='inner-backdrop' />
+            <Dialog.Viewport>
+              <Dialog.Popup data-testid='inner-popup'>
+                <Dialog.Title>Inner</Dialog.Title>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Root>
+        </Dialog.Root>,
+      );
+
+      expect(screen.getByTestId('inner-popup')).not.toHaveAttribute('data-stacked');
+      expect(screen.getByTestId('inner-backdrop')).not.toHaveAttribute('data-stacked');
+    });
+
+    it('marks the middle of a three-deep stack as both', () => {
+      render(
+        <Dialog.Root open>
+          <Dialog.Viewport>
+            <Dialog.Popup data-testid='bottom-popup'>
+              <Dialog.Title>Bottom</Dialog.Title>
+              <Dialog.Root open>
+                <Dialog.Viewport>
+                  <Dialog.Popup data-testid='middle-popup'>
+                    <Dialog.Title>Middle</Dialog.Title>
+                    <Dialog.Root open>
+                      <Dialog.Viewport>
+                        <Dialog.Popup data-testid='top-popup'>
+                          <Dialog.Title>Top</Dialog.Title>
+                        </Dialog.Popup>
+                      </Dialog.Viewport>
+                    </Dialog.Root>
+                  </Dialog.Popup>
+                </Dialog.Viewport>
+              </Dialog.Root>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Root>,
+      );
+
+      const middle = screen.getByTestId('middle-popup');
+      expect(middle).toHaveAttribute('data-stacked', '');
+      expect(middle).toHaveAttribute('data-stack-base', '');
+      expect(screen.getByTestId('bottom-popup')).not.toHaveAttribute('data-stacked');
+      expect(screen.getByTestId('top-popup')).not.toHaveAttribute('data-stack-base');
+    });
+
+    it('does not treat a floating but non-dialog ancestor as a stack', async () => {
+      // The distinction `data-nested` cannot make: a dialog opened from a popover has a floating
+      // ancestor, but it sits on the bare page and still owns its scrim.
+      const user = userEvent.setup();
+      render(
+        <Popover.Root>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Positioner>
+              <Popover.Popup>
+                <Dialog.Root>
+                  <Dialog.Trigger>Open dialog</Dialog.Trigger>
+                  <Dialog.Backdrop data-testid='dialog-backdrop' />
+                  <Dialog.Viewport>
+                    <Dialog.Popup data-testid='dialog-popup'>
+                      <Dialog.Title>Dialog in a popover</Dialog.Title>
+                    </Dialog.Popup>
+                  </Dialog.Viewport>
+                </Dialog.Root>
+              </Popover.Popup>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+
+      const popup = screen.getByTestId('dialog-popup');
+      expect(popup).toHaveAttribute('data-nested', '');
+      expect(popup).not.toHaveAttribute('data-stacked');
+      expect(screen.getByTestId('dialog-backdrop')).not.toHaveAttribute('data-stacked');
     });
   });
 

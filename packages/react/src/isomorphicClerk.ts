@@ -46,8 +46,10 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PricingTableProps,
+  ProtectAssertion,
   RedirectOptions,
   Resources,
+  ResumeAfterProtectCheckParams,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -300,6 +302,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.__internal_moduleManager;
   }
 
+  public get __internal_protectChallengeLoadTimeoutMs(): number | undefined {
+    return this.clerkjs?.__internal_protectChallengeLoadTimeoutMs;
+  }
+
   constructor(options: IsomorphicClerkOptions) {
     this.#publishableKey = options?.publishableKey;
     this.#proxyUrl = options?.proxyUrl;
@@ -390,6 +396,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
     return false;
   }
+
+  setProtectAssertion = (assertion?: ProtectAssertion): void => {
+    const callback = () => this.clerkjs?.setProtectAssertion(assertion);
+    if (this.clerkjs && this.loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('setProtectAssertion', callback);
+    }
+  };
 
   buildSignInUrl = (opts?: RedirectOptions): string | void => {
     const callback = () => this.clerkjs?.buildSignInUrl(opts) || '';
@@ -1582,6 +1597,24 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       });
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
+    }
+  };
+
+  __internal_resumeAfterProtectCheck = async (
+    params?: ResumeAfterProtectCheckParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<void> => {
+    const callback = () => {
+      const clerkjs = this.clerkjs;
+      if (typeof clerkjs?.__internal_resumeAfterProtectCheck !== 'function') {
+        return;
+      }
+      void clerkjs.__internal_resumeAfterProtectCheck(params, customNavigate)?.catch(() => {});
+    };
+    if (this.clerkjs && this.loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('__internal_resumeAfterProtectCheck', callback);
     }
   };
 

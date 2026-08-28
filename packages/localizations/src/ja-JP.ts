@@ -106,8 +106,11 @@ export const jaJP: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'このプランを契約することはできません。現在のサブスクリプションの方がこのプランより高額です。',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: '支払いが完了しました。',
       description__subscriptionSuccessful: '新しいサブスクリプションの設定が完了しました。',
+      discount: undefined,
       downgradeNotice:
         '現在の請求期間が終了するまでは既存のサブスクリプションとその機能を利用でき、その後このサブスクリプションに切り替わります。',
       emailForm: {
@@ -123,6 +126,8 @@ export const jaJP: LocalizationResource = {
       },
       pastDueNotice: '前回のサブスクリプションには未払い分が残っています。',
       perMonth: '月あたり',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'チェックアウト',
       title__paymentSuccessful: '支払いが完了しました！',
       title__subscriptionSuccessful: '成功しました！',
@@ -133,6 +138,9 @@ export const jaJP: LocalizationResource = {
     credit: 'クレジット',
     creditRemainder: '現在のサブスクリプションの残り期間に対するクレジット。',
     defaultFreePlanActive: '現在は無料プランをご利用中です',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '無料',
     getStarted: 'はじめる',
     highlightedPlanBadge: '人気',
@@ -144,6 +152,7 @@ export const jaJP: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: '月払い',
+    months: undefined,
     pastDue: '支払い遅延',
     pay: '{{amount}}を支払う',
     payerCreditRemainder: 'アカウント残高からのクレジット。',
@@ -222,6 +231,7 @@ export const jaJP: LocalizationResource = {
     year: '年',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1759,6 +1769,7 @@ export const jaJP: LocalizationResource = {
       'このパスワードは侵害された可能性があります。アカウントを保護するため、別のサインイン方法を使用してください。サインイン後にパスワードのリセットが必要になります。',
     form_password_incorrect: '入力されたパスワードが正しくありません。もう一度お試しください。',
     form_password_length_too_short: 'パスワードが短すぎます。8文字以上である必要があります。',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_or_identifier_incorrect:
       'パスワードまたはメールアドレスが正しくありません。もう一度お試しいただくか、別の方法をご利用ください。',

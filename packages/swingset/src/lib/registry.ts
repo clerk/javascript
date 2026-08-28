@@ -1,8 +1,14 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import {
+  Default as AlertDialogDefault,
+  DiscardChanges as AlertDialogDiscardChanges,
+  meta as alertDialogComponentMeta,
+} from '../stories/alert-dialog.component.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
+  Interactive as AvatarInteractive,
   meta as avatarMeta,
   Primary as AvatarPrimary,
   Shapes as AvatarShapes,
@@ -14,17 +20,25 @@ import {
   Primary as BadgePrimary,
   WithIcon as BadgeWithIcon,
 } from '../stories/badge.stories';
-import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import {
-  Centered as CardCentered,
-  Default as CardDefault,
-  meta as cardComponentMeta,
-} from '../stories/card.component.stories';
+  Announced as BannerAnnounced,
+  Colors as BannerColors,
+  Default as BannerDefault,
+  LabelOnly as BannerLabelOnly,
+  meta as bannerMeta,
+} from '../stories/banner.stories';
+import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
-import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
+import {
+  Default as DestructiveDefault,
+  meta as destructiveMeta,
+  WithError as DestructiveWithError,
+} from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
+import { Default as FieldDefault, meta as fieldMeta } from '../stories/field.component.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Colors as HeadingColors,
@@ -56,37 +70,13 @@ import {
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
-  Default as OrganizationProfileDefault,
-  meta as organizationProfileMeta,
-} from '../stories/organization-profile.stories';
-import {
-  Default as OrganizationProfileApiKeysPanelDefault,
-  meta as organizationProfileApiKeysPanelMeta,
-} from '../stories/organization-profile-api-keys-panel.stories';
-import {
-  Default as OrganizationProfileDeleteSectionDefault,
-  meta as organizationProfileDeleteSectionMeta,
-} from '../stories/organization-profile-delete-section.stories';
-import {
-  Default as OrganizationProfileDomainsSectionDefault,
-  meta as organizationProfileDomainsSectionMeta,
-} from '../stories/organization-profile-domains-section.stories';
-import {
-  Default as OrganizationProfileGeneralPanelDefault,
-  meta as organizationProfileGeneralPanelMeta,
-} from '../stories/organization-profile-general-panel.stories';
-import {
-  Default as OrganizationProfileLeaveSectionDefault,
-  meta as organizationProfileLeaveSectionMeta,
-} from '../stories/organization-profile-leave-section.stories';
-import {
-  Default as OrganizationProfileMembersPanelDefault,
-  meta as organizationProfileMembersPanelMeta,
-} from '../stories/organization-profile-members-panel.stories';
-import {
-  Default as OrganizationProfileProfileSectionDefault,
-  meta as organizationProfileProfileSectionMeta,
-} from '../stories/organization-profile-profile-section.stories';
+  Default as OtpComponentDefault,
+  Disabled as OtpComponentDisabled,
+  Error as OtpComponentError,
+  meta as otpComponentMeta,
+  Sizes as OtpComponentSizes,
+  Success as OtpComponentSuccess,
+} from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -104,8 +94,14 @@ import {
   ShadowIndicators as ScrollAreaShadowIndicators,
   ThemedScrollbar as ScrollAreaThemedScrollbar,
 } from '../stories/scroll-area.stories';
+import {
+  ConnectedAccounts as SectionConnectedAccounts,
+  Default as SectionDefault,
+  Destructive as SectionDestructive,
+  meta as sectionMeta,
+  MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
+} from '../stories/section.stories';
 import { meta as selectMeta } from '../stories/select.stories';
-import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
   Colors as TextColors,
@@ -115,45 +111,104 @@ import {
 } from '../stories/text.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
+import {
+  Combined as UserButtonCombined,
+  meta as userButtonMeta,
+  Organizations as UserButtonOrganizations,
+  User as UserButtonUser,
+} from '../stories/user-button.stories';
+import { Default as UserPageDefault, meta as userPageMeta } from '../stories/user-page.stories';
+import {
+  Default as UserProfileAccountSectionDefault,
+  meta as userProfileAccountSectionMeta,
+  MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
+} from '../stories/user-profile-account-section.stories';
+import {
+  Default as UserProfileActiveDevicesSectionDefault,
+  meta as userProfileActiveDevicesSectionMeta,
+} from '../stories/user-profile-active-devices-section.stories';
+import {
+  Default as UserProfileApiKeysPanelDefault,
+  Empty as UserProfileApiKeysPanelEmpty,
+  meta as userProfileApiKeysPanelMeta,
+} from '../stories/user-profile-api-keys-panel.stories';
+import {
+  Default as UserProfileBillingHistorySectionDefault,
+  Empty as UserProfileBillingHistorySectionEmpty,
+  meta as userProfileBillingHistorySectionMeta,
+} from '../stories/user-profile-billing-history-section.stories';
+import {
+  Default as UserProfileBillingPanelDefault,
+  meta as userProfileBillingPanelMeta,
+} from '../stories/user-profile-billing-panel.stories';
+import {
+  Default as UserProfileConnectedAccountsSectionDefault,
+  meta as userProfileConnectedAccountsSectionMeta,
+} from '../stories/user-profile-connected-accounts-section.stories';
+import {
+  Default as UserProfileDeleteSectionDefault,
+  meta as userProfileDeleteSectionMeta,
+  WithError as UserProfileDeleteSectionWithError,
+} from '../stories/user-profile-delete-section.stories';
+import {
+  Default as UserProfileMfaSectionDefault,
+  Empty as UserProfileMfaSectionEmpty,
+  meta as userProfileMfaSectionMeta,
+} from '../stories/user-profile-mfa-section.stories';
+import {
+  Default as UserProfilePasskeysSectionDefault,
+  Empty as UserProfilePasskeysSectionEmpty,
+  meta as userProfilePasskeysSectionMeta,
+} from '../stories/user-profile-passkeys-section.stories';
+import {
+  Default as UserProfilePasswordSectionDefault,
+  meta as userProfilePasswordSectionMeta,
+} from '../stories/user-profile-password-section.stories';
+import {
+  Default as UserProfilePaymentMethodsSectionDefault,
+  Empty as UserProfilePaymentMethodsSectionEmpty,
+  meta as userProfilePaymentMethodsSectionMeta,
+} from '../stories/user-profile-payment-methods-section.stories';
+import {
+  Default as UserProfileProfilePanelDefault,
+  meta as userProfileProfilePanelMeta,
+} from '../stories/user-profile-profile-panel.stories';
+import {
+  Default as UserProfileSecurityPanelDefault,
+  meta as userProfileSecurityPanelMeta,
+} from '../stories/user-profile-security-panel.stories';
+import {
+  Default as UserProfileSubscriptionSectionDefault,
+  meta as userProfileSubscriptionSectionMeta,
+} from '../stories/user-profile-subscription-section.stories';
+import {
+  Default as UserProfileWeb3WalletsSectionDefault,
+  meta as userProfileWeb3WalletsSectionMeta,
+} from '../stories/user-profile-web3-wallets-section.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
-const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
-const organizationProfileLeaveSectionModule: StoryModule = {
-  meta: organizationProfileLeaveSectionMeta,
-  Default: OrganizationProfileLeaveSectionDefault,
+const sectionModule: StoryModule = {
+  meta: sectionMeta,
+  Default: SectionDefault,
+  MultipleEmailAndPhoneNumbers: SectionMultipleEmailAndPhoneNumbers,
+  ConnectedAccounts: SectionConnectedAccounts,
+  Destructive: SectionDestructive,
 };
-const organizationProfileDeleteSectionModule: StoryModule = {
-  meta: organizationProfileDeleteSectionMeta,
-  Default: OrganizationProfileDeleteSectionDefault,
-};
-const organizationProfileProfileSectionModule: StoryModule = {
-  meta: organizationProfileProfileSectionMeta,
-  Default: OrganizationProfileProfileSectionDefault,
-};
-const organizationProfileDomainsSectionModule: StoryModule = {
-  meta: organizationProfileDomainsSectionMeta,
-  Default: OrganizationProfileDomainsSectionDefault,
-};
-const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, Default: OrganizationProfileDefault };
-const organizationProfileGeneralPanelModule: StoryModule = {
-  meta: organizationProfileGeneralPanelMeta,
-  Default: OrganizationProfileGeneralPanelDefault,
-};
-const organizationProfileApiKeysPanelModule: StoryModule = {
-  meta: organizationProfileApiKeysPanelMeta,
-  Default: OrganizationProfileApiKeysPanelDefault,
-};
-const organizationProfileMembersPanelModule: StoryModule = {
-  meta: organizationProfileMembersPanelMeta,
-  Default: OrganizationProfileMembersPanelDefault,
+const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+
+const alertDialogComponentModule: StoryModule = {
+  meta: alertDialogComponentMeta,
+  Default: AlertDialogDefault,
+  DiscardChanges: AlertDialogDiscardChanges,
 };
 
-const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
+const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
 
 const avatarModule: StoryModule = {
   meta: avatarMeta,
   Primary: AvatarPrimary,
+  Interactive: AvatarInteractive,
   Fallback: AvatarFallbackStory,
   Sizes: AvatarSizes,
   Shapes: AvatarShapes,
@@ -166,11 +221,17 @@ const badgeModule: StoryModule = {
   WithIcon: BadgeWithIcon,
 };
 
+const bannerModule: StoryModule = {
+  meta: bannerMeta,
+  Default: BannerDefault,
+  Colors: BannerColors,
+  LabelOnly: BannerLabelOnly,
+  Announced: BannerAnnounced,
+};
+
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
-
-const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
 const popoverComponentModule: StoryModule = {
   meta: popoverComponentMeta,
@@ -187,6 +248,13 @@ const itemModule: StoryModule = {
   Scrolling: ItemScrolling,
 };
 
+const userButtonModule: StoryModule = {
+  meta: userButtonMeta,
+  Combined: UserButtonCombined,
+  Organizations: UserButtonOrganizations,
+  User: UserButtonUser,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -196,9 +264,21 @@ const headingModule: StoryModule = {
 
 const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
 
-const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
+const otpComponentModule: StoryModule = {
+  meta: otpComponentMeta,
+  Default: OtpComponentDefault,
+  Sizes: OtpComponentSizes,
+  Success: OtpComponentSuccess,
+  Error: OtpComponentError,
+  Disabled: OtpComponentDisabled,
+};
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
+
+const fieldModule: StoryModule = {
+  meta: fieldMeta,
+  Default: FieldDefault,
+};
 
 const iconModule: StoryModule = {
   meta: iconMeta,
@@ -236,32 +316,127 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const userProfileApiKeysPanelModule: StoryModule = {
+  meta: userProfileApiKeysPanelMeta,
+  Default: UserProfileApiKeysPanelDefault,
+  Empty: UserProfileApiKeysPanelEmpty,
+};
+const userPageModule: StoryModule = {
+  meta: userPageMeta,
+  Default: UserPageDefault,
+};
+
+const userProfileAccountSectionModule: StoryModule = {
+  meta: userProfileAccountSectionMeta,
+  Default: UserProfileAccountSectionDefault,
+  MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
+};
+const userProfileProfilePanelModule: StoryModule = {
+  meta: userProfileProfilePanelMeta,
+  Default: UserProfileProfilePanelDefault,
+};
+const userProfileSecurityPanelModule: StoryModule = {
+  meta: userProfileSecurityPanelMeta,
+  Default: UserProfileSecurityPanelDefault,
+};
+const userProfileBillingPanelModule: StoryModule = {
+  meta: userProfileBillingPanelMeta,
+  Default: UserProfileBillingPanelDefault,
+};
+const userProfileBillingHistorySectionModule: StoryModule = {
+  meta: userProfileBillingHistorySectionMeta,
+  Default: UserProfileBillingHistorySectionDefault,
+  Empty: UserProfileBillingHistorySectionEmpty,
+};
+const userProfilePasswordSectionModule: StoryModule = {
+  meta: userProfilePasswordSectionMeta,
+  Default: UserProfilePasswordSectionDefault,
+};
+const userProfilePasskeysSectionModule: StoryModule = {
+  meta: userProfilePasskeysSectionMeta,
+  Default: UserProfilePasskeysSectionDefault,
+  Empty: UserProfilePasskeysSectionEmpty,
+};
+const userProfileMfaSectionModule: StoryModule = {
+  meta: userProfileMfaSectionMeta,
+  Default: UserProfileMfaSectionDefault,
+  Empty: UserProfileMfaSectionEmpty,
+};
+const userProfileActiveDevicesSectionModule: StoryModule = {
+  meta: userProfileActiveDevicesSectionMeta,
+  Default: UserProfileActiveDevicesSectionDefault,
+};
+const userProfileSubscriptionSectionModule: StoryModule = {
+  meta: userProfileSubscriptionSectionMeta,
+  Default: UserProfileSubscriptionSectionDefault,
+};
+const userProfilePaymentMethodsSectionModule: StoryModule = {
+  meta: userProfilePaymentMethodsSectionMeta,
+  Default: UserProfilePaymentMethodsSectionDefault,
+  Empty: UserProfilePaymentMethodsSectionEmpty,
+};
+const userProfileConnectedAccountsSectionModule: StoryModule = {
+  meta: userProfileConnectedAccountsSectionMeta,
+  Default: UserProfileConnectedAccountsSectionDefault,
+};
+const userProfileWeb3WalletsSectionModule: StoryModule = {
+  meta: userProfileWeb3WalletsSectionMeta,
+  Default: UserProfileWeb3WalletsSectionDefault,
+};
+const userProfileDeleteSectionModule: StoryModule = {
+  meta: userProfileDeleteSectionMeta,
+  Default: UserProfileDeleteSectionDefault,
+  WithError: UserProfileDeleteSectionWithError,
+};
+
+const destructiveModule: StoryModule = {
+  meta: destructiveMeta,
+  Default: DestructiveDefault,
+  WithError: DestructiveWithError,
+};
+
 export const registry: StoryModule[] = [
-  // Organization
-  organizationProfileModule,
-  organizationProfileGeneralPanelModule,
-  organizationProfileApiKeysPanelModule,
-  organizationProfileMembersPanelModule,
-  organizationProfileProfileSectionModule,
-  organizationProfileDomainsSectionModule,
-  organizationProfileLeaveSectionModule,
-  organizationProfileDeleteSectionModule,
-  // Blocks
+  // User Button
+  userButtonModule,
+  // User Profile
+  userPageModule,
+  // User Profile · Panels
+  userProfileProfilePanelModule,
+  userProfileSecurityPanelModule,
+  userProfileBillingPanelModule,
+  userProfileApiKeysPanelModule,
+  // User Profile · Sections
+  userProfileAccountSectionModule,
+  userProfilePasswordSectionModule,
+  userProfilePasskeysSectionModule,
+  userProfileMfaSectionModule,
+  userProfileActiveDevicesSectionModule,
+  userProfileSubscriptionSectionModule,
+  userProfilePaymentMethodsSectionModule,
+  userProfileBillingHistorySectionModule,
+  userProfileConnectedAccountsSectionModule,
+  userProfileWeb3WalletsSectionModule,
+  userProfileDeleteSectionModule,
+  // Blocks — flows assembled from components, wired by the caller's machine.
   destructiveModule,
   // Components
   avatarModule,
   badgeModule,
+  bannerModule,
   buttonModule,
   cardComponentModule,
   inputModule,
   itemModule,
   dialogComponentModule,
+  alertDialogComponentModule,
   headingModule,
   iconModule,
   menuComponentModule,
+  otpComponentModule,
   popoverComponentModule,
-  tabsComponentModule,
+  sectionModule,
   textModule,
+  fieldModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,

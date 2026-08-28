@@ -4,9 +4,7 @@ import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 
-import { E2EControls } from './components/E2EControls';
 import { GoogleSignInButton } from './components/GoogleSignInButton';
-import { JsSignInForm } from './components/JsSignInForm';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -19,7 +17,35 @@ function NativeBuildFixture() {
   const { user } = useUser();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [e2eStatus, setE2eStatus] = useState<string | null>(null);
+
+  if (isProfileOpen) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.embeddedProfile}>
+          <UserProfileView
+            customPages={[
+              {
+                path: 'e2e-custom-page',
+                label: 'E2E Custom Page',
+                icon: 'key',
+                placement: { type: 'after', row: 'security' },
+                content: (
+                  <View
+                    testID='custom-page-content'
+                    style={styles.customPage}
+                  >
+                    <Text style={styles.customPageText}>Rehosted RN body</Text>
+                  </View>
+                ),
+              },
+            ]}
+            isDismissible={false}
+            onHostBack={() => setIsProfileOpen(false)}
+          />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -36,9 +62,6 @@ function NativeBuildFixture() {
         onPress={() => setIsAuthOpen(true)}
       />
       {!isSignedIn && <GoogleSignInButton />}
-      {!isSignedIn && <JsSignInForm onStatus={setE2eStatus} />}
-      {isSignedIn && <E2EControls onStatus={setE2eStatus} />}
-      {e2eStatus && <Text testID='e2e-status'>{e2eStatus}</Text>}
       {isSignedIn && (
         <Button
           testID='open-embedded-profile-button'
@@ -52,15 +75,6 @@ function NativeBuildFixture() {
           title='Sign out'
           onPress={() => void signOut()}
         />
-      )}
-
-      {isProfileOpen && (
-        <View style={styles.embeddedProfile}>
-          <UserProfileView
-            isDismissible={false}
-            onHostBack={() => setIsProfileOpen(false)}
-          />
-        </View>
       )}
 
       <Modal
@@ -119,6 +133,16 @@ const styles = StyleSheet.create({
   },
   customLogoText: {
     color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  customPage: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  customPageText: {
     fontSize: 16,
     fontWeight: '600',
   },

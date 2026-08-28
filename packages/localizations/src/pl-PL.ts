@@ -100,8 +100,11 @@ export const plPL: LocalizationResource = {
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      discount: undefined,
       downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
@@ -116,6 +119,8 @@ export const plPL: LocalizationResource = {
       },
       pastDueNotice: undefined,
       perMonth: undefined,
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
@@ -126,6 +131,9 @@ export const plPL: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: undefined,
     getStarted: undefined,
     highlightedPlanBadge: undefined,
@@ -137,6 +145,7 @@ export const plPL: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -215,6 +224,7 @@ export const plPL: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -1745,6 +1755,7 @@ export const plPL: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Twoje hasło nie jest wystarczająco silne',
     form_password_or_identifier_incorrect:
       'Hasło lub adres e-mail jest nieprawidłowy. Spróbuj ponownie lub użyj innej metody.',

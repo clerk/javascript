@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, radiusVars, scrollbarVars, scrollFadeVars, space } from '../../tokens.stylex';
+import { durationVars, radiusVars, scrollbarVars, scrollFadeVars } from '../../tokens.stylex';
+import { focusOutline } from '../../utils/focus-outline.styles';
 import { scrollAreaVars, scrollbarThumbVars } from './scroll-area.vars.stylex';
 
 // Same-file locals so the `var()` references read as names rather than as a wall of
@@ -63,12 +64,20 @@ const styles = stylex.create({
     minHeight: 0,
   },
 
-  /** The scroll container itself. */
+  /**
+   * The scroll container itself.
+   *
+   * The scroll padding answers the fade: tabbing to a row below the fold would otherwise land it
+   * flush against the edge the mask fades out, on the one row you just moved to. Block axis only,
+   * like everything else here.
+   */
   viewport: {
     overscrollBehavior: 'contain',
     flexBasis: 'auto',
     flexGrow: 1,
     flexShrink: 1,
+    scrollPaddingBlockEnd: fadeSize,
+    scrollPaddingBlockStart: fadeSize,
     minHeight: 0,
     overflowX: 'hidden',
     overflowY: 'auto',
@@ -241,13 +250,6 @@ const styles = stylex.create({
     animationTimeline: 'scroll(self block), scroll(self block)',
     animationTimingFunction: 'linear',
   },
-
-  // Not focusable by default — see the `tabIndex` note on the component. Styled anyway so it
-  // looks right the moment a consumer opts in.
-  focusRing: {
-    outline: { default: null, ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}` },
-    outlineOffset: { default: null, ':focus-visible': space['0.5'] },
-  },
 });
 
 // Gutter only — the scrollbar's own size is a theme token (`--cl-scrollbar-width`), since
@@ -297,7 +299,9 @@ export function scrollAreaViewport(gutter: ScrollAreaGutter = 'auto') {
     styles.scrollbar,
     styles.mask,
     styles.indicators,
-    styles.focusRing,
+    // Not focusable by default — see the `tabIndex` note on the component. Ringed anyway so it
+    // looks right the moment a consumer opts in.
+    focusOutline.visible,
     gutters[gutter],
   ] as const;
 }

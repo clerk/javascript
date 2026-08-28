@@ -26,7 +26,7 @@ test.describe('Custom Flows OAuth @custom', () => {
       publishableKey: instanceKeys.get('oauth-provider').pk,
     });
     const users = createUserService(client);
-    fakeUser = users.createFakeUser({ withUsername: true });
+    fakeUser = users.createFakeUser(test, { withUsername: true });
     await users.createBapiUser(fakeUser);
   });
 
@@ -89,6 +89,10 @@ test.describe('Custom Flows OAuth @custom', () => {
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+
+    const allowAccessButton = u.page.getByRole('button', { name: 'Allow' });
+    await expect(allowAccessButton).toBeVisible();
+    await allowAccessButton.click();
 
     await u.page.waitForAppUrl('/protected');
     await u.po.expect.toBeSignedIn();

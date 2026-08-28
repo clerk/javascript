@@ -1,5 +1,90 @@
 # Change Log
 
+## 6.14.7
+
+### Patch Changes
+
+- Fix an issue where a verification that was still progressing normally could be cancelled and reported to the user as having timed out. ([#9527](https://github.com/clerk/javascript/pull/9527)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Updated dependencies [[`dbaa95a`](https://github.com/clerk/javascript/commit/dbaa95a4e9e2ebd0a6b7fdb266024490a35b7caf)]:
+  - @clerk/shared@4.30.1
+
+## 6.14.6
+
+### Patch Changes
+
+- Fixes an issue where OAuth account transfers that needed additional verification were returned to the beginning of sign-in. ([#9497](https://github.com/clerk/javascript/pull/9497)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+
+## 6.14.5
+
+### Patch Changes
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+
+## 6.14.4
+
+### Patch Changes
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+
+## 6.14.3
+
+### Patch Changes
+
+- Updated dependencies [[`7f5c294`](https://github.com/clerk/javascript/commit/7f5c2947e2b3b2ac9677116ff7eede61a1dab649)]:
+  - @clerk/shared@4.29.1
+
+## 6.14.2
+
+### Patch Changes
+
+- Updated dependencies [[`81840b3`](https://github.com/clerk/javascript/commit/81840b3b28bf89fdd6afcc155a84bc641dcd3b69), [`b7fb564`](https://github.com/clerk/javascript/commit/b7fb56455a657b209c0bb292bf05145e6dcde790), [`44edcc9`](https://github.com/clerk/javascript/commit/44edcc961664e83b8ff7d3c946b880fbb5a7d897)]:
+  - @clerk/shared@4.29.0
+
+## 6.14.1
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/shared@4.28.1
+
+## 6.14.0
+
+### Minor Changes
+
+- Add a way to supply a Clerk Protect assertion from your application, so a token minted by your own backend reaches Protect without your having to set a cookie. ([#9313](https://github.com/clerk/javascript/pull/9313)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  A Protect assertion is a short-lived, signed token you create with the Clerk Backend API, carrying key/value pairs your Protect rules can read. Until now the only way to deliver one was the `__clerk_protect_assertion` cookie, which requires your app and Frontend API to be on the same site — true with a production CNAME setup, but not on development instances.
+
+  Pass the token to Clerk and it is attached to sign-in and sign-up requests instead:
+
+  ```ts
+  // A token you already have.
+  Clerk.load({ protectAssertion: token });
+
+  // Or a function, re-read for each request.
+  Clerk.load({ protectAssertion: () => sessionStorage.getItem('protect_assertion') ?? undefined });
+
+  // Or set it later, once your app has fetched one.
+  clerk.setProtectAssertion(token);
+  ```
+
+  Prefer the function form when a page can outlive the token. Assertions are short-lived by design, so a string captured at load time stops applying once it expires, whereas a function picks up a refreshed one.
+
+  An assertion is an input to rules you author, never a decision on its own, and it applies only from the context you constrained it to when you minted it. Nothing about it can fail a sign-in: a resolver that throws, rejects, or returns anything other than a non-empty string simply results in no assertion being attached, and the request proceeds.
+
+  The cookie continues to work unchanged. If both are present, the value supplied to the SDK wins.
+
+### Patch Changes
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/shared@4.28.0
+
 ## 6.13.1
 
 ### Patch Changes

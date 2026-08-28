@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
@@ -51,7 +50,7 @@ function OrganizationRow({ name }: { name: string }) {
         </Avatar.Root>
       </Item.Media>
       <Item.Content>
-        <Item.Title>{name}</Item.Title>
+        <Item.Label>{name}</Item.Label>
       </Item.Content>
     </Item.Root>
   );
@@ -68,7 +67,7 @@ export function Default() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {accounts.map(({ email, organizations }, index) => (
@@ -100,7 +99,7 @@ export function NotScrollable() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {accounts[0].organizations.map(name => (
@@ -145,7 +144,7 @@ export function Gutter() {
             <div
               {...root}
               className={`${root.className} border-border border`}
-              style={{ height: 140, borderRadius: radiusVars['--cl-radius-inner'] }}
+              style={{ height: 140, borderRadius: radiusVars['--cl-radius-sm'] }}
             >
               <Item.Group {...stylex.props(...scrollAreaViewport(gutter))}>
                 {names.map(name => (
@@ -166,7 +165,7 @@ export function Gutter() {
                       </Avatar.Root>
                     </Item.Media>
                     <Item.Content>
-                      <Item.Title>{name}</Item.Title>
+                      <Item.Label>{name}</Item.Label>
                     </Item.Content>
                     {/* The shift is only legible against something reaching the content's right edge. */}
                     <div className='bg-border h-4 w-8 rounded-full' />
@@ -212,8 +211,11 @@ export function HoverReveal() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      css={{ '--cl-scrollbar-thumb-idle': 'oklch(from var(--cl-scrollbar-thumb) l c h / 0)' }}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+      style={{
+        height: 260,
+        borderRadius: radiusVars['--cl-radius-sm'],
+        '--cl-scrollbar-thumb-idle': 'oklch(from var(--cl-scrollbar-thumb) l c h / 0)',
+      }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {manyRows.map(name => (
@@ -236,29 +238,36 @@ export function ThemedScrollbar() {
   const root = stylex.props(scrollAreaRoot);
 
   return (
-    <div
-      {...root}
-      className={`${root.className} border-border w-full border`}
-      css={{
-        '--cl-scrollbar-width': '14px',
-        '--cl-scrollbar-thumb-inset': '4px',
-        '--cl-duration-base': '0.6s',
-        '--cl-scrollbar-thumb': 'oklch(0.77 0.16 70)',
-        '&:hover': { '--cl-scrollbar-thumb': 'oklch(0.72 0.15 195)' },
-        '--cl-scrollbar-thumb-hover': 'oklch(0.65 0.24 15)',
-        '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
-      }}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
-    >
-      <Item.Group {...stylex.props(...scrollAreaViewport())}>
-        {manyRows.map(name => (
-          <OrganizationRow
-            key={name}
-            name={name}
-          />
-        ))}
-      </Item.Group>
-    </div>
+    <>
+      {/* Both halves of the amber → teal pair live here: an inline base value would outrank the
+          hover rule, since inline styles beat any stylesheet selector. */}
+      <style>{`
+        .demo-themed-scrollbar { --cl-scrollbar-thumb: oklch(0.77 0.16 70); }
+        .demo-themed-scrollbar:hover { --cl-scrollbar-thumb: oklch(0.72 0.15 195); }
+      `}</style>
+      <div
+        {...root}
+        className={`${root.className} demo-themed-scrollbar border-border w-full border`}
+        style={{
+          height: 260,
+          borderRadius: radiusVars['--cl-radius-sm'],
+          '--cl-scrollbar-width': '14px',
+          '--cl-scrollbar-thumb-inset': '4px',
+          '--cl-duration-base': '0.6s',
+          '--cl-scrollbar-thumb-hover': 'oklch(0.65 0.24 15)',
+          '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
+        }}
+      >
+        <Item.Group {...stylex.props(...scrollAreaViewport())}>
+          {manyRows.map(name => (
+            <OrganizationRow
+              key={name}
+              name={name}
+            />
+          ))}
+        </Item.Group>
+      </div>
+    </>
   );
 }
 
@@ -306,7 +315,7 @@ export function ShadowIndicators() {
       <div
         {...root}
         className={`${root.className} demo-scroll-shadows border-border w-full overflow-hidden border`}
-        style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+        style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
       >
         <Item.Group
           {...stylex.props(...scrollAreaViewport())}

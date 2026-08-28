@@ -899,6 +899,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
    */
   seats?: BillingSubscriptionItemSeatsJSON;
   credits?: BillingCreditsJSON;
+  applied_discount?: BillingDiscountRedemptionJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   price_id: string;
@@ -1012,6 +1013,37 @@ export interface BillingProrationDiscountJSON {
   cycle_passed_percent: number;
 }
 
+export interface BillingAppliedDiscountJSON {
+  amount: BillingMoneyAmountJSON;
+  discount_id: string;
+  name: string;
+  effect: 'percentage' | 'fixed_amount';
+  percent_off?: number;
+  amount_off?: BillingMoneyAmountJSON;
+  promo_code?: string;
+  cycles_remaining: number | null;
+  duration_in_cycles?: number | null;
+}
+
+export interface BillingDiscountRedemptionJSON extends ClerkResourceJSON {
+  object: 'commerce_discount_redemption';
+  id: string;
+  subscription_item_id: string;
+  discount_id: string;
+  name: string;
+  source: 'promotion' | 'manual' | 'promo_code';
+  promo_code?: string;
+  effect?: 'percentage' | 'fixed_amount';
+  percent_off?: number;
+  amount_off?: BillingMoneyAmountJSON;
+  amount?: BillingMoneyAmountJSON;
+  cycles_remaining: number | null;
+  cycles_applied: number;
+  status?: 'active' | 'exhausted' | 'removed';
+  redeemed_at: number;
+  redeemed_by: string | null;
+}
+
 /**
  * Discounts applied to the checkout, such as prorated discounts for mid-cycle seat additions.
  *
@@ -1024,6 +1056,10 @@ export interface BillingDiscountsJSON {
    * means you are not charged for the portion of the new seat's cycle that has already elapsed.
    */
   proration: BillingProrationDiscountJSON | null;
+  /**
+   * The catalog discount applied to the transaction. This field is omitted when no catalog discount applies.
+   */
+  discount?: BillingAppliedDiscountJSON;
   /**
    * The total of all discounts applied to the checkout.
    */

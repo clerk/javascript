@@ -1,14 +1,13 @@
 # Styling a component with StyleX
 
-Mosaic styling is migrating off the Emotion slot-recipe engine (`styling.md`)
-onto **StyleX** (`@stylexjs/stylex` 0.19). StyleX is compile-time atomic CSS: the
-style objects become hashed atom classes plus one static stylesheet, with zero
-runtime. This file is the authoring model for the StyleX layer; read it against
-the pilot, `packages/ui/src/mosaic/components/button/`.
+Mosaic is styled with **StyleX** (`@stylexjs/stylex` 0.19). StyleX is
+compile-time atomic CSS: the style objects become hashed atom classes plus one
+static stylesheet, with zero runtime. This file is the authoring model; read it
+against the reference component, `packages/ui/src/mosaic/components/button/`.
 
-The public contract is unchanged from the recipe era — consumers still target
-`--cl-*` vars, the `.cl-<slot>` class, and `data-<axis>` attrs, never StyleX's
-hashed `x…` atoms. What changes is how a component is authored internally.
+Consumers target `--cl-*` vars, the `.cl-<slot>` class, and `data-<axis>` attrs,
+never StyleX's hashed `x…` atoms. That public contract is fixed; everything
+below is how a component is authored internally to produce it.
 
 The guidance below is opinionated and evidence-backed: it codifies patterns
 proven out across a full StyleX component library (tokens, ~100 components,
@@ -18,15 +17,16 @@ conventions to follow by hand, not guarantees the toolchain makes for you.
 
 ## File layout & the `.stylex.ts` convention
 
-| File                              | Holds                                                           |
-| --------------------------------- | --------------------------------------------------------------- |
-| `tokens.stylex.ts`                | `defineVars` / `defineConsts` only (the tokens)                 |
-| `<comp>/<comp>.styles.ts`         | `stylex.create({...})` — this component's atoms                 |
-| `<family>.styles.ts`              | **shared** atoms imported by a whole component family           |
-| `<comp>/<comp>.markers.stylex.ts` | `stylex.defineMarker()` results for scoped ancestor states      |
-| `<comp>/<comp>.tsx`               | component; spreads `stylex.props(...)` via `mergeStyleProps`    |
-| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`) + `mergeStyleProps` |
-| `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                 |
+| File                              | Holds                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------ |
+| `tokens.stylex.ts`                | `defineVars` / `defineConsts` only (the tokens)                                            |
+| `<comp>/<comp>.styles.ts`         | `stylex.create({...})` — this component's atoms                                            |
+| `utils/<family>.styles.ts`        | **shared** atoms composed by many components (`reset`, `focusOutline`, `truncationStyles`) |
+| `utils/`                          | everything shared across components — styles and non-style helpers alike                   |
+| `<comp>/<comp>.markers.stylex.ts` | `stylex.defineMarker()` results for scoped ancestor states                                 |
+| `<comp>/<comp>.tsx`               | component; spreads `stylex.props(...)` via `mergeStyleProps`                               |
+| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`) + `mergeStyleProps`                            |
+| `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                                            |
 
 The `@stylexjs` eslint rules run on `src/mosaic/**`. The `enforce-extension`
 rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
@@ -48,12 +48,15 @@ rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
   `create` inline in the component; we don't.
 - **DON'T** inline `stylex.create` in a `.tsx`. No "it's only a few atoms"
   exception — small components get a `.styles.ts` too.
-- **DO** hoist atoms into a shared `<family>.styles.ts` when several siblings
-  render the same visual surface — e.g. inputs (`TextInput`, `NumberInput`, date
-  fields, `Selector`) sharing one `inputWrapper` / `inputStatusBorder` /
-  `inputStatusFocusWithin` set instead of redefining the border/focus treatment
-  five times. (The shared-surface pattern to reach for when it appears; no shared
-  styles file exists in Mosaic yet.)
+- **DO** hoist atoms into a shared `utils/<family>.styles.ts` when several
+  components render the same visual surface — e.g. inputs (`TextInput`,
+  `NumberInput`, date fields, `Selector`) sharing one `inputWrapper` /
+  `inputStatusBorder` / `inputStatusFocusWithin` set instead of redefining the
+  border/focus treatment five times. Three exist today: `reset.styles.ts`,
+  `typography.styles.ts` and `focus-outline.styles.ts`.
+- **DON'T** put a shared style file under `components/`. That directory holds one
+  subdirectory per component and nothing else, so a loose file there reads as a
+  component that lost its folder.
 - **DON'T** copy a slot's atoms between siblings. A repeated style object is the
   same signal as a repeated conditional: extract the shared concept.
 
@@ -87,6 +90,10 @@ export const colorVars = stylex.defineVars(colorDefaults);
   `--cl-color-primary-hover-12`.
 - **DON'T** mint a per-step derivative token for something a `calc()`/`color-mix()`
   can express from an existing token.
+- **DON'T** give one value two public names. The focus ring's colour is
+  `--cl-color-ring` and nothing else — a `--cl-focus-outline-color` alias beside it
+  would let a consumer override one and not the other, and the ring's appearance
+  would then depend on which they picked.
 - **DO** build a fill that sits _on top of_ an unknown backdrop — a hover or pressed
   wash on a transparent `outline`/`ghost` control — as a **scrim**: an opacity of
   black-on-light / white-on-dark over `transparent`, not a percentage of a gray token.
@@ -319,29 +326,38 @@ device, while touch devices look correct.
 
 Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
 
-- **DO** use `:focus-visible` for focus rings (never bare `:focus`). For a
-  **container** that should ring when a child is focused, use
-  `:has(:focus-visible)` — **not** `:focus-within`. `:focus-within` matches any
-  descendant focus, including a mouse click, so the container ring would flash on
-  click; `:has(:focus-visible)` matches only keyboard-visible focus, so the
-  container ring tracks the same modality as the element's own. `:has(:focus-visible)`
-  is a plain conditional-value key, no special API:
+- **DON'T** write a focus ring by hand. Compose `focusOutline` from
+  `utils/focus-outline.styles.ts` into the element's `stylex.props(...)`:
+  `focusOutline.visible` for the element's own keyboard focus, `focusOutline.within`
+  for a **container** that should ring when a child is focused. The ring is one
+  decision for the whole system — width, style, colour and offset all come from
+  `--cl-focus-outline-*` and `--cl-color-ring`, so a theme retargets every ring at
+  once.
 
-  ```ts
-  // container.styles.ts — the wrapper rings only on keyboard focus of a child
-  outline:       { default: null, ':has(:focus-visible)': `2px solid ${colorVars['--cl-color-primary']}` },
-  outlineOffset: { default: null, ':has(:focus-visible)': space['0.5'] },
+  ```tsx
+  // item.tsx — the ring is an atom in the chain, not a property in the styles file
+  stylex.props(reset.base, focusOutline.visible, slots.item.base, slots.item[size]);
   ```
 
-  Reach for `:focus-within` only when you genuinely want an any-modality reaction
-  (keep an affordance visible while a descendant is focused), never for a ring.
+  It uses `:focus-visible`, never bare `:focus`, and `:has(:focus-visible)` for the
+  container form — **not** `:focus-within`, which matches any descendant focus
+  including a mouse click, so the container ring would flash on click. Reach for
+  `:focus-within` only when you genuinely want an any-modality reaction (keep an
+  affordance visible while a descendant is focused), never for a ring.
+
+  The ring is written as **longhands**, not the `outline` shorthand: StyleX ranks a
+  longhand above a shorthand regardless of argument order, so it survives a
+  component or consumer style carrying `outline: 'none'`, and a component can
+  re-colour its ring without restating the width and style.
+
+  `Input` is the deliberate exception — it marks focus with a border and box-shadow
+  rather than a ring, and keeps an outline only under `forced-colors`.
 
 - **DO** use `default: null` when a property exists **only** in a pseudo/state
   branch, so the atom doesn't emit a base value that would clobber a merged style:
 
   ```ts
-  outline:       { default: null, ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}` },
-  outlineOffset: { default: null, ':focus-visible': space['0.5'] },
+  boxShadow: { default: null, ':focus-visible': focusShadow },
   ```
 
 - **DO** take durations from `durationVars` (`--cl-duration-instant` / `-fast` /

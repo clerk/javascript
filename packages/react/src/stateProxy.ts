@@ -439,6 +439,7 @@ export class StateProxy implements State {
         },
 
         start: this.gateMethod<ReturnType<typeof target>, 'start'>(target, 'start'),
+        update: this.gateMethod<ReturnType<typeof target>, 'update'>(target, 'update'),
         confirm: this.gateMethod<ReturnType<typeof target>, 'confirm'>(target, 'confirm'),
         finalize: this.gateMethod<ReturnType<typeof target>, 'finalize'>(target, 'finalize'),
       },
