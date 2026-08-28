@@ -5,19 +5,11 @@ const basePath = '/email';
 const idempotencyKeyPattern = /^[a-zA-Z0-9_-]{1,255}$/;
 
 /**
- * A subset of mailbox object as specified in RFC 5322 §3.4. Specifically, a
- * `name-addr` with an optional `display-name` and a required `addr-spec`.
+ * A mailbox address as specified by RFC 5322's `addr-spec`.
  *
  * @see {@link https://datatracker.ietf.org/doc/html/rfc5322#section-3.4}
  */
 type Mailbox = {
-  /**
-   * (Optional) Display name for the mailbox. Currently accepted by the API but
-   * not yet rendered server-side, so it has no effect on the delivered email
-   * for now.
-   */
-  name?: string;
-
   /**
    * The `addr-spec` of the mailbox, i.e. the email address itself.
    */
@@ -28,7 +20,7 @@ type Mailbox = {
  * The recipient of the email. Provide exactly one of the two mutually exclusive
  * forms:
  *
- * - a literal mailbox: an `address` (plus an optional `name`), or
+ * - a literal mailbox: an `address`, or
  * - a `userId`: the ID of a Clerk user whose primary email address Clerk
  *   resolves server-side, from the instance the secret key belongs to.
  */
@@ -38,11 +30,6 @@ type EmailRecipient =
        * The `addr-spec` of the recipient mailbox, i.e. the email address itself.
        */
       address: string;
-      /**
-       * (Optional) Display name for the recipient mailbox. Currently accepted
-       * by the API but not yet rendered server-side.
-       */
-      name?: string;
       userId?: never;
     }
   | {
@@ -53,13 +40,13 @@ type EmailRecipient =
        */
       userId: string;
       address?: never;
-      name?: never;
     };
 
 /**
  * The body of the email. At least one of `html` and `text` must be provided; if
- * both are provided, the `html` version takes precedence. Encoded as a union so
- * that omitting both is a compile-time error rather than a server-side one.
+ * both are provided, the `html` version takes precedence. Their combined UTF-8
+ * encoding is limited to 50,000 bytes. Encoded as a union so that omitting both
+ * is a compile-time error rather than a server-side one.
  */
 type EmailContent =
   | {
@@ -88,19 +75,20 @@ type EmailContent =
 export type CreateEmailParams = {
   /**
    * The recipient of the email. Currently only a single recipient is supported.
-   * Provide either an `address` (with an optional `name`) or the `userId` of a
+   * Provide either an `address` or the `userId` of a
    * Clerk user; the two forms are mutually exclusive.
    */
   to: EmailRecipient;
 
   /**
-   * The sender of the email. See {@link Mailbox} for the accepted format. Note
-   * that the API does not yet render the `name` field of the `from` mailbox.
+   * The sender of the email. Its domain must exactly match the instance's
+   * verified production sending domain.
    */
   from: Mailbox;
 
   /**
-   * (Optional) The mailbox to include in the `reply-to` header of the email.
+   * (Optional) The mailbox to include in the `reply-to` header. Its domain must
+   * exactly match the same verified production domain as `from`.
    */
   replyTo?: Mailbox;
 
@@ -111,11 +99,12 @@ export type CreateEmailParams = {
 export type CreateEmailOptions = {
   /**
    * Deduplicates retries of the same logical send. Reuse a key only when the
-   * recipient and content are identical; use one stable key per recipient
-   * when fanning out a batch. The server replay window is 24 hours; keep a
-   * durable logical-send record if duplicates after that window matter. Keys
-   * may contain only ASCII letters, digits, underscores, and hyphens, up to
-   * 255 characters.
+   * recipient and content are identical; use one stable key per recipient when
+   * fanning out a batch. Clerk durably returns the original email for the same
+   * key and request, and returns a conflict if the key is reused with different
+   * parameters. Without a key, each call is a distinct send and the SDK does
+   * not retry an ambiguous POST. Keys may contain only ASCII letters, digits,
+   * underscores, and hyphens, up to 255 characters.
    */
   idempotencyKey?: string;
 };

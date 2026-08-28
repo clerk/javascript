@@ -25,6 +25,7 @@ describe('EmailApi', () => {
     status: 'queued',
     data: null,
     delivered_by_clerk: true,
+    suppression_reason: null,
   };
 
   it('sends a transactional email and snake_cases the body', async () => {
@@ -124,6 +125,27 @@ describe('EmailApi', () => {
     const response = await apiClient.emails.get('ema_123');
     expect(response.id).toBe('ema_123');
     expect(response.status).toBe('accepted');
+  });
+
+  it('surfaces transactional suppression state', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/email/ema_123',
+        validateHeaders(() =>
+          HttpResponse.json({
+            ...mockEmail,
+            status: 'suppressed',
+            delivered_by_clerk: false,
+            suppression_reason: 'application_communication_lock',
+          }),
+        ),
+      ),
+    );
+
+    const response = await apiClient.emails.get('ema_123');
+    expect(response.status).toBe('suppressed');
+    expect(response.deliveredByClerk).toBe(false);
+    expect(response.suppressionReason).toBe('application_communication_lock');
   });
 
   it('rejects an empty email ID before sending a request', async () => {
