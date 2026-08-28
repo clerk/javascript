@@ -39,6 +39,12 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   blocks: {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
+    'reverification-password': dynamic(() => import('../stories/reverification-password.mdx')),
+    'reverification-passkey': dynamic(() => import('../stories/reverification-passkey.mdx')),
+    'reverification-otp': dynamic(() => import('../stories/reverification-otp.mdx')),
+    'reverification-backup-code': dynamic(() => import('../stories/reverification-backup-code.mdx')),
+    'reverification-method-picker': dynamic(() => import('../stories/reverification-method-picker.mdx')),
+    'reverification-help': dynamic(() => import('../stories/reverification-help.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
@@ -52,6 +58,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'alert-dialog': dynamic(() => import('../stories/alert-dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
+    'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
     otp: dynamic(() => import('../stories/otp.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
@@ -67,6 +74,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     dialog: dynamic(() => import('../stories/dialog.mdx')),
     drawer: dynamic(() => import('../stories/drawer.mdx')),
     'file-upload': dynamic(() => import('../stories/file-upload.mdx')),
+    flow: dynamic(() => import('../stories/flow.mdx')),
     menu: dynamic(() => import('../stories/menu.mdx')),
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),
