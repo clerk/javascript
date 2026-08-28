@@ -1800,6 +1800,8 @@ export const srRS: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Već ste prijavljeni.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Odbio/la si zahtev za potpis. Pokušaj ponovo da nastaviš.',
     web3_solana_signature_generation_failed: 'Došlo je do greške pri generisanju potpisa. Pokušaj ponovo da nastaviš.',

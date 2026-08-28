@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.16.13
+
+### Patch Changes
+
+- Align JSDoc link targets with the docs link rules: internal docs links don't open in a new tab (removed `{{ target: '_blank' }}` from the `Invitation` Metadata link), while API reference links do (added it to the `ExternalAccount` Backend API link and the `currentUser()` endpoint link). ([#9556](https://github.com/clerk/javascript/pull/9556)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/shared@4.30.2
+
 ## 3.16.12
 
 ### Patch Changes
