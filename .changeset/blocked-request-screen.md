@@ -14,4 +14,4 @@ The error's `meta` also carries `kind` — a tag naming why the request was bloc
 
 Also adds the `actionBlocked` localization keys (`title`, `subtitle`, `traceIdLabel`) and appearance descriptors for the new elements, so both the copy and the styling are customizable.
 
-This is additive and degrades safely: the error's `code`, `message` and `long_message` are unchanged, and a response without the new `meta` renders exactly as before.
+This degrades safely: the error's `code` is unchanged, and a response without the new `meta` renders exactly as before. Note that `message` and `long_message` now carry the application owner's own wording when they configured any — so a client that renders only those, rather than the new screen, shows what the owner wrote instead of the generic sentence.
