@@ -88,23 +88,25 @@ export function ReverificationMethodPicker({
             {messages.backButton}
           </Button>
         ) : null}
-      </Card.Content>
-      <Card.Footer>
         <Text
           size='xs'
           color='neutral'
+          style={{
+            textAlign: 'center',
+            marginBlockStart: space['1'],
+          }}
         >
-          {messages.helpText}
+          {messages.helpText}{' '}
+          <Button
+            type='button'
+            size='sm'
+            variant='link'
+            onClick={onHelp}
+          >
+            {messages.helpButton}
+          </Button>
         </Text>
-        <Button
-          type='button'
-          size='sm'
-          variant='link'
-          onClick={onHelp}
-        >
-          {messages.helpButton}
-        </Button>
-      </Card.Footer>
+      </Card.Content>
     </>
   );
 }
