@@ -1,5 +1,6 @@
 package expo.modules.clerk.googlesignin
 
+import android.util.Base64
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -18,6 +19,7 @@ import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class ClerkGoogleSignInModule : Module() {
   private var webClientId: String? = null
@@ -221,6 +223,15 @@ class ClerkGoogleSignInModule : Module() {
     promise.reject("SIGN_IN_CANCELLED", exception.message ?: "User cancelled the sign-in flow", exception)
   }
 
+  // GoogleIdTokenCredential.id is the email, so the stable account ID has to come from the token's sub claim.
+  private fun subjectFromIdToken(idToken: String): String? {
+    val payload = idToken.split(".").getOrNull(1) ?: return null
+    return runCatching {
+      val json = String(Base64.decode(payload, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING))
+      JSONObject(json).optString("sub").takeIf { it.isNotEmpty() }
+    }.getOrNull()
+  }
+
   private fun handleSignInResult(result: GetCredentialResponse, promise: Promise) {
     when (val credential = result.credential) {
       is CustomCredential -> {
@@ -229,7 +240,7 @@ class ClerkGoogleSignInModule : Module() {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
 
             val user = mapOf(
-              "id" to googleIdTokenCredential.id,
+              "id" to (subjectFromIdToken(googleIdTokenCredential.idToken) ?: ""),
               "email" to googleIdTokenCredential.id,
               "name" to googleIdTokenCredential.displayName,
               "givenName" to googleIdTokenCredential.givenName,
