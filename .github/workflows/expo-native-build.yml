@@ -305,6 +305,12 @@ jobs:
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
+          # The one-time QuickPath tutorial sheet carries its own "Continue"
+          # button, which makes the AuthView's Continue ambiguous on the first
+          # flow that types.
+          for key in DidShowContinuousPathIntroduction DidShowGestureKeyboardIntroduction KeyboardDidShowProductivityTutorial UIKeyboardDidShowInternationalInfoIntroduction; do
+            xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.preferences "$key" -bool YES || true
+          done
           xcrun simctl install "$SIM_UDID" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
           # Stream the app's console output into the debug artifact so a hang has
           # actionable evidence (keychain/network errors) instead of just screenshots.

@@ -40,7 +40,7 @@ fi
 # Email-code-first: for +clerk_test@ emails the documented test code is
 # 424242: https://clerk.com/docs/testing/test-emails-and-phones
 if is_visible_text "Check your email"; then
-  input_text "$CODE_FIELD" "424242"
+  type_text "424242"
   wait_for_animation_to_end 5000
 fi
 if is_visible_text "Enter your password"; then
@@ -50,11 +50,15 @@ if is_visible_text "Enter your password"; then
   # screen going stable so the tap doesn't race the enabling recomposition.
   wait_for_animation_to_end 2000
   tap_on_text "Continue"
+  # The screen stays stable while the sign-in request is in flight, so a
+  # settle alone returns before the next screen exists. Wait for either
+  # outcome; the conditional below then sees the real screen.
   wait_for_animation_to_end 5000
+  wait_visible_text_optional 15000 "Check your email" "signed in"
 fi
 # Some instances ask for the email code after the password instead.
 if is_visible_text "Check your email"; then
-  input_text "$CODE_FIELD" "424242"
+  type_text "424242"
   wait_for_animation_to_end 5000
 fi
 # Android Google Password Manager may prompt to save the password.

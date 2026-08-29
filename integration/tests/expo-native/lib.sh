@@ -99,6 +99,12 @@ input_text() {
   step "inputText into $1"
   ad fill "$1" "$2" >/dev/null 2>&1
 }
+# inputText into whatever is focused, for one-time-code boxes that expose no
+# stable field selector.
+type_text() {
+  step "inputText (focused field)"
+  ad_run type "$1"
+}
 
 wait_visible_id() {
   step "extendedWaitUntil id=$1 (${2}ms)"
@@ -109,6 +115,14 @@ wait_visible_text() {
   shift
   step "extendedWaitUntil text=$* (${ms}ms)"
   ad_visible wait "$(selector_text "$@")" "$ms"
+}
+# A wait that gates a conditional rather than asserting: timing out is not a
+# failure, the following is_visible_* decides.
+wait_visible_text_optional() {
+  local ms=$1
+  shift
+  step "waitUntil (optional) text=$* (${ms}ms)"
+  ad_visible wait "$(selector_text "$@")" "$ms" >/dev/null 2>&1 || true
 }
 wait_visible_substring() {
   step "extendedWaitUntil substring=$2 (${1}ms)"
