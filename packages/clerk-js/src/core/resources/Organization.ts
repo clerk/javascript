@@ -10,8 +10,6 @@ import type {
   DeletedObjectResource,
   DirectorySyncJSON,
   DirectorySyncResource,
-  DirectorySyncUserJSON,
-  DirectorySyncUserResource,
   EnterpriseConnectionJSON,
   EnterpriseConnectionResource,
   EnterpriseConnectionTestRunInitJSON,
@@ -19,7 +17,6 @@ import type {
   EnterpriseConnectionTestRunJSON,
   EnterpriseConnectionTestRunResource,
   EnterpriseConnectionTestRunsPaginatedJSON,
-  GetDirectorySyncUsersParams,
   GetDomainsParams,
   GetEnterpriseConnectionsParams,
   GetEnterpriseConnectionTestRunsParams,
@@ -43,7 +40,6 @@ import type {
   OrganizationResource,
   RoleJSON,
   SetOrganizationLogoParams,
-  UpdateDirectorySyncParams,
   UpdateMembershipParams,
   UpdateOrganizationEnterpriseConnectionParams,
   UpdateOrganizationParams,
@@ -57,7 +53,6 @@ import {
   BaseResource,
   DeletedObject,
   DirectorySync,
-  DirectorySyncUser,
   EnterpriseConnection,
   EnterpriseConnectionTestRun,
   OrganizationInvitation,
@@ -291,7 +286,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       })
     )?.response as unknown as DirectorySyncJSON;
 
-    return new DirectorySync(json);
+    return new DirectorySync(json, this.id);
   };
 
   createDirectorySync = async (
@@ -306,70 +301,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       })
     )?.response as unknown as DirectorySyncJSON;
 
-    return new DirectorySync(json);
-  };
-
-  updateDirectorySync = async (
-    enterpriseConnectionId: string,
-    params: UpdateDirectorySyncParams,
-  ): Promise<DirectorySyncResource> => {
-    const body: Record<string, string | boolean> = {};
-    if (params.enabled !== undefined) {
-      body.enabled = params.enabled;
-    }
-    if (params.attributeMapping !== undefined) {
-      body.attribute_mapping = JSON.stringify(params.attributeMapping);
-    }
-
-    const json = (
-      await BaseResource._fetch<DirectorySyncJSON>({
-        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory`,
-        method: 'PATCH',
-        body: body as any,
-      })
-    )?.response as unknown as DirectorySyncJSON;
-
-    return new DirectorySync(json);
-  };
-
-  rotateDirectorySyncToken = async (enterpriseConnectionId: string): Promise<DirectorySyncResource> => {
-    const json = (
-      await BaseResource._fetch<DirectorySyncJSON>({
-        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory/rotate_api_key`,
-        method: 'POST',
-      })
-    )?.response as unknown as DirectorySyncJSON;
-
-    return new DirectorySync(json);
-  };
-
-  deleteDirectorySync = async (enterpriseConnectionId: string): Promise<DeletedObjectResource> => {
-    const json = (
-      await BaseResource._fetch<DeletedObjectJSON>({
-        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory`,
-        method: 'DELETE',
-      })
-    )?.response as unknown as DeletedObjectJSON;
-
-    return new DeletedObject(json);
-  };
-
-  getDirectorySyncUsers = async (
-    enterpriseConnectionId: string,
-    params?: GetDirectorySyncUsersParams,
-  ): Promise<ClerkPaginatedResponse<DirectorySyncUserResource>> => {
-    const res = await BaseResource._fetch({
-      path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory/users`,
-      method: 'GET',
-      search: convertPageToOffsetSearchParams(params),
-    });
-
-    const payload = res?.response as unknown as ClerkPaginatedResponse<DirectorySyncUserJSON> | undefined;
-
-    return {
-      total_count: payload?.total_count ?? 0,
-      data: (payload?.data ?? []).map(row => new DirectorySyncUser(row)),
-    };
+    return new DirectorySync(json, this.id);
   };
 
   getMembershipRequests = async (
