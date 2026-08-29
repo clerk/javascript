@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Verb table: one function per Maestro verb the flows used, each a single
-# agent-device call, so a flow file reads like the YAML it replaced.
-# Sourced by run-flows.sh with PLATFORM, AD_SESSION, and APP_ID set; flows
-# never call agent-device directly.
+# Verb table: one function per Maestro verb, one agent-device call each, so a
+# flow file reads like the YAML it replaced. Sourced by run-flows.sh.
 
 : "${AGENT_DEVICE:=agent-device}"
 : "${PLATFORM:?PLATFORM (ios|android) is required}"
@@ -18,8 +16,7 @@ ad() {
   "$AGENT_DEVICE" "$@" --session "$AD_SESSION" --platform "$PLATFORM" ${target[@]+"${target[@]}"}
 }
 
-# Runs a command and prints its output only when it fails, so a CI log shows
-# the agent-device error and hints without the settle diffs of every step.
+# Prints agent-device output only on failure to keep CI logs to the errors.
 ad_run() {
   local rc=0
   AD_OUT=$(ad "$@" 2>&1) || rc=$?
@@ -27,8 +24,7 @@ ad_run() {
   return $rc
 }
 
-# wait/is reject a selector that matches two elements; a second match still
-# proves the text is on screen, which is all a visibility check needs.
+# wait/is reject ambiguous selectors; a second match still proves visibility.
 ad_visible() {
   local rc=0
   AD_OUT=$(ad "$@" 2>&1) || rc=$?
@@ -53,9 +49,8 @@ force_stop() {
   fi
 }
 
-# launchApp; --clear-state is Maestro's clearState + clearKeychain. agent-device
-# clears the data container but never the iOS keychain, where clerk-ios keeps
-# device state, so the keychain is reset here.
+# --clear-state is Maestro's clearState + clearKeychain; clear-app-state never
+# touches the iOS keychain, where clerk-ios keeps device state.
 launch_app() {
   if [ "${1:-}" = "--clear-state" ]; then
     step "launchApp clearState clearKeychain"
@@ -81,9 +76,8 @@ tap_on_text() {
   step "tapOn text=$*"
   ad_run press "$(selector_text "$@")"
 }
-# Back controls: iOS exposes a labeled button next to a navigation bar with the
-# same label, so the role disambiguates; Compose puts the label on a group
-# wrapping an unlabeled button, so text alone is the unique match there.
+# iOS labels both the nav bar and its button "Back", so the role disambiguates;
+# Compose labels only the group around an unlabeled button.
 tap_on_button_text() {
   step "tapOn button text=$*"
   if is_platform ios; then
@@ -93,14 +87,12 @@ tap_on_button_text() {
   fi
 }
 
-# inputText: fill replaces the field value, so Maestro's eraseText has no
-# counterpart. The value is never echoed.
+# fill replaces the value, so Maestro's eraseText has no counterpart.
 input_text() {
   step "inputText into $1"
   ad fill "$1" "$2" >/dev/null 2>&1
 }
-# inputText into whatever is focused, for one-time-code boxes that expose no
-# stable field selector.
+# For one-time-code boxes, which expose no field selector.
 type_text() {
   step "inputText (focused field)"
   ad_run type "$1"
@@ -116,8 +108,7 @@ wait_visible_text() {
   step "extendedWaitUntil text=$* (${ms}ms)"
   ad_visible wait "$(selector_text "$@")" "$ms"
 }
-# A wait that gates a conditional rather than asserting: timing out is not a
-# failure, the following is_visible_* decides.
+# Gates a conditional rather than asserting, so a timeout is not a failure.
 wait_visible_text_optional() {
   local ms=$1
   shift
@@ -141,8 +132,7 @@ assert_visible_text() {
 is_visible_text() { ad_visible is exists "$(selector_text "$@")" >/dev/null 2>&1; }
 is_visible_substring() { [[ $(ad find text "$1" exists 2>/dev/null) == *"Found: true"* ]]; }
 
-# waitForAnimationToEnd never fails a Maestro flow; wait stable times out on
-# screens that keep animating, so the timeout is swallowed here too.
+# waitForAnimationToEnd never fails a Maestro flow, so the timeout is swallowed.
 wait_for_animation_to_end() {
   step "waitForAnimationToEnd (${1}ms)"
   ad wait stable 500 "$1" >/dev/null 2>&1 || true
@@ -158,7 +148,7 @@ run_flow() {
   source "$FLOWS_DIR/$1"
 }
 
-# Maestro retry: maxRetries=N means up to N more attempts after the first.
+# maxRetries=N means N more attempts after the first, as in Maestro.
 retry() {
   local max=$1 fn=$2 attempt
   for attempt in $(seq 0 "$max"); do
@@ -175,14 +165,11 @@ ad_screenshot() { ad screenshot "$1" >/dev/null 2>&1 || true; }
 ad_close() { ad close >/dev/null 2>&1 || true; }
 ad_session_dir() { printf '%s/sessions/%s' "$("$AGENT_DEVICE" session state-dir 2>/dev/null)" "$AD_SESSION"; }
 
-# Text fields: placeholder is not a selector key, so fields are targeted by
-# the role and identifier each platform exposes once the field is focused.
+# placeholder is not a selector key, so fields are targeted by role and id.
 if is_platform ios; then
   IDENTIFIER_FIELD='role=textfield id="clerk.auth.start.identifier"'
   PASSWORD_FIELD='role=securetextfield id="clerk.auth.signIn.password"'
-  CODE_FIELD='role=textfield'
 else
   IDENTIFIER_FIELD='role=edittext'
   PASSWORD_FIELD='role=edittext'
-  CODE_FIELD='role=edittext'
 fi

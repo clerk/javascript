@@ -30,9 +30,8 @@ enter_identifier_and_continue() {
 }
 retry 2 enter_identifier_and_continue
 
-# Instances that offer the email link first (clerk-android prefers it when
-# available) land on a screen no automation can complete; switch to the
-# password strategy. Never taken on the CI instance.
+# Email-link-first instances (clerk-android prefers it when offered) cannot be
+# automated; switch to the password strategy. Never taken on the CI instance.
 if is_visible_text "Open email app"; then
   tap_on_text "Use another method"
   tap_on_text "Sign in with your password"
@@ -50,9 +49,8 @@ if is_visible_text "Enter your password"; then
   # screen going stable so the tap doesn't race the enabling recomposition.
   wait_for_animation_to_end 2000
   tap_on_text "Continue"
-  # The screen stays stable while the sign-in request is in flight, so a
-  # settle alone returns before the next screen exists. Wait for either
-  # outcome; the conditional below then sees the real screen.
+  # The screen is stable while the request is in flight, so a settle alone
+  # returns too early for the conditional below.
   wait_for_animation_to_end 5000
   wait_visible_text_optional 15000 "Check your email" "signed in"
 fi

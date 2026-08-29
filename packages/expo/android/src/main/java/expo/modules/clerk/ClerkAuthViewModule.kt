@@ -103,9 +103,8 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
 
   @Composable
   private fun AuthContent() {
-    // AuthView reads the environment when it composes. Mounted before Clerk
-    // has loaded it (JS configures the native SDK only after clerk-js loads),
-    // it renders no form and never recovers, so recreate it once loaded.
+    // An AuthView composed before Clerk has loaded the environment renders no
+    // form and never recovers, so recreate it once loaded.
     val isInitialized by Clerk.isInitialized.collectAsStateWithLifecycle()
     key(isInitialized) {
       AuthContentBody()
