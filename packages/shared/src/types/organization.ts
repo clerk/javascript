@@ -1,12 +1,6 @@
 import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
-import type {
-  CreateDirectorySyncParams,
-  DirectorySyncResource,
-  DirectorySyncUserResource,
-  GetDirectorySyncUsersParams,
-  UpdateDirectorySyncParams,
-} from './directorySync';
+import type { CreateDirectorySyncParams, DirectorySyncResource } from './directorySync';
 import type {
   CreateOrganizationEnterpriseConnectionParams,
   EnterpriseConnectionResource,
@@ -241,31 +235,6 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
     enterpriseConnectionId: string,
     params?: CreateDirectorySyncParams,
   ) => Promise<DirectorySyncResource>;
-  /**
-   * Updates the Directory Sync directory bound to the given enterprise connection, e.g. to activate or deactivate
-   * provisioning.
-   */
-  updateDirectorySync: (
-    enterpriseConnectionId: string,
-    params: UpdateDirectorySyncParams,
-  ) => Promise<DirectorySyncResource>;
-  /**
-   * Mints a new SCIM bearer token for the directory, expiring the previous one after a short grace period. The
-   * returned resource is the only place the new token is available.
-   */
-  rotateDirectorySyncToken: (enterpriseConnectionId: string) => Promise<DirectorySyncResource>;
-  /**
-   * Deletes the connection's directory and stops provisioning. Previously provisioned members keep their
-   * memberships.
-   */
-  deleteDirectorySync: (enterpriseConnectionId: string) => Promise<DeletedObjectResource>;
-  /**
-   * Gets the users the identity provider has provisioned into the connection's directory.
-   */
-  getDirectorySyncUsers: (
-    enterpriseConnectionId: string,
-    params?: GetDirectorySyncUsersParams,
-  ) => Promise<ClerkPaginatedResponse<DirectorySyncUserResource>>;
   /**
    * Deletes the Organization. Only administrators can delete an Organization.
    *

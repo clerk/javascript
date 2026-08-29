@@ -1,4 +1,6 @@
+import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkResourceJSON } from './json';
+import type { ClerkPaginatedResponse } from './pagination';
 import type { ClerkResource } from './resource';
 
 /**
@@ -10,7 +12,7 @@ export type DirectorySyncProvider = 'okta' | 'entra' | 'custom' | 'google';
 export interface DirectorySyncJSON extends ClerkResourceJSON {
   object: 'directory';
   name: string;
-  enterprise_connection_id: string | null;
+  enterprise_connection_id: string;
   endpoint_url: string;
   provider: DirectorySyncProvider;
   enabled: boolean;
@@ -32,8 +34,10 @@ export interface DirectorySyncResource extends ClerkResource {
   id: string;
   /** The display name of the directory. */
   name: string;
+  /** The ID of the organization that owns the directory. */
+  organizationId: string;
   /** The ID of the enterprise connection the directory provisions through. */
-  enterpriseConnectionId: string | null;
+  enterpriseConnectionId: string;
   /** The SCIM 2.0 endpoint URL the identity provider pushes to. */
   endpointUrl: string;
   /** The SCIM provider, derived from the linked enterprise connection. */
@@ -46,7 +50,7 @@ export interface DirectorySyncResource extends ClerkResource {
   attributeMapping: Record<string, string>;
   /**
    * The SCIM bearer token. Only populated on the resource returned by
-   * `createDirectorySync` and `rotateDirectorySyncToken`; `null` everywhere
+   * `Organization.createDirectorySync` and `rotateToken`; `null` everywhere
    * else — generate a new token if it was lost.
    */
   apiKey: string | null;
@@ -54,6 +58,23 @@ export interface DirectorySyncResource extends ClerkResource {
   createdAt: Date | null;
   /** The date when the directory was last updated. */
   updatedAt: Date | null;
+  /**
+   * Updates the directory, e.g. to activate or deactivate provisioning.
+   */
+  update: (params: UpdateDirectorySyncParams) => Promise<DirectorySyncResource>;
+  /**
+   * Mints a new SCIM bearer token, expiring the previous one after a short grace period. The returned resource is
+   * the only place the new token is available.
+   */
+  rotateToken: () => Promise<DirectorySyncResource>;
+  /**
+   * Deletes the directory and stops provisioning. Previously provisioned members keep their memberships.
+   */
+  delete: () => Promise<DeletedObjectResource>;
+  /**
+   * Gets the users the identity provider has provisioned into the directory.
+   */
+  getUsers: (params?: GetDirectorySyncUsersParams) => Promise<ClerkPaginatedResponse<DirectorySyncUserResource>>;
   __internal_toSnapshot: () => DirectorySyncJSONSnapshot;
 }
 
