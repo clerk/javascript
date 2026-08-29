@@ -75,10 +75,7 @@ export const ConfigureDirectorySyncProvider = ({
     rotateDirectorySyncToken,
   } = __internal_useOrganizationDirectorySync({ enterpriseConnectionId });
 
-  const usersHook = __internal_useOrganizationDirectorySyncUsers({
-    enterpriseConnectionId,
-    enabled: Boolean(directory),
-  });
+  const usersHook = __internal_useOrganizationDirectorySyncUsers({ directory });
 
   const [revealedToken, setRevealedToken] = React.useState<string | null>(null);
 
