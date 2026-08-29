@@ -214,6 +214,7 @@ export const OAuthDeviceVerification = withClerk(({ clerk, ...props }: WithClerk
     <Portal
       mount={clerk?.__internal_mountOAuthDeviceVerification}
       unmount={clerk?.__internal_unmountOAuthDeviceVerification}
+      updateProps={(clerk as any)?.__internal_updateProps}
       props={props}
     />
   );

@@ -37,7 +37,7 @@ function CodeGroup({ slots, hasError }: { slots: SlotProps[]; hasError: boolean 
 export function OAuthDeviceVerificationCodeInput({ control }: OAuthDeviceVerificationCodeInputProps) {
   const { autoFocus } = useAppearance().parsedOptions;
   const formField = useFormField();
-  const hasError = control.feedbackType === 'error';
+  const hasError = formField.hasError ?? false;
 
   return (
     <Box
@@ -51,7 +51,7 @@ export function OAuthDeviceVerificationCodeInput({ control }: OAuthDeviceVerific
         autoComplete='one-time-code'
         autoCapitalize='characters'
         aria-describedby={formField.feedbackMessageId || undefined}
-        aria-invalid={formField.hasError}
+        aria-invalid={hasError}
         aria-required={formField.isRequired}
         disabled={formField.isDisabled}
         inputMode='text'

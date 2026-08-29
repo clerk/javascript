@@ -19,6 +19,10 @@ type PendingLookup = {
   key: string;
   promise: Promise<OAuthDeviceVerificationInfo>;
 };
+type PendingSubmit = {
+  key: string;
+  promise: Promise<OAuthDeviceVerificationResult>;
+};
 
 const normalizeUserCode = (userCode: string) => userCode.toUpperCase().replace(/[-\p{White_Space}]/gu, '');
 
@@ -30,6 +34,11 @@ const createNotReadyError = () =>
 const createLookupInProgressError = () =>
   new ClerkRuntimeError('An OAuth device verification lookup is already in progress for another code.', {
     code: 'oauth_device_verification_lookup_in_progress',
+  });
+
+const createSubmissionInProgressError = () =>
+  new ClerkRuntimeError('Another OAuth device verification decision is already in progress.', {
+    code: 'oauth_device_verification_submission_in_progress',
   });
 
 /**
@@ -68,7 +77,7 @@ export function useOAuthDeviceVerification(): UseOAuthDeviceVerificationReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const pendingLookup = useRef<PendingLookup | null>(null);
-  const submitPromise = useRef<Promise<OAuthDeviceVerificationResult> | null>(null);
+  const pendingSubmit = useRef<PendingSubmit | null>(null);
   const generation = useRef(0);
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
@@ -95,7 +104,7 @@ export function useOAuthDeviceVerification(): UseOAuthDeviceVerificationReturn {
       setIsLoading(true);
 
       const request = oauthApplication
-        .lookupDeviceVerification(params)
+        .lookupDeviceVerification({ ...params, userCode: key })
         .then(info => {
           if (generation.current === requestGeneration) {
             setData(info);
@@ -130,8 +139,13 @@ export function useOAuthDeviceVerification(): UseOAuthDeviceVerificationReturn {
         return Promise.reject(createNotReadyError());
       }
 
-      if (submitPromise.current) {
-        return submitPromise.current;
+      const userCode = normalizeUserCode(params.userCode);
+      const key = JSON.stringify([userCode, params.organizationId ?? null, approved]);
+      if (pendingSubmit.current) {
+        if (pendingSubmit.current.key === key) {
+          return pendingSubmit.current.promise;
+        }
+        return Promise.reject(createSubmissionInProgressError());
       }
 
       const requestGeneration = generation.current;
@@ -139,7 +153,7 @@ export function useOAuthDeviceVerification(): UseOAuthDeviceVerificationReturn {
       setIsSubmitting(true);
 
       const request = oauthApplication
-        .submitDeviceVerification({ ...params, approved })
+        .submitDeviceVerification({ ...params, userCode, approved })
         .then(decision => {
           if (generation.current === requestGeneration) {
             setResult(decision);
@@ -153,15 +167,15 @@ export function useOAuthDeviceVerification(): UseOAuthDeviceVerificationReturn {
           throw err;
         })
         .finally(() => {
-          if (submitPromise.current === request) {
-            submitPromise.current = null;
+          if (pendingSubmit.current?.promise === request) {
+            pendingSubmit.current = null;
           }
           if (generation.current === requestGeneration) {
             setIsSubmitting(false);
           }
         });
 
-      submitPromise.current = request;
+      pendingSubmit.current = { key, promise: request };
       return request;
     },
     [clerk],
@@ -173,7 +187,7 @@ export function useOAuthDeviceVerification(): UseOAuthDeviceVerificationReturn {
   const reset = useCallback(() => {
     generation.current += 1;
     pendingLookup.current = null;
-    submitPromise.current = null;
+    pendingSubmit.current = null;
     setData(undefined);
     setResult(undefined);
     setError(null);

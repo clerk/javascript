@@ -805,9 +805,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
 
-    this.premountOAuthDeviceVerificationNodes.forEach((props, node) => {
-      clerkjs.__internal_mountOAuthDeviceVerification(node, props);
-    });
+    if (typeof clerkjs.__internal_mountOAuthDeviceVerification === 'function') {
+      this.premountOAuthDeviceVerificationNodes.forEach((props, node) => {
+        clerkjs.__internal_mountOAuthDeviceVerification(node, props);
+      });
+    }
 
     this.premountTaskChooseOrganizationNodes.forEach((props, node) => {
       clerkjs.mountTaskChooseOrganization(node, props);
@@ -1411,18 +1413,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   __internal_mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__internal_mountOAuthDeviceVerification(node, props);
+      if (typeof this.clerkjs.__internal_mountOAuthDeviceVerification === 'function') {
+        this.clerkjs.__internal_mountOAuthDeviceVerification(node, props);
+      }
     } else {
       this.premountOAuthDeviceVerificationNodes.set(node, props);
     }
   };
 
   __internal_unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.loaded) {
+    if (this.clerkjs && this.loaded && typeof this.clerkjs.__internal_unmountOAuthDeviceVerification === 'function') {
       this.clerkjs.__internal_unmountOAuthDeviceVerification(node);
-    } else {
-      this.premountOAuthDeviceVerificationNodes.delete(node);
     }
+    this.premountOAuthDeviceVerificationNodes.delete(node);
   };
 
   mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {

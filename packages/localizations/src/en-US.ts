@@ -995,7 +995,7 @@ export const enUS: LocalizationResource = {
       genericTitle: 'We could not verify this code',
       invalidCode: 'Enter a valid 8-character code.',
       rateLimitedSubtitle: 'Wait before trying another code.',
-      rateLimitedTitle: 'Too many incorrect attempts',
+      rateLimitedTitle: 'Too many attempts',
       unknownCode: "We couldn't find that code. Check it and try again.",
     },
     start: {

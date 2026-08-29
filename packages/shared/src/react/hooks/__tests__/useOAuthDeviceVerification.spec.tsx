@@ -49,10 +49,10 @@ describe('useOAuthDeviceVerification', () => {
   it('looks up verification information once and stores it', async () => {
     const { result } = renderHook(() => useOAuthDeviceVerification(), { wrapper });
 
-    await act(() => result.current.lookup({ userCode: 'BCDF-GHJK' }));
+    await act(() => result.current.lookup({ userCode: 'bcdf ghjk' }));
 
     expect(lookupDeviceVerification).toHaveBeenCalledOnce();
-    expect(lookupDeviceVerification).toHaveBeenCalledWith({ userCode: 'BCDF-GHJK' });
+    expect(lookupDeviceVerification).toHaveBeenCalledWith({ userCode: 'BCDFGHJK' });
     expect(result.current.data).toEqual(verificationInfo);
     expect(result.current.error).toBeNull();
   });
@@ -63,15 +63,15 @@ describe('useOAuthDeviceVerification', () => {
       .mockResolvedValueOnce({ object: 'oauth_device_verification', status: 'denied' });
     const { result } = renderHook(() => useOAuthDeviceVerification(), { wrapper });
 
-    await act(() => result.current.approve({ userCode: 'BCDF-GHJK', organizationId: 'org_123' }));
+    await act(() => result.current.approve({ userCode: 'bcdf ghjk', organizationId: 'org_123' }));
     expect(submitDeviceVerification).toHaveBeenLastCalledWith({
-      userCode: 'BCDF-GHJK',
+      userCode: 'BCDFGHJK',
       organizationId: 'org_123',
       approved: true,
     });
 
     await act(() => result.current.deny({ userCode: 'BCDF-GHJK' }));
-    expect(submitDeviceVerification).toHaveBeenLastCalledWith({ userCode: 'BCDF-GHJK', approved: false });
+    expect(submitDeviceVerification).toHaveBeenLastCalledWith({ userCode: 'BCDFGHJK', approved: false });
     expect(result.current.result?.status).toBe('denied');
   });
 
@@ -150,7 +150,7 @@ describe('useOAuthDeviceVerification', () => {
     expect(submitDeviceVerification).not.toHaveBeenCalled();
   });
 
-  it('coalesces concurrent decisions', async () => {
+  it('coalesces concurrent equivalent decisions', async () => {
     let resolveSubmit!: (value: OAuthDeviceVerificationResult) => void;
     submitDeviceVerification.mockImplementationOnce(() => new Promise(resolve => (resolveSubmit = resolve)));
     const { result } = renderHook(() => useOAuthDeviceVerification(), { wrapper });
@@ -158,14 +158,39 @@ describe('useOAuthDeviceVerification', () => {
     let first!: Promise<OAuthDeviceVerificationResult>;
     let second!: Promise<OAuthDeviceVerificationResult>;
     act(() => {
-      first = result.current.approve({ userCode: 'BCDF-GHJK' });
-      second = result.current.deny({ userCode: 'BCDF-GHJK' });
+      first = result.current.approve({ userCode: 'BCDF-GHJK', organizationId: 'org_123' });
+      second = result.current.approve({ userCode: 'bcdf ghjk', organizationId: 'org_123' });
     });
 
     expect(first).toBe(second);
     expect(submitDeviceVerification).toHaveBeenCalledOnce();
+    expect(submitDeviceVerification).toHaveBeenCalledWith({
+      userCode: 'BCDFGHJK',
+      organizationId: 'org_123',
+      approved: true,
+    });
     resolveSubmit(approvedResult);
     await act(() => first);
+  });
+
+  it('rejects a conflicting decision while another decision is pending', async () => {
+    let resolveSubmit!: (value: OAuthDeviceVerificationResult) => void;
+    submitDeviceVerification.mockImplementationOnce(() => new Promise(resolve => (resolveSubmit = resolve)));
+    const { result } = renderHook(() => useOAuthDeviceVerification(), { wrapper });
+
+    let first!: Promise<OAuthDeviceVerificationResult>;
+    act(() => {
+      first = result.current.approve({ userCode: 'BCDF-GHJK' });
+    });
+
+    const second = result.current.deny({ userCode: 'BCDF-GHJK' });
+    await expect(second).rejects.toMatchObject({ code: 'oauth_device_verification_submission_in_progress' });
+    expect(submitDeviceVerification).toHaveBeenCalledOnce();
+    expect(result.current.isSubmitting).toBe(true);
+
+    resolveSubmit(approvedResult);
+    await act(() => first);
+    expect(result.current.result).toEqual(approvedResult);
   });
 
   it('stores and rethrows an action error without retrying', async () => {

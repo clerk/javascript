@@ -32,6 +32,7 @@ import {
   userProfileLinkRenderedError,
   userProfilePageRenderedError,
 } from '../errors/messages';
+import type { IsomorphicClerk } from '../isomorphicClerk';
 import type {
   CustomPortalsRendererProps,
   MountProps,
@@ -59,6 +60,8 @@ type FallbackProp = {
    */
   fallback?: ReactNode;
 };
+
+type ClerkWithInternalUpdateProps = WithClerkProp['clerk'] & Pick<IsomorphicClerk, '__internal_updateProps'>;
 
 type UserProfileExportType = typeof _UserProfile & {
   Page: typeof UserProfilePage;
@@ -704,7 +707,7 @@ export const OAuthDeviceVerification = withClerk(
             component={component}
             mount={clerk.__internal_mountOAuthDeviceVerification}
             unmount={clerk.__internal_unmountOAuthDeviceVerification}
-            updateProps={(clerk as any).__internal_updateProps}
+            updateProps={props => void (clerk as ClerkWithInternalUpdateProps).__internal_updateProps(props)}
             props={props}
             rootProps={rendererRootProps}
           />

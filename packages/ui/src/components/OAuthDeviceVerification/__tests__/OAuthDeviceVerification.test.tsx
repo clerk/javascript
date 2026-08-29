@@ -176,7 +176,7 @@ describe('OAuthDeviceVerification', () => {
 
   it.each([
     ['oauth_device_code_expired', 'This code expired', 'Start over on your device.'],
-    ['too_many_requests', 'Too many incorrect attempts', 'Wait before trying another code.'],
+    ['too_many_requests', 'Too many attempts', 'Wait before trying another code.'],
   ])('renders the %s lookup error distinctly without retrying', async (code, title, subtitle) => {
     Object.defineProperty(window, 'location', {
       configurable: true,
@@ -288,6 +288,41 @@ describe('OAuthDeviceVerification', () => {
       await Promise.resolve();
     });
     await waitFor(() => expect(getByRole('heading', { name: terminalTitle })).toBeVisible());
+  });
+
+  it('ignores a second decision while the first decision is pending', async () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { ...originalLocation, search: '?user_code=BFWS-ZBZM' },
+    });
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+    props.setProps({ componentName: 'OAuthDeviceVerification' } as any);
+    let resolveSubmit: ((value: { object: string; status: string }) => void) | undefined;
+    const submit = vi.fn().mockImplementation(
+      () =>
+        new Promise(resolve => {
+          resolveSubmit = resolve;
+        }),
+    );
+    mockOAuthApplication(fixtures.clerk, { submitDeviceVerification: submit });
+    const { getByRole, getByText } = render(<OAuthDeviceVerification />, { wrapper });
+
+    await waitFor(() => expect(getByRole('button', { name: 'Approve' })).toBeVisible());
+    act(() => {
+      getByRole('button', { name: 'Approve' }).click();
+      getByRole('button', { name: 'Deny' }).click();
+    });
+
+    expect(submit).toHaveBeenCalledOnce();
+    expect(submit).toHaveBeenCalledWith({ userCode: 'BFWSZBZM', approved: true });
+
+    await act(async () => {
+      resolveSubmit?.({ object: 'oauth_device_verification', status: 'approved' });
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(getByText('Device approved')).toBeVisible());
   });
 
   it('renders an already-decided report without success copy for a decision-time bad_request', async () => {

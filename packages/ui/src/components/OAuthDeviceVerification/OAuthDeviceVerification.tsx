@@ -70,6 +70,7 @@ function OAuthDeviceVerificationInternal() {
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
   const [submittingDecision, setSubmittingDecision] = useState<'approve' | 'deny' | null>(null);
   const handledPrefill = useRef(false);
+  const decisionInProgress = useRef(false);
 
   const codeControl = useFormControl('userCode', '', {
     type: 'text',
@@ -192,6 +193,10 @@ function OAuthDeviceVerificationInternal() {
   };
 
   const handleApprove = async () => {
+    if (decisionInProgress.current) {
+      return;
+    }
+    decisionInProgress.current = true;
     const userCode = normalizeOAuthDeviceUserCode(codeControl.value);
     setSubmittingDecision('approve');
     try {
@@ -200,11 +205,16 @@ function OAuthDeviceVerificationInternal() {
     } catch (error) {
       showDecisionError(error);
     } finally {
+      decisionInProgress.current = false;
       setSubmittingDecision(null);
     }
   };
 
   const handleDeny = async () => {
+    if (decisionInProgress.current) {
+      return;
+    }
+    decisionInProgress.current = true;
     const userCode = normalizeOAuthDeviceUserCode(codeControl.value);
     setSubmittingDecision('deny');
     try {
@@ -213,11 +223,13 @@ function OAuthDeviceVerificationInternal() {
     } catch (error) {
       showDecisionError(error);
     } finally {
+      decisionInProgress.current = false;
       setSubmittingDecision(null);
     }
   };
 
   const reset = () => {
+    decisionInProgress.current = false;
     verification.reset();
     codeControl.setValue('');
     codeControl.clearFeedback();

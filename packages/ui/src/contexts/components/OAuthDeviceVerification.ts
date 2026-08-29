@@ -4,7 +4,7 @@ import type { OAuthDeviceVerificationCtx } from '../../types';
 
 export const OAuthDeviceVerificationContext = createContext<OAuthDeviceVerificationCtx | null>(null);
 
-export const useOAuthDeviceVerificationContext = () => {
+export const useOAuthDeviceVerificationContext = (): OAuthDeviceVerificationCtx => {
   const context = useContext(OAuthDeviceVerificationContext);
 
   if (context === null) {
