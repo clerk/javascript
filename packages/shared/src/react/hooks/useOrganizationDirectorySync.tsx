@@ -32,6 +32,7 @@ export type UseOrganizationDirectorySyncReturn = {
   isLoading: boolean;
   isFetching: boolean;
   createDirectorySync: (params?: CreateDirectorySyncParams) => Promise<DirectorySyncResource | undefined>;
+  /** Resolves `undefined` until `data` has loaded, since the mutations act on the loaded directory. */
   updateDirectorySync: (params: UpdateDirectorySyncParams) => Promise<DirectorySyncResource | undefined>;
   rotateDirectorySyncToken: () => Promise<DirectorySyncResource | undefined>;
   deleteDirectorySync: () => Promise<DeletedObjectResource | undefined>;
@@ -99,35 +100,37 @@ function useOrganizationDirectorySync(params: UseOrganizationDirectorySyncParams
     [organization, enterpriseConnectionId, revalidate],
   );
 
+  const directory = query.data;
+
   const updateDirectorySync = useCallback(
     async (updateParams: UpdateDirectorySyncParams) => {
-      if (!enterpriseConnectionId) {
+      if (!directory) {
         return undefined;
       }
-      const updated = await organization?.updateDirectorySync(enterpriseConnectionId, updateParams);
+      const updated = await directory.update(updateParams);
       await revalidate();
       return updated;
     },
-    [organization, enterpriseConnectionId, revalidate],
+    [directory, revalidate],
   );
 
   const rotateDirectorySyncToken = useCallback(async () => {
-    if (!enterpriseConnectionId) {
+    if (!directory) {
       return undefined;
     }
-    const rotated = await organization?.rotateDirectorySyncToken(enterpriseConnectionId);
+    const rotated = await directory.rotateToken();
     await revalidate();
     return rotated;
-  }, [organization, enterpriseConnectionId, revalidate]);
+  }, [directory, revalidate]);
 
   const deleteDirectorySync = useCallback(async () => {
-    if (!enterpriseConnectionId) {
+    if (!directory) {
       return undefined;
     }
-    const deleted = await organization?.deleteDirectorySync(enterpriseConnectionId);
+    const deleted = await directory.delete();
     await revalidate();
     return deleted;
-  }, [organization, enterpriseConnectionId, revalidate]);
+  }, [directory, revalidate]);
 
   return {
     data: query.data,
