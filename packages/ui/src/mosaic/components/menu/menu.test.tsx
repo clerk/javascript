@@ -1,9 +1,23 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { Menu } from './menu';
+
+const scrollClasses = stylex.props(...scrollAreaViewport()).className?.split(' ') ?? [];
+// The popup shares the root's atoms (both are `min-height: 0` flex columns), so only what the
+// viewport adds on top of them — the mask, the overflow, the scrollbar — distinguishes the two.
+const rootClasses = stylex.props(scrollAreaRoot).className?.split(' ') ?? [];
+// StyleX atoms are content-hashed, so an identical declaration here resolves to the same atom the
+// styles module emits. jsdom has no stylesheet, so the class is the only thing there is to assert on.
+// The debug class alongside it is derived from the source filename, so only the atoms can match.
+const noShrinkClass = (stylex.props(stylex.create({ base: { flexShrink: 0 } }).base).className ?? '')
+  .split(' ')
+  .filter(name => /^x[a-z0-9]+$/.test(name));
+const viewportOnlyClasses = scrollClasses.filter(name => !rootClasses.includes(name));
 
 function renderMenu(props?: { onSignOut?: () => void }) {
   return render(
@@ -77,6 +91,35 @@ describe('Mosaic Menu', () => {
     expect(screen.getByRole('menuitem', { name: 'Add workspace' })).toHaveAttribute('data-color', 'neutral');
     expect(screen.getByRole('separator')).toHaveClass('cl-menu-separator');
     expect(screen.getByTestId('add-icon')).toBeInTheDocument();
+  });
+
+  it('scrolls the items in a viewport inside the popup, not on the popup itself', async () => {
+    const user = userEvent.setup();
+    renderMenu();
+
+    await user.click(screen.getByRole('button'));
+
+    const popup = screen.getByRole('menu').querySelector('.cl-menu-popup');
+    const viewport = popup?.querySelector('.cl-menu-viewport');
+    expect(viewport).toBeInTheDocument();
+    expect(viewport).toHaveClass(...scrollClasses);
+    // The chrome must NOT carry them: `scrollAreaViewport()` masks the element it lands on, and a
+    // mask on the popup would clip its own background and drop shadow.
+    expect(viewportOnlyClasses).not.toHaveLength(0);
+    expect(viewportOnlyClasses.filter(name => popup?.classList.contains(name))).toEqual([]);
+    expect(screen.getByRole('menuitem', { name: 'Sign out' }).closest('.cl-menu-viewport')).toBe(viewport);
+  });
+
+  it('holds row height inside the capped viewport rather than letting flex squash it', async () => {
+    const user = userEvent.setup();
+    renderMenu();
+
+    await user.click(screen.getByRole('button'));
+
+    // The viewport is a height-capped flex column. With flex's default shrink the rows compress to
+    // fit the cap instead of overflowing it, so the menu loses both its row height and its scroll.
+    expect(screen.getByRole('menuitem', { name: 'Sign out' })).toHaveClass(...noShrinkClass);
+    expect(screen.getByRole('separator')).toHaveClass(...noShrinkClass);
   });
 
   it('calls an item handler and closes the menu on click', async () => {

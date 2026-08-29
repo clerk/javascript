@@ -74,12 +74,12 @@ const popup = () => screen.getByRole('dialog', { name: 'Account' });
 // popup's sections rather than an implementation detail.
 const groups = () => Array.from(popup().querySelectorAll<HTMLElement>('.cl-item-group'));
 const labels = (group: HTMLElement | undefined) =>
-  Array.from(group?.querySelectorAll(".cl-item-label[data-variant='primary']") ?? []).map(
+  Array.from(group?.querySelectorAll(".cl-item-label[data-variant='default']") ?? []).map(
     node => node.textContent ?? '',
   );
 const row = (group: HTMLElement | undefined, label: string) =>
   Array.from(group?.querySelectorAll<HTMLElement>('.cl-item') ?? []).find(
-    node => node.querySelector(".cl-item-label[data-variant='primary']")?.textContent === label,
+    node => node.querySelector(".cl-item-label[data-variant='default']")?.textContent === label,
   );
 
 const scrollClasses = stylex.props(...scrollAreaViewport('auto')).className?.split(' ') ?? [];
@@ -290,7 +290,7 @@ describe('UserButtonView, combined mode', () => {
     const onCreateOrganization = vi.fn();
     renderCombined({ onCreateOrganization });
 
-    // Not `labels`: the row is an action rather than a workspace, so its label is the secondary one.
+    // Not `labels`: the row is an action rather than a workspace, so its label is the interactive one.
     const rows = Array.from(workspaceList()?.querySelectorAll('.cl-item-label') ?? []);
     expect(rows.at(-1)?.textContent).toBe('Create organization');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Create organization' }));
@@ -588,7 +588,7 @@ describe('UserButtonView, the foot', () => {
 
   /** The foot's rows, in the order it lists them. It is the last group in the popup. */
   const footActions = () =>
-    Array.from(groups().at(-1)?.querySelectorAll(".cl-item-label[data-variant='secondary']") ?? []).map(
+    Array.from(groups().at(-1)?.querySelectorAll(".cl-item-label[data-variant='interactive']") ?? []).map(
       node => node.textContent ?? '',
     );
 

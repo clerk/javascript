@@ -9,7 +9,7 @@ import { Otp } from './otp';
 const slots = () => screen.getAllByRole('textbox');
 
 describe('Mosaic Otp', () => {
-  it('renders one slot per character and applies the default variants', () => {
+  it('renders one slot per character and applies the default status', () => {
     render(
       <Otp
         length={6}
@@ -19,13 +19,11 @@ describe('Mosaic Otp', () => {
 
     const group = screen.getByRole('group', { name: 'Verification code' });
     expect(group).toHaveClass('cl-otp');
-    expect(group).toHaveAttribute('data-size', 'md');
     expect(group).toHaveAttribute('data-status', 'neutral');
 
     expect(slots()).toHaveLength(6);
     for (const slot of slots()) {
       expect(slot).toHaveClass('cl-otp-slot');
-      expect(slot).toHaveAttribute('data-size', 'md');
     }
   });
 
@@ -48,20 +46,6 @@ describe('Mosaic Otp', () => {
     render(<Otp aria-label='Verification code' />);
 
     expect(slots()).toHaveLength(6);
-  });
-
-  it.each(['sm', 'md', 'lg'] as const)('reflects the %s size on the group and every slot', size => {
-    render(
-      <Otp
-        length={3}
-        size={size}
-        aria-label='Code'
-      />,
-    );
-    expect(screen.getByRole('group', { name: 'Code' })).toHaveAttribute('data-size', size);
-    for (const slot of slots()) {
-      expect(slot).toHaveAttribute('data-size', size);
-    }
   });
 
   it('marks every slot invalid when the status is error', () => {
