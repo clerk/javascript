@@ -23,6 +23,7 @@ while preserving the existing resource props and callback seams.
 import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
 
 <UserProfileProfilePanelView
+  allowMultipleAccounts={allowMultipleAccounts}
   imageUrl={user.imageUrl}
   name={user.fullName ?? ''}
   username={user.username ?? ''}

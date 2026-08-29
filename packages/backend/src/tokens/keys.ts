@@ -19,20 +19,36 @@ type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
 type JsonWebKeyCache = Record<string, JsonWebKeyWithKid>;
 
-let cache: JsonWebKeyCache = {};
-let lastUpdatedAt = 0;
+type RemoteJwksCache = {
+  keys: JsonWebKeyCache;
+  lastUpdatedAt: number;
+};
 
-function getFromCache(kid: string) {
-  return cache[kid];
-}
+/**
+ * Remote JWKS caches, one per Clerk instance. A single process-wide cache keyed by `kid`
+ * alone hands one instance's signing key to another instance's verification: a Clerk `kid`
+ * is the instance id, the lookup short-circuits before `secretKey` is consulted, and
+ * `verifyJwt` does not assert `iss`. That let a session token minted by instance B
+ * authenticate against instance A in any process serving both.
+ */
+const remoteCaches = new Map<string, RemoteJwksCache>();
 
-function getCacheValues() {
-  return Object.values(cache);
-}
-
-function setInCache(cacheKey: string, jwk: JsonWebKeyWithKid, shouldExpire = true) {
-  cache[cacheKey] = jwk;
-  lastUpdatedAt = shouldExpire ? Date.now() : -1;
+/**
+ * The scope is held in memory only as a Map key. It is never logged or surfaced in errors.
+ */
+function getRemoteCache(scope: string): RemoteJwksCache {
+  let cache = remoteCaches.get(scope);
+  if (!cache) {
+    // Evict expired scopes on new-scope creation so one-off scopes cannot grow the Map forever.
+    for (const [key, entry] of remoteCaches) {
+      if (cacheHasExpired(entry)) {
+        remoteCaches.delete(key);
+      }
+    }
+    cache = { keys: {}, lastUpdatedAt: 0 };
+    remoteCaches.set(scope, cache);
+  }
+  return cache;
 }
 
 const PEM_HEADER = '-----BEGIN PUBLIC KEY-----';
@@ -47,20 +63,11 @@ type LoadClerkJwkFromPemOptions = {
 
 /**
  * Loads a local PEM key usually from process.env and transform it to JsonWebKey format.
- * The result is cached on the module level to avoid unnecessary computations in subsequent invocations.
+ * Derived fresh on every call: a cache keyed on `kid` (which comes from the untrusted token
+ * header) served one instance's key to another instance's verifier, and derivation is cheap.
  */
 export function loadClerkJwkFromPem(params: LoadClerkJwkFromPemOptions): JsonWebKey {
   const { kid, pem } = params;
-
-  // We use a cache key that includes the local prefix in order to avoid
-  // cache conflicts when loadClerkJwkFromPem and loadClerkJWKFromRemote
-  // are called with the same kid
-  const prefixedKid = `local-${kid}`;
-  const cachedJwk = getFromCache(prefixedKid);
-
-  if (cachedJwk) {
-    return cachedJwk;
-  }
 
   if (!pem) {
     throw new TokenVerificationError({
@@ -80,8 +87,8 @@ export function loadClerkJwkFromPem(params: LoadClerkJwkFromPemOptions): JsonWeb
     .replace(/\//g, '_');
 
   // https://datatracker.ietf.org/doc/html/rfc7517
-  const jwk = { kid: prefixedKid, kty: 'RSA', alg: 'RS256', n: modulus, e: 'AQAB' };
-  setInCache(prefixedKid, jwk, false); // local key never expires in cache
+  // The 'local-' kid prefix distinguishes locally derived JWKs from remote ones.
+  const jwk: JsonWebKeyWithKid = { kid: `local-${kid}`, kty: 'RSA', alg: 'RS256', n: modulus, e: 'AQAB' };
   return jwk;
 }
 
@@ -131,7 +138,9 @@ export type LoadClerkJWKFromRemoteOptions = {
 export async function loadClerkJWKFromRemote(params: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
   const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, kid, skipJwksCache } = params;
 
-  if (skipJwksCache || cacheHasExpired() || !getFromCache(kid)) {
+  const cache = getRemoteCache(`${apiUrl}|${apiVersion}|${secretKey ?? ''}`);
+
+  if (skipJwksCache || cacheHasExpired(cache) || !cache.keys[kid]) {
     if (!secretKey) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,
@@ -150,21 +159,20 @@ export async function loadClerkJWKFromRemote(params: LoadClerkJWKFromRemoteOptio
       });
     }
 
-    keys.forEach(key => setInCache(key.kid, key));
+    keys.forEach(key => {
+      cache.keys[key.kid] = key;
+    });
+    cache.lastUpdatedAt = Date.now();
   }
 
-  const jwk = getFromCache(kid);
+  const jwk = cache.keys[kid];
 
   if (!jwk) {
-    const cacheValues = getCacheValues();
-    const jwkKeys = cacheValues
-      .map(jwk => jwk.kid)
-      .sort()
-      .join(', ');
-
+    // The available kids are deliberately omitted: they are instance ids, and enumerating
+    // them would disclose which co-tenants are warm in a shared process.
     throw new TokenVerificationError({
       action: `Go to your Dashboard and validate your secret and public keys are correct. ${TokenVerificationErrorAction.ContactSupport} if the issue persists.`,
-      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${jwkKeys}`,
+      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.`,
       reason: TokenVerificationErrorReason.JWKKidMismatch,
     });
   }
@@ -218,17 +226,12 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   return response.json();
 }
 
-function cacheHasExpired() {
-  // If lastUpdatedAt is -1, it means that we're using a local JWKS and it never expires
-  if (lastUpdatedAt === -1) {
-    return false;
-  }
-
+function cacheHasExpired(cache: RemoteJwksCache) {
   // If the cache has expired, clear the value so we don't attempt to make decisions based on stale data
-  const isExpired = Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
+  const isExpired = Date.now() - cache.lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
 
   if (isExpired) {
-    cache = {};
+    cache.keys = {};
   }
 
   return isExpired;

@@ -1,5 +1,5 @@
 import type { DialogFocusTarget, DialogHandle, DialogProps as HeadlessDialogProps } from '@clerk/headless/dialog';
-import { Dialog as Primitive, useDialogContext } from '@clerk/headless/dialog';
+import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '@clerk/headless/dialog';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode } from 'react';
 import React from 'react';
@@ -7,9 +7,9 @@ import React from 'react';
 import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
-import { reset } from '../reset.styles';
 import { backdropMotion, closeInsets, popupMotion, sizes, styles, viewportSizes } from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
@@ -40,9 +40,39 @@ const DialogSizeContext = React.createContext<DialogSize>('prompt');
  */
 const DialogParentSizeContext = React.createContext<DialogSize>('prompt');
 
+/**
+ * The dialog surface a part is rendered inside, or `null` when there is none.
+ *
+ * The general answer to "am I in a dialog": a part reads it to take an id, or to adapt to the
+ * surface, without branching on where it was rendered. `Card.Title` is the first consumer — it
+ * takes `labelId` and so names the dialog, and carries no id at all outside one.
+ *
+ * Distinct from the headless `DialogContext`, which `Dialog.Root` provides. `Root` also spans the
+ * trigger, so a part reading that one reports a dialog while sitting outside the popup, and would
+ * claim ids that belong to the surface. This is published by the popup, which is the real boundary.
+ */
+export interface DialogContextValue {
+  /** Id the popup points `aria-labelledby` at. The part that names the dialog takes it. */
+  labelId: string;
+  /** Id the popup points `aria-describedby` at. The part that describes the dialog takes it. */
+  descriptionId: string;
+  /** Width, and for `panel` also height, of the surface. */
+  size: DialogSize;
+}
+
+export const DialogContext = React.createContext<DialogContextValue | null>(null);
+
+/**
+ * The compound component the popup's dev warnings speak in. `AlertDialog` is composed from these
+ * same parts, so a message hardcoded to `Dialog` would name parts that do not exist at the call
+ * site it is complaining about. Not exported from the folder's `index.ts`: it is how one Mosaic
+ * component wraps another, not something a consumer sets.
+ */
+export const DialogPartNameContext = React.createContext('Dialog');
+
 /** Whether this dialog is a prompt stacked on a prompt — see {@link DialogParentSizeContext}. */
 function useIsStacked() {
-  const { isStacked } = useDialogContext();
+  const { isStacked } = useHeadlessDialogContext();
   const parentSize = React.useContext(DialogParentSizeContext);
   return isStacked && parentSize === 'prompt';
 }
@@ -260,11 +290,12 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   const size = React.useContext(DialogSizeContext);
   // The headless flag, not `useIsStacked` — the rule is about opening a dialog inside ANY dialog,
   // which is broader than the prompt-on-prompt case the stacking styles cover.
-  const { isStacked: isNestedInDialog } = useDialogContext();
+  const { isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
+  const surface = React.useMemo(() => ({ labelId, descriptionId, size }), [labelId, descriptionId, size]);
   // Observed through state rather than a plain ref, because the warning has to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog');
+  useAccessibleNameWarning(node, React.useContext(DialogPartNameContext));
   useNestedSizeWarning(isNestedInDialog, size);
 
   const mergedRef = React.useCallback(
@@ -280,16 +311,18 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 
   return (
-    <Primitive.Popup
-      ref={mergedRef}
-      {...mergeStyleProps(
-        themeProps('dialog-popup', { size }),
-        stylex.props(reset.base, styles.popup, sizes[size], popupMotion[size]),
-        className,
-        style,
-      )}
-      {...rest}
-    />
+    <DialogContext.Provider value={surface}>
+      <Primitive.Popup
+        ref={mergedRef}
+        {...mergeStyleProps(
+          themeProps('dialog-popup', { size }),
+          stylex.props(reset.base, styles.popup, sizes[size], popupMotion[size]),
+          className,
+          style,
+        )}
+        {...rest}
+      />
+    </DialogContext.Provider>
   );
 });
 
@@ -307,8 +340,16 @@ export interface DialogProps extends Pick<
   size?: DialogSize;
 }
 
-function DialogContent({ children }: { children: DialogProps['children'] }) {
-  const { setOpen } = useDialogContext();
+/**
+ * Resolves the render-prop form of `children`. Shared with `AlertDialog`, which offers the same
+ * `close` contract and would otherwise carry a second implementation of it. Not exported from the
+ * folder's `index.ts`, for the same reason as {@link DialogPartNameContext}.
+ *
+ * Routed through the primitive's close funnel, so a controlled consumer's `onOpenChange` sees this
+ * close the same as Escape does — and can decline it.
+ */
+export function DialogContent({ children }: { children: DialogProps['children'] }) {
+  const { setOpen } = useHeadlessDialogContext();
   if (typeof children !== 'function') {
     return <>{children}</>;
   }

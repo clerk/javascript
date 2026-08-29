@@ -1786,6 +1786,8 @@ export const zhTW: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '您已經登錄。',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: '找不到 Web3 錢包擴充功能。請安裝以繼續。',
     web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',
     web3_solana_signature_generation_failed: '產生簽名時發生錯誤。請再試一次以繼續。',

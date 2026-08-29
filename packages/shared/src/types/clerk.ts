@@ -332,6 +332,16 @@ export interface Clerk {
    */
   __internal_moduleManager: ModuleManager | undefined;
 
+  /**
+   * The verification-module load timeout asked for by the loader this browser was assigned, or
+   * undefined when it asked for nothing. The assignment is randomized per page load, so it cannot
+   * be recomputed from the environment config; callers fall back to the instance-wide value on
+   * that config, and then to the SDK default.
+   *
+   * @internal
+   */
+  __internal_protectChallengeLoadTimeoutMs?: number;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -1170,6 +1180,22 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
+   * Resumes redirect-callback routing after a verification challenge has been cleared, from
+   * a page that is no longer the callback route.
+   *
+   * A challenge can interrupt a callback partway through routing, on a step whose
+   * continuation is not one of the interactive sign-in cards — an OAuth sign-in that has to
+   * become a sign-up, for instance. Once the challenge clears, the flow has to pick up where
+   * the callback left off rather than start over.
+   *
+   * @internal
+   */
+  __internal_resumeAfterProtectCheck: (
+    params?: ResumeAfterProtectCheckParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
    *
    * @param params - Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution.
@@ -1365,6 +1391,31 @@ export type HandleOAuthCallbackParams = TransferableOption &
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
+
+/**
+ * The continuation a caller observed on the resource *before* it ran a verification
+ * challenge. Supplied explicitly, because resolving a challenge re-serializes the sign-in
+ * and sign-up resources and can drop the marker the router would otherwise read back off
+ * them.
+ *
+ * @internal
+ */
+export type ProtectCheckContinuation = 'transfer_to_sign_up';
+
+/**
+ * Params for resuming a redirect callback that a Protect challenge interrupted.
+ *
+ * @internal
+ */
+export type ResumeAfterProtectCheckParams = HandleOAuthCallbackParams & {
+  /**
+   * What the flow was doing before the challenge interrupted it. See
+   * {@link ProtectCheckContinuation}.
+   *
+   * @internal
+   */
+  continuation?: ProtectCheckContinuation;
+};
 
 /**
  * A function used to navigate to a given URL after certain steps in the Clerk processes.

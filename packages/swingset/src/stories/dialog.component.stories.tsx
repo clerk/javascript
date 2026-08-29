@@ -110,8 +110,9 @@ const sectionHeader = {
  *
  * With `confirmDiscard`, closing it while the field holds anything opens a confirmation stacked on
  * top rather than closing: `panel -> prompt -> prompt`, and the veto is nothing more than a
- * controlled `open` whose `onOpenChange` declines to commit. Hand-rolled here on purpose — it is
- * what the `AlertDialog` and close-confirmation work is meant to replace.
+ * controlled `open` whose `onOpenChange` declines to commit. Hand-rolled here on purpose, to show
+ * that a veto needs no machinery; `AlertDialog`'s `useConfirmedClose` is the same thing packaged,
+ * and its page has the composed version.
  */
 function AddValueDialog({
   trigger,
@@ -540,10 +541,9 @@ export function CardSurface() {
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup render={<Card.Root elevation='overlay' />}>
-            <Dialog.CloseButton />
             <Card.Header>
-              <Dialog.Title render={<Heading size='sm' />}>Sign in</Dialog.Title>
-              <Dialog.Description render={<Text />}>Continue to your account.</Dialog.Description>
+              <Card.Title>Sign in</Card.Title>
+              <Card.Description>Continue to your account.</Card.Description>
             </Card.Header>
             <Card.Content>
               <Input placeholder='you@example.com' />
@@ -554,12 +554,13 @@ export function CardSurface() {
                   <Button
                     {...props}
                     variant='outline'
+                    fullWidth
                   >
                     Cancel
                   </Button>
                 )}
               />
-              <Button>Continue</Button>
+              <Button fullWidth>Continue</Button>
             </Card.Footer>
           </Dialog.Popup>
         </Dialog.Viewport>
@@ -585,7 +586,6 @@ export function OutsideScroll() {
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup render={<Card.Root elevation='overlay' />}>
-            <Dialog.CloseButton />
             <Card.Header>
               <Dialog.Title render={<Heading size='sm' />}>Terms of service</Dialog.Title>
               <Dialog.Description render={<Text />}>

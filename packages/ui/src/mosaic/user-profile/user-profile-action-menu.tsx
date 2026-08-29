@@ -14,16 +14,18 @@ export function UserProfileActionMenu({ label, actions }: { label: string; actio
   return (
     <Menu.Root placement='bottom-end'>
       <Menu.Trigger aria-label={label} />
-      <Menu.Content>
+      <Menu.Popup>
         {actions.map(action => (
           <Menu.Item
             key={action.label}
             color={action.color}
             label={action.label}
             onClick={action.onClick}
-          />
+          >
+            <Menu.Label>{action.label}</Menu.Label>
+          </Menu.Item>
         ))}
-      </Menu.Content>
+      </Menu.Popup>
     </Menu.Root>
   );
 }

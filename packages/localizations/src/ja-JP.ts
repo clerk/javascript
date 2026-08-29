@@ -1824,6 +1824,8 @@ export const jaJP: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '既にサインインしています。',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3ウォレット拡張機能が見つかりません。続行するにはインストールしてください。',
     web3_signature_request_rejected: '署名リクエストを拒否しました。続行するにはもう一度お試しください。',
     web3_solana_signature_generation_failed: '署名の生成中にエラーが発生しました。続行するにはもう一度お試しください。',

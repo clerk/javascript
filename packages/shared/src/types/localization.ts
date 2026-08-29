@@ -2237,6 +2237,8 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  ticket_expired_code: LocalizationValue;
+  ticket_invalid_code: LocalizationValue;
   zxcvbn: {
     notEnough: LocalizationValue;
     couldBeStronger: LocalizationValue;

@@ -1,5 +1,104 @@
 # Change Log
 
+## 4.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`5a74f4c`](https://github.com/clerk/javascript/commit/5a74f4c455961af3ec97d8c8997902dde607a980), [`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/clerk-js@6.30.2
+  - @clerk/shared@4.30.2
+  - @clerk/react@6.14.8
+
+## 4.6.0
+
+### Minor Changes
+
+- Add `useBiometricCredentials()` and biometric credential types for enrollment, management, and biometric sign-in, backed by [`clerk-ios` 1.5.0](https://github.com/clerk/clerk-ios/releases/tag/1.5.0) and [`clerk-android` 1.1.4](https://github.com/clerk/clerk-android/releases/tag/v1.1.4). The previous trusted-device exports, including `useTrustedDevices()`, remain available as deprecated aliases and will be removed in the next major release. ([#9519](https://github.com/clerk/javascript/pull/9519)) by [@seanperez29](https://github.com/seanperez29)
+
+## 4.5.4
+
+### Patch Changes
+
+- Updated dependencies [[`dbaa95a`](https://github.com/clerk/javascript/commit/dbaa95a4e9e2ebd0a6b7fdb266024490a35b7caf)]:
+  - @clerk/clerk-js@6.30.1
+  - @clerk/react@6.14.7
+  - @clerk/shared@4.30.1
+
+## 4.5.3
+
+### Patch Changes
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+  - @clerk/clerk-js@6.30.0
+  - @clerk/react@6.14.6
+
+## 4.5.2
+
+### Patch Changes
+
+- Fix `AuthView`'s `onDismiss` never firing on iOS when `isDismissible` is `false`. The callback now runs once the auth flow completes, matching Android, so an app-owned modal or screen wrapping the view can close after sign-in. ([#9501](https://github.com/clerk/javascript/pull/9501)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-ios` SDK from `1.4.0` to `1.4.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.4.1. ([#9513](https://github.com/clerk/javascript/pull/9513)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+  - @clerk/clerk-js@6.29.3
+  - @clerk/react@6.14.5
+
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/react@6.14.4
+  - @clerk/clerk-js@6.29.2
+
+## 4.5.0
+
+### Minor Changes
+
+- Add iOS and Android APIs for biometric trusted-device enrollment, sign-in, availability, listing, and revocation, including structured native error codes. Trusted-device sign-in synchronizes the JS client before resolving and returns the JS sign-in resource and `setActive()` so apps can continue second-factor, new-password, or client-trust steps. Add `useAuthViewState()` for keeping a non-dismissible root `<AuthView />` mounted through an optional trusted-device enrollment prompt, and support configuring the Face ID permission message through the Expo config plugin. ([#9257](https://github.com/clerk/javascript/pull/9257)) by [@seanperez29](https://github.com/seanperez29)
+
+  ```tsx
+  import { useTrustedDevices } from '@clerk/expo';
+
+  export function useBiometricSignIn(identifierHint: string) {
+    const { enroll, getAvailability, signIn } = useTrustedDevices();
+
+    // Call after the user completes a normal sign-in.
+    const enableBiometricSignIn = () =>
+      enroll({
+        identifierHint,
+        reason: 'Use biometrics to sign in next time.',
+      });
+
+    // Call when the user returns to sign in.
+    const signInWithBiometrics = async () => {
+      const { isAvailable } = await getAvailability({ identifierHint });
+
+      if (!isAvailable) {
+        return null;
+      }
+
+      const result = await signIn({
+        identifierHint,
+        reason: 'Use biometrics to sign in.',
+      });
+
+      // Continue any remaining steps through result.signIn.
+      return result;
+    };
+
+    return { enableBiometricSignIn, signInWithBiometrics };
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.29.2
+
 ## 4.4.0
 
 ### Minor Changes

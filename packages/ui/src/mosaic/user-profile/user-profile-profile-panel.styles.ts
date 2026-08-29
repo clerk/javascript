@@ -9,13 +9,6 @@ export const styles = stylex.create({
     display: 'flex',
     minWidth: 0,
   },
-  providerMedia: {
-    borderColor: 'light-dark(var(--cl-color-border-faded), var(--cl-color-background))',
-    borderRadius: 'var(--cl-radius-lg)',
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    backgroundColor: 'var(--cl-color-background)',
-  },
   providerIcon: {
     display: 'block',
     height: space['5'],
@@ -30,5 +23,6 @@ export const styles = stylex.create({
     gap: space['8'],
     display: 'flex',
     flexDirection: 'column',
+    width: '100%',
   },
 });

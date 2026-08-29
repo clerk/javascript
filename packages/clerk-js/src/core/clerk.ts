@@ -113,6 +113,7 @@ import type {
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
+  ResumeAfterProtectCheckParams,
   SDKMetadata,
   SessionResource,
   SessionTouchParams,
@@ -325,6 +326,16 @@ export class Clerk implements ClerkInterface {
 
   get __internal_oauthTransport(): OAuthTransport | null {
     return this.#oauthTransport;
+  }
+
+  /**
+   * The verification-module load timeout asked for by the loader THIS browser was assigned, or
+   * undefined when it asked for nothing. Exposed because the assignment is a random draw per page
+   * load and cannot be recomputed from the environment config; callers fall back to the
+   * instance-wide value on that config, and then to the SDK default.
+   */
+  get __internal_protectChallengeLoadTimeoutMs(): number | undefined {
+    return this.#protect?.challengeLoadTimeoutMs;
   }
 
   public __internal_getCachedResources:
@@ -2481,15 +2492,17 @@ export class Clerk implements ClerkInterface {
   };
 
   private _handleRedirectCallback = async (
-    params: HandleOAuthCallbackParams,
+    params: ResumeAfterProtectCheckParams,
     {
       signIn,
       signUp,
       navigate,
+      resuming = false,
     }: {
       signIn: SignInResource;
       signUp: SignUpResource;
       navigate: (to: string) => Promise<unknown>;
+      resuming?: boolean;
     },
   ): Promise<unknown> => {
     if (!this.loaded || !this.environment || !this.client) {
@@ -2633,14 +2646,14 @@ export class Clerk implements ClerkInterface {
     // sign-in's challenge. We only consult `si` here unless this is explicitly a sign-up callback.
     // Transfers are unaffected: the `signIn.create({ transfer })` path below checks its own fresh
     // response for the gate.
-    if (params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
+    if (!resuming && params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
       return navigateToSignInProtectCheck();
     }
 
     // The sign-up resource can be gated the same way (e.g. a callback that resolves straight into a
     // gated sign-up). Scope to the sign-up intent for the symmetric reason — a stale sign-up's gate
     // shouldn't hijack a sign-in callback.
-    if (params.reloadResource !== 'signIn' && su.protectCheck) {
+    if (!resuming && params.reloadResource !== 'signIn' && su.protectCheck) {
       return navigateToSignUpProtectCheck();
     }
 
@@ -2700,7 +2713,8 @@ export class Clerk implements ClerkInterface {
       return navigateToResetPassword();
     }
 
-    const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
+    const userNeedsToBeCreated =
+      si.firstFactorVerificationStatus === 'transferable' || params.continuation === 'transfer_to_sign_up';
 
     if (userNeedsToBeCreated) {
       if (params.transferable === false) {
@@ -2801,6 +2815,27 @@ export class Clerk implements ClerkInterface {
     }
 
     return navigateToSignIn();
+  };
+
+  public __internal_resumeAfterProtectCheck = async (
+    params: ResumeAfterProtectCheckParams = {},
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.loaded || !this.environment || !this.client) {
+      return;
+    }
+    const { signIn, signUp } = this.client;
+
+    const resolvedNavigate = customNavigate ?? params.__internal_navigate;
+    const navigate = (to: string) =>
+      resolvedNavigate && typeof resolvedNavigate === 'function' ? resolvedNavigate(to) : this.navigate(to);
+
+    return this._handleRedirectCallback(params, {
+      signUp,
+      signIn,
+      navigate,
+      resuming: true,
+    });
   };
 
   public handleRedirectCallback = async (
@@ -3356,7 +3391,11 @@ export class Clerk implements ClerkInterface {
         const initEnvironmentPromise = Environment.getInstance()
           .fetch({ touch: shouldTouchEnv })
           .then(res => this.updateEnvironment(res))
-          .catch(() => {
+          .catch(err => {
+            if (isError(err, 'dev_browser_unauthenticated')) {
+              throw err;
+            }
+
             ++initializationDegradedCounter;
             const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
               CLERK_ENVIRONMENT_STORAGE_ENTRY,
@@ -3418,7 +3457,11 @@ export class Clerk implements ClerkInterface {
             });
         };
 
-        const [, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        const [environmentResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        if (environmentResult.status === 'rejected') {
+          throw environmentResult.reason;
+        }
+
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 

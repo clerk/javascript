@@ -1,4 +1,6 @@
+import type { UserProfileEmail, UserProfilePhone } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -8,18 +10,26 @@ const profileImageUrl = 'https://avatars.githubusercontent.com/u/51144033?v=4';
 export { default as __source } from './user-profile-profile-panel.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileProfilePanel',
+  label: 'Profile panel',
+  navigation: { category: 'Panels' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-profile-panel.view.tsx',
 };
 
 export function Default(_args: Record<string, unknown>) {
+  const [emails, setEmails] = useState<UserProfileEmail[]>([
+    { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
+    { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
+  ]);
+  const [phones, setPhones] = useState<UserProfilePhone[]>([
+    { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
+  ]);
+
   return (
     <UserProfileProfilePanelView
-      emails={[
-        { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
-        { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
-      ]}
+      allowMultipleAccounts
+      emails={emails}
       connectedAccounts={[
         {
           id: 'google',
@@ -48,16 +58,32 @@ export function Default(_args: Record<string, unknown>) {
       ]}
       imageUrl={profileImageUrl}
       name='Preston Booth'
-      phones={[{ id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true }]}
+      phones={phones}
       username='prestonxyz'
-      onAddEmail={() => undefined}
-      onAddPhone={() => undefined}
+      onAddEmail={() =>
+        setEmails(current => [
+          ...current,
+          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
+        ])
+      }
+      onAddPhone={() =>
+        setPhones(current => [
+          ...current,
+          {
+            id: `phone_${Date.now()}`,
+            value: `+1 801-555-${String(current.length + 1).padStart(4, '0')}`,
+            isVerified: true,
+          },
+        ])
+      }
       onConnectAccount={() => undefined}
-      onDeleteAccount={() => undefined}
+      onDeleteAccount={() => Promise.resolve()}
       onEditProfilePicture={() => undefined}
+      onManageEmail={() => undefined}
+      onManagePhone={() => undefined}
       onRemoveConnectedAccount={() => undefined}
-      onRemoveEmail={() => undefined}
-      onRemovePhone={() => undefined}
+      onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
+      onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onConnectWeb3Wallet={() => undefined}
       onRemoveWeb3Wallet={() => undefined}
       onSetPrimaryWeb3Wallet={() => undefined}

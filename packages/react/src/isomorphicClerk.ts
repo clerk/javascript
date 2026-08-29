@@ -50,6 +50,7 @@ import type {
   ProtectAssertion,
   RedirectOptions,
   Resources,
+  ResumeAfterProtectCheckParams,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -301,6 +302,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
    */
   public get __internal_moduleManager(): ModuleManager | undefined {
     return this.clerkjs?.__internal_moduleManager;
+  }
+
+  public get __internal_protectChallengeLoadTimeoutMs(): number | undefined {
+    return this.clerkjs?.__internal_protectChallengeLoadTimeoutMs;
   }
 
   constructor(options: IsomorphicClerkOptions) {
@@ -1614,6 +1619,24 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       });
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
+    }
+  };
+
+  __internal_resumeAfterProtectCheck = async (
+    params?: ResumeAfterProtectCheckParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<void> => {
+    const callback = () => {
+      const clerkjs = this.clerkjs;
+      if (typeof clerkjs?.__internal_resumeAfterProtectCheck !== 'function') {
+        return;
+      }
+      void clerkjs.__internal_resumeAfterProtectCheck(params, customNavigate)?.catch(() => {});
+    };
+    if (this.clerkjs && this.loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('__internal_resumeAfterProtectCheck', callback);
     }
   };
 
