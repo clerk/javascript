@@ -15,15 +15,15 @@ is_platform() { [ "$PLATFORM" = "$1" ]; }
 ad() {
   local target=()
   if is_platform ios && [ -n "${SIM_UDID:-}" ]; then target=(--udid "$SIM_UDID"); fi
-  "$AGENT_DEVICE" "$@" --session "$AD_SESSION" --platform "$PLATFORM" "${target[@]}"
+  "$AGENT_DEVICE" "$@" --session "$AD_SESSION" --platform "$PLATFORM" ${target[@]+"${target[@]}"}
 }
 
-# Runs a command, keeps its output in AD_OUT, and prints it so CI logs carry
-# the hints and settle diffs agent-device emits.
+# Runs a command and prints its output only when it fails, so a CI log shows
+# the agent-device error and hints without the settle diffs of every step.
 ad_run() {
   local rc=0
   AD_OUT=$(ad "$@" 2>&1) || rc=$?
-  printf '%s\n' "$AD_OUT"
+  [ $rc -eq 0 ] || printf '%s\n' "$AD_OUT"
   return $rc
 }
 
@@ -60,12 +60,12 @@ launch_app() {
   if [ "${1:-}" = "--clear-state" ]; then
     step "launchApp clearState clearKeychain"
     force_stop
-    ad_run settings clear-app-state "$APP_ID" >/dev/null
+    ad_run settings clear-app-state "$APP_ID"
     if is_platform ios; then xcrun simctl keychain "${SIM_UDID:-booted}" reset; fi
   else
     step "launchApp"
   fi
-  ad_run open "$APP_ID" --relaunch >/dev/null
+  ad_run open "$APP_ID" --relaunch
 }
 
 stop_app() {
@@ -75,15 +75,22 @@ stop_app() {
 
 tap_on_id() {
   step "tapOn id=$1"
-  ad_run press "id=\"$1\"" >/dev/null
+  ad_run press "id=\"$1\""
 }
 tap_on_text() {
   step "tapOn text=$*"
-  ad_run press "$(selector_text "$@")" >/dev/null
+  ad_run press "$(selector_text "$@")"
 }
+# Back controls: iOS exposes a labeled button next to a navigation bar with the
+# same label, so the role disambiguates; Compose puts the label on a group
+# wrapping an unlabeled button, so text alone is the unique match there.
 tap_on_button_text() {
   step "tapOn button text=$*"
-  ad_run press "role=button $(selector_text "$@")" >/dev/null
+  if is_platform ios; then
+    ad_run press "role=button $(selector_text "$@")"
+  else
+    ad_run press "$(selector_text "$@")"
+  fi
 }
 
 # inputText: fill replaces the field value, so Maestro's eraseText has no
@@ -105,7 +112,7 @@ wait_visible_text() {
 }
 wait_visible_substring() {
   step "extendedWaitUntil substring=$2 (${1}ms)"
-  ad_run find text "$2" wait "$1" >/dev/null
+  ad_run find text "$2" wait "$1"
 }
 
 assert_visible_id() {
@@ -129,7 +136,7 @@ wait_for_animation_to_end() {
 
 back_system() {
   step "back"
-  ad_run back --system >/dev/null
+  ad_run back --system
 }
 
 run_flow() {

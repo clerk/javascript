@@ -30,6 +30,13 @@ enter_identifier_and_continue() {
 }
 retry 2 enter_identifier_and_continue
 
+# Instances that offer the email link first (clerk-android prefers it when
+# available) land on a screen no automation can complete; switch to the
+# password strategy. Never taken on the CI instance.
+if is_visible_text "Open email app"; then
+  tap_on_text "Use another method"
+  tap_on_text "Sign in with your password"
+fi
 # Email-code-first: for +clerk_test@ emails the documented test code is
 # 424242: https://clerk.com/docs/testing/test-emails-and-phones
 if is_visible_text "Check your email"; then
