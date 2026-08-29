@@ -21,7 +21,7 @@ const mountAllClerkAstroJSComponents = () => {
     waitlist: 'mountWaitlist',
     'pricing-table': 'mountPricingTable',
     'api-keys': 'mountAPIKeys',
-    'oauth-device-verification': 'mountOAuthDeviceVerification',
+    'oauth-device-verification': '__internal_mountOAuthDeviceVerification',
   } as const satisfies Record<InternalUIComponentId, keyof Clerk>;
 
   Object.entries(mountFns).forEach(([category, mountFn]) => {

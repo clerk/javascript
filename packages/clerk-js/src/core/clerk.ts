@@ -1546,7 +1546,7 @@ export class Clerk implements ClerkInterface {
     return this.unmountOAuthConsent(node);
   };
 
-  public mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
+  public __internal_mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderOAuthDeviceVerificationComponentWhenUserDoesNotExist, {
@@ -1572,7 +1572,7 @@ export class Clerk implements ClerkInterface {
     this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
-  public unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
+  public __internal_unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 

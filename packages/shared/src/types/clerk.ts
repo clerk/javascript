@@ -853,14 +853,17 @@ export interface Clerk {
    *
    * @param targetNode - Target node to mount the OAuth device verification component.
    * @param props - OAuth device verification configuration parameters.
+   * @internal
    */
-  mountOAuthDeviceVerification: (targetNode: HTMLDivElement, props?: OAuthDeviceVerificationProps) => void;
+  __internal_mountOAuthDeviceVerification: (targetNode: HTMLDivElement, props?: OAuthDeviceVerificationProps) => void;
 
   /**
    * Unmounts an OAuth device verification component from the target element.
    * If there is no component mounted at the target node, this is a noop.
+   *
+   * @internal
    */
-  unmountOAuthDeviceVerification: (targetNode: HTMLDivElement) => void;
+  __internal_unmountOAuthDeviceVerification: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a TaskChooseOrganization component at the target element.

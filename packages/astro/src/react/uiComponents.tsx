@@ -212,8 +212,8 @@ export const OAuthConsent = withClerk(({ clerk, ...props }: WithClerkProp<OAuthC
 export const OAuthDeviceVerification = withClerk(({ clerk, ...props }: WithClerkProp<OAuthDeviceVerificationProps>) => {
   return (
     <Portal
-      mount={clerk?.mountOAuthDeviceVerification}
-      unmount={clerk?.unmountOAuthDeviceVerification}
+      mount={clerk?.__internal_mountOAuthDeviceVerification}
+      unmount={clerk?.__internal_unmountOAuthDeviceVerification}
       props={props}
     />
   );

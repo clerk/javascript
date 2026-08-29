@@ -9,8 +9,8 @@ const props = defineProps<OAuthDeviceVerificationProps>();
 
 <template>
   <ClerkHostRenderer
-    :mount="clerk?.mountOAuthDeviceVerification"
-    :unmount="clerk?.unmountOAuthDeviceVerification"
+    :mount="clerk?.__internal_mountOAuthDeviceVerification"
+    :unmount="clerk?.__internal_unmountOAuthDeviceVerification"
     :update-props="(clerk as any)?.__internal_updateProps"
     :props="props"
   />

@@ -702,8 +702,8 @@ export const OAuthDeviceVerification = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountOAuthDeviceVerification}
-            unmount={clerk.unmountOAuthDeviceVerification}
+            mount={clerk.__internal_mountOAuthDeviceVerification}
+            unmount={clerk.__internal_unmountOAuthDeviceVerification}
             updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
