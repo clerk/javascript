@@ -2870,6 +2870,18 @@ export type TaskSetupMFAProps = {
 };
 
 /** @generateWithEmptyComment */
+export type TaskSetupPasskeyProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+   */
+  appearance?: ClerkAppearanceTheme;
+};
+
+/** @generateWithEmptyComment */
 export type CreateOrganizationInvitationParams = {
   /**
    * The email address of the user to invite.

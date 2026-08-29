@@ -13,12 +13,14 @@ import {
   TaskChooseOrganizationContext,
   TaskResetPasswordContext,
   TaskSetupMFAContext,
+  TaskSetupPasskeyContext,
   useSessionTasksContext,
 } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
 import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
 import { TaskResetPassword } from './tasks/TaskResetPassword';
 import { TaskSetupMFA } from './tasks/TaskSetupMfa';
+import { TaskSetupPasskey } from './tasks/TaskSetupPasskey';
 
 const SessionTasksStart = () => {
   const clerk = useClerk();
@@ -107,6 +109,13 @@ function SessionTasksRoutes(): JSX.Element {
           >
             <TaskSetupMFA />
           </TaskSetupMFAContext.Provider>
+        </Route>
+        <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['setup-passkey']}>
+          <TaskSetupPasskeyContext.Provider
+            value={{ componentName: 'TaskSetupPasskey', redirectUrlComplete: ctx.redirectUrlComplete }}
+          >
+            <TaskSetupPasskey />
+          </TaskSetupPasskeyContext.Provider>
         </Route>
         <Route index>
           <SessionTasksStart />
