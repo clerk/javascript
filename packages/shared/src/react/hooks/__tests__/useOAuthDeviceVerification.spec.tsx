@@ -230,4 +230,25 @@ describe('useOAuthDeviceVerification', () => {
     expect(result.current.result).toBeUndefined();
     expect(result.current.error).toBeNull();
   });
+
+  it('reset keeps a pending decision locked until its request settles', async () => {
+    let resolveSubmit!: (value: OAuthDeviceVerificationResult) => void;
+    submitDeviceVerification.mockImplementationOnce(() => new Promise(resolve => (resolveSubmit = resolve)));
+    const { result } = renderHook(() => useOAuthDeviceVerification(), { wrapper });
+
+    let first!: Promise<OAuthDeviceVerificationResult>;
+    act(() => {
+      first = result.current.approve({ userCode: 'BCDF-GHJK' });
+    });
+    act(() => result.current.reset());
+
+    const second = result.current.deny({ userCode: 'BCDF-GHJK' });
+    await expect(second).rejects.toMatchObject({ code: 'oauth_device_verification_submission_in_progress' });
+    expect(submitDeviceVerification).toHaveBeenCalledOnce();
+
+    resolveSubmit(approvedResult);
+    await act(() => first);
+    await act(() => result.current.deny({ userCode: 'BCDF-GHJK' }));
+    expect(submitDeviceVerification).toHaveBeenCalledTimes(2);
+  });
 });

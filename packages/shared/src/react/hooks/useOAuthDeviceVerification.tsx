@@ -187,7 +187,6 @@ export function useOAuthDeviceVerification(): UseOAuthDeviceVerificationReturn {
   const reset = useCallback(() => {
     generation.current += 1;
     pendingLookup.current = null;
-    pendingSubmit.current = null;
     setData(undefined);
     setResult(undefined);
     setError(null);
