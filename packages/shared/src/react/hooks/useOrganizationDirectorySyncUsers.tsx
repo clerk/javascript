@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import type { DirectorySyncUserResource, GetDirectorySyncUsersParams } from '../../types/directorySync';
+import type {
+  DirectorySyncResource,
+  DirectorySyncUserResource,
+  GetDirectorySyncUsersParams,
+} from '../../types/directorySync';
 import { useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
@@ -12,7 +16,8 @@ import { useOrganizationDirectorySyncUsersCacheKeys } from './useOrganizationDir
 const DEFAULT_POLL_INTERVAL_MS = 2_000;
 
 export type UseOrganizationDirectorySyncUsersParams = {
-  enterpriseConnectionId: string | null;
+  /** The directory to list users for, e.g. `data` from `useOrganizationDirectorySync`. Dormant while nullish. */
+  directory: DirectorySyncResource | null | undefined;
   /**
    * Pass-through fetch parameters (pagination).
    * Defaults to `{ initialPage: 1, pageSize: 10 }`.
@@ -70,7 +75,7 @@ function useOrganizationDirectorySyncUsers(
   params: UseOrganizationDirectorySyncUsersParams,
 ): UseOrganizationDirectorySyncUsersReturn {
   const {
-    enterpriseConnectionId,
+    directory,
     params: fetchParams = { initialPage: 1, pageSize: 10 },
     pollIntervalMs = DEFAULT_POLL_INTERVAL_MS,
     enabled = true,
@@ -80,6 +85,7 @@ function useOrganizationDirectorySyncUsers(
   const clerk = useClerkInstanceContext();
   const organization = useOrganizationBase();
   const [queryClient] = useClerkQueryClient();
+  const enterpriseConnectionId = directory?.enterpriseConnectionId ?? null;
 
   const { queryKey, invalidationKey, stableKey, authenticated } = useOrganizationDirectorySyncUsersCacheKeys({
     organizationId: organization?.id ?? null,
@@ -93,7 +99,7 @@ function useOrganizationDirectorySyncUsers(
     stableKeys: stableKey,
   });
 
-  const queryEnabled = enabled && clerk.loaded && Boolean(organization) && Boolean(enterpriseConnectionId);
+  const queryEnabled = enabled && clerk.loaded && Boolean(organization) && Boolean(directory);
 
   const [shouldPoll, setShouldPoll] = useState(false);
 
@@ -106,10 +112,10 @@ function useOrganizationDirectorySyncUsers(
   const query = useClerkQuery({
     queryKey,
     queryFn: () => {
-      if (!enterpriseConnectionId) {
-        throw new Error('enterpriseConnectionId is required to fetch directory users');
+      if (!directory) {
+        throw new Error('directory is required to fetch directory users');
       }
-      return organization?.getDirectorySyncUsers(enterpriseConnectionId, fetchParams);
+      return directory.getUsers(fetchParams);
     },
     refetchInterval: () => (shouldPoll ? pollIntervalMs : false),
     enabled: queryEnabled,
