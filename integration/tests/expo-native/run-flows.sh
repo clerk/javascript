@@ -1,50 +1,66 @@
 #!/usr/bin/env bash
-# Runs every top-level Maestro flow (flows/*.yaml; flows/subflows/ are
-# runFlow-only pieces) as one CLI invocation per flow, so a hang or crash in
-# one flow can't poison the rest, with one clean-state retry per flow.
-# Whole-flow retry can mask app instability (the Maestro docs discourage it),
-# so it is capped at a single retry purely to absorb emulator/simulator flake.
+# Runs every top-level flow (flows/*.sh; flows/subflows/ are run_flow-only
+# pieces) in its own agent-device session, so a hang or crash in one flow
+# can't poison the rest, with one clean-state retry per flow. Whole-flow retry
+# can mask app instability, so it is capped at a single retry purely to absorb
+# emulator/simulator flake.
 #
-# Usage: ./run-flows.sh [force-stop command...]
-#   CI iOS:     ./run-flows.sh xcrun simctl terminate "$SIM_UDID" com.clerk.exponativebuildfixture
-#   CI Android: ./run-flows.sh adb shell am force-stop com.clerk.exponativebuildfixture
-#   Local:      ./run-flows.sh
+# Usage: ./run-flows.sh <ios|android>
+#   CI iOS:     SIM_UDID=... ./run-flows.sh ios       (app installed by caller)
+#   CI Android: ./run-android-flows.sh <apk>           (installs, then runs android)
 #
-# Required env: CLERK_TEST_EMAIL, CLERK_TEST_PASSWORD
-# Optional env: MAESTRO_DEBUG_OUTPUT (directory for CI debug artifacts)
+# Required env: CLERK_TEST_EMAIL, CLERK_TEST_PASSWORD; SIM_UDID on ios
+# Optional env: E2E_DEBUG_OUTPUT (directory for CI debug artifacts),
+#               AGENT_DEVICE (binary, default: agent-device on PATH)
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Runs the official maestro CLI. maestro-runner was tried and reverted: its
-# drivers mangle typed text and resolve text selectors by substring, so
-# tapOn 'Continue' hits the 'Continue to <app>' title instead of the button.
-command -v maestro >/dev/null 2>&1 || {
-  echo "maestro is required: https://docs.maestro.dev"
+export PLATFORM=${1:?platform (ios|android) is required}
+export AGENT_DEVICE=${AGENT_DEVICE:-agent-device}
+export APP_ID=com.clerk.exponativebuildfixture
+export FLOWS_DIR=$PWD/flows
+
+command -v "$AGENT_DEVICE" >/dev/null 2>&1 || {
+  echo "agent-device is required: https://github.com/callstack/agent-device"
   exit 1
 }
-
 : "${CLERK_TEST_EMAIL:?CLERK_TEST_EMAIL is required}"
 : "${CLERK_TEST_PASSWORD:?CLERK_TEST_PASSWORD is required}"
+if [ "$PLATFORM" = ios ]; then : "${SIM_UDID:?SIM_UDID is required on ios}"; fi
 
-force_stop() { if [ "$#" -gt 0 ]; then "$@" >/dev/null 2>&1 || true; fi; }
+debug_root=${E2E_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-agent-device-runner}
 
-run_flow() {
-  local output_name=$1
-  shift
-  local output_root=${MAESTRO_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-maestro-runner}
-
-  maestro test \
-    --debug-output "$output_root/$output_name" \
-    --flatten-debug-output \
+with_lib() {
+  (
+    source ./lib.sh
     "$@"
+  ) || true
+}
+
+# One attempt of one flow in a fresh session. Failure evidence goes to
+# $debug_root/<name>/ before the session is closed.
+run_flow_attempt() {
+  local name=$1 flow=$2
+  local out_dir=$debug_root/$name
+  mkdir -p "$out_dir"
+  export AD_SESSION=e2e-$name
+  local rc=0
+  (
+    set -e
+    source ./lib.sh
+    echo "Flow $flow"
+    source "$flow"
+  ) 2>&1 | tee "$out_dir/steps.log" || rc=${PIPESTATUS[0]}
+  if [ "$rc" -ne 0 ]; then
+    with_lib ad_screenshot "$out_dir/failure.png"
+    cp -R "$(with_lib ad_session_dir)" "$out_dir/session" 2>/dev/null || true
+  fi
+  with_lib ad_close
+  return "$rc"
 }
 
 record_result() {
-  local flow=$1
-  local result=$2
-  local attempts=$3
-  local duration=$4
-
+  local flow=$1 result=$2 attempts=$3 duration=$4
   echo "Flow $flow: $result after $attempts attempt(s) in ${duration}s"
   if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     printf '| `%s` | %s | %s | %ss |\n' "$flow" "$result" "$attempts" "$duration" >> "$GITHUB_STEP_SUMMARY"
@@ -53,7 +69,7 @@ record_result() {
 
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   {
-    echo '### Maestro flow timings'
+    echo '### agent-device flow timings'
     echo '| Flow | Result | Attempts | Duration |'
     echo '| --- | --- | ---: | ---: |'
   } >> "$GITHUB_STEP_SUMMARY"
@@ -63,52 +79,47 @@ fi
 warmup_started=$SECONDS
 warmup_result=failed
 for warmup_attempt in 1 2; do
-  if run_flow "warmup-attempt-$warmup_attempt" flows/subflows/_warmup.yaml; then
+  if run_flow_attempt "warmup-attempt-$warmup_attempt" flows/subflows/_warmup.sh; then
     warmup_result=passed
     break
   fi
-  force_stop "$@"
+  with_lib force_stop
   if [ "$warmup_attempt" -eq 1 ]; then
     echo "::warning::Warmup failed attempt 1, retrying after 10s..."
     sleep 10
   fi
 done
-warmup_duration=$((SECONDS - warmup_started))
-record_result "_warmup" "$warmup_result" "$warmup_attempt" "$warmup_duration"
+record_result "_warmup" "$warmup_result" "$warmup_attempt" "$((SECONDS - warmup_started))"
 if [ "$warmup_result" != passed ]; then
-  echo "::error::Warmup failed after 2 attempts; aborting Maestro flows"
+  echo "::error::Warmup failed after 2 attempts; aborting flows"
   exit 1
 fi
 
-# Force-stop so the first launchApp clearState doesn't race the warm process.
-force_stop "$@"
+# Force-stop so the first clean-state launch doesn't race the warm process.
+with_lib force_stop
 
-# Every flows/*.yaml is a cross-platform test (platform differences live in
-# per-step `when: platform:` conditionals); flows/subflows/ are runFlow-only.
+# Every flows/*.sh is a cross-platform test (platform differences live in
+# is_platform branches); flows/subflows/ are run_flow-only.
 status=0
-for flow in flows/*.yaml; do
+for flow in flows/*.sh; do
   [ -e "$flow" ] || continue
   flow_started=$SECONDS
   flow_result=failed
   for attempt in 1 2; do
-    if run_flow "${flow##*/}-attempt-$attempt" \
-      -e CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
-      -e CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
-      "$flow"; then
+    if run_flow_attempt "${flow##*/}-attempt-$attempt" "$flow"; then
       flow_result=passed
       break
     fi
     if [ "$attempt" -eq 2 ]; then
       echo "::error::Flow $flow failed after 2 attempts"
       status=1
-      force_stop "$@"
+      with_lib force_stop
       break
     fi
     echo "::warning::Flow $flow failed attempt $attempt, retrying after 10s..."
-    force_stop "$@"
+    with_lib force_stop
     sleep 10
   done
-  flow_duration=$((SECONDS - flow_started))
-  record_result "$flow" "$flow_result" "$attempt" "$flow_duration"
+  record_result "$flow" "$flow_result" "$attempt" "$((SECONDS - flow_started))"
 done
 exit $status
