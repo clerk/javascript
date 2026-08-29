@@ -101,7 +101,7 @@ jobs:
         with:
           path: ${{ steps.native-build-key.outputs.artifact }}
           # Bump the version when native build commands change.
-          key: expo-native-build-v2-${{ runner.os }}-${{ matrix.expo-sdk }}-${{ matrix.platform }}-${{ matrix.run-e2e == true && 'e2e' || 'build' }}-${{ env.E2E_INSTANCE_NAME }}-${{ steps.native-build-key.outputs.hash }}
+          key: expo-native-build-v1-${{ runner.os }}-${{ matrix.expo-sdk }}-${{ matrix.platform }}-${{ matrix.run-e2e == true && 'e2e' || 'build' }}-${{ env.E2E_INSTANCE_NAME }}-${{ steps.native-build-key.outputs.hash }}
 
       - if: steps.native-build-cache.outputs.cache-hit != 'true'
         uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
@@ -194,7 +194,6 @@ jobs:
           # This workflow never runs on main, so the default (write from main
           # only) would never seed the cache.
           cache-read-only: false
-          cache-write-only: true
           add-job-summary: on-failure
 
       - name: Prebuild Android fixture
@@ -243,7 +242,7 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.agent-device/apple-runner/derived
-          key: agent-device-runner-${{ runner.os }}-${{ env.AGENT_DEVICE_VERSION }}-${{ steps.xcode.outputs.version }}-cold
+          key: agent-device-runner-${{ runner.os }}-${{ env.AGENT_DEVICE_VERSION }}-${{ steps.xcode.outputs.version }}
 
       - name: Install agent-device CLI
         if: steps.keys.outputs.pk != ''
@@ -342,7 +341,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-34-google_apis-x86_64-v2
+          key: avd-34-google_apis-x86_64-v1
 
       - name: Create AVD snapshot
         if: matrix.platform == 'android' && steps.user.outputs.user_id != '' && steps.avd-cache.outputs.cache-hit != 'true'
