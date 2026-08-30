@@ -392,6 +392,10 @@ describe('areAllOrganizationDomainsVerified', () => {
   it('domain without ownership verification → false', () => {
     expect(areAllOrganizationDomainsVerified([makeDomain(null)])).toBe(false);
   });
+
+  it('ignores affiliation-only domains that were not selected for ownership verification', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain('verified'), makeDomain(null)])).toBe(true);
+  });
 });
 
 describe('connectionBackingEmail', () => {
