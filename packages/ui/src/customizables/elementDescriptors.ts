@@ -215,6 +215,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'organizationSwitcherTrigger',
   'organizationSwitcherTriggerIcon',
+  'organizationSwitcherTriggerBadge',
   'organizationSwitcherPopoverRootBox',
   'organizationSwitcherPopoverCard',
   'organizationSwitcherPopoverMain',
