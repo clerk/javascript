@@ -321,6 +321,12 @@ const withNeedsClientTrust = await withInstanceKeys(
 
 const withPasskeys = await withInstanceKeys('with-passkeys', base.clone().setId('withPasskeys'));
 
+const withPasskeys = base
+  .clone()
+  .setId('withPasskeys')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-passkeys').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-passkeys').pk);
+
 export const envs = {
   base,
   sessionsProd1,
