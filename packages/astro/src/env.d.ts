@@ -31,9 +31,6 @@ interface ImportMeta {
 declare namespace App {
   interface Locals {
     runtime?: { env: InternalEnv };
-    keylessClaimUrl?: string;
-    keylessApiKeysUrl?: string;
-    keylessPublishableKey?: string;
   }
 }
 

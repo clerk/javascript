@@ -1,4 +1,5 @@
-import { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } from './devCache';
+import { completeClaimedOnboarding } from './completeClaimedOnboarding';
+import { clerkDevelopmentCache, createKeylessModeMessage } from './devCache';
 import type { AccountlessApplication } from './types';
 
 const KEYLESS_SOURCE_FALLBACK = 'javascript';
@@ -34,18 +35,20 @@ export interface KeylessStorage {
 }
 
 /**
- * API adapter for keyless mode operations.
+ * API adapter for SDKs that only complete onboarding for already-claimed keyless
+ * applications and no longer mint new ones.
  * This abstraction allows the service to work without depending on @clerk/backend.
  */
-export interface KeylessAPI {
+export interface KeylessCompletionAPI {
   /**
    * Creates a new accountless application.
+   * Omitted by SDKs that no longer mint keyless applications.
    *
    * @param requestHeaders - Optional headers to include with the request.
    * @param source - Optional source value to include with the request.
    * @returns The created AccountlessApplication or null if failed.
    */
-  createAccountlessApplication(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
+  createAccountlessApplication?(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
 
   /**
    * Notifies the backend that onboarding is complete (instance has been claimed).
@@ -58,6 +61,13 @@ export interface KeylessAPI {
 }
 
 /**
+ * API adapter for keyless mode operations, for SDKs that can still mint keyless applications.
+ */
+export interface KeylessAPI extends KeylessCompletionAPI {
+  createAccountlessApplication(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
+}
+
+/**
  * Options for creating a keyless service.
  */
 export interface KeylessServiceOptions {
@@ -67,9 +77,9 @@ export interface KeylessServiceOptions {
   storage: KeylessStorage;
 
   /**
-   * API adapter for keyless operations (create application, complete onboarding).
+   * API adapter for keyless operations (complete onboarding, optionally create application).
    */
-  api: KeylessAPI;
+  api: KeylessCompletionAPI;
 
   /**
    * Optional: Framework name for metadata (e.g., 'Next.js', 'TanStack Start').
@@ -210,6 +220,10 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
         return existingConfig;
       }
 
+      if (!api.createAccountlessApplication) {
+        return null;
+      }
+
       // Create metadata headers
       const headers = createMetadataHeaders(framework, frameworkVersion);
 
@@ -260,21 +274,7 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
           Boolean(configuredPublishableKey) && configuredPublishableKey === locallyStoredKeys?.publishableKey;
 
         if (runningWithClaimedKeys && locallyStoredKeys) {
-          // Complete onboarding when running with claimed keys
-          try {
-            await clerkDevelopmentCache?.run(() => this.completeOnboarding(), {
-              cacheKey: `${locallyStoredKeys.publishableKey}_complete`,
-              onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
-            });
-          } catch {
-            // noop
-          }
-
-          clerkDevelopmentCache?.log({
-            cacheKey: `${locallyStoredKeys.publishableKey}_claimed`,
-            msg: createConfirmationMessage(),
-          });
-
+          await completeClaimedOnboarding(locallyStoredKeys.publishableKey, this);
           return { publishableKey, secretKey, claimUrl, apiKeysUrl };
         }
 
