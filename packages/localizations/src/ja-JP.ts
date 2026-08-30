@@ -747,6 +747,7 @@ export const jaJP: LocalizationResource = {
         },
         verifiedAtLabel: "{{ date | shortDate('ja-JP') }} に確認",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} を追加',

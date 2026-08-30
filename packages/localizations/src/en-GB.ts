@@ -739,6 +739,7 @@ export const enGB: LocalizationResource = {
         },
         verifiedAtLabel: "Verified on {{ date | shortDate('en-GB') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Add {{domain}}',

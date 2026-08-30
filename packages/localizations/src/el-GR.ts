@@ -740,6 +740,7 @@ export const elGR: LocalizationResource = {
         },
         verifiedAtLabel: "Επαληθεύτηκε στις {{ date | shortDate('el-GR') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Προσθήκη {{domain}}',

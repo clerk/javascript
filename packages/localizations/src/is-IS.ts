@@ -746,6 +746,7 @@ export const isIS: LocalizationResource = {
         },
         verifiedAtLabel: "Staðfest {{ date | shortDate('is-IS') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Bæta við {{domain}}',

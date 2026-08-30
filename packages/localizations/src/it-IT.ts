@@ -746,6 +746,7 @@ export const itIT: LocalizationResource = {
         },
         verifiedAtLabel: "Verificato il {{ date | shortDate('it-IT') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Aggiungi {{domain}}',

@@ -747,6 +747,7 @@ export const teIN: LocalizationResource = {
         },
         verifiedAtLabel: "{{ date | shortDate('te-IN') }} న ధృవీకరించబడింది",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} జోడించు',

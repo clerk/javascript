@@ -747,6 +747,7 @@ export const huHU: LocalizationResource = {
         },
         verifiedAtLabel: "Igazolva: {{ date | shortDate('hu-HU') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} hozzáadása',

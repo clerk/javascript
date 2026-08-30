@@ -746,6 +746,7 @@ export const bnIN: LocalizationResource = {
         },
         verifiedAtLabel: "{{ date | shortDate('bn-IN') }} তারিখে যাচাই করা হয়েছে",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} যোগ করুন',

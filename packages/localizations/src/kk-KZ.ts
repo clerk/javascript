@@ -740,6 +740,7 @@ export const kkKZ: LocalizationResource = {
         },
         verifiedAtLabel: "{{ date | shortDate('kk-KZ') }} күні расталды",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} қосу',

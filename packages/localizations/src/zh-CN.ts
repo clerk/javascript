@@ -739,6 +739,7 @@ export const zhCN: LocalizationResource = {
         },
         verifiedAtLabel: "验证于 {{ date | shortDate('zh-CN') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '添加 {{domain}}',

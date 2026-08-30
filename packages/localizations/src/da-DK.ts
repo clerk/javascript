@@ -739,6 +739,7 @@ export const daDK: LocalizationResource = {
         },
         verifiedAtLabel: "Bekræftet den {{ date | shortDate('da-DK') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Tilføj {{domain}}',

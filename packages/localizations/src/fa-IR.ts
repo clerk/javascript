@@ -745,6 +745,7 @@ export const faIR: LocalizationResource = {
         },
         verifiedAtLabel: "تأیید‌شده در {{ date | shortDate('fa-IR') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'افزودن {{domain}}',
