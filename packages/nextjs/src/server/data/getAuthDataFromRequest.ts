@@ -17,6 +17,7 @@ import {
   TokenType,
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
+import { createCheckAuthorizationFromOAuthScopes } from '@clerk/shared/authorization';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
@@ -171,7 +172,13 @@ const handleMachineToken = (
     return {
       ...authObject,
       getToken: () => (authObject.isAuthenticated ? Promise.resolve(bearerToken) : Promise.resolve(null)),
-      has: () => false,
+      has:
+        authObject.tokenType === TokenType.OAuthToken
+          ? createCheckAuthorizationFromOAuthScopes({
+              userId: authObject.userId,
+              oauthScopes: authObject.scopes,
+            })
+          : () => false,
     } as MachineAuthObject<MachineTokenType>;
   }
 

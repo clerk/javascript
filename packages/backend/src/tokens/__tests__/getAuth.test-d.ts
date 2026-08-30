@@ -42,10 +42,14 @@ describe('getAuth() or auth() with request parameter', () => {
       expectTypeOf(auth).toExtend<SessionAuthObject>();
     } else if (auth.tokenType === 'api_key') {
       expectTypeOf(auth).toExtend<MachineAuthObject<'api_key'>>();
+      // @ts-expect-error OAuth scope checks are only available for OAuth tokens.
+      auth.has({ oauth_scope: 'profile' });
     } else if (auth.tokenType === 'm2m_token') {
       expectTypeOf(auth).toExtend<MachineAuthObject<'m2m_token'>>();
     } else if (auth.tokenType === 'oauth_token') {
       expectTypeOf(auth).toExtend<MachineAuthObject<'oauth_token'>>();
+      auth.has({ oauth_scope: 'profile' });
+      auth.has({ role: 'org:admin' });
     }
   });
 });
