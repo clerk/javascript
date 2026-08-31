@@ -31,7 +31,7 @@ function throwRemovedControlComponentError(
  * - Core 3 upgrade guide: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3
  * - `<Show>` component docs: https://clerk.com/docs/reference/components/control/show
  *
- * @deprecated Removed in Clerk Core 3. Rendering `<SignedIn>` throws an error. Use `<Show when="signed-in">` instead — see https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3.
+ * @deprecated Removed in Clerk Core 3 (`@clerk/nextjs@7.0.0`). Rendering `<SignedIn>` throws an error. Use `<Show when="signed-in">` instead — see https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3.
  */
 export function SignedIn(_props: RemovedControlComponentProps): never {
   return throwRemovedControlComponentError(
@@ -61,7 +61,7 @@ export function SignedIn(_props: RemovedControlComponentProps): never {
  * - Core 3 upgrade guide: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3
  * - `<Show>` component docs: https://clerk.com/docs/reference/components/control/show
  *
- * @deprecated Removed in Clerk Core 3. Rendering `<SignedOut>` throws an error. Use `<Show when="signed-out">` instead — see https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3.
+ * @deprecated Removed in Clerk Core 3 (`@clerk/nextjs@7.0.0`). Rendering `<SignedOut>` throws an error. Use `<Show when="signed-out">` instead — see https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3.
  */
 export function SignedOut(_props: RemovedControlComponentProps): never {
   return throwRemovedControlComponentError(
@@ -95,7 +95,7 @@ export function SignedOut(_props: RemovedControlComponentProps): never {
  * - Core 3 upgrade guide: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3
  * - `<Show>` component docs: https://clerk.com/docs/reference/components/control/show
  *
- * @deprecated Removed in Clerk Core 3. Rendering `<Protect>` throws an error. Use `<Show when={...}>` instead — see https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3.
+ * @deprecated Removed in Clerk Core 3 (`@clerk/nextjs@7.0.0`). Rendering `<Protect>` throws an error. Use `<Show when={...}>` instead — see https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3.
  */
 export function Protect(_props: RemovedControlComponentProps): never {
   return throwRemovedControlComponentError('Protect', 'https://clerk.com/err/protect-is-not-available-in-clerk-nextjs');
