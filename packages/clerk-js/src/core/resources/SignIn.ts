@@ -388,6 +388,12 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
+    // A pending `protect_check` leaves the hand-off unprepared: the server returns before it
+    // builds a verification, so there is no external URL to navigate to. Stop rather than
+    // reporting the response as invalid — the caller runs the challenge and calls back in with
+    // `continueSignIn`, at which point the hand-off is prepared for real.
+    const isChallengePending = () => !!this.protectCheck || this.status === 'needs_protect_check';
+
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
@@ -395,6 +401,10 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
       });
+
+      if (isChallengePending()) {
+        return;
+      }
     }
 
     if (strategy === 'enterprise_sso') {
@@ -405,6 +415,10 @@ export class SignIn extends BaseResource implements SignInResource {
         oidcPrompt,
         enterpriseConnectionId,
       });
+
+      if (isChallengePending()) {
+        return;
+      }
     }
 
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;

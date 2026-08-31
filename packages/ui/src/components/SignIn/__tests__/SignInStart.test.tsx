@@ -450,6 +450,28 @@ describe('SignInStart', () => {
         continueSignIn: true,
       });
     });
+
+    it('routes to the challenge when preparing the hand-off raises one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        } as unknown as SignInResource),
+      );
+      // No redirect is issued: the sign-in comes back sitting on the challenge instead.
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
+        return Promise.resolve();
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('protect-check');
+    });
   });
 
   describe('Identifier switching', () => {
