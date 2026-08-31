@@ -1712,6 +1712,7 @@ export const deDE: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2066,6 +2067,7 @@ export const deDE: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Scannen Sie stattdessen den QR-Code',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'QR-Code kann nicht gescannt werden?',
         infoText__ableToScan:
           'Richten Sie eine neue Anmeldemethode in Ihrer Authentifizierungs-App ein und scannen Sie den folgenden QR-Code, um ihn mit Ihrem Konto zu verknüpfen.',

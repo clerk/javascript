@@ -1701,6 +1701,7 @@ export const idID: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2037,6 +2038,7 @@ export const idID: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         infoText__ableToScan: undefined,
         infoText__unableToScan: undefined,

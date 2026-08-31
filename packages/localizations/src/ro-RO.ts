@@ -1709,6 +1709,7 @@ export const roRO: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2050,6 +2051,7 @@ export const roRO: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Scanează codul QR în schimb',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Nu poți scana codul QR?',
         infoText__ableToScan:
           'Adaugă o metodă nouă de autentificare în aplicația ta și scanează codul QR de mai jos pentru a o lega de cont.',

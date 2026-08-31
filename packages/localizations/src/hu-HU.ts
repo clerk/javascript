@@ -1713,6 +1713,7 @@ export const huHU: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Inkább olvasd be a QR kódot',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Nem tudod beolvasni a QR kódot?',
         formButtonPrimary: 'Folytatás',
         formButtonReset: 'Mégse',
@@ -2062,6 +2063,7 @@ export const huHU: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Inkább olvasd be a QR kódot',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Nem tudod beolvasni a QR kódot?',
         infoText__ableToScan:
           'Állíts be egy új belépési módot, a hitelesítő alkalmazásodban és olvasd a QR kódot, hogy összekösd a fiókoddal.',

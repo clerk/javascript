@@ -1714,6 +1714,7 @@ export const msMY: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Imbas kod QR sebaliknya',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Tidak boleh imbas kod QR?',
         formButtonPrimary: 'Teruskan',
         formButtonReset: 'Batalkan',
@@ -2067,6 +2068,7 @@ export const msMY: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Imbas kod QR sebaliknya',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Tidak dapat mengimbas kod QR?',
         infoText__ableToScan:
           'Sediakan kaedah pendaftaran masuk baharu dalam aplikasi pengesah anda dan imbas kod QR berikut untuk menghubungkannya ke akaun anda.',

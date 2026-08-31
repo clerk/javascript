@@ -1705,6 +1705,7 @@ export const elGR: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2055,6 +2056,7 @@ export const elGR: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Σάρωση QR κωδικού αντί αυτού',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Δεν μπορείτε να σαρώσετε τον QR κωδικό;',
         infoText__ableToScan:
           'Ρυθμίστε μια νέα μέθοδο σύνδεσης στην εφαρμογή αυθεντικοποίησης σας και σαρώστε τον παρακάτω QR κωδικό για να τον συνδέσετε με τον λογαριασμό σας.',

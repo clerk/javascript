@@ -1711,6 +1711,7 @@ export const hrHR: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Umjesto toga, skeniraj QR kod',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Ne možete skenirati QR kod?',
         formButtonPrimary: 'Nastavi',
         formButtonReset: 'Odustani',
@@ -2062,6 +2063,7 @@ export const hrHR: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Umjesto toga, skeniraj QR kod',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Ne možete skenirati QR kod?',
         infoText__ableToScan:
           'Postavite novu metodu prijave u vašoj aplikaciji za autentifikaciju i skenirajte sljedeći QR kod da biste je povezali s vašim računom.',

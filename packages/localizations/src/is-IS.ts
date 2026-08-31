@@ -1711,6 +1711,7 @@ export const isIS: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Skanna QR kóða í staðinn',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Getur ekki skannað QR kóða?',
         formButtonPrimary: 'Halda áfram',
         formButtonReset: 'Hætta við',
@@ -2060,6 +2061,7 @@ export const isIS: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Skanna QR kóða í staðinn',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Getur ekki skannað QR kóða?',
         infoText__ableToScan:
           'Settu upp nýja innskráningaraðferð í auðkennisforritinu þínu og skannaðu eftirfarandi QR kóða til að tengja það við reikninginn þinn.',

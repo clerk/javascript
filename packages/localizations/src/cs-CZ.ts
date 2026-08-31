@@ -1705,6 +1705,7 @@ export const csCZ: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2043,6 +2044,7 @@ export const csCZ: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Místo toho naskenovat QR kód',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Nemůžete naskenovat QR kód?',
         infoText__ableToScan:
           'Nastavte novou metodu přihlášení ve vaší aplikaci pro ověřování a naskenujte následující QR kód, abyste ji propojili se svým účtem.',

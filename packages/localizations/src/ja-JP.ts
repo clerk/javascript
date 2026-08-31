@@ -1708,6 +1708,7 @@ export const jaJP: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: '代わりにQRコードをスキャン',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'QRコードをスキャンできませんか？',
         formButtonPrimary: '続行',
         formButtonReset: 'キャンセル',
@@ -2051,6 +2052,7 @@ export const jaJP: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: '代わりにQRコードをスキャンする',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'QRコードをスキャンできませんか？',
         infoText__ableToScan:
           '認証アプリで新しいサインイン方法を設定し、以下のQRコードをスキャンしてアカウントとリンクさせます。',

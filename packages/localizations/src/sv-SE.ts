@@ -1697,6 +1697,7 @@ export const svSE: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2033,6 +2034,7 @@ export const svSE: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Skanna QR-kod istället',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Kan inte skanna QR-kod?',
         infoText__ableToScan:
           'Konfigurera en ny inloggningsmetod i din autentiseringsapp och skanna följande QR-kod för att länka den till ditt konto.',

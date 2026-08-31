@@ -1699,6 +1699,7 @@ export const beBY: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2039,6 +2040,7 @@ export const beBY: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Замест гэтага адсканіруйце QR-код',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Не ўдаецца адсканаваць QR-код?',
         infoText__ableToScan:
           'Настройце новы метад уваходу ў вашым прыкладным аўтэнтыфікатары і адсканіруйце наступны QR-код, каб звязаць яго з вашай уліковай запісю.',

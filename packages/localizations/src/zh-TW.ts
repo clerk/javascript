@@ -1684,6 +1684,7 @@ export const zhTW: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: '掃描 QR 碼代替',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: '無法掃描 QR 碼？',
         formButtonPrimary: '繼續',
         formButtonReset: '取消',
@@ -2007,6 +2008,7 @@ export const zhTW: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: '掃描 QR Code',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: '無法掃描 QR Code？',
         infoText__ableToScan: '在您的驗證器應用程式中設定新的登入方式，並掃描下方的 QR Code 以連結您的帳戶。',
         infoText__unableToScan: '在驗證器中設定新的登入方式，並輸入下方提供的金鑰 (Key)。',

@@ -1703,6 +1703,7 @@ export const itIT: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2041,6 +2042,7 @@ export const itIT: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Scansiona il codice QR',
+        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: 'Non è possibile scansionare il codice QR?',
         infoText__ableToScan:
           'Aggiungi un nuovo metodo di accesso nella tua app di autenticazione e scansione il seguente codice QR per associarla a questo account.',
