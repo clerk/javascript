@@ -314,7 +314,7 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
     >
       <Item.Media>{busy ? <Spinner size='sm' /> : icon}</Item.Media>
       <Item.Content>
-        <Item.Label variant='secondary'>{label}</Item.Label>
+        <Item.Label variant='interactive'>{label}</Item.Label>
       </Item.Content>
     </Item.Root>
   );
@@ -795,7 +795,7 @@ function SwitchAccountRow() {
           )}
         </Item.Media>
         <Item.Content>
-          <Item.Label variant='secondary'>{m.accounts.switch}</Item.Label>
+          <Item.Label variant='interactive'>{m.accounts.switch}</Item.Label>
         </Item.Content>
         <Trailing>
           <Icon

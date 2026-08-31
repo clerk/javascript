@@ -1,5 +1,12 @@
 # @clerk/msw
 
+## 0.0.66
+
+### Patch Changes
+
+- Updated dependencies [[`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/shared@4.30.2
+
 ## 0.0.65
 
 ### Patch Changes

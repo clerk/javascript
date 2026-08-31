@@ -1,2 +1,2 @@
 export { Otp } from './otp';
-export type { OtpProps, OtpSize, OtpStatus } from './otp';
+export type { OtpProps, OtpStatus } from './otp';
