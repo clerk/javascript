@@ -33,9 +33,10 @@ export function useOrganizationDirectorySyncCacheKeys(params: {
 export function useOrganizationDirectorySyncUsersCacheKeys(params: {
   organizationId: string | null;
   enterpriseConnectionId: string | null;
+  directoryId: string | null;
   args: GetDirectorySyncUsersParams;
 }) {
-  const { organizationId, enterpriseConnectionId, args } = params;
+  const { organizationId, enterpriseConnectionId, directoryId, args } = params;
   return useMemo(() => {
     return createCacheKeys({
       stablePrefix: INTERNAL_STABLE_KEYS.ORGANIZATION_DIRECTORY_SYNC_USERS_KEY,
@@ -43,6 +44,7 @@ export function useOrganizationDirectorySyncUsersCacheKeys(params: {
       tracked: {
         organizationId: organizationId ?? null,
         enterpriseConnectionId: enterpriseConnectionId ?? null,
+        directoryId: directoryId ?? null,
       },
       untracked: {
         args,
@@ -50,5 +52,5 @@ export function useOrganizationDirectorySyncUsersCacheKeys(params: {
     });
     // The args object is intentionally serialized via the consumer to keep stability.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId, enterpriseConnectionId, JSON.stringify(args)]);
+  }, [organizationId, enterpriseConnectionId, directoryId, JSON.stringify(args)]);
 }

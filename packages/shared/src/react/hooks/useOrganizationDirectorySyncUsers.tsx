@@ -6,7 +6,6 @@ import type {
   GetDirectorySyncUsersParams,
 } from '../../types/directorySync';
 import { useClerkInstanceContext } from '../contexts';
-import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
 import { useClerkQuery } from '../query/useQuery';
 import { useOrganizationBase } from './base/useOrganizationBase';
@@ -39,6 +38,7 @@ export type UseOrganizationDirectorySyncUsersParams = {
 };
 
 export type UseOrganizationDirectorySyncUsersReturn = {
+  /** `undefined` while loading and while the hook is dormant. */
   data: DirectorySyncUserResource[] | undefined;
   totalCount: number | undefined;
   error: Error | null;
@@ -90,6 +90,7 @@ function useOrganizationDirectorySyncUsers(
   const { queryKey, invalidationKey, stableKey, authenticated } = useOrganizationDirectorySyncUsersCacheKeys({
     organizationId: organization?.id ?? null,
     enterpriseConnectionId,
+    directoryId: directory?.id ?? null,
     args: fetchParams,
   });
 
@@ -104,11 +105,12 @@ function useOrganizationDirectorySyncUsers(
   const [shouldPoll, setShouldPoll] = useState(false);
 
   useEffect(() => {
-    // Polling intent is scoped to the current connection — clear it when the
-    // connection changes so a reset/recreate doesn't inherit a stale armed poll.
+    // Polling intent is scoped to the current directory — clear it when the
+    // identity changes so a reset/recreate doesn't inherit a stale armed poll.
     setShouldPoll(false);
-  }, [enterpriseConnectionId]);
+  }, [enterpriseConnectionId, directory?.id]);
 
+  const currentTracked = queryKey[2];
   const query = useClerkQuery({
     queryKey,
     queryFn: () => {
@@ -120,7 +122,20 @@ function useOrganizationDirectorySyncUsers(
     refetchInterval: () => (shouldPoll ? pollIntervalMs : false),
     enabled: queryEnabled,
     refetchIntervalInBackground: false,
-    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
+    // Carry previous data only across pagination within the same organization
+    // and directory — never across an identity change, where stale rows would
+    // leak into the new context.
+    placeholderData: keepPreviousData
+      ? (previousData, previousQuery) => {
+          const previousTracked = previousQuery?.queryKey[2];
+          const sameIdentity =
+            Boolean(currentTracked.organizationId) &&
+            Boolean(currentTracked.directoryId) &&
+            previousTracked?.organizationId === currentTracked.organizationId &&
+            previousTracked?.directoryId === currentTracked.directoryId;
+          return sameIdentity ? previousData : undefined;
+        }
+      : undefined,
   });
 
   const startPolling = useCallback(() => {
@@ -138,8 +153,9 @@ function useOrganizationDirectorySyncUsers(
   const isPolling = queryEnabled && shouldPoll;
 
   return {
-    data: query.data?.data,
-    totalCount: query.data?.total_count,
+    // Dormant means dormant: never surface cached rows while the query cannot run.
+    data: queryEnabled ? query.data?.data : undefined,
+    totalCount: queryEnabled ? query.data?.total_count : undefined,
     error: query.error ?? null,
     isLoading: query.isLoading,
     isFetching: query.isFetching,

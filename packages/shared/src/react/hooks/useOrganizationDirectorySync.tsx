@@ -8,7 +8,6 @@ import type {
   UpdateDirectorySyncParams,
 } from '../../types/directorySync';
 import { useClerkInstanceContext } from '../contexts';
-import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
 import { useClerkQuery } from '../query/useQuery';
 import { useOrganizationBase } from './base/useOrganizationBase';
@@ -18,7 +17,6 @@ import { useOrganizationDirectorySyncCacheKeys } from './useOrganizationDirector
 export type UseOrganizationDirectorySyncParams = {
   enterpriseConnectionId: string | null;
   enabled?: boolean;
-  keepPreviousData?: boolean;
 };
 
 export type UseOrganizationDirectorySyncReturn = {
@@ -45,7 +43,7 @@ export type UseOrganizationDirectorySyncReturn = {
  * @internal
  */
 function useOrganizationDirectorySync(params: UseOrganizationDirectorySyncParams): UseOrganizationDirectorySyncReturn {
-  const { enterpriseConnectionId, enabled = true, keepPreviousData = true } = params;
+  const { enterpriseConnectionId, enabled = true } = params;
   const clerk = useClerkInstanceContext();
   const organization = useOrganizationBase();
   const [queryClient] = useClerkQueryClient();
@@ -80,7 +78,7 @@ function useOrganizationDirectorySync(params: UseOrganizationDirectorySyncParams
       }
     },
     enabled: queryEnabled,
-    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
+    // No placeholderData: any key change is an identity change, and the mutations act on `query.data`.
   });
 
   const revalidate = useCallback(
