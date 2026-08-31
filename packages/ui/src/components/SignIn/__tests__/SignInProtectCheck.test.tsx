@@ -23,6 +23,29 @@ beforeEach(() => {
 });
 
 describe('SignInProtectCheck', () => {
+  it('clears the invitation ticket when the sign-in completes on the challenge', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck();
+    });
+    const url = new URL(window.location.href);
+    url.searchParams.set('__clerk_ticket', 'tkt_abc');
+    window.history.replaceState({}, '', url.toString());
+
+    mockExecute.mockResolvedValue('proof-abc');
+    fixtures.signIn.submitProtectCheck.mockResolvedValue({
+      status: 'complete',
+      protectCheck: null,
+      createdSessionId: 'sess_1',
+    } as unknown as SignInResource);
+
+    render(<SignInProtectCheck />, { wrapper });
+
+    await waitFor(() => {
+      expect(fixtures.clerk.setActive).toHaveBeenCalled();
+    });
+    expect(new URL(window.location.href).searchParams.get('__clerk_ticket')).toBeNull();
+  });
+
   describe('enterprise SSO', () => {
     const enterpriseSSOSignIn = (supportedFirstFactors: unknown[]) =>
       ({
