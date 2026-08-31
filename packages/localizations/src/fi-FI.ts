@@ -1849,6 +1849,8 @@ export const fiFI: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Olet jo kirjautunut sisään.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3-lompakkoa ei löytynyt. Asenna sellainen jatkaaksesi.',
     web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',
     web3_solana_signature_generation_failed: 'Allekirjoitusta luotaessa tapahtui virhe. Yritä uudelleen jatkaaksesi.',

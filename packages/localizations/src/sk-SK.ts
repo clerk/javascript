@@ -1832,6 +1832,8 @@ export const skSK: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Jste už přihlášen.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
     web3_signature_request_rejected: 'Odmietli ste žiadosť o podpis. Skúste to znova, aby ste mohli pokračovať.',
     web3_solana_signature_generation_failed:

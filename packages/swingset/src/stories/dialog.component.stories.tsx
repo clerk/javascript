@@ -541,10 +541,9 @@ export function CardSurface() {
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup render={<Card.Root elevation='overlay' />}>
-            <Dialog.CloseButton />
             <Card.Header>
-              <Dialog.Title render={<Heading size='sm' />}>Sign in</Dialog.Title>
-              <Dialog.Description render={<Text />}>Continue to your account.</Dialog.Description>
+              <Card.Title>Sign in</Card.Title>
+              <Card.Description>Continue to your account.</Card.Description>
             </Card.Header>
             <Card.Content>
               <Input placeholder='you@example.com' />
@@ -555,12 +554,13 @@ export function CardSurface() {
                   <Button
                     {...props}
                     variant='outline'
+                    fullWidth
                   >
                     Cancel
                   </Button>
                 )}
               />
-              <Button>Continue</Button>
+              <Button fullWidth>Continue</Button>
             </Card.Footer>
           </Dialog.Popup>
         </Dialog.Viewport>
@@ -586,7 +586,6 @@ export function OutsideScroll() {
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup render={<Card.Root elevation='overlay' />}>
-            <Dialog.CloseButton />
             <Card.Header>
               <Dialog.Title render={<Heading size='sm' />}>Terms of service</Dialog.Title>
               <Dialog.Description render={<Text />}>

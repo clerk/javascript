@@ -1869,6 +1869,9 @@ export const enUS: LocalizationResource = {
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    ticket_expired_code: 'This link has expired. Please start again or request a new link.',
+    ticket_invalid_code:
+      'This link is no longer valid or has already been used. Please start again or request a new link.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:

@@ -14,6 +14,7 @@ export class Email {
     readonly data?: Record<string, any> | null,
     readonly deliveredByClerk?: boolean,
     readonly userId?: string | null,
+    readonly suppressionReason?: string | null,
   ) {}
 
   static fromJSON(data: EmailJSON): Email {
@@ -30,6 +31,7 @@ export class Email {
       data.data,
       data.delivered_by_clerk,
       data.user_id,
+      data.suppression_reason,
     );
   }
 }

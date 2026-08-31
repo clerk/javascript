@@ -1843,6 +1843,8 @@ export const ptBR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Você já está conectado.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier:
       'Uma extensão de carteira Web3 não pode ser encontrada. Por favor, instale uma para continuar.',
     web3_signature_request_rejected: 'Você rejeitou a solicitação de assinatura. Tente novamente para continuar.',

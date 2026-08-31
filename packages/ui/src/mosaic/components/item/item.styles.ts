@@ -11,7 +11,7 @@ export const item = stylex.create({
     // last style that declares it, so the two can't merge.
     '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
     borderRadius: radiusVars['--cl-radius-lg'],
-    paddingInline: space['2'],
+    paddingInline: space['1.5'],
     alignItems: 'center',
     color: colorVars['--cl-color-neutral-faded'],
     display: 'flex',
@@ -57,13 +57,24 @@ export const item = stylex.create({
     },
   },
 
+  outline: {
+    borderColor: colorVars['--cl-color-border'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+  },
+
   xs: {
     gap: space['2'],
-    height: space['8'],
+    height: space['9'],
   },
   md: {
     gap: space['3'],
     height: space['13'],
+  },
+  lg: {
+    gap: space['3'],
+    paddingInline: space['3'],
+    height: space['16'],
   },
 });
 
@@ -76,8 +87,9 @@ export const media = stylex.create({
     justifyContent: 'center',
   },
 
-  xs: { width: space['5'] },
-  md: { width: space['9'] },
+  xs: { width: space['6'] },
+  md: { width: space['10'] },
+  lg: { width: space['10'] },
 });
 
 export const content = stylex.create({
@@ -92,22 +104,19 @@ export const content = stylex.create({
 
 export const label = stylex.create({
   base: {
+    fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
   },
 
-  primary: {
+  default: {
     color: colorVars['--cl-color-neutral'],
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-    lineHeight: typeScaleVars['--cl-text-sm-leading'],
   },
   // Declares no color, so `reset`'s `inherit` stands and the row's own color reaches it. That is
   // what carries it through the hover promotion on an interactive row, which a fixed color would
   // freeze. It has to stay undeclared here rather than restated: StyleX resolves a property to the
   // last style that declares it, so `base` cannot hold a color either.
-  secondary: {
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-  },
+  interactive: {},
 });
 
 export const description = stylex.create({
@@ -130,8 +139,19 @@ export const actions = stylex.create({
 
 export const group = stylex.create({
   base: {
-    padding: space['2'],
     width: '100%',
+  },
+
+  // The gutter belongs to the variant rather than `base`: `outline` has none, and holding it here
+  // keeps the two from overriding each other.
+  default: {
+    padding: space['1.5'],
+  },
+  // Bordered rows read as separate cards, so the group drops its gutter and spaces them instead.
+  outline: {
+    gap: space['2'],
+    display: 'flex',
+    flexDirection: 'column',
   },
 });
 

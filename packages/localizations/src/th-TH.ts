@@ -1822,6 +1822,8 @@ export const thTH: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'ไม่พบส่วนขยาย Web3 Wallet โปรดติดตั้งเพื่อดำเนินการต่อ',
     web3_signature_request_rejected: 'คุณได้ปฏิเสธคำขอการลงลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',
     web3_solana_signature_generation_failed: 'เกิดข้อผิดพลาดขณะสร้างลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',

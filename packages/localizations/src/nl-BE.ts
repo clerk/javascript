@@ -1825,6 +1825,8 @@ export const nlBE: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Je bent al ingelogd.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:
       'Je hebt het handtekeningverzoek afgewezen. Probeer het opnieuw om verder te gaan.',

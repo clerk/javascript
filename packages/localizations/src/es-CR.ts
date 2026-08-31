@@ -1836,6 +1836,8 @@ export const esCR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'No se puede encontrar la extension de la billetera Web3. Instala una para continuar',
     web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',
     web3_solana_signature_generation_failed:

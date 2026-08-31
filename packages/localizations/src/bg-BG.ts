@@ -1824,6 +1824,8 @@ export const bgBG: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Вече сте влезнали.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Отхвърлихте заявката за подпис. Моля, опитайте отново, за да продължите.',
     web3_solana_signature_generation_failed:

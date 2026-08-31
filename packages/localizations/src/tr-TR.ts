@@ -1828,6 +1828,8 @@ export const trTR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Zaten giriş yapmışsınız.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
     web3_signature_request_rejected: 'İmza isteğini reddettiniz. Devam etmek için lütfen tekrar deneyin.',
     web3_solana_signature_generation_failed:

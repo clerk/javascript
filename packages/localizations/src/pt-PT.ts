@@ -1849,6 +1849,8 @@ export const ptPT: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Já está conectado.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Falta um identificador Web3. Tente novamente.',
     web3_signature_request_rejected: 'Rejeitou o pedido de assinatura. Tente novamente para continuar.',
     web3_solana_signature_generation_failed: 'Ocorreu um erro ao gerar a assinatura. Tente novamente para continuar.',

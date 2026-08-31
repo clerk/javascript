@@ -1805,6 +1805,8 @@ export const zhCN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '您已登录。',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: '您已拒绝签名请求。请重试以继续。',
     web3_solana_signature_generation_failed: '生成签名时发生错误。请重试以继续。',

@@ -200,4 +200,28 @@ describe('useTransition', () => {
       await new Promise(r => setTimeout(r, 0));
     });
   });
+
+  it('does not unmount when the interrupted exit settles', async () => {
+    const { ref, el, resolveAnim } = createAnimatingRef();
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
+      initialProps: { open: true },
+    });
+    act(() => flushRaf());
+
+    // Close, then reopen before the exit animation finishes.
+    rerender({ open: false });
+    rerender({ open: true });
+    act(() => flushRaf());
+
+    // The exit's pending unmount must have been abandoned, so settling the
+    // animation leaves the element mounted rather than restarting its entrance.
+    el.getAnimations = vi.fn(() => [] as unknown as Animation[]);
+    await act(async () => {
+      resolveAnim();
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    expect(result.current.mounted).toBe(true);
+    expect(result.current.transitionProps).toEqual({ 'data-open': '' });
+  });
 });
