@@ -1,5 +1,7 @@
 import type { SignInResource } from '@clerk/shared/types';
 
+import { shouldHandOffToEnterpriseConnection } from './enterpriseSSOFactors';
+
 /**
  * Detects whether a sign-in response is gated by Clerk Protect.
  *
@@ -48,10 +50,12 @@ export function resumeSignInAfterProtectCheck(
   signIn: SignInResource,
   {
     navigate,
+    resumeEnterpriseSSO,
     resumeOAuthContinuation,
     startedAsOAuthTransfer,
   }: {
     navigate: (to: string) => Promise<unknown>;
+    resumeEnterpriseSSO: () => Promise<unknown>;
     resumeOAuthContinuation: () => Promise<unknown>;
     startedAsOAuthTransfer: boolean;
   },
@@ -63,6 +67,11 @@ export function resumeSignInAfterProtectCheck(
 
   switch (signIn.status) {
     case 'needs_first_factor':
+      // An SSO-only sign-in has no first factor to render — the hand-off to the identity
+      // provider is the next step, and it was interrupted before it could be issued.
+      if (shouldHandOffToEnterpriseConnection(signIn)) {
+        return resumeEnterpriseSSO();
+      }
       return navigate('../factor-one');
     case 'needs_second_factor':
       return navigate('../factor-two');
