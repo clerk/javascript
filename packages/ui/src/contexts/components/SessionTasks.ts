@@ -6,7 +6,13 @@ import { createContext, useContext } from 'react';
 import { useRouter, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
 import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
-import type { SessionTasksCtx, TaskChooseOrganizationCtx, TaskResetPasswordCtx, TaskSetupMFACtx } from '../../types';
+import type {
+  SessionTasksCtx,
+  TaskChooseOrganizationCtx,
+  TaskResetPasswordCtx,
+  TaskSetupMFACtx,
+  TaskSetupPasskeyCtx,
+} from '../../types';
 
 export const SessionTasksContext = createContext<SessionTasksCtx | null>(null);
 
@@ -104,6 +110,18 @@ export const useTaskSetupMFAContext = (): TaskSetupMFACtx => {
 
   if (context === null) {
     throw new Error('Clerk: useTaskSetupMFAContext called outside of the mounted TaskSetupMFA component.');
+  }
+
+  return context;
+};
+
+export const TaskSetupPasskeyContext = createContext<TaskSetupPasskeyCtx | null>(null);
+
+export const useTaskSetupPasskeyContext = (): TaskSetupPasskeyCtx => {
+  const context = useContext(TaskSetupPasskeyContext);
+
+  if (context === null) {
+    throw new Error('Clerk: useTaskSetupPasskeyContext called outside of the mounted TaskSetupPasskey component.');
   }
 
   return context;

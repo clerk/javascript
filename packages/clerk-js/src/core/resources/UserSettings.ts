@@ -112,6 +112,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   passkeySettings: PasskeySettingsData = {
     allow_autofill: false,
     show_sign_in_button: false,
+    prompt_at_sign_up: 'off',
   };
   passwordSettings: PasswordSettingsData = {} as PasswordSettingsData;
   signIn: SignInData = {

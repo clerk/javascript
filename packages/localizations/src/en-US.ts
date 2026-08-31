@@ -1756,6 +1756,24 @@ export const enUS: LocalizationResource = {
       },
     },
   },
+  taskSetupPasskey: {
+    formButtonPrimary: 'Create a passkey',
+    formButtonSkip: 'Not now',
+    infoText: 'Your passkey never leaves this device, so there is nothing to remember and nothing to leak.',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+    subtitle: 'Next time, sign in with your fingerprint, face, or screen lock instead of a password.',
+    subtitle__required:
+      'Your account requires a passkey to finish signing up. You will sign in with your fingerprint, face, or screen lock instead of a password.',
+    title: 'Set up a passkey',
+    unsupportedDevice: {
+      subtitle:
+        'This account requires a passkey, but this browser or device cannot create one. Sign in again from a device that unlocks with a fingerprint, face, or screen lock.',
+      title: "This device can't create a passkey",
+    },
+  },
   unstable__errors: {
     action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
