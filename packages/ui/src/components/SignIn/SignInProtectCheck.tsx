@@ -24,7 +24,11 @@ import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
-import { isSignInPendingOAuthTransfer, resumeSignInAfterProtectCheck } from './handleProtectCheck';
+import {
+  isSignInPendingOAuthTransfer,
+  isSignInProtectGated,
+  resumeSignInAfterProtectCheck,
+} from './handleProtectCheck';
 
 function SignInProtectCheckInternal(): JSX.Element | null {
   const card = useCardState();
@@ -78,6 +82,21 @@ function SignInProtectCheckInternal(): JSX.Element | null {
       }
       await resumeSignInAfterProtectCheck(updatedSignIn, {
         navigate,
+        resumeEnterpriseSSO: async () => {
+          await signIn.authenticateWithRedirect({
+            strategy: 'enterprise_sso',
+            redirectUrl: ctx.ssoCallbackUrl,
+            redirectUrlComplete: afterSignInUrl || '/',
+            oidcPrompt: ctx.oidcPrompt,
+            continueSignIn: true,
+          });
+
+          // Preparing the hand-off can raise a further challenge, in which case no redirect was
+          // issued: stay here and run it on the next render.
+          if (isSignInProtectGated(signIn)) {
+            await navigate('.');
+          }
+        },
         startedAsOAuthTransfer: startedAsOAuthTransfer.current,
         resumeOAuthContinuation: () =>
           typeof __internal_resumeAfterProtectCheck === 'function'

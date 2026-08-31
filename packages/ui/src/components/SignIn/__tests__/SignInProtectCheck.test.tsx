@@ -23,6 +23,75 @@ beforeEach(() => {
 });
 
 describe('SignInProtectCheck', () => {
+  describe('enterprise SSO', () => {
+    const enterpriseSSOSignIn = (supportedFirstFactors: unknown[]) =>
+      ({
+        status: 'needs_first_factor',
+        protectCheck: null,
+        createdSessionId: null,
+        supportedFirstFactors,
+      }) as unknown as SignInResource;
+
+    it('hands off to the connection once the challenge resolves', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]));
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'http://localhost:3000/#/sso-callback',
+          redirectUrlComplete: '/',
+          oidcPrompt: undefined,
+          continueSignIn: true,
+        });
+      });
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../factor-one');
+    });
+
+    it('stays on the challenge when preparing the hand-off raises another one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]));
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-2' };
+        return Promise.resolve();
+      });
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('.');
+      });
+    });
+
+    it('routes to factor one when there is more than one connection to choose from', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(
+        enterpriseSSOSignIn([
+          { strategy: 'enterprise_sso', enterpriseConnectionId: 'ent_1', enterpriseConnectionName: 'Okta' },
+          { strategy: 'enterprise_sso', enterpriseConnectionId: 'ent_2', enterpriseConnectionName: 'Entra' },
+        ]),
+      );
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-one');
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+  });
+
   it('renders verification UI', async () => {
     const { wrapper } = await createFixtures(f => {
       f.startSignInWithProtectCheck();
