@@ -6,7 +6,7 @@ The working example shows the complete reverification card. The individual panel
 
 The example pauses briefly in each pending state. Enter `error` in password or backup code fields, or `000000` for OTP, to render an attempt error.
 
-## Working example
+## Example
 
 <Story
   name='Default'
@@ -17,7 +17,19 @@ The example pauses briefly in each pending state. Enter `error` in password or b
   ]}
 />
 
+## Usage
+
+The controller supplies one model containing the active view, transition direction, resolved messages, form state, and event handlers. Spread that model directly into the prop-driven `Reverification` view.
+
+```tsx
+import { Reverification } from '@clerk/ui/mosaic/blocks/reverification';
+
+<Reverification {...reverificationModel} />;
+```
+
 ## Panels
+
+These examples isolate the presentational views and their visual states. Product code should normally render the `Reverification` block shown above.
 
 ### Password
 

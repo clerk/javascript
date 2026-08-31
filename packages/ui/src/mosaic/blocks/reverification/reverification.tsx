@@ -16,8 +16,10 @@ import { ReverificationPassword } from './reverification-password';
 
 export type ReverificationStatus = 'password' | 'passkey' | 'otp' | 'backup-code' | 'method-picker' | 'help';
 
-export interface ReverificationState {
+/** Controlled rendering model produced by a reverification controller. */
+export interface ReverificationModel {
   status: ReverificationStatus;
+  direction: FlowDirection;
   password: ReverificationPasswordProps;
   passkey: ReverificationPasskeyProps;
   otp: ReverificationOTPProps;
@@ -26,18 +28,15 @@ export interface ReverificationState {
   help: ReverificationHelpProps;
 }
 
-export interface ReverificationProps {
-  state: ReverificationState;
-  direction?: FlowDirection;
-}
+export type ReverificationProps = ReverificationModel;
 
-export function Reverification({ state, direction }: ReverificationProps): JSX.Element {
+export function Reverification(model: ReverificationProps): JSX.Element {
   return (
     <Card.Root>
       <Flow.Root
-        value={state.status}
-        direction={direction}
-        state={state}
+        value={model.status}
+        direction={model.direction}
+        state={model}
       >
         {current => (
           <>
