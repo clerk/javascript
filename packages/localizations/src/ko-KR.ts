@@ -1797,6 +1797,8 @@ export const koKR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '이미 로그인 중이에요.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3 지갑 확장 프로그램을 찾을 수 없어요. 계속하려면 설치해 주세요.',
     web3_signature_request_rejected: '서명 요청을 거부했어요. 계속하려면 다시 시도해 주세요.',
     web3_solana_signature_generation_failed: '서명을 생성하는 동안 오류가 발생했어요. 계속하려면 다시 시도해 주세요.',

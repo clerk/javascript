@@ -13,17 +13,13 @@ export const positioner = stylex.create({
 
 export const popup = stylex.create({
   base: {
-    padding: space['0.5'],
     borderRadius: radiusVars['--cl-radius-lg'],
-    gap: space['0.5'],
     outline: 'none',
     backgroundColor: colorVars['--cl-color-card'],
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
                 0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
                 0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
     color: colorVars['--cl-color-card-foreground'],
-    display: 'flex',
-    flexDirection: 'column',
     opacity: {
       default: 1,
       ':is([data-ending-style])': 0,
@@ -48,8 +44,22 @@ export const popup = stylex.create({
     // reaches the width it has to truncate at.
     maxWidth: 'min(18rem, calc(100vw - 2rem))',
     minWidth: '12.5rem',
-    overflowX: 'visible',
-    overflowY: 'auto',
+  },
+});
+
+// The popup supplies the chrome and the height cap; this scrolls inside it. They cannot be
+// one element: `scrollAreaViewport()` carries a `mask-image` for the fade, and a mask clips
+// the element's whole rendering — so on the popup it would eat the background and the drop
+// shadow along with the overflowing rows. Same split the Dialog panel makes.
+export const viewport = stylex.create({
+  base: {
+    // The inset belongs to the scrolling box, not the popup: `Menu.Separator` bleeds through it
+    // with a negative margin, and from inside a viewport that clips its inline axis a bleed past
+    // the popup's own padding would be cut off instead.
+    padding: space['0.5'],
+    gap: space['0.5'],
+    display: 'flex',
+    flexDirection: 'column',
   },
 });
 
@@ -70,6 +80,9 @@ export const item = stylex.create({
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
     display: 'flex',
+    // The viewport is a height-capped flex column: without this the rows squash to fit the cap
+    // instead of overflowing it, and the menu silently loses both its row height and its scroll.
+    flexShrink: 0,
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
@@ -83,7 +96,7 @@ export const item = stylex.create({
       '@media (prefers-reduced-motion: reduce)': '0.01ms',
     },
     transitionProperty: 'background-color',
-    height: space['7'],
+    height: space['8'],
     width: '100%',
     '::before': {
       insetBlock: `calc(-1 * ${space['0.5']})`,
@@ -130,10 +143,11 @@ export const label = stylex.create({
 
 export const separator = stylex.create({
   base: {
-    // Full-bleed across the popup: cancel the popup's inline padding.
+    // Full-bleed across the popup: cancel the viewport's inline padding.
     marginBlock: space['0.5'],
     marginInline: `calc(-1 * ${space['0.5']})`,
     backgroundColor: colorVars['--cl-color-border'],
     blockSize: '1px',
+    flexShrink: 0,
   },
 });

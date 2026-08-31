@@ -32,10 +32,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 
 export function Default(props: Record<string, unknown>) {
   return (
-    <Card.Root
-      {...knobsAsProps(props)}
-      style={{ maxWidth: 400 }}
-    >
+    <Card.Root {...knobsAsProps(props)}>
       <Card.Header>
         <Card.Title>Login to your account</Card.Title>
         <Card.Description>Enter your email below to login to your account</Card.Description>
