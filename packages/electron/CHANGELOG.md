@@ -1,5 +1,18 @@
 # @clerk/electron
 
+## 0.0.38
+
+### Patch Changes
+
+- Keep the current client token available for the lifetime of the Electron app when secure persistence is unavailable or fails. ([#9588](https://github.com/clerk/javascript/pull/9588)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+  Fixed a race where an older in-flight token write could replace a newer token when multiple requests completed at the same time.
+
+- Updated dependencies [[`5a74f4c`](https://github.com/clerk/javascript/commit/5a74f4c455961af3ec97d8c8997902dde607a980), [`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/clerk-js@6.30.2
+  - @clerk/shared@4.30.2
+  - @clerk/react@6.14.8
+
 ## 0.0.37
 
 ### Patch Changes
