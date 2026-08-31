@@ -95,8 +95,7 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
       setFieldError('That password is incorrect. Try again.');
       return;
     }
-    setMethodId('otp');
-    navigate('otp', 1);
+    onComplete();
   };
 
   const submitOtp = async (code: string) => {
@@ -152,7 +151,7 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
     onValueChange('');
   };
 
-  const showMethods = () => navigate('method-picker', 1);
+  const showMethods = () => navigate('method-picker', -1);
   const viewState: ReverificationState = {
     status,
     password: {
@@ -223,7 +222,7 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
       pendingMethodId,
       onSelect: id => void selectMethod(id),
       onHelp: () => navigate('help', 1),
-      onBack: () => navigate(methodId, -1),
+      onBack: () => navigate(methodId, 1),
     },
     help: {
       messages: helpMessages,
