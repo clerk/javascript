@@ -1,3 +1,4 @@
+import type { SignInFutureResource, SignUpFutureResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { StateProxy } from '../stateProxy';
@@ -34,7 +35,7 @@ describe('StateProxy', () => {
       __internal_state: state,
       addOnLoaded: vi.fn((callback: () => void) => loadedCallbacks.push(callback)),
     };
-    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn;
+    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn as SignInFutureResource;
 
     const ticketPromise = signIn.ticket({ ticket: 'ticket_123' });
     expect(isomorphicClerk.addOnLoaded).toHaveBeenCalledOnce();
@@ -71,7 +72,9 @@ describe('StateProxy', () => {
       }),
       finalize: vi.fn(() => Promise.resolve({ error: null })),
     };
-    const client = {
+    const client: {
+      signUp: { __internal_future: typeof completedSignUp | typeof emptySignUp };
+    } = {
       signUp: { __internal_future: completedSignUp },
     };
     const state = {
@@ -84,7 +87,7 @@ describe('StateProxy', () => {
       __internal_state: state,
       addOnLoaded: vi.fn((callback: () => void) => loadedCallbacks.push(callback)),
     };
-    const signUp = new StateProxy(isomorphicClerk as any).signUpSignal().signUp;
+    const signUp = new StateProxy(isomorphicClerk as any).signUpSignal().signUp as SignUpFutureResource;
 
     const ticketPromise = signUp.ticket({ ticket: 'ticket_123' });
     expect(isomorphicClerk.addOnLoaded).toHaveBeenCalledOnce();
@@ -111,7 +114,7 @@ describe('StateProxy', () => {
       client: { signIn: { __internal_future: clientSignIn } },
       __internal_state: { signInSignal: () => ({ signIn: null }) },
     };
-    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn;
+    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn as SignInFutureResource;
 
     await expect(signIn.create({ identifier: 'test@example.com' })).resolves.toEqual({ error: null });
     expect(signIn.status).toBe('needs_first_factor');
@@ -130,7 +133,7 @@ describe('StateProxy', () => {
       client: { signIn: { __internal_future: clientSignIn } },
       __internal_state: { signInSignal: () => ({ signIn: currentSignIn }) },
     };
-    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn;
+    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn as SignInFutureResource;
 
     await expect(signIn.finalize()).resolves.toEqual({ error: null });
     expect(currentSignIn.finalize).toHaveBeenCalledOnce();
@@ -155,7 +158,7 @@ describe('StateProxy', () => {
       client: { signIn: { __internal_future: clientSignIn } },
       __internal_state: { signInSignal: () => ({ signIn: stateSignIn }) },
     };
-    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn;
+    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn as SignInFutureResource;
 
     expect(signIn.status).toBe('complete');
     await expect(signIn.finalize()).resolves.toEqual({ error: null });
