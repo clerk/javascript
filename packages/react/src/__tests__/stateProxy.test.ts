@@ -27,15 +27,22 @@ describe('StateProxy', () => {
     const state = {
       signInSignal: () => ({ signIn: completedSignIn }),
     };
+    const loadedCallbacks: Array<() => void> = [];
     const isomorphicClerk = {
       loaded: false,
       client,
       __internal_state: state,
+      addOnLoaded: vi.fn((callback: () => void) => loadedCallbacks.push(callback)),
     };
     const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn;
 
+    const ticketPromise = signIn.ticket({ ticket: 'ticket_123' });
+    expect(isomorphicClerk.addOnLoaded).toHaveBeenCalledOnce();
+    expect(completedSignIn.ticket).not.toHaveBeenCalled();
+
     isomorphicClerk.loaded = true;
-    await signIn.ticket({ ticket: 'ticket_123' });
+    loadedCallbacks.forEach(callback => callback());
+    await ticketPromise;
 
     await expect(signIn.finalize()).resolves.toEqual({ error: null });
     expect(signIn.status).toBe('complete');
@@ -70,15 +77,22 @@ describe('StateProxy', () => {
     const state = {
       signUpSignal: () => ({ signUp: completedSignUp }),
     };
+    const loadedCallbacks: Array<() => void> = [];
     const isomorphicClerk = {
       loaded: false,
       client,
       __internal_state: state,
+      addOnLoaded: vi.fn((callback: () => void) => loadedCallbacks.push(callback)),
     };
     const signUp = new StateProxy(isomorphicClerk as any).signUpSignal().signUp;
 
+    const ticketPromise = signUp.ticket({ ticket: 'ticket_123' });
+    expect(isomorphicClerk.addOnLoaded).toHaveBeenCalledOnce();
+    expect(completedSignUp.ticket).not.toHaveBeenCalled();
+
     isomorphicClerk.loaded = true;
-    await signUp.ticket({ ticket: 'ticket_123' });
+    loadedCallbacks.forEach(callback => callback());
+    await ticketPromise;
 
     await expect(signUp.finalize()).resolves.toEqual({ error: null });
     expect(signUp.status).toBe('complete');
