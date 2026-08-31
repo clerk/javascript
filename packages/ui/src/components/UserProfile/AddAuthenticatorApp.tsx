@@ -10,6 +10,7 @@ import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
 import { handleError } from '@/ui/utils/errorHandler';
+import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 
 import { QRCode } from '../../common';
 import type { LocalizationKey } from '../../customizables';
@@ -67,10 +68,22 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
         <>
           <Col gap={4}>
             {displayFormat == 'qr' && (
-              <QRCode
-                justify='center'
-                url={totp.uri || ''}
-              />
+              <>
+                <QRCode
+                  justify='center'
+                  url={totp.uri || ''}
+                />
+                {isMobileDevice() && totp.uri && (
+                  <Button
+                    variant='link'
+                    textVariant='buttonLarge'
+                    onClick={() => (window.location.href = totp.uri || '')}
+                    localizationKey={localizationKeys(
+                      'userProfile.mfaTOTPPage.authenticatorApp.buttonOpenInAuthenticatorApp__nonPrimary',
+                    )}
+                  />
+                )}
+              </>
             )}
 
             {displayFormat == 'uri' && (
