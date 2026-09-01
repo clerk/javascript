@@ -23,11 +23,13 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
         onSuccess={wizard.nextStep}
         onReset={onReset}
+        resourceRef={ref}
       />
 
       <VerifyTOTP
         onSuccess={wizard.nextStep}
         onReset={onReset}
+        onBack={wizard.prevStep}
         resourceRef={ref}
       />
 

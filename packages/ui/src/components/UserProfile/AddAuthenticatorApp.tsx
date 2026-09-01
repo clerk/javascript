@@ -19,17 +19,18 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 
 type AddAuthenticatorAppProps = FormProps & {
   title: LocalizationKey;
+  resourceRef?: React.MutableRefObject<TOTPResource | undefined>;
 };
 
 type DisplayFormat = 'qr' | 'uri';
 
 export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticatorAppProps) => {
-  const { title, onSuccess, onReset } = props;
+  const { title, onSuccess, onReset, resourceRef } = props;
   const { user } = useUser();
   const card = useCardState();
   const createTOTP = useReverification(() => user?.createTOTP());
   const { close } = useActionContext();
-  const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
+  const [totp, setTOTP] = React.useState<TOTPResource | undefined>(resourceRef?.current);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
 
   // TODO: React18
@@ -39,8 +40,20 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
       return;
     }
 
+    // Each createTOTP() mints a new secret server-side, so reuse the one already
+    // issued this session — otherwise navigating back here invalidates the QR the
+    // user has scanned.
+    if (resourceRef?.current) {
+      return;
+    }
+
     void createTOTP()
-      .then(totp => setTOTP(totp))
+      .then(totp => {
+        if (resourceRef) {
+          resourceRef.current = totp;
+        }
+        setTOTP(totp);
+      })
       .catch(err => {
         if (isClerkRuntimeError(err) && err.code === 'reverification_cancelled') {
           return close();
