@@ -1,0 +1,103 @@
+import * as OtpStories from './otp.component.stories';
+
+# OTP
+
+The Mosaic `Otp` is the verification-code field: one styled box per character, built on the headless [OTP primitive](/primitives/otp). Focus advances as the code is typed, `Backspace` walks back, and a pasted code spreads across the boxes. Each box carries the same border, hover, and focus treatment as `Input`.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={OtpStories}
+/>
+
+## Props
+
+<PropTable
+  meta={OtpStories.meta}
+  styleProps={false}
+  extra={[
+    { name: 'length', type: 'number', default: '6' },
+    { name: 'value', type: 'string', default: '—' },
+    { name: 'defaultValue', type: 'string', default: "''" },
+    { name: 'onValueChange', type: '(value: string) => void', default: '—' },
+    { name: 'onComplete', type: '(value: string) => void', default: '—' },
+    { name: 'pattern', type: "'numeric' | 'alpha' | 'alphanumeric'", default: "'numeric'" },
+    { name: 'mask', type: 'boolean', default: 'false' },
+    { name: 'name', type: 'string', default: '—' },
+    { name: 'disabled', type: 'boolean', default: 'false' },
+  ]}
+/>
+
+Every prop of the headless [OTP primitive](/primitives/otp) passes through. The boxes are styled through their `.cl-otp` and `.cl-otp-slot` classes, so `Otp` takes no `className` or `style`.
+
+## Usage
+
+`length` defaults to `6`. Give the group an accessible name with `aria-label`, or place it in a `Field.Root` with a `Field.Label`.
+
+```tsx
+import { Otp } from '@clerk/ui/mosaic/components/otp';
+
+<Otp
+  aria-label='Verification code'
+  onComplete={code => verify(code)}
+/>;
+```
+
+The value is uncontrolled by default. Pass `value` with `onValueChange` to control it. There is no `onChange`: the boxes are separate inputs, so the whole code is reported as one string.
+
+```tsx
+const [code, setCode] = useState('');
+
+<Otp
+  value={code}
+  onValueChange={setCode}
+  aria-label='Verification code'
+/>;
+```
+
+Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes, and the label and messages are associated with the group:
+
+```tsx
+<Field.Root invalid={Boolean(error)}>
+  <Field.Label>Verification code</Field.Label>
+  <Otp name='code' />
+  {error ? <Field.Error>{error}</Field.Error> : <Field.Description>Didn’t receive a code? Resend</Field.Description>}
+</Field.Root>
+```
+
+`status` overrides that: `'error'` marks every box invalid and colours it negative, `'success'` colours a verified code positive.
+
+---
+
+## Examples
+
+### Success
+
+<Story
+  name='Success'
+  storyModule={OtpStories}
+/>
+
+### Error
+
+<Story
+  name='Error'
+  storyModule={OtpStories}
+/>
+
+### Disabled
+
+<Story
+  name='Disabled'
+  storyModule={OtpStories}
+/>
+
+## Parts
+
+| Part | Stable slot class | Description                                    |
+| ---- | ----------------- | ---------------------------------------------- |
+| Root | `.cl-otp`         | The `role="group"` holding the boxes.          |
+| Slot | `.cl-otp-slot`    | One `input` per character, one box in the row. |
+
+Both carry `data-status`, plus `data-disabled` when disabled. Each slot additionally carries the primitive's `data-active` (holds focus) and `data-filled` (holds a character).

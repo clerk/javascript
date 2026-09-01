@@ -35,6 +35,8 @@ export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
+export { Banner } from '../components/banner';
+export type { BannerDescriptionProps, BannerLabelProps, BannerRootProps } from '../components/banner';
 export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
@@ -57,17 +59,21 @@ export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
-export { Icon } from '../components/icon';
-export type { IconProps } from '../components/icon';
-export type { MosaicIconOverride, MosaicIconOverrides } from '../icons/overrides';
+export { Icon, IconFrame } from '../components/icon';
+export type { IconFrameProps, IconProps } from '../components/icon';
 export { Input } from '../components/input';
 export type { InputProps } from '../components/input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
+export { Otp } from '../components/otp';
+export type { OtpProps, OtpStatus } from '../components/otp';
 export type {
-  MenuContentProps,
   MenuItemProps,
+  MenuLabelProps,
+  MenuMediaProps,
+  MenuMediaSize,
+  MenuPopupProps,
   MenuProps,
   MenuSeparatorProps,
   MenuTriggerProps,
@@ -93,6 +99,8 @@ export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
+export { VisuallyHidden } from '../components/visually-hidden';
+export type { VisuallyHiddenProps } from '../components/visually-hidden';
 export { Popover } from '../components/popover';
 export type {
   PopoverCloseProps,

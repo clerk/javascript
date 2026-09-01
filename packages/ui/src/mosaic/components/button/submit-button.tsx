@@ -88,9 +88,10 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
       ref={ref}
       type='submit'
       size={size}
-      aria-busy={isPending || undefined}
-      aria-disabled={isPending || undefined}
-      data-pending={isPending ? '' : undefined}
+      // Spread rather than set to `undefined`: `mergeProps` copies every key the caller passes,
+      // so an explicit `aria-disabled={undefined}` would erase the one `focusableWhenDisabled`
+      // puts there when the button is disabled but not pending.
+      {...(isPending ? { 'aria-busy': true, 'aria-disabled': true, 'data-pending': '' } : null)}
       onClick={handleClick}
       {...mergeStyleProps(stylex.props(styles.root, isPending && styles.rootPending), className)}
       {...rest}

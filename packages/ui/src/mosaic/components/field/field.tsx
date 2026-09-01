@@ -6,6 +6,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
+import { visuallyHidden } from '../../utils/visually-hidden.styles';
 import { Icon } from '../icon';
 import { FieldProvider, useOptionalFieldContext, useRegisterFieldPartId } from './field.context';
 import { styles } from './field.styles';
@@ -34,7 +35,7 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base), className, style),
+      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root), className, style),
       ...rest,
     },
   });
@@ -51,10 +52,13 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
 });
 
 /** Props for a native field label. */
-export type FieldLabelProps = MosaicComponentProps<'label'>;
+export interface FieldLabelProps extends MosaicComponentProps<'label'> {
+  /** Hide the label visually while keeping it in the accessibility tree. */
+  visuallyHidden?: boolean;
+}
 
 const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function MosaicFieldLabel(
-  { render, className, style, id: idProp, htmlFor: htmlForProp, ...rest },
+  { render, className, style, id: idProp, htmlFor: htmlForProp, visuallyHidden: isVisuallyHidden = false, ...rest },
   ref,
 ) {
   const context = useOptionalFieldContext();
@@ -70,8 +74,14 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
     ref: [ref, setLabel],
     props: {
       ...mergeStyleProps(
-        themeProps('field-label'),
-        stylex.props(reset.base, typographyStyles.base, typographySizes.sm, styles.label),
+        themeProps('field-label', { visuallyHidden: isVisuallyHidden }),
+        stylex.props(
+          reset.base,
+          typographyStyles.base,
+          typographySizes.sm,
+          styles.label,
+          isVisuallyHidden && visuallyHidden.base,
+        ),
         className,
         style,
       ),
