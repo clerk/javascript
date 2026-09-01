@@ -31,8 +31,6 @@ export const completeSignUpFlow = ({
     removeClerkQueryParam('__clerk_invitation_token');
     return handleComplete && handleComplete();
   } else if (signUp.status === 'missing_requirements') {
-    const params = forwardClerkQueryParams();
-
     // The protect_check field is the authoritative gating signal. Sign-up also surfaces it
     // via a missing_fields entry; treat either as equivalent.
     //
@@ -42,7 +40,7 @@ export const completeSignUpFlow = ({
     // over. Resolving it here returns to this function with only the hand-off left to do.
     const isProtectGated = !!signUp.protectCheck || signUp.missingFields.some(mf => mf === 'protect_check');
     if (isProtectGated && protectCheckPath) {
-      return navigate(protectCheckPath, { searchParams: params });
+      return navigate(protectCheckPath, { searchParams: forwardClerkQueryParams() });
     }
 
     if (signUp.missingFields.some(mf => mf === 'enterprise_sso')) {
@@ -60,6 +58,8 @@ export const completeSignUpFlow = ({
         oidcPrompt,
       });
     }
+
+    const params = forwardClerkQueryParams();
 
     if (signUp.unverifiedFields?.includes('email_address') && verifyEmailPath) {
       return navigate(verifyEmailPath, { searchParams: params });
