@@ -1,6 +1,20 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('node:child_process', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    execSync: vi.fn(actual.execSync),
+  };
+});
+
+import { execSync, spawnSync } from 'node:child_process';
+
 import { loadConfig } from '../../config.js';
+import { renderDebug } from '../../render.js';
 import { runCodemods, runScans } from '../../runner.js';
 import { createTempFixture } from '../helpers/create-fixture.js';
 
@@ -22,6 +36,7 @@ vi.mock('../../render.js', () => ({
   promptText: vi.fn((msg, defaultValue) => defaultValue),
   renderCodemodResults: vi.fn(),
   renderText: vi.fn(),
+  renderDebug: vi.fn(),
 }));
 
 describe('runCodemods', () => {
@@ -143,6 +158,20 @@ describe('runCodemods', () => {
 describe('runScans', () => {
   let fixture;
 
+  const createScanConfig = (matcher = /afterSignInUrl/g) => ({
+    changes: [
+      {
+        title: 'Test scan change',
+        matcher,
+        packages: ['*'],
+        category: 'breaking',
+        warning: false,
+        docsAnchor: 'test',
+        content: 'Test',
+      },
+    ],
+  });
+
   beforeEach(() => {
     fixture = createTempFixture('nextjs-v6');
   });
@@ -217,6 +246,159 @@ describe('runScans', () => {
     expect(results).toHaveLength(1);
     expect(results[0].title).toBe('Test change without matcher');
     expect(results[0].instances).toEqual([]);
+  });
+
+  it('scans extensionless node scripts as text files', async () => {
+    const content = '#!/usr/bin/env node\nafterSignInUrl\n';
+    fs.writeFileSync(path.join(fixture.path, 'run'), content, 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', {
+      dir: fixture.path,
+      ignore: [],
+    });
+
+    const expected = path.relative(process.cwd(), path.join(fixture.path, 'run'));
+    expect(results[0].instances.some(instance => instance.file === expected)).toBe(true);
+  });
+
+  it('skips binary files that are not covered by ignore globs', async () => {
+    const binaryPath = path.join(fixture.path, 'binary');
+    fs.writeFileSync(
+      binaryPath,
+      Buffer.concat([Buffer.from([0x7f, 0x45, 0x4c, 0x46, 0x00]), Buffer.from('afterSignInUrl')]),
+    );
+
+    const results = await runScans(createScanConfig(), 'nextjs', { dir: fixture.path, ignore: [] });
+
+    const allInstances = results.flatMap(result => result.instances);
+    const skipped = path.relative(process.cwd(), binaryPath);
+    expect(allInstances.every(instance => instance.file !== skipped)).toBe(true);
+  });
+
+  it('respects .gitignore files by default', async () => {
+    // Guard as this test assumes git is available
+    if (spawnSync('git', ['--version'], { stdio: 'ignore' }).status !== 0) return;
+
+    const gitPath = fs.mkdtempSync(path.join(fixture.path, 'gitignore-'));
+
+    expect(spawnSync('git', ['init', '-q'], { cwd: gitPath, stdio: 'ignore' }).status).toBe(0);
+    fs.writeFileSync(path.join(gitPath, '.gitignore'), 'run\n', 'utf8');
+    fs.writeFileSync(path.join(gitPath, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', { dir: gitPath, ignore: [] });
+
+    const skipped = path.relative(process.cwd(), path.join(gitPath, 'run'));
+    expect(results.flatMap(result => result.instances).every(instance => instance.file !== skipped)).toBe(true);
+  });
+
+  it('respects ignored files with unusual characters in their path', async () => {
+    // Guard as this test assumes git is available
+    if (spawnSync('git', ['--version'], { stdio: 'ignore' }).status !== 0) {
+      return;
+    }
+
+    const gitPath = fs.mkdtempSync(path.join(fixture.path, 'gitignore-'));
+    const ignoredFile = path.join(gitPath, 'ignored-\n-file');
+
+    expect(spawnSync('git', ['init', '-q'], { cwd: gitPath, stdio: 'ignore' }).status).toBe(0);
+    fs.writeFileSync(path.join(gitPath, '.gitignore'), 'ignored-*\n', 'utf8');
+    fs.writeFileSync(ignoredFile, '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', { dir: gitPath, ignore: [] });
+
+    const skipped = path.relative(process.cwd(), ignoredFile);
+    expect(results.flatMap(result => result.instances).every(instance => instance.file !== skipped)).toBe(true);
+  });
+
+  it('can skip using .gitignore files', async () => {
+    // Guard as this test assumes git is available
+    if (spawnSync('git', ['--version'], { stdio: 'ignore' }).status !== 0) return;
+
+    const gitPath = fs.mkdtempSync(path.join(fixture.path, 'gitignore-'));
+
+    expect(spawnSync('git', ['init', '-q'], { cwd: gitPath, stdio: 'ignore' }).status).toBe(0);
+    fs.writeFileSync(path.join(gitPath, '.gitignore'), 'run\n', 'utf8');
+    fs.writeFileSync(path.join(gitPath, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', {
+      dir: gitPath,
+      ignore: [],
+      skipGitignore: true,
+    });
+
+    const expected = path.relative(process.cwd(), path.join(gitPath, 'run'));
+    expect(results.flatMap(result => result.instances).some(instance => instance.file === expected)).toBe(true);
+  });
+
+  it('falls back to normal scanning when git is not installed', async () => {
+    vi.mocked(execSync).mockImplementationOnce(() => {
+      const error = new Error('spawnSync git ENOENT');
+      error.code = 'ENOENT';
+      throw error;
+    });
+
+    fs.writeFileSync(path.join(fixture.path, '.gitignore'), 'run\n', 'utf8');
+    fs.writeFileSync(path.join(fixture.path, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', {
+      dir: fixture.path,
+      ignore: [],
+    });
+
+    const file = path.relative(process.cwd(), path.join(fixture.path, 'run'));
+    expect(results.flatMap(result => result.instances).some(instance => instance.file === file)).toBe(true);
+  });
+
+  it('falls back to normal scanning when the directory is not a git repo', async () => {
+    vi.mocked(execSync).mockImplementationOnce(() => {
+      const error = new Error('fatal: not a git repository');
+      error.status = 128;
+      throw error;
+    });
+
+    fs.writeFileSync(path.join(fixture.path, '.gitignore'), 'run\n', 'utf8');
+    fs.writeFileSync(path.join(fixture.path, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', {
+      dir: fixture.path,
+      ignore: [],
+    });
+
+    const file = path.relative(process.cwd(), path.join(fixture.path, 'run'));
+    expect(results.flatMap(result => result.instances).some(instance => instance.file === file)).toBe(true);
+  });
+
+  it('logs and falls back to normal scanning when git ignored output exceeds the child process buffer', async () => {
+    const { execSync: actualExecSync } = await vi.importActual('node:child_process');
+    let gitError;
+
+    vi.mocked(execSync).mockImplementationOnce((command, options) => {
+      expect(command).toBe('git ls-files -z --others --ignored --exclude-standard --directory');
+
+      try {
+        return actualExecSync(
+          `"${process.execPath}" -e "process.stdout.write('ignored-file\\\\n'.repeat(100000))"`,
+          options,
+        );
+      } catch (error) {
+        gitError = error;
+        throw error;
+      }
+    });
+
+    fs.writeFileSync(path.join(fixture.path, '.gitignore'), 'run\n', 'utf8');
+    fs.writeFileSync(path.join(fixture.path, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', {
+      dir: fixture.path,
+      ignore: [],
+    });
+
+    const file = path.relative(process.cwd(), path.join(fixture.path, 'run'));
+    expect(results.flatMap(result => result.instances).some(instance => instance.file === file)).toBe(true);
+    expect(gitError).toBeDefined();
+    expect(renderDebug).toHaveBeenCalledWith(expect.stringContaining('Skipping .gitignore support for scans'));
+    expect(renderDebug).toHaveBeenCalledWith(expect.stringContaining(gitError.message));
   });
 
   it('includes both changes with and without matchers', async () => {
