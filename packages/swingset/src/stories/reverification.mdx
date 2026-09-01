@@ -19,12 +19,17 @@ The example pauses briefly in each pending state. Enter `error` in password or b
 
 ## Usage
 
-The controller supplies one model containing the active view, transition direction, resolved messages, form state, and event handlers. Spread that model directly into the prop-driven `Reverification` view.
+The feature wrapper reads Clerk state and drives `ReverificationView`. Isolated panel stories below are for visual development only.
 
 ```tsx
-import { Reverification } from '@clerk/ui/mosaic/features/reverification/reverification.view';
+import { Reverification } from '@clerk/ui/mosaic/features/reverification';
 
-<Reverification {...reverificationModel} />;
+<Reverification
+  isActive
+  complete={() => {}}
+  cancel={() => {}}
+  level='first_factor'
+/>;
 ```
 
 ## Panels
