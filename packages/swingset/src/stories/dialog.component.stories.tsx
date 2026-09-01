@@ -178,10 +178,7 @@ const accountTrigger = (props: RenderProps) => <Button {...props}>Open account</
 
 /**
  * The "add email address" prompt the account panel opens, driven by `open` rather than a trigger.
- * Closing it while the field holds anything raises a confirmation stacked on top instead —
- * `panel -> prompt -> prompt` — and the veto is a controlled `open` whose `onOpenChange` declines
- * to commit. Hand-rolled to show a veto needs no machinery; `useConfirmedClose` is the same thing
- * packaged, and [Confirming a discard](#confirming-a-discard) has the composed version.
+ * Closing it with a value typed asks first — `panel -> prompt -> prompt`.
  */
 function AddEmailDialog({
   open,
@@ -192,32 +189,33 @@ function AddEmailDialog({
   onOpenChange: (open: boolean) => void;
   onAdd: (value: string) => void;
 }) {
-  const [discardOpen, setDiscardOpen] = React.useState(false);
+  const confirm = React.useMemo(() => createConfirmHandle(), []);
   const [value, setValue] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const dismiss = () => {
-    setValue('');
-    onOpenChange(false);
-  };
+  const guardedOpenChange = useConfirmedClose({
+    handle: confirm,
+    when: () => value.trim() !== '',
+    onOpenChange: next => {
+      onOpenChange(next);
+      if (!next) {
+        setValue('');
+      }
+    },
+    confirm: {
+      title: 'Discard changes?',
+      description: 'You have not finished adding this address. It will not be saved.',
+      actionLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
+    },
+  });
 
   return (
     <Dialog.Root
       closedBy='closerequest'
       open={open}
-      onOpenChange={next => {
-        // The veto. Every close request lands here — Escape, the corner X, `Dialog.Close` — so
-        // declining to commit covers all of them at once. A footer button wired to a bare
-        // `setOpen(false)` would go around it, which is the argument for `Dialog.Close`.
-        if (!next && value.trim() !== '') {
-          setDiscardOpen(true);
-          return;
-        }
-        if (!next) {
-          setValue('');
-        }
-        onOpenChange(next);
-      }}
+      onOpenChange={guardedOpenChange}
     >
       <Dialog.Popup>
         <Dialog.CloseButton />
@@ -232,42 +230,22 @@ function AddEmailDialog({
         />
         <Dialog.Actions>
           <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+          {/* Straight to the parent's setter: adding is the one close that must not be questioned. */}
           <Button
             disabled={value.trim() === ''}
             onClick={() => {
               onAdd(value.trim());
-              dismiss();
+              setValue('');
+              onOpenChange(false);
             }}
           >
             Add email
           </Button>
         </Dialog.Actions>
-        <Dialog.Root
-          role='alertdialog'
-          open={discardOpen}
-          onOpenChange={setDiscardOpen}
-        >
-          {/* Raised by a close request rather than a trigger, so without `finalFocus` there is
-              nothing for focus to return to. */}
-          <Dialog.Popup finalFocus={inputRef}>
-            <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
-            <Dialog.Description render={<Text />}>
-              You have not finished adding this address. It will not be saved.
-            </Dialog.Description>
-            <Dialog.Actions>
-              <Dialog.Close render={<Button variant='outline' />}>Keep editing</Dialog.Close>
-              <Button
-                color='negative'
-                onClick={() => {
-                  setDiscardOpen(false);
-                  dismiss();
-                }}
-              >
-                Discard
-              </Button>
-            </Dialog.Actions>
-          </Dialog.Popup>
-        </Dialog.Root>
+        <Dialog.Confirm
+          handle={confirm}
+          finalFocus={inputRef}
+        />
       </Dialog.Popup>
     </Dialog.Root>
   );
@@ -363,28 +341,39 @@ const settingsTrigger = (props: RenderProps) => <Button {...props}>Open settings
 
 const editProfileTrigger = (props: RenderProps) => <Button {...props}>Edit profile</Button>;
 
-const discardTrigger = (props: RenderProps) => (
-  <Button
-    variant='outline'
-    {...props}
-  >
-    Cancel
-  </Button>
-);
-
 /**
- * A prompt stacked on a prompt — the shape a close confirmation takes. The second prompt paints
- * no scrim of its own; the one beneath it recedes instead.
+ * A prompt stacked on a prompt — the shape a close confirmation takes. Edit the name and press
+ * Cancel: the second prompt paints no scrim of its own, and the one beneath it recedes instead.
  */
 export function StackedPrompts() {
+  const confirm = React.useMemo(() => createConfirmHandle(), []);
   const [open, setOpen] = React.useState(false);
-  const [confirmationOpen, setConfirmationOpen] = React.useState(false);
+  const [name, setName] = React.useState('Ada Lovelace');
   const nameRef = React.useRef<HTMLInputElement>(null);
+
+  const onOpenChange = useConfirmedClose({
+    handle: confirm,
+    when: () => name !== 'Ada Lovelace',
+    onOpenChange: next => {
+      setOpen(next);
+      if (!next) {
+        setName('Ada Lovelace');
+      }
+    },
+    confirm: {
+      title: 'Discard changes?',
+      description: 'Your edits will be lost.',
+      actionLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
+    },
+  });
+
   return (
     <Dialog.Root
       closedBy='closerequest'
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={onOpenChange}
     >
       <Dialog.Trigger render={editProfileTrigger} />
       <Dialog.Popup>
@@ -393,37 +382,18 @@ export function StackedPrompts() {
         <Dialog.Description render={<Text />}>Change the name people see on your account.</Dialog.Description>
         <Input
           ref={nameRef}
-          defaultValue='Ada Lovelace'
           placeholder='Your name'
+          value={name}
+          onChange={event => setName(event.target.value)}
         />
         <Dialog.Actions>
-          <Dialog.Root
-            role='alertdialog'
-            open={confirmationOpen}
-            onOpenChange={setConfirmationOpen}
-          >
-            <Dialog.Trigger render={discardTrigger} />
-            {/* "Keep editing" should put the caret back in the field, not on the Cancel that
-                raised the question. */}
-            <Dialog.Popup finalFocus={nameRef}>
-              <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
-              <Dialog.Description render={<Text />}>Your edits will be lost.</Dialog.Description>
-              <Dialog.Actions>
-                <Dialog.Close render={<Button variant='outline' />}>Keep editing</Dialog.Close>
-                <Button
-                  color='negative'
-                  onClick={() => {
-                    setConfirmationOpen(false);
-                    setOpen(false);
-                  }}
-                >
-                  Discard
-                </Button>
-              </Dialog.Actions>
-            </Dialog.Popup>
-          </Dialog.Root>
+          <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
           <Button onClick={() => setOpen(false)}>Save</Button>
         </Dialog.Actions>
+        <Dialog.Confirm
+          handle={confirm}
+          finalFocus={nameRef}
+        />
       </Dialog.Popup>
     </Dialog.Root>
   );
