@@ -1,40 +1,51 @@
 import type { FormEvent } from 'react';
 import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import { Field } from '../../components/field';
-import { Input } from '../../components/input';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { Field } from '../../../components/field';
+import { Otp } from '../../../components/otp';
 
-export interface ReverificationPasswordMessages {
+export interface ReverificationOtpMessages {
   title: string;
   description: string;
   fieldLabel: string;
-  fieldPlaceholder: string;
   secondaryActionLabel: string;
   primaryActionLabel: string;
   pendingLabel: string;
 }
 
-export interface ReverificationPasswordProps {
-  messages: ReverificationPasswordMessages;
+export interface ReverificationOtpResend {
+  label: string;
+  disabled?: boolean;
+  onClick: () => void;
+}
+
+export interface ReverificationOTPProps {
+  messages: ReverificationOtpMessages;
   value: string;
+  length?: number;
   errorMessage?: string;
   isPending?: boolean;
+  resend?: ReverificationOtpResend;
   onValueChange: (value: string) => void;
+  onComplete?: (value: string) => void;
   onSubmit: () => void;
   onCancel?: () => void;
 }
 
-export function ReverificationPassword({
+export function ReverificationOTP({
   messages,
   value,
+  length = 6,
   errorMessage,
   isPending = false,
+  resend,
   onValueChange,
+  onComplete,
   onSubmit,
   onCancel,
-}: ReverificationPasswordProps) {
+}: ReverificationOTPProps) {
   const formId = useId();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -61,15 +72,29 @@ export function ReverificationPassword({
             disabled={isPending}
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
-            <Input
-              name='password'
-              type='password'
-              autoComplete='current-password'
-              placeholder={messages.fieldPlaceholder}
+            <Otp
+              name='code'
+              length={length}
               value={value}
-              onChange={event => onValueChange(event.target.value)}
+              onValueChange={onValueChange}
+              onComplete={code => {
+                if (!isPending) {
+                  onComplete?.(code);
+                }
+              }}
             />
             {errorMessage ? <Field.Error>{errorMessage}</Field.Error> : null}
+            {resend ? (
+              <Button
+                type='button'
+                size='sm'
+                variant='link'
+                disabled={resend.disabled || isPending}
+                onClick={resend.onClick}
+              >
+                {resend.label}
+              </Button>
+            ) : null}
           </Field.Root>
         </form>
       </Card.Content>
