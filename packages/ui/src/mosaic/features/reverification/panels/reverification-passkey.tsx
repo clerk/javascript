@@ -1,6 +1,6 @@
-import { Banner } from '../../components/banner';
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
+import { Banner } from '../../../components/banner';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
 
 export interface ReverificationPasskeyMessages {
   title: string;

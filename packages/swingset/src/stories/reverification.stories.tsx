@@ -1,13 +1,13 @@
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Card } from '@clerk/ui/mosaic/components/card';
 import type { ReverificationMethod, ReverificationStep } from '@clerk/ui/mosaic/features/reverification';
+import { ReverificationBackupCode } from '@clerk/ui/mosaic/features/reverification/panels/reverification-backup-code';
+import { ReverificationHelp } from '@clerk/ui/mosaic/features/reverification/panels/reverification-help';
+import { ReverificationMethodPicker } from '@clerk/ui/mosaic/features/reverification/panels/reverification-method-picker';
+import { ReverificationOTP } from '@clerk/ui/mosaic/features/reverification/panels/reverification-otp';
+import { ReverificationPasskey } from '@clerk/ui/mosaic/features/reverification/panels/reverification-passkey';
+import { ReverificationPassword } from '@clerk/ui/mosaic/features/reverification/panels/reverification-password';
 import { ReverificationView } from '@clerk/ui/mosaic/features/reverification/reverification.view';
-import { ReverificationBackupCode } from '@clerk/ui/mosaic/features/reverification/reverification-backup-code';
-import { ReverificationHelp } from '@clerk/ui/mosaic/features/reverification/reverification-help';
-import { ReverificationMethodPicker } from '@clerk/ui/mosaic/features/reverification/reverification-method-picker';
-import { ReverificationOTP } from '@clerk/ui/mosaic/features/reverification/reverification-otp';
-import { ReverificationPasskey } from '@clerk/ui/mosaic/features/reverification/reverification-passkey';
-import { ReverificationPassword } from '@clerk/ui/mosaic/features/reverification/reverification-password';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
