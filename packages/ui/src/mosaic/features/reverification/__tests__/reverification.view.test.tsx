@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { ReverificationModel } from './reverification';
-import { Reverification } from './reverification';
+import type { ReverificationModel } from '../reverification.view';
+import { Reverification } from '../reverification.view';
 
 const actions = {
   secondaryActionLabel: 'Use another method',
