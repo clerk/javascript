@@ -2046,7 +2046,7 @@ export const esCR: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Escanea el código QR en su lugar',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Abrir en la aplicación de autenticación',
         buttonUnableToScan__nonPrimary: '¿No puedes escanear el código QR?',
         infoText__ableToScan:
           'Configura un nuevo método de inicio de sesión en tu aplicación de autenticación y escanea el siguiente código QR para vincularlo a tu cuenta.',

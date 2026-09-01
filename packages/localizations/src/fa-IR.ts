@@ -2043,7 +2043,7 @@ export const faIR: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'در عوض کد QR را اسکن کنید',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'باز کردن در برنامه تأیید هویت',
         buttonUnableToScan__nonPrimary: 'نمی‌توانید کد QR را اسکن کنید؟',
         infoText__ableToScan:
           'یک روش ورود جدید در برنامه تأیید هویت خود تنظیم کنید و کد QR زیر را اسکن کنید تا آن را به حساب خود پیوند دهید.',

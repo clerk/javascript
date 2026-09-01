@@ -1707,7 +1707,7 @@ export const viVN: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Thay vào đó, quét mã QR',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Mở trong ứng dụng xác thực',
         buttonUnableToScan__nonPrimary: 'Không thể quét mã QR?',
         formButtonPrimary: 'Tiếp tục',
         formButtonReset: 'Hủy',
@@ -2052,7 +2052,7 @@ export const viVN: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Quét mã QR thay vì',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Mở trong ứng dụng xác thực',
         buttonUnableToScan__nonPrimary: 'Không thể quét mã QR?',
         infoText__ableToScan:
           'Thiết lập phương thức đăng nhập mới trong ứng dụng xác thực của bạn và quét mã QR sau để kết nối với tài khoản của bạn.',

@@ -2039,7 +2039,7 @@ export const skSK: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Namiesto toho naskenujte QR kód',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Otvoriť v overovacej aplikácii',
         buttonUnableToScan__nonPrimary: 'Nemôžete naskenovať QR kód?',
         infoText__ableToScan:
           'Nastavte novú metódu prihlásenia vo vašej aplikácii pre overovanie a naskenujte nasledujúci QR kód, aby ste ju spojili so svojím účtom.',

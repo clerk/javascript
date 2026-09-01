@@ -2017,7 +2017,7 @@ export const kkKZ: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Орнына QR кодын сканерлеу',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Аутентификатор қолданбасында ашу',
         buttonUnableToScan__nonPrimary: 'QR кодын сканерлей алмайсыз ба?',
         infoText__ableToScan: 'Аутентификатор қолданбасында жаңа кіру әдісін орнатып, төмендегі QR кодын сканерлеңіз.',
         infoText__unableToScan: 'Аутентификатор қолданбасында жаңа кіру әдісін орнатып, төмендегі Кілтті енгізіңіз.',

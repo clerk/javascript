@@ -2032,7 +2032,7 @@ export const bgBG: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Сканирай QR кода вместо това',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Отвори в приложението за удостоверяване',
         buttonUnableToScan__nonPrimary: 'Не може да се сканира QR кода?',
         infoText__ableToScan:
           'Настройте нов метод за влизане във вашия удостоверителен апликатор и сканирайте следващия QR код, за да го свържете с вашия акаунт.',

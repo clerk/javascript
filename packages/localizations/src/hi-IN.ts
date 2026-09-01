@@ -1708,7 +1708,7 @@ export const hiIN: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'इसके बजाय QR कोड स्कैन करें',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'प्रमाणकर्ता ऐप में खोलें',
         buttonUnableToScan__nonPrimary: 'QR कोड स्कैन नहीं कर सकते?',
         formButtonPrimary: 'जारी रखें',
         formButtonReset: 'रद्द करें',
@@ -2059,7 +2059,7 @@ export const hiIN: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'इसके बजाय QR कोड स्कैन करें',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'प्रमाणकर्ता ऐप में खोलें',
         buttonUnableToScan__nonPrimary: 'QR कोड स्कैन नहीं कर सकते?',
         infoText__ableToScan:
           'अपने प्रमाणकर्ता ऐप में एक नई साइन-इन विधि सेट करें और इसे अपने खाते से लिंक करने के लिए निम्न QR कोड को स्कैन करें।',

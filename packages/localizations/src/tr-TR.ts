@@ -2036,7 +2036,7 @@ export const trTR: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Veya QR kodunu tara',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Authenticator uygulamasında aç',
         buttonUnableToScan__nonPrimary: 'QR kodunu tarayamıyorum',
         infoText__ableToScan:
           'Authenticator uygulamanızda yeni bir giriş yöntemi ayarlayın ve hesabınızla bağlamak için aşağıdaki QR kodunu tarayın.',

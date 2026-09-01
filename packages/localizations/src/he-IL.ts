@@ -2013,7 +2013,7 @@ export const heIL: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'סרוק קוד QR במקום',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'פתח באפליקציית האותנטיקטור',
         buttonUnableToScan__nonPrimary: 'לא יכול לסרוק קוד QR?',
         infoText__ableToScan:
           'הגדר שיטת התחברות חדשה באפליקציית האותנטיקטור שלך וסרוק את קוד ה-QR הבא כדי לחברו לחשבון שלך.',

@@ -1712,7 +1712,7 @@ export const teIN: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'బదులుగా QR కోడ్‌ను స్కాన్ చేయి',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'ప్రమాణీకరణ యాప్‌లో తెరవండి',
         buttonUnableToScan__nonPrimary: 'QR కోడ్‌ను స్కాన్ చేయలేకపోతున్నారా?',
         formButtonPrimary: 'కొనసాగించు',
         formButtonReset: 'రద్దు చేయి',
@@ -2062,7 +2062,7 @@ export const teIN: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'బదులుగా QR కోడ్‌ను స్కాన్ చేయండి',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'ప్రమాణీకరణ యాప్‌లో తెరవండి',
         buttonUnableToScan__nonPrimary: 'QR కోడ్‌ను స్కాన్ చేయలేరా?',
         infoText__ableToScan:
           'మీ ప్రమాణీకరణ యాప్‌లో కొత్త సైన్-ఇన్ పద్ధతిని సెటప్ చేసి, దానిని మీ ఖాతాకు లింక్ చేయడానికి క్రింది QR కోడ్‌ను స్కాన్ చేయండి.',

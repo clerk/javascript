@@ -2004,7 +2004,7 @@ export const zhCN: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: '扫描二维码',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: '在验证器应用中打开',
         buttonUnableToScan__nonPrimary: '不能扫描二维码？',
         infoText__ableToScan: '在您的验证器应用中设置一个新的登录方法，并扫描下面的二维码将其链接到您的账户。',
         infoText__unableToScan: '在验证器中设置一个新的登录方法，并输入下面提供的 Key。',

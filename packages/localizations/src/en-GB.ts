@@ -2036,7 +2036,7 @@ export const enGB: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Scan QR code instead',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Open in authenticator app',
         buttonUnableToScan__nonPrimary: 'Can’t scan QR code?',
         infoText__ableToScan:
           'Set up a new sign-in method in your authenticator app and scan the following QR code to link it to your account.',

@@ -2049,7 +2049,7 @@ export const caES: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Escaneja el codi QR en lloc',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: "Obre a l'aplicació d'autenticació",
         buttonUnableToScan__nonPrimary: 'No pots escanejar el codi QR? ',
         infoText__ableToScan:
           "Configura un nou mètode d'inici de sessió a la teva aplicació d'autenticador i escaneja el següent codi QR per vincular - lo al teu compte.",

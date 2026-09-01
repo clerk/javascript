@@ -2052,7 +2052,7 @@ export const ruRU: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Вместо этого отсканируйте QR-код',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Открыть в приложении аутентификации',
         buttonUnableToScan__nonPrimary: 'Не удается отсканировать QR-код?',
         infoText__ableToScan:
           'Настройте новый метод входа в вашем приложении аутентификации и отсканируйте следующий QR-код, чтобы связать его с вашей учетной записью.',

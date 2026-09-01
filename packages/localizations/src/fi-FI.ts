@@ -1710,7 +1710,7 @@ export const fiFI: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Skannaa sen sijaan QR-koodi',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Avaa todennussovelluksessa',
         buttonUnableToScan__nonPrimary: 'Etkö voi skannata QR-koodia?',
         formButtonPrimary: 'Jatka',
         formButtonReset: 'Peruuta',
@@ -2058,7 +2058,7 @@ export const fiFI: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Skannaa sen sijaan QR-koodi',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Avaa todennussovelluksessa',
         buttonUnableToScan__nonPrimary: 'Et voi skannata QR-koodia?',
         infoText__ableToScan:
           'Aseta uusi kirjautumistapa todennussovellukseesi ja skannaa seuraava QR-koodi linkittääksesi se tilillesi.',

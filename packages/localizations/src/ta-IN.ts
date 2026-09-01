@@ -1714,7 +1714,7 @@ export const taIN: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'அதற்குப் பதிலாக QR குறியீட்டை ஸ்கேன் செய்',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'அங்கீகாரி பயன்பாட்டில் திற',
         buttonUnableToScan__nonPrimary: 'QR குறியீட்டை ஸ்கேன் செய்ய முடியவில்லையா?',
         formButtonPrimary: 'தொடரவும்',
         formButtonReset: 'ரத்து செய்',
@@ -2071,7 +2071,7 @@ export const taIN: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'QR குறியீட்டை ஸ்கேன் செய்',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'அங்கீகாரி பயன்பாட்டில் திற',
         buttonUnableToScan__nonPrimary: 'QR குறியீட்டை ஸ்கேன் செய்ய முடியவில்லையா?',
         infoText__ableToScan:
           'உங்கள் அங்கீகாரி பயன்பாட்டில் ஒரு புதிய உள்நுழைவு முறையை அமைத்து, பின்வரும் QR குறியீட்டை ஸ்கேன் செய்து உங்கள் கணக்குடன் இணைக்கவும்.',

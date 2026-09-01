@@ -2029,7 +2029,7 @@ export const ukUA: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Замість цього відскануйте QR-код',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Відкрити в застосунку аутентифікації',
         buttonUnableToScan__nonPrimary: 'Не вдається відсканувати QR-код?',
         infoText__ableToScan:
           "Налаштуйте новий метод входу у вашому застосунку аутентифікації та відскануйте наступний QR-код, щоб пов'язати його з вашим обліковим записом.",

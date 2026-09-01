@@ -2044,7 +2044,7 @@ export const csCZ: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Místo toho naskenovat QR kód',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Otevřít v ověřovací aplikaci',
         buttonUnableToScan__nonPrimary: 'Nemůžete naskenovat QR kód?',
         infoText__ableToScan:
           'Nastavte novou metodu přihlášení ve vaší aplikaci pro ověřování a naskenujte následující QR kód, abyste ji propojili se svým účtem.',

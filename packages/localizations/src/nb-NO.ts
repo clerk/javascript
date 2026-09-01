@@ -1711,7 +1711,7 @@ export const nbNO: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Skann QR-kode i stedet',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Åpne i autentiseringsappen',
         buttonUnableToScan__nonPrimary: 'Kan ikke skanne QR-kode?',
         formButtonPrimary: 'Fortsett',
         formButtonReset: 'Avbryt',
@@ -2061,7 +2061,7 @@ export const nbNO: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Skan QR-kode i stedet',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Åpne i autentiseringsappen',
         buttonUnableToScan__nonPrimary: 'Kan ikke skanne QR-kode?',
         infoText__ableToScan:
           'Sett opp en ny innloggingsmetode i autentiseringsappen din og skann følgende QR-kode for å koble den til kontoen din.',

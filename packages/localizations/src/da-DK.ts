@@ -2029,7 +2029,7 @@ export const daDK: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Scan QR-koden i stedet',
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
+        buttonOpenInAuthenticatorApp__nonPrimary: 'Åbn i autentificeringsappen',
         buttonUnableToScan__nonPrimary: 'Kan du ikke scanne QR-koden?',
         infoText__ableToScan:
           'Konfigurer en ny login-metode i din autentificeringsapp, og scan følgende QR-kode for at linke den til din konto.',
