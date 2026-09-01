@@ -186,8 +186,17 @@ Focus opens on the first tabbable element, so a `CloseButton` rendered first tak
 
 ### Dismissal
 
-`closedBy`: `any` (Escape and outside press, default), `closerequest` (Escape only), `none`
-(programmatic only). Use `closerequest` for anything holding input.
+`closedBy` mirrors the native `<dialog closedby>` attribute:
+
+| Value          | Escape | Outside press | Programmatic | Use for                                     |
+| -------------- | ------ | ------------- | ------------ | ------------------------------------------- |
+| `any`          | ✅     | ✅            | ✅           | Read-and-dismiss content (default)          |
+| `closerequest` | ✅     | ❌            | ✅           | Anything holding input; alert dialogs       |
+| `none`         | ❌     | ❌            | ✅           | Flows the user must complete or acknowledge |
+
+```tsx
+<Dialog.Root closedBy='closerequest'>…</Dialog.Root>
+```
 
 ### Exit
 
