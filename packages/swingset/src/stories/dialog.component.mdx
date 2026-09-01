@@ -247,9 +247,16 @@ State attributes:
 
 ### Nested dialogs and stacks
 
-A dialog over a `panel` or `card` is **nested**: it paints its own lighter scrim. A prompt over a
-prompt is a **stack**: no second scrim, and the prompt beneath dims and recedes. Whichever it is,
-the dialog that opens should be a `prompt` — anything else warns in dev.
+A dialog opened inside another is one of two relationships, decided by the size beneath it:
+
+|                     | Nested                     | Stack                              |
+| ------------------- | -------------------------- | ---------------------------------- |
+| Opens over          | a `panel` or `card`        | a `prompt`                         |
+| Its own scrim       | Yes, lighter than the base | None — one scrim serves the stack  |
+| The surface beneath | Unchanged                  | Dims and recedes                   |
+| Attributes          | `data-nested`              | `data-stacked` / `data-stack-base` |
+
+The dialog that opens should always be a `prompt`; anything else warns in dev.
 
 ---
 
