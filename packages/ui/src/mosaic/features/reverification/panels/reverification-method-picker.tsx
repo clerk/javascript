@@ -1,10 +1,11 @@
-import { Button } from '../../components/button';
-import { Card } from '../../components/card';
+import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
+import type { IconProps } from '../../../components/icon';
+import { Icon, IconFrame } from '../../../components/icon';
+import { Item } from '../../../components/item';
+import { Spinner } from '../../../components/spinner';
+import { Text } from '../../../components/text';
 import type { IconProps } from '../../components/icon';
-import { Icon, IconFrame } from '../../components/icon';
-import { Item } from '../../components/item';
-import { Spinner } from '../../components/spinner';
-import { Text } from '../../components/text';
 
 export interface ReverificationMethod {
   id: string;
