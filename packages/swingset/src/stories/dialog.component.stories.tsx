@@ -194,6 +194,7 @@ function AddEmailDialog({
 }) {
   const [discardOpen, setDiscardOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const dismiss = () => {
     setValue('');
@@ -223,6 +224,7 @@ function AddEmailDialog({
         <Dialog.Title render={<Heading size='sm' />}>Add email address</Dialog.Title>
         <Dialog.Description render={<Text />}>A verification code will be sent to this address.</Dialog.Description>
         <Input
+          ref={inputRef}
           type='email'
           placeholder='you@example.com'
           value={value}
@@ -245,7 +247,9 @@ function AddEmailDialog({
           open={discardOpen}
           onOpenChange={setDiscardOpen}
         >
-          <Dialog.Popup>
+          {/* Raised by a close request rather than a trigger, so without `finalFocus` there is
+              nothing for focus to return to. */}
+          <Dialog.Popup finalFocus={inputRef}>
             <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
             <Dialog.Description render={<Text />}>
               You have not finished adding this address. It will not be saved.
@@ -375,6 +379,7 @@ const discardTrigger = (props: RenderProps) => (
 export function StackedPrompts() {
   const [open, setOpen] = React.useState(false);
   const [confirmationOpen, setConfirmationOpen] = React.useState(false);
+  const nameRef = React.useRef<HTMLInputElement>(null);
   return (
     <Dialog.Root
       closedBy='closerequest'
@@ -387,6 +392,7 @@ export function StackedPrompts() {
         <Dialog.Title render={<Heading size='sm' />}>Update profile</Dialog.Title>
         <Dialog.Description render={<Text />}>Change the name people see on your account.</Dialog.Description>
         <Input
+          ref={nameRef}
           defaultValue='Ada Lovelace'
           placeholder='Your name'
         />
@@ -397,7 +403,9 @@ export function StackedPrompts() {
             onOpenChange={setConfirmationOpen}
           >
             <Dialog.Trigger render={discardTrigger} />
-            <Dialog.Popup>
+            {/* "Keep editing" should put the caret back in the field, not on the Cancel that
+                raised the question. */}
+            <Dialog.Popup finalFocus={nameRef}>
               <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
               <Dialog.Description render={<Text />}>Your edits will be lost.</Dialog.Description>
               <Dialog.Actions>
