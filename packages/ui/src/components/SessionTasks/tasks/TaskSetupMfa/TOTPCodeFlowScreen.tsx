@@ -89,6 +89,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
                     variant='outline'
                     textVariant='buttonLarge'
                     onClick={() => (window.location.href = totp.uri || '')}
+                    sx={{ alignSelf: 'center' }}
                     localizationKey={localizationKeys(
                       'taskSetupMfa.totpCode.addAuthenticatorApp.buttonOpenInAuthenticatorApp__nonPrimary',
                     )}
