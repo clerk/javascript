@@ -32,7 +32,7 @@ export type ReverificationProps = ReverificationModel;
 
 export function Reverification(model: ReverificationProps): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <Flow.Root
         value={model.status}
         direction={model.direction}

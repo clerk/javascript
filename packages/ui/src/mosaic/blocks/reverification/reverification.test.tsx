@@ -117,6 +117,12 @@ describe('Reverification', () => {
     expect(otpStep?.style.getPropertyValue('--cl-flow-transition-direction')).toBe('-1');
   });
 
+  it('does not render Card branding', () => {
+    render(<Reverification {...model('password')} />);
+
+    expect(screen.queryByText('Secured by')).not.toBeInTheDocument();
+  });
+
   it('renders a passkey attempt error in a negative Banner', () => {
     const errorModel = model('passkey');
     errorModel.passkey.errorMessage = 'We couldn’t verify that passkey. Try again.';

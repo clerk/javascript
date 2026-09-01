@@ -23,7 +23,7 @@ export function Default(): JSX.Element {
   };
 
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <Flow.Root
         value={step}
         direction={direction}

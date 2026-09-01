@@ -19,7 +19,7 @@ Keep `Card.Root` outside `Flow.Root` so the card remains stable while Flow clips
 import { Card } from '@clerk/ui/mosaic/components/card';
 import { Flow } from '@clerk/ui/mosaic/components/flow';
 
-<Card.Root>
+<Card.Root renderBranding={false}>
   <Flow.Root
     value={model.status}
     direction={model.direction}

@@ -260,7 +260,7 @@ export function Password(): JSX.Element {
   const [value, setValue] = useState('');
 
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationPassword
         messages={passwordMessages}
         value={value}
@@ -274,7 +274,7 @@ export function Password(): JSX.Element {
 
 export function PasswordPending(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationPassword
         messages={passwordMessages}
         value=''
@@ -289,7 +289,7 @@ export function PasswordPending(): JSX.Element {
 
 export function PasswordError(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationPassword
         messages={passwordMessages}
         value='incorrect-password'
@@ -304,7 +304,7 @@ export function PasswordError(): JSX.Element {
 
 export function Passkey(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationPasskey
         messages={passkeyMessages}
         onVerify={() => undefined}
@@ -316,7 +316,7 @@ export function Passkey(): JSX.Element {
 
 export function PasskeyPending(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationPasskey
         messages={passkeyMessages}
         isPending
@@ -329,7 +329,7 @@ export function PasskeyPending(): JSX.Element {
 
 export function PasskeyError(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationPasskey
         messages={passkeyMessages}
         errorMessage='We couldn’t verify that passkey. Try again.'
@@ -344,7 +344,7 @@ export function OTP(): JSX.Element {
   const [value, setValue] = useState('');
 
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationOTP
         messages={phoneOtpMessages}
         value={value}
@@ -364,7 +364,7 @@ export function AuthenticatorOTP(): JSX.Element {
   const [value, setValue] = useState('');
 
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationOTP
         messages={authenticatorOtpMessages}
         value={value}
@@ -378,7 +378,7 @@ export function AuthenticatorOTP(): JSX.Element {
 
 export function OTPPending(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationOTP
         messages={phoneOtpMessages}
         value='123456'
@@ -398,7 +398,7 @@ export function OTPPending(): JSX.Element {
 
 export function OTPError(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationOTP
         messages={phoneOtpMessages}
         value='123456'
@@ -417,7 +417,7 @@ export function OTPError(): JSX.Element {
 
 export function OTPResending(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationOTP
         messages={phoneOtpMessages}
         value=''
@@ -438,7 +438,7 @@ export function BackupCode(): JSX.Element {
   const [value, setValue] = useState('');
 
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationBackupCode
         messages={backupCodeMessages}
         value={value}
@@ -452,7 +452,7 @@ export function BackupCode(): JSX.Element {
 
 export function BackupCodePending(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationBackupCode
         messages={backupCodeMessages}
         value=''
@@ -467,7 +467,7 @@ export function BackupCodePending(): JSX.Element {
 
 export function BackupCodeError(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationBackupCode
         messages={backupCodeMessages}
         value='invalid-code'
@@ -484,7 +484,7 @@ export function MethodPicker(): JSX.Element {
   const [pendingMethodId, setPendingMethodId] = useState<string>();
 
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationMethodPicker
         messages={methodPickerMessages}
         methods={[
@@ -504,7 +504,7 @@ export function MethodPicker(): JSX.Element {
 
 export function MethodPickerPending(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationMethodPicker
         messages={methodPickerMessages}
         methods={[
@@ -524,7 +524,7 @@ export function MethodPickerPending(): JSX.Element {
 
 export function Help(): JSX.Element {
   return (
-    <Card.Root>
+    <Card.Root renderBranding={false}>
       <ReverificationHelp
         messages={helpMessages}
         onEmailSupport={() => undefined}
