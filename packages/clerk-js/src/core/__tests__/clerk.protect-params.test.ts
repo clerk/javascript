@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Clerk } from '../clerk';
+import type * as FapiClientModule from '../fapiClient';
 
 /**
  * Pins the `getProtectParams` hook Clerk hands the FAPI client. Dropping it still compiles and
@@ -19,7 +20,7 @@ vi.mock('../protect', () => ({
 const { capturedOptions } = vi.hoisted(() => ({ capturedOptions: { current: undefined as any } }));
 
 vi.mock('../fapiClient', async importOriginal => {
-  const actual = await importOriginal<typeof import('../fapiClient')>();
+  const actual = await importOriginal<typeof FapiClientModule>();
   return {
     ...actual,
     createFapiClient: (options: any) => {
