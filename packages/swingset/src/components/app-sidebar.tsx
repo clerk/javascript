@@ -106,14 +106,17 @@ function SidebarEntryMenu({
         const href = `/${groupSlug}/${componentSlug}`;
         // How an entry is USED differs by layer, so the label follows the layer rather
         // than a guess at the title: hooks are called, atomic styles are a set of
-        // exports with no single call form worth privileging, and everything else is a
-        // component rendered as JSX.
+        // exports with no single call form worth privileging, flows are a set of surfaces
+        // and the states they take rather than anything you render, and everything else is
+        // a component rendered as JSX.
         const usage =
           mod.meta.group === 'Hooks'
             ? `${mod.meta.title}()`
             : mod.meta.group === 'Styles'
               ? mod.meta.title
-              : `<${mod.meta.title} />`;
+              : mod.meta.navigation?.category === 'Flows'
+                ? (mod.meta.label ?? mod.meta.title)
+                : `<${mod.meta.title} />`;
         return (
           <SidebarUsageItem
             key={mod.meta.title}

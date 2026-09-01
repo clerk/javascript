@@ -162,6 +162,12 @@ import {
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
 } from '../stories/user-profile-account-section.stories';
 import {
+  Default as UserProfileAccountSectionFlowDefault,
+  meta as userProfileAccountSectionFlowMeta,
+  ProfileStates as UserProfileAccountSectionFlowProfileStates,
+  States as UserProfileAccountSectionFlowStates,
+} from '../stories/user-profile-account-section-flow.stories';
+import {
   Default as UserProfileActiveDevicesSectionDefault,
   meta as userProfileActiveDevicesSectionMeta,
 } from '../stories/user-profile-active-devices-section.stories';
@@ -385,6 +391,12 @@ const userPageModule: StoryModule = {
   meta: userPageMeta,
   Default: UserPageDefault,
 };
+const userProfileAccountSectionFlowModule: StoryModule = {
+  meta: userProfileAccountSectionFlowMeta,
+  Default: UserProfileAccountSectionFlowDefault,
+  States: UserProfileAccountSectionFlowStates,
+  ProfileStates: UserProfileAccountSectionFlowProfileStates,
+};
 
 const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
@@ -485,6 +497,7 @@ export const registry: StoryModule[] = [
   userButtonModule,
   // User Profile
   userPageModule,
+  userProfileAccountSectionFlowModule,
   // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,

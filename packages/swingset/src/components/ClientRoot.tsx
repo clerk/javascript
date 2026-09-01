@@ -29,7 +29,10 @@ function useBreadcrumb() {
   // to how the entry is actually written — `scroll-area` → `Scroll Area`, `use-data-table` →
   // `useDataTable`. Fall back to title-casing the slug for any path the registry doesn't cover.
   return parts.map((part, index) => {
-    const title = index === 0 ? getModule(groupSlug, part)?.meta.title : undefined;
+    const meta = index === 0 ? getModule(groupSlug, part)?.meta : undefined;
+    // A flow is not a component, so it reads as prose here and in the sidebar rather than as the
+    // name of something you could render. See `app-sidebar.tsx` for the same rule.
+    const title = meta && (meta.navigation?.category === 'Flows' ? (meta.label ?? meta.title) : meta.title);
     return title ?? part.replace(/(^|-)([a-z])/g, (_, sep: string, ch: string) => (sep ? ' ' : '') + ch.toUpperCase());
   });
 }
