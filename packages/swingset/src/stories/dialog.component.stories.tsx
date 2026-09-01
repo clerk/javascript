@@ -1,3 +1,4 @@
+import { Tabs } from '@clerk/headless/tabs';
 import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Card } from '@clerk/ui/mosaic/components/card';
@@ -7,8 +8,12 @@ import { Heading } from '@clerk/ui/mosaic/components/heading';
 import { Input } from '@clerk/ui/mosaic/components/input';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
 import { Text } from '@clerk/ui/mosaic/components/text';
+import { ProfilePage } from '@clerk/ui/mosaic/profile-page';
 import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
+import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
 import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
+import type { UserProfilePanelId } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
+import { UserProfileSidebar } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -352,8 +357,6 @@ export function Inline() {
 
 const settingsTrigger = (props: RenderProps) => <Button {...props}>Open settings</Button>;
 
-const NAV_SECTIONS = ['Account', 'Security', 'Billing', 'API keys'];
-
 const editProfileTrigger = (props: RenderProps) => <Button {...props}>Edit profile</Button>;
 
 const discardTrigger = (props: RenderProps) => (
@@ -418,62 +421,59 @@ export function StackedPrompts() {
   );
 }
 
+const PANELS: readonly UserProfilePanelId[] = ['account', 'security'];
+
 /** The panel clips rather than scrolling, so the scroll region is composed inside it. */
 export function PanelSidebar() {
-  const { panels } = useUserPageFixture();
+  const { activePanel, setActivePanel, panels } = useUserPageFixture();
   return (
     <Dialog.Root>
       <Dialog.Trigger render={settingsTrigger} />
-      <Dialog.Popup size='panel'>
+      <Dialog.Popup
+        size='panel'
+        aria-label='Account'
+      >
         <Dialog.CloseButton />
+        {/* The sidebar's tabs and the panels share this context; `ProfilePage.Root` would supply
+            it too, but its grid gives the content column no height to scroll within. */}
+        <Tabs.Root
+          value={activePanel}
+          onValueChange={value => setActivePanel(value as UserProfilePanelId)}
+          orientation='vertical'
+        >
+          <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+            {/* The rail has nowhere to go on a phone. Queried against the dialog's own `cl-dialog`
+                container rather than the window, so it follows the surface it sits in — `@3xl` is
+                Tailwind's 48rem, the dialog's phone band. On a wrapper, because the sidebar's own
+                StyleX `display` outranks a Tailwind utility. */}
+            <div
+              className='@3xl/cl-dialog:flex hidden'
+              style={{ flex: 'none', width: '14rem' }}
+            >
+              <UserProfileSidebar
+                panels={PANELS}
+                style={{ flex: 1 }}
+              />
+            </div>
 
-        {/* Its own header, so the accessible name survives the nav being hidden on a phone. */}
-        <div style={{ flex: 'none', padding: '1.5rem 1.5rem 0' }}>
-          <Dialog.Title render={<Heading size='lg' />}>Settings</Dialog.Title>
-        </div>
-
-        <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-          {/* The rail has nowhere to go on a phone. Queried against the dialog's own `cl-dialog`
-              container rather than the window, so it follows the surface it sits in — `@3xl` is
-              Tailwind's 48rem, the dialog's phone band. */}
-          <nav
-            className='@3xl/cl-dialog:flex hidden'
-            style={{
-              borderInlineEnd: `1px solid var(--cl-color-border)`,
-              flex: 'none',
-              flexDirection: 'column',
-              gap: '0.25rem',
-              padding: '1.5rem 1rem',
-              width: '14rem',
-            }}
-          >
-            {NAV_SECTIONS.map((section, index) => (
-              <Button
-                key={section}
-                variant='ghost'
-                size='sm'
-                fullWidth
-                // `Button` centres its content; a nav row wants a leading label.
-                style={{ justifyContent: 'flex-start' }}
-                aria-current={index === 1 ? 'page' : undefined}
-              >
-                {section}
-              </Button>
-            ))}
-          </nav>
-
-          {/* Flush with the popup edge, so the scrollbar and edge fade land on the true edge. */}
-          <div
-            {...stylex.props(scrollAreaRoot)}
-            style={{ flex: 1, minWidth: 0 }}
-          >
-            <div {...stylex.props(...scrollAreaViewport())}>
-              <div style={{ padding: '1.5rem' }}>
-                <UserProfileSecurityPanelView {...panels.security} />
+            {/* Flush with the popup edge, so the scrollbar and edge fade land on the true edge. */}
+            <div
+              {...stylex.props(scrollAreaRoot)}
+              style={{ flex: 1, minWidth: 0 }}
+            >
+              <div {...stylex.props(...scrollAreaViewport())}>
+                <div style={{ padding: '2.5rem' }}>
+                  <ProfilePage.Panel value='account'>
+                    <UserProfileProfilePanelView {...panels.account} />
+                  </ProfilePage.Panel>
+                  <ProfilePage.Panel value='security'>
+                    <UserProfileSecurityPanelView {...panels.security} />
+                  </ProfilePage.Panel>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </Tabs.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );

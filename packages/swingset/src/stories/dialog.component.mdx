@@ -273,14 +273,19 @@ atoms. The panel has no padding of its own — put it on the content.
 />
 
 ```tsx
-<div {...stylex.props(scrollAreaRoot)} style={{ flex: 1, minWidth: 0 }}>
-  <div {...stylex.props(...scrollAreaViewport())}>
-    <div style={{ padding: '1.5rem' }}>…</div>
+<Dialog.Popup size='panel'>
+  <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+    <UserProfileSidebar panels={panels} className='hidden @3xl/cl-dialog:flex' />
+
+    <div {...stylex.props(scrollAreaRoot)} style={{ flex: 1, minWidth: 0 }}>
+      <div {...stylex.props(...scrollAreaViewport())}>…</div>
+    </div>
   </div>
-</div>
+</Dialog.Popup>
 ```
 
 `min-height: 0` on the flex row is required, or the row grows past the panel and never scrolls.
+The rail hides below `48rem` of the dialog's own `cl-dialog` container, not the window.
 
 ### Scrolling a tall card
 
