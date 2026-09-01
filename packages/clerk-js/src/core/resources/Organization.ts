@@ -297,7 +297,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       await BaseResource._fetch<DirectorySyncJSON>({
         path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory`,
         method: 'POST',
-        body: (params?.name ? { name: params.name } : {}) as any,
+        body: { name: params?.name } as any,
       })
     )?.response as unknown as DirectorySyncJSON;
 

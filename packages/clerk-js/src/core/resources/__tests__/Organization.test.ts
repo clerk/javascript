@@ -396,5 +396,20 @@ describe('Organization', () => {
       expect(result.apiKey).toBe('ak_secret');
       expect(result.__internal_toSnapshot()).not.toHaveProperty('api_key');
     });
+
+    it('creates the directory without a name, leaving it to the FAPI client to drop the undefined field', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: directoryJSON }));
+
+      const organization = createOrganization();
+      await organization.createDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: DIRECTORY_PATH,
+        body: { name: undefined },
+      });
+    });
   });
 });
