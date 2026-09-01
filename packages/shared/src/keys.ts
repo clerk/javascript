@@ -36,9 +36,11 @@ const PUBLISHABLE_FRONTEND_API_DEV_REGEX = /^(([a-z]+)-){2}([0-9]{1,2})\.clerk\.
  * @returns An unpadded base64-encoded publishable key with appropriate prefix (pk_live_ or pk_test_).
  */
 export function buildPublishableKey(frontendApi: string): string {
-  const isDevKey =
-    PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi) ||
-    (frontendApi.startsWith('clerk.') && LEGACY_DEV_INSTANCE_SUFFIXES.some(s => frontendApi.endsWith(s)));
+  const isLegacyDevKey =
+    frontendApi.startsWith('clerk.') &&
+    LEGACY_DEV_INSTANCE_SUFFIXES.some(s => frontendApi.endsWith(s)) &&
+    !frontendApi.endsWith('.prod.lclclerk.com');
+  const isDevKey = PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi) || isLegacyDevKey;
   const keyPrefix = isDevKey ? PUBLISHABLE_KEY_TEST_PREFIX : PUBLISHABLE_KEY_LIVE_PREFIX;
   return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`).replace(/=+$/, '')}`;
 }
