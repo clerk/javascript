@@ -147,23 +147,27 @@ export function DiscardChanges() {
         <Dialog.Description render={<Text />}>
           You will need to verify this address before it can be used.
         </Dialog.Description>
-        <Input
-          ref={inputRef}
-          placeholder='name@example.com'
-          value={value}
-          onChange={event => setValue(event.target.value)}
-        />
-        <Dialog.Actions>
-          <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
-          <Button
-            onClick={() => {
-              bypassGuardRef.current = true;
-              onOpenChange(false, { trigger: null, triggerId: null, event: undefined });
-            }}
-          >
-            Add
-          </Button>
-        </Dialog.Actions>
+        {/* A form, so Enter in the field is the primary action; Tab stays in visual order. */}
+        <form
+          style={{ display: 'contents' }}
+          onSubmit={event => {
+            event.preventDefault();
+            bypassGuardRef.current = true;
+            onOpenChange(false, { trigger: null, triggerId: null, event: undefined });
+          }}
+        >
+          <Input
+            ref={inputRef}
+            type='email'
+            placeholder='name@example.com'
+            value={value}
+            onChange={event => setValue(event.target.value)}
+          />
+          <Dialog.Actions>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+            <Button type='submit'>Add</Button>
+          </Dialog.Actions>
+        </form>
 
         <Dialog.Confirm
           handle={confirm}
@@ -221,27 +225,30 @@ function AddEmailDialog({
         <Dialog.CloseButton />
         <Dialog.Title render={<Heading size='sm' />}>Add email address</Dialog.Title>
         <Dialog.Description render={<Text />}>A verification code will be sent to this address.</Dialog.Description>
-        <Input
-          ref={inputRef}
-          type='email'
-          placeholder='you@example.com'
-          value={value}
-          onChange={event => setValue(event.target.value)}
-        />
-        <Dialog.Actions>
-          <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
-          {/* Straight to the parent's setter: adding is the one close that must not be questioned. */}
-          <Button
-            disabled={value.trim() === ''}
-            onClick={() => {
-              onAdd(value.trim());
-              setValue('');
-              onOpenChange(false);
-            }}
-          >
-            Add email
-          </Button>
-        </Dialog.Actions>
+        {/* Straight to the parent's setter on submit: adding is the one close that must not be
+            questioned. A form, so Enter in the field adds. */}
+        <form
+          style={{ display: 'contents' }}
+          onSubmit={event => {
+            event.preventDefault();
+            onAdd(value.trim());
+            setValue('');
+            onOpenChange(false);
+          }}
+        >
+          <Input
+            ref={inputRef}
+            type='email'
+            required
+            placeholder='you@example.com'
+            value={value}
+            onChange={event => setValue(event.target.value)}
+          />
+          <Dialog.Actions>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+            <Button type='submit'>Add email</Button>
+          </Dialog.Actions>
+        </form>
         <Dialog.Confirm
           handle={confirm}
           finalFocus={inputRef}
@@ -380,16 +387,25 @@ export function StackedPrompts() {
         <Dialog.CloseButton />
         <Dialog.Title render={<Heading size='sm' />}>Update profile</Dialog.Title>
         <Dialog.Description render={<Text />}>Change the name people see on your account.</Dialog.Description>
-        <Input
-          ref={nameRef}
-          placeholder='Your name'
-          value={name}
-          onChange={event => setName(event.target.value)}
-        />
-        <Dialog.Actions>
-          <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
-          <Button onClick={() => setOpen(false)}>Save</Button>
-        </Dialog.Actions>
+        {/* Saving goes straight to `setOpen`, past the guard. A form, so Enter in the field saves. */}
+        <form
+          style={{ display: 'contents' }}
+          onSubmit={event => {
+            event.preventDefault();
+            setOpen(false);
+          }}
+        >
+          <Input
+            ref={nameRef}
+            placeholder='Your name'
+            value={name}
+            onChange={event => setName(event.target.value)}
+          />
+          <Dialog.Actions>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+            <Button type='submit'>Save</Button>
+          </Dialog.Actions>
+        </form>
         <Dialog.Confirm
           handle={confirm}
           finalFocus={nameRef}

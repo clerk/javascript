@@ -198,6 +198,27 @@ Focus opens on the first tabbable element, so a `CloseButton` rendered first tak
 <Dialog.Root closedBy='closerequest'>…</Dialog.Root>
 ```
 
+### Keyboard
+
+| Key                | Does                                                              |
+| ------------------ | ----------------------------------------------------------------- |
+| Enter (in a field) | Submits the prompt's form — the primary action                    |
+| Escape             | Cancels, per `closedBy`                                           |
+| Tab                | Moves through the popup in visual order: field → Cancel → confirm |
+
+Tab follows the layout (WCAG 2.4.3), so a prompt with a field should be a form with the primary
+action as its submit — that is how Enter reaches it:
+
+```tsx
+<form style={{ display: 'contents' }} onSubmit={save}>
+  <Input value={name} onChange={…} />
+  <Dialog.Actions>
+    <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+    <Button type='submit'>Save</Button>
+  </Dialog.Actions>
+</form>
+```
+
 ### Exit animations
 
 The popup's contents hold their last frame while it fades out, so state that resets on close (a
