@@ -1,5 +1,14 @@
 # Change Log
 
+## 7.8.4
+
+### Patch Changes
+
+- Add `@deprecated` tags to the removed `<SignedIn>`, `<SignedOut>`, and `<Protect>` control-component stubs so editors and lint rules flag them at authoring time (with the `<Show>` migration guidance) instead of only failing when rendered. ([#9627](https://github.com/clerk/javascript/pull/9627)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c4f9883`](https://github.com/clerk/javascript/commit/c4f98834434edd7821f5c6f344583c07e30013cd), [`eef0ceb`](https://github.com/clerk/javascript/commit/eef0ceb97926688384ec480afe44199b16f13993)]:
+  - @clerk/backend@3.17.0
+
 ## 7.8.3
 
 ### Patch Changes
