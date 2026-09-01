@@ -174,14 +174,16 @@ describe('Mosaic Card', () => {
 
   it('names and describes the dialog it is rendered inside', () => {
     render(
-      <Dialog defaultOpen>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title data-testid='title'>Review terms</Card.Title>
-            <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
-          </Card.Header>
-        </Card.Root>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title data-testid='title'>Review terms</Card.Title>
+              <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     const popup = screen.getByRole('dialog');
@@ -200,13 +202,9 @@ describe('Mosaic Card', () => {
           <Card.Title data-testid='outside-title'>Terms</Card.Title>
         </Card.Root>
         <Dialog.Trigger>Open</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Viewport>
-            <Dialog.Popup>
-              <Dialog.Title>Review terms</Dialog.Title>
-            </Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
+        <Dialog.Popup>
+          <Dialog.Title>Review terms</Dialog.Title>
+        </Dialog.Popup>
       </Dialog.Root>,
     );
 
@@ -221,22 +219,24 @@ describe('Mosaic Card', () => {
   // id that displaced it would silently leave the dialog unnamed.
   it('keeps the dialog id over an explicit one, and stays named', () => {
     render(
-      <Dialog defaultOpen>
-        <Card.Root>
-          <Card.Title
-            id='custom-title'
-            data-testid='title'
-          >
-            Review terms
-          </Card.Title>
-          <Card.Description
-            id='custom-description'
-            data-testid='description'
-          >
-            Read them before you continue.
-          </Card.Description>
-        </Card.Root>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Title
+              id='custom-title'
+              data-testid='title'
+            >
+              Review terms
+            </Card.Title>
+            <Card.Description
+              id='custom-description'
+              data-testid='description'
+            >
+              Read them before you continue.
+            </Card.Description>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     const dialog = screen.getByRole('dialog');
@@ -267,13 +267,15 @@ describe('Mosaic Card', () => {
   it('carries the dialog dismiss button in the header', async () => {
     const user = userEvent.setup();
     render(
-      <Dialog defaultOpen>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title>Review terms</Card.Title>
-          </Card.Header>
-        </Card.Root>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title>Review terms</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     const close = screen.getByRole('button', { name: 'Close' });
@@ -283,6 +285,23 @@ describe('Mosaic Card', () => {
     await user.click(close);
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('carries no dismiss button in an inline dialog, which nothing closes', () => {
+    render(
+      <Dialog.Root inline>
+        <Dialog.Popup size='panel'>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title>Account</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Account');
   });
 
   it('carries no dismiss button in a header outside a dialog', () => {

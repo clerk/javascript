@@ -4,7 +4,7 @@ import React from 'react';
 import type { ConfirmHandle, ConfirmOptions } from './confirm-handle';
 
 export interface UseConfirmedCloseOptions {
-  /** The handle shared with the `<AlertDialog.Confirm>` rendered inside the guarded dialog. */
+  /** The handle shared with the `<Dialog.Confirm>` rendered inside the guarded dialog. */
   handle: ConfirmHandle;
   /**
    * Whether closing needs confirming, evaluated at the moment of each close request — typically
@@ -31,10 +31,12 @@ const PROGRAMMATIC_DETAILS: DialogOpenChangeDetails = { trigger: null, triggerId
  *   confirm: { title: 'Discard changes?', description: '…', actionLabel: 'Discard' },
  * });
  *
- * <Dialog open={open} onOpenChange={onOpenChange} closedBy='closerequest'>
- *   …
- *   <AlertDialog.Confirm handle={confirm} />
- * </Dialog>
+ * <Dialog.Root open={open} onOpenChange={onOpenChange} closedBy='closerequest'>
+ *   <Dialog.Popup>
+ *     …
+ *     <Dialog.Confirm handle={confirm} />
+ *   </Dialog.Popup>
+ * </Dialog.Root>
  * ```
  *
  * **The dialog must be controlled.** A veto is the absence of a commit, and an uncontrolled dialog
@@ -42,9 +44,8 @@ const PROGRAMMATIC_DETAILS: DialogOpenChangeDetails = { trigger: null, triggerId
  * decline.
  *
  * **What it covers is every close the dialog itself owns**: Escape, an outside press where
- * `closedBy` allows one, `Dialog.CloseButton`, `Dialog.Close`, and the `close` the `Dialog` wrapper
- * hands its children. All of them funnel through `onOpenChange`, so one branch here answers them
- * all. What it cannot cover is a button wired to your own `setOpen(false)` — that never reaches the
+ * `closedBy` allows one, `Dialog.CloseButton`, `Dialog.Close`, and a `handle.close()`. All of them
+ * funnel through `onOpenChange`, so one branch here answers them all. What it cannot cover is a button wired to your own `setOpen(false)` — that never reaches the
  * dialog, so it bypasses the question silently. Route those through `Dialog.Close` instead.
  */
 export function useConfirmedClose({ handle, when, onOpenChange, confirm }: UseConfirmedCloseOptions) {

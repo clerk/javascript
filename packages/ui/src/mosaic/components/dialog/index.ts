@@ -1,16 +1,25 @@
 export { Dialog, DialogContext } from './dialog';
-export type { DialogFocusTarget, DialogHandle, DialogOpenChangeDetails } from '@clerk/headless/dialog';
+export { createConfirmHandle } from './confirm-handle';
+export { useConfirmedClose } from './use-confirmed-close';
+export type { ConfirmHandle, ConfirmOptions } from './confirm-handle';
+export type { UseConfirmedCloseOptions } from './use-confirmed-close';
 export type {
-  DialogBackdropProps,
+  DialogClosedBy,
+  DialogFocusTarget,
+  DialogHandle,
+  DialogOpenChangeDetails,
+  DialogRole,
+} from '@clerk/headless/dialog';
+export type {
+  DialogActionsProps,
   DialogCloseButtonProps,
   DialogCloseProps,
+  DialogConfirmProps,
   DialogContextValue,
   DialogDescriptionProps,
   DialogPopupProps,
-  DialogProps,
   DialogRootProps,
   DialogSize,
   DialogTitleProps,
   DialogTriggerProps,
-  DialogViewportProps,
 } from './dialog';
