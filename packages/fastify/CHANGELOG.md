@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.1.75
+
+### Patch Changes
+
+- Add an internal `__internal_enableHandshake` option to `clerkPlugin()` (defaults to `true`). When set to `false`, the plugin skips the handshake flow and strips handshake cookies and query params before authenticating requests. Intended for API-only backends that cannot return `Set-Cookie` headers to the browser. ([#8560](https://github.com/clerk/javascript/pull/8560)) by [@jescalan](https://github.com/jescalan)
+
+- Updated dependencies [[`c4f9883`](https://github.com/clerk/javascript/commit/c4f98834434edd7821f5c6f344583c07e30013cd), [`eef0ceb`](https://github.com/clerk/javascript/commit/eef0ceb97926688384ec480afe44199b16f13993)]:
+  - @clerk/backend@3.17.0
+
 ## 3.1.74
 
 ### Patch Changes
