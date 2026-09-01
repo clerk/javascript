@@ -82,14 +82,17 @@ export const ActivateDirectorySyncStep = (): JSX.Element => {
         </Col>
 
         {isActive ? (
-          <Button
-            variant='bordered'
-            colorScheme='secondary'
-            size='sm'
-            onClick={() => onExit?.()}
-          >
-            Done
-          </Button>
+          // Exit-only: without a host-supplied onExit (the standalone mount) there is nowhere to go.
+          onExit && (
+            <Button
+              variant='bordered'
+              colorScheme='secondary'
+              size='sm'
+              onClick={onExit}
+            >
+              Done
+            </Button>
+          )
         ) : (
           <Flex
             align='center'
@@ -104,19 +107,21 @@ export const ActivateDirectorySyncStep = (): JSX.Element => {
               Activate Directory Sync
             </Button>
 
-            <Button
-              variant='outline'
-              size='sm'
-              isDisabled={card.isLoading}
-              onClick={() => onExit?.()}
-            >
-              <Text as='span'>Skip for now</Text>
-              <Icon
-                icon={ChevronRight}
+            {onExit && (
+              <Button
+                variant='outline'
                 size='sm'
-                sx={t => ({ marginInlineStart: t.space.$1 })}
-              />
-            </Button>
+                isDisabled={card.isLoading}
+                onClick={onExit}
+              >
+                <Text as='span'>Skip for now</Text>
+                <Icon
+                  icon={ChevronRight}
+                  size='sm'
+                  sx={t => ({ marginInlineStart: t.space.$1 })}
+                />
+              </Button>
+            )}
           </Flex>
         )}
       </Step.Section>

@@ -166,6 +166,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
+  private premountConfigureDirectorySyncNodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountOAuthDeviceVerificationNodes = new Map<HTMLDivElement, OAuthDeviceVerificationProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
@@ -801,6 +802,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_mountConfigureSSO(node, props);
     });
 
+    this.premountConfigureDirectorySyncNodes.forEach((props, node) => {
+      clerkjs.__internal_mountConfigureDirectorySync(node, props);
+    });
+
     this.premountOAuthConsentNodes.forEach((props, node) => {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
@@ -1384,6 +1389,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.__internal_unmountConfigureSSO(node);
     } else {
       this.premountConfigureSSONodes.delete(node);
+    }
+  };
+
+  __internal_mountConfigureDirectorySync = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_mountConfigureDirectorySync(node, props);
+    } else {
+      this.premountConfigureDirectorySyncNodes.set(node, props);
+    }
+  };
+
+  __internal_unmountConfigureDirectorySync = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_unmountConfigureDirectorySync(node);
+    } else {
+      this.premountConfigureDirectorySyncNodes.delete(node);
     }
   };
 

@@ -4,6 +4,7 @@ import {
 } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { Alert } from '@/ui/elements/Alert';
 import { Card } from '@/ui/elements/Card';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
@@ -11,7 +12,7 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/utils/errorHandler';
 
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { Badge, Button, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import { ResetConnectionDialog } from '../ConfigureSSO/ResetConnectionDialog';
 
 type SecurityDirectorySyncSectionProps = {
@@ -49,15 +50,26 @@ export const SecurityDirectorySyncSection = ({
   contentRef,
   onConfigure,
 }: SecurityDirectorySyncSectionProps): JSX.Element => {
-  const { data: connections } = __internal_useOrganizationEnterpriseConnections();
+  const {
+    data: connections,
+    isLoading: isLoadingConnections,
+    error: connectionsError,
+  } = __internal_useOrganizationEnterpriseConnections();
   const connection = connections?.[0];
   const {
     data: directory,
+    isLoading: isLoadingDirectory,
+    error: directoryError,
     updateDirectorySync,
     deleteDirectorySync,
   } = __internal_useOrganizationDirectorySync({
     enterpriseConnectionId: connection?.id ?? null,
   });
+
+  // A 404 (no directory yet) resolves to `data: null` — errors here are real failures.
+  const isLoading = isLoadingConnections || (Boolean(connection) && isLoadingDirectory);
+  const error = connectionsError ?? directoryError;
+  const isSettled = !isLoading && !error;
 
   const status: DirectorySyncStatus = directory ? (directory.enabled ? 'active' : 'inactive') : 'unconfigured';
   const badge = STATUS_BADGES[status];
@@ -68,13 +80,33 @@ export const SecurityDirectorySyncSection = ({
       id='directorySync'
       centered={false}
       badge={
-        <Badge
-          colorScheme={badge.colorScheme}
-          localizationKey={badge.label}
-        />
+        isSettled ? (
+          <Badge
+            colorScheme={badge.colorScheme}
+            localizationKey={badge.label}
+          />
+        ) : undefined
       }
     >
-      {status === 'unconfigured' ? (
+      {isLoading ? (
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ paddingBlock: t.space.$5 })}
+        >
+          <Spinner
+            size='xs'
+            colorScheme='neutral'
+            elementDescriptor={descriptors.spinner}
+          />
+        </Flex>
+      ) : error ? (
+        <Alert
+          variant='danger'
+          title='Could not load Directory Sync'
+          subtitle={error.message}
+        />
+      ) : status === 'unconfigured' ? (
         <Col
           align='start'
           gap={4}

@@ -3,6 +3,7 @@ import React from 'react';
 import { CardStateProvider } from '@/elements/contexts';
 
 import { ConfigureSSOHeader } from '../ConfigureSSO/ConfigureSSOHeader';
+import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
 import { Step } from '../ConfigureSSO/elements/Step';
 import { Wizard, type WizardStepConfig } from '../ConfigureSSO/elements/Wizard';
 import { ConfigureDirectorySyncProvider, useConfigureDirectorySync } from './ConfigureDirectorySyncContext';
@@ -29,7 +30,7 @@ export const ConfigureDirectorySyncWizard = (props: ConfigureDirectorySyncWizard
 );
 
 const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Element => {
-  const { connection, directory } = useConfigureDirectorySync();
+  const { connection, directory, isLoading } = useConfigureDirectorySync();
   const hasSsoConnection = Boolean(connection);
   const hasDirectory = Boolean(directory);
   const isDirectorySyncActive = directory?.enabled ?? false;
@@ -49,6 +50,10 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
     ],
     [hasSsoConnection, hasDirectory, isDirectorySyncActive],
   );
+
+  if (isLoading) {
+    return <ConfigureSSOSkeleton />;
+  }
 
   return (
     <Wizard
