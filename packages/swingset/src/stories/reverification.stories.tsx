@@ -1,13 +1,11 @@
-import type { ReverificationModel } from '@clerk/ui/mosaic/blocks/reverification';
-import {
-  Reverification,
-  ReverificationBackupCode,
-  ReverificationHelp,
-  ReverificationMethodPicker,
-  ReverificationOTP,
-  ReverificationPasskey,
-  ReverificationPassword,
-} from '@clerk/ui/mosaic/blocks/reverification';
+import type { ReverificationModel } from '@clerk/ui/mosaic/features/reverification/reverification.view';
+import { Reverification } from '@clerk/ui/mosaic/features/reverification/reverification.view';
+import { ReverificationBackupCode } from '@clerk/ui/mosaic/features/reverification/reverification-backup-code';
+import { ReverificationHelp } from '@clerk/ui/mosaic/features/reverification/reverification-help';
+import { ReverificationMethodPicker } from '@clerk/ui/mosaic/features/reverification/reverification-method-picker';
+import { ReverificationOTP } from '@clerk/ui/mosaic/features/reverification/reverification-otp';
+import { ReverificationPasskey } from '@clerk/ui/mosaic/features/reverification/reverification-passkey';
+import { ReverificationPassword } from '@clerk/ui/mosaic/features/reverification/reverification-password';
 import { Card } from '@clerk/ui/mosaic/components/card';
 import { useState } from 'react';
 
@@ -19,7 +17,7 @@ export const meta: StoryMeta = {
   group: 'Blocks',
   status: 'wip',
   title: 'Reverification',
-  source: 'packages/ui/src/mosaic/blocks/reverification/reverification.tsx',
+  source: 'packages/ui/src/mosaic/features/reverification/reverification.view.tsx',
 };
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
