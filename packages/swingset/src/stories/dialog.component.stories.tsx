@@ -4,15 +4,17 @@ import { Card } from '@clerk/ui/mosaic/components/card';
 import type { DialogSize } from '@clerk/ui/mosaic/components/dialog';
 import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/ui/mosaic/components/dialog';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Input } from '@clerk/ui/mosaic/components/input';
-import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
 import { Text } from '@clerk/ui/mosaic/components/text';
+import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
+import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { useUserPageFixture } from './fixtures/user-page';
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -146,7 +148,7 @@ export function DiscardChanges() {
           value={value}
           onChange={event => setValue(event.target.value)}
         />
-        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+        <Dialog.Actions>
           <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
           <Button
             onClick={() => {
@@ -156,7 +158,7 @@ export function DiscardChanges() {
           >
             Add
           </Button>
-        </div>
+        </Dialog.Actions>
 
         <Dialog.Confirm
           handle={confirm}
@@ -169,84 +171,28 @@ export function DiscardChanges() {
 
 const accountTrigger = (props: RenderProps) => <Button {...props}>Open account</Button>;
 
-const addTrigger = (label: string) => (props: RenderProps) => (
-  <Button
-    {...props}
-    variant='outline'
-    size='sm'
-  >
-    <Icon
-      name='plus'
-      placement='inline-start'
-    />
-    {label}
-  </Button>
-);
-
-const addEmailRowTrigger = addTrigger('Add email address');
-const addPhoneTrigger = addTrigger('Add phone number');
-const deleteAccountTrigger = (props: RenderProps) => (
-  <Button
-    {...props}
-    color='negative'
-    variant='outline'
-    size='sm'
-  >
-    Delete account
-  </Button>
-);
-
-// A `panel` has no padding of its own, so a body of ordinary content supplies it.
-const panelBody = {
-  display: 'flex',
-  flex: 1,
-  flexDirection: 'column',
-  gap: '0.75rem',
-  minHeight: 0,
-  overflowY: 'auto',
-  padding: '1.5rem',
-} as const;
-
-const sectionHeader = {
-  alignItems: 'center',
-  display: 'flex',
-  gap: '1rem',
-  justifyContent: 'space-between',
-} as const;
-
 /**
- * A `prompt` dialog opened from inside the `panel` — the shape the account profile uses.
- *
- * With `confirmDiscard`, closing it while the field holds anything opens a confirmation stacked on
- * top rather than closing: `panel -> prompt -> prompt`, and the veto is nothing more than a
- * controlled `open` whose `onOpenChange` declines to commit. Hand-rolled here on purpose, to show
- * that a veto needs no machinery; `useConfirmedClose` is the same thing packaged, and
- * [Confirming a discard](#confirming-a-discard) has the composed version.
+ * The "add email address" prompt the account panel opens, driven by `open` rather than a trigger.
+ * Closing it while the field holds anything raises a confirmation stacked on top instead —
+ * `panel -> prompt -> prompt` — and the veto is a controlled `open` whose `onOpenChange` declines
+ * to commit. Hand-rolled to show a veto needs no machinery; `useConfirmedClose` is the same thing
+ * packaged, and [Confirming a discard](#confirming-a-discard) has the composed version.
  */
-function AddValueDialog({
-  trigger,
-  title,
-  description,
-  placeholder,
-  confirmLabel = 'Continue',
-  confirmColor,
-  confirmDiscard = false,
+function AddEmailDialog({
+  open,
+  onOpenChange,
+  onAdd,
 }: {
-  trigger: (props: RenderProps) => React.ReactElement;
-  title: string;
-  description: string;
-  placeholder: string;
-  confirmLabel?: string;
-  confirmColor?: 'negative';
-  confirmDiscard?: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onAdd: (value: string) => void;
 }) {
-  const [open, setOpen] = React.useState(false);
   const [discardOpen, setDiscardOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
 
   const dismiss = () => {
     setValue('');
-    setOpen(false);
+    onOpenChange(false);
   };
 
   return (
@@ -257,143 +203,120 @@ function AddValueDialog({
         // The veto. Every close request lands here — Escape, the corner X, `Dialog.Close` — so
         // declining to commit covers all of them at once. A footer button wired to a bare
         // `setOpen(false)` would go around it, which is the argument for `Dialog.Close`.
-        if (!next && confirmDiscard && value.trim() !== '') {
+        if (!next && value.trim() !== '') {
           setDiscardOpen(true);
           return;
         }
         if (!next) {
           setValue('');
         }
-        setOpen(next);
+        onOpenChange(next);
       }}
     >
-      <Dialog.Trigger render={trigger} />
       <Dialog.Popup>
         <Dialog.CloseButton />
-        <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
-        <Dialog.Description render={<Text />}>{description}</Dialog.Description>
+        <Dialog.Title render={<Heading size='sm' />}>Add email address</Dialog.Title>
+        <Dialog.Description render={<Text />}>A verification code will be sent to this address.</Dialog.Description>
         <Input
-          placeholder={placeholder}
+          type='email'
+          placeholder='you@example.com'
           value={value}
           onChange={event => setValue(event.target.value)}
         />
-        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+        <Dialog.Actions>
           <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
           <Button
-            color={confirmColor}
-            onClick={dismiss}
+            disabled={value.trim() === ''}
+            onClick={() => {
+              onAdd(value.trim());
+              dismiss();
+            }}
           >
-            {confirmLabel}
+            Add email
           </Button>
-        </div>
-        {confirmDiscard ? (
-          <Dialog.Root
-            role='alertdialog'
-            open={discardOpen}
-            onOpenChange={setDiscardOpen}
-          >
-            <Dialog.Popup>
-              <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
-              <Dialog.Description render={<Text />}>
-                You have not finished adding this address. It will not be saved.
-              </Dialog.Description>
-              <Dialog.Actions>
-                <Dialog.Close render={<Button variant='outline' />}>Keep editing</Dialog.Close>
-                <Button
-                  color='negative'
-                  onClick={() => {
-                    setDiscardOpen(false);
-                    dismiss();
-                  }}
-                >
-                  Discard
-                </Button>
-              </Dialog.Actions>
-            </Dialog.Popup>
-          </Dialog.Root>
-        ) : null}
-      </Dialog.Popup>
-    </Dialog.Root>
-  );
-}
-
-/** The account surface, shared by the modal `panel` and the inline one below. */
-function AccountPanelBody() {
-  return (
-    <div style={panelBody}>
-      <Dialog.Title render={<Heading size='lg' />}>Account</Dialog.Title>
-      <Dialog.Description render={<Text />}>Manage the addresses people can reach you at.</Dialog.Description>
-
-      <div style={sectionHeader}>
-        <Heading size='sm'>Email addresses</Heading>
-        <AddValueDialog
-          trigger={addEmailRowTrigger}
-          title='Add email address'
-          description="We'll send a verification code to this address."
-          placeholder='you@example.com'
-          confirmDiscard
-        />
-      </div>
-      <Item.Group>
-        <Item.Root>
-          <Item.Content>
-            <Item.Label>ada@example.com</Item.Label>
-            <Item.Description>Primary</Item.Description>
-          </Item.Content>
-        </Item.Root>
-        <Item.Root>
-          <Item.Content>
-            <Item.Label>ada.lovelace@work.example.com</Item.Label>
-          </Item.Content>
-        </Item.Root>
-      </Item.Group>
-
-      <div style={sectionHeader}>
-        <Heading size='sm'>Phone numbers</Heading>
-        <AddValueDialog
-          trigger={addPhoneTrigger}
-          title='Add phone number'
-          description="We'll send a verification code to this number."
-          placeholder='+1 (555) 000-0000'
-        />
-      </div>
-      <Item.Group>
-        <Item.Root>
-          <Item.Content>
-            <Item.Label>+1 (555) 010-1842</Item.Label>
-          </Item.Content>
-        </Item.Root>
-      </Item.Group>
-
-      <div style={{ display: 'flex', marginBlockStart: 'auto' }}>
-        <AddValueDialog
-          trigger={deleteAccountTrigger}
-          title='Delete account'
-          description='Type your email address to confirm. This cannot be undone.'
-          placeholder='you@example.com'
-          confirmLabel='Delete account'
-          confirmColor='negative'
-        />
-      </div>
-    </div>
-  );
-}
-
-/** A `panel` account surface with `prompt` dialogs opened from inside it. */
-export function Nested() {
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger render={accountTrigger} />
-      <Dialog.Popup size='panel'>
-        <Dialog.CloseButton />
-        <AccountPanelBody />
+        </Dialog.Actions>
+        <Dialog.Root
+          role='alertdialog'
+          open={discardOpen}
+          onOpenChange={setDiscardOpen}
+        >
+          <Dialog.Popup>
+            <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
+            <Dialog.Description render={<Text />}>
+              You have not finished adding this address. It will not be saved.
+            </Dialog.Description>
+            <Dialog.Actions>
+              <Dialog.Close render={<Button variant='outline' />}>Keep editing</Dialog.Close>
+              <Button
+                color='negative'
+                onClick={() => {
+                  setDiscardOpen(false);
+                  dismiss();
+                }}
+              >
+                Discard
+              </Button>
+            </Dialog.Actions>
+          </Dialog.Popup>
+        </Dialog.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );
 }
 
 /**
- * The same panel presented `inline`: it is the page's content rather than a surface over it, so
+ * The real user page — sidebar plus the account and security panels — as the content of a `panel`
+ * dialog. The popup supplies the frame, so the page's own border is dropped; the popup clips, so
+ * the page scrolls inside it. Adding an email opens a `prompt` over the panel, and the danger
+ * zone's delete confirmation is the page's own.
+ */
+function AccountPage() {
+  const [addEmailOpen, setAddEmailOpen] = React.useState(false);
+  const { activePanel, setActivePanel, panels, addEmail } = useUserPageFixture({
+    onAddEmail: () => setAddEmailOpen(true),
+  });
+  return (
+    <>
+      <div
+        {...stylex.props(scrollAreaRoot)}
+        style={{ flex: 1, minHeight: 0 }}
+      >
+        <div {...stylex.props(...scrollAreaViewport())}>
+          <UserPageView
+            activePanel={activePanel}
+            panels={panels}
+            onPanelChange={setActivePanel}
+            style={{ border: 0, borderRadius: 0, maxWidth: 'none', minHeight: '100%' }}
+          />
+        </div>
+      </div>
+      <AddEmailDialog
+        open={addEmailOpen}
+        onOpenChange={setAddEmailOpen}
+        onAdd={addEmail}
+      />
+    </>
+  );
+}
+
+/** The user page in a `panel`, with `prompt` dialogs opened from inside it. */
+export function Nested() {
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger render={accountTrigger} />
+      <Dialog.Popup
+        size='panel'
+        aria-label='Account'
+      >
+        <Dialog.CloseButton />
+        <AccountPage />
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+/**
+ * The same page presented `inline`: it is the page's content rather than a surface over it, so
  * there is no portal, scrim, scroll lock or focus trap, and nothing dismisses it. The prompts it
  * opens are still modal over the whole page.
  *
@@ -407,17 +330,20 @@ export function Inline() {
       style={{
         border: '1px dashed var(--cl-color-border)',
         borderRadius: '0.5rem',
-        height: '32rem',
+        height: '36rem',
         maxWidth: '100%',
         overflow: 'auto',
         padding: '1rem',
         resize: 'horizontal',
-        width: '40rem',
+        width: '52rem',
       }}
     >
       <Dialog.Root inline>
-        <Dialog.Popup size='panel'>
-          <AccountPanelBody />
+        <Dialog.Popup
+          size='panel'
+          aria-label='Account'
+        >
+          <AccountPage />
         </Dialog.Popup>
       </Dialog.Root>
     </div>
@@ -426,34 +352,7 @@ export function Inline() {
 
 const settingsTrigger = (props: RenderProps) => <Button {...props}>Open settings</Button>;
 
-const NAV_SECTIONS = ['Profile', 'Security', 'Sessions', 'Connected accounts', 'Billing'];
-
-// Long enough to overflow the panel even on a large display, or the scroll example shows nothing.
-const SESSION_DEVICES = [
-  'MacBook Pro',
-  'iPhone 15',
-  'Windows PC',
-  'iPad Air',
-  'Pixel 8',
-  'Linux Workstation',
-  'MacBook Air',
-  'Steam Deck',
-];
-const SESSION_PLACES = [
-  'Denver, CO · Chrome',
-  'Boulder, CO · Edge',
-  'Fort Collins, CO · Firefox',
-  'Seattle, WA · Chrome',
-  'Remote · Safari',
-];
-const SESSION_TIMES = ['Active now', '2 hours ago', 'Yesterday', '3 days ago', 'Last week', 'Last month'];
-
-const SESSIONS = Array.from({ length: 40 }, (_, index) => ({
-  id: index,
-  device: SESSION_DEVICES[index % SESSION_DEVICES.length],
-  where: SESSION_PLACES[index % SESSION_PLACES.length],
-  when: SESSION_TIMES[index % SESSION_TIMES.length],
-}));
+const NAV_SECTIONS = ['Account', 'Security', 'Billing', 'API keys'];
 
 const editProfileTrigger = (props: RenderProps) => <Button {...props}>Edit profile</Button>;
 
@@ -488,7 +387,7 @@ export function StackedPrompts() {
           defaultValue='Ada Lovelace'
           placeholder='Your name'
         />
-        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+        <Dialog.Actions>
           <Dialog.Root
             role='alertdialog'
             open={confirmationOpen}
@@ -513,7 +412,7 @@ export function StackedPrompts() {
             </Dialog.Popup>
           </Dialog.Root>
           <Button onClick={() => setOpen(false)}>Save</Button>
-        </div>
+        </Dialog.Actions>
       </Dialog.Popup>
     </Dialog.Root>
   );
@@ -521,6 +420,7 @@ export function StackedPrompts() {
 
 /** The panel clips rather than scrolling, so the scroll region is composed inside it. */
 export function PanelSidebar() {
+  const { panels } = useUserPageFixture();
   return (
     <Dialog.Root>
       <Dialog.Trigger render={settingsTrigger} />
@@ -555,7 +455,7 @@ export function PanelSidebar() {
                 fullWidth
                 // `Button` centres its content; a nav row wants a leading label.
                 style={{ justifyContent: 'flex-start' }}
-                aria-current={index === 2 ? 'page' : undefined}
+                aria-current={index === 1 ? 'page' : undefined}
               >
                 {section}
               </Button>
@@ -569,27 +469,7 @@ export function PanelSidebar() {
           >
             <div {...stylex.props(...scrollAreaViewport())}>
               <div style={{ padding: '1.5rem' }}>
-                <Item.Group>
-                  {SESSIONS.map(session => (
-                    <Item.Root key={session.id}>
-                      <Item.Content>
-                        <Item.Label>{session.device}</Item.Label>
-                        <Item.Description>
-                          {session.where} · {session.when}
-                        </Item.Description>
-                      </Item.Content>
-                      <Item.Actions>
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          color='negative'
-                        >
-                          Revoke
-                        </Button>
-                      </Item.Actions>
-                    </Item.Root>
-                  ))}
-                </Item.Group>
+                <UserProfileSecurityPanelView {...panels.security} />
               </div>
             </div>
           </div>

@@ -102,7 +102,8 @@ What follows from the role:
 - A `Title` **and** a `Description` are required; both warn in dev when missing.
 - `Dialog.CloseButton` warns: the cancel in `Dialog.Actions` is the way out.
 
-Render the cancel first in `Dialog.Actions` so it takes focus on open. The action usually starts
+`Dialog.Actions` is the button row for any prompt, not only alerts — it splits the width evenly.
+Render the cancel first so it takes focus on open. The action usually starts
 work, so close from your own state when it resolves rather than with `Dialog.Close`. Pass
 `finalFocus` when there is no trigger to return focus to.
 
