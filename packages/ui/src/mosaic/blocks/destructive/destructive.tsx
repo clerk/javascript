@@ -113,7 +113,6 @@ export function Destructive({
           />
         }
       >
-        <Dialog.CloseButton />
         <Card.Header>
           <Dialog.Title render={<Heading />}>{title}</Dialog.Title>
           <Dialog.Description render={<Text />}>{description}</Dialog.Description>
