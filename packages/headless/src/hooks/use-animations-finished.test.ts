@@ -142,6 +142,33 @@ describe('useAnimationsFinished', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
+  it('returns a cancel function that aborts the pending wait', async () => {
+    let resolveAnim!: () => void;
+    const animPromise = new Promise<void>(r => {
+      resolveAnim = r;
+    });
+    const el = createMockElement([{ finished: animPromise }]);
+    const ref = { current: el } as RefObject<HTMLElement | null>;
+
+    const { result } = renderHook(() => useAnimationsFinished(ref, false));
+
+    const callback = vi.fn();
+    let cancel!: () => void;
+    act(() => {
+      cancel = result.current(callback);
+    });
+
+    act(() => cancel());
+
+    el.getAnimations = vi.fn(() => [] as unknown as Animation[]);
+    await act(async () => {
+      resolveAnim();
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    expect(callback).not.toHaveBeenCalled();
+  });
+
   it('cleans up on unmount', () => {
     let resolveAnim!: () => void;
     const animPromise = new Promise<void>(r => {
