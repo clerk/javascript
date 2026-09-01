@@ -1,67 +1,200 @@
 import { Card } from '../../components/card';
-import type { FlowDirection } from '../../components/flow';
 import { Flow } from '../../components/flow';
-import type { ReverificationBackupCodeProps } from './reverification-backup-code';
+import type { IconName } from '../../icons/registry';
+import { fill, reverificationBase as m } from './reverification.messages';
+import type { ReverificationMethod, ReverificationOtpChannel, ReverificationViewProps } from './reverification.types';
 import { ReverificationBackupCode } from './reverification-backup-code';
-import type { ReverificationHelpProps } from './reverification-help';
 import { ReverificationHelp } from './reverification-help';
-import type { ReverificationMethodPickerProps } from './reverification-method-picker';
 import { ReverificationMethodPicker } from './reverification-method-picker';
-import type { ReverificationOTPProps } from './reverification-otp';
 import { ReverificationOTP } from './reverification-otp';
-import type { ReverificationPasskeyProps } from './reverification-passkey';
 import { ReverificationPasskey } from './reverification-passkey';
-import type { ReverificationPasswordProps } from './reverification-password';
 import { ReverificationPassword } from './reverification-password';
 
-export type ReverificationStatus = 'password' | 'passkey' | 'otp' | 'backup-code' | 'method-picker' | 'help';
+const actions = {
+  secondaryActionLabel: m.footerActionLink__useAnotherMethod,
+  primaryActionLabel: m.formButtonPrimary,
+  pendingLabel: m.verifying,
+};
 
-/** Controlled rendering model produced by a reverification controller. */
-export interface ReverificationModel {
-  status: ReverificationStatus;
-  direction: FlowDirection;
-  password: ReverificationPasswordProps;
-  passkey: ReverificationPasskeyProps;
-  otp: ReverificationOTPProps;
-  backupCode: ReverificationBackupCodeProps;
-  methodPicker: ReverificationMethodPickerProps;
-  help: ReverificationHelpProps;
+const methodIcon = {
+  password: 'security-lock-square',
+  passkey: 'security-passkey',
+  email_code: 'code',
+  phone_code: 'security-phone',
+  totp: 'security-authenticator',
+  backup_code: 'security-phone',
+} as const satisfies Record<ReverificationMethod['strategy'], IconName>;
+
+function methodLabel(method: ReverificationMethod): string {
+  const identifier = method.identifier ?? '';
+  switch (method.strategy) {
+    case 'password':
+      return m.alternativeMethods.blockButton__password;
+    case 'passkey':
+      return m.alternativeMethods.blockButton__passkey;
+    case 'email_code':
+      return fill(m.alternativeMethods.blockButton__emailCode, { identifier });
+    case 'phone_code':
+      return fill(m.alternativeMethods.blockButton__phoneCode, { identifier });
+    case 'totp':
+      return m.alternativeMethods.blockButton__totp;
+    case 'backup_code':
+      return m.alternativeMethods.blockButton__backupCode;
+  }
 }
 
-export type ReverificationProps = ReverificationModel;
+function otpCopy(channel: ReverificationOtpChannel | undefined) {
+  if (channel === 'email') {
+    return m.emailCode;
+  }
+  if (channel === 'phone') {
+    return m.phoneCode;
+  }
+  return m.totpMfa;
+}
 
-export function Reverification(model: ReverificationProps): JSX.Element {
+export function ReverificationView(props: ReverificationViewProps): JSX.Element {
+  const {
+    step,
+    direction,
+    value,
+    onValueChange,
+    errorMessage,
+    isPending,
+    onSubmit,
+    onVerifyPasskey,
+    onShowMethods,
+    onShowHelp,
+    onBack,
+    onEmailSupport,
+    methods,
+    onSelectMethod,
+    otpChannel,
+    onResend,
+    canResend,
+  } = props;
+
+  const otp = otpCopy(otpChannel);
+
   return (
     <Card.Root renderBranding={false}>
       <Flow.Root
-        value={model.status}
-        direction={model.direction}
-        state={model}
+        value={step}
+        direction={direction}
+        state={props}
       >
-        {current => (
+        {() => (
           <>
             <Flow.Step ids={['password']}>
-              <ReverificationPassword {...current.password} />
+              <ReverificationPassword
+                messages={{
+                  title: m.password.title,
+                  description: m.password.description,
+                  fieldLabel: m.formFieldLabel__password,
+                  fieldPlaceholder: m.formFieldInputPlaceholder__password,
+                  ...actions,
+                }}
+                value={value}
+                errorMessage={errorMessage}
+                isPending={isPending}
+                onValueChange={onValueChange}
+                onSubmit={onSubmit}
+                onCancel={onShowMethods}
+              />
             </Flow.Step>
 
             <Flow.Step ids={['passkey']}>
-              <ReverificationPasskey {...current.passkey} />
+              <ReverificationPasskey
+                messages={{
+                  title: m.passkey.title,
+                  description: m.passkey.description,
+                  ...actions,
+                }}
+                errorMessage={errorMessage}
+                isPending={isPending}
+                onVerify={onVerifyPasskey}
+                onCancel={onShowMethods}
+              />
             </Flow.Step>
 
             <Flow.Step ids={['otp']}>
-              <ReverificationOTP {...current.otp} />
+              <ReverificationOTP
+                messages={{
+                  title: otp.title,
+                  description: otp.description,
+                  fieldLabel: otp.formTitle,
+                  ...actions,
+                }}
+                value={value}
+                errorMessage={errorMessage}
+                isPending={isPending}
+                resend={
+                  onResend
+                    ? {
+                        label: otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton,
+                        disabled: !canResend || isPending,
+                        onClick: onResend,
+                      }
+                    : undefined
+                }
+                onValueChange={onValueChange}
+                onComplete={code => {
+                  onValueChange(code);
+                  onSubmit();
+                }}
+                onSubmit={onSubmit}
+                onCancel={onShowMethods}
+              />
             </Flow.Step>
 
             <Flow.Step ids={['backup-code']}>
-              <ReverificationBackupCode {...current.backupCode} />
+              <ReverificationBackupCode
+                messages={{
+                  title: m.backupCodeMfa.title,
+                  description: m.backupCodeMfa.description,
+                  fieldLabel: m.formFieldLabel__backupCode,
+                  ...actions,
+                }}
+                value={value}
+                errorMessage={errorMessage}
+                isPending={isPending}
+                onValueChange={onValueChange}
+                onSubmit={onSubmit}
+                onCancel={onShowMethods}
+              />
             </Flow.Step>
 
             <Flow.Step ids={['method-picker']}>
-              <ReverificationMethodPicker {...current.methodPicker} />
+              <ReverificationMethodPicker
+                messages={{
+                  title: m.alternativeMethods.title,
+                  description: m.alternativeMethods.description,
+                  backButton: m.backButton,
+                  helpText: m.alternativeMethods.actionText,
+                  helpButton: m.alternativeMethods.actionLink,
+                }}
+                methods={methods.map(method => ({
+                  id: method.id,
+                  label: methodLabel(method),
+                  icon: methodIcon[method.strategy],
+                }))}
+                onSelect={onSelectMethod}
+                onHelp={onShowHelp}
+                onBack={onBack}
+              />
             </Flow.Step>
 
             <Flow.Step ids={['help']}>
-              <ReverificationHelp {...current.help} />
+              <ReverificationHelp
+                messages={{
+                  title: m.alternativeMethods.getHelp.title,
+                  description: m.alternativeMethods.getHelp.description,
+                  backButton: m.backButton,
+                  supportButton: m.alternativeMethods.getHelp.blockButton__emailSupport,
+                }}
+                onEmailSupport={onEmailSupport}
+                onBack={onBack ?? (() => {})}
+              />
             </Flow.Step>
           </>
         )}
