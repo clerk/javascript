@@ -10,6 +10,7 @@ import { BaseResource } from './internal';
 export class ProtectConfig extends BaseResource implements ProtectConfigResource {
   id: string = '';
   loaders?: ProtectLoader[];
+  tokens_invalid_before?: number;
   rollout?: number;
 
   public constructor(data: ProtectConfigJSON | ProtectConfigJSONSnapshot | null = null) {
@@ -25,6 +26,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
 
     this.id = this.withDefault(data.id, this.id);
     this.loaders = this.withDefault(data.loaders, this.loaders);
+    this.tokens_invalid_before = this.withDefault(data.tokens_invalid_before, this.tokens_invalid_before);
 
     return this;
   }
@@ -34,6 +36,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
       object: 'protect_config',
       id: this.id,
       loaders: this.loaders,
+      tokens_invalid_before: this.tokens_invalid_before,
     };
   }
 }
