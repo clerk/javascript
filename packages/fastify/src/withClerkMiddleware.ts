@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import { AuthStatus } from '@clerk/backend/internal';
+import { AuthStatus, signedOutAuthObject } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import type { FastifyReply, FastifyRequest } from 'fastify';
@@ -9,8 +9,35 @@ import * as constants from './constants';
 import type { ClerkFastifyOptions } from './types';
 import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
 
+// Handshake cookies and query params share the same names (`QueryParameters` aliases `Cookies` in `@clerk/backend`).
+function stripHandshakeCookiesAndParams(req: Request, names: string[]): Request {
+  const url = new URL(req.url);
+  for (const name of names) {
+    url.searchParams.delete(name);
+  }
+
+  const headers = new Headers(req.headers);
+  const cookieHeader = headers.get('cookie');
+  if (cookieHeader) {
+    const filtered = cookieHeader
+      .split(';')
+      .map(c => c.trim())
+      .filter(c => !names.some(name => c === name || c.startsWith(`${name}=`)))
+      .join('; ');
+    if (filtered) {
+      headers.set('cookie', filtered);
+    } else {
+      headers.delete('cookie');
+    }
+  }
+
+  // The body is dropped; this request is only passed to `authenticateRequest`, which never reads it.
+  return new Request(url.toString(), { method: req.method, headers });
+}
+
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
-  const { hookName: _hookName, frontendApiProxy, ...clerkOptions } = options;
+  const { hookName: _hookName, frontendApiProxy, __internal_enableHandshake, ...clerkOptions } = options;
+  const enableHandshake = __internal_enableHandshake ?? true;
   const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
   const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
   const secretKey = options.secretKey || constants.SECRET_KEY;
@@ -102,8 +129,12 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       return reply.code(400).send();
     }
 
+    if (!enableHandshake) {
+      req = stripHandshakeCookiesAndParams(req, [constants.Cookies.Handshake, constants.Cookies.HandshakeNonce]);
+    }
+
     const requestState = await clerkClient.authenticateRequest(req, {
-      ...options,
+      ...clerkOptions,
       secretKey,
       publishableKey,
       proxyUrl: resolvedProxyUrl,
@@ -114,13 +145,22 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      return reply.code(307).send();
-    } else if (requestState.status === AuthStatus.Handshake) {
+      // Development instances cannot establish auth state without the dev browser handshake.
+      const isDevBrowserHandshake =
+        requestState.reason === 'dev-browser-missing' || requestState.reason === 'dev-browser-sync';
+      if (enableHandshake || isDevBrowserHandshake) {
+        return reply.code(307).send();
+      }
+      reply.removeHeader(constants.Headers.Location);
+      reply.removeHeader(constants.Headers.CacheControl);
+    } else if (enableHandshake && requestState.status === AuthStatus.Handshake) {
       throw new Error('Clerk: handshake status without redirect');
     }
 
+    // A skipped handshake redirect leaves a handshake state whose toAuth() is null.
     // @ts-expect-error Inject auth so getAuth can read it
-    fastifyRequest.auth = requestState.toAuth();
+    fastifyRequest.auth =
+      requestState.toAuth() ?? signedOutAuthObject({ reason: requestState.reason, message: requestState.message });
     fastifyRequest.clerk = clerkClient;
   };
 };
