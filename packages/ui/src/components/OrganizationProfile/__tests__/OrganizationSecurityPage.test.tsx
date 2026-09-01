@@ -1,5 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
@@ -490,6 +490,7 @@ describe('OrganizationSecurityPage', () => {
       f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
     };
 
+    // The mutations live on the DirectorySyncResource resolved by getDirectorySync.
     const directory = (overrides: Record<string, unknown> = {}) =>
       ({
         id: 'scimdir_1',
@@ -499,6 +500,9 @@ describe('OrganizationSecurityPage', () => {
         enabled: true,
         attributeMapping: {},
         apiKey: null,
+        update: vi.fn(),
+        delete: vi.fn(),
+        rotateToken: vi.fn(),
         ...overrides,
       }) as any;
 
@@ -508,6 +512,9 @@ describe('OrganizationSecurityPage', () => {
         data: [],
         total_count: 0,
       } as any);
+      // The page-level loading gate also waits on the domains query; an unmocked
+      // fetch resolves undefined and error-retries, wedging the gate open.
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [], total_count: 0 } as any);
     };
 
     it('is hidden when the instance is not flagged into self-serve Directory Sync', async () => {
@@ -555,10 +562,11 @@ describe('OrganizationSecurityPage', () => {
     it('deactivates from the menu and settles on the revalidated directory', async () => {
       const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
       withActiveConnection(fixtures);
+      const activeDirectory = directory();
+      activeDirectory.update.mockResolvedValue(directory({ enabled: false }));
       fixtures.clerk.organization?.getDirectorySync
-        .mockResolvedValueOnce(directory())
+        .mockResolvedValueOnce(activeDirectory)
         .mockResolvedValue(directory({ enabled: false }));
-      fixtures.clerk.organization?.updateDirectorySync.mockResolvedValue(directory({ enabled: false }));
 
       const { userEvent } = renderPage(wrapper);
 
@@ -566,7 +574,7 @@ describe('OrganizationSecurityPage', () => {
       await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
       await userEvent.click(screen.getByRole('menuitem', { name: 'Deactivate' }));
 
-      expect(fixtures.clerk.organization?.updateDirectorySync).toHaveBeenCalledWith('ent_1', { enabled: false });
+      expect(activeDirectory.update).toHaveBeenCalledWith({ enabled: false });
 
       await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
       await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Activate' })).toBeInTheDocument());
@@ -575,8 +583,9 @@ describe('OrganizationSecurityPage', () => {
     it('removes the directory through the type-to-confirm dialog', async () => {
       const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
       withActiveConnection(fixtures);
-      fixtures.clerk.organization?.getDirectorySync.mockResolvedValueOnce(directory()).mockResolvedValue(null);
-      fixtures.clerk.organization?.deleteDirectorySync.mockResolvedValue({ id: 'scimdir_1', deleted: true } as any);
+      const activeDirectory = directory();
+      activeDirectory.delete.mockResolvedValue({ id: 'scimdir_1', deleted: true });
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValueOnce(activeDirectory).mockResolvedValue(null);
 
       const { userEvent } = renderPage(wrapper);
 
@@ -591,7 +600,7 @@ describe('OrganizationSecurityPage', () => {
       await userEvent.type(screen.getByRole('textbox'), 'Org1');
       await userEvent.click(confirmButton);
 
-      expect(fixtures.clerk.organization?.deleteDirectorySync).toHaveBeenCalledWith('ent_1');
+      expect(activeDirectory.delete).toHaveBeenCalledWith();
       await waitFor(() => expect(screen.getByRole('button', { name: 'Set up Directory Sync' })).toBeInTheDocument());
     });
 

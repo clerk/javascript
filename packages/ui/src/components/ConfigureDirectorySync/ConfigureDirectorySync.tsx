@@ -7,6 +7,7 @@ import { withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { Route, Switch } from '@/router';
 
+import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
 import { ConfigureDirectorySyncWizard } from './ConfigureDirectorySyncWizard';
 import { DirectorySyncNavbar } from './DirectorySyncNavbar';
 
@@ -35,7 +36,9 @@ const AuthenticatedContent = withCoreUserGuard(() => {
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
       <DirectorySyncNavbar contentRef={contentRef}>
-        <ConfigureDirectorySyncWizard />
+        <ConfigureSSOProtect>
+          <ConfigureDirectorySyncWizard />
+        </ConfigureSSOProtect>
       </DirectorySyncNavbar>
     </ProfileCard.Root>
   );

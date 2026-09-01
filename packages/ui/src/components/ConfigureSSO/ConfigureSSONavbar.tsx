@@ -2,6 +2,7 @@ import { __internal_useOrganizationBase } from '@clerk/shared/react/index';
 import React from 'react';
 
 import { useEnvironment } from '@/contexts';
+import type { LocalizationKey } from '@/customizables';
 import { Box, Col, descriptors, Flex, Heading, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
 import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
@@ -10,9 +11,14 @@ import { mqu } from '@/styledSystem';
 
 type ConfigureSSONavbarProps = React.PropsWithChildren<{
   contentRef: React.RefObject<HTMLDivElement>;
+  title?: LocalizationKey | string;
 }>;
 
-export const ConfigureSSONavbar = ({ children, contentRef }: ConfigureSSONavbarProps) => {
+export const ConfigureSSONavbar = ({
+  children,
+  contentRef,
+  title = localizationKeys('configureSSO.navbar.title'),
+}: ConfigureSSONavbarProps) => {
   const { parsedOptions } = useAppearance();
   const {
     organizationSettings,
@@ -25,7 +31,7 @@ export const ConfigureSSONavbar = ({ children, contentRef }: ConfigureSSONavbarP
     <NavbarContextProvider contentRef={contentRef}>
       <NavBar
         contentRef={contentRef}
-        title={localizationKeys('configureSSO.navbar.title')}
+        title={title}
         titleSx={t => ({ fontSize: t.fontSizes.$lg })}
         containerSx={{
           flexDirection: 'column-reverse',
@@ -94,14 +100,14 @@ export const ConfigureSSONavbar = ({ children, contentRef }: ConfigureSSONavbarP
           flex: 1,
         })}
       >
-        <ConfigureSSOMobileNavbar />
+        <ConfigureSSOMobileNavbar title={title} />
         {children}
       </Col>
     </NavbarContextProvider>
   );
 };
 
-const ConfigureSSOMobileNavbar = () => {
+const ConfigureSSOMobileNavbar = ({ title }: { title: LocalizationKey | string }) => {
   const { parsedOptions } = useAppearance();
   const {
     organizationSettings,
@@ -177,7 +183,7 @@ const ConfigureSSOMobileNavbar = () => {
 
       <Heading
         as='h3'
-        localizationKey={localizationKeys('configureSSO.navbar.title')}
+        localizationKey={title}
         sx={t => ({ fontSize: t.fontSizes.$lg })}
       />
     </Col>

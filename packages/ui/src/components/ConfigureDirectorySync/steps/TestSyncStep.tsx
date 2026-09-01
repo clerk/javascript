@@ -28,7 +28,7 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
           as='span'
           sx={t => ({ fontSize: t.fontSizes.$sm, fontWeight: t.fontWeights.$medium })}
         >
-          {user.identifier ?? displayName ?? user.userId}
+          {user.identifier || displayName || user.userId}
         </Text>
         {displayName && user.identifier && (
           <Text
