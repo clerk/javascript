@@ -17,6 +17,7 @@ import { reset } from '../../utils/reset.styles';
 import { truncationStyles } from '../../utils/typography.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
+import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import * as slots from './menu.styles';
 
 export type { MenuProps, MenuSeparatorProps };
@@ -74,10 +75,22 @@ export const MenuPopup = React.forwardRef<HTMLDivElement, MenuPopupProps>(functi
       >
         <Primitive.Popup
           ref={ref}
-          {...mergeStyleProps(themeProps('menu-popup'), stylex.props(reset.base, slots.popup.base), className, style)}
+          {...mergeStyleProps(
+            themeProps('menu-popup'),
+            stylex.props(reset.base, scrollAreaRoot, slots.popup.base),
+            className,
+            style,
+          )}
           {...rest}
         >
-          {children}
+          <div
+            {...mergeStyleProps(
+              themeProps('menu-viewport'),
+              stylex.props(reset.base, ...scrollAreaViewport(), slots.viewport.base),
+            )}
+          >
+            {children}
+          </div>
         </Primitive.Popup>
       </Primitive.Positioner>
     </Primitive.Portal>

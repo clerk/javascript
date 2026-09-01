@@ -1,12 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { cardContentMarker } from './card.markers.stylex';
 
 export const root = stylex.create({
   base: {
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
+    maxWidth: '26.25rem',
     width: '100%',
   },
   card: {
@@ -85,7 +87,10 @@ export const footer = stylex.create({
     justifyContent: 'space-between',
     borderTopColor: colorVars['--cl-color-border'],
     borderTopStyle: 'solid',
-    borderTopWidth: '1px',
+    borderTopWidth: {
+      default: '0px',
+      [stylex.when.siblingBefore(':where(*)', cardContentMarker)]: '1px',
+    },
     width: '100%',
   },
 });

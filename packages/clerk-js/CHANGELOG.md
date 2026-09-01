@@ -1,5 +1,20 @@
 # Change Log
 
+## 6.30.3
+
+### Patch Changes
+
+- Fix `oidcPrompt` and `oidcLoginHint` being silently dropped from the Frontend API request in `user.createExternalAccount()` and `externalAccount.reauthorize()`. Both parameters were already accepted by the public types but never serialized, so providers such as Google would fall back to their default prompt behavior. They are now sent as `oidc_prompt` and `oidc_login_hint`. ([#9354](https://github.com/clerk/javascript/pull/9354)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 6.30.2
+
+### Patch Changes
+
+- Fix development instance initialization when a stale dev browser value is rejected by clearing the value and retrying the environment and client requests. ([#9421](https://github.com/clerk/javascript/pull/9421)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/shared@4.30.2
+
 ## 6.30.1
 
 ### Patch Changes

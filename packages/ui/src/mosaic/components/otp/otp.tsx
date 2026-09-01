@@ -7,22 +7,19 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { inputStyles } from '../../utils/input.styles';
 import { reset } from '../../utils/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
-import { rootSizes, slotSizes, styles } from './otp.styles';
+import { styles } from './otp.styles';
 
 /** How the entered code currently reads back to the user. */
 export type OtpStatus = 'neutral' | 'success' | 'error';
 
-export type OtpSize = 'sm' | 'md' | 'lg';
-
 export interface OtpProps extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style'> {
   /** The number of boxes in the code. @default 6 */
   length?: number;
-  size?: OtpSize;
   /** Colours every slot for the verification outcome. Defaults to the enclosing `Field`'s validity. */
   status?: OtpStatus;
 }
 
-function OtpSlots({ size, status }: { size: OtpSize; status: OtpStatus }) {
+function OtpSlots({ status }: { status: OtpStatus }) {
   const { slots, disabled } = Primitive.useOtp();
 
   return slots.map(slot => (
@@ -31,13 +28,12 @@ function OtpSlots({ size, status }: { size: OtpSize; status: OtpStatus }) {
       index={slot.index}
       aria-invalid={status === 'error' ? true : undefined}
       {...mergeStyleProps(
-        themeProps('otp-slot', { size, status, disabled }),
+        themeProps('otp-slot', { status, disabled }),
         stylex.props(
           reset.base,
           inputStyles.base,
           styles.slot,
           styles.touchTarget,
-          slotSizes[size],
           status === 'success' && styles.success,
           disabled && inputStyles.disabled,
         ),
@@ -52,21 +48,25 @@ function OtpSlots({ size, status }: { size: OtpSize; status: OtpStatus }) {
  */
 export function Otp({
   length = 6,
-  size = 'md',
   status: statusProp,
   disabled: disabledProp,
+  required: requiredProp,
+  id,
   'aria-invalid': ariaInvalidProp,
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
   ...rest
 }: OtpProps): React.ReactElement {
   const fieldProps = useOptionalFieldControlProps({
+    id,
     disabled: disabledProp,
+    required: requiredProp,
     ariaInvalid: ariaInvalidProp,
     ariaLabelledBy,
     ariaDescribedBy,
   });
   const disabled = fieldProps?.disabled ?? disabledProp ?? false;
+  const required = fieldProps?.required ?? requiredProp;
   const ariaInvalid = fieldProps?.['aria-invalid'] ?? ariaInvalidProp;
   const status = statusProp ?? (ariaInvalid === true || ariaInvalid === 'true' ? 'error' : 'neutral');
 
@@ -75,17 +75,13 @@ export function Otp({
       {...rest}
       length={length}
       disabled={disabled}
-      {...mergeStyleProps(
-        themeProps('otp', { size, status, disabled }),
-        stylex.props(reset.base, styles.root, rootSizes[size]),
-      )}
+      required={required}
+      id={fieldProps?.id ?? id}
+      {...mergeStyleProps(themeProps('otp', { status, disabled }), stylex.props(reset.base, styles.root))}
       aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
     >
-      <OtpSlots
-        size={size}
-        status={status}
-      />
+      <OtpSlots status={status} />
     </Primitive.Root>
   );
 }

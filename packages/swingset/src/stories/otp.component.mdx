@@ -56,10 +56,13 @@ const [code, setCode] = useState('');
 />;
 ```
 
-Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes, and the label and messages are associated with the group:
+Inside a `Field.Root`, the field's `disabled`, `required`, and `invalid` flow into the boxes, and the messages are associated with the group. `Field.Label` targets the first box, so clicking it focuses the code — drop `aria-label` and let the label name the field:
 
 ```tsx
-<Field.Root invalid={Boolean(error)}>
+<Field.Root
+  required
+  invalid={Boolean(error)}
+>
   <Field.Label>Verification code</Field.Label>
   <Otp name='code' />
   {error ? <Field.Error>{error}</Field.Error> : <Field.Description>Didn’t receive a code? Resend</Field.Description>}
@@ -72,10 +75,10 @@ Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes,
 
 ## Examples
 
-### Sizes
+### In a Field
 
 <Story
-  name='Sizes'
+  name='WithField'
   storyModule={OtpStories}
 />
 
@@ -107,4 +110,4 @@ Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes,
 | Root | `.cl-otp`         | The `role="group"` holding the boxes.          |
 | Slot | `.cl-otp-slot`    | One `input` per character, one box in the row. |
 
-Both carry `data-size` and `data-status`, plus `data-disabled` when disabled. Each slot additionally carries the primitive's `data-active` (holds focus) and `data-filled` (holds a character).
+Both carry `data-status`, plus `data-disabled` when disabled. Each slot additionally carries the primitive's `data-active` (holds focus) and `data-filled` (holds a character).
