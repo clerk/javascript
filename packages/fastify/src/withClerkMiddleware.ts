@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import { AuthStatus, signedOutAuthObject } from '@clerk/backend/internal';
+import { AuthStatus } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import type { FastifyReply, FastifyRequest } from 'fastify';
@@ -116,22 +116,13 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      // Development instances cannot establish auth state without the dev browser handshake.
-      const isDevBrowserHandshake =
-        requestState.reason === 'dev-browser-missing' || requestState.reason === 'dev-browser-sync';
-      if (enableHandshake || isDevBrowserHandshake) {
-        return reply.code(307).send();
-      }
-      reply.removeHeader(constants.Headers.Location);
-      reply.removeHeader(constants.Headers.CacheControl);
-    } else if (enableHandshake && requestState.status === AuthStatus.Handshake) {
+      return reply.code(307).send();
+    } else if (requestState.status === AuthStatus.Handshake) {
       throw new Error('Clerk: handshake status without redirect');
     }
 
-    // A skipped handshake redirect leaves a handshake state whose toAuth() is null.
     // @ts-expect-error Inject auth so getAuth can read it
-    fastifyRequest.auth =
-      requestState.toAuth() ?? signedOutAuthObject({ reason: requestState.reason, message: requestState.message });
+    fastifyRequest.auth = requestState.toAuth();
     fastifyRequest.clerk = clerkClient;
   };
 };
