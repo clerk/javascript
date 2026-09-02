@@ -535,6 +535,7 @@ function SignInStartInternal(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
         navigateOnSetActive,
         passwordEnabled: userSettings.attributes.password?.required ?? false,
         alternativePhoneCodeChannel:
