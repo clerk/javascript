@@ -2218,7 +2218,7 @@ export const trTR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: 'Giriş Yap',
+      actionLink: 'Giriş yap',
       actionText: 'Hesabınız var mı?',
       formButton: 'Kayıt Ol',
       subtitle: 'Kaydolduktan sonra erken erişim kazanabilirsiniz.',
