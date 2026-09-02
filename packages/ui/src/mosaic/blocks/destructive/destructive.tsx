@@ -6,9 +6,7 @@ import { Card } from '../../components/card';
 import type { DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
-import { Heading } from '../../components/heading';
 import { Input } from '../../components/input';
-import { Text } from '../../components/text';
 
 export interface DestructiveProps {
   /** Whether the dialog is open */
@@ -114,8 +112,8 @@ export function Destructive({
         }
       >
         <Card.Header>
-          <Dialog.Title render={<Heading />}>{title}</Dialog.Title>
-          <Dialog.Description render={<Text />}>{description}</Dialog.Description>
+          <Card.Title>{title}</Card.Title>
+          <Card.Description>{description}</Card.Description>
         </Card.Header>
         <Card.Content>
           <form

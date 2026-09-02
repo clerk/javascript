@@ -595,10 +595,10 @@ export function OutsideScroll() {
         render={<Card.Root elevation='overlay' />}
       >
         <Card.Header>
-          <Dialog.Title render={<Heading size='sm' />}>Terms of service</Dialog.Title>
-          <Dialog.Description render={<Text />}>
+          <Card.Title>Terms of service</Card.Title>
+          <Card.Description>
             Nothing here scrolls on its own — the card grows past the screen and the viewport takes the scroll.
-          </Dialog.Description>
+          </Card.Description>
         </Card.Header>
         <Card.Content>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
