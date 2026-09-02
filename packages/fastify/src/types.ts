@@ -31,9 +31,8 @@ export type ClerkFastifyOptions = ClerkOptions & {
    * Whether to enable the handshake flow for session verification.
    *
    * When set to `false`, handshake cookies and query params are ignored on requests that
-   * cannot complete a handshake redirect (non-GET requests and `fetch`/XHR calls), and
-   * handshake redirects are skipped (except dev-browser handshakes, which development
-   * instances require). Intended for pure API backends (e.g. a SPA calling a Fastify
+   * are not eligible for a handshake redirect, and handshake redirects are skipped (except
+   * dev-browser handshakes, which development instances require). Intended for pure API backends (e.g. a SPA calling a Fastify
    * server) where the server cannot deliver `Set-Cookie` headers back to the browser,
    * so stale handshake nonces would otherwise be replayed and trigger repeated `404`
    * errors from the Frontend API.
