@@ -48,7 +48,7 @@ function useOrganizationDirectorySync(params: UseOrganizationDirectorySyncParams
   const organization = useOrganizationBase();
   const [queryClient] = useClerkQueryClient();
 
-  const { queryKey, stableKey, authenticated } = useOrganizationDirectorySyncCacheKeys({
+  const { queryKey, invalidationKey, stableKey, authenticated } = useOrganizationDirectorySyncCacheKeys({
     organizationId: organization?.id ?? null,
     enterpriseConnectionId,
   });
@@ -82,8 +82,8 @@ function useOrganizationDirectorySync(params: UseOrganizationDirectorySyncParams
   });
 
   const revalidate = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: [stableKey] }),
-    [queryClient, stableKey],
+    () => queryClient.invalidateQueries({ queryKey: invalidationKey }),
+    [queryClient, invalidationKey],
   );
 
   const createDirectorySync = useCallback(

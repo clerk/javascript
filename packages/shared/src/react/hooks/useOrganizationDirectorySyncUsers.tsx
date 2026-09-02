@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import type {
   DirectorySyncResource,
@@ -86,11 +86,12 @@ function useOrganizationDirectorySyncUsers(
   const organization = useOrganizationBase();
   const [queryClient] = useClerkQueryClient();
   const enterpriseConnectionId = directory?.enterpriseConnectionId ?? null;
+  const directoryId = directory?.id ?? null;
 
   const { queryKey, invalidationKey, stableKey, authenticated } = useOrganizationDirectorySyncUsersCacheKeys({
     organizationId: organization?.id ?? null,
     enterpriseConnectionId,
-    directoryId: directory?.id ?? null,
+    directoryId,
     args: fetchParams,
   });
 
@@ -102,13 +103,10 @@ function useOrganizationDirectorySyncUsers(
 
   const queryEnabled = enabled && clerk.loaded && Boolean(organization) && Boolean(directory);
 
-  const [shouldPoll, setShouldPoll] = useState(false);
-
-  useEffect(() => {
-    // Polling intent is scoped to the current directory — clear it when the
-    // identity changes so a reset/recreate doesn't inherit a stale armed poll.
-    setShouldPoll(false);
-  }, [enterpriseConnectionId, directory?.id]);
+  // Polling is armed for a specific directory and derived, not reset in an effect: a child
+  // effect arming it in the same commit the directory arrives would otherwise be cancelled.
+  const [armedForDirectoryId, setArmedForDirectoryId] = useState<string | null>(null);
+  const shouldPoll = armedForDirectoryId !== null && armedForDirectoryId === directoryId;
 
   const currentTracked = queryKey[2];
   const query = useClerkQuery({
@@ -139,11 +137,11 @@ function useOrganizationDirectorySyncUsers(
   });
 
   const startPolling = useCallback(() => {
-    setShouldPoll(true);
-  }, []);
+    setArmedForDirectoryId(directoryId);
+  }, [directoryId]);
 
   const stopPolling = useCallback(() => {
-    setShouldPoll(false);
+    setArmedForDirectoryId(null);
   }, []);
 
   const revalidate = useCallback(async () => {
