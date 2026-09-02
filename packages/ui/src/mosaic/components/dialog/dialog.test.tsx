@@ -218,21 +218,22 @@ describe('nested Mosaic Dialogs', () => {
     expect(document.body.style.overflow).toBe('');
   });
 
-  it('warns when a stacked dialog is not a prompt', async () => {
+  it('warns when a panel opens inside another dialog', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const user = userEvent.setup();
-    render(<Nested innerSize='card' />);
+    render(<Nested innerSize='panel' />);
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="card"'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="panel"'));
     warn.mockRestore();
   });
 
-  it('does not warn for a stacked prompt, or for a root-level panel', async () => {
+  // A card over a panel is the delete-account confirmation: a `Card` inside a `card` dialog.
+  it.each(['prompt', 'card'] as const)('does not warn for a %s over a panel, or for the panel itself', async size => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const user = userEvent.setup();
-    render(<Nested />);
+    render(<Nested innerSize={size} />);
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 

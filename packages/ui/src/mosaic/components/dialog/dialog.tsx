@@ -339,23 +339,20 @@ function Viewport({ size, inline, children }: { size: DialogSize; inline: boolea
 }
 
 /**
- * Warns when a dialog opened inside another dialog is not a `prompt`.
+ * Warns when a `panel` opens inside another dialog.
  *
- * `panel` and `card` are root-level surfaces: they host what opens over them and are never the
- * thing that opens. A `panel` inside a dialog renders at a size that assumes it owns the viewport,
- * over a surface it was meant to replace.
- *
- * One rule stated on the child covers every case — panel-in-panel, card-in-panel — without having
- * to enumerate which sizes may host what.
+ * A `panel` is a root-level surface: it hosts what opens over it and is never the thing that
+ * opens. Inside a dialog it renders at a size that assumes it owns the viewport, over a surface it
+ * was meant to replace. A `prompt` or a `card` — a confirmation holding a `Card`, say — is what
+ * opens over a panel, and either is fine.
  */
 function useNestedSizeWarning(isNestedInDialog: boolean, size: DialogSize) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || size === 'prompt') {
+    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || size !== 'panel') {
       return;
     }
     console.warn(
-      `[clerk] a Dialog opened inside another Dialog should be size="prompt", but this one is size="${size}". ` +
-        'Only prompts are meant to open over another dialog; the rest are root-level surfaces.',
+      '[clerk] a size="panel" Dialog opened inside another Dialog. A panel is a root-level surface that hosts what opens over it; open a prompt or a card instead.',
     );
   }, [isNestedInDialog, size]);
 }

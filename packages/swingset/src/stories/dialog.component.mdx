@@ -303,7 +303,7 @@ A dialog opened inside another is one of two relationships, decided by the size 
 | The surface beneath | Unchanged                  | Dims and recedes                   |
 | Attributes          | `data-nested`              | `data-stacked` / `data-stack-base` |
 
-The dialog that opens should always be a `prompt`; anything else warns in dev.
+A `panel` never opens inside another dialog — it warns in dev. A `prompt` or a `card` (a confirmation holding a `Card`) is what opens over one.
 
 ---
 
