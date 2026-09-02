@@ -84,12 +84,12 @@ catalogs:
 
 overrides:
   '@babel/plugin-transform-modules-systemjs@<=7.29.3': 7.29.4
-  axios@<=0.31.1: 0.33.0
+  axios@<0.33.0: 0.33.0
   chokidar@<5.0.0: 5.0.0
-  fast-uri@<=3.1.1: 3.1.5
+  fast-uri@<3.1.6: 3.1.6
   flatted@<=3.4.1: 3.4.2
   follow-redirects@<=1.15.11: 1.16.0
-  ip-address@<=10.1.0: 10.3.1
+  ip-address@<10.3.1: 10.3.1
   jws@<3.2.3: 3.2.3
   minimatch@>=9.0.0 <9.0.7: 9.0.7
   picomatch@>=3.0.0 <3.0.2: 3.0.2
@@ -100,10 +100,10 @@ overrides:
   rolldown: 1.1.0
   semver@<7.7.3: 7.7.4
   smol-toml@<1.6.1: 1.6.1
-  socket.io-parser@>=4.0.0 <4.2.6: 4.2.7
+  socket.io-parser@>=4.0.0 <4.2.7: 4.2.7
   svgo@>=3.0.0 <3.3.3: 4.0.2
-  tar@<7.5.11: 7.5.21
-  tmp@<0.2.6: 0.2.7
+  tar@<7.5.21: 7.5.21
+  tmp@<0.2.7: 0.2.7
   undici-types@<7.16.0: 7.24.8
   utf-8-validate: 5.0.10
 
@@ -9454,8 +9454,8 @@ packages:
   fast-string-width@3.0.2:
     resolution: {integrity: sha512-gX8LrtNEI5hq8DVUfRQMbr5lpaS4nMIWV+7XEbXk2b8kiQIizgnlr12B4dA3ZEx3308ze0O4Q1R+cHts8kyUJg==}
 
-  fast-uri@3.1.5:
-    resolution: {integrity: sha512-gHwA1O9LDIcKunMKhObS/HimwtehO1nPUECKAu5TpKgaO19fcWEl4bliWe1jWxVFvIXztJjjQ4L8XQ1EU9f7Jw==}
+  fast-uri@3.1.6:
+    resolution: {integrity: sha512-7Ical1vFEMr0onbVzEDIreM22I4khW+fzyQPwvAFWBp1iwdshSZRsL4jjRvPG9JP1uiqMHRto+YU6R2/CzDz5Q==}
 
   fast-wrap-ansi@0.2.2:
     resolution: {integrity: sha512-7F2Fl+TjRSenLqlU3UjSH0iyqopqoZIu7eZVpEirP2g1GtWa2G/ecEmBdgz31+Mxr+ELclgg6sokpSFIQiZ02Q==}
@@ -18049,7 +18049,7 @@ snapshots:
     dependencies:
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
-      fast-uri: 3.1.5
+      fast-uri: 3.1.6
 
   '@fastify/busboy@2.1.1': {}
 
@@ -22721,14 +22721,14 @@ snapshots:
   ajv@8.18.0:
     dependencies:
       fast-deep-equal: 3.1.3
-      fast-uri: 3.1.5
+      fast-uri: 3.1.6
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
   ajv@8.20.0:
     dependencies:
       fast-deep-equal: 3.1.3
-      fast-uri: 3.1.5
+      fast-uri: 3.1.6
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
@@ -25524,7 +25524,7 @@ snapshots:
       '@fastify/merge-json-schemas': 0.2.1
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
-      fast-uri: 3.1.5
+      fast-uri: 3.1.6
       json-schema-ref-resolver: 3.0.0
       rfdc: 1.4.1
 
@@ -25550,7 +25550,7 @@ snapshots:
     dependencies:
       fast-string-truncated-width: 3.0.3
 
-  fast-uri@3.1.5: {}
+  fast-uri@3.1.6: {}
 
   fast-wrap-ansi@0.2.2:
     dependencies:
