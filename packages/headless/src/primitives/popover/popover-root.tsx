@@ -29,6 +29,12 @@ export interface PopoverProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Fires once the open or close animation has finished. Reset what the popup showed here
+   * rather than in `onOpenChange`: the contents hold their last frame while closing, and this is
+   * the first moment a reset cannot show through the animation.
+   */
+  onOpenChangeComplete?: (open: boolean) => void;
   placement?: Placement;
   sideOffset?: number;
   alignOffset?: number;
@@ -97,6 +103,7 @@ function PopoverInner(props: PopoverProps) {
   const { mounted, transitionProps } = useTransition({
     open,
     ref: popupRef,
+    onOpenChangeComplete: props.onOpenChangeComplete,
   });
 
   const click = useClick(floatingContext);

@@ -2,6 +2,7 @@
 
 import { Button as HeadlessButton } from '@clerk/headless/button';
 import type { PopoverProps } from '@clerk/headless/popover';
+import { useFrozenValue } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
@@ -1105,17 +1106,29 @@ export function UserButtonTrigger({
   );
 }
 
+/**
+ * The popup's parts read their data through context, so the popup's exit hold (which keeps only
+ * the elements it was handed) would not cover them: an action that closes the popup as it settles
+ * — switching workspace — also swaps the data underneath. Re-provide the context held instead.
+ */
+function HeldUserButtonContext({ children }: { children: ReactNode }): ReactElement {
+  const data = useFrozenValue(useUserButtonContext());
+  return <UserButtonContext.Provider value={data}>{children}</UserButtonContext.Provider>;
+}
+
 /** The popover surface: header, organizations, and footer. */
 export function UserButtonPopup(): ReactElement {
   const { renderBranding } = useUserButtonContext();
 
   return (
     <Popover.Popup aria-label={m.popup.label}>
-      <Card.Root renderBranding={renderBranding}>
-        <Header />
-        <OrganizationSection />
-        <Footer />
-      </Card.Root>
+      <HeldUserButtonContext>
+        <Card.Root renderBranding={renderBranding}>
+          <Header />
+          <OrganizationSection />
+          <Footer />
+        </Card.Root>
+      </HeldUserButtonContext>
     </Popover.Popup>
   );
 }
