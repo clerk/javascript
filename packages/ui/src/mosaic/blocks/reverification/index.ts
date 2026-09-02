@@ -1,3 +1,5 @@
+export { Reverification } from './reverification';
+export type { ReverificationProps, ReverificationState, ReverificationStatus } from './reverification';
 export { ReverificationBackupCode } from './reverification-backup-code';
 export type { ReverificationBackupCodeMessages, ReverificationBackupCodeProps } from './reverification-backup-code';
 export { ReverificationHelp } from './reverification-help';
