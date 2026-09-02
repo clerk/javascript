@@ -14,9 +14,9 @@ export const DIRECTORY_SYNC_PROVIDERS: Record<DirectorySyncProvider, DirectorySy
     supportsScim: true,
     instructions: [
       'In the Okta Admin Console, open the application used for your SSO connection.',
-      'Open the Provisioning tab and select Configure API Integration.',
-      'Check Enable API integration, then paste the SCIM endpoint URL and bearer token below.',
-      'Under Provisioning to App, enable Create Users, Update User Attributes, and Deactivate Users.',
+      'Open the Provisioning tab and select the Integration setting.',
+      'Paste the SCIM endpoint URL and bearer token found below.',
+      'For provisioning actions, enable pushing of New Users, Profile Updates, and Groups.',
     ],
   },
   entra: {
@@ -24,8 +24,8 @@ export const DIRECTORY_SYNC_PROVIDERS: Record<DirectorySyncProvider, DirectorySy
     supportsScim: true,
     instructions: [
       'In the Microsoft Entra admin center, open Enterprise applications and select the application used for your SSO connection.',
+      'Under Connectivity, paste the SCIM endpoint URL as the Tenant URL and the bearer token as the Secret Token, then select Test Connection.',
       'Select Provisioning and set the provisioning mode to Automatic.',
-      'Paste the SCIM endpoint URL as the Tenant URL and the bearer token as the Secret Token, then select Test Connection.',
       'Assign the users and groups to provision, then turn provisioning On.',
     ],
   },
