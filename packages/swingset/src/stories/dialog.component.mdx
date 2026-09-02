@@ -292,15 +292,27 @@ The dialog that opens should always be a `prompt`; anything else warns in dev.
 
 ## Examples
 
-### Scrolling a panel
+### A panel
 
-A `panel` clips rather than scrolls, and its surface owns the scroll: `ProfilePage` scrolls its
-content column and keeps the sidebar put. Nothing to compose — render the page as the popup.
+The account profile as a `panel`: the page is the popup, so it paints the frame, scrolls its own
+content column, collapses its own sidebar, and carries the dismiss. The dialog only positions it.
 
 <Story
   name='Nested'
   storyModule={DialogStories}
 />
+
+Add an email address, type into the field and try to close it: the prompt opens over the panel
+(nested, with its own lighter scrim), and a confirmation stacks on the prompt (no second scrim; the
+prompt recedes). The same stack on its own:
+
+<Story
+  name='StackedPrompts'
+  storyModule={DialogStories}
+/>
+
+Nest by rendering a `Dialog.Root` inside another popup's children. Dismissal reaches only the top
+dialog, scroll stays locked until the last one closes, and focus returns down the stack.
 
 ### Scrolling a tall card
 
@@ -312,19 +324,6 @@ surface on a phone.)
   name='OutsideScroll'
   storyModule={DialogStories}
 />
-
-### Nested dialogs
-
-In the panel above, add an email address, type into the field and try to close it: the prompt
-opens over the panel, and a confirmation stacks on the prompt. The same stack on its own:
-
-<Story
-  name='StackedPrompts'
-  storyModule={DialogStories}
-/>
-
-Nest by rendering a `Dialog.Root` inside another popup's children. Dismissal reaches only the top
-dialog, scroll stays locked until the last one closes, and focus returns down the stack.
 
 ### Detached triggers
 
