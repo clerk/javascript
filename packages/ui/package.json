@@ -57,7 +57,12 @@
       "default": "./dist/experimental/index.js"
     },
     "./themes/shadcn.css": "./dist/themes/shadcn.css",
-    "./styles.css": {
+    "./experimental/mosaic": {
+      "types": "./dist-mosaic/index.d.ts",
+      "import": "./dist-mosaic/index.js",
+      "default": "./dist-mosaic/index.js"
+    },
+    "./experimental/mosaic/styles.css": {
       "types": "./styles.css.d.ts",
       "default": "./dist-mosaic/styles.css"
     },
@@ -81,7 +86,7 @@
     "register"
   ],
   "scripts": {
-    "build": "pnpm build:umd && pnpm build:esm && pnpm build:mosaic && pnpm check:no-rhc && pnpm type-check",
+    "build": "pnpm build:umd && pnpm build:esm && pnpm build:mosaic && pnpm check:no-rhc && pnpm check:no-emotion && pnpm type-check",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze",
     "build:esm": "tsdown",
     "build:mosaic": "tsdown --config tsdown.mosaic.config.mts",
@@ -89,6 +94,7 @@
     "build:umd": "rspack build --config rspack.config.js --env production",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
+    "check:no-emotion": "node scripts/check-mosaic-emotion-free.mjs",
     "check:no-rhc": "node ../../scripts/search-for-rhc.mjs directory dist/no-rhc",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
@@ -116,7 +122,6 @@
     "@solana/wallet-adapter-base": "catalog:module-manager",
     "@solana/wallet-adapter-react": "catalog:module-manager",
     "@solana/wallet-standard": "catalog:module-manager",
-    "@stylexjs/stylex": "0.19.0",
     "@swc/helpers": "catalog:repo",
     "copy-to-clipboard": "3.3.3",
     "core-js": "catalog:repo",
@@ -135,6 +140,7 @@
     "@rspack/plugin-react-refresh": "catalog:rspack",
     "@stylexjs/eslint-plugin": "0.19.0",
     "@stylexjs/rollup-plugin": "0.19.0",
+    "@stylexjs/stylex": "0.19.0",
     "@stylexjs/unplugin": "0.19.0",
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",

@@ -63,6 +63,17 @@
         "default": "./dist/experimental.cjs"
       }
     },
+    "./experimental/mosaic": {
+      "import": {
+        "types": "./dist/experimental/mosaic.d.mts",
+        "default": "./dist/experimental/mosaic.mjs"
+      },
+      "require": {
+        "types": "./dist/experimental/mosaic.d.cts",
+        "default": "./dist/experimental/mosaic.cjs"
+      }
+    },
+    "./experimental/mosaic/styles.css": "./dist/experimental/mosaic/styles.css",
     "./legacy": {
       "import": {
         "types": "./dist/legacy.d.mts",
@@ -88,14 +99,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsdown",
+    "build": "tsdown && node ../../scripts/copy-mosaic-styles.mjs dist/experimental/mosaic/styles.css",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch",
     "dev:pub": "pnpm dev --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16",
+    "lint:attw": "attw --pack . --exclude-entrypoints experimental/mosaic/styles.css --profile node16",
     "lint:publint": "publint",
     "test": "vitest run",
     "test:watch": "vitest watch"
