@@ -32,10 +32,10 @@ export type ClerkFastifyOptions = ClerkOptions & {
    *
    * When set to `false`, handshake cookies and query params are ignored on requests that
    * are not eligible for a handshake redirect, and handshake redirects are skipped (except
-   * dev-browser handshakes, which development instances require). Intended for pure API backends (e.g. a SPA calling a Fastify
-   * server) where the server cannot deliver `Set-Cookie` headers back to the browser,
-   * so stale handshake nonces would otherwise be replayed and trigger repeated `404`
-   * errors from the Frontend API.
+   * dev-browser handshakes, which development instances require). Intended for pure API
+   * backends (e.g. a SPA calling a Fastify server) where the server cannot deliver
+   * `Set-Cookie` headers back to the browser, so stale handshake nonces would otherwise be
+   * replayed and trigger repeated `404` errors from the Frontend API.
    *
    * @internal
    * @default true
