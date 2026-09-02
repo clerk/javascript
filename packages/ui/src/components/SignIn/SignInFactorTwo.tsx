@@ -31,8 +31,17 @@ function SignInFactorTwoInternal(): JSX.Element {
   const onShowAlternativeMethodsClicked =
     signIn.supportedSecondFactors && signIn.supportedSecondFactors.length > 1 ? toggleAllStrategies : undefined;
 
+  const setActiveTookOverRef = React.useRef(false);
+
   React.useEffect(() => {
     if (clerk.__internal_setActiveInProgress) {
+      // setActive owns navigation from here on. It consumes the sign-in (status -> null), so the
+      // check below would fire as setActive winds down and redirect over a flow that succeeded.
+      setActiveTookOverRef.current = true;
+      return;
+    }
+
+    if (setActiveTookOverRef.current) {
       return;
     }
 

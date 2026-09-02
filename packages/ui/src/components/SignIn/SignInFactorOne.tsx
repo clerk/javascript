@@ -123,8 +123,17 @@ function SignInFactorOneInternal(): JSX.Element {
 
   const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
 
+  const setActiveTookOverRef = React.useRef(false);
+
   React.useEffect(() => {
     if (__internal_setActiveInProgress) {
+      // setActive owns navigation from here on. It consumes the sign-in (status -> null), so the
+      // check below would fire as setActive winds down and flash the start card over a success.
+      setActiveTookOverRef.current = true;
+      return;
+    }
+
+    if (setActiveTookOverRef.current) {
       return;
     }
 
