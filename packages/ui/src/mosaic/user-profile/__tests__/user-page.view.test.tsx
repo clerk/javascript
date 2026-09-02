@@ -181,6 +181,8 @@ describe('UserPageView', () => {
         </Dialog.Root>
       </MosaicProvider>,
     );
+    // `inline` forces the dialog open, so the page is on screen — and still carries no dismiss.
+    expect(screen.getByRole('dialog', { name: 'User profile' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
   });
 

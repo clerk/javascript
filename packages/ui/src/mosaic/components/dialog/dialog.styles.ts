@@ -81,33 +81,48 @@ export const styles = stylex.create({
     backgroundColor: 'transparent',
   },
 
-  // Centering track inside the headless `FloatingOverlay`, which owns the fixed positioning and
-  // the scroll lock. Whether this box is a fixed height or grows with its content is the whole
-  // outside-scroll question, and it differs per size — see `viewportSizes` below.
-  //
-  // Also the query container every band reads — see `PHONE` and friends above. `inline-size`
-  // rather than `size`: block-size containment would stop the box growing with its content,
-  // which is exactly what the outside-scroll sizes need it to do, and no band queries height.
-  //
-  // The gap between a dialog and the edge of the screen is a FIXED INSET, not a percentage.
-  // A percentage margin is asymmetric between the axes and the asymmetry tracks the viewport's
-  // aspect ratio: at 90vw/90dvh a 1920x1080 screen leaves 96px at the sides and 54px top and
-  // bottom, an ultrawide closer to 172 against 72, and a phone inverts it — 20px at the sides
-  // against 42px. The surround never reads as a frame and its character changes per device. One
-  // inset is even on all four sides everywhere, and steps up with available room rather than
-  // with aspect ratio.
-  //
-  // Published as a var so the two edges can be driven from one ladder and so anything inside can
-  // read it without plumbing — custom properties inherit. The popup needs no width math of its
-  // own: it is `width: 100%` inside this padding, so the inset is already subtracted.
-  //
-  // Square everywhere except the phone band, where the sides come in to `1rem` and the block edges
-  // stay at `1.25rem`. On a phone the horizontal inset is the expensive one — it is subtracted from
-  // a content box only ~380px wide, so every pixel there costs line length in a way the same pixel
-  // costs nothing vertically. The vertical edges are doing the opposite job: separating the surface
-  // from the browser's own chrome, which is closer on a phone than on any desktop.
-  //
+  /**
+   * The headless viewport element, inside the `FloatingOverlay` that owns the fixed positioning
+   * and the scroll lock. Two jobs: it is the query container every band reads — see `PHONE` and
+   * friends above — and it is the box the sizes measure against. Whether that box is a fixed
+   * height or grows with its content is the whole outside-scroll question, and it differs per
+   * size — see `viewportSizes` below.
+   *
+   * It carries NO band of its own, and cannot: an element is never its own query container, so a
+   * `@container cl-dialog` rule on this element would resolve against some OUTER dialog's viewport
+   * — or nothing. Everything width-dependent lives on `track`, the padded grid inside it.
+   *
+   * `inline-size` rather than `size`: block-size containment would stop the box growing with its
+   * content, which is exactly what the outside-scroll sizes need it to do, and no band queries
+   * height. A grid so the track fills it: an `auto` row stretches to the container's used height,
+   * `min-height` included, which is what hands the track a definite box to centre within.
+   */
   viewport: {
+    containerName: 'cl-dialog',
+    containerType: 'inline-size',
+    display: 'grid',
+    width: '100%',
+  },
+
+  /**
+   * The centering track: the inset, and the grid the popup is centred in. The gap between a
+   * dialog and the edge of the screen is a FIXED INSET, not a percentage. A percentage margin is
+   * asymmetric between the axes and the asymmetry tracks the viewport's aspect ratio: at 90vw/90dvh
+   * a 1920x1080 screen leaves 96px at the sides and 54px top and bottom, an ultrawide closer to
+   * 172 against 72, and a phone inverts it — 20px at the sides against 42px. One inset is even on
+   * all four sides everywhere, and steps up with available room rather than with aspect ratio.
+   *
+   * Published as a var so the two edges can be driven from one ladder and so anything inside can
+   * read it without plumbing — custom properties inherit. The popup needs no width math of its
+   * own: it is `width: 100%` inside this padding, so the inset is already subtracted.
+   *
+   * Square everywhere except the phone band, where the sides come in to `1rem` and the block edges
+   * stay at `1.25rem`. On a phone the horizontal inset is the expensive one — it is subtracted from
+   * a content box only ~380px wide, so every pixel there costs line length in a way the same pixel
+   * costs nothing vertically. The vertical edges are doing the opposite job: separating the surface
+   * from the browser's own chrome, which is closer on a phone than on any desktop.
+   */
+  track: {
     '--_cl-dialog-inset': {
       [DESK]: space['8'],
       [WIDE]: space['12'],
@@ -124,27 +139,26 @@ export const styles = stylex.create({
     // top half above the scroll origin and unreachable; `safe` falls back to start alignment in
     // exactly that case, so the popup overflows downward only and scrolls from its top.
     placeItems: 'safe center',
-    containerName: 'cl-dialog',
-    containerType: 'inline-size',
     display: 'grid',
     // The keyboard's share of the viewport, added to the inset on the bottom edge only. A longhand
     // beside the `padding` shorthand above is deliberate — StyleX ranks a longhand higher
     // regardless of order, so this wins without depending on argument order. Falls back to `0px`,
     // so it is inert until `acquireKeyboardInset` has something to report.
     paddingBlockEnd: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
+    // A grid item's automatic minimum would otherwise hold this to its content and defeat the
+    // definite row `viewportSizes.panel` pins.
+    minHeight: 0,
     width: '100%',
   },
 
   /**
    * An inline dialog fills its host edge to edge: the inset is the gap between a surface and the
-   * screen, and a surface that IS the page's content has no screen edge to hold off. The
-   * surface keeps its own ring, radius and shadow — it reads as a card sitting on the page —
-   * which is one cell on the popup to change if it should ever sit flush instead.
+   * screen, and a surface that IS the page's content has no screen edge to hold off.
    *
    * Only the var and the one longhand that departs from it need restating: `padding` and
    * `paddingBlockEnd` both derive from the var, and the keyboard inset is never published inline.
    */
-  viewportInline: {
+  trackInline: {
     '--_cl-dialog-inset': '0px',
     paddingInline: 0,
   },
@@ -309,18 +323,40 @@ export const closeInsets = stylex.create({
  * surface already is.
  *
  * A `panel` is a fixed-height window you navigate inside, so it scrolls INSIDE: the viewport stays
- * pinned to the overlay and the consumer composes a scroll region out of `scrollAreaRoot` /
- * `scrollAreaViewport()`. A `prompt` and a `card` take their height from their content and have no
- * obvious region to scroll, so they scroll OUTSIDE: the whole dialog moves within the overlay.
+ * pinned to the overlay and the surface scrolls its own region. A `prompt` and a `card` take their
+ * height from their content and have no obvious region to scroll, so they scroll OUTSIDE: the
+ * whole dialog moves within the overlay.
  *
  * The mechanism is one property. Pinned at `height: 100%` the viewport cannot grow, so an over-tall
- * popup spills past its padding box — the scrollable overflow reaches the overlay, but the
- * viewport's own `padding-block-end` stays behind at the fold, and the popup runs flush into the
- * bottom edge with none of the inset that surrounds it everywhere else. `min-height: 100%` lets the
- * box grow instead: the padding travels with the content, and short dialogs still fill the overlay
- * so `place-items: center` has something to centre against.
+ * popup spills past its padding box — the scrollable overflow reaches the overlay, but the track's
+ * `padding-block-end` stays behind at the fold, and the popup runs flush into the bottom edge with
+ * none of the inset that surrounds it everywhere else. `min-height: 100%` lets the box grow
+ * instead: the padding travels with the content, and short dialogs still fill the overlay so the
+ * track has something to centre against.
  */
 export const viewportSizes = stylex.create({
+  prompt: { minHeight: '100%' },
+  card: { minHeight: '100%' },
+  panel: {
+    // A definite container height is NOT enough on its own: an `auto` grid row still sizes to its
+    // content and happily exceeds the container, which is how a panel of rows measured 2208px
+    // inside a 1251px overlay. `minmax(0, 1fr)` pins the single row to the content box, so the row
+    // is what an item stretches to and what its overflow is measured against.
+    //
+    // Deliberately NOT applied to the scrolling sizes: it would clamp the row there too, which is
+    // exactly what has to stop happening for the popup to grow past the fold.
+    gridTemplateRows: 'minmax(0, 1fr)',
+    // A DEFINITE height, taken from the overlay (`position: fixed; inset: 0`), which makes the
+    // single grid row definite too. That is what lets `sizes.panel` fill the content box with
+    // `align-self: stretch` alone — no `dvh` arithmetic, so nothing can disagree with the box a
+    // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
+    // overlay measures 1251px while `100dvh` reports 844.
+    height: '100%',
+  },
+});
+
+/** The per-size half of `styles.track` — the rules that need the band, and so must sit inside the container. */
+export const trackSizes = stylex.create({
   prompt: {
     // Clips the sheet while it is outside the box, and ONLY for the size that translates. A
     // `prompt` enters from `translate: 0 100%` — a full height BELOW its resting place — and the
@@ -341,25 +377,10 @@ export const viewportSizes = stylex.create({
     // asks one thing, so it should not reach that height; a tall surface on a phone wants `card`,
     // which does not translate and therefore is not clipped here.
     overflow: { [PHONE]: 'clip', default: null },
-    minHeight: '100%',
   },
-  card: { minHeight: '100%' },
-  panel: {
-    // A definite container height is NOT enough on its own: an `auto` grid row still sizes to its
-    // content and happily exceeds the container, which is how a panel of rows measured 2208px
-    // inside a 1251px overlay. `minmax(0, 1fr)` pins the single row to the content box, so the row
-    // is what an item stretches to and what its overflow is measured against.
-    //
-    // Deliberately NOT applied to the scrolling sizes: it would clamp the row there too, which is
-    // exactly what has to stop happening for the popup to grow past the fold.
-    gridTemplateRows: 'minmax(0, 1fr)',
-    // A DEFINITE height, taken from the overlay (`position: fixed; inset: 0`), which makes the
-    // single grid row definite too. That is what lets `sizes.panel` fill the content box with
-    // `align-self: stretch` alone — no `dvh` arithmetic, so nothing can disagree with the box a
-    // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
-    // overlay measures 1251px while `100dvh` reports 844.
-    height: '100%',
-  },
+  card: {},
+  // Same definite row as the viewport's, one level down, so the popup's `stretch` lands on it.
+  panel: { gridTemplateRows: 'minmax(0, 1fr)' },
 });
 
 export const sizes = stylex.create({

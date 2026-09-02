@@ -264,8 +264,8 @@ machine returning to idle) does not flash through the exit.
 | `Dialog.Actions`     | `dialog-actions`      | An alert dialog's response row. Cancel first.                       |
 | `Dialog.Confirm`     | `dialog-popup`        | A confirmation rendered from `confirm.show()`.                      |
 
-`Dialog.Popup` also renders the scrim (`dialog-backdrop`) and the centering viewport
-(`dialog-viewport`).
+`Dialog.Popup` also renders the scrim (`dialog-backdrop`), the viewport (`dialog-viewport`, the
+`cl-dialog` container) and the centering track inside it (`dialog-track`, which carries the inset).
 
 ## Styling
 
@@ -287,8 +287,8 @@ State attributes:
 | ------------------------------------------- | ---------------------------------- | ------------------------------------- |
 | `data-open` / `data-closed`                 | Trigger, Backdrop, Viewport, Popup | Open state (`closed` during the exit) |
 | `data-starting-style` / `data-ending-style` | Backdrop, Viewport, Popup          | Entering frame / exit animation       |
-| `data-size`                                 | Viewport, Popup                    | Resolved size                         |
-| `data-inline`                               | Viewport, Popup                    | Root is `inline`                      |
+| `data-size`                                 | Viewport, Track, Popup             | Resolved size                         |
+| `data-inline`                               | Viewport, Track, Popup             | Root is `inline`                      |
 | `data-nested`                               | Backdrop, Viewport, Popup          | Opened inside another overlay         |
 | `data-stacked` / `data-stack-base`          | Popup                              | On top of / beneath another dialog    |
 

@@ -19,7 +19,7 @@ import { Heading } from '../heading';
 import { Icon } from '../icon';
 import { Text } from '../text';
 import { type ConfirmHandle, createConfirmHandle } from './confirm-handle';
-import { backdropMotion, closeInsets, popupMotion, sizes, styles, viewportSizes } from './dialog.styles';
+import { backdropMotion, closeInsets, popupMotion, sizes, styles, trackSizes, viewportSizes } from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
 /** Width of the dialog surface, and for `panel` its height too. */
@@ -308,10 +308,12 @@ function Backdrop({ size, stacked, overInline }: { size: DialogSize; stacked: bo
 }
 
 /**
- * Centering container for the popup, and the container its sizes are queried against. Over the
- * page it also locks body scroll and — because it is the element that owns the inset — publishes
- * the on-screen keyboard's share of the viewport for its own bottom padding to consume. See
- * `keyboard-inset.ts`. Inline, it is a plain box that fills its host.
+ * The box the popup is sized against and the query container its bands read, holding the track
+ * that centres the popup and carries the inset. Two elements because a container cannot query
+ * itself: the width-dependent rules have to sit one level inside the element that is the
+ * container. Over the page the viewport also locks body scroll and — because the track is what
+ * owns the inset — publishes the on-screen keyboard's share of the viewport for the track's
+ * bottom padding to consume. See `keyboard-inset.ts`. Inline, it is a plain box that fills its host.
  */
 function Viewport({ size, inline, children }: { size: DialogSize; inline: boolean; children: React.ReactNode }) {
   React.useEffect(() => (inline ? undefined : acquireKeyboardInset()), [inline]);
@@ -321,10 +323,17 @@ function Viewport({ size, inline, children }: { size: DialogSize; inline: boolea
       lockScroll={!inline}
       {...mergeStyleProps(
         themeProps('dialog-viewport', { size, inline }),
-        stylex.props(reset.base, styles.viewport, viewportSizes[size], inline && styles.viewportInline),
+        stylex.props(reset.base, styles.viewport, viewportSizes[size]),
       )}
     >
-      {children}
+      <div
+        {...mergeStyleProps(
+          themeProps('dialog-track', { size, inline }),
+          stylex.props(reset.base, styles.track, trackSizes[size], inline && styles.trackInline),
+        )}
+      >
+        {children}
+      </div>
     </Primitive.Viewport>
   );
 }

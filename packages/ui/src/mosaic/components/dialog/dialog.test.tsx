@@ -45,16 +45,19 @@ describe('Mosaic Dialog', () => {
 
   it('renders the whole floating tree from the popup: backdrop, viewport and popup carry the slots', () => {
     render(
-      <Dialog.Root defaultOpen>
-        <Dialog.Popup>Body</Dialog.Popup>
-      </Dialog.Root>,
+      <div data-testid='host'>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>Body</Dialog.Popup>
+        </Dialog.Root>
+      </div>,
     );
 
     expect(document.querySelector('.cl-dialog-backdrop')).toBeInTheDocument();
     expect(document.querySelector('.cl-dialog-viewport')).toBeInTheDocument();
+    expect(document.querySelector('.cl-dialog-track')).toBeInTheDocument();
     expect(document.querySelector('.cl-dialog-popup')).toBeInTheDocument();
     // Portalled: the tree lands in the body, not where the root sits.
-    expect(document.querySelector('.cl-dialog-viewport')?.closest('[data-testid="host"]')).toBeNull();
+    expect(screen.getByTestId('host')).not.toContainElement(document.querySelector('.cl-dialog-viewport'));
   });
 
   it('defaults the popup to the prompt size and reflects it as data-size', () => {
@@ -575,12 +578,27 @@ describe('sizing container', () => {
   // container — drop that and every band silently stops matching, at every width.
   const probe = stylex.create({
     container: { containerName: 'cl-dialog', containerType: 'inline-size' },
+    // The phone-band side inset, one of the rules that queries the container.
+    phoneSides: { paddingInline: { default: space['4'], '@container cl-dialog (max-width: 47.99rem)': null } },
   });
 
   it('makes the viewport the named inline-size container the bands query', () => {
     renderSize('prompt');
 
     expect(classesOf('.cl-dialog-viewport')).toEqual(expect.arrayContaining(atomFor(probe.container)));
+  });
+
+  // An element is never its own query container. A band declared on the viewport would resolve
+  // against an OUTER dialog's container, or nothing — so every banded rule has to sit on the track
+  // inside it, and none may sit on the viewport.
+  it('keeps every banded rule inside the container, on the track', () => {
+    renderSize('prompt');
+
+    const viewport = document.querySelector('.cl-dialog-viewport')!;
+    const track = document.querySelector('.cl-dialog-track')!;
+    expect(viewport).toContainElement(track);
+    expect(Array.from(track.classList)).toEqual(expect.arrayContaining(atomFor(probe.phoneSides)));
+    expect(Array.from(viewport.classList)).not.toEqual(expect.arrayContaining(atomFor(probe.phoneSides)));
   });
 
   it('keeps the container inline, where the host width is what the bands should follow', () => {
@@ -658,7 +676,7 @@ describe('inline presentation', () => {
     const probe = stylex.create({ flush: { paddingInline: 0 } });
     renderSize('panel', true);
 
-    expect(classesOf('.cl-dialog-viewport')).toEqual(expect.arrayContaining(atomFor(probe.flush)));
+    expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.flush)));
   });
 
   it('renders no corner close button, and warns', () => {

@@ -103,17 +103,13 @@ export function DiscardChanges() {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
-  // Adding is the one close that must not be questioned. A ref rather than clearing `value`,
-  // because `when` runs before React has re-rendered and would still read the old state.
-  const bypassGuardRef = React.useRef(false);
 
   const onOpenChange = useConfirmedClose({
     handle: confirm,
-    when: () => !bypassGuardRef.current && value.trim() !== '',
+    when: () => value.trim() !== '',
     onOpenChange: next => {
       setOpen(next);
       if (!next) {
-        bypassGuardRef.current = false;
         setValue('');
       }
     },
@@ -139,13 +135,15 @@ export function DiscardChanges() {
         <Dialog.Description render={<Text />}>
           You will need to verify this address before it can be used.
         </Dialog.Description>
-        {/* A form, so Enter in the field is the primary action; Tab stays in visual order. */}
+        {/* A form, so Enter in the field is the primary action; Tab stays in visual order. Adding
+            is the one close that must not be questioned, so it goes straight to `setOpen`, past
+            the guard. */}
         <form
           style={{ display: 'contents' }}
           onSubmit={event => {
             event.preventDefault();
-            bypassGuardRef.current = true;
-            onOpenChange(false, { trigger: null, triggerId: null, event: undefined });
+            setValue('');
+            setOpen(false);
           }}
         >
           <Input
@@ -335,16 +333,17 @@ const editProfileTrigger = (props: RenderProps) => <Button {...props}>Edit profi
 export function StackedPrompts() {
   const confirm = React.useMemo(() => createConfirmHandle(), []);
   const [open, setOpen] = React.useState(false);
-  const [name, setName] = React.useState('Ada Lovelace');
+  const [savedName, setSavedName] = React.useState('Ada Lovelace');
+  const [name, setName] = React.useState(savedName);
   const nameRef = React.useRef<HTMLInputElement>(null);
 
   const onOpenChange = useConfirmedClose({
     handle: confirm,
-    when: () => name !== 'Ada Lovelace',
+    when: () => name !== savedName,
     onOpenChange: next => {
       setOpen(next);
       if (!next) {
-        setName('Ada Lovelace');
+        setName(savedName);
       }
     },
     confirm: {
@@ -372,6 +371,7 @@ export function StackedPrompts() {
           style={{ display: 'contents' }}
           onSubmit={event => {
             event.preventDefault();
+            setSavedName(name);
             setOpen(false);
           }}
         >
