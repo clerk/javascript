@@ -56,6 +56,7 @@ export const SecurityDirectorySyncSection = ({
     error: connectionsError,
   } = __internal_useOrganizationEnterpriseConnections();
   const connection = connections?.[0];
+  const hasSsoConnection = Boolean(connection);
   const {
     data: directory,
     isLoading: isLoadingDirectory,
@@ -112,15 +113,29 @@ export const SecurityDirectorySyncSection = ({
           gap={4}
         >
           <Description />
-          <Button
-            variant='bordered'
-            colorScheme='secondary'
-            size='sm'
-            onClick={onConfigure}
-            localizationKey={localizationKeys(
-              'organizationProfile.securityPage.directorySyncSection.primaryButton__startConfiguration',
+          <Flex
+            align='center'
+            gap={2}
+          >
+            <Button
+              variant='bordered'
+              colorScheme='secondary'
+              size='sm'
+              isDisabled={!hasSsoConnection}
+              onClick={onConfigure}
+              localizationKey={localizationKeys(
+                'organizationProfile.securityPage.directorySyncSection.primaryButton__startConfiguration',
+              )}
+            />
+            {!hasSsoConnection && (
+              <Badge
+                colorScheme='primary'
+                localizationKey={localizationKeys(
+                  'organizationProfile.securityPage.directorySyncSection.badge__ssoRequired',
+                )}
+              />
             )}
-          />
+          </Flex>
         </Col>
       ) : (
         <CardStateProvider>

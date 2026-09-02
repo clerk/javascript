@@ -9,8 +9,7 @@ import { Wizard, type WizardStepConfig } from '../ConfigureSSO/elements/Wizard';
 import { ConfigureDirectorySyncProvider, useConfigureDirectorySync } from './ConfigureDirectorySyncContext';
 import { ActivateDirectorySyncStep } from './steps/ActivateDirectorySyncStep';
 import { AttributeMappingStep } from './steps/AttributeMappingStep';
-import { ConnectionStep } from './steps/ConnectionStep';
-import { EndpointTokenStep } from './steps/EndpointTokenStep';
+import { ConfigureStep } from './steps/ConfigureStep';
 import { TestSyncStep } from './steps/TestSyncStep';
 
 export type ConfigureDirectorySyncWizardProps = {
@@ -37,8 +36,7 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'connection', label: 'Connection', isComplete: () => hasSsoConnection },
-      { id: 'endpoint', label: 'Endpoint', isReachable: () => hasSsoConnection && hasDirectory },
+      { id: 'configure', label: 'Configure', isComplete: () => hasSsoConnection && hasDirectory },
       { id: 'attributes', label: 'Attributes', isReachable: () => hasSsoConnection && hasDirectory },
       { id: 'test', label: 'Test', isReachable: () => hasSsoConnection && hasDirectory },
       {
@@ -58,22 +56,14 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
   return (
     <Wizard
       steps={steps}
-      initialStepId='connection'
+      initialStepId='configure'
     >
       <ConfigureSSOHeader title={title} />
 
-      <Wizard.Match id='connection'>
+      <Wizard.Match id='configure'>
         <CardStateProvider>
           <Step>
-            <ConnectionStep />
-          </Step>
-        </CardStateProvider>
-      </Wizard.Match>
-
-      <Wizard.Match id='endpoint'>
-        <CardStateProvider>
-          <Step>
-            <EndpointTokenStep />
+            <ConfigureStep />
           </Step>
         </CardStateProvider>
       </Wizard.Match>

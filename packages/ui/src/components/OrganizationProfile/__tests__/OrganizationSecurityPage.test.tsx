@@ -538,8 +538,25 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      expect(await screen.findByRole('button', { name: 'Set up Directory Sync' })).toBeInTheDocument();
+      const startButton = await screen.findByRole('button', { name: 'Start configuration' });
+      expect(startButton).toBeEnabled();
+      expect(screen.queryByText('SSO Required')).not.toBeInTheDocument();
       expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(1);
+    });
+
+    it('disables setup and flags SSO as required when no connection exists', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [], total_count: 0 } as any);
+
+      renderPage(wrapper);
+
+      expect(await screen.findByText('SSO Required')).toBeInTheDocument();
+      const startButtons = screen.getAllByRole('button', { name: 'Start configuration' });
+      expect(startButtons).toHaveLength(2);
+      expect(startButtons[0]).toBeEnabled();
+      expect(startButtons[1]).toBeDisabled();
+      expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
     });
 
     it('lists Edit and Deactivate for an active directory', async () => {
@@ -601,7 +618,7 @@ describe('OrganizationSecurityPage', () => {
       await userEvent.click(confirmButton);
 
       expect(activeDirectory.delete).toHaveBeenCalledWith();
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Set up Directory Sync' })).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument());
     });
 
     it('opens the Directory Sync wizard from Edit', async () => {
