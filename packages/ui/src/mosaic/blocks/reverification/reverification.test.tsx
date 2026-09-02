@@ -108,7 +108,7 @@ describe('Reverification', () => {
     expect(container.querySelector('.cl-card-root')).toBe(card);
     expect(container.querySelector('.cl-flow-root')).toBe(flow);
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Verification code')).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Verification code' })).toBeInTheDocument();
   });
 
   it('renders a passkey attempt error in a negative Banner', () => {
