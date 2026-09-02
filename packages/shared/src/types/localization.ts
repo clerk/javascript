@@ -1209,6 +1209,7 @@ export type __internal_LocalizationResource = {
       directorySyncSection: {
         title: LocalizationValue;
         badge__unconfigured: LocalizationValue;
+        badge__ssoRequired: LocalizationValue;
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         description: LocalizationValue;
