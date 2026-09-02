@@ -462,7 +462,14 @@ export const authenticateRequest: AuthenticateRequest = (async (
     /**
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
      */
-    if (authenticateContext.handshakeNonce || authenticateContext.handshakeToken) {
+    const hasHandshakeArtifacts = !!(authenticateContext.handshakeNonce || authenticateContext.handshakeToken);
+    // When resolution is limited to navigation requests, a stale handshake cookie on a fetch/XHR request must not trigger a
+    // (failing) payload exchange. Navigation requests still resolve so the redirect flow can complete.
+    const shouldResolveHandshake =
+      hasHandshakeArtifacts &&
+      (authenticateContext.__internal_resolveHandshakeOnlyForNavigation !== true ||
+        handshakeService.isRequestEligibleForHandshake());
+    if (shouldResolveHandshake) {
       try {
         return await handshakeService.resolveHandshake();
       } catch (error) {
