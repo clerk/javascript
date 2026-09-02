@@ -38,13 +38,10 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
+import { hasOnlyEnterpriseSSOFirstFactors, shouldHandOffToEnterpriseConnection } from './enterpriseSSOFactors';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
-import {
-  hasMultipleEnterpriseConnections,
-  SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
-  useHandleAuthenticateWithPasskey,
-} from './shared';
+import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -241,7 +238,7 @@ function SignInStartInternal(): JSX.Element {
         }
         switch (res.status) {
           case 'needs_first_factor': {
-            if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            if (!shouldHandOffToEnterpriseConnection(res)) {
               return navigate('factor-one');
             }
 
@@ -418,7 +415,7 @@ function SignInStartInternal(): JSX.Element {
           }
           break;
         case 'needs_first_factor': {
-          if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+          if (!shouldHandOffToEnterpriseConnection(res)) {
             if (options?.resetPasswordIntent) {
               return navigate('factor-one', {
                 searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
@@ -722,14 +719,6 @@ function SignInStartInternal(): JSX.Element {
     </Flow.Part>
   );
 }
-
-const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
-  if (!signIn.supportedFirstFactors?.length) {
-    return false;
-  }
-
-  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
-};
 
 const InstantPasswordRow = ({
   field,
