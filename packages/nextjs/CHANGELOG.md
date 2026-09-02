@@ -1,5 +1,18 @@
 # Change Log
 
+## 7.9.0
+
+### Minor Changes
+
+- Add an authenticated OAuth device verification component and workflow hook for approving or denying OAuth Device Authorization Grant requests. ([#9518](https://github.com/clerk/javascript/pull/9518)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/react@6.15.0
+  - @clerk/shared@4.31.0
+  - @clerk/backend@3.17.1
+
 ## 7.8.4
 
 ### Patch Changes
