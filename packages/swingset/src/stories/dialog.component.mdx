@@ -87,10 +87,25 @@ and `Dialog.Title` are only for a `prompt`.
   storyModule={DialogStories}
 />
 
+A `panel` composes the same way, with the user page in place of the card. The page names the
+dialog, carries the dismiss, scrolls its own content column, and collapses its own sidebar — the
+full example is under [A panel](#a-panel):
+
 ```tsx
-<Dialog.Popup size='panel'>
-  <UserPageView … />
-</Dialog.Popup>
+import { Button } from '@clerk/ui/mosaic/components/button';
+import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
+
+<Dialog.Root>
+  <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
+  <Dialog.Popup size='panel'>
+    <UserPageView
+      activePanel={activePanel}
+      panels={panels}
+      onPanelChange={setActivePanel}
+    />
+  </Dialog.Popup>
+</Dialog.Root>;
 ```
 
 ### Alert dialogs
