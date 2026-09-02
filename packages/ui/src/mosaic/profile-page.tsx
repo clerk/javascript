@@ -5,9 +5,10 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { ClerkLogo } from './components/clerk-logo';
+import { DialogContext } from './components/dialog';
 import { Icon } from './components/icon';
 import type { IconName } from './icons/registry';
-import { styles } from './profile-page.styles';
+import { contentScroll, mainScroll, styles } from './profile-page.styles';
 import type { MosaicComponentProps } from './props';
 import { mergeStyleProps, themeProps } from './props';
 import { focusOutline } from './utils/focus-outline.styles';
@@ -27,18 +28,33 @@ export interface ProfilePageRootProps extends Omit<MosaicComponentProps<'div'>, 
   children: React.ReactNode;
 }
 
+/**
+ * The page: a surface holding a sidebar and a content column. Doubles as the popup of a `panel`
+ * dialog — `<Dialog.Popup size='panel' render={<ProfilePage.Root />}>` — where the dialog
+ * positions it and this root paints it, the way a `card` dialog renders as a `Card`.
+ */
 const ProfilePageRoot = React.forwardRef<HTMLDivElement, ProfilePageRootProps>(function ProfilePageRoot(
   { value, onValueChange, orientation = 'vertical', activationMode, children, render, className, style, ...rest },
   ref,
 ) {
+  const dialog = React.useContext(DialogContext);
   const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('profile-page'), stylex.props(styles.root), className, style),
+      ...mergeStyleProps(
+        themeProps('profile-page'),
+        stylex.props(reset.base, styles.root, dialog !== null && styles.rootInDialog),
+        className,
+        style,
+      ),
       ...rest,
-      children,
+      children: (
+        <div {...mergeStyleProps(themeProps('profile-page-layout'), stylex.props(reset.base, styles.layout))}>
+          {children}
+        </div>
+      ),
     },
   });
 
@@ -137,10 +153,20 @@ const ProfilePageContent = React.forwardRef<HTMLElement, ProfilePageContentProps
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('profile-page-main'), stylex.props(reset.base, styles.main), className, style),
+      ...mergeStyleProps(
+        themeProps('profile-page-main'),
+        stylex.props(reset.base, styles.main, mainScroll),
+        className,
+        style,
+      ),
       ...rest,
       children: (
-        <div {...mergeStyleProps(themeProps('profile-page-content'), stylex.props(reset.base, styles.content))}>
+        <div
+          {...mergeStyleProps(
+            themeProps('profile-page-content'),
+            stylex.props(reset.base, styles.content, ...contentScroll),
+          )}
+        >
           {children}
         </div>
       ),

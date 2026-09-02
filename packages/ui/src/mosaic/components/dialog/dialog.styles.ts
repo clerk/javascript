@@ -299,11 +299,9 @@ export const closeInsets = stylex.create({
  * `card` sets only `max-width`; the popup is `width: 100%` and its height is whatever the
  * content needs, which is right for a confirmation or a two-field form.
  *
- * `panel` decides both axes. Its content NAVIGATES — a settings surface switches sections
- * in place — and a content-driven height would resize the window on every section change,
- * in both directions at once since the viewport centres it. `94rem` is 1504px at the
- * default root size; both axes stay in `rem`/`dvh` so a consumer scaling type scales with
- * them. `dvh` rather than `vh` for mobile browser chrome.
+ * `panel` fixes the height. Its content NAVIGATES — a settings surface switches sections in
+ * place — and a content-driven height would resize the window on every section change, in both
+ * directions at once since the viewport centres it. Its width is the surface's own.
  */
 /**
  * How the viewport behaves when the popup is taller than the screen — the "inside scroll" vs
@@ -413,47 +411,43 @@ export const sizes = stylex.create({
     boxShadow: null,
     maxWidth: '25rem',
   },
+  /**
+   * Like `card`, the panel does NOT paint itself. It is the account-profile and settings surface,
+   * which is a `ProfilePage` — so the frame comes from `ProfilePage.Root`'s own styles and the
+   * popup contributes geometry and motion only. Compose it by rendering the popup AS the page:
+   *
+   *   <Dialog.Popup size='panel' render={<UserPageView … />}>
+   *
+   * That is also what makes `inline` a non-event for the surface: modal or in a page slot, the
+   * page paints itself the same way, and the dialog only decides where it sits. The `null`s
+   * remove the popup's own atoms outright — see the note on `card` — so `ProfilePage`'s apply
+   * unopposed. The width cap is the surface's too, since a page knows its own reading width.
+   *
+   * Consequence worth knowing: `size="panel"` with no surface inside renders an unpainted box.
+   */
   panel: {
-    // No padding, unlike `card`. A panel's regions reach the popup's edges: a scroll region sits
-    // flush, so its scrollbar and edge fade land on the true edge rather than floating in a
-    // margin, and a sidebar can run the full height. Padding belongs to the children, which is
-    // the same trade `overflow: hidden` makes — the panel supplies the frame, the composition
-    // supplies the anatomy.
-    padding: space['0'],
+    padding: null,
+    borderColor: null,
+    borderRadius: null,
+    borderStyle: null,
+    borderWidth: null,
+    gap: null,
     // The panel does NOT scroll itself, and that is the whole design. A fixed-height surface
     // needs somewhere for overflow to go, but putting the scroll on the POPUP takes everything
-    // anchored to it along for the ride — the close button most obviously, and anything else a
-    // consumer positions against the corner.
-    //
-    // So the popup clips, and the scroll region is composed INSIDE it out of `scrollAreaRoot` /
-    // `scrollAreaViewport()`. That also buys the sidebar case for free: a fixed rail beside a
-    // scrolling column is just a flex row, where a Header/Body/Footer anatomy would have had to
-    // grow a second axis to express it. `overscroll-behavior` comes with the ScrollArea viewport,
-    // so it is not restated here.
+    // anchored to it along for the ride — the close button most obviously. So the popup clips,
+    // and the scroll region is the surface's own: `ProfilePage` scrolls its content column.
     //
     // `clip` rather than `hidden` for the same reason as the viewport: `hidden` would make the
     // panel a scroll container, and focusing anything inside it that sits outside its box would
-    // scroll the panel itself. The panel must never scroll — that is the composed region's job.
+    // scroll the panel itself.
     overflow: 'clip',
     // Fills the viewport's content box rather than computing a height from `dvh`. The grid row
-    // already stretches to the container (`place-items` sets `align-items`, not `align-content`,
-    // so the row keeps its default stretch), and that box is by definition "the viewport minus the
-    // inset on every side" — so `stretch` lands the panel's edges on exactly the same lines a
-    // bottom-anchored `prompt` sheet reaches with `align-self: end`.
-    //
-    // Deriving the height from `100dvh` let the two disagree: `dvh` is measured against the visual
-    // viewport while the grid box is 100% of the overlay, and wherever those differ — mobile
-    // browser chrome most obviously — the panel overhung the box and sat lower than the sheet.
-    // Stretching removes the arithmetic, and with it the class of bug.
-    // Fills the viewport's content box exactly, and clamps to it. Both follow from the row being
-    // definite (see `styles.viewport`) — without that a grid auto-row grows to its content, and
-    // `stretch` faithfully filled 2144px in an 800px viewport, so the composed scroll region never
-    // engaged. With it, the panel's edges land on the same lines a bottom-anchored sheet reaches
-    // and its overflow has somewhere to go.
+    // is definite (see `styles.viewport`), so `stretch` lands the panel's edges on exactly the
+    // lines a bottom-anchored `prompt` sheet reaches with `align-self: end`, and clamps to them.
     alignSelf: 'stretch',
-    // No `vw` term: the popup is `width: 100%` inside the viewport's padding, so the inset is
-    // already subtracted. This only caps how wide the panel may get — 1504px at the default root.
-    maxWidth: '94rem',
+    backgroundColor: null,
+    boxShadow: null,
+    maxWidth: null,
   },
 });
 

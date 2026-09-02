@@ -25,6 +25,11 @@ export interface UserPageViewProps extends Omit<ProfilePageRootProps, 'children'
   panels: UserPagePanels;
   onPanelChange: (panel: UserProfilePanelId) => void;
   renderBranding?: boolean;
+  /**
+   * Rendered after the panels. When the page is the popup of a dialog, this is where the dialog's
+   * parts land — its `CloseButton`, and any prompt it opens.
+   */
+  children?: React.ReactNode;
 }
 
 function getAvailablePanels(panels: UserPagePanels): UserProfilePanelId[] {
@@ -62,7 +67,7 @@ function Panel({ panel, panels }: { panel: UserProfilePanelId; panels: UserPageP
 }
 
 export const UserPageView = React.forwardRef<HTMLDivElement, UserPageViewProps>(function UserPageView(
-  { activePanel, panels, onPanelChange, renderBranding = true, render, className, style, ...rest },
+  { activePanel, panels, onPanelChange, renderBranding = true, children, render, className, style, ...rest },
   ref,
 ) {
   const availablePanels = getAvailablePanels(panels);
@@ -101,6 +106,7 @@ export const UserPageView = React.forwardRef<HTMLDivElement, UserPageViewProps>(
           </ProfilePage.Panel>
         ))}
       </ProfilePage.Content>
+      {children}
     </ProfilePage.Root>
   );
 });

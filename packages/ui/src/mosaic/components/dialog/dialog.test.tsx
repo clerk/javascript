@@ -5,7 +5,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../props';
-import { space } from '../../tokens.stylex';
+import { colorVars, radiusVars, space } from '../../tokens.stylex';
 import type { DialogSize } from './dialog';
 import { Dialog } from './dialog';
 
@@ -494,22 +494,48 @@ describe('popup padding', () => {
     expect(prompt).not.toEqual(expect.arrayContaining(atomFor(probe.six)));
   });
 
-  it('leaves a panel unpadded so its children can sit flush with the edge', () => {
-    const panel = popupClassesFor('panel');
-
-    expect(panel).toEqual(expect.arrayContaining(atomFor(probe.zero)));
-    expect(panel).not.toEqual(expect.arrayContaining(atomFor(probe.six)));
-  });
-
-  // A `card` takes its padding from the `Card` rendered as the popup, so the popup must emit NO
-  // padding atom at all — a competing value would put two atoms for the same property on the
-  // element, and StyleX cannot dedupe across the two `stylex.props` calls involved.
-  it('emits no padding at all for a card, deferring to the Card surface', () => {
-    const card = popupClassesFor('card');
+  // A `card` takes its padding from the `Card` rendered as the popup, and a `panel` from the
+  // `ProfilePage`, so the popup must emit NO padding atom at all — a competing value would put
+  // two atoms for the same property on the element, and StyleX cannot dedupe across the two
+  // `stylex.props` calls involved.
+  it.each(['card', 'panel'] as const)('emits no padding at all for a %s, deferring to its surface', size => {
+    const classes = popupClassesFor(size);
 
     for (const value of [probe.zero, probe.four, probe.six]) {
-      expect(card).not.toEqual(expect.arrayContaining(atomFor(value)));
+      expect(classes).not.toEqual(expect.arrayContaining(atomFor(value)));
     }
+  });
+});
+
+describe('popup surface', () => {
+  // `card` and `panel` are painted by what renders as the popup, so the popup itself must emit
+  // no paint of its own — the same cross-call dedupe problem as the padding above. StyleX names
+  // an atom from its property and value, so a probe with the popup's own values yields the very
+  // atoms `styles.popup` declares.
+  const probe = stylex.create({
+    background: { backgroundColor: colorVars['--cl-color-card'] },
+    radius: { borderRadius: radiusVars['--cl-radius-xl'] },
+  });
+
+  it('paints a prompt itself', () => {
+    renderSize('prompt');
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.background)));
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.radius)));
+  });
+
+  it.each(['card', 'panel'] as const)('emits no background for a %s, deferring to its surface', size => {
+    renderSize(size);
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.background)));
+  });
+
+  // A card keeps the popup's radius for the scale's counter-correction; a panel does not scale,
+  // so it has no reason to claim one over the page's own.
+  it('leaves the radius to the page for a panel', () => {
+    renderSize('panel');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.radius)));
   });
 });
 

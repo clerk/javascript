@@ -1,7 +1,9 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Dialog } from '../../components/dialog';
 import { MosaicProvider } from '../../MosaicProvider';
 import type { UserPageViewProps } from '../user-page.view';
 import { UserPageView } from '../user-page.view';
@@ -122,5 +124,80 @@ describe('UserPageView', () => {
     renderView({ renderBranding: false });
 
     expect(screen.queryByText('Secured by')).not.toBeInTheDocument();
+  });
+
+  // The compact layout is a container query against the page itself, so the page has to BE a
+  // container — drop that and it never collapses, at any width.
+  it('is the named container its compact layout queries', () => {
+    const probe = stylex.create({ container: { containerName: 'cl-profile-page', containerType: 'inline-size' } });
+    const atoms = stylex
+      .props(probe.container)
+      .className!.split(' ')
+      .filter(name => !name.includes('__'));
+    const { container } = renderView();
+
+    expect(Array.from((container.firstChild as HTMLElement).classList)).toEqual(expect.arrayContaining(atoms));
+  });
+
+  // The shape the account profile takes as a modal: the page IS the popup, and the dialog's own
+  // parts land inside it through `children`.
+  it('renders as the popup of a panel dialog, with the dialog parts inside it', () => {
+    render(
+      <MosaicProvider>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup
+            size='panel'
+            aria-label='Account'
+            render={
+              <UserPageView
+                activePanel='account'
+                panels={panels}
+                onPanelChange={vi.fn()}
+              />
+            }
+          >
+            <Dialog.CloseButton />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+
+    const popup = screen.getByRole('dialog', { name: 'Account' });
+    expect(popup).toHaveClass('cl-profile-page', 'cl-dialog-popup');
+    expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
+    expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+  });
+
+  it('drops its standalone minimum height inside a dialog, where the popup decides', () => {
+    const probe = stylex.create({ floor: { minHeight: '37.5rem' } });
+    const atoms = stylex
+      .props(probe.floor)
+      .className!.split(' ')
+      .filter(name => !name.includes('__'));
+
+    const standalone = renderView();
+    expect(Array.from((standalone.container.firstChild as HTMLElement).classList)).toEqual(
+      expect.arrayContaining(atoms),
+    );
+    standalone.unmount();
+
+    render(
+      <MosaicProvider>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup
+            size='panel'
+            aria-label='Account'
+            render={
+              <UserPageView
+                activePanel='account'
+                panels={panels}
+                onPanelChange={vi.fn()}
+              />
+            }
+          />
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+    expect(Array.from(screen.getByRole('dialog').classList)).not.toEqual(expect.arrayContaining(atoms));
   });
 });

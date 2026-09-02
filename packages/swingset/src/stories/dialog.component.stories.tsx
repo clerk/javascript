@@ -1,4 +1,3 @@
-import { Tabs } from '@clerk/headless/tabs';
 import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Card } from '@clerk/ui/mosaic/components/card';
@@ -6,15 +5,8 @@ import type { DialogSize } from '@clerk/ui/mosaic/components/dialog';
 import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/ui/mosaic/components/dialog';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
 import { Input } from '@clerk/ui/mosaic/components/input';
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
 import { Text } from '@clerk/ui/mosaic/components/text';
-import { ProfilePage } from '@clerk/ui/mosaic/profile-page';
 import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
-import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
-import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
-import type { UserProfilePanelId } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
-import { UserProfileSidebar } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
-import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -259,54 +251,45 @@ function AddEmailDialog({
 }
 
 /**
- * The real user page — sidebar plus the account and security panels — as the content of a `panel`
- * dialog. The popup supplies the frame, so the page's own border is dropped; the popup clips, so
- * the page scrolls inside it. Adding an email opens a `prompt` over the panel, and the danger
- * zone's delete confirmation is the page's own.
+ * The real user page as the popup of a `panel` dialog. The dialog positions it and the page
+ * paints itself — the same composition as a `card` rendering as a `Card` — so the page scrolls
+ * its own content column and collapses its own sidebar. The dialog's parts go in as children.
+ * Adding an email opens a `prompt` over the panel; the danger zone's delete confirmation is the
+ * page's own.
  */
-function AccountPage() {
+function AccountPage({ inline = false }: { inline?: boolean }) {
   const [addEmailOpen, setAddEmailOpen] = React.useState(false);
   const { activePanel, setActivePanel, panels, addEmail } = useUserPageFixture({
     onAddEmail: () => setAddEmailOpen(true),
   });
   return (
-    <>
-      <div
-        {...stylex.props(scrollAreaRoot)}
-        style={{ flex: 1, minHeight: 0 }}
-      >
-        <div {...stylex.props(...scrollAreaViewport())}>
+    <Dialog.Root inline={inline}>
+      {inline ? null : <Dialog.Trigger render={accountTrigger} />}
+      <Dialog.Popup
+        size='panel'
+        aria-label='Account'
+        render={
           <UserPageView
             activePanel={activePanel}
             panels={panels}
             onPanelChange={setActivePanel}
-            style={{ border: 0, borderRadius: 0, maxWidth: 'none', minHeight: '100%' }}
           />
-        </div>
-      </div>
-      <AddEmailDialog
-        open={addEmailOpen}
-        onOpenChange={setAddEmailOpen}
-        onAdd={addEmail}
-      />
-    </>
+        }
+      >
+        {inline ? null : <Dialog.CloseButton />}
+        <AddEmailDialog
+          open={addEmailOpen}
+          onOpenChange={setAddEmailOpen}
+          onAdd={addEmail}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
   );
 }
 
 /** The user page in a `panel`, with `prompt` dialogs opened from inside it. */
 export function Nested() {
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger render={accountTrigger} />
-      <Dialog.Popup
-        size='panel'
-        aria-label='Account'
-      >
-        <Dialog.CloseButton />
-        <AccountPage />
-      </Dialog.Popup>
-    </Dialog.Root>
-  );
+  return <AccountPage />;
 }
 
 /**
@@ -314,9 +297,9 @@ export function Nested() {
  * there is no portal, scrim, scroll lock or focus trap, and nothing dismisses it. The prompts it
  * opens are still modal over the whole page.
  *
- * The host is resizable. The dialog's width bands are container queries against its own viewport
- * element, so dragging the host below `48rem` gives the panel its phone-band inset without the
- * browser window moving — the same rule that makes a modal dialog respond to the window.
+ * The host is resizable. The page's compact layout is a container query against the page itself,
+ * and the dialog's inset is one against its viewport, so dragging the host below `48rem`
+ * collapses the sidebar without the browser window moving.
  */
 export function Inline() {
   return (
@@ -332,19 +315,10 @@ export function Inline() {
         width: '52rem',
       }}
     >
-      <Dialog.Root inline>
-        <Dialog.Popup
-          size='panel'
-          aria-label='Account'
-        >
-          <AccountPage />
-        </Dialog.Popup>
-      </Dialog.Root>
+      <AccountPage inline />
     </div>
   );
 }
-
-const settingsTrigger = (props: RenderProps) => <Button {...props}>Open settings</Button>;
 
 const editProfileTrigger = (props: RenderProps) => <Button {...props}>Edit profile</Button>;
 
@@ -410,64 +384,6 @@ export function StackedPrompts() {
           handle={confirm}
           finalFocus={nameRef}
         />
-      </Dialog.Popup>
-    </Dialog.Root>
-  );
-}
-
-const PANELS: readonly UserProfilePanelId[] = ['account', 'security'];
-
-/** The panel clips rather than scrolling, so the scroll region is composed inside it. */
-export function PanelSidebar() {
-  const { activePanel, setActivePanel, panels } = useUserPageFixture();
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger render={settingsTrigger} />
-      <Dialog.Popup
-        size='panel'
-        aria-label='Account'
-      >
-        <Dialog.CloseButton />
-        {/* The sidebar's tabs and the panels share this context; `ProfilePage.Root` would supply
-            it too, but its grid gives the content column no height to scroll within. */}
-        <Tabs.Root
-          value={activePanel}
-          onValueChange={value => setActivePanel(value as UserProfilePanelId)}
-          orientation='vertical'
-        >
-          <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-            {/* The rail has nowhere to go on a phone. Queried against the dialog's own `cl-dialog`
-                container rather than the window, so it follows the surface it sits in — `@3xl` is
-                Tailwind's 48rem, the dialog's phone band. On a wrapper, because the sidebar's own
-                StyleX `display` outranks a Tailwind utility. */}
-            <div
-              className='@3xl/cl-dialog:flex hidden'
-              style={{ flex: 'none', width: '14rem' }}
-            >
-              <UserProfileSidebar
-                panels={PANELS}
-                style={{ flex: 1 }}
-              />
-            </div>
-
-            {/* Flush with the popup edge, so the scrollbar and edge fade land on the true edge. */}
-            <div
-              {...stylex.props(scrollAreaRoot)}
-              style={{ flex: 1, minWidth: 0 }}
-            >
-              <div {...stylex.props(...scrollAreaViewport())}>
-                <div style={{ padding: '2.5rem' }}>
-                  <ProfilePage.Panel value='account'>
-                    <UserProfileProfilePanelView {...panels.account} />
-                  </ProfilePage.Panel>
-                  <ProfilePage.Panel value='security'>
-                    <UserProfileSecurityPanelView {...panels.security} />
-                  </ProfilePage.Panel>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Tabs.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );

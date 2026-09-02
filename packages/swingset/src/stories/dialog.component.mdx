@@ -68,20 +68,30 @@ committing. Your own `setOpen(false)` skips that; use `Dialog.Close` when a clos
 
 ### Size
 
-| Value    | Width                           | For                                                   |
-| -------- | ------------------------------- | ----------------------------------------------------- |
-| `prompt` | `23.75rem`, height from content | One question or one field (default)                   |
-| `card`   | `25rem`, height from content    | Sign-in / sign-up                                     |
-| `panel`  | `94rem`, fills the viewport     | Account profile and settings — a surface you navigate |
+| Value    | Width                                    | For                                                   |
+| -------- | ---------------------------------------- | ----------------------------------------------------- |
+| `prompt` | `23.75rem`, height from content          | One question or one field (default)                   |
+| `card`   | `25rem`, height from content             | Sign-in / sign-up                                     |
+| `panel`  | Width from its surface, fills the height | Account profile and settings — a surface you navigate |
 
-### A card brings its own surface
+### `card` and `panel` bring their own surface
 
-`card` paints nothing itself; render the popup **as** a `Card` so one element paints and animates:
+Only `prompt` paints itself. A `card` renders **as** a `Card`, and a `panel` **as** a `ProfilePage`
+(or `UserPageView`): the dialog positions and animates the popup, the surface paints it, and the
+dialog's own parts go in as children. Use `Card.Title` / `Card.Description` inside a card — they
+name the dialog through `DialogContext`, and `Card.Header` carries the dismiss, so no
+`Dialog.CloseButton` is needed there.
 
 <Story
   name='CardSurface'
   storyModule={DialogStories}
 />
+
+```tsx
+<Dialog.Popup size='panel' render={<UserPageView … />}>
+  <Dialog.CloseButton />
+</Dialog.Popup>
+```
 
 ### Alert dialogs
 
@@ -153,7 +163,8 @@ scroll lock or focus trap, and nothing dismisses it. For the account panel mount
 
 - `open`, `modal`, `closedBy` are implied; `onOpenChange` is never called.
 - No initial focus on mount. `Dialog.CloseButton` renders nothing; `Card.Header` carries no dismiss.
-- Fills the host edge to edge, keeping its ring, radius and shadow.
+- Fills the host edge to edge. How the surface looks there is the surface's call — the page
+  paints the same frame modal or inline.
 - Dialogs opened from inside it are normal modal dialogs over the page.
 
 ### Responsive behaviour
@@ -168,8 +179,8 @@ The gap to the screen edge is a fixed inset, not a percentage:
 
 The bands are **container queries** against the dialog's viewport element (named `cl-dialog`), not
 media queries. For a modal dialog that is the window, so nothing differs; for an `inline` dialog the
-bands follow the host's width. Content inside a dialog can query the same container — the panel
-sidebar example hides its rail with `@3xl/cl-dialog:flex`.
+bands follow the host's width. `ProfilePage` does the same against its own width (`cl-profile-page`),
+which is what collapses its sidebar inside a narrow host.
 
 Below `48rem` a `prompt` becomes a bottom sheet: it pins to the bottom, slides up, and lifts its
 width cap. `card` and `panel` are unchanged. Under `prefers-reduced-motion: reduce` only the fade
@@ -285,28 +296,13 @@ The dialog that opens should always be a `prompt`; anything else warns in dev.
 
 ### Scrolling a panel
 
-A `panel` clips rather than scrolls; compose the scroll region inside it with the `ScrollArea`
-atoms. The panel has no padding of its own — put it on the content.
+A `panel` clips rather than scrolls, and its surface owns the scroll: `ProfilePage` scrolls its
+content column and keeps the sidebar put. Nothing to compose — render the page as the popup.
 
 <Story
-  name='PanelSidebar'
+  name='Nested'
   storyModule={DialogStories}
 />
-
-```tsx
-<Dialog.Popup size='panel'>
-  <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-    <UserProfileSidebar panels={panels} className='hidden @3xl/cl-dialog:flex' />
-
-    <div {...stylex.props(scrollAreaRoot)} style={{ flex: 1, minWidth: 0 }}>
-      <div {...stylex.props(...scrollAreaViewport())}>…</div>
-    </div>
-  </div>
-</Dialog.Popup>
-```
-
-`min-height: 0` on the flex row is required, or the row grows past the panel and never scrolls.
-The rail hides below `48rem` of the dialog's own `cl-dialog` container, not the window.
 
 ### Scrolling a tall card
 
@@ -321,13 +317,8 @@ surface on a phone.)
 
 ### Nested dialogs
 
-A `panel` with `prompt` dialogs opened from inside it. Type into **Add email address** and try to
-close it to see a confirmation stack on top.
-
-<Story
-  name='Nested'
-  storyModule={DialogStories}
-/>
+In the panel above, add an email address, type into the field and try to close it: the prompt
+opens over the panel, and a confirmation stacks on the prompt. The same stack on its own:
 
 <Story
   name='StackedPrompts'
