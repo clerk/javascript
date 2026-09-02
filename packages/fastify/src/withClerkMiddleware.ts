@@ -11,7 +11,6 @@ import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
 
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
   const { hookName: _hookName, frontendApiProxy, __internal_enableHandshake, ...clerkOptions } = options;
-  const enableHandshake = __internal_enableHandshake ?? true;
   const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
   const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
   const secretKey = options.secretKey || constants.SECRET_KEY;
@@ -109,7 +108,7 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       publishableKey,
       proxyUrl: resolvedProxyUrl,
       acceptsToken: 'any',
-      __internal_resolveHandshakeOnlyForNavigation: !enableHandshake,
+      __internal_resolveHandshakeOnlyForNavigation: __internal_enableHandshake === false,
     });
 
     requestState.headers.forEach((value, key) => reply.header(key, value));

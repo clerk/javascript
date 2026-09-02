@@ -4,9 +4,9 @@ import Fastify from 'fastify';
 import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 
 import { clerkPlugin } from '../index';
+import type { ClerkFastifyOptions } from '../types';
 
-// End-to-end through the real @clerk/backend. A local Fastify instance stands in for the
-// Backend API so the tests can observe whether a handshake payload exchange happens.
+// Runs the real @clerk/backend against a local stand-in for the Backend API.
 const PK_LIVE = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 
@@ -33,7 +33,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const buildApp = async (pluginOptions: Record<string, unknown>) => {
+const buildApp = async (pluginOptions: Partial<ClerkFastifyOptions>) => {
   vi.spyOn(console, 'error').mockImplementation(() => {});
   const app = Fastify();
   await app.register(clerkPlugin, { apiUrl, ...pluginOptions });
