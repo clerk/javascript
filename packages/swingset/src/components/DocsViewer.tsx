@@ -97,7 +97,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
   const DocContent = docModules[group]?.[slug];
   if (!DocContent) {
     return (
-      <div className='text-muted-foreground p-8 text-sm'>
+      <div className='text-muted-foreground p-3 text-sm sm:p-8'>
         No docs found for &quot;{group}/{slug}&quot;.
       </div>
     );
@@ -110,10 +110,10 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose relative mx-auto w-full min-w-0 p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose relative mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
         {meta?.source ? (
-          <div className='absolute right-8 top-8'>
+          <div className='absolute right-3 top-3 sm:right-8 sm:top-8'>
             <ViewSource source={meta.source} />
           </div>
         ) : null}
