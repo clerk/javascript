@@ -28,7 +28,7 @@ function FlowRoot<State>(
 ): JSX.Element {
   return (
     <HeadlessFlow.Root
-      {...mergeStyleProps(themeProps('flow-root', { value }), stylex.props(reset.base), className, style)}
+      {...mergeStyleProps(themeProps('flow-root', { value }), stylex.props(reset.base, styles.root), className, style)}
       {...rest}
       ref={ref}
       render={render}

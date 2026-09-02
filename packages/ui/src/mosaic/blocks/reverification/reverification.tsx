@@ -16,8 +16,10 @@ import { ReverificationPassword } from './reverification-password';
 
 export type ReverificationStatus = 'password' | 'passkey' | 'otp' | 'backup-code' | 'method-picker' | 'help';
 
-export interface ReverificationState {
+/** Controlled rendering model produced by a reverification controller. */
+export interface ReverificationModel {
   status: ReverificationStatus;
+  direction: FlowDirection;
   password: ReverificationPasswordProps;
   passkey: ReverificationPasskeyProps;
   otp: ReverificationOTPProps;
@@ -26,46 +28,44 @@ export interface ReverificationState {
   help: ReverificationHelpProps;
 }
 
-export interface ReverificationProps {
-  state: ReverificationState;
-  direction?: FlowDirection;
-}
+export type ReverificationProps = ReverificationModel;
 
-export function Reverification({ state, direction }: ReverificationProps): JSX.Element {
+export function Reverification(model: ReverificationProps): JSX.Element {
   return (
-    <Flow.Root
-      render={<Card.Root />}
-      value={state.status}
-      direction={direction}
-      state={state}
-    >
-      {current => (
-        <>
-          <Flow.Step ids={['password']}>
-            <ReverificationPassword {...current.password} />
-          </Flow.Step>
+    <Card.Root renderBranding={false}>
+      <Flow.Root
+        value={model.status}
+        direction={model.direction}
+        state={model}
+      >
+        {current => (
+          <>
+            <Flow.Step ids={['password']}>
+              <ReverificationPassword {...current.password} />
+            </Flow.Step>
 
-          <Flow.Step ids={['passkey']}>
-            <ReverificationPasskey {...current.passkey} />
-          </Flow.Step>
+            <Flow.Step ids={['passkey']}>
+              <ReverificationPasskey {...current.passkey} />
+            </Flow.Step>
 
-          <Flow.Step ids={['otp']}>
-            <ReverificationOTP {...current.otp} />
-          </Flow.Step>
+            <Flow.Step ids={['otp']}>
+              <ReverificationOTP {...current.otp} />
+            </Flow.Step>
 
-          <Flow.Step ids={['backup-code']}>
-            <ReverificationBackupCode {...current.backupCode} />
-          </Flow.Step>
+            <Flow.Step ids={['backup-code']}>
+              <ReverificationBackupCode {...current.backupCode} />
+            </Flow.Step>
 
-          <Flow.Step ids={['method-picker']}>
-            <ReverificationMethodPicker {...current.methodPicker} />
-          </Flow.Step>
+            <Flow.Step ids={['method-picker']}>
+              <ReverificationMethodPicker {...current.methodPicker} />
+            </Flow.Step>
 
-          <Flow.Step ids={['help']}>
-            <ReverificationHelp {...current.help} />
-          </Flow.Step>
-        </>
-      )}
-    </Flow.Root>
+            <Flow.Step ids={['help']}>
+              <ReverificationHelp {...current.help} />
+            </Flow.Step>
+          </>
+        )}
+      </Flow.Root>
+    </Card.Root>
   );
 }
