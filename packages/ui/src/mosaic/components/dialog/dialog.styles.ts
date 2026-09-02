@@ -221,7 +221,7 @@ export const styles = stylex.create({
     width: '100%',
     '::after': {
       inset: 0,
-      // Follows the popup's own radius, counter-scale included.
+      // Follows the popup's own radius.
       borderRadius: 'inherit',
       backgroundColor: colorVars['--cl-color-card'],
       content: '""',
@@ -392,9 +392,7 @@ export const sizes = stylex.create({
   //
   // The card reads `DialogContext` from there: `Card.Title` names the dialog and `Card.Header`
   // carries its dismiss, so the surface stays self-contained. The popup is then a transparent
-  // box that scales; the card's painted corners take that scale without the radius correction
-  // `popupMotion.card` applies to the popup itself — under a pixel for the length of the
-  // entrance, and accepted for the simpler composition.
+  // box that scales, and the card's painted corners scale with it — see `ENTER_SCALE`.
   //
   // These are `null` rather than `transparent` / `none` / `0`. Within one `stylex.props` call a
   // later `null` REMOVES the earlier atom, so the popup emits no class for these properties at
@@ -405,6 +403,7 @@ export const sizes = stylex.create({
   // Consequence worth knowing: `size="card"` with no `Card` inside renders an unpainted box.
   card: {
     padding: null,
+    borderRadius: null,
     gap: null,
     backgroundColor: null,
     boxShadow: null,
@@ -528,17 +527,6 @@ export const backdropMotion = stylex.create({
   },
 });
 
-// The entering/exiting scale, and the radius that survives it. `transform: scale()` scales the
-// RENDERED border-radius along with everything else, so a popup at 0.94 draws its corners at 94%
-// of their value and the roundness drifts over the transition. Dividing the radius by the same
-// factor cancels it exactly: `r/s` drawn at scale `s` renders as `r`.
-//
-// One same-file const feeds both, so the correction cannot drift from the scale it corrects. At
-// 0.94 it is worth about 0.77px on a 12px radius — well above the threshold it sat at when the
-// scale was 0.98 (0.24px), so this is now load-bearing rather than merely principled.
-//
-// Only the endpoints are exact. Both properties interpolate on the same curve over the same
-// duration, so the mid-transition error is second-order and stays well under a pixel.
 // The plain CSS `ease-out` — `cubic-bezier(0, 0, 0.58, 1)` — used ONLY for the sheet's slide out.
 //
 // `--cl-ease-exit` (In Quad) is right for a small delta: over ~11px its slow start is imperceptible
@@ -552,16 +540,23 @@ export const backdropMotion = stylex.create({
 // other in Mosaic. If a second large-travel exit appears, it should graduate to one.
 const SHEET_EXIT_EASE = 'ease-out';
 
+// The entering/exiting scale. `transform: scale()` scales the RENDERED border-radius along with
+// everything else, so a surface at 0.94 draws its corners at 94% of their value for the length of
+// the transition — about 0.77px on a 12px radius. An earlier version cancelled that by dividing
+// the popup's radius by the same factor, which only reaches corners the POPUP paints: since a
+// `card` and a `panel` are painted by the surface inside, the correction had stopped reaching the
+// corners that matter and was dropped rather than pushed into every surface's API. If it comes
+// back, it should come back self-contained — the popup publishing its current scale as a custom
+// property a surface can read to counter its own radius — not as a composition rule.
 const ENTER_SCALE = 0.94;
 
-// How far a prompt recedes while another prompt is stacked on it, and the radius that survives
-// that scale — the same `r/s` correction `ENTER_SCALE` documents above, for the same reason.
+// How far a prompt recedes while another prompt is stacked on it.
 //
 // Shallower than the entrance scale on purpose: the entrance is a surface arriving from nowhere,
 // while this is a surface that stays legible the whole time and only has to read as further back.
-// The lift (`STACK_LIFT`, at the top of this file) is what separates it from the entrance rather
-// than the depth of the scale — a surface that only shrinks reads as being pushed away, one that
-// shrinks and rises reads as being layered over, which is the relationship this actually is.
+// The lift (`STACK_LIFT`) is what separates it from the entrance rather than the depth of the
+// scale — a surface that only shrinks reads as being pushed away, one that shrinks and rises reads
+// as being layered over, which is the relationship this actually is.
 //
 // A single step rather than a `--cl-stack-index` formula: the headless layer counts DIRECT
 // children, so a third level would report the same 1 as the second and every level below the top
@@ -569,8 +564,6 @@ const ENTER_SCALE = 0.94;
 // whenever a stack deep enough to need them turns up.
 const STACK_SCALE = 0.96;
 const STACK_LIFT = '-0.5rem';
-
-const popupRadius = radiusVars['--cl-radius-xl'];
 
 export const popupMotion = stylex.create({
   /**
@@ -581,27 +574,6 @@ export const popupMotion = stylex.create({
    * Each cell is therefore self-contained and reads straight against the design matrix.
    */
   prompt: {
-    borderRadius: {
-      [PHONE]: {
-        default: popupRadius,
-        ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
-        ':where([data-starting-style], [data-ending-style])': popupRadius,
-      },
-      default: popupRadius,
-      // The recede is the one scale that survives the phone band, so unlike the entrance its
-      // radius correction is NOT pinned flat there — see `transform` below.
-      ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
-      ':where([data-starting-style], [data-ending-style])': `calc(${popupRadius} / ${ENTER_SCALE})`,
-      // Both entrance branches resolve to the same value, so their order relative to each other
-      // cannot matter: there is no scale to counteract in either case. The recede is the
-      // exception — it still applies under `reduce`, just without a duration — so its correction
-      // has to come with it.
-      '@media (prefers-reduced-motion: reduce)': {
-        default: popupRadius,
-        ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
-        ':where([data-starting-style], [data-ending-style])': popupRadius,
-      },
-    },
     // One fade at every width, including the sheet. An earlier version pinned the sheet at
     // opacity 1 on the theory that a pure slide reads more like a native sheet — compared
     // side by side it did not; the fade gives the travel somewhere to resolve into rather than
@@ -676,9 +648,8 @@ export const popupMotion = stylex.create({
     // The FIRST slot tracks the fourth on the phone branch rather than staying at `fast`: opacity
     // and the slide are one gesture there, and a fade that finishes while the surface is still
     // travelling reads as a flash rather than as an arrival. Above the phone band the fade keeps
-    // `fast` and lands with the scrim, since the scale it accompanies barely moves. The third slot
-    // is inert under the phone band (no scale, so no radius counter-scale) but still has to be
-    // filled — the list is positional.
+    // `fast` and lands with the scrim, since the scale it accompanies barely moves. The list is
+    // positional against `transitionProperty` below.
     //
     // EXCEPT for a sheet arriving over another dialog, which takes the desktop `fast` fade back.
     // The long fade earns itself on the first sheet, where it gives the travel somewhere to
@@ -692,20 +663,20 @@ export const popupMotion = stylex.create({
     // arriving over something opaque, and a panel is as opaque as a prompt.
     //
     // The combined exiting branch restates `base` because `@stylexjs/sort-keys` puts it after the
-    // plain `data-stacked` one, which would otherwise hand a stacked sheet the four-value entrance
+    // plain `data-stacked` one, which would otherwise hand a stacked sheet the three-value entrance
     // list on its way out and slow its exit slide.
     transitionDuration: {
       [PHONE]: {
-        default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-slow']}`,
+        default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
         ':where([data-ending-style])': durationVars['--cl-duration-base'],
-        ':where([data-stacked])': `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-slow']}`,
+        ':where([data-stacked])': `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
         ':where([data-stacked][data-ending-style])': durationVars['--cl-duration-base'],
       },
-      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
       ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
     transitionProperty: {
-      default: 'opacity, transform, border-radius, translate',
+      default: 'opacity, transform, translate',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     // Unchanged by the sheet: a translate is still something that moves, so it wants the arrival
@@ -713,14 +684,14 @@ export const popupMotion = stylex.create({
     // `--cl-ease-default` because a surface this size should land rather than settle — Swift Out's
     // ~2% overshoot reads as the sheet arriving past its inset and correcting.
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
-      // Positional against `transitionProperty`, so the fourth slot is `translate` — the sheet's
+      default: `linear, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
+      // Positional against `transitionProperty`, so the third slot is `translate` — the sheet's
       // slide, and the only one that departs from `--cl-ease-exit`. Set on the PLAIN
       // `[data-ending-style]` branch rather than behind a media query on purpose: `translate` is
       // unset above the phone band, so the slot is inert there, and a media-scoped branch would
       // have to out-rank a plain sibling on the same property — the fight documented on
       // `translate` below.
-      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
+      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
     },
     /**
      * The sheet's slide rides the independent `translate` property, NOT `transform` — and it
@@ -754,14 +725,6 @@ export const popupMotion = stylex.create({
 
   /** The sign-in / sign-up surface. Stays centred and centre-scaled at every width. */
   card: {
-    borderRadius: {
-      default: popupRadius,
-      ':where([data-starting-style], [data-ending-style])': `calc(${popupRadius} / ${ENTER_SCALE})`,
-      '@media (prefers-reduced-motion: reduce)': {
-        default: popupRadius,
-        ':where([data-starting-style], [data-ending-style])': popupRadius,
-      },
-    },
     opacity: {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
@@ -775,16 +738,16 @@ export const popupMotion = stylex.create({
       },
     },
     transitionDuration: {
-      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
       ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
     transitionProperty: {
-      default: 'opacity, transform, border-radius',
+      default: 'opacity, transform',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
-      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}, ${easingVars['--cl-ease-exit']}`,
+      default: `linear, ${easingVars['--cl-ease-enter']}`,
+      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
     },
   },
 

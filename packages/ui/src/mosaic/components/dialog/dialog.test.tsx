@@ -530,10 +530,8 @@ describe('popup surface', () => {
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.background)));
   });
 
-  // A card keeps the popup's radius for the scale's counter-correction; a panel does not scale,
-  // so it has no reason to claim one over the page's own.
-  it('leaves the radius to the page for a panel', () => {
-    renderSize('panel');
+  it.each(['card', 'panel'] as const)('leaves the radius to the surface for a %s', size => {
+    renderSize(size);
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.radius)));
   });
