@@ -251,11 +251,11 @@ function AddEmailDialog({
 }
 
 /**
- * The real user page as the popup of a `panel` dialog. The dialog positions it and the page
- * paints itself — the same composition as a `card` rendering as a `Card` — so the page scrolls
- * its own content column, collapses its own sidebar, and carries the dismiss. Prompts it opens
- * go in as children: adding an email opens one over the panel, and the danger zone's delete
- * confirmation is the page's own.
+ * The real user page inside a `panel` dialog. The dialog positions it and the page paints
+ * itself — the same composition as a `Card` inside a `card` dialog — so the page names the
+ * dialog, scrolls its own content column, collapses its own sidebar, and carries the dismiss.
+ * Adding an email opens a prompt over the panel; the danger zone's delete confirmation is the
+ * page's own.
  */
 export function Nested() {
   const [addEmailOpen, setAddEmailOpen] = React.useState(false);
@@ -265,17 +265,12 @@ export function Nested() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={accountTrigger} />
-      <Dialog.Popup
-        size='panel'
-        aria-label='Account'
-        render={
-          <UserPageView
-            activePanel={activePanel}
-            panels={panels}
-            onPanelChange={setActivePanel}
-          />
-        }
-      >
+      <Dialog.Popup size='panel'>
+        <UserPageView
+          activePanel={activePanel}
+          panels={panels}
+          onPanelChange={setActivePanel}
+        />
         <AddEmailDialog
           open={addEmailOpen}
           onOpenChange={setAddEmailOpen}
@@ -314,17 +309,12 @@ export function Inline() {
       }}
     >
       <Dialog.Root inline>
-        <Dialog.Popup
-          size='panel'
-          aria-label='Account'
-          render={
-            <UserPageView
-              activePanel={activePanel}
-              panels={panels}
-              onPanelChange={setActivePanel}
-            />
-          }
-        >
+        <Dialog.Popup size='panel'>
+          <UserPageView
+            activePanel={activePanel}
+            panels={panels}
+            onPanelChange={setActivePanel}
+          />
           <AddEmailDialog
             open={addEmailOpen}
             onOpenChange={setAddEmailOpen}
@@ -474,36 +464,35 @@ export function MultipleTriggers() {
   );
 }
 
-/** `size='card'` paints nothing itself — the popup renders AS a `Card`, which supplies the surface. */
+/** `size='card'` paints nothing itself — the `Card` inside supplies the surface. */
 export function CardSurface() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Sign in</Button>} />
-      <Dialog.Popup
-        size='card'
-        render={<Card.Root elevation='overlay' />}
-      >
-        <Card.Header>
-          <Card.Title>Sign in</Card.Title>
-          <Card.Description>Continue to your account.</Card.Description>
-        </Card.Header>
-        <Card.Content>
-          <Input placeholder='you@example.com' />
-        </Card.Content>
-        <Card.Footer>
-          <Dialog.Close
-            render={props => (
-              <Button
-                {...props}
-                variant='outline'
-                fullWidth
-              >
-                Cancel
-              </Button>
-            )}
-          />
-          <Button fullWidth>Continue</Button>
-        </Card.Footer>
+      <Dialog.Popup size='card'>
+        <Card.Root elevation='overlay'>
+          <Card.Header>
+            <Card.Title>Sign in</Card.Title>
+            <Card.Description>Continue to your account.</Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <Input placeholder='you@example.com' />
+          </Card.Content>
+          <Card.Footer>
+            <Dialog.Close
+              render={props => (
+                <Button
+                  {...props}
+                  variant='outline'
+                  fullWidth
+                >
+                  Cancel
+                </Button>
+              )}
+            />
+            <Button fullWidth>Continue</Button>
+          </Card.Footer>
+        </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );
@@ -522,39 +511,38 @@ export function OutsideScroll() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Review terms</Button>} />
-      <Dialog.Popup
-        size='card'
-        render={<Card.Root elevation='overlay' />}
-      >
-        <Card.Header>
-          <Card.Title>Terms of service</Card.Title>
-          <Card.Description>
-            Nothing here scrolls on its own — the card grows past the screen and the viewport takes the scroll.
-          </Card.Description>
-        </Card.Header>
-        <Card.Content>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {TERMS_CLAUSES.map(clause => (
-              <div key={clause.heading}>
-                <Heading size='xs'>{clause.heading}</Heading>
-                <Text>{clause.body}</Text>
-              </div>
-            ))}
-          </div>
-        </Card.Content>
-        <Card.Footer>
-          <Dialog.Close
-            render={props => (
-              <Button
-                {...props}
-                variant='outline'
-              >
-                Decline
-              </Button>
-            )}
-          />
-          <Button>Accept</Button>
-        </Card.Footer>
+      <Dialog.Popup size='card'>
+        <Card.Root elevation='overlay'>
+          <Card.Header>
+            <Card.Title>Terms of service</Card.Title>
+            <Card.Description>
+              Nothing here scrolls on its own — the card grows past the screen and the viewport takes the scroll.
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {TERMS_CLAUSES.map(clause => (
+                <div key={clause.heading}>
+                  <Heading size='xs'>{clause.heading}</Heading>
+                  <Text>{clause.body}</Text>
+                </div>
+              ))}
+            </div>
+          </Card.Content>
+          <Card.Footer>
+            <Dialog.Close
+              render={props => (
+                <Button
+                  {...props}
+                  variant='outline'
+                >
+                  Decline
+                </Button>
+              )}
+            />
+            <Button>Accept</Button>
+          </Card.Footer>
+        </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );

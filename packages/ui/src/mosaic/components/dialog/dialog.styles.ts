@@ -384,18 +384,17 @@ export const sizes = stylex.create({
     alignSelf: { [PHONE]: 'end', default: null },
     maxWidth: { [PHONE]: 'none', default: '23.75rem' },
   },
-  // The one size that does NOT paint itself. A `card` is the sign-in / sign-up surface, which is
-  // a `Card` — so the surface comes from `Card`'s own `elevations.overlay` rather than from here,
-  // and the popup contributes only geometry and motion. Compose it by rendering the popup AS the
-  // card, not by nesting one inside the other:
+  // Does NOT paint itself. A `card` is the sign-in / sign-up surface, which is a `Card` — so the
+  // surface comes from `Card`'s own `elevations.overlay` rather than from here, and the popup
+  // contributes only geometry and motion. Compose it by rendering the card INSIDE the popup:
   //
-  //   <Dialog.Popup render={<Card.Root elevation='overlay' />}>
+  //   <Dialog.Popup size='card'><Card.Root elevation='overlay'>…</Card.Root></Dialog.Popup>
   //
-  // One element then both paints and animates, which is what keeps the radius counter-scale in
-  // `popupMotion.card` landing on the corners you actually see. Nested, the popup would scale a
-  // transparent box while the `Card` inside it took the scale on its painted corners with no
-  // correction. `borderRadius` stays here for that reason; `Card` declares the same token, so the
-  // two agree at rest and the counter-scale wins during the transition on specificity.
+  // The card reads `DialogContext` from there: `Card.Title` names the dialog and `Card.Header`
+  // carries its dismiss, so the surface stays self-contained. The popup is then a transparent
+  // box that scales; the card's painted corners take that scale without the radius correction
+  // `popupMotion.card` applies to the popup itself — under a pixel for the length of the
+  // entrance, and accepted for the simpler composition.
   //
   // These are `null` rather than `transparent` / `none` / `0`. Within one `stylex.props` call a
   // later `null` REMOVES the earlier atom, so the popup emits no class for these properties at
@@ -414,14 +413,15 @@ export const sizes = stylex.create({
   /**
    * Like `card`, the panel does NOT paint itself. It is the account-profile and settings surface,
    * which is a `ProfilePage` — so the frame comes from `ProfilePage.Root`'s own styles and the
-   * popup contributes geometry and motion only. Compose it by rendering the popup AS the page:
+   * popup contributes geometry and motion only. Compose it by rendering the page INSIDE the popup:
    *
-   *   <Dialog.Popup size='panel' render={<UserPageView … />}>
+   *   <Dialog.Popup size='panel'><UserPageView … /></Dialog.Popup>
    *
-   * That is also what makes `inline` a non-event for the surface: modal or in a page slot, the
-   * page paints itself the same way, and the dialog only decides where it sits. The `null`s
-   * remove the popup's own atoms outright — see the note on `card` — so `ProfilePage`'s apply
-   * unopposed. The width cap is the surface's too, since a page knows its own reading width.
+   * The page reads `DialogContext` from there — it names the dialog, carries its dismiss, and
+   * fills the popup's height — and that is also what makes `inline` a non-event for the surface:
+   * modal or in a page slot, the page paints itself the same way, and the dialog only decides
+   * where it sits. The `null`s remove the popup's own atoms outright — see the note on `card`.
+   * The width cap matches the page's, the way `card` matches the `Card`.
    *
    * Consequence worth knowing: `size="panel"` with no surface inside renders an unpainted box.
    */
@@ -436,6 +436,8 @@ export const sizes = stylex.create({
     // needs somewhere for overflow to go, but putting the scroll on the POPUP takes everything
     // anchored to it along for the ride — the close button most obviously. So the popup clips,
     // and the scroll region is the surface's own: `ProfilePage` scrolls its content column.
+    // Deliberately a flex column with no `align-items` override, so the surface inside stretches
+    // to the popup's width and grows to its height.
     //
     // `clip` rather than `hidden` for the same reason as the viewport: `hidden` would make the
     // panel a scroll container, and focusing anything inside it that sits outside its box would

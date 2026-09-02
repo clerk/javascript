@@ -76,11 +76,11 @@ committing. Your own `setOpen(false)` skips that; use `Dialog.Close` when a clos
 
 ### `card` and `panel` bring their own surface
 
-Only `prompt` paints itself. A `card` renders **as** a `Card`, and a `panel` **as** a `ProfilePage`
-(or `UserPageView`): the dialog positions and animates the popup, and the surface paints it. Both
-surfaces read `DialogContext` and carry the dismiss themselves (`Card.Header`, `ProfilePage.Root`),
-so `Dialog.CloseButton` is only for a `prompt`. Inside a card, `Card.Title` / `Card.Description`
-name the dialog.
+Only `prompt` paints itself. A `card` holds a `Card`, and a `panel` holds a `ProfilePage` (or
+`UserPageView`): the dialog positions and animates the popup, and the surface inside paints it.
+Both surfaces read `DialogContext` and are self-contained — `Card.Title` and the page's label name
+the dialog, and `Card.Header` and `ProfilePage.Root` carry the dismiss — so `Dialog.CloseButton`
+and `Dialog.Title` are only for a `prompt`.
 
 <Story
   name='CardSurface'
@@ -88,7 +88,9 @@ name the dialog.
 />
 
 ```tsx
-<Dialog.Popup size='panel' render={<UserPageView … />} />
+<Dialog.Popup size='panel'>
+  <UserPageView … />
+</Dialog.Popup>
 ```
 
 ### Alert dialogs
@@ -294,8 +296,8 @@ The dialog that opens should always be a `prompt`; anything else warns in dev.
 
 ### A panel
 
-The account profile as a `panel`: the page is the popup, so it paints the frame, scrolls its own
-content column, collapses its own sidebar, and carries the dismiss. The dialog only positions it.
+The account profile as a `panel`: the page inside paints the frame, names the dialog, scrolls its
+own content column, collapses its own sidebar, and carries the dismiss. The dialog only positions it.
 
 <Story
   name='Nested'

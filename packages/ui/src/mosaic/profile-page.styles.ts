@@ -43,9 +43,13 @@ export const styles = stylex.create({
     width: '100%',
   },
 
-  /** Inside a dialog the popup decides the height, so the standalone floor would only overflow it. */
+  /**
+   * Inside a dialog the popup decides the height: the page grows to fill it (the popup is a
+   * column flex) and drops the standalone floor, which would only overflow it.
+   */
   rootInDialog: {
-    minHeight: null,
+    flexGrow: 1,
+    minHeight: 0,
   },
 
   /**

@@ -102,61 +102,58 @@ export function Destructive({
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <Dialog.Popup
-        size='card'
-        render={
-          <Card.Root
-            elevation='overlay'
-            renderBranding={false}
-          />
-        }
-      >
-        <Card.Header>
-          <Card.Title>{title}</Card.Title>
-          <Card.Description>{description}</Card.Description>
-        </Card.Header>
-        <Card.Content>
-          <form
-            id={formId}
-            onSubmit={handleSubmit}
-          >
-            <Field.Root invalid={Boolean(errorMessage)}>
-              <Field.Label>{fieldLabel}</Field.Label>
-              <Input
-                // Not a credential, so 1Password is told to leave it alone rather than
-                // cover it with an autofill overlay.
-                data-1p-ignore
-                placeholder={confirmationValue}
-                value={typedValue}
-                disabled={isDeleting}
-                onChange={event => setTypedValue(event.target.value)}
-              />
-              {errorMessage ? <Field.Error>{errorMessage}</Field.Error> : null}
-            </Field.Root>
-          </form>
-        </Card.Content>
-        <Card.Footer>
-          <Dialog.Close
-            render={
-              <Button
-                variant='outline'
-                fullWidth
-              >
-                {cancelLabel}
-              </Button>
-            }
-          />
-          <SubmitButton
-            form={formId}
-            fullWidth
-            color='negative'
-            isPending={isDeleting}
-            disabled={!isConfirmed}
-            focusableWhenDisabled
-          >
-            {actionLabel}
-          </SubmitButton>
-        </Card.Footer>
+      <Dialog.Popup size='card'>
+        <Card.Root
+          elevation='overlay'
+          renderBranding={false}
+        >
+          <Card.Header>
+            <Card.Title>{title}</Card.Title>
+            <Card.Description>{description}</Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <form
+              id={formId}
+              onSubmit={handleSubmit}
+            >
+              <Field.Root invalid={Boolean(errorMessage)}>
+                <Field.Label>{fieldLabel}</Field.Label>
+                <Input
+                  // Not a credential, so 1Password is told to leave it alone rather than
+                  // cover it with an autofill overlay.
+                  data-1p-ignore
+                  placeholder={confirmationValue}
+                  value={typedValue}
+                  disabled={isDeleting}
+                  onChange={event => setTypedValue(event.target.value)}
+                />
+                {errorMessage ? <Field.Error>{errorMessage}</Field.Error> : null}
+              </Field.Root>
+            </form>
+          </Card.Content>
+          <Card.Footer>
+            <Dialog.Close
+              render={
+                <Button
+                  variant='outline'
+                  fullWidth
+                >
+                  {cancelLabel}
+                </Button>
+              }
+            />
+            <SubmitButton
+              form={formId}
+              fullWidth
+              color='negative'
+              isPending={isDeleting}
+              disabled={!isConfirmed}
+              focusableWhenDisabled
+            >
+              {actionLabel}
+            </SubmitButton>
+          </Card.Footer>
+        </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );

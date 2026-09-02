@@ -139,29 +139,26 @@ describe('UserPageView', () => {
     expect(Array.from((container.firstChild as HTMLElement).classList)).toEqual(expect.arrayContaining(atoms));
   });
 
-  // The shape the account profile takes as a modal: the page IS the popup.
-  it('renders as the popup of a panel dialog, and carries its dismiss', () => {
+  // The shape the account profile takes as a modal: the page inside the popup, self-contained.
+  it('names a panel dialog and carries its dismiss from inside the popup', () => {
     render(
       <MosaicProvider>
         <Dialog.Root defaultOpen>
-          <Dialog.Popup
-            size='panel'
-            aria-label='Account'
-            render={
-              <UserPageView
-                activePanel='account'
-                panels={panels}
-                onPanelChange={vi.fn()}
-              />
-            }
-          />
+          <Dialog.Popup size='panel'>
+            <UserPageView
+              activePanel='account'
+              panels={panels}
+              onPanelChange={vi.fn()}
+            />
+          </Dialog.Popup>
         </Dialog.Root>
       </MosaicProvider>,
     );
 
-    const popup = screen.getByRole('dialog', { name: 'Account' });
-    expect(popup).toHaveClass('cl-profile-page', 'cl-dialog-popup');
-    // The page carries the dismiss itself, the way `Card.Header` does — nothing is passed in.
+    // Named from inside, the way `Card.Title` names a card dialog — nothing is passed in.
+    const popup = screen.getByRole('dialog', { name: 'User profile' });
+    expect(popup).toContainElement(document.querySelector('.cl-profile-page'));
+    // And the dismiss comes from the page too, the way `Card.Header` carries a card's.
     expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
     expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
   });
@@ -174,17 +171,13 @@ describe('UserPageView', () => {
     render(
       <MosaicProvider>
         <Dialog.Root inline>
-          <Dialog.Popup
-            size='panel'
-            aria-label='Account'
-            render={
-              <UserPageView
-                activePanel='account'
-                panels={panels}
-                onPanelChange={vi.fn()}
-              />
-            }
-          />
+          <Dialog.Popup size='panel'>
+            <UserPageView
+              activePanel='account'
+              panels={panels}
+              onPanelChange={vi.fn()}
+            />
+          </Dialog.Popup>
         </Dialog.Root>
       </MosaicProvider>,
     );
@@ -207,20 +200,24 @@ describe('UserPageView', () => {
     render(
       <MosaicProvider>
         <Dialog.Root defaultOpen>
-          <Dialog.Popup
-            size='panel'
-            aria-label='Account'
-            render={
-              <UserPageView
-                activePanel='account'
-                panels={panels}
-                onPanelChange={vi.fn()}
-              />
-            }
-          />
+          <Dialog.Popup size='panel'>
+            <UserPageView
+              activePanel='account'
+              panels={panels}
+              onPanelChange={vi.fn()}
+            />
+          </Dialog.Popup>
         </Dialog.Root>
       </MosaicProvider>,
     );
-    expect(Array.from(screen.getByRole('dialog').classList)).not.toEqual(expect.arrayContaining(atoms));
+    expect(Array.from(document.querySelector('.cl-profile-page')!.classList)).not.toEqual(
+      expect.arrayContaining(atoms),
+    );
+  });
+
+  it('renders no heading for the dialog standalone', () => {
+    renderView();
+
+    expect(screen.queryByRole('heading', { name: 'User profile' })).not.toBeInTheDocument();
   });
 });

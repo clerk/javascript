@@ -25,11 +25,8 @@ export interface UserPageViewProps extends Omit<ProfilePageRootProps, 'children'
   panels: UserPagePanels;
   onPanelChange: (panel: UserProfilePanelId) => void;
   renderBranding?: boolean;
-  /**
-   * Rendered after the panels. When the page is the popup of a dialog, this is where the dialog's
-   * parts land — its `CloseButton`, and any prompt it opens.
-   */
-  children?: React.ReactNode;
+  /** Names the page, and the dialog it is rendered in. Defaults to English; pass a localized string once one is available. */
+  label?: string;
 }
 
 function getAvailablePanels(panels: UserPagePanels): UserProfilePanelId[] {
@@ -67,7 +64,17 @@ function Panel({ panel, panels }: { panel: UserProfilePanelId; panels: UserPageP
 }
 
 export const UserPageView = React.forwardRef<HTMLDivElement, UserPageViewProps>(function UserPageView(
-  { activePanel, panels, onPanelChange, renderBranding = true, children, render, className, style, ...rest },
+  {
+    activePanel,
+    panels,
+    onPanelChange,
+    renderBranding = true,
+    label = 'User profile',
+    render,
+    className,
+    style,
+    ...rest
+  },
   ref,
 ) {
   const availablePanels = getAvailablePanels(panels);
@@ -82,6 +89,7 @@ export const UserPageView = React.forwardRef<HTMLDivElement, UserPageViewProps>(
   return (
     <ProfilePage.Root
       ref={ref}
+      label={label}
       value={resolvedPanel}
       onValueChange={handlePanelChange}
       render={render}
@@ -106,7 +114,6 @@ export const UserPageView = React.forwardRef<HTMLDivElement, UserPageViewProps>(
           </ProfilePage.Panel>
         ))}
       </ProfilePage.Content>
-      {children}
     </ProfilePage.Root>
   );
 });
