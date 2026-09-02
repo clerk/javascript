@@ -139,9 +139,8 @@ describe('UserPageView', () => {
     expect(Array.from((container.firstChild as HTMLElement).classList)).toEqual(expect.arrayContaining(atoms));
   });
 
-  // The shape the account profile takes as a modal: the page IS the popup, and the dialog's own
-  // parts land inside it through `children`.
-  it('renders as the popup of a panel dialog, with the dialog parts inside it', () => {
+  // The shape the account profile takes as a modal: the page IS the popup.
+  it('renders as the popup of a panel dialog, and carries its dismiss', () => {
     render(
       <MosaicProvider>
         <Dialog.Root defaultOpen>
@@ -155,17 +154,41 @@ describe('UserPageView', () => {
                 onPanelChange={vi.fn()}
               />
             }
-          >
-            <Dialog.CloseButton />
-          </Dialog.Popup>
+          />
         </Dialog.Root>
       </MosaicProvider>,
     );
 
     const popup = screen.getByRole('dialog', { name: 'Account' });
     expect(popup).toHaveClass('cl-profile-page', 'cl-dialog-popup');
+    // The page carries the dismiss itself, the way `Card.Header` does — nothing is passed in.
     expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
     expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+  });
+
+  it('carries no dismiss standalone, or inline', () => {
+    const standalone = renderView();
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    standalone.unmount();
+
+    render(
+      <MosaicProvider>
+        <Dialog.Root inline>
+          <Dialog.Popup
+            size='panel'
+            aria-label='Account'
+            render={
+              <UserPageView
+                activePanel='account'
+                panels={panels}
+                onPanelChange={vi.fn()}
+              />
+            }
+          />
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
   });
 
   it('drops its standalone minimum height inside a dialog, where the popup decides', () => {

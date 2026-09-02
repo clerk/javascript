@@ -253,9 +253,9 @@ function AddEmailDialog({
 /**
  * The real user page as the popup of a `panel` dialog. The dialog positions it and the page
  * paints itself — the same composition as a `card` rendering as a `Card` — so the page scrolls
- * its own content column and collapses its own sidebar. The dialog's parts go in as children.
- * Adding an email opens a `prompt` over the panel; the danger zone's delete confirmation is the
- * page's own.
+ * its own content column, collapses its own sidebar, and carries the dismiss. Prompts it opens
+ * go in as children: adding an email opens one over the panel, and the danger zone's delete
+ * confirmation is the page's own.
  */
 function AccountPage({ inline = false }: { inline?: boolean }) {
   const [addEmailOpen, setAddEmailOpen] = React.useState(false);
@@ -276,7 +276,6 @@ function AccountPage({ inline = false }: { inline?: boolean }) {
           />
         }
       >
-        {inline ? null : <Dialog.CloseButton />}
         <AddEmailDialog
           open={addEmailOpen}
           onOpenChange={setAddEmailOpen}

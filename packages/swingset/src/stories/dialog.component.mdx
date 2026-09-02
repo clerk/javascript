@@ -77,10 +77,10 @@ committing. Your own `setOpen(false)` skips that; use `Dialog.Close` when a clos
 ### `card` and `panel` bring their own surface
 
 Only `prompt` paints itself. A `card` renders **as** a `Card`, and a `panel` **as** a `ProfilePage`
-(or `UserPageView`): the dialog positions and animates the popup, the surface paints it, and the
-dialog's own parts go in as children. Use `Card.Title` / `Card.Description` inside a card — they
-name the dialog through `DialogContext`, and `Card.Header` carries the dismiss, so no
-`Dialog.CloseButton` is needed there.
+(or `UserPageView`): the dialog positions and animates the popup, and the surface paints it. Both
+surfaces read `DialogContext` and carry the dismiss themselves (`Card.Header`, `ProfilePage.Root`),
+so `Dialog.CloseButton` is only for a `prompt`. Inside a card, `Card.Title` / `Card.Description`
+name the dialog.
 
 <Story
   name='CardSurface'
@@ -88,9 +88,7 @@ name the dialog through `DialogContext`, and `Card.Header` carries the dismiss, 
 />
 
 ```tsx
-<Dialog.Popup size='panel' render={<UserPageView … />}>
-  <Dialog.CloseButton />
-</Dialog.Popup>
+<Dialog.Popup size='panel' render={<UserPageView … />} />
 ```
 
 ### Alert dialogs
@@ -188,9 +186,9 @@ runs.
 
 ### Close button
 
-`Dialog.CloseButton` is the styled corner X, absolutely positioned so it can sit anywhere in the
-children. Pass `aria-label` to localise it. `Dialog.Close` is the unstyled alternative for a footer
-"Cancel".
+`Dialog.CloseButton` is the styled corner X for a `prompt`, absolutely positioned so it can sit
+anywhere in the children. Pass `aria-label` to localise it. A `card` or `panel` surface carries its
+own. `Dialog.Close` is the unstyled alternative for a footer "Cancel".
 
 Focus opens on the first tabbable element, so a `CloseButton` rendered first takes it. Point
 `initialFocus` on `Dialog.Popup` at the field that should have it instead.

@@ -5,7 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { ClerkLogo } from './components/clerk-logo';
-import { DialogContext } from './components/dialog';
+import { Dialog, DialogContext } from './components/dialog';
 import { Icon } from './components/icon';
 import type { IconName } from './icons/registry';
 import { contentScroll, mainScroll, styles } from './profile-page.styles';
@@ -31,7 +31,9 @@ export interface ProfilePageRootProps extends Omit<MosaicComponentProps<'div'>, 
 /**
  * The page: a surface holding a sidebar and a content column. Doubles as the popup of a `panel`
  * dialog — `<Dialog.Popup size='panel' render={<ProfilePage.Root />}>` — where the dialog
- * positions it and this root paints it, the way a `card` dialog renders as a `Card`.
+ * positions it and this root paints it, the way a `card` dialog renders as a `Card`. Like
+ * `Card.Header`, it then carries the dialog's dismiss itself, so the composition needs nothing
+ * passed in; standalone it renders no such thing.
  */
 const ProfilePageRoot = React.forwardRef<HTMLDivElement, ProfilePageRootProps>(function ProfilePageRoot(
   { value, onValueChange, orientation = 'vertical', activationMode, children, render, className, style, ...rest },
@@ -51,9 +53,15 @@ const ProfilePageRoot = React.forwardRef<HTMLDivElement, ProfilePageRootProps>(f
       ),
       ...rest,
       children: (
-        <div {...mergeStyleProps(themeProps('profile-page-layout'), stylex.props(reset.base, styles.layout))}>
-          {children}
-        </div>
+        <>
+          {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
+              focus — the same reason `Card.Header` renders its dismiss first. Never inline, which
+              nothing closes. */}
+          {dialog && !dialog.inline ? <Dialog.CloseButton /> : null}
+          <div {...mergeStyleProps(themeProps('profile-page-layout'), stylex.props(reset.base, styles.layout))}>
+            {children}
+          </div>
+        </>
       ),
     },
   });
@@ -80,6 +88,7 @@ const ProfilePageSidebar = React.forwardRef<HTMLElement, ProfilePageSidebarProps
   { items, navigationLabel, renderBranding = true, render, className, style, ...rest },
   ref,
 ) {
+  const dialog = React.useContext(DialogContext);
   return useRender({
     defaultTagName: 'aside',
     render,
@@ -87,7 +96,7 @@ const ProfilePageSidebar = React.forwardRef<HTMLElement, ProfilePageSidebarProps
     props: {
       ...mergeStyleProps(
         themeProps('profile-page-sidebar'),
-        stylex.props(reset.base, styles.sidebar),
+        stylex.props(reset.base, styles.sidebar, dialog !== null && !dialog.inline && styles.sidebarInDialog),
         className,
         style,
       ),

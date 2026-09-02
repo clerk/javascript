@@ -36,6 +36,8 @@ export const styles = stylex.create({
     containerType: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
+    // The containing block for the dismiss the root carries inside a dialog.
+    position: 'relative',
     maxWidth: '66rem',
     minHeight: '37.5rem',
     width: '100%',
@@ -44,6 +46,17 @@ export const styles = stylex.create({
   /** Inside a dialog the popup decides the height, so the standalone floor would only overflow it. */
   rootInDialog: {
     minHeight: null,
+  },
+
+  /**
+   * Compact, the navigation is a row across the top — under the corner the dialog's dismiss
+   * sits in. Room for it, so the last destination cannot run beneath the button.
+   */
+  sidebarInDialog: {
+    paddingInlineEnd: {
+      default: null,
+      [profilePageCompact]: space['12'],
+    },
   },
 
   layout: {
