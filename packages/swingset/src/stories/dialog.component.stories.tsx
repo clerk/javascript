@@ -257,14 +257,14 @@ function AddEmailDialog({
  * go in as children: adding an email opens one over the panel, and the danger zone's delete
  * confirmation is the page's own.
  */
-function AccountPage({ inline = false }: { inline?: boolean }) {
+export function Nested() {
   const [addEmailOpen, setAddEmailOpen] = React.useState(false);
   const { activePanel, setActivePanel, panels, addEmail } = useUserPageFixture({
     onAddEmail: () => setAddEmailOpen(true),
   });
   return (
-    <Dialog.Root inline={inline}>
-      {inline ? null : <Dialog.Trigger render={accountTrigger} />}
+    <Dialog.Root>
+      <Dialog.Trigger render={accountTrigger} />
       <Dialog.Popup
         size='panel'
         aria-label='Account'
@@ -286,21 +286,20 @@ function AccountPage({ inline = false }: { inline?: boolean }) {
   );
 }
 
-/** The user page in a `panel`, with `prompt` dialogs opened from inside it. */
-export function Nested() {
-  return <AccountPage />;
-}
-
 /**
  * The same page presented `inline`: it is the page's content rather than a surface over it, so
- * there is no portal, scrim, scroll lock or focus trap, and nothing dismisses it. The prompts it
- * opens are still modal over the whole page.
+ * there is no trigger, portal, scrim, scroll lock or focus trap, and nothing dismisses it. The
+ * prompts it opens are still modal over the whole page.
  *
  * The host is resizable. The page's compact layout is a container query against the page itself,
  * and the dialog's inset is one against its viewport, so dragging the host below `48rem`
  * collapses the sidebar without the browser window moving.
  */
 export function Inline() {
+  const [addEmailOpen, setAddEmailOpen] = React.useState(false);
+  const { activePanel, setActivePanel, panels, addEmail } = useUserPageFixture({
+    onAddEmail: () => setAddEmailOpen(true),
+  });
   return (
     <div
       style={{
@@ -314,7 +313,25 @@ export function Inline() {
         width: '52rem',
       }}
     >
-      <AccountPage inline />
+      <Dialog.Root inline>
+        <Dialog.Popup
+          size='panel'
+          aria-label='Account'
+          render={
+            <UserPageView
+              activePanel={activePanel}
+              panels={panels}
+              onPanelChange={setActivePanel}
+            />
+          }
+        >
+          <AddEmailDialog
+            open={addEmailOpen}
+            onOpenChange={setAddEmailOpen}
+            onAdd={addEmail}
+          />
+        </Dialog.Popup>
+      </Dialog.Root>
     </div>
   );
 }
