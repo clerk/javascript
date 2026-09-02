@@ -1,7 +1,7 @@
 import type { DirectorySyncUserResource } from '@clerk/shared/types';
 import React from 'react';
 
-import { Badge, Col, Flex, Spinner, Text } from '@/customizables';
+import { Badge, Button, Col, Flex, Spinner, Text } from '@/customizables';
 import { Alert } from '@/ui/elements/Alert';
 
 import { Step } from '../../ConfigureSSO/elements/Step';
@@ -60,11 +60,10 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
 };
 
 export const TestSyncStep = (): JSX.Element => {
-  const { goNext, goPrev } = useWizard();
-  const { providerMeta, users } = useConfigureDirectorySync();
+  const { goPrev } = useWizard();
+  const { providerMeta, users, onExit } = useConfigureDirectorySync();
 
   const rows = users.data ?? [];
-  const hasProvisionedUser = rows.length > 0;
 
   // Poll for the whole lifetime of this step: the list is ordered by most
   // recent activity, so it doubles as a live feed while the admin pushes
@@ -161,10 +160,13 @@ export const TestSyncStep = (): JSX.Element => {
 
       <Step.Footer>
         <Step.Footer.Previous onClick={() => goPrev()} />
-        <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={!hasProvisionedUser}
-        />
+        <Button
+          variant='solid'
+          size='sm'
+          onClick={() => onExit?.()}
+        >
+          Complete
+        </Button>
       </Step.Footer>
     </>
   );

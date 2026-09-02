@@ -7,7 +7,6 @@ import { ConfigureSSOSkeleton } from '../ConfigureSSO/ConfigureSSOSkeleton';
 import { Step } from '../ConfigureSSO/elements/Step';
 import { Wizard, type WizardStepConfig } from '../ConfigureSSO/elements/Wizard';
 import { ConfigureDirectorySyncProvider, useConfigureDirectorySync } from './ConfigureDirectorySyncContext';
-import { ActivateDirectorySyncStep } from './steps/ActivateDirectorySyncStep';
 import { AttributeMappingStep } from './steps/AttributeMappingStep';
 import { ConfigureStep } from './steps/ConfigureStep';
 import { TestSyncStep } from './steps/TestSyncStep';
@@ -32,21 +31,14 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
   const { connection, directory, isLoading } = useConfigureDirectorySync();
   const hasSsoConnection = Boolean(connection);
   const hasDirectory = Boolean(directory);
-  const isDirectorySyncActive = directory?.enabled ?? false;
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
       { id: 'configure', label: 'Configure', isComplete: () => hasSsoConnection && hasDirectory },
       { id: 'attributes', label: 'Attributes', isReachable: () => hasSsoConnection && hasDirectory },
       { id: 'test', label: 'Test', isReachable: () => hasSsoConnection && hasDirectory },
-      {
-        id: 'activate',
-        label: 'Activate',
-        isReachable: () => hasSsoConnection && hasDirectory,
-        isComplete: () => isDirectorySyncActive,
-      },
     ],
-    [hasSsoConnection, hasDirectory, isDirectorySyncActive],
+    [hasSsoConnection, hasDirectory],
   );
 
   if (isLoading) {
@@ -80,14 +72,6 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
         <CardStateProvider>
           <Step>
             <TestSyncStep />
-          </Step>
-        </CardStateProvider>
-      </Wizard.Match>
-
-      <Wizard.Match id='activate'>
-        <CardStateProvider>
-          <Step>
-            <ActivateDirectorySyncStep />
           </Step>
         </CardStateProvider>
       </Wizard.Match>
