@@ -420,7 +420,18 @@ const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
     dc.terms_url = opts.termsOfService || '';
     dc.privacy_policy_url = opts.privacyPolicy || '';
   };
-  return { withSupportEmail, withoutClerkBranding, withPreferredSignInStrategy, withTermsPrivacyPolicyUrls };
+
+  const withSignUpUrl = (url: string) => {
+    dc.sign_up_url = url;
+  };
+
+  return {
+    withSupportEmail,
+    withoutClerkBranding,
+    withPreferredSignInStrategy,
+    withTermsPrivacyPolicyUrls,
+    withSignUpUrl,
+  };
 };
 
 const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
