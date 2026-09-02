@@ -388,6 +388,10 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
+    // Defer external navigation while a challenge is pending: the caller resolves it and calls
+    // back in with `continueSignIn`.
+    const isChallengePending = () => !!this.protectCheck || this.status === 'needs_protect_check';
+
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
@@ -395,6 +399,10 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
       });
+
+      if (isChallengePending()) {
+        return;
+      }
     }
 
     if (strategy === 'enterprise_sso') {
@@ -405,6 +413,10 @@ export class SignIn extends BaseResource implements SignInResource {
         oidcPrompt,
         enterpriseConnectionId,
       });
+
+      if (isChallengePending()) {
+        return;
+      }
     }
 
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
