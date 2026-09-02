@@ -1,10 +1,12 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, render, renderHook, waitFor } from '@testing-library/react';
+import React, { useEffect } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { GetEnterpriseConnectionTestRunsParams } from '@/types/enterpriseConnectionTestRun';
 
 import { INTERNAL_STABLE_KEYS } from '../../stable-keys';
 import { createCacheKeys } from '../createCacheKeys';
+import type { UseOrganizationEnterpriseConnectionTestRunsReturn } from '../useOrganizationEnterpriseConnectionTestRuns';
 import { __internal_useOrganizationEnterpriseConnectionTestRuns } from '../useOrganizationEnterpriseConnectionTestRuns';
 import { createMockClerk, createMockQueryClient } from './mocks/clerk';
 import { wrapper } from './wrapper';
@@ -97,5 +99,71 @@ describe('useOrganizationEnterpriseConnectionTestRuns — revalidate invalidatio
     expect(invalidateSpy).not.toHaveBeenCalledWith({ queryKey: exactKey, exact: true });
 
     invalidateSpy.mockRestore();
+  });
+});
+
+describe('useOrganizationEnterpriseConnectionTestRuns — polling arm scope', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    defaultQueryClient.client.clear();
+    mockClerk.loaded = true;
+  });
+
+  it('keeps polling armed by a child effect in the same commit the connection arrives', async () => {
+    getTestRunsSpy.mockImplementation(() => Promise.resolve({ data: [], total_count: 0 }));
+    let latest: UseOrganizationEnterpriseConnectionTestRunsReturn | undefined;
+
+    // Child effects run before parent effects, so this is the ordering a
+    // reset-in-effect implementation would silently cancel.
+    const Child = ({
+      enterpriseConnectionId,
+      revalidate,
+    }: {
+      enterpriseConnectionId: string | null;
+      revalidate: UseOrganizationEnterpriseConnectionTestRunsReturn['revalidate'];
+    }) => {
+      useEffect(() => {
+        if (enterpriseConnectionId) {
+          void revalidate();
+        }
+      }, [enterpriseConnectionId, revalidate]);
+      return null;
+    };
+
+    const Parent = ({ enterpriseConnectionId }: { enterpriseConnectionId: string | null }) => {
+      latest = __internal_useOrganizationEnterpriseConnectionTestRuns({ enterpriseConnectionId, pollIntervalMs: 20 });
+      return (
+        <Child
+          enterpriseConnectionId={enterpriseConnectionId}
+          revalidate={latest.revalidate}
+        />
+      );
+    };
+
+    const { rerender } = render(<Parent enterpriseConnectionId={null} />);
+    expect(latest?.isPolling).toBe(false);
+
+    rerender(<Parent enterpriseConnectionId='ent_1' />);
+
+    await waitFor(() => expect(latest?.isPolling).toBe(true));
+    await waitFor(() => expect(getTestRunsSpy.mock.calls.length).toBeGreaterThanOrEqual(3));
+  });
+
+  it('disarms polling when the connection changes', async () => {
+    getTestRunsSpy.mockImplementation(() => Promise.resolve({ data: [], total_count: 0 }));
+    const { result, rerender } = renderHook(
+      ({ enterpriseConnectionId }: { enterpriseConnectionId: string }) =>
+        __internal_useOrganizationEnterpriseConnectionTestRuns({ enterpriseConnectionId, pollIntervalMs: 20 }),
+      { wrapper, initialProps: { enterpriseConnectionId: 'ent_1' } },
+    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.revalidate();
+    });
+    expect(result.current.isPolling).toBe(true);
+
+    rerender({ enterpriseConnectionId: 'ent_2' });
+    expect(result.current.isPolling).toBe(false);
   });
 });
