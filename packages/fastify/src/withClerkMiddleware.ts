@@ -7,7 +7,7 @@ import { Readable } from 'stream';
 
 import * as constants from './constants';
 import type { ClerkFastifyOptions } from './types';
-import { fastifyRequestToRequest, requestToProxyRequest, stripHandshakeCookiesAndParams } from './utils';
+import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
 
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
   const { hookName: _hookName, frontendApiProxy, __internal_enableHandshake, ...clerkOptions } = options;
@@ -103,16 +103,13 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       return reply.code(400).send();
     }
 
-    if (!enableHandshake) {
-      req = stripHandshakeCookiesAndParams(req, [constants.Cookies.Handshake, constants.Cookies.HandshakeNonce]);
-    }
-
     const requestState = await clerkClient.authenticateRequest(req, {
       ...clerkOptions,
       secretKey,
       publishableKey,
       proxyUrl: resolvedProxyUrl,
       acceptsToken: 'any',
+      __internal_resolveHandshakeOnlyForNavigation: !enableHandshake,
     });
 
     requestState.headers.forEach((value, key) => reply.header(key, value));

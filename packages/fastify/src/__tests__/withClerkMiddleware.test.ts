@@ -408,7 +408,7 @@ describe('withClerkMiddleware(options)', () => {
     },
   );
 
-  test('strips handshake cookies and query params before authenticating when __internal_enableHandshake is false', async () => {
+  test('asks @clerk/backend to resolve handshakes only for navigation when __internal_enableHandshake is false', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
       toAuth: () => ({ tokenType: 'session_token' }),
@@ -422,22 +422,17 @@ describe('withClerkMiddleware(options)', () => {
 
     await fastify.inject({
       method: 'GET',
-      path: '/?__clerk_handshake=token123&__clerk_handshake_nonce=nonce456&foo=bar',
-      headers: {
-        cookie: '__clerk_handshake=token123; __clerk_handshake_nonce=nonce456; __client_uat=1675692233',
-      },
+      path: '/?__clerk_handshake_nonce=nonce456',
+      headers: { cookie: '__clerk_handshake_nonce=nonce456; __client_uat=1675692233' },
     });
 
-    const [req] = authenticateRequestMock.mock.calls[0];
-    expect(new URL(req.url).searchParams.has('__clerk_handshake')).toBe(false);
-    expect(new URL(req.url).searchParams.has('__clerk_handshake_nonce')).toBe(false);
-    expect(new URL(req.url).searchParams.get('foo')).toBe('bar');
-    expect(req.headers.get('cookie')).not.toContain('__clerk_handshake=');
-    expect(req.headers.get('cookie')).not.toContain('__clerk_handshake_nonce=');
-    expect(req.headers.get('cookie')).toContain('__client_uat=1675692233');
+    const [req, options] = authenticateRequestMock.mock.calls[0];
+    expect(options).toEqual(expect.objectContaining({ __internal_resolveHandshakeOnlyForNavigation: true }));
+    expect(options).not.toHaveProperty('__internal_enableHandshake');
+    expect(req.headers.get('cookie')).toContain('__clerk_handshake_nonce=nonce456');
   });
 
-  test('does not strip handshake cookies or query params by default', async () => {
+  test('leaves handshake resolution enabled by default', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
       toAuth: () => ({ tokenType: 'session_token' }),
@@ -449,16 +444,9 @@ describe('withClerkMiddleware(options)', () => {
       reply.send({});
     });
 
-    await fastify.inject({
-      method: 'GET',
-      path: '/?__clerk_handshake=token123',
-      headers: {
-        cookie: '__clerk_handshake_nonce=nonce456; __client_uat=1675692233',
-      },
-    });
+    await fastify.inject({ method: 'GET', path: '/' });
 
-    const [req] = authenticateRequestMock.mock.calls[0];
-    expect(new URL(req.url).searchParams.get('__clerk_handshake')).toBe('token123');
-    expect(req.headers.get('cookie')).toContain('__clerk_handshake_nonce=nonce456');
+    const [, options] = authenticateRequestMock.mock.calls[0];
+    expect(options).toEqual(expect.objectContaining({ __internal_resolveHandshakeOnlyForNavigation: false }));
   });
 });
