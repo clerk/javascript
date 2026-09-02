@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import type { ApiClient } from '../../api';
 import { mockJwks, mockJwt, mockJwtPayload } from '../../fixtures';
 import { server } from '../../mock-server';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
@@ -32,7 +33,7 @@ const requestWith = (
 
 const buildOptions = (overrides: Partial<AuthenticateRequestOptions> = {}) => {
   const getHandshakePayload = vi.fn().mockResolvedValue({ directives: [`__session=${mockJwt}; Path=/`] });
-  const options = {
+  const options: AuthenticateRequestOptions = {
     secretKey: 'live_deadbeef',
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
@@ -45,9 +46,9 @@ const buildOptions = (overrides: Partial<AuthenticateRequestOptions> = {}) => {
     afterSignInUrl: '',
     afterSignUpUrl: '',
     domain: '',
-    apiClient: { clients: { getHandshakePayload } },
+    apiClient: { clients: { getHandshakePayload } } as unknown as ApiClient,
     ...overrides,
-  } as unknown as AuthenticateRequestOptions;
+  };
   return { options, getHandshakePayload };
 };
 
