@@ -55,7 +55,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     input: dynamic(() => import('../stories/input.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
-    'alert-dialog': dynamic(() => import('../stories/alert-dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
