@@ -98,11 +98,18 @@ function isValidDecodedPublishableKey(decoded: string): boolean {
   return withoutTrailing.includes('.');
 }
 
+/**
+ * The one sentence that explains how to get working Clerk keys without a Clerk account.
+ * Shared by every message that mentions `clerk init` so there is a single sentence to keep true.
+ */
+export const accountlessInitGuidance =
+  '`npx clerk@latest init` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.';
+
 const fatalKeyGuidance = `To create a Clerk application with valid keys, in your terminal run:
 
 npx clerk@latest init
 
-\`npx clerk@latest init\` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.
+${accountlessInitGuidance}
 
 If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys (\`--instance prod\` for production keys). Or copy them from https://dashboard.clerk.com/last-active?path=api-keys.`;
 

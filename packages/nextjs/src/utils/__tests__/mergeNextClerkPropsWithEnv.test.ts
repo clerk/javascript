@@ -9,6 +9,34 @@ describe('mergeNextClerkPropsWithEnv', () => {
     process.env = { ...ORIGINAL_ENV };
   });
 
+  describe('unsafe_disableDevelopmentModeConsoleWarning', () => {
+    it('is false when neither the prop nor the env var is set', () => {
+      expect(mergeNextClerkPropsWithEnv({}).unsafe_disableDevelopmentModeConsoleWarning).toBe(false);
+    });
+
+    it('is true when set as a prop', () => {
+      expect(
+        mergeNextClerkPropsWithEnv({ unsafe_disableDevelopmentModeConsoleWarning: true })
+          .unsafe_disableDevelopmentModeConsoleWarning,
+      ).toBe(true);
+    });
+
+    it('is true when set by env var', () => {
+      process.env.NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING = 'true';
+
+      expect(mergeNextClerkPropsWithEnv({}).unsafe_disableDevelopmentModeConsoleWarning).toBe(true);
+    });
+
+    it('is true when the env var is set even if the prop is explicitly false', () => {
+      process.env.NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING = '1';
+
+      expect(
+        mergeNextClerkPropsWithEnv({ unsafe_disableDevelopmentModeConsoleWarning: false })
+          .unsafe_disableDevelopmentModeConsoleWarning,
+      ).toBe(true);
+    });
+  });
+
   it('auto-derives a relative proxyUrl for Vercel production static generation', () => {
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_live_Zm9vLmNsZXJrLmNvbSQ=';
     process.env.VERCEL_TARGET_ENV = 'production';

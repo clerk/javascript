@@ -1,6 +1,7 @@
 import { describe, expect, it, test } from 'vitest';
 
 import {
+  accountlessInitGuidance,
   buildPublishableKey,
   createDevOrStagingUrlCache,
   getCookieSuffix,
@@ -83,6 +84,19 @@ describe('parsePublishableKey(key)', () => {
     expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
       'Publishable key is missing. To create a Clerk application with valid keys, in your terminal run:\n\nnpx clerk@latest init',
     );
+  });
+
+  it('keeps the full guidance text on fatal errors and shares the init sentence with it', () => {
+    const expectedGuidance =
+      'To create a Clerk application with valid keys, in your terminal run:\n\nnpx clerk@latest init\n\n`npx clerk@latest init` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.\n\nIf you have a Clerk application, run `npx clerk@latest env pull` to write the keys (`--instance prod` for production keys). Or copy them from https://dashboard.clerk.com/last-active?path=api-keys.';
+
+    expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
+      `Publishable key is missing. ${expectedGuidance}`,
+    );
+    expect(() => parsePublishableKey('fake_pk', { fatal: true })).toThrowError(
+      `Publishable key not valid (expected format: pk_test_... or pk_live_...). ${expectedGuidance}`,
+    );
+    expect(expectedGuidance).toContain(accountlessInitGuidance);
   });
 
   it('applies the proxyUrl if provided', () => {

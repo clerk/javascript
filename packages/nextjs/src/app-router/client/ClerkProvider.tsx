@@ -8,6 +8,7 @@ import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEf
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import { errorThrower } from '../../server/errorThrower';
 import type { NextClerkProviderProps } from '../../types';
+import { maybeShowDevelopmentKeyNotice } from '../../utils/devKeyNotice';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { RouterTelemetry } from '../../utils/router-telemetry';
@@ -74,6 +75,12 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
     routerPush: push,
     // @ts-expect-error Error because of the stricter types of internal `replace`
     routerReplace: replace,
+  });
+
+  maybeShowDevelopmentKeyNotice({
+    publishableKey: mergedProps.publishableKey,
+    disabled: mergedProps.unsafe_disableDevelopmentModeConsoleWarning,
+    keyless: Boolean(mergedProps.__internal_keyless_claimKeylessApplicationUrl),
   });
 
   return (

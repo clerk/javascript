@@ -132,10 +132,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
       `,
       )
+      .addFile(
+        'src/app/dev-key-notice/node/page.tsx',
+        () => `export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  console.log('dev-key-notice-sentinel:node');
+  return <p>dev-key-notice-marker:node</p>;
+}
+`,
+      )
+      .addFile(
+        'src/app/dev-key-notice/edge/page.tsx',
+        () => `export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  console.log('dev-key-notice-sentinel:edge');
+  return <p>dev-key-notice-marker:edge</p>;
+}
+`,
+      )
       .commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.build();
+    await app.serve();
   });
 
   test.afterAll(async () => {
@@ -153,6 +175,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     const notFoundPageLine = app.buildOutput.split('\n').find(msg => msg.includes('/_not-found'));
 
     expect(notFoundPageLine).toContain(staticIndicator);
+  });
+
+  test('Prints the clerk init hint for development keys when <ClerkProvider /> is a client component', () => {
+    expect(app.buildOutput).toContain('Development keys in use');
+  });
+
+  test('Does not print the clerk init hint when the built app is served', async () => {
+    // Both pages render the provider at request time, one on Node and one on Edge, and log a sentinel so
+    // the negative assertion below only runs once their server output has been captured.
+    for (const target of ['node', 'edge']) {
+      const res = await fetch(`${app.serverUrl}/dev-key-notice/${target}`);
+      expect(res.status).toBe(200);
+      expect(await res.text()).toContain(`dev-key-notice-marker:${target}`);
+    }
+    await expect
+      .poll(() => app.serveOutput, { timeout: 15_000 })
+      .toMatch(
+        /dev-key-notice-sentinel:node[\s\S]*dev-key-notice-sentinel:edge|dev-key-notice-sentinel:edge[\s\S]*dev-key-notice-sentinel:node/,
+      );
+
+    expect(app.serveOutput).not.toContain('Development keys in use');
   });
 
   /**
