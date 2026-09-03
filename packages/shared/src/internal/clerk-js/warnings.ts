@@ -82,6 +82,8 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
   cannotRenderOAuthConsentComponentWhenUserDoesNotExist:
     '<OAuthConsent/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
+  cannotRenderOAuthDeviceVerificationComponentWhenUserDoesNotExist:
+    '<OAuthDeviceVerification/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderConfigureSSOComponentWhenUserDoesNotExist:
     '<ConfigureSSO/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderConfigureSSOComponentWhenDisabled:

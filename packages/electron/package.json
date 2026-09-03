@@ -1,6 +1,6 @@
 {
   "name": "@clerk/electron",
-  "version": "0.0.38",
+  "version": "0.0.40",
   "description": "Clerk SDK for Electron",
   "keywords": [
     "clerk",

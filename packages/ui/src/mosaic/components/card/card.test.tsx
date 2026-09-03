@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -5,6 +6,19 @@ import { describe, expect, it } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Card } from './card';
+
+const compactCard = '@container card (max-width: 20rem)' as const;
+
+const responsiveLayout = stylex.create({
+  root: {
+    containerName: 'card',
+    containerType: 'inline-size',
+  },
+  footer: {
+    display: { [compactCard]: 'grid', default: 'flex' },
+    gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
+  },
+});
 
 describe('Mosaic Card', () => {
   it('renders each compound slot with its stable class', () => {
@@ -22,6 +36,20 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('content')).toHaveClass('cl-card-content');
     expect(screen.getByTestId('footer')).toHaveClass('cl-card-footer');
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'card');
+  });
+
+  it('uses grid to stack the footer only when its card container is compact', () => {
+    render(
+      <Card.Root data-testid='root'>
+        <Card.Footer data-testid='footer'>Footer</Card.Footer>
+      </Card.Root>,
+    );
+
+    const atoms = (style: stylex.StyleXStyles) =>
+      (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
+
+    expect(screen.getByTestId('root')).toHaveClass(...atoms(responsiveLayout.root));
+    expect(screen.getByTestId('footer')).toHaveClass(...atoms(responsiveLayout.footer));
   });
 
   it('reflects flush elevation on the root and footer', () => {
@@ -174,14 +202,16 @@ describe('Mosaic Card', () => {
 
   it('names and describes the dialog it is rendered inside', () => {
     render(
-      <Dialog defaultOpen>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title data-testid='title'>Review terms</Card.Title>
-            <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
-          </Card.Header>
-        </Card.Root>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title data-testid='title'>Review terms</Card.Title>
+              <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     const popup = screen.getByRole('dialog');
@@ -200,13 +230,9 @@ describe('Mosaic Card', () => {
           <Card.Title data-testid='outside-title'>Terms</Card.Title>
         </Card.Root>
         <Dialog.Trigger>Open</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Viewport>
-            <Dialog.Popup>
-              <Dialog.Title>Review terms</Dialog.Title>
-            </Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
+        <Dialog.Popup>
+          <Dialog.Title>Review terms</Dialog.Title>
+        </Dialog.Popup>
       </Dialog.Root>,
     );
 
@@ -221,22 +247,24 @@ describe('Mosaic Card', () => {
   // id that displaced it would silently leave the dialog unnamed.
   it('keeps the dialog id over an explicit one, and stays named', () => {
     render(
-      <Dialog defaultOpen>
-        <Card.Root>
-          <Card.Title
-            id='custom-title'
-            data-testid='title'
-          >
-            Review terms
-          </Card.Title>
-          <Card.Description
-            id='custom-description'
-            data-testid='description'
-          >
-            Read them before you continue.
-          </Card.Description>
-        </Card.Root>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Title
+              id='custom-title'
+              data-testid='title'
+            >
+              Review terms
+            </Card.Title>
+            <Card.Description
+              id='custom-description'
+              data-testid='description'
+            >
+              Read them before you continue.
+            </Card.Description>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     const dialog = screen.getByRole('dialog');
@@ -267,13 +295,15 @@ describe('Mosaic Card', () => {
   it('carries the dialog dismiss button in the header', async () => {
     const user = userEvent.setup();
     render(
-      <Dialog defaultOpen>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title>Review terms</Card.Title>
-          </Card.Header>
-        </Card.Root>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title>Review terms</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     const close = screen.getByRole('button', { name: 'Close' });
@@ -283,6 +313,23 @@ describe('Mosaic Card', () => {
     await user.click(close);
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('carries no dismiss button in an inline dialog, which nothing closes', () => {
+    render(
+      <Dialog.Root inline>
+        <Dialog.Popup size='panel'>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title>Account</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Account');
   });
 
   it('carries no dismiss button in a header outside a dialog', () => {

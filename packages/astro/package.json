@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "4.0.20",
+  "version": "4.1.0",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -97,7 +97,7 @@
   },
   "devDependencies": {
     "@clerk/ui": "workspace:^",
-    "astro": "^6.4.8"
+    "astro": "^7.0.0"
   },
   "peerDependencies": {
     "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"

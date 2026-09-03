@@ -1,5 +1,27 @@
 # Change Log
 
+## 4.6.3
+
+### Patch Changes
+
+- Fix the Android `<AuthView>` rendering no sign-in form when it is opened within a couple of seconds of `isLoaded` turning true. The native view now recreates itself once the Clerk Android SDK finishes loading instead of staying empty until it is dismissed and reopened. ([#9618](https://github.com/clerk/javascript/pull/9618)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/clerk-js@6.31.0
+  - @clerk/react@6.15.0
+  - @clerk/shared@4.31.0
+
+## 4.6.2
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.5.0` to `1.5.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.1. ([#9617](https://github.com/clerk/javascript/pull/9617)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.1` to `1.5.2`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.2. ([#9631](https://github.com/clerk/javascript/pull/9631)) by [@seanperez29](https://github.com/seanperez29)
+
+- Updated dependencies [[`0f70a63`](https://github.com/clerk/javascript/commit/0f70a633af154f9bc6cb9eaa53a5c5b39dc1c2b6)]:
+  - @clerk/clerk-js@6.30.3
+
 ## 4.6.1
 
 ### Patch Changes

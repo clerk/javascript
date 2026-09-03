@@ -41,6 +41,19 @@ export function Default(props: Record<string, unknown>) {
   );
 }
 
+export function WithField() {
+  return (
+    <Field.Root
+      required
+      style={stackStyles}
+    >
+      <Field.Label>Verification code</Field.Label>
+      <Otp name='code' />
+      <Field.Description>Enter the code we sent to your device.</Field.Description>
+    </Field.Root>
+  );
+}
+
 export function Success() {
   return (
     <Field.Root style={stackStyles}>
