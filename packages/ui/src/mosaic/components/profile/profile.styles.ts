@@ -86,11 +86,9 @@ export const styles = stylex.create({
       [compact]: '100dvh',
       default: '45rem',
     },
-    // The card's elevation, so the two surfaces sit on a page the same way. Flush compact.
-    boxShadow: {
-      [compact]: 'none',
-      default: shadowVars['--cl-shadow-card'],
-    },
+    // In a page — standalone or inline — the frame is its border alone, the way a card sits flat in
+    // content. The card's elevation belongs to the overlay; see `layoutInDialog`.
+    boxShadow: 'none',
     color: colorVars['--cl-color-card-foreground'],
     display: 'grid',
     gridTemplateColumns: {
@@ -103,6 +101,12 @@ export const styles = stylex.create({
 
   layoutInDialog: {
     blockSize: 'auto',
+    // Lifted off the page like a card in a dialog: the card's elevation, none compact, where the
+    // popup is the screen and there is nothing to lift off.
+    boxShadow: {
+      [compact]: 'none',
+      default: shadowVars['--cl-shadow-card'],
+    },
     flexGrow: 1,
     minHeight: 0,
   },
