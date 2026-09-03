@@ -8,10 +8,14 @@ over the same scrim a prompt takes. Built on the headless `Drawer` — drag-to-d
 nesting and the on-screen keyboard are its doing — and this layer composes the motion from the
 custom properties it writes.
 
-<Story
+<Preview
   name='Default'
   storyModule={DrawerStories}
 />
+
+## Props
+
+<PropTable meta={DrawerStories.meta} />
 
 ## Usage
 
@@ -30,7 +34,8 @@ import { Drawer } from '@clerk/ui/mosaic/components/drawer';
 ```
 
 `Drawer.Popup` renders the portal, the scrim, the box the sheet rises in, and the grip; its
-children are the sheet's content. `Drawer.Root` takes every headless option — `open` /
+children are the sheet's content. `height` picks how tall it stands: `content` (default), at least
+`two-thirds` of the screen, or `full`, a hand's width short of the top. `Drawer.Root` takes every headless option — `open` /
 `onOpenChange`, `snapPoints`, `dismissible`, `handleOnly`, `autoFocus`.
 
 ## Inside a profile

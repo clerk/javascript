@@ -72,6 +72,12 @@ export const styles = stylex.create({
    * slow drag past the threshold.
    */
   popup: {
+    // The grip's colour, set here because the drag state lives on the popup and the grip is a
+    // descendant: it deepens while the sheet is held.
+    '--_cl-grip-color': {
+      default: colorVars['--cl-color-border'],
+      ':where([data-swiping])': colorVars['--cl-color-neutral-faded'],
+    },
     borderColor: { default: null, '@media (forced-colors: active)': 'CanvasText' },
     borderStyle: { default: null, '@media (forced-colors: active)': 'solid' },
     borderWidth: { default: null, '@media (forced-colors: active)': '1px' },
@@ -137,9 +143,12 @@ export const styles = stylex.create({
   },
   grip: {
     borderRadius: radiusVars['--cl-radius-full'],
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: 'var(--_cl-grip-color)',
     blockSize: space['1.5'],
     inlineSize: space['11.5'],
+    transitionDuration: durationVars['--cl-duration-fast'],
+    transitionProperty: 'background-color',
+    transitionTimingFunction: 'linear',
   },
 
   /** The sheet's content, under the grip. */
@@ -148,5 +157,20 @@ export const styles = stylex.create({
     gap: space['3'],
     display: 'flex',
     flexDirection: 'column',
+  },
+});
+
+/**
+ * How tall the sheet stands. `content` takes its height from what it holds; `two-thirds` is at
+ * least that share of the screen; `full` stops a hand's width short of the top. Each includes the
+ * bleed, which sits below the screen and is not part of what shows.
+ */
+export const heights = stylex.create({
+  content: {},
+  'two-thirds': {
+    minBlockSize: `calc(66% + ${BLEED})`,
+  },
+  full: {
+    blockSize: `calc(100% - ${space['16']} + ${BLEED})`,
   },
 });

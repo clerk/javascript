@@ -1,5 +1,6 @@
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+import type { DrawerPopupProps } from '@clerk/ui/mosaic/components/drawer';
 import { Drawer } from '@clerk/ui/mosaic/components/drawer';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
 import { Text } from '@clerk/ui/mosaic/components/text';
@@ -17,7 +18,19 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Drawer',
   source: 'packages/ui/src/mosaic/components/drawer/drawer.tsx',
+  styles: {
+    _variants: {
+      height: { content: {}, 'two-thirds': {}, full: {} },
+    },
+    _defaultVariants: {
+      height: 'content',
+    },
+  },
 };
+
+function knobsAsProps(props: Record<string, unknown>) {
+  return props as unknown as Pick<DrawerPopupProps, 'height'>;
+}
 
 function SheetContent() {
   return (
@@ -33,11 +46,11 @@ function SheetContent() {
   );
 }
 
-export function Default() {
+export function Default(props: Record<string, unknown>) {
   return (
     <Drawer.Root>
       <Drawer.Trigger render={<Button />}>Sort</Drawer.Trigger>
-      <Drawer.Popup>
+      <Drawer.Popup {...knobsAsProps(props)}>
         <SheetContent />
       </Drawer.Popup>
     </Drawer.Root>
