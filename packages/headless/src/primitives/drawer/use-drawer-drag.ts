@@ -72,6 +72,10 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
   // Removes the current iOS `touchend` fallback listener (see `onPointerDown`),
   // so it never outlives its gesture or piles up across gestures.
   const removeTouchEnd = useRef<(() => void) | null>(null);
+  // Removes the window-level release listeners armed for the current gesture (see `onPointerDown`).
+  const removeWindowRelease = useRef<(() => void) | null>(null);
+  // `onRelease` is defined after `onPointerDown`, which needs to arm it; read through a ref.
+  const onReleaseRef = useRef<((e: { clientY: number }) => void) | null>(null);
 
   // Latest options, read at event time so the handlers can stay referentially stable.
   const cfg = useRef(opts);
@@ -86,7 +90,27 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
   }, [open, now]);
 
   // Drop any pending iOS touchend fallback if the drawer unmounts mid-gesture.
-  useEffect(() => () => removeTouchEnd.current?.(), []);
+  useEffect(
+    () => () => {
+      removeTouchEnd.current?.();
+      removeWindowRelease.current?.();
+    },
+    [],
+  );
+
+  // A gesture never outlives the open state. Should a release be lost anyway, closing (or the
+  // sheet unmounting under the finger) must not leave the engine armed for the next open.
+  useEffect(() => {
+    if (open) {
+      return;
+    }
+    draggingRef.current = false;
+    allowed.current = false;
+    pid.current = null;
+    removeWindowRelease.current?.();
+    removeWindowRelease.current = null;
+    setIsDragging(false);
+  }, [open]);
 
   const shouldDrag = useCallback((target: HTMLElement, down: boolean): boolean => {
     const { now: clock, curSwipe, snap } = cfg.current;
@@ -104,8 +128,18 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     if (target.closest(`[${DrawerAttrs.noDrag}]`)) {
       return false;
     }
-    // A text selection is in progress (contenteditable / regular DOM text).
-    if (window.getSelection()?.toString().length) {
+    // A text selection is in progress INSIDE the sheet (contenteditable / regular DOM text). One
+    // elsewhere on the page is none of the sheet's business, and would otherwise veto every drag
+    // for as long as it stood.
+    const selection = window.getSelection();
+    const sheet = cfg.current.popupRef.current;
+    if (
+      selection &&
+      !selection.isCollapsed &&
+      selection.toString().length &&
+      selection.anchorNode &&
+      sheet?.contains(selection.anchorNode)
+    ) {
       return false;
     }
     // A focused input/textarea with a non-collapsed selection: dragging is
@@ -130,11 +164,27 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
       lastScrollAt.current = clock();
       return false;
     }
-    // Upward at rest: let inner content scroll instead.
+    // Upward at rest: inner content with room left to scroll takes the gesture; otherwise the sheet
+    // rubber-bands, so the drag is never simply swallowed.
     if (!down) {
-      return false;
+      const sheet = cfg.current.popupRef.current;
+      for (let el: HTMLElement | null = target; el; el = el.parentElement) {
+        if (el.scrollHeight > el.clientHeight && el.scrollTop + el.clientHeight < el.scrollHeight - 1) {
+          return false;
+        }
+        // Nothing above the sheet is inner content — its box may well be taller than the screen.
+        if (el === sheet) {
+          break;
+        }
+      }
+      return true;
     }
     for (let el: HTMLElement | null = target; el; el = el.parentElement) {
+      // The page behind the sheet is never inner content: a scrolled document must not veto the
+      // drag, which it otherwise would whenever the sheet itself has nothing to scroll.
+      if (el === document.body || el === document.documentElement) {
+        return true;
+      }
       if (el.scrollHeight > el.clientHeight) {
         if (el.scrollTop !== 0) {
           lastScrollAt.current = clock();
@@ -186,6 +236,23 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     captured.current = target;
     safeCapture(target, e.pointerId, 'setPointerCapture');
 
+    // The release is expected on the captured target, but capture is not a guarantee — a release
+    // the popup never sees would leave the sheet held mid-drag, across opens. Whatever lands on
+    // `window` for this pointer ends the gesture; the popup's own handler then finds nothing to do.
+    removeWindowRelease.current?.();
+    const pointerId = e.pointerId;
+    const onWindowRelease = (ev: PointerEvent): void => {
+      if (ev.pointerId === pointerId) {
+        onReleaseRef.current?.(ev);
+      }
+    };
+    window.addEventListener('pointerup', onWindowRelease, true);
+    window.addEventListener('pointercancel', onWindowRelease, true);
+    removeWindowRelease.current = () => {
+      window.removeEventListener('pointerup', onWindowRelease, true);
+      window.removeEventListener('pointercancel', onWindowRelease, true);
+    };
+
     // iOS doesn't dispatch pointerup after a scroll-cancelled gesture, so reset
     // `allowed` on touchend. Track the listener (and drop any stale one from a
     // prior gesture that never fired) so it's removed on release/unmount instead
@@ -234,13 +301,15 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     [shouldDrag, sample],
   );
 
-  const onRelease = useCallback((e: ReactPointerEvent<HTMLElement>): void => {
+  const onRelease = useCallback((e: { clientY: number }): void => {
     if (!draggingRef.current) {
       return;
     }
-    // Normal release: the iOS touchend fallback is no longer needed.
+    // Normal release: neither fallback is needed any more.
     removeTouchEnd.current?.();
     removeTouchEnd.current = null;
+    removeWindowRelease.current?.();
+    removeWindowRelease.current = null;
     const {
       snapPoints,
       snap,
@@ -299,6 +368,8 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     }
     onNestedRelease?.(!dismiss);
   }, []);
+
+  onReleaseRef.current = onRelease;
 
   return {
     onPointerDown,

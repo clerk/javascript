@@ -1,5 +1,5 @@
-import type { UserPageViewProps } from '@clerk/ui/mosaic/user-profile/user-page.view';
-import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
+import type { UserProfileViewProps } from '@clerk/ui/mosaic/user-profile/user-profile.view';
+import { UserProfileView } from '@clerk/ui/mosaic/user-profile/user-profile.view';
 import type { UserProfileAPIKey } from '@clerk/ui/mosaic/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
@@ -11,19 +11,18 @@ import type {
   UserProfileMfaMethod,
   UserProfilePasskey,
 } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
-import type { UserProfilePanelId } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
 import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-export { default as __source } from './user-page.stories?raw';
+export { default as __source } from './user-profile.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  title: 'UserPage',
-  label: 'User page',
+  title: 'UserProfile',
+  label: 'User profile',
   layout: 'wide',
-  source: 'packages/ui/src/mosaic/user-profile/user-page.view.tsx',
+  source: 'packages/ui/src/mosaic/user-profile/user-profile.view.tsx',
 };
 
 const initialAPIKeys: UserProfileAPIKey[] = [
@@ -45,7 +44,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
 ];
 
 export function Default() {
-  const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
+  const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
     { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
@@ -99,7 +98,7 @@ export function Default() {
     [apiKeys, searchValue],
   );
 
-  const panels: UserPageViewProps['panels'] = {
+  const pages: UserProfileViewProps['pages'] = {
     account: {
       allowMultipleAccounts: true,
       imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
@@ -242,10 +241,10 @@ export function Default() {
   };
 
   return (
-    <UserPageView
-      activePanel={activePanel}
-      panels={panels}
-      onPanelChange={setActivePanel}
+    <UserProfileView
+      activePage={activePage}
+      pages={pages}
+      onPageChange={setActivePage}
     />
   );
 }

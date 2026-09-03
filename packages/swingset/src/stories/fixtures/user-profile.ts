@@ -1,24 +1,23 @@
-import type { UserPageViewProps } from '@clerk/ui/mosaic/user-profile/user-page.view';
+import type { UserProfileViewProps } from '@clerk/ui/mosaic/user-profile/user-profile.view';
 import type { UserProfileEmail, UserProfilePhone } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
 import type {
   UserProfileDevice,
   UserProfileMfaMethod,
   UserProfilePasskey,
 } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
-import type { UserProfilePanelId } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
 import { useState } from 'react';
 
-export interface UserPageFixtureOptions {
+export interface UserProfileFixtureOptions {
   /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
   onAddEmail?: () => void;
 }
 
 /**
- * The account and security panels of the user page, backed by local state so the actions on them
+ * The account and security pages of the user page, backed by local state so the actions on them
  * do something. For stories that need a realistic profile surface without being about it.
  */
-export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) {
-  const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
+export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
+  const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
     { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
@@ -63,7 +62,7 @@ export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) 
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
 
-  const panels: UserPageViewProps['panels'] = {
+  const pages: UserProfileViewProps['pages'] = {
     account: {
       allowMultipleAccounts: true,
       imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
@@ -123,5 +122,5 @@ export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) 
     },
   };
 
-  return { activePanel, setActivePanel, panels, addEmail, devices };
+  return { activePage, setActivePage, pages, addEmail, devices };
 }

@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { Heading } from '../components/heading';
+import { Profile } from '../components/profile';
 import { mergeStyleProps, themeProps } from '../props';
 import type {
   UserProfileAccountSectionViewProps,
@@ -65,12 +65,7 @@ export function UserProfileProfilePanelView({
 }: UserProfileProfilePanelViewProps): ReactElement {
   return (
     <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(styles.root))}>
-      <Heading
-        render={props => <h3 {...props} />}
-        size='2xl'
-      >
-        Account
-      </Heading>
+      <Profile.PageTitle>Account</Profile.PageTitle>
       <div {...stylex.props(styles.sections)}>
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}

@@ -13,7 +13,7 @@
  * - `prompt` is `align-self: end`, so it rises to sit exactly on top of the keyboard.
  * - `card` is centred, so it re-centres in the space that is left — it moves up, and its height is
  *   still driven by its content, so nothing is squashed.
- * - `panel` is `align-self: stretch`, so it shrinks — which is right for the one surface that
+ * - `profile` is `align-self: stretch`, so it shrinks — which is right for the one surface that
  *   already composes its own scroll region.
  *
  * And `place-items: safe center` on the viewport means a card taller than the remaining space

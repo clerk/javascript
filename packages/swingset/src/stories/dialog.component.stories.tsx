@@ -6,12 +6,12 @@ import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/ui/mosaic
 import { Heading } from '@clerk/ui/mosaic/components/heading';
 import { Input } from '@clerk/ui/mosaic/components/input';
 import { Text } from '@clerk/ui/mosaic/components/text';
-import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
+import { UserProfileView } from '@clerk/ui/mosaic/user-profile/user-profile.view';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { useUserPageFixture } from './fixtures/user-page';
+import { useUserProfileFixture } from './fixtures/user-profile';
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -23,7 +23,7 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/dialog/dialog.tsx',
   styles: {
     _variants: {
-      size: { prompt: {}, card: {}, panel: {} },
+      size: { prompt: {}, card: {}, profile: {} },
     },
     _defaultVariants: {
       size: 'prompt',
@@ -171,8 +171,8 @@ export function DiscardChanges() {
 const accountTrigger = (props: RenderProps) => <Button {...props}>Open account</Button>;
 
 /**
- * The "add email address" prompt the account panel opens, driven by `open` rather than a trigger.
- * Closing it with a value typed asks first — `panel -> prompt -> prompt`.
+ * The "add email address" prompt the account profile opens, driven by `open` rather than a trigger.
+ * Closing it with a value typed asks first — `profile -> prompt -> prompt`.
  */
 function AddEmailDialog({
   open,
@@ -249,25 +249,25 @@ function AddEmailDialog({
 }
 
 /**
- * The real user page inside a `panel` dialog. The dialog positions it and the page paints
+ * The real user page inside a `profile` dialog. The dialog positions it and the page paints
  * itself — the same composition as a `Card` inside a `card` dialog — so the page names the
  * dialog, scrolls its own content column, collapses its own sidebar, and carries the dismiss.
- * Adding an email opens a prompt over the panel; the danger zone's delete confirmation is the
+ * Adding an email opens a prompt over the profile; the danger zone's delete confirmation is the
  * page's own.
  */
 export function Nested() {
   const [addEmailOpen, setAddEmailOpen] = React.useState(false);
-  const { activePanel, setActivePanel, panels, addEmail } = useUserPageFixture({
+  const { activePage, setActivePage, pages, addEmail } = useUserProfileFixture({
     onAddEmail: () => setAddEmailOpen(true),
   });
   return (
     <Dialog.Root>
       <Dialog.Trigger render={accountTrigger} />
-      <Dialog.Popup size='panel'>
-        <UserPageView
-          activePanel={activePanel}
-          panels={panels}
-          onPanelChange={setActivePanel}
+      <Dialog.Popup size='profile'>
+        <UserProfileView
+          activePage={activePage}
+          pages={pages}
+          onPageChange={setActivePage}
         />
         <AddEmailDialog
           open={addEmailOpen}
@@ -290,7 +290,7 @@ export function Nested() {
  */
 export function Inline() {
   const [addEmailOpen, setAddEmailOpen] = React.useState(false);
-  const { activePanel, setActivePanel, panels, addEmail } = useUserPageFixture({
+  const { activePage, setActivePage, pages, addEmail } = useUserProfileFixture({
     onAddEmail: () => setAddEmailOpen(true),
   });
   return (
@@ -307,11 +307,11 @@ export function Inline() {
       }}
     >
       <Dialog.Root inline>
-        <Dialog.Popup size='panel'>
-          <UserPageView
-            activePanel={activePanel}
-            panels={panels}
-            onPanelChange={setActivePanel}
+        <Dialog.Popup size='profile'>
+          <UserProfileView
+            activePage={activePage}
+            pages={pages}
+            onPageChange={setActivePage}
           />
           <AddEmailDialog
             open={addEmailOpen}

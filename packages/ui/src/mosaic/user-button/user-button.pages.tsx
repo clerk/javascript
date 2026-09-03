@@ -9,10 +9,15 @@ import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
+import type {
+  CustomProfileItem,
+  CustomProfileLink,
+  CustomProfilePage,
+  UserProfilePageId,
+} from '../user-profile/user-profile.types';
 import { applyOrder } from './user-button.utils';
 
-/** A page the UserProfile brings itself, named by the id its navigation knows it as. */
-export type UserProfilePageId = 'account' | 'security' | 'billing' | 'apiKeys';
+export type { CustomProfileItem, CustomProfileLink, CustomProfilePage, UserProfilePageId };
 
 /**
  * The UserProfile's own pages, in the order it lists them, minus the ones this instance has turned
@@ -36,32 +41,6 @@ export function useUserProfilePages(): UserProfilePageId[] {
   }
   return pages;
 }
-
-/** A page of your own inside the profile, reached from its navigation. */
-export interface CustomProfilePage {
-  /** Names the page in the profile's navigation. */
-  label: string;
-  /** Where the page lives, relative to the profile root. Absolute URLs are rejected. */
-  path: string;
-  href?: never;
-  icon?: ReactNode;
-  /** Rendered as the page itself. */
-  content: ReactNode;
-}
-
-/** A row in the profile's navigation that leaves for somewhere else. */
-export interface CustomProfileLink {
-  /** Names the row in the profile's navigation. */
-  label: string;
-  /** Identifies the row, for ordering. */
-  path: string;
-  /** Where the row goes. */
-  href: string;
-  icon?: ReactNode;
-  content?: never;
-}
-
-export type CustomProfileItem = CustomProfilePage | CustomProfileLink;
 
 export interface CustomPagesOptions {
   /** Pages and links of the consumer's own. */

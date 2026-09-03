@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -568,6 +568,22 @@ describe('Drawer', () => {
       expect(onOpenChange).not.toHaveBeenCalledWith(false);
     });
 
+    it('mirrors the swipe vars onto the backdrop, which cannot inherit them from the popup', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 0, button: 0, isPrimary: true, pointerType: 'touch' });
+      clock.t += 50;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 });
+
+      const backdrop = screen.getByTestId('backdrop');
+      expect(swipeProgress(backdrop)).toBe(swipeProgress(popup));
+      expect(swipeY(backdrop)).toBe('100px');
+
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 100 });
+    });
+
     it('updates the swipe-progress var and swiping attribute during a drag', () => {
       render(<DrawerFixture defaultOpen />);
       const popup = screen.getByRole('dialog');
@@ -583,6 +599,97 @@ describe('Drawer', () => {
 
       fireEvent.pointerUp(popup, { pointerId: 1, clientY: 50 });
       expect(popup).not.toHaveAttribute('data-swiping');
+    });
+
+    it('rubber-bands an upward drag at rest when nothing under the finger can scroll', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 300, button: 0, pointerType: 'touch' });
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 }); // up 200px, never dragged down
+
+      expect(parseFloat(swipeY(popup))).toBeLessThan(0);
+      expect(popup).toHaveAttribute('data-swiping');
+
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 100 });
+      expect(swipeY(popup)).toBe('0px');
+    });
+
+    // The styled sheet bleeds below the screen, so its viewport measures taller than it shows; that
+    // is not inner content, and must not swallow the upward drag.
+    it('rubber-bands upward at rest even when the viewport above the sheet overflows', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      makeScrollable(screen.getByTestId('viewport'), { scrollHeight: 940, clientHeight: 844, scrollTop: 0 });
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 300, button: 0, pointerType: 'touch' });
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 });
+
+      expect(parseFloat(swipeY(popup))).toBeLessThan(0);
+
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 100 });
+    });
+
+    it('lets inner content scroll on an upward drag at rest when it has room to', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      const list = screen.getByTestId('scrollable');
+      makeScrollable(list, { scrollHeight: 500, clientHeight: 100, scrollTop: 0 });
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(list, { pointerId: 1, clientY: 300, button: 0, pointerType: 'touch' });
+      clock.t += 30;
+      fireEvent.pointerMove(list, { pointerId: 1, clientY: 100 });
+
+      expect(swipeY(popup)).toBe('');
+
+      fireEvent.pointerUp(list, { pointerId: 1, clientY: 100 });
+    });
+
+    // Pointer capture is asked for, not guaranteed. A release the popup never receives used to leave
+    // the engine armed: the sheet held its drag offset and `data-swiping`, and the next open started
+    // that way too, until a fresh press on the sheet released it.
+    it('ends the gesture on a release that reaches only the window', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 300, button: 0, pointerType: 'mouse' });
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 });
+      expect(popup).toHaveAttribute('data-swiping');
+
+      fireEvent.pointerUp(window, { pointerId: 1, clientY: 100 });
+
+      expect(popup).not.toHaveAttribute('data-swiping');
+      expect(swipeY(popup)).toBe('0px');
+    });
+
+    it('does not carry a lost gesture into the next open', async () => {
+      const user = userEvent.setup();
+      render(<DrawerFixture />);
+      await user.click(screen.getByTestId('trigger'));
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 300, button: 0, pointerType: 'mouse' });
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 });
+      // No release at all; close from the keyboard instead.
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      await user.click(screen.getByTestId('trigger'));
+      expect(screen.getByRole('dialog')).not.toHaveAttribute('data-swiping');
     });
 
     it('rubber-bands upward over-drag without ever moving the sheet downward', () => {
@@ -751,6 +858,32 @@ describe('Drawer', () => {
 
       expect(onOpenChange).not.toHaveBeenCalledWith(false);
       expect(swipeY(popup)).toBe('');
+    });
+
+    // A portalled sheet's ancestors above the viewport are the page itself; the walk used to reach a
+    // scrolled `<html>` and read it as inner content, so a drawer over a scrolled page could not be
+    // dragged at all unless the sheet happened to scroll.
+    it('drags when the page behind the sheet is scrolled', () => {
+      const onOpenChange = vi.fn();
+      render(
+        <DrawerFixture
+          defaultOpen
+          onOpenChange={onOpenChange}
+        />,
+      );
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      makeScrollable(document.documentElement, { scrollHeight: 3000, clientHeight: 800, scrollTop: 900 });
+
+      try {
+        drag(popup, 0, 120, 200);
+      } finally {
+        delete (document.documentElement as unknown as Record<string, unknown>).scrollHeight;
+        delete (document.documentElement as unknown as Record<string, unknown>).clientHeight;
+        document.documentElement.scrollTop = 0;
+      }
+
+      expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
     it('ignores cross-axis (horizontal) jitter during a vertical drag', () => {

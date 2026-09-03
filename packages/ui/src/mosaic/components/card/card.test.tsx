@@ -118,8 +118,7 @@ describe('Mosaic Card', () => {
       </Card.Root>,
     );
 
-    // The mark closes the card out. Held by position rather than by a class: the branding
-    // carries no slot for a consumer to reach, so a test has none to reach for either.
+    // The mark closes the card out.
     const branding = screen.getByTestId('root').lastElementChild;
     expect(branding).toHaveTextContent('Secured by');
 

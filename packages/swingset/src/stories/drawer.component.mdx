@@ -1,0 +1,61 @@
+import * as DrawerStories from './drawer.component.stories';
+
+# Drawer
+
+A bottom sheet: the prompt's surface, flush with the sides and the bottom of the screen, rounded at
+the top, with a grip to drag it down. Closed, it sits entirely below the screen; open, it rises
+over the same scrim a prompt takes. Built on the headless `Drawer` — drag-to-dismiss, snap points,
+nesting and the on-screen keyboard are its doing — and this layer composes the motion from the
+custom properties it writes.
+
+<Story
+  name='Default'
+  storyModule={DrawerStories}
+/>
+
+## Usage
+
+```tsx
+import { Button } from '@clerk/ui/mosaic/components/button';
+import { Drawer } from '@clerk/ui/mosaic/components/drawer';
+
+<Drawer.Root>
+  <Drawer.Trigger render={<Button />}>Sort</Drawer.Trigger>
+  <Drawer.Popup>
+    <Drawer.Title>Sort members</Drawer.Title>
+    <Drawer.Description>Choose how the list is ordered.</Drawer.Description>
+    <Drawer.Close>Done</Drawer.Close>
+  </Drawer.Popup>
+</Drawer.Root>;
+```
+
+`Drawer.Popup` renders the portal, the scrim, the box the sheet rises in, and the grip; its
+children are the sheet's content. `Drawer.Root` takes every headless option — `open` /
+`onOpenChange`, `snapPoints`, `dismissible`, `handleOnly`, `autoFocus`.
+
+## Inside a profile
+
+Opened from inside a `profile` dialog the sheet takes the nested scrim, the way a prompt opened
+there does, so it reads as a surface over the profile rather than as the profile dimming.
+
+<Story
+  name='InsideProfile'
+  storyModule={DrawerStories}
+/>
+
+## Parts
+
+| Part           | Element            | Slot                                  |
+| -------------- | ------------------ | ------------------------------------- |
+| `Drawer.Popup` | `div[role=dialog]` | `cl-drawer-popup`                     |
+| —              | scrim              | `cl-drawer-backdrop`                  |
+| —              | box                | `cl-drawer-viewport`                  |
+| —              | grip area / pill   | `cl-drawer-handle` / `cl-drawer-grip` |
+
+## Motion
+
+The sheet moves on `translate`, composed from the headless layer's `--cl-drawer-snap-point-offset`
+and `--cl-drawer-swipe-movement-y`. While `data-swiping` is present the transition is off and it
+follows the finger; on release the exit duration is scaled by `--cl-drawer-swipe-strength`, so a
+flick leaves faster than a slow drag. The scrim thins with `--cl-drawer-swipe-progress` during a
+drag. Under `prefers-reduced-motion: reduce` only the scrim fades.

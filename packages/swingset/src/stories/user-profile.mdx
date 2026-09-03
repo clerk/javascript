@@ -1,9 +1,10 @@
-import * as Stories from './user-page.stories';
+import * as Stories from './user-profile.stories';
 
-# UserPage
+# UserProfile
 
-The complete User page. It owns the profile navigation and composes the Account, Security, Billing,
-and API Keys panels without imposing a modal height or scroll container.
+The complete user profile: a `Profile` whose navigation lists the Account, Security, Billing, and
+API Keys pages it was given content for, then any pages of the consumer's own, in the order asked
+for. Rendered inside a `profile` dialog it names it, carries its dismiss, and fills its height.
 
 <Story
   name='Default'

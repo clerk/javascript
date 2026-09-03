@@ -215,7 +215,13 @@ export function useRender<
     }
   }
 
-  const computedProps = { ...props, ...dataAttrs };
+  // State attributes lead, and still win: a key's position is fixed by its first spread, its value
+  // by its last. React writes changed attributes in key order, and Chrome flushes style when
+  // `tabindex` changes on the focused element, so a state marker written after a roving `tabindex`
+  // would be missing from that flush — an anchor named on `[data-selected]` resolves to nothing for
+  // one recalc and its transition snaps. Ahead of the rest, the marker is in place before any write
+  // that can flush.
+  const computedProps = { ...dataAttrs, ...props, ...dataAttrs };
 
   if (typeof render === 'function') {
     return render({ ...computedProps, ref: mergedRef });

@@ -22,7 +22,7 @@ import { type ConfirmHandle, createConfirmHandle } from './confirm-handle';
 import { backdropMotion, closeInsets, popupMotion, sizes, styles, trackSizes, viewportSizes } from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
-/** Width of the dialog surface, and for `panel` its height too. */
+/** Width of the dialog surface, and for `profile` its height too. */
 export type DialogSize = keyof typeof sizes;
 
 /**
@@ -38,14 +38,14 @@ export type DialogSize = keyof typeof sizes;
  *
  * It is also how a dialog learns about the one it renders inside: `Dialog.Popup` reads it before
  * publishing its own, and that is what decides whether two dialogs form a STACK — successive
- * prompts — or a nested dialog over a `panel` or `card`. The two want opposite backdrops.
+ * prompts — or a nested dialog over a `profile` or `card`. The two want opposite backdrops.
  */
 export interface DialogContextValue {
   /** Id the popup points `aria-labelledby` at. The part that names the dialog takes it. */
   labelId: string;
   /** Id the popup points `aria-describedby` at. The part that describes the dialog takes it. */
   descriptionId: string;
-  /** Width, and for `panel` also height, of the surface. */
+  /** Width, and for `profile` also height, of the surface. */
   size: DialogSize;
   /** Whether the surface is presented in its host rather than over the page — see `Dialog.Root`. */
   inline: boolean;
@@ -94,7 +94,7 @@ export type DialogActionsProps = MosaicComponentProps<'div'>;
 
 export interface DialogPopupProps extends MosaicComponentProps<'div'> {
   /**
-   * Width, and for `panel` also height, of the dialog surface. Ignored under
+   * Width, and for `profile` also height, of the dialog surface. Ignored under
    * `role="alertdialog"`, which is always a `prompt`. @default 'prompt'
    */
   size?: DialogSize;
@@ -112,7 +112,7 @@ type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 
   /**
    * Presents the dialog in its host rather than over the page: no portal, no scrim, no scroll
    * lock, no focus trap, and nothing dismisses it — it is open for as long as it is mounted.
-   * For a surface that is the page's content, such as an account panel mounted in a layout slot.
+   * For a surface that is the page's content, such as an account profile mounted in a layout slot.
    *
    * Implies `open`, `modal={false}` and `closedBy='none'`; those props are ignored. A dialog
    * opened from inside an inline one presents normally, over the page.
@@ -339,20 +339,20 @@ function Viewport({ size, inline, children }: { size: DialogSize; inline: boolea
 }
 
 /**
- * Warns when a `panel` opens inside another dialog.
+ * Warns when a `profile` opens inside another dialog.
  *
- * A `panel` is a root-level surface: it hosts what opens over it and is never the thing that
+ * A `profile` is a root-level surface: it hosts what opens over it and is never the thing that
  * opens. Inside a dialog it renders at a size that assumes it owns the viewport, over a surface it
  * was meant to replace. A `prompt` or a `card` — a confirmation holding a `Card`, say — is what
- * opens over a panel, and either is fine.
+ * opens over a profile, and either is fine.
  */
 function useNestedSizeWarning(isNestedInDialog: boolean, size: DialogSize) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || size !== 'panel') {
+    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || size !== 'profile') {
       return;
     }
     console.warn(
-      '[clerk] a size="panel" Dialog opened inside another Dialog. A panel is a root-level surface that hosts what opens over it; open a prompt or a card instead.',
+      '[clerk] a size="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a prompt or a card instead.',
     );
   }, [isNestedInDialog, size]);
 }

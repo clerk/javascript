@@ -1,0 +1,99 @@
+import * as ProfileStories from './profile.component.stories';
+
+# Profile
+
+A surface you navigate: a column of destinations beside the page each one opens. The user profile
+and the organization profile are both one of these — `UserProfileView` composes it from the pages an
+instance has content for. Rendered as the content of a `profile` dialog it names the dialog, carries
+its dismiss, and fills the popup; standalone it paints the same frame and takes its own height.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={ProfileStories}
+/>
+
+## Props
+
+<PropTable meta={ProfileStories.meta} />
+
+## Usage
+
+```tsx
+import { Icon } from '@clerk/ui/mosaic/components/icon';
+import { Profile } from '@clerk/ui/mosaic/components/profile';
+
+<Profile.Root
+  label='User profile'
+  value={page}
+  onValueChange={setPage}
+>
+  <Profile.Nav>
+    <Profile.NavItem
+      value='account'
+      icon={<Icon name='user-circle' size='sm' />}
+    >
+      Account
+    </Profile.NavItem>
+    <Profile.NavItem
+      value='security'
+      icon={<Icon name='shield-check' size='sm' />}
+    >
+      Security
+    </Profile.NavItem>
+  </Profile.Nav>
+  <Profile.Content>
+    <Profile.Page value='account'>…</Profile.Page>
+    <Profile.Page value='security'>…</Profile.Page>
+  </Profile.Content>
+</Profile.Root>;
+```
+
+`Root` is controlled: `value` names the open page and `onValueChange` reports a selection. A
+`NavItem` and a `Page` pair by `value`. `icon` takes any node, so a page of the consumer's own can
+bring its own mark.
+
+## Parts
+
+| Part              | Element               | Slot                  |
+| ----------------- | --------------------- | --------------------- |
+| `Profile.Root`    | `div` (the container) | `cl-profile`          |
+| `Profile.Nav`     | `nav` (labelled)      | `cl-profile-nav`      |
+| —                 | tablist               | `cl-profile-nav-list` |
+| `Profile.NavItem` | `button[role=tab]`    | `cl-profile-nav-item` |
+| `Profile.Content` | `div` (scroll region) | `cl-profile-content`  |
+| `Profile.Page`    | `div[role=tabpanel]`  | `cl-profile-page`     |
+
+`Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
+`main`, or of a dialog.
+
+## Compact layout
+
+Below `48rem` of the profile's **own** width the frame goes — the profile is the page there, flush
+with whatever holds it — and the navigation leaves the column for a sheet: `Profile.PageTitle`
+grows a caret that opens a `Drawer` holding the tablist, and a choice closes it. The width is
+measured on the root rather than queried, because where the tablist renders is a DOM decision: one
+tablist, in the column or in the sheet, never both. The same surface collapses in a narrow layout
+slot, an inline dialog, or a phone alike.
+
+## Customising the marks
+
+The selected and hover fills are plain backgrounds on `.cl-profile-nav-item[data-selected]` and
+`:hover`. The tablist is positioned and isolated so a consumer can hang marks off it: below, the
+selected item and the hovered item each publish a CSS anchor name, and the tablist's `::after` and
+`::before` follow them through anchor positioning — sliding between destinations, in either layout,
+with no script. The rules sit inside `@supports (anchor-name: --probe)`, so browsers without anchors
+keep the default fills, and inside a prelude-less `@scope`, which confines a style element's sheet to
+its parent.
+
+<Story
+  name='Customized'
+  storyModule={ProfileStories}
+/>
+
+## Page transitions
+
+`Page` keeps the tabs primitive's transition contract — `data-hidden` today, `data-starting-style`
+/ `data-ending-style` and `--cl-tab-transition-direction` once pages are force-mounted — so a page
+transition is a styling change here rather than a new part.

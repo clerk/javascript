@@ -4,10 +4,9 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
+import { Branding } from '../branding';
 import { Button } from '../button';
-import { ClerkLogo } from '../clerk-logo';
 import { Dialog, DialogContext } from '../dialog';
 import { Icon } from '../icon';
 import { cardContentMarker } from './card.markers.stylex';
@@ -19,20 +18,10 @@ const DEFAULT_ELEVATION: CardElevation = 'card';
 
 const CardElevationContext = React.createContext<CardElevation>(DEFAULT_ELEVATION);
 
-function Branding() {
+function CardBranding() {
   return (
     <div {...stylex.props(reset.base, slots.branding.base)}>
-      <span {...stylex.props(reset.base, slots.branding.text)}>
-        Secured by{' '}
-        <a
-          href='https://go.clerk.com/components'
-          target='_blank'
-          rel='noopener noreferrer'
-          {...stylex.props(reset.base, slots.branding.link, focusOutline.visible)}
-        >
-          <ClerkLogo height={14} />
-        </a>
-      </span>
+      <Branding />
     </div>
   );
 }
@@ -68,7 +57,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
       children: (
         <>
           {children}
-          {renderBranding ? <Branding /> : null}
+          {renderBranding ? <CardBranding /> : null}
         </>
       ),
     },
