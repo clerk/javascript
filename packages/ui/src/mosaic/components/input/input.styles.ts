@@ -23,6 +23,14 @@ export const styles = stylex.create({
       color: colorVars['--cl-color-input-placeholder'],
     },
   },
+  headless: {
+    borderRadius: 0,
+    borderStyle: 'none',
+    borderWidth: 0,
+    outline: 'none',
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+  },
 });
 
 export const sizes = stylex.create({
