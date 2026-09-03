@@ -76,7 +76,8 @@ export const styles = stylex.create({
     // descendant: it deepens while the sheet is held.
     '--_cl-grip-color': {
       default: colorVars['--cl-color-border'],
-      ':where([data-swiping])': colorVars['--cl-color-neutral-faded'],
+      // A step deeper, not a jump: enough to say "held", not enough to read as a state change.
+      ':where([data-swiping])': `color-mix(in oklab, ${colorVars['--cl-color-border']}, ${colorVars['--cl-color-neutral-faded']} 35%)`,
     },
     borderColor: { default: null, '@media (forced-colors: active)': 'CanvasText' },
     borderStyle: { default: null, '@media (forced-colors: active)': 'solid' },

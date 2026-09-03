@@ -36,6 +36,19 @@ describe('Drawer', () => {
     expect(document.querySelector('.cl-drawer-viewport')).toContainElement(sheet);
   });
 
+  it('reflects its height as a data attribute', () => {
+    render(
+      <MosaicProvider>
+        <Drawer.Root defaultOpen>
+          <Drawer.Popup height='full'>
+            <Drawer.Title>Filters</Drawer.Title>
+          </Drawer.Popup>
+        </Drawer.Root>
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('dialog')).toHaveAttribute('data-height', 'full');
+  });
+
   it('opens from its trigger and closes from inside', async () => {
     const user = userEvent.setup();
     render(
