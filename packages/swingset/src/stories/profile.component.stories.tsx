@@ -312,6 +312,10 @@ export function Transitions() {
               scale var(--cl-duration-slow) var(--cl-ease-enter),
               filter var(--cl-duration-slow) var(--cl-ease-enter),
               display var(--cl-duration-slow) allow-discrete;
+            /* The entering page waits for the leaving one to mostly clear — a hand-off, not a
+               cross-fade. Not on \`display\`, which must show the page at once for the entrance to
+               have a frame to start from. */
+            transition-delay: var(--cl-duration-fast), var(--cl-duration-fast), var(--cl-duration-fast), 0s;
 
             @starting-style {
               opacity: 0;
@@ -325,6 +329,7 @@ export function Transitions() {
             filter: blur(4px);
             transition-duration: var(--cl-duration-base);
             transition-timing-function: var(--cl-ease-exit);
+            transition-delay: 0s;
           }
           @media (prefers-reduced-motion: reduce) {
             .cl-profile-tab-panel {
