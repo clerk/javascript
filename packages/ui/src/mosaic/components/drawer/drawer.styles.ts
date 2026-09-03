@@ -163,7 +163,7 @@ export const styles = stylex.create({
 
 /**
  * How tall the sheet stands. `content` takes its height from what it holds; `two-thirds` is at
- * least that share of the screen; `full` stops a hand's width short of the top. Each includes the
+ * least that share of the screen; `full` stops `3rem` short of the top. Each includes the
  * bleed, which sits below the screen and is not part of what shows.
  */
 export const heights = stylex.create({
@@ -172,6 +172,6 @@ export const heights = stylex.create({
     minBlockSize: `calc(66% + ${BLEED})`,
   },
   full: {
-    blockSize: `calc(100% - ${space['16']} + ${BLEED})`,
+    blockSize: `calc(100% - ${space['12']} + ${BLEED})`,
   },
 });
