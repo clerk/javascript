@@ -432,6 +432,7 @@ void (async () => {
     '/oauth-device-verification': {
       mount: '__internal_mountOAuthDeviceVerification',
       component: 'oauthDeviceVerification',
+    },
     '/configure-directory-sync': {
       mount: '__internal_mountConfigureDirectorySync',
       component: 'configureDirectorySync',
