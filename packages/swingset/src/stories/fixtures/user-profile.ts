@@ -1,20 +1,43 @@
 import type { UserProfileViewProps } from '@clerk/ui/mosaic/user-profile/user-profile.view';
+import type { UserProfileAPIKey } from '@clerk/ui/mosaic/user-profile/user-profile-api-keys-panel.view';
+import type {
+  UserProfilePaymentMethod,
+  UserProfileSubscription,
+} from '@clerk/ui/mosaic/user-profile/user-profile-billing-panel.view';
 import type { UserProfileEmail, UserProfilePhone } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
 import type {
   UserProfileDevice,
   UserProfileMfaMethod,
   UserProfilePasskey,
 } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export interface UserProfileFixtureOptions {
   /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
   onAddEmail?: () => void;
 }
 
+const initialAPIKeys: UserProfileAPIKey[] = [
+  {
+    id: 'primary',
+    name: 'Primary API Key',
+    expirationLabel: 'Expires Dec 31, 2027',
+    createdAtLabel: 'Jan 05, 2026',
+    lastUsedAtLabel: 'Dec 31, 2026',
+  },
+  {
+    id: 'legacy',
+    name: 'Legacy API Key',
+    expirationLabel: 'Expired Jul 1, 2025',
+    createdAtLabel: 'Jul 1, 2024',
+    lastUsedAtLabel: 'Jul 1, 2025',
+    isExpired: true,
+  },
+];
+
 /**
- * The account and security pages of the user page, backed by local state so the actions on them
- * do something. For stories that need a realistic profile surface without being about it.
+ * Every page of the user profile, backed by local state so the actions on them do something. For
+ * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
@@ -58,6 +81,25 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       type: 'desktop',
     },
   ]);
+
+  const [subscription, setSubscription] = useState<UserProfileSubscription>({
+    planName: 'Basic Plan',
+    priceLabel: '$12 / Month',
+    totalDueLabel: '$12.00',
+    renewsAtLabel: 'Renews Aug 26',
+  });
+  const [paymentMethods, setPaymentMethods] = useState<UserProfilePaymentMethod[]>([
+    { id: 'visa', label: 'Visa •••• 0644', expiryLabel: 'Expires 02/2029', isDefault: true },
+  ]);
+  const [historyPageSize, setHistoryPageSize] = useState(10);
+  const [apiKeys, setAPIKeys] = useState(initialAPIKeys);
+  const [apiKeysPageSize, setAPIKeysPageSize] = useState(10);
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const visibleAPIKeys = useMemo(
+    () => apiKeys.filter(apiKey => apiKey.name.toLowerCase().includes(searchValue.toLowerCase())),
+    [apiKeys, searchValue],
+  );
 
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
@@ -119,6 +161,71 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onRemovePasskey: id => setPasskeys(current => current.filter(passkey => passkey.id !== id)),
       onSignOutAllOtherDevices: () => setDevices(current => current.filter(device => device.isCurrent)),
       onSignOutDevice: id => setDevices(current => current.filter(device => device.id !== id)),
+    },
+    billing: {
+      subscription,
+      paymentMethods,
+      historyItems: [
+        {
+          id: 'stmt_202605_0644',
+          dateLabel: 'May 26, 2026',
+          invoiceLabel: 'stmt_202605_...us64a',
+          amountLabel: '$25.00',
+          statusLabel: 'Paid',
+        },
+      ],
+      historyPagination: { page: 1, pageCount: 1, pageSize: historyPageSize },
+      onAddPaymentMethod: () =>
+        setPaymentMethods(current => [
+          ...current,
+          { id: `card-${Date.now()}`, label: 'Visa •••• 4242', expiryLabel: 'Expires 08/2030' },
+        ]),
+      onChangePlan: () =>
+        setSubscription(current =>
+          current.planName === 'Basic Plan'
+            ? {
+                planName: 'Pro Plan',
+                priceLabel: '$25 / Month',
+                totalDueLabel: '$25.00',
+                renewsAtLabel: 'Renews Aug 26',
+              }
+            : {
+                planName: 'Basic Plan',
+                priceLabel: '$12 / Month',
+                totalDueLabel: '$12.00',
+                renewsAtLabel: 'Renews Aug 26',
+              },
+        ),
+      onMakeDefaultPaymentMethod: id =>
+        setPaymentMethods(current => current.map(method => ({ ...method, isDefault: method.id === id }))),
+      onRemovePaymentMethod: id =>
+        setPaymentMethods(current => current.filter(paymentMethod => paymentMethod.id !== id)),
+      onBillingHistoryPageSizeChange: setHistoryPageSize,
+      onViewInvoice: () => undefined,
+    },
+    apiKeys: {
+      apiKeys: visibleAPIKeys,
+      pagination: { page: 1, pageCount: 1, pageSize: apiKeysPageSize },
+      searchValue,
+      selectedIds,
+      onCreate: () =>
+        setAPIKeys(current => [
+          ...current,
+          {
+            id: `key-${Date.now()}`,
+            name: `API Key ${current.length + 1}`,
+            expirationLabel: 'Expires Never',
+            createdAtLabel: 'Just now',
+            lastUsedAtLabel: 'Never',
+          },
+        ]),
+      onPageSizeChange: setAPIKeysPageSize,
+      onRevoke: id => {
+        setAPIKeys(current => current.filter(apiKey => apiKey.id !== id));
+        setSelectedIds(current => current.filter(selectedId => selectedId !== id));
+      },
+      onSearchChange: setSearchValue,
+      onSelectionChange: setSelectedIds,
     },
   };
 
