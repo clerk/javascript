@@ -223,34 +223,37 @@ export function OTPInputSlot(
   props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { isSuccessfullyFilled?: boolean },
 ) {
   const { isSuccessfullyFilled, ...otpProps } = props;
-  const { char, hasFakeCaret, isActive, placeholderChar, ...rest } = otpProps;
+  const { char, hasFakeCaret, isActive, placeholderChar, sx, ...rest } = otpProps;
   return (
     <OTPInputSegment
       data-testid='otp-input-segment'
       {...rest}
       focusRing={isActive}
       variant='default'
-      sx={t => ({
-        textAlign: 'center',
-        ...common.textVariants(t).h2,
-        padding: `${t.space.$0x5} 0`,
-        boxSizing: 'border-box',
-        display: 'flex',
-        position: 'relative',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: t.space.$10,
-        width: t.space.$10,
-        color: t.colors.$colorInputForeground,
-        borderWidth: t.borderWidths.$normal,
-        borderRadius: t.radii.$md,
-        ...(isSuccessfullyFilled ? { borderColor: t.colors.$success500 } : common.borderColor(t, props)),
-        backgroundColor: 'unset',
-        [mqu.sm]: {
-          height: t.space.$8,
-          width: t.space.$8,
-        },
-      })}
+      sx={[
+        t => ({
+          textAlign: 'center',
+          ...common.textVariants(t).h2,
+          padding: `${t.space.$0x5} 0`,
+          boxSizing: 'border-box',
+          display: 'flex',
+          position: 'relative',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: t.space.$10,
+          width: t.space.$10,
+          color: t.colors.$colorInputForeground,
+          borderWidth: t.borderWidths.$normal,
+          borderRadius: t.radii.$md,
+          ...(isSuccessfullyFilled ? { borderColor: t.colors.$success500 } : common.borderColor(t, props)),
+          backgroundColor: 'unset',
+          [mqu.sm]: {
+            height: t.space.$8,
+            width: t.space.$8,
+          },
+        }),
+        sx,
+      ]}
     >
       {char !== null && <div>{char}</div>}
       {hasFakeCaret && <FakeCaret />}
