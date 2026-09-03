@@ -1,5 +1,8 @@
 import type { SignUpModes } from '../../types';
 
+// Set on add-account navigations so the sign-in start screen renders the identifier form instead of the account switcher.
+export const CLERK_ADD_ACCOUNT = '__clerk_add_account';
+
 // TODO: Do we still have a use for this or can we simply preserve all params?
 export const PRESERVED_QUERYSTRING_PARAMS = [
   'redirect_url',
@@ -9,6 +12,7 @@ export const PRESERVED_QUERYSTRING_PARAMS = [
   'sign_in_fallback_redirect_url',
   'sign_up_force_redirect_url',
   'sign_up_fallback_redirect_url',
+  CLERK_ADD_ACCOUNT,
 ];
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
