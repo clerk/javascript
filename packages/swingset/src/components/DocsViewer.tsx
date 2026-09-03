@@ -47,6 +47,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     banner: dynamic(() => import('../stories/banner.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
+    combobox: dynamic(() => import('../stories/combobox.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),

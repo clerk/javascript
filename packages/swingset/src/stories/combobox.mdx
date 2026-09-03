@@ -1,0 +1,64 @@
+import * as ComboboxStories from './combobox.stories';
+
+# Combobox
+
+`Combobox` adds Mosaic styling to the headless `Autocomplete` behavior: text entry, listbox ARIA,
+keyboard navigation, selection, positioning, and the shared scrolling treatment.
+
+## Example
+
+Use the trigger to show every option, or type to open and filter the list. Use the arrow keys and
+Enter to select an option.
+
+<Story
+  name='Default'
+  storyModule={ComboboxStories}
+/>
+
+Filtering stays with the caller: read `inputValue` and render only the matching options.
+`Combobox.Popup` owns its portal, positioner, surface, and scrolling viewport.
+
+## Inline lists
+
+Use `List` when the searchable list already lives in another floating surface, such as a country
+picker inside a popover. Use the headless input variant when it needs an icon or adjacent text.
+This avoids both a second input implementation and a nested popup.
+
+```tsx
+<Combobox.Root open inputValue={query} onInputValueChange={setQuery}>
+  <InputGroup.Root>
+    <InputGroup.Text>
+      <Icon name='search' aria-hidden='true' />
+    </InputGroup.Text>
+    <Combobox.Input variant='headless' aria-label='Search countries' />
+  </InputGroup.Root>
+  <Combobox.List>
+    {countries.map(country => (
+      <Combobox.Option key={country.iso} value={country.iso} label={country.name}>
+        {country.name}
+      </Combobox.Option>
+    ))}
+  </Combobox.List>
+</Combobox.Root>
+```
+
+## Scrolling
+
+Long lists receive the shared ScrollArea fade and scrollbar automatically.
+
+<Story
+  name='Scrolling'
+  storyModule={ComboboxStories}
+/>
+
+## Parts
+
+| Part               | Description                                                                       |
+| ------------------ | --------------------------------------------------------------------------------- |
+| `Combobox.Root`    | Owns input, selection, open state, and keyboard navigation.                       |
+| `Combobox.Input`   | Autocomplete input; renders Mosaic `Input` unless composed through another input. |
+| `Combobox.Trigger` | Opens and closes the option list while keeping focus on the input.                |
+| `Combobox.Popup`   | Portals, positions, surfaces, and scrolls a floating option list.                 |
+| `Combobox.List`    | Scrollable inline listbox.                                                        |
+| `Combobox.Option`  | Selectable option with active, selected, and disabled states.                     |
+| `Combobox.Empty`   | Empty result message.                                                             |
