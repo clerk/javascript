@@ -66,6 +66,61 @@ describe('SignInStart', () => {
     screen.getAllByText(/sign in to .*/i);
   });
 
+  describe('multi-session start', () => {
+    const withSignedInSessions = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
+      f.withEmailAddress();
+      f.withMultiSessionMode();
+      f.withUser({ email_addresses: ['test1@clerk.com'] });
+    };
+
+    it('renders the identifier form when the prop is unset and signed-in sessions exist', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSignedInSessions);
+      render(<SignInStart />, { wrapper });
+      screen.getAllByText(/sign in to .*/i);
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+    });
+
+    it('redirects to the account switcher when the prop is "switcher" and signed-in sessions exist', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(withSignedInSessions);
+      props.setProps({ multiSessionStart: 'switcher' });
+      render(<SignInStart />, { wrapper });
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('choose'));
+      expect(screen.queryByText(/sign in to .*/i)).toBeNull();
+    });
+
+    it('renders the identifier form when the prop is "switcher" and no signed-in sessions exist', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withMultiSessionMode();
+      });
+      props.setProps({ multiSessionStart: 'switcher' });
+      render(<SignInStart />, { wrapper });
+      screen.getAllByText(/sign in to .*/i);
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+    });
+
+    it('renders the identifier form when the add-account param is set', async () => {
+      const { createFixtures: createFixturesWithAddAccount } = bindCreateFixtures('SignIn', {
+        router: { queryParams: { __clerk_add_account: 'true' } },
+      });
+      const { wrapper, fixtures, props } = await createFixturesWithAddAccount(withSignedInSessions);
+      props.setProps({ multiSessionStart: 'switcher' });
+      render(<SignInStart />, { wrapper });
+      screen.getAllByText(/sign in to .*/i);
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+    });
+
+    it('does not redirect to the account switcher in single-session mode', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withUser({ email_addresses: ['test1@clerk.com'] });
+      });
+      props.setProps({ multiSessionStart: 'switcher' });
+      render(<SignInStart />, { wrapper });
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+    });
+  });
+
   describe('Login Methods', () => {
     it('enables login with email address', async () => {
       const { wrapper } = await createFixtures(f => {

@@ -1,3 +1,6 @@
+import { CLERK_ADD_ACCOUNT } from '@clerk/shared/internal/clerk-js/constants';
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
+
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -15,15 +18,20 @@ import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 const SignInAccountSwitcherInternal = () => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
-  const { afterSignInUrl, path: signInPath, signInUrl, taskUrl } = useSignInContext();
+  const { afterSignInUrl, signInUrl, taskUrl } = useSignInContext();
   const { navigateAfterSignOut } = useSignOutContext();
+  // signInUrl already carries the current query (incl. redirect_url) in the fragment, which both routers read.
+  const addAccountUrl = buildURL(
+    { base: signInUrl, hashSearchParams: { [CLERK_ADD_ACCOUNT]: 'true' } },
+    { stringify: true },
+  );
   const { handleSignOutAllClicked, handleSessionClicked, signedInSessions, handleAddAccountClicked } =
     useMultisessionActions({
       taskUrl,
       navigateAfterSignOut,
       afterSwitchSessionUrl: afterSignInUrl,
       userProfileUrl,
-      signInUrl: signInPath ?? signInUrl,
+      signInUrl: addAccountUrl,
       user: undefined,
     });
 

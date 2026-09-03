@@ -1,5 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
-import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
+import { CLERK_ADD_ACCOUNT, ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
@@ -11,6 +11,7 @@ import type {
   SignInResource,
 } from '@clerk/shared/types';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import type { ComponentType } from 'react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -797,6 +798,34 @@ const InstantPasswordRow = ({
   );
 };
 
+const withRedirectToAccountSwitcher = <P extends object>(Component: ComponentType<P>) => {
+  const HOC = (props: P) => {
+    const clerk = useClerk();
+    const { authConfig } = useEnvironment();
+    const { multiSessionStart } = useSignInContext();
+    const { navigate, queryParams } = useRouter();
+
+    const shouldShowSwitcher =
+      multiSessionStart === 'switcher' &&
+      !authConfig.singleSessionMode &&
+      clerk.client.signedInSessions.length > 0 &&
+      queryParams[CLERK_ADD_ACCOUNT] === undefined;
+
+    useEffect(() => {
+      if (shouldShowSwitcher) {
+        void navigate('choose');
+      }
+    }, [shouldShowSwitcher, navigate]);
+
+    if (shouldShowSwitcher) {
+      return null;
+    }
+    return <Component {...props} />;
+  };
+  HOC.displayName = `withRedirectToAccountSwitcher(${Component.displayName || Component.name || 'Component'})`;
+  return HOC;
+};
+
 export const SignInStart = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
+  withRedirectToAfterSignIn(withRedirectToAccountSwitcher(withCardStateProvider(SignInStartInternal))),
 );
