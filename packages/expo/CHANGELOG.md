@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.6.4
+
+### Patch Changes
+
+- Keep post-authentication prompts open in the native `AuthView` when the Clerk iOS SDK configuration refreshes. ([#9644](https://github.com/clerk/javascript/pull/9644)) by [@seanperez29](https://github.com/seanperez29)
+
+- Updated dependencies []:
+  - @clerk/react@6.15.0
+
 ## 4.6.3
 
 ### Patch Changes
