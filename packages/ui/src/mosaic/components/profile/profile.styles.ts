@@ -33,14 +33,15 @@ export const styles = stylex.create({
    * inside a dialog. `maxWidth` here so the frame inside is what the width clamps.
    */
   root: {
-    // Centred where the host is wider — a `profile` dialog's popup spans the viewport.
+    // Centred where the host is wider — a `profile` dialog's popup spans the viewport. The frame
+    // runs wide; the content inside is held to a reading width of its own, see `contentBody`.
     marginInline: 'auto',
     containerName: 'cl-profile',
     containerType: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    maxWidth: '80rem',
+    maxWidth: '94.625rem',
     width: '100%',
   },
 
@@ -228,6 +229,12 @@ export const styles = stylex.create({
       [compact]: space['6'],
       default: space['16'],
     },
+  },
+
+  /** The pages' column: held to a reading width and centred, however wide the frame runs. */
+  contentBody: {
+    marginInline: 'auto',
+    maxInlineSize: '56rem',
   },
 
   /** The headline row. */

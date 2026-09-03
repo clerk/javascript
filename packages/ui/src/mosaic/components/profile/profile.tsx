@@ -434,7 +434,9 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
             stylex.props(reset.base, styles.contentViewport, ...contentViewportScroll),
           )}
         >
-          {children}
+          <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
+            {children}
+          </div>
         </div>
       ),
     },
