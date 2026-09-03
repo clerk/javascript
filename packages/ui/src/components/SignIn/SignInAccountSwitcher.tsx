@@ -1,4 +1,5 @@
 import { CLERK_ADD_ACCOUNT } from '@clerk/shared/internal/clerk-js/constants';
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
@@ -11,28 +12,26 @@ import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Add, ArrowRight } from '../../icons';
-import { useRouter } from '../../router';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
 const SignInAccountSwitcherInternal = () => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
-  const { afterSignInUrl, path: signInPath, signInUrl, taskUrl } = useSignInContext();
+  const { afterSignInUrl, signInUrl, taskUrl } = useSignInContext();
   const { navigateAfterSignOut } = useSignOutContext();
-  const { queryParams } = useRouter();
-  const addAccountUrl = new URL((signInPath ?? signInUrl) || window.location.href, window.location.origin);
-  if (queryParams.redirect_url && !addAccountUrl.searchParams.has('redirect_url')) {
-    addAccountUrl.searchParams.set('redirect_url', queryParams.redirect_url);
-  }
-  addAccountUrl.searchParams.set(CLERK_ADD_ACCOUNT, 'true');
+  // signInUrl already carries the current query (incl. redirect_url) in the fragment, which both routers read.
+  const addAccountUrl = buildURL(
+    { base: signInUrl, hashSearchParams: { [CLERK_ADD_ACCOUNT]: 'true' } },
+    { stringify: true },
+  );
   const { handleSignOutAllClicked, handleSessionClicked, signedInSessions, handleAddAccountClicked } =
     useMultisessionActions({
       taskUrl,
       navigateAfterSignOut,
       afterSwitchSessionUrl: afterSignInUrl,
       userProfileUrl,
-      signInUrl: addAccountUrl.toString(),
+      signInUrl: addAccountUrl,
       user: undefined,
     });
 
