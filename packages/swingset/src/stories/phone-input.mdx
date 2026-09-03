@@ -1,0 +1,72 @@
+import * as PhoneInputStories from './phone-input.stories';
+
+# PhoneInput
+
+The `PhoneInput` combines a searchable country picker and native telephone input into one Mosaic field while exposing a normalized E.164 value.
+
+It composes `InputGroup` for the telephone field and the inline `Combobox` composition for the country search inside its `Popover`.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={PhoneInputStories}
+/>
+
+## Props
+
+<PropTable
+  meta={PhoneInputStories.meta}
+  extra={[
+    { name: 'value', type: 'string', default: '—' },
+    { name: 'defaultValue', type: 'string', default: "''" },
+    { name: 'onValueChange', type: '(value: string) => void', default: '—' },
+    { name: 'country', type: 'CountryIso', default: '—' },
+    { name: 'defaultCountry', type: 'CountryIso', default: "'us'" },
+    { name: 'onCountryChange', type: '(country: CountryIso) => void', default: '—' },
+    { name: 'countrySearchPlaceholder', type: 'string', default: "'Search country or code'" },
+    { name: 'noResultsMessage', type: 'string', default: "'No countries found'" },
+  ]}
+/>
+
+`value` and `defaultValue` use E.164. `onValueChange` reports that normalized value while the visible input formats the national number. Control `country` separately when countries share a calling code.
+
+## Usage
+
+<Usage
+  component='PhoneInput'
+  module='@clerk/ui/mosaic/components/phone-input'
+  props={{ name: 'phoneNumber', placeholder: '202 555 0123' }}
+/>
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={PhoneInputStories}
+/>
+
+### Prefilled international number
+
+<Story
+  name='Prefilled'
+  storyModule={PhoneInputStories}
+/>
+
+### Disabled
+
+<Story
+  name='Disabled'
+  storyModule={PhoneInputStories}
+/>
+
+### Invalid
+
+<Story
+  name='Invalid'
+  storyModule={PhoneInputStories}
+/>

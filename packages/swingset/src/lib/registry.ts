@@ -100,6 +100,14 @@ import {
 } from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
+  Default as PhoneInputDefault,
+  Disabled as PhoneInputDisabled,
+  Invalid as PhoneInputInvalid,
+  meta as phoneInputMeta,
+  Prefilled as PhoneInputPrefilled,
+  Sizes as PhoneInputSizes,
+} from '../stories/phone-input.stories';
+import {
   Alignment as PopoverComponentAlignment,
   Default as PopoverComponentDefault,
   meta as popoverComponentMeta,
@@ -295,6 +303,15 @@ const inputGroupModule: StoryModule = {
   Sizes: InputGroupSizes,
   Disabled: InputGroupDisabled,
   Invalid: InputGroupInvalid,
+};
+
+const phoneInputModule: StoryModule = {
+  meta: phoneInputMeta,
+  Default: PhoneInputDefault,
+  Sizes: PhoneInputSizes,
+  Prefilled: PhoneInputPrefilled,
+  Disabled: PhoneInputDisabled,
+  Invalid: PhoneInputInvalid,
 };
 
 const popoverComponentModule: StoryModule = {
@@ -536,6 +553,7 @@ export const registry: StoryModule[] = [
   flowComponentModule,
   inputModule,
   inputGroupModule,
+  phoneInputModule,
   itemModule,
   dialogComponentModule,
   headingModule,
