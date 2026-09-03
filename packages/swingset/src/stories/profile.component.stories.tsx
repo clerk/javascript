@@ -1,6 +1,8 @@
+import { Button } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import type { ProfileRootProps } from '@clerk/ui/mosaic/components/profile';
 import { Profile } from '@clerk/ui/mosaic/components/profile';
+import { Section } from '@clerk/ui/mosaic/components/section';
 import { Text } from '@clerk/ui/mosaic/components/text';
 import { useState } from 'react';
 
@@ -44,7 +46,107 @@ function Placeholder({ title }: { title: string }) {
   );
 }
 
-function Surface({ forceMountPages, ...props }: Partial<ProfileRootProps> & { forceMountPages?: boolean }) {
+/** Stand-in content with the shape of a real page: a headline, then sections of rows. */
+const stubSections: Record<string, { title: string; rows: { label: string; description: string }[] }[]> = {
+  general: [
+    {
+      title: 'Profile',
+      rows: [
+        { label: 'Name', description: 'Preston Booth' },
+        { label: 'Username', description: 'prestonxyz' },
+        { label: 'Email addresses', description: 'preston@clerk.dev, preston.booth@gmail.com' },
+      ],
+    },
+    {
+      title: 'Preferences',
+      rows: [
+        { label: 'Language', description: 'English (US)' },
+        { label: 'Time zone', description: 'Mountain Time' },
+      ],
+    },
+  ],
+  security: [
+    {
+      title: 'Sign in',
+      rows: [
+        { label: 'Password', description: 'Last changed 3 months ago' },
+        { label: 'Passkeys', description: 'MacBook Pro · iPhone' },
+        { label: 'Two-step verification', description: 'Authenticator app, SMS backup' },
+      ],
+    },
+    {
+      title: 'Devices',
+      rows: [
+        { label: 'Safari on macOS', description: 'This device · Salt Lake City, UT' },
+        { label: 'Safari on iOS', description: 'Last seen 2 weeks ago · Orem, UT' },
+        { label: 'Chrome on Windows', description: 'Last seen 3 months ago · Denver, CO' },
+      ],
+    },
+  ],
+  billing: [
+    {
+      title: 'Subscription',
+      rows: [
+        { label: 'Plan', description: 'Basic · $12 / month' },
+        { label: 'Next payment', description: 'Aug 26' },
+      ],
+    },
+    {
+      title: 'Payment methods',
+      rows: [{ label: 'Visa •••• 0644', description: 'Expires 02/2029 · Default' }],
+    },
+    {
+      title: 'History',
+      rows: [
+        { label: 'May 26, 2026', description: '$25.00 · Paid' },
+        { label: 'Apr 26, 2026', description: '$25.00 · Paid' },
+        { label: 'Mar 26, 2026', description: '$12.00 · Paid' },
+      ],
+    },
+  ],
+};
+
+function StubPage({ id, title }: { id: string; title: string }) {
+  return (
+    <div style={{ display: 'grid', gap: '1rem' }}>
+      <Profile.PageTitle>{title}</Profile.PageTitle>
+      {stubSections[id]?.map(section => (
+        <Section.Root key={section.title}>
+          <Section.Title>{section.title}</Section.Title>
+          <Section.Group>
+            <Section.Row>
+              <Section.Items>
+                {section.rows.map(row => (
+                  <Section.Item key={row.label}>
+                    <Section.Content>
+                      <Section.Label>{row.label}</Section.Label>
+                      <Section.Description>{row.description}</Section.Description>
+                    </Section.Content>
+                    <Section.Actions>
+                      <Button
+                        color='neutral'
+                        size='sm'
+                        variant='outline'
+                      >
+                        Edit
+                      </Button>
+                    </Section.Actions>
+                  </Section.Item>
+                ))}
+              </Section.Items>
+            </Section.Row>
+          </Section.Group>
+        </Section.Root>
+      ))}
+    </div>
+  );
+}
+
+function Surface({
+  forceMountPages,
+  stub,
+  ...props
+}: Partial<ProfileRootProps> & { forceMountPages?: boolean; stub?: boolean }) {
   const [page, setPage] = useState('general');
   return (
     <Profile.Root
@@ -76,7 +178,14 @@ function Surface({ forceMountPages, ...props }: Partial<ProfileRootProps> & { fo
             value={item.id}
             shouldForceMount={forceMountPages}
           >
-            <Placeholder title={item.label} />
+            {stub ? (
+              <StubPage
+                id={item.id}
+                title={item.label}
+              />
+            ) : (
+              <Placeholder title={item.label} />
+            )}
           </Profile.TabPanel>
         ))}
       </Profile.Content>
@@ -221,7 +330,10 @@ export function Transitions() {
           }
         }
       `}</style>
-      <Surface forceMountPages />
+      <Surface
+        forceMountPages
+        stub
+      />
     </>
   );
 }
