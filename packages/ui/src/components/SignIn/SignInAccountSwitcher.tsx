@@ -1,3 +1,5 @@
+import { CLERK_ADD_ACCOUNT } from '@clerk/shared/internal/clerk-js/constants';
+
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -9,6 +11,7 @@ import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Add, ArrowRight } from '../../icons';
+import { useRouter } from '../../router';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
@@ -17,13 +20,19 @@ const SignInAccountSwitcherInternal = () => {
   const { userProfileUrl } = useEnvironment().displayConfig;
   const { afterSignInUrl, path: signInPath, signInUrl, taskUrl } = useSignInContext();
   const { navigateAfterSignOut } = useSignOutContext();
+  const { queryParams } = useRouter();
+  const addAccountUrl = new URL((signInPath ?? signInUrl) || window.location.href, window.location.origin);
+  if (queryParams.redirect_url && !addAccountUrl.searchParams.has('redirect_url')) {
+    addAccountUrl.searchParams.set('redirect_url', queryParams.redirect_url);
+  }
+  addAccountUrl.searchParams.set(CLERK_ADD_ACCOUNT, 'true');
   const { handleSignOutAllClicked, handleSessionClicked, signedInSessions, handleAddAccountClicked } =
     useMultisessionActions({
       taskUrl,
       navigateAfterSignOut,
       afterSwitchSessionUrl: afterSignInUrl,
       userProfileUrl,
-      signInUrl: signInPath ?? signInUrl,
+      signInUrl: addAccountUrl.toString(),
       user: undefined,
     });
 
