@@ -3,7 +3,7 @@ export type {
   ProfileContentProps,
   ProfileNavItemProps,
   ProfileNavProps,
-  ProfilePageProps,
+  ProfileTabPanelProps,
   ProfilePageTitleProps,
   ProfileRootProps,
   ProfileTitleProps,

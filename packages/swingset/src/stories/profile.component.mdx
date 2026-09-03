@@ -44,8 +44,8 @@ import { Profile } from '@clerk/ui/mosaic/components/profile';
     </Profile.NavItem>
   </Profile.Nav>
   <Profile.Content>
-    <Profile.Page value='account'>…</Profile.Page>
-    <Profile.Page value='security'>…</Profile.Page>
+    <Profile.TabPanel value='account'>…</Profile.TabPanel>
+    <Profile.TabPanel value='security'>…</Profile.TabPanel>
   </Profile.Content>
 </Profile.Root>;
 ```
@@ -57,14 +57,14 @@ sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 ## Parts
 
-| Part              | Element               | Slot                  |
-| ----------------- | --------------------- | --------------------- |
-| `Profile.Root`    | `div` (the container) | `cl-profile`          |
-| `Profile.Nav`     | `nav` (labelled)      | `cl-profile-nav`      |
-| —                 | tablist               | `cl-profile-nav-list` |
-| `Profile.NavItem` | `button[role=tab]`    | `cl-profile-nav-item` |
-| `Profile.Content` | `div` (scroll region) | `cl-profile-content`  |
-| `Profile.Page`    | `div[role=tabpanel]`  | `cl-profile-page`     |
+| Part               | Element               | Slot                   |
+| ------------------ | --------------------- | ---------------------- |
+| `Profile.Root`     | `div` (the container) | `cl-profile`           |
+| `Profile.Nav`      | `nav` (labelled)      | `cl-profile-nav`       |
+| —                  | tablist               | `cl-profile-nav-list`  |
+| `Profile.NavItem`  | `button[role=tab]`    | `cl-profile-nav-item`  |
+| `Profile.Content`  | `div` (scroll region) | `cl-profile-content`   |
+| `Profile.TabPanel` | `div[role=tabpanel]`  | `cl-profile-tab-panel` |
 
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog.

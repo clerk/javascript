@@ -70,7 +70,7 @@ function useCompact(node: HTMLElement | null): boolean {
 }
 
 export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'children'> {
-  /** The selected page, by the `value` of its `Profile.NavItem` and `Profile.Page`. */
+  /** The selected page, by the `value` of its `Profile.NavItem` and `Profile.TabPanel`. */
   value: string;
   onValueChange?: (value: string) => void;
   /**
@@ -145,7 +145,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     }
     wasNavOpen.current = false;
     const caret = node.querySelector<HTMLElement>(
-      '.cl-profile-page:not([hidden]):not([inert]) .cl-profile-nav-trigger',
+      '.cl-profile-tab-panel:not([hidden]):not([inert]) .cl-profile-nav-trigger',
     );
     caret?.focus();
   }, [navOpen, node]);
@@ -309,14 +309,14 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
 });
 
 export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
-  /** Matches the `value` of the `Profile.Page` this destination opens. */
+  /** Matches the `value` of the `Profile.TabPanel` this destination opens. */
   value: string;
   /** Leads the label. Any node, so a page of the consumer's own can bring its own mark. */
   icon?: React.ReactNode;
   disabled?: boolean;
 }
 
-/** A destination. Selecting it shows the `Profile.Page` sharing its `value`. */
+/** A destination. Selecting it shows the `Profile.TabPanel` sharing its `value`. */
 const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(function ProfileNavItem(
   { value, icon, disabled, children, render, className, style, onClick, ...rest },
   ref,
@@ -458,7 +458,7 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
   });
 });
 
-export interface ProfilePageProps extends MosaicComponentProps<'div'> {
+export interface ProfileTabPanelProps extends MosaicComponentProps<'div'> {
   /** Matches the `value` of the `Profile.NavItem` that opens this page. */
   value: string;
   /**
@@ -475,7 +475,7 @@ export interface ProfilePageProps extends MosaicComponentProps<'div'> {
  * — `data-open` / `data-closed`, `data-starting-style` / `data-ending-style`, and
  * `--cl-tab-transition-direction` — so a page transition is a styling change rather than a new part.
  */
-const Page = React.forwardRef<HTMLDivElement, ProfilePageProps>(function ProfilePage(
+const TabPanel = React.forwardRef<HTMLDivElement, ProfileTabPanelProps>(function ProfileTabPanel(
   { value, shouldForceMount, className, style, ...rest },
   ref,
 ) {
@@ -484,7 +484,7 @@ const Page = React.forwardRef<HTMLDivElement, ProfilePageProps>(function Profile
       ref={ref}
       value={value}
       shouldForceMount={shouldForceMount}
-      {...mergeStyleProps(themeProps('profile-page', { value }), className, style)}
+      {...mergeStyleProps(themeProps('profile-tab-panel', { value }), className, style)}
       {...rest}
     />
   );
@@ -492,8 +492,8 @@ const Page = React.forwardRef<HTMLDivElement, ProfilePageProps>(function Profile
 
 /**
  * A surface you navigate, composed through `Profile.Root`, `Profile.Title`, `Profile.Nav`,
- * `Profile.NavItem`, `Profile.Content`, `Profile.Page`, and `Profile.PageTitle`. Every part accepts the Mosaic
- * `render` prop and forwards its ref.
+ * `Profile.NavItem`, `Profile.Content`, `Profile.TabPanel`, and `Profile.PageTitle`. Every part
+ * accepts the Mosaic `render` prop and forwards its ref.
  *
  * ```tsx
  * <Profile.Root value={page} onValueChange={setPage}>
@@ -502,9 +502,9 @@ const Page = React.forwardRef<HTMLDivElement, ProfilePageProps>(function Profile
  *     <Profile.NavItem value='account' icon={<Icon name='user-circle' size='sm' />}>Account</Profile.NavItem>
  *   </Profile.Nav>
  *   <Profile.Content>
- *     <Profile.Page value='account'>…</Profile.Page>
+ *     <Profile.TabPanel value='account'>…</Profile.TabPanel>
  *   </Profile.Content>
  * </Profile.Root>
  * ```
  */
-export const Profile = { Root, Title, Nav, NavItem, PageTitle, Content, Page };
+export const Profile = { Root, Title, Nav, NavItem, PageTitle, Content, TabPanel };

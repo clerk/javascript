@@ -71,13 +71,13 @@ function Surface({ forceMountPages, ...props }: Partial<ProfileRootProps> & { fo
       </Profile.Nav>
       <Profile.Content>
         {pages.map(item => (
-          <Profile.Page
+          <Profile.TabPanel
             key={item.id}
             value={item.id}
             shouldForceMount={forceMountPages}
           >
             <Placeholder title={item.label} />
-          </Profile.Page>
+          </Profile.TabPanel>
         ))}
       </Profile.Content>
     </Profile.Root>
@@ -195,27 +195,27 @@ export function Transitions() {
           .cl-profile-content-body {
             display: grid;
           }
-          .cl-profile-page {
+          .cl-profile-tab-panel {
             grid-area: 1 / 1;
             transition-property: opacity, scale, filter;
             transition-duration: var(--cl-duration-slow);
             transition-timing-function: var(--cl-ease-enter);
           }
-          .cl-profile-page[data-ending-style] {
+          .cl-profile-tab-panel[data-ending-style] {
             transition-duration: var(--cl-duration-base);
             transition-timing-function: var(--cl-ease-exit);
           }
-          .cl-profile-page[data-starting-style],
-          .cl-profile-page[data-ending-style] {
+          .cl-profile-tab-panel[data-starting-style],
+          .cl-profile-tab-panel[data-ending-style] {
             opacity: 0;
             scale: 0.98;
             filter: blur(4px);
           }
-          .cl-profile-page:not([data-open]):not([data-ending-style]) {
+          .cl-profile-tab-panel:not([data-open]):not([data-ending-style]) {
             display: none;
           }
           @media (prefers-reduced-motion: reduce) {
-            .cl-profile-page {
+            .cl-profile-tab-panel {
               transition: none;
             }
           }
