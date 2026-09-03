@@ -188,6 +188,17 @@ export type {
 } from './api/resources';
 
 /**
+ * Endpoint params and responses
+ */
+export type {
+  CheckParams,
+  ExplicitCheckParams,
+  OAuthMachineCheckParams,
+  OpaqueMachineCheckParams,
+  PolicyApiResponse,
+} from './api/endpoints/PolicyApi';
+
+/**
  * Webhooks event types
  */
 export type {

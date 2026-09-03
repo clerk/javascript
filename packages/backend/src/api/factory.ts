@@ -23,6 +23,7 @@ import {
   OrganizationPermissionAPI,
   OrganizationRoleAPI,
   PhoneNumberAPI,
+  PolicyAPI,
   ProxyCheckAPI,
   RedirectUrlAPI,
   RoleSetAPI,
@@ -108,6 +109,10 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     organizationPermissions: new OrganizationPermissionAPI(request),
     organizationRoles: new OrganizationRoleAPI(request),
     phoneNumbers: new PhoneNumberAPI(request),
+    /**
+     * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+     */
+    policy: new PolicyAPI(request),
     proxyChecks: new ProxyCheckAPI(request),
     redirectUrls: new RedirectUrlAPI(request),
     roleSets: new RoleSetAPI(request),
