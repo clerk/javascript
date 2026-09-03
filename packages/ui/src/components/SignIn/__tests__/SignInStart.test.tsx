@@ -82,7 +82,7 @@ describe('SignInStart', () => {
 
     it('redirects to the account switcher when the prop is "switcher" and signed-in sessions exist', async () => {
       const { wrapper, fixtures, props } = await createFixtures(withSignedInSessions);
-      props.setProps({ __experimental_multiSessionStart: 'switcher' });
+      props.setProps({ multiSessionStart: 'switcher' });
       render(<SignInStart />, { wrapper });
       await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('choose'));
       expect(screen.queryByText(/sign in to .*/i)).toBeNull();
@@ -93,7 +93,7 @@ describe('SignInStart', () => {
         f.withEmailAddress();
         f.withMultiSessionMode();
       });
-      props.setProps({ __experimental_multiSessionStart: 'switcher' });
+      props.setProps({ multiSessionStart: 'switcher' });
       render(<SignInStart />, { wrapper });
       screen.getAllByText(/sign in to .*/i);
       expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
@@ -104,7 +104,7 @@ describe('SignInStart', () => {
         router: { queryParams: { __clerk_add_account: 'true' } },
       });
       const { wrapper, fixtures, props } = await createFixturesWithAddAccount(withSignedInSessions);
-      props.setProps({ __experimental_multiSessionStart: 'switcher' });
+      props.setProps({ multiSessionStart: 'switcher' });
       render(<SignInStart />, { wrapper });
       screen.getAllByText(/sign in to .*/i);
       expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
@@ -115,7 +115,7 @@ describe('SignInStart', () => {
         f.withEmailAddress();
         f.withUser({ email_addresses: ['test1@clerk.com'] });
       });
-      props.setProps({ __experimental_multiSessionStart: 'switcher' });
+      props.setProps({ multiSessionStart: 'switcher' });
       render(<SignInStart />, { wrapper });
       expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
     });

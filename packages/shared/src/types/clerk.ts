@@ -1908,10 +1908,8 @@ export type SignInProps = RoutingOptions & {
    * with "Add account" and "Sign out of all accounts". Ignored in single-session mode.
    *
    * @default 'form'
-   *
-   * @experimental
    */
-  __experimental_multiSessionStart?: 'form' | 'switcher';
+  multiSessionStart?: 'form' | 'switcher';
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
