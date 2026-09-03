@@ -15,9 +15,11 @@ export const meta: StoryMeta = {
   styles: {
     _variants: {
       size: { sm: {}, md: {}, lg: {} },
+      variant: { default: {}, ghost: {} },
     },
     _defaultVariants: {
       size: 'md',
+      variant: 'default',
     },
   },
 };
@@ -74,5 +76,17 @@ export function Invalid(props: Record<string, unknown>) {
       aria-invalid='true'
       placeholder='Invalid'
     />
+  );
+}
+
+export function Ghost(props: Record<string, unknown>) {
+  return (
+    <div style={{ border: '1px solid currentColor', borderRadius: 8 }}>
+      <Input
+        {...knobsAsProps(props)}
+        variant='ghost'
+        placeholder='Parent provides the field chrome'
+      />
+    </div>
   );
 }

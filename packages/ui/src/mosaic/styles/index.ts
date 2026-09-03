@@ -49,7 +49,7 @@ export type { HeadingProps } from '../components/heading';
 export { Icon, IconFrame } from '../components/icon';
 export type { IconFrameProps, IconProps } from '../components/icon';
 export { Input } from '../components/input';
-export type { InputProps } from '../components/input';
+export type { InputProps, InputVariant } from '../components/input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';

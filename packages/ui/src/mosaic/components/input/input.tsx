@@ -9,13 +9,19 @@ import { reset } from '../../utils/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { sizes, styles } from './input.styles';
 
+/** `default` provides field chrome; `ghost` keeps input sizing while its container provides chrome and focus styling. */
+export type InputVariant = 'default' | 'ghost';
+
 export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> {
   size?: 'sm' | 'md' | 'lg';
+  /** Removes field chrome so a parent composition can provide it. @default 'default' */
+  variant?: InputVariant;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(function MosaicInput(
   {
     size = 'md',
+    variant = 'default',
     disabled: disabledProp,
     required: requiredProp,
     render,
@@ -52,8 +58,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
       'aria-labelledby': fieldProps?.['aria-labelledby'] ?? ariaLabelledBy,
       'aria-describedby': fieldProps?.['aria-describedby'] ?? ariaDescribedBy,
       ...mergeStyleProps(
-        themeProps('input', { size, disabled }),
-        stylex.props(reset.base, inputStyles.base, styles.base, sizes[size], disabled && inputStyles.disabled),
+        themeProps('input', { size, variant, disabled }),
+        stylex.props(
+          reset.base,
+          styles.base,
+          sizes[size],
+          variant === 'default' && inputStyles.base,
+          variant === 'ghost' && styles.ghost,
+          variant === 'default' && disabled && inputStyles.disabled,
+        ),
         className,
         style,
       ),

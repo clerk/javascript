@@ -65,6 +65,7 @@ import {
 import {
   Default,
   Disabled as InputDisabled,
+  Ghost as InputGhost,
   Invalid,
   meta as inputMeta,
   Sizes as InputSizes,
@@ -261,7 +262,14 @@ const bannerModule: StoryModule = {
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
-const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
+const inputModule: StoryModule = {
+  meta: inputMeta,
+  Default,
+  Sizes: InputSizes,
+  Disabled: InputDisabled,
+  Invalid,
+  Ghost: InputGhost,
+};
 
 const popoverComponentModule: StoryModule = {
   meta: popoverComponentMeta,
