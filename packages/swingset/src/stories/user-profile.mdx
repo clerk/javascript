@@ -6,16 +6,12 @@ The complete user profile: a `Profile` whose navigation lists the Account, Secur
 API Keys pages it was given content for, then any pages of the consumer's own, in the order asked
 for. Rendered inside a `profile` dialog it names it, carries its dismiss, and fills its height.
 
-<Story
+<Preview
   name='Default'
   storyModule={Stories}
-  composition={[
-    { name: 'Profile panel', href: '/user-profile/user-profile-profile-panel', layer: 'User Profile' },
-    { name: 'Security panel', href: '/user-profile/user-profile-security-panel', layer: 'User Profile' },
-    { name: 'Billing panel', href: '/user-profile/user-profile-billing-panel', layer: 'User Profile' },
-    { name: 'API keys panel', href: '/user-profile/user-profile-api-keys-panel', layer: 'User Profile' },
-  ]}
 />
+
+<PropTable meta={Stories.meta} />
 
 ## As an overlay
 
@@ -25,4 +21,10 @@ and animates the popup; the profile paints it, names it, and carries the dismiss
 <Story
   name='Overlay'
   storyModule={Stories}
+  composition={[
+    { name: 'Profile panel', href: '/user-profile/user-profile-profile-panel', layer: 'User Profile' },
+    { name: 'Security panel', href: '/user-profile/user-profile-security-panel', layer: 'User Profile' },
+    { name: 'Billing panel', href: '/user-profile/user-profile-billing-panel', layer: 'User Profile' },
+    { name: 'API keys panel', href: '/user-profile/user-profile-api-keys-panel', layer: 'User Profile' },
+  ]}
 />

@@ -10,6 +10,7 @@ import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Branding } from '../branding';
 import { Dialog, DialogContext } from '../dialog';
+import type { DrawerHeight } from '../drawer';
 import { Drawer } from '../drawer';
 import { Heading } from '../heading';
 import { Icon } from '../icon';
@@ -25,6 +26,7 @@ interface ProfileContextValue {
   navOpen: boolean;
   openNav: () => void;
   closeNav: () => void;
+  navSheetHeight: DrawerHeight;
 }
 
 const ProfileContext = React.createContext<ProfileContextValue | null>(null);
@@ -86,6 +88,11 @@ export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'chi
    * @default true
    */
   renderBranding?: boolean;
+  /**
+   * TEMPORARY, for design review: how tall the compact navigation sheet stands. Removed once a
+   * height is chosen.
+   */
+  navSheetHeight?: DrawerHeight;
   children: React.ReactNode;
 }
 
@@ -105,6 +112,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     orientation = 'vertical',
     activationMode,
     renderBranding = true,
+    navSheetHeight = 'content',
     children,
     render,
     className,
@@ -140,8 +148,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     caret?.focus();
   }, [navOpen, node]);
   const context = React.useMemo(
-    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav }),
-    [titleId, renderBranding, compact, navOpen, openNav, closeNav],
+    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight }),
+    [titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight],
   );
   const mergedRef = React.useCallback(
     (element: HTMLDivElement | null) => {
@@ -248,7 +256,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
-  const { titleId, renderBranding, compact, navOpen, closeNav } = profile;
+  const { titleId, renderBranding, compact, navOpen, closeNav, navSheetHeight } = profile;
   const list = (
     <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
       {children}
@@ -288,7 +296,12 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
         }
       }}
     >
-      <Drawer.Popup aria-labelledby={titleId}>{element}</Drawer.Popup>
+      <Drawer.Popup
+        aria-labelledby={titleId}
+        height={navSheetHeight}
+      >
+        {element}
+      </Drawer.Popup>
     </Drawer.Root>
   );
 });
