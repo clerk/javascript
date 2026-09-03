@@ -3,9 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { Dialog } from '../dialog';
-import { AlertDialog } from './alert-dialog';
 import { createConfirmHandle } from './confirm-handle';
+import { Dialog } from './dialog';
 import { useConfirmedClose } from './use-confirmed-close';
 
 afterEach(() => cleanup());
@@ -44,24 +43,26 @@ function GuardedForm({ onClosed }: { onClosed?: () => void } = {}) {
   });
 
   return (
-    <Dialog
+    <Dialog.Root
       open={open}
       onOpenChange={onOpenChange}
       closedBy='closerequest'
     >
-      <Dialog.Title>Add email address</Dialog.Title>
-      <input
-        ref={inputRef}
-        aria-label='Email address'
-        value={value}
-        onChange={event => setValue(event.target.value)}
-      />
-      <Dialog.Close>Cancel</Dialog.Close>
-      <AlertDialog.Confirm
-        handle={confirm}
-        finalFocus={inputRef}
-      />
-    </Dialog>
+      <Dialog.Popup>
+        <Dialog.Title>Add email address</Dialog.Title>
+        <input
+          ref={inputRef}
+          aria-label='Email address'
+          value={value}
+          onChange={event => setValue(event.target.value)}
+        />
+        <Dialog.Close>Cancel</Dialog.Close>
+        <Dialog.Confirm
+          handle={confirm}
+          finalFocus={inputRef}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
   );
 }
 
@@ -202,20 +203,22 @@ describe('createConfirmHandle', () => {
 
     function Harness() {
       return (
-        <Dialog defaultOpen>
-          <Dialog.Title>Host</Dialog.Title>
-          <button
-            type='button'
-            onClick={() => {
-              void handle
-                .show({ title: 'Delete this key?', description: 'Applications using it stop working.' })
-                .then(answer => answers.push(answer));
-            }}
-          >
-            Ask
-          </button>
-          <AlertDialog.Confirm handle={handle} />
-        </Dialog>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Dialog.Title>Host</Dialog.Title>
+            <button
+              type='button'
+              onClick={() => {
+                void handle
+                  .show({ title: 'Delete this key?', description: 'Applications using it stop working.' })
+                  .then(answer => answers.push(answer));
+              }}
+            >
+              Ask
+            </button>
+            <Dialog.Confirm handle={handle} />
+          </Dialog.Popup>
+        </Dialog.Root>
       );
     }
     render(<Harness />);
@@ -235,18 +238,20 @@ describe('createConfirmHandle', () => {
     const answers: boolean[] = [];
 
     render(
-      <Dialog defaultOpen>
-        <Dialog.Title>Host</Dialog.Title>
-        <button
-          type='button'
-          onClick={() => {
-            void handle.show({ title: 'Sure?', description: 'No going back.' }).then(a => answers.push(a));
-          }}
-        >
-          Ask
-        </button>
-        <AlertDialog.Confirm handle={handle} />
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.Title>Host</Dialog.Title>
+          <button
+            type='button'
+            onClick={() => {
+              void handle.show({ title: 'Sure?', description: 'No going back.' }).then(a => answers.push(a));
+            }}
+          >
+            Ask
+          </button>
+          <Dialog.Confirm handle={handle} />
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     await user.click(screen.getByRole('button', { name: 'Ask' }));
@@ -258,10 +263,12 @@ describe('createConfirmHandle', () => {
   it('returns the in-flight promise rather than opening a second confirmation', async () => {
     const handle = createConfirmHandle();
     render(
-      <Dialog defaultOpen>
-        <Dialog.Title>Host</Dialog.Title>
-        <AlertDialog.Confirm handle={handle} />
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.Title>Host</Dialog.Title>
+          <Dialog.Confirm handle={handle} />
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     let first!: Promise<boolean>;
@@ -283,10 +290,12 @@ describe('createConfirmHandle', () => {
 
     function Harness({ mounted }: { mounted: boolean }) {
       return (
-        <Dialog defaultOpen>
-          <Dialog.Title>Host</Dialog.Title>
-          {mounted ? <AlertDialog.Confirm handle={handle} /> : null}
-        </Dialog>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Dialog.Title>Host</Dialog.Title>
+            {mounted ? <Dialog.Confirm handle={handle} /> : null}
+          </Dialog.Popup>
+        </Dialog.Root>
       );
     }
     const { rerender } = render(<Harness mounted />);
@@ -310,14 +319,16 @@ describe('createConfirmHandle', () => {
     const handle = createConfirmHandle();
 
     await expect(handle.show({ title: 'Sure?', description: 'No going back.' })).resolves.toBe(false);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<AlertDialog.Confirm>'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Dialog.Confirm>'));
 
     // Not poisoned: the unanswerable request is not retained, so mounting one still works.
     render(
-      <Dialog defaultOpen>
-        <Dialog.Title>Host</Dialog.Title>
-        <AlertDialog.Confirm handle={handle} />
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.Title>Host</Dialog.Title>
+          <Dialog.Confirm handle={handle} />
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
     await act(async () => {
       void handle.show({ title: 'Again?', description: 'Still no going back.' });

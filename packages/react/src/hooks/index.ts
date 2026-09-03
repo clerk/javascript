@@ -12,6 +12,7 @@ export {
   useReverification,
   useAPIKeys,
   useOAuthConsent,
+  useOAuthDeviceVerification,
   __experimental_useCheckout,
   __experimental_CheckoutProvider,
   __experimental_usePaymentElement,

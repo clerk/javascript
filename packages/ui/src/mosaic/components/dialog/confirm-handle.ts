@@ -1,7 +1,7 @@
 import { Dialog as Primitive, type DialogHandle } from '@clerk/headless/dialog';
 import type { ReactNode } from 'react';
 
-/** What a confirmation asks. Delivered to `<AlertDialog.Confirm>` as the dialog's payload. */
+/** What a confirmation asks. Delivered to `<Dialog.Confirm>` as the dialog's payload. */
 export interface ConfirmOptions {
   title: ReactNode;
   description: ReactNode;
@@ -14,7 +14,7 @@ export interface ConfirmOptions {
 }
 
 /**
- * Links a `show()` call to the `<AlertDialog.Confirm>` that answers it. Create with
+ * Links a `show()` call to the `<Dialog.Confirm>` that answers it. Create with
  * {@link createConfirmHandle}; `show` is the whole public surface.
  */
 export interface ConfirmHandle {
@@ -27,14 +27,14 @@ export interface ConfirmHandle {
    * confirmations, one per keypress. The options of the later call are ignored, since the
    * question on screen is already the one being answered.
    *
-   * The `<AlertDialog.Confirm>` must be MOUNTED when this is called. It is what opens, and a
+   * The `<Dialog.Confirm>` must be MOUNTED when this is called. It is what opens, and a
    * `dialog.open()` with no root attached is a no-op. Since the confirmation belongs inside the
    * dialog it guards, that means asking only from inside that dialog while it is open. Calling it
    * with nothing mounted resolves `false` and warns in development; a confirmation that unmounts
    * with a question in flight answers `false` too, rather than hanging.
    */
   show(options: ConfirmOptions): Promise<boolean>;
-  /** The dialog handle `<AlertDialog.Confirm>` mounts against. @internal */
+  /** The dialog handle `<Dialog.Confirm>` mounts against. @internal */
   readonly dialog: DialogHandle<ConfirmOptions>;
   /**
    * Resolves the in-flight promise, if any. Idempotent per question: the second call for the same
@@ -55,7 +55,7 @@ export interface ConfirmHandle {
  * }
  * ```
  *
- * The dialog itself is still rendered as JSX — `<AlertDialog.Confirm handle={confirm} />` — and
+ * The dialog itself is still rendered as JSX — `<Dialog.Confirm handle={confirm} />` — and
  * where it is rendered matters: it belongs inside the dialog it guards, so the two are in the same
  * floating tree and escape ordering, the stacking styles and the refcounted scroll lock all apply.
  * A confirmation mounted app-globally would be a sibling of the dialog rather than a child of it,
@@ -80,7 +80,7 @@ export function createConfirmHandle(): ConfirmHandle {
       if (!dialog.hasRoot) {
         if (process.env.NODE_ENV !== 'production') {
           console.warn(
-            '[clerk] `confirm.show()` was called with no `<AlertDialog.Confirm>` mounted against this handle, so there is nothing to open. It resolved `false`. Render `<AlertDialog.Confirm handle={…} />` inside the dialog it guards, and ask only while that dialog is open.',
+            '[clerk] `confirm.show()` was called with no `<Dialog.Confirm>` mounted against this handle, so there is nothing to open. It resolved `false`. Render `<Dialog.Confirm handle={…} />` inside the dialog it guards, and ask only while that dialog is open.',
           );
         }
         return Promise.resolve(false);

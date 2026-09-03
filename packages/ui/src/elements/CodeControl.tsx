@@ -202,7 +202,7 @@ export const OTPCodeControl = () => {
             role='group'
           >
             {slots.map((slot, index: number) => (
-              <Slot
+              <OTPInputSlot
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
                 elementDescriptor={descriptors.otpCodeFieldInput}
@@ -219,7 +219,9 @@ export const OTPCodeControl = () => {
   );
 };
 
-function Slot(props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { isSuccessfullyFilled?: boolean }) {
+export function OTPInputSlot(
+  props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { isSuccessfullyFilled?: boolean },
+) {
   const { isSuccessfullyFilled, ...otpProps } = props;
   const { char, hasFakeCaret, isActive, placeholderChar, ...rest } = otpProps;
   return (

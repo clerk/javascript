@@ -2,17 +2,16 @@ import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Card } from '@clerk/ui/mosaic/components/card';
 import type { DialogSize } from '@clerk/ui/mosaic/components/dialog';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/ui/mosaic/components/dialog';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Input } from '@clerk/ui/mosaic/components/input';
-import { Item } from '@clerk/ui/mosaic/components/item';
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
 import { Text } from '@clerk/ui/mosaic/components/text';
-import * as stylex from '@stylexjs/stylex';
+import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { useUserPageFixture } from './fixtures/user-page';
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -37,419 +36,362 @@ const dialogTrigger = (props: RenderProps) => <Button {...props}>Open dialog</Bu
 export function Default(args: Record<string, unknown>) {
   const { size } = args as { size?: DialogSize };
   return (
-    <Dialog
-      size={size}
-      trigger={dialogTrigger}
+    <Dialog.Root>
+      <Dialog.Trigger render={dialogTrigger} />
+      <Dialog.Popup size={size}>
+        <Dialog.CloseButton />
+        <Dialog.Title>Confirm action</Dialog.Title>
+        <Dialog.Description>Are you sure you want to proceed? This action cannot be undone.</Dialog.Description>
+        <Dialog.Close render={<Button color='negative' />}>Cancel</Dialog.Close>
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+const deleteTrigger = (props: RenderProps) => (
+  <Button
+    {...props}
+    color='negative'
+  >
+    Delete organization
+  </Button>
+);
+
+/**
+ * `role='alertdialog'` is the whole difference: it announces as an interruption, an outside press
+ * cannot dismiss it, and it is always a `prompt`. `Dialog.Actions` holds the answer, cancel first.
+ */
+export function Alert() {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <Dialog.Root
+      role='alertdialog'
+      open={open}
+      onOpenChange={setOpen}
     >
-      {({ close }) => (
-        <>
-          <Dialog.CloseButton />
-          <Dialog.Title>Confirm action</Dialog.Title>
-          <Dialog.Description>Are you sure you want to proceed? This action cannot be undone.</Dialog.Description>
+      <Dialog.Trigger render={deleteTrigger} />
+      <Dialog.Popup>
+        <Dialog.Title render={<Heading size='sm' />}>Delete Acme Inc?</Dialog.Title>
+        <Dialog.Description render={<Text />}>
+          The organization and everything in it will be permanently removed. This cannot be undone.
+        </Dialog.Description>
+        <Dialog.Actions>
+          <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+          {/* Not a `Dialog.Close`: the action is where the work happens, so the caller closes
+              once it resolves rather than the button closing on press. */}
           <Button
             color='negative'
-            onClick={close}
+            onClick={() => setOpen(false)}
           >
-            Cancel
+            Delete organization
           </Button>
-        </>
-      )}
-    </Dialog>
+        </Dialog.Actions>
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email address</Button>;
+
+// `useConfirmedClose` wraps the dialog's own `onOpenChange`, so every close it owns — Escape, the
+// corner X, `Dialog.Close` — is guarded by one hook and a veto is just the absence of a commit.
+// `Dialog.Confirm` renders INSIDE the dialog it guards so the two share a floating tree, which
+// escape ordering, the stacking styles and the refcounted scroll lock all depend on. `finalFocus` is
+// optional but wanted here: a confirmation raised by a close request has no trigger to return to.
+export function DiscardChanges() {
+  const confirm = React.useMemo(() => createConfirmHandle(), []);
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const onOpenChange = useConfirmedClose({
+    handle: confirm,
+    when: () => value.trim() !== '',
+    onOpenChange: next => {
+      setOpen(next);
+      if (!next) {
+        setValue('');
+      }
+    },
+    confirm: {
+      title: 'Discard changes?',
+      description: 'You have not finished adding this address. It will not be saved.',
+      actionLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
+    },
+  });
+
+  return (
+    <Dialog.Root
+      closedBy='closerequest'
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <Dialog.Trigger render={addEmailTrigger} />
+      <Dialog.Popup>
+        <Dialog.CloseButton />
+        <Dialog.Title render={<Heading size='sm' />}>Add email address</Dialog.Title>
+        <Dialog.Description render={<Text />}>
+          You will need to verify this address before it can be used.
+        </Dialog.Description>
+        {/* A form, so Enter in the field is the primary action; Tab stays in visual order. Adding
+            is the one close that must not be questioned, so it goes straight to `setOpen`, past
+            the guard. */}
+        <form
+          style={{ display: 'contents' }}
+          onSubmit={event => {
+            event.preventDefault();
+            setValue('');
+            setOpen(false);
+          }}
+        >
+          <Input
+            ref={inputRef}
+            type='email'
+            placeholder='name@example.com'
+            value={value}
+            onChange={event => setValue(event.target.value)}
+          />
+          <Dialog.Actions>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+            <Button type='submit'>Add</Button>
+          </Dialog.Actions>
+        </form>
+
+        <Dialog.Confirm
+          handle={confirm}
+          finalFocus={inputRef}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
   );
 }
 
 const accountTrigger = (props: RenderProps) => <Button {...props}>Open account</Button>;
 
-const addTrigger = (label: string) => (props: RenderProps) => (
-  <Button
-    {...props}
-    variant='outline'
-    size='sm'
-  >
-    <Icon
-      name='plus'
-      placement='inline-start'
-    />
-    {label}
-  </Button>
-);
-
-const addEmailTrigger = addTrigger('Add email address');
-const addPhoneTrigger = addTrigger('Add phone number');
-const deleteAccountTrigger = (props: RenderProps) => (
-  <Button
-    {...props}
-    color='negative'
-    variant='outline'
-    size='sm'
-  >
-    Delete account
-  </Button>
-);
-
-// A `panel` has no padding of its own, so a body of ordinary content supplies it.
-const panelBody = {
-  display: 'flex',
-  flex: 1,
-  flexDirection: 'column',
-  gap: '0.75rem',
-  minHeight: 0,
-  overflowY: 'auto',
-  padding: '1.5rem',
-} as const;
-
-const sectionHeader = {
-  alignItems: 'center',
-  display: 'flex',
-  gap: '1rem',
-  justifyContent: 'space-between',
-} as const;
-
 /**
- * A `prompt` dialog opened from inside the `panel` — the shape the account profile uses.
- *
- * With `confirmDiscard`, closing it while the field holds anything opens a confirmation stacked on
- * top rather than closing: `panel -> prompt -> prompt`, and the veto is nothing more than a
- * controlled `open` whose `onOpenChange` declines to commit. Hand-rolled here on purpose, to show
- * that a veto needs no machinery; `AlertDialog`'s `useConfirmedClose` is the same thing packaged,
- * and its page has the composed version.
+ * The "add email address" prompt the account panel opens, driven by `open` rather than a trigger.
+ * Closing it with a value typed asks first — `panel -> prompt -> prompt`.
  */
-function AddValueDialog({
-  trigger,
-  title,
-  description,
-  placeholder,
-  confirmLabel = 'Continue',
-  confirmColor,
-  confirmDiscard = false,
+function AddEmailDialog({
+  open,
+  onOpenChange,
+  onAdd,
 }: {
-  trigger: (props: RenderProps) => React.ReactElement;
-  title: string;
-  description: string;
-  placeholder: string;
-  confirmLabel?: string;
-  confirmColor?: 'negative';
-  confirmDiscard?: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onAdd: (value: string) => void;
 }) {
-  const [open, setOpen] = React.useState(false);
-  const [discardOpen, setDiscardOpen] = React.useState(false);
+  const confirm = React.useMemo(() => createConfirmHandle(), []);
   const [value, setValue] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const dismiss = () => {
-    setValue('');
-    setOpen(false);
-  };
+  const guardedOpenChange = useConfirmedClose({
+    handle: confirm,
+    when: () => value.trim() !== '',
+    onOpenChange: next => {
+      onOpenChange(next);
+      if (!next) {
+        setValue('');
+      }
+    },
+    confirm: {
+      title: 'Discard changes?',
+      description: 'You have not finished adding this address. It will not be saved.',
+      actionLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
+    },
+  });
 
   return (
-    <Dialog
-      trigger={trigger}
+    <Dialog.Root
       closedBy='closerequest'
       open={open}
-      onOpenChange={next => {
-        // The veto. Every close request lands here — Escape, the corner X, `Dialog.Close` — so
-        // declining to commit covers all of them at once. A footer button wired to a bare
-        // `setOpen(false)` would go around it, which is the argument for `Dialog.Close`.
-        if (!next && confirmDiscard && value.trim() !== '') {
-          setDiscardOpen(true);
-          return;
-        }
-        if (!next) {
-          setValue('');
-        }
-        setOpen(next);
+      onOpenChange={guardedOpenChange}
+    >
+      <Dialog.Popup>
+        <Dialog.CloseButton />
+        <Dialog.Title render={<Heading size='sm' />}>Add email address</Dialog.Title>
+        <Dialog.Description render={<Text />}>A verification code will be sent to this address.</Dialog.Description>
+        {/* Straight to the parent's setter on submit: adding is the one close that must not be
+            questioned. A form, so Enter in the field adds. */}
+        <form
+          style={{ display: 'contents' }}
+          onSubmit={event => {
+            event.preventDefault();
+            onAdd(value.trim());
+            setValue('');
+            onOpenChange(false);
+          }}
+        >
+          <Input
+            ref={inputRef}
+            type='email'
+            required
+            placeholder='you@example.com'
+            value={value}
+            onChange={event => setValue(event.target.value)}
+          />
+          <Dialog.Actions>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+            <Button type='submit'>Add email</Button>
+          </Dialog.Actions>
+        </form>
+        <Dialog.Confirm
+          handle={confirm}
+          finalFocus={inputRef}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+/**
+ * The real user page inside a `panel` dialog. The dialog positions it and the page paints
+ * itself — the same composition as a `Card` inside a `card` dialog — so the page names the
+ * dialog, scrolls its own content column, collapses its own sidebar, and carries the dismiss.
+ * Adding an email opens a prompt over the panel; the danger zone's delete confirmation is the
+ * page's own.
+ */
+export function Nested() {
+  const [addEmailOpen, setAddEmailOpen] = React.useState(false);
+  const { activePanel, setActivePanel, panels, addEmail } = useUserPageFixture({
+    onAddEmail: () => setAddEmailOpen(true),
+  });
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger render={accountTrigger} />
+      <Dialog.Popup size='panel'>
+        <UserPageView
+          activePanel={activePanel}
+          panels={panels}
+          onPanelChange={setActivePanel}
+        />
+        <AddEmailDialog
+          open={addEmailOpen}
+          onOpenChange={setAddEmailOpen}
+          onAdd={addEmail}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+/**
+ * The same page presented `inline`: it is the page's content rather than a surface over it, so
+ * there is no trigger, portal, scrim, scroll lock or focus trap, and nothing dismisses it. The
+ * prompts it opens are still modal over the whole page.
+ *
+ * The host is resizable. The page's compact layout is a container query against the page itself,
+ * and the dialog's inset is one against its viewport, so dragging the host below `48rem`
+ * collapses the sidebar without the browser window moving.
+ */
+export function Inline() {
+  const [addEmailOpen, setAddEmailOpen] = React.useState(false);
+  const { activePanel, setActivePanel, panels, addEmail } = useUserPageFixture({
+    onAddEmail: () => setAddEmailOpen(true),
+  });
+  return (
+    <div
+      style={{
+        border: '1px dashed var(--cl-color-border)',
+        borderRadius: '0.5rem',
+        height: '36rem',
+        maxWidth: '100%',
+        overflow: 'auto',
+        padding: '1rem',
+        resize: 'horizontal',
+        width: '52rem',
       }}
     >
-      <Dialog.CloseButton />
-      <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
-      <Dialog.Description render={<Text />}>{description}</Dialog.Description>
-      <Input
-        placeholder={placeholder}
-        value={value}
-        onChange={event => setValue(event.target.value)}
-      />
-      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-        <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
-        <Button
-          color={confirmColor}
-          onClick={dismiss}
-        >
-          {confirmLabel}
-        </Button>
-      </div>
-      {confirmDiscard ? (
-        <Dialog
-          open={discardOpen}
-          onOpenChange={setDiscardOpen}
-          closedBy='closerequest'
-        >
-          <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
-          <Dialog.Description render={<Text />}>
-            You have not finished adding this address. It will not be saved.
-          </Dialog.Description>
-          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-            <Button
-              variant='outline'
-              onClick={() => setDiscardOpen(false)}
-            >
-              Keep editing
-            </Button>
-            <Button
-              color='negative'
-              onClick={() => {
-                setDiscardOpen(false);
-                dismiss();
-              }}
-            >
-              Discard
-            </Button>
-          </div>
-        </Dialog>
-      ) : null}
-    </Dialog>
+      <Dialog.Root inline>
+        <Dialog.Popup size='panel'>
+          <UserPageView
+            activePanel={activePanel}
+            panels={panels}
+            onPanelChange={setActivePanel}
+          />
+          <AddEmailDialog
+            open={addEmailOpen}
+            onOpenChange={setAddEmailOpen}
+            onAdd={addEmail}
+          />
+        </Dialog.Popup>
+      </Dialog.Root>
+    </div>
   );
 }
-
-/** A `panel` account surface with `prompt` dialogs opened from inside it. */
-export function Nested() {
-  return (
-    <Dialog
-      size='panel'
-      trigger={accountTrigger}
-    >
-      <Dialog.CloseButton />
-      <div style={panelBody}>
-        <Dialog.Title render={<Heading size='lg' />}>Account</Dialog.Title>
-        <Dialog.Description render={<Text />}>Manage the addresses people can reach you at.</Dialog.Description>
-
-        <div style={sectionHeader}>
-          <Heading size='sm'>Email addresses</Heading>
-          <AddValueDialog
-            trigger={addEmailTrigger}
-            title='Add email address'
-            description="We'll send a verification code to this address."
-            placeholder='you@example.com'
-            confirmDiscard
-          />
-        </div>
-        <Item.Group>
-          <Item.Root>
-            <Item.Content>
-              <Item.Label>ada@example.com</Item.Label>
-              <Item.Description>Primary</Item.Description>
-            </Item.Content>
-          </Item.Root>
-          <Item.Root>
-            <Item.Content>
-              <Item.Label>ada.lovelace@work.example.com</Item.Label>
-            </Item.Content>
-          </Item.Root>
-        </Item.Group>
-
-        <div style={sectionHeader}>
-          <Heading size='sm'>Phone numbers</Heading>
-          <AddValueDialog
-            trigger={addPhoneTrigger}
-            title='Add phone number'
-            description="We'll send a verification code to this number."
-            placeholder='+1 (555) 000-0000'
-          />
-        </div>
-        <Item.Group>
-          <Item.Root>
-            <Item.Content>
-              <Item.Label>+1 (555) 010-1842</Item.Label>
-            </Item.Content>
-          </Item.Root>
-        </Item.Group>
-
-        <div style={{ display: 'flex', marginBlockStart: 'auto' }}>
-          <AddValueDialog
-            trigger={deleteAccountTrigger}
-            title='Delete account'
-            description='Type your email address to confirm. This cannot be undone.'
-            placeholder='you@example.com'
-            confirmLabel='Delete account'
-            confirmColor='negative'
-          />
-        </div>
-      </div>
-    </Dialog>
-  );
-}
-
-const settingsTrigger = (props: RenderProps) => <Button {...props}>Open settings</Button>;
-
-const NAV_SECTIONS = ['Profile', 'Security', 'Sessions', 'Connected accounts', 'Billing'];
-
-// Long enough to overflow the panel even on a large display, or the scroll example shows nothing.
-const SESSION_DEVICES = [
-  'MacBook Pro',
-  'iPhone 15',
-  'Windows PC',
-  'iPad Air',
-  'Pixel 8',
-  'Linux Workstation',
-  'MacBook Air',
-  'Steam Deck',
-];
-const SESSION_PLACES = [
-  'Denver, CO · Chrome',
-  'Boulder, CO · Edge',
-  'Fort Collins, CO · Firefox',
-  'Seattle, WA · Chrome',
-  'Remote · Safari',
-];
-const SESSION_TIMES = ['Active now', '2 hours ago', 'Yesterday', '3 days ago', 'Last week', 'Last month'];
-
-const SESSIONS = Array.from({ length: 40 }, (_, index) => ({
-  id: index,
-  device: SESSION_DEVICES[index % SESSION_DEVICES.length],
-  where: SESSION_PLACES[index % SESSION_PLACES.length],
-  when: SESSION_TIMES[index % SESSION_TIMES.length],
-}));
 
 const editProfileTrigger = (props: RenderProps) => <Button {...props}>Edit profile</Button>;
 
-const discardTrigger = (props: RenderProps) => (
-  <Button
-    variant='outline'
-    {...props}
-  >
-    Cancel
-  </Button>
-);
-
 /**
- * A prompt stacked on a prompt — the shape a close confirmation takes. The second prompt paints
- * no scrim of its own; the one beneath it recedes instead.
+ * A prompt stacked on a prompt — the shape a close confirmation takes. Edit the name and press
+ * Cancel: the second prompt paints no scrim of its own, and the one beneath it recedes instead.
  */
 export function StackedPrompts() {
+  const confirm = React.useMemo(() => createConfirmHandle(), []);
+  const [open, setOpen] = React.useState(false);
+  const [savedName, setSavedName] = React.useState('Ada Lovelace');
+  const [name, setName] = React.useState(savedName);
+  const nameRef = React.useRef<HTMLInputElement>(null);
+
+  const onOpenChange = useConfirmedClose({
+    handle: confirm,
+    when: () => name !== savedName,
+    onOpenChange: next => {
+      setOpen(next);
+      if (!next) {
+        setName(savedName);
+      }
+    },
+    confirm: {
+      title: 'Discard changes?',
+      description: 'Your edits will be lost.',
+      actionLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
+    },
+  });
+
   return (
-    <Dialog
-      trigger={editProfileTrigger}
+    <Dialog.Root
       closedBy='closerequest'
+      open={open}
+      onOpenChange={onOpenChange}
     >
-      {({ close }) => (
-        <>
-          <Dialog.CloseButton />
-          <Dialog.Title render={<Heading size='sm' />}>Update profile</Dialog.Title>
-          <Dialog.Description render={<Text />}>Change the name people see on your account.</Dialog.Description>
-          <Input
-            defaultValue='Ada Lovelace'
-            placeholder='Your name'
-          />
-          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-            <Dialog
-              trigger={discardTrigger}
-              closedBy='closerequest'
-            >
-              {({ close: closeConfirmation }) => (
-                <>
-                  <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
-                  <Dialog.Description render={<Text />}>Your edits will be lost.</Dialog.Description>
-                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                    <Button
-                      variant='outline'
-                      onClick={closeConfirmation}
-                    >
-                      Keep editing
-                    </Button>
-                    <Button
-                      color='negative'
-                      onClick={() => {
-                        closeConfirmation();
-                        close();
-                      }}
-                    >
-                      Discard
-                    </Button>
-                  </div>
-                </>
-              )}
-            </Dialog>
-            <Button onClick={close}>Save</Button>
-          </div>
-        </>
-      )}
-    </Dialog>
-  );
-}
-
-/** The panel clips rather than scrolling, so the scroll region is composed inside it. */
-export function PanelSidebar() {
-  return (
-    <Dialog
-      size='panel'
-      trigger={settingsTrigger}
-    >
-      <Dialog.CloseButton />
-
-      {/* Its own header, so the accessible name survives the nav being hidden on a phone. */}
-      <div style={{ flex: 'none', padding: '1.5rem 1.5rem 0' }}>
-        <Dialog.Title render={<Heading size='lg' />}>Settings</Dialog.Title>
-      </div>
-
-      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        {/* The rail has nowhere to go on a phone; `md` is 48rem, the dialog's own mobile band. */}
-        <nav
-          className='hidden md:flex'
-          style={{
-            borderInlineEnd: `1px solid var(--cl-color-border)`,
-            flex: 'none',
-            flexDirection: 'column',
-            gap: '0.25rem',
-            padding: '1.5rem 1rem',
-            width: '14rem',
+      <Dialog.Trigger render={editProfileTrigger} />
+      <Dialog.Popup>
+        <Dialog.CloseButton />
+        <Dialog.Title render={<Heading size='sm' />}>Update profile</Dialog.Title>
+        <Dialog.Description render={<Text />}>Change the name people see on your account.</Dialog.Description>
+        {/* Saving goes straight to `setOpen`, past the guard. A form, so Enter in the field saves. */}
+        <form
+          style={{ display: 'contents' }}
+          onSubmit={event => {
+            event.preventDefault();
+            setSavedName(name);
+            setOpen(false);
           }}
         >
-          {NAV_SECTIONS.map((section, index) => (
-            <Button
-              key={section}
-              variant='ghost'
-              size='sm'
-              fullWidth
-              // `Button` centres its content; a nav row wants a leading label.
-              style={{ justifyContent: 'flex-start' }}
-              aria-current={index === 2 ? 'page' : undefined}
-            >
-              {section}
-            </Button>
-          ))}
-        </nav>
-
-        {/* Flush with the popup edge, so the scrollbar and edge fade land on the true edge. */}
-        <div
-          {...stylex.props(scrollAreaRoot)}
-          style={{ flex: 1, minWidth: 0 }}
-        >
-          <div {...stylex.props(...scrollAreaViewport())}>
-            <div style={{ padding: '1.5rem' }}>
-              <Item.Group>
-                {SESSIONS.map(session => (
-                  <Item.Root key={session.id}>
-                    <Item.Content>
-                      <Item.Label>{session.device}</Item.Label>
-                      <Item.Description>
-                        {session.where} · {session.when}
-                      </Item.Description>
-                    </Item.Content>
-                    <Item.Actions>
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        color='negative'
-                      >
-                        Revoke
-                      </Button>
-                    </Item.Actions>
-                  </Item.Root>
-                ))}
-              </Item.Group>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Dialog>
+          <Input
+            ref={nameRef}
+            placeholder='Your name'
+            value={name}
+            onChange={event => setName(event.target.value)}
+          />
+          <Dialog.Actions>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+            <Button type='submit'>Save</Button>
+          </Dialog.Actions>
+        </form>
+        <Dialog.Confirm
+          handle={confirm}
+          finalFocus={nameRef}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
   );
 }
 
@@ -467,16 +409,11 @@ export function DetachedTrigger() {
         render={props => <Button {...props}>View notifications</Button>}
       />
       <Dialog.Root handle={notificationsDialog}>
-        <Dialog.Portal>
-          <Dialog.Backdrop />
-          <Dialog.Viewport>
-            <Dialog.Popup>
-              <Dialog.CloseButton />
-              <Dialog.Title render={<Heading size='sm' />}>Notifications</Dialog.Title>
-              <Dialog.Description render={<Text />}>You are all caught up. Good job!</Dialog.Description>
-            </Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
+        <Dialog.Popup>
+          <Dialog.CloseButton />
+          <Dialog.Title render={<Heading size='sm' />}>Notifications</Dialog.Title>
+          <Dialog.Description render={<Text />}>You are all caught up. Good job!</Dialog.Description>
+        </Dialog.Popup>
       </Dialog.Root>
     </>
   );
@@ -514,57 +451,49 @@ export function MultipleTriggers() {
       </div>
       <Dialog.Root handle={memberDialog}>
         {({ payload }) => (
-          <Dialog.Portal>
-            <Dialog.Backdrop />
-            <Dialog.Viewport>
-              <Dialog.Popup>
-                <Dialog.CloseButton />
-                <Dialog.Title render={<Heading size='sm' />}>{payload?.name}</Dialog.Title>
-                <Dialog.Description render={<Text />}>
-                  {payload ? `${payload.role} of this organization.` : null}
-                </Dialog.Description>
-              </Dialog.Popup>
-            </Dialog.Viewport>
-          </Dialog.Portal>
+          <Dialog.Popup>
+            <Dialog.CloseButton />
+            <Dialog.Title render={<Heading size='sm' />}>{payload?.name}</Dialog.Title>
+            <Dialog.Description render={<Text />}>
+              {payload ? `${payload.role} of this organization.` : null}
+            </Dialog.Description>
+          </Dialog.Popup>
         )}
       </Dialog.Root>
     </>
   );
 }
 
-/** `size='card'` paints nothing itself — the popup renders AS a `Card`, which supplies the surface. */
+/** `size='card'` paints nothing itself — the `Card` inside supplies the surface. */
 export function CardSurface() {
   return (
-    <Dialog.Root size='card'>
+    <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Sign in</Button>} />
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup render={<Card.Root elevation='overlay' />}>
-            <Card.Header>
-              <Card.Title>Sign in</Card.Title>
-              <Card.Description>Continue to your account.</Card.Description>
-            </Card.Header>
-            <Card.Content>
-              <Input placeholder='you@example.com' />
-            </Card.Content>
-            <Card.Footer>
-              <Dialog.Close
-                render={props => (
-                  <Button
-                    {...props}
-                    variant='outline'
-                    fullWidth
-                  >
-                    Cancel
-                  </Button>
-                )}
-              />
-              <Button fullWidth>Continue</Button>
-            </Card.Footer>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
+      <Dialog.Popup size='card'>
+        <Card.Root elevation='overlay'>
+          <Card.Header>
+            <Card.Title>Sign in</Card.Title>
+            <Card.Description>Continue to your account.</Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <Input placeholder='you@example.com' />
+          </Card.Content>
+          <Card.Footer>
+            <Dialog.Close
+              render={props => (
+                <Button
+                  {...props}
+                  variant='outline'
+                  fullWidth
+                >
+                  Cancel
+                </Button>
+              )}
+            />
+            <Button fullWidth>Continue</Button>
+          </Card.Footer>
+        </Card.Root>
+      </Dialog.Popup>
     </Dialog.Root>
   );
 }
@@ -580,44 +509,41 @@ const TERMS_CLAUSES = Array.from({ length: 12 }, (_, index) => ({
 /** A tall `card` outgrows the screen, so the whole dialog scrolls inside the viewport. */
 export function OutsideScroll() {
   return (
-    <Dialog.Root size='card'>
+    <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Review terms</Button>} />
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup render={<Card.Root elevation='overlay' />}>
-            <Card.Header>
-              <Dialog.Title render={<Heading size='sm' />}>Terms of service</Dialog.Title>
-              <Dialog.Description render={<Text />}>
-                Nothing here scrolls on its own — the card grows past the screen and the viewport takes the scroll.
-              </Dialog.Description>
-            </Card.Header>
-            <Card.Content>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {TERMS_CLAUSES.map(clause => (
-                  <div key={clause.heading}>
-                    <Heading size='xs'>{clause.heading}</Heading>
-                    <Text>{clause.body}</Text>
-                  </div>
-                ))}
-              </div>
-            </Card.Content>
-            <Card.Footer>
-              <Dialog.Close
-                render={props => (
-                  <Button
-                    {...props}
-                    variant='outline'
-                  >
-                    Decline
-                  </Button>
-                )}
-              />
-              <Button>Accept</Button>
-            </Card.Footer>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
+      <Dialog.Popup size='card'>
+        <Card.Root elevation='overlay'>
+          <Card.Header>
+            <Card.Title>Terms of service</Card.Title>
+            <Card.Description>
+              Nothing here scrolls on its own — the card grows past the screen and the viewport takes the scroll.
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {TERMS_CLAUSES.map(clause => (
+                <div key={clause.heading}>
+                  <Heading size='xs'>{clause.heading}</Heading>
+                  <Text>{clause.body}</Text>
+                </div>
+              ))}
+            </div>
+          </Card.Content>
+          <Card.Footer>
+            <Dialog.Close
+              render={props => (
+                <Button
+                  {...props}
+                  variant='outline'
+                >
+                  Decline
+                </Button>
+              )}
+            />
+            <Button>Accept</Button>
+          </Card.Footer>
+        </Card.Root>
+      </Dialog.Popup>
     </Dialog.Root>
   );
 }
@@ -628,23 +554,18 @@ export function CustomFocus() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Give feedback</Button>} />
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Viewport>
-          <Dialog.Popup initialFocus={feedbackRef}>
-            <Dialog.CloseButton />
-            <Dialog.Title render={<Heading size='sm' />}>Feedback</Dialog.Title>
-            <Dialog.Description render={<Text />}>
-              The feedback field takes focus on open — past the close button and the name field.
-            </Dialog.Description>
-            <Input placeholder='Name' />
-            <Input
-              ref={feedbackRef}
-              placeholder='Feedback'
-            />
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
+      <Dialog.Popup initialFocus={feedbackRef}>
+        <Dialog.CloseButton />
+        <Dialog.Title render={<Heading size='sm' />}>Feedback</Dialog.Title>
+        <Dialog.Description render={<Text />}>
+          The feedback field takes focus on open — past the close button and the name field.
+        </Dialog.Description>
+        <Input placeholder='Name' />
+        <Input
+          ref={feedbackRef}
+          placeholder='Feedback'
+        />
+      </Dialog.Popup>
     </Dialog.Root>
   );
 }
