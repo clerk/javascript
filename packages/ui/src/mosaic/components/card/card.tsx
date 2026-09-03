@@ -115,8 +115,9 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
       children: (
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
-              focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag. */}
-          {dialog ? <HeaderCloseButton /> : null}
+              focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
+              Not for an inline dialog, which nothing closes. */}
+          {dialog && !dialog.inline ? <HeaderCloseButton /> : null}
           <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
             {children}
           </div>

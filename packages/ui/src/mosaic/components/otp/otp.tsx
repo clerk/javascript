@@ -50,18 +50,23 @@ export function Otp({
   length = 6,
   status: statusProp,
   disabled: disabledProp,
+  required: requiredProp,
+  id,
   'aria-invalid': ariaInvalidProp,
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
   ...rest
 }: OtpProps): React.ReactElement {
   const fieldProps = useOptionalFieldControlProps({
+    id,
     disabled: disabledProp,
+    required: requiredProp,
     ariaInvalid: ariaInvalidProp,
     ariaLabelledBy,
     ariaDescribedBy,
   });
   const disabled = fieldProps?.disabled ?? disabledProp ?? false;
+  const required = fieldProps?.required ?? requiredProp;
   const ariaInvalid = fieldProps?.['aria-invalid'] ?? ariaInvalidProp;
   const status = statusProp ?? (ariaInvalid === true || ariaInvalid === 'true' ? 'error' : 'neutral');
 
@@ -70,6 +75,8 @@ export function Otp({
       {...rest}
       length={length}
       disabled={disabled}
+      required={required}
+      id={fieldProps?.id ?? id}
       {...mergeStyleProps(themeProps('otp', { status, disabled }), stylex.props(reset.base, styles.root))}
       aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}

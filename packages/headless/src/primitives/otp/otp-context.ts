@@ -14,6 +14,9 @@ export interface OtpSlot {
   isFilled: boolean;
 }
 
+/** The naming attributes the first slot inherits from `<Otp.Root>`. */
+export type FirstInputLabel = { 'aria-labelledby': string } | { 'aria-label': string };
+
 export interface OtpContextValue {
   /** The current Otp value. */
   value: string;
@@ -21,6 +24,8 @@ export interface OtpContextValue {
   length: number;
   /** Whether the whole field is disabled. */
   disabled: boolean;
+  /** Whether every slot must be filled before the enclosing form submits. */
+  required: boolean;
   /** Whether every slot is filled. */
   complete: boolean;
   /** The allowed character set. */
@@ -36,6 +41,13 @@ export interface OtpContextValue {
   /** Focus the slot at `index` (clamped to range). */
   focus: (index: number) => void;
   // --- internal wiring used by <Otp.Input> ---
+  /** The `id` for the slot at `index`. Slot `0` takes the root's `id` so a `<label>` can target it. */
+  getInputId: (index: number) => string;
+  /**
+   * The accessible name the first slot inherits from the root, or `undefined` when the root
+   * carries no name of its own and the slot is left to a native `<label>`.
+   */
+  firstInputLabel: FirstInputLabel | undefined;
   /** Register/unregister a slot input's element by index. */
   registerInput: (index: number, element: HTMLInputElement | null) => void;
   /** Propose a new full value; it is sanitized and clamped before commit. */

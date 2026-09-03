@@ -14,23 +14,6 @@ export type {
   ProfilePageSidebarProps,
 } from '../profile-page';
 
-export { AlertDialog, createConfirmHandle, useConfirmedClose } from '../components/alert-dialog';
-export type {
-  ConfirmHandle,
-  ConfirmOptions,
-  UseConfirmedCloseOptions,
-  AlertDialogActionsProps,
-  AlertDialogBackdropProps,
-  AlertDialogCloseProps,
-  AlertDialogConfirmProps,
-  AlertDialogDescriptionProps,
-  AlertDialogPopupProps,
-  AlertDialogProps,
-  AlertDialogRootProps,
-  AlertDialogTitleProps,
-  AlertDialogTriggerProps,
-  AlertDialogViewportProps,
-} from '../components/alert-dialog';
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
@@ -41,22 +24,26 @@ export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
-export { Dialog } from '../components/dialog';
+export { Dialog, createConfirmHandle, useConfirmedClose } from '../components/dialog';
 export type {
-  DialogBackdropProps,
+  ConfirmHandle,
+  ConfirmOptions,
+  DialogActionsProps,
   DialogCloseButtonProps,
   DialogCloseProps,
+  DialogConfirmProps,
   DialogDescriptionProps,
   DialogPopupProps,
-  DialogProps,
   DialogRootProps,
   DialogSize,
   DialogTitleProps,
   DialogTriggerProps,
-  DialogViewportProps,
+  UseConfirmedCloseOptions,
 } from '../components/dialog';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
+export { Flow } from '../components/flow';
+export type { FlowRootProps, FlowStepProps } from '../components/flow';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon, IconFrame } from '../components/icon';

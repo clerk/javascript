@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { Dialog } from '../dialog';
-import { AlertDialog } from './alert-dialog';
+import type { DialogRootProps } from './dialog';
+import { Dialog } from './dialog';
 
 afterEach(() => cleanup());
 
@@ -14,23 +14,27 @@ const settle = () =>
     await new Promise(resolve => setTimeout(resolve, 0));
   });
 
-function Confirm({ onOpenChange }: { onOpenChange?: (open: boolean) => void } = {}) {
+function Confirm({ onOpenChange, ...rest }: Partial<DialogRootProps> = {}) {
   return (
-    <AlertDialog
+    <Dialog.Root
       defaultOpen
+      {...rest}
+      role='alertdialog'
       onOpenChange={onOpenChange}
     >
-      <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-      <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-      <AlertDialog.Actions>
-        <AlertDialog.Close>Keep editing</AlertDialog.Close>
-        <button type='button'>Discard</button>
-      </AlertDialog.Actions>
-    </AlertDialog>
+      <Dialog.Popup>
+        <Dialog.Title>Discard changes?</Dialog.Title>
+        <Dialog.Description>This address has not been saved.</Dialog.Description>
+        <Dialog.Actions>
+          <Dialog.Close>Keep editing</Dialog.Close>
+          <button type='button'>Discard</button>
+        </Dialog.Actions>
+      </Dialog.Popup>
+    </Dialog.Root>
   );
 }
 
-describe('Mosaic AlertDialog', () => {
+describe('role="alertdialog"', () => {
   it('renders as an alertdialog, named and described by its parts', () => {
     render(<Confirm />);
 
@@ -40,16 +44,15 @@ describe('Mosaic AlertDialog', () => {
 
   it('keeps the alertdialog role when a consumer passes one to the popup', () => {
     render(
-      <AlertDialog.Root defaultOpen>
-        <AlertDialog.Backdrop />
-        <AlertDialog.Viewport>
-          {/* `role` is omitted from AlertDialogPopupProps; the cast is how a JS consumer gets here. */}
-          <AlertDialog.Popup {...({ role: 'dialog' } as Record<string, string>)}>
-            <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-            <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-          </AlertDialog.Popup>
-        </AlertDialog.Viewport>
-      </AlertDialog.Root>,
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+      >
+        <Dialog.Popup role='dialog'>
+          <Dialog.Title>Discard changes?</Dialog.Title>
+          <Dialog.Description>This address has not been saved.</Dialog.Description>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     expect(screen.getByRole('alertdialog', { name: 'Discard changes?' })).toBeInTheDocument();
@@ -62,31 +65,38 @@ describe('Mosaic AlertDialog', () => {
     expect(document.querySelector('.cl-dialog-backdrop')).toBeInTheDocument();
     expect(document.querySelector('.cl-dialog-viewport')).toBeInTheDocument();
     expect(document.querySelector('.cl-dialog-popup')).toBeInTheDocument();
-    expect(document.querySelector('.cl-alert-dialog-actions')).toBeInTheDocument();
+    expect(document.querySelector('.cl-dialog-actions')).toBeInTheDocument();
   });
 
-  it('is always the prompt size', () => {
-    render(<Confirm />);
+  it('is always the prompt size, and warns when asked for another', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+      >
+        <Dialog.Popup size='panel'>
+          <Dialog.Title>Discard changes?</Dialog.Title>
+          <Dialog.Description>This address has not been saved.</Dialog.Description>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
 
     expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'prompt');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="panel"'));
+    warn.mockRestore();
   });
 
   it('opens from a trigger', async () => {
     const user = userEvent.setup();
     render(
-      <AlertDialog
-        trigger={props => (
-          <button
-            type='button'
-            {...props}
-          >
-            Delete
-          </button>
-        )}
-      >
-        <AlertDialog.Title>Delete this key?</AlertDialog.Title>
-        <AlertDialog.Description>Applications using it stop working.</AlertDialog.Description>
-      </AlertDialog>,
+      <Dialog.Root role='alertdialog'>
+        <Dialog.Trigger>Delete</Dialog.Trigger>
+        <Dialog.Popup>
+          <Dialog.Title>Delete this key?</Dialog.Title>
+          <Dialog.Description>Applications using it stop working.</Dialog.Description>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
@@ -104,7 +114,7 @@ describe('Mosaic AlertDialog', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Keep editing' })).toHaveFocus());
   });
 
-  it('closes on AlertDialog.Close, reporting it through onOpenChange', async () => {
+  it('closes on Dialog.Close, reporting it through onOpenChange', async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
     render(<Confirm onOpenChange={onOpenChange} />);
@@ -114,40 +124,8 @@ describe('Mosaic AlertDialog', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
-
-  it('hands the render-prop form a close that routes through onOpenChange', async () => {
-    const user = userEvent.setup();
-    const onOpenChange = vi.fn();
-    render(
-      <AlertDialog
-        defaultOpen
-        onOpenChange={onOpenChange}
-      >
-        {({ close }) => (
-          <>
-            <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-            <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-            <AlertDialog.Actions>
-              <button
-                type='button'
-                onClick={close}
-              >
-                Keep editing
-              </button>
-            </AlertDialog.Actions>
-          </>
-        )}
-      </AlertDialog>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Keep editing' }));
-
-    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
-  });
 });
 
-// The dismissal policy is the behavioural half of what makes this an alert dialog: it cannot be
-// answered by clicking next to it, but Escape — the keyboard's cancel — still works.
 // An alert raised by a veto has no trigger, so without `finalFocus` there is nothing for focus to
 // return to and answering the question drops the user on the body.
 describe('focus', () => {
@@ -163,17 +141,19 @@ describe('focus', () => {
             ref={inputRef}
             aria-label='Email address'
           />
-          <AlertDialog
+          <Dialog.Root
+            role='alertdialog'
             open={confirmOpen}
             onOpenChange={setConfirmOpen}
-            finalFocus={inputRef}
           >
-            <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-            <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-            <AlertDialog.Actions>
-              <AlertDialog.Close>Keep editing</AlertDialog.Close>
-            </AlertDialog.Actions>
-          </AlertDialog>
+            <Dialog.Popup finalFocus={inputRef}>
+              <Dialog.Title>Discard changes?</Dialog.Title>
+              <Dialog.Description>This address has not been saved.</Dialog.Description>
+              <Dialog.Actions>
+                <Dialog.Close>Keep editing</Dialog.Close>
+              </Dialog.Actions>
+            </Dialog.Popup>
+          </Dialog.Root>
         </>
       );
     }
@@ -185,6 +165,8 @@ describe('focus', () => {
   });
 });
 
+// The dismissal policy is the behavioural half of what makes this an alert dialog: it cannot be
+// answered by clicking next to it, but Escape — the keyboard's cancel — still works.
 describe('dismissal', () => {
   it('does not close on an outside press', async () => {
     const user = userEvent.setup();
@@ -204,13 +186,23 @@ describe('dismissal', () => {
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
+  it('keeps Escape out too under closedBy="none"', async () => {
+    const user = userEvent.setup();
+    render(<Confirm closedBy='none' />);
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+  });
+
   it('lets a controlled consumer decline a close', async () => {
     const user = userEvent.setup();
 
     function Guarded() {
       const [open, setOpen] = React.useState(true);
       return (
-        <AlertDialog
+        <Dialog.Root
+          role='alertdialog'
           open={open}
           onOpenChange={next => {
             if (next) {
@@ -218,12 +210,14 @@ describe('dismissal', () => {
             }
           }}
         >
-          <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-          <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-          <AlertDialog.Actions>
-            <AlertDialog.Close>Keep editing</AlertDialog.Close>
-          </AlertDialog.Actions>
-        </AlertDialog>
+          <Dialog.Popup>
+            <Dialog.Title>Discard changes?</Dialog.Title>
+            <Dialog.Description>This address has not been saved.</Dialog.Description>
+            <Dialog.Actions>
+              <Dialog.Close>Keep editing</Dialog.Close>
+            </Dialog.Actions>
+          </Dialog.Popup>
+        </Dialog.Root>
       );
     }
     render(<Guarded />);
@@ -239,32 +233,58 @@ describe('dev warnings', () => {
   it('warns when the alert dialog has no description', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
-      <AlertDialog defaultOpen>
-        <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-      </AlertDialog>,
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+      >
+        <Dialog.Popup>
+          <Dialog.Title>Discard changes?</Dialog.Title>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     await settle();
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no description'));
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<AlertDialog.Description>'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Dialog.Description>'));
     warn.mockRestore();
   });
 
-  // The name warning skipped any role but `dialog` before this component existed, which would have
-  // made it silently inert for every alert dialog.
-  it('warns when it has no accessible name, and names the alert dialog parts', async () => {
+  it('does not ask a plain dialog for a description', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
-      <AlertDialog defaultOpen>
-        <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-      </AlertDialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.Title>Notifications</Dialog.Title>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    await settle();
+
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  // The name warning skipped any role but `dialog` before alert dialogs existed, which would have
+  // made it silently inert for every one of them.
+  it('warns when it has no accessible name', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+      >
+        <Dialog.Popup>
+          <Dialog.Description>This address has not been saved.</Dialog.Description>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     await settle();
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<AlertDialog.Title>'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Dialog.Title>'));
     warn.mockRestore();
   });
 
@@ -279,40 +299,50 @@ describe('dev warnings', () => {
   });
 });
 
-describe('AlertDialog.Actions', () => {
+describe('Dialog.Actions', () => {
   it('merges consumer className and style', () => {
     render(
-      <AlertDialog defaultOpen>
-        <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-        <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-        <AlertDialog.Actions
-          className='custom'
-          style={{ marginBlockStart: '2rem' }}
-          data-testid='actions'
-        >
-          <AlertDialog.Close>Keep editing</AlertDialog.Close>
-        </AlertDialog.Actions>
-      </AlertDialog>,
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+      >
+        <Dialog.Popup>
+          <Dialog.Title>Discard changes?</Dialog.Title>
+          <Dialog.Description>This address has not been saved.</Dialog.Description>
+          <Dialog.Actions
+            className='custom'
+            style={{ marginBlockStart: '2rem' }}
+            data-testid='actions'
+          >
+            <Dialog.Close>Keep editing</Dialog.Close>
+          </Dialog.Actions>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     const actions = screen.getByTestId('actions');
-    expect(actions).toHaveClass('cl-alert-dialog-actions');
+    expect(actions).toHaveClass('cl-dialog-actions');
     expect(actions).toHaveClass('custom');
     expect(actions).toHaveStyle({ marginBlockStart: '2rem' });
   });
 
   it('renders as another element through render', () => {
     render(
-      <AlertDialog defaultOpen>
-        <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-        <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-        <AlertDialog.Actions render={props => <footer {...props} />}>
-          <AlertDialog.Close>Keep editing</AlertDialog.Close>
-        </AlertDialog.Actions>
-      </AlertDialog>,
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+      >
+        <Dialog.Popup>
+          <Dialog.Title>Discard changes?</Dialog.Title>
+          <Dialog.Description>This address has not been saved.</Dialog.Description>
+          <Dialog.Actions render={props => <footer {...props} />}>
+            <Dialog.Close>Keep editing</Dialog.Close>
+          </Dialog.Actions>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
-    expect(document.querySelector('footer.cl-alert-dialog-actions')).toBeInTheDocument();
+    expect(document.querySelector('footer.cl-dialog-actions')).toBeInTheDocument();
   });
 });
 
@@ -323,22 +353,18 @@ describe('stacked on another dialog', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const user = userEvent.setup();
     render(
-      <Dialog defaultOpen>
-        <Dialog.Title>Add email address</Dialog.Title>
-        <AlertDialog
-          trigger={props => (
-            <button
-              type='button'
-              {...props}
-            >
-              Discard
-            </button>
-          )}
-        >
-          <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-          <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
-        </AlertDialog>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.Title>Add email address</Dialog.Title>
+          <Dialog.Root role='alertdialog'>
+            <Dialog.Trigger>Discard</Dialog.Trigger>
+            <Dialog.Popup>
+              <Dialog.Title>Discard changes?</Dialog.Title>
+              <Dialog.Description>This address has not been saved.</Dialog.Description>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     await user.click(screen.getByRole('button', { name: 'Discard' }));
