@@ -95,11 +95,13 @@ its parent.
 
 ## Page transitions
 
-With `shouldForceMount`, a `Page` stays in the document while another is selected — `inert`, and
-carrying the tabs primitive's transition attributes: `data-open` / `data-closed`, then
-`data-starting-style` on the frame it enters and `data-ending-style` while it leaves, plus
-`--cl-tab-transition-direction` for a directional move. A transition is a styling change, not a
-new part. Below, the pages share one grid cell and cross-fade with a little scale and blur.
+An unselected page carries the `hidden` attribute, and a transition across it is CSS alone —
+the CSS a customer adds against a `<UserProfile />` they do not render. `@starting-style` gives the
+page that just lost `hidden` a frame to enter from; `transition-behavior: allow-discrete` on
+`display` holds the page that just gained it until its exit finishes. Stack the pages in one grid
+cell and the two cross-fade in place. `shouldForceMount` on `TabPanel` is there for a transition
+that needs the primitive's own timing attributes instead (`data-starting-style` /
+`data-ending-style`, `--cl-tab-transition-direction`).
 
 <Story
   name='Transitions'

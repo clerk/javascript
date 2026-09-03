@@ -290,11 +290,12 @@ export function Customized() {
 }
 
 /**
- * A page transition, in CSS alone. Force-mounted pages stay in the document, `inert` while another
- * is selected, and carry the tabs primitive's transition attributes: `data-starting-style` on the
- * frame a page enters, `data-ending-style` while the one it replaces leaves. The pages are stacked
- * in one grid cell so the two cross-fade in place; a page that is neither open nor leaving is not
- * displayed. Under `prefers-reduced-motion: reduce` the swap is instant.
+ * A page transition, in CSS alone — the CSS a customer can add against a `<UserProfile />` they do
+ * not render themselves. The primitive hides an unselected page with the `hidden` attribute, and
+ * CSS can now transition across that: `@starting-style` gives the page that just lost `hidden` a
+ * frame to enter from, and `transition-behavior: allow-discrete` holds the page that just gained
+ * it on screen until its exit finishes. The pages share one grid cell so the two cross-fade in
+ * place. Under `prefers-reduced-motion: reduce` the swap is instant.
  */
 export function Transitions() {
   return (
@@ -306,22 +307,24 @@ export function Transitions() {
           }
           .cl-profile-tab-panel {
             grid-area: 1 / 1;
-            transition-property: opacity, scale, filter;
-            transition-duration: var(--cl-duration-slow);
-            transition-timing-function: var(--cl-ease-enter);
+            transition:
+              opacity var(--cl-duration-slow) var(--cl-ease-enter),
+              scale var(--cl-duration-slow) var(--cl-ease-enter),
+              filter var(--cl-duration-slow) var(--cl-ease-enter),
+              display var(--cl-duration-slow) allow-discrete;
+
+            @starting-style {
+              opacity: 0;
+              scale: 0.98;
+              filter: blur(4px);
+            }
           }
-          .cl-profile-tab-panel[data-ending-style] {
-            transition-duration: var(--cl-duration-base);
-            transition-timing-function: var(--cl-ease-exit);
-          }
-          .cl-profile-tab-panel[data-starting-style],
-          .cl-profile-tab-panel[data-ending-style] {
+          .cl-profile-tab-panel[hidden] {
             opacity: 0;
             scale: 0.98;
             filter: blur(4px);
-          }
-          .cl-profile-tab-panel:not([data-open]):not([data-ending-style]) {
-            display: none;
+            transition-duration: var(--cl-duration-base);
+            transition-timing-function: var(--cl-ease-exit);
           }
           @media (prefers-reduced-motion: reduce) {
             .cl-profile-tab-panel {
@@ -330,10 +333,7 @@ export function Transitions() {
           }
         }
       `}</style>
-      <Surface
-        forceMountPages
-        stub
-      />
+      <Surface stub />
     </>
   );
 }
