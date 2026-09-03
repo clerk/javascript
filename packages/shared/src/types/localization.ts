@@ -1376,18 +1376,21 @@ export type __internal_LocalizationResource = {
   };
   agentActionApproval: {
     title: LocalizationValue;
-    subtitle: LocalizationValue;
-    requestedBy: LocalizationValue<'agent' | 'createdAt'>;
+    requestedAt: LocalizationValue<'relativeTime'>;
     commentLabel: LocalizationValue;
+    commentOptional: LocalizationValue;
     commentPlaceholder: LocalizationValue;
+    detailsLabel: LocalizationValue;
+    copyParameter: LocalizationValue<'parameter'>;
+    parameterCopied: LocalizationValue<'parameter'>;
     expiresIn: LocalizationValue<'remaining'>;
     action__approve: LocalizationValue;
-    action__reject: LocalizationValue;
+    action__deny: LocalizationValue;
     terminal: {
       approvedTitle: LocalizationValue;
       approvedSubtitle: LocalizationValue;
-      rejectedTitle: LocalizationValue;
-      rejectedSubtitle: LocalizationValue;
+      deniedTitle: LocalizationValue;
+      deniedSubtitle: LocalizationValue;
       expiredTitle: LocalizationValue;
       expiredSubtitle: LocalizationValue;
     };
