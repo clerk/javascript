@@ -27,6 +27,11 @@ import { Default as CardDefault, meta as cardComponentMeta } from '../stories/ca
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
 import {
+  Default as ComboboxDefault,
+  meta as comboboxMeta,
+  Scrolling as ComboboxScrolling,
+} from '../stories/combobox.stories';
+import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
   WithError as DestructiveWithError,
@@ -265,6 +270,12 @@ const drawerComponentModule: StoryModule = {
 };
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
+
+const comboboxModule: StoryModule = {
+  meta: comboboxMeta,
+  Default: ComboboxDefault,
+  Scrolling: ComboboxScrolling,
+};
 
 const avatarModule: StoryModule = {
   meta: avatarMeta,
@@ -556,6 +567,7 @@ export const registry: StoryModule[] = [
   bannerModule,
   buttonModule,
   cardComponentModule,
+  comboboxModule,
   flowComponentModule,
   inputModule,
   inputGroupModule,
