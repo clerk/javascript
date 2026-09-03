@@ -18,7 +18,7 @@ type OAuthDeviceVerificationCodeInputProps = {
 function CodeGroup({ slots, hasError }: { slots: SlotProps[]; hasError: boolean }) {
   return (
     <Flex
-      gap={2}
+      sx={t => ({ gap: t.space.$1x5 })}
       hasError={hasError}
     >
       {slots.map((slot, index) => (
@@ -27,6 +27,7 @@ function CodeGroup({ slots, hasError }: { slots: SlotProps[]; hasError: boolean 
           key={index}
           elementDescriptor={descriptors.otpCodeFieldInput}
           hasError={hasError}
+          sx={t => ({ width: t.space.$8, height: t.space.$8 })}
           {...slot}
         />
       ))}
@@ -70,7 +71,7 @@ export function OAuthDeviceVerificationCodeInput({ control }: OAuthDeviceVerific
           <Flex
             align='center'
             elementDescriptor={descriptors.otpCodeFieldInputs}
-            gap={3}
+            gap={2}
             hasError={hasError}
             justify='center'
             role='group'
