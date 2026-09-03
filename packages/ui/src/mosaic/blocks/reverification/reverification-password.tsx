@@ -36,11 +36,10 @@ export function ReverificationPassword({
   onCancel,
 }: ReverificationPasswordProps) {
   const formId = useId();
-  const canSubmit = value.length > 0;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSubmit && !isPending) {
+    if (!isPending) {
       onSubmit();
     }
   };
@@ -90,8 +89,6 @@ export function ReverificationPassword({
         <SubmitButton
           form={formId}
           fullWidth
-          disabled={!canSubmit}
-          focusableWhenDisabled
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

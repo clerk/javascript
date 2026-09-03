@@ -47,11 +47,10 @@ export function ReverificationOTP({
   onCancel,
 }: ReverificationOTPProps) {
   const formId = useId();
-  const canSubmit = value.length === length;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSubmit && !isPending) {
+    if (!isPending) {
       onSubmit();
     }
   };
@@ -115,8 +114,6 @@ export function ReverificationOTP({
         <SubmitButton
           form={formId}
           fullWidth
-          disabled={!canSubmit}
-          focusableWhenDisabled
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

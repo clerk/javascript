@@ -1,6 +1,6 @@
+import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import { Text } from '../../components/text';
 
 export interface ReverificationPasskeyMessages {
   title: string;
@@ -33,12 +33,12 @@ export function ReverificationPasskey({
       </Card.Header>
       {errorMessage ? (
         <Card.Content>
-          <Text
+          <Banner.Root
             role='alert'
             color='negative'
           >
-            {errorMessage}
-          </Text>
+            <Banner.Label>{errorMessage}</Banner.Label>
+          </Banner.Root>
         </Card.Content>
       ) : null}
       <Card.Footer>

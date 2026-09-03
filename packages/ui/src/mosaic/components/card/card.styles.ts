@@ -3,9 +3,13 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 import { cardContentMarker } from './card.markers.stylex';
 
+const compactCard = '@container card (max-width: 20rem)' as const;
+
 export const root = stylex.create({
   base: {
     color: colorVars['--cl-color-card-foreground'],
+    containerName: 'card',
+    containerType: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
     maxWidth: '26.25rem',
@@ -78,8 +82,10 @@ export const footer = stylex.create({
     paddingBlock: space['4'],
     paddingInline: space['5'],
     alignItems: 'center',
-    display: 'flex',
+    display: { [compactCard]: 'grid', default: 'flex' },
+    flexDirection: 'row',
     flexShrink: 0,
+    gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
     justifyContent: 'space-between',
     borderTopColor: colorVars['--cl-color-border'],
     borderTopStyle: 'solid',

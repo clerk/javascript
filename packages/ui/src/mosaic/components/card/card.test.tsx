@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -5,6 +6,19 @@ import { describe, expect, it } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Card } from './card';
+
+const compactCard = '@container card (max-width: 20rem)' as const;
+
+const responsiveLayout = stylex.create({
+  root: {
+    containerName: 'card',
+    containerType: 'inline-size',
+  },
+  footer: {
+    display: { [compactCard]: 'grid', default: 'flex' },
+    gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
+  },
+});
 
 describe('Mosaic Card', () => {
   it('renders each compound slot with its stable class', () => {
@@ -22,6 +36,20 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('content')).toHaveClass('cl-card-content');
     expect(screen.getByTestId('footer')).toHaveClass('cl-card-footer');
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'card');
+  });
+
+  it('uses grid to stack the footer only when its card container is compact', () => {
+    render(
+      <Card.Root data-testid='root'>
+        <Card.Footer data-testid='footer'>Footer</Card.Footer>
+      </Card.Root>,
+    );
+
+    const atoms = (style: stylex.StyleXStyles) =>
+      (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
+
+    expect(screen.getByTestId('root')).toHaveClass(...atoms(responsiveLayout.root));
+    expect(screen.getByTestId('footer')).toHaveClass(...atoms(responsiveLayout.footer));
   });
 
   it('reflects flush elevation on the root and footer', () => {
