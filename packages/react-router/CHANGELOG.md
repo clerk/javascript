@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.6.21
+
+### Patch Changes
+
+- Updated dependencies [[`2b3341f`](https://github.com/clerk/javascript/commit/2b3341fd5f666ab86ac13c2dabbab06345cd39b4)]:
+  - @clerk/react@6.15.1
+
 ## 3.6.20
 
 ### Patch Changes
