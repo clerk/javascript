@@ -1,0 +1,70 @@
+import * as InputGroupStories from './input-group.stories';
+
+# InputGroup
+
+`InputGroup` composes a headless `Input` and supporting content inside one shared field surface.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={InputGroupStories}
+/>
+
+## Props
+
+<PropTable meta={InputGroupStories.meta} />
+
+## Usage
+
+```tsx
+import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
+import { Input } from '@clerk/ui/mosaic/components/input';
+import { Icon } from '@clerk/ui/mosaic/components/icon';
+import { useState } from 'react';
+
+function PasswordField() {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <InputGroup.Root>
+      <Input variant='headless' type={visible ? 'text' : 'password'} aria-label='Password' />
+      <InputGroup.Action
+        type='button'
+        size='xs'
+        shape='square'
+        aria-label={visible ? 'Hide password' : 'Show password'}
+        onClick={() => setVisible(value => !value)}
+      >
+        <Icon name={visible ? 'eye-slash' : 'eye'} size='sm' />
+      </InputGroup.Action>
+    </InputGroup.Root>
+  );
+}
+```
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={InputGroupStories}
+  showCode={false}
+/>
+
+### Disabled
+
+<Story
+  name='Disabled'
+  storyModule={InputGroupStories}
+/>
+
+### Invalid
+
+<Story
+  name='Invalid'
+  storyModule={InputGroupStories}
+/>

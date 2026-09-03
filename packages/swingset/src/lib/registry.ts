@@ -71,6 +71,13 @@ import {
   Sizes as InputSizes,
 } from '../stories/input.stories';
 import {
+  Default as InputGroupDefault,
+  Disabled as InputGroupDisabled,
+  Invalid as InputGroupInvalid,
+  meta as inputGroupMeta,
+  Sizes as InputGroupSizes,
+} from '../stories/input-group.stories';
+import {
   Default as ItemDefault,
   Group as ItemGroup,
   Interactive as ItemInteractive,
@@ -269,6 +276,14 @@ const inputModule: StoryModule = {
   Disabled: InputDisabled,
   Invalid,
   Headless: InputHeadless,
+};
+
+const inputGroupModule: StoryModule = {
+  meta: inputGroupMeta,
+  Default: InputGroupDefault,
+  Sizes: InputGroupSizes,
+  Disabled: InputGroupDisabled,
+  Invalid: InputGroupInvalid,
 };
 
 const popoverComponentModule: StoryModule = {
@@ -508,6 +523,7 @@ export const registry: StoryModule[] = [
   cardComponentModule,
   flowComponentModule,
   inputModule,
+  inputGroupModule,
   itemModule,
   dialogComponentModule,
   headingModule,
