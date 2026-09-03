@@ -13,10 +13,10 @@ import { Profile } from './profile';
 function Surface(rootProps: Partial<ProfileRootProps>) {
   return (
     <Profile.Root
-      label='User profile'
       value='account'
       {...rootProps}
     >
+      <Profile.Title>User profile</Profile.Title>
       <Profile.Nav>
         <Profile.NavItem
           value='account'
@@ -56,7 +56,11 @@ describe('Profile', () => {
   it('is a labelled navigation of tabs beside the selected page', () => {
     renderSurface();
 
-    expect(screen.getByRole('navigation', { name: 'User profile' })).toBeInTheDocument();
+    // The title is a heading for the page outline and the name of the navigation, but not a
+    // visible headline: those belong to the pages.
+    const title = screen.getByRole('heading', { level: 2, name: 'User profile' });
+    expect(title).toHaveClass('cl-profile-title', 'cl-visually-hidden');
+    expect(screen.getByRole('navigation', { name: 'User profile' })).toHaveAttribute('aria-labelledby', title.id);
     expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical');
     const account = screen.getByRole('tab', { name: 'Account' });
     const page = screen.getByRole('tabpanel');
@@ -208,10 +212,10 @@ describe('Profile', () => {
         const [value, setValue] = React.useState('account');
         return (
           <Profile.Root
-            label='User profile'
             value={value}
             onValueChange={setValue}
           >
+            <Profile.Title>User profile</Profile.Title>
             <Profile.Nav>
               <Profile.NavItem value='account'>Account</Profile.NavItem>
               <Profile.NavItem value='security'>Security</Profile.NavItem>
@@ -280,7 +284,6 @@ describe('Profile', () => {
     it('carries no dismiss standalone, or inline', () => {
       const standalone = renderSurface();
       expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('heading', { name: 'User profile' })).not.toBeInTheDocument();
       standalone.unmount();
 
       renderInDialog(true);

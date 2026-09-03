@@ -17,7 +17,8 @@ import { VisuallyHidden } from '../visually-hidden';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
 interface ProfileContextValue {
-  label: string | undefined;
+  /** The id `Profile.Title` renders under; the navigation and the sheet point their names at it. */
+  titleId: string;
   renderBranding: boolean;
   /** Below `COMPACT_WIDTH`: the navigation lives in a sheet, opened from a page's title. */
   compact: boolean;
@@ -67,13 +68,6 @@ function useCompact(node: HTMLElement | null): boolean {
 }
 
 export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'children'> {
-  /**
-   * What the surface is called — "User profile", "Organization". Names the navigation landmark, and
-   * inside a dialog names the dialog too, through a visually hidden heading carrying the popup's
-   * `labelId`: the counterpart of `Card.Title`, for a surface whose visible headings belong to its
-   * pages.
-   */
-  label?: string;
   /** The selected page, by the `value` of its `Profile.NavItem` and `Profile.Page`. */
   value: string;
   onValueChange?: (value: string) => void;
@@ -101,12 +95,11 @@ export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'chi
  *
  * Rendered as the content of a `profile` dialog's popup, it fills it and paints it — the dialog
  * positions, the profile paints, the way a `Card` does inside a `card` dialog. Like `Card`, it
- * reads `DialogContext` to name the dialog and carry its dismiss, so the composition needs nothing
- * passed in; standalone it renders neither.
+ * reads `DialogContext` to name the dialog (through `Profile.Title`) and carry its dismiss, so the
+ * composition needs nothing passed in; standalone it carries no dismiss.
  */
 const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function ProfileRoot(
   {
-    label,
     value,
     onValueChange,
     orientation = 'vertical',
@@ -121,6 +114,10 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  // Inside a dialog the title takes the id the popup points `aria-labelledby` at, so the surface
+  // names the dialog without knowing it is in one — the way `Card.Title` does.
+  const generatedTitleId = React.useId();
+  const titleId = dialog?.labelId ?? generatedTitleId;
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
   const compact = useCompact(node);
   const [navOpen, setNavOpen] = React.useState(false);
@@ -143,8 +140,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     caret?.focus();
   }, [navOpen, node]);
   const context = React.useMemo(
-    () => ({ label, renderBranding, compact, navOpen, openNav, closeNav }),
-    [label, renderBranding, compact, navOpen, openNav, closeNav],
+    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav }),
+    [titleId, renderBranding, compact, navOpen, openNav, closeNav],
   );
   const mergedRef = React.useCallback(
     (element: HTMLDivElement | null) => {
@@ -175,7 +172,6 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
               focus — the same reason `Card.Header` renders its dismiss first. Never inline, which
               nothing closes. */}
           {dialog && !dialog.inline ? <Dialog.CloseButton /> : null}
-          {dialog && label ? <VisuallyHidden render={<h2 id={dialog.labelId} />}>{label}</VisuallyHidden> : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),
@@ -203,6 +199,31 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   );
 });
 
+export type ProfileTitleProps = MosaicComponentProps<'h2'>;
+
+/**
+ * What the surface is called — "User profile", "Organization" — as a visually hidden heading. The
+ * navigation and the compact sheet take their accessible names from it, and inside a dialog it
+ * names the dialog too, through the popup's `labelId`: the counterpart of `Card.Title`, for a
+ * surface whose visible headings belong to its pages.
+ */
+const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function ProfileTitle(
+  { render, className, style, ...rest },
+  ref,
+) {
+  const { titleId } = useProfileContext('Profile.Title');
+  return (
+    <VisuallyHidden
+      ref={ref as React.Ref<HTMLSpanElement>}
+      render={render ?? <h2 />}
+      {...mergeStyleProps(themeProps('profile-title'), className, style)}
+      {...rest}
+      // The ids the navigation and the dialog point at, so the caller's cannot displace it.
+      id={titleId}
+    />
+  );
+});
+
 export type ProfileNavProps = MosaicComponentProps<'nav'>;
 
 function NavBranding() {
@@ -227,7 +248,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
-  const { label, renderBranding, compact, navOpen, closeNav } = profile;
+  const { titleId, renderBranding, compact, navOpen, closeNav } = profile;
   const list = (
     <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
       {children}
@@ -238,7 +259,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
     render,
     ref,
     props: {
-      'aria-label': label,
+      'aria-labelledby': titleId,
       ...mergeStyleProps(
         themeProps('profile-nav', { compact }),
         stylex.props(reset.base, styles.nav, compact && styles.navInSheet),
@@ -267,7 +288,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
         }
       }}
     >
-      <Drawer.Popup aria-label={label}>{element}</Drawer.Popup>
+      <Drawer.Popup aria-labelledby={titleId}>{element}</Drawer.Popup>
     </Drawer.Root>
   );
 });
@@ -446,12 +467,13 @@ const Page = React.forwardRef<HTMLDivElement, ProfilePageProps>(function Profile
 });
 
 /**
- * A surface you navigate, composed through `Profile.Root`, `Profile.Nav`, `Profile.NavItem`,
- * `Profile.Content`, `Profile.Page`, and `Profile.PageTitle`. Every part accepts the Mosaic
+ * A surface you navigate, composed through `Profile.Root`, `Profile.Title`, `Profile.Nav`,
+ * `Profile.NavItem`, `Profile.Content`, `Profile.Page`, and `Profile.PageTitle`. Every part accepts the Mosaic
  * `render` prop and forwards its ref.
  *
  * ```tsx
- * <Profile.Root label='User profile' value={page} onValueChange={setPage}>
+ * <Profile.Root value={page} onValueChange={setPage}>
+ *   <Profile.Title>User profile</Profile.Title>
  *   <Profile.Nav>
  *     <Profile.NavItem value='account' icon={<Icon name='user-circle' size='sm' />}>Account</Profile.NavItem>
  *   </Profile.Nav>
@@ -461,4 +483,4 @@ const Page = React.forwardRef<HTMLDivElement, ProfilePageProps>(function Profile
  * </Profile.Root>
  * ```
  */
-export const Profile = { Root, Nav, NavItem, PageTitle, Content, Page };
+export const Profile = { Root, Title, Nav, NavItem, PageTitle, Content, Page };

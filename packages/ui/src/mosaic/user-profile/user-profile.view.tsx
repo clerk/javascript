@@ -12,6 +12,8 @@ import { UserProfileProfilePanelView } from './user-profile-profile-panel.view';
 import { UserProfileSecurityPanelView } from './user-profile-security-panel.view';
 
 export interface UserProfileViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
+  /** Names the surface, and the dialog it opens in. Defaults to English; pass a localized string once one is available. */
+  label?: string;
   /** The open page: a built-in page's id, or a custom page's `path`. */
   activePage: UserProfilePageId | (string & {});
   pages: UserProfilePages;
@@ -54,11 +56,11 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
   return (
     <Profile.Root
       ref={ref}
-      label={label}
       value={resolvedPage}
       onValueChange={onPageChange}
       {...rest}
     >
+      <Profile.Title>{label}</Profile.Title>
       <Profile.Nav>
         {entries.map(entry => (
           <Profile.NavItem

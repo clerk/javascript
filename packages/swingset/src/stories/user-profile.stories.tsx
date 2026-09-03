@@ -1,3 +1,5 @@
+import { Button } from '@clerk/ui/mosaic/components/button';
+import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import type { UserProfileViewProps } from '@clerk/ui/mosaic/user-profile/user-profile.view';
 import { UserProfileView } from '@clerk/ui/mosaic/user-profile/user-profile.view';
 import type { UserProfileAPIKey } from '@clerk/ui/mosaic/user-profile/user-profile-api-keys-panel.view';
@@ -14,6 +16,8 @@ import type {
 import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { useUserProfileFixture } from './fixtures/user-profile';
 
 export { default as __source } from './user-profile.stories?raw';
 
@@ -246,5 +250,25 @@ export function Default() {
       pages={pages}
       onPageChange={setActivePage}
     />
+  );
+}
+
+/**
+ * The same profile as an overlay: opened from a trigger on the page into a `profile` dialog, which
+ * positions it while the profile paints itself, names the dialog, and carries its dismiss.
+ */
+export function Overlay() {
+  const { activePage, setActivePage, pages } = useUserProfileFixture();
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
+      <Dialog.Popup size='profile'>
+        <UserProfileView
+          activePage={activePage}
+          pages={pages}
+          onPageChange={setActivePage}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
   );
 }

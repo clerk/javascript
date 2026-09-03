@@ -19,8 +19,8 @@ import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
  */
 const compact = '@container cl-profile (max-width: 48rem)' as const;
 
-/** How far the content's clip edge sits inside the frame's corners — a hair past the radius. */
-const SCROLL_INSET = space['4'];
+/** How far the content's clip edge — and the scrollbar with it — sits inside the frame's corners. */
+const SCROLL_INSET = space['2'];
 
 const NAV_GAP = space['0.5'];
 const HALF_GAP = `calc(-1 * ${NAV_GAP} / 2)`;

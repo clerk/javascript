@@ -106,6 +106,7 @@ export type {
   ProfilePageProps,
   ProfilePageTitleProps,
   ProfileRootProps,
+  ProfileTitleProps,
 } from '../components/profile';
 
 import {

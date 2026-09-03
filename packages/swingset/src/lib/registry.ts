@@ -160,7 +160,11 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
-import { Default as UserProfileDefault, meta as userProfileMeta } from '../stories/user-profile.stories';
+import {
+  Default as UserProfileDefault,
+  meta as userProfileMeta,
+  Overlay as UserProfileOverlay,
+} from '../stories/user-profile.stories';
 import {
   Default as UserProfileAccountSectionDefault,
   meta as userProfileAccountSectionMeta,
@@ -393,6 +397,7 @@ const userProfileApiKeysPanelModule: StoryModule = {
 const userProfileModule: StoryModule = {
   meta: userProfileMeta,
   Default: UserProfileDefault,
+  Overlay: UserProfileOverlay,
 };
 
 const userProfileAccountSectionModule: StoryModule = {

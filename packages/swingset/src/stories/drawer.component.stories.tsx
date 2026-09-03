@@ -2,12 +2,12 @@ import { Button } from '@clerk/ui/mosaic/components/button';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import { Drawer } from '@clerk/ui/mosaic/components/drawer';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { Profile } from '@clerk/ui/mosaic/components/profile';
 import { Text } from '@clerk/ui/mosaic/components/text';
-import { useState } from 'react';
+import { UserProfileView } from '@clerk/ui/mosaic/user-profile/user-profile.view';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { useUserProfileFixture } from './fixtures/user-profile';
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -45,62 +45,20 @@ export function Default() {
 }
 
 /**
- * Opened from inside a `profile` dialog: the sheet rises over the profile and takes the nested
- * scrim, the way a prompt opened there does. Narrow the window below the phone band to see the
- * profile fill the screen first.
+ * The user profile in a `profile` dialog. Narrow the window below the phone band: the profile fills
+ * the screen, and its navigation moves into a sheet that each page's headline opens.
  */
 export function InsideProfile() {
-  const [page, setPage] = useState('members');
+  const { activePage, setActivePage, pages } = useUserProfileFixture();
   return (
     <Dialog.Root>
-      <Dialog.Trigger render={<Button />}>Manage organization</Dialog.Trigger>
+      <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
       <Dialog.Popup size='profile'>
-        <Profile.Root
-          label='Organization'
-          value={page}
-          onValueChange={setPage}
-        >
-          <Profile.Nav>
-            <Profile.NavItem
-              value='general'
-              icon={
-                <Icon
-                  name='user-circle'
-                  size='sm'
-                />
-              }
-            >
-              General
-            </Profile.NavItem>
-            <Profile.NavItem
-              value='members'
-              icon={
-                <Icon
-                  name='users'
-                  size='sm'
-                />
-              }
-            >
-              Members
-            </Profile.NavItem>
-          </Profile.Nav>
-          <Profile.Content>
-            <Profile.Page value='general'>
-              <Profile.PageTitle>General</Profile.PageTitle>
-            </Profile.Page>
-            <Profile.Page value='members'>
-              <div style={{ display: 'grid', gap: '1rem', justifyItems: 'start' }}>
-                <Profile.PageTitle>Members</Profile.PageTitle>
-                <Drawer.Root>
-                  <Drawer.Trigger render={<Button variant='outline' />}>Sort</Drawer.Trigger>
-                  <Drawer.Popup>
-                    <SheetContent />
-                  </Drawer.Popup>
-                </Drawer.Root>
-              </div>
-            </Profile.Page>
-          </Profile.Content>
-        </Profile.Root>
+        <UserProfileView
+          activePage={activePage}
+          pages={pages}
+          onPageChange={setActivePage}
+        />
       </Dialog.Popup>
     </Dialog.Root>
   );

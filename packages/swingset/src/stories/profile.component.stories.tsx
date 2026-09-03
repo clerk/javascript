@@ -48,11 +48,11 @@ function Surface(props: Partial<ProfileRootProps>) {
   const [page, setPage] = useState('general');
   return (
     <Profile.Root
-      label='Settings'
       value={page}
       onValueChange={setPage}
       {...props}
     >
+      <Profile.Title>Settings</Profile.Title>
       <Profile.Nav>
         {pages.map(item => (
           <Profile.NavItem

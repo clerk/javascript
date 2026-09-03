@@ -6,4 +6,5 @@ export type {
   ProfilePageProps,
   ProfilePageTitleProps,
   ProfileRootProps,
+  ProfileTitleProps,
 } from './profile';

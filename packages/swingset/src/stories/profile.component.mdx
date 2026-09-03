@@ -25,10 +25,10 @@ import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Profile } from '@clerk/ui/mosaic/components/profile';
 
 <Profile.Root
-  label='User profile'
   value={page}
   onValueChange={setPage}
 >
+  <Profile.Title>User profile</Profile.Title>
   <Profile.Nav>
     <Profile.NavItem
       value='account'
@@ -52,7 +52,8 @@ import { Profile } from '@clerk/ui/mosaic/components/profile';
 
 `Root` is controlled: `value` names the open page and `onValueChange` reports a selection. A
 `NavItem` and a `Page` pair by `value`. `icon` takes any node, so a page of the consumer's own can
-bring its own mark.
+bring its own mark. `Title` is a visually hidden heading: it names the navigation, the compact
+sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 ## Parts
 
