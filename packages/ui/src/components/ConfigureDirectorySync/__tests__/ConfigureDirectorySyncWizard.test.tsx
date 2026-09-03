@@ -48,6 +48,8 @@ const directory = (overrides: Record<string, unknown> = {}) =>
     delete: vi.fn(),
     rotateToken: vi.fn(),
     getUsers: vi.fn().mockResolvedValue({ data: [], total_count: 0 }),
+    getGroups: vi.fn().mockResolvedValue({ data: [], startingAfter: null, hasNextPage: false }),
+    getGroupRoleMappings: vi.fn().mockResolvedValue({ data: [], defaultRole: null }),
     ...overrides,
   }) as any;
 

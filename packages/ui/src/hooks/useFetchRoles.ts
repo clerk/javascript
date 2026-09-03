@@ -31,7 +31,7 @@ export const useFetchRoles = (enabled = true) => {
   return {
     isLoading,
     hasRoleSetMigration: !!data?.has_role_set_migration,
-    options: data?.data?.map(role => ({ value: role.key, label: role.name })),
+    options: data?.data?.map(role => ({ value: role.key, label: role.name, description: role.description })),
   };
 };
 

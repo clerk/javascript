@@ -1,5 +1,6 @@
 import {
   __internal_useOrganizationDirectorySync,
+  __internal_useOrganizationDirectorySyncGroupRoleMappings,
   __internal_useOrganizationEnterpriseConnections,
 } from '@clerk/shared/react';
 import type {
@@ -7,12 +8,38 @@ import type {
   DirectorySyncResource,
   EnterpriseConnectionResource,
   SetDirectorySyncCredentialsParams,
+  UpdateDirectorySyncParams,
 } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
+import { useFetchRoles } from '../../hooks/useFetchRoles';
 import { sortEnterpriseConnections } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import type { DirectorySyncProviderMeta } from './providerMeta';
 import { DIRECTORY_SYNC_PROVIDERS, directorySyncProviderForConnection } from './providerMeta';
+import type { GroupRoleMapping, RoleOption, UnmappedGroup } from './roleMapping';
+import { moveItem, NO_ROLE_KEY } from './roleMapping';
+
+/**
+ * Group → role mapping edits for the wizard's role mapping step. Edits stay
+ * local until `save`; `mappings` is ordered by priority (index 0 wins).
+ */
+export interface RoleMappingView {
+  isLoading: boolean;
+  error: Error | null;
+  enabled: boolean;
+  setEnabled: (enabled: boolean) => void;
+  roles: RoleOption[];
+  mappings: GroupRoleMapping[];
+  unmappedGroups: UnmappedGroup[];
+  /** Binds a group to a role; a new mapping is appended at the lowest priority. `NO_ROLE_KEY` unmaps it. */
+  setRole: (group: UnmappedGroup, roleKey: string) => void;
+  /** Reorders a mapping by position within `mappings`. */
+  move: (from: number, to: number) => void;
+  /** The role members in no mapped group receive. */
+  defaultRole: RoleOption | null;
+  /** Writes any changed mappings and the enabled flag. */
+  save: () => Promise<void>;
+}
 
 /**
  * Shared state for the ConfigureDirectorySync wizard, persisted across steps.
@@ -39,6 +66,8 @@ export interface ConfigureDirectorySyncData {
   setCredentials: (params: SetDirectorySyncCredentialsParams) => Promise<DirectorySyncResource | undefined>;
   /** Starts a sync for a pull directory. */
   syncDirectory: () => Promise<void>;
+  roleMapping: RoleMappingView;
+  contentRef?: React.RefObject<HTMLDivElement>;
   onExit?: () => void;
 }
 
@@ -46,6 +75,7 @@ const ConfigureDirectorySyncContext = React.createContext<ConfigureDirectorySync
 ConfigureDirectorySyncContext.displayName = 'ConfigureDirectorySyncContext';
 
 type ConfigureDirectorySyncProviderProps = PropsWithChildren<{
+  contentRef?: React.RefObject<HTMLDivElement>;
   onExit?: () => void;
 }>;
 
@@ -55,6 +85,7 @@ type RevealedToken = {
 };
 
 export const ConfigureDirectorySyncProvider = ({
+  contentRef,
   onExit,
   children,
 }: ConfigureDirectorySyncProviderProps): JSX.Element => {
@@ -105,6 +136,8 @@ export const ConfigureDirectorySyncProvider = ({
   const provider =
     directory?.provider ?? (connection ? directorySyncProviderForConnection(connection.provider) : undefined);
 
+  const roleMapping = useRoleMapping(directory, updateDirectorySync);
+
   const value: ConfigureDirectorySyncData = {
     isLoading: isLoadingConnections || (Boolean(enterpriseConnectionId) && isLoadingDirectory),
     connection,
@@ -117,10 +150,107 @@ export const ConfigureDirectorySyncProvider = ({
     setDirectoryEnabled,
     setCredentials: setDirectorySyncCredentials,
     syncDirectory,
+    roleMapping,
+    contentRef,
     onExit,
   };
 
   return <ConfigureDirectorySyncContext.Provider value={value}>{children}</ConfigureDirectorySyncContext.Provider>;
+};
+
+const sameMappings = (a: GroupRoleMapping[], b: GroupRoleMapping[]): boolean =>
+  a.length === b.length && a.every((m, i) => m.groupId === b[i].groupId && m.roleKey === b[i].roleKey);
+
+const useRoleMapping = (
+  directory: DirectorySyncResource | null | undefined,
+  updateDirectorySync: (params: UpdateDirectorySyncParams) => Promise<DirectorySyncResource | undefined>,
+): RoleMappingView => {
+  const {
+    data,
+    error,
+    isLoading: isLoadingMappings,
+    replaceGroupRoleMappings,
+  } = __internal_useOrganizationDirectorySyncGroupRoleMappings({ directory });
+  const { options: roleOptions, isLoading: isLoadingRoles } = useFetchRoles();
+
+  const savedMappings = React.useMemo<GroupRoleMapping[]>(
+    () =>
+      (data?.mappings ?? []).flatMap(m =>
+        m.role ? [{ groupId: m.directoryGroupId, groupName: m.directoryGroupDisplayName, roleKey: m.role.key }] : [],
+      ),
+    [data?.mappings],
+  );
+  const savedEnabled = directory?.groupRoleMappingEnabled ?? false;
+
+  const [draftMappings, setDraftMappings] = React.useState<GroupRoleMapping[] | null>(null);
+  const [draftEnabled, setDraftEnabled] = React.useState<boolean | null>(null);
+  const mappings = draftMappings ?? savedMappings;
+  const enabled = draftEnabled ?? savedEnabled;
+
+  const unmappedGroups = React.useMemo<UnmappedGroup[]>(
+    () =>
+      (data?.groups ?? [])
+        .filter(g => !mappings.some(m => m.groupId === g.id))
+        .map(g => ({ id: g.id, name: g.displayName }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [data?.groups, mappings],
+  );
+
+  const setRole = React.useCallback(
+    (group: UnmappedGroup, roleKey: string) => {
+      setDraftMappings(prev => {
+        const current = prev ?? savedMappings;
+        if (roleKey === NO_ROLE_KEY) {
+          return current.filter(m => m.groupId !== group.id);
+        }
+        return current.some(m => m.groupId === group.id)
+          ? current.map(m => (m.groupId === group.id ? { ...m, roleKey } : m))
+          : [...current, { groupId: group.id, groupName: group.name, roleKey }];
+      });
+    },
+    [savedMappings],
+  );
+
+  const move = React.useCallback(
+    (from: number, to: number) => {
+      setDraftMappings(prev => moveItem(prev ?? savedMappings, from, to));
+    },
+    [savedMappings],
+  );
+
+  const save = React.useCallback(async () => {
+    if (draftMappings && !sameMappings(draftMappings, savedMappings)) {
+      await replaceGroupRoleMappings({
+        mappings: draftMappings.map(m => ({ directoryGroupId: m.groupId, role: m.roleKey })),
+      });
+    }
+    setDraftMappings(null);
+    if (draftEnabled !== null && draftEnabled !== savedEnabled) {
+      await updateDirectorySync({ groupRoleMappingEnabled: draftEnabled });
+    }
+    setDraftEnabled(null);
+  }, [draftMappings, savedMappings, draftEnabled, savedEnabled, replaceGroupRoleMappings, updateDirectorySync]);
+
+  const defaultRole = data?.defaultRole
+    ? {
+        value: data.defaultRole.key,
+        label: roleOptions?.find(r => r.value === data.defaultRole?.key)?.label ?? data.defaultRole.name,
+      }
+    : null;
+
+  return {
+    isLoading: isLoadingMappings || isLoadingRoles,
+    error,
+    enabled,
+    setEnabled: setDraftEnabled,
+    roles: roleOptions ?? [],
+    mappings,
+    unmappedGroups,
+    setRole,
+    move,
+    defaultRole,
+    save,
+  };
 };
 
 export const useConfigureDirectorySync = (): ConfigureDirectorySyncData => {

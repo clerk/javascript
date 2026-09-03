@@ -11,6 +11,8 @@ interface SwitchProps {
   onChange?: (checked: boolean) => void;
   isDisabled?: boolean;
   label?: string | LocalizationKey;
+  labelVariant?: 'caption' | 'subtitle';
+  labelPosition?: 'start' | 'end';
   'aria-label'?: string;
   'aria-labelledby'?: string;
 }
@@ -24,6 +26,8 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
       onChange,
       isDisabled = false,
       label,
+      labelVariant = 'caption',
+      labelPosition = 'end',
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledBy,
     },
@@ -49,7 +53,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
       <Flex
         ref={ref}
         elementDescriptor={descriptors.switchRoot}
-        direction='row'
+        direction={labelPosition === 'start' ? 'rowReverse' : 'row'}
         align='center'
         as='label'
         sx={t => ({
@@ -117,11 +121,11 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         {hasInternalLabel ? (
           <Text
             as='span'
-            variant='caption'
+            variant={labelVariant}
             colorScheme='secondary'
             localizationKey={label}
             sx={t => ({
-              paddingInlineStart: t.sizes.$2,
+              [labelPosition === 'start' ? 'paddingInlineEnd' : 'paddingInlineStart']: t.sizes.$2,
               cursor: isDisabled ? 'not-allowed' : 'pointer',
               userSelect: 'none',
             })}
