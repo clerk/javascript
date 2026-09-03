@@ -12,12 +12,12 @@ import { FormContainer } from '@/ui/elements/FormContainer';
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
 
 type VerifyTOTPProps = FormProps & {
-  resourceRef: React.MutableRefObject<TOTPResource | undefined>;
+  verifiedTotpRef: React.MutableRefObject<TOTPResource | undefined>;
   onBack: () => void;
 };
 
 export const VerifyTOTP = withCardStateProvider((props: VerifyTOTPProps) => {
-  const { onSuccess, onReset, onBack, resourceRef } = props;
+  const { onSuccess, onReset, onBack, verifiedTotpRef } = props;
   const { user } = useUser();
 
   const otp = useFieldOTP<TOTPResource>({
@@ -28,7 +28,7 @@ export const VerifyTOTP = withCardStateProvider((props: VerifyTOTPProps) => {
         .catch(reject);
     },
     onResolve: a => {
-      resourceRef.current = a;
+      verifiedTotpRef.current = a;
       onSuccess();
     },
   });

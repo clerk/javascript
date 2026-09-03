@@ -15,7 +15,10 @@ type MfaTOTPFormProps = FormProps;
 export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => {
   const { onReset } = props;
   const wizard = useWizard();
-  const ref = React.useRef<TOTPResource>();
+  // The secret issued for the QR step, kept so returning to it does not mint a new one.
+  const pendingTotpRef = React.useRef<TOTPResource>();
+  // The enrolled resource, which is what carries the backup codes.
+  const verifiedTotpRef = React.useRef<TOTPResource>();
 
   return (
     <Wizard {...wizard.props}>
@@ -23,14 +26,14 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
         onSuccess={wizard.nextStep}
         onReset={onReset}
-        resourceRef={ref}
+        pendingTotpRef={pendingTotpRef}
       />
 
       <VerifyTOTP
         onSuccess={wizard.nextStep}
         onReset={onReset}
         onBack={wizard.prevStep}
-        resourceRef={ref}
+        verifiedTotpRef={verifiedTotpRef}
       />
 
       <SuccessPage
@@ -40,7 +43,7 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
         contents={
           <MfaBackupCodeList
             subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
-            backupCodes={ref.current?.backupCodes}
+            backupCodes={verifiedTotpRef.current?.backupCodes}
           />
         }
       />
