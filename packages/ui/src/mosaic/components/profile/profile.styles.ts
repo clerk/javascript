@@ -264,4 +264,5 @@ export const styles = stylex.create({
 });
 
 export const contentScroll = scrollAreaRoot;
-export const contentViewportScroll = scrollAreaViewport();
+// A held gutter: switching to a page that does not scroll must not reflow the one that did.
+export const contentViewportScroll = scrollAreaViewport('stable');
