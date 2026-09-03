@@ -55,6 +55,48 @@ export const inputStyles = stylex.create({
       ':focus-visible': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
     },
   },
+  group: {
+    borderColor: {
+      default: colorVars['--cl-color-border'],
+      ':where([data-invalid])': colorVars['--cl-color-negative'],
+      ':has(:focus-visible)': hoverBorderColor,
+      ':has(:focus-visible):where([data-invalid])': colorVars['--cl-color-negative'],
+      '@media (hover: hover)': {
+        ':hover:not([data-invalid])': hoverBorderColor,
+      },
+    },
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    outline: {
+      default: 'none',
+      '@media (forced-colors: active)': {
+        default: null,
+        ':has(:focus-visible)': '2px solid CanvasText',
+      },
+    },
+    backgroundColor: colorVars['--cl-color-input'],
+    boxShadow: {
+      default: null,
+      ':has(:focus-visible)': focusShadow,
+      ':has(:focus-visible):where([data-invalid])': invalidFocusShadow,
+    },
+    outlineOffset: {
+      default: null,
+      '@media (forced-colors: active)': {
+        default: null,
+        ':has(:focus-visible)': '2px',
+      },
+    },
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      ':has(:focus-visible)': durationVars['--cl-duration-fast'],
+    },
+    transitionProperty: 'color, background-color, border-color, box-shadow',
+    transitionTimingFunction: {
+      default: 'linear',
+      ':has(:focus-visible)': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
+    },
+  },
   disabled: {
     backgroundColor: disabledBackgroundColor,
     cursor: 'not-allowed',

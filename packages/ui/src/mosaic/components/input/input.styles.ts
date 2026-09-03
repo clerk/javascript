@@ -4,6 +4,7 @@ import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScale
 
 export const styles = stylex.create({
   base: {
+    color: colorVars['--cl-color-card-foreground'],
     display: 'block',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     minWidth: 0,
@@ -30,6 +31,7 @@ export const styles = stylex.create({
     outline: 'none',
     backgroundColor: 'transparent',
     boxShadow: 'none',
+    flexGrow: 1,
   },
 });
 

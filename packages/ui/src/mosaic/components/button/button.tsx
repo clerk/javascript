@@ -12,7 +12,7 @@ import { iconSizes, sizes, styles, variants } from './button.styles';
 export interface ButtonProps extends MosaicElementProps<'button'> {
   color?: 'primary' | 'neutral' | 'negative';
   variant?: 'filled' | 'outline' | 'ghost' | 'link';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   shape?: 'default' | 'square' | 'circle';
   fullWidth?: boolean;
   /**
