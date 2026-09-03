@@ -802,11 +802,11 @@ const withRedirectToAccountSwitcher = <P extends object>(Component: ComponentTyp
   const HOC = (props: P) => {
     const clerk = useClerk();
     const { authConfig } = useEnvironment();
-    const { __experimental_multiSessionStart } = useSignInContext();
+    const { multiSessionStart } = useSignInContext();
     const { navigate, queryParams } = useRouter();
 
     const shouldShowSwitcher =
-      __experimental_multiSessionStart === 'switcher' &&
+      multiSessionStart === 'switcher' &&
       !authConfig.singleSessionMode &&
       clerk.client.signedInSessions.length > 0 &&
       queryParams[CLERK_ADD_ACCOUNT] === undefined;
