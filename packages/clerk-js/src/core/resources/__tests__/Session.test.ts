@@ -2611,6 +2611,38 @@ describe('Session', () => {
       });
     });
 
+    it('updates the active session factor age after email-link reverification completes', async () => {
+      BaseResource.clerk = clerkMock();
+      const staleSessionJSON = {
+        ...createSession({ id: 'session_1' }),
+        factor_verification_age: [99999, -1],
+      } satisfies SessionJSON;
+      const refreshedSessionJSON = {
+        ...createSession({ id: 'session_1' }),
+        factor_verification_age: [0, -1],
+      } satisfies SessionJSON;
+      const session = new Session(staleSessionJSON);
+      vi.spyOn(session, 'getToken').mockResolvedValue('fresh-token');
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch');
+
+      fetchSpy
+        .mockResolvedValueOnce(createSessionVerificationResponse(staleSessionJSON, 'needs_first_factor', 'unverified'))
+        .mockResolvedValueOnce(createSessionVerificationResponse(refreshedSessionJSON, 'complete', 'verified'));
+
+      const resultPromise = startEmailLinkFlow(session);
+      await vi.advanceTimersByTimeAsync(0);
+      await resultPromise;
+
+      expect(
+        session.checkAuthorization({
+          reverification: {
+            level: 'first_factor',
+            afterMinutes: 1,
+          },
+        }),
+      ).toBe(true);
+    });
+
     it.each(['expired', 'failed'] as const)('resolves when the email-link verification is %s', async status => {
       BaseResource.clerk = clerkMock();
       const sessionJSON = createSession({ id: 'session_1', factor_verification_age: [99999, -1] });

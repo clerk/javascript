@@ -328,6 +328,7 @@ export class Session extends BaseResource implements SessionResource {
               ) {
                 stop();
                 if (res.status === 'complete') {
+                  this.fromJSON(res.session.__internal_toSnapshot());
                   await this.getToken({ skipCache: true });
                 }
                 resolve(res);
