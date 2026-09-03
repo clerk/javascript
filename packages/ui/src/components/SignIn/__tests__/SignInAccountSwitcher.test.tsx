@@ -56,9 +56,9 @@ describe('SignInAccountSwitcher', () => {
     const { wrapper } = await createFixturesWithRedirect(initConfig);
     const { userEvent, getByText } = render(<SignInAccountSwitcher />, { wrapper });
     await userEvent.click(getByText('Add account'));
-    expect(clerkWindowNavigate).toHaveBeenCalledWith(
+    expect(clerkWindowNavigate).toHaveBeenLastCalledWith(
       expect.anything(),
-      expect.stringContaining('redirect_url=https%3A%2F%2Fexample.com%2Fconsent'),
+      expect.stringMatching(/redirect_url=https%3A%2F%2Fexample\.com%2Fconsent.*__clerk_add_account=true/),
     );
   });
 
