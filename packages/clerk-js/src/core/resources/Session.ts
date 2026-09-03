@@ -317,7 +317,7 @@ export class Session extends BaseResource implements SessionResource {
       return new Promise((resolve, reject) => {
         void run(() => {
           return this.#readVerification()
-            .then(res => {
+            .then(async res => {
               const verificationStatus = res.firstFactorVerification.status;
               if (
                 res.status === 'complete' ||
@@ -327,6 +327,9 @@ export class Session extends BaseResource implements SessionResource {
                 verificationStatus === 'failed'
               ) {
                 stop();
+                if (res.status === 'complete') {
+                  await this.getToken({ skipCache: true });
+                }
                 resolve(res);
               }
             })

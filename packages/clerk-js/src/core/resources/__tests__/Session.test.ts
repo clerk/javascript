@@ -2575,6 +2575,7 @@ describe('Session', () => {
       BaseResource.clerk = clerkMock();
       const sessionJSON = createSession({ id: 'session_1', factor_verification_age: [99999, -1] });
       const session = new Session(sessionJSON);
+      const getTokenSpy = vi.spyOn(session, 'getToken').mockResolvedValue('fresh-token');
       const fetchSpy = vi.spyOn(BaseResource, '_fetch');
 
       fetchSpy
@@ -2590,6 +2591,7 @@ describe('Session', () => {
 
       expect(result.status).toBe('complete');
       expect(result.firstFactorVerification.strategy).toBe('email_link');
+      expect(getTokenSpy).toHaveBeenCalledWith({ skipCache: true });
       expect(fetchSpy).toHaveBeenNthCalledWith(1, {
         method: 'POST',
         path: '/client/sessions/session_1/verify/prepare_first_factor',
