@@ -13,7 +13,7 @@ import { Button, Col, descriptors, localizationKeys } from '../../customizables'
 
 type VerifyTOTPProps = FormProps & {
   resourceRef: React.MutableRefObject<TOTPResource | undefined>;
-  onBack?: () => void;
+  onBack: () => void;
 };
 
 export const VerifyTOTP = withCardStateProvider((props: VerifyTOTPProps) => {
@@ -52,14 +52,13 @@ export const VerifyTOTP = withCardStateProvider((props: VerifyTOTPProps) => {
           elementDescriptor={descriptors.formButtonReset}
         />
 
-        {onBack && (
-          <Button
-            onClick={onBack}
-            variant='ghost'
-            isDisabled={otp.isLoading}
-            localizationKey={localizationKeys('backButton')}
-          />
-        )}
+        <Button
+          onClick={onBack}
+          variant='ghost'
+          isDisabled={otp.isLoading}
+          localizationKey={localizationKeys('backButton')}
+          elementDescriptor={descriptors.backLink}
+        />
       </FormButtonContainer>
     </FormContainer>
   );
