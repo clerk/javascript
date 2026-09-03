@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.15.1
+
+### Patch Changes
+
+- Ensure ticket-based sign-in and sign-up flows started before Clerk finishes loading can be finalized successfully. ([#9628](https://github.com/clerk/javascript/pull/9628)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
 ## 6.15.0
 
 ### Minor Changes
