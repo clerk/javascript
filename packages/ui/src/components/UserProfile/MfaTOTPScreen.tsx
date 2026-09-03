@@ -15,9 +15,7 @@ type MfaTOTPFormProps = FormProps;
 export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => {
   const { onReset } = props;
   const wizard = useWizard();
-  // The secret issued for the QR step, kept so returning to it does not mint a new one.
   const pendingTotpRef = React.useRef<TOTPResource>();
-  // The enrolled resource, which is what carries the backup codes.
   const verifiedTotpRef = React.useRef<TOTPResource>();
 
   return (
