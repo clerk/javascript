@@ -1,8 +1,9 @@
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Badge } from '@clerk/ui/mosaic/components/badge';
 import { Button } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
 import { Section } from '@clerk/ui/mosaic/components/section';
+import { space } from '@clerk/ui/mosaic/styles';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,13 +11,17 @@ export { default as __source } from './section.stories?raw';
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 
-function ProviderIcon({ provider }: { provider: string }) {
+function ProviderMedia({ provider }: { provider: string }) {
   return (
-    <img
-      alt=''
-      src={providerIconUrl(provider)}
-      style={{ display: 'block', height: 24, width: 24 }}
-    />
+    <Section.Media size='lg'>
+      <IconFrame>
+        <img
+          alt=''
+          src={providerIconUrl(provider)}
+          style={{ display: 'block', height: space['5'], width: space['5'] }}
+        />
+      </IconFrame>
+    </Section.Media>
   );
 }
 
@@ -33,18 +38,27 @@ export function Default() {
       <Section.Group>
         <Section.Row>
           <Section.Item>
-            <Section.Content>
-              <Section.Label>Profile picture</Section.Label>
-              <Section.Description>PNG or JPEG, Recommended size 1:1, up to 10MB.</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Avatar.Root size='lg'>
+            <Section.Media size='lg'>
+              <Avatar.Root size='fit'>
                 <Avatar.Image
                   alt='Preston Booth'
                   src='https://avatars.githubusercontent.com/u/51144033?v=4'
                 />
                 <Avatar.Fallback>PB</Avatar.Fallback>
               </Avatar.Root>
+            </Section.Media>
+            <Section.Content>
+              <Section.Label>Profile picture</Section.Label>
+              <Section.Description>Recommend size 1:1, up to 10MB.</Section.Description>
+            </Section.Content>
+            <Section.Actions>
+              <Button
+                color='neutral'
+                size='sm'
+                variant='outline'
+              >
+                Upload
+              </Button>
             </Section.Actions>
           </Section.Item>
         </Section.Row>
@@ -61,7 +75,7 @@ export function Default() {
                 size='sm'
                 variant='outline'
               >
-                Update name
+                Edit name
               </Button>
             </Section.Actions>
           </Section.Item>
@@ -79,7 +93,7 @@ export function Default() {
                 size='sm'
                 variant='outline'
               >
-                Update username
+                Edit username
               </Button>
             </Section.Actions>
           </Section.Item>
@@ -114,18 +128,27 @@ export function MultipleEmailAndPhoneNumbers() {
       <Section.Group>
         <Section.Row>
           <Section.Item>
-            <Section.Content>
-              <Section.Label>Profile picture</Section.Label>
-              <Section.Description>PNG or JPEG, Recommended size 1:1, up to 10MB.</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Avatar.Root size='lg'>
+            <Section.Media size='lg'>
+              <Avatar.Root size='fit'>
                 <Avatar.Image
                   alt='Preston Booth'
                   src='https://avatars.githubusercontent.com/u/51144033?v=4'
                 />
                 <Avatar.Fallback>PB</Avatar.Fallback>
               </Avatar.Root>
+            </Section.Media>
+            <Section.Content>
+              <Section.Label>Profile picture</Section.Label>
+              <Section.Description>Recommend size 1:1, up to 10MB.</Section.Description>
+            </Section.Content>
+            <Section.Actions>
+              <Button
+                color='neutral'
+                size='sm'
+                variant='outline'
+              >
+                Upload
+              </Button>
             </Section.Actions>
           </Section.Item>
         </Section.Row>
@@ -142,7 +165,7 @@ export function MultipleEmailAndPhoneNumbers() {
                 size='sm'
                 variant='outline'
               >
-                Update name
+                Edit name
               </Button>
             </Section.Actions>
           </Section.Item>
@@ -160,7 +183,7 @@ export function MultipleEmailAndPhoneNumbers() {
                 size='sm'
                 variant='outline'
               >
-                Update username
+                Edit username
               </Button>
             </Section.Actions>
           </Section.Item>
@@ -177,12 +200,7 @@ export function MultipleEmailAndPhoneNumbers() {
                 size='sm'
                 variant='outline'
               >
-                Add
-                <Icon
-                  name='plus'
-                  placement='inline-end'
-                  size='sm'
-                />
+                Add email
               </Button>
             </Section.Actions>
           </Section.Item>
@@ -236,12 +254,7 @@ export function MultipleEmailAndPhoneNumbers() {
                 size='sm'
                 variant='outline'
               >
-                Add
-                <Icon
-                  name='plus'
-                  placement='inline-end'
-                  size='sm'
-                />
+                Add phone number
               </Button>
             </Section.Actions>
           </Section.Item>
@@ -279,9 +292,7 @@ export function ConnectedAccounts() {
       <Section.Group>
         <Section.Row>
           <Section.Item>
-            <Section.Media>
-              <ProviderIcon provider='google' />
-            </Section.Media>
+            <ProviderMedia provider='google' />
             <Section.Content>
               <Section.Label>Google</Section.Label>
               <Section.Description>test@google.com</Section.Description>
@@ -301,9 +312,7 @@ export function ConnectedAccounts() {
         </Section.Row>
         <Section.Row>
           <Section.Item>
-            <Section.Media>
-              <ProviderIcon provider='apple' />
-            </Section.Media>
+            <ProviderMedia provider='apple' />
             <Section.Content>
               <Section.Label>Apple</Section.Label>
             </Section.Content>
@@ -314,8 +323,39 @@ export function ConnectedAccounts() {
                 variant='outline'
               >
                 Connect
+                <Icon
+                  name='arrow-right-top'
+                  placement='inline-end'
+                  size='sm'
+                />
               </Button>
             </Section.Actions>
+          </Section.Item>
+        </Section.Row>
+      </Section.Group>
+    </Section.Root>
+  );
+}
+
+export function IconFrameMedia() {
+  return (
+    <Section.Root style={{ maxWidth: 560 }}>
+      <Section.Title>Team</Section.Title>
+      <Section.Group>
+        <Section.Row>
+          <Section.Item>
+            <Section.Media size='lg'>
+              <IconFrame>
+                <Icon
+                  name='users'
+                  size='lg'
+                />
+              </IconFrame>
+            </Section.Media>
+            <Section.Content>
+              <Section.Label>Engineering</Section.Label>
+              <Section.Description>12 members</Section.Description>
+            </Section.Content>
           </Section.Item>
         </Section.Row>
       </Section.Group>
@@ -340,7 +380,7 @@ export function Destructive() {
               <Button
                 color='negative'
                 size='sm'
-                variant='ghost'
+                variant='outline'
               >
                 Delete account
               </Button>

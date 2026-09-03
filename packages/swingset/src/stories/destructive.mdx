@@ -1,0 +1,93 @@
+import * as Stories from './destructive.stories';
+
+# Destructive
+
+A type-to-confirm dialog for an action that cannot be undone. The action stays inert until the user types the confirmation phrase back.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+The block holds one thing: the phrase the user types. Nothing outside the dialog can use a half-typed string, so keeping it inside removes the keystroke plumbing a caller would otherwise write.
+
+Everything that decides what the dialog does next belongs to the caller. `open` closes it, `isDeleting` marks it busy, `errorMessage` explains a failure.
+
+```tsx
+import { Destructive } from '@clerk/ui/mosaic/blocks/destructive';
+import { Button } from '@clerk/ui/mosaic/components/button';
+
+const [open, setOpen] = useState(false);
+const [isDeleting, setIsDeleting] = useState(false);
+
+const handleDelete = async () => {
+  setIsDeleting(true);
+  await deleteAccount();
+  setIsDeleting(false);
+  setOpen(false);
+};
+
+<Destructive
+  open={open}
+  onOpenChange={setOpen}
+  trigger={<Button color='negative' variant='outline'>Delete account</Button>}
+  title='Delete account?'
+  description='Are you sure you want to delete your account? All of your data will be permanently deleted.'
+  fieldLabel='Type “Delete account” below to continue'
+  confirmationValue='Delete account'
+  actionLabel='Delete account'
+  onDelete={() => void handleDelete()}
+  isDeleting={isDeleting}
+/>;
+```
+
+## Failure
+
+A failed attempt leaves the dialog up. Pass the sentence the user should read as `errorMessage`, and clear it when the next attempt starts. The field is marked invalid for as long as a message is set.
+
+<Story
+  name='WithError'
+  storyModule={Stories}
+/>
+
+## Props
+
+| Prop                | Type                      | Description                                                                                                       |
+| ------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `open`              | `boolean`                 | Whether the confirmation is showing. Controlled, the way any dialog is.                                           |
+| `onOpenChange`      | `(open: boolean) => void` | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.                                    |
+| `trigger`           | `ReactNode`               | Optional. The button that asks to open the dialog.                                                                |
+| `title`             | `string`                  | Names what is about to be destroyed.                                                                              |
+| `description`       | `string`                  | Spells out what is lost. Sits above the confirmation field.                                                       |
+| `fieldLabel`        | `string`                  | Labels the confirmation field.                                                                                    |
+| `confirmationValue` | `string`                  | The phrase the user has to type back. Also the field's placeholder.                                               |
+| `actionLabel`       | `string`                  | The destructive button's label.                                                                                   |
+| `cancelLabel`       | `string`                  | Optional. Defaults to `Cancel`.                                                                                   |
+| `onDelete`          | `() => void`              | Asks the caller to run the action. Reached by the button or by Enter in the field, once the typed phrase matches. |
+| `isDeleting`        | `boolean`                 | Optional. Disables the field and renders the action pending.                                                      |
+| `errorMessage`      | `string`                  | Optional. Marks the field invalid and renders under it.                                                           |
+
+## Driving it from a machine
+
+`UserProfileDeleteSection` wires the same block to a state machine rather than to `useState`. The machine's state maps onto the same props:
+
+```tsx
+<Destructive
+  open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
+  onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
+  onDelete={() => send({ type: 'CONFIRM' })}
+  isDeleting={snapshot.value === 'deleting'}
+  errorMessage={snapshot.context.errorMessage}
+  {...copy}
+/>
+```

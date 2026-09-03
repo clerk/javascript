@@ -163,7 +163,7 @@ export class User extends BaseResource implements UserResource {
   };
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
-    const { strategy, redirectUrl, additionalScopes, enterpriseConnectionId } = params || {};
+    const { strategy, redirectUrl, additionalScopes, enterpriseConnectionId, oidcPrompt, oidcLoginHint } = params || {};
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
@@ -174,6 +174,8 @@ export class User extends BaseResource implements UserResource {
           redirect_url: redirectUrl,
           additional_scope: additionalScopes,
           enterprise_connection_id: enterpriseConnectionId,
+          oidc_prompt: oidcPrompt,
+          oidc_login_hint: oidcLoginHint,
         } as any,
       })
     )?.response as unknown as ExternalAccountJSON;
