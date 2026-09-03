@@ -307,15 +307,19 @@ export function Transitions() {
           }
           .cl-profile-tab-panel {
             grid-area: 1 / 1;
+            /* Seven tenths of the scale's steps: quick enough to feel like a swap, slow enough to see. */
+            --enter: calc(var(--cl-duration-slow) * 0.7);
+            --exit: calc(var(--cl-duration-base) * 0.7);
+            --wait: calc(var(--cl-duration-fast) * 0.7);
             transition:
-              opacity var(--cl-duration-slow) var(--cl-ease-enter),
-              scale var(--cl-duration-slow) var(--cl-ease-enter),
-              filter var(--cl-duration-slow) var(--cl-ease-enter),
-              display var(--cl-duration-slow) allow-discrete;
+              opacity var(--enter) var(--cl-ease-enter),
+              scale var(--enter) var(--cl-ease-enter),
+              filter var(--enter) var(--cl-ease-enter),
+              display var(--enter) allow-discrete;
             /* The entering page waits for the leaving one to mostly clear — a hand-off, not a
                cross-fade. Not on \`display\`, which must show the page at once for the entrance to
                have a frame to start from. */
-            transition-delay: var(--cl-duration-fast), var(--cl-duration-fast), var(--cl-duration-fast), 0s;
+            transition-delay: var(--wait), var(--wait), var(--wait), 0s;
 
             @starting-style {
               opacity: 0;
@@ -327,7 +331,7 @@ export function Transitions() {
             opacity: 0;
             scale: 0.98;
             filter: blur(4px);
-            transition-duration: var(--cl-duration-base);
+            transition-duration: var(--exit);
             transition-timing-function: var(--cl-ease-exit);
             transition-delay: 0s;
           }
