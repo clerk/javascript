@@ -1,27 +1,82 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { scrollAreaRoot, scrollAreaViewport } from './components/scroll-area';
 import { colorVars, fontWeightVars, radiusVars, space, targetVars, typeScaleVars } from './tokens.stylex';
 
-const profilePageCompact = '@media (max-width: 48rem)' as const;
+/**
+ * The compact layout — sidebar on top, navigation as a row — queried against the page's OWN
+ * width rather than the window's. The root is the container (`cl-profile-page`), so the same
+ * page collapses in a narrow layout slot, an inline dialog, or a phone alike. A container cannot
+ * query itself, which is why the grid lives on an inner element: the root is the container, the
+ * layout inside it is what the query reshapes.
+ */
+const profilePageCompact = '@container cl-profile-page (max-width: 48rem)' as const;
 
 export const styles = stylex.create({
+  /**
+   * The surface, and the query container. Paints the frame (border, radius, background) so the
+   * page looks the same standalone and as the popup of a `panel` dialog — that size paints
+   * nothing itself, and is composed by rendering the popup AS this root.
+   *
+   * A column flex so the layout below can take the remaining height: standalone that is the
+   * `minHeight`, in a dialog it is the popup's stretched height, and either way the content
+   * column scrolls inside it rather than growing past it.
+   */
   root: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
     borderWidth: '1px',
-    overflow: 'hidden',
+    // `clip` rather than `hidden`: the page must never become a scroll container itself, or
+    // focusing something in the content column would scroll the whole page instead of the column.
+    overflow: 'clip',
     backgroundColor: colorVars['--cl-color-card'],
     color: colorVars['--cl-color-card-foreground'],
+    containerName: 'cl-profile-page',
+    containerType: 'inline-size',
+    display: 'flex',
+    flexDirection: 'column',
+    // The containing block for the dismiss the root carries inside a dialog.
+    position: 'relative',
+    maxWidth: '66rem',
+    minHeight: '37.5rem',
+    width: '100%',
+  },
+
+  /**
+   * Inside a dialog the popup decides the height: the page grows to fill it (the popup is a
+   * column flex) and drops the standalone floor, which would only overflow it.
+   */
+  rootInDialog: {
+    flexGrow: 1,
+    minHeight: 0,
+  },
+
+  /**
+   * Compact, the navigation is a row across the top — under the corner the dialog's dismiss
+   * sits in. Room for it, so the last destination cannot run beneath the button.
+   */
+  sidebarInDialog: {
+    paddingInlineEnd: {
+      default: null,
+      [profilePageCompact]: space['12'],
+    },
+  },
+
+  layout: {
     display: 'grid',
+    flexGrow: 1,
     gridTemplateColumns: {
       default: `calc(${space['40']} + ${space['15']}) minmax(0, 1fr)`,
       [profilePageCompact]: 'minmax(0, 1fr)',
     },
-    gridTemplateRows: 'auto',
-    maxWidth: '66rem',
-    minHeight: '37.5rem',
-    width: '100%',
+    // A definite row is what lets the content column scroll instead of growing: an `auto` row
+    // sizes to its content and happily exceeds the container.
+    gridTemplateRows: {
+      default: 'minmax(0, 1fr)',
+      [profilePageCompact]: 'auto minmax(0, 1fr)',
+    },
+    minHeight: 0,
   },
   sidebar: {
     padding: space['4'],
@@ -119,9 +174,14 @@ export const styles = stylex.create({
     display: 'inline-flex',
     height: space['4'],
   },
+  // The content column is the scroll region — composed from the `ScrollArea` atoms, so the
+  // scrollbar and edge fade land on the column's true edge and the padding scrolls with the content.
   main: { minWidth: 0 },
   content: {
     paddingBlock: space['16'],
     paddingInline: space['16'],
   },
 });
+
+export const mainScroll = scrollAreaRoot;
+export const contentScroll = scrollAreaViewport();

@@ -5,9 +5,11 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { ClerkLogo } from './components/clerk-logo';
+import { Dialog, DialogContext } from './components/dialog';
 import { Icon } from './components/icon';
+import { VisuallyHidden } from './components/visually-hidden';
 import type { IconName } from './icons/registry';
-import { styles } from './profile-page.styles';
+import { contentScroll, mainScroll, styles } from './profile-page.styles';
 import type { MosaicComponentProps } from './props';
 import { mergeStyleProps, themeProps } from './props';
 import { focusOutline } from './utils/focus-outline.styles';
@@ -20,6 +22,12 @@ export interface ProfilePageItem {
 }
 
 export interface ProfilePageRootProps extends Omit<MosaicComponentProps<'div'>, 'children'> {
+  /**
+   * What the page is called. Inside a dialog it names the dialog, through a visually hidden
+   * heading carrying the popup's `labelId` — the counterpart of `Card.Title`, for a surface
+   * whose visible headings belong to its panels.
+   */
+  label?: string;
   value: string;
   onValueChange?: (value: string) => void;
   orientation?: TabsProps['orientation'];
@@ -27,18 +35,52 @@ export interface ProfilePageRootProps extends Omit<MosaicComponentProps<'div'>, 
   children: React.ReactNode;
 }
 
+/**
+ * The page: a surface holding a sidebar and a content column. Rendered inside a `panel` dialog's
+ * popup, it fills it and paints it — the dialog positions, the page paints, the way a `Card` does
+ * inside a `card` dialog. Like `Card`, it reads `DialogContext` to name the dialog and carry its
+ * dismiss, so the composition needs nothing passed in; standalone it renders neither.
+ */
 const ProfilePageRoot = React.forwardRef<HTMLDivElement, ProfilePageRootProps>(function ProfilePageRoot(
-  { value, onValueChange, orientation = 'vertical', activationMode, children, render, className, style, ...rest },
+  {
+    label,
+    value,
+    onValueChange,
+    orientation = 'vertical',
+    activationMode,
+    children,
+    render,
+    className,
+    style,
+    ...rest
+  },
   ref,
 ) {
+  const dialog = React.useContext(DialogContext);
   const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('profile-page'), stylex.props(styles.root), className, style),
+      ...mergeStyleProps(
+        themeProps('profile-page'),
+        stylex.props(reset.base, styles.root, dialog !== null && styles.rootInDialog),
+        className,
+        style,
+      ),
       ...rest,
-      children,
+      children: (
+        <>
+          {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
+              focus — the same reason `Card.Header` renders its dismiss first. Never inline, which
+              nothing closes. */}
+          {dialog && !dialog.inline ? <Dialog.CloseButton /> : null}
+          {dialog && label ? <VisuallyHidden render={<h2 id={dialog.labelId} />}>{label}</VisuallyHidden> : null}
+          <div {...mergeStyleProps(themeProps('profile-page-layout'), stylex.props(reset.base, styles.layout))}>
+            {children}
+          </div>
+        </>
+      ),
     },
   });
 
@@ -64,6 +106,7 @@ const ProfilePageSidebar = React.forwardRef<HTMLElement, ProfilePageSidebarProps
   { items, navigationLabel, renderBranding = true, render, className, style, ...rest },
   ref,
 ) {
+  const dialog = React.useContext(DialogContext);
   return useRender({
     defaultTagName: 'aside',
     render,
@@ -71,7 +114,7 @@ const ProfilePageSidebar = React.forwardRef<HTMLElement, ProfilePageSidebarProps
     props: {
       ...mergeStyleProps(
         themeProps('profile-page-sidebar'),
-        stylex.props(reset.base, styles.sidebar),
+        stylex.props(reset.base, styles.sidebar, dialog !== null && !dialog.inline && styles.sidebarInDialog),
         className,
         style,
       ),
@@ -137,10 +180,20 @@ const ProfilePageContent = React.forwardRef<HTMLElement, ProfilePageContentProps
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('profile-page-main'), stylex.props(reset.base, styles.main), className, style),
+      ...mergeStyleProps(
+        themeProps('profile-page-main'),
+        stylex.props(reset.base, styles.main, mainScroll),
+        className,
+        style,
+      ),
       ...rest,
       children: (
-        <div {...mergeStyleProps(themeProps('profile-page-content'), stylex.props(reset.base, styles.content))}>
+        <div
+          {...mergeStyleProps(
+            themeProps('profile-page-content'),
+            stylex.props(reset.base, styles.content, ...contentScroll),
+          )}
+        >
           {children}
         </div>
       ),

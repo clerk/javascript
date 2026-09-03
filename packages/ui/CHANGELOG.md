@@ -1,5 +1,25 @@
 # @clerk/ui
 
+## 1.32.1
+
+### Patch Changes
+
+- Fix the `<OAuthDeviceVerification />` code input overflowing the card when the card is not flush. ([#9643](https://github.com/clerk/javascript/pull/9643)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+## 1.32.0
+
+### Minor Changes
+
+- Add an authenticated OAuth device verification component and workflow hook for approving or denying OAuth Device Authorization Grant requests. ([#9518](https://github.com/clerk/javascript/pull/9518)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+### Patch Changes
+
+- Fix configured OIDC prompts being ignored by sign-up continuations, including enterprise SSO after email-link verification or direct combined-flow transfer and OAuth sign-ups embedded in `<SignIn withSignUp>`. ([#9541](https://github.com/clerk/javascript/pull/9541)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/localizations@4.16.0
+  - @clerk/shared@4.31.0
+
 ## 1.31.0
 
 ### Minor Changes

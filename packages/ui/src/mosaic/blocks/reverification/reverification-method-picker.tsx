@@ -1,16 +1,17 @@
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import type { IconProps } from '../../components/icon';
-import { Icon } from '../../components/icon';
+import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
+import { space } from '../../tokens.stylex';
 
 export interface ReverificationMethod {
   id: string;
   label: string;
   description?: string;
-  icon?: IconProps['name'];
+  icon: IconProps['name'];
 }
 
 export interface ReverificationMethodPickerMessages {
@@ -45,12 +46,13 @@ export function ReverificationMethodPicker({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <Item.Group>
+        <Item.Group variant='outline'>
           {methods.map(method => {
             const isPending = pendingMethodId === method.id;
             return (
               <Item.Root
                 key={method.id}
+                size='lg'
                 render={
                   <button
                     type='button'
@@ -59,11 +61,11 @@ export function ReverificationMethodPicker({
                   />
                 }
               >
-                {method.icon ? (
-                  <Item.Media>
+                <Item.Media>
+                  <IconFrame filled>
                     <Icon name={method.icon} />
-                  </Item.Media>
-                ) : null}
+                  </IconFrame>
+                </Item.Media>
                 <Item.Content>
                   <Item.Label>{method.label}</Item.Label>
                   {method.description ? <Item.Description>{method.description}</Item.Description> : null}
@@ -79,27 +81,32 @@ export function ReverificationMethodPicker({
             variant='ghost'
             fullWidth
             onClick={onBack}
+            style={{
+              marginBlockStart: space['2'],
+            }}
           >
             {messages.backButton}
           </Button>
         ) : null}
-      </Card.Content>
-      <Card.Footer>
         <Text
           size='xs'
           color='neutral'
+          style={{
+            textAlign: 'center',
+            marginBlockStart: space['1'],
+          }}
         >
-          {messages.helpText}
+          {messages.helpText}{' '}
+          <Button
+            type='button'
+            size='sm'
+            variant='link'
+            onClick={onHelp}
+          >
+            {messages.helpButton}
+          </Button>
         </Text>
-        <Button
-          type='button'
-          size='sm'
-          variant='link'
-          onClick={onHelp}
-        >
-          {messages.helpButton}
-        </Button>
-      </Card.Footer>
+      </Card.Content>
     </>
   );
 }

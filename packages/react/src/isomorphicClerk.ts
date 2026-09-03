@@ -41,6 +41,7 @@ import type {
   LoadedClerk,
   OAuthApplicationNamespace,
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -166,6 +167,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
+  private premountOAuthDeviceVerificationNodes = new Map<HTMLDivElement, OAuthDeviceVerificationProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
   private premountTaskSetupMFANodes = new Map<HTMLDivElement, TaskSetupMFAProps | undefined>();
@@ -803,6 +805,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
 
+    if (typeof clerkjs.__internal_mountOAuthDeviceVerification === 'function') {
+      this.premountOAuthDeviceVerificationNodes.forEach((props, node) => {
+        clerkjs.__internal_mountOAuthDeviceVerification(node, props);
+      });
+    }
+
     this.premountTaskChooseOrganizationNodes.forEach((props, node) => {
       clerkjs.mountTaskChooseOrganization(node, props);
     });
@@ -1401,6 +1409,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   unmountOAuthConsent = (node: HTMLDivElement) => {
     this.__internal_unmountOAuthConsent(node);
+  };
+
+  __internal_mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
+    if (this.clerkjs && this.loaded) {
+      if (typeof this.clerkjs.__internal_mountOAuthDeviceVerification === 'function') {
+        this.clerkjs.__internal_mountOAuthDeviceVerification(node, props);
+      }
+    } else {
+      this.premountOAuthDeviceVerificationNodes.set(node, props);
+    }
+  };
+
+  __internal_unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded && typeof this.clerkjs.__internal_unmountOAuthDeviceVerification === 'function') {
+      this.clerkjs.__internal_unmountOAuthDeviceVerification(node);
+    }
+    this.premountOAuthDeviceVerificationNodes.delete(node);
   };
 
   mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {
