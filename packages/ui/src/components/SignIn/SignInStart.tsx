@@ -2,6 +2,7 @@ import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePh
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import { logger } from '@clerk/shared/logger';
 import { useClerk } from '@clerk/shared/react';
 import type {
   ClerkAPIError,
@@ -31,7 +32,7 @@ import {
   withRedirectToAfterSignIn,
   withRedirectToSignInTask,
 } from '../../common';
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useCoreSignUp, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
@@ -90,9 +91,19 @@ function SignInStartInternal(): JSX.Element {
   const status = useLoadingStatus();
   const { userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
+  const signUp = useCoreSignUp();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, signUpIfMissingEnabled, navigateOnSetActive } = ctx;
+  const {
+    afterSignInUrl,
+    afterSignUpUrl,
+    signUpUrl,
+    waitlistUrl,
+    isCombinedFlow,
+    signUpUrlIsSignInPage,
+    signUpIfMissingEnabled,
+    navigateOnSetActive,
+  } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
@@ -122,6 +133,8 @@ function SignInStartInternal(): JSX.Element {
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const clerkStatus = getClerkQueryParam('__clerk_status') || '';
+  // Releases the loading card below, which would otherwise wait on a hand-off that never happens.
+  const [ticketSignUpUnavailable, setTicketSignUpUnavailable] = useState(false);
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
@@ -222,9 +235,45 @@ function SignInStartInternal(): JSX.Element {
       if (organizationTicket) {
         paramsToForward.set('__clerk_ticket', organizationTicket);
       }
+
       // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
       // signUpUrl triggers a full page reload when used with the hash router.
-      void navigate(isCombinedFlow ? `create` : signUpUrl, { searchParams: paramsToForward });
+      if (!signUpUrlIsSignInPage) {
+        void navigate(isCombinedFlow ? `create` : signUpUrl, { searchParams: paramsToForward });
+        return;
+      }
+
+      // The hand-off would land back here, so there is no sign-up flow to reach. A ticket sign-up
+      // takes no user input, so consume it in place instead of leaving the ticket unspent.
+      status.setLoading();
+      card.setLoading();
+      signUp
+        .create({ strategy: 'ticket', ticket: organizationTicket })
+        .then(res => {
+          if (res.status !== 'complete') {
+            logger.warnOnce(
+              `Clerk: this sign-up needs more information than the ticket carries, but the instance's sign-up URL points at this sign-in page. Set the sign-up URL to a page rendering <SignUp />, or render <SignIn withSignUp /> here.`,
+            );
+            setTicketSignUpUnavailable(true);
+            return;
+          }
+
+          removeClerkQueryParam('__clerk_ticket');
+          return clerk.setActive({
+            session: res.createdSessionId,
+            navigate: async ({ session, decorateUrl }) => {
+              await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
+            },
+          });
+        })
+        .catch(err => {
+          setTicketSignUpUnavailable(true);
+          return handleError(err, [], card.setError);
+        })
+        .finally(() => {
+          status.setIdle();
+          card.setIdle();
+        });
       return;
     }
 
@@ -579,7 +628,7 @@ function SignInStartInternal(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  if (status.isLoading || clerkStatus === 'sign_up') {
+  if (!ticketSignUpUnavailable && (status.isLoading || clerkStatus === 'sign_up')) {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
     // rendering the sign in flow.
     return <LoadingCard />;
