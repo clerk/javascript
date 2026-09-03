@@ -148,19 +148,25 @@ type CheckAuthorizationParams = WithReverification<
  * System Permissions are not allowed since they are not included
  * in session claims and cannot be verified on the server side.
  */
-export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomPermissionKey>(
-  isAuthorizedParams: CheckAuthorizationParamsFromSessionClaims<P>,
+export type CheckAuthorizationFromSessionClaims = <
+  P extends OrganizationCustomPermissionKey,
+  R extends OrganizationCustomRoleKey = OrganizationCustomRoleKey,
+>(
+  isAuthorizedParams: CheckAuthorizationParamsFromSessionClaims<P, R>,
 ) => boolean;
 
 /**
  * @interface
  */
-export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
+export type CheckAuthorizationParamsFromSessionClaims<
+  P extends OrganizationCustomPermissionKey,
+  R extends OrganizationCustomRoleKey = OrganizationCustomRoleKey,
+> = WithReverification<
   | {
       /**
        * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
-      role: OrganizationCustomRoleKey;
+      role: R;
       /**
        * The [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
