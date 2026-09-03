@@ -1692,7 +1692,6 @@ export const srRS: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2030,7 +2029,6 @@ export const srRS: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Umesto toga, skeniraj QR kod',
-        buttonOpenInAuthenticatorApp__nonPrimary: 'Otvori u aplikaciji za autentifikaciju',
         buttonUnableToScan__nonPrimary: 'Ne možeš skenirati QR kod?',
         infoText__ableToScan:
           'Podesi novi način prijave u svojoj aplikaciji za autentifikaciju i skeniraj sledeći QR kod da ga povežeš sa svojim nalogom.',

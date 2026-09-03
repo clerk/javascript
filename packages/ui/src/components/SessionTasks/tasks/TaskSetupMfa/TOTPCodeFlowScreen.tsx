@@ -16,7 +16,6 @@ import { Checkmark, Clipboard } from '@/icons';
 import { Button, Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { SuccessPage } from '@/ui/elements/SuccessPage';
-import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 import { handleError } from '@/utils/errorHandler';
 
 import { SharedFooterActionForSignOut } from './shared';
@@ -79,23 +78,10 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
         <>
           <Col gap={4}>
             {displayFormat === 'qr' && (
-              <>
-                <QRCode
-                  justify='center'
-                  url={totp.uri || ''}
-                />
-                {isMobileDevice() && totp.uri && (
-                  <Button
-                    variant='outline'
-                    textVariant='buttonLarge'
-                    onClick={() => (window.location.href = totp.uri || '')}
-                    sx={{ alignSelf: 'center' }}
-                    localizationKey={localizationKeys(
-                      'taskSetupMfa.totpCode.addAuthenticatorApp.buttonOpenInAuthenticatorApp__nonPrimary',
-                    )}
-                  />
-                )}
-              </>
+              <QRCode
+                justify='center'
+                url={totp.uri || ''}
+              />
             )}
 
             {displayFormat === 'uri' && (

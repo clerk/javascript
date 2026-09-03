@@ -1695,7 +1695,6 @@ export const mnMN: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2035,7 +2034,6 @@ export const mnMN: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'QR кодыг уншина уу',
-        buttonOpenInAuthenticatorApp__nonPrimary: 'Authenticator програм дээр нээх',
         buttonUnableToScan__nonPrimary: 'QR кодыг скан хийж чадахгүй байна уу?',
         infoText__ableToScan:
           'Authenticator програмдаа нэвтрэх шинэ аргыг тохируулаад дараах QR кодыг скан хийж өөрийн бүртгэлтэй холбоно уу.',

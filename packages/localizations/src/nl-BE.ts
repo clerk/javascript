@@ -1695,7 +1695,6 @@ export const nlBE: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2034,7 +2033,6 @@ export const nlBE: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Een tweede optie, scan de QR-code',
-        buttonOpenInAuthenticatorApp__nonPrimary: 'Openen in authenticator app',
         buttonUnableToScan__nonPrimary: 'Kan je de code niet scannen?',
         infoText__ableToScan: 'Scan de QR-code met je authenticator app om de authenticator toe te voegen.',
         infoText__unableToScan:

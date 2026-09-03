@@ -1694,7 +1694,6 @@ export const thTH: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2027,7 +2026,6 @@ export const thTH: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'สแกน QR code แทน',
-        buttonOpenInAuthenticatorApp__nonPrimary: 'เปิดในแอป Authenticator',
         buttonUnableToScan__nonPrimary: 'ไม่สามารถสแกน QR code?',
         infoText__ableToScan:
           'ตั้งค่าวิธีเข้าสู่ระบบใหม่ในแอป Authenticator ของคุณและสแกน QR code ด้านล่างเพื่อเชื่อมโยงกับบัญชีของคุณ',

@@ -927,7 +927,6 @@ export type __internal_LocalizationResource = {
         inputLabel__unableToScan2: LocalizationValue;
         buttonAbleToScan__nonPrimary: LocalizationValue;
         buttonUnableToScan__nonPrimary: LocalizationValue;
-        buttonOpenInAuthenticatorApp__nonPrimary: LocalizationValue;
       };
       removeResource: {
         title: LocalizationValue;
@@ -2098,7 +2097,6 @@ export type __internal_LocalizationResource = {
         inputLabel__unableToScan1: LocalizationValue;
         buttonUnableToScan__nonPrimary: LocalizationValue;
         buttonAbleToScan__nonPrimary: LocalizationValue;
-        buttonOpenInAuthenticatorApp__nonPrimary: LocalizationValue;
         formButtonPrimary: LocalizationValue;
         formButtonReset: LocalizationValue;
       };

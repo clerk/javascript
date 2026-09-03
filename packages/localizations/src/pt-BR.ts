@@ -1708,7 +1708,6 @@ export const ptBR: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2052,7 +2051,6 @@ export const ptBR: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Escanear código QR em vez disso',
-        buttonOpenInAuthenticatorApp__nonPrimary: 'Abrir no aplicativo autenticador',
         buttonUnableToScan__nonPrimary: 'Não pode escanear o código QR?',
         infoText__ableToScan:
           'Configure um novo método de login no seu aplicativo autenticador e escaneie o seguinte código QR para vinculá-lo à sua conta.',

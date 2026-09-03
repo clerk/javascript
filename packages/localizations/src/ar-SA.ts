@@ -1690,7 +1690,6 @@ export const arSA: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: undefined,
-        buttonOpenInAuthenticatorApp__nonPrimary: undefined,
         buttonUnableToScan__nonPrimary: undefined,
         formButtonPrimary: undefined,
         formButtonReset: undefined,
@@ -2024,7 +2023,6 @@ export const arSA: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'مسح رمز الQR بدلا من ذلك',
-        buttonOpenInAuthenticatorApp__nonPrimary: 'فتح في تطبيق المصادقة',
         buttonUnableToScan__nonPrimary: 'لا يمكنك مسح رمز الQR?',
         infoText__ableToScan: 'قم بإعداد طريقة تسجيل دخول جديدة في تطبيق المصادقة و قم بمسح كود الQR لربطه بحسابك',
         infoText__unableToScan: 'قم بإعداد تسجيل دخول جديدة في تطبيق المصادقة وأدخل الرمز المقدم أدناه',

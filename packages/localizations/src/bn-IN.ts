@@ -1708,7 +1708,6 @@ export const bnIN: LocalizationResource = {
     totpCode: {
       addAuthenticatorApp: {
         buttonAbleToScan__nonPrimary: 'পরিবর্তে QR কোড স্ক্যান করুন',
-        buttonOpenInAuthenticatorApp__nonPrimary: 'অথেনটিকেটর অ্যাপে খুলুন',
         buttonUnableToScan__nonPrimary: 'QR কোড স্ক্যান করতে পারছেন না?',
         formButtonPrimary: 'চালিয়ে যান',
         formButtonReset: 'বাতিল করুন',
@@ -2059,7 +2058,6 @@ export const bnIN: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'পরিবর্তে QR কোড স্ক্যান করুন',
-        buttonOpenInAuthenticatorApp__nonPrimary: 'অথেনটিকেটর অ্যাপে খুলুন',
         buttonUnableToScan__nonPrimary: 'QR কোড স্ক্যান করতে পারছেন না?',
         infoText__ableToScan:
           'আপনার অথেনটিকেটর অ্যাপে একটি নতুন সাইন-ইন পদ্ধতি সেট আপ করুন এবং আপনার অ্যাকাউন্টের সাথে লিঙ্ক করতে নিম্নলিখিত QR কোড স্ক্যান করুন।',
