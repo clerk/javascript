@@ -36,6 +36,7 @@ const AVAILABLE_COMPONENTS = [
   'configureSSO',
   'oauthConsent',
   'agentActionApproval',
+  'oauthDeviceVerification',
   'taskChooseOrganization',
   'taskResetPassword',
   'taskSetupMFA',
@@ -156,6 +157,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   configureSSO: buildComponentControls('configureSSO'),
   oauthConsent: buildComponentControls('oauthConsent'),
   agentActionApproval: buildComponentControls('agentActionApproval'),
+  oauthDeviceVerification: buildComponentControls('oauthDeviceVerification'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
   taskSetupMFA: buildComponentControls('taskSetupMFA'),
@@ -430,6 +432,10 @@ void (async () => {
     '/agent-action-approval': {
       mount: '__experimental_mountAgentActionApproval',
       component: 'agentActionApproval',
+    },
+    '/oauth-device-verification': {
+      mount: '__internal_mountOAuthDeviceVerification',
+      component: 'oauthDeviceVerification',
     },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',

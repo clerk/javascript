@@ -46,7 +46,10 @@ export function useTransition({ open, ref }: UseTransitionOptions): UseTransitio
     if (transitionStatus !== 'ending') {
       return;
     }
-    runOnAnimationsFinished(() => {
+    // Cancelling on cleanup is what makes an exit interruptible: reopening
+    // mid-exit must abandon the pending unmount, not unmount once the
+    // retargeted transition settles.
+    return runOnAnimationsFinished(() => {
       setMounted(false);
     });
   }, [transitionStatus, runOnAnimationsFinished, setMounted]);

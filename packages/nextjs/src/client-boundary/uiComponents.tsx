@@ -19,6 +19,7 @@ export {
   HandleSSOCallback,
   InviteMembersButton,
   OAuthConsent,
+  OAuthDeviceVerification,
   OrganizationList,
   OrganizationSwitcher,
   PricingTable,

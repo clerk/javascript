@@ -101,6 +101,7 @@ export type FlowMetadata = {
     | 'configureSSO'
     | 'oauthConsent'
     | 'agentActionApproval'
+    | 'oauthDeviceVerification'
     | 'subscriptionDetails'
     | 'tasks'
     | 'taskChooseOrganization'

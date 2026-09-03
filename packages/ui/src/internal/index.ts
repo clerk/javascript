@@ -75,6 +75,7 @@ export type {
   IdSelectors,
   Options,
   OAuthConsentTheme,
+  OAuthDeviceVerificationTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,

@@ -39,7 +39,7 @@ import type {
 import { applyOrder } from './user-button.utils';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
-// what the controller and the view agree on, so neither file owns them.
+// what the model and the view agree on, so neither file owns them.
 export type * from './user-button.types';
 
 /**
@@ -86,23 +86,42 @@ function useBusy(key?: string): { busy: boolean; disabled: boolean } {
   return { busy: pendingKey === key, disabled: pendingKey !== key };
 }
 
-interface ActiveWorkspace {
-  name: string;
-  imageUrl?: string;
-  shape: 'circle' | 'square';
-  /** Absent when the personal account is what's active. */
-  organization?: UserButtonMembership;
-}
+type ActiveWorkspace =
+  | {
+      kind: 'organization';
+      name: string;
+      imageUrl?: string;
+      shape: 'square';
+      organization: UserButtonMembership;
+    }
+  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle' }
+  | { kind: 'none'; name: string; imageUrl?: string; shape: 'square' };
 
 /**
  * What the surface leads with: named in the trigger and headed in the popup, so the two always
- * agree. Only an organization-led surface with an organization actually active resolves to one.
+ * agree. An organization-led surface with no org and no personal workspace is no selection.
  */
-function leadWorkspace({ layout, activeOrganization, activeSession }: UserButtonContextValue): ActiveWorkspace {
-  const organization = layout.leadWith === 'organization' ? activeOrganization : null;
-  return organization
-    ? { name: organization.name, imageUrl: organization.imageUrl, shape: 'square', organization }
-    : { name: activeSession.name, imageUrl: activeSession.imageUrl, shape: 'circle' };
+function leadWorkspace({
+  layout,
+  activeOrganization,
+  activeSession,
+  hidePersonal,
+}: UserButtonContextValue): ActiveWorkspace {
+  if (layout.leadWith === 'organization') {
+    if (activeOrganization) {
+      return {
+        kind: 'organization',
+        name: activeOrganization.name,
+        imageUrl: activeOrganization.imageUrl,
+        shape: 'square',
+        organization: activeOrganization,
+      };
+    }
+    if (hidePersonal) {
+      return { kind: 'none', name: m.workspaces.notSelected, shape: 'square' };
+    }
+  }
+  return { kind: 'user', name: activeSession.name, imageUrl: activeSession.imageUrl, shape: 'circle' };
 }
 
 function membershipSubtitle(membership: UserButtonMembership): string {
@@ -272,8 +291,6 @@ const asAnchor =
   );
 
 interface ActionRowProps {
-  /** Identifies the row, for ordering. */
-  id: UserButtonMenuItemId | (string & {});
   icon?: ReactNode;
   label: string;
   /** Where the row goes, for a row that leaves rather than acting. */
@@ -297,7 +314,7 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
     >
       <Item.Media>{busy ? <Spinner size='sm' /> : icon}</Item.Media>
       <Item.Content>
-        <Item.Label variant='secondary'>{label}</Item.Label>
+        <Item.Label variant='interactive'>{label}</Item.Label>
       </Item.Content>
     </Item.Root>
   );
@@ -353,10 +370,18 @@ function Header() {
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
   const { sessionId, identifier } = data.activeSession;
-  const { name, imageUrl, shape, organization } = leadWorkspace(data);
+  const workspace = leadWorkspace(data);
+  const { name, imageUrl, shape } = workspace;
+  const organization = workspace.kind === 'organization' ? workspace.organization : undefined;
   // An account with no name is titled by its identifier, and repeating it underneath says nothing.
+  // No selection is not the account, so it carries no identifier line either.
   const accountSubtitle = identifier === name ? '' : identifier;
-  const subtitle = organization ? membershipSubtitle(organization) : accountSubtitle;
+  const subtitle =
+    workspace.kind === 'organization'
+      ? membershipSubtitle(workspace.organization)
+      : workspace.kind === 'user'
+        ? accountSubtitle
+        : '';
 
   const actions: HeaderAction[] = [];
   for (const action of data.layout.actions.header) {
@@ -430,16 +455,18 @@ function ActionMenu({ label, actions, disabled }: { label: string; actions: RowA
           aria-label={label}
           disabled={disabled}
         />
-        <Menu.Content>
+        <Menu.Popup>
           {actions.map(a => (
             <Menu.Item
               key={a.label}
               label={a.label}
               color={a.color}
               onClick={a.onClick}
-            />
+            >
+              <Menu.Label>{a.label}</Menu.Label>
+            </Menu.Item>
           ))}
-        </Menu.Content>
+        </Menu.Popup>
       </Menu.Root>
     </Trailing>
   );
@@ -685,27 +712,128 @@ function PendingRows() {
 }
 
 /**
- * A signed-in account: a plain row you click to switch to, checked where it is already the active
- * one. Its workspaces cannot be listed here — they are scoped to the session that fetches them —
- * so switching is all it offers.
+ * A signed-in account inside the accounts flyout: a menu item you pick to switch to, checked where
+ * it is already the active one. Its workspaces cannot be listed here — they are scoped to the
+ * session that fetches them — so switching is all it offers.
  */
-function SessionRow({ session, active }: { session: UserButtonSession; active?: boolean }) {
+function SessionMenuItem({ session, active }: { session: UserButtonSession; active: boolean }) {
   const data = useUserButtonContext();
   const switchSession = data.onSwitchSession;
-  const { busy, disabled } = useBusy(userButtonBusyKeys.switchSession(session.sessionId));
 
   return (
-    <SwitcherRow
+    <Menu.Item
       // Named by its identifier, like the active account's row, so the two read as the same kind.
-      name={session.identifier}
-      avatarName={session.name}
-      imageUrl={session.imageUrl}
-      shape='circle'
-      active={active}
-      onSelect={switchSession ? () => switchSession(session.sessionId) : undefined}
-      busy={busy}
-      disabled={disabled}
-    />
+      label={session.identifier}
+      // The check is decorative, so without this the active item reads like the ones you can
+      // switch to.
+      aria-current={active ? 'true' : undefined}
+      // Picking what is already picked does nothing, so the active item only closes the flyout.
+      onClick={active || !switchSession ? undefined : () => switchSession(session.sessionId)}
+    >
+      <Menu.Media>
+        <RowAvatar
+          name={session.name}
+          imageUrl={session.imageUrl}
+          shape='circle'
+          size='fit'
+        />
+      </Menu.Media>
+      <Menu.Label>{session.identifier}</Menu.Label>
+      {active ? (
+        <Menu.Media>
+          <Icon
+            name='check'
+            size='sm'
+          />
+        </Menu.Media>
+      ) : null}
+    </Menu.Item>
+  );
+}
+
+/**
+ * The accounts affordance at the foot: a row that opens a flyout of every signed-in account, and
+ * of the way to add one more.
+ *
+ * The flyout closes on pick, so the row itself carries the switch's spinner, the way the
+ * organizations heading carries the spinner for what its own `⋯` opens.
+ */
+function SwitchAccountRow() {
+  const data = useUserButtonContext();
+  const addAccount = data.onAddAccount;
+  const { pendingKey } = data;
+  const busy = data.additionalSessions.some(s => pendingKey === userButtonBusyKeys.switchSession(s.sessionId));
+  const { disabled } = useBusy();
+
+  return (
+    // It opens out of the popup, so the opposite side is the popup itself. Where the viewport is
+    // too narrow for either side — a phone — it goes above the row instead of under the card.
+    // The row is inset 8px, so the sideways gap clears that before it clears the card's edge. Above
+    // the row there is nothing to clear, so that gap is the plain one.
+    <Menu.Root
+      placement='right-start'
+      sideOffset={{ x: 12, y: 8 }}
+      fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
+    >
+      <Menu.Trigger
+        disabled={disabled}
+        render={
+          <Item.Root
+            size='xs'
+            render={<button type='button' />}
+          />
+        }
+      >
+        <Item.Media>
+          {busy ? (
+            <Spinner size='sm' />
+          ) : (
+            <Icon
+              name='switch-horizontal'
+              size='sm'
+            />
+          )}
+        </Item.Media>
+        <Item.Content>
+          <Item.Label variant='interactive'>{m.accounts.switch}</Item.Label>
+        </Item.Content>
+        <Trailing>
+          <Icon
+            name='chevron-right'
+            size='sm'
+          />
+        </Trailing>
+      </Menu.Trigger>
+      <Menu.Popup>
+        {/* The account it is on leads, checked: the flyout is the full set of accounts rather than
+            a list of somewhere else to go. */}
+        <SessionMenuItem
+          session={data.activeSession}
+          active
+        />
+        {data.additionalSessions.map(s => (
+          <SessionMenuItem
+            key={s.sessionId}
+            session={s}
+            active={false}
+          />
+        ))}
+        {addAccount ? (
+          <Menu.Item
+            label={m.accounts.add}
+            onClick={addAccount}
+          >
+            <Menu.Media>
+              <Icon
+                name='plus'
+                size='sm'
+              />
+            </Menu.Media>
+            <Menu.Label>{m.accounts.add}</Menu.Label>
+          </Menu.Item>
+        ) : null}
+      </Menu.Popup>
+    </Menu.Root>
   );
 }
 
@@ -736,7 +864,26 @@ function OrganizationSection() {
   const data = useUserButtonContext();
   const { showOrganizations, showOrganizationsHeading } = data.layout;
 
-  if (!showOrganizations && !showOrganizationsHeading) {
+  const actions: ReactNode[] = [];
+  for (const action of data.layout.actions.organizationsFooter) {
+    if (action === 'createOrganization' && data.onCreateOrganization) {
+      actions.push(
+        <ActionRow
+          key='createOrganization'
+          icon={
+            <Icon
+              name='plus'
+              size='sm'
+            />
+          }
+          label={m.manage.createOrganization}
+          onClick={data.onCreateOrganization}
+        />,
+      );
+    }
+  }
+
+  if (!showOrganizations && !showOrganizationsHeading && actions.length === 0) {
     return null;
   }
 
@@ -765,123 +912,77 @@ function OrganizationSection() {
               {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
             </>
           ))}
+        {/* Trails the rows rather than sitting at the foot of the surface: what it offers is one
+            more of the workspaces above it, not an action on the account. */}
+        {actions}
       </Item.Group>
     </>
   );
 }
 
-/** The heading the session rows sit under, and the actions across every account it carries. */
-function SessionsHeading() {
-  const data = useUserButtonContext();
-  // Everything it opens is a navigation, so it owns no action of its own to spin. It still stands
-  // down while one runs, the way the organization heading's `⋯` does.
-  const { disabled } = useBusy();
-
-  const actions: RowAction[] = [];
-  for (const action of data.layout.actions.sessionsHeading) {
-    if (action === 'addAccount' && data.onAddAccount) {
-      actions.push({ label: m.accounts.add, onClick: data.onAddAccount });
-    }
-  }
-
-  return (
-    <Item.Root size='xs'>
-      <Item.Content>
-        <Item.Label variant='secondary'>{m.accounts.heading}</Item.Label>
-      </Item.Content>
-      <ActionMenu
-        label={m.accounts.menu}
-        actions={actions}
-        disabled={disabled}
-      />
-    </Item.Root>
-  );
-}
-
-/** The other signed-in accounts, under their own heading, so they never read as workspaces. */
-function SessionSection() {
-  const data = useUserButtonContext();
-
-  if (!data.layout.showSessions) {
-    return null;
-  }
-
-  return (
-    <>
-      <Item.Separator />
-      <Item.Group>
-        {data.layout.showSessionsHeading ? (
-          <>
-            <SessionsHeading />
-            {/* Under a heading the group reads as the full set of accounts, so the one you are on
-                is listed and checked. Without one it is a list of somewhere else to go. */}
-            <SessionRow
-              session={data.activeSession}
-              active
-            />
-          </>
-        ) : null}
-        {data.additionalSessions.map(s => (
-          <SessionRow
-            key={s.sessionId}
-            session={s}
-          />
-        ))}
-      </Item.Group>
-    </>
-  );
+/** One row at the foot: whatever it renders, and the id `menuItemOrder` places it by. */
+interface FooterRow {
+  id: UserButtonMenuItemId | (string & {});
+  node: ReactNode;
 }
 
 /** The actions that close out the surface. */
 function Footer() {
   const data = useUserButtonContext();
 
-  // "Create organization" and "Add account" both make something new, and the foot is where a mode
-  // ends up putting whichever of them it has nowhere else for, so they share the icon.
-  const plus = (
-    <Icon
-      name='plus'
-      size='sm'
-    />
-  );
-
-  const builtIn: ActionRowProps[] = [];
+  const builtIn: FooterRow[] = [];
   for (const action of data.layout.actions.footer) {
-    if (action === 'createOrganization' && data.onCreateOrganization) {
-      builtIn.push({
-        id: 'createOrganization',
-        icon: plus,
-        label: m.manage.createOrganization,
-        onClick: data.onCreateOrganization,
-      });
+    // The only foot row that is not a plain action: it opens rather than doing, so it brings its
+    // own element instead of an `ActionRow`'s props.
+    if (action === 'switchAccount') {
+      builtIn.push({ id: 'switchAccount', node: <SwitchAccountRow /> });
     }
     if (action === 'addAccount' && data.onAddAccount) {
-      builtIn.push({ id: 'addAccount', icon: plus, label: m.accounts.add, onClick: data.onAddAccount });
+      builtIn.push({
+        id: 'addAccount',
+        node: (
+          <ActionRow
+            icon={
+              <Icon
+                name='plus'
+                size='sm'
+              />
+            }
+            label={m.accounts.add}
+            onClick={data.onAddAccount}
+          />
+        ),
+      });
     }
     if (action === 'signOutAll' && data.onSignOutAll) {
       builtIn.push({
         id: 'signOutAll',
-        icon: (
-          <Icon
-            name='log-out'
-            size='sm'
+        node: (
+          <ActionRow
+            icon={
+              <Icon
+                name='log-out'
+                size='sm'
+              />
+            }
+            label={m.accounts.signOutAll}
+            onClick={data.onSignOutAll}
+            busyKey={userButtonBusyKeys.signOutAll()}
           />
         ),
-        label: m.accounts.signOutAll,
-        onClick: data.onSignOutAll,
-        busyKey: userButtonBusyKeys.signOutAll(),
       });
     }
   }
 
-  // Custom rows lead by default, the way the existing UserButton lists them above "Add account".
-  const actions = applyOrder<ActionRowProps>(
-    data.menuItemOrder,
-    [...(data.customMenuItems ?? []), ...builtIn],
-    r => r.id,
-  );
+  const custom: FooterRow[] = (data.customMenuItems ?? []).map(({ id, ...item }) => ({
+    id,
+    node: <ActionRow {...item} />,
+  }));
 
-  if (actions.length === 0) {
+  // Custom rows lead by default, the way the existing UserButton lists them above "Add account".
+  const rows = applyOrder<FooterRow>(data.menuItemOrder, [...custom, ...builtIn], r => r.id);
+
+  if (rows.length === 0) {
     return null;
   }
 
@@ -889,11 +990,8 @@ function Footer() {
     <>
       <Item.Separator />
       <Item.Group>
-        {actions.map(action => (
-          <ActionRow
-            key={action.id}
-            {...action}
-          />
+        {rows.map(r => (
+          <React.Fragment key={r.id}>{r.node}</React.Fragment>
         ))}
       </Item.Group>
     </>
@@ -955,7 +1053,8 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
 export interface UserButtonTriggerProps {
   /**
    * Names the active workspace beside its avatar — the organization wherever one heads the
-   * trigger, the account otherwise. Turn it off for the avatar alone.
+   * trigger, no selection when personal is hidden and none is active, the account otherwise.
+   * Turn it off for the avatar alone.
    *
    * @default true
    */
@@ -975,8 +1074,10 @@ export function UserButtonTrigger({
   renderTriggerBadge = true,
 }: UserButtonTriggerProps = {}): ReactElement {
   const data = useUserButtonContext();
-  const { name, imageUrl, shape, organization } = leadWorkspace(data);
-  const planLabel = renderTriggerBadge ? organization?.planLabel : undefined;
+  const workspace = leadWorkspace(data);
+  const { name, imageUrl, shape } = workspace;
+  const planLabel =
+    renderTriggerBadge && workspace.kind === 'organization' ? workspace.organization.planLabel : undefined;
 
   return (
     <Popover.Trigger
@@ -1004,7 +1105,7 @@ export function UserButtonTrigger({
   );
 }
 
-/** The popover surface: header, organizations, other accounts, and footer. */
+/** The popover surface: header, organizations, and footer. */
 export function UserButtonPopup(): ReactElement {
   const { renderBranding } = useUserButtonContext();
 
@@ -1013,7 +1114,6 @@ export function UserButtonPopup(): ReactElement {
       <Card.Root renderBranding={renderBranding}>
         <Header />
         <OrganizationSection />
-        <SessionSection />
         <Footer />
       </Card.Root>
     </Popover.Popup>

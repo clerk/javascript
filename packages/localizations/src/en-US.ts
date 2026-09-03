@@ -1000,6 +1000,47 @@ export const enUS: LocalizationResource = {
     warning:
       'Make sure that you trust {{applicationName}} ({{domainAction}}). You may be sharing sensitive data with this site or app.',
   },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: 'Enter another code',
+    confirmation: {
+      action__approve: 'Approve',
+      action__deny: 'Deny',
+      scopeListTitle: 'This will allow {{applicationName}} access to:',
+      subtitle: 'Confirm this request for {{identifier}}',
+      title: 'Allow {{applicationName}} to access your account?',
+      warning: 'Only approve this request if you started it on your other device.',
+    },
+    error: {
+      expiredSubtitle: 'Start over on your device.',
+      expiredTitle: 'This code expired',
+      genericSubtitle: 'Check your connection and try again.',
+      genericTitle: 'We could not verify this code',
+      invalidCode: 'Enter a valid 8-character code.',
+      rateLimitedSubtitle: 'Wait before trying another code.',
+      rateLimitedTitle: 'Too many attempts',
+      unknownCode: "We couldn't find that code. Check it and try again.",
+    },
+    start: {
+      action__continue: 'Continue',
+      subtitle: 'Enter the code shown on the device or app you want to authorize.',
+      title: 'Verify a device',
+      userCodeLabel: 'Device code',
+    },
+    status: {
+      alreadyApprovedSubtitle: 'Return to your device to continue.',
+      alreadyApprovedTitle: "You've approved this",
+      alreadyDecidedSubtitle: 'It was decided elsewhere. Return to your device.',
+      alreadyDecidedTitle: 'This request was already completed',
+      alreadyDeniedSubtitle: 'Start over on your device if you want to try again.',
+      alreadyDeniedTitle: 'This request was denied',
+      approvedSubtitle: 'You approved this request. Return to your device to continue.',
+      approvedTitle: 'Device approved',
+      consumedSubtitle: 'Your device is authorized. You can close this window.',
+      consumedTitle: 'This code has already been used',
+      deniedSubtitle: 'You denied this request. Return to your device.',
+      deniedTitle: 'Access denied',
+    },
+  },
   organizationList: {
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
@@ -1867,6 +1908,9 @@ export const enUS: LocalizationResource = {
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    ticket_expired_code: 'This link has expired. Please start again or request a new link.',
+    ticket_invalid_code:
+      'This link is no longer valid or has already been used. Please start again or request a new link.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:

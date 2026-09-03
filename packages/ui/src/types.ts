@@ -11,6 +11,7 @@ import type {
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -36,6 +37,7 @@ import type { WithInternalRouting } from './internal';
 export type {
   AgentActionApprovalProps,
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -70,6 +72,7 @@ export type AvailableComponentProps =
   | ConfigureSSOProps
   | OAuthConsentProps
   | AgentActionApprovalProps
+  | OAuthDeviceVerificationProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
   | TaskSetupMFAProps;
@@ -234,6 +237,10 @@ export type AgentActionApprovalCtx = AgentActionApprovalProps & {
   componentName: 'AgentActionApproval';
 };
 
+export type OAuthDeviceVerificationCtx = OAuthDeviceVerificationProps & {
+  componentName: 'OAuthDeviceVerification';
+};
+
 export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
   componentName: 'SubscriptionDetails';
 };
@@ -261,6 +268,7 @@ export type AvailableComponentCtx =
   | ConfigureSSOCtx
   | OAuthConsentCtx
   | AgentActionApprovalCtx
+  | OAuthDeviceVerificationCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
   | TaskChooseOrganizationCtx

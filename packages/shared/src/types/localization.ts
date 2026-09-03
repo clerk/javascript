@@ -1395,6 +1395,47 @@ export type __internal_LocalizationResource = {
       expiredSubtitle: LocalizationValue;
     };
   };
+  oauthDeviceVerification: {
+    start: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      userCodeLabel: LocalizationValue;
+      action__continue: LocalizationValue;
+    };
+    confirmation: {
+      title: LocalizationValue<'applicationName'>;
+      subtitle: LocalizationValue<'identifier'>;
+      scopeListTitle: LocalizationValue<'applicationName'>;
+      warning: LocalizationValue;
+      action__deny: LocalizationValue;
+      action__approve: LocalizationValue;
+    };
+    status: {
+      approvedTitle: LocalizationValue;
+      approvedSubtitle: LocalizationValue;
+      alreadyApprovedTitle: LocalizationValue;
+      alreadyApprovedSubtitle: LocalizationValue;
+      alreadyDecidedTitle: LocalizationValue;
+      alreadyDecidedSubtitle: LocalizationValue;
+      deniedTitle: LocalizationValue;
+      deniedSubtitle: LocalizationValue;
+      alreadyDeniedTitle: LocalizationValue;
+      alreadyDeniedSubtitle: LocalizationValue;
+      consumedTitle: LocalizationValue;
+      consumedSubtitle: LocalizationValue;
+    };
+    error: {
+      invalidCode: LocalizationValue;
+      unknownCode: LocalizationValue;
+      expiredTitle: LocalizationValue;
+      expiredSubtitle: LocalizationValue;
+      rateLimitedTitle: LocalizationValue;
+      rateLimitedSubtitle: LocalizationValue;
+      genericTitle: LocalizationValue;
+      genericSubtitle: LocalizationValue;
+    };
+    action__tryAnotherCode: LocalizationValue;
+  };
   unstable__errors: UnstableErrors;
   dates: {
     previous6Days: LocalizationValue<'date'>;
@@ -2217,6 +2258,8 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  ticket_expired_code: LocalizationValue;
+  ticket_invalid_code: LocalizationValue;
   zxcvbn: {
     notEnough: LocalizationValue;
     couldBeStronger: LocalizationValue;

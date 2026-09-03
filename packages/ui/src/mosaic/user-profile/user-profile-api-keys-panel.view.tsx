@@ -165,13 +165,15 @@ export function UserProfileApiKeysPanelView({
                       {onRevoke ? (
                         <Menu.Root placement='bottom-end'>
                           <Menu.Trigger aria-label={`Manage ${apiKey.name}`} />
-                          <Menu.Content>
+                          <Menu.Popup>
                             <Menu.Item
                               color='negative'
                               label='Revoke'
                               onClick={() => onRevoke(apiKey.id)}
-                            />
-                          </Menu.Content>
+                            >
+                              <Menu.Label>Revoke</Menu.Label>
+                            </Menu.Item>
+                          </Menu.Popup>
                         </Menu.Root>
                       ) : null}
                     </td>

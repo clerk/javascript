@@ -866,6 +866,23 @@ export interface Clerk {
   unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts an OAuth device verification component at the target element.
+   *
+   * @param targetNode - Target node to mount the OAuth device verification component.
+   * @param props - OAuth device verification configuration parameters.
+   * @internal
+   */
+  __internal_mountOAuthDeviceVerification: (targetNode: HTMLDivElement, props?: OAuthDeviceVerificationProps) => void;
+
+  /**
+   * Unmounts an OAuth device verification component from the target element.
+   * If there is no component mounted at the target node, this is a noop.
+   *
+   * @internal
+   */
+  __internal_unmountOAuthDeviceVerification: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a TaskChooseOrganization component at the target element.
    *
    * @param targetNode - Target node to mount the TaskChooseOrganization component.
@@ -2797,6 +2814,13 @@ export type OAuthConsentProps = {
 export type AgentActionApprovalProps = {
   /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided).
+   */
+  appearance?: ClerkAppearanceTheme;
+};
+
+export type OAuthDeviceVerificationProps = {
+  /**
+   * Customization options to fully match the Clerk component to your own brand.
    */
   appearance?: ClerkAppearanceTheme;
 };

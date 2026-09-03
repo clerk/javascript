@@ -2,6 +2,7 @@ import type {
   APIKeysProps,
   ConfigureSSOProps,
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
@@ -18,6 +19,7 @@ import {
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
+  OAuthDeviceVerificationContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
@@ -150,6 +152,12 @@ export function ComponentContextProvider({
     }
     case 'AgentActionApproval':
       return children;
+    case 'OAuthDeviceVerification':
+      return (
+        <OAuthDeviceVerificationContext.Provider value={{ componentName, ...(props as OAuthDeviceVerificationProps) }}>
+          {children}
+        </OAuthDeviceVerificationContext.Provider>
+      );
     case 'TaskChooseOrganization':
       return (
         <TaskChooseOrganizationContext.Provider
