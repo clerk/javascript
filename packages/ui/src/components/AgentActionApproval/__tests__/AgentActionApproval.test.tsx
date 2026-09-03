@@ -13,39 +13,36 @@ describe('AgentActionApproval', () => {
     vi.useRealTimers();
   });
 
-  it('renders the interactive Codex refund prototype', async () => {
-    const { container } = await renderApproval();
+  it('renders the interactive refund prototype without claiming an agent identity', async () => {
+    await renderApproval();
 
-    const pageTitle = screen.getByRole('heading', { name: 'Approve agent action' });
-    const divider = container.querySelector('.cl-dividerRow');
-    const operation = screen.getByRole('heading', { name: 'Create a refund', level: 2 });
-    const requestMetadata = screen.getByText(/Requested by Codex ·/);
+    const pageTitle = screen.getByRole('heading', { name: 'Approve agent action', level: 2 });
+    const requestMetadata = screen.getByText(/Requested 3 minutes ago/);
     const description = screen.getByText(
       'Refund the most recent charge after the customer reported a duplicate payment.',
     );
     const parameterLabel = screen.getByText('Refund amount');
 
-    expect(divider).not.toBeNull();
-    expect(divider?.querySelector('.cl-dividerText')).toBeNull();
-    expect(pageTitle.compareDocumentPosition(divider) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(divider?.compareDocumentPosition(operation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(requestMetadata).toHaveAttribute('data-variant', 'caption');
-    expect(operation.compareDocumentPosition(requestMetadata) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByText(/Codex/i)).not.toBeInTheDocument();
     expect(requestMetadata.compareDocumentPosition(description) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(description.compareDocumentPosition(parameterLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.getByText('$250.00')).toBeVisible();
+    expect(pageTitle.compareDocumentPosition(requestMetadata) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByText('$400.00')).toBeVisible();
+    expect(screen.getByText('Cameron Walker')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Copy Payment intent' })).toHaveAttribute('data-variant', 'ghost');
+    expect(screen.getByText('Optional')).toBeVisible();
     expect(screen.getByText(/Approval window closes in/)).toHaveStyle({ fontVariantNumeric: 'tabular-nums' });
   });
 
   it.each([
-    { button: 'Approve', heading: 'Agent is now authorized to continue' },
-    { button: 'Reject', heading: 'Action rejected' },
+    { button: 'Approve', heading: 'Action approved' },
+    { button: 'Deny', heading: 'Action denied' },
   ])('renders the terminal state after $button', async ({ button, heading }) => {
     const { userEvent } = await renderApproval();
 
     await userEvent.click(screen.getByRole('button', { name: button }));
 
-    expect(screen.getByRole('heading', { name: heading })).toBeVisible();
+    expect(screen.getByRole('heading', { name: heading, level: 2 })).toBeVisible();
     expect(screen.getByText(/You can close this window/)).toBeVisible();
   });
 

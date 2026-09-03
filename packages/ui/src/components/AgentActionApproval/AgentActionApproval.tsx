@@ -1,45 +1,34 @@
 import { useMemo, useState } from 'react';
 
-import {
-  Button,
-  Col,
-  Flow,
-  FormLabel,
-  Grid,
-  Heading,
-  localizationKeys,
-  Text,
-  useLocalizations,
-} from '@/ui/customizables';
+import { Button, Col, Flex, Flow, FormLabel, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { Divider } from '@/ui/elements/Divider';
 import { Header } from '@/ui/elements/Header';
-import { LineItems } from '@/ui/elements/LineItems';
+import { CreditCard, ShieldCheck } from '@/ui/icons';
 import { Textarea } from '@/ui/primitives';
 
+import { ActionDetails } from './ActionDetails';
+import { AgentActionIcon } from './AgentActionIcon';
 import { TerminalCard, type TerminalStatus } from './TerminalCard';
 import { formatRemainingTime, useCountdown } from './useCountdown';
 
 const mockAction = {
   description: 'Refund the most recent charge after the customer reported a duplicate payment.',
-  operation: 'Create a refund',
   parameters: [
-    { key: 'refund_amount', label: 'Refund amount', value: '$250.00' },
-    { key: 'customer_id', label: 'Customer', value: 'cus_agent_demo' },
-    { key: 'payment_intent_id', label: 'Payment intent', value: 'pi_agent_demo' },
-    { key: 'payment_method', label: 'Payment method', value: 'Visa ending in 4242' },
+    { key: 'refund_amount', label: 'Refund amount', value: '$400.00' },
+    { key: 'customer_id', label: 'Refund to', value: 'Cameron Walker' },
+    { key: 'payment_method', label: 'Payment method', value: 'Visa', secondaryValue: '⋯ 4242', icon: CreditCard },
+    { key: 'payment_intent_id', label: 'Payment intent', value: 'pi_3QkL8mF7bXn4p9V2c6a', copyable: true },
   ],
-  requestedBy: 'Codex',
 };
 
 function ApprovalScreen() {
-  const { t } = useLocalizations();
+  const { locale, t } = useLocalizations();
   const [comment, setComment] = useState('');
   const [decision, setDecision] = useState<TerminalStatus | null>(null);
   const timestamps = useMemo(
     () => ({
-      createdAt: Date.now() - 2 * 60 * 1_000,
+      createdAt: Date.now() - 3 * 60 * 1_000,
       expiresAt: Date.now() + 15 * 60 * 1_000,
     }),
     [],
@@ -57,64 +46,52 @@ function ApprovalScreen() {
   return (
     <Card.Root>
       <Card.Content gap={6}>
-        <Header.Root>
-          <Header.Title localizationKey={localizationKeys('agentActionApproval.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('agentActionApproval.subtitle')} />
-        </Header.Root>
-        <Divider dividerText={null} />
+        <Col gap={4}>
+          <AgentActionIcon icon={ShieldCheck} />
+          <Header.Root>
+            <Header.Title
+              as='h2'
+              localizationKey={localizationKeys('agentActionApproval.title')}
+            />
+            <Header.Subtitle
+              localizationKey={localizationKeys('agentActionApproval.requestedAt', {
+                relativeTime: formatRelativeTime(timestamps.createdAt, locale),
+              })}
+            />
+          </Header.Root>
+        </Col>
         <Col
           gap={4}
           sx={{ textAlign: 'start' }}
         >
-          <Col gap={2}>
-            <Col gap={1}>
-              <Heading
-                as='h2'
-                textVariant='h2'
-                sx={{ overflowWrap: 'anywhere' }}
-              >
-                {mockAction.operation}
-              </Heading>
-              <Text
-                variant='caption'
-                colorScheme='secondary'
-                sx={theme => ({ fontSize: theme.fontSizes.$sm })}
-                localizationKey={localizationKeys('agentActionApproval.requestedBy', {
-                  agent: mockAction.requestedBy,
-                  createdAt: formatTimestamp(timestamps.createdAt),
-                })}
-              />
-            </Col>
-            <Text colorScheme='secondary'>{mockAction.description}</Text>
-          </Col>
-          <LineItems.Root>
-            {mockAction.parameters.map(parameter => (
-              <LineItems.Group
-                key={parameter.key}
-                variant='secondary'
-              >
-                <LineItems.Title title={parameter.label} />
-                <LineItems.Description text={String(parameter.value)} />
-              </LineItems.Group>
-            ))}
-          </LineItems.Root>
+          <Text colorScheme='secondary'>{mockAction.description}</Text>
+          <ActionDetails details={mockAction.parameters} />
         </Col>
         <Col
           gap={2}
           sx={{ textAlign: 'start' }}
         >
-          <FormLabel
-            htmlFor='agent-action-comment'
-            localizationKey={localizationKeys('agentActionApproval.commentLabel')}
-          />
+          <Flex
+            align='center'
+            justify='between'
+          >
+            <FormLabel
+              htmlFor='agent-action-comment'
+              localizationKey={localizationKeys('agentActionApproval.commentLabel')}
+            />
+            <Text
+              colorScheme='secondary'
+              localizationKey={localizationKeys('agentActionApproval.commentOptional')}
+            />
+          </Flex>
           <Textarea
             id='agent-action-comment'
             value={comment}
             maxLength={500}
-            rows={4}
+            rows={3}
             onChange={event => setComment(event.target.value)}
             placeholder={t(localizationKeys('agentActionApproval.commentPlaceholder'))}
-            style={{ maxHeight: 'none', minHeight: '5.5rem', resize: 'vertical' }}
+            style={{ maxHeight: 'none', minHeight: '4.5rem', resize: 'vertical' }}
           />
         </Col>
         <Grid
@@ -124,8 +101,8 @@ function ApprovalScreen() {
           <Button
             colorScheme='secondary'
             variant='outline'
-            onClick={() => setDecision('rejected')}
-            localizationKey={localizationKeys('agentActionApproval.action__reject')}
+            onClick={() => setDecision('denied')}
+            localizationKey={localizationKeys('agentActionApproval.action__deny')}
           />
           <Button
             onClick={() => setDecision('approved')}
@@ -156,8 +133,25 @@ function AgentActionApprovalInternal() {
   );
 }
 
-function formatTimestamp(timestamp: number): string {
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(timestamp));
+function formatRelativeTime(timestamp: number, locale: string): string {
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1_000));
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'always' });
+
+  if (elapsedSeconds < 60) {
+    return formatter.format(-elapsedSeconds, 'second');
+  }
+
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+  if (elapsedMinutes < 60) {
+    return formatter.format(-elapsedMinutes, 'minute');
+  }
+
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) {
+    return formatter.format(-elapsedHours, 'hour');
+  }
+
+  return formatter.format(-Math.floor(elapsedHours / 24), 'day');
 }
 
 export const AgentActionApproval = withCardStateProvider(AgentActionApprovalInternal);
