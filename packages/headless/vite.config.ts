@@ -14,6 +14,7 @@ export default defineConfig({
       entry: {
         'primitives/accordion/index': 'src/primitives/accordion/index.ts',
         'primitives/button/index': 'src/primitives/button/index.ts',
+        'primitives/input/index': 'src/primitives/input/index.ts',
         'primitives/tabs/index': 'src/primitives/tabs/index.ts',
         'primitives/tooltip/index': 'src/primitives/tooltip/index.ts',
         'primitives/popover/index': 'src/primitives/popover/index.ts',

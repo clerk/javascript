@@ -1,0 +1,74 @@
+import * as InputStories from './input.primitive.stories';
+
+# Input
+
+An unstyled native input from `@clerk/headless`. It provides the shared `render` escape hatch and reflects native disabled, invalid, and read-only state as `data-*` attributes, but ships no styles.
+
+## Example
+
+The demo renders the raw primitive with only the browser's native appearance.
+
+<Story
+  name='Default'
+  storyModule={InputStories}
+/>
+
+## Usage
+
+```tsx
+import { Input } from '@clerk/headless/input';
+
+<label>
+  Email address
+  <Input
+    type='email'
+    name='email'
+    autoComplete='email'
+    placeholder='you@example.com'
+  />
+</label>;
+```
+
+Use `render` when a styled layer or compound control needs to supply another input-like element:
+
+```tsx
+<Input
+  render={<textarea />}
+  aria-label='Biography'
+/>
+```
+
+## Parts
+
+| Part    | Default Element | Description                                                      |
+| ------- | --------------- | ---------------------------------------------------------------- |
+| `Input` | `<input>`       | Native input with polymorphic rendering and reflected state data |
+
+`Input` accepts the shared `render` prop and all standard attributes for its default element.
+
+## Props
+
+| Prop           | Type                             | Default     | Description                                              |
+| -------------- | -------------------------------- | ----------- | -------------------------------------------------------- |
+| `render`       | `ReactElement \| RenderFunction` | `<input>`   | Replaces the default element while merging props and ref |
+| `disabled`     | `boolean`                        | `false`     | Disables the native control                              |
+| `readOnly`     | `boolean`                        | `false`     | Makes the native control read-only                       |
+| `aria-invalid` | `boolean \| 'true' \| 'false'`   | `undefined` | Exposes the control's validation state                   |
+
+All other native input attributes pass through unchanged.
+
+## Styling
+
+The primitive exposes state through attributes that any styling system can target:
+
+| Attribute       | Description                           |
+| --------------- | ------------------------------------- |
+| `data-disabled` | Present when `disabled` is `true`     |
+| `data-invalid`  | Present when `aria-invalid` is `true` |
+| `data-readonly` | Present when `readOnly` is `true`     |
+
+```css
+input[data-invalid] {
+  border-color: red;
+}
+```

@@ -62,6 +62,7 @@ import {
   Sizes as IconFrameSizes,
   Treatments as IconFrameTreatments,
 } from '../stories/icon-frame.stories';
+import { meta as inputPrimitiveMeta } from '../stories/input.primitive.stories';
 import {
   Default,
   Disabled as InputDisabled,
@@ -348,6 +349,7 @@ const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const flowModule: StoryModule = { meta: flowMeta };
+const inputPrimitiveModule: StoryModule = { meta: inputPrimitiveMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
@@ -520,6 +522,7 @@ export const registry: StoryModule[] = [
   drawerModule,
   fileUploadModule,
   flowModule,
+  inputPrimitiveModule,
   menuModule,
   otpModule,
   popoverModule,
