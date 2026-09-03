@@ -95,6 +95,13 @@ its parent.
 
 ## Page transitions
 
-`Page` keeps the tabs primitive's transition contract — `data-hidden` today, `data-starting-style`
-/ `data-ending-style` and `--cl-tab-transition-direction` once pages are force-mounted — so a page
-transition is a styling change here rather than a new part.
+With `shouldForceMount`, a `Page` stays in the document while another is selected — `inert`, and
+carrying the tabs primitive's transition attributes: `data-open` / `data-closed`, then
+`data-starting-style` on the frame it enters and `data-ending-style` while it leaves, plus
+`--cl-tab-transition-direction` for a directional move. A transition is a styling change, not a
+new part. Below, the pages share one grid cell and cross-fade with a little scale and blur.
+
+<Story
+  name='Transitions'
+  storyModule={ProfileStories}
+/>

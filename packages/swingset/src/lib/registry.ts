@@ -101,6 +101,7 @@ import {
   Customized as ProfileCustomized,
   Default as ProfileDefault,
   meta as profileComponentMeta,
+  Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
 import {
   Default as ReverificationBackupCodeDefault,
@@ -295,6 +296,7 @@ const profileComponentModule: StoryModule = {
   meta: profileComponentMeta,
   Default: ProfileDefault,
   Customized: ProfileCustomized,
+  Transitions: ProfileTransitions,
 };
 
 const itemModule: StoryModule = {

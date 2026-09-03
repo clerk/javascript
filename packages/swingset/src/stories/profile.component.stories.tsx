@@ -44,7 +44,7 @@ function Placeholder({ title }: { title: string }) {
   );
 }
 
-function Surface(props: Partial<ProfileRootProps>) {
+function Surface({ forceMountPages, ...props }: Partial<ProfileRootProps> & { forceMountPages?: boolean }) {
   const [page, setPage] = useState('general');
   return (
     <Profile.Root
@@ -74,6 +74,7 @@ function Surface(props: Partial<ProfileRootProps>) {
           <Profile.Page
             key={item.id}
             value={item.id}
+            shouldForceMount={forceMountPages}
           >
             <Placeholder title={item.label} />
           </Profile.Page>
@@ -175,6 +176,52 @@ export function Customized() {
         }
       `}</style>
       <Surface />
+    </>
+  );
+}
+
+/**
+ * A page transition, in CSS alone. Force-mounted pages stay in the document, `inert` while another
+ * is selected, and carry the tabs primitive's transition attributes: `data-starting-style` on the
+ * frame a page enters, `data-ending-style` while the one it replaces leaves. The pages are stacked
+ * in one grid cell so the two cross-fade in place; a page that is neither open nor leaving is not
+ * displayed. Under `prefers-reduced-motion: reduce` the swap is instant.
+ */
+export function Transitions() {
+  return (
+    <>
+      <style>{`
+        @scope {
+          .cl-profile-content-body {
+            display: grid;
+          }
+          .cl-profile-page {
+            grid-area: 1 / 1;
+            transition-property: opacity, scale, filter;
+            transition-duration: var(--cl-duration-slow);
+            transition-timing-function: var(--cl-ease-enter);
+          }
+          .cl-profile-page[data-ending-style] {
+            transition-duration: var(--cl-duration-base);
+            transition-timing-function: var(--cl-ease-exit);
+          }
+          .cl-profile-page[data-starting-style],
+          .cl-profile-page[data-ending-style] {
+            opacity: 0;
+            scale: 0.98;
+            filter: blur(4px);
+          }
+          .cl-profile-page:not([data-open]):not([data-ending-style]) {
+            display: none;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .cl-profile-page {
+              transition: none;
+            }
+          }
+        }
+      `}</style>
+      <Surface forceMountPages />
     </>
   );
 }

@@ -144,7 +144,9 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       return;
     }
     wasNavOpen.current = false;
-    const caret = node.querySelector<HTMLElement>('.cl-profile-page:not([hidden]) .cl-profile-nav-trigger');
+    const caret = node.querySelector<HTMLElement>(
+      '.cl-profile-page:not([hidden]):not([inert]) .cl-profile-nav-trigger',
+    );
     caret?.focus();
   }, [navOpen, node]);
   const context = React.useMemo(
@@ -459,22 +461,29 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
 export interface ProfilePageProps extends MosaicComponentProps<'div'> {
   /** Matches the `value` of the `Profile.NavItem` that opens this page. */
   value: string;
+  /**
+   * Keeps the page in the document while another is selected — `inert`, and carrying the tabs
+   * primitive's transition attributes — so a page transition can be styled. Off, an unselected
+   * page is `hidden`. Stack the pages yourself when on: they are all in flow.
+   */
+  shouldForceMount?: boolean;
 }
 
 /**
- * One destination's content, shown while its `value` is selected and `hidden` otherwise. It keeps
- * the tabs primitive's transition contract (`data-hidden` today; `data-starting-style` /
- * `data-ending-style` and the direction variable once pages are force-mounted), so a page
- * transition is a styling change here rather than a new part.
+ * One destination's content, shown while its `value` is selected and `hidden` otherwise. With
+ * `shouldForceMount` it stays in the document and carries the tabs primitive's transition contract
+ * — `data-open` / `data-closed`, `data-starting-style` / `data-ending-style`, and
+ * `--cl-tab-transition-direction` — so a page transition is a styling change rather than a new part.
  */
 const Page = React.forwardRef<HTMLDivElement, ProfilePageProps>(function ProfilePage(
-  { value, className, style, ...rest },
+  { value, shouldForceMount, className, style, ...rest },
   ref,
 ) {
   return (
     <Tabs.Panel
       ref={ref}
       value={value}
+      shouldForceMount={shouldForceMount}
       {...mergeStyleProps(themeProps('profile-page', { value }), className, style)}
       {...rest}
     />
