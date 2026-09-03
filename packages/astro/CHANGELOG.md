@@ -1,5 +1,14 @@
 # @clerk/astro
 
+## 4.0.21
+
+### Patch Changes
+
+- Bump `nanoid` to 5.1.16 to pick up an upstream security fix. ([#9565](https://github.com/clerk/javascript/pull/9565)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`c4f9883`](https://github.com/clerk/javascript/commit/c4f98834434edd7821f5c6f344583c07e30013cd), [`eef0ceb`](https://github.com/clerk/javascript/commit/eef0ceb97926688384ec480afe44199b16f13993)]:
+  - @clerk/backend@3.17.0
+
 ## 4.0.20
 
 ### Patch Changes

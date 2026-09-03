@@ -66,3 +66,10 @@ export const truncationStyles = stylex.create({
     display: '-webkit-box',
   },
 });
+
+// Fixed-width figures, for values that change in place without shifting the layout around them.
+export const tabularNumbersStyle = stylex.create({
+  enabled: {
+    fontVariantNumeric: 'tabular-nums',
+  },
+});

@@ -65,6 +65,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     section: dynamic(() => import('../stories/section.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
+    'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),
   },
   primitives: {
     // Headless primitives — alphabetical.

@@ -57,6 +57,12 @@ describe('Flow', () => {
     globalThis.cancelAnimationFrame = originalCaf;
   });
 
+  function flushRaf() {
+    const callbacks = [...rafCallbacks];
+    rafCallbacks = [];
+    callbacks.forEach(callback => callback(performance.now()));
+  }
+
   it('renders only the step matching the controlled value', () => {
     render(<TestFlow value='password' />);
 
@@ -147,6 +153,39 @@ describe('Flow', () => {
     finishAnimation();
   });
 
+  it('keeps the returning step mounted when its exit is interrupted', async () => {
+    let finishAnimation!: () => void;
+    const animationFinished = new Promise<void>(resolve => {
+      finishAnimation = resolve;
+    });
+    const { rerender } = render(<TestFlow value='password' />);
+    const step = screen.getByTestId('password-step');
+    step.getAnimations = vi.fn(() => [{ finished: animationFinished }] as unknown as Animation[]);
+
+    rerender(<TestFlow value='otp' />);
+    expect(step).toHaveAttribute('data-ending-style');
+
+    rerender(
+      <TestFlow
+        value='password'
+        direction={-1}
+      />,
+    );
+    act(() => flushRaf());
+
+    expect(step).toHaveAttribute('data-open');
+    expect(step).not.toHaveAttribute('data-ending-style');
+
+    step.getAnimations = vi.fn(() => []);
+    await act(async () => {
+      finishAnimation();
+      await animationFinished;
+    });
+
+    expect(screen.getByTestId('password-step')).toBe(step);
+    expect(step).not.toHaveAttribute('data-starting-style');
+  });
+
   it('forwards its ref and supports a custom rendered element', () => {
     const ref = createRef<HTMLDivElement>();
 
@@ -195,11 +234,7 @@ describe('Flow', () => {
     expect(root.style.getPropertyValue('--cl-flow-step-height')).toBe('120px');
     expect(root).toHaveAttribute('data-initial');
 
-    act(() => {
-      const callbacks = [...rafCallbacks];
-      rafCallbacks = [];
-      callbacks.forEach(callback => callback(performance.now()));
-    });
+    act(() => flushRaf());
 
     expect(root).not.toHaveAttribute('data-initial');
 
