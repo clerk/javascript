@@ -10,6 +10,9 @@ import type {
 
 import type {
   ActorTokenStatus,
+  AgentActionEffect,
+  AgentActionEvaluation,
+  AgentActionStatusValue,
   AllowlistIdentifierType,
   BlocklistIdentifierType,
   DomainsEnrollmentModes,
@@ -27,6 +30,9 @@ import type {
 export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   ActorToken: 'actor_token',
+  AgentAction: 'agent_action',
+  AgentActionDecision: 'agent_action_decision',
+  AgentActionStatus: 'agent_action_status',
   AgentTask: 'agent_task',
   AllowlistIdentifier: 'allowlist_identifier',
   ApiKey: 'api_key',
@@ -597,6 +603,98 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
   url: string;
   created_at: number;
   updated_at: number;
+}
+
+/**
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface AgentActionParametersDisplayJSON {
+  key: string;
+  label: string;
+  value: string | number | boolean;
+}
+
+/**
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface AgentActionEvaluationErrorJSON {
+  rule_id: string;
+  message: string;
+}
+
+/**
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface AgentActionApprovalJSON {
+  role: string | null;
+  url: string;
+  expires_at: number;
+}
+
+/**
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface AgentActionResolutionJSON {
+  resolved_by_user_id: string;
+  resolved_at: number;
+  resolution_comment: string | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface AgentActionDecisionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.AgentActionDecision;
+  action_id: string;
+  policy_id: string | null;
+  policy_revision: number | null;
+  rule_id: string | null;
+  effect: AgentActionEffect;
+  reason: string | null;
+  evaluation: AgentActionEvaluation;
+  evaluation_errors: AgentActionEvaluationErrorJSON[] | null;
+  created_at: number;
+}
+
+/**
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface AgentActionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.AgentAction;
+  status: AgentActionStatusValue;
+  actor_id: string;
+  subject_id: string | null;
+  organization_id: string | null;
+  authorized_client_id: string | null;
+  operation: string;
+  parameters: Record<string, unknown>;
+  description: string | null;
+  parameters_display: AgentActionParametersDisplayJSON[];
+  idempotency_key: string | null;
+  approval: AgentActionApprovalJSON | null;
+  resolution: AgentActionResolutionJSON | null;
+  decision: AgentActionDecisionJSON;
+  created_at: number;
+  updated_at: number;
+}
+
+/**
+ * The slim status view returned by the resolution-delivery endpoint. It carries no
+ * `id` of its own: it is a projection of the Agent Action named by `action_id`.
+ *
+ * @experimental This is an experimental API for the Agent Approvals feature that is available under a private beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface AgentActionStatusJSON {
+  object: typeof ObjectType.AgentActionStatus;
+  action_id: string;
+  status: AgentActionStatusValue;
+  effect: AgentActionEffect;
+  reason: string | null;
+  evaluation: AgentActionEvaluation;
+  evaluation_errors: AgentActionEvaluationErrorJSON[] | null;
+  expires_at: number | null;
+  resolved_at: number | null;
+  created_at: number;
 }
 
 export interface AgentTaskJSON extends ClerkResourceJSON {

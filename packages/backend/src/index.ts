@@ -48,13 +48,25 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
 /**
  * General Types
  */
-export type { OrganizationMembershipRole } from './api/resources';
+export type {
+  AgentActionEffect,
+  AgentActionEvaluation,
+  AgentActionStatusValue,
+  OrganizationMembershipRole,
+} from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
 /**
  * JSON types
  */
 export type {
   ActorTokenJSON,
+  AgentActionApprovalJSON,
+  AgentActionDecisionJSON,
+  AgentActionEvaluationErrorJSON,
+  AgentActionJSON,
+  AgentActionParametersDisplayJSON,
+  AgentActionResolutionJSON,
+  AgentActionStatusJSON,
   AgentTaskJSON,
   AccountlessApplicationJSON,
   ClerkResourceJSON,
@@ -120,6 +132,13 @@ export type {
  * Resources
  */
 export type {
+  AgentAction,
+  AgentActionApproval,
+  AgentActionDecision,
+  AgentActionEvaluationError,
+  AgentActionParametersDisplay,
+  AgentActionResolution,
+  AgentActionStatus,
   AgentTask,
   APIKey,
   ActorToken,

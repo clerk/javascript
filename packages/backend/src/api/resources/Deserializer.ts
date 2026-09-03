@@ -1,5 +1,7 @@
 import {
   ActorToken,
+  AgentAction,
+  AgentActionStatus,
   AgentTask,
   AllowlistIdentifier,
   APIKey,
@@ -144,6 +146,10 @@ function jsonToObject(item: any): any {
       return AccountlessApplication.fromJSON(item);
     case ObjectType.ActorToken:
       return ActorToken.fromJSON(item);
+    case ObjectType.AgentAction:
+      return AgentAction.fromJSON(item);
+    case ObjectType.AgentActionStatus:
+      return AgentActionStatus.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
     case ObjectType.ApiKey:
