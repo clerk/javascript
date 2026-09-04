@@ -43,7 +43,7 @@ npm install @clerk/express
 
 ## Usage
 
-Navigate to the [Clerk Dashboard](https://dashboard.clerk.com/last-active?path=api-keys) and inside the **API Keys** section copy the publishable key and secret key.
+Navigate to the [Clerk Dashboard](https://dashboard.clerk.com/~/api-keys) and inside the **API Keys** section copy the publishable key and secret key.
 
 Paste your keys into an `.env` file:
 
