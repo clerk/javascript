@@ -4,14 +4,17 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import { isStaging } from '@clerk/shared/utils';
 import { test as setup } from '@playwright/test';
 
-import { appConfigs } from '../presets/';
-import { findE2ERunUsers, getE2ERunMarker } from '../testUtils/e2eRun';
+import { constants } from '../constants';
+import { instanceKeys } from '../presets/instanceKeys';
+import { deleteApplication, listApplications } from '../presets/platformApplication';
+import { findE2ERunUsers, getE2EApplicationRunMarker, getE2ERunMarker } from '../testUtils/e2eRun';
 import { withRetry } from '../testUtils/retryableClerkClient';
 
 setup('cleanup instances ', async () => {
   const runMarker = getE2ERunMarker();
-  const entries = Array.from(appConfigs.secrets.instanceKeys.values())
-    .map(({ pk, sk }) => {
+  const applicationRunMarker = getE2EApplicationRunMarker(constants.INTEGRATION_TEST_RUN_KEY);
+  const entries = Array.from(instanceKeys.entries())
+    .map(([keyName, { pk, sk }]) => {
       const secretKey = sk;
       if (!secretKey) {
         return null;
@@ -19,6 +22,7 @@ setup('cleanup instances ', async () => {
       const parsedPk = parsePublishableKey(pk);
       const apiUrl = isStaging(parsedPk.frontendApi) ? 'https://api.clerkstage.dev' : 'https://api.clerk.com';
       return {
+        keyName,
         secretKey,
         apiUrl,
         instanceName: parsedPk.instanceId || parsedPk.frontendApi.split('.')[0] || 'unknown',
@@ -30,6 +34,7 @@ setup('cleanup instances ', async () => {
     instanceName: string;
     usersDeleted: number;
     orgsDeleted: number;
+    oauthApplicationsDeleted: number;
     errors: string[];
     status: 'success' | 'error' | 'unauthorized';
   }> = [];
@@ -44,6 +49,7 @@ setup('cleanup instances ', async () => {
       instanceName: entry.instanceName,
       usersDeleted: 0,
       orgsDeleted: 0,
+      oauthApplicationsDeleted: 0,
       errors: [] as string[],
       status: 'success' as 'success' | 'error' | 'unauthorized',
     };
@@ -165,11 +171,48 @@ setup('cleanup instances ', async () => {
         }
       }
 
+      if (entry.keyName === 'oauth-provider') {
+        if (applicationRunMarker) {
+          let offset = 0;
+          const limit = 100;
+          const applicationsToDelete: Array<{ id: string; name: string }> = [];
+
+          while (true) {
+            const { data, totalCount } = await clerkClient.oauthApplications.list({ limit, offset });
+            applicationsToDelete.push(...data.filter(application => application.name.endsWith(applicationRunMarker)));
+
+            offset += data.length;
+            if (offset >= totalCount || data.length === 0) {
+              break;
+            }
+          }
+
+          for (const application of applicationsToDelete) {
+            try {
+              await clerkClient.oauthApplications.delete(application.id);
+              instanceSummary.oauthApplicationsDeleted++;
+              console.log(`Deleted OAuth application ${application.id} (${application.name}).`);
+            } catch (error) {
+              if (!isClerkAPIResponseError(error) || error.status !== 404) {
+                const message = error instanceof Error ? error.message : String(error);
+                instanceSummary.errors.push(`OAuth application ${application.id}: ${message}`);
+              }
+            }
+          }
+        } else {
+          console.log('INTEGRATION_TEST_RUN_KEY is not set. Skipping OAuth application cleanup.');
+        }
+      }
+
       // Report instance results
       const maskedKey = entry.secretKey.replace(/(sk_(test|live)_)(.+)(...)/, '$1***$4');
-      if (instanceSummary.usersDeleted > 0 || instanceSummary.orgsDeleted > 0) {
+      if (
+        instanceSummary.usersDeleted > 0 ||
+        instanceSummary.orgsDeleted > 0 ||
+        instanceSummary.oauthApplicationsDeleted > 0
+      ) {
         console.log(
-          `✅ ${entry.instanceName} (${maskedKey}): ${instanceSummary.usersDeleted} users, ${instanceSummary.orgsDeleted} orgs deleted`,
+          `✅ ${entry.instanceName} (${maskedKey}): ${instanceSummary.usersDeleted} users, ${instanceSummary.orgsDeleted} orgs, ${instanceSummary.oauthApplicationsDeleted} OAuth applications deleted`,
         );
       } else {
         console.log(`✅ ${entry.instanceName} (${maskedKey}): clean`);
@@ -193,13 +236,52 @@ setup('cleanup instances ', async () => {
     cleanupSummary.push(instanceSummary);
   }
 
+  const applicationCleanupErrors: string[] = [];
+  let applicationsDeleted = 0;
+  if (constants.CLERK_PLATFORM_API_KEY) {
+    try {
+      const applications = await listApplications(constants.CLERK_PLATFORM_API_KEY);
+      console.log(`Found ${applications.length} Platform API applications.`);
+
+      if (applicationRunMarker) {
+        const applicationNameSuffix = `-${applicationRunMarker}`;
+        const applicationsToDelete = applications.filter(application =>
+          application.name.endsWith(applicationNameSuffix),
+        );
+
+        for (const application of applicationsToDelete) {
+          try {
+            await deleteApplication(constants.CLERK_PLATFORM_API_KEY, application.application_id);
+            applicationsDeleted++;
+            console.log(`Deleted Platform API application ${application.application_id} (${application.name}).`);
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            applicationCleanupErrors.push(`${application.application_id}: ${message}`);
+          }
+        }
+      } else {
+        console.log('INTEGRATION_TEST_RUN_KEY is not set. Skipping Platform API application deletion.');
+      }
+    } catch (error) {
+      applicationCleanupErrors.push(error instanceof Error ? error.message : String(error));
+    }
+  } else {
+    console.log('CLERK_PLATFORM_API_KEY is not set. Skipping Platform API application cleanup.');
+  }
+
   // Final summary
   const totalUsersDeleted = cleanupSummary.reduce((sum, instance) => sum + instance.usersDeleted, 0);
   const totalOrgsDeleted = cleanupSummary.reduce((sum, instance) => sum + instance.orgsDeleted, 0);
+  const totalOAuthApplicationsDeleted = cleanupSummary.reduce(
+    (sum, instance) => sum + instance.oauthApplicationsDeleted,
+    0,
+  );
   const errorInstances = cleanupSummary.filter(instance => instance.status === 'error').length;
   const unauthorizedInstances = cleanupSummary.filter(instance => instance.status === 'unauthorized').length;
 
-  console.log(`\n📊 Summary: ${totalUsersDeleted} users, ${totalOrgsDeleted} orgs deleted`);
+  console.log(
+    `\n📊 Summary: ${totalUsersDeleted} users, ${totalOrgsDeleted} orgs, ${totalOAuthApplicationsDeleted} OAuth applications, ${applicationsDeleted} Platform API applications deleted`,
+  );
   if (errorInstances > 0 || unauthorizedInstances > 0) {
     console.log(`   ${errorInstances} errors, ${unauthorizedInstances} unauthorized`);
   }
@@ -214,7 +296,12 @@ setup('cleanup instances ', async () => {
     });
   }
 
-  if (errorInstances === 0 && unauthorizedInstances === 0) {
+  if (applicationCleanupErrors.length > 0) {
+    console.log('\nPlatform application cleanup errors:');
+    applicationCleanupErrors.forEach(error => console.log(`  - ${error}`));
+  }
+
+  if (errorInstances === 0 && unauthorizedInstances === 0 && applicationCleanupErrors.length === 0) {
     console.log('\n✅ Cleanup completed successfully with no errors');
   }
 });

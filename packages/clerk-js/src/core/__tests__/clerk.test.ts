@@ -15,7 +15,6 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test,
 import { mockJwt } from '@/test/core-fixtures';
 
 import { mockNativeRuntime } from '../../test/utils';
-import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
@@ -30,15 +29,19 @@ vi.mock('../resources/Environment');
 const { mockCreateClientFromJwt } = vi.hoisted(() => ({ mockCreateClientFromJwt: vi.fn() }));
 vi.mock('../jwt-client', () => ({ createClientFromJwt: mockCreateClientFromJwt }));
 
-vi.mock('../auth/devBrowser', () => ({
-  createDevBrowser: (): DevBrowser => ({
+const { mockDevBrowser } = vi.hoisted(() => ({
+  mockDevBrowser: {
     clear: vi.fn(),
     setup: vi.fn(),
     getDevBrowser: vi.fn(() => 'deadbeef'),
     setDevBrowser: vi.fn(),
     removeDevBrowser: vi.fn(),
     refreshCookies: vi.fn(),
-  }),
+  },
+}));
+
+vi.mock('../auth/devBrowser', () => ({
+  createDevBrowser: () => mockDevBrowser,
 }));
 
 Client.getOrCreateInstance = vi.fn().mockImplementation(() => {
@@ -762,6 +765,41 @@ describe('Clerk singleton', () => {
   });
 
   describe('.load()', () => {
+    it('clears the stale dev browser before retrying the initial resources', async () => {
+      const callLog: string[] = [];
+      const devBrowserError = Object.assign(new Error('dev browser unauthenticated'), {
+        errors: [{ code: 'dev_browser_unauthenticated' }],
+        status: 401,
+      });
+
+      mockDevBrowser.clear.mockImplementationOnce(() => void callLog.push('clearDevBrowser'));
+      mockEnvironmentFetch
+        .mockImplementationOnce(() => {
+          callLog.push('environment');
+          return Promise.reject(devBrowserError);
+        })
+        .mockImplementation(() => {
+          callLog.push('environment');
+          return Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+          });
+        });
+      mockClientFetch.mockImplementation(() => {
+        callLog.push('client');
+        return Promise.resolve({ signedInSessions: [] });
+      });
+
+      const sut = new Clerk(developmentPublishableKey);
+      await sut.load({ unsafe_disableDevelopmentModeConsoleWarning: true });
+
+      expect(callLog).toEqual(['environment', 'client', 'clearDevBrowser', 'environment', 'client']);
+      expect(sut.status).toBe('ready');
+    });
+
     describe.each(['active', 'pending'] satisfies Array<SignedInSessionResource['status']>)(
       'when session has %s status',
       status => {

@@ -1,10 +1,10 @@
 'use client';
 
-import { type CSSProperties, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { type ComponentProps, mergeProps, useRender } from '../../utils';
-import { OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
+import { type FirstInputLabel, OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
 import { inputModeForPattern, type OtpPattern, sanitize } from './otp-utils';
 
 export interface OtpProps extends Omit<ComponentProps<'div'>, 'value' | 'defaultValue' | 'onChange'> {
@@ -29,6 +29,13 @@ export interface OtpProps extends Omit<ComponentProps<'div'>, 'value' | 'default
   name?: string;
   /** Disable every slot and the picker. @default false */
   disabled?: boolean;
+  /** Require every slot to be filled before the enclosing form submits. @default false */
+  required?: boolean;
+  /**
+   * Identifies the field for a `<label>`. Applied to the first slot rather than this
+   * element, since a `role="group"` is not labelable. Generated when omitted.
+   */
+  id?: string;
   children: ReactNode;
 }
 
@@ -58,9 +65,30 @@ export function OtpRoot(props: OtpProps) {
     mask = false,
     name,
     disabled = false,
+    required = false,
+    id: idProp,
     children,
     ...otherProps
   } = props;
+
+  const generatedId = useId();
+  const id = idProp ?? `otp-${generatedId}`;
+  const getInputId = useCallback((index: number) => (index === 0 ? id : `${id}-${index + 1}`), [id]);
+
+  // The first slot is what a `<label>` targets and where focus lands, so it takes the field's
+  // name instead of its positional one; otherwise its accessible name would contradict the
+  // visible label. With no name here the slot is left to a native `<label>`.
+  const ariaLabel = otherProps['aria-label'];
+  const ariaLabelledBy = otherProps['aria-labelledby'];
+  const firstInputLabel = useMemo<FirstInputLabel | undefined>(() => {
+    if (ariaLabelledBy) {
+      return { 'aria-labelledby': ariaLabelledBy };
+    }
+    if (ariaLabel) {
+      return { 'aria-label': ariaLabel };
+    }
+    return undefined;
+  }, [ariaLabel, ariaLabelledBy]);
 
   const [rawValue, setRawValue] = useControllableState(valueProp, defaultValue, onValueChange);
   // Never let out-of-range or disallowed characters reach the slots, even from a
@@ -140,6 +168,7 @@ export function OtpRoot(props: OtpProps) {
       value,
       length,
       disabled,
+      required,
       complete,
       pattern,
       mask,
@@ -147,6 +176,8 @@ export function OtpRoot(props: OtpProps) {
       activeIndex,
       clear,
       focus,
+      getInputId,
+      firstInputLabel,
       registerInput,
       setValue,
       queueFocus,
@@ -157,6 +188,7 @@ export function OtpRoot(props: OtpProps) {
       value,
       length,
       disabled,
+      required,
       complete,
       pattern,
       mask,
@@ -164,6 +196,8 @@ export function OtpRoot(props: OtpProps) {
       activeIndex,
       clear,
       focus,
+      getInputId,
+      firstInputLabel,
       registerInput,
       setValue,
       queueFocus,
@@ -185,6 +219,7 @@ export function OtpRoot(props: OtpProps) {
             name={name}
             value={value}
             readOnly
+            disabled={disabled}
             aria-hidden='true'
             tabIndex={-1}
             autoComplete='one-time-code'

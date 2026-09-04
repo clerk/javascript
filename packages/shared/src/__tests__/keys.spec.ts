@@ -81,7 +81,7 @@ describe('parsePublishableKey(key)', () => {
 
   it('throws an error if the publishable key is missing, when fatal: true', () => {
     expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
-      'Publishable key is missing. To create a Clerk application with valid keys, in your terminal run:\n\n  npx clerk@latest init',
+      'Publishable key is missing. To create a Clerk application with valid keys, in your terminal run:\n\nnpx clerk@latest init',
     );
   });
 
