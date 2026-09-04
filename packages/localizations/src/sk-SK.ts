@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: undefined,
     action__search: undefined,

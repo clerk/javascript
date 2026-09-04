@@ -6,6 +6,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 
 import { withRedirectToAfterSignUp } from '../../common';
+import { ActionBlockedCard } from '../../common';
 import { useCoreSignUp } from '../../contexts';
 import {
   Box,
@@ -101,6 +102,13 @@ function SignUpProtectCheckInternal({
   // shell for one paint. Must stay below every hook call.
   if (!signUp.protectCheck && !everSawProtectCheck) {
     return null;
+  }
+
+  // A block that arrives HERE is still terminal: the challenge was submitted and
+  // denied, so there is nothing to retry, and the runner's inline error would
+  // otherwise offer a Retry button for something that cannot succeed.
+  if (card.blockedDetails) {
+    return <ActionBlockedCard details={card.blockedDetails} />;
   }
 
   return (

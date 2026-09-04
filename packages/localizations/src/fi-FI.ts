@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Lisää uusi avain',
     action__search: 'Etsi avaimia',

@@ -150,6 +150,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formHeaderTitle',
   'formHeaderSubtitle',
 
+  'actionBlockedIconBox',
+  'actionBlockedIcon',
+  'actionBlockedLink',
+  'actionBlockedTraceIdBox',
+  'actionBlockedTraceIdLabel',
+  'actionBlockedTraceId',
   'verificationLinkStatusBox',
   'verificationLinkStatusIconBox',
   'verificationLinkStatusIcon',

@@ -26,6 +26,7 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import type { SignInStartIdentifier } from '../../common';
 import {
+  ActionBlockedCard,
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
@@ -593,6 +594,14 @@ function SignInStartInternal(): JSX.Element {
     lastAuthenticationStrategy && totalEnabledAuthMethods > 1
       ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
       : false;
+
+  // A blocked request is terminal — no field to correct, no retry that helps —
+  // so it replaces the card rather than showing an inline error beside a form
+  // the user cannot resubmit. Detection lives in card state, so every path
+  // that reports an error here is covered.
+  if (card.blockedDetails) {
+    return <ActionBlockedCard details={card.blockedDetails} />;
+  }
 
   return (
     <Flow.Part part='start'>

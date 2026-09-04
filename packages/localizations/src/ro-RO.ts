@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Adaugă cheie nouă',
     action__search: 'Caută chei',
