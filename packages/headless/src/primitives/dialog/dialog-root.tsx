@@ -74,7 +74,7 @@ export interface DialogProps<Payload = unknown> {
    * open programmatically as if a given trigger had been activated.
    */
   triggerId?: string | null;
-  /** Content, or a function of `{ payload }` — the `payload` of the active trigger — for per-trigger content. */
+  /** Content, or a function of `{ payload }` — the active trigger's, or the one `handle.open()` supplied. */
   children: ReactNode | ((ctx: { payload: Payload | undefined }) => ReactNode);
 }
 
@@ -98,6 +98,10 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   // consumed by the floating `onOpenChange` the request funnels into.
   const pendingDetailsRef = useRef<DialogOpenChangeDetails | null>(null);
 
+  // The payload of the most recent programmatic `handle.open(payload)`, kept so the registry
+  // lookup below has something to fall back to when no trigger is involved.
+  const directPayloadRef = useRef<Payload | undefined>(undefined);
+
   // Every open/close funnels through `floatingContext.onOpenChange` — trigger activations,
   // dismissals, and programmatic `setOpen` alike. floating-ui emits its `openchange` event
   // synchronously before invoking this callback, which is what lets listeners (`useReturnFocus`,
@@ -119,6 +123,9 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       openFromTrigger: (id, event) => {
         const registration = store.getTrigger(id);
         setActiveTriggerId(id);
+        // A trigger names its own payload, so it supersedes anything a previous programmatic
+        // open supplied — otherwise the stale one would resurface through the effect below.
+        directPayloadRef.current = undefined;
         setActivePayload(registration?.getPayload());
         if (registration) {
           refs.setReference(registration.element);
@@ -131,7 +138,21 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
         pendingDetailsRef.current = { trigger: registration?.element ?? null, triggerId: id, event };
         floatingContext.onOpenChange(false, event, 'click');
       },
-      setOpen: nextOpen => floatingContext.onOpenChange(nextOpen),
+      setOpen: (nextOpen, payload) => {
+        // Held in a ref as well as in state because the payload effect below re-runs on `open`
+        // and would otherwise resolve a trigger-less open to `undefined`, wiping this a commit
+        // after it was set. Cleared on close as well, so the next payload-less open does not
+        // resurface this one.
+        directPayloadRef.current = payload;
+        // Published only on the way IN. A close carries no payload, and writing it would blank
+        // the children-as-function while the popup is still mounted for its exit transition —
+        // rendering the dialog empty as it leaves, or throwing in a consumer that dereferences
+        // the payload. The next open sets it afresh.
+        if (nextOpen) {
+          setActivePayload(payload);
+        }
+        floatingContext.onOpenChange(nextOpen);
+      },
     });
     // `floatingContext` is rebuilt on open/element changes; re-registering is an idempotent swap.
   }, [store, refs, floatingContext, setActiveTriggerId]);
@@ -155,9 +176,21 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   // `defaultOpen` — the payload is looked up from the registry once the dialog is open. Runs
   // after the children's layout effects, so triggers rendered inside the root are registered by
   // the time it reads, and the pre-paint re-render delivers their payload on the first frame.
+  //
+  // An explicit programmatic payload wins over the registry lookup: `activeTriggerId` is never
+  // reset on close, so once any trigger has opened the dialog the lookup would otherwise overwrite
+  // every later `handle.open(payload)` with that trigger's payload. The mirror already holds —
+  // `openFromTrigger` clears `directPayloadRef`, so a trigger wins the other way.
   useLayoutEffect(() => {
     if (open) {
-      setActivePayload(activeTriggerId != null ? store.getTrigger(activeTriggerId)?.getPayload() : undefined);
+      const direct = directPayloadRef.current;
+      setActivePayload(
+        direct !== undefined
+          ? direct
+          : activeTriggerId != null
+            ? store.getTrigger(activeTriggerId)?.getPayload()
+            : undefined,
+      );
     }
   }, [store, open, activeTriggerId]);
 
@@ -205,6 +238,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       returnFocusRef,
       store,
       modal,
+      role: ariaRole,
       isNested,
       isStacked: nesting.isStacked,
       stackedChildCount: nesting.stackedChildCount,
@@ -222,6 +256,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       returnFocusRef,
       store,
       modal,
+      ariaRole,
       isNested,
       nesting.isStacked,
       nesting.stackedChildCount,

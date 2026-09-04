@@ -1,0 +1,31 @@
+import * as Stories from './user-profile-account-section.stories';
+
+# UserProfileAccountSection
+
+Account details, profile image, email addresses, and phone numbers composed with `Section`. The
+`allowMultipleAccounts` flag controls whether contact methods appear inline or in dedicated sections.
+
+## Single account
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+  ]}
+/>
+
+## Multiple accounts
+
+<Story
+  name='MultipleAccounts'
+  storyModule={Stories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Icon', href: '/components/icon', layer: 'Components' },
+  ]}
+/>

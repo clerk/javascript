@@ -5,7 +5,7 @@ import { useMosaicIcons } from '../../icons/overrides';
 import type { IconName } from '../../icons/registry';
 import { iconRegistry } from '../../icons/registry';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../reset.styles';
+import { reset } from '../../utils/reset.styles';
 import { iconScope } from './icon.markers.stylex';
 import { sizes, styles } from './icon.styles';
 
