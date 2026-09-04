@@ -153,6 +153,7 @@ function Root<Payload = unknown>({
   open,
   defaultOpen,
   onOpenChange,
+  onOpenChangeComplete,
   modal,
   children,
   ...rest
@@ -172,6 +173,7 @@ function Root<Payload = unknown>({
         open={inline ? true : open}
         defaultOpen={inline ? undefined : defaultOpen}
         onOpenChange={inline ? undefined : onOpenChange}
+        onOpenChangeComplete={inline ? undefined : onOpenChangeComplete}
       >
         {children}
       </Primitive.Root>

@@ -107,12 +107,7 @@ export function DiscardChanges() {
   const onOpenChange = useConfirmedClose({
     handle: confirm,
     when: () => value.trim() !== '',
-    onOpenChange: next => {
-      setOpen(next);
-      if (!next) {
-        setValue('');
-      }
-    },
+    onOpenChange: setOpen,
     confirm: {
       title: 'Discard changes?',
       description: 'You have not finished adding this address. It will not be saved.',
@@ -127,6 +122,11 @@ export function DiscardChanges() {
       closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
+      onOpenChangeComplete={next => {
+        if (!next) {
+          setValue('');
+        }
+      }}
     >
       <Dialog.Trigger render={addEmailTrigger} />
       <Dialog.Popup>
@@ -565,6 +565,71 @@ export function CustomFocus() {
           ref={feedbackRef}
           placeholder='Feedback'
         />
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+/**
+ * What the popup shows is held through the exit. The parent here resets the "saved" state the
+ * instant it closes the dialog, the way a machine returning to `idle` would; without the hold, the
+ * spinner and the typed name would snap back to their blank state under the fade. The second
+ * button closes from inside `startTransition` — React 19 form actions do the same — so the exit
+ * has to work as a transition too.
+ */
+export function ExitHold() {
+  const [open, setOpen] = React.useState(false);
+  const [name, setName] = React.useState('');
+  const [status, setStatus] = React.useState<'idle' | 'saving' | 'saved'>('idle');
+
+  const save = (close: (fn: () => void) => void) => {
+    setStatus('saving');
+    setTimeout(() => {
+      close(() => {
+        setStatus('saved');
+        setOpen(false);
+      });
+    }, 600);
+  };
+
+  return (
+    <Dialog.Root
+      open={open}
+      onOpenChange={setOpen}
+      onOpenChangeComplete={next => {
+        if (!next) {
+          setName('');
+          setStatus('idle');
+        }
+      }}
+    >
+      <Dialog.Trigger render={props => <Button {...props}>Rename workspace</Button>} />
+      <Dialog.Popup>
+        <Dialog.CloseButton />
+        <Dialog.Title render={<Heading size='sm' />}>Rename workspace</Dialog.Title>
+        <Dialog.Description render={<Text />}>
+          {status === 'saved' ? 'Saved.' : 'The name is cleared and the status reset once the dialog has closed.'}
+        </Dialog.Description>
+        <Input
+          placeholder='Workspace name'
+          value={name}
+          disabled={status !== 'idle'}
+          onChange={event => setName(event.target.value)}
+        />
+        <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+        <Button
+          disabled={name === '' || status !== 'idle'}
+          onClick={() => save(fn => fn())}
+        >
+          {status === 'saving' ? 'Saving…' : 'Save'}
+        </Button>
+        <Button
+          variant='outline'
+          disabled={name === '' || status !== 'idle'}
+          onClick={() => save(fn => React.startTransition(fn))}
+        >
+          {status === 'saving' ? 'Saving…' : 'Save in a transition'}
+        </Button>
       </Dialog.Popup>
     </Dialog.Root>
   );
