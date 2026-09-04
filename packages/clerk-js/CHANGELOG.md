@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.31.1
+
+### Patch Changes
+
+- Update the `@tanstack/query-core` dependency range to `^5.101.4`. ([#8577](https://github.com/clerk/javascript/pull/8577)) by [@renovate](https://github.com/apps/renovate)
+
+- Complete local sign-out while offline when cached resources surface a network error. ([#9663](https://github.com/clerk/javascript/pull/9663)) by [@swolfand](https://github.com/swolfand)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+
 ## 6.31.0
 
 ### Minor Changes

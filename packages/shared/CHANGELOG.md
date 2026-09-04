@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.31.1
+
+### Patch Changes
+
+- Update the `@tanstack/query-core` dependency range to `^5.101.4`. ([#8577](https://github.com/clerk/javascript/pull/8577)) by [@renovate](https://github.com/apps/renovate)
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Update the `js-cookie` dependency to 3.0.8. ([#9086](https://github.com/clerk/javascript/pull/9086)) by [@renovate](https://github.com/apps/renovate)
+
 ## 4.31.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.6.6
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.2` to `1.5.3`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.3. ([#9666](https://github.com/clerk/javascript/pull/9666)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`f4bc807`](https://github.com/clerk/javascript/commit/f4bc8071823625d6f1f5e5411d6af4719aae7d33), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/clerk-js@6.31.1
+  - @clerk/shared@4.31.1
+  - @clerk/react@6.15.2
+
 ## 4.6.5
 
 ### Patch Changes
