@@ -22,7 +22,7 @@ export const $csrState = map<{
   organization: undefined,
 });
 
-export const $initialState = map<InitialState>();
+export const $initialState = map<InitialState>({} as InitialState); // nanostores 1.5 types a bare map() as Partial<Value>
 
 // Use atom instead of `map` to prohibit key changes and allow only replacing the whole object
 export const $clerk = atom<Clerk | null>(null);
