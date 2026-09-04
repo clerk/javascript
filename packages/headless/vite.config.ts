@@ -24,6 +24,7 @@ export default defineConfig({
         'primitives/dialog/index': 'src/primitives/dialog/index.ts',
         'primitives/drawer/index': 'src/primitives/drawer/index.ts',
         'primitives/file-upload/index': 'src/primitives/file-upload/index.ts',
+        'primitives/flow/index': 'src/primitives/flow/index.ts',
         'primitives/otp/index': 'src/primitives/otp/index.ts',
         'utils/index': 'src/utils/index.ts',
         'hooks/index': 'src/hooks/index.ts',
