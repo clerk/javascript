@@ -1,5 +1,6 @@
 export { type AutocompleteProps, AutocompleteRoot as Root } from './autocomplete-root';
 export { type AutocompleteInputProps, AutocompleteInput as Input } from './autocomplete-input';
+export { type AutocompleteTriggerProps, AutocompleteTrigger as Trigger } from './autocomplete-trigger';
 export { type AutocompletePortalProps, AutocompletePortal as Portal } from './autocomplete-portal';
 export { type AutocompletePositionerProps, AutocompletePositioner as Positioner } from './autocomplete-positioner';
 export { type AutocompletePopupProps, AutocompletePopup as Popup } from './autocomplete-popup';

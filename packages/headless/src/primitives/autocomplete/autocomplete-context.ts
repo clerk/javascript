@@ -25,11 +25,15 @@ export interface AutocompleteContextValue {
   elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
   labelsRef: React.MutableRefObject<Array<string | null>>;
   popupRef: React.RefObject<HTMLDivElement | null>;
+  triggerRef: React.MutableRefObject<HTMLButtonElement | null>;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
   setInlineMode: React.Dispatch<React.SetStateAction<boolean>>;
   handleSelect: (value: string, index: number, label: string) => void;
   handleInputChange: (value: string) => void;
+  setOpen: (open: boolean) => void;
+  focusInput: () => void;
+  popupId: string | undefined;
   registerSelectedIndex: (index: number, value: string) => void;
   mounted: boolean;
   transitionProps: TransitionProps;

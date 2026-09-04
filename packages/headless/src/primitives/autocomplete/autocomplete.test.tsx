@@ -78,6 +78,40 @@ function StaticAutocomplete(props: Partial<React.ComponentProps<typeof Autocompl
 
 describe('Autocomplete', () => {
   describe('open/close', () => {
+    it('toggles from a popup button while keeping focus on the input', async () => {
+      const user = userEvent.setup();
+      const onOpenChange = vi.fn();
+      render(
+        <Autocomplete.Root onOpenChange={onOpenChange}>
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.Trigger aria-label='Toggle fruit options' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Option value='apple'>Apple</Autocomplete.Option>
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      const input = screen.getByRole('combobox');
+      const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
+      expect(trigger).toHaveAttribute('tabindex', '-1');
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+      await user.click(trigger);
+
+      const listbox = screen.getByRole('listbox');
+      expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      expect(trigger).toHaveAttribute('aria-controls', listbox.id);
+      expect(input).toHaveFocus();
+
+      await user.click(trigger);
+
+      expect(onOpenChange).toHaveBeenLastCalledWith(false);
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expect(input).toHaveFocus();
+    });
+
     it('opens when user types', async () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);

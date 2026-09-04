@@ -68,6 +68,7 @@ function AutocompleteInner(props: AutocompleteProps) {
   const labelsRef = useRef<Array<string | null>>([]);
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
   const registerSelectedIndex = useCallback(
     (index: number, value: string) => {
@@ -125,7 +126,13 @@ function AutocompleteInner(props: AutocompleteProps) {
 
   const dismiss = useDismiss(floatingContext, {
     escapeKey: !inlineMode,
-    outsidePress: !inlineMode,
+    outsidePress(event) {
+      if (inlineMode) {
+        return false;
+      }
+      const target = event.target;
+      return !(target instanceof Node && triggerRef.current?.contains(target));
+    },
     bubbles: {
       escapeKey: inlineMode,
       outsidePress: inlineMode,
@@ -143,6 +150,15 @@ function AutocompleteInner(props: AutocompleteProps) {
   });
 
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav]);
+  const referenceProps = getReferenceProps();
+  const popupId = typeof referenceProps['aria-controls'] === 'string' ? referenceProps['aria-controls'] : undefined;
+
+  const focusInput = useCallback(() => {
+    const input = refs.domReference.current;
+    if (input instanceof HTMLElement) {
+      input.focus();
+    }
+  }, [refs.domReference]);
 
   const handleSelect = useCallback(
     (value: string, index: number, label: string) => {
@@ -186,11 +202,15 @@ function AutocompleteInner(props: AutocompleteProps) {
       elementsRef,
       labelsRef,
       popupRef,
+      triggerRef,
       arrowRef,
       valuesByIndexRef,
       setInlineMode,
       handleSelect,
       handleInputChange,
+      setOpen,
+      focusInput,
+      popupId,
       registerSelectedIndex,
       mounted,
       transitionProps,
@@ -210,6 +230,9 @@ function AutocompleteInner(props: AutocompleteProps) {
       selectedIndex,
       handleSelect,
       handleInputChange,
+      setOpen,
+      focusInput,
+      popupId,
       registerSelectedIndex,
       mounted,
       transitionProps,

@@ -24,6 +24,16 @@ export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
+export { Combobox } from '../components/combobox';
+export type {
+  ComboboxEmptyProps,
+  ComboboxInputProps,
+  ComboboxListProps,
+  ComboboxOptionProps,
+  ComboboxPopupProps,
+  ComboboxRootProps,
+  ComboboxSize,
+} from '../components/combobox';
 export { Dialog, createConfirmHandle, useConfirmedClose } from '../components/dialog';
 export type {
   ConfirmHandle,

@@ -25,6 +25,7 @@ function MyAutocomplete() {
       onInputValueChange={setInputValue}
     >
       <Autocomplete.Input placeholder='Search fruits...' />
+      <Autocomplete.Trigger aria-label='Toggle fruit options'>⌄</Autocomplete.Trigger>
       <Autocomplete.Positioner>
         <Autocomplete.Popup>
           {filtered.map(fruit => (
@@ -75,6 +76,7 @@ In this pattern, keep the outer `Popover` or `Dialog` as the source of truth for
 | ------------------------- | --------------- | ---------------------------------------- |
 | `Autocomplete.Root`       | —               | Root context provider                    |
 | `Autocomplete.Input`      | `<input>`       | Text input that drives filtering         |
+| `Autocomplete.Trigger`    | `<button>`      | Pointer-accessible popup toggle          |
 | `Autocomplete.Portal`     | —               | Portals children (accepts `root` prop)   |
 | `Autocomplete.Positioner` | `<div>`         | Floating positioned container            |
 | `Autocomplete.Popup`      | `<div>`         | Visual wrapper for the option list       |
@@ -108,7 +110,7 @@ In this pattern, keep the outer `Popover` or `Dialog` as the source of truth for
 | `label`    | `string`  | falls back to `value` | Display label, also used for input text on selection |
 | `disabled` | `boolean` | —                     | Prevents selection                                   |
 
-### `Autocomplete.Input`, `Autocomplete.Positioner`, `Autocomplete.Popup`, `Autocomplete.List`
+### `Autocomplete.Input`, `Autocomplete.Trigger`, `Autocomplete.Positioner`, `Autocomplete.Popup`, `Autocomplete.List`
 
 No additional props beyond standard HTML attributes and the `render` prop.
 
@@ -131,7 +133,7 @@ Navigation loops and auto-scrolls the active option into view.
 
 | Attribute                   | Applies To        | Description                     |
 | --------------------------- | ----------------- | ------------------------------- |
-| `data-open` / `data-closed` | Input             | Popup open state                |
+| `data-open` / `data-closed` | Input, Trigger    | Popup open state                |
 | `data-selected`             | Option            | The currently selected option   |
 | `data-active`               | Option            | The keyboard-highlighted option |
 | `data-disabled`             | Option            | Disabled option                 |
@@ -140,6 +142,7 @@ Navigation loops and auto-scrolls the active option into view.
 ## Open/Close Behavior
 
 - Typing a non-empty string opens the popup automatically.
+- Activating `Trigger` toggles the popup and returns focus to the input.
 - Clearing the input closes the popup.
 - Clicking an option closes the popup and returns focus to the input.
 - Outside click and Escape close the popup.
@@ -147,5 +150,6 @@ Navigation loops and auto-scrolls the active option into view.
 ## ARIA
 
 - Input: `aria-autocomplete="list"`, `aria-activedescendant` (virtual focus)
+- Trigger: `tabindex="-1"`, `aria-controls`, `aria-expanded`
 - Options: `role="option"`, `aria-selected`, `aria-disabled`
 - Focus manager: non-modal, `initialFocus={-1}` (focus stays on input)
