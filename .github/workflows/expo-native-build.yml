@@ -187,6 +187,15 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Set up Gradle cache
+        if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
+        uses: gradle/actions/setup-gradle@4733eaac7c1b0da527e4206b7671e0061de1ce37 # v6.3.0
+        with:
+          # This workflow never runs on main, so the default (write from main
+          # only) would never seed the cache.
+          cache-read-only: false
+          add-job-summary: on-failure
+
       - name: Prebuild Android fixture
         if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
         working-directory: ${{ env.FIXTURE_DIR }}
@@ -295,6 +304,11 @@ jobs:
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
+          # The one-time keyboard tutorial sheets carry their own Continue
+          # button, which can hijack taps on the AuthView's Continue.
+          for key in DidShowContinuousPathIntroduction DidShowGestureKeyboardIntroduction KeyboardDidShowProductivityTutorial UIKeyboardDidShowInternationalInfoIntroduction; do
+            xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.preferences "$key" -bool YES || true
+          done
           xcrun simctl install "$SIM_UDID" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
           # Stream the app's console output into the debug artifact so a hang has
           # actionable evidence (keychain/network errors) instead of just screenshots.

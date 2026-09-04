@@ -44,7 +44,7 @@ const colorDefaults = {
   '--cl-color-warning-foreground': 'oklch(0.985 0 0)',
   '--cl-color-warning-faded': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
 
-  '--cl-color-background': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+  '--cl-color-background': 'light-dark(oklch(0.985 0 0), oklch(0.2686 0 0))',
 
   '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
   '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
@@ -53,7 +53,9 @@ const colorDefaults = {
   '--cl-color-input-placeholder': '#a3a3a3',
 
   '--cl-color-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
-  '--cl-color-border-faded': 'light-dark(oklch(0.9587 0.0027 286.35), oklch(0.296 0.0126 285.61))',
+  '--cl-color-border-faded': 'light-dark(oklch(0.9702 0 0), oklch(0.296 0.0126 285.61))',
+
+  '--cl-color-ring': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
 } as const;
 
 export const colorVars = stylex.defineVars(colorDefaults);
@@ -205,14 +207,76 @@ export const space = stylex.defineVars({
   '4': step(4),
   '4.5': step(4.5),
   '5': step(5),
+  '5.5': step(5.5),
   '6': step(6),
+  '6.5': step(6.5),
   '7': step(7),
+  '7.5': step(7.5),
   '8': step(8),
+  '8.5': step(8.5),
   '9': step(9),
+  '9.5': step(9.5),
   '10': step(10),
+  '10.5': step(10.5),
   '11': step(11),
+  '11.5': step(11.5),
   '12': step(12),
+  '12.5': step(12.5),
   '13': step(13),
+  '13.5': step(13.5),
+  '14': step(14),
+  '14.5': step(14.5),
+  '15': step(15),
+  '15.5': step(15.5),
+  '16': step(16),
+  '16.5': step(16.5),
+  '17': step(17),
+  '17.5': step(17.5),
+  '18': step(18),
+  '18.5': step(18.5),
+  '19': step(19),
+  '19.5': step(19.5),
+  '20': step(20),
+  '20.5': step(20.5),
+  '21': step(21),
+  '21.5': step(21.5),
+  '22': step(22),
+  '22.5': step(22.5),
+  '23': step(23),
+  '23.5': step(23.5),
+  '24': step(24),
+  '24.5': step(24.5),
+  '25': step(25),
+  '25.5': step(25.5),
+  '26': step(26),
+  '26.5': step(26.5),
+  '27': step(27),
+  '27.5': step(27.5),
+  '28': step(28),
+  '28.5': step(28.5),
+  '29': step(29),
+  '29.5': step(29.5),
+  '30': step(30),
+  '30.5': step(30.5),
+  '31': step(31),
+  '31.5': step(31.5),
+  '32': step(32),
+  '32.5': step(32.5),
+  '33': step(33),
+  '33.5': step(33.5),
+  '34': step(34),
+  '34.5': step(34.5),
+  '35': step(35),
+  '35.5': step(35.5),
+  '36': step(36),
+  '36.5': step(36.5),
+  '37': step(37),
+  '37.5': step(37.5),
+  '38': step(38),
+  '38.5': step(38.5),
+  '39': step(39),
+  '39.5': step(39.5),
+  '40': step(40),
 });
 
 // =============================================================================
@@ -329,3 +393,22 @@ const easingDefaults = {
 } as const;
 
 export const easingVars = stylex.defineVars(easingDefaults);
+
+// =============================================================================
+// Focus Tokens
+// =============================================================================
+// The keyboard focus ring, as one definition for the whole system. Components read
+// these through `utils/focus-outline.styles.ts`; the `:focus-visible` condition stays
+// there, so a theme can restyle the ring but cannot show it to pointer users.
+//
+// The colour is NOT restated here: it is `--cl-color-ring`, which lives with the other
+// colours. A `--cl-focus-outline-color` alias would be a second public name for the same
+// value, and the two would drift the moment a consumer overrode one of them.
+
+const focusDefaults = {
+  '--cl-focus-outline-width': '2px',
+  '--cl-focus-outline-style': 'solid',
+  '--cl-focus-outline-offset': '2px',
+} as const;
+
+export const focusVars = stylex.defineVars(focusDefaults);

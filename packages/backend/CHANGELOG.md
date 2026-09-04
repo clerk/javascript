@@ -1,5 +1,79 @@
 # Change Log
 
+## 3.17.1
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/shared@4.31.0
+
+## 3.17.0
+
+### Minor Changes
+
+- Add experimental methods for sending and retrieving internal transactional emails, including Clerk suppression state and reasons. ([#9553](https://github.com/clerk/javascript/pull/9553)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Reject JWT-template tokens presented as session tokens in the `Authorization` header when `acceptsToken` is `'any'` or an array that includes `'session_token'`. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token, matching the existing `acceptsToken: 'session_token'` behavior. ([#9511](https://github.com/clerk/javascript/pull/9511)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.16.13
+
+### Patch Changes
+
+- Align JSDoc link targets with the docs link rules: internal docs links don't open in a new tab (removed `{{ target: '_blank' }}` from the `Invitation` Metadata link), while API reference links do (added it to the `ExternalAccount` Backend API link and the `currentUser()` endpoint link). ([#9556](https://github.com/clerk/javascript/pull/9556)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/shared@4.30.2
+
+## 3.16.12
+
+### Patch Changes
+
+- Updated dependencies [[`dbaa95a`](https://github.com/clerk/javascript/commit/dbaa95a4e9e2ebd0a6b7fdb266024490a35b7caf)]:
+  - @clerk/shared@4.30.1
+
+## 3.16.11
+
+### Patch Changes
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+
+## 3.16.10
+
+### Patch Changes
+
+- Mark the internal `createBootstrapSignedOutState` as deprecated. It is no longer used by `@clerk/nextjs` and is kept only for older published SDK versions. ([#9493](https://github.com/clerk/javascript/pull/9493)) by [@djgould](https://github.com/djgould)
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+
+## 3.16.9
+
+### Patch Changes
+
+- Reject JWT-template tokens where a session or handshake token is expected. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token in the `Authorization` header or `__session` cookie. Tokens with no category tag, and instances configured to omit it, are unaffected. ([#9469](https://github.com/clerk/javascript/pull/9469)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.16.8
+
+### Patch Changes
+
+- Scope the JWKS cache per Clerk instance. The cache was keyed on the JWT `kid` alone and shared across the whole process, so an application verifying tokens for more than one Clerk instance (for example the Dynamic Keys / multi-tenant pattern) could resolve a signing key that was fetched for a different instance. Keys are now cached separately per secret key and API URL, so a token can only be verified against the instance whose credentials fetched its signing key. ([#9394](https://github.com/clerk/javascript/pull/9394)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+  Networkless verification with `jwtKey` had the same flaw: the JWK derived from the PEM was cached by `kid` alone, so a process verifying tokens with different `jwtKey` values could resolve a key derived from another instance's PEM. The JWK is now always derived from the `jwtKey` that was passed in.
+
+  The `jwk-kid-mismatch` error message no longer lists the key IDs currently held in the cache.
+
+## 3.16.7
+
+### Patch Changes
+
+- Fix `Cookie` header parsing in `authenticateRequest()` to follow RFC 6265 and guard against a non-string `iss`. Legitimate cookies and JWTs are unaffected. ([#9466](https://github.com/clerk/javascript/pull/9466)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+
 ## 3.16.6
 
 ### Patch Changes

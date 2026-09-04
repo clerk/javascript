@@ -17,8 +17,9 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-button.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Button',
   title: 'UserButton',
+  label: 'User button',
   source: 'packages/ui/src/mosaic/user-button/user-button.view.tsx',
 };
 
@@ -142,9 +143,19 @@ const LATENCY_MS = 800;
  * The actions that would navigate somewhere in a real app (Manage, Invite, Create organization, Add
  * account) have nowhere to go here, so they only close the popover.
  */
-function usePrototype(): Omit<UserButtonProps, 'mode'> {
+function usePrototype({
+  hidePersonal = false,
+  startWithoutOrganization = false,
+}: {
+  hidePersonal?: boolean;
+  startWithoutOrganization?: boolean;
+} = {}): Omit<UserButtonProps, 'mode'> {
   const [open, setOpen] = useState(false);
-  const [accounts, setAccounts] = useState(initialAccounts);
+  const [accounts, setAccounts] = useState(() =>
+    startWithoutOrganization
+      ? initialAccounts.map(a => (a.session.sessionId === colin.sessionId ? { ...a, activeOrganizationId: null } : a))
+      : initialAccounts,
+  );
   const [activeSessionId, setActiveSessionId] = useState(colin.sessionId);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
 
@@ -195,6 +206,7 @@ function usePrototype(): Omit<UserButtonProps, 'mode'> {
     suggestions: account.suggestions,
     invitations: account.invitations,
     additionalSessions: accounts.filter(a => a.session.sessionId !== activeSessionId).map(a => a.session),
+    hidePersonal,
     // Selecting an organization only ever acts on the active account, and is the one action that
     // closes the surface behind it.
     onSelectOrganization: organizationId =>
@@ -299,6 +311,19 @@ export function User(_args: Record<string, unknown>) {
   );
 }
 
+export function NoOrganizationSelected(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true, startWithoutOrganization: true });
+
+  // Personal is withheld and nothing is active, so the lead is no selection — not the account.
+  // Picking an organization leaves it.
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+    />
+  );
+}
+
 export function SingleSession(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
@@ -324,8 +349,8 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
     <UserButtonView
       {...prototype}
       mode='combined'
-      // With another account to switch to, the Accounts heading carries "Add account" instead of the
-      // foot. One account leaves both built-in rows here, which is what there is to order.
+      // One account resolves the accounts row to "Add account", which is the form `menuItemOrder`
+      // names by either id.
       additionalSessions={[]}
       customMenuItems={[
         {

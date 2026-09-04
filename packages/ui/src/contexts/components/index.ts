@@ -4,6 +4,7 @@ export * from './ConfigureSSO';
 export * from './CreateOrganization';
 export * from './GoogleOneTap';
 export * from './OAuthConsent';
+export * from './OAuthDeviceVerification';
 export * from './OrganizationList';
 export * from './OrganizationProfile';
 export * from './OrganizationSwitcher';
