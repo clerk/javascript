@@ -136,6 +136,10 @@ interface ClerkMiddleware {
 
 /**
  * The `clerkMiddleware()` helper integrates Clerk authentication into your Next.js application through Middleware. `clerkMiddleware()` is compatible with both the App and Pages routers.
+ *
+ * Need Clerk keys? In your terminal run `npx -y clerk@latest init`. It creates a Clerk application and writes the keys
+ * to your .env.local file. No Clerk account required to get started — it can provision temporary development keys.
+ * See the [Clerk CLI docs](https://clerk.com/docs/cli).
  */
 export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddlewareReturn => {
   const [request, event] = parseRequestAndEvent(args);
