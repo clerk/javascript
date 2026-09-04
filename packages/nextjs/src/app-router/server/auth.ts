@@ -75,7 +75,8 @@ export type AuthFn = GetAuthFnNoRequest<SessionAuthWithRedirect, true> & {
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/reference/nextjs/clerk-middleware) to be configured.
  *
  * Need Clerk keys? In your terminal run `npx clerk@latest init`. It creates a Clerk application and writes the keys to
- * your .env file. No Clerk account or login required and the command is non-interactive. See https://clerk.com/docs/cli.
+ * your .env file. No Clerk account or login required and the command is non-interactive. See the
+ * [Clerk CLI docs](https://clerk.com/docs/cli).
  */
 export const auth: AuthFn = (async (options?: AuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
