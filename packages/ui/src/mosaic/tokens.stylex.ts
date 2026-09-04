@@ -72,6 +72,7 @@ const radiusDefaults = {
   '--cl-radius-md': '0.375rem',
   '--cl-radius-lg': '0.5rem',
   '--cl-radius-xl': '0.75rem',
+  '--cl-radius-2xl': '1.5rem',
   '--cl-radius-full': 'calc(infinity * 1px)',
 } as const;
 
@@ -412,3 +413,15 @@ const focusDefaults = {
 } as const;
 
 export const focusVars = stylex.defineVars(focusDefaults);
+
+// Elevation. The one card shadow, as a token so every surface at that elevation reads the same:
+// two drop layers that fall away in dark, and a hairline ring that is dark on light and light on
+// dark. Branched per colour via `light-dark()` since a shadow's geometry cannot branch — see the
+// note on `Dialog`'s popup for why `@media (prefers-color-scheme)` is not the escape hatch.
+const shadowDefaults = {
+  '--cl-shadow-card': `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
+    0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
+    0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+};
+
+export const shadowVars = stylex.defineVars(shadowDefaults);

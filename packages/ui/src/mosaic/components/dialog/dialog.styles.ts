@@ -37,7 +37,7 @@ export const styles = stylex.create({
   // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
   // than darkening it — and it read as haze over the page rather than as a surface lifting off it.
   //
-  // A dialog opened over a `panel` or a `card` paints its OWN scrim, lighter than the base because
+  // A dialog opened over a `profile` or a `card` paints its OWN scrim, lighter than the base because
   // the two COMPOSITE: alpha over alpha is `1 − (1 − a)(1 − b)`, so the nested value is solved for
   // the intended total rather than picked by eye — `1 − 0.32/0.6 = 0.4667` lands two levels on
   // 0.68. That is what separates a surface from the one it was opened from.
@@ -65,10 +65,10 @@ export const styles = stylex.create({
    * A prompt stacked on a prompt paints NO scrim — one serves the whole stack.
    *
    * The two cases are different relationships, not one at two strengths. A prompt opened over a
-   * panel is a new surface over a page-like one, and a scrim of its own is what says so. A prompt
+   * profile is a new surface over a page-like one, and a scrim of its own is what says so. A prompt
    * over a prompt is the same conversation continuing one step further in, and darkening the page
    * again for it makes depth a function of stack count: the composite compounds, so the
-   * three-deep `panel -> prompt -> alert` this exists for would land on 0.83 against the 0.68 the
+   * three-deep `profile -> prompt -> alert` this exists for would land on 0.83 against the 0.68 the
    * nested value above was solved for. The stack reads through the surface beneath receding and
    * dimming instead.
    *
@@ -146,7 +146,7 @@ export const styles = stylex.create({
     // so it is inert until `acquireKeyboardInset` has something to report.
     paddingBlockEnd: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
     // A grid item's automatic minimum would otherwise hold this to its content and defeat the
-    // definite row `viewportSizes.panel` pins.
+    // definite row `viewportSizes.profile` pins.
     minHeight: 0,
     width: '100%',
   },
@@ -163,7 +163,7 @@ export const styles = stylex.create({
     paddingInline: 0,
   },
 
-  // The dialog surface. Unlike `Popover`, this one paints, because a `prompt` and a `panel` take
+  // The dialog surface. Unlike `Popover`, this one paints, because a `prompt` and a `profile` take
   // raw content rather than a `Card` and the surface has to come from somewhere. `sizes.card`
   // nulls the painting properties back out — see the note there.
   popup: {
@@ -187,7 +187,7 @@ export const styles = stylex.create({
      * stacked dialog holds focus, and `pointer-events: none` keeps it that way regardless.
      *
      * The variable itself is set per size — only `prompt` sets it, in `sizes` below — so this
-     * reads `0` on a `panel` or a `card`, which have a scrim of their own to separate them from
+     * reads `0` on a `profile` or a `card`, which have a scrim of their own to separate them from
      * what they host and would double up.
      */
     padding: space['6'],
@@ -260,9 +260,9 @@ export const styles = stylex.create({
    * participates in the column's `gap` and a consumer can render it anywhere in the children
    * without the layout moving.
    *
-   * It stays put on a `panel` because the popup itself never scrolls — see `sizes.panel`. An
+   * It stays put on a `profile` because the popup itself never scrolls — see `sizes.profile`. An
    * absolutely positioned child of a scroll container scrolls away with the content, so the
-   * scroll region has to live in the panel's children, not on the popup.
+   * scroll region has to live in the profile's children, not on the popup.
    *
    * Carried by a wrapper rather than by the button itself: `Button`'s touch target sets
    * `position` inside a media query, which compiles to a class the button's own `stylex.props`
@@ -293,12 +293,12 @@ export const styles = stylex.create({
  * Positions the ICON the surface's inset from the corner, not the button box: the `sm` circle
  * carries `(space[7] - space[4]) / 2` = `space[1.5]` of its own padding around the glyph, so each
  * inset runs that much shy of the distance the eye should read (`4` for prompt/card, `4.5` for
- * panel). The hit target hangs past the icon toward the corner, which only helps.
+ * profile). The hit target hangs past the icon toward the corner, which only helps.
  */
 export const closeInsets = stylex.create({
   prompt: { insetBlockStart: space['2.5'], insetInlineEnd: space['2.5'] },
   card: { insetBlockStart: space['2.5'], insetInlineEnd: space['2.5'] },
-  panel: { insetBlockStart: space['3'], insetInlineEnd: space['3'] },
+  profile: { insetBlockStart: space['3'], insetInlineEnd: space['3'] },
 });
 
 /**
@@ -308,12 +308,12 @@ export const closeInsets = stylex.create({
  *
  * `prompt` asks one thing and returns: a confirmation, or a single-field form like "add an email
  * address". `card` is the sign-in / sign-up surface, and matches the width of the legacy card
- * (`theme.sizes.$100`). `panel` is the account-profile and settings surface, which you navigate.
+ * (`theme.sizes.$100`). `profile` is the account-profile and settings surface, which you navigate.
  *
  * `card` sets only `max-width`; the popup is `width: 100%` and its height is whatever the
  * content needs, which is right for a confirmation or a two-field form.
  *
- * `panel` fixes the height. Its content NAVIGATES — a settings surface switches sections in
+ * `profile` fixes the height. Its content NAVIGATES — a settings surface switches sections in
  * place — and a content-driven height would resize the window on every section change, in both
  * directions at once since the viewport centres it. Its width is the surface's own.
  */
@@ -322,7 +322,7 @@ export const closeInsets = stylex.create({
  * "outside scroll" split, decided by size rather than by a prop because it follows from what each
  * surface already is.
  *
- * A `panel` is a fixed-height window you navigate inside, so it scrolls INSIDE: the viewport stays
+ * A `profile` is a fixed-height window you navigate inside, so it scrolls INSIDE: the viewport stays
  * pinned to the overlay and the surface scrolls its own region. A `prompt` and a `card` take their
  * height from their content and have no obvious region to scroll, so they scroll OUTSIDE: the
  * whole dialog moves within the overlay.
@@ -337,9 +337,9 @@ export const closeInsets = stylex.create({
 export const viewportSizes = stylex.create({
   prompt: { minHeight: '100%' },
   card: { minHeight: '100%' },
-  panel: {
+  profile: {
     // A definite container height is NOT enough on its own: an `auto` grid row still sizes to its
-    // content and happily exceeds the container, which is how a panel of rows measured 2208px
+    // content and happily exceeds the container, which is how a profile of rows measured 2208px
     // inside a 1251px overlay. `minmax(0, 1fr)` pins the single row to the content box, so the row
     // is what an item stretches to and what its overflow is measured against.
     //
@@ -347,7 +347,7 @@ export const viewportSizes = stylex.create({
     // exactly what has to stop happening for the popup to grow past the fold.
     gridTemplateRows: 'minmax(0, 1fr)',
     // A DEFINITE height, taken from the overlay (`position: fixed; inset: 0`), which makes the
-    // single grid row definite too. That is what lets `sizes.panel` fill the content box with
+    // single grid row definite too. That is what lets `sizes.profile` fill the content box with
     // `align-self: stretch` alone — no `dvh` arithmetic, so nothing can disagree with the box a
     // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
     // overlay measures 1251px while `100dvh` reports 844.
@@ -379,14 +379,27 @@ export const trackSizes = stylex.create({
     overflow: { [PHONE]: 'clip', default: null },
   },
   card: {},
-  // Same definite row as the viewport's, one level down, so the popup's `stretch` lands on it.
-  panel: { gridTemplateRows: 'minmax(0, 1fr)' },
+  profile: {
+    // Under the phone band a profile takes the whole screen: it is the page there, not a surface
+    // over one, and the frame it would float in is the surface's own. Both the var and the one
+    // longhand that reads it are restated in full — StyleX replaces a property's declaration
+    // wholesale, so the ladder from `styles.track` cannot be extended, only rewritten.
+    '--_cl-dialog-inset': {
+      [DESK]: space['8'],
+      [PHONE]: '0px',
+      [WIDE]: space['12'],
+      default: space['5'],
+    },
+    paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [PHONE]: 0, default: space['4'] },
+    // Same definite row as the viewport's, one level down, so the popup's `stretch` lands on it.
+    gridTemplateRows: 'minmax(0, 1fr)',
+  },
 });
 
 export const sizes = stylex.create({
   prompt: {
     // Read by the veil on `styles.popup`. Set here rather than there so it applies to `prompt`
-    // alone: a `panel` or a `card` hosting a dialog gets a scrim between the two instead, and
+    // alone: a `profile` or a `card` hosting a dialog gets a scrim between the two instead, and
     // would otherwise dim as well as darken.
     '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
     // Tighter than the popup's default 1.5rem. A prompt asks one thing, so its content box is
@@ -431,40 +444,40 @@ export const sizes = stylex.create({
     maxWidth: '25rem',
   },
   /**
-   * Like `card`, the panel does NOT paint itself. It is the account-profile and settings surface,
-   * which is a `ProfilePage` — so the frame comes from `ProfilePage.Root`'s own styles and the
-   * popup contributes geometry and motion only. Compose it by rendering the page INSIDE the popup:
+   * Like `card`, the profile does NOT paint itself. It is the account-profile and settings surface,
+   * which is a `Profile` — so the frame comes from `Profile.Root`'s own styles and the popup
+   * contributes geometry and motion only. Compose it by rendering the profile INSIDE the popup:
    *
-   *   <Dialog.Popup size='panel'><UserPageView … /></Dialog.Popup>
+   *   <Dialog.Popup size='profile'><UserProfileView … /></Dialog.Popup>
    *
-   * The page reads `DialogContext` from there — it names the dialog, carries its dismiss, and
+   * The profile reads `DialogContext` from there — it names the dialog, carries its dismiss, and
    * fills the popup's height — and that is also what makes `inline` a non-event for the surface:
    * modal or in a page slot, the page paints itself the same way, and the dialog only decides
    * where it sits. The `null`s remove the popup's own atoms outright — see the note on `card`.
    * The width cap matches the page's, the way `card` matches the `Card`.
    *
-   * Consequence worth knowing: `size="panel"` with no surface inside renders an unpainted box.
+   * Consequence worth knowing: `size="profile"` with no surface inside renders an unpainted box.
    */
-  panel: {
+  profile: {
     padding: null,
     borderColor: null,
     borderRadius: null,
     borderStyle: null,
     borderWidth: null,
     gap: null,
-    // The panel does NOT scroll itself, and that is the whole design. A fixed-height surface
+    // The profile does NOT scroll itself, and that is the whole design. A fixed-height surface
     // needs somewhere for overflow to go, but putting the scroll on the POPUP takes everything
     // anchored to it along for the ride — the close button most obviously. So the popup clips,
-    // and the scroll region is the surface's own: `ProfilePage` scrolls its content column.
+    // and the scroll region is the surface's own: `Profile` scrolls its content column.
     // Deliberately a flex column with no `align-items` override, so the surface inside stretches
     // to the popup's width and grows to its height.
     //
     // `clip` rather than `hidden` for the same reason as the viewport: `hidden` would make the
-    // panel a scroll container, and focusing anything inside it that sits outside its box would
-    // scroll the panel itself.
+    // profile a scroll container, and focusing anything inside it that sits outside its box would
+    // scroll the profile itself.
     overflow: 'clip',
     // Fills the viewport's content box rather than computing a height from `dvh`. The grid row
-    // is definite (see `styles.viewport`), so `stretch` lands the panel's edges on exactly the
+    // is definite (see `styles.viewport`), so `stretch` lands the profile's edges on exactly the
     // lines a bottom-anchored `prompt` sheet reaches with `align-self: end`, and clamps to them.
     alignSelf: 'stretch',
     backgroundColor: null,
@@ -476,10 +489,10 @@ export const sizes = stylex.create({
 /**
  * Enter/exit motion, keyed by size, because the two surfaces want opposite things.
  *
- * `card` scales from its centre. `panel` fades without scaling — it is most of the
+ * `card` scales from its centre. `profile` fades without scaling — it is most of the
  * viewport, and the larger a surface is the worse a scale reads on it: the absolute travel
  * is `(1 − scale) ×` its own dimensions, so the same 2% that is a few pixels on a card is
- * tens of pixels on a panel, and it arrives as a zoom rather than an emergence.
+ * tens of pixels on a profile, and it arrives as a zoom rather than an emergence.
  *
  * Both maps are keyed by SIZE rather than by a shared "animated" cell. StyleX dedupes by
  * PROPERTY across a `stylex.props` call, so a thin "mobile only" atom declaring `transform` would
@@ -490,7 +503,7 @@ export const sizes = stylex.create({
  * headless transition watches the POPUP's animations to decide when to unmount, and the
  * whole subtree goes at once — so a backdrop that outlives its popup gets cut off
  * mid-fade. Every size therefore fades its scrim over the same duration its popup runs for,
- * `panel` included — which is why `popupMotion.panel` fades rather than being left inert.
+ * `profile` included — which is why `popupMotion.profile` fades rather than being left inert.
  */
 export const backdropMotion = stylex.create({
   /**
@@ -534,7 +547,7 @@ export const backdropMotion = stylex.create({
   },
 
   /** Identical to `card` — the popup it accompanies fades on the same clock, it just does not scale. */
-  panel: {
+  profile: {
     opacity: {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
@@ -565,7 +578,7 @@ const SHEET_EXIT_EASE = 'ease-out';
 // everything else, so a surface at 0.94 draws its corners at 94% of their value for the length of
 // the transition — about 0.77px on a 12px radius. An earlier version cancelled that by dividing
 // the popup's radius by the same factor, which only reaches corners the POPUP paints: since a
-// `card` and a `panel` are painted by the surface inside, the correction had stopped reaching the
+// `card` and a `profile` are painted by the surface inside, the correction had stopped reaching the
 // corners that matter and was dropped rather than pushed into every surface's API. If it comes
 // back, it should come back self-contained — the popup publishing its current scale as a custom
 // property a surface can read to counter its own radius — not as a composition rule.
@@ -679,9 +692,9 @@ export const popupMotion = stylex.create({
     // read as one muddy one. There is already a surface there, so the fade has nothing left to do
     // and the slide can carry the arrival alone.
     //
-    // Keyed on `data-stacked` — over any open dialog, panel included — rather than on the narrower
+    // Keyed on `data-stacked` — over any open dialog, profile included — rather than on the narrower
     // prompt-on-prompt stack the backdrop cares about. What makes the long fade wrong here is
-    // arriving over something opaque, and a panel is as opaque as a prompt.
+    // arriving over something opaque, and a profile is as opaque as a prompt.
     //
     // The combined exiting branch restates `base` because `@stylexjs/sort-keys` puts it after the
     // plain `data-stacked` one, which would otherwise hand a stacked sheet the three-value entrance
@@ -776,12 +789,12 @@ export const popupMotion = stylex.create({
    * Fade only, no scale — see the note above this map for why a surface this size should not
    * scale. The fade is not optional the way an inert cell would be: the headless transition
    * watches the POPUP to decide when to unmount, so with nothing running here the whole subtree,
-   * scrim included, is pulled on close before `backdropMotion.panel` can fade.
+   * scrim included, is pulled on close before `backdropMotion.profile` can fade.
    *
    * No reduced-motion branch, matching `card` — under `reduce` the two shed their transform and
    * are left with exactly this, so there is nothing here to drop.
    */
-  panel: {
+  profile: {
     opacity: {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,

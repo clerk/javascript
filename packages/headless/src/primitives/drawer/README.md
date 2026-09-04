@@ -157,12 +157,12 @@ The headless parts emit raw inputs only — the styled layer composes them. The 
 (`swipe-movement-y`, `snap-point-offset`, `swipe-progress`) are registered as non-inheriting custom
 properties via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` is unavailable).
 
-### CSS custom properties (on `Drawer.Popup`)
+### CSS custom properties (on `Drawer.Popup`, mirrored onto `Drawer.Backdrop`)
 
 | Variable                           | Written by    | Meaning                                                                               |
 | ---------------------------------- | ------------- | ------------------------------------------------------------------------------------- |
 | `--cl-drawer-swipe-movement-y`     | drag engine   | px live drag delta on the Y axis (0 at rest)                                          |
-| `--cl-drawer-swipe-progress`       | drag engine   | 0..1 dismiss progress (drives backdrop fade)                                          |
+| `--cl-drawer-swipe-progress`       | drag engine   | 0..1 dismiss progress (drives backdrop fade; also written to the backdrop, a sibling) |
 | `--cl-drawer-snap-point-offset`    | snap layer    | px resting translateY of the active snap point                                        |
 | `--cl-drawer-swipe-strength`       | drag engine   | 0.1..1 from release velocity (scales exit speed)                                      |
 | `--cl-drawer-nested-drawers`       | nesting layer | count of open nested children                                                         |

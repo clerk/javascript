@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 import { cardContentMarker } from './card.markers.stylex';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
@@ -19,9 +19,7 @@ export const root = stylex.create({
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    boxShadow: shadowVars['--cl-shadow-card'],
   },
   flush: {
     borderRadius: radiusVars['--cl-radius-xl'],
@@ -33,9 +31,7 @@ export const root = stylex.create({
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    boxShadow: shadowVars['--cl-shadow-card'],
   },
 });
 
@@ -102,6 +98,7 @@ export const footer = stylex.create({
 });
 
 export const branding = stylex.create({
+  // Placement only; the mark itself is `Branding`.
   base: {
     paddingBlock: space['3'],
     paddingInline: space['6'],
@@ -109,20 +106,5 @@ export const branding = stylex.create({
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
     textAlign: 'center',
-  },
-  text: {
-    color: colorVars['--cl-color-neutral-faded'],
-    display: 'inline-block',
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-    textWrap: 'pretty',
-  },
-  link: {
-    borderRadius: radiusVars['--cl-radius-sm'],
-    alignItems: 'center',
-    color: 'inherit',
-    display: 'inline-flex',
-    verticalAlign: 'top',
-    height: space['4'],
   },
 });

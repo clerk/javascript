@@ -68,18 +68,18 @@ committing. Your own `setOpen(false)` skips that; use `Dialog.Close` when a clos
 
 ### Size
 
-| Value    | Width                                    | For                                                   |
-| -------- | ---------------------------------------- | ----------------------------------------------------- |
-| `prompt` | `23.75rem`, height from content          | One question or one field (default)                   |
-| `card`   | `25rem`, height from content             | Sign-in / sign-up                                     |
-| `panel`  | Width from its surface, fills the height | Account profile and settings — a surface you navigate |
+| Value     | Width                                    | For                                                   |
+| --------- | ---------------------------------------- | ----------------------------------------------------- |
+| `prompt`  | `23.75rem`, height from content          | One question or one field (default)                   |
+| `card`    | `25rem`, height from content             | Sign-in / sign-up                                     |
+| `profile` | Width from its surface, fills the height | Account profile and settings — a surface you navigate |
 
-### `card` and `panel` bring their own surface
+### `card` and `profile` bring their own surface
 
-Only `prompt` paints itself. A `card` holds a `Card`, and a `panel` holds a `ProfilePage` (or
-`UserPageView`): the dialog positions and animates the popup, and the surface inside paints it.
-Both surfaces read `DialogContext` and are self-contained — `Card.Title` and the page's label name
-the dialog, and `Card.Header` and `ProfilePage.Root` carry the dismiss — so `Dialog.CloseButton`
+Only `prompt` paints itself. A `card` holds a `Card`, and a `profile` holds a `Profile` (or
+`UserProfileView`): the dialog positions and animates the popup, and the surface inside paints it.
+Both surfaces read `DialogContext` and are self-contained — `Card.Title` and the profile's label name
+the dialog, and `Card.Header` and `Profile.Root` carry the dismiss — so `Dialog.CloseButton`
 and `Dialog.Title` are only for a `prompt`.
 
 <Story
@@ -87,22 +87,22 @@ and `Dialog.Title` are only for a `prompt`.
   storyModule={DialogStories}
 />
 
-A `panel` composes the same way, with the user page in place of the card. The page names the
+A `profile` composes the same way, with the user page in place of the card. The page names the
 dialog, carries the dismiss, scrolls its own content column, and collapses its own sidebar — the
-full example is under [A panel](#a-panel):
+full example is under [A profile](#a-profile):
 
 ```tsx
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
+import { UserProfileView } from '@clerk/ui/mosaic/user-profile/user-profile.view';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
-  <Dialog.Popup size='panel'>
-    <UserPageView
-      activePanel={activePanel}
-      panels={panels}
-      onPanelChange={setActivePanel}
+  <Dialog.Popup size='profile'>
+    <UserProfileView
+      activePage={activePage}
+      pages={pages}
+      onPageChange={setActivePage}
     />
   </Dialog.Popup>
 </Dialog.Root>;
@@ -169,7 +169,7 @@ const onOpenChange = useConfirmedClose({
 ### Inline
 
 `inline` on the root renders the dialog in its host instead of over the page: no portal, scrim,
-scroll lock or focus trap, and nothing dismisses it. For the account panel mounted in a page slot.
+scroll lock or focus trap, and nothing dismisses it. For the account profile mounted in a page slot.
 
 <Story
   name='Inline'
@@ -194,17 +194,17 @@ The gap to the screen edge is a fixed inset, not a percentage:
 
 The bands are **container queries** against the dialog's viewport element (named `cl-dialog`), not
 media queries. For a modal dialog that is the window, so nothing differs; for an `inline` dialog the
-bands follow the host's width. `ProfilePage` does the same against its own width (`cl-profile-page`),
-which is what collapses its sidebar inside a narrow host.
+bands follow the host's width. `Profile` does the same against its own width (`cl-profile`), which is
+what collapses its navigation inside a narrow host.
 
 Below `48rem` a `prompt` becomes a bottom sheet: it pins to the bottom, slides up, and lifts its
-width cap. `card` and `panel` are unchanged. Under `prefers-reduced-motion: reduce` only the fade
+width cap. `card` and `profile` are unchanged. Under `prefers-reduced-motion: reduce` only the fade
 runs.
 
 ### Close button
 
 `Dialog.CloseButton` is the styled corner X for a `prompt`, absolutely positioned so it can sit
-anywhere in the children. Pass `aria-label` to localise it. A `card` or `panel` surface carries its
+anywhere in the children. Pass `aria-label` to localise it. A `card` or `profile` surface carries its
 own. `Dialog.Close` is the unstyled alternative for a footer "Cancel".
 
 Focus opens on the first tabbable element, so a `CloseButton` rendered first takes it. Point
@@ -275,7 +275,7 @@ Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/ui/st
 @import '@clerk/ui/styles.css' layer(components);
 
 @layer overrides {
-  .cl-dialog-popup[data-size='panel'] {
+  .cl-dialog-popup[data-size='profile'] {
     max-width: 60rem;
   }
 }
@@ -298,20 +298,20 @@ A dialog opened inside another is one of two relationships, decided by the size 
 
 |                     | Nested                     | Stack                              |
 | ------------------- | -------------------------- | ---------------------------------- |
-| Opens over          | a `panel` or `card`        | a `prompt`                         |
+| Opens over          | a `profile` or `card`      | a `prompt`                         |
 | Its own scrim       | Yes, lighter than the base | None — one scrim serves the stack  |
 | The surface beneath | Unchanged                  | Dims and recedes                   |
 | Attributes          | `data-nested`              | `data-stacked` / `data-stack-base` |
 
-A `panel` never opens inside another dialog — it warns in dev. A `prompt` or a `card` (a confirmation holding a `Card`) is what opens over one.
+A `profile` never opens inside another dialog — it warns in dev. A `prompt` or a `card` (a confirmation holding a `Card`) is what opens over one.
 
 ---
 
 ## Examples
 
-### A panel
+### A profile
 
-The account profile as a `panel`: the page inside paints the frame, names the dialog, scrolls its
+The account profile as a `profile`: the page inside paints the frame, names the dialog, scrolls its
 own content column, collapses its own sidebar, and carries the dismiss. The dialog only positions it.
 
 <Story
@@ -319,7 +319,7 @@ own content column, collapses its own sidebar, and carries the dismiss. The dial
   storyModule={DialogStories}
 />
 
-Add an email address, type into the field and try to close it: the prompt opens over the panel
+Add an email address, type into the field and try to close it: the prompt opens over the profile
 (nested, with its own lighter scrim), and a confirmation stacks on the prompt (no second scrim; the
 prompt recedes). The same stack on its own:
 

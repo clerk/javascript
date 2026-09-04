@@ -234,4 +234,30 @@ describe('useRender', () => {
       }),
     );
   });
+
+  // React writes changed attributes in key order, and Chrome flushes style when `tabindex` changes on
+  // the focused element. A state marker that lands after that write is absent from the flush, which
+  // is how a CSS anchor on `[data-selected]` loses its transition. So the markers lead, and still win.
+  it('emits state attributes ahead of the other props, and lets them win', () => {
+    function Probe() {
+      return useRender({
+        defaultTagName: 'button',
+        state: { selected: true },
+        stateAttributesMapping: { selected: (v: boolean) => (v ? { 'data-selected': '' } : null) },
+        props: { tabIndex: 0, 'data-selected': 'stale', 'data-testid': 'probe' },
+      });
+    }
+    render(<Probe />);
+    const element = screen.getByTestId('probe');
+    expect(element).toHaveAttribute('data-selected', '');
+    expect(
+      Array.from(element.attributes)
+        .map(attribute => attribute.name)
+        .indexOf('data-selected'),
+    ).toBeLessThan(
+      Array.from(element.attributes)
+        .map(attribute => attribute.name)
+        .indexOf('tabindex'),
+    );
+  });
 });

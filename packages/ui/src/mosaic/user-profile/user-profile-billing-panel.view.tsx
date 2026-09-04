@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { Heading } from '../components/heading';
+import { Profile } from '../components/profile';
 import { mergeStyleProps, themeProps } from '../props';
 import type {
   UserProfileBillingHistoryItem,
@@ -50,12 +50,7 @@ export function UserProfileBillingPanelView({
 }: UserProfileBillingPanelViewProps): ReactElement {
   return (
     <div {...mergeStyleProps(themeProps('user-profile-billing-panel'), stylex.props(styles.root))}>
-      <Heading
-        render={props => <h3 {...props} />}
-        size='2xl'
-      >
-        Billing
-      </Heading>
+      <Profile.PageTitle>Billing</Profile.PageTitle>
       <div {...stylex.props(styles.sections)}>
         <UserProfileSubscriptionSectionView
           subscription={subscription}
