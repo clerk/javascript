@@ -65,6 +65,34 @@ const Close = glyph(
   />,
 );
 
+const Eye = glyph(
+  <>
+    <path
+      d='M13.75 8C13.75 8.5 12.2 12.75 8 12.75C3.8 12.75 2.25 8.5 2.25 8C2.25 7.5 3.8 3.25 8 3.25C12.2 3.25 13.75 7.5 13.75 8Z'
+      {...strokeProps}
+    />
+    <circle
+      cx='8'
+      cy='8'
+      r='1.25'
+      {...strokeProps}
+    />
+  </>,
+);
+
+const EyeSlash = glyph(
+  <>
+    <path
+      d='M2.949 7C2.80739 7.40946 2.75 7.76622 2.75 8C2.75 9 3.8 12.25 8 12.25C8.35547 12.25 8.68838 12.2267 9 12.1835M11.5 11.1743C12.8384 10.134 13.25 8.62607 13.25 8C13.25 7 12.2 3.75 8 3.75C6.7199 3.75 5.73242 4.05191 4.97809 4.5M7.11612 7.11612C7.60427 6.62797 8.39573 6.62797 8.88388 7.11612C9.37204 7.60428 9.37204 8.39573 8.88388 8.88389'
+      {...strokeProps}
+    />
+    <path
+      d='M3 3L13 13'
+      {...strokeProps}
+    />
+  </>,
+);
+
 const InfoCircle = glyph(
   <>
     <circle
@@ -337,6 +365,8 @@ export const iconRegistry = {
   code: Code,
   'credit-card': CreditCard,
   ellipsis: Ellipsis,
+  eye: Eye,
+  'eye-slash': EyeSlash,
   'info-circle': InfoCircle,
   pen: Pen,
   plus: Plus,

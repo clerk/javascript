@@ -94,7 +94,7 @@ describe('Mosaic Button', () => {
     expect(screen.getByRole('button')).toHaveAttribute('data-variant', variant);
   });
 
-  it.each(['sm', 'md', 'lg'] as const)('reflects the %s size', size => {
+  it.each(['xs', 'sm', 'md', 'lg'] as const)('reflects the %s size', size => {
     render(<Button size={size}>Hi</Button>);
     expect(screen.getByRole('button')).toHaveAttribute('data-size', size);
   });

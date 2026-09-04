@@ -17,7 +17,7 @@ export const meta: StoryMeta = {
     _variants: {
       color: { primary: {}, neutral: {}, negative: {} },
       variant: { filled: {}, outline: {}, ghost: {}, link: {} },
-      size: { sm: {}, md: {}, lg: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {} },
       shape: { default: {}, square: {}, circle: {} },
       fullWidth: { true: {}, false: {} },
       touchTarget: { true: {}, false: {} },
@@ -46,6 +46,12 @@ export function Primary(props: Record<string, unknown>) {
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <Button
+        {...knobsAsProps(props)}
+        size='xs'
+      >
+        Extra small
+      </Button>
       <Button
         {...knobsAsProps(props)}
         size='sm'
@@ -218,7 +224,7 @@ export function Icons(props: Record<string, unknown>) {
 export function IconSizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'grid', gap: 12, justifyItems: 'start' }}>
-      {(['sm', 'md', 'lg'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
         <div
           key={size}
           style={{ display: 'flex', gap: 8, alignItems: 'center' }}
@@ -230,7 +236,7 @@ export function IconSizes(props: Record<string, unknown>) {
             <Icon
               name='check'
               placement='inline-start'
-              size={size}
+              size={size === 'xs' ? 'sm' : size}
             />
             Approve
           </Button>
@@ -248,7 +254,7 @@ export function IconSizes(props: Record<string, unknown>) {
             <Icon
               name='chevron-down'
               placement='inline-end'
-              size={size}
+              size={size === 'xs' ? 'sm' : size}
             />
           </Button>
         </div>
@@ -388,7 +394,7 @@ export function SubmitDelay(props: Record<string, unknown>) {
 export function SubmitSizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      {(['sm', 'md', 'lg'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
         <SubmitButton
           key={size}
           {...knobsAsProps(props)}
