@@ -1,5 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
@@ -481,6 +481,158 @@ describe('OrganizationSecurityPage', () => {
       // The badge reads from the (unchanged) entity — no optimistic flip to roll back.
       expect(screen.getByText('Active')).toBeInTheDocument();
       expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('directory sync section', () => {
+    const withDirectorySyncFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
+      withSecurityPageFixtures(f);
+      f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
+    };
+
+    // The mutations live on the DirectorySyncResource resolved by getDirectorySync.
+    const directory = (overrides: Record<string, unknown> = {}) =>
+      ({
+        id: 'scimdir_1',
+        enterpriseConnectionId: 'ent_1',
+        endpointUrl: 'https://api.example.com/scim/v2',
+        provider: 'okta',
+        enabled: true,
+        attributeMapping: {},
+        apiKey: null,
+        update: vi.fn(),
+        delete: vi.fn(),
+        rotateToken: vi.fn(),
+        ...overrides,
+      }) as any;
+
+    const withActiveConnection = (fixtures: any) => {
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+      // The page-level loading gate also waits on the domains query; an unmocked
+      // fetch resolves undefined and error-retries, wedging the gate open.
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [], total_count: 0 } as any);
+    };
+
+    it('is hidden when the instance is not flagged into self-serve Directory Sync', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(directory());
+
+      renderPage(wrapper);
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(1));
+      expect(screen.queryByText('Directory Sync')).not.toBeInTheDocument();
+      expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
+    });
+
+    it('offers setup instead of a menu when no directory exists', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getDirectorySync.mockRejectedValue(
+        new ClerkAPIResponseError('Not found', { status: 404, data: [{ code: 'resource_not_found', message: '' }] }),
+      );
+
+      renderPage(wrapper);
+
+      const startButton = await screen.findByRole('button', { name: 'Start configuration' });
+      expect(startButton).toBeEnabled();
+      expect(screen.queryByText('SSO Required')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(1);
+    });
+
+    it('disables setup and flags SSO as required when no connection exists', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [], total_count: 0 } as any);
+
+      renderPage(wrapper);
+
+      expect(await screen.findByText('SSO Required')).toBeInTheDocument();
+      const startButtons = screen.getAllByRole('button', { name: 'Start configuration' });
+      expect(startButtons).toHaveLength(2);
+      expect(startButtons[0]).toBeEnabled();
+      expect(startButtons[1]).toBeDisabled();
+      expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
+    });
+
+    it('lists Edit and Deactivate for an active directory', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(directory());
+
+      const { userEvent } = renderPage(wrapper);
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
+
+      expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Deactivate' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Activate' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Manage Directory Sync' })).not.toBeInTheDocument();
+    });
+
+    it('deactivates from the menu and settles on the revalidated directory', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      const activeDirectory = directory();
+      activeDirectory.update.mockResolvedValue(directory({ enabled: false }));
+      fixtures.clerk.organization?.getDirectorySync
+        .mockResolvedValueOnce(activeDirectory)
+        .mockResolvedValue(directory({ enabled: false }));
+
+      const { userEvent } = renderPage(wrapper);
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Deactivate' }));
+
+      expect(activeDirectory.update).toHaveBeenCalledWith({ enabled: false });
+
+      await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
+      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Activate' })).toBeInTheDocument());
+    });
+
+    it('removes the directory through the type-to-confirm dialog', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      const activeDirectory = directory();
+      activeDirectory.delete.mockResolvedValue({ id: 'scimdir_1', deleted: true });
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValueOnce(activeDirectory).mockResolvedValue(null);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Remove' }));
+
+      expect(await screen.findByRole('heading', { name: 'Remove Directory Sync' })).toBeInTheDocument();
+      const confirmButton = screen.getByRole('button', { name: 'Remove Directory Sync' });
+      expect(confirmButton).toBeDisabled();
+
+      await userEvent.type(screen.getByRole('textbox'), 'Org1');
+      await userEvent.click(confirmButton);
+
+      expect(activeDirectory.delete).toHaveBeenCalledWith();
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument());
+    });
+
+    it('opens the Directory Sync wizard from Edit', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(directory());
+
+      const { userEvent } = renderPage(wrapper);
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
+
+      await waitFor(() => expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument());
     });
   });
 });

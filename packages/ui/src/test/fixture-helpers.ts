@@ -627,9 +627,13 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
-  const withEnterpriseSso = (opts?: { selfServeSSO?: boolean }) => {
+  const withEnterpriseSso = (opts?: { selfServeSSO?: boolean; selfServeDirectorySync?: boolean }) => {
     us.saml = { enabled: true };
-    us.enterprise_sso = { enabled: true, self_serve_sso: opts?.selfServeSSO ?? false };
+    us.enterprise_sso = {
+      enabled: true,
+      self_serve_sso: opts?.selfServeSSO ?? false,
+      self_serve_directory_sync: opts?.selfServeDirectorySync ?? false,
+    };
   };
 
   const withBackupCode = (opts?: Partial<UserSettingsJSON['attributes']['backup_code']>) => {
