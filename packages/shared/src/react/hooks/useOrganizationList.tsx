@@ -253,7 +253,10 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganizationList');
-  useAttemptToEnableOrganizations('useOrganizationList');
+  // No list keys means this call is not using Organizations; the prompt is for the lists.
+  useAttemptToEnableOrganizations('useOrganizationList', {
+    enabled: userMemberships !== undefined || userInvitations !== undefined || userSuggestions !== undefined,
+  });
 
   const userMembershipsSafeValues = useWithSafeValues(userMemberships, {
     initialPage: 1,

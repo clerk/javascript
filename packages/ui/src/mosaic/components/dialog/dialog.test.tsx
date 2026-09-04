@@ -5,7 +5,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../props';
-import { space } from '../../tokens.stylex';
+import { colorVars, radiusVars, space } from '../../tokens.stylex';
 import type { DialogSize } from './dialog';
 import { Dialog } from './dialog';
 
@@ -17,22 +17,23 @@ const settle = () =>
     await new Promise(resolve => setTimeout(resolve, 0));
   });
 
+const nativeTrigger = (label: string) => (props: MosaicComponentProps<'button'>) => (
+  <button
+    type='button'
+    {...props}
+  >
+    {label}
+  </button>
+);
+
 describe('Mosaic Dialog', () => {
   it('renders the trigger and opens the dialog on click', async () => {
     const user = userEvent.setup();
     render(
-      <Dialog
-        trigger={props => (
-          <button
-            type='button'
-            {...props}
-          >
-            Open
-          </button>
-        )}
-      >
-        Body
-      </Dialog>,
+      <Dialog.Root>
+        <Dialog.Trigger render={nativeTrigger('Open')} />
+        <Dialog.Popup>Body</Dialog.Popup>
+      </Dialog.Root>,
     );
 
     expect(screen.queryByText('Body')).not.toBeInTheDocument();
@@ -42,94 +43,88 @@ describe('Mosaic Dialog', () => {
     expect(screen.getByText('Body')).toBeInTheDocument();
   });
 
-  it('renders no trigger when one is not supplied', () => {
+  it('renders the whole floating tree from the popup: backdrop, viewport and popup carry the slots', () => {
     render(
-      <Dialog
-        open
-        onOpenChange={() => {}}
-      >
-        Body
-      </Dialog>,
+      <div data-testid='host'>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>Body</Dialog.Popup>
+        </Dialog.Root>
+      </div>,
     );
-
-    expect(screen.getByText('Body')).toBeInTheDocument();
-    // Not `queryByRole('button')` — floating-ui's focus guards are `role="button"`.
-    expect(document.querySelector('[aria-haspopup="dialog"]')).not.toBeInTheDocument();
-  });
-
-  it('carries the mosaic slot classes on the backdrop, viewport and popup', () => {
-    render(<Dialog defaultOpen>Body</Dialog>);
 
     expect(document.querySelector('.cl-dialog-backdrop')).toBeInTheDocument();
     expect(document.querySelector('.cl-dialog-viewport')).toBeInTheDocument();
+    expect(document.querySelector('.cl-dialog-track')).toBeInTheDocument();
     expect(document.querySelector('.cl-dialog-popup')).toBeInTheDocument();
+    // Portalled: the tree lands in the body, not where the root sits.
+    expect(screen.getByTestId('host')).not.toContainElement(document.querySelector('.cl-dialog-viewport'));
   });
 
   it('defaults the popup to the prompt size and reflects it as data-size', () => {
-    render(<Dialog defaultOpen>Body</Dialog>);
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>Body</Dialog.Popup>
+      </Dialog.Root>,
+    );
 
     expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'prompt');
   });
 
-  it('reflects an explicit size as data-size', () => {
+  it('reflects an explicit size as data-size on the popup and the viewport', () => {
     render(
-      <Dialog
-        defaultOpen
-        size='panel'
-      >
-        Body
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup size='panel'>Body</Dialog.Popup>
+      </Dialog.Root>,
     );
 
     expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'panel');
+    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-size', 'panel');
   });
 
   it('merges consumer className and style onto the popup', () => {
     render(
       <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          <Dialog.Viewport>
-            <Dialog.Popup
-              className='my-popup'
-              style={{ marginTop: '8px' }}
-            >
-              Body
-            </Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
+        <Dialog.Popup
+          className='my-popup'
+          style={{ marginTop: '8px' }}
+        >
+          Body
+        </Dialog.Popup>
       </Dialog.Root>,
     );
 
-    const popup = screen.getByText('Body');
+    const popup = document.querySelector('.cl-dialog-popup');
     expect(popup).toHaveClass('cl-dialog-popup', 'my-popup');
     expect(popup).toHaveStyle({ marginTop: '8px' });
   });
 
-  it('hands children a close callback', async () => {
+  it('closes on Dialog.Close, reporting it through onOpenChange', async () => {
     const user = userEvent.setup();
+    const onOpenChange = vi.fn();
     render(
-      <Dialog defaultOpen>
-        {({ close }) => (
-          <button
-            type='button'
-            onClick={close}
-          >
-            Dismiss
-          </button>
-        )}
-      </Dialog>,
+      <Dialog.Root
+        defaultOpen
+        onOpenChange={onOpenChange}
+      >
+        <Dialog.Popup>
+          <Dialog.Close>Dismiss</Dialog.Close>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     await user.click(screen.getByRole('button', { name: 'Dismiss' }));
 
+    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
     expect(screen.queryByRole('button', { name: 'Dismiss' })).not.toBeInTheDocument();
   });
 
   it('names the dialog from Dialog.Title', () => {
     render(
-      <Dialog defaultOpen>
-        <Dialog.Title>Confirm action</Dialog.Title>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.Title>Confirm action</Dialog.Title>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     expect(screen.getByRole('dialog', { name: 'Confirm action' })).toBeInTheDocument();
@@ -139,45 +134,34 @@ describe('Mosaic Dialog', () => {
     const ref = React.createRef<HTMLDivElement>();
     render(
       <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          <Dialog.Viewport>
-            <Dialog.Popup ref={ref}>Body</Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
+        <Dialog.Popup ref={ref}>Body</Dialog.Popup>
       </Dialog.Root>,
     );
 
-    expect(ref.current).toBe(screen.getByText('Body'));
+    expect(ref.current).toBe(document.querySelector('.cl-dialog-popup'));
   });
 });
 
-// A `panel` dialog (account profile) opening a `card` dialog (add an email address) is a
-// real shape, so the `FloatingTree` nesting the headless README claims is exercised here
-// rather than assumed. Dismissal must reach the topmost dialog only, and the body must
-// stay locked until the last one closes.
+// A `panel` dialog (account profile) opening a `prompt` dialog (add an email address) is a real
+// shape, so the `FloatingTree` nesting the headless README claims is exercised here rather than
+// assumed. Dismissal must reach the topmost dialog only, and the body must stay locked until the
+// last one closes.
 describe('nested Mosaic Dialogs', () => {
-  const addEmailTrigger = (props: MosaicComponentProps<'button'>) => (
-    <button
-      type='button'
-      {...props}
-    >
-      Add email
-    </button>
-  );
-
-  function Nested() {
+  function Nested({ innerSize }: { innerSize?: DialogSize } = {}) {
     return (
-      <Dialog
-        defaultOpen
-        size='panel'
-      >
-        <Dialog.Title>Account</Dialog.Title>
-        <div>Outer body</div>
-        <Dialog trigger={addEmailTrigger}>
-          <Dialog.Title>Add email address</Dialog.Title>
-          <div>Inner body</div>
-        </Dialog>
-      </Dialog>
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup size='panel'>
+          <Dialog.Title>Account</Dialog.Title>
+          <div>Outer body</div>
+          <Dialog.Root>
+            <Dialog.Trigger render={nativeTrigger('Add email')} />
+            <Dialog.Popup size={innerSize}>
+              <Dialog.Title>Add email address</Dialog.Title>
+              <div>Inner body</div>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </Dialog.Popup>
+      </Dialog.Root>
     );
   }
 
@@ -233,73 +217,98 @@ describe('nested Mosaic Dialogs', () => {
     await user.keyboard('{Escape}');
     expect(document.body.style.overflow).toBe('');
   });
+
+  it('warns when a panel opens inside another dialog', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(<Nested innerSize='panel' />);
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="panel"'));
+    warn.mockRestore();
+  });
+
+  // A card over a panel is the delete-account confirmation: a `Card` inside a `card` dialog.
+  it.each(['prompt', 'card'] as const)('does not warn for a %s over a panel, or for the panel itself', async size => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(<Nested innerSize={size} />);
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
 });
 
 describe('stacked backdrops', () => {
-  const addEmailTrigger = (props: MosaicComponentProps<'button'>) => (
-    <button
-      type='button'
-      {...props}
-    >
-      Add email
-    </button>
-  );
-
-  function renderStack() {
-    return render(
-      <Dialog
-        defaultOpen
-        size='panel'
-      >
-        <Dialog.Title>Account</Dialog.Title>
-        <div>Outer body</div>
-        <Dialog trigger={addEmailTrigger}>
-          <Dialog.Title>Add email address</Dialog.Title>
-          <div>Inner body</div>
-        </Dialog>
-      </Dialog>,
-    );
-  }
-
   // The backdrop's two cases differ by a style rather than by an attribute, so the assertion is
   // that the same tree with only the hosting size changed produces different classes. Comparing
   // rather than matching a class: StyleX names are content hashes and would pin the value.
-  async function innerBackdropClass(hostSize: DialogSize) {
+  async function innerBackdropClass(host: { size?: DialogSize; inline?: boolean }) {
     const user = userEvent.setup();
     render(
-      <Dialog
+      <Dialog.Root
         defaultOpen
-        size={hostSize}
+        inline={host.inline}
       >
-        <Dialog.Title>Host</Dialog.Title>
-        <Dialog trigger={addEmailTrigger}>
-          <Dialog.Title>Add email address</Dialog.Title>
-        </Dialog>
-      </Dialog>,
+        <Dialog.Popup size={host.size}>
+          <Dialog.Title>Host</Dialog.Title>
+          <Dialog.Root>
+            <Dialog.Trigger render={nativeTrigger('Add email')} />
+            <Dialog.Popup>
+              <Dialog.Title>Add email address</Dialog.Title>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
     await user.click(screen.getByRole('button', { name: 'Add email' }));
-    const className = document.querySelectorAll('.cl-dialog-backdrop')[1].className;
+    // An inline host renders no backdrop of its own, so the inner one is the only one.
+    const backdrops = document.querySelectorAll('.cl-dialog-backdrop');
+    const className = backdrops[backdrops.length - 1].className;
     cleanup();
     return className;
   }
 
   it('drops the scrim for a prompt over a prompt, and keeps it for one over a panel', async () => {
-    const overPrompt = await innerBackdropClass('prompt');
-    const overPanel = await innerBackdropClass('panel');
+    const overPrompt = await innerBackdropClass({ size: 'prompt' });
+    const overPanel = await innerBackdropClass({ size: 'panel' });
 
     expect(overPrompt).not.toBe(overPanel);
   });
 
   it('keeps a prompt over a card on the nested scrim, same as over a panel', async () => {
-    const overCard = await innerBackdropClass('card');
-    const overPanel = await innerBackdropClass('panel');
+    const overCard = await innerBackdropClass({ size: 'card' });
+    const overPanel = await innerBackdropClass({ size: 'panel' });
 
     expect(overCard).toBe(overPanel);
   });
 
+  // The nested scrim is solved to composite over the host's own, and an inline host has none.
+  it('paints the base scrim, not the nested one, for a prompt over an inline panel', async () => {
+    const overInline = await innerBackdropClass({ size: 'panel', inline: true });
+    const overPanel = await innerBackdropClass({ size: 'panel' });
+
+    expect(overInline).not.toBe(overPanel);
+  });
+
   it('marks the popup beneath as the stack base, so it can recede', async () => {
     const user = userEvent.setup();
-    renderStack();
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup size='panel'>
+          <Dialog.Title>Account</Dialog.Title>
+          <Dialog.Root>
+            <Dialog.Trigger render={nativeTrigger('Add email')} />
+            <Dialog.Popup>
+              <Dialog.Title>Add email address</Dialog.Title>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
 
     const outerPopup = document.querySelector('.cl-dialog-popup');
     expect(outerPopup).not.toHaveAttribute('data-stack-base');
@@ -310,53 +319,18 @@ describe('stacked backdrops', () => {
     expect(popups[0]).toHaveAttribute('data-stack-base', '');
     expect(popups[1]).not.toHaveAttribute('data-stack-base');
   });
-
-  it('warns when a stacked dialog is not a prompt', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const user = userEvent.setup();
-    render(
-      <Dialog
-        defaultOpen
-        size='panel'
-      >
-        <Dialog.Title>Account</Dialog.Title>
-        <div>Outer body</div>
-        <Dialog
-          trigger={addEmailTrigger}
-          size='card'
-        >
-          <Dialog.Title>Add email address</Dialog.Title>
-          <div>Inner body</div>
-        </Dialog>
-      </Dialog>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Add email' }));
-
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="card"'));
-    warn.mockRestore();
-  });
-
-  it('does not warn for a stacked prompt, or for a root-level panel', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const user = userEvent.setup();
-    renderStack();
-
-    await user.click(screen.getByRole('button', { name: 'Add email' }));
-
-    expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
-  });
 });
 
 describe('Dialog.CloseButton', () => {
   it('closes the dialog and carries a default accessible name', async () => {
     const user = userEvent.setup();
     render(
-      <Dialog defaultOpen>
-        <Dialog.CloseButton />
-        <div>Body</div>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.CloseButton />
+          <div>Body</div>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     const close = screen.getByRole('button', { name: 'Close' });
@@ -368,9 +342,11 @@ describe('Dialog.CloseButton', () => {
 
   it('takes an overridable label, ready for a localized string', () => {
     render(
-      <Dialog defaultOpen>
-        <Dialog.CloseButton aria-label='Fermer' />
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.CloseButton aria-label='Fermer' />
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     expect(screen.getByRole('button', { name: 'Fermer' })).toBeInTheDocument();
@@ -378,16 +354,37 @@ describe('Dialog.CloseButton', () => {
 
   it('is the first tabbable element when rendered first — see initialFocus', async () => {
     render(
-      <Dialog defaultOpen>
-        <Dialog.CloseButton />
-        <input aria-label='Email' />
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.CloseButton />
+          <input aria-label='Email' />
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     // Pinning the default: a corner X rendered before the form is what the dialog opens
     // focused on unless `initialFocus` on `Dialog.Popup` says otherwise (next test).
     // `FloatingFocusManager` moves focus in an effect, hence the wait.
     await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
+  });
+
+  it('warns inside an alert dialog, where a corner X is a way out without answering', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+      >
+        <Dialog.Popup>
+          <Dialog.CloseButton />
+          <Dialog.Title>Discard?</Dialog.Title>
+          <Dialog.Description>Unsaved.</Dialog.Description>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('alert dialog'));
+    warn.mockRestore();
   });
 });
 
@@ -458,33 +455,37 @@ describe('composition APIs', () => {
   });
 });
 
+// A probe gives us atoms to look for without hard-coding a hash. StyleX dedupes by property
+// within one `stylex.props` call, so a size atom should REPLACE a base one rather than sit
+// alongside it — and a `null` should remove it outright.
+const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
+  stylex
+    .props(style)
+    .className!.split(' ')
+    .filter(name => !name.includes('__'));
+
+const classesOf = (selector: string) => Array.from(document.querySelector(selector)!.classList);
+
+function renderSize(size: DialogSize, inline = false) {
+  return render(
+    <Dialog.Root
+      defaultOpen
+      inline={inline}
+    >
+      <Dialog.Popup size={size}>Body</Dialog.Popup>
+    </Dialog.Root>,
+  );
+}
+
 describe('popup padding', () => {
-  // Regression: `sizes[size]` has to actually override `styles.popup`'s padding. StyleX dedupes
-  // by property within one `stylex.props` call, so the size atom should REPLACE the base one
-  // rather than sit alongside it — and a `null` should remove it outright. A probe gives us the
-  // atoms to look for without hard-coding a hash.
   const probe = stylex.create({
     zero: { padding: space['0'] },
     four: { padding: space['4'] },
     six: { padding: space['6'] },
   });
-  const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
-    stylex
-      .props(style)
-      .className!.split(' ')
-      .filter(name => !name.includes('__'));
-
-  const classesOf = (selector: string) => Array.from(document.querySelector(selector)!.classList);
 
   const popupClassesFor = (size: DialogSize) => {
-    const { unmount } = render(
-      <Dialog
-        defaultOpen
-        size={size}
-      >
-        Body
-      </Dialog>,
-    );
+    const { unmount } = renderSize(size);
     const classes = classesOf('.cl-dialog-popup');
     unmount();
     return classes;
@@ -497,22 +498,46 @@ describe('popup padding', () => {
     expect(prompt).not.toEqual(expect.arrayContaining(atomFor(probe.six)));
   });
 
-  it('leaves a panel unpadded so its children can sit flush with the edge', () => {
-    const panel = popupClassesFor('panel');
-
-    expect(panel).toEqual(expect.arrayContaining(atomFor(probe.zero)));
-    expect(panel).not.toEqual(expect.arrayContaining(atomFor(probe.six)));
-  });
-
-  // A `card` takes its padding from the `Card` rendered as the popup, so the popup must emit NO
-  // padding atom at all — a competing value would put two atoms for the same property on the
-  // element, and StyleX cannot dedupe across the two `stylex.props` calls involved.
-  it('emits no padding at all for a card, deferring to the Card surface', () => {
-    const card = popupClassesFor('card');
+  // A `card` takes its padding from the `Card` rendered as the popup, and a `panel` from the
+  // `ProfilePage`, so the popup must emit NO padding atom at all — a competing value would put
+  // two atoms for the same property on the element, and StyleX cannot dedupe across the two
+  // `stylex.props` calls involved.
+  it.each(['card', 'panel'] as const)('emits no padding at all for a %s, deferring to its surface', size => {
+    const classes = popupClassesFor(size);
 
     for (const value of [probe.zero, probe.four, probe.six]) {
-      expect(card).not.toEqual(expect.arrayContaining(atomFor(value)));
+      expect(classes).not.toEqual(expect.arrayContaining(atomFor(value)));
     }
+  });
+});
+
+describe('popup surface', () => {
+  // `card` and `panel` are painted by what renders as the popup, so the popup itself must emit
+  // no paint of its own — the same cross-call dedupe problem as the padding above. StyleX names
+  // an atom from its property and value, so a probe with the popup's own values yields the very
+  // atoms `styles.popup` declares.
+  const probe = stylex.create({
+    background: { backgroundColor: colorVars['--cl-color-card'] },
+    radius: { borderRadius: radiusVars['--cl-radius-xl'] },
+  });
+
+  it('paints a prompt itself', () => {
+    renderSize('prompt');
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.background)));
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.radius)));
+  });
+
+  it.each(['card', 'panel'] as const)('emits no background for a %s, deferring to its surface', size => {
+    renderSize(size);
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.background)));
+  });
+
+  it.each(['card', 'panel'] as const)('leaves the radius to the surface for a %s', size => {
+    renderSize(size);
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.radius)));
   });
 });
 
@@ -526,22 +551,10 @@ describe('viewport scroll behaviour', () => {
     fixed: { height: '100%' },
     grows: { minHeight: '100%' },
   });
-  const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
-    stylex
-      .props(style)
-      .className!.split(' ')
-      .filter(name => !name.includes('__'));
 
   const viewportClassesFor = (size: DialogSize) => {
-    const { unmount } = render(
-      <Dialog
-        defaultOpen
-        size={size}
-      >
-        Body
-      </Dialog>,
-    );
-    const classes = Array.from(document.querySelector('.cl-dialog-viewport')!.classList);
+    const { unmount } = renderSize(size);
+    const classes = classesOf('.cl-dialog-viewport');
     unmount();
     return classes;
   };
@@ -559,25 +572,174 @@ describe('viewport scroll behaviour', () => {
     expect(viewport).toEqual(expect.arrayContaining(atomFor(probe.fixed)));
     expect(viewport).not.toEqual(expect.arrayContaining(atomFor(probe.grows)));
   });
+});
 
-  it('exposes the size on the viewport for styling', () => {
+describe('sizing container', () => {
+  // The width bands are container queries against the viewport, so the viewport has to BE a
+  // container — drop that and every band silently stops matching, at every width.
+  const probe = stylex.create({
+    container: { containerName: 'cl-dialog', containerType: 'inline-size' },
+    // The phone-band side inset, one of the rules that queries the container.
+    phoneSides: { paddingInline: { default: space['4'], '@container cl-dialog (max-width: 47.99rem)': null } },
+  });
+
+  it('makes the viewport the named inline-size container the bands query', () => {
+    renderSize('prompt');
+
+    expect(classesOf('.cl-dialog-viewport')).toEqual(expect.arrayContaining(atomFor(probe.container)));
+  });
+
+  // An element is never its own query container. A band declared on the viewport would resolve
+  // against an OUTER dialog's container, or nothing — so every banded rule has to sit on the track
+  // inside it, and none may sit on the viewport.
+  it('keeps every banded rule inside the container, on the track', () => {
+    renderSize('prompt');
+
+    const viewport = document.querySelector('.cl-dialog-viewport')!;
+    const track = document.querySelector('.cl-dialog-track')!;
+    expect(viewport).toContainElement(track);
+    expect(Array.from(track.classList)).toEqual(expect.arrayContaining(atomFor(probe.phoneSides)));
+    expect(Array.from(viewport.classList)).not.toEqual(expect.arrayContaining(atomFor(probe.phoneSides)));
+  });
+
+  it('keeps the container inline, where the host width is what the bands should follow', () => {
+    renderSize('panel', true);
+
+    expect(classesOf('.cl-dialog-viewport')).toEqual(expect.arrayContaining(atomFor(probe.container)));
+  });
+});
+
+describe('inline presentation', () => {
+  function Inline({ onOpenChange }: { onOpenChange?: () => void } = {}) {
+    return (
+      <div data-testid='host'>
+        <Dialog.Root
+          inline
+          onOpenChange={onOpenChange}
+        >
+          <Dialog.Popup size='panel'>
+            <Dialog.Title>Account</Dialog.Title>
+            <input aria-label='Name' />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </div>
+    );
+  }
+
+  it('renders in place, open, with no portal, backdrop or scroll lock', () => {
+    render(<Inline />);
+
+    const popup = screen.getByRole('dialog', { name: 'Account' });
+    expect(screen.getByTestId('host')).toContainElement(popup);
+    expect(document.querySelector('.cl-dialog-backdrop')).not.toBeInTheDocument();
+    expect(document.body.style.overflow).toBe('');
+    expect(popup).toHaveAttribute('data-inline', '');
+    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-inline', '');
+  });
+
+  it('does not steal focus on mount', async () => {
+    render(<Inline />);
+
+    await settle();
+
+    expect(screen.getByRole('textbox', { name: 'Name' })).not.toHaveFocus();
+  });
+
+  it('is not dismissed by Escape, and reports no close', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(<Inline onOpenChange={onOpenChange} />);
+
+    await user.click(screen.getByRole('textbox', { name: 'Name' }));
+    await user.keyboard('{Escape}');
+    await user.tab();
+
+    expect(screen.getByRole('dialog', { name: 'Account' })).toBeInTheDocument();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('does not trap focus: the page around it stays reachable', async () => {
+    const user = userEvent.setup();
     render(
-      <Dialog
-        defaultOpen
-        size='card'
-      >
-        Body
-      </Dialog>,
+      <>
+        <Inline />
+        <button type='button'>After</button>
+      </>,
     );
 
-    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-size', 'card');
+    await user.click(screen.getByRole('textbox', { name: 'Name' }));
+    await user.tab();
+
+    expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
+  });
+
+  it('drops the inset so the surface fills its host', () => {
+    const probe = stylex.create({ flush: { paddingInline: 0 } });
+    renderSize('panel', true);
+
+    expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.flush)));
+  });
+
+  it('renders no corner close button, and warns', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dialog.Root inline>
+        <Dialog.Popup size='panel'>
+          <Dialog.CloseButton />
+          <Dialog.Title>Account</Dialog.Title>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('inline'));
+    warn.mockRestore();
+  });
+
+  // The shape the account profile takes when mounted in a page: the panel is the page, and the
+  // prompts it opens are modal over everything.
+  it('still portals and dismisses a dialog opened from inside it', async () => {
+    const user = userEvent.setup();
+    render(
+      <div data-testid='host'>
+        <Dialog.Root inline>
+          <Dialog.Popup size='panel'>
+            <Dialog.Title>Account</Dialog.Title>
+            <Dialog.Root>
+              <Dialog.Trigger render={nativeTrigger('Add email')} />
+              <Dialog.Popup>
+                <Dialog.Title>Add email address</Dialog.Title>
+              </Dialog.Popup>
+            </Dialog.Root>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </div>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    const prompt = screen.getByRole('dialog', { name: 'Add email address' });
+    expect(screen.getByTestId('host')).not.toContainElement(prompt);
+    expect(document.querySelector('.cl-dialog-backdrop')).toBeInTheDocument();
+    expect(document.body.style.overflow).toBe('hidden');
+    expect(prompt).not.toHaveAttribute('data-inline');
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('dialog', { name: 'Add email address' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Account' })).toBeInTheDocument();
+    expect(document.body.style.overflow).toBe('');
   });
 });
 
 describe('accessible name warning', () => {
   it('warns when the dialog has no accessible name', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    render(<Dialog defaultOpen>Body</Dialog>);
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>Body</Dialog.Popup>
+      </Dialog.Root>,
+    );
 
     await settle();
 
@@ -588,9 +750,11 @@ describe('accessible name warning', () => {
   it('does not warn when a Dialog.Title supplies the name', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
-      <Dialog defaultOpen>
-        <Dialog.Title>Confirm action</Dialog.Title>
-      </Dialog>,
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Dialog.Title>Confirm action</Dialog.Title>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     await settle();
@@ -605,11 +769,7 @@ describe('accessible name warning', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
       <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          <Dialog.Viewport>
-            <Dialog.Popup aria-label='Confirm action'>Body</Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
+        <Dialog.Popup aria-label='Confirm action'>Body</Dialog.Popup>
       </Dialog.Root>,
     );
 
@@ -617,20 +777,5 @@ describe('accessible name warning', () => {
 
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
-  });
-
-  it('still forwards the popup ref alongside the observing one', () => {
-    const ref = React.createRef<HTMLDivElement>();
-    render(
-      <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          <Dialog.Viewport>
-            <Dialog.Popup ref={ref}>Body</Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
-      </Dialog.Root>,
-    );
-
-    expect(ref.current).toBe(screen.getByText('Body'));
   });
 });

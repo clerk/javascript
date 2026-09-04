@@ -1,6 +1,6 @@
 {
   "name": "@clerk/headless",
-  "version": "0.0.27",
+  "version": "0.0.31",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -53,6 +53,10 @@
       "import": "./dist/primitives/file-upload/index.js",
       "types": "./dist/primitives/file-upload/index.d.ts"
     },
+    "./flow": {
+      "import": "./dist/primitives/flow/index.js",
+      "types": "./dist/primitives/flow/index.d.ts"
+    },
     "./otp": {
       "import": "./dist/primitives/otp/index.js",
       "types": "./dist/primitives/otp/index.d.ts"
@@ -90,7 +94,7 @@
     "react-dom": "catalog:react",
     "rollup-plugin-preserve-directives": "^0.4.0",
     "typescript": "catalog:repo",
-    "vite": "6.4.2",
+    "vite": "6.4.3",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "4.1.6",
     "vitest-axe": "^0.1.0"

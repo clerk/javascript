@@ -332,6 +332,16 @@ export interface Clerk {
    */
   __internal_moduleManager: ModuleManager | undefined;
 
+  /**
+   * The verification-module load timeout asked for by the loader this browser was assigned, or
+   * undefined when it asked for nothing. The assignment is randomized per page load, so it cannot
+   * be recomputed from the environment config; callers fall back to the instance-wide value on
+   * that config, and then to the SDK default.
+   *
+   * @internal
+   */
+  __internal_protectChallengeLoadTimeoutMs?: number;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -837,6 +847,23 @@ export interface Clerk {
    * @param targetNode - Target node to unmount the OAuth consent component from.
    */
   unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts an OAuth device verification component at the target element.
+   *
+   * @param targetNode - Target node to mount the OAuth device verification component.
+   * @param props - OAuth device verification configuration parameters.
+   * @internal
+   */
+  __internal_mountOAuthDeviceVerification: (targetNode: HTMLDivElement, props?: OAuthDeviceVerificationProps) => void;
+
+  /**
+   * Unmounts an OAuth device verification component from the target element.
+   * If there is no component mounted at the target node, this is a noop.
+   *
+   * @internal
+   */
+  __internal_unmountOAuthDeviceVerification: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a TaskChooseOrganization component at the target element.
@@ -2758,6 +2785,13 @@ export type OAuthConsentProps = {
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   onDeny?: () => void;
+};
+
+export type OAuthDeviceVerificationProps = {
+  /**
+   * Customization options to fully match the Clerk component to your own brand.
+   */
+  appearance?: ClerkAppearanceTheme;
 };
 
 /** @deprecated Use OAuthConsentProps instead. */
