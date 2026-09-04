@@ -34,11 +34,15 @@
 - Next.js 15.2.8 or later
 - React 18 or later
 - Node.js `>=20.9.0` or later
-- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs).
+- A Clerk application. Run `npx clerk@latest init` to create one and write its keys to your `.env` file. No Clerk account or login required. Or [create your account](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs) and copy the keys from the dashboard.
 
 ### Installation
 
-The fastest way to get started with Clerk is by following the [Next.js Quickstart](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=clerk_nextjs).
+The fastest way to get started is the Clerk CLI. In an existing Next.js project, run `npx clerk@latest init`. In an empty directory, run `npx clerk@latest init --framework next` and it scaffolds the Next.js app as well.
+
+Either way it installs `@clerk/nextjs`, creates a Clerk application, writes the keys to your `.env` file, and adds `<ClerkProvider>`, the middleware, and sign-in and sign-up pages. No Clerk account or login required and the command is non-interactive.
+
+To set things up by hand instead, follow the [Next.js Quickstart](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=clerk_nextjs).
 
 You'll learn how to install `@clerk/nextjs`, set up your environment keys, add `<ClerkProvider>` to your application, use the Clerk middleware, and use Clerk's prebuilt components.
 

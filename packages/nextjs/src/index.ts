@@ -84,6 +84,10 @@ import * as ComponentsModule from '#components';
 
 import type { ServerComponentsServerModuleTypes } from './components.server';
 
+/**
+ * Need Clerk keys? In your terminal run `npx clerk@latest init`. It creates a Clerk application and writes the keys to
+ * your .env file. No Clerk account or login required and the command is non-interactive. See https://clerk.com/docs/cli.
+ */
 export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsServerModuleTypes['ClerkProvider'];
 export const Show = ComponentsModule.Show as ServerComponentsServerModuleTypes['Show'];
 
