@@ -113,7 +113,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
         className={`prose relative mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
         {meta?.source ? (
-          <div className='absolute top-3 right-3 sm:top-8 sm:right-8'>
+          <div className='absolute right-3 top-3 sm:right-8 sm:top-8'>
             <ViewSource source={meta.source} />
           </div>
         ) : null}

@@ -42,7 +42,7 @@ export function CompositionPanel({ pieces }: { pieces: CompositionPiece[] }) {
           key={layer}
           className='flex flex-col gap-2'
         >
-          <div className='text-brand text-[10px] font-semibold tracking-widest uppercase'>{layer}</div>
+          <div className='text-brand text-[10px] font-semibold uppercase tracking-widest'>{layer}</div>
           {groups
             .get(layer)
             ?.slice()
