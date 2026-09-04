@@ -39,7 +39,20 @@ describe('Pages Router ClerkProvider (server render)', () => {
 
     expect(html).toContain('child');
     expect(notice).toHaveBeenCalledTimes(1);
-    expect(notice).toHaveBeenCalledWith({ publishableKey: DEV_KEY, disabled: false });
+    expect(notice).toHaveBeenCalledWith({ publishableKey: DEV_KEY, disabled: false, keyless: false });
+  });
+
+  it('flags keys that came from keyless mode', () => {
+    renderToStaticMarkup(
+      <ClerkProvider
+        publishableKey={DEV_KEY}
+        __internal_keyless_claimKeylessApplicationUrl='https://dashboard.clerk.com/claim'
+      >
+        child
+      </ClerkProvider>,
+    );
+
+    expect(notice).toHaveBeenCalledWith(expect.objectContaining({ keyless: true }));
   });
 
   it('passes the opt-out through when set as a prop', () => {

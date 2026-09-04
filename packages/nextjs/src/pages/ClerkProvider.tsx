@@ -50,6 +50,7 @@ export function ClerkProvider<TUi extends Ui = Ui>({ children, ...props }: NextC
   maybeShowDevelopmentKeyNotice({
     publishableKey: mergedProps.publishableKey,
     disabled: mergedProps.unsafe_disableDevelopmentModeConsoleWarning,
+    keyless: Boolean(mergedProps.__internal_keyless_claimKeylessApplicationUrl),
   });
   // ClerkProvider automatically injects __clerk_ssr_state
   // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
