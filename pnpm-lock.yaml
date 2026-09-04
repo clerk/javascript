@@ -367,8 +367,8 @@ importers:
         specifier: 5.1.16
         version: 5.1.16
       nanostores:
-        specifier: 1.0.1
-        version: 1.0.1
+        specifier: 1.5.1
+        version: 1.5.1
     devDependencies:
       '@clerk/ui':
         specifier: workspace:^
@@ -11817,8 +11817,8 @@ packages:
     engines: {node: ^18 || >=20}
     hasBin: true
 
-  nanostores@1.0.1:
-    resolution: {integrity: sha512-kNZ9xnoJYKg/AfxjrVL4SS0fKX++4awQReGqWnwTRHxeHGZ1FJFVgTqr/eMrNQdp0Tz7M7tG/TDaX8QfHDwVCw==}
+  nanostores@1.5.1:
+    resolution: {integrity: sha512-DNIX+HyFpo14fKGe0NsX9/aPzdKGiSZwX5xEMpDwQrDdo2iTiUYunOCCQLYwJrziKVe8ZOtVvcv0dEVI8lMx2g==}
     engines: {node: ^20.0.0 || >=22.0.0}
 
   nanotar@0.3.0:
@@ -28545,7 +28545,7 @@ snapshots:
 
   nanoid@5.1.16: {}
 
-  nanostores@1.0.1: {}
+  nanostores@1.5.1: {}
 
   nanotar@0.3.0: {}
 
