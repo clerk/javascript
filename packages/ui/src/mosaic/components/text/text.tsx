@@ -5,9 +5,9 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { useContextProps } from '../../utils/context';
-import { reset } from '../reset.styles';
-import type { TypographyColor, TypographySize } from '../typography.styles';
-import { colors, sizes, styles } from '../typography.styles';
+import { reset } from '../../utils/reset.styles';
+import type { TypographyColor, TypographySize } from '../../utils/typography.styles';
+import { colors, sizes, styles } from '../../utils/typography.styles';
 
 export interface TextProps extends MosaicComponentProps<'p'> {
   size?: TypographySize;

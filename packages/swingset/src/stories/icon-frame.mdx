@@ -1,0 +1,70 @@
+import * as IconFrameStories from './icon-frame.stories';
+
+# IconFrame
+
+IconFrame centers an icon or other visual in a square Mosaic surface. `bordered` and `filled` are independent treatments, while `size` controls the frame dimensions. The default is a bordered 40px frame; the filled treatment uses `oklch(0.9702 0 0)` in light mode and `oklch(0.2393 0 0)` in dark mode.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={IconFrameStories}
+/>
+
+## Props
+
+<PropTable
+  meta={IconFrameStories.meta}
+  extra={[{ name: 'render', type: '(props) => ReactNode' }]}
+/>
+
+## Usage
+
+```tsx
+import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
+
+<IconFrame
+  bordered={false}
+  filled
+  size='lg'
+>
+  <Icon name='check' />
+</IconFrame>
+```
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={IconFrameStories}
+  composition={[{ name: 'Icon', href: '/components/icon', layer: 'Components' }]}
+/>
+
+`sm`, `md`, `lg`, and `xl` map to 28px, 32px, 36px, and 40px respectively.
+
+### Treatments
+
+<Story
+  name='Treatments'
+  storyModule={IconFrameStories}
+/>
+
+`bordered` and `filled` can be used separately, together, or both disabled for a centered bare icon.
+
+### Custom surface
+
+<Story
+  name='CustomSurface'
+  storyModule={IconFrameStories}
+/>
+
+### Brand icons
+
+<Story
+  name='BrandIcons'
+  storyModule={IconFrameStories}
+/>

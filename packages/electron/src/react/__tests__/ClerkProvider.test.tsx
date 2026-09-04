@@ -99,6 +99,77 @@ describe('Electron ClerkProvider', () => {
     });
   });
 
+  describe('router handlers', () => {
+    const renderWithRouter = (props: Record<string, unknown> = {}) => {
+      renderToStaticMarkup(
+        <ClerkProvider
+          publishableKey='pk_test_provider'
+          {...props}
+        >
+          <span>App</span>
+        </ClerkProvider>,
+      );
+
+      return {
+        routerPush: capturedProviderProps?.routerPush as (to: string, metadata?: unknown) => void,
+        routerReplace: capturedProviderProps?.routerReplace as (to: string, metadata?: unknown) => void,
+      };
+    };
+
+    it('always supplies both handlers so clerk-js never falls back to a window navigation', () => {
+      const { routerPush, routerReplace } = renderWithRouter();
+
+      expect(routerPush).toBeTypeOf('function');
+      expect(routerReplace).toBeTypeOf('function');
+    });
+
+    it('absorbs virtual router paths instead of forwarding them to the application router', () => {
+      const push = vi.fn();
+      const replace = vi.fn();
+      const windowNavigate = vi.fn();
+      const { routerPush, routerReplace } = renderWithRouter({ routerPush: push, routerReplace: replace });
+
+      routerPush('/CLERK-ROUTER/VIRTUAL/sign-up#/continue', { windowNavigate });
+      routerReplace('/CLERK-ROUTER/VIRTUAL/sign-in#/factor-two', { windowNavigate });
+
+      expect(push).not.toHaveBeenCalled();
+      expect(replace).not.toHaveBeenCalled();
+      expect(windowNavigate).not.toHaveBeenCalled();
+    });
+
+    it('absorbs virtual router paths even without an application router', () => {
+      const windowNavigate = vi.fn();
+      const { routerPush } = renderWithRouter();
+
+      routerPush('/CLERK-ROUTER/VIRTUAL/sign-up#/continue', { windowNavigate });
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+    });
+
+    it('forwards real destinations to the application router', () => {
+      const push = vi.fn();
+      const replace = vi.fn();
+      const windowNavigate = vi.fn();
+      const { routerPush, routerReplace } = renderWithRouter({ routerPush: push, routerReplace: replace });
+
+      routerPush('/settings/connections', { windowNavigate });
+      routerReplace('/dashboard', { windowNavigate });
+
+      expect(push).toHaveBeenCalledWith('/settings/connections', { windowNavigate });
+      expect(replace).toHaveBeenCalledWith('/dashboard', { windowNavigate });
+      expect(windowNavigate).not.toHaveBeenCalled();
+    });
+
+    it('falls back to the host navigation for real destinations when no application router is provided', () => {
+      const windowNavigate = vi.fn();
+      const { routerPush } = renderWithRouter();
+
+      routerPush('/settings/connections', { windowNavigate });
+
+      expect(windowNavigate).toHaveBeenCalledWith('/settings/connections');
+    });
+  });
+
   it('defaults allowedRedirectProtocols to the renderer custom scheme', () => {
     stubWindowProtocol('clerk:');
 

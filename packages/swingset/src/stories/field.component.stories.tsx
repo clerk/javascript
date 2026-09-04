@@ -32,3 +32,16 @@ export function Default() {
     </Field.Root>
   );
 }
+
+export function VisuallyHiddenLabel() {
+  return (
+    <Field.Root style={stackStyles}>
+      <Field.Label visuallyHidden>Search members</Field.Label>
+      <Input
+        name='search'
+        type='search'
+        placeholder='Search members'
+      />
+    </Field.Root>
+  );
+}

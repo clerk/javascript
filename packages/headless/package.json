@@ -1,69 +1,73 @@
 {
   "name": "@clerk/headless",
-  "version": "0.0.27",
+  "version": "0.0.31",
   "private": true,
   "sideEffects": false,
   "type": "module",
   "exports": {
     "./accordion": {
-      "import": "./dist/primitives/accordion/index.js",
-      "types": "./dist/primitives/accordion/index.d.ts"
+      "types": "./dist/primitives/accordion/index.d.ts",
+      "import": "./dist/primitives/accordion/index.js"
     },
     "./button": {
-      "import": "./dist/primitives/button/index.js",
-      "types": "./dist/primitives/button/index.d.ts"
+      "types": "./dist/primitives/button/index.d.ts",
+      "import": "./dist/primitives/button/index.js"
     },
     "./tabs": {
-      "import": "./dist/primitives/tabs/index.js",
-      "types": "./dist/primitives/tabs/index.d.ts"
+      "types": "./dist/primitives/tabs/index.d.ts",
+      "import": "./dist/primitives/tabs/index.js"
     },
     "./tooltip": {
-      "import": "./dist/primitives/tooltip/index.js",
-      "types": "./dist/primitives/tooltip/index.d.ts"
+      "types": "./dist/primitives/tooltip/index.d.ts",
+      "import": "./dist/primitives/tooltip/index.js"
     },
     "./popover": {
-      "import": "./dist/primitives/popover/index.js",
-      "types": "./dist/primitives/popover/index.d.ts"
+      "types": "./dist/primitives/popover/index.d.ts",
+      "import": "./dist/primitives/popover/index.js"
     },
     "./select": {
-      "import": "./dist/primitives/select/index.js",
-      "types": "./dist/primitives/select/index.d.ts"
+      "types": "./dist/primitives/select/index.d.ts",
+      "import": "./dist/primitives/select/index.js"
     },
     "./menu": {
-      "import": "./dist/primitives/menu/index.js",
-      "types": "./dist/primitives/menu/index.d.ts"
+      "types": "./dist/primitives/menu/index.d.ts",
+      "import": "./dist/primitives/menu/index.js"
     },
     "./autocomplete": {
-      "import": "./dist/primitives/autocomplete/index.js",
-      "types": "./dist/primitives/autocomplete/index.d.ts"
+      "types": "./dist/primitives/autocomplete/index.d.ts",
+      "import": "./dist/primitives/autocomplete/index.js"
     },
     "./collapsible": {
-      "import": "./dist/primitives/collapsible/index.js",
-      "types": "./dist/primitives/collapsible/index.d.ts"
+      "types": "./dist/primitives/collapsible/index.d.ts",
+      "import": "./dist/primitives/collapsible/index.js"
     },
     "./dialog": {
-      "import": "./dist/primitives/dialog/index.js",
-      "types": "./dist/primitives/dialog/index.d.ts"
+      "types": "./dist/primitives/dialog/index.d.ts",
+      "import": "./dist/primitives/dialog/index.js"
     },
     "./drawer": {
-      "import": "./dist/primitives/drawer/index.js",
-      "types": "./dist/primitives/drawer/index.d.ts"
+      "types": "./dist/primitives/drawer/index.d.ts",
+      "import": "./dist/primitives/drawer/index.js"
     },
     "./file-upload": {
-      "import": "./dist/primitives/file-upload/index.js",
-      "types": "./dist/primitives/file-upload/index.d.ts"
+      "types": "./dist/primitives/file-upload/index.d.ts",
+      "import": "./dist/primitives/file-upload/index.js"
+    },
+    "./flow": {
+      "types": "./dist/primitives/flow/index.d.ts",
+      "import": "./dist/primitives/flow/index.js"
     },
     "./otp": {
-      "import": "./dist/primitives/otp/index.js",
-      "types": "./dist/primitives/otp/index.d.ts"
+      "types": "./dist/primitives/otp/index.d.ts",
+      "import": "./dist/primitives/otp/index.js"
     },
     "./hooks": {
-      "import": "./dist/hooks/index.js",
-      "types": "./dist/hooks/index.d.ts"
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.js"
     },
     "./utils": {
-      "import": "./dist/utils/index.js",
-      "types": "./dist/utils/index.d.ts"
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js"
     }
   },
   "scripts": {
@@ -81,7 +85,7 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/user-event": "^14.6.5",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "axe-core": "^4.11.3",
@@ -90,9 +94,9 @@
     "react-dom": "catalog:react",
     "rollup-plugin-preserve-directives": "^0.4.0",
     "typescript": "catalog:repo",
-    "vite": "6.4.2",
+    "vite": "6.4.3",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "4.1.6",
+    "vitest": "4.1.11",
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {
