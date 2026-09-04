@@ -169,6 +169,7 @@ export type SignInCreateParams = (
 ) & {
   transfer?: boolean;
   signUpIfMissing?: boolean;
+  timezone?: string;
 };
 
 export type ResetPasswordParams = {
