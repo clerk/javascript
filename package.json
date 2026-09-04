@@ -93,7 +93,7 @@
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/cross-spawn": "^6.0.6",
-    "@types/node": "^22.19.17",
+    "@types/node": "^22.20.1",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "^4.5.2",
@@ -155,10 +155,10 @@
     "vitest": "4.1.5",
     "zx": "catalog:repo"
   },
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
+  "packageManager": "pnpm@10.34.5+sha512.a4ee05f2f73658255bd6a89859c065a45c28a57daefae2c893a168ee2b73168c37b91e83e57ea67654ad03f03031746430e8bce38e362e042605fb8abc80192e",
   "engines": {
     "node": ">=24.15.0",
-    "pnpm": ">=10.33.0"
+    "pnpm": ">=10.34.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -166,7 +166,7 @@
       "msw"
     ],
     "overrides": {
-      "@babel/plugin-transform-modules-systemjs@<=7.29.3": "7.29.4",
+      "@babel/plugin-transform-modules-systemjs@<=7.29.3": "7.29.8",
       "axios@<0.33.0": "0.33.0",
       "chokidar@<5.0.0": "5.0.0",
       "fast-uri@<3.1.6": "3.1.6",
