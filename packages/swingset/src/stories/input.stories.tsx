@@ -14,9 +14,11 @@ export const meta: StoryMeta = {
   styles: {
     _variants: {
       size: { sm: {}, md: {}, lg: {} },
+      variant: { default: {}, headless: {} },
     },
     _defaultVariants: {
       size: 'md',
+      variant: 'default',
     },
   },
 };
@@ -73,5 +75,17 @@ export function Invalid(props: Record<string, unknown>) {
       aria-invalid='true'
       placeholder='Invalid'
     />
+  );
+}
+
+export function Headless(props: Record<string, unknown>) {
+  return (
+    <div style={{ border: '1px solid currentColor', borderRadius: 8 }}>
+      <Input
+        {...knobsAsProps(props)}
+        variant='headless'
+        placeholder='Parent provides the field chrome'
+      />
+    </div>
   );
 }

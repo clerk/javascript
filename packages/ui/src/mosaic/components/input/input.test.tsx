@@ -24,6 +24,19 @@ describe('Mosaic Input', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveAttribute('data-size', size);
   });
 
+  it('removes field chrome with the headless variant', () => {
+    render(
+      <Input
+        variant='headless'
+        aria-label='Search'
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Search' });
+    expect(input).toHaveClass('cl-input');
+    expect(input).toHaveAttribute('data-variant', 'headless');
+  });
+
   it('reflects and forwards the disabled state', () => {
     render(
       <Input
