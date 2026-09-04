@@ -31,6 +31,15 @@ export function originSatisfiesRpId(env: Pick<StrategyEnv, 'protocol' | 'hostnam
   return env.hostname === rpId || env.hostname.endsWith(`.${rpId}`);
 }
 
+/** Whether the origin could satisfy some RP ID, without knowing which one is requested. */
+function originCanSatisfyRpId(env: Pick<StrategyEnv, 'protocol' | 'hostname'>): boolean {
+  return env.protocol === 'https:' || (env.protocol === 'http:' && isLoopbackHostname(env.hostname));
+}
+
+function prefersNativeOnLegacyDarwin(env: StrategyEnv): boolean {
+  return env.platform === 'darwin' && env.electronMajor > 0 && env.electronMajor < 42 && env.nativeAvailable;
+}
+
 /**
  * Prefer Chromium WebAuthn when the page origin can satisfy the RP ID.
  * Local bundles and older macOS Electron builds use the native bridge when available.
@@ -44,11 +53,23 @@ export function decidePath(rpId: string, mode: PasskeyMode, env: StrategyEnv): P
   }
 
   if (env.hasWebAuthn && originSatisfiesRpId(env, rpId)) {
-    if (env.platform === 'darwin' && env.electronMajor > 0 && env.electronMajor < 42 && env.nativeAvailable) {
-      return 'native';
-    }
-    return 'renderer';
+    return prefersNativeOnLegacyDarwin(env) ? 'native' : 'renderer';
   }
 
   return env.nativeAvailable ? 'native' : 'unsupported';
+}
+
+/**
+ * Whether a request can take the renderer path, evaluated without RP ID.
+ * More loose than originSatisfiesRpId as we don't have an RP ID yet.
+ * This informs if Chromium *can* service a request rather than *will service*
+ */
+export function canUseRendererPath(mode: PasskeyMode, env: StrategyEnv): boolean {
+  if (!env.hasWebAuthn || mode === 'native') {
+    return false;
+  }
+  if (mode === 'renderer') {
+    return true;
+  }
+  return originCanSatisfyRpId(env) && !prefersNativeOnLegacyDarwin(env);
 }

@@ -1,0 +1,72 @@
+import * as UserProfileProfilePanelStories from './user-profile-profile-panel.stories';
+
+# UserProfileProfilePanel
+
+The Profile panel from UserProfile, composed without the surrounding navigation shell. The
+presentational view uses `Section` for its account details, connected accounts, Web3 wallets, and danger zone
+while preserving the existing resource props and callback seams.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={UserProfileProfilePanelStories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
+
+<UserProfileProfilePanelView
+  allowMultipleAccounts={allowMultipleAccounts}
+  imageUrl={user.imageUrl}
+  name={user.fullName ?? ''}
+  username={user.username ?? ''}
+  emails={user.emailAddresses.map(email => ({
+    id: email.id,
+    value: email.emailAddress,
+    isDefault: email.id === user.primaryEmailAddressId,
+    isVerified: email.verification.status === 'verified',
+  }))}
+  phones={user.phoneNumbers.map(phone => ({
+    id: phone.id,
+    value: phone.phoneNumber,
+    isDefault: phone.id === user.primaryPhoneNumberId,
+    isVerified: phone.verification.status === 'verified',
+  }))}
+  connectedAccounts={user.externalAccounts.map(account => ({
+    id: account.id,
+    provider: account.provider,
+    identifier: account.emailAddress,
+    connected: true,
+  }))}
+  web3Wallets={supportedWeb3Wallets.map(provider => {
+    const wallet = user.web3Wallets.find(wallet => wallet.provider === provider.id);
+
+    return {
+      id: provider.id,
+      provider: provider.name,
+      iconUrl: provider.iconUrl,
+      address: wallet?.web3Wallet,
+      connected: Boolean(wallet),
+      isPrimary: wallet?.id === user.primaryWeb3WalletId,
+      isVerified: wallet ? wallet.verification.status === 'verified' : undefined,
+    };
+  })}
+  onVerifyEmail={verifyEmail}
+  onSetPrimaryEmail={setPrimaryEmail}
+  onRemoveEmail={removeEmail}
+  onVerifyPhone={verifyPhone}
+  onSetPrimaryPhone={setPrimaryPhone}
+  onRemovePhone={removePhone}
+  onRemoveConnectedAccount={removeConnectedAccount}
+  onConnectWeb3Wallet={connectWeb3Wallet}
+  onSetPrimaryWeb3Wallet={setPrimaryWeb3Wallet}
+  onRemoveWeb3Wallet={removeWeb3Wallet}
+/>
+```

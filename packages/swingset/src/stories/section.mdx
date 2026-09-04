@@ -26,9 +26,9 @@ import { Section } from '@clerk/ui/mosaic/components/section';
 </Section.Root>
 ```
 
-`Section.Group` owns the outlined surface. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `md` and `lg` sizes.
+`Section.Group` owns the outlined surface. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`, and `xl` sizes.
 
-Use `Section.Items` for a nested value list beneath a row's header item. The row keeps an 8px header-to-list gap, nested items stack without gaps at a 44px minimum height, and their content receives 12px vertical padding.
+Use `Section.Items` for a nested value list beneath a row's header item. The row keeps a 12px header-to-list gap, and nested items stack without gaps with 4px vertical padding.
 
 ## Examples
 
@@ -60,6 +60,17 @@ Use `Section.Items` for a nested value list beneath a row's header item. The row
   storyModule={SectionStories}
   composition={[
     { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Icon', href: '/components/icon', layer: 'Components' },
+  ]}
+/>
+
+### Framed icon media
+
+<Story
+  name='IconFrameMedia'
+  storyModule={SectionStories}
+  composition={[
+    { name: 'IconFrame', href: '/components/icon-frame', layer: 'Components' },
     { name: 'Icon', href: '/components/icon', layer: 'Components' },
   ]}
 />

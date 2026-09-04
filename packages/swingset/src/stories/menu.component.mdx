@@ -23,31 +23,38 @@ import { Menu } from '@clerk/ui/mosaic/components/menu';
 
 <Menu.Root>
   <Menu.Trigger />
-  <Menu.Content>
+  <Menu.Popup>
     <Menu.Item label='Add workspace'>
-      <Icon name='plus' />
-      Add workspace
+      <Menu.Media>
+        <Icon name='plus' />
+      </Menu.Media>
+      <Menu.Label>Add workspace</Menu.Label>
     </Menu.Item>
     <Menu.Item
       label='Sign out'
       onClick={signOut}
     >
-      <Icon name='log-out' />
-      Sign out
+      <Menu.Media>
+        <Icon name='log-out' />
+      </Menu.Media>
+      <Menu.Label>Sign out</Menu.Label>
     </Menu.Item>
     <Menu.Item
       label='Delete user'
       color='negative'
       onClick={deleteUser}
     >
-      <Icon name='close' />
-      Delete user
+      <Menu.Media>
+        <Icon name='close' />
+      </Menu.Media>
+      <Menu.Label>Delete user</Menu.Label>
     </Menu.Item>
-  </Menu.Content>
+  </Menu.Popup>
 </Menu.Root>;
 ```
 
-`Menu.Content` composes the portal, positioner, and popup, so items are the only children you write.
+`Menu.Popup` renders the portal and the floating positioner itself — neither is a part you compose
+— so items are the only children you write.
 
 ### Trigger
 
@@ -63,20 +70,79 @@ props (ARIA attributes, click and keyboard handlers) to spread.
 
 ### Items
 
-`label` drives typeahead and is used as the visible text when `children` is omitted. Render an icon
-and text together as children. Use `color='negative'` for destructive actions; the color is
-inherited by the children. `disabled` items are skipped by keyboard navigation and their `onClick`
-never fires. Activating an item closes the menu; pass `closeOnClick={false}` to keep it open.
+`label` names the item for typeahead and for assistive technology. What the row shows is composed
+from `Menu.Media` and `Menu.Label`, and those children are required: text dropped straight into the
+item is not a flex child the row can size, so it neither lines up with the other rows nor
+truncates. A row with nothing to lead it is `Menu.Label` alone. Use
+`color='negative'` for destructive actions; the color is inherited by the children. `disabled` items
+are skipped by keyboard navigation and their `onClick` never fires. Activating an item closes the
+menu; pass `closeOnClick={false}` to keep it open.
 
 ```tsx
+<Menu.Item
+  label='Revoke'
+  color='negative'
+>
+  <Menu.Label>Revoke</Menu.Label>
+</Menu.Item>
+
 <Menu.Item
   label='Delete'
   color='negative'
 >
-  <Icon name='close' />
-  Delete
+  <Menu.Media>
+    <Icon name='close' />
+  </Menu.Media>
+  <Menu.Label>Delete</Menu.Label>
 </Menu.Item>
 ```
+
+### Media
+
+`Menu.Media` is a square leading column that centers whatever it holds — an icon, an image, an
+avatar. Items that lead with marks of differing widths need it: without it each row sets its own
+text start, and the labels no longer line up. Leave it empty on an item that leads with nothing and
+that row keeps the column. It renders a `span`, since the item it sits in is a button.
+
+`size` is the column's width: `sm` (the default) fits an icon or an avatar, `xs` a bare glyph. The
+row has no height of its own, so it takes whatever the media asks for. That makes the size a
+per-menu decision rather than a per-item one: give every item in one menu the same value, or their
+text no longer starts on one line.
+
+```tsx
+<Menu.Media size='xs'>
+  <Icon name='check' />
+</Menu.Media>
+```
+
+### Label
+
+`Menu.Label` takes the space between the media and whatever trails it, and truncates its text to one
+line. Items whose text is a name — an account, a workspace — need it most: a long name would widen
+the menu instead of ellipsing. It is also what pushes a trailing mark to the end of the row. Use it
+for every composed item, so rows built from parts all read the same.
+
+The two together are the whole of a row that leads with an avatar and trails with a check:
+
+```tsx
+<Menu.Item label='colin@clerk.dev'>
+  <Menu.Media>
+    <Avatar.Root
+      shape='circle'
+      size='fit'
+    >
+      <Avatar.Fallback>C</Avatar.Fallback>
+    </Avatar.Root>
+  </Menu.Media>
+  <Menu.Label>colin@clerk.dev</Menu.Label>
+  <Icon name='check' size='sm' />
+</Menu.Item>
+```
+
+<Story
+  name='Accounts'
+  storyModule={MenuStories}
+/>
 
 ### Placement
 
@@ -91,6 +157,37 @@ view, and its `max-height` tracks the available space so long menus scroll rathe
   …
 </Menu.Root>;
 ```
+
+`sideOffset` also takes `{ x, y }`, one gap per axis, for a menu that can flip between the two: what
+it has to clear sideways is not what it has to clear above. `fallbackPlacements` names where it goes
+when `placement` does not fit, in the order it tries them, instead of the opposite side. A menu
+opened from inside another floating surface wants both — the opposite side is that surface, so it
+has to be given somewhere else to land.
+
+```tsx
+<Menu.Root
+  placement='right-start'
+  sideOffset={{ x: 16, y: 8 }}
+  fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
+>
+  …
+</Menu.Root>;
+```
+
+### Scrolling
+
+A menu with more items than fit gets the shared ScrollArea treatment rather than a bare scrollbar:
+the rows fade out at whichever edge still has content past it, and the thumb lifts as the pointer
+enters. Nothing to opt into — `Menu.Popup` composes it.
+
+The popup itself only supplies the chrome and the height cap; the rows scroll in a `menu-viewport`
+inside it. They cannot be one element, because the fade is a `mask-image` and a mask on the popup
+would clip its own background and drop shadow along with the overflowing rows.
+
+<Story
+  name='Overflowing'
+  storyModule={MenuStories}
+/>
 
 ### Controlled
 
@@ -107,13 +204,16 @@ const [open, setOpen] = useState(false);
 
 ## Parts
 
-| Part             | Slot                             | Description                                                           |
-| ---------------- | -------------------------------- | --------------------------------------------------------------------- |
-| `Menu.Root`      | —                                | State provider; owns open/close, placement, and keyboard navigation.  |
-| `Menu.Trigger`   | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis. |
-| `Menu.Content`   | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                    |
-| `Menu.Item`      | `menu-item`                      | A single action whose content is composed through children.           |
-| `Menu.Separator` | `menu-separator`                 | Full-bleed divider between groups of items.                           |
+| Part             | Slot                             | Description                                                                     |
+| ---------------- | -------------------------------- | ------------------------------------------------------------------------------- |
+| `Menu.Root`      | —                                | State provider; owns open/close, placement, and keyboard navigation.            |
+| `Menu.Trigger`   | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis.           |
+| `Menu.Popup`     | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                              |
+| ↳ viewport       | `menu-viewport`                  | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.  |
+| `Menu.Item`      | `menu-item`                      | A single action whose content is composed through children.                     |
+| `Menu.Media`     | `menu-media`                     | Square leading column that centers an item's icon, image, or avatar.            |
+| `Menu.Label`     | `menu-label`                     | The item's text. Fills the row between media and trailing marks, and truncates. |
+| `Menu.Separator` | `menu-separator`                 | Full-bleed divider between groups of items.                                     |
 
 ## Styling
 

@@ -244,4 +244,4 @@ if (!element) return null;
 Tests run in **real Chromium** (vitest browser mode), not jsdom, and include
 `axe` accessibility assertions. `pnpm test` in `packages/headless`. See
 `testing.md` for the Mosaic flow-layer testing model (a different concern — that
-covers machines/controllers/views, not these primitives).
+covers models/controllers/views, not these primitives).
