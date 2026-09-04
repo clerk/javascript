@@ -45,7 +45,7 @@ export function ClientRoot({ children }: { children: React.ReactNode }) {
           <SidebarTrigger className='-ml-1' />
           <Separator
             orientation='vertical'
-            className='data-vertical:h-4 data-vertical:self-auto mr-2'
+            className='mr-2 data-vertical:h-4 data-vertical:self-auto'
           />
           {crumbs.length > 0 && (
             <Breadcrumb>

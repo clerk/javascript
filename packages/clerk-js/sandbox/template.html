@@ -260,6 +260,11 @@
             component="<OAuthConsent />"
           ></nav-link>
           <nav-link
+            href="/oauth-device-verification"
+            label="OAuth Device Verification"
+            component="<OAuthDeviceVerification />"
+          ></nav-link>
+          <nav-link
             href="/api-keys"
             label="API Keys"
             component="<APIKeys />"
@@ -402,7 +407,7 @@
 
     <button
       id="sidebarToggle"
-      class="border-sidebar-border bg-sidebar text-sidebar-foreground fixed left-3 top-3 z-50 rounded-md border p-1.5 lg:hidden"
+      class="border-sidebar-border bg-sidebar text-sidebar-foreground fixed top-3 left-3 z-50 rounded-md border p-1.5 lg:hidden"
       aria-label="Toggle sidebar"
     >
       <svg
@@ -421,7 +426,7 @@
     </button>
 
     <main
-      class="flex h-full min-w-px flex-1 items-center justify-center overflow-y-auto overflow-x-hidden px-4 py-12 md:px-12"
+      class="flex h-full min-w-px flex-1 items-center justify-center overflow-x-hidden overflow-y-auto px-4 py-12 md:px-12"
     >
       <div
         id="app"

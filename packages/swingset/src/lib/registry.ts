@@ -1,10 +1,5 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
-import {
-  Default as AlertDialogDefault,
-  DiscardChanges as AlertDialogDiscardChanges,
-  meta as alertDialogComponentMeta,
-} from '../stories/alert-dialog.component.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -20,18 +15,32 @@ import {
   Primary as BadgePrimary,
   WithIcon as BadgeWithIcon,
 } from '../stories/badge.stories';
-import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import {
-  Centered as CardCentered,
-  Default as CardDefault,
-  meta as cardComponentMeta,
-} from '../stories/card.component.stories';
+  Announced as BannerAnnounced,
+  Colors as BannerColors,
+  Default as BannerDefault,
+  LabelOnly as BannerLabelOnly,
+  meta as bannerMeta,
+} from '../stories/banner.stories';
+import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import {
+  Default as DestructiveDefault,
+  meta as destructiveMeta,
+  WithError as DestructiveWithError,
+} from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
-import { Default as FieldDefault, meta as fieldMeta } from '../stories/field.component.stories';
+import {
+  Default as FieldDefault,
+  meta as fieldMeta,
+  VisuallyHiddenLabel as FieldVisuallyHiddenLabel,
+} from '../stories/field.component.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
+import { Default as FlowDefault, meta as flowComponentMeta } from '../stories/flow.component.stories';
+import { meta as flowMeta } from '../stories/flow.stories';
 import {
   Colors as HeadingColors,
   Default as HeadingDefault,
@@ -45,6 +54,14 @@ import {
   Override as IconOverride,
   Sizes as IconSizes,
 } from '../stories/icon.stories';
+import {
+  BrandIcons as IconFrameBrandIcons,
+  CustomSurface as IconFrameCustomSurface,
+  Default as IconFrameDefault,
+  meta as iconFrameMeta,
+  Sizes as IconFrameSizes,
+  Treatments as IconFrameTreatments,
+} from '../stories/icon-frame.stories';
 import {
   Default,
   Disabled as InputDisabled,
@@ -61,6 +78,13 @@ import {
 } from '../stories/item.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OtpComponentDefault,
+  Disabled as OtpComponentDisabled,
+  Error as OtpComponentError,
+  meta as otpComponentMeta,
+  Success as OtpComponentSuccess,
+} from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -69,6 +93,27 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import {
+  AuthenticatorOTP as ReverificationAuthenticatorOTP,
+  BackupCode as ReverificationBackupCode,
+  BackupCodeError as ReverificationBackupCodeError,
+  BackupCodePending as ReverificationBackupCodePending,
+  Default as ReverificationDefault,
+  Help as ReverificationHelp,
+  meta as reverificationMeta,
+  MethodPicker as ReverificationMethodPicker,
+  MethodPickerPending as ReverificationMethodPickerPending,
+  OTP as ReverificationOTP,
+  OTPError as ReverificationOTPError,
+  OTPPending as ReverificationOTPPending,
+  OTPResending as ReverificationOTPResending,
+  Passkey as ReverificationPasskey,
+  PasskeyError as ReverificationPasskeyError,
+  PasskeyPending as ReverificationPasskeyPending,
+  Password as ReverificationPassword,
+  PasswordError as ReverificationPasswordError,
+  PasswordPending as ReverificationPasswordPending,
+} from '../stories/reverification.stories';
 import {
   Default as ScrollAreaDefault,
   Gutter as ScrollAreaGutter,
@@ -82,6 +127,7 @@ import {
   ConnectedAccounts as SectionConnectedAccounts,
   Default as SectionDefault,
   Destructive as SectionDestructive,
+  IconFrameMedia as SectionIconFrameMedia,
   meta as sectionMeta,
   MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
@@ -132,6 +178,7 @@ import {
 import {
   Default as UserProfileDeleteSectionDefault,
   meta as userProfileDeleteSectionMeta,
+  WithError as UserProfileDeleteSectionWithError,
 } from '../stories/user-profile-delete-section.stories';
 import {
   Default as UserProfileMfaSectionDefault,
@@ -168,6 +215,11 @@ import {
   Default as UserProfileWeb3WalletsSectionDefault,
   meta as userProfileWeb3WalletsSectionMeta,
 } from '../stories/user-profile-web3-wallets-section.stories';
+import {
+  Default as VisuallyHiddenDefault,
+  LiveRegion as VisuallyHiddenLiveRegion,
+  meta as visuallyHiddenMeta,
+} from '../stories/visually-hidden.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -176,17 +228,12 @@ const sectionModule: StoryModule = {
   Default: SectionDefault,
   MultipleEmailAndPhoneNumbers: SectionMultipleEmailAndPhoneNumbers,
   ConnectedAccounts: SectionConnectedAccounts,
+  IconFrameMedia: SectionIconFrameMedia,
   Destructive: SectionDestructive,
 };
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
-const alertDialogComponentModule: StoryModule = {
-  meta: alertDialogComponentMeta,
-  Default: AlertDialogDefault,
-  DiscardChanges: AlertDialogDiscardChanges,
-};
-
-const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
+const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
 
 const avatarModule: StoryModule = {
   meta: avatarMeta,
@@ -202,6 +249,14 @@ const badgeModule: StoryModule = {
   Primary: BadgePrimary,
   Colors: BadgeColors,
   WithIcon: BadgeWithIcon,
+};
+
+const bannerModule: StoryModule = {
+  meta: bannerMeta,
+  Default: BannerDefault,
+  Colors: BannerColors,
+  LabelOnly: BannerLabelOnly,
+  Announced: BannerAnnounced,
 };
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
@@ -239,11 +294,31 @@ const headingModule: StoryModule = {
 
 const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
 
+const otpComponentModule: StoryModule = {
+  meta: otpComponentMeta,
+  Default: OtpComponentDefault,
+  Success: OtpComponentSuccess,
+  Error: OtpComponentError,
+  Disabled: OtpComponentDisabled,
+};
+
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
 const fieldModule: StoryModule = {
   meta: fieldMeta,
   Default: FieldDefault,
+  VisuallyHiddenLabel: FieldVisuallyHiddenLabel,
+};
+
+const visuallyHiddenModule: StoryModule = {
+  meta: visuallyHiddenMeta,
+  Default: VisuallyHiddenDefault,
+  LiveRegion: VisuallyHiddenLiveRegion,
+};
+
+const flowComponentModule: StoryModule = {
+  meta: flowComponentMeta,
+  Default: FlowDefault,
 };
 
 const iconModule: StoryModule = {
@@ -252,6 +327,15 @@ const iconModule: StoryModule = {
   Sizes: IconSizes,
   Names: IconNames,
   Override: IconOverride,
+};
+
+const iconFrameModule: StoryModule = {
+  meta: iconFrameMeta,
+  Default: IconFrameDefault,
+  Sizes: IconFrameSizes,
+  Treatments: IconFrameTreatments,
+  CustomSurface: IconFrameCustomSurface,
+  BrandIcons: IconFrameBrandIcons,
 };
 
 // Headless primitives carry just `meta` (no story functions). Like every component
@@ -263,6 +347,7 @@ const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
+const flowModule: StoryModule = { meta: flowMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
@@ -352,8 +437,36 @@ const userProfileWeb3WalletsSectionModule: StoryModule = {
 const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
+  WithError: UserProfileDeleteSectionWithError,
 };
 
+const destructiveModule: StoryModule = {
+  meta: destructiveMeta,
+  Default: DestructiveDefault,
+  WithError: DestructiveWithError,
+};
+
+const reverificationModule: StoryModule = {
+  meta: reverificationMeta,
+  Default: ReverificationDefault,
+  Password: ReverificationPassword,
+  PasswordPending: ReverificationPasswordPending,
+  PasswordError: ReverificationPasswordError,
+  Passkey: ReverificationPasskey,
+  PasskeyPending: ReverificationPasskeyPending,
+  PasskeyError: ReverificationPasskeyError,
+  OTP: ReverificationOTP,
+  AuthenticatorOTP: ReverificationAuthenticatorOTP,
+  OTPPending: ReverificationOTPPending,
+  OTPError: ReverificationOTPError,
+  OTPResending: ReverificationOTPResending,
+  BackupCode: ReverificationBackupCode,
+  BackupCodePending: ReverificationBackupCodePending,
+  BackupCodeError: ReverificationBackupCodeError,
+  MethodPicker: ReverificationMethodPicker,
+  MethodPickerPending: ReverificationMethodPickerPending,
+  Help: ReverificationHelp,
+};
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -376,22 +489,29 @@ export const registry: StoryModule[] = [
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  // Blocks — flows assembled from components, wired by the caller's machine.
+  destructiveModule,
+  reverificationModule,
   // Components
   avatarModule,
   badgeModule,
+  bannerModule,
   buttonModule,
   cardComponentModule,
+  flowComponentModule,
   inputModule,
   itemModule,
   dialogComponentModule,
-  alertDialogComponentModule,
   headingModule,
   iconModule,
+  iconFrameModule,
   menuComponentModule,
+  otpComponentModule,
   popoverComponentModule,
   sectionModule,
   textModule,
   fieldModule,
+  visuallyHiddenModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
@@ -399,6 +519,7 @@ export const registry: StoryModule[] = [
   dialogModule,
   drawerModule,
   fileUploadModule,
+  flowModule,
   menuModule,
   otpModule,
   popoverModule,

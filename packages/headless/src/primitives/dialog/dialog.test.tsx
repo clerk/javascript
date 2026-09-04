@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
 import { Popover } from '../popover';
+import { useDialogContext } from './dialog-context';
 import { Dialog } from './index';
 
 afterEach(() => cleanup());
@@ -781,6 +782,95 @@ describe('Dialog', () => {
 
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    // A styled layer branches on the role — pinning a size, demanding a description — and the
+    // parts are where it branches, so the role has to reach them through the context.
+    it('publishes the role on the context', () => {
+      const seen: string[] = [];
+      function Probe() {
+        seen.push(useDialogContext().role);
+        return null;
+      }
+      render(
+        <Dialog.Root
+          defaultOpen
+          role='alertdialog'
+        >
+          <Probe />
+        </Dialog.Root>,
+      );
+
+      expect(seen).toContain('alertdialog');
+    });
+  });
+
+  describe('viewport overlay', () => {
+    it('renders in flow without a fixed overlay or a scroll lock when overlay is false', () => {
+      render(
+        <Dialog.Root
+          open
+          modal={false}
+        >
+          <Dialog.Viewport
+            data-testid='dialog-viewport'
+            overlay={false}
+          >
+            <Dialog.Popup initialFocus={false}>Body</Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Root>,
+      );
+
+      const viewport = screen.getByTestId('dialog-viewport');
+      expect(viewport.parentElement).toBe(document.body.firstElementChild);
+      expect(viewport.parentElement?.style.position).not.toBe('fixed');
+      expect(document.body.style.overflow).toBe('');
+    });
+  });
+
+  describe('exit', () => {
+    // A machine driving the dialog resets to its initial state on close, in the same commit that
+    // starts the exit. Without holding the frame, the dialog would repaint that reset state and
+    // fade out showing the wrong thing.
+    it('holds the contents at their last frame while the popup exits', () => {
+      const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [
+        { finished: new Promise<void>(() => {}) },
+      ];
+      try {
+        function Fixture({ open, label }: { open: boolean; label: string }) {
+          return (
+            <Dialog.Root open={open}>
+              <Dialog.Viewport>
+                <Dialog.Popup>{label}</Dialog.Popup>
+              </Dialog.Viewport>
+            </Dialog.Root>
+          );
+        }
+        const { rerender } = render(
+          <Fixture
+            open
+            label='Confirming'
+          />,
+        );
+
+        rerender(
+          <Fixture
+            open={false}
+            label='Idle'
+          />,
+        );
+
+        const popup = screen.getByRole('dialog', { hidden: true });
+        expect(popup).toHaveAttribute('data-closed', '');
+        expect(popup).toHaveTextContent('Confirming');
+      } finally {
+        if (original) {
+          (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+        } else {
+          delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+        }
+      }
     });
   });
 

@@ -61,7 +61,7 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
       <button
         type='button'
         onClick={copy}
-        className='absolute right-2 top-2 z-10 rounded bg-white/10 px-2 py-1 text-xs text-white/60 opacity-0 transition-opacity hover:bg-white/20 hover:text-white group-hover:opacity-100'
+        className='absolute top-2 right-2 z-10 rounded bg-white/10 px-2 py-1 text-xs text-white/60 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/20 hover:text-white'
       >
         {copied ? 'Copied!' : 'Copy'}
       </button>
@@ -69,7 +69,7 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
         // safe: shiki output is developer-controlled source code
         <div
           dangerouslySetInnerHTML={{ __html: html }}
-          className='[&>pre]:bg-transparent! [&>pre]:overflow-auto [&>pre]:p-4'
+          className='[&>pre]:overflow-auto [&>pre]:bg-transparent! [&>pre]:p-4'
         />
       ) : (
         <pre className='overflow-auto p-4 text-[var(--shiki-foreground)]'>

@@ -24,7 +24,7 @@ import { getSidebarGroups } from '@/lib/registry';
 
 const groups = getSidebarGroups();
 
-const COLLAPSED_BY_DEFAULT = new Set(['Primitives', 'Components', 'Styles', 'Hooks']);
+const COLLAPSED_BY_DEFAULT = new Set(['Blocks', 'Primitives', 'Components', 'Styles', 'Hooks']);
 
 type SidebarEntry = ReturnType<typeof getSidebarGroups>[number]['components'][number];
 
@@ -167,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className='gap-0'>
         {groups.map(({ group, groupSlug, components }) => (
           <React.Fragment key={group}>
-            {group === 'Components' && <SidebarSeparator className='data-horizontal:w-auto my-1' />}
+            {group === 'Blocks' && <SidebarSeparator className='my-1 data-horizontal:w-auto' />}
             <Collapsible
               defaultOpen={!COLLAPSED_BY_DEFAULT.has(group)}
               className='group/collapsible'
@@ -177,11 +177,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 data-section={group}
               >
                 <SidebarGroupLabel
-                  className='text-sidebar-foreground/50 hover:text-sidebar-foreground/80 h-auto w-full px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'
+                  className='text-sidebar-foreground/50 hover:text-sidebar-foreground/80 h-auto w-full px-2 pt-3 pb-1 text-[10px] font-semibold tracking-wider uppercase'
                   render={<CollapsibleTrigger />}
                 >
                   {group}
-                  <ChevronRightIcon className='size-3! ml-auto transition-transform group-data-[open]/collapsible:rotate-90' />
+                  <ChevronRightIcon className='ml-auto size-3! transition-transform group-data-[open]/collapsible:rotate-90' />
                 </SidebarGroupLabel>
                 <CollapsibleContent>
                   <SidebarGroupContent>
@@ -195,7 +195,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           )}
                           className='group/category'
                         >
-                          <CollapsibleTrigger className='text-sidebar-foreground/40 hover:text-sidebar-foreground/70 flex w-full items-center gap-1 px-2 pb-0.5 pt-2 text-[9px] font-semibold uppercase tracking-wider'>
+                          <CollapsibleTrigger className='text-sidebar-foreground/40 hover:text-sidebar-foreground/70 flex w-full items-center gap-1 px-2 pt-2 pb-0.5 text-[9px] font-semibold tracking-wider uppercase'>
                             <span
                               aria-hidden='true'
                               className='font-mono text-[10px] leading-none'
@@ -203,7 +203,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               └
                             </span>
                             {category}
-                            <ChevronRightIcon className='size-2.5! ml-auto transition-transform group-data-[open]/category:rotate-90' />
+                            <ChevronRightIcon className='ml-auto size-2.5! transition-transform group-data-[open]/category:rotate-90' />
                           </CollapsibleTrigger>
                           <CollapsibleContent>
                             <div className='border-sidebar-border ml-3 border-l pl-1'>

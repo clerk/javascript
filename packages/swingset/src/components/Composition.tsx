@@ -13,7 +13,7 @@ export interface CompositionPiece {
 
 // Mosaic layers, high → low. Drives the order the composition groups render in.
 // Matches the sidebar group names.
-const LAYER_ORDER = ['User Button', 'User Profile', 'Components', 'Styles', 'Primitives'];
+const LAYER_ORDER = ['User Button', 'User Profile', 'Blocks', 'Components', 'Styles', 'Primitives'];
 
 function layerRank(layer: string): number {
   const i = LAYER_ORDER.indexOf(layer);
@@ -42,7 +42,7 @@ export function CompositionPanel({ pieces }: { pieces: CompositionPiece[] }) {
           key={layer}
           className='flex flex-col gap-2'
         >
-          <div className='text-brand text-[10px] font-semibold uppercase tracking-widest'>{layer}</div>
+          <div className='text-brand text-[10px] font-semibold tracking-widest uppercase'>{layer}</div>
           {groups
             .get(layer)
             ?.slice()
