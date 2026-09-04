@@ -59,4 +59,4 @@ export type SessionVerificationFirstFactor =
    * @experimental
    */
   | EnterpriseSSOFactor;
-export type SessionVerificationSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
+export type SessionVerificationSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor | PasskeyFactor;

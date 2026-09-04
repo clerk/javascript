@@ -1331,6 +1331,11 @@ export const bgBG: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Use another method',
       subtitle: 'Enter your current password to continue using "{{applicationName}}"',
@@ -1475,6 +1480,10 @@ export const bgBG: LocalizationResource = {
       title: 'Неуспешно влизане',
     },
     passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkeyMfa: {
       subtitle: undefined,
       title: undefined,
     },

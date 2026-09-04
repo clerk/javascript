@@ -1339,6 +1339,11 @@ export const bnIN: LocalizationResource = {
         'আপনার পাসকি ব্যবহার করে আপনার পরিচয় নিশ্চিত করা হয়। আপনার ডিভাইস আপনার আঙ্গুলের ছাপ, মুখ বা স্ক্রিন লক চাইতে পারে।',
       title: 'আপনার পাসকি ব্যবহার করুন',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'অন্য পদ্ধতি ব্যবহার করুন',
       subtitle: 'চালিয়ে যেতে আপনার বর্তমান পাসওয়ার্ড লিখুন',
@@ -1486,6 +1491,10 @@ export const bnIN: LocalizationResource = {
       subtitle:
         'আপনার পাসকি ব্যবহার করলে নিশ্চিত হয় যে এটি আপনি। আপনার ডিভাইস আপনার আঙ্গুলের ছাপ, মুখ বা স্ক্রিন লক চাইতে পারে।',
       title: 'আপনার পাসকি ব্যবহার করুন',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'অন্য পদ্ধতি ব্যবহার করুন',
