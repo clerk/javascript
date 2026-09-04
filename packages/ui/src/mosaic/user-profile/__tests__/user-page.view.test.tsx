@@ -1,7 +1,9 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Dialog } from '../../components/dialog';
 import { MosaicProvider } from '../../MosaicProvider';
 import type { UserPageViewProps } from '../user-page.view';
 import { UserPageView } from '../user-page.view';
@@ -122,5 +124,102 @@ describe('UserPageView', () => {
     renderView({ renderBranding: false });
 
     expect(screen.queryByText('Secured by')).not.toBeInTheDocument();
+  });
+
+  // The compact layout is a container query against the page itself, so the page has to BE a
+  // container — drop that and it never collapses, at any width.
+  it('is the named container its compact layout queries', () => {
+    const probe = stylex.create({ container: { containerName: 'cl-profile-page', containerType: 'inline-size' } });
+    const atoms = stylex
+      .props(probe.container)
+      .className!.split(' ')
+      .filter(name => !name.includes('__'));
+    const { container } = renderView();
+
+    expect(Array.from((container.firstChild as HTMLElement).classList)).toEqual(expect.arrayContaining(atoms));
+  });
+
+  // The shape the account profile takes as a modal: the page inside the popup, self-contained.
+  it('names a panel dialog and carries its dismiss from inside the popup', () => {
+    render(
+      <MosaicProvider>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup size='panel'>
+            <UserPageView
+              activePanel='account'
+              panels={panels}
+              onPanelChange={vi.fn()}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+
+    // Named from inside, the way `Card.Title` names a card dialog — nothing is passed in.
+    const popup = screen.getByRole('dialog', { name: 'User profile' });
+    expect(popup).toContainElement(document.querySelector('.cl-profile-page'));
+    // And the dismiss comes from the page too, the way `Card.Header` carries a card's.
+    expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
+    expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+  });
+
+  it('carries no dismiss standalone, or inline', () => {
+    const standalone = renderView();
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    standalone.unmount();
+
+    render(
+      <MosaicProvider>
+        <Dialog.Root inline>
+          <Dialog.Popup size='panel'>
+            <UserPageView
+              activePanel='account'
+              panels={panels}
+              onPanelChange={vi.fn()}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+    // `inline` forces the dialog open, so the page is on screen — and still carries no dismiss.
+    expect(screen.getByRole('dialog', { name: 'User profile' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+  });
+
+  it('drops its standalone minimum height inside a dialog, where the popup decides', () => {
+    const probe = stylex.create({ floor: { minHeight: '37.5rem' } });
+    const atoms = stylex
+      .props(probe.floor)
+      .className!.split(' ')
+      .filter(name => !name.includes('__'));
+
+    const standalone = renderView();
+    expect(Array.from((standalone.container.firstChild as HTMLElement).classList)).toEqual(
+      expect.arrayContaining(atoms),
+    );
+    standalone.unmount();
+
+    render(
+      <MosaicProvider>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup size='panel'>
+            <UserPageView
+              activePanel='account'
+              panels={panels}
+              onPanelChange={vi.fn()}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+    expect(Array.from(document.querySelector('.cl-profile-page')!.classList)).not.toEqual(
+      expect.arrayContaining(atoms),
+    );
+  });
+
+  it('renders no heading for the dialog standalone', () => {
+    renderView();
+
+    expect(screen.queryByRole('heading', { name: 'User profile' })).not.toBeInTheDocument();
   });
 });
