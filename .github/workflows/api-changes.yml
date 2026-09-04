@@ -90,7 +90,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
           filter: 'blob:none'
@@ -142,7 +142,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           # Check out the PR head commit, not the refs/pull/N/merge ref that
           # checkout resolves by default (it absorbs base-branch drift, so once
