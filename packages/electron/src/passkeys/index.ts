@@ -11,7 +11,7 @@ import { isWebAuthnAutofillSupported, isWebAuthnPlatformAuthenticatorSupported }
 
 import { getPasskeyBridge, nativeCreateCredential, nativeGetCredential } from './renderer/native-bridge';
 import type { PasskeyMode, StrategyEnv } from './renderer/strategy';
-import { decidePath } from './renderer/strategy';
+import { canUseRendererPath, decidePath } from './renderer/strategy';
 
 export type { PasskeyMode, PasskeyPath, StrategyEnv } from './renderer/strategy';
 
@@ -29,6 +29,7 @@ export type PasskeySupport = {
   ) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>>;
   get: (args: {
     publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+    conditionalUI?: boolean;
   }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>;
   isSupported: () => boolean;
   isAutoFillSupported: () => Promise<boolean>;
@@ -67,6 +68,14 @@ const unsupportedReturn = <T>(): CredentialReturn<T> =>
     ),
   }) as CredentialReturn<T>;
 
+const abortedReturn = <T>(): CredentialReturn<T> =>
+  ({
+    publicKeyCredential: null,
+    error: new ClerkWebAuthnError('Clerk: Conditional passkey requests require the renderer WebAuthn path.', {
+      code: 'passkey_operation_aborted',
+    }),
+  }) as CredentialReturn<T>;
+
 const shouldRetryNativeAfterRendererError = (error: unknown): boolean => {
   if (!error || typeof error !== 'object') {
     return false;
@@ -102,9 +111,14 @@ export function createPasskeys(options?: CreatePasskeysOptions): PasskeySupport 
     return result;
   };
 
-  const get: PasskeySupport['get'] = async ({ publicKeyOptions }) => {
+  const get: PasskeySupport['get'] = async ({ publicKeyOptions, conditionalUI = false }) => {
     const env = getEnv();
     const path = decidePath(publicKeyOptions.rpId ?? '', mode, env);
+
+    // Conditional runs without user intent, don't fall through to opening a prompt.
+    if (conditionalUI && path !== 'renderer') {
+      return abortedReturn();
+    }
 
     if (path === 'unsupported') {
       return unsupportedReturn();
@@ -113,8 +127,14 @@ export function createPasskeys(options?: CreatePasskeysOptions): PasskeySupport 
       return nativeGetCredential(publicKeyOptions);
     }
 
-    const result = await webAuthnGetCredential({ publicKeyOptions, conditionalUI: false });
-    if (result.error && shouldRetryNativeAfterRendererError(result.error) && mode === 'auto' && env.nativeAvailable) {
+    const result = await webAuthnGetCredential({ publicKeyOptions, conditionalUI });
+    if (
+      !conditionalUI &&
+      result.error &&
+      shouldRetryNativeAfterRendererError(result.error) &&
+      mode === 'auto' &&
+      env.nativeAvailable
+    ) {
       return nativeGetCredential(publicKeyOptions);
     }
     return result;
@@ -128,11 +148,11 @@ export function createPasskeys(options?: CreatePasskeysOptions): PasskeySupport 
     if (mode === 'native') {
       return env.nativeAvailable;
     }
-    return env.hasWebAuthn || env.nativeAvailable;
+    return canUseRendererPath(mode, env) || env.nativeAvailable;
   };
 
-  const isAutoFillSupported: PasskeySupport['isAutoFillSupported'] = () => {
-    return mode === 'native' ? Promise.resolve(false) : isWebAuthnAutofillSupported();
+  const isAutoFillSupported: PasskeySupport['isAutoFillSupported'] = async () => {
+    return canUseRendererPath(mode, getEnv()) && isWebAuthnAutofillSupported();
   };
 
   const isPlatformAuthenticatorSupported: PasskeySupport['isPlatformAuthenticatorSupported'] = async () => {

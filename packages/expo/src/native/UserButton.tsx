@@ -1,5 +1,5 @@
 import type { ComponentProps, ComponentType, JSX, Ref } from 'react';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 
@@ -7,6 +7,7 @@ import NativeClerkUserButtonView from '../specs/NativeClerkUserButtonView';
 import { isNativeSupported } from '../utils/native-module';
 import type {
   NativeUserProfileNavigationHandle,
+  UserProfileCustomDestination,
   UserProfileCustomPage,
   UserProfileCustomPageEvent,
 } from './UserProfileCustomPages';
@@ -28,6 +29,9 @@ const CustomizableNativeClerkUserButtonView =
 export interface UserButtonUserProfileProps {
   /** Custom pages displayed as rows in the user profile. */
   customPages?: UserProfileCustomPage[];
+
+  /** Custom destinations that can be pushed from a custom page without creating a profile row. */
+  customDestinations?: UserProfileCustomDestination[];
 }
 
 export interface UserButtonProps {
@@ -61,8 +65,13 @@ export interface UserButtonProps {
  */
 export function UserButton({ userProfileProps }: UserButtonProps): JSX.Element | null {
   const nativeViewRef = useRef<NativeUserProfileNavigationHandle>(null);
-  const customPages = userProfileProps?.customPages ?? [];
-  const { activePath, onCustomPageEvent } = useUserProfileCustomPages(customPages, nativeViewRef);
+  const customPages = userProfileProps?.customPages;
+  const customDestinations = userProfileProps?.customDestinations;
+  const customRoutes = useMemo(
+    () => [...(customPages ?? []), ...(customDestinations ?? [])],
+    [customDestinations, customPages],
+  );
+  const { navigation, presentedPaths, onCustomPageEvent } = useUserProfileCustomPages(customRoutes, nativeViewRef);
   const { width, height } = useWindowDimensions();
 
   if (!isNativeSupported || !CustomizableNativeClerkUserButtonView) {
@@ -73,13 +82,13 @@ export function UserButton({ userProfileProps }: UserButtonProps): JSX.Element |
     <CustomizableNativeClerkUserButtonView
       ref={nativeViewRef}
       style={styles.host}
-      customPages={serializeUserProfileCustomPages(customPages)}
+      customPages={serializeUserProfileCustomPages(customPages ?? [], customDestinations ?? [])}
       onCustomPageEvent={onCustomPageEvent}
     >
       <UserProfileCustomPageHosts
-        customPages={customPages}
-        activePath={activePath}
-        navigationHandleRef={nativeViewRef}
+        customRoutes={customRoutes}
+        presentedPaths={presentedPaths}
+        navigation={navigation}
         style={{ width, height }}
       />
     </CustomizableNativeClerkUserButtonView>

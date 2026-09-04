@@ -16,7 +16,7 @@ export class Invitation {
     readonly id: string,
     /** The email address that the invitation was sent to. */
     readonly emailAddress: string,
-    /** [Metadata](https://clerk.com/docs/reference/types/metadata#user-public-metadata){{ target: '_blank' }} that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} and can be set only from the Backend API. Once the user accepts the invitation and signs up, these metadata will end up in the user's public metadata. */
+    /** [Metadata](https://clerk.com/docs/reference/types/metadata#user-public-metadata) that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} and can be set only from the Backend API. Once the user accepts the invitation and signs up, these metadata will end up in the user's public metadata. */
     readonly publicMetadata: Record<string, unknown> | null,
     /** The Unix timestamp when the `Invitation` was first created. */
     readonly createdAt: number,
