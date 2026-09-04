@@ -789,10 +789,16 @@ export class Clerk implements ClerkInterface {
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       this.#setTransitiveState();
 
-      if (this.#options.experimental?.persistClient ?? true) {
-        await this.client.removeSessions();
-      } else {
-        await this.client.destroy();
+      try {
+        if (this.#options.experimental?.persistClient ?? true) {
+          await this.client.removeSessions();
+        } else {
+          await this.client.destroy();
+        }
+      } catch (err) {
+        if (!isClerkRuntimeError(err) || err.code !== 'network_error') {
+          throw err;
+        }
       }
 
       await executeSignOut();
