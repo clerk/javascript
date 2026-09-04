@@ -12,7 +12,9 @@ import { useEffect } from 'react';
  * - it has to be deferred by a task even then, for the same reason one commit later.
  *
  * `role` is checked rather than assumed because the part may be rendered as something else
- * through `render`, and only a `dialog` needs a name badly enough to warn about.
+ * through `render`, and only a dialog needs a name badly enough to warn about. Both dialog roles
+ * count: `alertdialog` is the same surface asking more urgently, and an unnamed one is worse, not
+ * exempt.
  *
  * @param node - The element carrying `role="dialog"`, once mounted.
  * @param component - Compound component name, used to name the parts in the message.
@@ -24,7 +26,8 @@ export function useAccessibleNameWarning(node: HTMLElement | null, component: st
     }
 
     const timer = setTimeout(() => {
-      if (!node.isConnected || node.getAttribute('role') !== 'dialog') {
+      const role = node.getAttribute('role');
+      if (!node.isConnected || (role !== 'dialog' && role !== 'alertdialog')) {
         return;
       }
       if (node.getAttribute('aria-label')?.trim()) {
