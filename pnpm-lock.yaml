@@ -26934,7 +26934,7 @@ snapshots:
       graceful-fs: 4.2.11
       neo-async: 2.6.2
       picocolors: 1.1.1
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       recast: 0.23.11
       tmp: 0.2.7
       write-file-atomic: 5.0.1
