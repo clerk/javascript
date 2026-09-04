@@ -2,6 +2,8 @@ export { assertContextExists, createContextAndHook } from './createContextAndHoo
 export { useAPIKeys } from './useAPIKeys';
 export { useOAuthConsent } from './useOAuthConsent';
 export type { UseOAuthConsentParams, UseOAuthConsentReturn } from './useOAuthConsent.types';
+export { useOAuthDeviceVerification } from './useOAuthDeviceVerification';
+export type { UseOAuthDeviceVerificationReturn } from './useOAuthDeviceVerification.types';
 export { useOrganization } from './useOrganization';
 export { useOrganizationCreationDefaults } from './useOrganizationCreationDefaults';
 export type {

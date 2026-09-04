@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { StrategyEnv } from '../renderer/strategy';
-import { decidePath, originSatisfiesRpId } from '../renderer/strategy';
+import { canUseRendererPath, decidePath, originSatisfiesRpId } from '../renderer/strategy';
 
 const RP_ID = 'example.com';
 
@@ -114,6 +114,48 @@ describe('decidePath', () => {
 
     it('uses the renderer for security keys on Linux remote origins', () => {
       expect(decidePath(RP_ID, 'auto', env({ platform: 'linux', nativeAvailable: false }))).toBe('renderer');
+    });
+  });
+});
+
+describe('canUseRendererPath', () => {
+  it('is false without renderer WebAuthn', () => {
+    expect(canUseRendererPath('auto', env({ hasWebAuthn: false }))).toBe(false);
+    expect(canUseRendererPath('renderer', env({ hasWebAuthn: false }))).toBe(false);
+  });
+
+  it('is false in native mode', () => {
+    expect(canUseRendererPath('native', env())).toBe(false);
+  });
+
+  it('is true in renderer mode regardless of origin', () => {
+    expect(canUseRendererPath('renderer', env({ protocol: 'app:', hostname: 'bundle' }))).toBe(true);
+  });
+
+  describe('auto mode', () => {
+    it.each([
+      ['https:', 'example.com', true],
+      ['http:', 'localhost', true],
+      ['http:', '127.0.0.1', true],
+      ['http:', '[::1]', true],
+      ['http:', 'example.com', false],
+      ['file:', '', false],
+      ['app:', 'bundle', false],
+      ['clerk:', 'app', false],
+    ])('%s//%s -> %s', (protocol, hostname, expected) => {
+      expect(canUseRendererPath('auto', env({ protocol, hostname }))).toBe(expected);
+    });
+
+    it('is true for an https origin that does not match any particular RP ID', () => {
+      expect(canUseRendererPath('auto', env({ hostname: 'other.com' }))).toBe(true);
+    });
+
+    it('is false on macOS before Electron 42, where the request routes native', () => {
+      expect(canUseRendererPath('auto', env({ electronMajor: 39 }))).toBe(false);
+    });
+
+    it('is true on macOS before Electron 42 when native is unavailable', () => {
+      expect(canUseRendererPath('auto', env({ electronMajor: 39, nativeAvailable: false }))).toBe(true);
     });
   });
 });

@@ -1,5 +1,23 @@
 # @clerk/expo-google-signin
 
+## 1.0.3
+
+### Patch Changes
+
+- Android now reports the Google account's stable identifier (the ID token's `sub` claim) as `user.id` instead of the email address, matching iOS. ([#9606](https://github.com/clerk/javascript/pull/9606)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.0.2
+
+### Patch Changes
+
+- Fix iOS Google sign-in failing with `GOOGLE_SIGN_IN_ERROR` in apps with more than one window or scene. The presenting view controller is now resolved from the key window of the foreground-active scene instead of an arbitrary window, so overlays such as splash screens or windows created by other modules no longer break the sign-in flow. ([#9505](https://github.com/clerk/javascript/pull/9505)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.0.1
+
+### Patch Changes
+
+- Pass the underlying Android Credential Manager message through when a sign-in is cancelled, so `@clerk/expo` can tell a provider failure apart from a dismissed account chooser. Upgrade `@clerk/expo` alongside this and rebuild your native app to get the fix. ([#9464](https://github.com/clerk/javascript/pull/9464)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.0.0
 
 ### Major Changes

@@ -22,8 +22,8 @@ export const completeSignUpFlow = ({
   continuePath,
   navigate,
   handleComplete,
-  redirectUrl = '',
-  redirectUrlComplete = '',
+  redirectUrl,
+  redirectUrlComplete,
   oidcPrompt,
 }: CompleteSignUpFlowProps): Promise<unknown> | undefined => {
   if (signUp.status === 'complete') {
@@ -32,6 +32,12 @@ export const completeSignUpFlow = ({
     return handleComplete && handleComplete();
   } else if (signUp.status === 'missing_requirements') {
     if (signUp.missingFields.some(mf => mf === 'enterprise_sso')) {
+      if (!redirectUrl || !redirectUrlComplete) {
+        throw new Error(
+          'completeSignUpFlow: `redirectUrl` and `redirectUrlComplete` are required to continue a sign-up that is missing `enterprise_sso`.',
+        );
+      }
+
       return signUp.authenticateWithRedirect({
         strategy: 'enterprise_sso',
         redirectUrl,

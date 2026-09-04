@@ -66,7 +66,8 @@ public class ClerkNativeViewHost: ExpoView {
       object: nil,
       queue: .main
     ) { [weak self] _ in
-      self?.setNeedsHostedViewUpdate()
+      guard let self, !hostingCoordinator.hasAttachedController else { return }
+      setNeedsHostedViewUpdate()
     }
   }
 
@@ -100,6 +101,8 @@ public class ClerkUserProfileCustomPageHost: ClerkNativeViewHost {
   func setCustomPages(_ customPages: String?) {
     let newCustomPages = customPages ?? "[]"
     guard newCustomPages != currentCustomPages else { return }
+    let validPaths = Set(decodeUserProfileCustomPages(newCustomPages).map(\.path))
+    customPageState.reconcileCustomPagePaths(validPaths)
     currentCustomPages = newCustomPages
     setNeedsHostedViewUpdate()
   }
@@ -142,6 +145,10 @@ public class ClerkUserProfileCustomPageHost: ClerkNativeViewHost {
 private final class ClerkNativeHostingCoordinator {
   private weak var containerView: UIView?
   private var hostingController: UIViewController?
+
+  var hasAttachedController: Bool {
+    hostingController != nil
+  }
 
   init(containerView: UIView) {
     self.containerView = containerView
