@@ -46,7 +46,7 @@ catalogs:
       version: 0.5.21
     '@tanstack/query-core':
       specifier: ^5.101.4
-      version: 5.101.4
+      version: 5.102.8
     core-js:
       specifier: 3.47.0
       version: 3.47.0
@@ -470,7 +470,7 @@ importers:
         version: 0.5.21
       '@tanstack/query-core':
         specifier: catalog:repo
-        version: 5.101.4
+        version: 5.102.8
       '@wallet-standard/core':
         specifier: catalog:module-manager
         version: 1.1.1
@@ -980,7 +980,7 @@ importers:
     dependencies:
       '@tanstack/query-core':
         specifier: catalog:repo
-        version: 5.101.4
+        version: 5.102.8
       dequal:
         specifier: 2.0.3
         version: 2.0.3
@@ -5967,8 +5967,8 @@ packages:
     resolution: {integrity: sha512-79pf/RkhteYZTRgcR4F9kbk84P2N8rugQJswxfIqovlbRiT3yI7eBE+5QorIrZaOKktsgzRlXh1l/du/xpl4iA==}
     engines: {node: '>=20.19'}
 
-  '@tanstack/query-core@5.101.4':
-    resolution: {integrity: sha512-gNwcvOJcRbLWPOLG/2OBm+zM+Yv+MKsXKEOWC57USuZDEsI71hEErQsiEGx5wX9rzWWkfwM0fVSPoiIFSsxfiw==}
+  '@tanstack/query-core@5.102.8':
+    resolution: {integrity: sha512-ZNjkJ33CqvPNec/6lZBnHqLc3EVGPZ9ySLhYahU9TcuRFdmwXewuj0c4hwSWcGHqEUwcSrKeZ+oGcvPBqXcQcg==}
 
   '@tanstack/react-router@1.170.19':
     resolution: {integrity: sha512-cK7VUsc9+8gYZMqwJjCAhrmL9wPhkwxEcZ7cxlHdBjjmqHbZyNxXAml/KfLmSuxRDQGVk2iofpoHclDTSrkmmg==}
@@ -21254,7 +21254,7 @@ snapshots:
 
   '@tanstack/history@1.162.0': {}
 
-  '@tanstack/query-core@5.101.4': {}
+  '@tanstack/query-core@5.102.8': {}
 
   '@tanstack/react-router@1.170.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
