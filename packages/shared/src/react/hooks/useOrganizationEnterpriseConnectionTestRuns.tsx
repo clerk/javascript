@@ -136,13 +136,10 @@ function useOrganizationEnterpriseConnectionTestRuns(
 
   const queryEnabled = enabled && clerk.loaded && Boolean(organization) && Boolean(enterpriseConnectionId);
 
-  const [shouldPoll, setShouldPoll] = useState(false);
-
-  useEffect(() => {
-    // Polling intent is scoped to the current connection — clear it when the
-    // connection changes so a reset/recreate doesn't inherit a stale armed poll.
-    setShouldPoll(false);
-  }, [enterpriseConnectionId]);
+  // Polling is armed for a specific connection and derived, not reset in an effect: a child
+  // effect arming it in the same commit the connection arrives would otherwise be cancelled.
+  const [armedForConnectionId, setArmedForConnectionId] = useState<string | null>(null);
+  const shouldPoll = armedForConnectionId !== null && armedForConnectionId === enterpriseConnectionId;
 
   const query = useClerkQuery({
     queryKey,
@@ -169,7 +166,7 @@ function useOrganizationEnterpriseConnectionTestRuns(
 
   useEffect(() => {
     if (shouldPoll && hasRows) {
-      setShouldPoll(false);
+      setArmedForConnectionId(null);
     }
   }, [shouldPoll, hasRows]);
 
@@ -184,7 +181,7 @@ function useOrganizationEnterpriseConnectionTestRuns(
       // off. Once any record has been seen, this is a one-shot refetch.
       const armPolling = options?.armPolling ?? true;
       if (armPolling && !hasRows) {
-        setShouldPoll(true);
+        setArmedForConnectionId(enterpriseConnectionId);
       }
       // `invalidateQueries` awaits the refetch it triggers, so by the time it
       // resolves the cache already holds the fresh page. Read it back from the
@@ -209,7 +206,7 @@ function useOrganizationEnterpriseConnectionTestRuns(
       }>(queryKey);
       return { data: fresh?.data, totalCount: fresh?.total_count };
     },
-    [queryClient, invalidationKey, queryKey, hasRows],
+    [queryClient, invalidationKey, queryKey, hasRows, enterpriseConnectionId],
   );
 
   const isPolling = queryEnabled && shouldPoll && !hasRows;
