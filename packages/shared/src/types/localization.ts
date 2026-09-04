@@ -1374,6 +1374,27 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue<'applicationName'>;
     };
   };
+  agentActionApproval: {
+    title: LocalizationValue;
+    requestedAt: LocalizationValue<'relativeTime'>;
+    commentLabel: LocalizationValue;
+    commentOptional: LocalizationValue;
+    commentPlaceholder: LocalizationValue;
+    detailsLabel: LocalizationValue;
+    copyParameter: LocalizationValue<'parameter'>;
+    parameterCopied: LocalizationValue<'parameter'>;
+    expiresIn: LocalizationValue<'remaining'>;
+    action__approve: LocalizationValue;
+    action__deny: LocalizationValue;
+    terminal: {
+      approvedTitle: LocalizationValue;
+      approvedSubtitle: LocalizationValue;
+      deniedTitle: LocalizationValue;
+      deniedSubtitle: LocalizationValue;
+      expiredTitle: LocalizationValue;
+      expiredSubtitle: LocalizationValue;
+    };
+  };
   oauthDeviceVerification: {
     start: {
       title: LocalizationValue;

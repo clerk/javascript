@@ -14,6 +14,27 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
+  agentActionApproval: {
+    action__approve: undefined,
+    action__deny: undefined,
+    commentLabel: undefined,
+    commentOptional: undefined,
+    commentPlaceholder: undefined,
+    copyParameter: undefined,
+    detailsLabel: undefined,
+    expiresIn: undefined,
+    parameterCopied: undefined,
+    requestedAt: undefined,
+    terminal: {
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+    },
+    title: undefined,
+  },
   apiKeys: {
     action__add: undefined,
     action__search: undefined,

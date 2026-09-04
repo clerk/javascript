@@ -834,6 +834,23 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts the experimental agent action approval component.
+   *
+   * @param targetNode - Target node to mount the component into.
+   * @param props - Agent action approval configuration.
+   * @experimental
+   */
+  __experimental_mountAgentActionApproval: (targetNode: HTMLDivElement, props?: AgentActionApprovalProps) => void;
+
+  /**
+   * Unmounts the experimental agent action approval component.
+   *
+   * @param targetNode - Target node to unmount the component from.
+   * @experimental
+   */
+  __experimental_unmountAgentActionApproval: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -2785,6 +2802,20 @@ export type OAuthConsentProps = {
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
   onDeny?: () => void;
+};
+
+/**
+ * Properties for the experimental agent action approval component.
+ *
+ * @interface
+ *
+ * @experimental
+ */
+export type AgentActionApprovalProps = {
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided).
+   */
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type OAuthDeviceVerificationProps = {
