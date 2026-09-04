@@ -82,6 +82,9 @@ jobs:
       - name: Check Formatting
         run: pnpm format:check
 
+      - name: Check Dashboard links
+        run: pnpm lint:dashboard-links
+
       - name: Verify localizations are generated
         run: |
           pnpm --filter @clerk/localizations generate
