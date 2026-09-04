@@ -1,5 +1,26 @@
 # @clerk/astro
 
+## 4.1.0
+
+### Minor Changes
+
+- Add an authenticated OAuth device verification component and workflow hook for approving or denying OAuth Device Authorization Grant requests. ([#9518](https://github.com/clerk/javascript/pull/9518)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/shared@4.31.0
+  - @clerk/backend@3.17.1
+
+## 4.0.21
+
+### Patch Changes
+
+- Bump `nanoid` to 5.1.16 to pick up an upstream security fix. ([#9565](https://github.com/clerk/javascript/pull/9565)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`c4f9883`](https://github.com/clerk/javascript/commit/c4f98834434edd7821f5c6f344583c07e30013cd), [`eef0ceb`](https://github.com/clerk/javascript/commit/eef0ceb97926688384ec480afe44199b16f13993)]:
+  - @clerk/backend@3.17.0
+
 ## 4.0.20
 
 ### Patch Changes

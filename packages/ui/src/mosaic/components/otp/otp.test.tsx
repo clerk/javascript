@@ -141,6 +141,54 @@ describe('Mosaic Otp', () => {
     expect(group).toHaveAccessibleDescription('Check your email.');
   });
 
+  it('points the Field label at the first slot so clicking it focuses the code', async () => {
+    render(
+      <Field.Root>
+        <Field.Label>Verification code</Field.Label>
+        <Otp length={3} />
+      </Field.Root>,
+    );
+
+    const label = screen.getByText('Verification code');
+    const first = slots()[0];
+    expect(first.id).not.toBe('');
+    expect(label).toHaveAttribute('for', first.id);
+    expect(first).toHaveAccessibleName('Verification code');
+    expect(slots()[1]).toHaveAccessibleName('Character 2 of 3');
+
+    await userEvent.click(label);
+    expect(first).toHaveFocus();
+  });
+
+  it('takes required from an enclosing Field and enforces it on every slot', () => {
+    render(
+      <Field.Root required>
+        <Field.Label>Verification code</Field.Label>
+        <Otp
+          length={3}
+          name='code'
+        />
+      </Field.Root>,
+    );
+
+    expect(slots().every(slot => (slot as HTMLInputElement).required)).toBe(true);
+  });
+
+  it('does not submit the value when an enclosing Field is disabled', () => {
+    render(
+      <Field.Root disabled>
+        <Otp
+          length={3}
+          name='code'
+          defaultValue='123'
+          aria-label='Code'
+        />
+      </Field.Root>,
+    );
+
+    expect(document.querySelector('input[name="code"]')).toBeDisabled();
+  });
+
   it('submits the combined value under the given name', () => {
     render(
       <Otp

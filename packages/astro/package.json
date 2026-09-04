@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "4.0.20",
+  "version": "4.1.0",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -93,7 +93,7 @@
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
     "nanoid": "5.1.16",
-    "nanostores": "1.0.1"
+    "nanostores": "1.5.1"
   },
   "devDependencies": {
     "@clerk/ui": "workspace:^",

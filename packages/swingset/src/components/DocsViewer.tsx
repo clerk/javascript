@@ -39,12 +39,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   blocks: {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
-    'reverification-password': dynamic(() => import('../stories/reverification-password.mdx')),
-    'reverification-passkey': dynamic(() => import('../stories/reverification-passkey.mdx')),
-    'reverification-otp': dynamic(() => import('../stories/reverification-otp.mdx')),
-    'reverification-backup-code': dynamic(() => import('../stories/reverification-backup-code.mdx')),
-    'reverification-method-picker': dynamic(() => import('../stories/reverification-method-picker.mdx')),
-    'reverification-help': dynamic(() => import('../stories/reverification-help.mdx')),
+    reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
@@ -55,7 +50,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     input: dynamic(() => import('../stories/input.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
-    'alert-dialog': dynamic(() => import('../stories/alert-dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
@@ -65,6 +59,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     section: dynamic(() => import('../stories/section.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
+    flow: dynamic(() => import('../stories/flow.component.mdx')),
     'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),
   },
   primitives: {
@@ -102,7 +97,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
   const DocContent = docModules[group]?.[slug];
   if (!DocContent) {
     return (
-      <div className='text-muted-foreground p-8 text-sm'>
+      <div className='text-muted-foreground p-3 text-sm sm:p-8'>
         No docs found for &quot;{group}/{slug}&quot;.
       </div>
     );
@@ -115,10 +110,10 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose relative mx-auto w-full min-w-0 p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose relative mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
         {meta?.source ? (
-          <div className='absolute right-8 top-8'>
+          <div className='absolute right-3 top-3 sm:right-8 sm:top-8'>
             <ViewSource source={meta.source} />
           </div>
         ) : null}

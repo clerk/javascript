@@ -159,6 +159,13 @@ and the `Ctrl`/`Cmd` boundary jumps stay logical (first / last-entered).
 ## ARIA
 
 - `Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
-- Each `Input` gets a default `aria-label` of `"Character N of M"`, overridable per input.
+- `Root`'s `id` lands on the first `Input`, not the group, so a `<label htmlFor>` targets a real
+  control and clicking it focuses the code. Remaining slots take `${id}-2`, `${id}-3`, and so on.
+- The first `Input` inherits the group's name (from `aria-labelledby`, then `aria-label`), or is
+  left to a native `<label>`. The rest get a default `aria-label` of `"Character N of M"`,
+  overridable per input.
 - Slots use a roving tab index: `Tab` enters the group at the next empty slot and leaves in one step.
-- When `name` is set, the hidden form input is `aria-hidden` and removed from the tab order.
+- When `name` is set, the hidden form input is `aria-hidden`, removed from the tab order, and
+  disabled alongside the field so a disabled code submits nothing.
+- `required` is applied to each slot rather than the hidden input, which is `readOnly` and so barred
+  from constraint validation. A partially entered code fails validation on its first empty slot.

@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.17.1
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/shared@4.31.0
+
+## 3.17.0
+
+### Minor Changes
+
+- Add experimental methods for sending and retrieving internal transactional emails, including Clerk suppression state and reasons. ([#9553](https://github.com/clerk/javascript/pull/9553)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Reject JWT-template tokens presented as session tokens in the `Authorization` header when `acceptsToken` is `'any'` or an array that includes `'session_token'`. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token, matching the existing `acceptsToken: 'session_token'` behavior. ([#9511](https://github.com/clerk/javascript/pull/9511)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 3.16.13
 
 ### Patch Changes

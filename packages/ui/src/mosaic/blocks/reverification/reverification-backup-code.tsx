@@ -35,11 +35,10 @@ export function ReverificationBackupCode({
   onCancel,
 }: ReverificationBackupCodeProps) {
   const formId = useId();
-  const canSubmit = value.trim().length > 0;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSubmit && !isPending) {
+    if (!isPending) {
       onSubmit();
     }
   };
@@ -90,8 +89,6 @@ export function ReverificationBackupCode({
         <SubmitButton
           form={formId}
           fullWidth
-          disabled={!canSubmit}
-          focusableWhenDisabled
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

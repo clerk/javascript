@@ -32,6 +32,10 @@ const componentImportPaths = {
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   ConfigureSSO: () => import(/* webpackChunkName: "configureSSO" */ '../components/ConfigureSSO/ConfigureSSO'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
+  OAuthDeviceVerification: () =>
+    import(
+      /* webpackChunkName: "oauthDeviceVerification" */ '../components/OAuthDeviceVerification/OAuthDeviceVerification'
+    ),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
 } as const;
@@ -156,6 +160,10 @@ export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
 );
 
+export const OAuthDeviceVerification = lazy(() =>
+  componentImportPaths.OAuthDeviceVerification().then(module => ({ default: module.OAuthDeviceVerification })),
+);
+
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTasks })),
 );
@@ -193,6 +201,7 @@ export const ClerkComponents = {
   APIKeys,
   ConfigureSSO,
   OAuthConsent,
+  OAuthDeviceVerification,
   SubscriptionDetails,
   TaskChooseOrganization,
   TaskResetPassword,
