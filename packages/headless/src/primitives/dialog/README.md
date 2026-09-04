@@ -63,7 +63,7 @@ const feedbackDialog = Dialog.createHandle();
 ### Multiple triggers and payloads
 
 Each trigger can carry an `id` and a `payload`. The root's children can be a function receiving
-the active trigger's payload, so one dialog renders per-trigger content. Type the payload through
+the active payload, so one dialog renders per-trigger content. Type the payload through
 the handle: `Dialog.createHandle<Payload>()`. The payload is captured when the trigger opens the
 dialog; for data that can change while it is open, carry an id and read live state inside.
 
@@ -76,6 +76,17 @@ const detail = Dialog.createHandle<{ name: string }>();
 <Dialog.Root handle={detail}>
   {({ payload }) => <Dialog.Popup>{payload?.name}</Dialog.Popup>}
 </Dialog.Root>
+```
+
+An open with no trigger behind it can supply the payload directly: `handle.open(payload)` is the
+programmatic counterpart, for a dialog raised by something that happened rather than by an element
+— a confirmation that has to say what it is asking. A trigger-driven open supersedes it, since a
+trigger names its own payload.
+
+```tsx
+const confirmation = Dialog.createHandle<{ question: string }>();
+
+confirmation.open({ question: 'Discard changes?' });
 ```
 
 In controlled mode, track which trigger is active with `triggerId` — `onOpenChange`'s second
@@ -147,7 +158,7 @@ the close was pointer-driven, where focus is left where the pointer put it (see 
 | `closedBy`     | `'any' \| 'closerequest' \| 'none'`                         | `'any'`    | Which gestures dismiss the dialog                                     |
 | `handle`       | `DialogHandle`                                              | —          | Connects detached triggers (see `Dialog.createHandle()`)              |
 | `triggerId`    | `string \| null`                                            | —          | Controls which trigger the open is attributed to                      |
-| `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —          | Content, or a render function of the active trigger's `payload`       |
+| `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —          | Content, or a render function of the active `payload`                 |
 
 #### `closedBy`
 
@@ -181,9 +192,14 @@ When `root` is provided, the dialog is portaled into that container instead of `
 
 ### `Dialog.Viewport`
 
-| Prop         | Type      | Default | Description                     |
-| ------------ | --------- | ------- | ------------------------------- |
-| `lockScroll` | `boolean` | `true`  | Prevents body scroll while open |
+| Prop         | Type      | Default | Description                                                                  |
+| ------------ | --------- | ------- | ---------------------------------------------------------------------------- |
+| `lockScroll` | `boolean` | `true`  | Prevents body scroll while open                                              |
+| `overlay`    | `boolean` | `true`  | Wraps the viewport in a fixed overlay. `false` renders it in flow, unlocked. |
+
+`overlay={false}` is for a dialog presented inline in its host rather than over the page — an
+account panel mounted in a page slot. Pair it with `modal={false}` and `closedBy='none'` on the
+root, and `initialFocus={false}` on the popup so mounting does not steal focus.
 
 ### `Dialog.Trigger`
 
@@ -201,6 +217,10 @@ When `root` is provided, the dialog is portaled into that container instead of `
 | `finalFocus`   | `DialogFocusTarget` | `true`  | Where focus returns when it closes      |
 
 `DialogFocusTarget` is `boolean | RefObject | (interactionType) => boolean | void | HTMLElement | null`.
+
+The popup's children are held at their last committed frame while it exits (`Freeze`), so state
+that resets on close — a machine returning to its initial state — does not flash through the
+fade. The popup element itself stays live for `data-closed` / `data-ending-style`.
 
 ### `Dialog.Backdrop`, `Dialog.Title`, `Dialog.Description`, `Dialog.Close`
 

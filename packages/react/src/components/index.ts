@@ -3,6 +3,7 @@ export {
   CreateOrganization,
   GoogleOneTap,
   OAuthConsent,
+  OAuthDeviceVerification,
   OrganizationList,
   OrganizationProfile,
   OrganizationSwitcher,

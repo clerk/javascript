@@ -21,6 +21,7 @@ import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
+import { JWT_CATEGORY_JWT_TEMPLATE } from '../jwtCategories';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
 import { type MachineTokenType, TokenType } from '../tokenTypes';
@@ -1304,6 +1305,45 @@ describe('tokens.authenticateRequest(options)', () => {
       message: '',
     });
     expect(requestState.toAuth()).toBeSignedOutToAuth();
+  });
+
+  // Regression tests for SEC-340. A JWT-template token is signed by the same instance key and
+  // passes verifyToken(), but carries no `sid`, so it outlives revocation of the session that
+  // minted it and must not authenticate one.
+  const templateInHeader = (jwt: string) => mockRequestWithHeaderAuth({ authorization: jwt });
+  describe.each([
+    ['headerToken', templateInHeader, {}],
+    [
+      'cookieToken',
+      (jwt: string) =>
+        mockRequestWithCookies(
+          {},
+          { __clerk_db_jwt: 'deadbeef', __client_uat: `${mockJwtPayload.iat - 10}`, __session: jwt },
+        ),
+      {},
+    ],
+    ['headerToken, acceptsToken: any', templateInHeader, { acceptsToken: 'any' as const }],
+    [
+      'headerToken, acceptsToken: [session_token, m2m_token]',
+      templateInHeader,
+      { acceptsToken: ['session_token', 'm2m_token'] as const },
+    ],
+  ])('%s: JWT-template token presented as a session token (SEC-340)', (_label, buildRequest, options) => {
+    test('returns signed out', async () => {
+      const { sid: _sid, ...payloadWithoutSid } = mockJwtPayload;
+      const { data: templateJwt } = await signJwt(payloadWithoutSid, signingJwks, {
+        algorithm: 'RS256',
+        header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_JWT_TEMPLATE },
+      });
+
+      const requestState = await authenticateRequest(buildRequest(templateJwt!), mockOptions(options));
+
+      expect(requestState).toBeSignedOut({
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+      expect(requestState.toAuth()).toBeSignedOutToAuth();
+    });
   });
 
   // todo(
