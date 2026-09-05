@@ -40,6 +40,9 @@ catalogs:
 
 minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
+  # Vitest 5 evaluation (age-clears 2026-09-05)
+  - vitest@5.0.0
+  - '@vitest/*'
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
