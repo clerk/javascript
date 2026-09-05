@@ -1309,6 +1309,7 @@ export const msMY: LocalizationResource = {
       actionText: 'Tidak mempunyai mana-mana ini?',
       blockButton__backupCode: 'Gunakan kod sandaran',
       blockButton__emailCode: 'E-mel kod ke {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Gunakan kunci pas anda',
       blockButton__password: 'Teruskan dengan kata laluan anda',
       blockButton__phoneCode: 'Hantar kod SMS ke {{identifier}}',
@@ -1331,6 +1332,29 @@ export const msMY: LocalizationResource = {
       resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Masukkan kod yang dihantar ke e-mel anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Tidak dapat meneruskan pengesahan. Tiada faktor pengesahan yang sesuai dikonfigurasi',

@@ -1302,6 +1302,7 @@ export const elGR: LocalizationResource = {
       actionText: 'Δεν έχετε κάποιο από αυτά;',
       blockButton__backupCode: 'Χρησιμοποιήστε εφεδρικό κωδικό',
       blockButton__emailCode: 'Αποστολή κωδικού στο {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Χρησιμοποιήστε το passkey σας',
       blockButton__password: 'Σύνδεση με τον κωδικό πρόσβασής σας',
       blockButton__phoneCode: 'Αποστολή κωδικού μέσω SMS στο {{identifier}}',
@@ -1325,6 +1326,29 @@ export const elGR: LocalizationResource = {
       resendButton: 'Δεν λάβατε κωδικό; Επαναποστολή',
       subtitle: 'για να συνεχίσετε',
       title: 'Ελέγξτε το email σας',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Δεν είναι δυνατή η συνέχεια. Δεν υπάρχει διαθέσιμος παράγοντας επαλήθευσης.',

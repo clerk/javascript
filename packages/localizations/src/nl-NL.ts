@@ -1300,6 +1300,7 @@ export const nlNL: LocalizationResource = {
       actionText: 'Heb je geen van deze?',
       blockButton__backupCode: 'Backupcode gebruiken',
       blockButton__emailCode: 'Email code naar {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Doorgaan met je wachtwoord',
       blockButton__phoneCode: 'Verzend SMS code naar {{identifier}}',
@@ -1322,6 +1323,29 @@ export const nlNL: LocalizationResource = {
       resendButton: 'Niet ontvangen? Opnieuw verzenden',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Controleer je email',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Kan niet verder gaan met verificatie. Er is geen beschikbare verificatiefactor.',

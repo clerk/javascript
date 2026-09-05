@@ -1307,6 +1307,7 @@ export const fiFI: LocalizationResource = {
       actionText: 'Eikö mikään näistä ole käytettävissä?',
       blockButton__backupCode: 'Käytä varakoodia',
       blockButton__emailCode: 'Lähetä koodi sähköpostitse {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Käytä pääsyavaintasi',
       blockButton__password: 'Jatka salasanallasi',
       blockButton__phoneCode: 'Lähetä SMS-koodi {{identifier}}',
@@ -1329,6 +1330,29 @@ export const fiFI: LocalizationResource = {
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
       subtitle: 'Syötä sähköpostiisi lähetetty koodi jatkaaksesi',
       title: 'Vahvistus vaaditaan',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Vahvistusta ei voida suorittaa. Sopivaa todennusmenetelmää ei ole määritetty.',

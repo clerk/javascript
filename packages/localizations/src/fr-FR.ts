@@ -1313,6 +1313,7 @@ export const frFR: LocalizationResource = {
       actionText: 'Vous ne pouvez pas accéder à votre compte ?',
       blockButton__backupCode: 'Utiliser un code de récupération',
       blockButton__emailCode: 'Recevoir un code par e-mail',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Utiliser une clé de sécurité',
       blockButton__password: 'Utiliser le mot de passe',
       blockButton__phoneCode: 'Recevoir un code par téléphone',
@@ -1335,6 +1336,29 @@ export const frFR: LocalizationResource = {
       resendButton: 'Renvoyer le code',
       subtitle: 'Un code a été envoyé à votre adresse e-mail.',
       title: 'Vérification par e-mail',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: "Aucune méthode de vérification n'est disponible.",

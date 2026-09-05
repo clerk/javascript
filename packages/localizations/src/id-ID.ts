@@ -1300,6 +1300,7 @@ export const idID: LocalizationResource = {
       actionText: 'Tidak memiliki salah satu dari ini?',
       blockButton__backupCode: 'Gunakan kode cadangan',
       blockButton__emailCode: 'Kirim kode ke {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Lanjutkan dengan kata sandi Anda',
       blockButton__phoneCode: 'Kirim kode SMS ke {{identifier}}',
@@ -1322,6 +1323,29 @@ export const idID: LocalizationResource = {
       resendButton: 'Tidak menerima kode? Kirim ulang',
       subtitle: 'Masukkan kode yang dikirim ke email Anda untuk melanjutkan',
       title: 'Verifikasi diperlukan',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Tidak dapat melanjutkan verifikasi. Tidak ada faktor autentikasi yang sesuai dikonfigurasi',

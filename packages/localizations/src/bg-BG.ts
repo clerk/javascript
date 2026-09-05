@@ -1299,6 +1299,7 @@ export const bgBG: LocalizationResource = {
       actionText: "Don't have one of these?",
       blockButton__backupCode: 'Use backup code',
       blockButton__emailCode: 'Send code to email',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Login with password',
       blockButton__phoneCode: 'Send code to phone',
@@ -1320,6 +1321,29 @@ export const bgBG: LocalizationResource = {
       resendButton: "Didn't receive the code? Send it again.",
       subtitle: "We've sent a code to your email.",
       title: 'Email verification',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Unable to proceed. No available authentication methods.',

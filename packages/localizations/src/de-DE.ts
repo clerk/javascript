@@ -1312,6 +1312,7 @@ export const deDE: LocalizationResource = {
       actionText: 'Verwenden Sie eine alternative Verifizierungsmethode',
       blockButton__backupCode: 'Mit Wiederherstellungscode verifizieren',
       blockButton__emailCode: 'Mit E-Mail-Code verifizieren',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Verwenden Sie Ihren Passkey',
       blockButton__password: 'Mit Passwort verifizieren',
       blockButton__phoneCode: 'Mit SMS-Code verifizieren',
@@ -1334,6 +1335,29 @@ export const deDE: LocalizationResource = {
       resendButton: 'Code erneut senden',
       subtitle: 'Überprüfen Sie Ihre E-Mail auf den Verifizierungscode.',
       title: 'E-Mail-Code Verifizierung',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Es sind keine Verifizierungsmethoden mehr verfügbar.',

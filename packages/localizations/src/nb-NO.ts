@@ -1308,6 +1308,7 @@ export const nbNO: LocalizationResource = {
       actionText: 'Har du ingen av disse?',
       blockButton__backupCode: 'Bruk en sikkerhetskode',
       blockButton__emailCode: 'Send e-postkode til {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Bruk passnøkkelen din',
       blockButton__password: 'Fortsett med passordet ditt',
       blockButton__phoneCode: 'Send SMS-kode til {{identifier}}',
@@ -1330,6 +1331,29 @@ export const nbNO: LocalizationResource = {
       resendButton: 'Ikke mottatt kode? Send på nytt',
       subtitle: 'Skriv inn koden sendt til e-posten din for å fortsette',
       title: 'Verifisering påkrevd',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Kan ikke fortsette med verifiseringen. Ingen passende autentiseringsfaktor er konfigurert',

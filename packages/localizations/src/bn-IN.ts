@@ -1305,6 +1305,7 @@ export const bnIN: LocalizationResource = {
       actionText: 'এর কোনটিই নেই?',
       blockButton__backupCode: 'একটি ব্যাকআপ কোড ব্যবহার করুন',
       blockButton__emailCode: '{{identifier}}-এ ইমেইল কোড পাঠান',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'আপনার পাসকি ব্যবহার করুন',
       blockButton__password: 'আপনার পাসওয়ার্ড দিয়ে চালিয়ে যান',
       blockButton__phoneCode: '{{identifier}}-এ এসএমএস কোড পাঠান',
@@ -1327,6 +1328,29 @@ export const bnIN: LocalizationResource = {
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'চালিয়ে যেতে আপনার ইমেইলে পাঠানো কোড লিখুন',
       title: 'যাচাইকরণ প্রয়োজন',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'যাচাইকরণ চালিয়ে যাওয়া যাচ্ছে না। কোনো উপযুক্ত অথেনটিকেশন ফ্যাক্টর কনফিগার করা নেই',

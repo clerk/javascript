@@ -1300,6 +1300,7 @@ export const mnMN: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
@@ -1321,6 +1322,29 @@ export const mnMN: LocalizationResource = {
       resendButton: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: undefined,

@@ -1308,6 +1308,7 @@ export const roRO: LocalizationResource = {
       actionText: 'Nu ai niciuna dintre acestea?',
       blockButton__backupCode: 'Folosește un cod de rezervă',
       blockButton__emailCode: 'Trimite cod pe email către {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Folosește cheia de acces',
       blockButton__password: 'Continuă cu parola',
       blockButton__phoneCode: 'Trimite cod prin SMS la {{identifier}}',
@@ -1330,6 +1331,29 @@ export const roRO: LocalizationResource = {
       resendButton: 'Nu ai primit un cod? Retrimite',
       subtitle: 'Introdu codul trimis pe email pentru a continua',
       title: 'Verificare necesară',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Nu se poate continua. Nu există un factor de autentificare configurat.',
