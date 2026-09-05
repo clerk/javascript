@@ -2014,7 +2014,7 @@ export const nlBE: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Een mail met daarin een verificatiecode is verstuurd naar dit adres.',
+        formHint: 'Een mail met daarin een verificatiecode zal worden verstuurd naar dit adres.',
         formSubtitle: 'Voer de verificatiecode in die verstuurd is naar {{identifier}}',
         formTitle: 'Verificatiecode',
         resendButton: 'Verstuur code opnieuw',
@@ -2123,7 +2123,7 @@ export const nlBE: LocalizationResource = {
       title__update: 'Wachtwoord wijzigen',
     },
     phoneNumberPage: {
-      infoText: 'Een SMS met daarin een verificatiecode is verstuurd naar dit nummer.',
+      infoText: 'Een SMS met daarin een verificatiecode zal worden verstuurd naar dit nummer.',
       removeResource: {
         messageLine1: '{{identifier}} zal van dit account verwijderd worden.',
         messageLine2: 'Je zal niet meer kunnen inloggen met dit telefoonnummer.',
