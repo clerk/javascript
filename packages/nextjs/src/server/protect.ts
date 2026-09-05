@@ -232,7 +232,7 @@ const getAuthorizationParams = (arg: any) => {
   return authParams as CheckAuthorizationParamsWithCustomPermissions;
 };
 
-const isServerActionRequest = (req: Request) => {
+export const isServerActionRequest = (req: Request) => {
   return (
     !!req.headers.get(nextConstants.Headers.NextUrl) &&
     (req.headers.get(constants.Headers.Accept)?.includes('text/x-component') ||
