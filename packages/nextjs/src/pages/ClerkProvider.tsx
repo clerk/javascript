@@ -10,6 +10,7 @@ import React from 'react';
 import { useSafeLayoutEffect } from '../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../types';
+import { maybeShowDevelopmentKeyNotice } from '../utils/devKeyNotice';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 import { removeBasePath } from '../utils/removeBasePath';
@@ -45,6 +46,11 @@ export function ClerkProvider<TUi extends Ui = Ui>({ children, ...props }: NextC
     ...props,
     routerPush: navigate,
     routerReplace: replaceNavigate,
+  });
+  maybeShowDevelopmentKeyNotice({
+    publishableKey: mergedProps.publishableKey,
+    disabled: mergedProps.unsafe_disableDevelopmentModeConsoleWarning,
+    keyless: Boolean(mergedProps.__internal_keyless_claimKeylessApplicationUrl),
   });
   // ClerkProvider automatically injects __clerk_ssr_state
   // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state

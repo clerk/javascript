@@ -61,8 +61,8 @@ export const mergeNextClerkPropsWithEnv = (
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
     sdkMetadata: SDK_METADATA,
-    unsafe_disableDevelopmentModeConsoleWarning: isTruthy(
-      process.env.NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING,
-    ),
+    unsafe_disableDevelopmentModeConsoleWarning:
+      props.unsafe_disableDevelopmentModeConsoleWarning === true ||
+      isTruthy(process.env.NEXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING),
   };
 };

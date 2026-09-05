@@ -1,6 +1,7 @@
 import { describe, expect, it, test } from 'vitest';
 
 import {
+  accountlessInitGuidance,
   buildPublishableKey,
   createDevOrStagingUrlCache,
   getCookieSuffix,
@@ -82,6 +83,26 @@ describe('parsePublishableKey(key)', () => {
   it('throws an error if the publishable key is missing, when fatal: true', () => {
     expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
       'Publishable key is missing. To create a Clerk application with valid keys, in your terminal run:\n\nnpx clerk@latest init',
+    );
+  });
+
+  it('appends the same guidance to every fatal error, and that guidance contains the init sentence', () => {
+    const messageFor = (key: string | undefined) => {
+      try {
+        parsePublishableKey(key, { fatal: true });
+      } catch (error) {
+        return (error as Error).message;
+      }
+      throw new Error('expected parsePublishableKey to throw');
+    };
+
+    const missingKeyMessage = messageFor(undefined);
+    const invalidKeyMessage = messageFor('fake_pk');
+
+    const guidance = missingKeyMessage.slice('Publishable key is missing. '.length);
+    expect(guidance).toContain(accountlessInitGuidance);
+    expect(invalidKeyMessage).toBe(
+      `Publishable key not valid (expected format: pk_test_... or pk_live_...). ${guidance}`,
     );
   });
 
