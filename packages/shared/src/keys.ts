@@ -111,7 +111,7 @@ npx clerk@latest init
 
 ${accountlessInitGuidance}
 
-If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys (\`--instance prod\` for production keys). Or copy them from https://dashboard.clerk.com/last-active?path=api-keys.`;
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys (\`--instance prod\` for production keys). Or copy them from https://dashboard.clerk.com/~/api-keys.`;
 
 export function parsePublishableKey(
   key: string | undefined,
