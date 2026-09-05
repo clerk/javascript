@@ -15,7 +15,7 @@ function isTerminalSafeInstance(value: string): boolean {
   return /^[a-z0-9.-]+$/i.test(value);
 }
 
-// CI builds print on purpose (sandboxed agents only see build output); PHASE_PRODUCTION_BUILD is hardcoded to keep next/constants out of client bundles.
+// PHASE_PRODUCTION_BUILD is hardcoded rather than imported from next/constants to keep that module out of client bundles.
 function isBuildOrDevServer(): boolean {
   if (typeof process === 'undefined' || !process.env) {
     return false;
