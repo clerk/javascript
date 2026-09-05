@@ -1,10 +1,10 @@
 import type { FormEvent } from 'react';
 import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import { Field } from '../../components/field';
-import { Input } from '../../components/input';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { Field } from '../../../components/field';
+import { Input } from '../../../components/input';
 
 export interface ReverificationBackupCodeMessages {
   title: string;

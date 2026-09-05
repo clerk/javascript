@@ -1,5 +1,5 @@
-import { Button } from '../../components/button';
-import { Card } from '../../components/card';
+import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
 
 export interface ReverificationHelpMessages {
   title: string;
