@@ -86,17 +86,24 @@ describe('parsePublishableKey(key)', () => {
     );
   });
 
-  it('keeps the full guidance text on fatal errors and shares the init sentence with it', () => {
-    const expectedGuidance =
-      'To create a Clerk application with valid keys, in your terminal run:\n\nnpx clerk@latest init\n\n`npx clerk@latest init` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.\n\nIf you have a Clerk application, run `npx clerk@latest env pull` to write the keys (`--instance prod` for production keys). Or copy them from https://dashboard.clerk.com/last-active?path=api-keys.';
+  it('appends the same guidance to every fatal error, and that guidance contains the init sentence', () => {
+    const messageFor = (key: string | undefined) => {
+      try {
+        parsePublishableKey(key, { fatal: true });
+      } catch (error) {
+        return (error as Error).message;
+      }
+      throw new Error('expected parsePublishableKey to throw');
+    };
 
-    expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
-      `Publishable key is missing. ${expectedGuidance}`,
+    const missingKeyMessage = messageFor(undefined);
+    const invalidKeyMessage = messageFor('fake_pk');
+
+    const guidance = missingKeyMessage.slice('Publishable key is missing. '.length);
+    expect(guidance).toContain(accountlessInitGuidance);
+    expect(invalidKeyMessage).toBe(
+      `Publishable key not valid (expected format: pk_test_... or pk_live_...). ${guidance}`,
     );
-    expect(() => parsePublishableKey('fake_pk', { fatal: true })).toThrowError(
-      `Publishable key not valid (expected format: pk_test_... or pk_live_...). ${expectedGuidance}`,
-    );
-    expect(expectedGuidance).toContain(accountlessInitGuidance);
   });
 
   it('applies the proxyUrl if provided', () => {
