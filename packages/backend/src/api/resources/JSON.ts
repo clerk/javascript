@@ -963,6 +963,7 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_at: number;
   updated_at: number;
+  aud?: string | string[];
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {

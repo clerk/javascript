@@ -25,6 +25,8 @@ export class IdPOAuthAccessToken {
     readonly createdAt: number,
     /** The Unix timestamp (in milliseconds) when the access token was last updated. */
     readonly updatedAt: number,
+    /** The intended audience for the access token. */
+    readonly aud?: string | string[],
   ) {}
 
   static fromJSON(data: IdPOAuthAccessTokenJSON) {
@@ -40,6 +42,7 @@ export class IdPOAuthAccessToken {
       data.expiration,
       data.created_at,
       data.updated_at,
+      data.aud,
     );
   }
 
@@ -59,10 +62,11 @@ export class IdPOAuthAccessToken {
       oauthPayload.scp ?? oauthPayload.scope?.split(' ') ?? [],
       false,
       null,
-      payload.exp * 1000 <= Date.now() - clockSkewInMs,
-      payload.exp * 1000, // milliseconds: expiration, converted from JWT exp claim
-      payload.iat * 1000, // milliseconds: createdAt, converted from JWT iat claim
-      payload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
+      oauthPayload.exp * 1000 <= Date.now() - clockSkewInMs,
+      oauthPayload.exp * 1000, // milliseconds: expiration, converted from JWT exp claim
+      oauthPayload.iat * 1000, // milliseconds: createdAt, converted from JWT iat claim
+      oauthPayload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
+      oauthPayload.aud,
     );
   }
 }

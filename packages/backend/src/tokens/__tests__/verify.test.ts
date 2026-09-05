@@ -22,7 +22,7 @@ import { JWT_CATEGORY_M2M_TOKEN } from '../jwtCategories';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
 async function createSignedOAuthJwt(
-  payload = mockOAuthAccessTokenJwtPayload,
+  payload: Record<string, unknown> = mockOAuthAccessTokenJwtPayload,
   typ: 'at+jwt' | 'application/at+jwt' | 'JWT' = 'at+jwt',
 ) {
   const { data } = await signJwt(payload, signingJwks, {
@@ -558,7 +558,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
           payload.sub = sub;
         }
 
-        const oauthJwt = await createSignedOAuthJwt(payload as typeof mockOAuthAccessTokenJwtPayload, 'at+jwt');
+        const oauthJwt = await createSignedOAuthJwt(payload, 'at+jwt');
 
         const result = await verifyMachineAuthToken(oauthJwt, {
           apiUrl: 'https://api.clerk.test',
@@ -569,6 +569,81 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         expect(result.tokenType).toBe('oauth_token');
       },
     );
+
+    it('verifies OAuth JWT with a matching RFC 8707 resource audience', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const audience = 'https://my-resource.example.com';
+      const oauthJwt = await createSignedOAuthJwt({
+        ...mockOAuthAccessTokenJwtPayload,
+        aud: audience,
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience,
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toMatchInlineSnapshot(`
+        IdPOAuthAccessToken {
+          "aud": "https://my-resource.example.com",
+          "clientId": "client_2VTWUzvGC5UhdJCNx6xG1D98edc",
+          "createdAt": 1666648250000,
+          "expiration": 1666648550000,
+          "expired": false,
+          "id": "oat_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE",
+          "revocationReason": null,
+          "revoked": false,
+          "scopes": [
+            "read:foo",
+            "write:bar",
+          ],
+          "subject": "user_2vYVtestTESTtestTESTtestTESTtest",
+          "type": "oauth_token",
+          "updatedAt": 1666648250000,
+        }
+      `);
+      expect((result.data as IdPOAuthAccessToken).aud).toBe(audience);
+      expect(result.errors).toBeUndefined();
+    });
+
+    it('rejects OAuth JWT with a mismatched RFC 8707 resource audience', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const oauthJwt = await createSignedOAuthJwt({
+        ...mockOAuthAccessTokenJwtPayload,
+        aud: 'https://attacker.example.com',
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience: 'https://my-resource.example.com',
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors![0]).toMatchInlineSnapshot(
+        `[MachineTokenVerificationError: Invalid JWT audience claim (aud) "https://attacker.example.com". Is not included in "["https://my-resource.example.com"]".]`,
+      );
+    });
   });
 
   describe('verifyM2MToken with JWT', () => {

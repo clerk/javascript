@@ -83,6 +83,11 @@ type JWTPayloadBase = {
   azp?: string;
 
   /**
+   * JWT Audience - [RFC7519#section-4.1.3](https://tools.ietf.org/html/rfc7519#section-4.1.3).
+   */
+  aud?: string | string[];
+
+  /**
    * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
    */
   act?: ActClaim;
