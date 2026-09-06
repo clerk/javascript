@@ -129,7 +129,7 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "test": "vitest run",
-    "test:ci": "vitest run --maxWorkers=70%",
+    "test:ci": "vitest run --maxWorkers=70% && pnpm check:swift-models",
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
