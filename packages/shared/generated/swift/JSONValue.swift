@@ -63,11 +63,11 @@ extension KeyedDecodingContainer {
 }
 
 extension KeyedEncodingContainer {
-  func encodeMillisecondsDate(_ date: Date, forKey key: Key) throws {
+  mutating func encodeMillisecondsDate(_ date: Date, forKey key: Key) throws {
     try encode(Int64((date.timeIntervalSince1970 * 1000).rounded()), forKey: key)
   }
 
-  func encodeIfPresentMillisecondsDate(_ date: Date?, forKey key: Key) throws {
+  mutating func encodeIfPresentMillisecondsDate(_ date: Date?, forKey key: Key) throws {
     guard let date else {
       return
     }
