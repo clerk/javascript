@@ -6,68 +6,68 @@
   "type": "module",
   "exports": {
     "./accordion": {
-      "types": "./dist/primitives/accordion/index.d.ts",
-      "import": "./dist/primitives/accordion/index.js"
+      "import": "./dist/primitives/accordion/index.js",
+      "types": "./dist/primitives/accordion/index.d.ts"
     },
     "./button": {
-      "types": "./dist/primitives/button/index.d.ts",
-      "import": "./dist/primitives/button/index.js"
+      "import": "./dist/primitives/button/index.js",
+      "types": "./dist/primitives/button/index.d.ts"
     },
     "./tabs": {
-      "types": "./dist/primitives/tabs/index.d.ts",
-      "import": "./dist/primitives/tabs/index.js"
+      "import": "./dist/primitives/tabs/index.js",
+      "types": "./dist/primitives/tabs/index.d.ts"
     },
     "./tooltip": {
-      "types": "./dist/primitives/tooltip/index.d.ts",
-      "import": "./dist/primitives/tooltip/index.js"
+      "import": "./dist/primitives/tooltip/index.js",
+      "types": "./dist/primitives/tooltip/index.d.ts"
     },
     "./popover": {
-      "types": "./dist/primitives/popover/index.d.ts",
-      "import": "./dist/primitives/popover/index.js"
+      "import": "./dist/primitives/popover/index.js",
+      "types": "./dist/primitives/popover/index.d.ts"
     },
     "./select": {
-      "types": "./dist/primitives/select/index.d.ts",
-      "import": "./dist/primitives/select/index.js"
+      "import": "./dist/primitives/select/index.js",
+      "types": "./dist/primitives/select/index.d.ts"
     },
     "./menu": {
-      "types": "./dist/primitives/menu/index.d.ts",
-      "import": "./dist/primitives/menu/index.js"
+      "import": "./dist/primitives/menu/index.js",
+      "types": "./dist/primitives/menu/index.d.ts"
     },
     "./autocomplete": {
-      "types": "./dist/primitives/autocomplete/index.d.ts",
-      "import": "./dist/primitives/autocomplete/index.js"
+      "import": "./dist/primitives/autocomplete/index.js",
+      "types": "./dist/primitives/autocomplete/index.d.ts"
     },
     "./collapsible": {
-      "types": "./dist/primitives/collapsible/index.d.ts",
-      "import": "./dist/primitives/collapsible/index.js"
+      "import": "./dist/primitives/collapsible/index.js",
+      "types": "./dist/primitives/collapsible/index.d.ts"
     },
     "./dialog": {
-      "types": "./dist/primitives/dialog/index.d.ts",
-      "import": "./dist/primitives/dialog/index.js"
+      "import": "./dist/primitives/dialog/index.js",
+      "types": "./dist/primitives/dialog/index.d.ts"
     },
     "./drawer": {
-      "types": "./dist/primitives/drawer/index.d.ts",
-      "import": "./dist/primitives/drawer/index.js"
+      "import": "./dist/primitives/drawer/index.js",
+      "types": "./dist/primitives/drawer/index.d.ts"
     },
     "./file-upload": {
-      "types": "./dist/primitives/file-upload/index.d.ts",
-      "import": "./dist/primitives/file-upload/index.js"
+      "import": "./dist/primitives/file-upload/index.js",
+      "types": "./dist/primitives/file-upload/index.d.ts"
     },
     "./flow": {
-      "types": "./dist/primitives/flow/index.d.ts",
-      "import": "./dist/primitives/flow/index.js"
+      "import": "./dist/primitives/flow/index.js",
+      "types": "./dist/primitives/flow/index.d.ts"
     },
     "./otp": {
-      "types": "./dist/primitives/otp/index.d.ts",
-      "import": "./dist/primitives/otp/index.js"
+      "import": "./dist/primitives/otp/index.js",
+      "types": "./dist/primitives/otp/index.d.ts"
     },
     "./hooks": {
-      "types": "./dist/hooks/index.d.ts",
-      "import": "./dist/hooks/index.js"
+      "import": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.ts"
     },
     "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js"
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
     }
   },
   "scripts": {
