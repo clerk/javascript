@@ -118,11 +118,13 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "check:swift-models": "pnpm generate:swift-models && git diff --exit-code -- packages/shared/generated/swift",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
+    "generate:swift-models": "unrun ./scripts/generate-swift-models.ts",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
