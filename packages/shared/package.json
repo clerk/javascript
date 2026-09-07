@@ -118,7 +118,7 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "check:swift-models": "pnpm generate:swift-models && git diff --exit-code -- packages/shared/generated/swift",
+    "check:swift-models": "unrun ./scripts/generate-swift-models.ts --check",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:pub": "pnpm dev -- --env.publish",

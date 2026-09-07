@@ -2173,7 +2173,33 @@ function isMainModule(): boolean {
 }
 
 if (isMainModule()) {
-  const outDir = process.argv[2] ? path.resolve(process.argv[2]) : defaultSwiftOutputDir();
-  const files = writeSwiftModels(outDir);
-  process.stdout.write(`Wrote ${files.length} Swift files to ${outDir}\n`);
+  const check = process.argv.includes('--check');
+  const outputArgument = process.argv.slice(2).find(argument => argument !== '--check');
+  const outDir = outputArgument ? path.resolve(outputArgument) : defaultSwiftOutputDir();
+  const files = generateSwiftModels();
+  if (check) {
+    const expected = new Set(files.map(file => file.filename));
+    const mismatches = files
+      .filter(file => {
+        const destination = path.join(outDir, file.filename);
+        return !fs.existsSync(destination) || fs.readFileSync(destination, 'utf8') !== file.contents;
+      })
+      .map(file => file.filename);
+    if (fs.existsSync(outDir)) {
+      const extras = fs
+        .readdirSync(outDir, { recursive: true })
+        .map(String)
+        .filter(filename => filename.endsWith('.swift') && !expected.has(filename));
+      mismatches.push(...extras);
+    }
+    if (mismatches.length) {
+      process.stderr.write(`Swift bindings differ from the generator:\n${mismatches.join('\n')}\n`);
+      process.exitCode = 1;
+    } else {
+      process.stdout.write(`Verified ${files.length} Swift files in ${outDir}\n`);
+    }
+  } else {
+    writeSwiftModels(outDir, files);
+    process.stdout.write(`Wrote ${files.length} Swift files to ${outDir}\n`);
+  }
 }
