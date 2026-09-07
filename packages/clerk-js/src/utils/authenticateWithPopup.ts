@@ -1,7 +1,27 @@
-import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
 import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from '@clerk/shared/types';
 
 import type { Clerk } from '../core/clerk';
+
+const popupCallbackPath = '/popup_auth_callback';
+
+const createPopupState = () =>
+  Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2, '0')).join('');
+
+const buildPopupCallbackUrls = (client: Clerk, state: string, returnUrl: string) => {
+  const callbackUrl = client.getFapiClient().buildUrl({
+    path: popupCallbackPath,
+    search: { state },
+  });
+  const popupRedirectUrlComplete = client.buildUrlWithAuth(callbackUrl.toString());
+  const popupRedirectUrl = new URL(popupRedirectUrlComplete);
+  popupRedirectUrl.searchParams.set('return_url', returnUrl);
+
+  return {
+    callbackOrigin: callbackUrl.origin,
+    popupRedirectUrl: popupRedirectUrl.toString(),
+    popupRedirectUrlComplete,
+  };
+};
 
 export async function _authenticateWithPopup(
   client: Clerk,
@@ -19,8 +39,6 @@ export async function _authenticateWithPopup(
     return;
   }
 
-  const accountPortalHost = buildAccountsBaseUrl(client.frontendApi);
-
   const { redirectUrl } = params;
 
   // We set the force_redirect_url query parameter to ensure that the user is redirected to the correct page even
@@ -29,16 +47,16 @@ export async function _authenticateWithPopup(
   r.searchParams.set('sign_in_force_redirect_url', params.redirectUrlComplete);
   r.searchParams.set('sign_up_force_redirect_url', params.redirectUrlComplete);
   r.searchParams.set('intent', reloadResource);
-  // All URLs are decorated with the dev browser token in development mode since we're moving between AP and the app.
   const redirectUrlWithForceRedirectUrl = client.buildUrlWithAuth(r.toString());
-
-  const popupRedirectUrlComplete = client.buildUrlWithAuth(`${accountPortalHost}/popup-callback`);
-  const popupRedirectUrl = client.buildUrlWithAuth(
-    `${accountPortalHost}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl)}`,
+  const state = createPopupState();
+  const { callbackOrigin, popupRedirectUrl, popupRedirectUrlComplete } = buildPopupCallbackUrls(
+    client,
+    state,
+    redirectUrlWithForceRedirectUrl,
   );
 
   const messageHandler = async (event: MessageEvent) => {
-    if (event.origin !== accountPortalHost) {
+    if (event.origin !== callbackOrigin || event.source !== params.popup || event.data?.state !== state) {
       return;
     }
 
@@ -81,9 +99,7 @@ export async function _authenticateWithPopup(
 }
 
 /**
- * Creates new redirect and callback URLs that point to the `/popup-callback` route on Account Portal. These URLs will
- * be used by FAPI to redirect after the OAuth flow completes, and will result in a message being sent to the parent
- * window.
+ * Creates new redirect and callback URLs that point to FAPI's popup callback route.
  */
 export function wrapWithPopupRoutes(
   client: Clerk,
@@ -100,28 +116,26 @@ export function wrapWithPopupRoutes(
      */
     redirectUrl: string;
   },
-): { redirectCallbackUrl: string; redirectUrl: string } {
-  const accountPortalHost = buildAccountsBaseUrl(client.frontendApi);
-
+): { redirectCallbackUrl: string; redirectUrl: string; state: string } {
   // We set the force_redirect_url query parameter to ensure that the user is redirected to the correct page even
   // in situations like a modal transfer flow.
   const r = new URL(redirectCallbackUrl);
   r.searchParams.set('sign_in_force_redirect_url', redirectUrl);
   r.searchParams.set('sign_up_force_redirect_url', redirectUrl);
-  // All URLs are decorated with the dev browser token in development mode since we're moving between AP and the app.
   const redirectUrlWithForceRedirectUrl = client.buildUrlWithAuth(r.toString());
-
-  const popupRedirectUrlComplete = client.buildUrlWithAuth(`${accountPortalHost}/popup-callback`);
-  const popupRedirectUrl = client.buildUrlWithAuth(
-    `${accountPortalHost}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl)}`,
+  const state = createPopupState();
+  const { popupRedirectUrl, popupRedirectUrlComplete } = buildPopupCallbackUrls(
+    client,
+    state,
+    redirectUrlWithForceRedirectUrl,
   );
 
-  return { redirectCallbackUrl: popupRedirectUrl, redirectUrl: popupRedirectUrlComplete };
+  return { redirectCallbackUrl: popupRedirectUrl, redirectUrl: popupRedirectUrlComplete, state };
 }
 
 export function _futureAuthenticateWithPopup(
   client: Clerk,
-  params: { popup: { location: { href: string } }; externalVerificationRedirectURL: URL },
+  params: { popup: Window; externalVerificationRedirectURL: URL; state: string },
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     if (!client.client || !params.popup) {
@@ -129,8 +143,9 @@ export function _futureAuthenticateWithPopup(
       return;
     }
 
-    const messageHandler = async (event: MessageEvent) => {
-      if (event.origin !== buildAccountsBaseUrl(client.frontendApi)) {
+    const callbackOrigin = client.getFapiClient().buildUrl({ path: popupCallbackPath }).origin;
+    const messageHandler = (event: MessageEvent) => {
+      if (event.origin !== callbackOrigin || event.source !== params.popup || event.data?.state !== params.state) {
         return;
       }
 
