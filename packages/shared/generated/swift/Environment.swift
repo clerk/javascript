@@ -58,4 +58,20 @@ public struct Environment: Codable, Equatable, Sendable, Identifiable {
     case id
     case object
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.apiKeysSettings = try container.decodeFlexible(APIKeysSettings.self, snake: "api_keys_settings", camel: "apiKeysSettings")
+    self.authConfig = try container.decodeFlexible(AuthConfig.self, snake: "auth_config", camel: "authConfig")
+    self.clientDebugMode = try container.decodeIfPresentFlexible(Bool.self, snake: "client_debug_mode", camel: "clientDebugMode")
+    self.commerceSettings = try container.decodeFlexible(CommerceSettings.self, snake: "commerce_settings", camel: "commerceSettings")
+    self.displayConfig = try container.decodeFlexible(DisplayConfig.self, snake: "display_config", camel: "displayConfig")
+    self.maintenanceMode = try container.decodeFlexible(Bool.self, snake: "maintenance_mode", camel: "maintenanceMode")
+    self.organizationSettings = try container.decodeFlexible(OrganizationSettings.self, snake: "organization_settings", camel: "organizationSettings")
+    self.partitionedCookies = try container.decodeIfPresentFlexible(Bool.self, snake: "partitioned_cookies", camel: "partitionedCookies")
+    self.userSettings = try container.decodeFlexible(UserSettings.self, snake: "user_settings", camel: "userSettings")
+    self.protectConfig = try container.decodeFlexible(ProtectConfig.self, snake: "protect_config", camel: "protectConfig")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+  }
 }

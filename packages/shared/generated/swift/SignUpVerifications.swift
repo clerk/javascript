@@ -26,4 +26,12 @@ public struct SignUpVerifications: Codable, Equatable, Sendable {
     case web3Wallet = "web3_wallet"
     case externalAccount = "external_account"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.emailAddress = try container.decodeFlexible(SignUpVerification.self, snake: "email_address", camel: "emailAddress")
+    self.phoneNumber = try container.decodeFlexible(SignUpVerification.self, snake: "phone_number", camel: "phoneNumber")
+    self.web3Wallet = try container.decodeFlexible(SignUpVerification.self, snake: "web3_wallet", camel: "web3Wallet")
+    self.externalAccount = try container.decodeFlexible(Verification.self, snake: "external_account", camel: "externalAccount")
+  }
 }

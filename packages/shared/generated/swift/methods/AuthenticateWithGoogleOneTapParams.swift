@@ -18,4 +18,10 @@ public struct AuthenticateWithGoogleOneTapParams: Codable, Equatable, Sendable {
     case token
     case legalAccepted
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.token = try container.decodeFlexible(String.self, snake: "token", camel: "token")
+    self.legalAccepted = try container.decodeIfPresentFlexible(Bool.self, snake: "legalAccepted", camel: "legalAccepted")
+  }
 }

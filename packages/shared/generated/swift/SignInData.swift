@@ -14,4 +14,9 @@ public struct SignInData: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case secondFactor = "second_factor"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.secondFactor = try container.decodeFlexible(SignInDataSecondFactor.self, snake: "second_factor", camel: "secondFactor")
+  }
 }

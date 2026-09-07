@@ -18,4 +18,10 @@ public struct SignInDataSecondFactor: Codable, Equatable, Sendable {
     case required
     case enabled
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.required = try container.decodeFlexible(Bool.self, snake: "required", camel: "required")
+    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
+  }
 }

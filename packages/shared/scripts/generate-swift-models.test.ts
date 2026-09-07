@@ -14,6 +14,10 @@ describe('generateSwiftModels', () => {
     expect(user, 'User.firstName CodingKey is first_name').toContain('case firstName = "first_name"');
     expect(user, 'User.createdAt is Date from created_at milliseconds').toContain('public var createdAt: Date');
     expect(user, 'User.createdAt CodingKey is created_at').toContain('case createdAt = "created_at"');
+    expect(
+      byName.get('JSONValue.swift'),
+      'models decode both snake_case FAPI keys and camelCase clerkDecoder keys',
+    ).toContain('struct FAPIJSONKey');
   });
 
   it('emits a string union as an enum with unknown(String)', () => {

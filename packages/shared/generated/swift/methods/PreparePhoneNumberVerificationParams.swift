@@ -18,4 +18,10 @@ public struct PreparePhoneNumberVerificationParams: Codable, Equatable, Sendable
     case strategy
     case channel
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.channel = try container.decodeIfPresentFlexible(PrepareFirstFactorParamsChannel.self, snake: "channel", camel: "channel")
+  }
 }

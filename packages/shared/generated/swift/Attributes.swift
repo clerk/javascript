@@ -50,4 +50,18 @@ public struct Attributes: Codable, Equatable, Sendable {
     case lastName = "last_name"
     case authenticatorApp = "authenticator_app"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.emailAddress = try container.decodeFlexible(AttributeData.self, snake: "email_address", camel: "emailAddress")
+    self.phoneNumber = try container.decodeFlexible(AttributeData.self, snake: "phone_number", camel: "phoneNumber")
+    self.web3Wallet = try container.decodeFlexible(AttributeData.self, snake: "web3_wallet", camel: "web3Wallet")
+    self.passkey = try container.decodeFlexible(AttributeData.self, snake: "passkey", camel: "passkey")
+    self.username = try container.decodeFlexible(AttributeData.self, snake: "username", camel: "username")
+    self.password = try container.decodeFlexible(AttributeData.self, snake: "password", camel: "password")
+    self.backupCode = try container.decodeFlexible(AttributeData.self, snake: "backup_code", camel: "backupCode")
+    self.firstName = try container.decodeFlexible(AttributeData.self, snake: "first_name", camel: "firstName")
+    self.lastName = try container.decodeFlexible(AttributeData.self, snake: "last_name", camel: "lastName")
+    self.authenticatorApp = try container.decodeFlexible(AttributeData.self, snake: "authenticator_app", camel: "authenticatorApp")
+  }
 }

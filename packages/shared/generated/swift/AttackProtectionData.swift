@@ -14,4 +14,9 @@ public struct AttackProtectionData: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case enumerationProtection = "enumeration_protection"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.enumerationProtection = try container.decodeFlexible(OrganizationSettingsOrganizationCreationDefaults.self, snake: "enumeration_protection", camel: "enumerationProtection")
+  }
 }

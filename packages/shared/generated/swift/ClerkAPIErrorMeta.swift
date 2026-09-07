@@ -46,4 +46,17 @@ public struct ClerkAPIErrorMeta: Codable, Equatable, Sendable {
     case seatsQuantityToAdd = "seats_quantity_to_add"
     case seatsQuantity = "seats_quantity"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.paramName = try container.decodeIfPresentFlexible(String.self, snake: "param_name", camel: "paramName")
+    self.sessionId = try container.decodeIfPresentFlexible(String.self, snake: "session_id", camel: "sessionId")
+    self.emailAddresses = try container.decodeIfPresentFlexible([String].self, snake: "email_addresses", camel: "emailAddresses")
+    self.identifiers = try container.decodeIfPresentFlexible([String].self, snake: "identifiers", camel: "identifiers")
+    self.zxcvbn = try container.decodeIfPresentFlexible(ClerkAPIErrorMetaZxcvbn.self, snake: "zxcvbn", camel: "zxcvbn")
+    self.plan = try container.decodeIfPresentFlexible(ClerkAPIErrorMetaPlan.self, snake: "plan", camel: "plan")
+    self.isPlanUpgradePossible = try container.decodeIfPresentFlexible(Bool.self, snake: "is_plan_upgrade_possible", camel: "isPlanUpgradePossible")
+    self.seatsQuantityToAdd = try container.decodeIfPresentFlexible(Int.self, snake: "seats_quantity_to_add", camel: "seatsQuantityToAdd")
+    self.seatsQuantity = try container.decodeIfPresentFlexible(Int.self, snake: "seats_quantity", camel: "seatsQuantity")
+  }
 }

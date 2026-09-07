@@ -50,4 +50,18 @@ public struct SessionVerifyPrepareFirstFactorParams: Codable, Equatable, Sendabl
     case redirectUrl
     case oidcPrompt
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(SessionVerifyPrepareFirstFactorParamsStrategy.self, snake: "strategy", camel: "strategy")
+    self.emailAddressId = try container.decodeIfPresentFlexible(String.self, snake: "emailAddressId", camel: "emailAddressId")
+    self.primary = try container.decodeIfPresentFlexible(Bool.self, snake: "primary", camel: "primary")
+    self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumberId", camel: "phoneNumberId")
+    self.`default` = try container.decodeIfPresentFlexible(Bool.self, snake: "default", camel: "default")
+    self.channel = try container.decodeIfPresentFlexible(PrepareFirstFactorParamsChannel.self, snake: "channel", camel: "channel")
+    self.enterpriseConnectionId = try container.decodeIfPresentFlexible(String.self, snake: "enterpriseConnectionId", camel: "enterpriseConnectionId")
+    self.enterpriseConnectionName = try container.decodeIfPresentFlexible(String.self, snake: "enterpriseConnectionName", camel: "enterpriseConnectionName")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
+  }
 }

@@ -42,4 +42,16 @@ public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
     case verification
     case backupCodes = "backup_codes"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.phoneNumber = try container.decodeFlexible(String.self, snake: "phone_number", camel: "phoneNumber")
+    self.reservedForSecondFactor = try container.decodeFlexible(Bool.self, snake: "reserved_for_second_factor", camel: "reservedForSecondFactor")
+    self.defaultSecondFactor = try container.decodeFlexible(Bool.self, snake: "default_second_factor", camel: "defaultSecondFactor")
+    self.linkedTo = try container.decodeFlexible([IdentificationLink].self, snake: "linked_to", camel: "linkedTo")
+    self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
+    self.backupCodes = try container.decodeIfPresentFlexible([String].self, snake: "backup_codes", camel: "backupCodes")
+  }
 }

@@ -50,4 +50,18 @@ public struct UserSettings: Codable, Equatable, Sendable {
     case usernameSettings = "username_settings"
     case attackProtection = "attack_protection"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.attributes = try container.decodeFlexible(Attributes.self, snake: "attributes", camel: "attributes")
+    self.actions = try container.decodeFlexible(Actions.self, snake: "actions", camel: "actions")
+    self.social = try container.decodeFlexible(OAuthProviders.self, snake: "social", camel: "social")
+    self.enterpriseSso = try container.decodeFlexible(EnterpriseSSOSettings.self, snake: "enterprise_sso", camel: "enterpriseSso")
+    self.signIn = try container.decodeFlexible(SignInData.self, snake: "sign_in", camel: "signIn")
+    self.signUp = try container.decodeFlexible(SignUpData.self, snake: "sign_up", camel: "signUp")
+    self.passwordSettings = try container.decodeFlexible(PasswordSettingsData.self, snake: "password_settings", camel: "passwordSettings")
+    self.passkeySettings = try container.decodeFlexible(PasskeySettingsData.self, snake: "passkey_settings", camel: "passkeySettings")
+    self.usernameSettings = try container.decodeFlexible(UsernameSettingsData.self, snake: "username_settings", camel: "usernameSettings")
+    self.attackProtection = try container.decodeIfPresentFlexible(AttackProtectionData.self, snake: "attack_protection", camel: "attackProtection")
+  }
 }

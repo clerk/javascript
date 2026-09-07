@@ -18,4 +18,10 @@ public struct PhoneCodeSecondFactorConfig: Codable, Equatable, Sendable {
     case strategy
     case phoneNumberId
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumberId", camel: "phoneNumberId")
+  }
 }

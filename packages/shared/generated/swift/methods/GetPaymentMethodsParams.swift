@@ -18,4 +18,10 @@ public struct GetPaymentMethodsParams: Codable, Equatable, Sendable {
     case initialPage
     case pageSize
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.initialPage = try container.decodeIfPresentFlexible(Int.self, snake: "initialPage", camel: "initialPage")
+    self.pageSize = try container.decodeIfPresentFlexible(Int.self, snake: "pageSize", camel: "pageSize")
+  }
 }

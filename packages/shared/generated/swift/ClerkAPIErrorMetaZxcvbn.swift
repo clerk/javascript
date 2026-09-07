@@ -14,4 +14,9 @@ public struct ClerkAPIErrorMetaZxcvbn: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case suggestions
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.suggestions = try container.decodeFlexible([ClerkAPIErrorMetaZxcvbnSuggestionsElement].self, snake: "suggestions", camel: "suggestions")
+  }
 }

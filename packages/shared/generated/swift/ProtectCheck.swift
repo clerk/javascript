@@ -32,12 +32,12 @@ public struct ProtectCheck: Codable, Equatable, Sendable {
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.status = try container.decode(String.self, forKey: .status)
-    self.token = try container.decode(String.self, forKey: .token)
-    self.sdkUrl = try container.decode(String.self, forKey: .sdkUrl)
-    self.expiresAt = try container.decodeIfPresentMillisecondsDate(forKey: .expiresAt)
-    self.uiHints = try container.decodeIfPresent([String: String].self, forKey: .uiHints)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.status = try container.decodeFlexible(String.self, snake: "status", camel: "status")
+    self.token = try container.decodeFlexible(String.self, snake: "token", camel: "token")
+    self.sdkUrl = try container.decodeFlexible(String.self, snake: "sdk_url", camel: "sdkUrl")
+    self.expiresAt = try container.decodeIfPresentMillisecondsDate(snake: "expires_at", camel: "expiresAt")
+    self.uiHints = try container.decodeIfPresentFlexible([String: String].self, snake: "ui_hints", camel: "uiHints")
   }
 
   public func encode(to encoder: Encoder) throws {

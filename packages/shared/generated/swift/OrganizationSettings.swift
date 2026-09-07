@@ -38,4 +38,15 @@ public struct OrganizationSettings: Codable, Equatable, Sendable {
     case slug
     case organizationCreationDefaults = "organization_creation_defaults"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
+    self.maxAllowedMemberships = try container.decodeFlexible(Int.self, snake: "max_allowed_memberships", camel: "maxAllowedMemberships")
+    self.forceOrganizationSelection = try container.decodeFlexible(Bool.self, snake: "force_organization_selection", camel: "forceOrganizationSelection")
+    self.actions = try container.decodeFlexible(OrganizationSettingsActions.self, snake: "actions", camel: "actions")
+    self.domains = try container.decodeFlexible(OrganizationSettingsDomains.self, snake: "domains", camel: "domains")
+    self.slug = try container.decodeFlexible(OrganizationSettingsSlug.self, snake: "slug", camel: "slug")
+    self.organizationCreationDefaults = try container.decodeFlexible(OrganizationSettingsOrganizationCreationDefaults.self, snake: "organization_creation_defaults", camel: "organizationCreationDefaults")
+  }
 }

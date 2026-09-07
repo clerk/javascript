@@ -42,4 +42,16 @@ public struct DisplayThemeGeneral: Codable, Equatable, Sendable {
     case borderRadius = "border_radius"
     case boxShadow = "box_shadow"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.color = try container.decodeFlexible(String.self, snake: "color", camel: "color")
+    self.backgroundColor = try container.decodeFlexible(JSONValue.self, snake: "background_color", camel: "backgroundColor")
+    self.fontFamily = try container.decodeFlexible(String.self, snake: "font_family", camel: "fontFamily")
+    self.fontColor = try container.decodeFlexible(String.self, snake: "font_color", camel: "fontColor")
+    self.labelFontWeight = try container.decodeFlexible(String.self, snake: "label_font_weight", camel: "labelFontWeight")
+    self.padding = try container.decodeFlexible(String.self, snake: "padding", camel: "padding")
+    self.borderRadius = try container.decodeFlexible(String.self, snake: "border_radius", camel: "borderRadius")
+    self.boxShadow = try container.decodeFlexible(String.self, snake: "box_shadow", camel: "boxShadow")
+  }
 }

@@ -40,14 +40,14 @@ public struct AuthConfig: Codable, Equatable, Sendable, Identifiable {
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.singleSessionMode = try container.decode(Bool.self, forKey: .singleSessionMode)
-    self.claimedAt = try container.decodeIfPresentMillisecondsDate(forKey: .claimedAt)
-    self.reverification = try container.decode(Bool.self, forKey: .reverification)
-    self.preferredChannels = try container.decodeIfPresent([String: PhoneCodeChannel].self, forKey: .preferredChannels)
-    self.sessionMinter = try container.decodeIfPresent(Bool.self, forKey: .sessionMinter)
-    self.id = try container.decode(String.self, forKey: .id)
-    self.object = try container.decode(String.self, forKey: .object)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.singleSessionMode = try container.decodeFlexible(Bool.self, snake: "single_session_mode", camel: "singleSessionMode")
+    self.claimedAt = try container.decodeIfPresentMillisecondsDate(snake: "claimed_at", camel: "claimedAt")
+    self.reverification = try container.decodeFlexible(Bool.self, snake: "reverification", camel: "reverification")
+    self.preferredChannels = try container.decodeIfPresentFlexible([String: PhoneCodeChannel].self, snake: "preferred_channels", camel: "preferredChannels")
+    self.sessionMinter = try container.decodeIfPresentFlexible(Bool.self, snake: "session_minter", camel: "sessionMinter")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
   }
 
   public func encode(to encoder: Encoder) throws {

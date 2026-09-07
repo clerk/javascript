@@ -40,14 +40,14 @@ public struct Passkey: Codable, Equatable, Sendable, Identifiable {
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.object = try container.decode(String.self, forKey: .object)
-    self.id = try container.decode(String.self, forKey: .id)
-    self.name = try container.decodeIfPresent(String.self, forKey: .name)
-    self.verification = try container.decodeIfPresent(Verification.self, forKey: .verification)
-    self.lastUsedAt = try container.decodeIfPresentMillisecondsDate(forKey: .lastUsedAt)
-    self.updatedAt = try container.decodeMillisecondsDate(forKey: .updatedAt)
-    self.createdAt = try container.decodeMillisecondsDate(forKey: .createdAt)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.name = try container.decodeIfPresentFlexible(String.self, snake: "name", camel: "name")
+    self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
+    self.lastUsedAt = try container.decodeIfPresentMillisecondsDate(snake: "last_used_at", camel: "lastUsedAt")
+    self.updatedAt = try container.decodeMillisecondsDate(snake: "updated_at", camel: "updatedAt")
+    self.createdAt = try container.decodeMillisecondsDate(snake: "created_at", camel: "createdAt")
   }
 
   public func encode(to encoder: Encoder) throws {

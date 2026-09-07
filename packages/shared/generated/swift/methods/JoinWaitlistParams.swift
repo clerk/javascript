@@ -14,4 +14,9 @@ public struct JoinWaitlistParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case emailAddress
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.emailAddress = try container.decodeFlexible(String.self, snake: "emailAddress", camel: "emailAddress")
+  }
 }

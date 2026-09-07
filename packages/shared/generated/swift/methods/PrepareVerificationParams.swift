@@ -34,4 +34,14 @@ public struct PrepareVerificationParams: Codable, Equatable, Sendable {
     case oidcPrompt
     case oidcLoginHint
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.channel = try container.decodeIfPresentFlexible(PrepareFirstFactorParamsChannel.self, snake: "channel", camel: "channel")
+    self.actionCompleteRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "actionCompleteRedirectUrl", camel: "actionCompleteRedirectUrl")
+    self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
+    self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
+  }
 }

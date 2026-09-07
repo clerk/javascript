@@ -14,4 +14,9 @@ public struct SessionTouchParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case intent
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.intent = try container.decodeIfPresentFlexible(SessionTouchParamsIntent.self, snake: "intent", camel: "intent")
+  }
 }

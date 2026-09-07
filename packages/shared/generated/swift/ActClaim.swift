@@ -18,4 +18,10 @@ public struct ActClaim: Codable, Equatable, Sendable {
     case sub
     case type
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.sub = try container.decodeFlexible(String.self, snake: "sub", camel: "sub")
+    self.type = try container.decodeIfPresentFlexible(String.self, snake: "type", camel: "type")
+  }
 }

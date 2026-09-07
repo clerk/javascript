@@ -22,4 +22,11 @@ public struct UpdateUserPasswordParams: Codable, Equatable, Sendable {
     case currentPassword
     case signOutOfOtherSessions
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.newPassword = try container.decodeFlexible(String.self, snake: "newPassword", camel: "newPassword")
+    self.currentPassword = try container.decodeIfPresentFlexible(String.self, snake: "currentPassword", camel: "currentPassword")
+    self.signOutOfOtherSessions = try container.decodeIfPresentFlexible(Bool.self, snake: "signOutOfOtherSessions", camel: "signOutOfOtherSessions")
+  }
 }

@@ -50,4 +50,18 @@ public struct PasswordSettingsData: Codable, Equatable, Sendable {
     case showZxcvbn = "show_zxcvbn"
     case minZxcvbnStrength = "min_zxcvbn_strength"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.allowedSpecialCharacters = try container.decodeFlexible(String.self, snake: "allowed_special_characters", camel: "allowedSpecialCharacters")
+    self.disableHibp = try container.decodeFlexible(Bool.self, snake: "disable_hibp", camel: "disableHibp")
+    self.minLength = try container.decodeFlexible(Int.self, snake: "min_length", camel: "minLength")
+    self.maxLength = try container.decodeFlexible(Int.self, snake: "max_length", camel: "maxLength")
+    self.requireSpecialChar = try container.decodeFlexible(Bool.self, snake: "require_special_char", camel: "requireSpecialChar")
+    self.requireNumbers = try container.decodeFlexible(Bool.self, snake: "require_numbers", camel: "requireNumbers")
+    self.requireUppercase = try container.decodeFlexible(Bool.self, snake: "require_uppercase", camel: "requireUppercase")
+    self.requireLowercase = try container.decodeFlexible(Bool.self, snake: "require_lowercase", camel: "requireLowercase")
+    self.showZxcvbn = try container.decodeFlexible(Bool.self, snake: "show_zxcvbn", camel: "showZxcvbn")
+    self.minZxcvbnStrength = try container.decodeFlexible(Int.self, snake: "min_zxcvbn_strength", camel: "minZxcvbnStrength")
+  }
 }

@@ -66,4 +66,22 @@ public struct PrepareFirstFactorParams: Codable, Equatable, Sendable {
     case enterpriseConnectionId
     case enterpriseConnectionName
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.web3WalletId = try container.decodeIfPresentFlexible(String.self, snake: "web3WalletId", camel: "web3WalletId")
+    self.primary = try container.decodeIfPresentFlexible(Bool.self, snake: "primary", camel: "primary")
+    self.walletName = try container.decodeIfPresentFlexible(String.self, snake: "walletName", camel: "walletName")
+    self.emailAddressId = try container.decodeIfPresentFlexible(String.self, snake: "emailAddressId", camel: "emailAddressId")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumberId", camel: "phoneNumberId")
+    self.`default` = try container.decodeIfPresentFlexible(Bool.self, snake: "default", camel: "default")
+    self.channel = try container.decodeIfPresentFlexible(PrepareFirstFactorParamsChannel.self, snake: "channel", camel: "channel")
+    self.actionCompleteRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "actionCompleteRedirectUrl", camel: "actionCompleteRedirectUrl")
+    self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
+    self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
+    self.enterpriseConnectionId = try container.decodeIfPresentFlexible(String.self, snake: "enterpriseConnectionId", camel: "enterpriseConnectionId")
+    self.enterpriseConnectionName = try container.decodeIfPresentFlexible(String.self, snake: "enterpriseConnectionName", camel: "enterpriseConnectionName")
+  }
 }

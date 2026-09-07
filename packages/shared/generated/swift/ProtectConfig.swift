@@ -30,4 +30,13 @@ public struct ProtectConfig: Codable, Equatable, Sendable, Identifiable {
     case challengeLoadTimeoutMs = "challenge_load_timeout_ms"
     case tokensInvalidBefore = "tokens_invalid_before"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.loaders = try container.decodeIfPresentFlexible([ProtectLoader].self, snake: "loaders", camel: "loaders")
+    self.challengeLoadTimeoutMs = try container.decodeIfPresentFlexible(Int.self, snake: "challenge_load_timeout_ms", camel: "challengeLoadTimeoutMs")
+    self.tokensInvalidBefore = try container.decodeIfPresentFlexible(Int.self, snake: "tokens_invalid_before", camel: "tokensInvalidBefore")
+  }
 }

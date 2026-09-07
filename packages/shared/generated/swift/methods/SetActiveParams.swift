@@ -22,4 +22,11 @@ public struct SetActiveParams: Codable, Equatable, Sendable {
     case organization
     case redirectUrl
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.session = try container.decodeIfPresentFlexible(JSONValue.self, snake: "session", camel: "session")
+    self.organization = try container.decodeIfPresentFlexible(JSONValue.self, snake: "organization", camel: "organization")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+  }
 }

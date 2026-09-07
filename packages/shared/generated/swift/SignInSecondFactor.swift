@@ -38,4 +38,15 @@ public struct SignInSecondFactor: Codable, Equatable, Sendable {
     case `default`
     case channel
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(SignInSecondFactorStrategy.self, snake: "strategy", camel: "strategy")
+    self.emailAddressId = try container.decodeIfPresentFlexible(String.self, snake: "email_address_id", camel: "emailAddressId")
+    self.safeIdentifier = try container.decodeIfPresentFlexible(String.self, snake: "safe_identifier", camel: "safeIdentifier")
+    self.primary = try container.decodeIfPresentFlexible(Bool.self, snake: "primary", camel: "primary")
+    self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phone_number_id", camel: "phoneNumberId")
+    self.`default` = try container.decodeIfPresentFlexible(Bool.self, snake: "default", camel: "default")
+    self.channel = try container.decodeIfPresentFlexible(SignInFirstFactorChannel.self, snake: "channel", camel: "channel")
+  }
 }

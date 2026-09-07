@@ -22,4 +22,11 @@ public struct Token: Codable, Equatable, Sendable, Identifiable {
     case jwt
     case id
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.jwt = try container.decodeFlexible(String.self, snake: "jwt", camel: "jwt")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+  }
 }

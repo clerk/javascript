@@ -30,4 +30,13 @@ public struct ClerkAPIErrorMetaPlan: Codable, Equatable, Sendable, Identifiable 
     case id
     case name
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.amountFormatted = try container.decodeFlexible(String.self, snake: "amount_formatted", camel: "amountFormatted")
+    self.annualMonthlyAmountFormatted = try container.decodeFlexible(String.self, snake: "annual_monthly_amount_formatted", camel: "annualMonthlyAmountFormatted")
+    self.currencySymbol = try container.decodeFlexible(String.self, snake: "currency_symbol", camel: "currencySymbol")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.name = try container.decodeFlexible(String.self, snake: "name", camel: "name")
+  }
 }

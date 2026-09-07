@@ -18,4 +18,10 @@ public struct CreateOrganizationParams: Codable, Equatable, Sendable {
     case name
     case slug
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.name = try container.decodeFlexible(String.self, snake: "name", camel: "name")
+    self.slug = try container.decodeIfPresentFlexible(String.self, snake: "slug", camel: "slug")
+  }
 }

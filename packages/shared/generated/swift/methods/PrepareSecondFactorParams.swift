@@ -30,4 +30,13 @@ public struct PrepareSecondFactorParams: Codable, Equatable, Sendable {
     case redirectUrl
     case phoneNumberId
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(PrepareSecondFactorParamsStrategy.self, snake: "strategy", camel: "strategy")
+    self.emailAddressId = try container.decodeIfPresentFlexible(String.self, snake: "emailAddressId", camel: "emailAddressId")
+    self.primary = try container.decodeIfPresentFlexible(Bool.self, snake: "primary", camel: "primary")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumberId", camel: "phoneNumberId")
+  }
 }

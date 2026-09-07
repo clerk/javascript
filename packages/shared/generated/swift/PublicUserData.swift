@@ -46,4 +46,17 @@ public struct PublicUserData: Codable, Equatable, Sendable {
     case banned
     case deprovisioned
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.firstName = try container.decodeIfPresentFlexible(String.self, snake: "first_name", camel: "firstName")
+    self.lastName = try container.decodeIfPresentFlexible(String.self, snake: "last_name", camel: "lastName")
+    self.imageUrl = try container.decodeFlexible(String.self, snake: "image_url", camel: "imageUrl")
+    self.hasImage = try container.decodeFlexible(Bool.self, snake: "has_image", camel: "hasImage")
+    self.identifier = try container.decodeFlexible(String.self, snake: "identifier", camel: "identifier")
+    self.userId = try container.decodeIfPresentFlexible(String.self, snake: "user_id", camel: "userId")
+    self.username = try container.decodeIfPresentFlexible(String.self, snake: "username", camel: "username")
+    self.banned = try container.decodeIfPresentFlexible(Bool.self, snake: "banned", camel: "banned")
+    self.deprovisioned = try container.decodeIfPresentFlexible(Bool.self, snake: "deprovisioned", camel: "deprovisioned")
+  }
 }

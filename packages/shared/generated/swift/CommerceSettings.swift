@@ -22,4 +22,11 @@ public struct CommerceSettings: Codable, Equatable, Sendable, Identifiable {
     case id
     case object
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.billing = try container.decodeFlexible(CommerceSettingsBilling.self, snake: "billing", camel: "billing")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+  }
 }

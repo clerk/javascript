@@ -14,4 +14,9 @@ public struct SessionTask: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case key
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.key = try container.decodeFlexible(SessionTaskKey.self, snake: "key", camel: "key")
+  }
 }

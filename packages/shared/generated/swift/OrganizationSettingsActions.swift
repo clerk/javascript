@@ -14,4 +14,9 @@ public struct OrganizationSettingsActions: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case adminDelete = "admin_delete"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.adminDelete = try container.decodeFlexible(Bool.self, snake: "admin_delete", camel: "adminDelete")
+  }
 }

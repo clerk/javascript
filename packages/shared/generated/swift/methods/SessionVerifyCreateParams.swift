@@ -14,4 +14,9 @@ public struct SessionVerifyCreateParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case level
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.level = try container.decodeFlexible(SessionVerifyCreateParamsLevel.self, snake: "level", camel: "level")
+  }
 }

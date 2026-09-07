@@ -34,4 +34,14 @@ public struct CreateExternalAccountParams: Codable, Equatable, Sendable {
     case oidcPrompt
     case oidcLoginHint
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeIfPresentFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.enterpriseConnectionId = try container.decodeIfPresentFlexible(String.self, snake: "enterpriseConnectionId", camel: "enterpriseConnectionId")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.additionalScopes = try container.decodeIfPresentFlexible([String].self, snake: "additionalScopes", camel: "additionalScopes")
+    self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
+    self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
+  }
 }

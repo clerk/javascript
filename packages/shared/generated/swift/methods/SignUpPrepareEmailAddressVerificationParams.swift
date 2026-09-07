@@ -18,4 +18,10 @@ public struct SignUpPrepareEmailAddressVerificationParams: Codable, Equatable, S
     case strategy
     case redirectUrl
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(SignUpPrepareEmailAddressVerificationParamsStrategy.self, snake: "strategy", camel: "strategy")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+  }
 }

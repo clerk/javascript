@@ -126,4 +126,37 @@ public struct OAuthProviders: Codable, Equatable, Sendable {
     case oauthHuggingface = "oauth_huggingface"
     case oauthVercel = "oauth_vercel"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.oauthFacebook = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_facebook", camel: "oauthFacebook")
+    self.oauthGoogle = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_google", camel: "oauthGoogle")
+    self.oauthHubspot = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_hubspot", camel: "oauthHubspot")
+    self.oauthGithub = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_github", camel: "oauthGithub")
+    self.oauthTiktok = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_tiktok", camel: "oauthTiktok")
+    self.oauthGitlab = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_gitlab", camel: "oauthGitlab")
+    self.oauthDiscord = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_discord", camel: "oauthDiscord")
+    self.oauthTwitter = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_twitter", camel: "oauthTwitter")
+    self.oauthTwitch = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_twitch", camel: "oauthTwitch")
+    self.oauthLinkedin = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_linkedin", camel: "oauthLinkedin")
+    self.oauthLinkedinOidc = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_linkedin_oidc", camel: "oauthLinkedinOidc")
+    self.oauthDropbox = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_dropbox", camel: "oauthDropbox")
+    self.oauthAtlassian = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_atlassian", camel: "oauthAtlassian")
+    self.oauthBitbucket = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_bitbucket", camel: "oauthBitbucket")
+    self.oauthMicrosoft = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_microsoft", camel: "oauthMicrosoft")
+    self.oauthNotion = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_notion", camel: "oauthNotion")
+    self.oauthApple = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_apple", camel: "oauthApple")
+    self.oauthLine = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_line", camel: "oauthLine")
+    self.oauthInstagram = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_instagram", camel: "oauthInstagram")
+    self.oauthCoinbase = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_coinbase", camel: "oauthCoinbase")
+    self.oauthSpotify = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_spotify", camel: "oauthSpotify")
+    self.oauthXero = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_xero", camel: "oauthXero")
+    self.oauthBox = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_box", camel: "oauthBox")
+    self.oauthSlack = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_slack", camel: "oauthSlack")
+    self.oauthLinear = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_linear", camel: "oauthLinear")
+    self.oauthX = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_x", camel: "oauthX")
+    self.oauthEnstall = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_enstall", camel: "oauthEnstall")
+    self.oauthHuggingface = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_huggingface", camel: "oauthHuggingface")
+    self.oauthVercel = try container.decodeFlexible(OAuthProviderSettings.self, snake: "oauth_vercel", camel: "oauthVercel")
+  }
 }

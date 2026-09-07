@@ -34,4 +34,14 @@ public struct OAuthProviderSettings: Codable, Equatable, Sendable {
     case name
     case logoUrl = "logo_url"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
+    self.required = try container.decodeFlexible(Bool.self, snake: "required", camel: "required")
+    self.authenticatable = try container.decodeFlexible(Bool.self, snake: "authenticatable", camel: "authenticatable")
+    self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.name = try container.decodeFlexible(String.self, snake: "name", camel: "name")
+    self.logoUrl = try container.decodeIfPresentFlexible(String.self, snake: "logo_url", camel: "logoUrl")
+  }
 }

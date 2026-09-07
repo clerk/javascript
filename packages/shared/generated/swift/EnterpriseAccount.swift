@@ -68,21 +68,21 @@ public struct EnterpriseAccount: Codable, Equatable, Sendable, Identifiable {
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.object = try container.decode(String.self, forKey: .object)
-    self.active = try container.decode(Bool.self, forKey: .active)
-    self.emailAddress = try container.decode(String.self, forKey: .emailAddress)
-    self.enterpriseConnection = try container.decodeIfPresent(EnterpriseAccountConnection.self, forKey: .enterpriseConnection)
-    self.firstName = try container.decodeIfPresent(String.self, forKey: .firstName)
-    self.lastName = try container.decodeIfPresent(String.self, forKey: .lastName)
-    self.`protocol` = try container.decode(EnterpriseAccountProtocol.self, forKey: .`protocol`)
-    self.provider = try container.decode(String.self, forKey: .provider)
-    self.providerUserId = try container.decodeIfPresent(String.self, forKey: .providerUserId)
-    self.publicMetadata = try container.decode(JSONValue.self, forKey: .publicMetadata)
-    self.verification = try container.decodeIfPresent(Verification.self, forKey: .verification)
-    self.lastAuthenticatedAt = try container.decodeIfPresentMillisecondsDate(forKey: .lastAuthenticatedAt)
-    self.enterpriseConnectionId = try container.decodeIfPresent(String.self, forKey: .enterpriseConnectionId)
-    self.id = try container.decode(String.self, forKey: .id)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.active = try container.decodeFlexible(Bool.self, snake: "active", camel: "active")
+    self.emailAddress = try container.decodeFlexible(String.self, snake: "email_address", camel: "emailAddress")
+    self.enterpriseConnection = try container.decodeIfPresentFlexible(EnterpriseAccountConnection.self, snake: "enterprise_connection", camel: "enterpriseConnection")
+    self.firstName = try container.decodeIfPresentFlexible(String.self, snake: "first_name", camel: "firstName")
+    self.lastName = try container.decodeIfPresentFlexible(String.self, snake: "last_name", camel: "lastName")
+    self.`protocol` = try container.decodeFlexible(EnterpriseAccountProtocol.self, snake: "protocol", camel: "protocol")
+    self.provider = try container.decodeFlexible(String.self, snake: "provider", camel: "provider")
+    self.providerUserId = try container.decodeIfPresentFlexible(String.self, snake: "provider_user_id", camel: "providerUserId")
+    self.publicMetadata = try container.decodeFlexible(JSONValue.self, snake: "public_metadata", camel: "publicMetadata")
+    self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
+    self.lastAuthenticatedAt = try container.decodeIfPresentMillisecondsDate(snake: "last_authenticated_at", camel: "lastAuthenticatedAt")
+    self.enterpriseConnectionId = try container.decodeIfPresentFlexible(String.self, snake: "enterprise_connection_id", camel: "enterpriseConnectionId")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
   }
 
   public func encode(to encoder: Encoder) throws {

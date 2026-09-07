@@ -14,4 +14,9 @@ public struct OrganizationSettingsSlug: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case disabled
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.disabled = try container.decodeFlexible(Bool.self, snake: "disabled", camel: "disabled")
+  }
 }

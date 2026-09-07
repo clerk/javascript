@@ -72,22 +72,22 @@ public struct Session: Codable, Equatable, Sendable, Identifiable {
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.object = try container.decode(String.self, forKey: .object)
-    self.id = try container.decode(String.self, forKey: .id)
-    self.status = try container.decode(SessionStatus.self, forKey: .status)
-    self.factorVerificationAge = try container.decodeIfPresent([Int].self, forKey: .factorVerificationAge)
-    self.expireAt = try container.decodeMillisecondsDate(forKey: .expireAt)
-    self.abandonAt = try container.decodeMillisecondsDate(forKey: .abandonAt)
-    self.lastActiveAt = try container.decodeMillisecondsDate(forKey: .lastActiveAt)
-    self.lastActiveToken = try container.decode(Token.self, forKey: .lastActiveToken)
-    self.lastActiveOrganizationId = try container.decodeIfPresent(String.self, forKey: .lastActiveOrganizationId)
-    self.actor = try container.decodeIfPresent(ActClaim.self, forKey: .actor)
-    self.tasks = try container.decodeIfPresent([SessionTask].self, forKey: .tasks)
-    self.user = try container.decode(User.self, forKey: .user)
-    self.publicUserData = try container.decode(PublicUserData.self, forKey: .publicUserData)
-    self.createdAt = try container.decodeMillisecondsDate(forKey: .createdAt)
-    self.updatedAt = try container.decodeMillisecondsDate(forKey: .updatedAt)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.status = try container.decodeFlexible(SessionStatus.self, snake: "status", camel: "status")
+    self.factorVerificationAge = try container.decodeIfPresentFlexible([Int].self, snake: "factor_verification_age", camel: "factorVerificationAge")
+    self.expireAt = try container.decodeMillisecondsDate(snake: "expire_at", camel: "expireAt")
+    self.abandonAt = try container.decodeMillisecondsDate(snake: "abandon_at", camel: "abandonAt")
+    self.lastActiveAt = try container.decodeMillisecondsDate(snake: "last_active_at", camel: "lastActiveAt")
+    self.lastActiveToken = try container.decodeFlexible(Token.self, snake: "last_active_token", camel: "lastActiveToken")
+    self.lastActiveOrganizationId = try container.decodeIfPresentFlexible(String.self, snake: "last_active_organization_id", camel: "lastActiveOrganizationId")
+    self.actor = try container.decodeIfPresentFlexible(ActClaim.self, snake: "actor", camel: "actor")
+    self.tasks = try container.decodeIfPresentFlexible([SessionTask].self, snake: "tasks", camel: "tasks")
+    self.user = try container.decodeFlexible(User.self, snake: "user", camel: "user")
+    self.publicUserData = try container.decodeFlexible(PublicUserData.self, snake: "public_user_data", camel: "publicUserData")
+    self.createdAt = try container.decodeMillisecondsDate(snake: "created_at", camel: "createdAt")
+    self.updatedAt = try container.decodeMillisecondsDate(snake: "updated_at", camel: "updatedAt")
   }
 
   public func encode(to encoder: Encoder) throws {

@@ -48,6 +48,54 @@ public enum JSONValue: Codable, Equatable, Sendable {
   }
 }
 
+public struct FAPIJSONKey: CodingKey {
+  public var stringValue: String
+  public var intValue: Int?
+
+  public init(_ value: String) {
+    stringValue = value
+    intValue = nil
+  }
+
+  public init?(stringValue: String) {
+    self.stringValue = stringValue
+    intValue = nil
+  }
+
+  public init?(intValue: Int) {
+    self.stringValue = String(intValue)
+    self.intValue = intValue
+  }
+}
+
+extension KeyedDecodingContainer where Key == FAPIJSONKey {
+  public func decodeFlexible<T: Decodable>(_ type: T.Type, snake: String, camel: String) throws -> T {
+    if let value = try? decode(type, forKey: FAPIJSONKey(snake)) {
+      return value
+    }
+    return try decode(type, forKey: FAPIJSONKey(camel))
+  }
+
+  public func decodeIfPresentFlexible<T: Decodable>(_ type: T.Type, snake: String, camel: String) throws -> T? {
+    if let value = try? decodeIfPresent(type, forKey: FAPIJSONKey(snake)) {
+      return value
+    }
+    return try decodeIfPresent(type, forKey: FAPIJSONKey(camel))
+  }
+
+  public func decodeMillisecondsDate(snake: String, camel: String) throws -> Date {
+    let millis = try decodeFlexible(Int64.self, snake: snake, camel: camel)
+    return Date(timeIntervalSince1970: TimeInterval(millis) / 1000)
+  }
+
+  public func decodeIfPresentMillisecondsDate(snake: String, camel: String) throws -> Date? {
+    guard let millis = try decodeIfPresentFlexible(Int64.self, snake: snake, camel: camel) else {
+      return nil
+    }
+    return Date(timeIntervalSince1970: TimeInterval(millis) / 1000)
+  }
+}
+
 extension KeyedDecodingContainer {
   func decodeMillisecondsDate(forKey key: Key) throws -> Date {
     let millis = try decode(Int64.self, forKey: key)

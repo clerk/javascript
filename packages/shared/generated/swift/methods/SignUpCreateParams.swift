@@ -102,4 +102,31 @@ public struct SignUpCreateParams: Codable, Equatable, Sendable {
     case web3Wallet
     case emailAddressOrPhoneNumber
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.externalAccountStrategy = try container.decodeIfPresentFlexible(String.self, snake: "externalAccountStrategy", camel: "externalAccountStrategy")
+    self.externalAccountRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "externalAccountRedirectUrl", camel: "externalAccountRedirectUrl")
+    self.externalAccountActionCompleteRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "externalAccountActionCompleteRedirectUrl", camel: "externalAccountActionCompleteRedirectUrl")
+    self.strategy = try container.decodeIfPresentFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.actionCompleteRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "actionCompleteRedirectUrl", camel: "actionCompleteRedirectUrl")
+    self.transfer = try container.decodeIfPresentFlexible(Bool.self, snake: "transfer", camel: "transfer")
+    self.unsafeMetadata = try container.decodeIfPresentFlexible(JSONValue.self, snake: "unsafeMetadata", camel: "unsafeMetadata")
+    self.ticket = try container.decodeIfPresentFlexible(String.self, snake: "ticket", camel: "ticket")
+    self.token = try container.decodeIfPresentFlexible(String.self, snake: "token", camel: "token")
+    self.legalAccepted = try container.decodeIfPresentFlexible(Bool.self, snake: "legalAccepted", camel: "legalAccepted")
+    self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
+    self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
+    self.channel = try container.decodeIfPresentFlexible(PrepareFirstFactorParamsChannel.self, snake: "channel", camel: "channel")
+    self.locale = try container.decodeIfPresentFlexible(String.self, snake: "locale", camel: "locale")
+    self.username = try container.decodeIfPresentFlexible(String.self, snake: "username", camel: "username")
+    self.password = try container.decodeIfPresentFlexible(String.self, snake: "password", camel: "password")
+    self.firstName = try container.decodeIfPresentFlexible(String.self, snake: "firstName", camel: "firstName")
+    self.lastName = try container.decodeIfPresentFlexible(String.self, snake: "lastName", camel: "lastName")
+    self.emailAddress = try container.decodeIfPresentFlexible(String.self, snake: "emailAddress", camel: "emailAddress")
+    self.phoneNumber = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumber", camel: "phoneNumber")
+    self.web3Wallet = try container.decodeIfPresentFlexible(String.self, snake: "web3Wallet", camel: "web3Wallet")
+    self.emailAddressOrPhoneNumber = try container.decodeIfPresentFlexible(String.self, snake: "emailAddressOrPhoneNumber", camel: "emailAddressOrPhoneNumber")
+  }
 }

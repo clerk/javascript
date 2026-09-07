@@ -14,4 +14,9 @@ public struct CreateEmailAddressParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case email
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.email = try container.decodeFlexible(String.self, snake: "email", camel: "email")
+  }
 }

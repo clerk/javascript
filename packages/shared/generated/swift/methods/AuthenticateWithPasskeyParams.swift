@@ -14,4 +14,9 @@ public struct AuthenticateWithPasskeyParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case flow
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.flow = try container.decodeIfPresentFlexible(AuthenticateWithPasskeyParamsFlow.self, snake: "flow", camel: "flow")
+  }
 }

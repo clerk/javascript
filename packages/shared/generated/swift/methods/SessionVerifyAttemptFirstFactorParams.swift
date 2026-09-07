@@ -26,4 +26,12 @@ public struct SessionVerifyAttemptFirstFactorParams: Codable, Equatable, Sendabl
     case code
     case password
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(SessionVerifyAttemptFirstFactorParamsStrategy.self, snake: "strategy", camel: "strategy")
+    self.publicKeyCredential = try container.decodeIfPresentFlexible(PublicKeyCredentialWithAuthenticatorAssertionResponse.self, snake: "publicKeyCredential", camel: "publicKeyCredential")
+    self.code = try container.decodeIfPresentFlexible(String.self, snake: "code", camel: "code")
+    self.password = try container.decodeIfPresentFlexible(String.self, snake: "password", camel: "password")
+  }
 }

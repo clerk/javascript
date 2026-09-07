@@ -14,4 +14,9 @@ public struct SignUpDataMfa: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case required
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.required = try container.decodeFlexible(Bool.self, snake: "required", camel: "required")
+  }
 }

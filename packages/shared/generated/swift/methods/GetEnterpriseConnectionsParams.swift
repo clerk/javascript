@@ -14,4 +14,9 @@ public struct GetEnterpriseConnectionsParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case withOrganizationAccountLinking
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.withOrganizationAccountLinking = try container.decodeIfPresentFlexible(Bool.self, snake: "withOrganizationAccountLinking", camel: "withOrganizationAccountLinking")
+  }
 }

@@ -22,4 +22,11 @@ public struct AttemptVerificationParams: Codable, Equatable, Sendable {
     case code
     case signature
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(AttemptVerificationParamsStrategy.self, snake: "strategy", camel: "strategy")
+    self.code = try container.decodeIfPresentFlexible(String.self, snake: "code", camel: "code")
+    self.signature = try container.decodeIfPresentFlexible(String.self, snake: "signature", camel: "signature")
+  }
 }

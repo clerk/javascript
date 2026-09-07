@@ -18,4 +18,10 @@ public struct EnterpriseSSOSettings: Codable, Equatable, Sendable {
     case enabled
     case selfServeSso = "self_serve_sso"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
+    self.selfServeSso = try container.decodeFlexible(Bool.self, snake: "self_serve_sso", camel: "selfServeSso")
+  }
 }

@@ -18,4 +18,10 @@ public struct AddPaymentMethodParams: Codable, Equatable, Sendable {
     case gateway
     case paymentToken
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.gateway = try container.decodeFlexible(String.self, snake: "gateway", camel: "gateway")
+    self.paymentToken = try container.decodeFlexible(String.self, snake: "paymentToken", camel: "paymentToken")
+  }
 }

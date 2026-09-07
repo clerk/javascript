@@ -70,4 +70,23 @@ public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
     case verification
     case id
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.provider = try container.decodeFlexible(String.self, snake: "provider", camel: "provider")
+    self.identificationId = try container.decodeFlexible(String.self, snake: "identification_id", camel: "identificationId")
+    self.providerUserId = try container.decodeFlexible(String.self, snake: "provider_user_id", camel: "providerUserId")
+    self.approvedScopes = try container.decodeFlexible(String.self, snake: "approved_scopes", camel: "approvedScopes")
+    self.emailAddress = try container.decodeFlexible(String.self, snake: "email_address", camel: "emailAddress")
+    self.firstName = try container.decodeFlexible(String.self, snake: "first_name", camel: "firstName")
+    self.lastName = try container.decodeFlexible(String.self, snake: "last_name", camel: "lastName")
+    self.imageUrl = try container.decodeFlexible(String.self, snake: "image_url", camel: "imageUrl")
+    self.username = try container.decodeFlexible(String.self, snake: "username", camel: "username")
+    self.phoneNumber = try container.decodeFlexible(String.self, snake: "phone_number", camel: "phoneNumber")
+    self.publicMetadata = try container.decodeFlexible(JSONValue.self, snake: "public_metadata", camel: "publicMetadata")
+    self.label = try container.decodeFlexible(String.self, snake: "label", camel: "label")
+    self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+  }
 }

@@ -22,4 +22,11 @@ public struct GetTokenOptions: Codable, Equatable, Sendable {
     case skipCache
     case template
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.organizationId = try container.decodeIfPresentFlexible(String.self, snake: "organizationId", camel: "organizationId")
+    self.skipCache = try container.decodeIfPresentFlexible(Bool.self, snake: "skipCache", camel: "skipCache")
+    self.template = try container.decodeIfPresentFlexible(String.self, snake: "template", camel: "template")
+  }
 }

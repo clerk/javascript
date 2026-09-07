@@ -26,4 +26,12 @@ public struct Web3Wallet: Codable, Equatable, Sendable, Identifiable {
     case web3Wallet = "web3_wallet"
     case verification
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.web3Wallet = try container.decodeFlexible(String.self, snake: "web3_wallet", camel: "web3Wallet")
+    self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
+  }
 }

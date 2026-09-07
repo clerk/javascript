@@ -18,4 +18,10 @@ public struct UsernameSettingsData: Codable, Equatable, Sendable {
     case minLength = "min_length"
     case maxLength = "max_length"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.minLength = try container.decodeFlexible(Int.self, snake: "min_length", camel: "minLength")
+    self.maxLength = try container.decodeFlexible(Int.self, snake: "max_length", camel: "maxLength")
+  }
 }

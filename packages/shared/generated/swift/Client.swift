@@ -56,18 +56,18 @@ public struct Client: Codable, Equatable, Sendable, Identifiable {
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.object = try container.decode(String.self, forKey: .object)
-    self.id = try container.decode(String.self, forKey: .id)
-    self.sessions = try container.decode([Session].self, forKey: .sessions)
-    self.signUp = try container.decodeIfPresent(SignUp.self, forKey: .signUp)
-    self.signIn = try container.decodeIfPresent(SignIn.self, forKey: .signIn)
-    self.captchaBypass = try container.decodeIfPresent(Bool.self, forKey: .captchaBypass)
-    self.lastActiveSessionId = try container.decodeIfPresent(String.self, forKey: .lastActiveSessionId)
-    self.lastAuthenticationStrategy = try container.decodeIfPresent(String.self, forKey: .lastAuthenticationStrategy)
-    self.cookieExpiresAt = try container.decodeIfPresentMillisecondsDate(forKey: .cookieExpiresAt)
-    self.createdAt = try container.decodeMillisecondsDate(forKey: .createdAt)
-    self.updatedAt = try container.decodeMillisecondsDate(forKey: .updatedAt)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.sessions = try container.decodeFlexible([Session].self, snake: "sessions", camel: "sessions")
+    self.signUp = try container.decodeIfPresentFlexible(SignUp.self, snake: "sign_up", camel: "signUp")
+    self.signIn = try container.decodeIfPresentFlexible(SignIn.self, snake: "sign_in", camel: "signIn")
+    self.captchaBypass = try container.decodeIfPresentFlexible(Bool.self, snake: "captcha_bypass", camel: "captchaBypass")
+    self.lastActiveSessionId = try container.decodeIfPresentFlexible(String.self, snake: "last_active_session_id", camel: "lastActiveSessionId")
+    self.lastAuthenticationStrategy = try container.decodeIfPresentFlexible(String.self, snake: "last_authentication_strategy", camel: "lastAuthenticationStrategy")
+    self.cookieExpiresAt = try container.decodeIfPresentMillisecondsDate(snake: "cookie_expires_at", camel: "cookieExpiresAt")
+    self.createdAt = try container.decodeMillisecondsDate(snake: "created_at", camel: "createdAt")
+    self.updatedAt = try container.decodeMillisecondsDate(snake: "updated_at", camel: "updatedAt")
   }
 
   public func encode(to encoder: Encoder) throws {

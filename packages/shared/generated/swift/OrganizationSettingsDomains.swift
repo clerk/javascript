@@ -22,4 +22,11 @@ public struct OrganizationSettingsDomains: Codable, Equatable, Sendable {
     case enrollmentModes = "enrollment_modes"
     case defaultRole = "default_role"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
+    self.enrollmentModes = try container.decodeFlexible([OrganizationEnrollmentMode].self, snake: "enrollment_modes", camel: "enrollmentModes")
+    self.defaultRole = try container.decodeIfPresentFlexible(String.self, snake: "default_role", camel: "defaultRole")
+  }
 }

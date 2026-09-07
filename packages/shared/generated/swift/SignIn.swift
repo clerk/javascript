@@ -62,4 +62,21 @@ public struct SignIn: Codable, Equatable, Sendable, Identifiable {
     case createdSessionId = "created_session_id"
     case protectCheck = "protect_check"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.status = try container.decodeFlexible(SignInStatus.self, snake: "status", camel: "status")
+    self.clientTrustState = try container.decodeIfPresentFlexible(SignInClientTrustState.self, snake: "client_trust_state", camel: "clientTrustState")
+    self.supportedIdentifiers = try container.decodeFlexible([SignInIdentifier].self, snake: "supported_identifiers", camel: "supportedIdentifiers")
+    self.identifier = try container.decodeFlexible(String.self, snake: "identifier", camel: "identifier")
+    self.userData = try container.decodeFlexible(UserData.self, snake: "user_data", camel: "userData")
+    self.supportedFirstFactors = try container.decodeFlexible([SignInFirstFactor].self, snake: "supported_first_factors", camel: "supportedFirstFactors")
+    self.supportedSecondFactors = try container.decodeFlexible([SignInSecondFactor].self, snake: "supported_second_factors", camel: "supportedSecondFactors")
+    self.firstFactorVerification = try container.decodeIfPresentFlexible(Verification.self, snake: "first_factor_verification", camel: "firstFactorVerification")
+    self.secondFactorVerification = try container.decodeIfPresentFlexible(Verification.self, snake: "second_factor_verification", camel: "secondFactorVerification")
+    self.createdSessionId = try container.decodeIfPresentFlexible(String.self, snake: "created_session_id", camel: "createdSessionId")
+    self.protectCheck = try container.decodeIfPresentFlexible(ProtectCheck.self, snake: "protect_check", camel: "protectCheck")
+  }
 }

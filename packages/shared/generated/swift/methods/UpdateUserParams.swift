@@ -38,4 +38,15 @@ public struct UpdateUserParams: Codable, Equatable, Sendable {
     case primaryWeb3WalletId
     case unsafeMetadata
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.username = try container.decodeIfPresentFlexible(String.self, snake: "username", camel: "username")
+    self.firstName = try container.decodeIfPresentFlexible(String.self, snake: "firstName", camel: "firstName")
+    self.lastName = try container.decodeIfPresentFlexible(String.self, snake: "lastName", camel: "lastName")
+    self.primaryEmailAddressId = try container.decodeIfPresentFlexible(String.self, snake: "primaryEmailAddressId", camel: "primaryEmailAddressId")
+    self.primaryPhoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "primaryPhoneNumberId", camel: "primaryPhoneNumberId")
+    self.primaryWeb3WalletId = try container.decodeIfPresentFlexible(String.self, snake: "primaryWeb3WalletId", camel: "primaryWeb3WalletId")
+    self.unsafeMetadata = try container.decodeIfPresentFlexible(JSONValue.self, snake: "unsafeMetadata", camel: "unsafeMetadata")
+  }
 }

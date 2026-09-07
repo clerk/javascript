@@ -14,4 +14,9 @@ public struct RemoveUserPasswordParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case currentPassword
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.currentPassword = try container.decodeIfPresentFlexible(String.self, snake: "currentPassword", camel: "currentPassword")
+  }
 }

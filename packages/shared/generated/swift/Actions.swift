@@ -18,4 +18,10 @@ public struct Actions: Codable, Equatable, Sendable {
     case deleteSelf = "delete_self"
     case createOrganization = "create_organization"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.deleteSelf = try container.decodeFlexible(Bool.self, snake: "delete_self", camel: "deleteSelf")
+    self.createOrganization = try container.decodeFlexible(Bool.self, snake: "create_organization", camel: "createOrganization")
+  }
 }

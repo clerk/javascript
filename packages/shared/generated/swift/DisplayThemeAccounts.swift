@@ -14,4 +14,9 @@ public struct DisplayThemeAccounts: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case backgroundColor = "background_color"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.backgroundColor = try container.decodeFlexible(JSONValue.self, snake: "background_color", camel: "backgroundColor")
+  }
 }

@@ -14,4 +14,9 @@ public struct UpdateUserMetadataParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case unsafeMetadata
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.unsafeMetadata = try container.decodeFlexible(JSONValue.self, snake: "unsafeMetadata", camel: "unsafeMetadata")
+  }
 }

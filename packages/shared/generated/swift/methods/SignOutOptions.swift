@@ -18,4 +18,10 @@ public struct SignOutOptions: Codable, Equatable, Sendable {
     case sessionId
     case redirectUrl
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.sessionId = try container.decodeIfPresentFlexible(String.self, snake: "sessionId", camel: "sessionId")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+  }
 }

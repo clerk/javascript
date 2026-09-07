@@ -22,4 +22,11 @@ public struct DisplayThemeButtons: Codable, Equatable, Sendable {
     case fontFamily = "font_family"
     case fontWeight = "font_weight"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.fontColor = try container.decodeFlexible(String.self, snake: "font_color", camel: "fontColor")
+    self.fontFamily = try container.decodeFlexible(String.self, snake: "font_family", camel: "fontFamily")
+    self.fontWeight = try container.decodeFlexible(String.self, snake: "font_weight", camel: "fontWeight")
+  }
 }

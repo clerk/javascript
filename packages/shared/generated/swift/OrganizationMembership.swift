@@ -52,17 +52,17 @@ public struct OrganizationMembership: Codable, Equatable, Sendable, Identifiable
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.object = try container.decode(String.self, forKey: .object)
-    self.id = try container.decode(String.self, forKey: .id)
-    self.organization = try container.decode(Organization.self, forKey: .organization)
-    self.permissions = try container.decode([JSONValue].self, forKey: .permissions)
-    self.publicMetadata = try container.decode(JSONValue.self, forKey: .publicMetadata)
-    self.publicUserData = try container.decodeIfPresent(PublicUserData.self, forKey: .publicUserData)
-    self.role = try container.decode(String.self, forKey: .role)
-    self.roleName = try container.decode(String.self, forKey: .roleName)
-    self.createdAt = try container.decodeMillisecondsDate(forKey: .createdAt)
-    self.updatedAt = try container.decodeMillisecondsDate(forKey: .updatedAt)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.organization = try container.decodeFlexible(Organization.self, snake: "organization", camel: "organization")
+    self.permissions = try container.decodeFlexible([JSONValue].self, snake: "permissions", camel: "permissions")
+    self.publicMetadata = try container.decodeFlexible(JSONValue.self, snake: "public_metadata", camel: "publicMetadata")
+    self.publicUserData = try container.decodeIfPresentFlexible(PublicUserData.self, snake: "public_user_data", camel: "publicUserData")
+    self.role = try container.decodeFlexible(String.self, snake: "role", camel: "role")
+    self.roleName = try container.decodeFlexible(String.self, snake: "role_name", camel: "roleName")
+    self.createdAt = try container.decodeMillisecondsDate(snake: "created_at", camel: "createdAt")
+    self.updatedAt = try container.decodeMillisecondsDate(snake: "updated_at", camel: "updatedAt")
   }
 
   public func encode(to encoder: Encoder) throws {

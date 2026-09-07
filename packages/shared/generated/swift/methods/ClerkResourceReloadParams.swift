@@ -14,4 +14,9 @@ public struct ClerkResourceReloadParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case rotatingTokenNonce
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.rotatingTokenNonce = try container.decodeIfPresentFlexible(String.self, snake: "rotatingTokenNonce", camel: "rotatingTokenNonce")
+  }
 }

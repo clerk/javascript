@@ -72,22 +72,22 @@ public struct Organization: Codable, Equatable, Sendable, Identifiable {
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.object = try container.decode(String.self, forKey: .object)
-    self.id = try container.decode(String.self, forKey: .id)
-    self.imageUrl = try container.decode(String.self, forKey: .imageUrl)
-    self.hasImage = try container.decode(Bool.self, forKey: .hasImage)
-    self.name = try container.decode(String.self, forKey: .name)
-    self.slug = try container.decode(String.self, forKey: .slug)
-    self.publicMetadata = try container.decode(JSONValue.self, forKey: .publicMetadata)
-    self.createdAt = try container.decodeMillisecondsDate(forKey: .createdAt)
-    self.updatedAt = try container.decodeMillisecondsDate(forKey: .updatedAt)
-    self.membersCount = try container.decode(Int.self, forKey: .membersCount)
-    self.pendingInvitationsCount = try container.decode(Int.self, forKey: .pendingInvitationsCount)
-    self.adminDeleteEnabled = try container.decode(Bool.self, forKey: .adminDeleteEnabled)
-    self.maxAllowedMemberships = try container.decode(Int.self, forKey: .maxAllowedMemberships)
-    self.selfServeSsoEnabled = try container.decodeIfPresent(Bool.self, forKey: .selfServeSsoEnabled)
-    self.exclusiveMembership = try container.decodeIfPresent(Bool.self, forKey: .exclusiveMembership)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.imageUrl = try container.decodeFlexible(String.self, snake: "image_url", camel: "imageUrl")
+    self.hasImage = try container.decodeFlexible(Bool.self, snake: "has_image", camel: "hasImage")
+    self.name = try container.decodeFlexible(String.self, snake: "name", camel: "name")
+    self.slug = try container.decodeFlexible(String.self, snake: "slug", camel: "slug")
+    self.publicMetadata = try container.decodeFlexible(JSONValue.self, snake: "public_metadata", camel: "publicMetadata")
+    self.createdAt = try container.decodeMillisecondsDate(snake: "created_at", camel: "createdAt")
+    self.updatedAt = try container.decodeMillisecondsDate(snake: "updated_at", camel: "updatedAt")
+    self.membersCount = try container.decodeFlexible(Int.self, snake: "members_count", camel: "membersCount")
+    self.pendingInvitationsCount = try container.decodeFlexible(Int.self, snake: "pending_invitations_count", camel: "pendingInvitationsCount")
+    self.adminDeleteEnabled = try container.decodeFlexible(Bool.self, snake: "admin_delete_enabled", camel: "adminDeleteEnabled")
+    self.maxAllowedMemberships = try container.decodeFlexible(Int.self, snake: "max_allowed_memberships", camel: "maxAllowedMemberships")
+    self.selfServeSsoEnabled = try container.decodeIfPresentFlexible(Bool.self, snake: "self_serve_sso_enabled", camel: "selfServeSsoEnabled")
+    self.exclusiveMembership = try container.decodeIfPresentFlexible(Bool.self, snake: "exclusive_membership", camel: "exclusiveMembership")
   }
 
   public func encode(to encoder: Encoder) throws {

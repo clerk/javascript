@@ -14,4 +14,9 @@ public struct SignInSubmitProtectCheckParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case proofToken
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.proofToken = try container.decodeFlexible(String.self, snake: "proofToken", camel: "proofToken")
+  }
 }

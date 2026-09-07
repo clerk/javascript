@@ -54,4 +54,19 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
     case token
     case password
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeIfPresentFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.actionCompleteRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "actionCompleteRedirectUrl", camel: "actionCompleteRedirectUrl")
+    self.identifier = try container.decodeIfPresentFlexible(String.self, snake: "identifier", camel: "identifier")
+    self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
+    self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
+    self.transfer = try container.decodeIfPresentFlexible(Bool.self, snake: "transfer", camel: "transfer")
+    self.signUpIfMissing = try container.decodeIfPresentFlexible(Bool.self, snake: "signUpIfMissing", camel: "signUpIfMissing")
+    self.ticket = try container.decodeIfPresentFlexible(String.self, snake: "ticket", camel: "ticket")
+    self.token = try container.decodeIfPresentFlexible(String.self, snake: "token", camel: "token")
+    self.password = try container.decodeIfPresentFlexible(String.self, snake: "password", camel: "password")
+  }
 }

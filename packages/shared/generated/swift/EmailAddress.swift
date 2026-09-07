@@ -34,4 +34,14 @@ public struct EmailAddress: Codable, Equatable, Sendable, Identifiable {
     case matchesSsoConnection = "matches_sso_connection"
     case id
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.emailAddress = try container.decodeFlexible(String.self, snake: "email_address", camel: "emailAddress")
+    self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
+    self.linkedTo = try container.decodeFlexible([IdentificationLink].self, snake: "linked_to", camel: "linkedTo")
+    self.matchesSsoConnection = try container.decodeFlexible(Bool.self, snake: "matches_sso_connection", camel: "matchesSsoConnection")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+  }
 }

@@ -18,4 +18,10 @@ public struct PasskeySettingsData: Codable, Equatable, Sendable {
     case allowAutofill = "allow_autofill"
     case showSignInButton = "show_sign_in_button"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.allowAutofill = try container.decodeFlexible(Bool.self, snake: "allow_autofill", camel: "allowAutofill")
+    self.showSignInButton = try container.decodeFlexible(Bool.self, snake: "show_sign_in_button", camel: "showSignInButton")
+  }
 }

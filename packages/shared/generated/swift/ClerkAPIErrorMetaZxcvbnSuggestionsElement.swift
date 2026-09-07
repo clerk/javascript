@@ -18,4 +18,10 @@ public struct ClerkAPIErrorMetaZxcvbnSuggestionsElement: Codable, Equatable, Sen
     case code
     case message
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.code = try container.decodeFlexible(String.self, snake: "code", camel: "code")
+    self.message = try container.decodeFlexible(String.self, snake: "message", camel: "message")
+  }
 }

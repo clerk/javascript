@@ -68,21 +68,21 @@ public struct SignUpVerification: Codable, Equatable, Sendable, Identifiable {
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.nextAction = try container.decode(String.self, forKey: .nextAction)
-    self.supportedStrategies = try container.decode([String].self, forKey: .supportedStrategies)
-    self.channel = try container.decodeIfPresent(SignInFirstFactorChannel.self, forKey: .channel)
-    self.status = try container.decode(VerificationStatus.self, forKey: .status)
-    self.verifiedAtClient = try container.decode(String.self, forKey: .verifiedAtClient)
-    self.strategy = try container.decode(String.self, forKey: .strategy)
-    self.nonce = try container.decodeIfPresent(String.self, forKey: .nonce)
-    self.message = try container.decodeIfPresent(String.self, forKey: .message)
-    self.externalVerificationRedirectUrl = try container.decodeIfPresent(String.self, forKey: .externalVerificationRedirectUrl)
-    self.attempts = try container.decode(Int.self, forKey: .attempts)
-    self.expireAt = try container.decodeMillisecondsDate(forKey: .expireAt)
-    self.error = try container.decode(ClerkAPIError.self, forKey: .error)
-    self.id = try container.decode(String.self, forKey: .id)
-    self.object = try container.decode(String.self, forKey: .object)
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.nextAction = try container.decodeFlexible(String.self, snake: "next_action", camel: "nextAction")
+    self.supportedStrategies = try container.decodeFlexible([String].self, snake: "supported_strategies", camel: "supportedStrategies")
+    self.channel = try container.decodeIfPresentFlexible(SignInFirstFactorChannel.self, snake: "channel", camel: "channel")
+    self.status = try container.decodeFlexible(VerificationStatus.self, snake: "status", camel: "status")
+    self.verifiedAtClient = try container.decodeFlexible(String.self, snake: "verified_at_client", camel: "verifiedAtClient")
+    self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.nonce = try container.decodeIfPresentFlexible(String.self, snake: "nonce", camel: "nonce")
+    self.message = try container.decodeIfPresentFlexible(String.self, snake: "message", camel: "message")
+    self.externalVerificationRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "external_verification_redirect_url", camel: "externalVerificationRedirectUrl")
+    self.attempts = try container.decodeFlexible(Int.self, snake: "attempts", camel: "attempts")
+    self.expireAt = try container.decodeMillisecondsDate(snake: "expire_at", camel: "expireAt")
+    self.error = try container.decodeFlexible(ClerkAPIError.self, snake: "error", camel: "error")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
   }
 
   public func encode(to encoder: Encoder) throws {

@@ -30,4 +30,13 @@ public struct PublicKeyCredentialWithAuthenticatorAssertionResponse: Codable, Eq
     case type
     case response
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.authenticatorAttachment = try container.decodeIfPresentFlexible(String.self, snake: "authenticatorAttachment", camel: "authenticatorAttachment")
+    self.rawId = try container.decodeFlexible(JSONValue.self, snake: "rawId", camel: "rawId")
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.type = try container.decodeFlexible(String.self, snake: "type", camel: "type")
+    self.response = try container.decodeFlexible(JSONValue.self, snake: "response", camel: "response")
+  }
 }

@@ -18,4 +18,10 @@ public struct ResetPasswordParams: Codable, Equatable, Sendable {
     case password
     case signOutOfOtherSessions
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.password = try container.decodeFlexible(String.self, snake: "password", camel: "password")
+    self.signOutOfOtherSessions = try container.decodeIfPresentFlexible(Bool.self, snake: "signOutOfOtherSessions", camel: "signOutOfOtherSessions")
+  }
 }

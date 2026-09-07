@@ -54,4 +54,19 @@ public struct SignInFirstFactor: Codable, Equatable, Sendable {
     case enterpriseConnectionId = "enterprise_connection_id"
     case enterpriseConnectionName = "enterprise_connection_name"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.emailAddressId = try container.decodeIfPresentFlexible(String.self, snake: "email_address_id", camel: "emailAddressId")
+    self.safeIdentifier = try container.decodeIfPresentFlexible(String.self, snake: "safe_identifier", camel: "safeIdentifier")
+    self.primary = try container.decodeIfPresentFlexible(Bool.self, snake: "primary", camel: "primary")
+    self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phone_number_id", camel: "phoneNumberId")
+    self.`default` = try container.decodeIfPresentFlexible(Bool.self, snake: "default", camel: "default")
+    self.channel = try container.decodeIfPresentFlexible(SignInFirstFactorChannel.self, snake: "channel", camel: "channel")
+    self.web3WalletId = try container.decodeIfPresentFlexible(String.self, snake: "web_3_wallet_id", camel: "web3WalletId")
+    self.walletName = try container.decodeIfPresentFlexible(String.self, snake: "wallet_name", camel: "walletName")
+    self.enterpriseConnectionId = try container.decodeIfPresentFlexible(String.self, snake: "enterprise_connection_id", camel: "enterpriseConnectionId")
+    self.enterpriseConnectionName = try container.decodeIfPresentFlexible(String.self, snake: "enterprise_connection_name", camel: "enterpriseConnectionName")
+  }
 }

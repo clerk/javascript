@@ -22,4 +22,11 @@ public struct DisplayTheme: Codable, Equatable, Sendable {
     case buttons
     case accounts
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.general = try container.decodeFlexible(DisplayThemeGeneral.self, snake: "general", camel: "general")
+    self.buttons = try container.decodeFlexible(DisplayThemeButtons.self, snake: "buttons", camel: "buttons")
+    self.accounts = try container.decodeFlexible(DisplayThemeAccounts.self, snake: "accounts", camel: "accounts")
+  }
 }

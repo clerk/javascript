@@ -34,4 +34,14 @@ public struct SignUpData: Codable, Equatable, Sendable {
     case legalConsentEnabled = "legal_consent_enabled"
     case mfa
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.allowlistOnly = try container.decodeFlexible(Bool.self, snake: "allowlist_only", camel: "allowlistOnly")
+    self.progressive = try container.decodeFlexible(Bool.self, snake: "progressive", camel: "progressive")
+    self.captchaEnabled = try container.decodeFlexible(Bool.self, snake: "captcha_enabled", camel: "captchaEnabled")
+    self.mode = try container.decodeFlexible(SignUpDataMode.self, snake: "mode", camel: "mode")
+    self.legalConsentEnabled = try container.decodeFlexible(Bool.self, snake: "legal_consent_enabled", camel: "legalConsentEnabled")
+    self.mfa = try container.decodeIfPresentFlexible(SignUpDataMfa.self, snake: "mfa", camel: "mfa")
+  }
 }

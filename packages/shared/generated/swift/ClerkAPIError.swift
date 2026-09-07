@@ -26,4 +26,12 @@ public struct ClerkAPIError: Codable, Equatable, Sendable {
     case longMessage = "long_message"
     case meta
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.code = try container.decodeFlexible(String.self, snake: "code", camel: "code")
+    self.message = try container.decodeFlexible(String.self, snake: "message", camel: "message")
+    self.longMessage = try container.decodeIfPresentFlexible(String.self, snake: "long_message", camel: "longMessage")
+    self.meta = try container.decodeIfPresentFlexible(ClerkAPIErrorMeta.self, snake: "meta", camel: "meta")
+  }
 }

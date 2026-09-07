@@ -22,4 +22,11 @@ public struct IdentificationLink: Codable, Equatable, Sendable, Identifiable {
     case type
     case object
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.type = try container.decodeFlexible(String.self, snake: "type", camel: "type")
+    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+  }
 }

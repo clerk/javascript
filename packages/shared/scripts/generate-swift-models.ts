@@ -980,6 +980,54 @@ public enum JSONValue: Codable, Equatable, Sendable {
   }
 }
 
+public struct FAPIJSONKey: CodingKey {
+  public var stringValue: String
+  public var intValue: Int?
+
+  public init(_ value: String) {
+    stringValue = value
+    intValue = nil
+  }
+
+  public init?(stringValue: String) {
+    self.stringValue = stringValue
+    intValue = nil
+  }
+
+  public init?(intValue: Int) {
+    self.stringValue = String(intValue)
+    self.intValue = intValue
+  }
+}
+
+extension KeyedDecodingContainer where Key == FAPIJSONKey {
+  public func decodeFlexible<T: Decodable>(_ type: T.Type, snake: String, camel: String) throws -> T {
+    if let value = try? decode(type, forKey: FAPIJSONKey(snake)) {
+      return value
+    }
+    return try decode(type, forKey: FAPIJSONKey(camel))
+  }
+
+  public func decodeIfPresentFlexible<T: Decodable>(_ type: T.Type, snake: String, camel: String) throws -> T? {
+    if let value = try? decodeIfPresent(type, forKey: FAPIJSONKey(snake)) {
+      return value
+    }
+    return try decodeIfPresent(type, forKey: FAPIJSONKey(camel))
+  }
+
+  public func decodeMillisecondsDate(snake: String, camel: String) throws -> Date {
+    let millis = try decodeFlexible(Int64.self, snake: snake, camel: camel)
+    return Date(timeIntervalSince1970: TimeInterval(millis) / 1000)
+  }
+
+  public func decodeIfPresentMillisecondsDate(snake: String, camel: String) throws -> Date? {
+    guard let millis = try decodeIfPresentFlexible(Int64.self, snake: snake, camel: camel) else {
+      return nil
+    }
+    return Date(timeIntervalSince1970: TimeInterval(millis) / 1000)
+  }
+}
+
 extension KeyedDecodingContainer {
   func decodeMillisecondsDate(forKey key: Key) throws -> Date {
     let millis = try decode(Int64.self, forKey: key)
@@ -1045,17 +1093,18 @@ function escapeSwiftString(value: string): string {
 }
 
 function emitDecode(property: SwiftProperty): string {
-  const key = `.${property.name}`;
+  const snake = escapeSwiftString(property.wireName);
+  const camel = escapeSwiftString(property.name.replace(/`/g, ''));
   const optional = isOptionalRef(property.type);
   if (property.isDate) {
     return optional
-      ? `    self.${property.name} = try container.decodeIfPresentMillisecondsDate(forKey: ${key})`
-      : `    self.${property.name} = try container.decodeMillisecondsDate(forKey: ${key})`;
+      ? `    self.${property.name} = try container.decodeIfPresentMillisecondsDate(snake: "${snake}", camel: "${camel}")`
+      : `    self.${property.name} = try container.decodeMillisecondsDate(snake: "${snake}", camel: "${camel}")`;
   }
   const typeName = emitRef(optional && property.type.kind === 'optional' ? property.type.of : property.type);
   return optional
-    ? `    self.${property.name} = try container.decodeIfPresent(${typeName}.self, forKey: ${key})`
-    : `    self.${property.name} = try container.decode(${typeName}.self, forKey: ${key})`;
+    ? `    self.${property.name} = try container.decodeIfPresentFlexible(${typeName}.self, snake: "${snake}", camel: "${camel}")`
+    : `    self.${property.name} = try container.decodeFlexible(${typeName}.self, snake: "${snake}", camel: "${camel}")`;
 }
 
 function emitEncode(property: SwiftProperty): string {
@@ -1101,13 +1150,17 @@ function emitStruct(decl: SwiftStruct): string {
   if (decl.properties.length > 0) {
     lines.push('', '  public enum CodingKeys: String, CodingKey {', ...codingKeys, '  }');
   }
-  if (needsCustomCodable) {
+  if (decl.properties.length > 0) {
     lines.push(
       '',
       '  public init(from decoder: Decoder) throws {',
-      '    let container = try decoder.container(keyedBy: CodingKeys.self)',
+      '    let container = try decoder.container(keyedBy: FAPIJSONKey.self)',
       ...decl.properties.map(emitDecode),
       '  }',
+    );
+  }
+  if (needsCustomCodable) {
+    lines.push(
       '',
       '  public func encode(to encoder: Encoder) throws {',
       '    var container = encoder.container(keyedBy: CodingKeys.self)',

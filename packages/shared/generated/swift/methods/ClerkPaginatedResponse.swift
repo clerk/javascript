@@ -18,4 +18,10 @@ public struct ClerkPaginatedResponse: Codable, Equatable, Sendable {
     case data
     case totalCount = "total_count"
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.data = try container.decodeFlexible([OrganizationMembership].self, snake: "data", camel: "data")
+    self.totalCount = try container.decodeFlexible(Int.self, snake: "total_count", camel: "totalCount")
+  }
 }

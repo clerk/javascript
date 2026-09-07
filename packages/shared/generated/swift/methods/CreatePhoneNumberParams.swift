@@ -14,4 +14,9 @@ public struct CreatePhoneNumberParams: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case phoneNumber
   }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: FAPIJSONKey.self)
+    self.phoneNumber = try container.decodeFlexible(String.self, snake: "phoneNumber", camel: "phoneNumber")
+  }
 }
