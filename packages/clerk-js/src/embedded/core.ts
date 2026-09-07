@@ -279,7 +279,12 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
         clientToken = await host.getToken();
         ensureActive();
         subscriptions.push(clerk.addListener(() => publish()));
-        for (const event of [events.TokenUpdate, events.EnvironmentUpdate, events.ResourceUpdate]) {
+        for (const event of [
+          events.TokenUpdate,
+          events.SessionTokenResolved,
+          events.EnvironmentUpdate,
+          events.ResourceUpdate,
+        ]) {
           const listener = () => {
             publish();
           };

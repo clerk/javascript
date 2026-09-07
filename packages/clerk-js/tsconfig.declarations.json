@@ -11,5 +11,11 @@
     "declarationDir": "./dist/types",
     "noImplicitReturns": false
   },
-  "include": ["src/index.ts", "src/index.browser.ts", "src/index.embedded.ts", "src/**/*.d.ts"]
+  "include": [
+    "src/index.ts",
+    "src/index.browser.ts",
+    "src/index.embedded.ts",
+    "src/index.authorization.ts",
+    "src/**/*.d.ts"
+  ]
 }

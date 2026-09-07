@@ -22,6 +22,7 @@ const variants = {
   clerkBrowser: 'clerk.browser',
   clerkNative: 'clerk.native', // For React Native (no chunk splitting)
   clerkEmbedded: 'clerk.embedded',
+  clerkAuthorization: 'clerk.authorization',
   clerkLegacyBrowser: 'clerk.legacy.browser',
 };
 
@@ -31,6 +32,7 @@ const variantToSourceFile = {
   [variants.clerkBrowser]: './src/index.browser.ts',
   [variants.clerkNative]: './src/index.ts',
   [variants.clerkEmbedded]: './src/index.embedded.ts',
+  [variants.clerkAuthorization]: './src/index.authorization.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
 };
 
@@ -414,15 +416,21 @@ const prodConfig = ({ mode, env, analysis }) => {
     return [clerkNative];
   }
 
-  if (env.variant === variants.clerkEmbedded) {
+  if (env.variant === variants.clerkEmbedded || env.variant === variants.clerkAuthorization) {
     return [
       merge(
-        entryForVariant(variants.clerkEmbedded),
-        common({ mode, variant: variants.clerkEmbedded, disableRHC: true }),
+        entryForVariant(env.variant),
+        common({ mode, variant: env.variant, disableRHC: true }),
         commonForProd(),
         commonForProdBundled(),
         {
-          output: { publicPath: '', library: { type: 'umd', name: 'ClerkEmbedded' } },
+          output: {
+            publicPath: '',
+            library: {
+              type: 'umd',
+              name: env.variant === variants.clerkEmbedded ? 'ClerkEmbedded' : 'ClerkAuthorization',
+            },
+          },
           optimization: { splitChunks: false },
           plugins: [new rspack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })],
         },

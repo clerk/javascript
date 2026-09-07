@@ -693,6 +693,9 @@ function resolveUnionParts(ctx: Ctx, parts: ts.Type[], hint: string, wireName?: 
 }
 
 function dateOrInt(wireName?: string): SwiftRef {
+  if (wireName === 'expirationBuffer') {
+    return { kind: 'primitive', name: 'Double' };
+  }
   if (wireName && /_at$/.test(wireName)) {
     return { kind: 'primitive', name: 'Date' };
   }

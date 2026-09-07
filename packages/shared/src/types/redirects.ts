@@ -86,6 +86,9 @@ export type AuthenticateWithRedirectParams = {
    */
   __internal_callbackParams?: HandleOAuthCallbackParams;
 
+  /** @internal Native browser session preferences for an OAuth transport. */
+  __internal_oauthOptions?: { prefersEphemeralSession?: boolean };
+
   /**
    * @experimental
    */

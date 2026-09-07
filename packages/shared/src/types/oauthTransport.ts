@@ -18,5 +18,5 @@ export type OAuthTransport = {
    * Open the provider verification URL externally and resolve with the callback URL the
    * OS routes back to the app after auth. Rejects on user cancellation or error.
    */
-  open: (url: URL) => Promise<{ callbackUrl: string }>;
+  open: (url: URL, options?: { prefersEphemeralSession?: boolean }) => Promise<{ callbackUrl: string }>;
 };

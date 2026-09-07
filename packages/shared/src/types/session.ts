@@ -499,6 +499,8 @@ export interface SessionTask {
 
 /** @generateWithEmptyComment */
 export type GetTokenOptions = {
+  /** Minimum cached token lifetime in seconds. Native SDKs may request up to 60 seconds. */
+  expirationBuffer?: number;
   /**
    * The Organization associated with the generated session token. _Does not modify the session's currently [Active Organization](!active-organization)._
    */

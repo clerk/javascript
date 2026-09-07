@@ -83,7 +83,10 @@ export async function _authenticateWithTransport(opts: {
     });
   }
 
-  const { callbackUrl } = await opts.transport.open(new URL(verificationUrl.toString()));
+  const providerUrl = new URL(verificationUrl.toString());
+  const { callbackUrl } = opts.params.__internal_oauthOptions
+    ? await opts.transport.open(providerUrl, opts.params.__internal_oauthOptions)
+    : await opts.transport.open(providerUrl);
   const failure = getNativeOAuthCallbackFailure(callbackUrl);
 
   if (failure) {
