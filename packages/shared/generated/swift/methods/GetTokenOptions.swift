@@ -3,25 +3,21 @@
 import Foundation
 
 public struct GetTokenOptions: Codable, Equatable, Sendable {
-  public var expirationBuffer: Double?
   public var organizationId: String?
   public var skipCache: Bool?
   public var template: String?
 
   public init(
-    expirationBuffer: Double? = nil,
     organizationId: String? = nil,
     skipCache: Bool? = nil,
     template: String? = nil
   ) {
-    self.expirationBuffer = expirationBuffer
     self.organizationId = organizationId
     self.skipCache = skipCache
     self.template = template
   }
 
   public enum CodingKeys: String, CodingKey {
-    case expirationBuffer
     case organizationId
     case skipCache
     case template
@@ -29,7 +25,6 @@ public struct GetTokenOptions: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.expirationBuffer = try container.decodeIfPresentFlexible(Double.self, snake: "expirationBuffer", camel: "expirationBuffer")
     self.organizationId = try container.decodeIfPresentFlexible(String.self, snake: "organizationId", camel: "organizationId")
     self.skipCache = try container.decodeIfPresentFlexible(Bool.self, snake: "skipCache", camel: "skipCache")
     self.template = try container.decodeIfPresentFlexible(String.self, snake: "template", camel: "template")
@@ -37,7 +32,6 @@ public struct GetTokenOptions: Codable, Equatable, Sendable {
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encodeIfPresent(expirationBuffer, forKey: .expirationBuffer)
     try container.encodeIfPresent(organizationId, forKey: .organizationId)
     try container.encodeIfPresent(skipCache, forKey: .skipCache)
     try container.encodeIfPresent(template, forKey: .template)

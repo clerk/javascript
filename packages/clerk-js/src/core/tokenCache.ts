@@ -90,7 +90,7 @@ export interface TokenCache {
    * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
    * @returns Result with entry, or undefined if token is missing/expired/too close to expiration
    */
-  get(cacheKeyJSON: TokenCacheKeyJSON, expirationBuffer?: number): TokenCacheGetResult | undefined;
+  get(cacheKeyJSON: TokenCacheKeyJSON): TokenCacheGetResult | undefined;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -182,7 +182,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     store.clear();
   };
 
-  const get = (cacheKeyJSON: TokenCacheKeyJSON, expirationBuffer?: number): TokenCacheGetResult | undefined => {
+  const get = (cacheKeyJSON: TokenCacheKeyJSON): TokenCacheGetResult | undefined => {
     ensureBroadcastChannel();
 
     const key = keyResolver.toKey(cacheKeyJSON);
@@ -198,11 +198,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
     // Token expired or dangerously close to expiration - force synchronous refresh
     // Uses poller interval as threshold since the poller might not get to it in time
-    const minimumLifetime =
-      expirationBuffer !== undefined && Number.isFinite(expirationBuffer)
-        ? Math.max(0, Math.min(60, expirationBuffer))
-        : POLLER_INTERVAL_IN_MS / 1000;
-    if (remainingTtl <= minimumLifetime) {
+    if (remainingTtl <= POLLER_INTERVAL_IN_MS / 1000) {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }

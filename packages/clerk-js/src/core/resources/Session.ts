@@ -470,7 +470,7 @@ export class Session extends BaseResource implements SessionResource {
 
     const tokenId = this.#getCacheId(template, organizationId);
 
-    const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId }, options?.expirationBuffer);
+    const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId });
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
