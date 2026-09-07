@@ -112,6 +112,8 @@ export function installPasskeyHooks(
       const payload = {
         challenge: bytesToBase64Url(publicKeyOptions.challenge),
         rpId: String(publicKeyOptions.rpId || ''),
+        conditionalUI: params.conditionalUI === true,
+        preferImmediatelyAvailableCredentials: params.preferImmediatelyAvailableCredentials !== false,
         allowCredentials: (publicKeyOptions.allowCredentials || []).map(function (credential: any) {
           return bytesToBase64Url(credential.id);
         }),

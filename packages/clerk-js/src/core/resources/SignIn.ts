@@ -110,6 +110,19 @@ import { BaseResource, UserData, Verification } from './internal';
 const isTerminalEmailLinkVerificationStatus = (status: string | null) =>
   status === 'verified' || status === 'expired' || status === 'transferable';
 
+export type NativePasskeyStage =
+  | 'preparingFirstFactor'
+  | 'preparingSecondFactor'
+  | 'requestingAuthorization'
+  | 'attemptingFirstFactor'
+  | 'attemptingSecondFactor';
+
+type NativePasskeyOptions = {
+  allowSecondFactor?: boolean;
+  onStage?: (stage: NativePasskeyStage) => void;
+  preferImmediatelyAvailableCredentials?: boolean;
+};
+
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
@@ -555,8 +568,16 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
-    const { flow } = params || {};
+  public authenticateWithPasskey = async (
+    params?: AuthenticateWithPasskeyParams,
+    nativeOptions?: NativePasskeyOptions,
+  ): Promise<SignInResource> => {
+    const usesSecondFactor =
+      nativeOptions?.allowSecondFactor &&
+      (this.status === 'needs_second_factor' || this.status === 'needs_client_trust') &&
+      this.supportedSecondFactors?.some(factor => String(factor.strategy) === 'passkey');
+    const flow = usesSecondFactor ? undefined : params?.flow;
+    nativeOptions?.onStage?.(usesSecondFactor ? 'preparingSecondFactor' : 'preparingFirstFactor');
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -574,7 +595,9 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    if (flow === 'autofill' || flow === 'discoverable') {
+    if (usesSecondFactor) {
+      await this.prepareSecondFactor({ strategy: 'passkey' } as unknown as PrepareSecondFactorParams);
+    } else if (flow === 'autofill' || flow === 'discoverable') {
       // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
     } else {
@@ -591,7 +614,7 @@ export class SignIn extends BaseResource implements SignInResource {
       await this.prepareFirstFactor(passKeyFactor);
     }
 
-    const { nonce } = this.firstFactorVerification;
+    const { nonce } = usesSecondFactor ? this.secondFactorVerification : this.firstFactorVerification;
     const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
 
     if (!publicKeyOptions) {
@@ -605,23 +628,29 @@ export class SignIn extends BaseResource implements SignInResource {
        * If autofill is not supported gracefully handle the result, we don't need to throw.
        * The caller should always check this before calling this method.
        */
-      canUseConditionalUI = await isWebAuthnAutofillSupported();
+      canUseConditionalUI = nativeOptions ? true : await isWebAuthnAutofillSupported();
     }
 
-    // Invoke the navigator.create.get() method.
-    const { publicKeyCredential, error } = await webAuthnGetCredential({
+    nativeOptions?.onStage?.('requestingAuthorization');
+    const credentialOptions = {
       publicKeyOptions,
       conditionalUI: canUseConditionalUI,
-    });
+      preferImmediatelyAvailableCredentials: nativeOptions?.preferImmediatelyAvailableCredentials,
+    };
+    const { publicKeyCredential, error } = await webAuthnGetCredential(credentialOptions);
 
     if (!publicKeyCredential) {
       throw error;
     }
 
-    return this.attemptFirstFactor({
-      publicKeyCredential,
-      strategy: 'passkey',
-    });
+    nativeOptions?.onStage?.(usesSecondFactor ? 'attemptingSecondFactor' : 'attemptingFirstFactor');
+    if (usesSecondFactor) {
+      return this.attemptSecondFactor({
+        strategy: 'passkey',
+        publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+      } as unknown as AttemptSecondFactorParams);
+    }
+    return this.attemptFirstFactor({ publicKeyCredential, strategy: 'passkey' });
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {

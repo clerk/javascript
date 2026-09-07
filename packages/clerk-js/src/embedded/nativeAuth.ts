@@ -2,6 +2,16 @@ import { ClerkAPIResponseError, ClerkRuntimeError, isClerkAPIResponseError } fro
 import type { AuthenticateWithRedirectParams, SignInCreateParams, SignUpCreateParams } from '@clerk/shared/types';
 
 import type { Clerk } from '../core/clerk';
+import type { NativePasskeyStage, SignIn } from '../core/resources/SignIn';
+
+export class NativeAuthOperationError extends Error {
+  constructor(
+    readonly stage: NativePasskeyStage,
+    readonly cause: unknown,
+  ) {
+    super('Native authentication failed');
+  }
+}
 
 type Flow = 'signIn' | 'signUp';
 type CompletionOptions = {
@@ -63,6 +73,36 @@ export function createNativeAuthOperations(clerk: Clerk, commitState: () => Prom
     finishNativeSignIn: () => finish('signIn'),
     finishNativeSignUp: () => finish('signUp'),
     completeNativeAuth,
+    async authenticateNativePasskey(options: {
+      expectedId?: string;
+      createNew?: boolean;
+      autofill?: boolean;
+      preferImmediatelyAvailableCredentials?: boolean;
+    }) {
+      const signIn = resource('signIn', options.expectedId) as SignIn;
+      let stage: NativePasskeyStage = 'preparingFirstFactor';
+      let authorizationSignInId: string | undefined;
+      try {
+        await signIn.authenticateWithPasskey(
+          { flow: options.createNew ? 'discoverable' : options.autofill ? 'autofill' : undefined },
+          {
+            allowSecondFactor: !options.createNew,
+            preferImmediatelyAvailableCredentials: options.preferImmediatelyAvailableCredentials,
+            onStage: value => {
+              stage = value;
+              if (value === 'requestingAuthorization') {
+                authorizationSignInId = signIn.id;
+              } else if (authorizationSignInId) {
+                resource('signIn', authorizationSignInId);
+              }
+            },
+          },
+        );
+        return await finish('signIn', signIn.id);
+      } catch (error) {
+        throw new NativeAuthOperationError(stage, error);
+      }
+    },
     async completeNativeAppleSignIn(options: {
       idToken: string;
       firstName?: string;

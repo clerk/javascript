@@ -17,7 +17,7 @@ import {
 } from '../core/resources/internal';
 import { SessionTokenCache } from '../core/tokenCache';
 import { createHostedAuthOperations } from './hostedAuth';
-import { createNativeAuthOperations } from './nativeAuth';
+import { createNativeAuthOperations, NativeAuthOperationError } from './nativeAuth';
 import { createNativeResourceOperations } from './nativeResources';
 
 export const EMBEDDED_PROTOCOL_VERSION = 1;
@@ -65,6 +65,7 @@ export interface EmbeddedError {
   errors: unknown[];
   status?: number;
   clerkTraceId?: string;
+  stage?: string;
 }
 
 type Resource = Record<string, any>;
@@ -96,6 +97,9 @@ class EmbeddedInvocationError extends Error {
 }
 
 function errorEnvelope(error: any): EmbeddedError {
+  if (error instanceof NativeAuthOperationError) {
+    return { ...errorEnvelope(error.cause), stage: error.stage };
+  }
   if (error?.kind && Array.isArray(error.errors)) {
     return error;
   }
