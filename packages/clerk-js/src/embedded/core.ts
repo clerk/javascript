@@ -436,16 +436,31 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
     return loadPromise;
   }
 
-  async function invoke(invocation: EmbeddedInvocation) {
+  async function invoke(
+    invocation: EmbeddedInvocation,
+    expectedIdentity?: { clientId: string | null; sessionId: string | null },
+  ): Promise<unknown> {
     try {
       await load();
       ensureActive();
+      if (
+        expectedIdentity &&
+        ((clerk.client?.id ?? null) !== expectedIdentity.clientId ||
+          (clerk.session?.id ?? null) !== expectedIdentity.sessionId)
+      ) {
+        failure('stale_identity', 'The paired device has a different active identity. Retry after synchronizing.');
+      }
       const { receiver, method, arguments: args = [] } = invocation;
       let value: unknown;
       if (receiver.kind === 'clerk' && ['signOut', 'setActive'].includes(method)) {
         identityEpoch += 1;
       }
-      if (receiver.kind === 'clerk' && method === 'initialize') {
+      if (receiver.kind === 'clerk' && method === 'invokeForIdentity') {
+        return await invoke(
+          args[0] as EmbeddedInvocation,
+          args[1] as { clientId: string | null; sessionId: string | null },
+        );
+      } else if (receiver.kind === 'clerk' && method === 'initialize') {
         value = null;
       } else if (receiver.kind === 'clerk' && method === 'signOut') {
         await clerk.signOut(() => undefined, {
