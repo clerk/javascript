@@ -5,7 +5,12 @@ import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/useMachine';
 import type { ReverificationModel } from './reverification.model';
-import type { ReverificationMethod, ReverificationResult, ReverificationViewProps } from './reverification.types';
+import type {
+  ReverificationFactorStatus,
+  ReverificationMethod,
+  ReverificationResult,
+  ReverificationViewProps,
+} from './reverification.types';
 import { needsPrepare, otpChannelFor } from './reverification.utils';
 
 export type ReverificationController =
@@ -18,13 +23,13 @@ type OverlayFrom = 'factor' | 'method-picker';
 
 export type ReverificationDeps = {
   start: () => Promise<ReverificationResult>;
-  prepare: (method: ReverificationMethod, verificationStatus: ReverificationResult['status']) => Promise<void>;
+  prepare: (method: ReverificationMethod, verificationStatus: ReverificationFactorStatus) => Promise<void>;
   attempt: (
     method: ReverificationMethod,
     value: string,
-    verificationStatus: ReverificationResult['status'],
+    verificationStatus: ReverificationFactorStatus,
   ) => Promise<ReverificationResult>;
-  verifyPasskey: () => Promise<ReverificationResult>;
+  verifyPasskey: (verificationStatus: ReverificationFactorStatus) => Promise<ReverificationResult>;
   finish: () => Promise<void>;
   cancel: () => void;
 };
@@ -39,7 +44,7 @@ interface ReverificationContext {
   abortRequested: boolean;
   overlayFrom: OverlayFrom;
   supportEmail: string;
-  verificationStatus: ReverificationResult['status'] | null;
+  verificationStatus: ReverificationFactorStatus | null;
   deps: ReverificationDeps;
 }
 
@@ -80,23 +85,21 @@ function selectMethod(ctx: ReverificationContext, id: string): Partial<Reverific
 }
 
 function prepareActive(ctx: ReverificationContext) {
-  return ctx.deps.prepare(
-    ctx.activeMethod as ReverificationMethod,
-    ctx.verificationStatus ?? 'needs_first_factor',
-  );
+  return ctx.deps.prepare(ctx.activeMethod as ReverificationMethod, ctx.verificationStatus ?? 'needs_first_factor');
 }
 
 function submit(ctx: ReverificationContext): Promise<ReverificationResult> {
   const method = ctx.activeMethod as ReverificationMethod;
+  const verificationStatus = ctx.verificationStatus ?? 'needs_first_factor';
   return method.strategy === 'passkey'
-    ? ctx.deps.verifyPasskey()
-    : ctx.deps.attempt(method, ctx.inputValue, ctx.verificationStatus ?? 'needs_first_factor');
+    ? ctx.deps.verifyPasskey(verificationStatus)
+    : ctx.deps.attempt(method, ctx.inputValue, verificationStatus);
 }
 
 const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => ({
   methods: event.output.methods,
   activeMethod: event.output.startingMethod,
-  verificationStatus: event.output.status,
+  verificationStatus: event.output.status === 'complete' ? null : event.output.status,
   inputValue: '',
   errorMessage: undefined,
   canResend: true,

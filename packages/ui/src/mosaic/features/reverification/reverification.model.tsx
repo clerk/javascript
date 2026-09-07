@@ -9,7 +9,12 @@ import type {
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
 import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
-import type { ReverificationMethod, ReverificationProps, ReverificationResult } from './reverification.types';
+import type {
+  ReverificationFactorStatus,
+  ReverificationMethod,
+  ReverificationProps,
+  ReverificationResult,
+} from './reverification.types';
 import { pickStartingMethod } from './reverification.utils';
 
 export type ReverificationReadyModel = {
@@ -17,13 +22,13 @@ export type ReverificationReadyModel = {
   isActive: boolean;
   supportEmail: string;
   start: () => Promise<ReverificationResult>;
-  prepare: (method: ReverificationMethod, verificationStatus: ReverificationResult['status']) => Promise<void>;
+  prepare: (method: ReverificationMethod, verificationStatus: ReverificationFactorStatus) => Promise<void>;
   attempt: (
     method: ReverificationMethod,
     value: string,
-    verificationStatus: ReverificationResult['status'],
+    verificationStatus: ReverificationFactorStatus,
   ) => Promise<ReverificationResult>;
-  verifyPasskey: () => Promise<ReverificationResult>;
+  verifyPasskey: (verificationStatus: ReverificationFactorStatus) => Promise<ReverificationResult>;
   finish: () => Promise<void>;
   cancel: () => void;
 };
@@ -36,6 +41,22 @@ function toError(error: unknown): Error {
     return new Error(first?.longMessage || first?.message || error.message);
   }
   return error instanceof Error ? error : new Error('Something went wrong. Please try again.');
+}
+
+// This only happens if there is a bug in the controller
+function incompatible(action: 'prepare' | 'attempt' | 'verify', subject: string, status: string): Error {
+  return new Error(`Cannot ${action} ${subject} when verification is ${status}.`);
+}
+
+function requireFactorId(value: string | undefined, strategy: 'email_code' | 'phone_code'): string {
+  if (!value) {
+    throw new Error(
+      strategy === 'email_code'
+        ? 'Cannot prepare email_code without an email address.'
+        : 'Cannot prepare phone_code without a phone number.',
+    );
+  }
+  return value;
 }
 
 function toMethod(
@@ -120,8 +141,11 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
         throw toError(error);
       }
     },
-    verifyPasskey: async () => {
+    verifyPasskey: async verificationStatus => {
       try {
+        if (verificationStatus !== 'needs_first_factor') {
+          throw incompatible('verify', 'passkey', verificationStatus);
+        }
         return handleResponse(await session.verifyWithPasskey());
       } catch (error) {
         throw toError(error);
@@ -133,24 +157,39 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
     prepare: async (method, verificationStatus) => {
       try {
         if (verificationStatus === 'needs_second_factor') {
-          await session.prepareSecondFactorVerification({
-            strategy: 'phone_code',
-            phoneNumberId: method.phoneNumberId,
-          });
-          return;
+          switch (method.strategy) {
+            case 'phone_code':
+              await session.prepareSecondFactorVerification({
+                strategy: 'phone_code',
+                phoneNumberId: requireFactorId(method.phoneNumberId, 'phone_code'),
+              });
+              return;
+            case 'totp':
+            case 'backup_code':
+              return;
+            default:
+              throw incompatible('prepare', method.strategy, verificationStatus);
+          }
         }
-        if (method.strategy === 'email_code') {
-          await session.prepareFirstFactorVerification({
-            strategy: 'email_code',
-            emailAddressId: method.emailAddressId ?? '',
-          });
-          return;
-        }
-        if (method.strategy === 'phone_code') {
-          await session.prepareFirstFactorVerification({
-            strategy: 'phone_code',
-            phoneNumberId: method.phoneNumberId ?? '',
-          });
+
+        switch (method.strategy) {
+          case 'email_code':
+            await session.prepareFirstFactorVerification({
+              strategy: 'email_code',
+              emailAddressId: requireFactorId(method.emailAddressId, 'email_code'),
+            });
+            return;
+          case 'phone_code':
+            await session.prepareFirstFactorVerification({
+              strategy: 'phone_code',
+              phoneNumberId: requireFactorId(method.phoneNumberId, 'phone_code'),
+            });
+            return;
+          case 'password':
+          case 'passkey':
+            return;
+          default:
+            throw incompatible('prepare', method.strategy, verificationStatus);
         }
       } catch (error) {
         throw toError(error);
@@ -159,18 +198,31 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
     attempt: async (method, value, verificationStatus) => {
       try {
         if (verificationStatus === 'needs_second_factor') {
-          const strategy = method.strategy === 'totp' || method.strategy === 'backup_code' ? method.strategy : 'phone_code';
-          return handleResponse(await session.attemptSecondFactorVerification({ strategy, code: value }));
+          switch (method.strategy) {
+            case 'phone_code':
+            case 'totp':
+            case 'backup_code':
+              return handleResponse(
+                await session.attemptSecondFactorVerification({ strategy: method.strategy, code: value }),
+              );
+            default:
+              throw incompatible('attempt', method.strategy, verificationStatus);
+          }
         }
-        if (method.strategy === 'password') {
-          return handleResponse(await session.attemptFirstFactorVerification({ strategy: 'password', password: value }));
+
+        switch (method.strategy) {
+          case 'password':
+            return handleResponse(
+              await session.attemptFirstFactorVerification({ strategy: 'password', password: value }),
+            );
+          case 'email_code':
+          case 'phone_code':
+            return handleResponse(
+              await session.attemptFirstFactorVerification({ strategy: method.strategy, code: value }),
+            );
+          default:
+            throw incompatible('attempt', method.strategy, verificationStatus);
         }
-        return handleResponse(
-          await session.attemptFirstFactorVerification({
-            strategy: method.strategy === 'phone_code' ? 'phone_code' : 'email_code',
-            code: value,
-          }),
-        );
       } catch (error) {
         throw toError(error);
       }
