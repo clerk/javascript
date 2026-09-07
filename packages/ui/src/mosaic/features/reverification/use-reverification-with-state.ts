@@ -23,7 +23,7 @@ export function useReverificationWithState<F extends Fetcher>(
   options?: UseReverificationWithStateOptions,
 ): UseReverificationWithStateResult<F> {
   const { session } = useSession();
-  const [props, setProps] = useState<ReverificationProps>({ isActive: false });
+  const [reverificationState, setReverificationState] = useState<ReverificationProps>({ isActive: false });
   const openedSessionId = useRef<string | null>(null);
   const cancelOnUnmountRef = useRef<(() => void) | undefined>(undefined);
 
@@ -31,15 +31,15 @@ export function useReverificationWithState<F extends Fetcher>(
     ...options,
     onNeedsReverification: ({ complete, cancel, level }) => {
       openedSessionId.current = session?.id ?? null;
-      setProps({
+      setReverificationState({
         isActive: true,
         level,
         complete: () => {
-          setProps({ isActive: false });
+          setReverificationState({ isActive: false });
           complete();
         },
         cancel: () => {
-          setProps({ isActive: false });
+          setReverificationState({ isActive: false });
           cancel();
         },
       });
@@ -47,7 +47,7 @@ export function useReverificationWithState<F extends Fetcher>(
   });
 
   // Cancel if the session changes mid-flight
-  const { isActive, cancel } = props;
+  const { isActive, cancel } = reverificationState;
   useEffect(() => {
     cancelOnUnmountRef.current = isActive ? cancel : undefined;
 
@@ -78,5 +78,5 @@ export function useReverificationWithState<F extends Fetcher>(
     };
   }, []);
 
-  return [wrapped, props];
+  return [wrapped, reverificationState];
 }
