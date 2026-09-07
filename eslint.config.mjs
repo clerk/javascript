@@ -339,7 +339,7 @@ export default tseslint.config([
         node: true,
         typescript: {
           alwaysTryTypes: true,
-          project: ['packages/*/tsconfig.json', 'integration/tsconfig.json'],
+          project: ['packages/*/tsconfig.json', 'packages/*/tsconfig.src.json', 'integration/tsconfig.json'],
         },
       },
     },
