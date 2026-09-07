@@ -17,8 +17,8 @@
     "allowJs": true,
     "verbatimModuleSyntax": true,
     "paths": {
-      // Test-only imports; vitest.config.mts aliases these to clerk-js at runtime.
-      "@/core/*": ["../clerk-js/src/core/*"],
+      // Test-only; tsserver stays in-package. vitest.config.mts aliases these to clerk-js at runtime.
+      "@/core/*": ["./src/test/core-shims/*"],
       "@/*": ["./src/*"],
       // Adding this to avoid changes in the ui files
       // in order to make git merges easier
