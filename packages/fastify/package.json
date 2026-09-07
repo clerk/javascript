@@ -57,6 +57,8 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map",
     "webhooks"
   ],
   "scripts": {

@@ -15,7 +15,7 @@ export default defineConfig({
   entry: ['./src/mosaic/styles/index.ts'],
   outDir: './dist-mosaic',
   format: ['esm'],
-  dts: true,
+  dts: { sourcemap: true },
   clean: true,
   target: 'es2022',
   platform: 'browser',

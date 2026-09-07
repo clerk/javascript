@@ -16,7 +16,7 @@ export default defineConfig(overrideOptions => {
     format: 'esm',
     fixedExtension: false,
     outDir: './dist',
-    dts: true,
+    dts: { sourcemap: true },
     define: {
       PACKAGE_NAME: `"${pkgJson.name}"`,
       PACKAGE_VERSION: `"${pkgJson.version}"`,

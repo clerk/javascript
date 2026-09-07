@@ -82,7 +82,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
     "build": "tsdown",
