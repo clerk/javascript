@@ -120,6 +120,36 @@ describe('SignIn', () => {
       vi.clearAllMocks();
     });
 
+    it('forwards PKCE fields on email_link prepareFirstFactor', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.prepareFirstFactor({
+        strategy: 'email_link',
+        emailAddressId: 'email_123',
+        redirectUrl: 'myapp://callback',
+        codeChallenge: 'challenge',
+        codeChallengeMethod: 'S256',
+      });
+
+      expect(mockFetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/client/sign_ins/signin_123/prepare_first_factor',
+        signal: expect.any(AbortSignal),
+        body: {
+          emailAddressId: 'email_123',
+          redirectUrl: 'myapp://callback',
+          codeChallenge: 'challenge',
+          codeChallengeMethod: 'S256',
+          strategy: 'email_link',
+        },
+      });
+    });
+
     it('coalesces concurrent first-factor preparations', async () => {
       const deferred = createDeferredPromise<any>();
       const mockFetch = vi.fn().mockReturnValue(deferred.promise);

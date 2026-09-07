@@ -202,6 +202,14 @@ export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
    * The URL to redirect to after the email link is clicked.
    */
   redirectUrl: string;
+  /**
+   * PKCE code challenge for native magic-link completion.
+   */
+  codeChallenge?: string;
+  /**
+   * PKCE code challenge method. FAPI expects `S256`.
+   */
+  codeChallengeMethod?: string;
 };
 /** @generateWithEmptyComment */
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;

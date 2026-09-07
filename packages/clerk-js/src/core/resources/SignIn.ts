@@ -236,6 +236,8 @@ export class SignIn extends BaseResource implements SignInResource {
         config = {
           emailAddressId: params.emailAddressId,
           redirectUrl: params.redirectUrl,
+          codeChallenge: params.codeChallenge,
+          codeChallengeMethod: params.codeChallengeMethod,
         } as EmailLinkConfig;
         break;
       case 'email_code':
