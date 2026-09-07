@@ -90,6 +90,15 @@ function getNavigator(): Navigator | null {
   ) {
     return workerScope.self.navigator;
   }
+  const hostNavigator = (globalThis as { navigator?: Navigator }).navigator;
+  if (
+    hostNavigator &&
+    typeof hostNavigator.userAgent === 'string' &&
+    hostNavigator.userAgent.startsWith('ClerkKit/') &&
+    !serverRuntimeUserAgentRegex.test(hostNavigator.userAgent)
+  ) {
+    return hostNavigator;
+  }
   return null;
 }
 

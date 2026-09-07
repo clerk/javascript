@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { inBrowser, isValidBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser';
+import { inBrowser, isBrowserOnline, isValidBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser';
 
 /**
  * Simulates a Web/Service Worker global scope (e.g. an MV3 background service worker):
@@ -309,6 +309,27 @@ describe('isValidBrowserOnline', () => {
     // @ts-ignore - Test
     windowSpy.mockReturnValue(undefined);
 
+    expect(isValidBrowserOnline()).toBe(false);
+  });
+
+  it('returns TRUE for a ClerkKit JSCore host navigator when window is absent', () => {
+    const windowSpy = vi.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+    vi.stubGlobal('navigator', { onLine: true, userAgent: 'ClerkKit/js-core', webdriver: false });
+
+    expect(isBrowserOnline()).toBe(true);
+    expect(isValidBrowser()).toBe(true);
+    expect(isValidBrowserOnline()).toBe(true);
+  });
+
+  it('returns FALSE for a ClerkKit JSCore host navigator that reports offline', () => {
+    const windowSpy = vi.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+    vi.stubGlobal('navigator', { onLine: false, userAgent: 'ClerkKit/js-core', webdriver: false });
+
+    expect(isBrowserOnline()).toBe(false);
     expect(isValidBrowserOnline()).toBe(false);
   });
 
