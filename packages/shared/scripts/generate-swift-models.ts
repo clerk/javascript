@@ -2009,27 +2009,7 @@ function collectMethodFacades(
   return { facades, paramDecls };
 }
 
-function emitOwnerReturn(ref: SwiftRef, owner: string): string {
-  if (ref.kind === 'named' && ref.name === owner) {
-    return 'Self';
-  }
-  if (ref.kind === 'optional' && ref.of.kind === 'named' && ref.of.name === owner) {
-    return 'Self?';
-  }
-  return emitRef(ref);
-}
-
-function emitMethodSignature(method: SwiftMethod, owner: string): string {
-  const params = method.params.map((param, index) => {
-    const typeName = emitRef(param.optional ? optionalize(param.type) : param.type);
-    const label = index === 0 ? '_ ' : '';
-    return `${label}${param.name}: ${typeName}`;
-  });
-  const returns = method.returnType ? ` -> ${emitOwnerReturn(method.returnType, owner)}` : '';
-  return `  func ${swiftIdent(method.jsName)}(${params.join(', ')}) async throws${returns}`;
-}
-
-function emitFacadeFile(facade: SwiftMethodFacade): string {
+function emitMethodNamesFile(facade: SwiftMethodFacade): string {
   const enumCases = facade.methods.map(
     method => `  case ${swiftIdent(method.jsName)} = "${escapeSwiftString(method.jsName)}"`,
   );
@@ -2037,13 +2017,8 @@ function emitFacadeFile(facade: SwiftMethodFacade): string {
     GENERATED_HEADER,
     'import Foundation',
     '',
-    `/// Headless JS methods on \`${facade.owner}\`. Wire each raw value to ClerkJSRuntime.call.`,
     `public enum ${facade.owner}JSMethod: String, Sendable {`,
     ...enumCases,
-    '}',
-    '',
-    `public protocol ${facade.owner}Methods: Sendable {`,
-    ...facade.methods.map(method => emitMethodSignature(method, facade.owner)),
     '}',
     '',
   ];
@@ -2118,8 +2093,8 @@ function emitJSCallFile(facade: SwiftMethodFacade): string {
 function emitMethodFiles(facades: SwiftMethodFacade[], paramDecls: SwiftDecl[]): GeneratedSwiftFile[] {
   return [
     ...facades.map(facade => ({
-      filename: `methods/${facade.owner}Methods.swift`,
-      contents: emitFacadeFile(facade),
+      filename: `methods/${facade.owner}JSMethod.swift`,
+      contents: emitMethodNamesFile(facade),
     })),
     ...facades.map(facade => ({
       filename: `methods/${facade.owner}JSCall.swift`,
