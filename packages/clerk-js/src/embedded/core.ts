@@ -16,6 +16,7 @@ import {
 } from '../core/resources/internal';
 import { SessionTokenCache } from '../core/tokenCache';
 import { createNativeAuthOperations } from './nativeAuth';
+import { createNativeResourceOperations } from './nativeResources';
 
 export const EMBEDDED_PROTOCOL_VERSION = 1;
 
@@ -129,7 +130,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
   let disposed = false;
   let identity: string | null | undefined;
   let persistence: Promise<void> = Promise.resolve();
-  const nativeAuth = createNativeAuthOperations(clerk);
+  const nativeAuth = { ...createNativeAuthOperations(clerk), ...createNativeResourceOperations(clerk) };
   let loadPromise: Promise<void> | undefined;
   const subscriptions: Array<() => void> = [];
 

@@ -180,6 +180,16 @@ describe('buildUrl(options)', () => {
 });
 
 describe('request', () => {
+  it('keeps an explicitly selected session when a different session is active', async () => {
+    await fapiClient.request({
+      path: '/me/biometric_credentials/prepare',
+      method: 'POST',
+      sessionId: 'sess_enrollment',
+    });
+    const url = (fetch as Mock).mock.calls[0][0];
+    expect(new URL(url.toString()).searchParams.get('_clerk_session_id')).toBe('sess_enrollment');
+  });
+
   it('invokes global.fetch', async () => {
     await fapiClient.request({
       path: '/foo',

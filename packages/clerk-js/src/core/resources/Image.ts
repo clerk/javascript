@@ -48,6 +48,10 @@ export class Image extends BaseResource implements ImageResource {
     this.fromJSON(data);
   }
 
+  __internal_toSnapshot() {
+    return { object: 'image', id: this.id, name: this.name, public_url: this.publicUrl };
+  }
+
   protected fromJSON(data: ImageJSON | null): this {
     if (!data) {
       return this;

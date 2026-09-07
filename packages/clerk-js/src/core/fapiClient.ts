@@ -250,7 +250,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     requestInit.url = buildUrl({
       ...requestInit,
       // TODO: Pass these values to the FAPI client instead of calculating them on the spot
-      sessionId: options.getSessionId(),
+      sessionId: requestInit.sessionId ?? options.getSessionId(),
     });
 
     // Normalize requestInit.headers
