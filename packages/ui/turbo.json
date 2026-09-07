@@ -11,6 +11,7 @@
         "*.d.ts",
         "src/**",
         "tsconfig.json",
+        "tsconfig.src.json",
         "tsconfig.mosaic.json",
         "rspack.config.js",
         "tsdown.mosaic.config.mts",

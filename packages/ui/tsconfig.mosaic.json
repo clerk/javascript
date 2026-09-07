@@ -1,6 +1,7 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.src.json",
   "compilerOptions": {
+    "composite": false,
     "jsxImportSource": "react",
     "paths": {
       // Resolve the private, unpublished `@clerk/headless` to its SOURCE for the Mosaic

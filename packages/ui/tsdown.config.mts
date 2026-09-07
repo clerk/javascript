@@ -6,6 +6,7 @@ import uiPackage from './package.json' with { type: 'json' };
 
 export default defineConfig(({ watch }) => {
   const common = {
+    tsconfig: './tsconfig.src.json',
     dts: true,
     sourcemap: true,
     clean: false,
