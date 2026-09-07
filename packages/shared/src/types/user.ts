@@ -401,6 +401,11 @@ export type CreateExternalAccountParams = {
    * The value to pass to the [OIDC `login_hint` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=login_hint,in%20\(if%20necessary\).) in the generated OAuth redirect URL.
    */
   oidcLoginHint?: string;
+  /**
+   * An ID token from a supported provider. Used when connecting an external account
+   * with an ID-token strategy such as Sign in with Apple.
+   */
+  token?: string;
 };
 /** @generateWithEmptyComment */
 export type VerifyTOTPParams = {

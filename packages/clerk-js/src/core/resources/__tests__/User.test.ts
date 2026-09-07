@@ -42,6 +42,7 @@ describe('User', () => {
         additional_scope: ['view'],
         oidc_prompt: 'consent',
         oidc_login_hint: 'test@test.com',
+        token: undefined,
       },
     });
   });
@@ -79,6 +80,46 @@ describe('User', () => {
         redirect_url: 'https://www.example.com',
         additional_scope: undefined,
         enterprise_connection_id: 'ec_123',
+        oidc_prompt: undefined,
+        oidc_login_hint: undefined,
+        token: undefined,
+      },
+    });
+  });
+
+  it('creates an external account with an ID token', async () => {
+    const externalAccountJSON = {
+      object: 'external_account',
+      provider: 'apple',
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: externalAccountJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.createExternalAccount({
+      strategy: 'oauth_token_apple',
+      token: 'id-token',
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/external_accounts',
+      body: {
+        strategy: 'oauth_token_apple',
+        redirect_url: undefined,
+        additional_scope: undefined,
+        enterprise_connection_id: undefined,
+        oidc_prompt: undefined,
+        oidc_login_hint: undefined,
+        token: 'id-token',
       },
     });
   });
