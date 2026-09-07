@@ -48,6 +48,18 @@ describe('generateSwiftModels', () => {
       'SignUpResource',
       'UserResource',
       'SessionResource',
+      'EmailAddressResource',
+      'PhoneNumberResource',
+      'PasskeyResource',
+      'ExternalAccountResource',
+      'OrganizationResource',
+      'OrganizationDomainResource',
+      'OrganizationInvitationResource',
+      'OrganizationMembershipResource',
+      'OrganizationMembershipRequestResource',
+      'OrganizationSuggestionResource',
+      'UserOrganizationInvitationResource',
+      'BillingNamespace',
     ]);
 
     const clerk = byName.get('methods/ClerkMethods.swift');
@@ -75,8 +87,14 @@ describe('generateSwiftModels', () => {
       'case identifier',
     );
 
+    const emailAddress = byName.get('methods/EmailAddressMethods.swift');
+    expect(emailAddress, 'EmailAddressResource emits EmailAddressMethods').toBeDefined();
+    expect(emailAddress, 'EmailAddress.prepareVerification matches the JS name').toContain('func prepareVerification(');
+    expect(emailAddress, 'EmailAddress.attemptVerification matches the JS name').toContain('func attemptVerification(');
+    expect(emailAddress, 'EmailAddress.destroy matches the JS name').toContain('func destroy(');
+
     const methodCounts = Object.fromEntries(
-      ['Clerk', 'SignIn', 'SignUp', 'User', 'Session'].map(owner => {
+      ['Clerk', 'SignIn', 'SignUp', 'User', 'Session', 'EmailAddress'].map(owner => {
         const contents = byName.get(`methods/${owner}Methods.swift`) ?? '';
         return [owner, [...contents.matchAll(/^  func /gm)].length];
       }),
@@ -87,6 +105,7 @@ describe('generateSwiftModels', () => {
       SignUp: 11,
       User: 25,
       Session: 11,
+      EmailAddress: 5,
     });
   });
 

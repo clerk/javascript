@@ -7,6 +7,8 @@ public struct PrepareSecondFactorParams: Codable, Equatable, Sendable {
   public var emailAddressId: String?
   public var primary: Bool?
   public var redirectUrl: String?
+  public var codeChallenge: String?
+  public var codeChallengeMethod: String?
   public var phoneNumberId: String?
 
   public init(
@@ -14,12 +16,16 @@ public struct PrepareSecondFactorParams: Codable, Equatable, Sendable {
     emailAddressId: String?,
     primary: Bool?,
     redirectUrl: String?,
+    codeChallenge: String?,
+    codeChallengeMethod: String?,
     phoneNumberId: String?
   ) {
     self.strategy = strategy
     self.emailAddressId = emailAddressId
     self.primary = primary
     self.redirectUrl = redirectUrl
+    self.codeChallenge = codeChallenge
+    self.codeChallengeMethod = codeChallengeMethod
     self.phoneNumberId = phoneNumberId
   }
 
@@ -28,6 +34,8 @@ public struct PrepareSecondFactorParams: Codable, Equatable, Sendable {
     case emailAddressId
     case primary
     case redirectUrl
+    case codeChallenge
+    case codeChallengeMethod
     case phoneNumberId
   }
 
@@ -37,6 +45,8 @@ public struct PrepareSecondFactorParams: Codable, Equatable, Sendable {
     self.emailAddressId = try container.decodeIfPresentFlexible(String.self, snake: "emailAddressId", camel: "emailAddressId")
     self.primary = try container.decodeIfPresentFlexible(Bool.self, snake: "primary", camel: "primary")
     self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.codeChallenge = try container.decodeIfPresentFlexible(String.self, snake: "codeChallenge", camel: "codeChallenge")
+    self.codeChallengeMethod = try container.decodeIfPresentFlexible(String.self, snake: "codeChallengeMethod", camel: "codeChallengeMethod")
     self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumberId", camel: "phoneNumberId")
   }
 }

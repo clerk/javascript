@@ -9,6 +9,8 @@ public struct PrepareFirstFactorParams: Codable, Equatable, Sendable {
   public var walletName: String?
   public var emailAddressId: String?
   public var redirectUrl: String?
+  public var codeChallenge: String?
+  public var codeChallengeMethod: String?
   public var phoneNumberId: String?
   public var `default`: Bool?
   public var channel: PrepareFirstFactorParamsChannel?
@@ -25,6 +27,8 @@ public struct PrepareFirstFactorParams: Codable, Equatable, Sendable {
     walletName: String?,
     emailAddressId: String?,
     redirectUrl: String?,
+    codeChallenge: String?,
+    codeChallengeMethod: String?,
     phoneNumberId: String?,
     `default`: Bool?,
     channel: PrepareFirstFactorParamsChannel?,
@@ -40,6 +44,8 @@ public struct PrepareFirstFactorParams: Codable, Equatable, Sendable {
     self.walletName = walletName
     self.emailAddressId = emailAddressId
     self.redirectUrl = redirectUrl
+    self.codeChallenge = codeChallenge
+    self.codeChallengeMethod = codeChallengeMethod
     self.phoneNumberId = phoneNumberId
     self.`default` = `default`
     self.channel = channel
@@ -57,6 +63,8 @@ public struct PrepareFirstFactorParams: Codable, Equatable, Sendable {
     case walletName
     case emailAddressId
     case redirectUrl
+    case codeChallenge
+    case codeChallengeMethod
     case phoneNumberId
     case `default`
     case channel
@@ -75,6 +83,8 @@ public struct PrepareFirstFactorParams: Codable, Equatable, Sendable {
     self.walletName = try container.decodeIfPresentFlexible(String.self, snake: "walletName", camel: "walletName")
     self.emailAddressId = try container.decodeIfPresentFlexible(String.self, snake: "emailAddressId", camel: "emailAddressId")
     self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+    self.codeChallenge = try container.decodeIfPresentFlexible(String.self, snake: "codeChallenge", camel: "codeChallenge")
+    self.codeChallengeMethod = try container.decodeIfPresentFlexible(String.self, snake: "codeChallengeMethod", camel: "codeChallengeMethod")
     self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumberId", camel: "phoneNumberId")
     self.`default` = try container.decodeIfPresentFlexible(Bool.self, snake: "default", camel: "default")
     self.channel = try container.decodeIfPresentFlexible(PrepareFirstFactorParamsChannel.self, snake: "channel", camel: "channel")

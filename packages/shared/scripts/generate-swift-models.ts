@@ -19,6 +19,18 @@ export const SWIFT_METHOD_ROOTS = [
   'SignUpResource',
   'UserResource',
   'SessionResource',
+  'EmailAddressResource',
+  'PhoneNumberResource',
+  'PasskeyResource',
+  'ExternalAccountResource',
+  'OrganizationResource',
+  'OrganizationDomainResource',
+  'OrganizationInvitationResource',
+  'OrganizationMembershipResource',
+  'OrganizationMembershipRequestResource',
+  'OrganizationSuggestionResource',
+  'UserOrganizationInvitationResource',
+  'BillingNamespace',
 ] as const;
 
 const SKIP_NAME =
@@ -229,6 +241,9 @@ function shouldSkipMethodName(name: string): boolean {
 function methodOwnerName(tsName: string): string {
   if (tsName === 'HeadlessBrowserClerk' || tsName === 'Clerk') {
     return 'Clerk';
+  }
+  if (tsName === 'BillingNamespace') {
+    return 'Billing';
   }
   return tsName.replace(/Resource$/, '');
 }
