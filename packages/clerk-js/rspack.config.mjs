@@ -408,6 +408,10 @@ const prodConfig = ({ mode, env, analysis }) => {
     return [clerkBrowser];
   }
 
+  if (env.variant === variants.clerkNative) {
+    return [clerkNative];
+  }
+
   return [clerkBrowser, clerkLegacyBrowser, clerkNative, clerkEsm, clerkEsmNoRHC, clerkCjs, clerkCjsNoRHC];
 };
 
