@@ -116,6 +116,29 @@ describe('generateSwiftModels', () => {
     });
   });
 
+  it('emits one honest ClerkPaginatedResponse whose data is [JSONValue]', () => {
+    const page = byName.get('methods/ClerkPaginatedResponse.swift');
+    expect(page, 'paginated returns share one generated struct').toBeDefined();
+    expect(page, 'heterogeneous pages must not claim OrganizationMembership').toContain('public var data: [JSONValue]');
+    expect(page, 'paginated data is never a first-wins model').not.toContain('OrganizationMembership');
+    const user = byName.get('methods/UserMethods.swift');
+    expect(user, 'invitations use the same honest page type').toContain(
+      'func getOrganizationInvitations(_ params: GetUserOrganizationInvitationsParams?) async throws -> ClerkPaginatedResponse',
+    );
+    expect(user, 'payment methods use the same honest page type').toContain(
+      'func getPaymentMethods(_ params: GetPaymentMethodsParams?) async throws -> ClerkPaginatedResponse',
+    );
+  });
+
+  it('does not collapse Passkey.update onto SignUpCreateParams', () => {
+    const passkey = byName.get('methods/PasskeyMethods.swift');
+    expect(passkey, 'PasskeyResource emits PasskeyMethods').toBeDefined();
+    expect(passkey, 'Partial<Passkey> must not intern as the first Partial').not.toContain('SignUpCreateParams');
+    expect(passkey, 'Passkey.update keeps a passkey-shaped params type').toMatch(
+      /func update\(_ params: \w+\) async throws -> Self/,
+    );
+  });
+
   it('skips mount, open, redirect, appearance, ClerkUI, Web3, and DOM methods', () => {
     const methodFiles = files.filter(file => file.filename.startsWith('methods/')).map(file => file.contents);
     const all = methodFiles.join('\n');

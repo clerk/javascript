@@ -3,11 +3,11 @@
 import Foundation
 
 public struct ClerkPaginatedResponse: Codable, Equatable, Sendable {
-  public var data: [OrganizationMembership]
+  public var data: [JSONValue]
   public var totalCount: Int
 
   public init(
-    data: [OrganizationMembership],
+    data: [JSONValue],
     totalCount: Int
   ) {
     self.data = data
@@ -21,7 +21,7 @@ public struct ClerkPaginatedResponse: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.data = try container.decodeFlexible([OrganizationMembership].self, snake: "data", camel: "data")
+    self.data = try container.decodeFlexible([JSONValue].self, snake: "data", camel: "data")
     self.totalCount = try container.decodeFlexible(Int.self, snake: "total_count", camel: "totalCount")
   }
 }

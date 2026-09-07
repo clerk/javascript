@@ -466,12 +466,30 @@ export function createSharedProgram(): ts.Program {
   return ts.createProgram({ rootNames: parsed.fileNames, options: parsed.options });
 }
 
+function typeArgumentsOf(checker: ts.TypeChecker, type: ts.Type): readonly ts.Type[] {
+  if (type.aliasTypeArguments?.length) {
+    return type.aliasTypeArguments;
+  }
+  if (type.flags & ts.TypeFlags.Object) {
+    const objectType = type as ts.ObjectType;
+    if (objectType.objectFlags & ts.ObjectFlags.Reference) {
+      return checker.getTypeArguments(type as ts.TypeReference);
+    }
+  }
+  return [];
+}
+
 function typeId(checker: ts.TypeChecker, type: ts.Type): string {
   const name = declaredName(type);
+  if (name === 'ClerkPaginatedResponse') {
+    return 'named:ClerkPaginatedResponse';
+  }
   if (name) {
     const declaration = type.aliasSymbol?.declarations?.[0] ?? type.getSymbol()?.declarations?.[0];
     const file = declaration?.getSourceFile().fileName ?? '';
-    return `named:${file}:${name}`;
+    const args = typeArgumentsOf(checker, type);
+    const argKey = args.length ? `<${args.map(arg => typeId(checker, arg)).join(',')}>` : '';
+    return `named:${file}:${name}${argKey}`;
   }
   const { parts } = decomposeUnion(type);
   const unique = uniqueTypes(parts, checker);
@@ -773,6 +791,28 @@ function enqueueObjectUnion(ctx: Ctx, hint: string, parts: ts.Type[]): string {
 }
 
 function structFromType(ctx: Ctx, name: string, type: ts.Type): SwiftStruct {
+  if (name === 'ClerkPaginatedResponse') {
+    return {
+      kind: 'struct',
+      name,
+      properties: [
+        {
+          name: 'data',
+          wireName: 'data',
+          type: { kind: 'array', of: { kind: 'primitive', name: 'JSONValue' } },
+          isDate: false,
+        },
+        {
+          name: 'totalCount',
+          wireName: 'total_count',
+          type: { kind: 'primitive', name: 'Int' },
+          isDate: false,
+        },
+      ],
+      identifiable: false,
+    };
+  }
+
   const properties: SwiftProperty[] = [];
   for (const prop of typeProperties(ctx.checker, type)) {
     const wireName = prop.symbol.getName();
