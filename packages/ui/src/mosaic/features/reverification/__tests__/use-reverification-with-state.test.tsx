@@ -136,4 +136,35 @@ describe('useReverificationWithState', () => {
     await waitFor(() => expect(cancel).toHaveBeenCalledOnce());
     expect(result.current[1].isActive).toBe(false);
   });
+
+  it('cancels when the owner unmounts mid-flow', () => {
+    const { unmount } = renderHook(() => useReverificationWithState(fetcher));
+    const cancel = vi.fn();
+
+    act(() => {
+      capturedOnNeeds?.({ complete: vi.fn(), cancel, level: 'first_factor' });
+    });
+
+    unmount();
+    expect(cancel).toHaveBeenCalledOnce();
+  });
+
+  it('does not cancel again on unmount after the flow already settled', () => {
+    const { result, unmount } = renderHook(() => useReverificationWithState(fetcher));
+    const cancel = vi.fn();
+
+    act(() => {
+      capturedOnNeeds?.({ complete: vi.fn(), cancel, level: 'first_factor' });
+    });
+    act(() => {
+      const [, state] = result.current;
+      if (state.isActive) {
+        state.cancel();
+      }
+    });
+    expect(cancel).toHaveBeenCalledOnce();
+
+    unmount();
+    expect(cancel).toHaveBeenCalledOnce();
+  });
 });
