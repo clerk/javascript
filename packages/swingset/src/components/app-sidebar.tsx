@@ -265,7 +265,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   className='h-auto py-1 text-xs'
-                  isActive={pathname === '/live/reverification'}
+                  isActive={pathname.startsWith('/live/reverification')}
                   render={<Link href='/live/reverification' />}
                 >
                   Reverification
