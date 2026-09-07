@@ -3,27 +3,13 @@ import type { ClientJSON } from '@clerk/shared/types';
 
 import type { Clerk } from '../core/clerk';
 import { BaseResource, getClientResourceFromPayload } from '../core/resources/internal';
+import { codeChallenge, randomString } from './nativeCrypto';
+import type { NativeIdentityContext } from './nativeIdentity';
 
 type HostedAuthOptions = { redirectUrl: string; mode?: 'sign-in' | 'sign-up' };
-type HostedAuthContext = {
-  ensureActive(): void;
-  identityEpoch(): number;
-  credential(): string;
-  commitState(): Promise<void>;
-  beginTokenTransaction(): string;
-  commitTokenTransaction(id: string, update: () => void): Promise<void>;
-  discardTokenTransaction(id: string): void;
-};
 
 function fail(message: string): never {
   throw new ClerkRuntimeError(message, { code: 'hosted_auth_failed' });
-}
-
-function base64url(bytes: Uint8Array) {
-  return btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(''))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
 }
 
 function parseRedirect(raw: string) {
@@ -51,7 +37,7 @@ function singleValue(url: URL, name: string) {
   return values[0];
 }
 
-export function createHostedAuthOperations(clerk: Clerk, context: HostedAuthContext) {
+export function createHostedAuthOperations(clerk: Clerk, context: NativeIdentityContext) {
   let pending:
     | {
         id: string;
@@ -77,19 +63,16 @@ export function createHostedAuthOperations(clerk: Clerk, context: HostedAuthCont
         fail('A hosted authentication session is already in progress.');
       }
       const redirect = parseRedirect(options.redirectUrl);
-      const id = base64url(crypto.getRandomValues(new Uint8Array(16)));
-      const state = base64url(crypto.getRandomValues(new Uint8Array(16)));
-      const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+      const id = randomString(16);
+      const state = randomString(16);
+      const verifier = randomString(32);
       pending = { id, redirect, state, verifier, epoch: context.identityEpoch(), credential: context.credential() };
       try {
-        const digest = await crypto.subtle.digest(
-          'SHA-256',
-          Uint8Array.from(verifier, character => character.charCodeAt(0)),
-        );
+        const challenge = await codeChallenge(verifier);
         context.ensureActive();
         const body = {
           redirectUrl: options.redirectUrl,
-          codeChallenge: base64url(new Uint8Array(digest)),
+          codeChallenge: challenge,
           state,
           mode: options.mode,
         };

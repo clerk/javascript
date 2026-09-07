@@ -17,8 +17,10 @@ import {
 } from '../core/resources/internal';
 import { SessionTokenCache } from '../core/tokenCache';
 import { createHostedAuthOperations } from './hostedAuth';
+import { createMagicLinkOperations } from './magicLink';
 import { createNativeAuthOperations, NativeAuthOperationError } from './nativeAuth';
 import { createNativeResourceOperations } from './nativeResources';
+import type { NativeStorage } from './nativeStorage';
 
 export const EMBEDDED_PROTOCOL_VERSION = 1;
 
@@ -33,6 +35,7 @@ export interface EmbeddedState {
 }
 
 export interface EmbeddedHost {
+  storage?: NativeStorage;
   getToken(): Promise<string>;
   saveToken(token: string): Promise<void>;
   getCachedResources(): Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>;
@@ -143,44 +146,49 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
   let tokenTransactionSequence = 0;
   let publicationPause = 0;
   let persistence: Promise<void> = Promise.resolve();
-  const nativeAuth = {
-    ...createNativeAuthOperations(clerk, commitState),
-    ...createNativeResourceOperations(clerk),
-    ...createHostedAuthOperations(clerk, {
-      ensureActive,
-      identityEpoch: () => identityEpoch,
-      credential: () => clientToken,
-      commitState,
-      beginTokenTransaction() {
-        const id = String(++tokenTransactionSequence);
-        stagedTokens.set(id, {});
-        return id;
-      },
-      async commitTokenTransaction(id: string, update: () => void) {
-        const token = stagedTokens.get(id)?.token;
-        const epoch = identityEpoch;
-        stagedTokens.delete(id);
+  const identityContext = {
+    ensureActive,
+    identityEpoch: () => identityEpoch,
+    credential: () => clientToken,
+    commitState,
+    beginTokenTransaction() {
+      const id = String(++tokenTransactionSequence);
+      stagedTokens.set(id, {});
+      return id;
+    },
+    async commitTokenTransaction(id: string, update: () => void) {
+      const token = stagedTokens.get(id)?.token;
+      const epoch = identityEpoch;
+      stagedTokens.delete(id);
+      if (token !== undefined) {
+        await host.saveToken(token);
+      }
+      ensureActive();
+      if (epoch !== identityEpoch) {
+        failure('stale_identity', 'The identity changed while committing this response');
+      }
+      publicationPause += 1;
+      try {
         if (token !== undefined) {
-          await host.saveToken(token);
+          clientToken = token;
         }
-        ensureActive();
-        if (epoch !== identityEpoch) {
-          failure('stale_identity', 'The identity changed while committing this response');
-        }
-        publicationPause += 1;
-        try {
-          if (token !== undefined) {
-            clientToken = token;
-          }
-          update();
-        } finally {
-          publicationPause -= 1;
-        }
-      },
-      discardTokenTransaction(id: string) {
-        stagedTokens.delete(id);
-      },
-    }),
+        update();
+      } finally {
+        publicationPause -= 1;
+      }
+    },
+    discardTokenTransaction(id: string) {
+      stagedTokens.delete(id);
+    },
+  };
+  const authOperations = createNativeAuthOperations(clerk, commitState);
+  const nativeAuth = {
+    ...authOperations,
+    ...createNativeResourceOperations(clerk),
+    ...createHostedAuthOperations(clerk, identityContext),
+    ...createMagicLinkOperations(clerk, host.storage, identityContext, flow =>
+      flow === 'signIn' ? authOperations.finishNativeSignIn() : authOperations.finishNativeSignUp(),
+    ),
   };
   let loadPromise: Promise<void> | undefined;
   const subscriptions: Array<() => void> = [];

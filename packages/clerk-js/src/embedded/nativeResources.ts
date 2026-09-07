@@ -57,8 +57,6 @@ export function createNativeResourceOperations(clerk: Clerk) {
       }),
     revokeNativeBiometricCredential: (id: string, sessionId?: string) =>
       fetchResponse({ path: `/me/biometric_credentials/${encodeURIComponent(id)}`, method: 'DELETE', sessionId }),
-    completeNativeMagicLink: (params: Record<string, unknown>) =>
-      fetchResponse({ path: '/client/magic_links/complete', method: 'POST', body: params as any }),
     attemptNativePasskeyVerification: (id: string, publicKeyCredential: string) =>
       fetchResponse({
         path: `/me/passkeys/${encodeURIComponent(id)}/attempt_verification`,
