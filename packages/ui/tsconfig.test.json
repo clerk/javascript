@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // composite so tsserver can load this via tsconfig.json references (tsc --noEmit requires it).
+    "composite": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "node_modules/.cache/tsconfig-test",
+    "tsBuildInfoFile": "node_modules/.cache/tsconfig-test.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
+    "src/**/__tests__/**/*.ts",
+    "src/**/__tests__/**/*.tsx",
+    "src/test/**/*.ts",
+    "src/test/**/*.tsx"
+  ],
+  "exclude": ["node_modules", "dist"]
+}
