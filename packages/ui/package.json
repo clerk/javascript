@@ -76,7 +76,10 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map",
     "dist-mosaic",
+    "!dist-mosaic/**/*.d.ts.map",
     "styles.css.d.ts",
     "register"
   ],

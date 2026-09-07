@@ -16,6 +16,7 @@ export default defineConfig(({ watch }) => {
         emitDeclarationOnly: false,
         incremental: false,
         outDir: 'dist',
+        sourcemap: true,
       },
     },
     sourcemap: true,
