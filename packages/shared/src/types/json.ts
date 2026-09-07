@@ -370,6 +370,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
   expire_at: number;
   channel?: PhoneCodeChannel;
   error: ClerkAPIErrorJSON;
+  trusted_device_challenge?: Record<string, unknown> | string;
 }
 
 export interface SignUpVerificationsJSON {

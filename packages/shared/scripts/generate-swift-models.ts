@@ -1607,7 +1607,12 @@ function applyExtraProperties(name: string, properties: SwiftProperty[]): SwiftP
   for (const extra of EXTRA_PROPERTIES[name] ?? []) {
     const existing = properties.findIndex(property => property.wireName === extra.wireName);
     if (existing >= 0) {
-      properties[existing] = extra;
+      if (name === 'Verification' && extra.wireName === 'trusted_device_challenge') {
+        properties.splice(existing, 1);
+        properties.push(extra);
+      } else {
+        properties[existing] = extra;
+      }
       continue;
     }
     const createdAt = properties.findIndex(property => property.wireName === 'created_at');

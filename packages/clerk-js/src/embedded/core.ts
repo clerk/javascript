@@ -15,6 +15,7 @@ import {
   UserOrganizationInvitation,
 } from '../core/resources/internal';
 import { SessionTokenCache } from '../core/tokenCache';
+import { createNativeAuthOperations } from './nativeAuth';
 
 export const EMBEDDED_PROTOCOL_VERSION = 1;
 
@@ -128,6 +129,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
   let disposed = false;
   let identity: string | null | undefined;
   let persistence: Promise<void> = Promise.resolve();
+  const nativeAuth = createNativeAuthOperations(clerk);
   let loadPromise: Promise<void> | undefined;
   const subscriptions: Array<() => void> = [];
 
@@ -320,7 +322,9 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
       ensureActive();
       const { receiver, method, arguments: args = [] } = invocation;
       let value: unknown;
-      if (receiver.kind === 'clerk' && method === 'refreshClient') {
+      if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(nativeAuth, method)) {
+        value = await (nativeAuth[method as keyof typeof nativeAuth] as (...args: any[]) => unknown)(...args);
+      } else if (receiver.kind === 'clerk' && method === 'refreshClient') {
         const client = await clerk.client?.reload();
         if (client) {
           clerk.updateClient(client);

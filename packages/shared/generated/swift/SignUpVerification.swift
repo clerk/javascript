@@ -15,6 +15,7 @@ public struct SignUpVerification: Codable, Equatable, Sendable, Identifiable {
   public var attempts: Int
   public var expireAt: Date
   public var error: ClerkAPIError
+  public var trustedDeviceChallenge: JSONValue?
   public var id: String
   public var object: String
 
@@ -31,6 +32,7 @@ public struct SignUpVerification: Codable, Equatable, Sendable, Identifiable {
     attempts: Int,
     expireAt: Date,
     error: ClerkAPIError,
+    trustedDeviceChallenge: JSONValue? = nil,
     id: String,
     object: String
   ) {
@@ -46,6 +48,7 @@ public struct SignUpVerification: Codable, Equatable, Sendable, Identifiable {
     self.attempts = attempts
     self.expireAt = expireAt
     self.error = error
+    self.trustedDeviceChallenge = trustedDeviceChallenge
     self.id = id
     self.object = object
   }
@@ -63,6 +66,7 @@ public struct SignUpVerification: Codable, Equatable, Sendable, Identifiable {
     case attempts
     case expireAt = "expire_at"
     case error
+    case trustedDeviceChallenge = "trusted_device_challenge"
     case id
     case object
   }
@@ -81,6 +85,7 @@ public struct SignUpVerification: Codable, Equatable, Sendable, Identifiable {
     self.attempts = try container.decodeFlexibleDefault(Int.self, snake: "attempts", camel: "attempts", default: 0)
     self.expireAt = try container.decodeIfPresentMillisecondsDate(snake: "expire_at", camel: "expireAt") ?? Date(timeIntervalSince1970: 0)
     self.error = try container.decodeFlexibleDefault(ClerkAPIError.self, snake: "error", camel: "error", default: ClerkAPIError(code: "", message: ""))
+    self.trustedDeviceChallenge = try container.decodeIfPresentFlexible(JSONValue.self, snake: "trusted_device_challenge", camel: "trustedDeviceChallenge")
     self.id = try container.decodeFlexibleDefault(String.self, snake: "id", camel: "id", default: "")
     self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "verification")
   }
@@ -99,6 +104,7 @@ public struct SignUpVerification: Codable, Equatable, Sendable, Identifiable {
     try container.encode(attempts, forKey: .attempts)
     try container.encodeMillisecondsDate(expireAt, forKey: .expireAt)
     try container.encode(error, forKey: .error)
+    try container.encodeIfPresent(trustedDeviceChallenge, forKey: .trustedDeviceChallenge)
     try container.encode(id, forKey: .id)
     try container.encode(object, forKey: .object)
   }
