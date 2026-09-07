@@ -5,12 +5,17 @@ import { ReverificationView } from './reverification.view';
 
 export function Reverification(props: ReverificationProps) {
   const model = useReverificationModel(props);
-  const ui = useReverificationController(model);
+  const controller = useReverificationController(model);
 
-  if (!props.isActive || ui.status !== 'ready') {
+  if (!props.isActive) {
     return null;
   }
 
-  const { status: _status, ...viewProps } = ui;
+  if (controller.status !== 'ready') {
+    // TODO: Implement unavailable and loading states, could also live in the .view.
+    return null;
+  }
+
+  const { status: _status, ...viewProps } = controller;
   return <ReverificationView {...viewProps} />;
 }
