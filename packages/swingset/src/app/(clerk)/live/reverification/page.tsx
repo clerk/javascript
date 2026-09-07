@@ -1,10 +1,11 @@
 'use client';
 
-import { SignIn, SignOutButton, useUser } from '@clerk/nextjs';
+import { SignOutButton, useUser } from '@clerk/nextjs';
 import { isReverificationCancelledError } from '@clerk/shared/error';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Reverification, useReverificationWithState } from '@clerk/ui/mosaic/features/reverification';
 import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
+import Link from 'next/link';
 import { useState } from 'react';
 
 async function mockDelete() {
@@ -89,7 +90,17 @@ export default function ReverificationLivePage() {
           </p>
         </div>
         {!isLoaded ? <p className='text-muted-foreground text-sm'>Loading…</p> : null}
-        {isLoaded && !isSignedIn ? <SignIn /> : null}
+        {isLoaded && !isSignedIn ? (
+          <p className='text-muted-foreground text-sm'>
+            <Link
+              href='/sign-in'
+              className='text-foreground underline underline-offset-4'
+            >
+              Sign in
+            </Link>{' '}
+            to use the live harness.
+          </p>
+        ) : null}
         {isLoaded && isSignedIn ? <DeleteAccountHarness /> : null}
       </div>
     </MosaicProvider>
