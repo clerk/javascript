@@ -7,7 +7,7 @@ export default defineConfig({
   entry: ['./src/index.ts'],
   outDir: './dist',
   format: ['esm'],
-  dts: true,
+  dts: { sourcemap: true },
   clean: true,
   target: 'es2022',
   platform: 'browser',
