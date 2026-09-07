@@ -10,7 +10,7 @@
       "@clerk/headless/utils": ["../headless/src/utils/index.ts"],
       "@clerk/headless/*": ["../headless/src/*"],
       // Preserve the base config's test-only aliases (extends replaces `paths` wholesale).
-      "@/core/*": ["../clerk-js/src/core/*"],
+      "@/core/*": ["./src/test/core-shims/*"],
       "@/*": ["./src/*"],
       "@/ui*": ["./src/*"]
     }
