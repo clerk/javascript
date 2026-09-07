@@ -1,12 +1,14 @@
 import createMDX from '@next/mdx';
 import stylexPlugin from '@stylexjs/unplugin/webpack';
-import { resolve } from 'path';
+import { createRequire } from 'module';
+import { dirname, resolve } from 'path';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import { fileURLToPath } from 'url';
 
 import { mosaicLightningCssTargets } from '../ui/stylex-lightningcss.config.mjs';
 
+const require = createRequire(import.meta.url);
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const withMDX = createMDX({
@@ -98,6 +100,9 @@ const nextConfig = {
     config.resolve.alias['@clerk/headless/hooks'] = resolve(__dirname, '../headless/src/hooks');
     config.resolve.alias['@clerk/headless/utils'] = resolve(__dirname, '../headless/src/utils');
     config.resolve.alias['@clerk/headless'] = resolve(__dirname, '../headless/src/primitives');
+    // Mosaic/headless source imports this. Webpack resolves from the aliased file's
+    // directory, which is outside swingset, so the package has to be named here.
+    config.resolve.alias['@floating-ui/react'] = dirname(require.resolve('@floating-ui/react/package.json'));
     return config;
   },
 };
