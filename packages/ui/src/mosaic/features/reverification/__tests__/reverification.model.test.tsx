@@ -323,7 +323,8 @@ describe('useReverificationModel', () => {
     session?.startVerification.mockResolvedValue(resource({ status: 'complete' }));
     const props = activeProps();
     const { result } = renderHook(() => useReverificationModel(props));
-    await ready(result.current).start();
+    const started = await ready(result.current).start();
+    expect(started).toEqual({ status: 'complete', methods: [], startingMethod: null });
     await ready(result.current).finish();
     expect(setActive).toHaveBeenCalledWith({ session: 'sess_1' });
     expect(props.complete).toHaveBeenCalledOnce();

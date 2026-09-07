@@ -101,6 +101,10 @@ function toResult(
   preferredSignInStrategy: PreferredSignInStrategy | undefined,
   webAuthnSupported: boolean,
 ): ReverificationResult {
+  if (resource.status === 'complete') {
+    return { status: 'complete', methods: [], startingMethod: null };
+  }
+
   const raw =
     resource.status === 'needs_second_factor' ? resource.supportedSecondFactors : resource.supportedFirstFactors;
   const methods = (raw ?? [])
