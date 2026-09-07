@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum JSONValue: Codable, Equatable, Sendable {
+public enum JSONValue: Codable, Equatable, Hashable, Sendable {
   case null
   case bool(Bool)
   case number(Double)

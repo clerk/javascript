@@ -19,6 +19,7 @@ export const SWIFT_METHOD_ROOTS = [
   'SignUpResource',
   'UserResource',
   'SessionResource',
+  'SessionWithActivitiesResource',
   'EmailAddressResource',
   'PhoneNumberResource',
   'PasskeyResource',
@@ -989,7 +990,7 @@ function emitHelperFile(): string {
   return `${GENERATED_HEADER}
 import Foundation
 
-public enum JSONValue: Codable, Equatable, Sendable {
+public enum JSONValue: Codable, Equatable, Hashable, Sendable {
   case null
   case bool(Bool)
   case number(Double)
@@ -1431,11 +1432,80 @@ function emitFacadeFile(facade: SwiftMethodFacade): string {
   return lines.join('\n');
 }
 
+function paramSwiftType(param: SwiftMethodParam): string {
+  return emitRef(param.optional ? optionalize(param.type) : param.type);
+}
+
+function isParamsStructRef(ref: SwiftRef): boolean {
+  const core = ref.kind === 'optional' ? ref.of : ref;
+  return core.kind === 'named';
+}
+
+function emitJSCallAssociated(method: SwiftMethod): string {
+  if (method.params.length === 0) {
+    return '';
+  }
+  const unlabeledStruct = method.params.length === 1 && isParamsStructRef(method.params[0].type);
+  const parts = method.params.map(param => {
+    const typeName = paramSwiftType(param);
+    return unlabeledStruct ? typeName : `${param.name}: ${typeName}`;
+  });
+  return `(${parts.join(', ')})`;
+}
+
+function emitJSCallArgBody(method: SwiftMethod): string {
+  const ident = swiftIdent(method.jsName);
+  if (method.params.length === 0) {
+    return `    case .${ident}:\n      return []`;
+  }
+  const bindings = method.params.map(param => `let ${param.name}`).join(', ');
+  const lines = [`    case .${ident}(${bindings}):`, '      var args: [JSONValue] = []'];
+  for (const param of method.params) {
+    if (param.optional) {
+      lines.push(`      if let ${param.name} { args.append(try JSONValue(encoding: ${param.name})) }`);
+    } else {
+      lines.push(`      args.append(try JSONValue(encoding: ${param.name}))`);
+    }
+  }
+  lines.push('      return args');
+  return lines.join('\n');
+}
+
+function emitJSCallFile(facade: SwiftMethodFacade): string {
+  const identCases = facade.methods.map(method => swiftIdent(method.jsName));
+  const lines = [
+    GENERATED_HEADER,
+    'import Foundation',
+    '',
+    `public enum ${facade.owner}JSCall: ClerkJSCallable {`,
+    ...facade.methods.map(method => `  case ${swiftIdent(method.jsName)}${emitJSCallAssociated(method)}`),
+    '',
+    '  public var jsMethod: String {',
+    '    switch self {',
+    ...identCases.map(ident => `    case .${ident}:\n      return ${facade.owner}JSMethod.${ident}.rawValue`),
+    '    }',
+    '  }',
+    '',
+    '  public func jsArguments() throws -> [JSONValue] {',
+    '    switch self {',
+    ...facade.methods.map(emitJSCallArgBody),
+    '    }',
+    '  }',
+    '}',
+    '',
+  ];
+  return lines.join('\n');
+}
+
 function emitMethodFiles(facades: SwiftMethodFacade[], paramDecls: SwiftDecl[]): GeneratedSwiftFile[] {
   return [
     ...facades.map(facade => ({
       filename: `methods/${facade.owner}Methods.swift`,
       contents: emitFacadeFile(facade),
+    })),
+    ...facades.map(facade => ({
+      filename: `methods/${facade.owner}JSCall.swift`,
+      contents: emitJSCallFile(facade),
     })),
     ...paramDecls.map(decl => ({
       filename: `methods/${decl.name}.swift`,

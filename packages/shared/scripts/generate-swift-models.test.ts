@@ -18,6 +18,9 @@ describe('generateSwiftModels', () => {
       byName.get('JSONValue.swift'),
       'models decode both snake_case FAPI keys and camelCase clerkDecoder keys',
     ).toContain('struct FAPIJSONKey');
+    expect(byName.get('JSONValue.swift'), 'invocation arguments are hashable').toContain(
+      'public enum JSONValue: Codable, Equatable, Hashable, Sendable',
+    );
   });
 
   it('emits a string union as an enum with unknown(String)', () => {
@@ -48,6 +51,7 @@ describe('generateSwiftModels', () => {
       'SignUpResource',
       'UserResource',
       'SessionResource',
+      'SessionWithActivitiesResource',
       'EmailAddressResource',
       'PhoneNumberResource',
       'PasskeyResource',
@@ -114,6 +118,30 @@ describe('generateSwiftModels', () => {
       Session: 11,
       EmailAddress: 5,
     });
+  });
+
+  it('emits JSCall enums that bind method names to params', () => {
+    const user = byName.get('methods/UserJSCall.swift');
+    expect(user, 'UserResource emits UserJSCall').toBeDefined();
+    expect(user, 'update takes the generated params struct unlabeled').toContain('case update(UpdateUserParams)');
+    expect(user, 'primitive arguments stay labelled').toContain('case leaveOrganization(organizationId: String)');
+    expect(user, 'no-arg methods have no associated value').toMatch(/case createTOTP$/m);
+    expect(user, 'optional params stay optional so nil omits the JS argument').toContain(
+      'case reload(ClerkResourceReloadParams?)',
+    );
+    expect(user, 'jsMethod uses the generated raw name').toContain('UserJSMethod.update.rawValue');
+    expect(user, 'nil optional params encode as no argument').toContain(
+      'if let p { args.append(try JSONValue(encoding: p)) }',
+    );
+
+    const session = byName.get('methods/SessionJSCall.swift');
+    expect(session, 'SessionResource emits SessionJSCall').toBeDefined();
+    expect(session, 'getToken keeps its options struct').toContain('case getToken(GetTokenOptions?)');
+
+    const listed = byName.get('methods/SessionWithActivitiesJSCall.swift');
+    expect(listed, 'SessionWithActivitiesResource is a method root').toBeDefined();
+    expect(listed, 'revoke is the listed-session method').toContain('case revoke');
+    expect(listed, 'revoke has no params').toMatch(/case revoke$/m);
   });
 
   it('emits one honest ClerkPaginatedResponse whose data is [JSONValue]', () => {
