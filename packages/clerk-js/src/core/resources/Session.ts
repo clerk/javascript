@@ -321,10 +321,21 @@ export class Session extends BaseResource implements SessionResource {
     return new SessionVerification(json);
   };
 
-  verifyWithPasskey = async (): Promise<SessionVerificationResource> => {
-    const prepareResponse = await this.prepareFirstFactorVerification({ strategy: 'passkey' });
+  verifyWithPasskey = async (nativeOptions?: {
+    level?: 'first_factor' | 'second_factor';
+    preferImmediatelyAvailableCredentials?: boolean;
+    onBeforeAttempt?: () => void;
+  }): Promise<SessionVerificationResource> => {
+    const usesSecondFactor = nativeOptions?.level === 'second_factor';
+    const prepareResponse = usesSecondFactor
+      ? await this.prepareSecondFactorVerification({
+          strategy: 'passkey',
+        } as unknown as SessionVerifyPrepareSecondFactorParams)
+      : await this.prepareFirstFactorVerification({ strategy: 'passkey' });
 
-    const { nonce = null } = prepareResponse.firstFactorVerification;
+    const { nonce = null } = usesSecondFactor
+      ? prepareResponse.secondFactorVerification
+      : prepareResponse.firstFactorVerification;
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -345,19 +356,25 @@ export class Session extends BaseResource implements SessionResource {
       clerkMissingWebAuthnPublicKeyOptions('get');
     }
 
-    const { publicKeyCredential, error } = await webAuthnGetCredential({
+    const credentialOptions = {
       publicKeyOptions,
       conditionalUI: false,
-    });
+      preferImmediatelyAvailableCredentials: nativeOptions?.preferImmediatelyAvailableCredentials,
+    };
+    const { publicKeyCredential, error } = await webAuthnGetCredential(credentialOptions);
 
     if (!publicKeyCredential) {
       throw error;
     }
 
-    return this.attemptFirstFactorVerification({
-      strategy: 'passkey',
-      publicKeyCredential,
-    });
+    nativeOptions?.onBeforeAttempt?.();
+    if (usesSecondFactor) {
+      return this.attemptSecondFactorVerification({
+        strategy: 'passkey',
+        publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+      } as unknown as SessionVerifyAttemptSecondFactorParams);
+    }
+    return this.attemptFirstFactorVerification({ strategy: 'passkey', publicKeyCredential });
   };
 
   prepareSecondFactorVerification = async (

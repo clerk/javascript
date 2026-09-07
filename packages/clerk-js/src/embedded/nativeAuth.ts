@@ -2,6 +2,7 @@ import { ClerkAPIResponseError, ClerkRuntimeError, isClerkAPIResponseError } fro
 import type { AuthenticateWithRedirectParams, SignInCreateParams, SignUpCreateParams } from '@clerk/shared/types';
 
 import type { Clerk } from '../core/clerk';
+import type { Session } from '../core/resources/Session';
 import type { NativePasskeyStage, SignIn } from '../core/resources/SignIn';
 
 export class NativeAuthOperationError extends Error {
@@ -45,6 +46,16 @@ export function createNativeAuthOperations(clerk: Clerk, commitState: () => Prom
     return value;
   }
 
+  function checkVerificationError(flow: Flow) {
+    const error =
+      flow === 'signIn'
+        ? client().signIn.firstFactorVerification.error
+        : client().signUp.verifications.externalAccount.error;
+    if (error) {
+      throw new ClerkAPIResponseError(error.message, { data: [error], status: 422 });
+    }
+  }
+
   async function completeNativeAuth(options: CompletionOptions) {
     let flow = options.flow;
     resource(flow, options.expectedId);
@@ -59,13 +70,7 @@ export function createNativeAuthOperations(clerk: Clerk, commitState: () => Prom
       await client().signIn.create({ transfer: true });
       flow = 'signIn';
     }
-    const error =
-      flow === 'signIn'
-        ? client().signIn.firstFactorVerification.error
-        : client().signUp.verifications.externalAccount.error;
-    if (error) {
-      throw new ClerkAPIResponseError(error.message, { data: [error], status: 422 });
-    }
+    checkVerificationError(flow);
     return { kind: flow, resource: await finish(flow) };
   }
 
@@ -73,6 +78,58 @@ export function createNativeAuthOperations(clerk: Clerk, commitState: () => Prom
     finishNativeSignIn: () => finish('signIn'),
     finishNativeSignUp: () => finish('signUp'),
     completeNativeAuth,
+    async verifyNativeSignInCode(options: { expectedId: string; code: string }) {
+      resource('signIn', options.expectedId);
+      const strategy = client().signIn.firstFactorVerification.strategy;
+      if (!strategy) {
+        throw Object.assign(new Error('Unable to verify code because no first factor strategy is set.'), {
+          code: 'invalid_strategy',
+        });
+      }
+      if (
+        strategy !== 'email_code' &&
+        strategy !== 'phone_code' &&
+        strategy !== 'reset_password_email_code' &&
+        strategy !== 'reset_password_phone_code'
+      ) {
+        throw Object.assign(new Error(`Unable to verify code for strategy '${strategy}'.`), {
+          code: 'invalid_strategy',
+        });
+      }
+      await client().signIn.attemptFirstFactor({ strategy, code: options.code });
+      return finish('signIn', options.expectedId);
+    },
+    async completeNativeRedirectCallback(options: CompletionOptions & { callbackUrl: string }) {
+      const value = resource(options.flow, options.expectedId);
+      const nonce = new URL(options.callbackUrl).searchParams.get('rotating_token_nonce');
+      await value.reload(nonce === null ? undefined : { rotatingTokenNonce: nonce });
+      resource(options.flow, options.expectedId);
+      if (nonce !== null) {
+        checkVerificationError(options.flow);
+        return { kind: options.flow, resource: value };
+      }
+      return completeNativeAuth(options);
+    },
+    async verifyNativeSessionPasskey(options: {
+      sessionId: string;
+      level: 'first_factor' | 'second_factor';
+      preferImmediatelyAvailableCredentials?: boolean;
+    }) {
+      const session = () => {
+        const value = client().sessions.find(candidate => candidate.id === options.sessionId);
+        if (!value || value.status !== 'active') {
+          throw new ClerkRuntimeError('The session is no longer active', { code: 'stale_session' });
+        }
+        return value as Session;
+      };
+      return session().verifyWithPasskey({
+        level: options.level,
+        preferImmediatelyAvailableCredentials: options.preferImmediatelyAvailableCredentials,
+        onBeforeAttempt: () => {
+          session();
+        },
+      });
+    },
     async authenticateNativePasskey(options: {
       expectedId?: string;
       createNew?: boolean;
