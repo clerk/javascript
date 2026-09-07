@@ -12,9 +12,9 @@ public enum OrganizationDomainJSMethod: String, Sendable {
 }
 
 public protocol OrganizationDomainMethods: Sendable {
-  func attemptAffiliationVerification(_ params: AttemptAffiliationVerificationParams) async throws -> JSONValue
+  func attemptAffiliationVerification(_ params: AttemptAffiliationVerificationParams) async throws -> Self
   func delete() async throws
-  func prepareAffiliationVerification(_ params: PrepareAffiliationVerificationParams) async throws -> JSONValue
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> JSONValue
-  func updateEnrollmentMode(_ params: UpdateEnrollmentModeParams) async throws -> JSONValue
+  func prepareAffiliationVerification(_ params: PrepareAffiliationVerificationParams) async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
+  func updateEnrollmentMode(_ params: UpdateEnrollmentModeParams) async throws -> Self
 }

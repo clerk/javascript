@@ -21,7 +21,7 @@ public struct SignInDataSecondFactor: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.required = try container.decodeFlexible(Bool.self, snake: "required", camel: "required")
-    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
+    self.required = try container.decodeFlexibleDefault(Bool.self, snake: "required", camel: "required", default: false)
+    self.enabled = try container.decodeFlexibleDefault(Bool.self, snake: "enabled", camel: "enabled", default: false)
   }
 }

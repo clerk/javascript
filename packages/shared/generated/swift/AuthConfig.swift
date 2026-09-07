@@ -7,7 +7,8 @@ public struct AuthConfig: Codable, Equatable, Sendable, Identifiable {
   public var claimedAt: Date?
   public var reverification: Bool
   public var preferredChannels: [String: PhoneCodeChannel]?
-  public var sessionMinter: Bool?
+  public var sessionMinter: Bool
+  public var nativeSettings: NativeSettings
   public var id: String
   public var object: String
 
@@ -16,7 +17,8 @@ public struct AuthConfig: Codable, Equatable, Sendable, Identifiable {
     claimedAt: Date? = nil,
     reverification: Bool,
     preferredChannels: [String: PhoneCodeChannel]? = nil,
-    sessionMinter: Bool? = nil,
+    sessionMinter: Bool = false,
+    nativeSettings: NativeSettings = .default,
     id: String,
     object: String
   ) {
@@ -25,6 +27,7 @@ public struct AuthConfig: Codable, Equatable, Sendable, Identifiable {
     self.reverification = reverification
     self.preferredChannels = preferredChannels
     self.sessionMinter = sessionMinter
+    self.nativeSettings = nativeSettings
     self.id = id
     self.object = object
   }
@@ -35,19 +38,21 @@ public struct AuthConfig: Codable, Equatable, Sendable, Identifiable {
     case reverification
     case preferredChannels = "preferred_channels"
     case sessionMinter = "session_minter"
+    case nativeSettings = "native_settings"
     case id
     case object
   }
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.singleSessionMode = try container.decodeFlexible(Bool.self, snake: "single_session_mode", camel: "singleSessionMode")
+    self.singleSessionMode = try container.decodeFlexibleDefault(Bool.self, snake: "single_session_mode", camel: "singleSessionMode", default: false)
     self.claimedAt = try container.decodeIfPresentMillisecondsDate(snake: "claimed_at", camel: "claimedAt")
-    self.reverification = try container.decodeFlexible(Bool.self, snake: "reverification", camel: "reverification")
+    self.reverification = try container.decodeFlexibleDefault(Bool.self, snake: "reverification", camel: "reverification", default: false)
     self.preferredChannels = try container.decodeIfPresentFlexible([String: PhoneCodeChannel].self, snake: "preferred_channels", camel: "preferredChannels")
-    self.sessionMinter = try container.decodeIfPresentFlexible(Bool.self, snake: "session_minter", camel: "sessionMinter")
-    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.sessionMinter = try container.decodeFlexibleDefault(Bool.self, snake: "session_minter", camel: "sessionMinter", default: false)
+    self.nativeSettings = try container.decodeFlexibleDefault(NativeSettings.self, snake: "native_settings", camel: "nativeSettings", default: .default)
+    self.id = try container.decodeFlexibleDefault(String.self, snake: "id", camel: "id", default: "")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "auth_config")
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -56,7 +61,8 @@ public struct AuthConfig: Codable, Equatable, Sendable, Identifiable {
     try container.encodeIfPresentMillisecondsDate(claimedAt, forKey: .claimedAt)
     try container.encode(reverification, forKey: .reverification)
     try container.encodeIfPresent(preferredChannels, forKey: .preferredChannels)
-    try container.encodeIfPresent(sessionMinter, forKey: .sessionMinter)
+    try container.encode(sessionMinter, forKey: .sessionMinter)
+    try container.encode(nativeSettings, forKey: .nativeSettings)
     try container.encode(id, forKey: .id)
     try container.encode(object, forKey: .object)
   }

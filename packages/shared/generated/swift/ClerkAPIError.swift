@@ -2,22 +2,39 @@
 
 import Foundation
 
-public struct ClerkAPIError: Codable, Equatable, Sendable {
+public final class ClerkAPIError: Codable, Equatable, @unchecked Sendable, Error, LocalizedError {
   public var code: String
   public var message: String
   public var longMessage: String?
   public var meta: ClerkAPIErrorMeta?
+  public var clerkTraceId: String
+
+  public static var empty: ClerkAPIError { ClerkAPIError(code: "", message: "") }
 
   public init(
     code: String,
     message: String,
     longMessage: String? = nil,
-    meta: ClerkAPIErrorMeta? = nil
+    meta: ClerkAPIErrorMeta? = nil,
+    clerkTraceId: String = ""
   ) {
     self.code = code
     self.message = message
     self.longMessage = longMessage
     self.meta = meta
+    self.clerkTraceId = clerkTraceId
+  }
+
+  public var errorDescription: String? {
+    longMessage ?? (message.isEmpty ? nil : message)
+  }
+
+  public static func == (lhs: ClerkAPIError, rhs: ClerkAPIError) -> Bool {
+    lhs.code == rhs.code
+      && lhs.message == rhs.message
+      && lhs.longMessage == rhs.longMessage
+      && lhs.meta == rhs.meta
+      && lhs.clerkTraceId == rhs.clerkTraceId
   }
 
   public enum CodingKeys: String, CodingKey {
@@ -25,14 +42,16 @@ public struct ClerkAPIError: Codable, Equatable, Sendable {
     case message
     case longMessage = "long_message"
     case meta
+    case clerkTraceId = "clerk_trace_id"
   }
 
-  public init(from decoder: Decoder) throws {
+  public required init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.code = try container.decodeFlexible(String.self, snake: "code", camel: "code")
-    self.message = try container.decodeFlexible(String.self, snake: "message", camel: "message")
+    self.code = try container.decodeFlexibleDefault(String.self, snake: "code", camel: "code", default: "")
+    self.message = try container.decodeFlexibleDefault(String.self, snake: "message", camel: "message", default: "")
     self.longMessage = try container.decodeIfPresentFlexible(String.self, snake: "long_message", camel: "longMessage")
     self.meta = try container.decodeIfPresentFlexible(ClerkAPIErrorMeta.self, snake: "meta", camel: "meta")
+    self.clerkTraceId = try container.decodeFlexibleDefault(String.self, snake: "clerk_trace_id", camel: "clerkTraceId", default: "")
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -41,5 +60,6 @@ public struct ClerkAPIError: Codable, Equatable, Sendable {
     try container.encode(message, forKey: .message)
     try container.encodeIfPresent(longMessage, forKey: .longMessage)
     try container.encodeIfPresent(meta, forKey: .meta)
+    try container.encode(clerkTraceId, forKey: .clerkTraceId)
   }
 }

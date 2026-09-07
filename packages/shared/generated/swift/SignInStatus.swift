@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SignInStatus: Codable, Equatable, Sendable {
+public enum SignInStatus: Codable, Equatable, Hashable, Sendable {
   case needsIdentifier
   case needsFirstFactor
   case needsSecondFactor

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct Environment: Codable, Equatable, Sendable, Identifiable {
+public struct ClerkEnvironment: Codable, Equatable, Sendable, Identifiable {
   public var apiKeysSettings: APIKeysSettings
   public var authConfig: AuthConfig
   public var clientDebugMode: Bool?
@@ -61,18 +61,18 @@ public struct Environment: Codable, Equatable, Sendable, Identifiable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.apiKeysSettings = try container.decodeFlexible(APIKeysSettings.self, snake: "api_keys_settings", camel: "apiKeysSettings")
-    self.authConfig = try container.decodeFlexible(AuthConfig.self, snake: "auth_config", camel: "authConfig")
+    self.apiKeysSettings = try container.decodeFlexibleDefault(APIKeysSettings.self, snake: "api_keys_settings", camel: "apiKeysSettings", default: .empty)
+    self.authConfig = try container.decodeFlexibleDefault(AuthConfig.self, snake: "auth_config", camel: "authConfig", default: ClerkEnvironment.empty.authConfig)
     self.clientDebugMode = try container.decodeIfPresentFlexible(Bool.self, snake: "client_debug_mode", camel: "clientDebugMode")
-    self.commerceSettings = try container.decodeFlexible(CommerceSettings.self, snake: "commerce_settings", camel: "commerceSettings")
-    self.displayConfig = try container.decodeFlexible(DisplayConfig.self, snake: "display_config", camel: "displayConfig")
-    self.maintenanceMode = try container.decodeFlexible(Bool.self, snake: "maintenance_mode", camel: "maintenanceMode")
-    self.organizationSettings = try container.decodeFlexible(OrganizationSettings.self, snake: "organization_settings", camel: "organizationSettings")
+    self.commerceSettings = try container.decodeFlexibleDefault(CommerceSettings.self, snake: "commerce_settings", camel: "commerceSettings", default: .empty)
+    self.displayConfig = try container.decodeFlexibleDefault(DisplayConfig.self, snake: "display_config", camel: "displayConfig", default: .empty)
+    self.maintenanceMode = try container.decodeFlexibleDefault(Bool.self, snake: "maintenance_mode", camel: "maintenanceMode", default: false)
+    self.organizationSettings = try container.decodeFlexibleDefault(OrganizationSettings.self, snake: "organization_settings", camel: "organizationSettings", default: .empty)
     self.partitionedCookies = try container.decodeIfPresentFlexible(Bool.self, snake: "partitioned_cookies", camel: "partitionedCookies")
-    self.userSettings = try container.decodeFlexible(UserSettings.self, snake: "user_settings", camel: "userSettings")
-    self.protectConfig = try container.decodeFlexible(ProtectConfig.self, snake: "protect_config", camel: "protectConfig")
-    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.userSettings = try container.decodeFlexibleDefault(UserSettings.self, snake: "user_settings", camel: "userSettings", default: .empty)
+    self.protectConfig = try container.decodeFlexibleDefault(ProtectConfig.self, snake: "protect_config", camel: "protectConfig", default: .empty)
+    self.id = try container.decodeFlexibleDefault(String.self, snake: "id", camel: "id", default: "")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "environment")
   }
 
   public func encode(to encoder: Encoder) throws {

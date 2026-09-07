@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum GetDomainsParamsEnrollmentMode: Codable, Equatable, Sendable {
+public enum GetDomainsParamsEnrollmentMode: Codable, Equatable, Hashable, Sendable {
   case enterpriseSso
   case manualInvitation
   case automaticInvitation

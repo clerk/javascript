@@ -10,7 +10,7 @@ public enum PasskeyJSMethod: String, Sendable {
 }
 
 public protocol PasskeyMethods: Sendable {
-  func delete() async throws -> JSONValue
+  func delete() async throws -> DeletedObject
   func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
   func update(_ params: PasskeyUpdateParams) async throws -> Self
 }

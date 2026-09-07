@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SignUpPrepareEmailAddressVerificationParamsStrategy: Codable, Equatable, Sendable {
+public enum SignUpPrepareEmailAddressVerificationParamsStrategy: Codable, Equatable, Hashable, Sendable {
   case emailCode
   case emailLink
   case enterpriseSso

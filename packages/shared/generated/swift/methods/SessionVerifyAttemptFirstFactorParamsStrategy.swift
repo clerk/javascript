@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SessionVerifyAttemptFirstFactorParamsStrategy: Codable, Equatable, Sendable {
+public enum SessionVerifyAttemptFirstFactorParamsStrategy: Codable, Equatable, Hashable, Sendable {
   case passkey
   case emailCode
   case phoneCode

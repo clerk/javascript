@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum AuthenticateWithPasskeyParamsFlow: Codable, Equatable, Sendable {
+public enum AuthenticateWithPasskeyParamsFlow: Codable, Equatable, Hashable, Sendable {
   case autofill
   case discoverable
   case unknown(String)

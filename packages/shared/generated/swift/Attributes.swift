@@ -53,15 +53,15 @@ public struct Attributes: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.emailAddress = try container.decodeFlexible(AttributeData.self, snake: "email_address", camel: "emailAddress")
-    self.phoneNumber = try container.decodeFlexible(AttributeData.self, snake: "phone_number", camel: "phoneNumber")
-    self.web3Wallet = try container.decodeFlexible(AttributeData.self, snake: "web3_wallet", camel: "web3Wallet")
-    self.passkey = try container.decodeFlexible(AttributeData.self, snake: "passkey", camel: "passkey")
-    self.username = try container.decodeFlexible(AttributeData.self, snake: "username", camel: "username")
-    self.password = try container.decodeFlexible(AttributeData.self, snake: "password", camel: "password")
-    self.backupCode = try container.decodeFlexible(AttributeData.self, snake: "backup_code", camel: "backupCode")
-    self.firstName = try container.decodeFlexible(AttributeData.self, snake: "first_name", camel: "firstName")
-    self.lastName = try container.decodeFlexible(AttributeData.self, snake: "last_name", camel: "lastName")
-    self.authenticatorApp = try container.decodeFlexible(AttributeData.self, snake: "authenticator_app", camel: "authenticatorApp")
+    self.emailAddress = try container.decodeFlexibleDefault(AttributeData.self, snake: "email_address", camel: "emailAddress", default: .empty)
+    self.phoneNumber = try container.decodeFlexibleDefault(AttributeData.self, snake: "phone_number", camel: "phoneNumber", default: .empty)
+    self.web3Wallet = try container.decodeFlexibleDefault(AttributeData.self, snake: "web3_wallet", camel: "web3Wallet", default: .empty)
+    self.passkey = try container.decodeFlexibleDefault(AttributeData.self, snake: "passkey", camel: "passkey", default: .empty)
+    self.username = try container.decodeFlexibleDefault(AttributeData.self, snake: "username", camel: "username", default: .empty)
+    self.password = try container.decodeFlexibleDefault(AttributeData.self, snake: "password", camel: "password", default: .empty)
+    self.backupCode = try container.decodeFlexibleDefault(AttributeData.self, snake: "backup_code", camel: "backupCode", default: .empty)
+    self.firstName = try container.decodeFlexibleDefault(AttributeData.self, snake: "first_name", camel: "firstName", default: .empty)
+    self.lastName = try container.decodeFlexibleDefault(AttributeData.self, snake: "last_name", camel: "lastName", default: .empty)
+    self.authenticatorApp = try container.decodeFlexibleDefault(AttributeData.self, snake: "authenticator_app", camel: "authenticatorApp", default: .empty)
   }
 }

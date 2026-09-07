@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SignInFirstFactorChannel: Codable, Equatable, Sendable {
+public enum SignInFirstFactorChannel: Codable, Equatable, Hashable, Sendable {
   case sms
   case whatsapp
   case unknown(String)

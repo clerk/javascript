@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum EnterpriseConnectionTestRunStatus: Codable, Equatable, Sendable {
+public enum EnterpriseConnectionTestRunStatus: Codable, Equatable, Hashable, Sendable {
   case pending
   case failed
   case success

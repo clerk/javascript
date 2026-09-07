@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum CreateOrganizationEnterpriseConnectionParamsProvider: Codable, Equatable, Sendable {
+public enum CreateOrganizationEnterpriseConnectionParamsProvider: Codable, Equatable, Hashable, Sendable {
   case samlOkta
   case samlGoogle
   case samlMicrosoft

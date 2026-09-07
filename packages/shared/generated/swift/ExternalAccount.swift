@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
+public struct ExternalAccount: Codable, Equatable, Hashable, Sendable, Identifiable {
   public var object: String
   public var provider: String
   public var identificationId: String
@@ -18,6 +18,7 @@ public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
   public var label: String
   public var verification: Verification?
   public var id: String
+  public var createdAt: Date
 
   public init(
     object: String,
@@ -34,7 +35,8 @@ public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
     publicMetadata: JSONValue,
     label: String,
     verification: Verification? = nil,
-    id: String
+    id: String,
+    createdAt: Date
   ) {
     self.object = object
     self.provider = provider
@@ -51,6 +53,7 @@ public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
     self.label = label
     self.verification = verification
     self.id = id
+    self.createdAt = createdAt
   }
 
   public enum CodingKeys: String, CodingKey {
@@ -69,25 +72,27 @@ public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
     case label
     case verification
     case id
+    case createdAt = "created_at"
   }
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "external_account")
     self.provider = try container.decodeFlexible(String.self, snake: "provider", camel: "provider")
-    self.identificationId = try container.decodeFlexible(String.self, snake: "identification_id", camel: "identificationId")
-    self.providerUserId = try container.decodeFlexible(String.self, snake: "provider_user_id", camel: "providerUserId")
-    self.approvedScopes = try container.decodeFlexible(String.self, snake: "approved_scopes", camel: "approvedScopes")
-    self.emailAddress = try container.decodeFlexible(String.self, snake: "email_address", camel: "emailAddress")
-    self.firstName = try container.decodeFlexible(String.self, snake: "first_name", camel: "firstName")
-    self.lastName = try container.decodeFlexible(String.self, snake: "last_name", camel: "lastName")
-    self.imageUrl = try container.decodeFlexible(String.self, snake: "image_url", camel: "imageUrl")
-    self.username = try container.decodeFlexible(String.self, snake: "username", camel: "username")
-    self.phoneNumber = try container.decodeFlexible(String.self, snake: "phone_number", camel: "phoneNumber")
-    self.publicMetadata = try container.decodeFlexible(JSONValue.self, snake: "public_metadata", camel: "publicMetadata")
-    self.label = try container.decodeFlexible(String.self, snake: "label", camel: "label")
+    self.identificationId = try container.decodeFlexibleDefault(String.self, snake: "identification_id", camel: "identificationId", default: "")
+    self.providerUserId = try container.decodeFlexibleDefault(String.self, snake: "provider_user_id", camel: "providerUserId", default: "")
+    self.approvedScopes = try container.decodeFlexibleDefault(String.self, snake: "approved_scopes", camel: "approvedScopes", default: "")
+    self.emailAddress = try container.decodeFlexibleDefault(String.self, snake: "email_address", camel: "emailAddress", default: "")
+    self.firstName = try container.decodeFlexibleDefault(String.self, snake: "first_name", camel: "firstName", default: "")
+    self.lastName = try container.decodeFlexibleDefault(String.self, snake: "last_name", camel: "lastName", default: "")
+    self.imageUrl = try container.decodeFlexibleDefault(String.self, snake: "image_url", camel: "imageUrl", default: "")
+    self.username = try container.decodeFlexibleDefault(String.self, snake: "username", camel: "username", default: "")
+    self.phoneNumber = try container.decodeFlexibleDefault(String.self, snake: "phone_number", camel: "phoneNumber", default: "")
+    self.publicMetadata = try container.decodeFlexibleDefault(JSONValue.self, snake: "public_metadata", camel: "publicMetadata", default: .object([:]))
+    self.label = try container.decodeFlexibleDefault(String.self, snake: "label", camel: "label", default: "")
     self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.createdAt = try container.decodeIfPresentMillisecondsDate(snake: "created_at", camel: "createdAt") ?? Date(timeIntervalSince1970: 0)
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -107,5 +112,6 @@ public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
     try container.encode(label, forKey: .label)
     try container.encodeIfPresent(verification, forKey: .verification)
     try container.encode(id, forKey: .id)
+    try container.encodeMillisecondsDate(createdAt, forKey: .createdAt)
   }
 }

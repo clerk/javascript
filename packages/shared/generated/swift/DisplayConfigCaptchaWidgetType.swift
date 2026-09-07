@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum DisplayConfigCaptchaWidgetType: Codable, Equatable, Sendable {
+public enum DisplayConfigCaptchaWidgetType: Codable, Equatable, Hashable, Sendable {
   case smart
   case invisible
   case unknown(String)

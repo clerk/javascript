@@ -2,11 +2,12 @@
 
 import Foundation
 
-public enum SignInIdentifier: Codable, Equatable, Sendable {
+public enum SignInIdentifier: Codable, Equatable, Hashable, Sendable {
   case emailAddress
   case phoneNumber
   case web3Wallet
   case username
+  case passkey
   case unknown(String)
 
   public init(from decoder: Decoder) throws {
@@ -21,6 +22,8 @@ public enum SignInIdentifier: Codable, Equatable, Sendable {
       self = .web3Wallet
     case "username":
       self = .username
+    case "passkey":
+      self = .passkey
     default:
       self = .unknown(value)
     }
@@ -37,6 +40,8 @@ public enum SignInIdentifier: Codable, Equatable, Sendable {
       try container.encode("web3_wallet")
     case .username:
       try container.encode("username")
+    case .passkey:
+      try container.encode("passkey")
     case .unknown(let value):
       try container.encode(value)
     }

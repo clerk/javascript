@@ -35,14 +35,14 @@ public enum OrganizationJSMethod: String, Sendable {
 
 public protocol OrganizationMethods: Sendable {
   func addMember(_ params: AddMemberParams) async throws -> OrganizationMembership
-  func addPaymentMethod(_ params: AddPaymentMethodParams) async throws -> JSONValue
+  func addPaymentMethod(_ params: AddPaymentMethodParams) async throws -> BillingPaymentMethod
   func attemptOwnershipVerification(_ domainIds: [String]) async throws -> JSONValue
-  func createDomain(_ domainName: String, params: OrganizationCreateDomainParams?) async throws -> JSONValue
+  func createDomain(_ domainName: String, params: OrganizationCreateDomainParams?) async throws -> OrganizationDomain
   func createEnterpriseConnection(_ params: CreateOrganizationEnterpriseConnectionParams) async throws -> JSONValue
   func createEnterpriseConnectionTestRun(_ enterpriseConnectionId: String) async throws -> JSONValue
-  func deleteEnterpriseConnection(_ enterpriseConnectionId: String) async throws -> JSONValue
+  func deleteEnterpriseConnection(_ enterpriseConnectionId: String) async throws -> DeletedObject
   func destroy() async throws
-  func getDomain(_ __0: OrganizationGetDomain_0) async throws -> JSONValue
+  func getDomain(_ __0: OrganizationGetDomain_0) async throws -> OrganizationDomain
   func getDomains(_ params: GetDomainsParams?) async throws -> ClerkPaginatedResponse
   func getEnterpriseConnections(_ params: GetEnterpriseConnectionsParams?) async throws -> [JSONValue]
   func getEnterpriseConnectionTestRuns(_ enterpriseConnectionId: String, params: GetEnterpriseConnectionTestRunsParams?) async throws -> ClerkPaginatedResponse
@@ -52,8 +52,8 @@ public protocol OrganizationMethods: Sendable {
   func getPaymentMethods(_ params: GetPaymentMethodsParams?) async throws -> ClerkPaginatedResponse
   func getRoles(_ params: GetRolesParams?) async throws -> GetRolesResponse
   func initializePaymentMethod(_ params: InitializePaymentMethodParams) async throws -> JSONValue
-  func inviteMember(_ params: InviteMemberParams) async throws -> JSONValue
-  func inviteMembers(_ params: InviteMembersParams) async throws -> [JSONValue]
+  func inviteMember(_ params: InviteMemberParams) async throws -> OrganizationInvitation
+  func inviteMembers(_ params: InviteMembersParams) async throws -> [OrganizationInvitation]
   func prepareOwnershipVerification(_ domainIds: [String]) async throws -> JSONValue
   func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
   func removeMember(_ userId: String) async throws -> OrganizationMembership

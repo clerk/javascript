@@ -26,8 +26,8 @@ public struct CommerceSettingsBilling: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.stripePublishableKey = try container.decodeIfPresentFlexible(String.self, snake: "stripe_publishable_key", camel: "stripePublishableKey")
-    self.organization = try container.decodeFlexible(CommerceSettingsBillingOrganization.self, snake: "organization", camel: "organization")
-    self.user = try container.decodeFlexible(CommerceSettingsBillingOrganization.self, snake: "user", camel: "user")
+    self.organization = try container.decodeFlexibleDefault(CommerceSettingsBillingOrganization.self, snake: "organization", camel: "organization", default: .empty)
+    self.user = try container.decodeFlexibleDefault(CommerceSettingsBillingOrganization.self, snake: "user", camel: "user", default: .empty)
   }
 
   public func encode(to encoder: Encoder) throws {

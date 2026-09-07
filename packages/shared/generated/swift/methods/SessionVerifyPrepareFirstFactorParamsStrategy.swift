@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SessionVerifyPrepareFirstFactorParamsStrategy: Codable, Equatable, Sendable {
+public enum SessionVerifyPrepareFirstFactorParamsStrategy: Codable, Equatable, Hashable, Sendable {
   case passkey
   case emailCode
   case phoneCode

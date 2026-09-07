@@ -57,17 +57,17 @@ public struct Client: Codable, Equatable, Sendable, Identifiable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "client")
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
-    self.sessions = try container.decodeFlexible([Session].self, snake: "sessions", camel: "sessions")
+    self.sessions = try container.decodeFlexibleDefault([Session].self, snake: "sessions", camel: "sessions", default: [])
     self.signUp = try container.decodeIfPresentFlexible(SignUp.self, snake: "sign_up", camel: "signUp")
     self.signIn = try container.decodeIfPresentFlexible(SignIn.self, snake: "sign_in", camel: "signIn")
     self.captchaBypass = try container.decodeIfPresentFlexible(Bool.self, snake: "captcha_bypass", camel: "captchaBypass")
     self.lastActiveSessionId = try container.decodeIfPresentFlexible(String.self, snake: "last_active_session_id", camel: "lastActiveSessionId")
     self.lastAuthenticationStrategy = try container.decodeIfPresentFlexible(String.self, snake: "last_authentication_strategy", camel: "lastAuthenticationStrategy")
     self.cookieExpiresAt = try container.decodeIfPresentMillisecondsDate(snake: "cookie_expires_at", camel: "cookieExpiresAt")
-    self.createdAt = try container.decodeMillisecondsDate(snake: "created_at", camel: "createdAt")
-    self.updatedAt = try container.decodeMillisecondsDate(snake: "updated_at", camel: "updatedAt")
+    self.createdAt = try container.decodeIfPresentMillisecondsDate(snake: "created_at", camel: "createdAt") ?? Date(timeIntervalSince1970: 0)
+    self.updatedAt = try container.decodeIfPresentMillisecondsDate(snake: "updated_at", camel: "updatedAt") ?? Date(timeIntervalSince1970: 0)
   }
 
   public func encode(to encoder: Encoder) throws {

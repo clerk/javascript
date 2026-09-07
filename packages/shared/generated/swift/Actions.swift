@@ -21,7 +21,7 @@ public struct Actions: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.deleteSelf = try container.decodeFlexible(Bool.self, snake: "delete_self", camel: "deleteSelf")
-    self.createOrganization = try container.decodeFlexible(Bool.self, snake: "create_organization", camel: "createOrganization")
+    self.deleteSelf = try container.decodeFlexibleDefault(Bool.self, snake: "delete_self", camel: "deleteSelf", default: false)
+    self.createOrganization = try container.decodeFlexibleDefault(Bool.self, snake: "create_organization", camel: "createOrganization", default: false)
   }
 }

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SignInClientTrustState: Codable, Equatable, Sendable {
+public enum SignInClientTrustState: Codable, Equatable, Hashable, Sendable {
   case pending
   case new
   case known

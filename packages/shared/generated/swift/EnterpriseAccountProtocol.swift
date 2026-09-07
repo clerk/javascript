@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum EnterpriseAccountProtocol: Codable, Equatable, Sendable {
+public enum EnterpriseAccountProtocol: Codable, Equatable, Hashable, Sendable {
   case saml
   case oauth
   case unknown(String)

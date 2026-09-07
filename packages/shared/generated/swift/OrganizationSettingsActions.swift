@@ -17,6 +17,6 @@ public struct OrganizationSettingsActions: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.adminDelete = try container.decodeFlexible(Bool.self, snake: "admin_delete", camel: "adminDelete")
+    self.adminDelete = try container.decodeFlexibleDefault(Bool.self, snake: "admin_delete", camel: "adminDelete", default: false)
   }
 }

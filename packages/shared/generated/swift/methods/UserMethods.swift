@@ -32,15 +32,15 @@ public enum UserJSMethod: String, Sendable {
 }
 
 public protocol UserMethods: Sendable {
-  func addPaymentMethod(_ params: AddPaymentMethodParams) async throws -> JSONValue
-  func createBackupCode() async throws -> JSONValue
+  func addPaymentMethod(_ params: AddPaymentMethodParams) async throws -> BillingPaymentMethod
+  func createBackupCode() async throws -> BackupCode
   func createEmailAddress(_ params: CreateEmailAddressParams) async throws -> EmailAddress
   func createExternalAccount(_ params: CreateExternalAccountParams) async throws -> ExternalAccount
   func createPasskey() async throws -> Passkey
   func createPhoneNumber(_ params: CreatePhoneNumberParams) async throws -> PhoneNumber
-  func createTOTP() async throws -> JSONValue
+  func createTOTP() async throws -> TOTP
   func delete() async throws
-  func disableTOTP() async throws -> JSONValue
+  func disableTOTP() async throws -> DeletedObject
   func getEnterpriseConnections(_ params: GetEnterpriseConnectionsParams?) async throws -> [JSONValue]
   func getOrganizationCreationDefaults() async throws -> JSONValue
   func getOrganizationInvitations(_ params: GetUserOrganizationInvitationsParams?) async throws -> ClerkPaginatedResponse
@@ -49,12 +49,12 @@ public protocol UserMethods: Sendable {
   func getPaymentMethods(_ params: GetPaymentMethodsParams?) async throws -> ClerkPaginatedResponse
   func getSessions() async throws -> [JSONValue]
   func initializePaymentMethod(_ params: InitializePaymentMethodParams) async throws -> JSONValue
-  func leaveOrganization(_ organizationId: String) async throws -> JSONValue
+  func leaveOrganization(_ organizationId: String) async throws -> DeletedObject
   func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
   func removePassword(_ params: RemoveUserPasswordParams) async throws -> Self
   func setProfileImage(_ params: SetProfileImageParams) async throws -> JSONValue
   func update(_ params: UpdateUserParams) async throws -> Self
   func updateMetadata(_ params: UpdateUserMetadataParams) async throws -> Self
   func updatePassword(_ params: UpdateUserPasswordParams) async throws -> Self
-  func verifyTOTP(_ params: VerifyTOTPParams) async throws -> JSONValue
+  func verifyTOTP(_ params: VerifyTOTPParams) async throws -> TOTP
 }

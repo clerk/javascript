@@ -83,6 +83,15 @@ extension KeyedDecodingContainer where Key == FAPIJSONKey {
     return try decodeIfPresent(type, forKey: FAPIJSONKey(camel))
   }
 
+  public func decodeFlexibleDefault<T: Decodable>(
+    _ type: T.Type,
+    snake: String,
+    camel: String,
+    default defaultValue: @autoclosure () -> T
+  ) throws -> T {
+    try decodeIfPresentFlexible(type, snake: snake, camel: camel) ?? defaultValue()
+  }
+
   public func decodeMillisecondsDate(snake: String, camel: String) throws -> Date {
     let millis = try decodeFlexible(Int64.self, snake: snake, camel: camel)
     return Date(timeIntervalSince1970: TimeInterval(millis) / 1000)

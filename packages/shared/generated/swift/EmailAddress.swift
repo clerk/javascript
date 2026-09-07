@@ -2,13 +2,14 @@
 
 import Foundation
 
-public struct EmailAddress: Codable, Equatable, Sendable, Identifiable {
+public struct EmailAddress: Codable, Equatable, Hashable, Sendable, Identifiable {
   public var object: String
   public var emailAddress: String
   public var verification: Verification?
   public var linkedTo: [IdentificationLink]
   public var matchesSsoConnection: Bool
   public var id: String
+  public var createdAt: Date
 
   public init(
     object: String,
@@ -16,7 +17,8 @@ public struct EmailAddress: Codable, Equatable, Sendable, Identifiable {
     verification: Verification? = nil,
     linkedTo: [IdentificationLink],
     matchesSsoConnection: Bool,
-    id: String
+    id: String,
+    createdAt: Date
   ) {
     self.object = object
     self.emailAddress = emailAddress
@@ -24,6 +26,7 @@ public struct EmailAddress: Codable, Equatable, Sendable, Identifiable {
     self.linkedTo = linkedTo
     self.matchesSsoConnection = matchesSsoConnection
     self.id = id
+    self.createdAt = createdAt
   }
 
   public enum CodingKeys: String, CodingKey {
@@ -33,16 +36,18 @@ public struct EmailAddress: Codable, Equatable, Sendable, Identifiable {
     case linkedTo = "linked_to"
     case matchesSsoConnection = "matches_sso_connection"
     case id
+    case createdAt = "created_at"
   }
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "email_address")
     self.emailAddress = try container.decodeFlexible(String.self, snake: "email_address", camel: "emailAddress")
     self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
-    self.linkedTo = try container.decodeFlexible([IdentificationLink].self, snake: "linked_to", camel: "linkedTo")
-    self.matchesSsoConnection = try container.decodeFlexible(Bool.self, snake: "matches_sso_connection", camel: "matchesSsoConnection")
+    self.linkedTo = try container.decodeFlexibleDefault([IdentificationLink].self, snake: "linked_to", camel: "linkedTo", default: [])
+    self.matchesSsoConnection = try container.decodeFlexibleDefault(Bool.self, snake: "matches_sso_connection", camel: "matchesSsoConnection", default: false)
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.createdAt = try container.decodeIfPresentMillisecondsDate(snake: "created_at", camel: "createdAt") ?? Date(timeIntervalSince1970: 0)
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -53,5 +58,6 @@ public struct EmailAddress: Codable, Equatable, Sendable, Identifiable {
     try container.encode(linkedTo, forKey: .linkedTo)
     try container.encode(matchesSsoConnection, forKey: .matchesSsoConnection)
     try container.encode(id, forKey: .id)
+    try container.encodeMillisecondsDate(createdAt, forKey: .createdAt)
   }
 }

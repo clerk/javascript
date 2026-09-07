@@ -11,6 +11,27 @@ export const SWIFT_MODEL_ROOTS = [
   'SignUpJSON',
   'ClientJSON',
   'EnvironmentJSON',
+  'OrganizationDomainJSON',
+  'OrganizationInvitationJSON',
+  'OrganizationMembershipRequestJSON',
+  'OrganizationSuggestionJSON',
+  'UserOrganizationInvitationJSON',
+  'RoleJSON',
+  'PermissionJSON',
+  'FeatureJSON',
+  'BillingSubscriptionJSON',
+  'BillingPlanJSON',
+  'BillingPaymentJSON',
+  'BillingPaymentMethodJSON',
+  'BillingStatementJSON',
+  'BillingCheckoutJSON',
+  'BillingCreditBalanceJSON',
+  'BillingCreditLedgerJSON',
+  'TOTPJSON',
+  'BackupCodeJSON',
+  'DeletedObjectJSON',
+  'ImageJSON',
+  'SessionActivityJSON',
 ] as const;
 
 export const SWIFT_METHOD_ROOTS = [
@@ -131,6 +152,7 @@ type SwiftStruct = {
   name: string;
   properties: SwiftProperty[];
   identifiable: boolean;
+  asClass: boolean;
 };
 
 type SwiftEnum = {
@@ -509,11 +531,25 @@ function typeId(checker: ts.TypeChecker, type: ts.Type): string {
   return `anon:${props}|i:${index ? checker.typeToString(index) : ''}`;
 }
 
+const SWIFT_UI_COLLISIONS: Record<string, string> = {
+  Environment: 'ClerkEnvironment',
+  Image: 'ClerkImage',
+};
+
+const SWIFT_FILE_ALIASES: Record<string, string> = {
+  ClerkEnvironment: 'Environment.swift',
+};
+
+function emitFilename(decl: { name: string }): string {
+  return SWIFT_FILE_ALIASES[decl.name] ?? `${decl.name}.swift`;
+}
+
 function claimName(ctx: Ctx, preferred: string): string {
-  let name = preferred;
+  const base = SWIFT_UI_COLLISIONS[preferred] ?? preferred;
+  let name = base;
   let suffix = 2;
   while (ctx.usedNames.has(name) || ctx.decls.has(name)) {
-    name = `${preferred}${suffix}`;
+    name = `${base}${suffix}`;
     suffix += 1;
   }
   ctx.usedNames.add(name);
@@ -771,6 +807,7 @@ function enqueueEnum(ctx: Ctx, hint: string, values: string[]): string {
     usedCases.add(caseName.replace(/`/g, ''));
     return { name: caseName, raw };
   });
+  applyExtraEnumCases(name, cases);
   ctx.decls.set(name, { kind: 'enum', name, cases });
   return name;
 }
@@ -811,6 +848,7 @@ function structFromType(ctx: Ctx, name: string, type: ts.Type): SwiftStruct {
         },
       ],
       identifiable: false,
+      asClass: false,
     };
   }
 
@@ -837,9 +875,11 @@ function structFromType(ctx: Ctx, name: string, type: ts.Type): SwiftStruct {
       isDate: isDateRef(ref),
     });
   }
+  applyExtraProperties(name, properties);
+  applyForceRequired(name, properties);
   const id = properties.find(property => property.wireName === 'id' && !isOptionalRef(property.type));
   const identifiable = Boolean(id && emitRef(id.type) === 'String');
-  return { kind: 'struct', name, properties, identifiable };
+  return { kind: 'struct', name, properties, identifiable, asClass: CLASS_TYPES.has(name) };
 }
 
 function isOptionalRef(ref: SwiftRef): boolean {
@@ -882,6 +922,7 @@ function drainQueue(ctx: Ctx): void {
         usedCases.add(caseName.replace(/`/g, ''));
         return { name: caseName, raw: part.value };
       });
+      applyExtraEnumCases(name, cases);
       ctx.decls.set(name, { kind: 'enum', name, cases });
       continue;
     }
@@ -938,12 +979,15 @@ function structFromMergedUnion(ctx: Ctx, name: string, parts: ts.Type[]): SwiftS
       isDate: isDateRef(ref),
     });
   }
+  applyExtraProperties(name, properties);
+  applyForceRequired(name, properties);
   const id = properties.find(property => property.wireName === 'id' && !isOptionalRef(property.type));
   return {
     kind: 'struct',
     name,
     properties,
     identifiable: Boolean(id && emitRef(id.type) === 'String'),
+    asClass: CLASS_TYPES.has(name),
   };
 }
 
@@ -1071,6 +1115,15 @@ extension KeyedDecodingContainer where Key == FAPIJSONKey {
     return try decodeIfPresent(type, forKey: FAPIJSONKey(camel))
   }
 
+  public func decodeFlexibleDefault<T: Decodable>(
+    _ type: T.Type,
+    snake: String,
+    camel: String,
+    default defaultValue: @autoclosure () -> T
+  ) throws -> T {
+    try decodeIfPresentFlexible(type, snake: snake, camel: camel) ?? defaultValue()
+  }
+
   public func decodeMillisecondsDate(snake: String, camel: String) throws -> Date {
     let millis = try decodeFlexible(Int64.self, snake: snake, camel: camel)
     return Date(timeIntervalSince1970: TimeInterval(millis) / 1000)
@@ -1114,13 +1167,32 @@ extension KeyedEncodingContainer {
 }
 
 function emitEnum(decl: SwiftEnum): string {
-  const lines = [
+  const rawValue = RAW_VALUE_ENUMS.has(decl.name)
+    ? [
+        '',
+        '  public var rawValue: String {',
+        '    switch self {',
+        ...decl.cases.map(item => `    case .${item.name}:\n      "${escapeSwiftString(item.raw)}"`),
+        '    case .unknown(let value):\n      value',
+        '    }',
+        '  }',
+        '',
+        '  public init(rawValue: String) {',
+        '    switch rawValue {',
+        ...decl.cases.map(item => `    case "${escapeSwiftString(item.raw)}":\n      self = .${item.name}`),
+        '    default:\n      self = .unknown(rawValue)',
+        '    }',
+        '  }',
+      ]
+    : [];
+  return [
     GENERATED_HEADER,
     'import Foundation',
     '',
-    `public enum ${decl.name}: Codable, Equatable, Sendable {`,
+    `public enum ${decl.name}: Codable, Equatable, Hashable, Sendable {`,
     ...decl.cases.map(item => `  case ${item.name}`),
     '  case unknown(String)',
+    ...rawValue,
     '',
     '  public init(from decoder: Decoder) throws {',
     '    let container = try decoder.singleValueContainer()',
@@ -1140,30 +1212,441 @@ function emitEnum(decl: SwiftEnum): string {
     '  }',
     '}',
     '',
-  ];
-  return lines.join('\n');
+  ].join('\n');
 }
 
 function escapeSwiftString(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
-function emitDecode(property: SwiftProperty): string {
+const DECODE_DEFAULTS: Record<string, string> = {
+  'APIKeysSettings.user_api_keys_enabled': 'false',
+  'APIKeysSettings.orgs_api_keys_enabled': 'false',
+  'APIKeysSettings.id': '""',
+  'APIKeysSettings.object': '"api_keys_settings"',
+  'Actions.delete_self': 'false',
+  'Actions.create_organization': 'false',
+  'AttributeData.enabled': 'false',
+  'AttributeData.required': 'false',
+  'AttributeData.verifications': '[]',
+  'AttributeData.used_for_first_factor': 'false',
+  'AttributeData.first_factors': '[]',
+  'AttributeData.used_for_second_factor': 'false',
+  'AttributeData.second_factors': '[]',
+  'AttributeData.verify_at_sign_up': 'false',
+  'Attributes.email_address': '.empty',
+  'Attributes.phone_number': '.empty',
+  'Attributes.web3_wallet': '.empty',
+  'Attributes.passkey': '.empty',
+  'Attributes.username': '.empty',
+  'Attributes.password': '.empty',
+  'Attributes.backup_code': '.empty',
+  'Attributes.first_name': '.empty',
+  'Attributes.last_name': '.empty',
+  'Attributes.authenticator_app': '.empty',
+  'CommerceSettings.billing': '.empty',
+  'CommerceSettings.id': '""',
+  'CommerceSettings.object': '"commerce_settings"',
+  'CommerceSettingsBilling.organization': '.empty',
+  'CommerceSettingsBilling.user': '.empty',
+  'CommerceSettingsBillingOrganization.enabled': 'false',
+  'CommerceSettingsBillingOrganization.has_paid_plans': 'false',
+  'DeletedObject.object': '"deleted_object"',
+  'DisplayConfig.object': '"display_config"',
+  'DisplayConfig.id': '""',
+  'DisplayConfig.after_sign_in_url': '""',
+  'DisplayConfig.after_sign_out_all_url': '""',
+  'DisplayConfig.after_sign_out_one_url': '""',
+  'DisplayConfig.after_sign_up_url': '""',
+  'DisplayConfig.after_switch_session_url': '""',
+  'DisplayConfig.application_name': '""',
+  'DisplayConfig.branded': 'false',
+  'DisplayConfig.captcha_provider': '""',
+  'DisplayConfig.home_url': '""',
+  'DisplayConfig.instance_environment_type': '""',
+  'DisplayConfig.logo_image_url': '""',
+  'DisplayConfig.favicon_image_url': '""',
+  'DisplayConfig.preferred_sign_in_strategy': '.otp',
+  'DisplayConfig.sign_in_url': '""',
+  'DisplayConfig.sign_up_url': '""',
+  'DisplayConfig.support_email': '""',
+  'DisplayConfig.theme': '.empty',
+  'DisplayConfig.user_profile_url': '""',
+  'DisplayConfig.organization_profile_url': '""',
+  'DisplayConfig.create_organization_url': '""',
+  'DisplayConfig.after_leave_organization_url': '""',
+  'DisplayConfig.after_create_organization_url': '""',
+  'DisplayConfig.show_devmode_warning': 'false',
+  'DisplayConfig.terms_url': '""',
+  'DisplayConfig.privacy_policy_url': '""',
+  'DisplayConfig.waitlist_url': '""',
+  'DisplayConfig.after_join_waitlist_url': '""',
+  'ClerkEnvironment.api_keys_settings': '.empty',
+  'ClerkEnvironment.auth_config': 'ClerkEnvironment.empty.authConfig',
+  'ClerkEnvironment.commerce_settings': '.empty',
+  'ClerkEnvironment.display_config': '.empty',
+  'ClerkEnvironment.maintenance_mode': 'false',
+  'ClerkEnvironment.organization_settings': '.empty',
+  'ClerkEnvironment.user_settings': '.empty',
+  'ClerkEnvironment.protect_config': '.empty',
+  'ClerkEnvironment.id': '""',
+  'ClerkEnvironment.object': '"environment"',
+  'OAuthProviderSettings.enabled': 'false',
+  'OAuthProviderSettings.required': 'false',
+  'OAuthProviderSettings.authenticatable': 'false',
+  'OAuthProviderSettings.strategy': '""',
+  'OAuthProviderSettings.name': '""',
+  'OAuthProviders.oauth_facebook': '.disabled(strategy: "oauth_facebook", name: "Facebook")',
+  'OAuthProviders.oauth_google': '.disabled(strategy: "oauth_google", name: "Google")',
+  'OAuthProviders.oauth_hubspot': '.disabled(strategy: "oauth_hubspot", name: "HubSpot")',
+  'OAuthProviders.oauth_github': '.disabled(strategy: "oauth_github", name: "GitHub")',
+  'OAuthProviders.oauth_tiktok': '.disabled(strategy: "oauth_tiktok", name: "TikTok")',
+  'OAuthProviders.oauth_gitlab': '.disabled(strategy: "oauth_gitlab", name: "GitLab")',
+  'OAuthProviders.oauth_discord': '.disabled(strategy: "oauth_discord", name: "Discord")',
+  'OAuthProviders.oauth_twitter': '.disabled(strategy: "oauth_twitter", name: "Twitter")',
+  'OAuthProviders.oauth_twitch': '.disabled(strategy: "oauth_twitch", name: "Twitch")',
+  'OAuthProviders.oauth_linkedin': '.disabled(strategy: "oauth_linkedin", name: "LinkedIn")',
+  'OAuthProviders.oauth_linkedin_oidc': '.disabled(strategy: "oauth_linkedin_oidc", name: "LinkedIn")',
+  'OAuthProviders.oauth_dropbox': '.disabled(strategy: "oauth_dropbox", name: "Dropbox")',
+  'OAuthProviders.oauth_atlassian': '.disabled(strategy: "oauth_atlassian", name: "Atlassian")',
+  'OAuthProviders.oauth_bitbucket': '.disabled(strategy: "oauth_bitbucket", name: "Bitbucket")',
+  'OAuthProviders.oauth_microsoft': '.disabled(strategy: "oauth_microsoft", name: "Microsoft")',
+  'OAuthProviders.oauth_notion': '.disabled(strategy: "oauth_notion", name: "Notion")',
+  'OAuthProviders.oauth_apple': '.disabled(strategy: "oauth_apple", name: "Apple")',
+  'OAuthProviders.oauth_line': '.disabled(strategy: "oauth_line", name: "LINE")',
+  'OAuthProviders.oauth_instagram': '.disabled(strategy: "oauth_instagram", name: "Instagram")',
+  'OAuthProviders.oauth_coinbase': '.disabled(strategy: "oauth_coinbase", name: "Coinbase")',
+  'OAuthProviders.oauth_spotify': '.disabled(strategy: "oauth_spotify", name: "Spotify")',
+  'OAuthProviders.oauth_xero': '.disabled(strategy: "oauth_xero", name: "Xero")',
+  'OAuthProviders.oauth_box': '.disabled(strategy: "oauth_box", name: "Box")',
+  'OAuthProviders.oauth_slack': '.disabled(strategy: "oauth_slack", name: "Slack")',
+  'OAuthProviders.oauth_linear': '.disabled(strategy: "oauth_linear", name: "Linear")',
+  'OAuthProviders.oauth_x': '.disabled(strategy: "oauth_x", name: "X")',
+  'OAuthProviders.oauth_enstall': '.disabled(strategy: "oauth_enstall", name: "Enstall")',
+  'OAuthProviders.oauth_huggingface': '.disabled(strategy: "oauth_huggingface", name: "Hugging Face")',
+  'OAuthProviders.oauth_vercel': '.disabled(strategy: "oauth_vercel", name: "Vercel")',
+  'OrganizationSettings.enabled': 'false',
+  'OrganizationSettings.max_allowed_memberships': '1',
+  'OrganizationSettings.force_organization_selection': 'false',
+  'OrganizationSettings.actions': '.empty',
+  'OrganizationSettings.domains': '.empty',
+  'OrganizationSettings.slug': '.empty',
+  'OrganizationSettings.organization_creation_defaults': '.empty',
+  'OrganizationSettingsActions.admin_delete': 'false',
+  'OrganizationSettingsDomains.enabled': 'false',
+  'OrganizationSettingsDomains.enrollment_modes': '[]',
+  'OrganizationSettingsOrganizationCreationDefaults.enabled': 'false',
+  'OrganizationSettingsSlug.disabled': 'false',
+  'SignInDataSecondFactor.required': 'false',
+  'SignInDataSecondFactor.enabled': 'false',
+  'SignUpData.allowlist_only': 'false',
+  'SignUpData.progressive': 'false',
+  'SignUpData.captcha_enabled': 'false',
+  'SignUpData.mode': '.public',
+  'SignUpData.legal_consent_enabled': 'false',
+  'UserSettings.attributes': '.empty',
+  'UserSettings.actions': '.empty',
+  'UserSettings.social': '.empty',
+  'UserSettings.enterprise_sso': '.empty',
+  'UserSettings.sign_in': '.empty',
+  'UserSettings.sign_up': '.empty',
+  'UserSettings.password_settings': '.empty',
+  'UserSettings.passkey_settings': '.empty',
+  'UserSettings.username_settings': '.empty',
+  'Client.object': '"client"',
+  'Client.sessions': '[]',
+  'Client.created_at': 'Date(timeIntervalSince1970: 0)',
+  'Client.updated_at': 'Date(timeIntervalSince1970: 0)',
+  'SignIn.object': '"sign_in"',
+  'SignIn.status': '.unknown("")',
+  'SignIn.supported_identifiers': '[]',
+  'SignIn.identifier': '""',
+  'SignIn.user_data': 'UserData(imageUrl: "", hasImage: false)',
+  'SignIn.supported_first_factors': '[]',
+  'SignIn.supported_second_factors': '[]',
+  'SignUp.object': '"sign_up"',
+  'SignUp.status': '.unknown("")',
+  'SignUp.required_fields': '[]',
+  'SignUp.optional_fields': '[]',
+  'SignUp.missing_fields': '[]',
+  'SignUp.unverified_fields': '[]',
+  'SignUp.external_account': '.object([:])',
+  'SignUp.has_password': 'false',
+  'SignUp.unsafe_metadata': '.object([:])',
+  'SignUpVerification.next_action': '""',
+  'SignUpVerification.supported_strategies': '[]',
+  'SignUpVerification.status': '.unverified',
+  'SignUpVerification.verified_at_client': '""',
+  'SignUpVerification.strategy': '""',
+  'SignUpVerification.attempts': '0',
+  'SignUpVerification.expire_at': 'Date(timeIntervalSince1970: 0)',
+  'SignUpVerification.error': 'ClerkAPIError(code: "", message: "")',
+  'SignUpVerification.id': '""',
+  'SignUpVerification.object': '"verification"',
+  'SignUpVerifications.email_address': '.empty',
+  'SignUpVerifications.phone_number': '.empty',
+  'SignUpVerifications.web3_wallet': '.empty',
+  'SignUpVerifications.external_account': 'Verification.empty',
+  'Token.object': '"token"',
+  'Token.jwt': '""',
+  'Token.id': '""',
+  'User.object': '"user"',
+  'User.image_url': '""',
+  'User.has_image': 'false',
+  'User.email_addresses': '[]',
+  'User.phone_numbers': '[]',
+  'User.web3_wallets': '[]',
+  'User.external_accounts': '[]',
+  'User.enterprise_accounts': '[]',
+  'User.passkeys': '[]',
+  'User.organization_memberships': '[]',
+  'User.password_enabled': 'false',
+  'User.profile_image_id': '""',
+  'User.totp_enabled': 'false',
+  'User.backup_code_enabled': 'false',
+  'User.two_factor_enabled': 'false',
+  'User.public_metadata': '.object([:])',
+  'User.unsafe_metadata': '.object([:])',
+  'User.create_organization_enabled': 'false',
+  'User.delete_self_enabled': 'false',
+  'User.created_at': 'Date(timeIntervalSince1970: 0)',
+  'User.updated_at': 'Date(timeIntervalSince1970: 0)',
+  'UserData.image_url': '""',
+  'UserData.has_image': 'false',
+  'Session.object': '"session"',
+  'Session.status': '.unknown("")',
+  'Session.expire_at': 'Date(timeIntervalSince1970: 0)',
+  'Session.abandon_at': 'Date(timeIntervalSince1970: 0)',
+  'Session.last_active_at': 'Date(timeIntervalSince1970: 0)',
+  'Session.last_active_token': '.empty',
+  'Session.user': '.empty',
+  'Session.public_user_data': '.empty',
+  'Session.created_at': 'Date(timeIntervalSince1970: 0)',
+  'Session.updated_at': 'Date(timeIntervalSince1970: 0)',
+  'EmailAddress.object': '"email_address"',
+  'EmailAddress.linked_to': '[]',
+  'EmailAddress.matches_sso_connection': 'false',
+  'EmailAddress.created_at': 'Date(timeIntervalSince1970: 0)',
+  'PhoneNumber.object': '"phone_number"',
+  'PhoneNumber.reserved_for_second_factor': 'false',
+  'PhoneNumber.default_second_factor': 'false',
+  'PhoneNumber.linked_to': '[]',
+  'PhoneNumber.created_at': 'Date(timeIntervalSince1970: 0)',
+  'ExternalAccount.object': '"external_account"',
+  'ExternalAccount.identification_id': '""',
+  'ExternalAccount.provider_user_id': '""',
+  'ExternalAccount.approved_scopes': '""',
+  'ExternalAccount.email_address': '""',
+  'ExternalAccount.first_name': '""',
+  'ExternalAccount.last_name': '""',
+  'ExternalAccount.image_url': '""',
+  'ExternalAccount.username': '""',
+  'ExternalAccount.phone_number': '""',
+  'ExternalAccount.public_metadata': '.object([:])',
+  'ExternalAccount.label': '""',
+  'ExternalAccount.created_at': 'Date(timeIntervalSince1970: 0)',
+  'Verification.status': '.unverified',
+  'Verification.verified_at_client': '""',
+  'Verification.strategy': '""',
+  'Verification.attempts': '0',
+  'Verification.expire_at': 'Date(timeIntervalSince1970: 0)',
+  'Verification.error': 'ClerkAPIError(code: "", message: "")',
+  'Verification.id': '""',
+  'Verification.object': '"verification"',
+  'Verification.trusted_device_challenge': '""',
+  'SessionActivity.id': '""',
+  'SessionActivity.object': '"session_activity"',
+  'AuthConfig.single_session_mode': 'false',
+  'AuthConfig.reverification': 'false',
+  'AuthConfig.session_minter': 'false',
+  'AuthConfig.native_settings': '.default',
+  'AuthConfig.id': '""',
+  'AuthConfig.object': '"auth_config"',
+  'ClerkAPIError.code': '""',
+  'ClerkAPIError.message': '""',
+  'ClerkAPIError.clerk_trace_id': '""',
+};
+
+const EXTRA_PROPERTIES: Record<string, SwiftProperty[]> = {
+  Session: [
+    {
+      name: 'latestActivity',
+      wireName: 'latest_activity',
+      type: { kind: 'optional', of: { kind: 'named', name: 'SessionActivity' } },
+      isDate: false,
+    },
+  ],
+  EmailAddress: [
+    {
+      name: 'createdAt',
+      wireName: 'created_at',
+      type: { kind: 'primitive', name: 'Date' },
+      isDate: true,
+    },
+  ],
+  PhoneNumber: [
+    {
+      name: 'createdAt',
+      wireName: 'created_at',
+      type: { kind: 'primitive', name: 'Date' },
+      isDate: true,
+    },
+  ],
+  ExternalAccount: [
+    {
+      name: 'createdAt',
+      wireName: 'created_at',
+      type: { kind: 'primitive', name: 'Date' },
+      isDate: true,
+    },
+  ],
+  ClerkAPIError: [
+    {
+      name: 'clerkTraceId',
+      wireName: 'clerk_trace_id',
+      type: { kind: 'primitive', name: 'String' },
+      isDate: false,
+    },
+  ],
+  AuthConfig: [
+    {
+      name: 'nativeSettings',
+      wireName: 'native_settings',
+      type: { kind: 'named', name: 'NativeSettings' },
+      isDate: false,
+    },
+  ],
+  Verification: [
+    {
+      name: 'trustedDeviceChallenge',
+      wireName: 'trusted_device_challenge',
+      type: { kind: 'primitive', name: 'String' },
+      isDate: false,
+    },
+  ],
+};
+
+const HASHABLE_STRUCTS = new Set([
+  'EmailAddress',
+  'PhoneNumber',
+  'ExternalAccount',
+  'IdentificationLink',
+  'SessionTask',
+  'Verification',
+]);
+
+const CLASS_TYPES = new Set(['ClerkAPIError']);
+const FORCE_REQUIRED = new Set(['AuthConfig.session_minter']);
+const RAW_VALUE_ENUMS = new Set(['OrganizationEnrollmentMode']);
+const EXTRA_ENUM_CASES: Record<string, { name: string; raw: string }[]> = {
+  SignInIdentifier: [{ name: 'passkey', raw: 'passkey' }],
+  SignInSecondFactorStrategy: [{ name: 'passkey', raw: 'passkey' }],
+};
+const INIT_DEFAULTS: Record<string, string> = {
+  'AuthConfig.session_minter': 'false',
+  'AuthConfig.native_settings': '.default',
+  'Verification.trusted_device_challenge': '""',
+  'ClerkAPIError.clerk_trace_id': '""',
+  'SessionActivity.object': '"session_activity"',
+};
+const CUSTOM_HASH: Record<string, string[]> = {
+  Verification: [
+    'id',
+    'status',
+    'strategy',
+    'nonce',
+    'attempts',
+    'expireAt',
+    'externalVerificationRedirectUrl',
+    'trustedDeviceChallenge',
+  ],
+};
+const CUSTOM_DECODE: Record<string, string> = {
+  'Verification.trusted_device_challenge': `    if let value = try container.decodeIfPresentFlexible(
+      JSONValue.self,
+      snake: "trusted_device_challenge",
+      camel: "trustedDeviceChallenge"
+    ) {
+      self.trustedDeviceChallenge = String(data: try value.data(), encoding: .utf8) ?? ""
+    } else {
+      self.trustedDeviceChallenge = try container.decodeIfPresentFlexible(
+        String.self,
+        snake: "trusted_device_challenge",
+        camel: "trustedDeviceChallenge"
+      ) ?? ""
+    }`,
+};
+const CUSTOM_ENCODE: Record<string, string> = {
+  'Verification.trusted_device_challenge': `    if !trustedDeviceChallenge.isEmpty, let data = trustedDeviceChallenge.data(using: .utf8) {
+      try container.encode(JSONDecoder().decode(JSONValue.self, from: data), forKey: .trustedDeviceChallenge)
+    }`,
+};
+
+function applyExtraProperties(name: string, properties: SwiftProperty[]): SwiftProperty[] {
+  for (const extra of EXTRA_PROPERTIES[name] ?? []) {
+    if (properties.some(property => property.wireName === extra.wireName)) {
+      continue;
+    }
+    const createdAt = properties.findIndex(property => property.wireName === 'created_at');
+    const resourceId = properties.findIndex(property => property.wireName === 'id');
+    if (extra.wireName !== 'created_at' && createdAt >= 0) {
+      properties.splice(createdAt, 0, extra);
+    } else if (extra.wireName === 'native_settings' && resourceId >= 0) {
+      properties.splice(resourceId, 0, extra);
+    } else {
+      properties.push(extra);
+    }
+  }
+  return properties;
+}
+
+function applyForceRequired(name: string, properties: SwiftProperty[]): void {
+  for (const property of properties) {
+    if (FORCE_REQUIRED.has(`${name}.${property.wireName}`) && property.type.kind === 'optional') {
+      property.type = property.type.of;
+    }
+  }
+}
+
+function applyExtraEnumCases(name: string, cases: { name: string; raw: string }[]): void {
+  for (const extra of EXTRA_ENUM_CASES[name] ?? []) {
+    if (!cases.some(item => item.raw === extra.raw)) {
+      cases.push(extra);
+    }
+  }
+}
+
+function emitDecode(property: SwiftProperty, owner: string): string {
+  const custom = CUSTOM_DECODE[`${owner}.${property.wireName}`];
+  if (custom) {
+    return custom;
+  }
   const snake = escapeSwiftString(property.wireName);
   const camel = escapeSwiftString(property.name.replace(/`/g, ''));
   const optional = isOptionalRef(property.type);
+  const defaultValue = DECODE_DEFAULTS[`${owner}.${property.wireName}`];
   if (property.isDate) {
+    if (defaultValue !== undefined) {
+      return `    self.${property.name} = try container.decodeIfPresentMillisecondsDate(snake: "${snake}", camel: "${camel}") ?? ${defaultValue}`;
+    }
     return optional
       ? `    self.${property.name} = try container.decodeIfPresentMillisecondsDate(snake: "${snake}", camel: "${camel}")`
       : `    self.${property.name} = try container.decodeMillisecondsDate(snake: "${snake}", camel: "${camel}")`;
   }
   const typeName = emitRef(optional && property.type.kind === 'optional' ? property.type.of : property.type);
+  if (defaultValue !== undefined) {
+    return `    self.${property.name} = try container.decodeFlexibleDefault(${typeName}.self, snake: "${snake}", camel: "${camel}", default: ${defaultValue})`;
+  }
   return optional
     ? `    self.${property.name} = try container.decodeIfPresentFlexible(${typeName}.self, snake: "${snake}", camel: "${camel}")`
     : `    self.${property.name} = try container.decodeFlexible(${typeName}.self, snake: "${snake}", camel: "${camel}")`;
 }
 
-function emitEncode(property: SwiftProperty): string {
+function emitEncode(property: SwiftProperty, owner: string): string {
+  const custom = CUSTOM_ENCODE[`${owner}.${property.wireName}`];
+  if (custom) {
+    return custom;
+  }
   const key = `.${property.name}`;
   const optional = isOptionalRef(property.type);
   if (property.isDate) {
@@ -1176,18 +1659,95 @@ function emitEncode(property: SwiftProperty): string {
     : `    try container.encode(${property.name}, forKey: ${key})`;
 }
 
+function emitInitDefault(property: SwiftProperty, owner: string): string {
+  const typeName = emitRef(property.type);
+  const initDefault = INIT_DEFAULTS[`${owner}.${property.wireName}`];
+  if (initDefault !== undefined) {
+    return `    ${property.name}: ${typeName} = ${initDefault}`;
+  }
+  return isOptionalRef(property.type) ? `    ${property.name}: ${typeName} = nil` : `    ${property.name}: ${typeName}`;
+}
+
+function emitHash(decl: SwiftStruct): string[] {
+  const fields = CUSTOM_HASH[decl.name];
+  if (!fields) {
+    return [];
+  }
+  return [
+    '',
+    '  public func hash(into hasher: inout Hasher) {',
+    ...fields.map(field => `    hasher.combine(${field})`),
+    '  }',
+  ];
+}
+
+function emitErrorClass(decl: SwiftStruct): string {
+  const initParams = decl.properties.map(property => emitInitDefault(property, decl.name));
+  const initBody = decl.properties.map(property => `    self.${property.name} = ${property.name}`);
+  const codingKeys = decl.properties.map(property => {
+    const caseName = property.name.replace(/`/g, '');
+    return caseName === property.wireName
+      ? `    case ${property.name}`
+      : `    case ${property.name} = "${escapeSwiftString(property.wireName)}"`;
+  });
+  const equals = decl.properties.map(property => `      && lhs.${property.name} == rhs.${property.name}`);
+  equals[0] = `    lhs.${decl.properties[0].name} == rhs.${decl.properties[0].name}`;
+  return [
+    GENERATED_HEADER,
+    'import Foundation',
+    '',
+    'public final class ClerkAPIError: Codable, Equatable, @unchecked Sendable, Error, LocalizedError {',
+    ...decl.properties.map(property => `  public var ${property.name}: ${emitRef(property.type)}`),
+    '',
+    '  public static var empty: ClerkAPIError { ClerkAPIError(code: "", message: "") }',
+    '',
+    '  public init(',
+    initParams.join(',\n'),
+    '  ) {',
+    ...initBody,
+    '  }',
+    '',
+    '  public var errorDescription: String? {',
+    '    longMessage ?? (message.isEmpty ? nil : message)',
+    '  }',
+    '',
+    '  public static func == (lhs: ClerkAPIError, rhs: ClerkAPIError) -> Bool {',
+    ...equals,
+    '  }',
+    '',
+    '  public enum CodingKeys: String, CodingKey {',
+    ...codingKeys,
+    '  }',
+    '',
+    '  public required init(from decoder: Decoder) throws {',
+    '    let container = try decoder.container(keyedBy: FAPIJSONKey.self)',
+    ...decl.properties.map(property => emitDecode(property, decl.name)),
+    '  }',
+    '',
+    '  public func encode(to encoder: Encoder) throws {',
+    '    var container = encoder.container(keyedBy: CodingKeys.self)',
+    ...decl.properties.map(property => emitEncode(property, decl.name)),
+    '  }',
+    '}',
+    '',
+  ].join('\n');
+}
+
 function emitStruct(decl: SwiftStruct): string {
-  const conformances = ['Codable', 'Equatable', 'Sendable'];
+  if (decl.asClass) {
+    return emitErrorClass(decl);
+  }
+  const conformances = ['Codable', 'Equatable'];
+  if (HASHABLE_STRUCTS.has(decl.name)) {
+    conformances.push('Hashable');
+  }
+  conformances.push('Sendable');
   if (decl.identifiable) {
     conformances.push('Identifiable');
   }
   const needsCustomCodable = decl.properties.some(property => property.isDate);
-  const initParams = decl.properties.map(property => {
-    const typeName = emitRef(property.type);
-    return isOptionalRef(property.type)
-      ? `    ${property.name}: ${typeName} = nil`
-      : `    ${property.name}: ${typeName}`;
-  });
+  const hasCustomEncode = decl.properties.some(property => CUSTOM_ENCODE[`${decl.name}.${property.wireName}`]);
+  const initParams = decl.properties.map(property => emitInitDefault(property, decl.name));
   const initBody = decl.properties.map(property => `    self.${property.name} = ${property.name}`);
   const codingKeys = decl.properties.map(property => {
     const caseName = property.name.replace(/`/g, '');
@@ -1207,6 +1767,7 @@ function emitStruct(decl: SwiftStruct): string {
     '  ) {',
     ...initBody,
     '  }',
+    ...emitHash(decl),
   ];
   if (decl.properties.length > 0) {
     lines.push('', '  public enum CodingKeys: String, CodingKey {', ...codingKeys, '  }');
@@ -1216,16 +1777,16 @@ function emitStruct(decl: SwiftStruct): string {
       '',
       '  public init(from decoder: Decoder) throws {',
       '    let container = try decoder.container(keyedBy: FAPIJSONKey.self)',
-      ...decl.properties.map(emitDecode),
+      ...decl.properties.map(property => emitDecode(property, decl.name)),
       '  }',
     );
   }
-  if (needsCustomCodable || decl.properties.some(property => isOptionalRef(property.type))) {
+  if (needsCustomCodable || hasCustomEncode || decl.properties.some(property => isOptionalRef(property.type))) {
     lines.push(
       '',
       '  public func encode(to encoder: Encoder) throws {',
       '    var container = encoder.container(keyedBy: CodingKeys.self)',
-      ...decl.properties.map(emitEncode),
+      ...decl.properties.map(property => emitEncode(property, decl.name)),
       '  }',
     );
   }
@@ -1524,7 +2085,7 @@ export function generateSwiftModels(
   const { facades, paramDecls } = collectMethodFacades(program, modelNames, methodRoots);
   const files = [
     { filename: 'JSONValue.swift', contents: emitHelperFile() },
-    ...decls.map(decl => ({ filename: `${decl.name}.swift`, contents: emitDecl(decl) })),
+    ...decls.map(decl => ({ filename: emitFilename(decl), contents: emitDecl(decl) })),
     ...emitMethodFiles(facades, paramDecls),
   ];
   return files.sort((a, b) => a.filename.localeCompare(b.filename));

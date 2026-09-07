@@ -30,6 +30,127 @@ describe('generateSwiftModels', () => {
     expect(status, 'string unions include unknown(String) for forward compat').toContain('case unknown(String)');
   });
 
+  it('emits organization satellites and billing resources from explicit JSON roots', () => {
+    expect(byName.get('OrganizationDomain.swift'), 'OrganizationDomainJSON emits OrganizationDomain').toBeDefined();
+    expect(
+      byName.get('OrganizationInvitation.swift'),
+      'OrganizationInvitationJSON emits OrganizationInvitation',
+    ).toBeDefined();
+    expect(
+      byName.get('OrganizationMembershipRequest.swift'),
+      'OrganizationMembershipRequestJSON emits OrganizationMembershipRequest',
+    ).toBeDefined();
+    expect(
+      byName.get('OrganizationSuggestion.swift'),
+      'OrganizationSuggestionJSON emits OrganizationSuggestion',
+    ).toBeDefined();
+    expect(
+      byName.get('UserOrganizationInvitation.swift'),
+      'UserOrganizationInvitationJSON emits UserOrganizationInvitation',
+    ).toBeDefined();
+    expect(byName.get('Role.swift'), 'RoleJSON emits Role').toBeDefined();
+    expect(byName.get('Permission.swift'), 'PermissionJSON emits Permission').toBeDefined();
+    expect(byName.get('BillingSubscription.swift'), 'BillingSubscriptionJSON emits BillingSubscription').toBeDefined();
+    expect(byName.get('BillingPlan.swift'), 'BillingPlanJSON emits BillingPlan').toBeDefined();
+    expect(byName.get('Feature.swift'), 'FeatureJSON emits Feature').toBeDefined();
+    expect(byName.get('TOTP.swift'), 'TOTPJSON emits TOTP').toBeDefined();
+    expect(byName.get('BackupCode.swift'), 'BackupCodeJSON emits BackupCode').toBeDefined();
+    expect(byName.get('DeletedObject.swift'), 'DeletedObjectJSON emits DeletedObject').toBeDefined();
+    expect(
+      byName.get('DeletedObject.swift'),
+      'JS delete payloads can omit object; keep the stored field required',
+    ).toContain('decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "deleted_object")');
+    expect(byName.get('SignUpData.swift'), 'live FAPI sign_up omits allowlist_only and captcha_enabled').toContain(
+      'decodeFlexibleDefault(Bool.self, snake: "allowlist_only", camel: "allowlistOnly", default: false)',
+    );
+    expect(byName.get('SignUpData.swift'), 'live FAPI sign_up omits captcha_enabled').toContain(
+      'decodeFlexibleDefault(Bool.self, snake: "captcha_enabled", camel: "captchaEnabled", default: false)',
+    );
+    expect(byName.get('APIKeysSettings.swift'), 'live FAPI api_keys_settings omits id and object').toContain(
+      'decodeFlexibleDefault(String.self, snake: "id", camel: "id", default: "")',
+    );
+    expect(byName.get('SignInDataSecondFactor.swift'), 'live FAPI sign_in.second_factor omits enabled').toContain(
+      'decodeFlexibleDefault(Bool.self, snake: "enabled", camel: "enabled", default: false)',
+    );
+    expect(byName.get('JSONValue.swift'), 'required FAPI omissions decode through one helper').toContain(
+      'func decodeFlexibleDefault',
+    );
+    expect(byName.get('Environment.swift'), 'live FAPI environment omits object and nested settings').toContain(
+      'decodeFlexibleDefault(UserSettings.self, snake: "user_settings", camel: "userSettings", default: .empty)',
+    );
+    expect(
+      byName.get('ClerkEnvironment.swift'),
+      'ClerkEnvironment writes Environment.swift so it does not collide with SwiftUI',
+    ).toBeUndefined();
+    expect(byName.get('Environment.swift'), 'the type remains ClerkEnvironment').toContain(
+      'public struct ClerkEnvironment:',
+    );
+    expect(
+      byName.get('SessionActivity.swift'),
+      'SessionActivityJSON is a model root so latest_activity can decode',
+    ).toContain('public struct SessionActivity:');
+    expect(byName.get('SessionActivity.swift'), 'session_activity payloads can omit object').toContain(
+      'decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "session_activity")',
+    );
+    expect(
+      byName.get('DisplayConfig.swift'),
+      'live FAPI display_config keeps application_name required with a decoder default',
+    ).toContain('decodeFlexibleDefault(String.self, snake: "application_name", camel: "applicationName", default: "")');
+    expect(byName.get('User.swift'), 'JS user snapshots can omit object and identifier arrays').toContain(
+      'decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "user")',
+    );
+    expect(byName.get('Client.swift'), 'client sessions default to empty when omitted').toContain(
+      'decodeFlexibleDefault([Session].self, snake: "sessions", camel: "sessions", default: [])',
+    );
+    expect(byName.get('ClerkImage.swift'), 'ImageJSON emits ClerkImage to avoid SwiftUI.Image').toBeDefined();
+    expect(byName.get('Image.swift'), 'ImageJSON must not emit Image.swift').toBeUndefined();
+    const session = byName.get('Session.swift') ?? '';
+    expect(session, 'session snapshots include latest_activity from SessionWithActivitiesJSON').toContain(
+      'public var latestActivity: SessionActivity?',
+    );
+    expect(
+      session.indexOf('public var latestActivity'),
+      'latestActivity stays before createdAt so Kit convenience inits keep their labels',
+    ).toBeLessThan(session.indexOf('public var createdAt'));
+    expect(byName.get('Session.swift'), 'JS session snapshots can omit object and required dates').toContain(
+      'decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "session")',
+    );
+    expect(byName.get('Session.swift'), 'omitted session.user decodes through User.empty').toContain(
+      'decodeFlexibleDefault(User.self, snake: "user", camel: "user", default: .empty)',
+    );
+    expect(byName.get('EmailAddress.swift'), 'FAPI email payloads can omit created_at').toContain(
+      'decodeIfPresentMillisecondsDate(snake: "created_at", camel: "createdAt") ?? Date(timeIntervalSince1970: 0)',
+    );
+    expect(byName.get('SignInStatus.swift'), 'closed string unions are Hashable so identifier types can be').toContain(
+      'public enum SignInStatus: Codable, Equatable, Hashable, Sendable',
+    );
+    expect(
+      byName.get('ClerkAPIError.swift'),
+      'ClerkAPIError stays a class so Optional<Verification> copy does not crash',
+    ).toContain('public final class ClerkAPIError:');
+    expect(
+      byName.get('ClerkAPIError.swift'),
+      'JS errors carry clerkTraceId even when ClerkAPIErrorJSON omits it',
+    ).toContain('decodeFlexibleDefault(String.self, snake: "clerk_trace_id", camel: "clerkTraceId", default: "")');
+    expect(byName.get('AuthConfig.swift'), 'nativeSettings is required on generated AuthConfig').toContain(
+      'public var nativeSettings: NativeSettings',
+    );
+    expect(byName.get('AuthConfig.swift'), 'session_minter stays required with a decoder default').toContain(
+      'public var sessionMinter: Bool',
+    );
+    expect(
+      byName.get('Verification.swift'),
+      'trusted_device_challenge is a Kit extra stored as a JSON string',
+    ).toContain('public var trustedDeviceChallenge: String');
+    expect(byName.get('SignInIdentifier.swift'), 'iOS passkey sign-in is a first-class identifier').toContain(
+      'case passkey',
+    );
+    expect(
+      byName.get('OrganizationEnrollmentMode.swift'),
+      'org domain UI reads enrollment mode as a raw string',
+    ).toContain('public var rawValue: String');
+  });
+
   it('reuses one Swift type per JSON type instead of suffixing copies', () => {
     const client = byName.get('Client.swift');
     expect(client, 'ClientJSON must emit Client.swift').toBeDefined();

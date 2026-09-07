@@ -2,25 +2,22 @@
 
 import Foundation
 
-public enum OrganizationInvitationStatus: Codable, Equatable, Sendable {
-  case expired
-  case revoked
-  case pending
-  case accepted
+public enum BillingDiscountRedemptionStatus: Codable, Equatable, Hashable, Sendable {
+  case active
+  case removed
+  case exhausted
   case unknown(String)
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
     let value = try container.decode(String.self)
     switch value {
-    case "expired":
-      self = .expired
-    case "revoked":
-      self = .revoked
-    case "pending":
-      self = .pending
-    case "accepted":
-      self = .accepted
+    case "active":
+      self = .active
+    case "removed":
+      self = .removed
+    case "exhausted":
+      self = .exhausted
     default:
       self = .unknown(value)
     }
@@ -29,14 +26,12 @@ public enum OrganizationInvitationStatus: Codable, Equatable, Sendable {
   public func encode(to encoder: Encoder) throws {
     var container = encoder.singleValueContainer()
     switch self {
-    case .expired:
-      try container.encode("expired")
-    case .revoked:
-      try container.encode("revoked")
-    case .pending:
-      try container.encode("pending")
-    case .accepted:
-      try container.encode("accepted")
+    case .active:
+      try container.encode("active")
+    case .removed:
+      try container.encode("removed")
+    case .exhausted:
+      try container.encode("exhausted")
     case .unknown(let value):
       try container.encode(value)
     }

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum VerificationStrategy: Codable, Equatable, Sendable {
+public enum VerificationStrategy: Codable, Equatable, Hashable, Sendable {
   case emailCode
   case emailLink
   case phoneCode

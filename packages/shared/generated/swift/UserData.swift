@@ -31,8 +31,8 @@ public struct UserData: Codable, Equatable, Sendable {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.firstName = try container.decodeIfPresentFlexible(String.self, snake: "first_name", camel: "firstName")
     self.lastName = try container.decodeIfPresentFlexible(String.self, snake: "last_name", camel: "lastName")
-    self.imageUrl = try container.decodeFlexible(String.self, snake: "image_url", camel: "imageUrl")
-    self.hasImage = try container.decodeFlexible(Bool.self, snake: "has_image", camel: "hasImage")
+    self.imageUrl = try container.decodeFlexibleDefault(String.self, snake: "image_url", camel: "imageUrl", default: "")
+    self.hasImage = try container.decodeFlexibleDefault(Bool.self, snake: "has_image", camel: "hasImage", default: false)
   }
 
   public func encode(to encoder: Encoder) throws {

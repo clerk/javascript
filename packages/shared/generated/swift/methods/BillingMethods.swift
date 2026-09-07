@@ -18,15 +18,15 @@ public enum BillingJSMethod: String, Sendable {
 }
 
 public protocol BillingMethods: Sendable {
-  func getCreditBalance(_ params: GetCreditBalanceParams) async throws -> JSONValue
+  func getCreditBalance(_ params: GetCreditBalanceParams) async throws -> BillingCreditBalance
   func getCreditHistory(_ params: GetCreditHistoryParams) async throws -> ClerkPaginatedResponse
-  func getPaymentAttempt(_ params: GetPaymentAttemptParams) async throws -> JSONValue
+  func getPaymentAttempt(_ params: GetPaymentAttemptParams) async throws -> BillingPayment
   func getPaymentAttempts(_ params: GetPaymentAttemptsParams) async throws -> ClerkPaginatedResponse
-  func getPlan(_ params: GetPlanParams) async throws -> JSONValue
+  func getPlan(_ params: GetPlanParams) async throws -> BillingPlan
   func getPlans(_ params: GetPlansParams?) async throws -> ClerkPaginatedResponse
-  func getStatement(_ params: GetStatementParams) async throws -> JSONValue
+  func getStatement(_ params: GetStatementParams) async throws -> BillingStatement
   func getStatements(_ params: GetStatementsParams) async throws -> ClerkPaginatedResponse
-  func getSubscription(_ params: GetSubscriptionParams) async throws -> JSONValue
-  func startCheckout(_ params: CreateCheckoutParams) async throws -> JSONValue
-  func updateCheckout(_ params: UpdateCheckoutParams) async throws -> JSONValue
+  func getSubscription(_ params: GetSubscriptionParams) async throws -> BillingSubscription
+  func startCheckout(_ params: CreateCheckoutParams) async throws -> BillingCheckout
+  func updateCheckout(_ params: UpdateCheckoutParams) async throws -> BillingCheckout
 }

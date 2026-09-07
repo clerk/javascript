@@ -9,6 +9,6 @@ public enum UserOrganizationInvitationJSMethod: String, Sendable {
 }
 
 public protocol UserOrganizationInvitationMethods: Sendable {
-  func accept() async throws -> JSONValue
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> JSONValue
+  func accept() async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
 }

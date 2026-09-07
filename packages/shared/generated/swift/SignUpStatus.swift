@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SignUpStatus: Codable, Equatable, Sendable {
+public enum SignUpStatus: Codable, Equatable, Hashable, Sendable {
   case abandoned
   case complete
   case missingRequirements

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct IdentificationLink: Codable, Equatable, Sendable, Identifiable {
+public struct IdentificationLink: Codable, Equatable, Hashable, Sendable, Identifiable {
   public var id: String
   public var type: String
   public var object: String

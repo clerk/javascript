@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum AttemptSecondFactorParamsStrategy: Codable, Equatable, Sendable {
+public enum AttemptSecondFactorParamsStrategy: Codable, Equatable, Hashable, Sendable {
   case emailCode
   case phoneCode
   case totp

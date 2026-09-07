@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum VerificationStatus: Codable, Equatable, Sendable {
+public enum VerificationStatus: Codable, Equatable, Hashable, Sendable {
   case expired
   case unverified
   case verified

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
+public struct PhoneNumber: Codable, Equatable, Hashable, Sendable, Identifiable {
   public var object: String
   public var id: String
   public var phoneNumber: String
@@ -11,6 +11,7 @@ public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
   public var linkedTo: [IdentificationLink]
   public var verification: Verification?
   public var backupCodes: [String]?
+  public var createdAt: Date
 
   public init(
     object: String,
@@ -20,7 +21,8 @@ public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
     defaultSecondFactor: Bool,
     linkedTo: [IdentificationLink],
     verification: Verification? = nil,
-    backupCodes: [String]? = nil
+    backupCodes: [String]? = nil,
+    createdAt: Date
   ) {
     self.object = object
     self.id = id
@@ -30,6 +32,7 @@ public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
     self.linkedTo = linkedTo
     self.verification = verification
     self.backupCodes = backupCodes
+    self.createdAt = createdAt
   }
 
   public enum CodingKeys: String, CodingKey {
@@ -41,18 +44,20 @@ public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
     case linkedTo = "linked_to"
     case verification
     case backupCodes = "backup_codes"
+    case createdAt = "created_at"
   }
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "phone_number")
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
     self.phoneNumber = try container.decodeFlexible(String.self, snake: "phone_number", camel: "phoneNumber")
-    self.reservedForSecondFactor = try container.decodeFlexible(Bool.self, snake: "reserved_for_second_factor", camel: "reservedForSecondFactor")
-    self.defaultSecondFactor = try container.decodeFlexible(Bool.self, snake: "default_second_factor", camel: "defaultSecondFactor")
-    self.linkedTo = try container.decodeFlexible([IdentificationLink].self, snake: "linked_to", camel: "linkedTo")
+    self.reservedForSecondFactor = try container.decodeFlexibleDefault(Bool.self, snake: "reserved_for_second_factor", camel: "reservedForSecondFactor", default: false)
+    self.defaultSecondFactor = try container.decodeFlexibleDefault(Bool.self, snake: "default_second_factor", camel: "defaultSecondFactor", default: false)
+    self.linkedTo = try container.decodeFlexibleDefault([IdentificationLink].self, snake: "linked_to", camel: "linkedTo", default: [])
     self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
     self.backupCodes = try container.decodeIfPresentFlexible([String].self, snake: "backup_codes", camel: "backupCodes")
+    self.createdAt = try container.decodeIfPresentMillisecondsDate(snake: "created_at", camel: "createdAt") ?? Date(timeIntervalSince1970: 0)
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -65,5 +70,6 @@ public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
     try container.encode(linkedTo, forKey: .linkedTo)
     try container.encodeIfPresent(verification, forKey: .verification)
     try container.encodeIfPresent(backupCodes, forKey: .backupCodes)
+    try container.encodeMillisecondsDate(createdAt, forKey: .createdAt)
   }
 }

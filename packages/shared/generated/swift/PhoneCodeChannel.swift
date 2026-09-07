@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum PhoneCodeChannel: Codable, Equatable, Sendable {
+public enum PhoneCodeChannel: Codable, Equatable, Hashable, Sendable {
   case sms
   case whatsapp
   case unknown(String)

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SessionVerifyCreateParamsLevel: Codable, Equatable, Sendable {
+public enum SessionVerifyCreateParamsLevel: Codable, Equatable, Hashable, Sendable {
   case firstFactor
   case secondFactor
   case multiFactor

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum GetUserOrganizationInvitationsParamsStatus: Codable, Equatable, Sendable {
+public enum GetUserOrganizationInvitationsParamsStatus: Codable, Equatable, Hashable, Sendable {
   case expired
   case revoked
   case pending

@@ -25,8 +25,8 @@ public struct Token: Codable, Equatable, Sendable, Identifiable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
-    self.jwt = try container.decodeFlexible(String.self, snake: "jwt", camel: "jwt")
-    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "token")
+    self.jwt = try container.decodeFlexibleDefault(String.self, snake: "jwt", camel: "jwt", default: "")
+    self.id = try container.decodeFlexibleDefault(String.self, snake: "id", camel: "id", default: "")
   }
 }

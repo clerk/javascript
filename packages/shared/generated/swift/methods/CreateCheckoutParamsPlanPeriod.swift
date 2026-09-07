@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum CreateCheckoutParamsPlanPeriod: Codable, Equatable, Sendable {
+public enum CreateCheckoutParamsPlanPeriod: Codable, Equatable, Hashable, Sendable {
   case month
   case annual
   case unknown(String)

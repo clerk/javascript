@@ -10,7 +10,7 @@ public enum OrganizationMembershipRequestJSMethod: String, Sendable {
 }
 
 public protocol OrganizationMembershipRequestMethods: Sendable {
-  func accept() async throws -> JSONValue
-  func reject() async throws -> JSONValue
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> JSONValue
+  func accept() async throws -> Self
+  func reject() async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
 }

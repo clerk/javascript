@@ -2,12 +2,42 @@
 
 import Foundation
 
-public enum OrganizationEnrollmentMode: Codable, Equatable, Sendable {
+public enum OrganizationEnrollmentMode: Codable, Equatable, Hashable, Sendable {
   case enterpriseSso
   case manualInvitation
   case automaticInvitation
   case automaticSuggestion
   case unknown(String)
+
+  public var rawValue: String {
+    switch self {
+    case .enterpriseSso:
+      "enterprise_sso"
+    case .manualInvitation:
+      "manual_invitation"
+    case .automaticInvitation:
+      "automatic_invitation"
+    case .automaticSuggestion:
+      "automatic_suggestion"
+    case .unknown(let value):
+      value
+    }
+  }
+
+  public init(rawValue: String) {
+    switch rawValue {
+    case "enterprise_sso":
+      self = .enterpriseSso
+    case "manual_invitation":
+      self = .manualInvitation
+    case "automatic_invitation":
+      self = .automaticInvitation
+    case "automatic_suggestion":
+      self = .automaticSuggestion
+    default:
+      self = .unknown(rawValue)
+    }
+  }
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()

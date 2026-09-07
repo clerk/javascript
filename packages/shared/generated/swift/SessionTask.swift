@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct SessionTask: Codable, Equatable, Sendable {
+public struct SessionTask: Codable, Equatable, Hashable, Sendable {
   public var key: SessionTaskKey
 
   public init(

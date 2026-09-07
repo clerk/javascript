@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SessionStatus: Codable, Equatable, Sendable {
+public enum SessionStatus: Codable, Equatable, Hashable, Sendable {
   case abandoned
   case active
   case ended

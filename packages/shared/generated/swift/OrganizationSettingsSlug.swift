@@ -17,6 +17,6 @@ public struct OrganizationSettingsSlug: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.disabled = try container.decodeFlexible(Bool.self, snake: "disabled", camel: "disabled")
+    self.disabled = try container.decodeFlexibleDefault(Bool.self, snake: "disabled", camel: "disabled", default: false)
   }
 }

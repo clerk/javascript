@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct Verification: Codable, Equatable, Sendable, Identifiable {
+public struct Verification: Codable, Equatable, Hashable, Sendable, Identifiable {
   public var status: VerificationStatus
   public var verifiedAtClient: String
   public var strategy: String
@@ -15,6 +15,7 @@ public struct Verification: Codable, Equatable, Sendable, Identifiable {
   public var error: ClerkAPIError
   public var id: String
   public var object: String
+  public var trustedDeviceChallenge: String
 
   public init(
     status: VerificationStatus,
@@ -28,7 +29,8 @@ public struct Verification: Codable, Equatable, Sendable, Identifiable {
     channel: SignInFirstFactorChannel? = nil,
     error: ClerkAPIError,
     id: String,
-    object: String
+    object: String,
+    trustedDeviceChallenge: String = ""
   ) {
     self.status = status
     self.verifiedAtClient = verifiedAtClient
@@ -42,6 +44,18 @@ public struct Verification: Codable, Equatable, Sendable, Identifiable {
     self.error = error
     self.id = id
     self.object = object
+    self.trustedDeviceChallenge = trustedDeviceChallenge
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+    hasher.combine(status)
+    hasher.combine(strategy)
+    hasher.combine(nonce)
+    hasher.combine(attempts)
+    hasher.combine(expireAt)
+    hasher.combine(externalVerificationRedirectUrl)
+    hasher.combine(trustedDeviceChallenge)
   }
 
   public enum CodingKeys: String, CodingKey {
@@ -57,22 +71,36 @@ public struct Verification: Codable, Equatable, Sendable, Identifiable {
     case error
     case id
     case object
+    case trustedDeviceChallenge = "trusted_device_challenge"
   }
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.status = try container.decodeFlexible(VerificationStatus.self, snake: "status", camel: "status")
-    self.verifiedAtClient = try container.decodeFlexible(String.self, snake: "verified_at_client", camel: "verifiedAtClient")
-    self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
+    self.status = try container.decodeFlexibleDefault(VerificationStatus.self, snake: "status", camel: "status", default: .unverified)
+    self.verifiedAtClient = try container.decodeFlexibleDefault(String.self, snake: "verified_at_client", camel: "verifiedAtClient", default: "")
+    self.strategy = try container.decodeFlexibleDefault(String.self, snake: "strategy", camel: "strategy", default: "")
     self.nonce = try container.decodeIfPresentFlexible(String.self, snake: "nonce", camel: "nonce")
     self.message = try container.decodeIfPresentFlexible(String.self, snake: "message", camel: "message")
     self.externalVerificationRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "external_verification_redirect_url", camel: "externalVerificationRedirectUrl")
-    self.attempts = try container.decodeFlexible(Int.self, snake: "attempts", camel: "attempts")
-    self.expireAt = try container.decodeMillisecondsDate(snake: "expire_at", camel: "expireAt")
+    self.attempts = try container.decodeFlexibleDefault(Int.self, snake: "attempts", camel: "attempts", default: 0)
+    self.expireAt = try container.decodeIfPresentMillisecondsDate(snake: "expire_at", camel: "expireAt") ?? Date(timeIntervalSince1970: 0)
     self.channel = try container.decodeIfPresentFlexible(SignInFirstFactorChannel.self, snake: "channel", camel: "channel")
-    self.error = try container.decodeFlexible(ClerkAPIError.self, snake: "error", camel: "error")
-    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.error = try container.decodeFlexibleDefault(ClerkAPIError.self, snake: "error", camel: "error", default: ClerkAPIError(code: "", message: ""))
+    self.id = try container.decodeFlexibleDefault(String.self, snake: "id", camel: "id", default: "")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "verification")
+    if let value = try container.decodeIfPresentFlexible(
+      JSONValue.self,
+      snake: "trusted_device_challenge",
+      camel: "trustedDeviceChallenge"
+    ) {
+      self.trustedDeviceChallenge = String(data: try value.data(), encoding: .utf8) ?? ""
+    } else {
+      self.trustedDeviceChallenge = try container.decodeIfPresentFlexible(
+        String.self,
+        snake: "trusted_device_challenge",
+        camel: "trustedDeviceChallenge"
+      ) ?? ""
+    }
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -89,5 +117,8 @@ public struct Verification: Codable, Equatable, Sendable, Identifiable {
     try container.encode(error, forKey: .error)
     try container.encode(id, forKey: .id)
     try container.encode(object, forKey: .object)
+    if !trustedDeviceChallenge.isEmpty, let data = trustedDeviceChallenge.data(using: .utf8) {
+      try container.encode(JSONDecoder().decode(JSONValue.self, from: data), forKey: .trustedDeviceChallenge)
+    }
   }
 }

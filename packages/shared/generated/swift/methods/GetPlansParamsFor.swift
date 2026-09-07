@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum GetPlansParamsFor: Codable, Equatable, Sendable {
+public enum GetPlansParamsFor: Codable, Equatable, Hashable, Sendable {
   case user
   case organization
   case unknown(String)

@@ -53,15 +53,15 @@ public struct UserSettings: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.attributes = try container.decodeFlexible(Attributes.self, snake: "attributes", camel: "attributes")
-    self.actions = try container.decodeFlexible(Actions.self, snake: "actions", camel: "actions")
-    self.social = try container.decodeFlexible(OAuthProviders.self, snake: "social", camel: "social")
-    self.enterpriseSso = try container.decodeFlexible(EnterpriseSSOSettings.self, snake: "enterprise_sso", camel: "enterpriseSso")
-    self.signIn = try container.decodeFlexible(SignInData.self, snake: "sign_in", camel: "signIn")
-    self.signUp = try container.decodeFlexible(SignUpData.self, snake: "sign_up", camel: "signUp")
-    self.passwordSettings = try container.decodeFlexible(PasswordSettingsData.self, snake: "password_settings", camel: "passwordSettings")
-    self.passkeySettings = try container.decodeFlexible(PasskeySettingsData.self, snake: "passkey_settings", camel: "passkeySettings")
-    self.usernameSettings = try container.decodeFlexible(UsernameSettingsData.self, snake: "username_settings", camel: "usernameSettings")
+    self.attributes = try container.decodeFlexibleDefault(Attributes.self, snake: "attributes", camel: "attributes", default: .empty)
+    self.actions = try container.decodeFlexibleDefault(Actions.self, snake: "actions", camel: "actions", default: .empty)
+    self.social = try container.decodeFlexibleDefault(OAuthProviders.self, snake: "social", camel: "social", default: .empty)
+    self.enterpriseSso = try container.decodeFlexibleDefault(EnterpriseSSOSettings.self, snake: "enterprise_sso", camel: "enterpriseSso", default: .empty)
+    self.signIn = try container.decodeFlexibleDefault(SignInData.self, snake: "sign_in", camel: "signIn", default: .empty)
+    self.signUp = try container.decodeFlexibleDefault(SignUpData.self, snake: "sign_up", camel: "signUp", default: .empty)
+    self.passwordSettings = try container.decodeFlexibleDefault(PasswordSettingsData.self, snake: "password_settings", camel: "passwordSettings", default: .empty)
+    self.passkeySettings = try container.decodeFlexibleDefault(PasskeySettingsData.self, snake: "passkey_settings", camel: "passkeySettings", default: .empty)
+    self.usernameSettings = try container.decodeFlexibleDefault(UsernameSettingsData.self, snake: "username_settings", camel: "usernameSettings", default: .empty)
     self.attackProtection = try container.decodeIfPresentFlexible(AttackProtectionData.self, snake: "attack_protection", camel: "attackProtection")
   }
 

@@ -53,15 +53,15 @@ public struct AttributeData: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
-    self.required = try container.decodeFlexible(Bool.self, snake: "required", camel: "required")
+    self.enabled = try container.decodeFlexibleDefault(Bool.self, snake: "enabled", camel: "enabled", default: false)
+    self.required = try container.decodeFlexibleDefault(Bool.self, snake: "required", camel: "required", default: false)
     self.immutable = try container.decodeIfPresentFlexible(Bool.self, snake: "immutable", camel: "immutable")
-    self.verifications = try container.decodeFlexible([VerificationStrategy].self, snake: "verifications", camel: "verifications")
-    self.usedForFirstFactor = try container.decodeFlexible(Bool.self, snake: "used_for_first_factor", camel: "usedForFirstFactor")
-    self.firstFactors = try container.decodeFlexible([VerificationStrategy].self, snake: "first_factors", camel: "firstFactors")
-    self.usedForSecondFactor = try container.decodeFlexible(Bool.self, snake: "used_for_second_factor", camel: "usedForSecondFactor")
-    self.secondFactors = try container.decodeFlexible([VerificationStrategy].self, snake: "second_factors", camel: "secondFactors")
-    self.verifyAtSignUp = try container.decodeFlexible(Bool.self, snake: "verify_at_sign_up", camel: "verifyAtSignUp")
+    self.verifications = try container.decodeFlexibleDefault([VerificationStrategy].self, snake: "verifications", camel: "verifications", default: [])
+    self.usedForFirstFactor = try container.decodeFlexibleDefault(Bool.self, snake: "used_for_first_factor", camel: "usedForFirstFactor", default: false)
+    self.firstFactors = try container.decodeFlexibleDefault([VerificationStrategy].self, snake: "first_factors", camel: "firstFactors", default: [])
+    self.usedForSecondFactor = try container.decodeFlexibleDefault(Bool.self, snake: "used_for_second_factor", camel: "usedForSecondFactor", default: false)
+    self.secondFactors = try container.decodeFlexibleDefault([VerificationStrategy].self, snake: "second_factors", camel: "secondFactors", default: [])
+    self.verifyAtSignUp = try container.decodeFlexibleDefault(Bool.self, snake: "verify_at_sign_up", camel: "verifyAtSignUp", default: false)
     self.channels = try container.decodeIfPresentFlexible([PhoneCodeChannel].self, snake: "channels", camel: "channels")
   }
 

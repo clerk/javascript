@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SignUpDataMode: Codable, Equatable, Sendable {
+public enum SignUpDataMode: Codable, Equatable, Hashable, Sendable {
   case `public`
   case restricted
   case waitlist

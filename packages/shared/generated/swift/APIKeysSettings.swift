@@ -29,9 +29,9 @@ public struct APIKeysSettings: Codable, Equatable, Sendable, Identifiable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.userApiKeysEnabled = try container.decodeFlexible(Bool.self, snake: "user_api_keys_enabled", camel: "userApiKeysEnabled")
-    self.orgsApiKeysEnabled = try container.decodeFlexible(Bool.self, snake: "orgs_api_keys_enabled", camel: "orgsApiKeysEnabled")
-    self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
-    self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+    self.userApiKeysEnabled = try container.decodeFlexibleDefault(Bool.self, snake: "user_api_keys_enabled", camel: "userApiKeysEnabled", default: false)
+    self.orgsApiKeysEnabled = try container.decodeFlexibleDefault(Bool.self, snake: "orgs_api_keys_enabled", camel: "orgsApiKeysEnabled", default: false)
+    self.id = try container.decodeFlexibleDefault(String.self, snake: "id", camel: "id", default: "")
+    self.object = try container.decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "api_keys_settings")
   }
 }

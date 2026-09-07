@@ -25,8 +25,8 @@ public struct OrganizationSettingsDomains: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
-    self.enrollmentModes = try container.decodeFlexible([OrganizationEnrollmentMode].self, snake: "enrollment_modes", camel: "enrollmentModes")
+    self.enabled = try container.decodeFlexibleDefault(Bool.self, snake: "enabled", camel: "enabled", default: false)
+    self.enrollmentModes = try container.decodeFlexibleDefault([OrganizationEnrollmentMode].self, snake: "enrollment_modes", camel: "enrollmentModes", default: [])
     self.defaultRole = try container.decodeIfPresentFlexible(String.self, snake: "default_role", camel: "defaultRole")
   }
 

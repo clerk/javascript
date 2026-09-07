@@ -4,12 +4,12 @@ import Foundation
 
 public struct GetRolesResponse: Codable, Equatable, Sendable {
   public var hasRoleSetMigration: Bool?
-  public var data: [JSONValue]
+  public var data: [Role]
   public var totalCount: Int
 
   public init(
     hasRoleSetMigration: Bool? = nil,
-    data: [JSONValue],
+    data: [Role],
     totalCount: Int
   ) {
     self.hasRoleSetMigration = hasRoleSetMigration
@@ -26,7 +26,7 @@ public struct GetRolesResponse: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.hasRoleSetMigration = try container.decodeIfPresentFlexible(Bool.self, snake: "has_role_set_migration", camel: "hasRoleSetMigration")
-    self.data = try container.decodeFlexible([JSONValue].self, snake: "data", camel: "data")
+    self.data = try container.decodeFlexible([Role].self, snake: "data", camel: "data")
     self.totalCount = try container.decodeFlexible(Int.self, snake: "total_count", camel: "totalCount")
   }
 

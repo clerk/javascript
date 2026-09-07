@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SessionTouchParamsIntent: Codable, Equatable, Sendable {
+public enum SessionTouchParamsIntent: Codable, Equatable, Hashable, Sendable {
   case focus
   case selectSession
   case selectOrg

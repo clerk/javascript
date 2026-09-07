@@ -29,9 +29,9 @@ public struct SignUpVerifications: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.emailAddress = try container.decodeFlexible(SignUpVerification.self, snake: "email_address", camel: "emailAddress")
-    self.phoneNumber = try container.decodeFlexible(SignUpVerification.self, snake: "phone_number", camel: "phoneNumber")
-    self.web3Wallet = try container.decodeFlexible(SignUpVerification.self, snake: "web3_wallet", camel: "web3Wallet")
-    self.externalAccount = try container.decodeFlexible(Verification.self, snake: "external_account", camel: "externalAccount")
+    self.emailAddress = try container.decodeFlexibleDefault(SignUpVerification.self, snake: "email_address", camel: "emailAddress", default: .empty)
+    self.phoneNumber = try container.decodeFlexibleDefault(SignUpVerification.self, snake: "phone_number", camel: "phoneNumber", default: .empty)
+    self.web3Wallet = try container.decodeFlexibleDefault(SignUpVerification.self, snake: "web3_wallet", camel: "web3Wallet", default: .empty)
+    self.externalAccount = try container.decodeFlexibleDefault(Verification.self, snake: "external_account", camel: "externalAccount", default: Verification.empty)
   }
 }

@@ -41,12 +41,12 @@ public struct OrganizationSettings: Codable, Equatable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
-    self.maxAllowedMemberships = try container.decodeFlexible(Int.self, snake: "max_allowed_memberships", camel: "maxAllowedMemberships")
-    self.forceOrganizationSelection = try container.decodeFlexible(Bool.self, snake: "force_organization_selection", camel: "forceOrganizationSelection")
-    self.actions = try container.decodeFlexible(OrganizationSettingsActions.self, snake: "actions", camel: "actions")
-    self.domains = try container.decodeFlexible(OrganizationSettingsDomains.self, snake: "domains", camel: "domains")
-    self.slug = try container.decodeFlexible(OrganizationSettingsSlug.self, snake: "slug", camel: "slug")
-    self.organizationCreationDefaults = try container.decodeFlexible(OrganizationSettingsOrganizationCreationDefaults.self, snake: "organization_creation_defaults", camel: "organizationCreationDefaults")
+    self.enabled = try container.decodeFlexibleDefault(Bool.self, snake: "enabled", camel: "enabled", default: false)
+    self.maxAllowedMemberships = try container.decodeFlexibleDefault(Int.self, snake: "max_allowed_memberships", camel: "maxAllowedMemberships", default: 1)
+    self.forceOrganizationSelection = try container.decodeFlexibleDefault(Bool.self, snake: "force_organization_selection", camel: "forceOrganizationSelection", default: false)
+    self.actions = try container.decodeFlexibleDefault(OrganizationSettingsActions.self, snake: "actions", camel: "actions", default: .empty)
+    self.domains = try container.decodeFlexibleDefault(OrganizationSettingsDomains.self, snake: "domains", camel: "domains", default: .empty)
+    self.slug = try container.decodeFlexibleDefault(OrganizationSettingsSlug.self, snake: "slug", camel: "slug", default: .empty)
+    self.organizationCreationDefaults = try container.decodeFlexibleDefault(OrganizationSettingsOrganizationCreationDefaults.self, snake: "organization_creation_defaults", camel: "organizationCreationDefaults", default: .empty)
   }
 }

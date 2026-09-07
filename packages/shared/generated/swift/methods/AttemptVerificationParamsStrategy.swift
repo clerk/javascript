@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum AttemptVerificationParamsStrategy: Codable, Equatable, Sendable {
+public enum AttemptVerificationParamsStrategy: Codable, Equatable, Hashable, Sendable {
   case emailCode
   case phoneCode
   case web3MetamaskSignature

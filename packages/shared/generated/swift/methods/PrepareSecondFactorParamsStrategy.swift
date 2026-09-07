@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum PrepareSecondFactorParamsStrategy: Codable, Equatable, Sendable {
+public enum PrepareSecondFactorParamsStrategy: Codable, Equatable, Hashable, Sendable {
   case emailLink
   case phoneCode
   case emailCode

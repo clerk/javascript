@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum DisplayConfigPreferredSignInStrategy: Codable, Equatable, Sendable {
+public enum DisplayConfigPreferredSignInStrategy: Codable, Equatable, Hashable, Sendable {
   case password
   case otp
   case unknown(String)

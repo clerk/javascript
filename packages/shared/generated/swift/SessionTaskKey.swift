@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum SessionTaskKey: Codable, Equatable, Sendable {
+public enum SessionTaskKey: Codable, Equatable, Hashable, Sendable {
   case chooseOrganization
   case resetPassword
   case setupMfa

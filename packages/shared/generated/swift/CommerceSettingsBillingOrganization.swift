@@ -21,7 +21,7 @@ public struct CommerceSettingsBillingOrganization: Codable, Equatable, Sendable 
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
-    self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
-    self.hasPaidPlans = try container.decodeFlexible(Bool.self, snake: "has_paid_plans", camel: "hasPaidPlans")
+    self.enabled = try container.decodeFlexibleDefault(Bool.self, snake: "enabled", camel: "enabled", default: false)
+    self.hasPaidPlans = try container.decodeFlexibleDefault(Bool.self, snake: "has_paid_plans", camel: "hasPaidPlans", default: false)
   }
 }

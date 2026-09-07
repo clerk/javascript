@@ -2,12 +2,13 @@
 
 import Foundation
 
-public enum SignInSecondFactorStrategy: Codable, Equatable, Sendable {
+public enum SignInSecondFactorStrategy: Codable, Equatable, Hashable, Sendable {
   case emailCode
   case emailLink
   case phoneCode
   case totp
   case backupCode
+  case passkey
   case unknown(String)
 
   public init(from decoder: Decoder) throws {
@@ -24,6 +25,8 @@ public enum SignInSecondFactorStrategy: Codable, Equatable, Sendable {
       self = .totp
     case "backup_code":
       self = .backupCode
+    case "passkey":
+      self = .passkey
     default:
       self = .unknown(value)
     }
@@ -42,6 +45,8 @@ public enum SignInSecondFactorStrategy: Codable, Equatable, Sendable {
       try container.encode("totp")
     case .backupCode:
       try container.encode("backup_code")
+    case .passkey:
+      try container.encode("passkey")
     case .unknown(let value):
       try container.encode(value)
     }
