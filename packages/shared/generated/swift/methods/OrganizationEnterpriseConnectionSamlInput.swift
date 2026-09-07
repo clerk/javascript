@@ -14,15 +14,15 @@ public struct OrganizationEnterpriseConnectionSamlInput: Codable, Equatable, Sen
   public var forceAuthn: Bool?
 
   public init(
-    idpEntityId: String?,
-    idpSsoUrl: String?,
-    idpCertificate: String?,
-    idpMetadataUrl: String?,
-    idpMetadata: String?,
-    attributeMapping: JSONValue?,
-    allowSubdomains: Bool?,
-    allowIdpInitiated: Bool?,
-    forceAuthn: Bool?
+    idpEntityId: String? = nil,
+    idpSsoUrl: String? = nil,
+    idpCertificate: String? = nil,
+    idpMetadataUrl: String? = nil,
+    idpMetadata: String? = nil,
+    attributeMapping: JSONValue? = nil,
+    allowSubdomains: Bool? = nil,
+    allowIdpInitiated: Bool? = nil,
+    forceAuthn: Bool? = nil
   ) {
     self.idpEntityId = idpEntityId
     self.idpSsoUrl = idpSsoUrl
@@ -58,5 +58,18 @@ public struct OrganizationEnterpriseConnectionSamlInput: Codable, Equatable, Sen
     self.allowSubdomains = try container.decodeIfPresentFlexible(Bool.self, snake: "allowSubdomains", camel: "allowSubdomains")
     self.allowIdpInitiated = try container.decodeIfPresentFlexible(Bool.self, snake: "allowIdpInitiated", camel: "allowIdpInitiated")
     self.forceAuthn = try container.decodeIfPresentFlexible(Bool.self, snake: "forceAuthn", camel: "forceAuthn")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(idpEntityId, forKey: .idpEntityId)
+    try container.encodeIfPresent(idpSsoUrl, forKey: .idpSsoUrl)
+    try container.encodeIfPresent(idpCertificate, forKey: .idpCertificate)
+    try container.encodeIfPresent(idpMetadataUrl, forKey: .idpMetadataUrl)
+    try container.encodeIfPresent(idpMetadata, forKey: .idpMetadata)
+    try container.encodeIfPresent(attributeMapping, forKey: .attributeMapping)
+    try container.encodeIfPresent(allowSubdomains, forKey: .allowSubdomains)
+    try container.encodeIfPresent(allowIdpInitiated, forKey: .allowIdpInitiated)
+    try container.encodeIfPresent(forceAuthn, forKey: .forceAuthn)
   }
 }

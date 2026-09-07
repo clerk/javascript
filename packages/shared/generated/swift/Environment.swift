@@ -19,12 +19,12 @@ public struct Environment: Codable, Equatable, Sendable, Identifiable {
   public init(
     apiKeysSettings: APIKeysSettings,
     authConfig: AuthConfig,
-    clientDebugMode: Bool?,
+    clientDebugMode: Bool? = nil,
     commerceSettings: CommerceSettings,
     displayConfig: DisplayConfig,
     maintenanceMode: Bool,
     organizationSettings: OrganizationSettings,
-    partitionedCookies: Bool?,
+    partitionedCookies: Bool? = nil,
     userSettings: UserSettings,
     protectConfig: ProtectConfig,
     id: String,
@@ -73,5 +73,21 @@ public struct Environment: Codable, Equatable, Sendable, Identifiable {
     self.protectConfig = try container.decodeFlexible(ProtectConfig.self, snake: "protect_config", camel: "protectConfig")
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
     self.object = try container.decodeFlexible(String.self, snake: "object", camel: "object")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(apiKeysSettings, forKey: .apiKeysSettings)
+    try container.encode(authConfig, forKey: .authConfig)
+    try container.encodeIfPresent(clientDebugMode, forKey: .clientDebugMode)
+    try container.encode(commerceSettings, forKey: .commerceSettings)
+    try container.encode(displayConfig, forKey: .displayConfig)
+    try container.encode(maintenanceMode, forKey: .maintenanceMode)
+    try container.encode(organizationSettings, forKey: .organizationSettings)
+    try container.encodeIfPresent(partitionedCookies, forKey: .partitionedCookies)
+    try container.encode(userSettings, forKey: .userSettings)
+    try container.encode(protectConfig, forKey: .protectConfig)
+    try container.encode(id, forKey: .id)
+    try container.encode(object, forKey: .object)
   }
 }

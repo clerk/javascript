@@ -12,9 +12,9 @@ public enum EmailAddressJSMethod: String, Sendable {
 }
 
 public protocol EmailAddressMethods: Sendable {
-  func attemptVerification(_ params: AttemptEmailAddressVerificationParams) async throws -> EmailAddress
-  func create() async throws -> EmailAddress
+  func attemptVerification(_ params: AttemptEmailAddressVerificationParams) async throws -> Self
+  func create() async throws -> Self
   func destroy() async throws
-  func prepareVerification(_ params: PrepareEmailAddressVerificationParams) async throws -> EmailAddress
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> EmailAddress
+  func prepareVerification(_ params: PrepareEmailAddressVerificationParams) async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
 }

@@ -12,13 +12,13 @@ public struct OrganizationEnterpriseConnectionOidcInput: Codable, Equatable, Sen
   public var requiresPkce: Bool?
 
   public init(
-    clientId: String?,
-    clientSecret: String?,
-    discoveryUrl: String?,
-    authUrl: String?,
-    tokenUrl: String?,
-    userInfoUrl: String?,
-    requiresPkce: Bool?
+    clientId: String? = nil,
+    clientSecret: String? = nil,
+    discoveryUrl: String? = nil,
+    authUrl: String? = nil,
+    tokenUrl: String? = nil,
+    userInfoUrl: String? = nil,
+    requiresPkce: Bool? = nil
   ) {
     self.clientId = clientId
     self.clientSecret = clientSecret
@@ -48,5 +48,16 @@ public struct OrganizationEnterpriseConnectionOidcInput: Codable, Equatable, Sen
     self.tokenUrl = try container.decodeIfPresentFlexible(String.self, snake: "tokenUrl", camel: "tokenUrl")
     self.userInfoUrl = try container.decodeIfPresentFlexible(String.self, snake: "userInfoUrl", camel: "userInfoUrl")
     self.requiresPkce = try container.decodeIfPresentFlexible(Bool.self, snake: "requiresPkce", camel: "requiresPkce")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(clientId, forKey: .clientId)
+    try container.encodeIfPresent(clientSecret, forKey: .clientSecret)
+    try container.encodeIfPresent(discoveryUrl, forKey: .discoveryUrl)
+    try container.encodeIfPresent(authUrl, forKey: .authUrl)
+    try container.encodeIfPresent(tokenUrl, forKey: .tokenUrl)
+    try container.encodeIfPresent(userInfoUrl, forKey: .userInfoUrl)
+    try container.encodeIfPresent(requiresPkce, forKey: .requiresPkce)
   }
 }

@@ -13,12 +13,12 @@ public struct PrepareSecondFactorParams: Codable, Equatable, Sendable {
 
   public init(
     strategy: PrepareSecondFactorParamsStrategy,
-    emailAddressId: String?,
-    primary: Bool?,
-    redirectUrl: String?,
-    codeChallenge: String?,
-    codeChallengeMethod: String?,
-    phoneNumberId: String?
+    emailAddressId: String? = nil,
+    primary: Bool? = nil,
+    redirectUrl: String? = nil,
+    codeChallenge: String? = nil,
+    codeChallengeMethod: String? = nil,
+    phoneNumberId: String? = nil
   ) {
     self.strategy = strategy
     self.emailAddressId = emailAddressId
@@ -48,5 +48,16 @@ public struct PrepareSecondFactorParams: Codable, Equatable, Sendable {
     self.codeChallenge = try container.decodeIfPresentFlexible(String.self, snake: "codeChallenge", camel: "codeChallenge")
     self.codeChallengeMethod = try container.decodeIfPresentFlexible(String.self, snake: "codeChallengeMethod", camel: "codeChallengeMethod")
     self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumberId", camel: "phoneNumberId")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(emailAddressId, forKey: .emailAddressId)
+    try container.encodeIfPresent(primary, forKey: .primary)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
+    try container.encodeIfPresent(codeChallenge, forKey: .codeChallenge)
+    try container.encodeIfPresent(codeChallengeMethod, forKey: .codeChallengeMethod)
+    try container.encodeIfPresent(phoneNumberId, forKey: .phoneNumberId)
   }
 }

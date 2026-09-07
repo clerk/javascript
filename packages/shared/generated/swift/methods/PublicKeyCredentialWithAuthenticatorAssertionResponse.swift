@@ -10,7 +10,7 @@ public struct PublicKeyCredentialWithAuthenticatorAssertionResponse: Codable, Eq
   public var response: JSONValue
 
   public init(
-    authenticatorAttachment: String?,
+    authenticatorAttachment: String? = nil,
     rawId: JSONValue,
     id: String,
     type: String,
@@ -38,5 +38,14 @@ public struct PublicKeyCredentialWithAuthenticatorAssertionResponse: Codable, Eq
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
     self.type = try container.decodeFlexible(String.self, snake: "type", camel: "type")
     self.response = try container.decodeFlexible(JSONValue.self, snake: "response", camel: "response")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(authenticatorAttachment, forKey: .authenticatorAttachment)
+    try container.encode(rawId, forKey: .rawId)
+    try container.encode(id, forKey: .id)
+    try container.encode(type, forKey: .type)
+    try container.encode(response, forKey: .response)
   }
 }

@@ -33,7 +33,7 @@ public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
     phoneNumber: String,
     publicMetadata: JSONValue,
     label: String,
-    verification: Verification?,
+    verification: Verification? = nil,
     id: String
   ) {
     self.object = object
@@ -88,5 +88,24 @@ public struct ExternalAccount: Codable, Equatable, Sendable, Identifiable {
     self.label = try container.decodeFlexible(String.self, snake: "label", camel: "label")
     self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(object, forKey: .object)
+    try container.encode(provider, forKey: .provider)
+    try container.encode(identificationId, forKey: .identificationId)
+    try container.encode(providerUserId, forKey: .providerUserId)
+    try container.encode(approvedScopes, forKey: .approvedScopes)
+    try container.encode(emailAddress, forKey: .emailAddress)
+    try container.encode(firstName, forKey: .firstName)
+    try container.encode(lastName, forKey: .lastName)
+    try container.encode(imageUrl, forKey: .imageUrl)
+    try container.encode(username, forKey: .username)
+    try container.encode(phoneNumber, forKey: .phoneNumber)
+    try container.encode(publicMetadata, forKey: .publicMetadata)
+    try container.encode(label, forKey: .label)
+    try container.encodeIfPresent(verification, forKey: .verification)
+    try container.encode(id, forKey: .id)
   }
 }

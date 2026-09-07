@@ -6,7 +6,7 @@ public struct OrganizationCreateDomainParams: Codable, Equatable, Sendable {
   public var enrollmentMode: GetDomainsParamsEnrollmentMode?
 
   public init(
-    enrollmentMode: GetDomainsParamsEnrollmentMode?
+    enrollmentMode: GetDomainsParamsEnrollmentMode? = nil
   ) {
     self.enrollmentMode = enrollmentMode
   }
@@ -18,5 +18,10 @@ public struct OrganizationCreateDomainParams: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.enrollmentMode = try container.decodeIfPresentFlexible(GetDomainsParamsEnrollmentMode.self, snake: "enrollmentMode", camel: "enrollmentMode")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(enrollmentMode, forKey: .enrollmentMode)
   }
 }

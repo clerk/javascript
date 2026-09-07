@@ -11,10 +11,10 @@ public struct AttemptFirstFactorParams: Codable, Equatable, Sendable {
 
   public init(
     strategy: AttemptFirstFactorParamsStrategy,
-    publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse?,
-    code: String?,
-    password: String?,
-    signature: String?
+    publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse? = nil,
+    code: String? = nil,
+    password: String? = nil,
+    signature: String? = nil
   ) {
     self.strategy = strategy
     self.publicKeyCredential = publicKeyCredential
@@ -38,5 +38,14 @@ public struct AttemptFirstFactorParams: Codable, Equatable, Sendable {
     self.code = try container.decodeIfPresentFlexible(String.self, snake: "code", camel: "code")
     self.password = try container.decodeIfPresentFlexible(String.self, snake: "password", camel: "password")
     self.signature = try container.decodeIfPresentFlexible(String.self, snake: "signature", camel: "signature")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(publicKeyCredential, forKey: .publicKeyCredential)
+    try container.encodeIfPresent(code, forKey: .code)
+    try container.encodeIfPresent(password, forKey: .password)
+    try container.encodeIfPresent(signature, forKey: .signature)
   }
 }

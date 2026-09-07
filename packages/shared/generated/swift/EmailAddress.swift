@@ -13,7 +13,7 @@ public struct EmailAddress: Codable, Equatable, Sendable, Identifiable {
   public init(
     object: String,
     emailAddress: String,
-    verification: Verification?,
+    verification: Verification? = nil,
     linkedTo: [IdentificationLink],
     matchesSsoConnection: Bool,
     id: String
@@ -43,5 +43,15 @@ public struct EmailAddress: Codable, Equatable, Sendable, Identifiable {
     self.linkedTo = try container.decodeFlexible([IdentificationLink].self, snake: "linked_to", camel: "linkedTo")
     self.matchesSsoConnection = try container.decodeFlexible(Bool.self, snake: "matches_sso_connection", camel: "matchesSsoConnection")
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(object, forKey: .object)
+    try container.encode(emailAddress, forKey: .emailAddress)
+    try container.encodeIfPresent(verification, forKey: .verification)
+    try container.encode(linkedTo, forKey: .linkedTo)
+    try container.encode(matchesSsoConnection, forKey: .matchesSsoConnection)
+    try container.encode(id, forKey: .id)
   }
 }

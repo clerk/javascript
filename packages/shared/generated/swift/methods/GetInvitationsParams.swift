@@ -8,9 +8,9 @@ public struct GetInvitationsParams: Codable, Equatable, Sendable {
   public var status: [OrganizationInvitationStatus]?
 
   public init(
-    initialPage: Int?,
-    pageSize: Int?,
-    status: [OrganizationInvitationStatus]?
+    initialPage: Int? = nil,
+    pageSize: Int? = nil,
+    status: [OrganizationInvitationStatus]? = nil
   ) {
     self.initialPage = initialPage
     self.pageSize = pageSize
@@ -28,5 +28,12 @@ public struct GetInvitationsParams: Codable, Equatable, Sendable {
     self.initialPage = try container.decodeIfPresentFlexible(Int.self, snake: "initialPage", camel: "initialPage")
     self.pageSize = try container.decodeIfPresentFlexible(Int.self, snake: "pageSize", camel: "pageSize")
     self.status = try container.decodeIfPresentFlexible([OrganizationInvitationStatus].self, snake: "status", camel: "status")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(initialPage, forKey: .initialPage)
+    try container.encodeIfPresent(pageSize, forKey: .pageSize)
+    try container.encodeIfPresent(status, forKey: .status)
   }
 }

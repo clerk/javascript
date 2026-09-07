@@ -20,13 +20,13 @@ public enum SessionJSMethod: String, Sendable {
 public protocol SessionMethods: Sendable {
   func attemptFirstFactorVerification(_ attemptFactor: SessionVerifyAttemptFirstFactorParams) async throws -> JSONValue
   func attemptSecondFactorVerification(_ params: SessionVerifyAttemptSecondFactorParams) async throws -> JSONValue
-  func end() async throws -> Session
+  func end() async throws -> Self
   func getToken(_ options: GetTokenOptions?) async throws -> String?
   func prepareFirstFactorVerification(_ factor: SessionVerifyPrepareFirstFactorParams) async throws -> JSONValue
   func prepareSecondFactorVerification(_ params: PhoneCodeSecondFactorConfig) async throws -> JSONValue
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> Session
-  func remove() async throws -> Session
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
+  func remove() async throws -> Self
   func startVerification(_ params: SessionVerifyCreateParams) async throws -> JSONValue
-  func touch(_ params: SessionTouchParams?) async throws -> Session
+  func touch(_ params: SessionTouchParams?) async throws -> Self
   func verifyWithPasskey() async throws -> JSONValue
 }

@@ -10,7 +10,7 @@ public enum OrganizationMembershipJSMethod: String, Sendable {
 }
 
 public protocol OrganizationMembershipMethods: Sendable {
-  func destroy() async throws -> OrganizationMembership
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> OrganizationMembership
-  func update(_ updateParams: UpdateOrganizationMembershipParams) async throws -> OrganizationMembership
+  func destroy() async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
+  func update(_ updateParams: UpdateOrganizationMembershipParams) async throws -> Self
 }

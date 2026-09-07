@@ -21,16 +21,16 @@ public struct SignIn: Codable, Equatable, Sendable, Identifiable {
     object: String,
     id: String,
     status: SignInStatus,
-    clientTrustState: SignInClientTrustState?,
+    clientTrustState: SignInClientTrustState? = nil,
     supportedIdentifiers: [SignInIdentifier],
     identifier: String,
     userData: UserData,
     supportedFirstFactors: [SignInFirstFactor],
     supportedSecondFactors: [SignInSecondFactor],
-    firstFactorVerification: Verification?,
-    secondFactorVerification: Verification?,
-    createdSessionId: String?,
-    protectCheck: ProtectCheck?
+    firstFactorVerification: Verification? = nil,
+    secondFactorVerification: Verification? = nil,
+    createdSessionId: String? = nil,
+    protectCheck: ProtectCheck? = nil
   ) {
     self.object = object
     self.id = id
@@ -78,5 +78,22 @@ public struct SignIn: Codable, Equatable, Sendable, Identifiable {
     self.secondFactorVerification = try container.decodeIfPresentFlexible(Verification.self, snake: "second_factor_verification", camel: "secondFactorVerification")
     self.createdSessionId = try container.decodeIfPresentFlexible(String.self, snake: "created_session_id", camel: "createdSessionId")
     self.protectCheck = try container.decodeIfPresentFlexible(ProtectCheck.self, snake: "protect_check", camel: "protectCheck")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(object, forKey: .object)
+    try container.encode(id, forKey: .id)
+    try container.encode(status, forKey: .status)
+    try container.encodeIfPresent(clientTrustState, forKey: .clientTrustState)
+    try container.encode(supportedIdentifiers, forKey: .supportedIdentifiers)
+    try container.encode(identifier, forKey: .identifier)
+    try container.encode(userData, forKey: .userData)
+    try container.encode(supportedFirstFactors, forKey: .supportedFirstFactors)
+    try container.encode(supportedSecondFactors, forKey: .supportedSecondFactors)
+    try container.encodeIfPresent(firstFactorVerification, forKey: .firstFactorVerification)
+    try container.encodeIfPresent(secondFactorVerification, forKey: .secondFactorVerification)
+    try container.encodeIfPresent(createdSessionId, forKey: .createdSessionId)
+    try container.encodeIfPresent(protectCheck, forKey: .protectCheck)
   }
 }

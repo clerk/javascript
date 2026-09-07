@@ -6,7 +6,7 @@ public struct GetCreditHistoryParams: Codable, Equatable, Sendable {
   public var orgId: String?
 
   public init(
-    orgId: String?
+    orgId: String? = nil
   ) {
     self.orgId = orgId
   }
@@ -18,5 +18,10 @@ public struct GetCreditHistoryParams: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.orgId = try container.decodeIfPresentFlexible(String.self, snake: "orgId", camel: "orgId")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(orgId, forKey: .orgId)
   }
 }

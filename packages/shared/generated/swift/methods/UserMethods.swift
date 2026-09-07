@@ -50,11 +50,11 @@ public protocol UserMethods: Sendable {
   func getSessions() async throws -> [JSONValue]
   func initializePaymentMethod(_ params: InitializePaymentMethodParams) async throws -> JSONValue
   func leaveOrganization(_ organizationId: String) async throws -> JSONValue
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> User
-  func removePassword(_ params: RemoveUserPasswordParams) async throws -> User
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
+  func removePassword(_ params: RemoveUserPasswordParams) async throws -> Self
   func setProfileImage(_ params: SetProfileImageParams) async throws -> JSONValue
-  func update(_ params: UpdateUserParams) async throws -> User
-  func updateMetadata(_ params: UpdateUserMetadataParams) async throws -> User
-  func updatePassword(_ params: UpdateUserPasswordParams) async throws -> User
+  func update(_ params: UpdateUserParams) async throws -> Self
+  func updateMetadata(_ params: UpdateUserMetadataParams) async throws -> Self
+  func updatePassword(_ params: UpdateUserPasswordParams) async throws -> Self
   func verifyTOTP(_ params: VerifyTOTPParams) async throws -> JSONValue
 }

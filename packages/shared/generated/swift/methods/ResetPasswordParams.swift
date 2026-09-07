@@ -8,7 +8,7 @@ public struct ResetPasswordParams: Codable, Equatable, Sendable {
 
   public init(
     password: String,
-    signOutOfOtherSessions: Bool?
+    signOutOfOtherSessions: Bool? = nil
   ) {
     self.password = password
     self.signOutOfOtherSessions = signOutOfOtherSessions
@@ -23,5 +23,11 @@ public struct ResetPasswordParams: Codable, Equatable, Sendable {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.password = try container.decodeFlexible(String.self, snake: "password", camel: "password")
     self.signOutOfOtherSessions = try container.decodeIfPresentFlexible(Bool.self, snake: "signOutOfOtherSessions", camel: "signOutOfOtherSessions")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(password, forKey: .password)
+    try container.encodeIfPresent(signOutOfOtherSessions, forKey: .signOutOfOtherSessions)
   }
 }

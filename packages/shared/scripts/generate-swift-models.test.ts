@@ -74,7 +74,7 @@ describe('generateSwiftModels', () => {
     expect(clerk).toMatch(/func setActive\([^)]*\) async throws/);
     expect(clerk, 'Clerk.load matches the JS name').toMatch(/func load\([^)]*\) async throws/);
     expect(signIn, 'SignIn.create matches the JS name').toMatch(
-      /func create\(_ \w+: SignInCreateParams\) async throws -> SignIn$/m,
+      /func create\(_ \w+: SignInCreateParams\) async throws -> Self$/m,
     );
     expect(signIn, 'SignIn.prepareFirstFactor matches the JS name').toContain('func prepareFirstFactor(');
     expect(signIn, 'SignIn.attemptFirstFactor matches the JS name').toContain('func attemptFirstFactor(');
@@ -85,6 +85,13 @@ describe('generateSwiftModels', () => {
     );
     expect(byName.get('methods/SignInCreateParams.swift'), 'create args keep JS keys, not FAPI snake_case').toContain(
       'case identifier',
+    );
+    expect(
+      byName.get('methods/SignInCreateParams.swift'),
+      'optional create args default to nil so handles can call with one field',
+    ).toContain('identifier: String? = nil');
+    expect(byName.get('methods/SignInCreateParams.swift'), 'optional create args omit nulls for JS').toContain(
+      'encodeIfPresent(identifier',
     );
 
     const emailAddress = byName.get('methods/EmailAddressMethods.swift');

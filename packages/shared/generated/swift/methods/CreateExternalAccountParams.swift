@@ -12,13 +12,13 @@ public struct CreateExternalAccountParams: Codable, Equatable, Sendable {
   public var token: String?
 
   public init(
-    strategy: String?,
-    enterpriseConnectionId: String?,
-    redirectUrl: String?,
-    additionalScopes: [String]?,
-    oidcPrompt: String?,
-    oidcLoginHint: String?,
-    token: String?
+    strategy: String? = nil,
+    enterpriseConnectionId: String? = nil,
+    redirectUrl: String? = nil,
+    additionalScopes: [String]? = nil,
+    oidcPrompt: String? = nil,
+    oidcLoginHint: String? = nil,
+    token: String? = nil
   ) {
     self.strategy = strategy
     self.enterpriseConnectionId = enterpriseConnectionId
@@ -48,5 +48,16 @@ public struct CreateExternalAccountParams: Codable, Equatable, Sendable {
     self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
     self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
     self.token = try container.decodeIfPresentFlexible(String.self, snake: "token", camel: "token")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(strategy, forKey: .strategy)
+    try container.encodeIfPresent(enterpriseConnectionId, forKey: .enterpriseConnectionId)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
+    try container.encodeIfPresent(additionalScopes, forKey: .additionalScopes)
+    try container.encodeIfPresent(oidcPrompt, forKey: .oidcPrompt)
+    try container.encodeIfPresent(oidcLoginHint, forKey: .oidcLoginHint)
+    try container.encodeIfPresent(token, forKey: .token)
   }
 }

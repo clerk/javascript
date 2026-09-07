@@ -1141,7 +1141,12 @@ function emitStruct(decl: SwiftStruct): string {
     conformances.push('Identifiable');
   }
   const needsCustomCodable = decl.properties.some(property => property.isDate);
-  const initParams = decl.properties.map(property => `    ${property.name}: ${emitRef(property.type)}`);
+  const initParams = decl.properties.map(property => {
+    const typeName = emitRef(property.type);
+    return isOptionalRef(property.type)
+      ? `    ${property.name}: ${typeName} = nil`
+      : `    ${property.name}: ${typeName}`;
+  });
   const initBody = decl.properties.map(property => `    self.${property.name} = ${property.name}`);
   const codingKeys = decl.properties.map(property => {
     const caseName = property.name.replace(/`/g, '');
@@ -1174,7 +1179,7 @@ function emitStruct(decl: SwiftStruct): string {
       '  }',
     );
   }
-  if (needsCustomCodable) {
+  if (needsCustomCodable || decl.properties.some(property => isOptionalRef(property.type))) {
     lines.push(
       '',
       '  public func encode(to encoder: Encoder) throws {',
@@ -1345,13 +1350,23 @@ function collectMethodFacades(
   return { facades, paramDecls };
 }
 
-function emitMethodSignature(method: SwiftMethod): string {
+function emitOwnerReturn(ref: SwiftRef, owner: string): string {
+  if (ref.kind === 'named' && ref.name === owner) {
+    return 'Self';
+  }
+  if (ref.kind === 'optional' && ref.of.kind === 'named' && ref.of.name === owner) {
+    return 'Self?';
+  }
+  return emitRef(ref);
+}
+
+function emitMethodSignature(method: SwiftMethod, owner: string): string {
   const params = method.params.map((param, index) => {
     const typeName = emitRef(param.optional ? optionalize(param.type) : param.type);
     const label = index === 0 ? '_ ' : '';
     return `${label}${param.name}: ${typeName}`;
   });
-  const returns = method.returnType ? ` -> ${emitRef(method.returnType)}` : '';
+  const returns = method.returnType ? ` -> ${emitOwnerReturn(method.returnType, owner)}` : '';
   return `  func ${swiftIdent(method.jsName)}(${params.join(', ')}) async throws${returns}`;
 }
 
@@ -1369,7 +1384,7 @@ function emitFacadeFile(facade: SwiftMethodFacade): string {
     '}',
     '',
     `public protocol ${facade.owner}Methods: Sendable {`,
-    ...facade.methods.map(emitMethodSignature),
+    ...facade.methods.map(method => emitMethodSignature(method, facade.owner)),
     '}',
     '',
   ];

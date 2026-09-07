@@ -10,7 +10,7 @@ public struct OrganizationSettingsDomains: Codable, Equatable, Sendable {
   public init(
     enabled: Bool,
     enrollmentModes: [OrganizationEnrollmentMode],
-    defaultRole: String?
+    defaultRole: String? = nil
   ) {
     self.enabled = enabled
     self.enrollmentModes = enrollmentModes
@@ -28,5 +28,12 @@ public struct OrganizationSettingsDomains: Codable, Equatable, Sendable {
     self.enabled = try container.decodeFlexible(Bool.self, snake: "enabled", camel: "enabled")
     self.enrollmentModes = try container.decodeFlexible([OrganizationEnrollmentMode].self, snake: "enrollment_modes", camel: "enrollmentModes")
     self.defaultRole = try container.decodeIfPresentFlexible(String.self, snake: "default_role", camel: "defaultRole")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(enabled, forKey: .enabled)
+    try container.encode(enrollmentModes, forKey: .enrollmentModes)
+    try container.encodeIfPresent(defaultRole, forKey: .defaultRole)
   }
 }

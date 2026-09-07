@@ -8,7 +8,7 @@ public struct AuthenticateWithGoogleOneTapParams: Codable, Equatable, Sendable {
 
   public init(
     token: String,
-    legalAccepted: Bool?
+    legalAccepted: Bool? = nil
   ) {
     self.token = token
     self.legalAccepted = legalAccepted
@@ -23,5 +23,11 @@ public struct AuthenticateWithGoogleOneTapParams: Codable, Equatable, Sendable {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.token = try container.decodeFlexible(String.self, snake: "token", camel: "token")
     self.legalAccepted = try container.decodeIfPresentFlexible(Bool.self, snake: "legalAccepted", camel: "legalAccepted")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(token, forKey: .token)
+    try container.encodeIfPresent(legalAccepted, forKey: .legalAccepted)
   }
 }

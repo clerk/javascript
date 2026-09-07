@@ -7,8 +7,8 @@ public struct SignOutOptions: Codable, Equatable, Sendable {
   public var redirectUrl: String?
 
   public init(
-    sessionId: String?,
-    redirectUrl: String?
+    sessionId: String? = nil,
+    redirectUrl: String? = nil
   ) {
     self.sessionId = sessionId
     self.redirectUrl = redirectUrl
@@ -23,5 +23,11 @@ public struct SignOutOptions: Codable, Equatable, Sendable {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.sessionId = try container.decodeIfPresentFlexible(String.self, snake: "sessionId", camel: "sessionId")
     self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(sessionId, forKey: .sessionId)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
   }
 }

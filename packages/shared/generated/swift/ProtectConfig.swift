@@ -12,9 +12,9 @@ public struct ProtectConfig: Codable, Equatable, Sendable, Identifiable {
   public init(
     object: String,
     id: String,
-    loaders: [ProtectLoader]?,
-    challengeLoadTimeoutMs: Int?,
-    tokensInvalidBefore: Int?
+    loaders: [ProtectLoader]? = nil,
+    challengeLoadTimeoutMs: Int? = nil,
+    tokensInvalidBefore: Int? = nil
   ) {
     self.object = object
     self.id = id
@@ -38,5 +38,14 @@ public struct ProtectConfig: Codable, Equatable, Sendable, Identifiable {
     self.loaders = try container.decodeIfPresentFlexible([ProtectLoader].self, snake: "loaders", camel: "loaders")
     self.challengeLoadTimeoutMs = try container.decodeIfPresentFlexible(Int.self, snake: "challenge_load_timeout_ms", camel: "challengeLoadTimeoutMs")
     self.tokensInvalidBefore = try container.decodeIfPresentFlexible(Int.self, snake: "tokens_invalid_before", camel: "tokensInvalidBefore")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(object, forKey: .object)
+    try container.encode(id, forKey: .id)
+    try container.encodeIfPresent(loaders, forKey: .loaders)
+    try container.encodeIfPresent(challengeLoadTimeoutMs, forKey: .challengeLoadTimeoutMs)
+    try container.encodeIfPresent(tokensInvalidBefore, forKey: .tokensInvalidBefore)
   }
 }

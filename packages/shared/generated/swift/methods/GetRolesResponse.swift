@@ -8,7 +8,7 @@ public struct GetRolesResponse: Codable, Equatable, Sendable {
   public var totalCount: Int
 
   public init(
-    hasRoleSetMigration: Bool?,
+    hasRoleSetMigration: Bool? = nil,
     data: [JSONValue],
     totalCount: Int
   ) {
@@ -28,5 +28,12 @@ public struct GetRolesResponse: Codable, Equatable, Sendable {
     self.hasRoleSetMigration = try container.decodeIfPresentFlexible(Bool.self, snake: "has_role_set_migration", camel: "hasRoleSetMigration")
     self.data = try container.decodeFlexible([JSONValue].self, snake: "data", camel: "data")
     self.totalCount = try container.decodeFlexible(Int.self, snake: "total_count", camel: "totalCount")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(hasRoleSetMigration, forKey: .hasRoleSetMigration)
+    try container.encode(data, forKey: .data)
+    try container.encode(totalCount, forKey: .totalCount)
   }
 }

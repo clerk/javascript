@@ -20,7 +20,7 @@ public struct OrganizationMembership: Codable, Equatable, Sendable, Identifiable
     organization: Organization,
     permissions: [JSONValue],
     publicMetadata: JSONValue,
-    publicUserData: PublicUserData?,
+    publicUserData: PublicUserData? = nil,
     role: String,
     roleName: String,
     createdAt: Date,

@@ -13,10 +13,10 @@ public struct AuthConfig: Codable, Equatable, Sendable, Identifiable {
 
   public init(
     singleSessionMode: Bool,
-    claimedAt: Date?,
+    claimedAt: Date? = nil,
     reverification: Bool,
-    preferredChannels: [String: PhoneCodeChannel]?,
-    sessionMinter: Bool?,
+    preferredChannels: [String: PhoneCodeChannel]? = nil,
+    sessionMinter: Bool? = nil,
     id: String,
     object: String
   ) {

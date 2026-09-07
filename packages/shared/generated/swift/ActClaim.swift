@@ -8,7 +8,7 @@ public struct ActClaim: Codable, Equatable, Sendable {
 
   public init(
     sub: String,
-    type: String?
+    type: String? = nil
   ) {
     self.sub = sub
     self.type = type
@@ -23,5 +23,11 @@ public struct ActClaim: Codable, Equatable, Sendable {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.sub = try container.decodeFlexible(String.self, snake: "sub", camel: "sub")
     self.type = try container.decodeIfPresentFlexible(String.self, snake: "type", camel: "type")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sub, forKey: .sub)
+    try container.encodeIfPresent(type, forKey: .type)
   }
 }

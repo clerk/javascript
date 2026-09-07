@@ -17,14 +17,14 @@ public struct AttributeData: Codable, Equatable, Sendable {
   public init(
     enabled: Bool,
     required: Bool,
-    immutable: Bool?,
+    immutable: Bool? = nil,
     verifications: [VerificationStrategy],
     usedForFirstFactor: Bool,
     firstFactors: [VerificationStrategy],
     usedForSecondFactor: Bool,
     secondFactors: [VerificationStrategy],
     verifyAtSignUp: Bool,
-    channels: [PhoneCodeChannel]?
+    channels: [PhoneCodeChannel]? = nil
   ) {
     self.enabled = enabled
     self.required = required
@@ -63,5 +63,19 @@ public struct AttributeData: Codable, Equatable, Sendable {
     self.secondFactors = try container.decodeFlexible([VerificationStrategy].self, snake: "second_factors", camel: "secondFactors")
     self.verifyAtSignUp = try container.decodeFlexible(Bool.self, snake: "verify_at_sign_up", camel: "verifyAtSignUp")
     self.channels = try container.decodeIfPresentFlexible([PhoneCodeChannel].self, snake: "channels", camel: "channels")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(enabled, forKey: .enabled)
+    try container.encode(required, forKey: .required)
+    try container.encodeIfPresent(immutable, forKey: .immutable)
+    try container.encode(verifications, forKey: .verifications)
+    try container.encode(usedForFirstFactor, forKey: .usedForFirstFactor)
+    try container.encode(firstFactors, forKey: .firstFactors)
+    try container.encode(usedForSecondFactor, forKey: .usedForSecondFactor)
+    try container.encode(secondFactors, forKey: .secondFactors)
+    try container.encode(verifyAtSignUp, forKey: .verifyAtSignUp)
+    try container.encodeIfPresent(channels, forKey: .channels)
   }
 }

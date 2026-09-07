@@ -6,7 +6,7 @@ public struct RemoveUserPasswordParams: Codable, Equatable, Sendable {
   public var currentPassword: String?
 
   public init(
-    currentPassword: String?
+    currentPassword: String? = nil
   ) {
     self.currentPassword = currentPassword
   }
@@ -18,5 +18,10 @@ public struct RemoveUserPasswordParams: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.currentPassword = try container.decodeIfPresentFlexible(String.self, snake: "currentPassword", camel: "currentPassword")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(currentPassword, forKey: .currentPassword)
   }
 }

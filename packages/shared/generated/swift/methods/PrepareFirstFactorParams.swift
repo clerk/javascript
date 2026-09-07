@@ -22,21 +22,21 @@ public struct PrepareFirstFactorParams: Codable, Equatable, Sendable {
 
   public init(
     strategy: String,
-    web3WalletId: String?,
-    primary: Bool?,
-    walletName: String?,
-    emailAddressId: String?,
-    redirectUrl: String?,
-    codeChallenge: String?,
-    codeChallengeMethod: String?,
-    phoneNumberId: String?,
-    `default`: Bool?,
-    channel: PrepareFirstFactorParamsChannel?,
-    actionCompleteRedirectUrl: String?,
-    oidcPrompt: String?,
-    oidcLoginHint: String?,
-    enterpriseConnectionId: String?,
-    enterpriseConnectionName: String?
+    web3WalletId: String? = nil,
+    primary: Bool? = nil,
+    walletName: String? = nil,
+    emailAddressId: String? = nil,
+    redirectUrl: String? = nil,
+    codeChallenge: String? = nil,
+    codeChallengeMethod: String? = nil,
+    phoneNumberId: String? = nil,
+    `default`: Bool? = nil,
+    channel: PrepareFirstFactorParamsChannel? = nil,
+    actionCompleteRedirectUrl: String? = nil,
+    oidcPrompt: String? = nil,
+    oidcLoginHint: String? = nil,
+    enterpriseConnectionId: String? = nil,
+    enterpriseConnectionName: String? = nil
   ) {
     self.strategy = strategy
     self.web3WalletId = web3WalletId
@@ -93,5 +93,25 @@ public struct PrepareFirstFactorParams: Codable, Equatable, Sendable {
     self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
     self.enterpriseConnectionId = try container.decodeIfPresentFlexible(String.self, snake: "enterpriseConnectionId", camel: "enterpriseConnectionId")
     self.enterpriseConnectionName = try container.decodeIfPresentFlexible(String.self, snake: "enterpriseConnectionName", camel: "enterpriseConnectionName")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(web3WalletId, forKey: .web3WalletId)
+    try container.encodeIfPresent(primary, forKey: .primary)
+    try container.encodeIfPresent(walletName, forKey: .walletName)
+    try container.encodeIfPresent(emailAddressId, forKey: .emailAddressId)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
+    try container.encodeIfPresent(codeChallenge, forKey: .codeChallenge)
+    try container.encodeIfPresent(codeChallengeMethod, forKey: .codeChallengeMethod)
+    try container.encodeIfPresent(phoneNumberId, forKey: .phoneNumberId)
+    try container.encodeIfPresent(`default`, forKey: .`default`)
+    try container.encodeIfPresent(channel, forKey: .channel)
+    try container.encodeIfPresent(actionCompleteRedirectUrl, forKey: .actionCompleteRedirectUrl)
+    try container.encodeIfPresent(oidcPrompt, forKey: .oidcPrompt)
+    try container.encodeIfPresent(oidcLoginHint, forKey: .oidcLoginHint)
+    try container.encodeIfPresent(enterpriseConnectionId, forKey: .enterpriseConnectionId)
+    try container.encodeIfPresent(enterpriseConnectionName, forKey: .enterpriseConnectionName)
   }
 }

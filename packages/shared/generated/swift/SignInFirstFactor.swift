@@ -17,16 +17,16 @@ public struct SignInFirstFactor: Codable, Equatable, Sendable {
 
   public init(
     strategy: String,
-    emailAddressId: String?,
-    safeIdentifier: String?,
-    primary: Bool?,
-    phoneNumberId: String?,
-    `default`: Bool?,
-    channel: SignInFirstFactorChannel?,
-    web3WalletId: String?,
-    walletName: String?,
-    enterpriseConnectionId: String?,
-    enterpriseConnectionName: String?
+    emailAddressId: String? = nil,
+    safeIdentifier: String? = nil,
+    primary: Bool? = nil,
+    phoneNumberId: String? = nil,
+    `default`: Bool? = nil,
+    channel: SignInFirstFactorChannel? = nil,
+    web3WalletId: String? = nil,
+    walletName: String? = nil,
+    enterpriseConnectionId: String? = nil,
+    enterpriseConnectionName: String? = nil
   ) {
     self.strategy = strategy
     self.emailAddressId = emailAddressId
@@ -68,5 +68,20 @@ public struct SignInFirstFactor: Codable, Equatable, Sendable {
     self.walletName = try container.decodeIfPresentFlexible(String.self, snake: "wallet_name", camel: "walletName")
     self.enterpriseConnectionId = try container.decodeIfPresentFlexible(String.self, snake: "enterprise_connection_id", camel: "enterpriseConnectionId")
     self.enterpriseConnectionName = try container.decodeIfPresentFlexible(String.self, snake: "enterprise_connection_name", camel: "enterpriseConnectionName")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(emailAddressId, forKey: .emailAddressId)
+    try container.encodeIfPresent(safeIdentifier, forKey: .safeIdentifier)
+    try container.encodeIfPresent(primary, forKey: .primary)
+    try container.encodeIfPresent(phoneNumberId, forKey: .phoneNumberId)
+    try container.encodeIfPresent(`default`, forKey: .`default`)
+    try container.encodeIfPresent(channel, forKey: .channel)
+    try container.encodeIfPresent(web3WalletId, forKey: .web3WalletId)
+    try container.encodeIfPresent(walletName, forKey: .walletName)
+    try container.encodeIfPresent(enterpriseConnectionId, forKey: .enterpriseConnectionId)
+    try container.encodeIfPresent(enterpriseConnectionName, forKey: .enterpriseConnectionName)
   }
 }

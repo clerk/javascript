@@ -10,11 +10,11 @@ public struct GetPlansParams: Codable, Equatable, Sendable {
   public var minSeats: Int?
 
   public init(
-    initialPage: Int?,
-    pageSize: Int?,
-    `for`: GetPlansParamsFor?,
-    orgId: String?,
-    minSeats: Int?
+    initialPage: Int? = nil,
+    pageSize: Int? = nil,
+    `for`: GetPlansParamsFor? = nil,
+    orgId: String? = nil,
+    minSeats: Int? = nil
   ) {
     self.initialPage = initialPage
     self.pageSize = pageSize
@@ -38,5 +38,14 @@ public struct GetPlansParams: Codable, Equatable, Sendable {
     self.`for` = try container.decodeIfPresentFlexible(GetPlansParamsFor.self, snake: "for", camel: "for")
     self.orgId = try container.decodeIfPresentFlexible(String.self, snake: "orgId", camel: "orgId")
     self.minSeats = try container.decodeIfPresentFlexible(Int.self, snake: "minSeats", camel: "minSeats")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(initialPage, forKey: .initialPage)
+    try container.encodeIfPresent(pageSize, forKey: .pageSize)
+    try container.encodeIfPresent(`for`, forKey: .`for`)
+    try container.encodeIfPresent(orgId, forKey: .orgId)
+    try container.encodeIfPresent(minSeats, forKey: .minSeats)
   }
 }

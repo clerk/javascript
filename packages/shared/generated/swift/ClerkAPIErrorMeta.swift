@@ -14,15 +14,15 @@ public struct ClerkAPIErrorMeta: Codable, Equatable, Sendable {
   public var seatsQuantity: Int?
 
   public init(
-    paramName: String?,
-    sessionId: String?,
-    emailAddresses: [String]?,
-    identifiers: [String]?,
-    zxcvbn: ClerkAPIErrorMetaZxcvbn?,
-    plan: ClerkAPIErrorMetaPlan?,
-    isPlanUpgradePossible: Bool?,
-    seatsQuantityToAdd: Int?,
-    seatsQuantity: Int?
+    paramName: String? = nil,
+    sessionId: String? = nil,
+    emailAddresses: [String]? = nil,
+    identifiers: [String]? = nil,
+    zxcvbn: ClerkAPIErrorMetaZxcvbn? = nil,
+    plan: ClerkAPIErrorMetaPlan? = nil,
+    isPlanUpgradePossible: Bool? = nil,
+    seatsQuantityToAdd: Int? = nil,
+    seatsQuantity: Int? = nil
   ) {
     self.paramName = paramName
     self.sessionId = sessionId
@@ -58,5 +58,18 @@ public struct ClerkAPIErrorMeta: Codable, Equatable, Sendable {
     self.isPlanUpgradePossible = try container.decodeIfPresentFlexible(Bool.self, snake: "is_plan_upgrade_possible", camel: "isPlanUpgradePossible")
     self.seatsQuantityToAdd = try container.decodeIfPresentFlexible(Int.self, snake: "seats_quantity_to_add", camel: "seatsQuantityToAdd")
     self.seatsQuantity = try container.decodeIfPresentFlexible(Int.self, snake: "seats_quantity", camel: "seatsQuantity")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(paramName, forKey: .paramName)
+    try container.encodeIfPresent(sessionId, forKey: .sessionId)
+    try container.encodeIfPresent(emailAddresses, forKey: .emailAddresses)
+    try container.encodeIfPresent(identifiers, forKey: .identifiers)
+    try container.encodeIfPresent(zxcvbn, forKey: .zxcvbn)
+    try container.encodeIfPresent(plan, forKey: .plan)
+    try container.encodeIfPresent(isPlanUpgradePossible, forKey: .isPlanUpgradePossible)
+    try container.encodeIfPresent(seatsQuantityToAdd, forKey: .seatsQuantityToAdd)
+    try container.encodeIfPresent(seatsQuantity, forKey: .seatsQuantity)
   }
 }

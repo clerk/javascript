@@ -8,7 +8,7 @@ public struct PhoneCodeSecondFactorConfig: Codable, Equatable, Sendable {
 
   public init(
     strategy: String,
-    phoneNumberId: String?
+    phoneNumberId: String? = nil
   ) {
     self.strategy = strategy
     self.phoneNumberId = phoneNumberId
@@ -23,5 +23,11 @@ public struct PhoneCodeSecondFactorConfig: Codable, Equatable, Sendable {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
     self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumberId", camel: "phoneNumberId")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(phoneNumberId, forKey: .phoneNumberId)
   }
 }

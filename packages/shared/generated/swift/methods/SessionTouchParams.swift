@@ -6,7 +6,7 @@ public struct SessionTouchParams: Codable, Equatable, Sendable {
   public var intent: SessionTouchParamsIntent?
 
   public init(
-    intent: SessionTouchParamsIntent?
+    intent: SessionTouchParamsIntent? = nil
   ) {
     self.intent = intent
   }
@@ -18,5 +18,10 @@ public struct SessionTouchParams: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.intent = try container.decodeIfPresentFlexible(SessionTouchParamsIntent.self, snake: "intent", camel: "intent")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(intent, forKey: .intent)
   }
 }

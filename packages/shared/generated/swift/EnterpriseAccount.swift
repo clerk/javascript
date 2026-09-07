@@ -22,16 +22,16 @@ public struct EnterpriseAccount: Codable, Equatable, Sendable, Identifiable {
     object: String,
     active: Bool,
     emailAddress: String,
-    enterpriseConnection: EnterpriseAccountConnection?,
-    firstName: String?,
-    lastName: String?,
+    enterpriseConnection: EnterpriseAccountConnection? = nil,
+    firstName: String? = nil,
+    lastName: String? = nil,
     `protocol`: EnterpriseAccountProtocol,
     provider: String,
-    providerUserId: String?,
+    providerUserId: String? = nil,
     publicMetadata: JSONValue,
-    verification: Verification?,
-    lastAuthenticatedAt: Date?,
-    enterpriseConnectionId: String?,
+    verification: Verification? = nil,
+    lastAuthenticatedAt: Date? = nil,
+    enterpriseConnectionId: String? = nil,
     id: String
   ) {
     self.object = object

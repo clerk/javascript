@@ -12,9 +12,9 @@ public struct CreateCheckoutParams: Codable, Equatable, Sendable {
   public init(
     planId: String,
     planPeriod: CreateCheckoutParamsPlanPeriod,
-    seatsQuantity: Int?,
-    priceId: String?,
-    orgId: String?
+    seatsQuantity: Int? = nil,
+    priceId: String? = nil,
+    orgId: String? = nil
   ) {
     self.planId = planId
     self.planPeriod = planPeriod
@@ -38,5 +38,14 @@ public struct CreateCheckoutParams: Codable, Equatable, Sendable {
     self.seatsQuantity = try container.decodeIfPresentFlexible(Int.self, snake: "seatsQuantity", camel: "seatsQuantity")
     self.priceId = try container.decodeIfPresentFlexible(String.self, snake: "priceId", camel: "priceId")
     self.orgId = try container.decodeIfPresentFlexible(String.self, snake: "orgId", camel: "orgId")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(planId, forKey: .planId)
+    try container.encode(planPeriod, forKey: .planPeriod)
+    try container.encodeIfPresent(seatsQuantity, forKey: .seatsQuantity)
+    try container.encodeIfPresent(priceId, forKey: .priceId)
+    try container.encodeIfPresent(orgId, forKey: .orgId)
   }
 }

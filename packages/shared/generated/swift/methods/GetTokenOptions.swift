@@ -8,9 +8,9 @@ public struct GetTokenOptions: Codable, Equatable, Sendable {
   public var template: String?
 
   public init(
-    organizationId: String?,
-    skipCache: Bool?,
-    template: String?
+    organizationId: String? = nil,
+    skipCache: Bool? = nil,
+    template: String? = nil
   ) {
     self.organizationId = organizationId
     self.skipCache = skipCache
@@ -28,5 +28,12 @@ public struct GetTokenOptions: Codable, Equatable, Sendable {
     self.organizationId = try container.decodeIfPresentFlexible(String.self, snake: "organizationId", camel: "organizationId")
     self.skipCache = try container.decodeIfPresentFlexible(Bool.self, snake: "skipCache", camel: "skipCache")
     self.template = try container.decodeIfPresentFlexible(String.self, snake: "template", camel: "template")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(organizationId, forKey: .organizationId)
+    try container.encodeIfPresent(skipCache, forKey: .skipCache)
+    try container.encodeIfPresent(template, forKey: .template)
   }
 }

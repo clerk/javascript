@@ -9,7 +9,7 @@ public struct UpdateCheckoutParams: Codable, Equatable, Sendable, Identifiable {
 
   public init(
     id: String,
-    orgId: String?,
+    orgId: String? = nil,
     promoCode: String
   ) {
     self.id = id
@@ -28,5 +28,12 @@ public struct UpdateCheckoutParams: Codable, Equatable, Sendable, Identifiable {
     self.id = try container.decodeFlexible(String.self, snake: "id", camel: "id")
     self.orgId = try container.decodeIfPresentFlexible(String.self, snake: "orgId", camel: "orgId")
     self.promoCode = try container.decodeFlexible(String.self, snake: "promoCode", camel: "promoCode")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encodeIfPresent(orgId, forKey: .orgId)
+    try container.encode(promoCode, forKey: .promoCode)
   }
 }

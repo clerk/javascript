@@ -8,7 +8,7 @@ public struct UpdateEnrollmentModeParams: Codable, Equatable, Sendable {
 
   public init(
     enrollmentMode: GetDomainsParamsEnrollmentMode,
-    deletePending: Bool?
+    deletePending: Bool? = nil
   ) {
     self.enrollmentMode = enrollmentMode
     self.deletePending = deletePending
@@ -23,5 +23,11 @@ public struct UpdateEnrollmentModeParams: Codable, Equatable, Sendable {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.enrollmentMode = try container.decodeFlexible(GetDomainsParamsEnrollmentMode.self, snake: "enrollmentMode", camel: "enrollmentMode")
     self.deletePending = try container.decodeIfPresentFlexible(Bool.self, snake: "deletePending", camel: "deletePending")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(enrollmentMode, forKey: .enrollmentMode)
+    try container.encodeIfPresent(deletePending, forKey: .deletePending)
   }
 }

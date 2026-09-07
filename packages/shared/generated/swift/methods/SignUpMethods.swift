@@ -18,15 +18,15 @@ public enum SignUpJSMethod: String, Sendable {
 }
 
 public protocol SignUpMethods: Sendable {
-  func attemptEmailAddressVerification(_ params: AttemptEmailAddressVerificationParams) async throws -> SignUp
-  func attemptPhoneNumberVerification(_ params: AttemptPhoneNumberVerificationParams) async throws -> SignUp
-  func attemptVerification(_ params: AttemptVerificationParams) async throws -> SignUp
-  func create(_ params: SignUpCreateParams) async throws -> SignUp
-  func prepareEmailAddressVerification(_ params: SignUpPrepareEmailAddressVerificationParams?) async throws -> SignUp
-  func preparePhoneNumberVerification(_ params: PreparePhoneNumberVerificationParams?) async throws -> SignUp
-  func prepareVerification(_ params: PrepareVerificationParams) async throws -> SignUp
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> SignUp
-  func submitProtectCheck(_ params: SignInSubmitProtectCheckParams) async throws -> SignUp
-  func update(_ params: SignUpCreateParams) async throws -> SignUp
-  func upsert(_ params: SignUpCreateParams) async throws -> SignUp
+  func attemptEmailAddressVerification(_ params: AttemptEmailAddressVerificationParams) async throws -> Self
+  func attemptPhoneNumberVerification(_ params: AttemptPhoneNumberVerificationParams) async throws -> Self
+  func attemptVerification(_ params: AttemptVerificationParams) async throws -> Self
+  func create(_ params: SignUpCreateParams) async throws -> Self
+  func prepareEmailAddressVerification(_ params: SignUpPrepareEmailAddressVerificationParams?) async throws -> Self
+  func preparePhoneNumberVerification(_ params: PreparePhoneNumberVerificationParams?) async throws -> Self
+  func prepareVerification(_ params: PrepareVerificationParams) async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
+  func submitProtectCheck(_ params: SignInSubmitProtectCheckParams) async throws -> Self
+  func update(_ params: SignUpCreateParams) async throws -> Self
+  func upsert(_ params: SignUpCreateParams) async throws -> Self
 }

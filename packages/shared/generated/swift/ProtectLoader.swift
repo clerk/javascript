@@ -13,14 +13,14 @@ public struct ProtectLoader: Codable, Equatable, Sendable {
   public var challengeLoadTimeoutMs: Int?
 
   public init(
-    rollout: Int?,
+    rollout: Int? = nil,
     target: String,
     type: String,
-    attributes: [String: JSONValue]?,
-    textContent: String?,
-    tokenUrl: String?,
-    tokenTimeoutMs: Int?,
-    challengeLoadTimeoutMs: Int?
+    attributes: [String: JSONValue]? = nil,
+    textContent: String? = nil,
+    tokenUrl: String? = nil,
+    tokenTimeoutMs: Int? = nil,
+    challengeLoadTimeoutMs: Int? = nil
   ) {
     self.rollout = rollout
     self.target = target
@@ -53,5 +53,17 @@ public struct ProtectLoader: Codable, Equatable, Sendable {
     self.tokenUrl = try container.decodeIfPresentFlexible(String.self, snake: "token_url", camel: "tokenUrl")
     self.tokenTimeoutMs = try container.decodeIfPresentFlexible(Int.self, snake: "token_timeout_ms", camel: "tokenTimeoutMs")
     self.challengeLoadTimeoutMs = try container.decodeIfPresentFlexible(Int.self, snake: "challenge_load_timeout_ms", camel: "challengeLoadTimeoutMs")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(rollout, forKey: .rollout)
+    try container.encode(target, forKey: .target)
+    try container.encode(type, forKey: .type)
+    try container.encodeIfPresent(attributes, forKey: .attributes)
+    try container.encodeIfPresent(textContent, forKey: .textContent)
+    try container.encodeIfPresent(tokenUrl, forKey: .tokenUrl)
+    try container.encodeIfPresent(tokenTimeoutMs, forKey: .tokenTimeoutMs)
+    try container.encodeIfPresent(challengeLoadTimeoutMs, forKey: .challengeLoadTimeoutMs)
   }
 }

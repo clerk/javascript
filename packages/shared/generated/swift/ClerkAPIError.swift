@@ -11,8 +11,8 @@ public struct ClerkAPIError: Codable, Equatable, Sendable {
   public init(
     code: String,
     message: String,
-    longMessage: String?,
-    meta: ClerkAPIErrorMeta?
+    longMessage: String? = nil,
+    meta: ClerkAPIErrorMeta? = nil
   ) {
     self.code = code
     self.message = message
@@ -33,5 +33,13 @@ public struct ClerkAPIError: Codable, Equatable, Sendable {
     self.message = try container.decodeFlexible(String.self, snake: "message", camel: "message")
     self.longMessage = try container.decodeIfPresentFlexible(String.self, snake: "long_message", camel: "longMessage")
     self.meta = try container.decodeIfPresentFlexible(ClerkAPIErrorMeta.self, snake: "meta", camel: "meta")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(code, forKey: .code)
+    try container.encode(message, forKey: .message)
+    try container.encodeIfPresent(longMessage, forKey: .longMessage)
+    try container.encodeIfPresent(meta, forKey: .meta)
   }
 }

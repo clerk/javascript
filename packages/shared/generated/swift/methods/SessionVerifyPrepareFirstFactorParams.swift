@@ -16,15 +16,15 @@ public struct SessionVerifyPrepareFirstFactorParams: Codable, Equatable, Sendabl
 
   public init(
     strategy: SessionVerifyPrepareFirstFactorParamsStrategy,
-    emailAddressId: String?,
-    primary: Bool?,
-    phoneNumberId: String?,
-    `default`: Bool?,
-    channel: PrepareFirstFactorParamsChannel?,
-    enterpriseConnectionId: String?,
-    enterpriseConnectionName: String?,
-    redirectUrl: String?,
-    oidcPrompt: String?
+    emailAddressId: String? = nil,
+    primary: Bool? = nil,
+    phoneNumberId: String? = nil,
+    `default`: Bool? = nil,
+    channel: PrepareFirstFactorParamsChannel? = nil,
+    enterpriseConnectionId: String? = nil,
+    enterpriseConnectionName: String? = nil,
+    redirectUrl: String? = nil,
+    oidcPrompt: String? = nil
   ) {
     self.strategy = strategy
     self.emailAddressId = emailAddressId
@@ -63,5 +63,19 @@ public struct SessionVerifyPrepareFirstFactorParams: Codable, Equatable, Sendabl
     self.enterpriseConnectionName = try container.decodeIfPresentFlexible(String.self, snake: "enterpriseConnectionName", camel: "enterpriseConnectionName")
     self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
     self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(emailAddressId, forKey: .emailAddressId)
+    try container.encodeIfPresent(primary, forKey: .primary)
+    try container.encodeIfPresent(phoneNumberId, forKey: .phoneNumberId)
+    try container.encodeIfPresent(`default`, forKey: .`default`)
+    try container.encodeIfPresent(channel, forKey: .channel)
+    try container.encodeIfPresent(enterpriseConnectionId, forKey: .enterpriseConnectionId)
+    try container.encodeIfPresent(enterpriseConnectionName, forKey: .enterpriseConnectionName)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
+    try container.encodeIfPresent(oidcPrompt, forKey: .oidcPrompt)
   }
 }

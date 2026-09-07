@@ -6,7 +6,7 @@ public struct ClerkResourceReloadParams: Codable, Equatable, Sendable {
   public var rotatingTokenNonce: String?
 
   public init(
-    rotatingTokenNonce: String?
+    rotatingTokenNonce: String? = nil
   ) {
     self.rotatingTokenNonce = rotatingTokenNonce
   }
@@ -18,5 +18,10 @@ public struct ClerkResourceReloadParams: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.rotatingTokenNonce = try container.decodeIfPresentFlexible(String.self, snake: "rotatingTokenNonce", camel: "rotatingTokenNonce")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(rotatingTokenNonce, forKey: .rotatingTokenNonce)
   }
 }

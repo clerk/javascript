@@ -19,12 +19,12 @@ public struct Client: Codable, Equatable, Sendable, Identifiable {
     object: String,
     id: String,
     sessions: [Session],
-    signUp: SignUp?,
-    signIn: SignIn?,
-    captchaBypass: Bool?,
-    lastActiveSessionId: String?,
-    lastAuthenticationStrategy: String?,
-    cookieExpiresAt: Date?,
+    signUp: SignUp? = nil,
+    signIn: SignIn? = nil,
+    captchaBypass: Bool? = nil,
+    lastActiveSessionId: String? = nil,
+    lastAuthenticationStrategy: String? = nil,
+    cookieExpiresAt: Date? = nil,
     createdAt: Date,
     updatedAt: Date
   ) {

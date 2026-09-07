@@ -13,8 +13,8 @@ public struct ProtectCheck: Codable, Equatable, Sendable {
     status: String,
     token: String,
     sdkUrl: String,
-    expiresAt: Date?,
-    uiHints: [String: String]?
+    expiresAt: Date? = nil,
+    uiHints: [String: String]? = nil
   ) {
     self.status = status
     self.token = token

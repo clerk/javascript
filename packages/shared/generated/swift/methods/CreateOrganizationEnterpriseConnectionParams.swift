@@ -12,11 +12,11 @@ public struct CreateOrganizationEnterpriseConnectionParams: Codable, Equatable, 
 
   public init(
     provider: CreateOrganizationEnterpriseConnectionParamsProvider,
-    name: String?,
-    domains: [String]?,
-    organizationId: String?,
-    saml: OrganizationEnterpriseConnectionSamlInput?,
-    oidc: OrganizationEnterpriseConnectionOidcInput?
+    name: String? = nil,
+    domains: [String]? = nil,
+    organizationId: String? = nil,
+    saml: OrganizationEnterpriseConnectionSamlInput? = nil,
+    oidc: OrganizationEnterpriseConnectionOidcInput? = nil
   ) {
     self.provider = provider
     self.name = name
@@ -43,5 +43,15 @@ public struct CreateOrganizationEnterpriseConnectionParams: Codable, Equatable, 
     self.organizationId = try container.decodeIfPresentFlexible(String.self, snake: "organizationId", camel: "organizationId")
     self.saml = try container.decodeIfPresentFlexible(OrganizationEnterpriseConnectionSamlInput.self, snake: "saml", camel: "saml")
     self.oidc = try container.decodeIfPresentFlexible(OrganizationEnterpriseConnectionOidcInput.self, snake: "oidc", camel: "oidc")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(provider, forKey: .provider)
+    try container.encodeIfPresent(name, forKey: .name)
+    try container.encodeIfPresent(domains, forKey: .domains)
+    try container.encodeIfPresent(organizationId, forKey: .organizationId)
+    try container.encodeIfPresent(saml, forKey: .saml)
+    try container.encodeIfPresent(oidc, forKey: .oidc)
   }
 }

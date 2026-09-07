@@ -16,13 +16,13 @@ public enum SignInJSMethod: String, Sendable {
 }
 
 public protocol SignInMethods: Sendable {
-  func attemptFirstFactor(_ params: AttemptFirstFactorParams) async throws -> SignIn
-  func attemptSecondFactor(_ params: AttemptSecondFactorParams) async throws -> SignIn
-  func authenticateWithPasskey(_ params: AuthenticateWithPasskeyParams?) async throws -> SignIn
-  func create(_ params: SignInCreateParams) async throws -> SignIn
-  func prepareFirstFactor(_ params: PrepareFirstFactorParams) async throws -> SignIn
-  func prepareSecondFactor(_ params: PrepareSecondFactorParams) async throws -> SignIn
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> SignIn
-  func resetPassword(_ params: ResetPasswordParams) async throws -> SignIn
-  func submitProtectCheck(_ params: SignInSubmitProtectCheckParams) async throws -> SignIn
+  func attemptFirstFactor(_ params: AttemptFirstFactorParams) async throws -> Self
+  func attemptSecondFactor(_ params: AttemptSecondFactorParams) async throws -> Self
+  func authenticateWithPasskey(_ params: AuthenticateWithPasskeyParams?) async throws -> Self
+  func create(_ params: SignInCreateParams) async throws -> Self
+  func prepareFirstFactor(_ params: PrepareFirstFactorParams) async throws -> Self
+  func prepareSecondFactor(_ params: PrepareSecondFactorParams) async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
+  func resetPassword(_ params: ResetPasswordParams) async throws -> Self
+  func submitProtectCheck(_ params: SignInSubmitProtectCheckParams) async throws -> Self
 }

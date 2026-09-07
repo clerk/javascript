@@ -8,7 +8,7 @@ public struct PreparePhoneNumberVerificationParams: Codable, Equatable, Sendable
 
   public init(
     strategy: String,
-    channel: PrepareFirstFactorParamsChannel?
+    channel: PrepareFirstFactorParamsChannel? = nil
   ) {
     self.strategy = strategy
     self.channel = channel
@@ -23,5 +23,11 @@ public struct PreparePhoneNumberVerificationParams: Codable, Equatable, Sendable
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
     self.channel = try container.decodeIfPresentFlexible(PrepareFirstFactorParamsChannel.self, snake: "channel", camel: "channel")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(channel, forKey: .channel)
   }
 }

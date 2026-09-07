@@ -14,9 +14,9 @@ public struct Passkey: Codable, Equatable, Sendable, Identifiable {
   public init(
     object: String,
     id: String,
-    name: String?,
-    verification: Verification?,
-    lastUsedAt: Date?,
+    name: String? = nil,
+    verification: Verification? = nil,
+    lastUsedAt: Date? = nil,
     updatedAt: Date,
     createdAt: Date
   ) {

@@ -26,7 +26,7 @@ public struct EnterpriseAccountConnection: Codable, Equatable, Sendable, Identif
     allowSubdomains: Bool,
     disableAdditionalIdentifications: Bool,
     domain: String,
-    logoPublicUrl: String?,
+    logoPublicUrl: String? = nil,
     name: String,
     `protocol`: EnterpriseAccountProtocol,
     provider: String,
@@ -34,7 +34,7 @@ public struct EnterpriseAccountConnection: Codable, Equatable, Sendable, Identif
     allowOrganizationAccountLinking: Bool,
     createdAt: Date,
     updatedAt: Date,
-    enterpriseConnectionId: String?,
+    enterpriseConnectionId: String? = nil,
     id: String,
     object: String
   ) {

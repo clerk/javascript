@@ -55,10 +55,10 @@ public protocol OrganizationMethods: Sendable {
   func inviteMember(_ params: InviteMemberParams) async throws -> JSONValue
   func inviteMembers(_ params: InviteMembersParams) async throws -> [JSONValue]
   func prepareOwnershipVerification(_ domainIds: [String]) async throws -> JSONValue
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> Organization
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
   func removeMember(_ userId: String) async throws -> OrganizationMembership
-  func setLogo(_ params: SetOrganizationLogoParams) async throws -> Organization
-  func update(_ params: UpdateOrganizationParams) async throws -> Organization
+  func setLogo(_ params: SetOrganizationLogoParams) async throws -> Self
+  func update(_ params: UpdateOrganizationParams) async throws -> Self
   func updateEnterpriseConnection(_ enterpriseConnectionId: String, params: UpdateOrganizationEnterpriseConnectionParams) async throws -> JSONValue
   func updateMember(_ params: UpdateMembershipParams) async throws -> OrganizationMembership
 }

@@ -51,13 +51,13 @@ public struct DisplayConfig: Codable, Equatable, Sendable, Identifiable {
     afterSwitchSessionUrl: String,
     applicationName: String,
     branded: Bool,
-    captchaPublicKey: String?,
-    captchaWidgetType: DisplayConfigCaptchaWidgetType?,
-    captchaPublicKeyInvisible: String?,
+    captchaPublicKey: String? = nil,
+    captchaWidgetType: DisplayConfigCaptchaWidgetType? = nil,
+    captchaPublicKeyInvisible: String? = nil,
     captchaProvider: String,
-    captchaOauthBypass: [String]?,
-    captchaHeartbeat: Bool?,
-    captchaHeartbeatIntervalMs: Int?,
+    captchaOauthBypass: [String]? = nil,
+    captchaHeartbeat: Bool? = nil,
+    captchaHeartbeatIntervalMs: Int? = nil,
     homeUrl: String,
     instanceEnvironmentType: String,
     logoImageUrl: String,
@@ -68,12 +68,12 @@ public struct DisplayConfig: Codable, Equatable, Sendable, Identifiable {
     supportEmail: String,
     theme: DisplayTheme,
     userProfileUrl: String,
-    clerkJsVersion: String?,
+    clerkJsVersion: String? = nil,
     organizationProfileUrl: String,
     createOrganizationUrl: String,
     afterLeaveOrganizationUrl: String,
     afterCreateOrganizationUrl: String,
-    googleOneTapClientId: String?,
+    googleOneTapClientId: String? = nil,
     showDevmodeWarning: Bool,
     termsUrl: String,
     privacyPolicyUrl: String,
@@ -198,5 +198,46 @@ public struct DisplayConfig: Codable, Equatable, Sendable, Identifiable {
     self.privacyPolicyUrl = try container.decodeFlexible(String.self, snake: "privacy_policy_url", camel: "privacyPolicyUrl")
     self.waitlistUrl = try container.decodeFlexible(String.self, snake: "waitlist_url", camel: "waitlistUrl")
     self.afterJoinWaitlistUrl = try container.decodeFlexible(String.self, snake: "after_join_waitlist_url", camel: "afterJoinWaitlistUrl")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(object, forKey: .object)
+    try container.encode(id, forKey: .id)
+    try container.encode(afterSignInUrl, forKey: .afterSignInUrl)
+    try container.encode(afterSignOutAllUrl, forKey: .afterSignOutAllUrl)
+    try container.encode(afterSignOutOneUrl, forKey: .afterSignOutOneUrl)
+    try container.encode(afterSignUpUrl, forKey: .afterSignUpUrl)
+    try container.encode(afterSwitchSessionUrl, forKey: .afterSwitchSessionUrl)
+    try container.encode(applicationName, forKey: .applicationName)
+    try container.encode(branded, forKey: .branded)
+    try container.encodeIfPresent(captchaPublicKey, forKey: .captchaPublicKey)
+    try container.encodeIfPresent(captchaWidgetType, forKey: .captchaWidgetType)
+    try container.encodeIfPresent(captchaPublicKeyInvisible, forKey: .captchaPublicKeyInvisible)
+    try container.encode(captchaProvider, forKey: .captchaProvider)
+    try container.encodeIfPresent(captchaOauthBypass, forKey: .captchaOauthBypass)
+    try container.encodeIfPresent(captchaHeartbeat, forKey: .captchaHeartbeat)
+    try container.encodeIfPresent(captchaHeartbeatIntervalMs, forKey: .captchaHeartbeatIntervalMs)
+    try container.encode(homeUrl, forKey: .homeUrl)
+    try container.encode(instanceEnvironmentType, forKey: .instanceEnvironmentType)
+    try container.encode(logoImageUrl, forKey: .logoImageUrl)
+    try container.encode(faviconImageUrl, forKey: .faviconImageUrl)
+    try container.encode(preferredSignInStrategy, forKey: .preferredSignInStrategy)
+    try container.encode(signInUrl, forKey: .signInUrl)
+    try container.encode(signUpUrl, forKey: .signUpUrl)
+    try container.encode(supportEmail, forKey: .supportEmail)
+    try container.encode(theme, forKey: .theme)
+    try container.encode(userProfileUrl, forKey: .userProfileUrl)
+    try container.encodeIfPresent(clerkJsVersion, forKey: .clerkJsVersion)
+    try container.encode(organizationProfileUrl, forKey: .organizationProfileUrl)
+    try container.encode(createOrganizationUrl, forKey: .createOrganizationUrl)
+    try container.encode(afterLeaveOrganizationUrl, forKey: .afterLeaveOrganizationUrl)
+    try container.encode(afterCreateOrganizationUrl, forKey: .afterCreateOrganizationUrl)
+    try container.encodeIfPresent(googleOneTapClientId, forKey: .googleOneTapClientId)
+    try container.encode(showDevmodeWarning, forKey: .showDevmodeWarning)
+    try container.encode(termsUrl, forKey: .termsUrl)
+    try container.encode(privacyPolicyUrl, forKey: .privacyPolicyUrl)
+    try container.encode(waitlistUrl, forKey: .waitlistUrl)
+    try container.encode(afterJoinWaitlistUrl, forKey: .afterJoinWaitlistUrl)
   }
 }

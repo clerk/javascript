@@ -8,9 +8,9 @@ public struct GetDomainsParams: Codable, Equatable, Sendable {
   public var enrollmentMode: GetDomainsParamsEnrollmentMode?
 
   public init(
-    initialPage: Int?,
-    pageSize: Int?,
-    enrollmentMode: GetDomainsParamsEnrollmentMode?
+    initialPage: Int? = nil,
+    pageSize: Int? = nil,
+    enrollmentMode: GetDomainsParamsEnrollmentMode? = nil
   ) {
     self.initialPage = initialPage
     self.pageSize = pageSize
@@ -28,5 +28,12 @@ public struct GetDomainsParams: Codable, Equatable, Sendable {
     self.initialPage = try container.decodeIfPresentFlexible(Int.self, snake: "initialPage", camel: "initialPage")
     self.pageSize = try container.decodeIfPresentFlexible(Int.self, snake: "pageSize", camel: "pageSize")
     self.enrollmentMode = try container.decodeIfPresentFlexible(GetDomainsParamsEnrollmentMode.self, snake: "enrollmentMode", camel: "enrollmentMode")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(initialPage, forKey: .initialPage)
+    try container.encodeIfPresent(pageSize, forKey: .pageSize)
+    try container.encodeIfPresent(enrollmentMode, forKey: .enrollmentMode)
   }
 }

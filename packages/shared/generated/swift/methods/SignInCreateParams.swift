@@ -16,17 +16,17 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
   public var password: String?
 
   public init(
-    strategy: String?,
-    redirectUrl: String?,
-    actionCompleteRedirectUrl: String?,
-    identifier: String?,
-    oidcPrompt: String?,
-    oidcLoginHint: String?,
-    transfer: Bool?,
-    signUpIfMissing: Bool?,
-    ticket: String?,
-    token: String?,
-    password: String?
+    strategy: String? = nil,
+    redirectUrl: String? = nil,
+    actionCompleteRedirectUrl: String? = nil,
+    identifier: String? = nil,
+    oidcPrompt: String? = nil,
+    oidcLoginHint: String? = nil,
+    transfer: Bool? = nil,
+    signUpIfMissing: Bool? = nil,
+    ticket: String? = nil,
+    token: String? = nil,
+    password: String? = nil
   ) {
     self.strategy = strategy
     self.redirectUrl = redirectUrl
@@ -68,5 +68,20 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
     self.ticket = try container.decodeIfPresentFlexible(String.self, snake: "ticket", camel: "ticket")
     self.token = try container.decodeIfPresentFlexible(String.self, snake: "token", camel: "token")
     self.password = try container.decodeIfPresentFlexible(String.self, snake: "password", camel: "password")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(strategy, forKey: .strategy)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
+    try container.encodeIfPresent(actionCompleteRedirectUrl, forKey: .actionCompleteRedirectUrl)
+    try container.encodeIfPresent(identifier, forKey: .identifier)
+    try container.encodeIfPresent(oidcPrompt, forKey: .oidcPrompt)
+    try container.encodeIfPresent(oidcLoginHint, forKey: .oidcLoginHint)
+    try container.encodeIfPresent(transfer, forKey: .transfer)
+    try container.encodeIfPresent(signUpIfMissing, forKey: .signUpIfMissing)
+    try container.encodeIfPresent(ticket, forKey: .ticket)
+    try container.encodeIfPresent(token, forKey: .token)
+    try container.encodeIfPresent(password, forKey: .password)
   }
 }

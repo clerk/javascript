@@ -6,7 +6,7 @@ public struct AuthenticateWithPasskeyParams: Codable, Equatable, Sendable {
   public var flow: AuthenticateWithPasskeyParamsFlow?
 
   public init(
-    flow: AuthenticateWithPasskeyParamsFlow?
+    flow: AuthenticateWithPasskeyParamsFlow? = nil
   ) {
     self.flow = flow
   }
@@ -18,5 +18,10 @@ public struct AuthenticateWithPasskeyParams: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.flow = try container.decodeIfPresentFlexible(AuthenticateWithPasskeyParamsFlow.self, snake: "flow", camel: "flow")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(flow, forKey: .flow)
   }
 }

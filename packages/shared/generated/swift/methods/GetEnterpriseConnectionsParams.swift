@@ -6,7 +6,7 @@ public struct GetEnterpriseConnectionsParams: Codable, Equatable, Sendable {
   public var withOrganizationAccountLinking: Bool?
 
   public init(
-    withOrganizationAccountLinking: Bool?
+    withOrganizationAccountLinking: Bool? = nil
   ) {
     self.withOrganizationAccountLinking = withOrganizationAccountLinking
   }
@@ -18,5 +18,10 @@ public struct GetEnterpriseConnectionsParams: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.withOrganizationAccountLinking = try container.decodeIfPresentFlexible(Bool.self, snake: "withOrganizationAccountLinking", camel: "withOrganizationAccountLinking")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(withOrganizationAccountLinking, forKey: .withOrganizationAccountLinking)
   }
 }

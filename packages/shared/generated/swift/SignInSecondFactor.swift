@@ -13,12 +13,12 @@ public struct SignInSecondFactor: Codable, Equatable, Sendable {
 
   public init(
     strategy: SignInSecondFactorStrategy,
-    emailAddressId: String?,
-    safeIdentifier: String?,
-    primary: Bool?,
-    phoneNumberId: String?,
-    `default`: Bool?,
-    channel: SignInFirstFactorChannel?
+    emailAddressId: String? = nil,
+    safeIdentifier: String? = nil,
+    primary: Bool? = nil,
+    phoneNumberId: String? = nil,
+    `default`: Bool? = nil,
+    channel: SignInFirstFactorChannel? = nil
   ) {
     self.strategy = strategy
     self.emailAddressId = emailAddressId
@@ -48,5 +48,16 @@ public struct SignInSecondFactor: Codable, Equatable, Sendable {
     self.phoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "phone_number_id", camel: "phoneNumberId")
     self.`default` = try container.decodeIfPresentFlexible(Bool.self, snake: "default", camel: "default")
     self.channel = try container.decodeIfPresentFlexible(SignInFirstFactorChannel.self, snake: "channel", camel: "channel")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(emailAddressId, forKey: .emailAddressId)
+    try container.encodeIfPresent(safeIdentifier, forKey: .safeIdentifier)
+    try container.encodeIfPresent(primary, forKey: .primary)
+    try container.encodeIfPresent(phoneNumberId, forKey: .phoneNumberId)
+    try container.encodeIfPresent(`default`, forKey: .`default`)
+    try container.encodeIfPresent(channel, forKey: .channel)
   }
 }

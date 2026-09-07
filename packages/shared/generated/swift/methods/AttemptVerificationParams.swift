@@ -9,8 +9,8 @@ public struct AttemptVerificationParams: Codable, Equatable, Sendable {
 
   public init(
     strategy: AttemptVerificationParamsStrategy,
-    code: String?,
-    signature: String?
+    code: String? = nil,
+    signature: String? = nil
   ) {
     self.strategy = strategy
     self.code = code
@@ -28,5 +28,12 @@ public struct AttemptVerificationParams: Codable, Equatable, Sendable {
     self.strategy = try container.decodeFlexible(AttemptVerificationParamsStrategy.self, snake: "strategy", camel: "strategy")
     self.code = try container.decodeIfPresentFlexible(String.self, snake: "code", camel: "code")
     self.signature = try container.decodeIfPresentFlexible(String.self, snake: "signature", camel: "signature")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(code, forKey: .code)
+    try container.encodeIfPresent(signature, forKey: .signature)
   }
 }

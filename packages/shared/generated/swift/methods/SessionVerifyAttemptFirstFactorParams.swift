@@ -10,9 +10,9 @@ public struct SessionVerifyAttemptFirstFactorParams: Codable, Equatable, Sendabl
 
   public init(
     strategy: SessionVerifyAttemptFirstFactorParamsStrategy,
-    publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse?,
-    code: String?,
-    password: String?
+    publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse? = nil,
+    code: String? = nil,
+    password: String? = nil
   ) {
     self.strategy = strategy
     self.publicKeyCredential = publicKeyCredential
@@ -33,5 +33,13 @@ public struct SessionVerifyAttemptFirstFactorParams: Codable, Equatable, Sendabl
     self.publicKeyCredential = try container.decodeIfPresentFlexible(PublicKeyCredentialWithAuthenticatorAssertionResponse.self, snake: "publicKeyCredential", camel: "publicKeyCredential")
     self.code = try container.decodeIfPresentFlexible(String.self, snake: "code", camel: "code")
     self.password = try container.decodeIfPresentFlexible(String.self, snake: "password", camel: "password")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(publicKeyCredential, forKey: .publicKeyCredential)
+    try container.encodeIfPresent(code, forKey: .code)
+    try container.encodeIfPresent(password, forKey: .password)
   }
 }

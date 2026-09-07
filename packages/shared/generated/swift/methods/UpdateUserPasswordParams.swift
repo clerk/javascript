@@ -9,8 +9,8 @@ public struct UpdateUserPasswordParams: Codable, Equatable, Sendable {
 
   public init(
     newPassword: String,
-    currentPassword: String?,
-    signOutOfOtherSessions: Bool?
+    currentPassword: String? = nil,
+    signOutOfOtherSessions: Bool? = nil
   ) {
     self.newPassword = newPassword
     self.currentPassword = currentPassword
@@ -28,5 +28,12 @@ public struct UpdateUserPasswordParams: Codable, Equatable, Sendable {
     self.newPassword = try container.decodeFlexible(String.self, snake: "newPassword", camel: "newPassword")
     self.currentPassword = try container.decodeIfPresentFlexible(String.self, snake: "currentPassword", camel: "currentPassword")
     self.signOutOfOtherSessions = try container.decodeIfPresentFlexible(Bool.self, snake: "signOutOfOtherSessions", camel: "signOutOfOtherSessions")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(newPassword, forKey: .newPassword)
+    try container.encodeIfPresent(currentPassword, forKey: .currentPassword)
+    try container.encodeIfPresent(signOutOfOtherSessions, forKey: .signOutOfOtherSessions)
   }
 }

@@ -9,8 +9,8 @@ public struct UserData: Codable, Equatable, Sendable {
   public var hasImage: Bool
 
   public init(
-    firstName: String?,
-    lastName: String?,
+    firstName: String? = nil,
+    lastName: String? = nil,
     imageUrl: String,
     hasImage: Bool
   ) {
@@ -33,5 +33,13 @@ public struct UserData: Codable, Equatable, Sendable {
     self.lastName = try container.decodeIfPresentFlexible(String.self, snake: "last_name", camel: "lastName")
     self.imageUrl = try container.decodeFlexible(String.self, snake: "image_url", camel: "imageUrl")
     self.hasImage = try container.decodeFlexible(Bool.self, snake: "has_image", camel: "hasImage")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(firstName, forKey: .firstName)
+    try container.encodeIfPresent(lastName, forKey: .lastName)
+    try container.encode(imageUrl, forKey: .imageUrl)
+    try container.encode(hasImage, forKey: .hasImage)
   }
 }

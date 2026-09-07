@@ -8,9 +8,9 @@ public struct SetActiveParams: Codable, Equatable, Sendable {
   public var redirectUrl: String?
 
   public init(
-    session: JSONValue?,
-    organization: JSONValue?,
-    redirectUrl: String?
+    session: JSONValue? = nil,
+    organization: JSONValue? = nil,
+    redirectUrl: String? = nil
   ) {
     self.session = session
     self.organization = organization
@@ -28,5 +28,12 @@ public struct SetActiveParams: Codable, Equatable, Sendable {
     self.session = try container.decodeIfPresentFlexible(JSONValue.self, snake: "session", camel: "session")
     self.organization = try container.decodeIfPresentFlexible(JSONValue.self, snake: "organization", camel: "organization")
     self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(session, forKey: .session)
+    try container.encodeIfPresent(organization, forKey: .organization)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
   }
 }

@@ -19,8 +19,8 @@ public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
     reservedForSecondFactor: Bool,
     defaultSecondFactor: Bool,
     linkedTo: [IdentificationLink],
-    verification: Verification?,
-    backupCodes: [String]?
+    verification: Verification? = nil,
+    backupCodes: [String]? = nil
   ) {
     self.object = object
     self.id = id
@@ -53,5 +53,17 @@ public struct PhoneNumber: Codable, Equatable, Sendable, Identifiable {
     self.linkedTo = try container.decodeFlexible([IdentificationLink].self, snake: "linked_to", camel: "linkedTo")
     self.verification = try container.decodeIfPresentFlexible(Verification.self, snake: "verification", camel: "verification")
     self.backupCodes = try container.decodeIfPresentFlexible([String].self, snake: "backup_codes", camel: "backupCodes")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(object, forKey: .object)
+    try container.encode(id, forKey: .id)
+    try container.encode(phoneNumber, forKey: .phoneNumber)
+    try container.encode(reservedForSecondFactor, forKey: .reservedForSecondFactor)
+    try container.encode(defaultSecondFactor, forKey: .defaultSecondFactor)
+    try container.encode(linkedTo, forKey: .linkedTo)
+    try container.encodeIfPresent(verification, forKey: .verification)
+    try container.encodeIfPresent(backupCodes, forKey: .backupCodes)
   }
 }

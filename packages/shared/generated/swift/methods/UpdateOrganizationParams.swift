@@ -8,7 +8,7 @@ public struct UpdateOrganizationParams: Codable, Equatable, Sendable {
 
   public init(
     name: String,
-    slug: String?
+    slug: String? = nil
   ) {
     self.name = name
     self.slug = slug
@@ -23,5 +23,11 @@ public struct UpdateOrganizationParams: Codable, Equatable, Sendable {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.name = try container.decodeFlexible(String.self, snake: "name", camel: "name")
     self.slug = try container.decodeIfPresentFlexible(String.self, snake: "slug", camel: "slug")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(name, forKey: .name)
+    try container.encodeIfPresent(slug, forKey: .slug)
   }
 }

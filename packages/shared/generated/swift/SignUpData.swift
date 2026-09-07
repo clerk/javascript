@@ -16,7 +16,7 @@ public struct SignUpData: Codable, Equatable, Sendable {
     captchaEnabled: Bool,
     mode: SignUpDataMode,
     legalConsentEnabled: Bool,
-    mfa: SignUpDataMfa?
+    mfa: SignUpDataMfa? = nil
   ) {
     self.allowlistOnly = allowlistOnly
     self.progressive = progressive
@@ -43,5 +43,15 @@ public struct SignUpData: Codable, Equatable, Sendable {
     self.mode = try container.decodeFlexible(SignUpDataMode.self, snake: "mode", camel: "mode")
     self.legalConsentEnabled = try container.decodeFlexible(Bool.self, snake: "legal_consent_enabled", camel: "legalConsentEnabled")
     self.mfa = try container.decodeIfPresentFlexible(SignUpDataMfa.self, snake: "mfa", camel: "mfa")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(allowlistOnly, forKey: .allowlistOnly)
+    try container.encode(progressive, forKey: .progressive)
+    try container.encode(captchaEnabled, forKey: .captchaEnabled)
+    try container.encode(mode, forKey: .mode)
+    try container.encode(legalConsentEnabled, forKey: .legalConsentEnabled)
+    try container.encodeIfPresent(mfa, forKey: .mfa)
   }
 }

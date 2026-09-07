@@ -8,7 +8,7 @@ public struct SignUpPrepareEmailAddressVerificationParams: Codable, Equatable, S
 
   public init(
     strategy: SignUpPrepareEmailAddressVerificationParamsStrategy,
-    redirectUrl: String?
+    redirectUrl: String? = nil
   ) {
     self.strategy = strategy
     self.redirectUrl = redirectUrl
@@ -23,5 +23,11 @@ public struct SignUpPrepareEmailAddressVerificationParams: Codable, Equatable, S
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.strategy = try container.decodeFlexible(SignUpPrepareEmailAddressVerificationParamsStrategy.self, snake: "strategy", camel: "strategy")
     self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
   }
 }

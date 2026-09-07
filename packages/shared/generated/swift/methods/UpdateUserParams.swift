@@ -12,13 +12,13 @@ public struct UpdateUserParams: Codable, Equatable, Sendable {
   public var unsafeMetadata: JSONValue?
 
   public init(
-    username: String?,
-    firstName: String?,
-    lastName: String?,
-    primaryEmailAddressId: String?,
-    primaryPhoneNumberId: String?,
-    primaryWeb3WalletId: String?,
-    unsafeMetadata: JSONValue?
+    username: String? = nil,
+    firstName: String? = nil,
+    lastName: String? = nil,
+    primaryEmailAddressId: String? = nil,
+    primaryPhoneNumberId: String? = nil,
+    primaryWeb3WalletId: String? = nil,
+    unsafeMetadata: JSONValue? = nil
   ) {
     self.username = username
     self.firstName = firstName
@@ -48,5 +48,16 @@ public struct UpdateUserParams: Codable, Equatable, Sendable {
     self.primaryPhoneNumberId = try container.decodeIfPresentFlexible(String.self, snake: "primaryPhoneNumberId", camel: "primaryPhoneNumberId")
     self.primaryWeb3WalletId = try container.decodeIfPresentFlexible(String.self, snake: "primaryWeb3WalletId", camel: "primaryWeb3WalletId")
     self.unsafeMetadata = try container.decodeIfPresentFlexible(JSONValue.self, snake: "unsafeMetadata", camel: "unsafeMetadata")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(username, forKey: .username)
+    try container.encodeIfPresent(firstName, forKey: .firstName)
+    try container.encodeIfPresent(lastName, forKey: .lastName)
+    try container.encodeIfPresent(primaryEmailAddressId, forKey: .primaryEmailAddressId)
+    try container.encodeIfPresent(primaryPhoneNumberId, forKey: .primaryPhoneNumberId)
+    try container.encodeIfPresent(primaryWeb3WalletId, forKey: .primaryWeb3WalletId)
+    try container.encodeIfPresent(unsafeMetadata, forKey: .unsafeMetadata)
   }
 }

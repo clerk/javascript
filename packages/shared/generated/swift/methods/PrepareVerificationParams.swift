@@ -12,11 +12,11 @@ public struct PrepareVerificationParams: Codable, Equatable, Sendable {
 
   public init(
     strategy: String,
-    redirectUrl: String?,
-    channel: PrepareFirstFactorParamsChannel?,
-    actionCompleteRedirectUrl: String?,
-    oidcPrompt: String?,
-    oidcLoginHint: String?
+    redirectUrl: String? = nil,
+    channel: PrepareFirstFactorParamsChannel? = nil,
+    actionCompleteRedirectUrl: String? = nil,
+    oidcPrompt: String? = nil,
+    oidcLoginHint: String? = nil
   ) {
     self.strategy = strategy
     self.redirectUrl = redirectUrl
@@ -43,5 +43,15 @@ public struct PrepareVerificationParams: Codable, Equatable, Sendable {
     self.actionCompleteRedirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "actionCompleteRedirectUrl", camel: "actionCompleteRedirectUrl")
     self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
     self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
+    try container.encodeIfPresent(channel, forKey: .channel)
+    try container.encodeIfPresent(actionCompleteRedirectUrl, forKey: .actionCompleteRedirectUrl)
+    try container.encodeIfPresent(oidcPrompt, forKey: .oidcPrompt)
+    try container.encodeIfPresent(oidcLoginHint, forKey: .oidcLoginHint)
   }
 }

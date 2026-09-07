@@ -8,9 +8,9 @@ public struct GetPaymentAttemptsParams: Codable, Equatable, Sendable {
   public var orgId: String?
 
   public init(
-    initialPage: Int?,
-    pageSize: Int?,
-    orgId: String?
+    initialPage: Int? = nil,
+    pageSize: Int? = nil,
+    orgId: String? = nil
   ) {
     self.initialPage = initialPage
     self.pageSize = pageSize
@@ -28,5 +28,12 @@ public struct GetPaymentAttemptsParams: Codable, Equatable, Sendable {
     self.initialPage = try container.decodeIfPresentFlexible(Int.self, snake: "initialPage", camel: "initialPage")
     self.pageSize = try container.decodeIfPresentFlexible(Int.self, snake: "pageSize", camel: "pageSize")
     self.orgId = try container.decodeIfPresentFlexible(String.self, snake: "orgId", camel: "orgId")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(initialPage, forKey: .initialPage)
+    try container.encodeIfPresent(pageSize, forKey: .pageSize)
+    try container.encodeIfPresent(orgId, forKey: .orgId)
   }
 }

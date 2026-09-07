@@ -14,11 +14,11 @@ public enum PhoneNumberJSMethod: String, Sendable {
 }
 
 public protocol PhoneNumberMethods: Sendable {
-  func attemptVerification(_ params: AttemptPhoneNumberVerificationParams) async throws -> PhoneNumber
-  func create() async throws -> PhoneNumber
+  func attemptVerification(_ params: AttemptPhoneNumberVerificationParams) async throws -> Self
+  func create() async throws -> Self
   func destroy() async throws
-  func makeDefaultSecondFactor() async throws -> PhoneNumber
-  func prepareVerification() async throws -> PhoneNumber
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> PhoneNumber
-  func setReservedForSecondFactor(_ params: SetReservedForSecondFactorParams) async throws -> PhoneNumber
+  func makeDefaultSecondFactor() async throws -> Self
+  func prepareVerification() async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
+  func setReservedForSecondFactor(_ params: SetReservedForSecondFactorParams) async throws -> Self
 }

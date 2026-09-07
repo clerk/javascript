@@ -8,7 +8,7 @@ public struct CommerceSettingsBilling: Codable, Equatable, Sendable {
   public var user: CommerceSettingsBillingOrganization
 
   public init(
-    stripePublishableKey: String?,
+    stripePublishableKey: String? = nil,
     organization: CommerceSettingsBillingOrganization,
     user: CommerceSettingsBillingOrganization
   ) {
@@ -28,5 +28,12 @@ public struct CommerceSettingsBilling: Codable, Equatable, Sendable {
     self.stripePublishableKey = try container.decodeIfPresentFlexible(String.self, snake: "stripe_publishable_key", camel: "stripePublishableKey")
     self.organization = try container.decodeFlexible(CommerceSettingsBillingOrganization.self, snake: "organization", camel: "organization")
     self.user = try container.decodeFlexible(CommerceSettingsBillingOrganization.self, snake: "user", camel: "user")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(stripePublishableKey, forKey: .stripePublishableKey)
+    try container.encode(organization, forKey: .organization)
+    try container.encode(user, forKey: .user)
   }
 }

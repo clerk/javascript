@@ -6,7 +6,7 @@ public struct SetOrganizationLogoParams: Codable, Equatable, Sendable {
   public var file: JSONValue?
 
   public init(
-    file: JSONValue?
+    file: JSONValue? = nil
   ) {
     self.file = file
   }
@@ -18,5 +18,10 @@ public struct SetOrganizationLogoParams: Codable, Equatable, Sendable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: FAPIJSONKey.self)
     self.file = try container.decodeIfPresentFlexible(JSONValue.self, snake: "file", camel: "file")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(file, forKey: .file)
   }
 }

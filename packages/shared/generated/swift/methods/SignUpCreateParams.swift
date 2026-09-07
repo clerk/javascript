@@ -28,29 +28,29 @@ public struct SignUpCreateParams: Codable, Equatable, Sendable {
   public var emailAddressOrPhoneNumber: String?
 
   public init(
-    externalAccountStrategy: String?,
-    externalAccountRedirectUrl: String?,
-    externalAccountActionCompleteRedirectUrl: String?,
-    strategy: String?,
-    redirectUrl: String?,
-    actionCompleteRedirectUrl: String?,
-    transfer: Bool?,
-    unsafeMetadata: JSONValue?,
-    ticket: String?,
-    token: String?,
-    legalAccepted: Bool?,
-    oidcPrompt: String?,
-    oidcLoginHint: String?,
-    channel: PrepareFirstFactorParamsChannel?,
-    locale: String?,
-    username: String?,
-    password: String?,
-    firstName: String?,
-    lastName: String?,
-    emailAddress: String?,
-    phoneNumber: String?,
-    web3Wallet: String?,
-    emailAddressOrPhoneNumber: String?
+    externalAccountStrategy: String? = nil,
+    externalAccountRedirectUrl: String? = nil,
+    externalAccountActionCompleteRedirectUrl: String? = nil,
+    strategy: String? = nil,
+    redirectUrl: String? = nil,
+    actionCompleteRedirectUrl: String? = nil,
+    transfer: Bool? = nil,
+    unsafeMetadata: JSONValue? = nil,
+    ticket: String? = nil,
+    token: String? = nil,
+    legalAccepted: Bool? = nil,
+    oidcPrompt: String? = nil,
+    oidcLoginHint: String? = nil,
+    channel: PrepareFirstFactorParamsChannel? = nil,
+    locale: String? = nil,
+    username: String? = nil,
+    password: String? = nil,
+    firstName: String? = nil,
+    lastName: String? = nil,
+    emailAddress: String? = nil,
+    phoneNumber: String? = nil,
+    web3Wallet: String? = nil,
+    emailAddressOrPhoneNumber: String? = nil
   ) {
     self.externalAccountStrategy = externalAccountStrategy
     self.externalAccountRedirectUrl = externalAccountRedirectUrl
@@ -128,5 +128,32 @@ public struct SignUpCreateParams: Codable, Equatable, Sendable {
     self.phoneNumber = try container.decodeIfPresentFlexible(String.self, snake: "phoneNumber", camel: "phoneNumber")
     self.web3Wallet = try container.decodeIfPresentFlexible(String.self, snake: "web3Wallet", camel: "web3Wallet")
     self.emailAddressOrPhoneNumber = try container.decodeIfPresentFlexible(String.self, snake: "emailAddressOrPhoneNumber", camel: "emailAddressOrPhoneNumber")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(externalAccountStrategy, forKey: .externalAccountStrategy)
+    try container.encodeIfPresent(externalAccountRedirectUrl, forKey: .externalAccountRedirectUrl)
+    try container.encodeIfPresent(externalAccountActionCompleteRedirectUrl, forKey: .externalAccountActionCompleteRedirectUrl)
+    try container.encodeIfPresent(strategy, forKey: .strategy)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
+    try container.encodeIfPresent(actionCompleteRedirectUrl, forKey: .actionCompleteRedirectUrl)
+    try container.encodeIfPresent(transfer, forKey: .transfer)
+    try container.encodeIfPresent(unsafeMetadata, forKey: .unsafeMetadata)
+    try container.encodeIfPresent(ticket, forKey: .ticket)
+    try container.encodeIfPresent(token, forKey: .token)
+    try container.encodeIfPresent(legalAccepted, forKey: .legalAccepted)
+    try container.encodeIfPresent(oidcPrompt, forKey: .oidcPrompt)
+    try container.encodeIfPresent(oidcLoginHint, forKey: .oidcLoginHint)
+    try container.encodeIfPresent(channel, forKey: .channel)
+    try container.encodeIfPresent(locale, forKey: .locale)
+    try container.encodeIfPresent(username, forKey: .username)
+    try container.encodeIfPresent(password, forKey: .password)
+    try container.encodeIfPresent(firstName, forKey: .firstName)
+    try container.encodeIfPresent(lastName, forKey: .lastName)
+    try container.encodeIfPresent(emailAddress, forKey: .emailAddress)
+    try container.encodeIfPresent(phoneNumber, forKey: .phoneNumber)
+    try container.encodeIfPresent(web3Wallet, forKey: .web3Wallet)
+    try container.encodeIfPresent(emailAddressOrPhoneNumber, forKey: .emailAddressOrPhoneNumber)
   }
 }

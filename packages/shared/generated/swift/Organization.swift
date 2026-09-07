@@ -33,8 +33,8 @@ public struct Organization: Codable, Equatable, Sendable, Identifiable {
     pendingInvitationsCount: Int,
     adminDeleteEnabled: Bool,
     maxAllowedMemberships: Int,
-    selfServeSsoEnabled: Bool?,
-    exclusiveMembership: Bool?
+    selfServeSsoEnabled: Bool? = nil,
+    exclusiveMembership: Bool? = nil
   ) {
     self.object = object
     self.id = id

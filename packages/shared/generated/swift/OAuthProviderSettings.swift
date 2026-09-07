@@ -16,7 +16,7 @@ public struct OAuthProviderSettings: Codable, Equatable, Sendable {
     authenticatable: Bool,
     strategy: String,
     name: String,
-    logoUrl: String?
+    logoUrl: String? = nil
   ) {
     self.enabled = enabled
     self.required = required
@@ -43,5 +43,15 @@ public struct OAuthProviderSettings: Codable, Equatable, Sendable {
     self.strategy = try container.decodeFlexible(String.self, snake: "strategy", camel: "strategy")
     self.name = try container.decodeFlexible(String.self, snake: "name", camel: "name")
     self.logoUrl = try container.decodeIfPresentFlexible(String.self, snake: "logo_url", camel: "logoUrl")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(enabled, forKey: .enabled)
+    try container.encode(required, forKey: .required)
+    try container.encode(authenticatable, forKey: .authenticatable)
+    try container.encode(strategy, forKey: .strategy)
+    try container.encode(name, forKey: .name)
+    try container.encodeIfPresent(logoUrl, forKey: .logoUrl)
   }
 }

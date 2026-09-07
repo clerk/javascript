@@ -9,10 +9,10 @@ public struct GetMembersParams: Codable, Equatable, Sendable {
   public var query: String?
 
   public init(
-    initialPage: Int?,
-    pageSize: Int?,
-    role: [String]?,
-    query: String?
+    initialPage: Int? = nil,
+    pageSize: Int? = nil,
+    role: [String]? = nil,
+    query: String? = nil
   ) {
     self.initialPage = initialPage
     self.pageSize = pageSize
@@ -33,5 +33,13 @@ public struct GetMembersParams: Codable, Equatable, Sendable {
     self.pageSize = try container.decodeIfPresentFlexible(Int.self, snake: "pageSize", camel: "pageSize")
     self.role = try container.decodeIfPresentFlexible([String].self, snake: "role", camel: "role")
     self.query = try container.decodeIfPresentFlexible(String.self, snake: "query", camel: "query")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(initialPage, forKey: .initialPage)
+    try container.encodeIfPresent(pageSize, forKey: .pageSize)
+    try container.encodeIfPresent(role, forKey: .role)
+    try container.encodeIfPresent(query, forKey: .query)
   }
 }

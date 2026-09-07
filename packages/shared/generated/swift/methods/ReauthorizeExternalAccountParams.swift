@@ -9,10 +9,10 @@ public struct ReauthorizeExternalAccountParams: Codable, Equatable, Sendable {
   public var oidcLoginHint: String?
 
   public init(
-    additionalScopes: [String]?,
-    redirectUrl: String?,
-    oidcPrompt: String?,
-    oidcLoginHint: String?
+    additionalScopes: [String]? = nil,
+    redirectUrl: String? = nil,
+    oidcPrompt: String? = nil,
+    oidcLoginHint: String? = nil
   ) {
     self.additionalScopes = additionalScopes
     self.redirectUrl = redirectUrl
@@ -33,5 +33,13 @@ public struct ReauthorizeExternalAccountParams: Codable, Equatable, Sendable {
     self.redirectUrl = try container.decodeIfPresentFlexible(String.self, snake: "redirectUrl", camel: "redirectUrl")
     self.oidcPrompt = try container.decodeIfPresentFlexible(String.self, snake: "oidcPrompt", camel: "oidcPrompt")
     self.oidcLoginHint = try container.decodeIfPresentFlexible(String.self, snake: "oidcLoginHint", camel: "oidcLoginHint")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(additionalScopes, forKey: .additionalScopes)
+    try container.encodeIfPresent(redirectUrl, forKey: .redirectUrl)
+    try container.encodeIfPresent(oidcPrompt, forKey: .oidcPrompt)
+    try container.encodeIfPresent(oidcLoginHint, forKey: .oidcLoginHint)
   }
 }

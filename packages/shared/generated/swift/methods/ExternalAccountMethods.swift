@@ -11,6 +11,6 @@ public enum ExternalAccountJSMethod: String, Sendable {
 
 public protocol ExternalAccountMethods: Sendable {
   func destroy() async throws
-  func reauthorize(_ params: ReauthorizeExternalAccountParams) async throws -> ExternalAccount
-  func reload(_ p: ClerkResourceReloadParams?) async throws -> ExternalAccount
+  func reauthorize(_ params: ReauthorizeExternalAccountParams) async throws -> Self
+  func reload(_ p: ClerkResourceReloadParams?) async throws -> Self
 }

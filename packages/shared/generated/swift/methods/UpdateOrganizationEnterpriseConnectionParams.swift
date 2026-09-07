@@ -14,15 +14,15 @@ public struct UpdateOrganizationEnterpriseConnectionParams: Codable, Equatable, 
   public var oidc: OrganizationEnterpriseConnectionOidcInput?
 
   public init(
-    name: String?,
-    domains: [String]?,
-    active: Bool?,
-    syncUserAttributes: Bool?,
-    disableAdditionalIdentifications: Bool?,
-    organizationId: String?,
-    customAttributes: JSONValue?,
-    saml: OrganizationEnterpriseConnectionSamlInput?,
-    oidc: OrganizationEnterpriseConnectionOidcInput?
+    name: String? = nil,
+    domains: [String]? = nil,
+    active: Bool? = nil,
+    syncUserAttributes: Bool? = nil,
+    disableAdditionalIdentifications: Bool? = nil,
+    organizationId: String? = nil,
+    customAttributes: JSONValue? = nil,
+    saml: OrganizationEnterpriseConnectionSamlInput? = nil,
+    oidc: OrganizationEnterpriseConnectionOidcInput? = nil
   ) {
     self.name = name
     self.domains = domains
@@ -58,5 +58,18 @@ public struct UpdateOrganizationEnterpriseConnectionParams: Codable, Equatable, 
     self.customAttributes = try container.decodeIfPresentFlexible(JSONValue.self, snake: "customAttributes", camel: "customAttributes")
     self.saml = try container.decodeIfPresentFlexible(OrganizationEnterpriseConnectionSamlInput.self, snake: "saml", camel: "saml")
     self.oidc = try container.decodeIfPresentFlexible(OrganizationEnterpriseConnectionOidcInput.self, snake: "oidc", camel: "oidc")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(name, forKey: .name)
+    try container.encodeIfPresent(domains, forKey: .domains)
+    try container.encodeIfPresent(active, forKey: .active)
+    try container.encodeIfPresent(syncUserAttributes, forKey: .syncUserAttributes)
+    try container.encodeIfPresent(disableAdditionalIdentifications, forKey: .disableAdditionalIdentifications)
+    try container.encodeIfPresent(organizationId, forKey: .organizationId)
+    try container.encodeIfPresent(customAttributes, forKey: .customAttributes)
+    try container.encodeIfPresent(saml, forKey: .saml)
+    try container.encodeIfPresent(oidc, forKey: .oidc)
   }
 }

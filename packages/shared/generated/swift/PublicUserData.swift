@@ -14,15 +14,15 @@ public struct PublicUserData: Codable, Equatable, Sendable {
   public var deprovisioned: Bool?
 
   public init(
-    firstName: String?,
-    lastName: String?,
+    firstName: String? = nil,
+    lastName: String? = nil,
     imageUrl: String,
     hasImage: Bool,
     identifier: String,
-    userId: String?,
-    username: String?,
-    banned: Bool?,
-    deprovisioned: Bool?
+    userId: String? = nil,
+    username: String? = nil,
+    banned: Bool? = nil,
+    deprovisioned: Bool? = nil
   ) {
     self.firstName = firstName
     self.lastName = lastName
@@ -58,5 +58,18 @@ public struct PublicUserData: Codable, Equatable, Sendable {
     self.username = try container.decodeIfPresentFlexible(String.self, snake: "username", camel: "username")
     self.banned = try container.decodeIfPresentFlexible(Bool.self, snake: "banned", camel: "banned")
     self.deprovisioned = try container.decodeIfPresentFlexible(Bool.self, snake: "deprovisioned", camel: "deprovisioned")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(firstName, forKey: .firstName)
+    try container.encodeIfPresent(lastName, forKey: .lastName)
+    try container.encode(imageUrl, forKey: .imageUrl)
+    try container.encode(hasImage, forKey: .hasImage)
+    try container.encode(identifier, forKey: .identifier)
+    try container.encodeIfPresent(userId, forKey: .userId)
+    try container.encodeIfPresent(username, forKey: .username)
+    try container.encodeIfPresent(banned, forKey: .banned)
+    try container.encodeIfPresent(deprovisioned, forKey: .deprovisioned)
   }
 }

@@ -24,7 +24,7 @@ public struct UserSettings: Codable, Equatable, Sendable {
     passwordSettings: PasswordSettingsData,
     passkeySettings: PasskeySettingsData,
     usernameSettings: UsernameSettingsData,
-    attackProtection: AttackProtectionData?
+    attackProtection: AttackProtectionData? = nil
   ) {
     self.attributes = attributes
     self.actions = actions
@@ -63,5 +63,19 @@ public struct UserSettings: Codable, Equatable, Sendable {
     self.passkeySettings = try container.decodeFlexible(PasskeySettingsData.self, snake: "passkey_settings", camel: "passkeySettings")
     self.usernameSettings = try container.decodeFlexible(UsernameSettingsData.self, snake: "username_settings", camel: "usernameSettings")
     self.attackProtection = try container.decodeIfPresentFlexible(AttackProtectionData.self, snake: "attack_protection", camel: "attackProtection")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(attributes, forKey: .attributes)
+    try container.encode(actions, forKey: .actions)
+    try container.encode(social, forKey: .social)
+    try container.encode(enterpriseSso, forKey: .enterpriseSso)
+    try container.encode(signIn, forKey: .signIn)
+    try container.encode(signUp, forKey: .signUp)
+    try container.encode(passwordSettings, forKey: .passwordSettings)
+    try container.encode(passkeySettings, forKey: .passkeySettings)
+    try container.encode(usernameSettings, forKey: .usernameSettings)
+    try container.encodeIfPresent(attackProtection, forKey: .attackProtection)
   }
 }
