@@ -101,31 +101,63 @@ export type OAuthConsentInfo = {
   scopes: OAuthConsentScope[];
 };
 
+/**
+ * The current status of an OAuth device authorization.
+ */
 export type OAuthDeviceVerificationStatus = 'pending' | 'approved' | 'denied' | 'consumed';
 
 /**
  * A scope requested by an OAuth device authorization.
+ *
+ * @interface
  */
 export type OAuthDeviceVerificationScope = OAuthConsentScope;
 
 /**
  * Information about an OAuth device authorization awaiting verification.
+ *
+ * @interface
  */
 export type OAuthDeviceVerificationInfo = {
+  /**
+   * The display name of the OAuth application requesting authorization.
+   */
   oauthApplicationName: string;
+  /**
+   * The URL of the OAuth application's logo image, or `null` if no logo is available.
+   */
   oauthApplicationLogoUrl: string | null;
+  /**
+   * The OAuth `client_id` that identifies the application requesting authorization.
+   */
   clientId: string;
+  /**
+   * The scopes the OAuth application is requesting.
+   */
   scopes: OAuthDeviceVerificationScope[];
+  /**
+   * The current status of the device authorization.
+   */
   status: OAuthDeviceVerificationStatus;
-  /** Expiration time as Unix milliseconds. */
+  /**
+   * The expiration time of the device authorization, as a Unix timestamp in milliseconds.
+   */
   expiresAt: number;
 };
 
 /**
  * The result of approving or denying an OAuth device authorization.
+ *
+ * @interface
  */
 export type OAuthDeviceVerificationResult = {
+  /**
+   * The type of the resource.
+   */
   object: 'oauth_device_verification';
+  /**
+   * The final decision for the device authorization.
+   */
   status: Extract<OAuthDeviceVerificationStatus, 'approved' | 'denied'>;
 };
 
@@ -138,13 +170,35 @@ export type GetOAuthConsentInfoParams = {
   redirectUri?: string;
 };
 
+/**
+ * The parameters for looking up an OAuth device authorization.
+ *
+ * @interface
+ */
 export type LookupOAuthDeviceVerificationParams = {
+  /**
+   * The user code displayed by the device requesting authorization.
+   */
   userCode: string;
 };
 
+/**
+ * The parameters for approving or denying an OAuth device authorization.
+ *
+ * @interface
+ */
 export type SubmitOAuthDeviceVerificationParams = {
+  /**
+   * The user code displayed by the device requesting authorization.
+   */
   userCode: string;
+  /**
+   * Whether to approve or deny the authorization request.
+   */
   approved: boolean;
+  /**
+   * The ID of the Organization to authorize the request for. Omit this to authorize the request for the user's personal account.
+   */
   organizationId?: string;
 };
 
