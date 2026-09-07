@@ -20,7 +20,14 @@ import { CUSTOM_BLOCK_TAGS, CUSTOM_MODIFIER_TAGS } from './.typedoc/custom-tags.
 const ECMA_VERSION = 2021,
   JAVASCRIPT_FILES = ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
-  TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+  TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
+  // turbo lint runs `eslint src` from each package cwd; these must be repo-absolute
+  IMPORT_RESOLVER_TSCONFIGS = [
+    `${import.meta.dirname}/packages/*/tsconfig.json`,
+    `${import.meta.dirname}/packages/*/tsconfig.src.json`,
+    `${import.meta.dirname}/packages/*/tsconfig.test.json`,
+    `${import.meta.dirname}/integration/tsconfig.json`,
+  ];
 
 const noNavigateUseClerk = {
   meta: {
@@ -339,12 +346,7 @@ export default tseslint.config([
         node: true,
         typescript: {
           alwaysTryTypes: true,
-          project: [
-            'packages/*/tsconfig.json',
-            'packages/*/tsconfig.src.json',
-            'packages/*/tsconfig.test.json',
-            'integration/tsconfig.json',
-          ],
+          project: IMPORT_RESOLVER_TSCONFIGS,
         },
       },
     },
@@ -528,6 +530,25 @@ export default tseslint.config([
     rules: {
       'custom-rules/no-navigate-useClerk': 'error',
       'custom-rules/no-unstable-methods': 'error',
+    },
+  },
+  {
+    // Don't reuse the repo-wide tsconfig list. clerk-js defines the same `@/*`
+    // alias, and the resolver will apply it to UI files and break `@/ui/*` imports.
+    name: 'packages/ui/import-resolver',
+    files: ['packages/ui/**/*.{ts,tsx}'],
+    settings: {
+      'import/resolver': {
+        node: true,
+        typescript: {
+          alwaysTryTypes: true,
+          project: [
+            `${import.meta.dirname}/packages/ui/tsconfig.src.json`,
+            `${import.meta.dirname}/packages/ui/tsconfig.test.json`,
+            `${import.meta.dirname}/packages/ui/tsconfig.mosaic.json`,
+          ],
+        },
+      },
     },
   },
   {
