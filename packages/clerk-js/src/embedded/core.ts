@@ -16,6 +16,7 @@ import {
   UserOrganizationInvitation,
 } from '../core/resources/internal';
 import { SessionTokenCache } from '../core/tokenCache';
+import { createBiometricCredentialOperations, type NativeBiometricCapability } from './biometricCredentials';
 import { createHostedAuthOperations } from './hostedAuth';
 import { createMagicLinkOperations } from './magicLink';
 import { createNativeAuthOperations, NativeAuthOperationError } from './nativeAuth';
@@ -36,6 +37,7 @@ export interface EmbeddedState {
 
 export interface EmbeddedHost {
   storage?: NativeStorage;
+  biometricCredential?: NativeBiometricCapability;
   getToken(): Promise<string>;
   saveToken(token: string): Promise<void>;
   getCachedResources(): Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>;
@@ -69,6 +71,7 @@ export interface EmbeddedError {
   status?: number;
   clerkTraceId?: string;
   stage?: string;
+  nativeError?: unknown;
 }
 
 type Resource = Record<string, any>;
@@ -117,6 +120,7 @@ function errorEnvelope(error: any): EmbeddedError {
     code,
     message: errors[0]?.longMessage || errors[0]?.long_message || errors[0]?.message || error?.message || String(error),
     errors,
+    nativeError: error?.nativeError,
     status: error?.status,
     clerkTraceId: error?.clerkTraceId || error?.clerk_trace_id,
   };
@@ -185,6 +189,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
   const nativeAuth = {
     ...authOperations,
     ...createNativeResourceOperations(clerk),
+    ...createBiometricCredentialOperations(clerk, host.biometricCredential, identityContext),
     ...createHostedAuthOperations(clerk, identityContext),
     ...createMagicLinkOperations(clerk, host.storage, identityContext, flow =>
       flow === 'signIn' ? authOperations.finishNativeSignIn() : authOperations.finishNativeSignUp(),
