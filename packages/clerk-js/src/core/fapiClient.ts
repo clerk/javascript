@@ -14,6 +14,7 @@ import { clerkNetworkError } from './errors';
 export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT' | 'TRACE';
 
 export type FapiRequestInit = RequestInit & {
+  __internal_clientTokenTransaction?: string;
   path?: string;
   search?: ConstructorParameters<typeof URLSearchParams>[0];
   sessionId?: string;

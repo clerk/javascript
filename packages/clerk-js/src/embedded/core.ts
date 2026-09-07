@@ -5,6 +5,7 @@ import { eventBus, events } from '../core/events';
 import type { Environment } from '../core/resources/internal';
 import {
   BillingPaymentMethod,
+  Client,
   Organization,
   OrganizationDomain,
   OrganizationInvitation,
@@ -15,6 +16,7 @@ import {
   UserOrganizationInvitation,
 } from '../core/resources/internal';
 import { SessionTokenCache } from '../core/tokenCache';
+import { createHostedAuthOperations } from './hostedAuth';
 import { createNativeAuthOperations } from './nativeAuth';
 import { createNativeResourceOperations } from './nativeResources';
 
@@ -39,6 +41,7 @@ export interface EmbeddedHost {
     environment: EnvironmentJSONSnapshot | null;
   }): Promise<void>;
   publish(state: EmbeddedState): void;
+  commitState?(state: EmbeddedState): Promise<void>;
 }
 
 export interface EmbeddedOptions {
@@ -129,8 +132,52 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
   let clientToken = '';
   let disposed = false;
   let identity: string | null | undefined;
+  let identityEpoch = 0;
+  let sessionIdentity: string | undefined;
+  const requestEpochs = new WeakMap<object, number>();
+  const stagedTokens = new Map<string, { token?: string }>();
+  let tokenTransactionSequence = 0;
+  let publicationPause = 0;
   let persistence: Promise<void> = Promise.resolve();
-  const nativeAuth = { ...createNativeAuthOperations(clerk), ...createNativeResourceOperations(clerk) };
+  const nativeAuth = {
+    ...createNativeAuthOperations(clerk, commitState),
+    ...createNativeResourceOperations(clerk),
+    ...createHostedAuthOperations(clerk, {
+      ensureActive,
+      identityEpoch: () => identityEpoch,
+      credential: () => clientToken,
+      commitState,
+      beginTokenTransaction() {
+        const id = String(++tokenTransactionSequence);
+        stagedTokens.set(id, {});
+        return id;
+      },
+      async commitTokenTransaction(id: string, update: () => void) {
+        const token = stagedTokens.get(id)?.token;
+        const epoch = identityEpoch;
+        stagedTokens.delete(id);
+        if (token !== undefined) {
+          await host.saveToken(token);
+        }
+        ensureActive();
+        if (epoch !== identityEpoch) {
+          failure('stale_identity', 'The identity changed while committing this response');
+        }
+        publicationPause += 1;
+        try {
+          if (token !== undefined) {
+            clientToken = token;
+          }
+          update();
+        } finally {
+          publicationPause -= 1;
+        }
+      },
+      discardTokenTransaction(id: string) {
+        stagedTokens.delete(id);
+      },
+    }),
+  };
   let loadPromise: Promise<void> | undefined;
   const subscriptions: Array<() => void> = [];
 
@@ -141,8 +188,15 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
   }
 
   function publish(): EmbeddedState | undefined {
-    if (disposed) {
+    if (disposed || publicationPause) {
       return;
+    }
+    if (clerk.loaded) {
+      const next = `${clerk.client?.id || ''}:${clerk.session?.id || ''}`;
+      if (sessionIdentity !== undefined && sessionIdentity !== next) {
+        identityEpoch += 1;
+      }
+      sessionIdentity = next;
     }
     const nextIdentity = clerk.user?.id ?? null;
     if (identity !== nextIdentity) {
@@ -172,9 +226,19 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
     return state;
   }
 
+  async function commitState() {
+    const state = publish();
+    await persistence;
+    ensureActive();
+    if (state) {
+      await host.commitState?.(state);
+    }
+  }
+
   clerk.__internal_getCachedResources = () => host.getCachedResources();
   clerk.__internal_onBeforeRequest(request => {
     ensureActive();
+    requestEpochs.set(request, identityEpoch);
     request.credentials = 'omit';
     request.url?.searchParams.set('_is_native', '1');
     const headers = new Headers(request.headers);
@@ -186,13 +250,28 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
     headers.set('x-ios-sdk-version', config.sdkVersion);
     return Promise.resolve();
   });
-  clerk.__internal_onAfterResponse(async (_, response) => {
+  clerk.__internal_onAfterResponse(async (request, response) => {
     ensureActive();
+    if (requestEpochs.get(request) !== identityEpoch) {
+      failure('stale_identity', 'The request belongs to a previous authentication state');
+    }
     if (response?.headers.has('authorization')) {
       const token = response.headers.get('authorization') || '';
+      const transaction = request.__internal_clientTokenTransaction;
+      if (token && transaction && stagedTokens.has(transaction)) {
+        stagedTokens.set(transaction, { token });
+        return;
+      }
       clientToken = token;
       await host.saveToken(token);
       ensureActive();
+      if (!token) {
+        identityEpoch += 1;
+        SessionTokenCache.clear();
+        Client.clearInstance();
+        clerk.updateClient(Client.getOrCreateInstance());
+        failure('client_cleared', 'The server cleared this client credential');
+      }
     }
   });
 
@@ -305,8 +384,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
             },
           });
           ensureActive();
-          publish();
-          await persistence;
+          await commitState();
         } catch (error) {
           subscriptions.splice(0).forEach(unsubscribe => unsubscribe());
           loadPromise = undefined;
@@ -323,6 +401,9 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
       ensureActive();
       const { receiver, method, arguments: args = [] } = invocation;
       let value: unknown;
+      if (receiver.kind === 'clerk' && ['signOut', 'setActive'].includes(method)) {
+        identityEpoch += 1;
+      }
       if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(nativeAuth, method)) {
         value = await (nativeAuth[method as keyof typeof nativeAuth] as (...args: any[]) => unknown)(...args);
       } else if (receiver.kind === 'clerk' && method === 'refreshClient') {
@@ -354,8 +435,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
       }
       ensureActive();
       const result = serialize(value);
-      publish();
-      await persistence;
+      await commitState();
       if ((method === 'destroy' || method === 'delete') && (value == null || value === true)) {
         registry.delete(`${receiver.scope || receiver.listedKind}:${receiver.id}`);
         return { id: receiver.id, deleted: true };
@@ -379,6 +459,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
       disposed = true;
       subscriptions.splice(0).forEach(unsubscribe => unsubscribe());
       registry.clear();
+      stagedTokens.clear();
       SessionTokenCache.clear();
       await persistence;
     },

@@ -11,7 +11,7 @@ type CompletionOptions = {
   unsafeMetadata?: SignUpCreateParams['unsafeMetadata'];
 };
 
-export function createNativeAuthOperations(clerk: Clerk) {
+export function createNativeAuthOperations(clerk: Clerk, commitState: () => Promise<void>) {
   const client = () => {
     if (!clerk.client) {
       throw new ClerkRuntimeError('The client is not initialized', { code: 'not_loaded' });
@@ -29,6 +29,7 @@ export function createNativeAuthOperations(clerk: Clerk) {
   async function finish(flow: Flow, expectedId?: string) {
     const value = resource(flow, expectedId);
     if (value.status === 'complete' && value.createdSessionId && clerk.session?.id !== value.createdSessionId) {
+      await commitState();
       await clerk.setActive({ session: value.createdSessionId });
     }
     return value;
