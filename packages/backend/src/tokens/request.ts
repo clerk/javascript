@@ -461,8 +461,14 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     /**
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
+     * With `__internal_resolveHandshakeOnlyForNavigation`, requests that are not eligible for a handshake redirect
+     * skip this, so a stale handshake cookie does not trigger a failing payload exchange.
      */
-    if (authenticateContext.handshakeNonce || authenticateContext.handshakeToken) {
+    const hasHandshakeToken = authenticateContext.handshakeNonce || authenticateContext.handshakeToken;
+    const canResolveHandshake =
+      !authenticateContext.__internal_resolveHandshakeOnlyForNavigation ||
+      handshakeService.isRequestEligibleForHandshake();
+    if (hasHandshakeToken && canResolveHandshake) {
       try {
         return await handshakeService.resolveHandshake();
       } catch (error) {
