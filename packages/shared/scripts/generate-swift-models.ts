@@ -877,6 +877,7 @@ function structFromType(ctx: Ctx, name: string, type: ts.Type): SwiftStruct {
   }
   applyExtraProperties(name, properties);
   applyForceRequired(name, properties);
+  applyPropertyOrder(name, properties);
   const id = properties.find(property => property.wireName === 'id' && !isOptionalRef(property.type));
   const identifiable = Boolean(id && emitRef(id.type) === 'String');
   return { kind: 'struct', name, properties, identifiable, asClass: CLASS_TYPES.has(name) };
@@ -981,6 +982,7 @@ function structFromMergedUnion(ctx: Ctx, name: string, parts: ts.Type[]): SwiftS
   }
   applyExtraProperties(name, properties);
   applyForceRequired(name, properties);
+  applyPropertyOrder(name, properties);
   const id = properties.find(property => property.wireName === 'id' && !isOptionalRef(property.type));
   return {
     kind: 'struct',
@@ -1549,6 +1551,19 @@ const INIT_DEFAULTS: Record<string, string> = {
   'ClerkAPIError.clerk_trace_id': '""',
   'SessionActivity.object': '"session_activity"',
 };
+const CUSTOM_EQUALS: Record<string, string[]> = {
+  SessionActivity: [
+    'id',
+    'object',
+    'browserName',
+    'browserVersion',
+    'deviceType',
+    'ipAddress',
+    'city',
+    'country',
+    'isMobile',
+  ],
+};
 const CUSTOM_HASH: Record<string, string[]> = {
   Verification: [
     'id',
@@ -1576,6 +1591,9 @@ const CUSTOM_DECODE: Record<string, string> = {
       ) ?? ""
     }`,
 };
+const PROPERTY_ORDER: Record<string, string[]> = {
+  SessionActivity: ['id', 'object'],
+};
 const CUSTOM_ENCODE: Record<string, string> = {
   'Verification.trusted_device_challenge': `    if !trustedDeviceChallenge.isEmpty, let data = trustedDeviceChallenge.data(using: .utf8) {
       try container.encode(JSONDecoder().decode(JSONValue.self, from: data), forKey: .trustedDeviceChallenge)
@@ -1598,6 +1616,20 @@ function applyExtraProperties(name: string, properties: SwiftProperty[]): SwiftP
     }
   }
   return properties;
+}
+
+function applyPropertyOrder(name: string, properties: SwiftProperty[]): void {
+  const order = PROPERTY_ORDER[name];
+  if (!order) {
+    return;
+  }
+  properties.sort((left, right) => {
+    const leftIndex = order.indexOf(left.wireName);
+    const rightIndex = order.indexOf(right.wireName);
+    const leftRank = leftIndex === -1 ? order.length : leftIndex;
+    const rightRank = rightIndex === -1 ? order.length : rightIndex;
+    return leftRank - rightRank;
+  });
 }
 
 function applyForceRequired(name: string, properties: SwiftProperty[]): void {
@@ -1677,6 +1709,20 @@ function emitHash(decl: SwiftStruct): string[] {
     '',
     '  public func hash(into hasher: inout Hasher) {',
     ...fields.map(field => `    hasher.combine(${field})`),
+    '  }',
+  ];
+}
+
+function emitEquals(decl: SwiftStruct): string[] {
+  const fields = CUSTOM_EQUALS[decl.name];
+  if (!fields?.length) {
+    return [];
+  }
+  return [
+    '',
+    `  public static func == (lhs: ${decl.name}, rhs: ${decl.name}) -> Bool {`,
+    `    lhs.${fields[0]} == rhs.${fields[0]}`,
+    ...fields.slice(1).map(field => `      && lhs.${field} == rhs.${field}`),
     '  }',
   ];
 }
@@ -1768,6 +1814,7 @@ function emitStruct(decl: SwiftStruct): string {
     ...initBody,
     '  }',
     ...emitHash(decl),
+    ...emitEquals(decl),
   ];
   if (decl.properties.length > 0) {
     lines.push('', '  public enum CodingKeys: String, CodingKey {', ...codingKeys, '  }');

@@ -92,6 +92,15 @@ describe('generateSwiftModels', () => {
     expect(byName.get('SessionActivity.swift'), 'session_activity payloads can omit object').toContain(
       'decodeFlexibleDefault(String.self, snake: "object", camel: "object", default: "session_activity")',
     );
+    const sessionActivity = byName.get('SessionActivity.swift') ?? '';
+    expect(
+      sessionActivity.indexOf('public var id: String'),
+      'id stays first so Kit SessionActivity(id:) call sites keep their labels',
+    ).toBeLessThan(sessionActivity.indexOf('public var object: String'));
+    expect(
+      sessionActivity,
+      'synthesized SessionActivity == crashes Client Observation; emit field-by-field ==',
+    ).toContain('public static func == (lhs: SessionActivity, rhs: SessionActivity) -> Bool');
     expect(
       byName.get('DisplayConfig.swift'),
       'live FAPI display_config keeps application_name required with a decoder default',
