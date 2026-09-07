@@ -16,3 +16,10 @@ export async function codeChallenge(verifier: string) {
   );
   return base64url(new Uint8Array(digest));
 }
+
+export interface NativeCrypto {
+  randomString(bytes: number): string | Promise<string>;
+  codeChallenge(verifier: string): Promise<string>;
+}
+
+export const nativeCrypto: NativeCrypto = { randomString, codeChallenge };

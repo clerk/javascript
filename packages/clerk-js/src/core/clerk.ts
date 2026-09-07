@@ -3205,12 +3205,12 @@ export class Clerk implements ClerkInterface {
     // }
   };
 
-  __internal_onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
-    this.#fapiClient.onBeforeRequest(callback);
+  __internal_onBeforeRequest = (callback: FapiRequestCallback<any>): (() => void) => {
+    return this.#fapiClient.onBeforeRequest(callback);
   };
 
-  __internal_onAfterResponse = (callback: FapiRequestCallback<any>): void => {
-    this.#fapiClient.onAfterResponse(callback);
+  __internal_onAfterResponse = (callback: FapiRequestCallback<any>): (() => void) => {
+    return this.#fapiClient.onAfterResponse(callback);
   };
 
   // TODO @userland-errors:

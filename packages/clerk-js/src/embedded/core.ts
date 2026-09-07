@@ -21,6 +21,7 @@ import { createHostedAuthOperations } from './hostedAuth';
 import { createEmbeddedLifecycle } from './lifecycle';
 import { createMagicLinkOperations } from './magicLink';
 import { createNativeAuthOperations, NativeAuthOperationError } from './nativeAuth';
+import type { NativeCrypto } from './nativeCrypto';
 import { createNativeResourceOperations } from './nativeResources';
 import type { NativeStorage } from './nativeStorage';
 
@@ -39,6 +40,7 @@ export interface EmbeddedState {
 
 export interface EmbeddedHost {
   storage?: NativeStorage;
+  crypto?: NativeCrypto;
   biometricCredential?: NativeBiometricCapability;
   getToken(): Promise<string>;
   saveToken(token: string): Promise<void>;
@@ -130,6 +132,7 @@ function errorEnvelope(error: any): EmbeddedError {
 
 // One instance per isolated engine: clerk-js resources and token caches are module-scoped.
 let activeInstance = false;
+const nativeAdapters = new WeakMap<Clerk, ReturnType<typeof createAdapter>>();
 
 export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost) {
   if (config.protocolVersion !== EMBEDDED_PROTOCOL_VERSION) {
@@ -139,10 +142,31 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
     failure('already_initialized', 'An embedded Clerk already owns this engine');
   }
   activeInstance = true;
-  const clerk: Clerk = new Clerk(config.publishableKey, { proxyUrl: config.options?.proxyUrl });
+  return createAdapter(new Clerk(config.publishableKey, { proxyUrl: config.options?.proxyUrl }), config, host, true);
+}
+
+export function createNativeAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost) {
+  if (config.protocolVersion !== EMBEDDED_PROTOCOL_VERSION) {
+    failure('protocol_mismatch', 'Unsupported embedded Clerk protocol');
+  }
+  if (!clerk.loaded) {
+    failure('not_loaded', 'Load the existing Clerk instance before attaching native screens');
+  }
+  void nativeAdapters
+    .get(clerk)
+    ?.dispose()
+    .catch(() => undefined);
+  const adapter = createAdapter(clerk, config, host, false);
+  nativeAdapters.set(clerk, adapter);
+  return adapter;
+}
+
+function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost, ownsRuntime: boolean) {
   const registry = new Map<string, Resource>();
-  SessionTokenCache.setProactiveRefreshEnabled(false);
-  const lifecycle = createEmbeddedLifecycle(clerk, commitState);
+  if (ownsRuntime) {
+    SessionTokenCache.setProactiveRefreshEnabled(false);
+  }
+  const lifecycle = ownsRuntime ? createEmbeddedLifecycle(clerk, commitState) : undefined;
   let tokenEvent: EmbeddedState['tokenEvent'];
   let tokenEventSequence = 0;
   let revision = 0;
@@ -196,9 +220,13 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
     ...authOperations,
     ...createNativeResourceOperations(clerk),
     ...createBiometricCredentialOperations(clerk, host.biometricCredential, identityContext),
-    ...createHostedAuthOperations(clerk, identityContext),
-    ...createMagicLinkOperations(clerk, host.storage, identityContext, flow =>
-      flow === 'signIn' ? authOperations.finishNativeSignIn() : authOperations.finishNativeSignUp(),
+    ...createHostedAuthOperations(clerk, identityContext, host.crypto),
+    ...createMagicLinkOperations(
+      clerk,
+      host.storage,
+      identityContext,
+      flow => (flow === 'signIn' ? authOperations.finishNativeSignIn() : authOperations.finishNativeSignUp()),
+      host.crypto,
     ),
   };
   let loadPromise: Promise<void> | undefined;
@@ -210,10 +238,9 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
     }
   }
 
-  function publish(): EmbeddedState | undefined {
-    if (disposed || publicationPause) {
-      return;
-    }
+  let externalPublication: Promise<void> = Promise.resolve();
+
+  function observeIdentity() {
     if (clerk.loaded) {
       const next = `${clerk.client?.id || ''}:${clerk.session?.id || ''}`;
       if (sessionIdentity !== undefined && sessionIdentity !== next) {
@@ -226,6 +253,37 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
       registry.clear();
       identity = nextIdentity;
     }
+  }
+
+  function publish() {
+    observeIdentity();
+    if (ownsRuntime) {
+      return publishCurrent();
+    }
+    externalPublication = externalPublication
+      .catch(() => undefined)
+      .then(async () => {
+        if (disposed || publicationPause) {
+          return;
+        }
+        clientToken = await host.getToken();
+        if (disposed) {
+          return;
+        }
+        const state = publishCurrent();
+        if (state) {
+          await host.commitState?.(state);
+        }
+      });
+    void externalPublication.catch(() => undefined);
+    return undefined;
+  }
+
+  function publishCurrent(): EmbeddedState | undefined {
+    if (disposed || publicationPause) {
+      return;
+    }
+    observeIdentity();
     const client = clerk.client?.id ? clerk.client.__internal_toSnapshot() : null;
     if (client) {
       client.last_active_session_id = clerk.session?.id ?? null;
@@ -253,14 +311,20 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
   async function commitState() {
     const state = publish();
     await persistence;
+    await externalPublication;
     ensureActive();
     if (state) {
       await host.commitState?.(state);
     }
   }
 
-  clerk.__internal_getCachedResources = () => host.getCachedResources();
-  clerk.__internal_onBeforeRequest(request => {
+  if (ownsRuntime) {
+    clerk.__internal_getCachedResources = () => host.getCachedResources();
+  }
+  const removeBeforeRequest = clerk.__internal_onBeforeRequest(request => {
+    if (!ownsRuntime) {
+      return Promise.resolve();
+    }
     ensureActive();
     requestEpochs.set(request, identityEpoch);
     request.credentials = 'omit';
@@ -274,7 +338,20 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
     headers.set('x-ios-sdk-version', config.sdkVersion);
     return Promise.resolve();
   });
-  clerk.__internal_onAfterResponse(async (request, response) => {
+  const removeAfterResponse = clerk.__internal_onAfterResponse(async (request, response) => {
+    if (!ownsRuntime) {
+      if (
+        !disposed &&
+        request.__internal_clientTokenTransaction &&
+        stagedTokens.has(request.__internal_clientTokenTransaction)
+      ) {
+        const token = response?.headers.get('authorization');
+        if (token) {
+          stagedTokens.set(request.__internal_clientTokenTransaction, { token });
+        }
+      }
+      return;
+    }
     ensureActive();
     if (requestEpochs.get(request) !== identityEpoch) {
       failure('stale_identity', 'The request belongs to a previous authentication state');
@@ -403,7 +480,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
         eventBus.on(events.SessionTokenResolved, tokenListener);
         subscriptions.push(() => eventBus.off(events.SessionTokenResolved, tokenListener));
         try {
-          for (let attempt = 0; ; attempt += 1) {
+          for (let attempt = 0; ownsRuntime; attempt += 1) {
             try {
               await clerk.load({
                 ...config.options,
@@ -425,7 +502,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
           }
           ensureActive();
           await commitState();
-          lifecycle.start();
+          lifecycle?.start();
         } catch (error) {
           subscriptions.splice(0).forEach(unsubscribe => unsubscribe());
           loadPromise = undefined;
@@ -469,7 +546,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
         });
         value = null;
       } else if (receiver.kind === 'clerk' && method === 'setApplicationActive') {
-        await lifecycle.setActive(args[0] === true, args[1] !== false);
+        await lifecycle?.setActive(args[0] === true, args[1] !== false);
         value = null;
       } else if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(nativeAuth, method)) {
         value = await (nativeAuth[method as keyof typeof nativeAuth] as (...args: any[]) => unknown)(...args);
@@ -509,7 +586,11 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
       }
       return result;
     } catch (error) {
-      publish();
+      try {
+        await commitState();
+      } catch {
+        /* Preserve the operation error. */
+      }
       throw new EmbeddedInvocationError(errorEnvelope(error));
     }
   }
@@ -524,12 +605,17 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
         return;
       }
       disposed = true;
-      lifecycle.dispose();
+      lifecycle?.dispose();
+      removeBeforeRequest();
+      removeAfterResponse();
       subscriptions.splice(0).forEach(unsubscribe => unsubscribe());
       registry.clear();
       stagedTokens.clear();
-      SessionTokenCache.clear();
+      if (ownsRuntime) {
+        SessionTokenCache.clear();
+      }
       await persistence;
+      await externalPublication;
     },
   };
 }

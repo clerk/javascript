@@ -3,7 +3,7 @@ import type { ClientJSON } from '@clerk/shared/types';
 
 import type { Clerk } from '../core/clerk';
 import { BaseResource, getClientResourceFromPayload } from '../core/resources/internal';
-import { codeChallenge, randomString } from './nativeCrypto';
+import { type NativeCrypto, nativeCrypto } from './nativeCrypto';
 import type { NativeIdentityContext } from './nativeIdentity';
 
 type HostedAuthOptions = { redirectUrl: string; mode?: 'sign-in' | 'sign-up' };
@@ -37,7 +37,11 @@ function singleValue(url: URL, name: string) {
   return values[0];
 }
 
-export function createHostedAuthOperations(clerk: Clerk, context: NativeIdentityContext) {
+export function createHostedAuthOperations(
+  clerk: Clerk,
+  context: NativeIdentityContext,
+  crypto: NativeCrypto = nativeCrypto,
+) {
   let pending:
     | {
         id: string;
@@ -63,12 +67,12 @@ export function createHostedAuthOperations(clerk: Clerk, context: NativeIdentity
         fail('A hosted authentication session is already in progress.');
       }
       const redirect = parseRedirect(options.redirectUrl);
-      const id = randomString(16);
-      const state = randomString(16);
-      const verifier = randomString(32);
+      const id = await crypto.randomString(16);
+      const state = await crypto.randomString(16);
+      const verifier = await crypto.randomString(32);
       pending = { id, redirect, state, verifier, epoch: context.identityEpoch(), credential: context.credential() };
       try {
-        const challenge = await codeChallenge(verifier);
+        const challenge = await crypto.codeChallenge(verifier);
         context.ensureActive();
         const body = {
           redirectUrl: options.redirectUrl,

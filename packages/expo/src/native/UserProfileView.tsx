@@ -63,14 +63,13 @@ export interface UserProfileViewProps extends EmbeddedNavigationProps {
  *
  * `UserProfileView` renders inline within your React Native view hierarchy, powered by:
  * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
- * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
  *
  * To present the profile, render it inside your own `Modal`, sheet, or route.
  *
  * To push the profile onto your own navigation stack, hide the route's header and
  * pass `onHostBack` so Clerk's own chrome takes over.
  *
- * Sign-out is detected automatically and synced with the JS SDK. Use `useAuth()` in a
+ * Sign-out updates the shared JS client. Use `useAuth()` in a
  * `useEffect` to react to sign-out.
  *
  * @example
@@ -127,7 +126,7 @@ export function UserProfileView({
       <View style={[styles.container, style]}>
         <Text style={styles.text}>
           {!isNativeSupported
-            ? 'Native UserProfileView is only available on iOS and Android'
+            ? 'Native UserProfileView is currently available on iOS; Android support will follow'
             : 'Native UserProfileView requires the @clerk/expo plugin. Add "@clerk/expo" to your app.json plugins array.'}
         </Text>
       </View>

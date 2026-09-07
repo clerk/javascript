@@ -17,7 +17,10 @@ else
   }
 end
 
-clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
+clerk_ios_repo = ENV.fetch('CLERK_IOS_SDK_PATH', 'https://github.com/clerk/clerk-ios.git')
+if ENV['CLERK_IOS_SDK_PATH'] && !File.file?(File.join(clerk_ios_repo, 'Package.swift'))
+  raise 'CLERK_IOS_SDK_PATH must point to a Clerk iOS package checkout.'
+end
 clerk_ios_version = '1.5.3'
 
 Pod::Spec.new do |s|
@@ -52,6 +55,7 @@ Pod::Spec.new do |s|
   end
 
   s.source_files = "ClerkNativeBridge.swift",
+                   "ClerkExternalRuntime.swift",
                    "ClerkAppDelegateSubscriber.swift",
                    "ClerkExpoModule.swift",
                    "ClerkNativeViewHost.swift",

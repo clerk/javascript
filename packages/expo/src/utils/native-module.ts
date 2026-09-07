@@ -1,21 +1,14 @@
 import { Platform } from 'react-native';
 
+import type { NativeRuntimeModule } from '../provider/nativeRuntime';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import type { NativeAuthFlowModule, NativeBiometricCredentialModule } from '../specs/NativeClerkModule.types';
 
-export const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+export const isNativeSupported = Platform.OS === 'ios';
 
 export type ClerkExpoNativeModule = {
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
-  configure(publishableKey: string, bearerToken: string | null): Promise<void>;
-  getClientToken(): Promise<string | null>;
-  syncClientStateFromJs(
-    deviceToken: string | null,
-    sourceId: string | null,
-    didChangeClient: boolean,
-    didChangeDeviceToken: boolean,
-  ): Promise<void>;
-} & Partial<NativeAuthFlowModule & NativeBiometricCredentialModule>;
+} & Partial<NativeAuthFlowModule & NativeBiometricCredentialModule & NativeRuntimeModule>;
 
 function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   if (!module || typeof module !== 'object') {
@@ -23,11 +16,14 @@ function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   }
   const maybeModule = module as Record<string, unknown>;
 
-  return (
-    typeof maybeModule.configure === 'function' &&
-    typeof maybeModule.getClientToken === 'function' &&
-    typeof maybeModule.syncClientStateFromJs === 'function'
-  );
+  return [
+    'addListener',
+    'configureExternalRuntime',
+    'publishRuntimeState',
+    'completeRuntimeOperation',
+    'detachRuntime',
+    'performRuntimeCapability',
+  ].every(method => typeof maybeModule[method] === 'function');
 }
 
 function loadNativeModule(): ClerkExpoNativeModule | null {

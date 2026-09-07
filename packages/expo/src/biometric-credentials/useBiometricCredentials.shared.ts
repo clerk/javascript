@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/react';
 import { useMemo } from 'react';
 
-import { synchronizeNativeClientToJs, waitForPendingJsToNativeSync } from '../provider/nativeClientSyncCoordinator';
+import { waitForNativeRuntime } from '../provider/useNativeRuntime';
 import type { NativeBiometricCredential, NativeBiometricCredentialModule } from '../specs/NativeClerkModule.types';
 import { errorThrower } from '../utils/errors';
 import { ClerkExpoModule } from '../utils/native-module';
@@ -56,18 +56,18 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
   return {
     getAvailability: async params => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await waitForNativeRuntime(clerk);
       return nativeModule.getTrustedDeviceAvailability(params?.id ?? null, params?.identifierHint ?? null);
     },
     list: async () => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await waitForNativeRuntime(clerk);
       const credentials = await nativeModule.listTrustedDevices();
       return credentials.map(toBiometricCredential);
     },
     enroll: async params => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await waitForNativeRuntime(clerk);
       const credential = await nativeModule.enrollTrustedDevice(
         params?.name ?? null,
         params?.identifierHint ?? null,
@@ -78,26 +78,23 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
     },
     revoke: async id => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await waitForNativeRuntime(clerk);
       const credential = await nativeModule.revokeTrustedDevice(id);
       return toBiometricCredential(credential);
     },
     signIn: async params => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await waitForNativeRuntime(clerk);
       const nativeSignIn = await nativeModule.signInWithTrustedDevice(
         params?.id ?? null,
         params?.identifierHint ?? null,
         params?.reason ?? null,
       );
-      await synchronizeNativeClientToJs();
 
       const client = clerk.client;
       const signIn = client?.signIn;
       if (!client || !signIn) {
-        return errorThrower.throw(
-          'Unable to synchronize biometric sign-in with the Clerk JS client: the client sign-in resource is unavailable.',
-        );
+        return errorThrower.throw('Biometric sign-in failed: the client sign-in resource is unavailable.');
       }
 
       const isComplete = nativeSignIn.status === 'complete';
@@ -106,14 +103,10 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
           !nativeSignIn.createdSessionId ||
           !client.signedInSessions.some(session => session.id === nativeSignIn.createdSessionId)
         ) {
-          return errorThrower.throw(
-            'Unable to synchronize biometric sign-in with the Clerk JS client: the created session is missing.',
-          );
+          return errorThrower.throw('Biometric sign-in failed: the created session is missing.');
         }
       } else if (!signIn.id || signIn.id !== nativeSignIn.id) {
-        return errorThrower.throw(
-          'Unable to synchronize biometric sign-in with the Clerk JS client: the sign-in attempt does not match.',
-        );
+        return errorThrower.throw('Biometric sign-in failed: the sign-in attempt does not match.');
       }
 
       return {

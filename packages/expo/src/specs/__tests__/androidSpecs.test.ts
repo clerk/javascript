@@ -21,7 +21,7 @@ vi.mock('expo', () => ({
 const importSpec = async (path: string) => (await import(path)).default;
 
 const importSpecs = async () => ({
-  clerkExpo: await importSpec('../NativeClerkModule.android'),
+  clerkExpo: await importSpec('../NativeClerkModule'),
   googleSignIn: await importSpec('../NativeClerkGoogleSignIn.android'),
 });
 

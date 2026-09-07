@@ -3,7 +3,6 @@
  *
  * These components provide pre-built, native authentication experiences powered by:
  * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
- * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
  *
  * ## Installation
  *

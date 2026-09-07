@@ -4,7 +4,7 @@ import type { SignInResource, SignUpJSON, SignUpResource } from '@clerk/shared/t
 import type { Clerk } from '../core/clerk';
 import type { SignUp } from '../core/resources/internal';
 import { BaseResource, getClientResourceFromPayload } from '../core/resources/internal';
-import { codeChallenge, randomString } from './nativeCrypto';
+import { type NativeCrypto, nativeCrypto } from './nativeCrypto';
 import type { NativeIdentityContext } from './nativeIdentity';
 import type { NativeStorage } from './nativeStorage';
 
@@ -39,6 +39,7 @@ export function createMagicLinkOperations(
   storage: NativeStorage | undefined,
   context: NativeIdentityContext,
   finish: (flow: Flow) => Promise<SignInResource | SignUpResource>,
+  crypto: NativeCrypto = nativeCrypto,
 ) {
   const owners = new Map<string, string>();
   let completion: Completion | { id: string; epoch: number } | undefined;
@@ -160,8 +161,8 @@ export function createMagicLinkOperations(
         );
       }
       const epoch = context.identityEpoch();
-      const verifier = randomString(32);
-      const challenge = await codeChallenge(verifier);
+      const verifier = await crypto.randomString(32);
+      const challenge = await crypto.codeChallenge(verifier);
       context.ensureActive();
       if (epoch !== context.identityEpoch() || clerk.client?.[options.flow].id !== options.expectedId) {
         fail('The authentication attempt is no longer current.');
@@ -210,7 +211,7 @@ export function createMagicLinkOperations(
       if (!approvalToken) {
         fail('Magic link callback is missing approval_token.');
       }
-      const id = randomString(16);
+      const id = await crypto.randomString(16);
       // Reserve before storage IO so two callbacks cannot redeem the same verifier.
       completion = { id, epoch: context.identityEpoch() };
       try {

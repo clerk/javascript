@@ -1,11 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import {
-  __internal_resetNativeClientSyncCoordinator,
-  registerNativeToJsSyncHandler,
-  trackPendingJsToNativeSync,
-} from '../../provider/nativeClientSyncCoordinator';
 import { isBiometricCredentialError } from '../errors';
 import { useBiometricCredentials as useBiometricCredentialsOnUnsupportedPlatform } from '../useBiometricCredentials';
 import { useBiometricCredentials as useBiometricCredentialsOnAndroid } from '../useBiometricCredentials.android';
@@ -23,7 +18,7 @@ const mocks = vi.hoisted(() => ({
   jsSignedInSessions: [{ id: 'sess_123' }],
   useClerk: vi.fn(),
   setActive: vi.fn(),
-  synchronizeNativeClientToJs: vi.fn(),
+  waitForNativeRuntime: vi.fn(),
   nativeModule: {
     getTrustedDeviceAvailability: vi.fn(),
     listTrustedDevices: vi.fn(),
@@ -32,6 +27,8 @@ const mocks = vi.hoisted(() => ({
     signInWithTrustedDevice: vi.fn(),
   },
 }));
+
+vi.mock('../../provider/useNativeRuntime', () => ({ waitForNativeRuntime: mocks.waitForNativeRuntime }));
 
 vi.mock('@clerk/react', () => ({
   useClerk: mocks.useClerk,
@@ -65,12 +62,8 @@ function renderBiometricCredentials(useHook = useBiometricCredentialsOnIos) {
   return renderHook(() => useHook()).result.current;
 }
 
-let unregisterNativeToJsSyncHandler: (() => void) | undefined;
-
 beforeEach(() => {
-  __internal_resetNativeClientSyncCoordinator();
-  unregisterNativeToJsSyncHandler = registerNativeToJsSyncHandler(mocks.synchronizeNativeClientToJs);
-  mocks.synchronizeNativeClientToJs.mockResolvedValue(undefined);
+  mocks.waitForNativeRuntime.mockResolvedValue(undefined);
   mocks.useClerk.mockReturnValue({
     client: { signIn: mocks.jsSignIn, signedInSessions: mocks.jsSignedInSessions },
     setActive: mocks.setActive,
@@ -85,7 +78,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
-  unregisterNativeToJsSyncHandler?.();
 });
 
 describe('useBiometricCredentials on iOS', () => {
@@ -109,12 +101,12 @@ describe('useBiometricCredentials on iOS', () => {
     expect(availability).toEqual({ isAvailable: true, unavailableReason: null });
   });
 
-  test('waits for native client synchronization before checking availability', async () => {
+  test('waits for the native runtime connection before checking availability', async () => {
     let finishNativeSync!: () => void;
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.waitForNativeRuntime.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.getTrustedDeviceAvailability.mockResolvedValue({
       isAvailable: true,
       unavailableReason: null,
@@ -130,22 +122,10 @@ describe('useBiometricCredentials on iOS', () => {
     expect(mocks.nativeModule.getTrustedDeviceAvailability).toHaveBeenCalledTimes(1);
   });
 
-  test('rejects availability when native client synchronization times out', async () => {
-    vi.useFakeTimers();
-    let finishNativeSync!: () => void;
-    const nativeSync = new Promise<void>(resolve => {
-      finishNativeSync = resolve;
-    });
-    trackPendingJsToNativeSync(nativeSync);
-
-    const availability = expect(renderBiometricCredentials().getAvailability()).rejects.toMatchObject({
-      code: 'environment_unavailable',
-    });
-
-    await vi.advanceTimersByTimeAsync(5_000);
-    await availability;
+  test('rejects availability when the runtime connection fails', async () => {
+    mocks.waitForNativeRuntime.mockRejectedValueOnce(new Error('Runtime unavailable'));
+    await expect(renderBiometricCredentials().getAvailability()).rejects.toThrow('Runtime unavailable');
     expect(mocks.nativeModule.getTrustedDeviceAvailability).not.toHaveBeenCalled();
-    finishNativeSync();
   });
 
   test('lists biometric credentials and converts native timestamps to dates', async () => {
@@ -177,12 +157,12 @@ describe('useBiometricCredentials on iOS', () => {
     expect(biometricCredential.revokedAt).toBeNull();
   });
 
-  test('waits for native client synchronization before listing biometric credentials', async () => {
+  test('waits for the native runtime connection before listing biometric credentials', async () => {
     let finishNativeSync!: () => void;
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.waitForNativeRuntime.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.listTrustedDevices.mockResolvedValue([nativeBiometricCredential]);
 
     const listing = renderBiometricCredentials().list();
@@ -222,12 +202,12 @@ describe('useBiometricCredentials on iOS', () => {
     expect(biometricCredential.createdAt).toEqual(new Date(nativeBiometricCredential.createdAt));
   });
 
-  test('waits for native client synchronization before enrollment', async () => {
+  test('waits for the native runtime connection before enrollment', async () => {
     let finishNativeSync!: () => void;
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.waitForNativeRuntime.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeBiometricCredential);
 
     const enrollment = renderBiometricCredentials().enroll();
@@ -254,12 +234,12 @@ describe('useBiometricCredentials on iOS', () => {
     expect(biometricCredential.revokedAt).toEqual(new Date(1_700_000_300_000));
   });
 
-  test('waits for native client synchronization before revoking a biometric credential', async () => {
+  test('waits for the native runtime connection before revoking a biometric credential', async () => {
     let finishNativeSync!: () => void;
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.waitForNativeRuntime.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.revokeTrustedDevice.mockResolvedValue({
       ...nativeBiometricCredential,
       status: 'revoked',
@@ -321,7 +301,7 @@ describe('useBiometricCredentials on iOS', () => {
     });
   });
 
-  test('accepts a completed sign-in when the synchronized client only contains its session', async () => {
+  test('accepts a completed sign-in when the shared client only contains its session', async () => {
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
       id: 'sia_123',
       status: 'complete',
@@ -342,7 +322,7 @@ describe('useBiometricCredentials on iOS', () => {
     });
   });
 
-  test('rejects a completed sign-in when its session is absent after synchronization', async () => {
+  test('rejects a completed sign-in when its session is absent after the operation', async () => {
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
       id: 'sia_123',
       status: 'complete',
@@ -350,16 +330,16 @@ describe('useBiometricCredentials on iOS', () => {
     });
 
     await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
-      'Unable to synchronize biometric sign-in with the Clerk JS client: the created session is missing.',
+      'Biometric sign-in failed: the created session is missing.',
     );
   });
 
-  test('waits for native client synchronization before biometric sign-in', async () => {
+  test('waits for the native runtime connection before biometric sign-in', async () => {
     let finishNativeSync!: () => void;
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.waitForNativeRuntime.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
       id: 'sia_123',
       status: 'complete',
@@ -386,13 +366,13 @@ describe('useBiometricCredentials on iOS', () => {
       status,
       createdSessionId: null,
     });
-    mocks.synchronizeNativeClientToJs.mockImplementation(() => {
+    mocks.nativeModule.signInWithTrustedDevice.mockImplementation(() => {
       Object.assign(mocks.jsSignIn, {
         id: 'sia_mfa',
         status,
         createdSessionId: null,
       });
-      return Promise.resolve();
+      return Promise.resolve({ id: 'sia_mfa', status, createdSessionId: null });
     });
 
     const result = await renderBiometricCredentials().signIn();
@@ -405,34 +385,7 @@ describe('useBiometricCredentials on iOS', () => {
     expect(result.signIn[continuationMethod]).toBe(mocks.jsSignIn[continuationMethod]);
   });
 
-  test('does not resolve a completed sign-in before native-to-JS synchronization', async () => {
-    let finishSync!: () => void;
-    mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
-      id: 'sia_123',
-      status: 'complete',
-      createdSessionId: 'sess_123',
-    });
-    mocks.synchronizeNativeClientToJs.mockReturnValue(
-      new Promise<void>(resolve => {
-        finishSync = resolve;
-      }),
-    );
-
-    let didResolve = false;
-    const signIn = renderBiometricCredentials()
-      .signIn()
-      .then(result => {
-        didResolve = true;
-        return result;
-      });
-    await vi.waitFor(() => expect(mocks.synchronizeNativeClientToJs).toHaveBeenCalled());
-    expect(didResolve).toBe(false);
-
-    finishSync();
-    await expect(signIn).resolves.toMatchObject({ createdSessionId: 'sess_123' });
-  });
-
-  test('rejects when native-to-JS synchronization returns a different sign-in attempt', async () => {
+  test('rejects when the operation returns a different sign-in attempt', async () => {
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
       id: 'sia_native',
       status: 'needs_second_factor',
@@ -445,11 +398,11 @@ describe('useBiometricCredentials on iOS', () => {
     });
 
     await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
-      'Unable to synchronize biometric sign-in with the Clerk JS client: the sign-in attempt does not match.',
+      'Biometric sign-in failed: the sign-in attempt does not match.',
     );
   });
 
-  test('uses the Clerk instance from the React provider after synchronization', async () => {
+  test('uses the Clerk instance from the React provider after the operation', async () => {
     const providerSetActive = vi.fn();
     const providerSignIn = {
       ...mocks.jsSignIn,
@@ -474,7 +427,7 @@ describe('useBiometricCredentials on iOS', () => {
     expect(result.setActive).toBe(providerSetActive);
   });
 
-  test('rejects when the Clerk JS client is unavailable after synchronization', async () => {
+  test('rejects when the Clerk JS client is unavailable after the operation', async () => {
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
       id: 'sia_native',
       status: 'complete',
@@ -486,11 +439,11 @@ describe('useBiometricCredentials on iOS', () => {
     });
 
     await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
-      'Unable to synchronize biometric sign-in with the Clerk JS client: the client sign-in resource is unavailable.',
+      'Biometric sign-in failed: the client sign-in resource is unavailable.',
     );
   });
 
-  test('normalizes unknown resource values and preserves the synchronized JS sign-in status', async () => {
+  test('normalizes unknown resource values and preserves the shared JS sign-in status', async () => {
     mocks.nativeModule.listTrustedDevices.mockResolvedValue([
       {
         ...nativeBiometricCredential,

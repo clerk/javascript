@@ -13,9 +13,8 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  *
  * `AuthView` renders inline within your React Native view hierarchy, powered by:
  * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
- * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
  *
- * After authentication completes, the session is automatically synced with the JS SDK.
+ * After authentication completes, the session is already available in the shared JS client.
  * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
  * state changes.
  *
@@ -62,7 +61,7 @@ export function AuthView({
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ fontSize: 16, color: '#666' }}>
           {!isNativeSupported
-            ? 'Native AuthView is only available on iOS and Android'
+            ? 'Native AuthView is currently available on iOS; Android support will follow'
             : 'Native AuthView requires the @clerk/expo plugin. Add "@clerk/expo" to your app.json plugins array.'}
         </Text>
       </View>

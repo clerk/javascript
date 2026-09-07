@@ -56,9 +56,9 @@ export interface FapiClient {
 
   buildEmailAddress(localPart: string): string;
 
-  onAfterResponse(callback: FapiRequestCallback<unknown>): void;
+  onAfterResponse(callback: FapiRequestCallback<unknown>): () => void;
 
-  onBeforeRequest(callback: FapiRequestCallback<unknown>): void;
+  onBeforeRequest(callback: FapiRequestCallback<unknown>): () => void;
 
   request<T>(requestInit: FapiRequestInit, options?: FapiRequestOptions): Promise<FapiResponse<T>>;
 }
@@ -111,10 +111,22 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
   function onBeforeRequest(callback: FapiRequestCallback<unknown>) {
     onBeforeRequestCallbacks.push(callback);
+    return () => {
+      const index = onBeforeRequestCallbacks.indexOf(callback);
+      if (index >= 0) {
+        onBeforeRequestCallbacks.splice(index, 1);
+      }
+    };
   }
 
   function onAfterResponse(callback: FapiRequestCallback<unknown>) {
     onAfterResponseCallbacks.push(callback);
+    return () => {
+      const index = onAfterResponseCallbacks.indexOf(callback);
+      if (index >= 0) {
+        onAfterResponseCallbacks.splice(index, 1);
+      }
+    };
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {

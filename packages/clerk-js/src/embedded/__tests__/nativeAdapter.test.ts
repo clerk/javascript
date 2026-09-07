@@ -1,0 +1,142 @@
+import type { ClientJSON } from '@clerk/shared/types';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { Clerk } from '../../core/clerk';
+import { Client } from '../../core/resources/internal';
+import { createSession } from '../../test/core-fixtures';
+import { createNativeAdapter, type EmbeddedHost, type EmbeddedState } from '../core';
+
+const adapters: ReturnType<typeof createNativeAdapter>[] = [];
+const key = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
+
+function fixture() {
+  Client.clearInstance();
+  const clerk = new Clerk(key);
+  vi.spyOn(clerk, 'status', 'get').mockReturnValue('ready');
+  const client = Client.getOrCreateInstance({
+    object: 'client',
+    id: 'client_owner',
+    last_active_session_id: 'sess_owner',
+    sessions: [createSession({ id: 'sess_owner', status: 'active' })],
+  } as ClientJSON);
+  clerk.client = client;
+  clerk.session = client.signedInSessions[0];
+  clerk.user = clerk.session.user;
+  const states: EmbeddedState[] = [];
+  let token = 'owner-token';
+  const host: EmbeddedHost = {
+    getToken: async () => token,
+    saveToken: async value => {
+      token = value;
+    },
+    getCachedResources: async () => ({ client: null, environment: null }),
+    saveCachedResources: async () => undefined,
+    publish: () => undefined,
+    commitState: async state => {
+      states.push(state);
+    },
+  };
+  const adapter = createNativeAdapter(
+    clerk,
+    { protocolVersion: 1, generation: 'expo', publishableKey: key, sdkVersion: 'test' },
+    host,
+  );
+  adapters.push(adapter);
+  return {
+    clerk,
+    client,
+    host,
+    adapter,
+    states,
+    setToken: (value: string) => {
+      token = value;
+    },
+  };
+}
+
+afterEach(async () => {
+  await Promise.all(adapters.splice(0).map(adapter => adapter.dispose()));
+  Client.clearInstance();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
+
+describe('native adapter for an existing Clerk owner', () => {
+  it('preserves the loaded owner and its cache provider without starting a second lifecycle', async () => {
+    const f = fixture();
+    const load = vi.spyOn(f.clerk, 'load');
+    const cache = f.clerk.__internal_getCachedResources;
+    const reload = vi.spyOn(f.client, 'reload');
+    await f.adapter.load();
+    expect(f.adapter.clerk).toBe(f.clerk);
+    expect(load).not.toHaveBeenCalled();
+    expect(f.clerk.__internal_getCachedResources).toBe(cache);
+    await f.adapter.invoke({ receiver: { kind: 'clerk' }, method: 'setApplicationActive', arguments: [true] });
+    expect(reload).not.toHaveBeenCalled();
+    expect(f.states.at(-1)).toMatchObject({
+      generation: 'expo',
+      clientToken: 'owner-token',
+      client: { id: 'client_owner', last_active_session_id: 'sess_owner' },
+    });
+  });
+
+  it('publishes JS changes with the latest credential and awaits native commit before resolving', async () => {
+    const f = fixture();
+    await f.adapter.load();
+    f.setToken('rotated-token');
+    f.clerk.session = null;
+    f.clerk.user = null;
+    f.clerk.updateClient(f.client);
+    await vi.waitFor(() =>
+      expect(f.states.at(-1)).toMatchObject({ clientToken: 'rotated-token', client: { last_active_session_id: null } }),
+    );
+    let release!: () => void;
+    f.host.commitState = () =>
+      new Promise<void>(resolve => {
+        release = resolve;
+      });
+    let completed = false;
+    const invocation = f.adapter.invoke({ receiver: { kind: 'clerk' }, method: 'initialize' }).then(() => {
+      completed = true;
+    });
+    await vi.waitFor(() => expect(release).toBeTypeOf('function'));
+    expect(completed).toBe(false);
+    release();
+    await invocation;
+    expect(completed).toBe(true);
+  });
+
+  it('rejects stale native operations before modifying the JS owner', async () => {
+    const f = fixture();
+    const signOut = vi.spyOn(f.clerk, 'signOut');
+    await expect(
+      f.adapter.invoke({
+        receiver: { kind: 'clerk' },
+        method: 'invokeForIdentity',
+        arguments: [
+          { receiver: { kind: 'clerk' }, method: 'signOut' },
+          { clientId: 'client_owner', sessionId: 'old_session' },
+        ],
+      }),
+    ).rejects.toThrow('different active identity');
+    expect(signOut).not.toHaveBeenCalled();
+    expect(f.clerk.session?.id).toBe('sess_owner');
+  });
+
+  it('leaves the owner usable after disposal and stops publishing its changes', async () => {
+    const f = fixture();
+    await f.adapter.load();
+    await f.adapter.dispose();
+    const count = f.states.length;
+    const response = { object: 'client', id: 'client_owner', sessions: [], last_active_session_id: null };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, status: 200, headers: new Headers(), json: async () => ({ response }) }),
+    );
+    await f.client.reload();
+    f.clerk.updateClient(f.client);
+    expect(f.clerk.client?.id).toBe('client_owner');
+    expect(f.clerk.session).toBeNull();
+    expect(f.states).toHaveLength(count);
+  });
+});

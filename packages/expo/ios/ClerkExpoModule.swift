@@ -1,66 +1,91 @@
 // ClerkExpoModule - Native module for Clerk integration
-// This module provides the configure function, client sync, and native view bridges.
+// This module connects native views and platform capabilities to the Expo JS runtime.
 // SwiftUI Clerk views are created by ClerkNativeBridge through the Clerk iOS SPM dependency.
 
 import ExpoModulesCore
 import Foundation
+@_spi(ClerkExpo) import ClerkKit
 
 // MARK: - Module
 
 public class ClerkExpoModule: Module {
   private static let nativeAuthFlowChangedEvent = "clerkNativeAuthFlowChanged"
-  private static let nativeClientChangedEvent = "clerkNativeClientChanged"
+
+  @MainActor private lazy var externalRuntime = ClerkExternalRuntime()
 
   private static weak var sharedInstance: ClerkExpoModule?
 
   public func definition() -> ModuleDefinition {
     Name("ClerkExpo")
 
-    Events(Self.nativeAuthFlowChangedEvent, Self.nativeClientChangedEvent)
+    Events(Self.nativeAuthFlowChangedEvent, "clerkRuntimeOperation")
 
     OnCreate {
       Self.sharedInstance = self
       ClerkNativeBridge.setAuthFlowChangedEmitter { body in
         Self.emitAuthFlowChanged(body)
       }
-      ClerkNativeBridge.setClientChangedEmitter { body in
-        Self.emitClientChanged(body)
-      }
     }
 
     OnDestroy {
+      Task { @MainActor in await self.externalRuntime.dispose() }
       if Self.sharedInstance === self {
         Self.sharedInstance = nil
         ClerkNativeBridge.setAuthFlowChangedEmitter(nil)
-        ClerkNativeBridge.setClientChangedEmitter(nil)
       }
     }
 
-    AsyncFunction("configure") { (publishableKey: String, bearerToken: String?, promise: Promise) in
-      self.configure(publishableKey, bearerToken: bearerToken, promise: promise)
+    AsyncFunction("configureExternalRuntime") { (publishableKey: String, runtimeID: String, state: String, promise: Promise) in
+      Task { @MainActor in
+        do {
+          try await self.externalRuntime.configure(publishableKey: publishableKey, runtimeID: runtimeID, state: state) { [weak self] body in
+            self?.sendEvent("clerkRuntimeOperation", body)
+          }
+          promise.resolve()
+        } catch { promise.reject("E_RUNTIME_CONFIGURE", error.localizedDescription) }
+      }
     }
 
-    AsyncFunction("getClientToken") { (promise: Promise) in
-      self.getClientToken(promise: promise)
+    AsyncFunction("publishRuntimeState") { (runtimeID: String, state: String, promise: Promise) in
+      Task { @MainActor in
+        do {
+          try await Clerk.publishExternalRuntimeState(runtimeID: runtimeID, state: Data(state.utf8))
+          promise.resolve()
+        } catch { promise.reject("E_RUNTIME_STATE", error.localizedDescription) }
+      }
+    }
+
+    AsyncFunction("completeRuntimeOperation") { (runtimeID: String, requestID: String, response: String, promise: Promise) in
+      Task { @MainActor in
+        self.externalRuntime.complete(runtimeID: runtimeID, requestID: requestID, response: response)
+        promise.resolve()
+      }
+    }
+
+    AsyncFunction("detachRuntime") { (runtimeID: String, promise: Promise) in
+      Task { @MainActor in
+        await self.externalRuntime.detach(runtimeID)
+        promise.resolve()
+      }
+    }
+
+    AsyncFunction("performRuntimeCapability") { (runtimeID: String, action: String, payload: String, promise: Promise) in
+      Task { @MainActor in
+        do {
+          let result = try await Clerk.performExternalRuntimeCapability(runtimeID: runtimeID, action: action, payload: Data(payload.utf8))
+          promise.resolve(String(decoding: result, as: UTF8.self))
+        } catch {
+          let descriptor = ClerkNativeBridge.biometricCredentialErrorDescriptor(error, fallbackCode: "native_capability_failed")
+          let envelope: [String: Any] = ["error": ["code": descriptor.code, "message": descriptor.message]]
+          if let data = try? JSONSerialization.data(withJSONObject: envelope) {
+            promise.resolve(String(decoding: data, as: UTF8.self))
+          } else { promise.reject("E_RUNTIME_CAPABILITY", error.localizedDescription) }
+        }
+      }
     }
 
     AsyncFunction("getAuthFlowState") { (promise: Promise) in
       self.getAuthFlowState(promise: promise)
-    }
-
-    AsyncFunction("syncClientStateFromJs") {
-      (deviceToken: String?,
-       sourceId: String?,
-       didChangeClient: Bool,
-       didChangeDeviceToken: Bool,
-       promise: Promise) in
-      self.syncClientStateFromJs(
-        deviceToken,
-        sourceId: sourceId,
-        didChangeClient: didChangeClient,
-        didChangeDeviceToken: didChangeDeviceToken,
-        promise: promise
-      )
     }
 
     AsyncFunction("getTrustedDeviceAvailability") {
@@ -102,27 +127,7 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  // MARK: - configure
 
-  private func configure(_ publishableKey: String, bearerToken: String?, promise: Promise) {
-    Task {
-      do {
-        try await ClerkNativeBridge.shared.configure(publishableKey: publishableKey, bearerToken: bearerToken)
-        promise.resolve()
-      } catch {
-        promise.reject("E_CONFIGURE_FAILED", error.localizedDescription)
-      }
-    }
-  }
-
-  // MARK: - getClientToken
-
-  private func getClientToken(promise: Promise) {
-    Task {
-      let token = await ClerkNativeBridge.shared.getClientToken()
-      promise.resolve(token)
-    }
-  }
 
   // MARK: - getAuthFlowState
 
@@ -133,27 +138,6 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  // MARK: - syncClientStateFromJs
-
-  private func syncClientStateFromJs(_ deviceToken: String?,
-                                     sourceId: String?,
-                                     didChangeClient: Bool,
-                                     didChangeDeviceToken: Bool,
-                                     promise: Promise) {
-    Task {
-      do {
-        try await ClerkNativeBridge.shared.syncClientStateFromJs(
-          deviceToken: deviceToken,
-          sourceId: sourceId,
-          didChangeClient: didChangeClient,
-          didChangeDeviceToken: didChangeDeviceToken
-        )
-        promise.resolve()
-      } catch {
-        promise.reject("E_SYNC_FROM_JS_FAILED", error.localizedDescription)
-      }
-    }
-  }
 
   // MARK: - Biometric credentials
 
@@ -265,20 +249,6 @@ public class ClerkExpoModule: Module {
       fallbackCode: fallbackCode
     )
     promise.reject(descriptor.code, descriptor.message)
-  }
-
-  /// Emits a native client change event to JS from anywhere in the native layer.
-  /// Used by native views to ask ClerkProvider to reload JS client state.
-  static func emitClientChanged(_ body: [String: Any]? = nil) {
-    let eventBody = body ?? [:]
-
-    guard let instance = sharedInstance else {
-      return
-    }
-
-    DispatchQueue.main.async { [weak instance] in
-      instance?.sendEvent(Self.nativeClientChangedEvent, eventBody)
-    }
   }
 
   static func emitAuthFlowChanged(_ body: [String: Any]? = nil) {

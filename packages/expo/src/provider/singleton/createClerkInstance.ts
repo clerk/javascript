@@ -33,6 +33,7 @@ import type { BuildClerkOptions } from './types';
  * used only for the __internal_onBeforeRequest and __internal_onAfterResponse hooks.
  */
 type FapiRequestInit = RequestInit & {
+  __internal_clientTokenTransaction?: string;
   url?: URL;
   headers?: Headers;
 };
@@ -303,9 +304,9 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse) => {
+      __internal_clerk.__internal_onAfterResponse(async (request: FapiRequestInit, response: FapiResponse) => {
         const authHeader = response.headers.get('authorization');
-        if (authHeader) {
+        if (authHeader && !request.__internal_clientTokenTransaction) {
           await saveToken(CLERK_CLIENT_JWT_KEY, authHeader);
         }
 

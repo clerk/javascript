@@ -10,9 +10,11 @@ const makeNativeModule = ({ includeEventMethods = true } = {}) => ({
         addListener: vi.fn(),
       }
     : {}),
-  configure: vi.fn(),
-  getClientToken: vi.fn(),
-  syncClientStateFromJs: vi.fn(),
+  configureExternalRuntime: vi.fn(),
+  publishRuntimeState: vi.fn(),
+  completeRuntimeOperation: vi.fn(),
+  detachRuntime: vi.fn(),
+  performRuntimeCapability: vi.fn(),
 });
 
 vi.mock('react-native', () => ({
@@ -44,12 +46,12 @@ describe('native module loader', () => {
     expect(ClerkExpoModule).toBe(mocks.nativeModule);
   });
 
-  test('returns the generated Android module when it satisfies the bootstrap contract without event methods', async () => {
+  test('rejects a runtime without an operation event channel', async () => {
     mocks.nativeModule = makeNativeModule({ includeEventMethods: false });
 
     const { ClerkExpoModule } = await importNativeModule();
 
-    expect(ClerkExpoModule).toBe(mocks.nativeModule);
+    expect(ClerkExpoModule).toBeNull();
   });
 
   test('returns null when no native module satisfies the bootstrap contract', async () => {
