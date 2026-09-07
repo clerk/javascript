@@ -215,7 +215,8 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       stagedTokens.delete(id);
     },
   };
-  const authOperations = createNativeAuthOperations(clerk, commitState);
+  const authController = createNativeAuthOperations(clerk, identityContext);
+  const authOperations = authController.operations;
   const nativeAuth = {
     ...authOperations,
     ...createNativeResourceOperations(clerk),
@@ -225,7 +226,7 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       clerk,
       host.storage,
       identityContext,
-      flow => (flow === 'signIn' ? authOperations.finishNativeSignIn() : authOperations.finishNativeSignUp()),
+      (flow, result) => authController.finish(flow, result.id, result),
       host.crypto,
     ),
   };
@@ -248,6 +249,7 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       }
       sessionIdentity = next;
     }
+    authController.observe();
     const nextIdentity = clerk.user?.id ?? null;
     if (identity !== nextIdentity) {
       registry.clear();
@@ -402,6 +404,7 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       return value.map(serialize);
     }
     remember(value);
+    authController.remember(value);
     if (value.organization) {
       remember(value.organization);
     }

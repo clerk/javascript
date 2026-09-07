@@ -17,7 +17,7 @@ type Completion = {
   flowId: string;
   approvalToken: string;
   epoch: number;
-  resultId?: string;
+  result?: SignInResource | SignUpResource;
 };
 const storageKey = 'pendingMagicLinkFlow';
 const terminalCodes = new Set([
@@ -38,7 +38,7 @@ export function createMagicLinkOperations(
   clerk: Clerk,
   storage: NativeStorage | undefined,
   context: NativeIdentityContext,
-  finish: (flow: Flow) => Promise<SignInResource | SignUpResource>,
+  finish: (flow: Flow, result: SignInResource | SignUpResource) => Promise<SignInResource | SignUpResource>,
   crypto: NativeCrypto = nativeCrypto,
 ) {
   const owners = new Map<string, string>();
@@ -286,16 +286,16 @@ export function createMagicLinkOperations(
         });
         await context.commitState();
         pending.epoch = context.identityEpoch();
-        if (pending.flow.kind === 'signIn') {
-          await client().signIn.create({ strategy: 'ticket', ticket: response.ticket as string });
-        }
+        const value =
+          pending.flow.kind === 'signIn'
+            ? await client().signIn.create({ strategy: 'ticket', ticket: response.ticket as string })
+            : client().signUp;
         context.ensureActive();
         if (completion !== pending) {
           fail('The magic link completion is no longer current.');
         }
         pending.epoch = context.identityEpoch();
-        const value = client()[pending.flow.kind];
-        pending.resultId = value.id;
+        pending.result = value;
         const activation =
           value.status === 'complete' && value.createdSessionId
             ? { flowId: value.id, sessionId: value.createdSessionId }
@@ -308,10 +308,11 @@ export function createMagicLinkOperations(
     async finishNativeMagicLinkCompletion(id: string) {
       const pending = current(id);
       try {
-        if (!pending.resultId || clerk.client?.[pending.flow.kind].id !== pending.resultId) {
+        const currentId = clerk.client?.[pending.flow.kind].id;
+        if (!pending.result || (currentId && currentId !== pending.result.id)) {
           fail('The authentication attempt is no longer current.');
         }
-        return { kind: pending.flow.kind, resource: await finish(pending.flow.kind) };
+        return { kind: pending.flow.kind, resource: await finish(pending.flow.kind, pending.result) };
       } finally {
         cancelNativeMagicLinkCompletion(id);
       }

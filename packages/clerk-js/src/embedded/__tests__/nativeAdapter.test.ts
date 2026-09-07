@@ -2,7 +2,7 @@ import type { ClientJSON } from '@clerk/shared/types';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Clerk } from '../../core/clerk';
-import { Client } from '../../core/resources/internal';
+import { Client, SignIn } from '../../core/resources/internal';
 import { createSession } from '../../test/core-fixtures';
 import { createNativeAdapter, type EmbeddedHost, type EmbeddedState } from '../core';
 
@@ -122,6 +122,67 @@ describe('native adapter for an existing Clerk owner', () => {
     expect(signOut).not.toHaveBeenCalled();
     expect(f.clerk.session?.id).toBe('sess_owner');
   });
+
+  it.each(['one operation', 'separate completion'] as const)(
+    'preserves the completed attempt when the response clears client.sign_in (%s)',
+    async mode => {
+      const f = fixture();
+      f.client.signIn = new SignIn({
+        object: 'sign_in',
+        id: 'sia_completed',
+        status: 'needs_first_factor',
+        first_factor_verification: { strategy: 'email_code', status: 'unverified' },
+      } as any);
+      await f.adapter.load();
+      const response = {
+        ...f.client.signIn.__internal_toSnapshot(),
+        status: 'complete',
+        created_session_id: 'sess_owner',
+        first_factor_verification: { strategy: 'email_code', status: 'verified' },
+      };
+      const client = { ...f.client.__internal_toSnapshot(), sign_in: null };
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          json: async () => ({ response, client }),
+        }),
+      );
+      const result =
+        mode === 'one operation'
+          ? await f.adapter.invoke({
+              receiver: { kind: 'clerk' },
+              method: 'verifyNativeSignInCode',
+              arguments: [{ expectedId: 'sia_completed', code: '424242' }],
+            })
+          : await (async () => {
+              await f.adapter.invoke({
+                receiver: { kind: 'signIn' },
+                method: 'attemptFirstFactor',
+                arguments: [{ strategy: 'email_code', code: '424242' }],
+              });
+              return f.adapter.invoke({ receiver: { kind: 'clerk' }, method: 'finishNativeSignIn' });
+            })();
+      expect(result).toMatchObject({ id: 'sia_completed', status: 'complete', created_session_id: 'sess_owner' });
+      expect(f.clerk.client?.signIn.id).toBeFalsy();
+      expect(f.states.at(-1)?.client?.sign_in?.id).toBeFalsy();
+      expect(f.clerk.session?.id).toBe('sess_owner');
+
+      f.clerk.session = null;
+      f.clerk.user = null;
+      f.client.sessions = [];
+      f.clerk.updateClient(f.client);
+      await expect(
+        f.adapter.invoke({
+          receiver: { kind: 'clerk' },
+          method: 'completeNativeAuth',
+          arguments: [{ flow: 'signIn', expectedId: 'sia_completed' }],
+        }),
+      ).rejects.toThrow('no longer current');
+    },
+  );
 
   it('leaves the owner usable after disposal and stops publishing its changes', async () => {
     const f = fixture();
