@@ -46,3 +46,5 @@ export type ReverificationResult = {
   methods: readonly ReverificationMethod[];
   startingMethod: ReverificationMethod | null;
 };
+
+export type ReverificationFactorStatus = 'needs_first_factor' | 'needs_second_factor';

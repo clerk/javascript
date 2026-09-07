@@ -1,10 +1,14 @@
-import type * as SharedReact from '@clerk/shared/react';
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import type * as SharedReact from '@clerk/shared/react';
 import type { PreferredSignInStrategy, SessionVerificationResource } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useReverificationModel, type ReverificationModel, type ReverificationReadyModel } from '../reverification.model';
+import {
+  type ReverificationModel,
+  type ReverificationReadyModel,
+  useReverificationModel,
+} from '../reverification.model';
 
 function ready(model: ReverificationModel): ReverificationReadyModel {
   expect(model.status).toBe('ready');
@@ -14,15 +18,18 @@ function ready(model: ReverificationModel): ReverificationReadyModel {
   return model;
 }
 
-let session: {
-  id: string;
-  startVerification: ReturnType<typeof vi.fn>;
-  prepareFirstFactorVerification: ReturnType<typeof vi.fn>;
-  prepareSecondFactorVerification: ReturnType<typeof vi.fn>;
-  attemptFirstFactorVerification: ReturnType<typeof vi.fn>;
-  attemptSecondFactorVerification: ReturnType<typeof vi.fn>;
-  verifyWithPasskey: ReturnType<typeof vi.fn>;
-} | null | undefined;
+let session:
+  | {
+    id: string;
+    startVerification: ReturnType<typeof vi.fn>;
+    prepareFirstFactorVerification: ReturnType<typeof vi.fn>;
+    prepareSecondFactorVerification: ReturnType<typeof vi.fn>;
+    attemptFirstFactorVerification: ReturnType<typeof vi.fn>;
+    attemptSecondFactorVerification: ReturnType<typeof vi.fn>;
+    verifyWithPasskey: ReturnType<typeof vi.fn>;
+  }
+  | null
+  | undefined;
 let environmentHydrated: boolean;
 let preferredSignInStrategy: PreferredSignInStrategy;
 let supportEmail: string;
@@ -30,9 +37,7 @@ let webAuthnSupported: boolean;
 let setActive: ReturnType<typeof vi.fn>;
 
 function environment() {
-  return environmentHydrated
-    ? { displayConfig: { preferredSignInStrategy, supportEmail } }
-    : undefined;
+  return environmentHydrated ? { displayConfig: { preferredSignInStrategy, supportEmail } } : undefined;
 }
 
 vi.mock('@clerk/shared/react', async importOriginal => {
@@ -115,7 +120,12 @@ describe('useReverificationModel', () => {
           { strategy: 'password' },
           { strategy: 'passkey' },
           { strategy: 'email_code', emailAddressId: 'idn_1', safeIdentifier: 'a***@ex.com' },
-          { strategy: 'enterprise_sso', emailAddressId: 'idn_2', enterpriseConnectionId: 'ec_1', safeIdentifier: 'sso' },
+          {
+            strategy: 'enterprise_sso',
+            emailAddressId: 'idn_2',
+            enterpriseConnectionId: 'ec_1',
+            safeIdentifier: 'sso',
+          },
         ],
       }),
     );
@@ -219,11 +229,85 @@ describe('useReverificationModel', () => {
     expect(session?.attemptSecondFactorVerification).toHaveBeenCalledWith({ strategy: 'totp', code: '123456' });
   });
 
+  it('no-ops prepare for methods that have no prepare step', async () => {
+    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    await ready(result.current).prepare({ id: 'password', strategy: 'password' }, 'needs_first_factor');
+    await ready(result.current).prepare({ id: 'passkey', strategy: 'passkey' }, 'needs_first_factor');
+    await ready(result.current).prepare({ id: 'totp', strategy: 'totp' }, 'needs_second_factor');
+    await ready(result.current).prepare({ id: 'backup_code', strategy: 'backup_code' }, 'needs_second_factor');
+
+    expect(session?.prepareFirstFactorVerification).not.toHaveBeenCalled();
+    expect(session?.prepareSecondFactorVerification).not.toHaveBeenCalled();
+  });
+
+  it('rejects prepare when the method does not belong to the verification stage', async () => {
+    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    const model = ready(result.current);
+
+    await expect(model.prepare({ id: 'totp', strategy: 'totp' }, 'needs_first_factor')).rejects.toThrow(
+      'Cannot prepare totp when verification is needs_first_factor.',
+    );
+    await expect(model.prepare({ id: 'password', strategy: 'password' }, 'needs_second_factor')).rejects.toThrow(
+      'Cannot prepare password when verification is needs_second_factor.',
+    );
+    expect(session?.prepareFirstFactorVerification).not.toHaveBeenCalled();
+    expect(session?.prepareSecondFactorVerification).not.toHaveBeenCalled();
+  });
+
+  it('rejects prepare when a code method is missing its factor id', async () => {
+    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    const model = ready(result.current);
+
+    await expect(model.prepare({ id: 'email_code:', strategy: 'email_code' }, 'needs_first_factor')).rejects.toThrow(
+      'Cannot prepare email_code without an email address.',
+    );
+    await expect(model.prepare({ id: 'phone_code:', strategy: 'phone_code' }, 'needs_first_factor')).rejects.toThrow(
+      'Cannot prepare phone_code without a phone number.',
+    );
+    await expect(model.prepare({ id: 'phone_code:', strategy: 'phone_code' }, 'needs_second_factor')).rejects.toThrow(
+      'Cannot prepare phone_code without a phone number.',
+    );
+    expect(session?.prepareFirstFactorVerification).not.toHaveBeenCalled();
+    expect(session?.prepareSecondFactorVerification).not.toHaveBeenCalled();
+  });
+
+  it('rejects attempt when the method does not belong to the verification stage', async () => {
+    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    const model = ready(result.current);
+
+    await expect(model.attempt({ id: 'passkey', strategy: 'passkey' }, 'x', 'needs_first_factor')).rejects.toThrow(
+      'Cannot attempt passkey when verification is needs_first_factor.',
+    );
+    await expect(model.attempt({ id: 'password', strategy: 'password' }, 'x', 'needs_second_factor')).rejects.toThrow(
+      'Cannot attempt password when verification is needs_second_factor.',
+    );
+    expect(session?.attemptFirstFactorVerification).not.toHaveBeenCalled();
+    expect(session?.attemptSecondFactorVerification).not.toHaveBeenCalled();
+  });
+
+  it('verifies a passkey only during first-factor verification', async () => {
+    session?.verifyWithPasskey.mockResolvedValue(resource({ status: 'complete' }));
+    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    const model = ready(result.current);
+
+    await expect(model.verifyPasskey('needs_second_factor')).rejects.toThrow(
+      'Cannot verify passkey when verification is needs_second_factor.',
+    );
+    expect(session?.verifyWithPasskey).not.toHaveBeenCalled();
+
+    await model.verifyPasskey('needs_first_factor');
+    expect(session?.verifyWithPasskey).toHaveBeenCalledOnce();
+  });
+
   it('rewrites Clerk API errors to plain Error messages', async () => {
     session?.attemptFirstFactorVerification.mockRejectedValue(
       new ClerkAPIResponseError('nope', {
         data: [
-          { code: 'form_password_incorrect', message: 'Incorrect password', long_message: 'That password is incorrect.' },
+          {
+            code: 'form_password_incorrect',
+            message: 'Incorrect password',
+            long_message: 'That password is incorrect.',
+          },
         ],
         status: 422,
       }),
@@ -232,9 +316,7 @@ describe('useReverificationModel', () => {
     const { result } = renderHook(() => useReverificationModel(activeProps()));
     await expect(
       ready(result.current).attempt({ id: 'password', strategy: 'password' }, 'bad', 'needs_first_factor'),
-    ).rejects.toThrow(
-      'That password is incorrect.',
-    );
+    ).rejects.toThrow('That password is incorrect.');
   });
 
   it('activates the verified session and calls complete', async () => {
