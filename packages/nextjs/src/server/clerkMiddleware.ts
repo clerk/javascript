@@ -137,7 +137,7 @@ interface ClerkMiddleware {
 /**
  * The `clerkMiddleware()` helper integrates Clerk authentication into your Next.js application through Middleware. `clerkMiddleware()` is compatible with both the App and Pages routers.
  *
- * To set up Clerk in your project, run `npx --yes clerk@latest init -y` from your project's root directory.
+ * To set up Clerk in your project, run `npx -y clerk@latest init` from your project's root directory.
  * The Clerk CLI can provision temporary development keys without a Clerk account and write them to `.env.local`. See
  * the [Clerk CLI docs](https://clerk.com/docs/cli).
  */
