@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
@@ -17,17 +20,43 @@ import tseslint from 'typescript-eslint';
 
 import { CUSTOM_BLOCK_TAGS, CUSTOM_MODIFIER_TAGS } from './.typedoc/custom-tags.mjs';
 
+const REPO_ROOT = import.meta.dirname;
 const ECMA_VERSION = 2021,
   JAVASCRIPT_FILES = ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
   TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
   // turbo lint runs `eslint src` from each package cwd; these must be repo-absolute
-  IMPORT_RESOLVER_TSCONFIGS = [
-    `${import.meta.dirname}/packages/*/tsconfig.json`,
-    `${import.meta.dirname}/packages/*/tsconfig.src.json`,
-    `${import.meta.dirname}/packages/*/tsconfig.test.json`,
-    `${import.meta.dirname}/integration/tsconfig.json`,
-  ];
+  IMPORT_RESOLVER_TSCONFIGS = [`${REPO_ROOT}/integration/tsconfig.json`],
+  IMPORT_RESOLVER_TSCONFIG_NAMES = ['tsconfig.json', 'tsconfig.src.json', 'tsconfig.test.json', 'tsconfig.mosaic.json'];
+
+// Each package must see only its own tsconfigs. Several packages define `@/*`, and a
+// shared project list lets the resolver apply clerk-js's alias to UI or shared files.
+const PACKAGE_IMPORT_RESOLVER_CONFIGS = fs
+  .readdirSync(path.join(REPO_ROOT, 'packages'), { withFileTypes: true })
+  .filter(entry => entry.isDirectory() && fs.existsSync(path.join(REPO_ROOT, 'packages', entry.name, 'package.json')))
+  .flatMap(entry => {
+    const project = IMPORT_RESOLVER_TSCONFIG_NAMES.map(name =>
+      path.join(REPO_ROOT, 'packages', entry.name, name),
+    ).filter(file => fs.existsSync(file));
+    if (project.length === 0) {
+      return [];
+    }
+    return [
+      {
+        name: `packages/${entry.name}/import-resolver`,
+        files: [`packages/${entry.name}/**/*.{ts,tsx,js,jsx,mts,cts}`],
+        settings: {
+          'import/resolver': {
+            node: true,
+            typescript: {
+              alwaysTryTypes: true,
+              project,
+            },
+          },
+        },
+      },
+    ];
+  });
 
 const noNavigateUseClerk = {
   meta: {
@@ -524,31 +553,13 @@ export default tseslint.config([
       'react-hooks/rules-of-hooks': 'warn',
     },
   },
+  ...PACKAGE_IMPORT_RESOLVER_CONFIGS,
   {
     name: 'packages/clerk-js',
     files: ['packages/clerk-js/src/ui/**/*'],
     rules: {
       'custom-rules/no-navigate-useClerk': 'error',
       'custom-rules/no-unstable-methods': 'error',
-    },
-  },
-  {
-    // Don't reuse the repo-wide tsconfig list. clerk-js defines the same `@/*`
-    // alias, and the resolver will apply it to UI files and break `@/ui/*` imports.
-    name: 'packages/ui/import-resolver',
-    files: ['packages/ui/**/*.{ts,tsx}'],
-    settings: {
-      'import/resolver': {
-        node: true,
-        typescript: {
-          alwaysTryTypes: true,
-          project: [
-            `${import.meta.dirname}/packages/ui/tsconfig.src.json`,
-            `${import.meta.dirname}/packages/ui/tsconfig.test.json`,
-            `${import.meta.dirname}/packages/ui/tsconfig.mosaic.json`,
-          ],
-        },
-      },
     },
   },
   {
