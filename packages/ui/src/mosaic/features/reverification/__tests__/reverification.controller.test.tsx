@@ -4,9 +4,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { createActor } from '../../../machine/createActor';
 import { deferred, tick } from '../../../machines/__tests__/test-utils';
 import {
+  type ReverificationDeps,
   reverificationMachine,
   useReverificationController,
-  type ReverificationDeps,
 } from '../reverification.controller';
 import type { ReverificationModel, ReverificationReadyModel } from '../reverification.model';
 import type { ReverificationMethod, ReverificationResult } from '../reverification.types';
@@ -32,10 +32,10 @@ function firstFactorResult(overrides: Partial<ReverificationResult> = {}): Rever
 function seatedDeps(overrides: Partial<ReverificationDeps> = {}): ReverificationDeps {
   return {
     start: vi.fn(async () => firstFactorResult()),
-    prepare: vi.fn(async () => {}),
+    prepare: vi.fn(async () => { }),
     attempt: vi.fn(async () => firstFactorResult({ status: 'complete' })),
     verifyPasskey: vi.fn(async () => firstFactorResult({ status: 'complete' })),
-    finish: vi.fn(async () => {}),
+    finish: vi.fn(async () => { }),
     cancel: vi.fn(),
     ...overrides,
   };
@@ -53,10 +53,10 @@ function readyModel(overrides: Partial<ReverificationReadyModel> = {}): Reverifi
     isActive: true,
     supportEmail: 'support@example.com',
     start: vi.fn(async () => firstFactorResult()),
-    prepare: vi.fn(async () => {}),
+    prepare: vi.fn(async () => { }),
     attempt: vi.fn(async () => firstFactorResult({ status: 'complete' })),
     verifyPasskey: vi.fn(async () => firstFactorResult({ status: 'complete' })),
-    finish: vi.fn(async () => {}),
+    finish: vi.fn(async () => { }),
     cancel: vi.fn(),
     ...overrides,
   };
@@ -84,7 +84,7 @@ describe('reverificationMachine', () => {
   });
 
   it('prepares an email code once when that method is selected', async () => {
-    const prepare = vi.fn(async () => {});
+    const prepare = vi.fn(async () => { });
     const actor = startActor(seatedDeps({ prepare }));
     await tick();
     actor.send({ type: 'SHOW_METHODS' });
