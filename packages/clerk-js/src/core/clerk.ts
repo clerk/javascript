@@ -2116,7 +2116,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string): string {
-    if (this.#instanceType === 'production') {
+    if (this.#instanceType === 'production' || !this.#options.standardBrowser) {
       return to;
     }
 

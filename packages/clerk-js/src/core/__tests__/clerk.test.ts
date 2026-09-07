@@ -3634,6 +3634,20 @@ describe('Clerk singleton', () => {
   });
 
   describe('buildUrlWithAuth', () => {
+    it.each(['myapp://sso-callback', 'https://example.com/sso-callback'])(
+      'preserves the native development callback without a browser: %s',
+      async callbackUrl => {
+        const sut = new Clerk(developmentPublishableKey);
+        await sut.load({ standardBrowser: false });
+        vi.stubGlobal('window', undefined);
+        try {
+          expect(sut.buildUrlWithAuth(callbackUrl)).toBe(callbackUrl);
+        } finally {
+          vi.unstubAllGlobals();
+        }
+      },
+    );
+
     it('builds an absolute url from a relative url in development', async () => {
       const sut = new Clerk(developmentPublishableKey);
       await sut.load();
