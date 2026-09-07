@@ -356,6 +356,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   reverification: boolean;
   preferred_channels?: Record<string, PhoneCodeChannel>;
   session_minter?: boolean;
+  native_settings?: Record<string, boolean>;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {

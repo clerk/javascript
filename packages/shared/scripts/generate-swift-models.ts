@@ -1602,7 +1602,9 @@ const CUSTOM_ENCODE: Record<string, string> = {
 
 function applyExtraProperties(name: string, properties: SwiftProperty[]): SwiftProperty[] {
   for (const extra of EXTRA_PROPERTIES[name] ?? []) {
-    if (properties.some(property => property.wireName === extra.wireName)) {
+    const existing = properties.findIndex(property => property.wireName === extra.wireName);
+    if (existing >= 0) {
+      properties[existing] = extra;
       continue;
     }
     const createdAt = properties.findIndex(property => property.wireName === 'created_at');

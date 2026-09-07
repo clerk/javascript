@@ -21,6 +21,7 @@ const variants = {
   clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
   clerkBrowser: 'clerk.browser',
   clerkNative: 'clerk.native', // For React Native (no chunk splitting)
+  clerkEmbedded: 'clerk.embedded',
   clerkLegacyBrowser: 'clerk.legacy.browser',
 };
 
@@ -29,6 +30,7 @@ const variantToSourceFile = {
   [variants.clerkNoRHC]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
   [variants.clerkNative]: './src/index.ts',
+  [variants.clerkEmbedded]: './src/index.embedded.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
 };
 
@@ -410,6 +412,22 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   if (env.variant === variants.clerkNative) {
     return [clerkNative];
+  }
+
+  if (env.variant === variants.clerkEmbedded) {
+    return [
+      merge(
+        entryForVariant(variants.clerkEmbedded),
+        common({ mode, variant: variants.clerkEmbedded, disableRHC: true }),
+        commonForProd(),
+        commonForProdBundled(),
+        {
+          output: { publicPath: '', library: { type: 'umd', name: 'ClerkEmbedded' } },
+          optimization: { splitChunks: false },
+          plugins: [new rspack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })],
+        },
+      ),
+    ];
   }
 
   return [clerkBrowser, clerkLegacyBrowser, clerkNative, clerkEsm, clerkEsmNoRHC, clerkCjs, clerkCjsNoRHC];

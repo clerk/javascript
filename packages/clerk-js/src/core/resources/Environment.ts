@@ -50,6 +50,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
       return this;
     }
 
+    this.id = this.withDefault(data.id, this.id);
     this.authConfig = new AuthConfig(data.auth_config);
     this.displayConfig = new DisplayConfig(data.display_config);
     this.maintenanceMode = this.withDefault(data.maintenance_mode, this.maintenanceMode);

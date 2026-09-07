@@ -4,6 +4,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
+  nativeSettings?: Record<string, boolean>;
   claimedAt: Date | null = null;
   reverification: boolean = false;
   singleSessionMode: boolean = false;
@@ -20,6 +21,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     if (!data) {
       return this;
     }
+    this.nativeSettings = this.withDefault(data.native_settings, this.nativeSettings);
     this.claimedAt = this.withDefault(data.claimed_at ? unixEpochToDate(data.claimed_at) : null, this.claimedAt);
     this.reverification = this.withDefault(data.reverification, this.reverification);
     this.singleSessionMode = this.withDefault(data.single_session_mode, this.singleSessionMode);
@@ -30,6 +32,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
 
   public __internal_toSnapshot(): AuthConfigJSONSnapshot {
     return {
+      ...(this.nativeSettings ? { native_settings: this.nativeSettings } : {}),
       claimed_at: this.claimedAt ? this.claimedAt.getTime() : null,
       id: this.id ?? '',
       object: 'auth_config',
