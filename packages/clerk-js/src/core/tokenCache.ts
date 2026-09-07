@@ -74,6 +74,7 @@ export interface TokenCache {
    * Side effects: Clears all scheduled expiration timers and empties the cache.
    */
   clear(): void;
+  setProactiveRefreshEnabled(enabled: boolean): void;
 
   /**
    * Closes the BroadcastChannel connection and releases resources.
@@ -148,6 +149,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
   const tabId = generateTabId();
 
   let broadcastChannel: BroadcastChannel | null = null;
+  let proactiveRefreshEnabled = true;
 
   const ensureBroadcastChannel = (): BroadcastChannel | null => {
     if (broadcastChannel) {
@@ -438,7 +440,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         const leeway = Math.max(BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS, minLeeway);
         const refreshFireTime = remainingTtl - leeway - refreshLeadTime;
 
-        if (refreshFireTime > 0 && live.entry.onRefresh) {
+        if (proactiveRefreshEnabled && refreshFireTime > 0 && live.entry.onRefresh) {
           const refreshTimeoutId = setTimeout(() => {
             live.entry.onRefresh?.();
           }, refreshFireTime * 1000);
@@ -515,7 +517,14 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     return store.size();
   };
 
-  return { clear, close, get, set, size };
+  const setProactiveRefreshEnabled = (enabled: boolean) => {
+    proactiveRefreshEnabled = enabled;
+    if (!enabled) {
+      store.forEach(value => clearTimeout(value.refreshTimeoutId));
+    }
+  };
+
+  return { clear, close, get, set, size, setProactiveRefreshEnabled };
 };
 
 export const SessionTokenCache = MemoryTokenCache();

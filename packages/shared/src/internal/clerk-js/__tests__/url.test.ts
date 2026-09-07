@@ -647,6 +647,16 @@ describe('relativeToAbsoluteUrl', () => {
 });
 
 describe('stripOrigin(url)', () => {
+  it('handles an engine without a window global', () => {
+    vi.stubGlobal('window', undefined);
+    try {
+      expect(stripOrigin('/test')).toBe('/test');
+      expect(stripOrigin('https://example.com/test')).toBe('https://example.com/test');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('should strip origin when window.location is available', () => {
     const originalLocation = window.location;
     Object.defineProperty(window, 'location', {

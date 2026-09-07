@@ -18,6 +18,7 @@ import {
 import { SessionTokenCache } from '../core/tokenCache';
 import { createBiometricCredentialOperations, type NativeBiometricCapability } from './biometricCredentials';
 import { createHostedAuthOperations } from './hostedAuth';
+import { createEmbeddedLifecycle } from './lifecycle';
 import { createMagicLinkOperations } from './magicLink';
 import { createNativeAuthOperations, NativeAuthOperationError } from './nativeAuth';
 import { createNativeResourceOperations } from './nativeResources';
@@ -33,6 +34,7 @@ export interface EmbeddedState {
   client: ClientJSONSnapshot | null;
   environment: EnvironmentJSONSnapshot | null;
   clientToken: string;
+  tokenEvent?: { sequence: number; sessionId: string; jwt: string };
 }
 
 export interface EmbeddedHost {
@@ -139,6 +141,10 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
   activeInstance = true;
   const clerk: Clerk = new Clerk(config.publishableKey, { proxyUrl: config.options?.proxyUrl });
   const registry = new Map<string, Resource>();
+  SessionTokenCache.setProactiveRefreshEnabled(false);
+  const lifecycle = createEmbeddedLifecycle(clerk, commitState);
+  let tokenEvent: EmbeddedState['tokenEvent'];
+  let tokenEventSequence = 0;
   let revision = 0;
   let clientToken = '';
   let disposed = false;
@@ -233,6 +239,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
       client,
       environment,
       clientToken,
+      tokenEvent,
     };
     host.publish(state);
     if (clerk.loaded) {
@@ -378,30 +385,47 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
         clientToken = await host.getToken();
         ensureActive();
         subscriptions.push(clerk.addListener(() => publish()));
-        for (const event of [
-          events.TokenUpdate,
-          events.SessionTokenResolved,
-          events.EnvironmentUpdate,
-          events.ResourceUpdate,
-        ]) {
+        for (const event of [events.TokenUpdate, events.EnvironmentUpdate, events.ResourceUpdate]) {
           const listener = () => {
             publish();
           };
           eventBus.on(event, listener);
           subscriptions.push(() => eventBus.off(event, listener));
         }
+        const tokenListener = () => {
+          const session = clerk.session;
+          const jwt = session?.lastActiveToken?.getRawString();
+          if (session && jwt) {
+            tokenEvent = { sequence: ++tokenEventSequence, sessionId: session.id, jwt };
+          }
+          publish();
+        };
+        eventBus.on(events.SessionTokenResolved, tokenListener);
+        subscriptions.push(() => eventBus.off(events.SessionTokenResolved, tokenListener));
         try {
-          await clerk.load({
-            ...config.options,
-            standardBrowser: false,
-            experimental: {
-              ...config.options?.experimental,
-              runtimeEnvironment: 'headless',
-              rethrowOfflineNetworkErrors: true,
-            },
-          });
+          for (let attempt = 0; ; attempt += 1) {
+            try {
+              await clerk.load({
+                ...config.options,
+                standardBrowser: false,
+                experimental: {
+                  ...config.options?.experimental,
+                  runtimeEnvironment: 'headless',
+                  rethrowOfflineNetworkErrors: true,
+                },
+              });
+              break;
+            } catch (error) {
+              if (attempt >= 2 || errorEnvelope(error).kind !== 'offline') {
+                throw error;
+              }
+              await new Promise(resolve => setTimeout(resolve, 500 * 2 ** attempt));
+              ensureActive();
+            }
+          }
           ensureActive();
           await commitState();
+          lifecycle.start();
         } catch (error) {
           subscriptions.splice(0).forEach(unsubscribe => unsubscribe());
           loadPromise = undefined;
@@ -421,7 +445,18 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
       if (receiver.kind === 'clerk' && ['signOut', 'setActive'].includes(method)) {
         identityEpoch += 1;
       }
-      if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(nativeAuth, method)) {
+      if (receiver.kind === 'clerk' && method === 'initialize') {
+        value = null;
+      } else if (receiver.kind === 'clerk' && method === 'signOut') {
+        await clerk.signOut(() => undefined, {
+          ...(args[0] as { sessionId?: string } | undefined),
+          redirectUrl: `https://${clerk.frontendApi}/`,
+        });
+        value = null;
+      } else if (receiver.kind === 'clerk' && method === 'setApplicationActive') {
+        await lifecycle.setActive(args[0] === true, args[1] !== false);
+        value = null;
+      } else if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(nativeAuth, method)) {
         value = await (nativeAuth[method as keyof typeof nativeAuth] as (...args: any[]) => unknown)(...args);
       } else if (receiver.kind === 'clerk' && method === 'refreshClient') {
         const client = await clerk.client?.reload();
@@ -474,6 +509,7 @@ export function createEmbeddedClerk(config: EmbeddedOptions, host: EmbeddedHost)
         return;
       }
       disposed = true;
+      lifecycle.dispose();
       subscriptions.splice(0).forEach(unsubscribe => unsubscribe());
       registry.clear();
       stagedTokens.clear();
