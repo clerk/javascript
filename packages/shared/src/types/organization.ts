@@ -223,8 +223,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
     params?: GetEnterpriseConnectionTestRunsParams,
   ) => Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>>;
   /**
-   * Gets the Directory Sync directory bound to the given enterprise connection. The returned resource never carries
-   * the SCIM bearer token.
+   * Gets the Directory Sync directory bound to the given enterprise connection.
    */
   getDirectorySync: (enterpriseConnectionId: string) => Promise<DirectorySyncResource>;
   /**

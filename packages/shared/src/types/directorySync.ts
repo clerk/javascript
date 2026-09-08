@@ -27,7 +27,9 @@ export interface DirectorySyncJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export type DirectorySyncJSONSnapshot = DirectorySyncJSON;
+export type DirectorySyncJSONSnapshot = Omit<DirectorySyncJSON, 'api_key'> & {
+  api_key?: never;
+};
 
 export interface DirectorySyncResource extends ClerkResource {
   /** The directory ID. */
@@ -92,8 +94,8 @@ export interface DirectorySyncUserJSON extends ClerkResourceJSON {
 }
 
 /**
- * A user the identity provider has provisioned into the directory, in
- * public-user-data shape.
+ * A user the identity provider has provisioned into the directory. Carries the same identifying fields as
+ * `PublicUserData`.
  */
 export interface DirectorySyncUserResource extends ClerkResource {
   id: string;
@@ -104,7 +106,7 @@ export interface DirectorySyncUserResource extends ClerkResource {
   identifier: string | null;
   imageUrl: string;
   hasImage: boolean;
-  /** `false` once the identity provider has deprovisioned the user. */
+  /** `false` if the identity provider has deprovisioned the user. */
   active: boolean;
   /** The date the user was provisioned into the directory. */
   provisionedAt: Date | null;
