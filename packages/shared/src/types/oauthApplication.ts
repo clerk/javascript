@@ -104,7 +104,23 @@ export type OAuthConsentInfo = {
 /**
  * The current status of an OAuth device authorization.
  */
-export type OAuthDeviceVerificationStatus = 'pending' | 'approved' | 'denied' | 'consumed';
+export type OAuthDeviceVerificationStatus =
+  /**
+   * The device authorization is awaiting approval or denial.
+   */
+  | 'pending'
+  /**
+   * The device authorization was approved.
+   */
+  | 'approved'
+  /**
+   * The device authorization was denied.
+   */
+  | 'denied'
+  /**
+   * The approved device authorization has already been used by the device.
+   */
+  | 'consumed';
 
 /**
  * A scope requested by an OAuth device authorization.
@@ -114,7 +130,7 @@ export type OAuthDeviceVerificationStatus = 'pending' | 'approved' | 'denied' | 
 export type OAuthDeviceVerificationScope = OAuthConsentScope;
 
 /**
- * Information about an OAuth device authorization awaiting verification.
+ * Information about an OAuth device authorization.
  *
  * @interface
  */

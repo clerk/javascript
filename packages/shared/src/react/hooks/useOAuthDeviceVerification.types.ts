@@ -7,8 +7,6 @@ import type {
   SubmitOAuthDeviceVerificationParams,
 } from '../../types';
 
-type DecisionParams = Omit<SubmitOAuthDeviceVerificationParams, 'approved'>;
-
 /**
  * The current state and actions for an OAuth device verification flow.
  *
@@ -42,7 +40,7 @@ export type UseOAuthDeviceVerificationReturn = {
   /**
    * Approves a device authorization.
    */
-  approve: (params: DecisionParams) => Promise<OAuthDeviceVerificationResult>;
+  approve: (params: Omit<SubmitOAuthDeviceVerificationParams, 'approved'>) => Promise<OAuthDeviceVerificationResult>;
   /**
    * Denies a device authorization.
    */
