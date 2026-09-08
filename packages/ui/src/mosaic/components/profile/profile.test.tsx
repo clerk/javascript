@@ -318,7 +318,7 @@ describe('Profile', () => {
 
     // Switching pages must never resize the surface: standalone and inline it holds a fixed height
     // and scrolls inside; over the page the popup's height is the one that counts.
-    it('holds a fixed height standalone and inline, and hands it to the popup over the page', () => {
+    it('holds a fixed height standalone, and hands it to the popup over the page', () => {
       const probe = stylex.create({ fixed: { blockSize: '45rem' }, handed: { blockSize: 'auto' } });
       const fixed = atomsOf(probe.fixed);
       const handed = atomsOf(probe.handed);
@@ -329,12 +329,28 @@ describe('Profile', () => {
       expect(frame()).toEqual(expect.arrayContaining(fixed));
       standalone.unmount();
 
-      const inline = renderInDialog(true);
-      expect(frame()).toEqual(expect.arrayContaining(fixed));
-      inline.unmount();
-
       renderInDialog();
       expect(frame()).toEqual(expect.arrayContaining(handed));
+    });
+
+    // Inline the profile is the page's content: no frame, no scroll region of its own, and the
+    // branding closes the pages' column out rather than the navigation's.
+    it('is flush and unframed inline, and scrolls with the page', () => {
+      const probe = stylex.create({
+        frameless: { borderWidth: '0px', overflow: 'visible', backgroundColor: 'transparent', blockSize: 'auto' },
+        scroller: { overflowY: 'auto' },
+      });
+      renderInDialog(true);
+
+      const frame = document.querySelector('.cl-profile-layout')!;
+      expect(Array.from(frame.classList)).toEqual(expect.arrayContaining(atomsOf(probe.frameless)));
+      const viewport = document.querySelector('.cl-profile-content-viewport')!;
+      expect(Array.from(viewport.classList)).not.toEqual(expect.arrayContaining(atomsOf(probe.scroller)));
+      expect(document.querySelector('.cl-profile-content')).toHaveAttribute('data-inline');
+
+      const branding = screen.getByText(/Secured by/);
+      expect(document.querySelector('.cl-profile-content-body')).toContainElement(branding);
+      expect(screen.getByRole('navigation')).not.toContainElement(branding);
     });
   });
 });

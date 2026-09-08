@@ -100,6 +100,20 @@ export const styles = stylex.create({
     minHeight: 0,
   },
 
+  /**
+   * Inline, the profile is the page's own content: no frame, no background, no fixed height, and
+   * no scroll region of its own — the page scrolls. Flush with whatever holds it.
+   */
+  layoutInline: {
+    borderRadius: 0,
+    borderWidth: '0px',
+    overflow: 'visible',
+    backgroundColor: 'transparent',
+    blockSize: 'auto',
+    boxShadow: 'none',
+    gridTemplateRows: 'auto',
+  },
+
   layoutInDialog: {
     blockSize: 'auto',
     // Lifted off the page like a card in a dialog: the card's elevation, none compact, where the
@@ -121,6 +135,11 @@ export const styles = stylex.create({
     flexDirection: 'column',
     minHeight: 0,
     minWidth: 0,
+  },
+
+  /** Inline there is no frame, so no edge between the column and the pages either. */
+  navInline: {
+    borderInlineEndWidth: '0px',
   },
 
   /** Inside the sheet: no column edge, and the sheet's own content padding frames it. */
@@ -220,6 +239,16 @@ export const styles = stylex.create({
     },
     minWidth: 0,
   },
+  /** Inline the column is not a scroll region, so it carries no inset for a clip edge. */
+  contentInline: {
+    paddingBlock: 0,
+  },
+
+  /** Inline, the branding closes out the pages' column instead of the navigation's. */
+  contentBranding: {
+    marginBlockStart: space['8'],
+  },
+
   contentViewport: {
     paddingBlock: {
       [compact]: space['6'],

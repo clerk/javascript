@@ -30,6 +30,8 @@ interface ProfileContextValue {
   navSheetHeight: DrawerHeight;
   /** The root element, for parts that have to find something inside the profile. */
   root: HTMLElement | null;
+  /** Presented as the page's content rather than over it — see `Dialog.Root`'s `inline`. */
+  inline: boolean;
 }
 
 const ProfileContext = React.createContext<ProfileContextValue | null>(null);
@@ -114,6 +116,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  const inline = dialog?.inline ?? false;
   // Inside a dialog the title takes the id the popup points `aria-labelledby` at, so the surface
   // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
@@ -132,8 +135,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     }
   }, [compact]);
   const context = React.useMemo(
-    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight, root: node }),
-    [titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight, node],
+    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight, root: node, inline }),
+    [titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight, node, inline],
   );
   const element = useRender({
     defaultTagName: 'div',
@@ -156,7 +159,12 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),
-              stylex.props(reset.base, styles.layout, dialog !== null && !dialog.inline && styles.layoutInDialog),
+              stylex.props(
+                reset.base,
+                styles.layout,
+                inline && styles.layoutInline,
+                dialog !== null && !inline && styles.layoutInDialog,
+              ),
             )}
           >
             {children}
@@ -229,7 +237,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
-  const { titleId, renderBranding, compact, navOpen, closeNav, navSheetHeight, root } = profile;
+  const { titleId, renderBranding, compact, navOpen, closeNav, navSheetHeight, root, inline } = profile;
   // The headline that opened the sheet belongs to the page a choice just left, so the sheet's own
   // return-focus would land on nothing. The headline of the page now showing is the same control,
   // on the destination.
@@ -252,7 +260,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       'aria-labelledby': titleId,
       ...mergeStyleProps(
         themeProps('profile-nav', { compact }),
-        stylex.props(reset.base, styles.nav, compact && styles.navInSheet),
+        stylex.props(reset.base, styles.nav, inline && styles.navInline, compact && styles.navInSheet),
         className,
         style,
       ),
@@ -260,7 +268,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       children: (
         <>
           {list}
-          {renderBranding && !compact ? <NavBranding /> : null}
+          {renderBranding && !compact && !inline ? <NavBranding /> : null}
         </>
       ),
     },
@@ -403,22 +411,24 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
 export type ProfileContentProps = MosaicComponentProps<'div'>;
 
 /**
- * The column the pages render in. It is the surface's scroll region — the navigation stays put
- * while a long page scrolls — and a plain `div`: the profile is often the content of the host's
+ * The column the pages render in. Standalone and over the page it is the surface's scroll region
+ * — the navigation stays put while a long page scrolls; inline the page itself scrolls and the
+ * branding closes the column out. A plain `div`: the profile is often the content of the host's
  * own `main`, or of a dialog, so it claims no landmark.
  */
 const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function ProfileContent(
   { children, render, className, style, ...rest },
   ref,
 ) {
+  const { inline, compact, renderBranding } = useProfileContext('Profile.Content');
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('profile-content'),
-        stylex.props(reset.base, styles.content, contentScroll),
+        themeProps('profile-content', { inline }),
+        stylex.props(reset.base, styles.content, inline ? styles.contentInline : contentScroll),
         className,
         style,
       ),
@@ -427,11 +437,21 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
         <div
           {...mergeStyleProps(
             themeProps('profile-content-viewport'),
-            stylex.props(reset.base, styles.contentViewport, ...contentViewportScroll),
+            stylex.props(reset.base, styles.contentViewport, ...(inline ? [] : contentViewportScroll)),
           )}
         >
           <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
             {children}
+            {inline && renderBranding && !compact ? (
+              <div
+                {...mergeStyleProps(
+                  themeProps('profile-branding'),
+                  stylex.props(reset.base, styles.branding, styles.contentBranding),
+                )}
+              >
+                <Branding />
+              </div>
+            ) : null}
           </div>
         </div>
       ),
