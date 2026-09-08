@@ -127,6 +127,41 @@ describe('UserVerificationFactorTwo', () => {
   });
 
   describe('Use another second factor method', () => {
+    it('does not show use another method when totp is the only second factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      vi.spyOn(fixtures.session, 'startVerification').mockResolvedValue({
+        status: 'needs_second_factor',
+        supportedSecondFactors: [{ strategy: 'totp' }],
+      } as any);
+
+      vi.spyOn(fixtures.session, 'prepareSecondFactorVerification').mockResolvedValue({
+        status: 'needs_second_factor',
+        supportedSecondFactors: [{ strategy: 'totp' }],
+      } as any);
+
+      const { findByText, queryByText } = render(<UserVerificationFactorTwo />, { wrapper });
+
+      await findByText('Verification required');
+      expect(queryByText('Use another method')).toBeNull();
+    });
+
+    it('does not show use another method when backup code is the only second factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      vi.spyOn(fixtures.session, 'startVerification').mockResolvedValue({
+        status: 'needs_second_factor',
+        supportedSecondFactors: [{ strategy: 'backup_code' }],
+      } as any);
+
+      const { findByText, queryByText } = render(<UserVerificationFactorTwo />, { wrapper });
+
+      await findByText('Enter a backup code');
+      expect(queryByText('Use another method')).toBeNull();
+    });
+
     it('should list enabled second factor methods without the current one', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });

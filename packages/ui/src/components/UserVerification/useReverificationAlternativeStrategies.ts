@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 
 import { allStrategiesButtonsComparator } from '@/ui/utils/factorSorting';
 
-import { factorHasLocalStrategy, isResetPasswordStrategy } from '../SignIn/utils';
+import { factorHasLocalStrategy } from '../SignIn/utils';
 
 const firstFactorsAreEqual = (a: SignInFactor | null | undefined, b: SignInFactor | null | undefined) => {
   if (!a || !b) {
@@ -44,11 +44,6 @@ export function useReverificationAlternativeStrategies<T = SignInFirstFactor>({
   filterOutFactor: SignInFactor | null | undefined;
   supportedFirstFactors: SignInFirstFactor[] | null | undefined;
 }) {
-  const firstFactors = supportedFirstFactors
-    ? supportedFirstFactors.filter(f => !isResetPasswordStrategy(f.strategy))
-    : [];
-  const shouldAllowForAlternativeStrategies = firstFactors && firstFactors.length > 0;
-
   const firstPartyFactors = useMemo(
     () =>
       supportedFirstFactors
@@ -64,9 +59,11 @@ export function useReverificationAlternativeStrategies<T = SignInFirstFactor>({
     [supportedFirstFactors, filterOutFactor],
   );
 
+  const hasAnyStrategy = firstPartyFactors.length > 0;
+
   return {
-    hasAnyStrategy: shouldAllowForAlternativeStrategies,
-    hasFirstParty: firstPartyFactors && firstPartyFactors.length > 0,
+    hasAnyStrategy,
+    hasFirstParty: hasAnyStrategy,
     firstPartyFactors,
   };
 }
