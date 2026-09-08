@@ -62,12 +62,98 @@ afterEach(async () => {
 });
 
 describe('native adapter for an existing Clerk owner', () => {
+  it('can cancel a subscription item returned inside a billing snapshot', async () => {
+    const f = fixture();
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        json: () =>
+          Promise.resolve({
+            response: {
+              id: 'sub_1',
+              status: 'active',
+              subscription_items: [{ id: 'item_1', status: 'active' }],
+            },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        json: () => Promise.resolve({ response: { id: 'item_1', deleted: true } }),
+      });
+    vi.stubGlobal('fetch', fetch);
+    await expect(
+      f.adapter.invoke({
+        receiver: { kind: 'billing' },
+        method: 'getSubscription',
+        arguments: [{}],
+      }),
+    ).resolves.toMatchObject({ subscriptionItems: [{ id: 'item_1' }] });
+    await expect(
+      f.adapter.invoke({
+        receiver: { kind: 'listed', listedKind: 'billingSubscriptionItem', id: 'item_1' },
+        method: 'cancel',
+        arguments: [{}],
+      }),
+    ).resolves.toMatchObject({ id: 'item_1', deleted: true });
+    expect(fetch.mock.calls.map(call => new URL(call[0]).pathname)).toEqual([
+      '/v1/me/billing/subscription',
+      '/v1/me/billing/subscription_items/item_1',
+    ]);
+  });
+
+  it('can accept a listed invitation and rejects its retained snapshot after the user changes', async () => {
+    const f = fixture();
+    const invitation = {
+      id: 'inv_1',
+      status: 'pending',
+      public_organization_data: { id: 'org_1', name: 'Team', has_image: false, image_url: '', slug: null },
+    };
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        json: () => Promise.resolve({ response: { data: [invitation], total_count: 1 } }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        json: () => Promise.resolve({ response: { ...invitation, status: 'accepted' } }),
+      });
+    vi.stubGlobal('fetch', fetch);
+    await expect(
+      f.adapter.invoke({
+        receiver: { kind: 'user', id: f.clerk.user!.id },
+        method: 'getOrganizationInvitations',
+      }),
+    ).resolves.toMatchObject({ data: [{ id: 'inv_1' }] });
+    const accept = {
+      receiver: { kind: 'listed', listedKind: 'userOrganizationInvitation', id: 'inv_1' },
+      method: 'accept',
+    };
+    await expect(f.adapter.invoke(accept)).resolves.toMatchObject({ id: 'inv_1', status: 'accepted' });
+    f.clerk.session = null;
+    f.clerk.user = null;
+    f.client.sessions = [];
+    f.clerk.updateClient(f.client);
+    await expect(f.adapter.invoke(accept)).rejects.toMatchObject({ envelope: { code: 'not_found' } });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   it.each([
     { receiver: { kind: 'user' }, method: 'delete' },
     { receiver: { kind: 'signIn' }, method: 'prepareFirstFactor' },
     { receiver: { kind: 'signUp', id: '' }, method: 'update' },
     { receiver: { kind: 'userResource', id: 'idn_1', collection: 'sessions' }, method: 'destroy' },
     { receiver: { kind: 'listed', id: 'inv_1', listedKind: 'unknown' }, method: 'revoke' },
+    { receiver: { kind: 'listed', id: 'ec_1', listedKind: 'organizationEnterpriseConnection' }, method: 'delete' },
     {
       receiver: { kind: 'listed', id: 'inv_1', listedKind: 'organizationInvitation', scope: 'organizationDomain' },
       method: 'revoke',

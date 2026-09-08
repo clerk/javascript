@@ -1,31 +1,13 @@
+import {
+  nativeListedKinds,
+  type NativeResourceRoute,
+  nativeUserCollections,
+} from '@clerk/shared/internal/clerk-js/nativeResourceRoutes';
+
 import { failure } from './errors';
 
-const userCollections = [
-  'emailAddresses',
-  'phoneNumbers',
-  'passkeys',
-  'externalAccounts',
-  'web3Wallets',
-  'enterpriseAccounts',
-] as const;
-
-const listedKinds = [
-  'userOrganizationInvitation',
-  'organizationSuggestion',
-  'organizationInvitation',
-  'organizationMembership',
-  'organizationMembershipRequest',
-  'organizationDomain',
-  'organizationEnterpriseConnection',
-  'billingPaymentMethod',
-  'sessionWithActivities',
-] as const;
-
-export type EmbeddedReceiver =
-  | { kind: 'clerk' | 'billing' }
-  | { kind: 'signIn' | 'signUp' | 'user' | 'session' | 'organization'; id: string }
-  | { kind: 'userResource'; collection: (typeof userCollections)[number]; id: string }
-  | { kind: 'listed'; listedKind: (typeof listedKinds)[number]; id: string };
+type ReceiverFor<Route> = Route extends { kind: 'clerk' | 'billing' } ? Route : Route & { id: string };
+export type EmbeddedReceiver = ReceiverFor<NativeResourceRoute>;
 
 export interface EmbeddedInvocation {
   receiver: EmbeddedReceiver;
@@ -79,13 +61,13 @@ function receiver(value: unknown): EmbeddedReceiver {
       return { kind, id: identifier(input.id) };
     case 'userResource':
       keys(input, ['kind', 'id', 'collection']);
-      if (!member(input.collection, userCollections)) {
+      if (!member(input.collection, nativeUserCollections)) {
         failure('invalid_invocation', 'Unknown user collection');
       }
       return { kind, collection: input.collection, id: identifier(input.id) };
     case 'listed':
       keys(input, ['kind', 'id', 'listedKind']);
-      if (!member(input.listedKind, listedKinds)) {
+      if (!member(input.listedKind, nativeListedKinds)) {
         failure('invalid_invocation', 'Unknown listed resource kind');
       }
       return { kind, listedKind: input.listedKind, id: identifier(input.id) };

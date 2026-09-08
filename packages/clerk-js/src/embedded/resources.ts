@@ -1,6 +1,13 @@
+import {
+  nativeResourceRoutes,
+  type NativeRetainedResource,
+} from '@clerk/shared/internal/clerk-js/nativeResourceRoutes';
+
 import type { Clerk } from '../core/clerk';
 import {
+  BillingCheckout,
   BillingPaymentMethod,
+  BillingSubscriptionItem,
   Organization,
   OrganizationDomain,
   OrganizationInvitation,
@@ -13,17 +20,25 @@ import {
 import { failure } from './errors';
 import type { EmbeddedReceiver } from './invocation';
 
-const resourceKinds = [
-  [Organization, 'organization'],
-  [OrganizationDomain, 'organizationDomain'],
-  [OrganizationInvitation, 'organizationInvitation'],
-  [OrganizationMembership, 'organizationMembership'],
-  [OrganizationMembershipRequest, 'organizationMembershipRequest'],
-  [OrganizationSuggestion, 'organizationSuggestion'],
-  [SessionWithActivities, 'sessionWithActivities'],
-  [UserOrganizationInvitation, 'userOrganizationInvitation'],
-  [BillingPaymentMethod, 'billingPaymentMethod'],
-] as const;
+// The mapped type requires a runtime constructor for every retained route.
+const retainedResourceTypes = {
+  OrganizationResource: Organization,
+  OrganizationDomainResource: OrganizationDomain,
+  OrganizationInvitationResource: OrganizationInvitation,
+  OrganizationMembershipResource: OrganizationMembership,
+  OrganizationMembershipRequestResource: OrganizationMembershipRequest,
+  OrganizationSuggestionResource: OrganizationSuggestion,
+  SessionWithActivitiesResource: SessionWithActivities,
+  UserOrganizationInvitationResource: UserOrganizationInvitation,
+  BillingPaymentMethodResource: BillingPaymentMethod,
+  BillingCheckoutResource: BillingCheckout,
+  BillingSubscriptionItemResource: BillingSubscriptionItem,
+} satisfies Record<NativeRetainedResource, { prototype: object }>;
+
+const retainedTypes = Object.entries(retainedResourceTypes).map(([name, type]) => {
+  const route = nativeResourceRoutes[name as NativeRetainedResource];
+  return { type, kind: route.kind === 'listed' ? route.listedKind : route.kind };
+});
 
 export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown) => void) {
   const registry = new Map<string, object>();
@@ -33,7 +48,7 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
     if (typeof id !== 'string') {
       return;
     }
-    for (const [type, kind] of resourceKinds) {
+    for (const { type, kind } of retainedTypes) {
       if (value instanceof type) {
         registry.set(`${kind}:${id}`, value);
         return;
@@ -41,7 +56,19 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
     }
   }
 
-  function serialize(value: unknown): unknown {
+  function rememberTree(value: unknown, seen = new WeakSet<object>()) {
+    if (!value || typeof value !== 'object' || value instanceof Date || seen.has(value)) {
+      return;
+    }
+    seen.add(value);
+    remember(value);
+    onResource(value);
+    for (const child of Object.values(value)) {
+      rememberTree(child, seen);
+    }
+  }
+
+  function serializeValue(value: unknown): unknown {
     if (value == null) {
       return null;
     }
@@ -52,13 +79,7 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
       return value.getTime();
     }
     if (Array.isArray(value)) {
-      return value.map(serialize);
-    }
-    remember(value);
-    onResource(value);
-    const organization: unknown = Reflect.get(value, 'organization');
-    if (organization && typeof organization === 'object') {
-      remember(organization);
+      return value.map(serializeValue);
     }
     const snapshot: unknown = Reflect.get(value, '__internal_toSnapshot');
     if (typeof snapshot === 'function') {
@@ -67,7 +88,7 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
     return Object.fromEntries(
       Object.entries(value)
         .filter(([key, entry]) => key !== 'pathRoot' && typeof entry !== 'function')
-        .map(([key, entry]) => [key, serialize(entry)]),
+        .map(([key, entry]) => [key, serializeValue(entry)]),
     );
   }
 
@@ -97,17 +118,17 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
         if (session && typeof Reflect.get(session, method) === 'function') {
           return session;
         }
-        let listed = registry.get(`sessionWithActivities:${receiver.id}`);
+        let listed = registry.get(`${nativeResourceRoutes.SessionWithActivitiesResource.listedKind}:${receiver.id}`);
         if (!listed && clerk.user) {
-          serialize(await clerk.user.getSessions());
-          listed = registry.get(`sessionWithActivities:${receiver.id}`);
+          rememberTree(await clerk.user.getSessions());
+          listed = registry.get(`${nativeResourceRoutes.SessionWithActivitiesResource.listedKind}:${receiver.id}`);
         }
         return listed;
       }
       case 'organization':
         return (
           clerk.user?.organizationMemberships.find(m => m.organization.id === receiver.id)?.organization ||
-          registry.get(`organization:${receiver.id}`) ||
+          registry.get(`${nativeResourceRoutes.OrganizationResource.kind}:${receiver.id}`) ||
           (await clerk.getOrganization(receiver.id))
         );
       case 'listed':
@@ -116,16 +137,19 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
   }
 
   return {
-    serialize,
+    serialize: (value: unknown) => {
+      rememberTree(value);
+      return serializeValue(value);
+    },
     resolve,
     clear: () => registry.clear(),
     forget: (receiver: EmbeddedReceiver) => {
       if (receiver.kind === 'listed') {
         registry.delete(`${receiver.listedKind}:${receiver.id}`);
       } else if (receiver.kind === 'organization') {
-        registry.delete(`organization:${receiver.id}`);
+        registry.delete(`${nativeResourceRoutes.OrganizationResource.kind}:${receiver.id}`);
       } else if (receiver.kind === 'session') {
-        registry.delete(`sessionWithActivities:${receiver.id}`);
+        registry.delete(`${nativeResourceRoutes.SessionWithActivitiesResource.listedKind}:${receiver.id}`);
       }
     },
   };

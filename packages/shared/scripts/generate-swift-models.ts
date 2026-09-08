@@ -8,6 +8,7 @@ import { emitDecl, emitHelperFile, emitMethodFiles } from './swift-models/emit';
 import { type GeneratedSwiftFile } from './swift-models/model';
 import { emitFilename } from './swift-models/naming';
 import { collectDecls, collectMethodFacades } from './swift-models/read';
+import { emitReceiverKinds, validateNativeResourceRoutes } from './swift-models/receivers';
 export type { GeneratedSwiftFile } from './swift-models/model';
 
 export const SWIFT_MODEL_ROOTS = [
@@ -96,9 +97,11 @@ export function generateSwiftModels(
   const { facades, paramDecls } = collectMethodFacades(program, modelNames, methodRoots);
   const files = [
     { filename: 'JSONValue.swift', contents: emitHelperFile() },
+    emitReceiverKinds(),
     ...decls.map(decl => ({ filename: emitFilename(decl), contents: emitDecl(decl) })),
     ...emitMethodFiles(facades, paramDecls),
   ];
+  validateNativeResourceRoutes(program, methodRoots);
   return files.sort((a, b) => a.filename.localeCompare(b.filename));
 }
 
