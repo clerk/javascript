@@ -72,13 +72,6 @@ export const styles = stylex.create({
    * slow drag past the threshold.
    */
   popup: {
-    // The grip's colour, set here because the drag state lives on the popup and the grip is a
-    // descendant: it deepens while the sheet is held.
-    '--_cl-grip-color': {
-      default: colorVars['--cl-color-border'],
-      // A step deeper, not a jump: enough to say "held", not enough to read as a state change.
-      ':where([data-swiping])': `color-mix(in oklab, ${colorVars['--cl-color-border']}, ${colorVars['--cl-color-neutral-faded']} 35%)`,
-    },
     borderColor: { default: null, '@media (forced-colors: active)': 'CanvasText' },
     borderStyle: { default: null, '@media (forced-colors: active)': 'solid' },
     borderWidth: { default: null, '@media (forced-colors: active)': '1px' },
@@ -135,6 +128,13 @@ export const styles = stylex.create({
 
   /** The drag affordance: a short pill, centred, with a hit area taller than it looks. */
   handle: {
+    // The grip deepens the instant the handle is pressed, and stays so for as long as it is held —
+    // the pointer is captured on it, so `:active` survives the drag. A press elsewhere in the sheet
+    // is not a press on the handle, and leaves it alone.
+    '--_cl-grip-color': {
+      default: colorVars['--cl-color-border'],
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-border']}, ${colorVars['--cl-color-neutral-faded']} 35%)`,
+    },
     placeItems: 'center',
     display: 'grid',
     flexShrink: 0,
