@@ -4,6 +4,7 @@ import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useContainerMaxWidth } from '../../hooks/useContainerMaxWidth';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
@@ -27,6 +28,8 @@ interface ProfileContextValue {
   openNav: () => void;
   closeNav: () => void;
   navSheetHeight: DrawerHeight;
+  /** The root element, for parts that have to find something inside the profile. */
+  root: HTMLElement | null;
 }
 
 const ProfileContext = React.createContext<ProfileContextValue | null>(null);
@@ -39,7 +42,7 @@ const TabPanelContext = React.createContext<string | undefined>(undefined);
  * `profile.styles.ts` reads, measured here because WHERE the navigation renders is a DOM decision
  * CSS cannot make: one tablist, in the column or in the sheet, never both.
  */
-const COMPACT_WIDTH_REM = 48;
+const COMPACT_MAX_WIDTH_REM = 48;
 
 function useProfileContext(part: string): ProfileContextValue {
   const context = React.useContext(ProfileContext);
@@ -47,30 +50,6 @@ function useProfileContext(part: string): ProfileContextValue {
     throw new Error(`${part} must be rendered inside Profile.Root`);
   }
   return context;
-}
-
-function useCompact(node: HTMLElement | null): boolean {
-  const [compact, setCompact] = React.useState(false);
-  React.useLayoutEffect(() => {
-    if (!node || typeof ResizeObserver === 'undefined') {
-      return;
-    }
-    const measure = () => {
-      const width = node.getBoundingClientRect().width;
-      // Not laid out (hidden, or a test document): nothing to conclude, keep what was known.
-      if (width === 0) {
-        return;
-      }
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      // `<=`: the container query is `max-width`, which is inclusive.
-      setCompact(width <= COMPACT_WIDTH_REM * rem);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [node]);
-  return compact;
 }
 
 export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'children'> {
@@ -131,7 +110,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  const compact = useCompact(node);
+  const compact = useContainerMaxWidth(node, COMPACT_MAX_WIDTH_REM);
   const [navOpen, setNavOpen] = React.useState(false);
   const openNav = React.useCallback(() => setNavOpen(true), []);
   const closeNav = React.useCallback(() => setNavOpen(false), []);
@@ -142,43 +121,14 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       setNavOpen(false);
     }
   }, [compact]);
-  // The caret that opened the sheet belongs to the page the choice just left, so the sheet's own
-  // return-focus lands on nothing. Focus goes to the caret of the page that is now showing — the
-  // same control, on the destination.
-  const wasNavOpen = React.useRef(false);
-  React.useEffect(() => {
-    if (navOpen) {
-      wasNavOpen.current = true;
-      return;
-    }
-    if (!wasNavOpen.current || !node) {
-      return;
-    }
-    wasNavOpen.current = false;
-    const caret = node.querySelector<HTMLElement>(
-      '.cl-profile-tab-panel:not([hidden]):not([inert]) .cl-profile-nav-trigger',
-    );
-    caret?.focus();
-  }, [navOpen, node]);
   const context = React.useMemo(
-    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight }),
-    [titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight],
-  );
-  const mergedRef = React.useCallback(
-    (element: HTMLDivElement | null) => {
-      setNode(element);
-      if (typeof ref === 'function') {
-        ref(element);
-      } else if (ref) {
-        ref.current = element;
-      }
-    },
-    [ref],
+    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight, root: node }),
+    [titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight, node],
   );
   const element = useRender({
     defaultTagName: 'div',
     render,
-    ref: mergedRef,
+    ref: [setNode, ref],
     props: {
       ...mergeStyleProps(
         themeProps('profile'),
@@ -269,7 +219,16 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
-  const { titleId, renderBranding, compact, navOpen, closeNav, navSheetHeight } = profile;
+  const { titleId, renderBranding, compact, navOpen, closeNav, navSheetHeight, root } = profile;
+  // The headline that opened the sheet belongs to the page a choice just left, so the sheet's own
+  // return-focus would land on nothing. The headline of the page now showing is the same control,
+  // on the destination.
+  const finalFocus = React.useCallback(
+    () =>
+      root?.querySelector<HTMLElement>('.cl-profile-tab-panel:not([hidden]):not([inert]) .cl-profile-nav-trigger') ??
+      null,
+    [root],
+  );
   const list = (
     <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
       {children}
@@ -312,6 +271,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       <Drawer.Popup
         aria-labelledby={titleId}
         height={navSheetHeight}
+        finalFocus={finalFocus}
       >
         {element}
       </Drawer.Popup>
@@ -417,10 +377,8 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
               <Icon
                 aria-hidden
                 name='chevron-down'
+                size='inherit'
                 {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
-                // Inline, so it outranks the icon's own size atoms without a cascade contest: sized
-                // in `em` and `ex` so it scales with the heading and centres on its x-height.
-                style={{ blockSize: '0.6em', inlineSize: '0.6em', verticalAlign: 'middle' }}
               />
             </button>
           ) : (

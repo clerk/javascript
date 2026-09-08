@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -289,6 +290,56 @@ describe('Drawer', () => {
       expect(screen.queryByText('Drawer body content')).not.toBeInTheDocument();
       expect(screen.queryByTestId('backdrop')).not.toBeInTheDocument();
       expect(screen.queryByTestId('viewport')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('final focus', () => {
+    // A close driven from outside — a controlled `open` flipping — never passes through
+    // floating-ui's own emit, so the function is consulted when focus is restored instead.
+    it('returns focus where the finalFocus function points, on a controlled close', async () => {
+      function Controlled() {
+        const [open, setOpen] = React.useState(true);
+        const target = React.useRef<HTMLButtonElement>(null);
+        return (
+          <>
+            <button
+              ref={target}
+              data-testid='target'
+            >
+              Landing
+            </button>
+            <button
+              data-testid='outside-close'
+              onClick={() => setOpen(false)}
+            >
+              Close from outside
+            </button>
+            <Drawer.Root
+              open={open}
+              onOpenChange={setOpen}
+            >
+              <Drawer.Portal>
+                <Drawer.Viewport>
+                  <Drawer.Popup finalFocus={() => target.current}>
+                    <Drawer.Title>Sheet</Drawer.Title>
+                    <button
+                      data-testid='inside-close'
+                      onClick={() => setOpen(false)}
+                    >
+                      Choose
+                    </button>
+                  </Drawer.Popup>
+                </Drawer.Viewport>
+              </Drawer.Portal>
+            </Drawer.Root>
+          </>
+        );
+      }
+      const user = userEvent.setup();
+      render(<Controlled />);
+      await user.click(screen.getByTestId('inside-close'));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.getByTestId('target')).toHaveFocus());
     });
   });
 

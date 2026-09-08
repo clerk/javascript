@@ -257,9 +257,17 @@ export const styles = stylex.create({
     display: 'inline',
     textAlign: 'start',
   },
+  /**
+   * Beside the title, `vertical-align: middle`: the caret's midpoint on the baseline plus half the
+   * x-height, which centres it on the lowercase letters rather than the line box. Sized in `em`
+   * through the icon's `inherit` size, so it scales with the heading; coloured through the icon's
+   * own variable rather than `color`, which the icon sets itself.
+   */
   caret: {
-    color: colorVars['--cl-color-neutral-faded'],
+    '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
+    fontSize: '0.6em',
     marginInlineStart: '0.25em',
+    verticalAlign: 'middle',
   },
 });
 

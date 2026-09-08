@@ -136,6 +136,12 @@ sheet resists overshooting.
 | -------- | -------------- | ---------------------------------------------------------------- |
 | `handle` | `DrawerHandle` | Drive a detached handle instead of the surrounding `Drawer.Root` |
 
+### `Drawer.Popup`
+
+| Prop         | Type                                                        | Default     | Description                                                     |
+| ------------ | ----------------------------------------------------------- | ----------- | --------------------------------------------------------------- |
+| `finalFocus` | `boolean \| RefObject \| (interactionType) => Element \| …` | the trigger | Where focus returns on close; same contract as `Dialog.Popup`'s |
+
 ### `Drawer.Viewport`
 
 | Prop         | Type      | Default | Description                     |

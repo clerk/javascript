@@ -1,4 +1,4 @@
-import type { DrawerProps as HeadlessDrawerProps } from '@clerk/headless/drawer';
+import type { DrawerFocusTarget, DrawerProps as HeadlessDrawerProps } from '@clerk/headless/drawer';
 import { Drawer as Primitive, registerDrawerCssVars } from '@clerk/headless/drawer';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -22,6 +22,8 @@ export interface DrawerPopupProps extends MosaicComponentProps<'div'> {
    * screen less a hand's width. @default 'content'
    */
   height?: DrawerHeight;
+  /** Where focus returns when the sheet closes. Default: the trigger. */
+  finalFocus?: DrawerFocusTarget;
 }
 
 /**
@@ -80,7 +82,7 @@ const Description = React.forwardRef<HTMLParagraphElement, DrawerDescriptionProp
  * `card` dialog it takes the nested scrim, the way a prompt does there.
  */
 const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function DrawerPopup(
-  { height = 'content', children, render, className, style, ...rest },
+  { height = 'content', finalFocus, children, render, className, style, ...rest },
   ref,
 ) {
   const host = React.useContext(DialogContext);
@@ -99,6 +101,7 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
         <Primitive.Popup
           ref={ref}
           render={render}
+          finalFocus={finalFocus}
           {...mergeStyleProps(
             themeProps('drawer-popup', { height }),
             stylex.props(reset.base, styles.popup, heights[height]),
