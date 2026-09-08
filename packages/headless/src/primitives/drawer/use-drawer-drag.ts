@@ -233,7 +233,8 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     vel.current = 0;
     allowed.current = false;
     draggingRef.current = true;
-    setIsDragging(true);
+    // Not `setIsDragging` yet: a press is not a drag. `data-swiping` — and everything the styled
+    // layer hangs off it — lands on the first move that commits to dragging the sheet.
 
     // Capture the actual target (not the popup) so a click on an inner control
     // still lands on it; the popup handler keeps receiving bubbled moves. (vaul)
@@ -284,6 +285,9 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
 
       if (!allowed.current && !shouldDrag(e.target as HTMLElement, down)) {
         return;
+      }
+      if (!allowed.current) {
+        setIsDragging(true);
       }
       allowed.current = true;
       sample(e.clientY, clock());

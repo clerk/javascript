@@ -635,6 +635,22 @@ describe('Drawer', () => {
       fireEvent.pointerUp(popup, { pointerId: 1, clientY: 100 });
     });
 
+    // A press on a control inside the sheet is not a drag: nothing that keys on `data-swiping` — the
+    // grip's held colour, the transition freeze — should react until the sheet actually moves.
+    it('marks swiping only once a move commits to dragging the sheet', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 100, button: 0, pointerType: 'touch' });
+      expect(popup).not.toHaveAttribute('data-swiping');
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 140 });
+      expect(popup).toHaveAttribute('data-swiping');
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 140 });
+      expect(popup).not.toHaveAttribute('data-swiping');
+    });
+
     it('updates the swipe-progress var and swiping attribute during a drag', () => {
       render(<DrawerFixture defaultOpen />);
       const popup = screen.getByRole('dialog');

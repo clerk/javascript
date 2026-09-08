@@ -11,7 +11,6 @@ import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Branding } from '../branding';
 import { Dialog, DialogContext } from '../dialog';
-import type { DrawerHeight } from '../drawer';
 import { Drawer } from '../drawer';
 import { Heading } from '../heading';
 import { Icon } from '../icon';
@@ -27,7 +26,6 @@ interface ProfileContextValue {
   navOpen: boolean;
   openNav: () => void;
   closeNav: () => void;
-  navSheetHeight: DrawerHeight;
   /** The root element, for parts that have to find something inside the profile. */
   root: HTMLElement | null;
   /** Flush: the page's own content — `elevation='flush'`, or an `inline` dialog. */
@@ -93,11 +91,6 @@ export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'chi
    * @default 'card'
    */
   elevation?: ProfileElevation;
-  /**
-   * TEMPORARY, for design review: how tall the compact navigation sheet stands. Removed once a
-   * height is chosen.
-   */
-  navSheetHeight?: DrawerHeight;
   children: React.ReactNode;
 }
 
@@ -118,7 +111,6 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     activationMode,
     renderBranding = true,
     elevation = 'card',
-    navSheetHeight = 'content',
     children,
     render,
     className,
@@ -147,8 +139,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     }
   }, [compact]);
   const context = React.useMemo(
-    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight, root: node, inline }),
-    [titleId, renderBranding, compact, navOpen, openNav, closeNav, navSheetHeight, node, inline],
+    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav, root: node, inline }),
+    [titleId, renderBranding, compact, navOpen, openNav, closeNav, node, inline],
   );
   const element = useRender({
     defaultTagName: 'div',
@@ -249,7 +241,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
-  const { titleId, renderBranding, compact, navOpen, closeNav, navSheetHeight, root, inline } = profile;
+  const { titleId, renderBranding, compact, navOpen, closeNav, root, inline } = profile;
   // The headline that opened the sheet belongs to the page a choice just left, so the sheet's own
   // return-focus would land on nothing. The headline of the page now showing is the same control,
   // on the destination.
@@ -300,7 +292,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
     >
       <Drawer.Popup
         aria-labelledby={titleId}
-        height={navSheetHeight}
+        height='two-thirds'
         finalFocus={finalFocus}
       >
         {element}

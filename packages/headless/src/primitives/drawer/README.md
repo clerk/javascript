@@ -176,18 +176,18 @@ properties via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` i
 
 ### Data attributes
 
-| Attribute                                   | Applies to                         | Meaning                         |
-| ------------------------------------------- | ---------------------------------- | ------------------------------- |
-| `data-open` / `data-closed`                 | Trigger, Backdrop, Viewport, Popup | Open state                      |
-| `data-starting-style` / `data-ending-style` | Backdrop, Viewport, Popup          | Enter / exit transition phase   |
-| `data-swiping`                              | Popup, Backdrop                    | A drag is in progress           |
-| `data-snap`                                 | Popup                              | Active snap index               |
-| `data-expanded`                             | Popup                              | Resting at the full-height snap |
-| `data-nested`                               | Popup                              | This drawer is itself nested    |
-| `data-nested-drawer-open`                   | Popup                              | A nested child is open          |
-| `data-nested-drawer-swiping`                | Popup                              | A nested child is being dragged |
-| `data-drawer-handle`                        | Handle                             | Grip / `handleOnly` hit-test    |
-| `data-drawer-no-drag`                       | (consumer-set)                     | Opt a subtree out of dragging   |
+| Attribute                                   | Applies to                         | Meaning                                                                 |
+| ------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------- |
+| `data-open` / `data-closed`                 | Trigger, Backdrop, Viewport, Popup | Open state                                                              |
+| `data-starting-style` / `data-ending-style` | Backdrop, Viewport, Popup          | Enter / exit transition phase                                           |
+| `data-swiping`                              | Popup, Backdrop                    | A drag is in progress (from the first move that commits, not the press) |
+| `data-snap`                                 | Popup                              | Active snap index                                                       |
+| `data-expanded`                             | Popup                              | Resting at the full-height snap                                         |
+| `data-nested`                               | Popup                              | This drawer is itself nested                                            |
+| `data-nested-drawer-open`                   | Popup                              | A nested child is open                                                  |
+| `data-nested-drawer-swiping`                | Popup                              | A nested child is being dragged                                         |
+| `data-drawer-handle`                        | Handle                             | Grip / `handleOnly` hit-test                                            |
+| `data-drawer-no-drag`                       | (consumer-set)                     | Opt a subtree out of dragging                                           |
 
 The headless parts are unstyled. Target a part with your own className (or `render` prop) and combine it with the `data-*` state attributes above.
 
