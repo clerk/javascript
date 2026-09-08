@@ -142,7 +142,13 @@ export const styles = stylex.create({
     borderInlineEndColor: colorVars['--cl-color-border'],
     borderInlineEndStyle: 'solid',
     borderInlineEndWidth: '1px',
-    display: 'flex',
+    // Until measured — before hydration, or the first observer callback — the column renders in
+    // place at any width, so compact CSS hides it rather than stack a tablist over the page. The
+    // sheet's copy is portalled out of the container and never matches.
+    display: {
+      [compact]: 'none',
+      default: 'flex',
+    },
     flexDirection: 'column',
     minHeight: 0,
     minWidth: 0,

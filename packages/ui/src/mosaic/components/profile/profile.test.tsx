@@ -136,6 +136,17 @@ describe('Profile', () => {
     );
   });
 
+  // Unmeasured — before hydration, or the observer's first callback — the column renders in place
+  // at any width; the compact query must hide it, or a phone shows the tablist over the page.
+  it('hides the in-place navigation under the compact query', () => {
+    const probe = stylex.create({
+      hidden: { display: { default: 'flex', '@container cl-profile (max-width: 48rem)': 'none' } },
+    });
+    renderSurface();
+
+    expect(Array.from(screen.getByRole('navigation').classList)).toEqual(expect.arrayContaining(atomsOf(probe.hidden)));
+  });
+
   describe('page title', () => {
     it('is a level-3 heading, and alone outside a profile', () => {
       render(
