@@ -8,7 +8,7 @@ import { ReverificationOTP } from '@clerk/ui/mosaic/features/reverification/pane
 import { ReverificationPasskey } from '@clerk/ui/mosaic/features/reverification/panels/reverification-passkey';
 import { ReverificationPassword } from '@clerk/ui/mosaic/features/reverification/panels/reverification-password';
 import { ReverificationView } from '@clerk/ui/mosaic/features/reverification/reverification.view';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -64,6 +64,7 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
   const [direction, setDirection] = useState<-1 | 1>(1);
   const [methodId, setMethodId] = useState('password');
   const [value, setValue] = useState('');
+  const valueRef = useRef(value);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isPending, setIsPending] = useState(false);
   const [supportRequested, setSupportRequested] = useState(false);
@@ -71,24 +72,27 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
   const navigate = (next: ReverificationStep, nextDirection: -1 | 1) => {
     setDirection(nextDirection);
     setStep(next);
+    valueRef.current = '';
     setValue('');
     setErrorMessage(undefined);
   };
 
   const onValueChange = (nextValue: string) => {
+    valueRef.current = nextValue;
     setValue(nextValue);
     setErrorMessage(undefined);
   };
 
   const submitPassword = async () => {
-    if (!value.trim()) {
+    const password = valueRef.current;
+    if (!password.trim()) {
       setErrorMessage('This field is required.');
       return;
     }
     setIsPending(true);
     await settleAfter(700);
     setIsPending(false);
-    if (value.toLowerCase() === 'error') {
+    if (password.toLowerCase() === 'error') {
       setErrorMessage('That password is incorrect. Try again.');
       return;
     }
@@ -112,14 +116,15 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
   };
 
   const submitBackupCode = async () => {
-    if (!value.trim()) {
+    const code = valueRef.current;
+    if (!code.trim()) {
       setErrorMessage('This field is required.');
       return;
     }
     setIsPending(true);
     await settleAfter(700);
     setIsPending(false);
-    if (value.toLowerCase() === 'error') {
+    if (code.toLowerCase() === 'error') {
       setErrorMessage('That backup code is incorrect. Try again.');
       return;
     }
@@ -147,7 +152,7 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
       return;
     }
     if (step === 'otp') {
-      void submitOtp(value);
+      void submitOtp(valueRef.current);
       return;
     }
     void submitPassword();
