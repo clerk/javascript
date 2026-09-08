@@ -317,7 +317,7 @@ describe('Mosaic Card', () => {
   it('carries no dismiss button in an inline dialog, which nothing closes', () => {
     render(
       <Dialog.Root inline>
-        <Dialog.Popup size='panel'>
+        <Dialog.Popup size='profile'>
           <Card.Root>
             <Card.Header>
               <Card.Title>Account</Card.Title>

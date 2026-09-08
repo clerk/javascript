@@ -673,6 +673,30 @@ describe('Drawer', () => {
       expect(swipeY(popup)).toBe('0px');
     });
 
+    // A dismiss leaves the swipe offset in place for the exit; the next open must not inherit it,
+    // or `shouldDrag` short-circuits past the inner-scroll check and drags a list that should scroll.
+    it('starts the next open at rest after a swipe dismiss', async () => {
+      const user = userEvent.setup();
+      const onOpenChange = vi.fn();
+      render(<DrawerFixture onOpenChange={onOpenChange} />);
+      await user.click(screen.getByTestId('trigger'));
+      stubHeight(screen.getByRole('dialog'), 400);
+      drag(screen.getByRole('dialog'), 0, 200, 200);
+      expect(onOpenChange).toHaveBeenLastCalledWith(false);
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      await user.click(screen.getByTestId('trigger'));
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      const list = screen.getByTestId('scrollable');
+      makeScrollable(list, { scrollHeight: 500, clientHeight: 100, scrollTop: 50 });
+
+      drag(list, 0, 120, 60);
+
+      expect(swipeY(popup)).toBe('');
+      expect(popup).toBeInTheDocument();
+    });
+
     it('does not carry a lost gesture into the next open', async () => {
       const user = userEvent.setup();
       render(<DrawerFixture />);

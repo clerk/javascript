@@ -33,8 +33,12 @@ describe('resolveUserProfilePages', () => {
     ).toEqual(['terms', 'account', 'security']);
   });
 
-  it('lets a custom page shadow a built-in it shares an id with', () => {
+  it('lets a custom page replace a built-in it shares an id with, in its place', () => {
     const shadow: CustomProfilePage = { label: 'Mine', path: 'security', content: null };
-    expect(resolveUserProfilePages(['account', 'security'], [shadow])).toEqual([{ id: 'account' }, { id: 'security' }]);
+    expect(resolveUserProfilePages(['account', 'security', 'billing'], [shadow])).toEqual([
+      { id: 'account' },
+      { id: 'security', custom: shadow },
+      { id: 'billing' },
+    ]);
   });
 });

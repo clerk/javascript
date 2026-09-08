@@ -31,6 +31,9 @@ interface ProfileContextValue {
 
 const ProfileContext = React.createContext<ProfileContextValue | null>(null);
 
+/** The id a `Profile.PageTitle` renders under, so the panel around it can be named by it. */
+const TabPanelContext = React.createContext<string | undefined>(undefined);
+
 /**
  * The width below which the layout is compact — the same `48rem` the container query in
  * `profile.styles.ts` reads, measured here because WHERE the navigation renders is a DOM decision
@@ -59,7 +62,8 @@ function useCompact(node: HTMLElement | null): boolean {
         return;
       }
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      setCompact(width < COMPACT_WIDTH_REM * rem);
+      // `<=`: the container query is `max-width`, which is inclusive.
+      setCompact(width <= COMPACT_WIDTH_REM * rem);
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -131,6 +135,13 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const [navOpen, setNavOpen] = React.useState(false);
   const openNav = React.useCallback(() => setNavOpen(true), []);
   const closeNav = React.useCallback(() => setNavOpen(false), []);
+  // Widening past the threshold unmounts the sheet; the state must go with it, or the sheet would
+  // be back the moment the layout narrowed again, unasked.
+  React.useEffect(() => {
+    if (!compact) {
+      setNavOpen(false);
+    }
+  }, [compact]);
   // The caret that opened the sheet belongs to the page the choice just left, so the sheet's own
   // return-focus lands on nothing. Focus goes to the caret of the page that is now showing — the
   // same control, on the destination.
@@ -372,6 +383,7 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
   ref,
 ) {
   const profile = React.useContext(ProfileContext);
+  const panelTitleId = React.useContext(TabPanelContext);
   return useRender({
     defaultTagName: 'div',
     render,
@@ -386,6 +398,7 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
       ...rest,
       children: (
         <Heading
+          id={panelTitleId}
           render={<h3 />}
           size='2xl'
         >
@@ -479,14 +492,22 @@ const TabPanel = React.forwardRef<HTMLDivElement, ProfileTabPanelProps>(function
   { value, shouldForceMount, className, style, ...rest },
   ref,
 ) {
+  const { compact } = useProfileContext('Profile.TabPanel');
+  const titleId = React.useId();
   return (
-    <Tabs.Panel
-      ref={ref}
-      value={value}
-      shouldForceMount={shouldForceMount}
-      {...mergeStyleProps(themeProps('profile-tab-panel', { value }), className, style)}
-      {...rest}
-    />
+    <TabPanelContext.Provider value={titleId}>
+      <Tabs.Panel
+        ref={ref}
+        value={value}
+        shouldForceMount={shouldForceMount}
+        // Compact, the tab it would be named by exists only while the sheet is open, so the panel
+        // is named by its own title instead — `Profile.PageTitle` takes this id. Spread only then:
+        // an explicit `undefined` would displace the primitive's own `aria-labelledby`.
+        {...(compact ? { 'aria-labelledby': titleId } : null)}
+        {...mergeStyleProps(themeProps('profile-tab-panel', { value }), className, style)}
+        {...rest}
+      />
+    </TabPanelContext.Provider>
   );
 });
 

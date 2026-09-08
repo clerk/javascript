@@ -245,6 +245,30 @@ describe('Profile', () => {
       await waitFor(() => expect(screen.getByRole('button', { name: 'Security' })).toHaveFocus());
     });
 
+    // The tab a panel is normally named by exists only while the sheet is open, so compact the
+    // panel is named by its own title.
+    it('names the visible panel by its title while the tablist is away', () => {
+      renderSurface();
+      act(() => observe?.(400));
+      const panel = screen.getByRole('tabpanel');
+      const title = screen.getByRole('heading', { level: 3, name: 'Account' });
+      expect(panel).toHaveAttribute('aria-labelledby', title.id);
+      expect(panel).toHaveAccessibleName('Account');
+    });
+
+    it('closes the sheet when the layout widens, and does not bring it back on narrowing', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(400));
+      await user.click(screen.getByRole('button', { name: 'Account' }));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      act(() => observe?.(1000));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      act(() => observe?.(400));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
     it('returns the tablist to the column when the width comes back', () => {
       renderSurface();
       act(() => observe?.(400));

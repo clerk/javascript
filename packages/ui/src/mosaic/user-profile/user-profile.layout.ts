@@ -24,17 +24,23 @@ export function getAvailableUserProfilePages(pages: UserProfilePages): UserProfi
 
 /**
  * The navigation, in order: the built-ins the instance shows, then the consumer's pages, with
- * `order` moving any of them by id (a custom page's id is its `path`). Same rule as the
- * UserButton's menu — see `applyOrder`.
+ * `order` moving any of them by id (a custom page's id is its `path`). A custom page given a
+ * built-in's id REPLACES it, in its place — `applyOrder`'s rule, applied before the order is.
  */
 export function resolveUserProfilePages(
   builtIn: readonly UserProfilePageId[],
   customPages: readonly CustomProfilePage[] = [],
   order?: readonly string[],
 ): UserProfileNavEntry[] {
+  const customById = new Map(customPages.map(page => [page.path, page]));
   const entries: UserProfileNavEntry[] = [
-    ...builtIn.map(id => ({ id })),
-    ...customPages.map(page => ({ id: page.path, custom: page })),
+    ...builtIn.map((id): UserProfileNavEntry => {
+      const custom = customById.get(id);
+      return custom ? { id, custom } : { id };
+    }),
+    ...customPages
+      .filter(page => !builtIn.includes(page.path as UserProfilePageId))
+      .map(page => ({ id: page.path, custom: page })),
   ];
   return applyOrder(order, entries, entry => entry.id);
 }

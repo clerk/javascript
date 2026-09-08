@@ -109,6 +109,11 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     pid.current = null;
     removeWindowRelease.current?.();
     removeWindowRelease.current = null;
+    // A dismiss leaves the swipe where the finger let go, on purpose — the exit slides from there.
+    // The next open starts at rest, and `shouldDrag` reads this ref before it looks at inner
+    // scroll, so a stale value would drag the sheet where a list should have scrolled.
+    cfg.current.setSwipe(0);
+    cfg.current.setVar(DrawerCssVars.swipeProgress, '0');
     setIsDragging(false);
   }, [open]);
 
