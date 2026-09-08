@@ -41,6 +41,7 @@ import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
+  getSSOFallbackFactor,
   hasMultipleEnterpriseConnections,
   SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
   useHandleAuthenticateWithPasskey,
@@ -241,7 +242,12 @@ function SignInStartInternal(): JSX.Element {
         }
         switch (res.status) {
           case 'needs_first_factor': {
-            if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            if (
+              !hasOnlyEnterpriseSSOFirstFactors(res) ||
+              hasMultipleEnterpriseConnections(res.supportedFirstFactors) ||
+              // The fallback is only reachable from a screen, so stop short of the automatic redirect.
+              !!getSSOFallbackFactor(res)
+            ) {
               return navigate('factor-one');
             }
 
@@ -418,7 +424,12 @@ function SignInStartInternal(): JSX.Element {
           }
           break;
         case 'needs_first_factor': {
-          if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+          if (
+            !hasOnlyEnterpriseSSOFirstFactors(res) ||
+            hasMultipleEnterpriseConnections(res.supportedFirstFactors) ||
+            // The fallback is only reachable from a screen, so stop short of the automatic redirect.
+            !!getSSOFallbackFactor(res)
+          ) {
             if (options?.resetPasswordIntent) {
               return navigate('factor-one', {
                 searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),

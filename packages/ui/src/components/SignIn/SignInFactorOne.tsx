@@ -13,7 +13,7 @@ import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import type { AlternativeMethodsMode } from './AlternativeMethods';
 import { AlternativeMethods } from './AlternativeMethods';
-import { hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
+import { getSSOFallbackFactor, hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -23,6 +23,7 @@ import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
+import { SignInFactorOneSSOFallback } from './SignInFactorOneSSOFallback';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
@@ -109,6 +110,10 @@ function SignInFactorOneInternal(): JSX.Element {
     supportedFirstFactors,
   });
 
+  // Frozen on mount: a later response may drop the field, which would otherwise unmount the
+  // fallback screens mid-flow.
+  const ssoFallbackFactor = React.useRef(getSSOFallbackFactor(signIn)).current;
+
   const resetPasswordFactor = useResetPasswordFactor();
   const resetPasswordIntent = router.queryParams[SIGN_IN_RESET_PASSWORD_INTENT_PARAM] === 'true';
 
@@ -161,6 +166,15 @@ function SignInFactorOneInternal(): JSX.Element {
       prevCurrentFactor: prev.currentFactor,
     }));
   };
+
+  /**
+   * An enterprise-routed sign-in on an instance that allows a fallback owns its own screens,
+   * including the enterprise connection choice, so that the fallback stays reachable from them.
+   * @experimental
+   */
+  if (ssoFallbackFactor) {
+    return <SignInFactorOneSSOFallback fallbackFactor={ssoFallbackFactor} />;
+  }
 
   /**
    * Prompt to choose between a list of enterprise connections as supported first factors

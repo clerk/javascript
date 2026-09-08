@@ -51,6 +51,16 @@ export interface SignInResource extends ClerkResource {
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
   supportedSecondFactors: SignInSecondFactor[] | null;
+  /**
+   * Factors an enterprise-routed user can fall back to when they cannot reach their
+   * identity provider. Kept out of `supportedFirstFactors` so consumers that assert
+   * that list is purely enterprise keep working.
+   *
+   * Its presence says the instance allows a fallback, never that this particular
+   * user may use one — the API does not disclose that, and the UI must not branch
+   * on it.
+   */
+  ssoFallbackFirstFactors: SignInFirstFactor[] | null;
   clientTrustState?: ClientTrustState;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
@@ -130,6 +140,11 @@ export interface SignInJSON extends ClerkResourceJSON {
   user_data: UserDataJSON;
   supported_first_factors: SignInFirstFactorJSON[];
   supported_second_factors: SignInSecondFactorJSON[];
+  /**
+   * Present only when the instance has opted into SSO fallback and the sign-in is
+   * still owed its first factor. Absent everywhere else.
+   */
+  sso_fallback_first_factors?: SignInFirstFactorJSON[];
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;

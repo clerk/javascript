@@ -339,6 +339,11 @@ export interface SignInFutureResource {
   readonly supportedSecondFactors: SignInSecondFactor[];
 
   /**
+   * Factors an enterprise-routed user can fall back to when they cannot reach their identity provider. Empty unless the instance allows a fallback; its contents never indicate whether this particular user is permitted to use one.
+   */
+  readonly ssoFallbackFirstFactors: SignInFirstFactor[];
+
+  /**
    * The current status of the sign-in.
    * <ul>
    * <li>`'complete'` - The sign-in process has been completed successfully.</li>

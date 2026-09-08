@@ -1485,6 +1485,9 @@ export const enUS: LocalizationResource = {
       subtitle: 'Select the enterprise account with which you wish to continue.',
       title: 'Choose your enterprise account',
     },
+    enterpriseSSO: {
+      formButtonPrimary: 'Continue with SSO',
+    },
     forgotPassword: {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
@@ -1570,6 +1573,15 @@ export const enUS: LocalizationResource = {
       subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
       titleCombined: 'Continue to {{applicationName}}',
+    },
+    ssoFallback: {
+      actionLink: "Can't use SSO?",
+      code: {
+        resendButton: "Didn't receive a code? Resend",
+        subtitle: 'to continue to {{applicationName}}',
+        title: 'Check your email',
+      },
+      notice: 'Your organization requires single sign-on. Continuing without it is recorded.',
     },
     totpMfa: {
       formTitle: 'Verification code',
