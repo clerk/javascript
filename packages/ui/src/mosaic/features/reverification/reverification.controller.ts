@@ -226,7 +226,7 @@ export const reverificationMachine = createMachine({
         RESET: { actions: assign(() => ({ abortRequested: true })) },
       },
       invoke: fromPromise(submit, {
-        onDone: afterResult,
+        onDone: [abortAfterInvoke, ...afterResult],
         onError: [
           abortAfterInvoke,
           {
