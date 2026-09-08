@@ -98,7 +98,7 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "^4.7.0",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "5.0.0",
     "chalk": "4.1.2",
     "citty": "^0.2.2",
     "conventional-changelog-conventionalcommits": "^4.6.3",
@@ -153,7 +153,7 @@
     "typescript-eslint": "8.58.0",
     "unrun": "0.3.1",
     "uuid": "11.1.1",
-    "vitest": "4.1.11",
+    "vitest": "5.0.0",
     "zx": "catalog:repo"
   },
   "packageManager": "pnpm@10.34.5+sha512.a4ee05f2f73658255bd6a89859c065a45c28a57daefae2c893a168ee2b73168c37b91e83e57ea67654ad03f03031746430e8bce38e362e042605fb8abc80192e",
