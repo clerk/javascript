@@ -29,8 +29,8 @@ describe('resolveUserButtonLayout, where each action lands', () => {
     expect(resolve('combined').actions).toEqual({
       header: ['inviteMembers', 'manageLead'],
       organizationsHeading: ['createOrganization', 'manageAccount', 'signOut'],
-      sessionsHeading: ['addAccount'],
-      footer: ['signOutAll'],
+      organizationsFooter: ['createOrganization'],
+      footer: ['switchAccount', 'signOutAll'],
     });
   });
 
@@ -38,8 +38,8 @@ describe('resolveUserButtonLayout, where each action lands', () => {
     expect(resolve('organization').actions).toEqual({
       header: ['inviteMembers', 'manageLead'],
       organizationsHeading: [],
-      sessionsHeading: [],
-      footer: ['createOrganization'],
+      organizationsFooter: ['createOrganization'],
+      footer: [],
     });
   });
 
@@ -47,8 +47,8 @@ describe('resolveUserButtonLayout, where each action lands', () => {
     expect(resolve('user').actions).toEqual({
       header: ['signOut', 'manageLead'],
       organizationsHeading: [],
-      sessionsHeading: [],
-      footer: ['addAccount', 'signOutAll'],
+      organizationsFooter: [],
+      footer: ['switchAccount', 'signOutAll'],
     });
   });
 });
@@ -58,18 +58,14 @@ describe('resolveUserButtonLayout, what the data settles', () => {
     expect(resolve('combined', { activeOrganization: null }).actions.header).toEqual(['manageLead']);
   });
 
-  // "All accounts" is one account, and the account's own row already signs out of it.
-  it('offers no sign-out of all accounts where there is only the one', () => {
-    expect(resolve('user', { additionalSessions: [] }).actions.footer).toEqual(['addAccount']);
-  });
-
-  it('drops "Add account" to the foot where no accounts heading renders to carry it', () => {
-    const layout = resolve('combined', { additionalSessions: [] });
-
-    expect(layout.showSessionsHeading).toBe(false);
-    expect(layout.actions.sessionsHeading).toEqual([]);
-    expect(layout.actions.footer).toEqual(['addAccount']);
-  });
+  // With no second account the flyout would open onto one row, so the foot offers that row instead.
+  // "All accounts" is that one account too, and the account's own row already signs out of it.
+  it.each<UserButtonMode>(['combined', 'user'])(
+    'leaves the foot "Add account" alone in %s mode where there is one account',
+    mode => {
+      expect(resolve(mode, { additionalSessions: [] }).actions.footer).toEqual(['addAccount']);
+    },
+  );
 });
 
 describe('resolveUserButtonLayout, which sections render', () => {
@@ -92,11 +88,6 @@ describe('resolveUserButtonLayout, which sections render', () => {
 
     expect(resolve('combined', data).showOrganizations).toBe(false);
     expect(resolve('combined', { ...data, invitations: [invitation] }).showOrganizations).toBe(true);
-  });
-
-  it('lists the accounts unheaded in user mode, and not at all in organization mode', () => {
-    expect(resolve('user')).toMatchObject({ showSessions: true, showSessionsHeading: false });
-    expect(resolve('organization')).toMatchObject({ showSessions: false, showSessionsHeading: false });
   });
 
   it('carries no organizations in user mode', () => {

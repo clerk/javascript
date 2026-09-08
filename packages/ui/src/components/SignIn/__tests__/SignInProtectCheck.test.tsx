@@ -467,4 +467,154 @@ describe('SignInProtectCheck', () => {
       expect(fixtures.signIn.submitProtectCheck).toHaveBeenCalledWith({ proofToken: 'proof-retry' });
     });
   });
+
+  describe('a sign-in that is pending an OAuth account transfer', () => {
+    // An OAuth sign-in for an identity with no account yet comes back as `needs_identifier`
+    // with a transferable first-factor verification: the server has recorded the transfer and
+    // the client is expected to complete it as a sign-up. None of the interactive sign-in
+    // steps apply, so before this the status fell to the default arm and returned to the
+    // start form — which renders the transfer's error and then resets the attempt, discarding
+    // the transfer for good.
+
+    it('resumes the callback continuation instead of returning to the start form', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledWith(
+          expect.objectContaining({ continuation: 'transfer_to_sign_up' }),
+          expect.any(Function),
+        );
+      });
+      // Dropping this param routes a completed transfer whose session has a pending task with
+      // the component's base URL rather than its mounted route.
+      expect(vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mock.calls[0][0]).toHaveProperty(
+        '__internal_navigateOnSetActive',
+      );
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('..');
+    });
+
+    it('resumes even when the resolved sign-in no longer carries the transferable marker', async () => {
+      // `SignIn.fromJSON` replaces `firstFactorVerification` wholesale on every write, so the
+      // marker that routed us here is not guaranteed to survive `submitProtectCheck`. The
+      // component latches it at mount for exactly this case; re-reading it afterwards would
+      // silently fall back to the broken path.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: null },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledWith(
+          expect.objectContaining({ continuation: 'transfer_to_sign_up' }),
+          expect.any(Function),
+        );
+      });
+      // Dropping this param routes a completed transfer whose session has a pending task with
+      // the component's base URL rather than its mounted route.
+      expect(vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mock.calls[0][0]).toHaveProperty(
+        '__internal_navigateOnSetActive',
+      );
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('..');
+    });
+
+    it('degrades to the pre-existing destination when the runtime predates the resume method', async () => {
+      // @clerk/ui reaches apps independently of clerk-js, so a newer card can meet a runtime
+      // that has no `__internal_resumeAfterProtectCheck`. An unconditional call throws there and
+      // strands the very transfer this card exists to resume, so the call is feature-detected.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      (fixtures.clerk as unknown as Record<string, unknown>).__internal_resumeAfterProtectCheck = undefined;
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('..'));
+    });
+
+    it('surfaces a message when the resumed continuation fails with a non-Clerk error', async () => {
+      // `handleError` re-throws what it does not recognise, and the continuation can raise a plain
+      // Error (a transient fetch failure, or a callback that did not complete). That throw escaped
+      // the void-invoked challenge run, leaving the card with no spinner, no message and no retry --
+      // stranding the user on the very flow this card exists to resume.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      } as unknown as SignInResource);
+      vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mockRejectedValue(new Error('Failed to fetch'));
+
+      const { findByText } = render(<SignInProtectCheck />, { wrapper });
+
+      expect(await findByText(/unable to complete action at this time/i)).toBeInTheDocument();
+    });
+
+    it('leaves an ordinary gated sign-in on the existing path', async () => {
+      // The guard above must not divert every gated sign-in into the OAuth router.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: null },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('..'));
+      expect(fixtures.clerk.__internal_resumeAfterProtectCheck).not.toHaveBeenCalled();
+    });
+  });
+
+  it('routes stale standalone protect-check visits back to the flow start', async () => {
+    // The sign-up card has had this guard since it shipped; without it this card renders an
+    // empty shell forever on a back-button or a bookmarked URL.
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithEmailAddress();
+    });
+    fixtures.router.currentPath = '/sign-in/protect-check';
+    fixtures.router.fullPath = '/sign-in';
+    fixtures.router.indexPath = '/sign-in';
+
+    const { queryByText } = render(<SignInProtectCheck />, { wrapper });
+
+    // The card shell must not flash while the redirect below kicks in.
+    expect(queryByText(/verifying your request/i)).not.toBeInTheDocument();
+
+    await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('/sign-in'));
+    expect(mockExecute).not.toHaveBeenCalled();
+  });
 });

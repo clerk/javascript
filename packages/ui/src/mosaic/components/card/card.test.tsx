@@ -1,12 +1,27 @@
-import { render, screen } from '@testing-library/react';
+import * as stylex from '@stylexjs/stylex';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { Text } from '../text';
+import { Dialog } from '../dialog';
 import { Card } from './card';
 
+const compactCard = '@container card (max-width: 20rem)' as const;
+
+const responsiveLayout = stylex.create({
+  root: {
+    containerName: 'card',
+    containerType: 'inline-size',
+  },
+  footer: {
+    display: { [compactCard]: 'grid', default: 'flex' },
+    gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
+  },
+});
+
 describe('Mosaic Card', () => {
-  it('renders each compound slot with the default alignment', () => {
+  it('renders each compound slot with its stable class', () => {
     render(
       <Card.Root data-testid='root'>
         <Card.Header data-testid='header'>Header</Card.Header>
@@ -16,27 +31,25 @@ describe('Mosaic Card', () => {
     );
 
     expect(screen.getByTestId('root')).toHaveClass('cl-card-root');
-    expect(screen.getByTestId('root')).toHaveAttribute('data-alignment', 'start');
     expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'card');
     expect(screen.getByTestId('header')).toHaveClass('cl-card-header');
-    expect(screen.getByTestId('header')).toHaveAttribute('data-alignment', 'start');
     expect(screen.getByTestId('content')).toHaveClass('cl-card-content');
     expect(screen.getByTestId('footer')).toHaveClass('cl-card-footer');
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'card');
   });
 
-  it('reflects centered alignment on the root and header', () => {
+  it('uses grid to stack the footer only when its card container is compact', () => {
     render(
-      <Card.Root
-        alignment='center'
-        data-testid='root'
-      >
-        <Card.Header data-testid='header'>Header</Card.Header>
+      <Card.Root data-testid='root'>
+        <Card.Footer data-testid='footer'>Footer</Card.Footer>
       </Card.Root>,
     );
 
-    expect(screen.getByTestId('root')).toHaveAttribute('data-alignment', 'center');
-    expect(screen.getByTestId('header')).toHaveAttribute('data-alignment', 'center');
+    const atoms = (style: stylex.StyleXStyles) =>
+      (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
+
+    expect(screen.getByTestId('root')).toHaveClass(...atoms(responsiveLayout.root));
+    expect(screen.getByTestId('footer')).toHaveClass(...atoms(responsiveLayout.footer));
   });
 
   it('reflects flush elevation on the root and footer', () => {
@@ -65,18 +78,6 @@ describe('Mosaic Card', () => {
 
     expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'overlay');
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
-  });
-
-  it('provides the neutral text color to header copy', () => {
-    render(
-      <Card.Root>
-        <Card.Header>
-          <Text>Supporting copy</Text>
-        </Card.Header>
-      </Card.Root>,
-    );
-
-    expect(screen.getByText('Supporting copy')).toHaveAttribute('data-color', 'neutral');
   });
 
   it('lets consumer className and style win on every slot', () => {
@@ -170,16 +171,193 @@ describe('Mosaic Card', () => {
     expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
   });
 
+  it('renders the title and description slots', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title data-testid='title'>Review terms</Card.Title>
+          <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('title').tagName).toBe('H2');
+    expect(screen.getByTestId('title')).toHaveClass('cl-card-title');
+    expect(screen.getByTestId('description').tagName).toBe('P');
+    expect(screen.getByTestId('description')).toHaveClass('cl-card-description');
+  });
+
+  // Nothing above named the card, so the parts carry no borrowed id.
+  it('leaves the title and description unidentified outside a labelled surface', () => {
+    render(
+      <Card.Root>
+        <Card.Title data-testid='title'>Review terms</Card.Title>
+        <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('title')).not.toHaveAttribute('id');
+    expect(screen.getByTestId('description')).not.toHaveAttribute('id');
+  });
+
+  it('names and describes the dialog it is rendered inside', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title data-testid='title'>Review terms</Card.Title>
+              <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    const popup = screen.getByRole('dialog');
+    expect(popup).toHaveAttribute('aria-labelledby', screen.getByTestId('title').id);
+    expect(popup).toHaveAttribute('aria-describedby', screen.getByTestId('description').id);
+    expect(popup).toHaveAccessibleName('Review terms');
+    expect(popup).toHaveAccessibleDescription('Accept before you continue.');
+  });
+
+  // `Dialog.Root` spans the trigger as well as the popup, so only the popup may hand out its ids.
+  it('withholds the dialog ids from a card outside the popup', async () => {
+    const user = userEvent.setup();
+    render(
+      <Dialog.Root>
+        <Card.Root renderBranding={false}>
+          <Card.Title data-testid='outside-title'>Terms</Card.Title>
+        </Card.Root>
+        <Dialog.Trigger>Open</Dialog.Trigger>
+        <Dialog.Popup>
+          <Dialog.Title>Review terms</Dialog.Title>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.getByTestId('outside-title')).not.toHaveAttribute('id');
+
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Review terms');
+  });
+
+  // The id is load-bearing inside a dialog: the popup points `aria-labelledby` at it, so a caller
+  // id that displaced it would silently leave the dialog unnamed.
+  it('keeps the dialog id over an explicit one, and stays named', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Title
+              id='custom-title'
+              data-testid='title'
+            >
+              Review terms
+            </Card.Title>
+            <Card.Description
+              id='custom-description'
+              data-testid='description'
+            >
+              Read them before you continue.
+            </Card.Description>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(screen.getByTestId('title')).not.toHaveAttribute('id', 'custom-title');
+    expect(screen.getByTestId('description')).not.toHaveAttribute('id', 'custom-description');
+    expect(dialog).toHaveAttribute('aria-labelledby', screen.getByTestId('title').id);
+    expect(dialog).toHaveAttribute('aria-describedby', screen.getByTestId('description').id);
+    expect(dialog).toHaveAccessibleName('Review terms');
+    expect(dialog).toHaveAccessibleDescription('Read them before you continue.');
+  });
+
+  it('takes an explicit id outside a dialog, where no surface claims one', () => {
+    render(
+      <Card.Root>
+        <Card.Title
+          id='custom-title'
+          data-testid='title'
+        >
+          Review terms
+        </Card.Title>
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('title')).toHaveAttribute('id', 'custom-title');
+  });
+
+  it('carries the dialog dismiss button in the header', async () => {
+    const user = userEvent.setup();
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title>Review terms</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    const close = screen.getByRole('button', { name: 'Close' });
+    // First in the DOM, so it takes the dialog's opening focus.
+    await waitFor(() => expect(close).toHaveFocus());
+
+    await user.click(close);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('carries no dismiss button in an inline dialog, which nothing closes', () => {
+    render(
+      <Dialog.Root inline>
+        <Dialog.Popup size='panel'>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title>Account</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Account');
+  });
+
+  it('carries no dismiss button in a header outside a dialog', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Review terms</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+  });
+
   it('supports custom elements through render on every slot', () => {
     render(
       <Card.Root render={props => <section {...props} />}>
         <Card.Header render={props => <header {...props}>Header</header>} />
+        <Card.Title render={props => <h3 {...props}>Title</h3>} />
+        <Card.Description render={props => <span {...props}>Description</span>} />
         <Card.Content render={props => <main {...props}>Content</main>} />
         <Card.Footer render={props => <footer {...props}>Footer</footer>} />
       </Card.Root>,
     );
 
     expect(screen.getByText('Header').tagName).toBe('HEADER');
+    expect(screen.getByText('Title').tagName).toBe('H3');
+    expect(screen.getByText('Description').tagName).toBe('SPAN');
     expect(screen.getByText('Content').tagName).toBe('MAIN');
     expect(screen.getByText('Footer').tagName).toBe('FOOTER');
     expect(screen.getByText('Header').closest('section')).toHaveClass('cl-card-root');

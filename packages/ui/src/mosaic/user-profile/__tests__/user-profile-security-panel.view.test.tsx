@@ -57,7 +57,7 @@ function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) 
 
 describe('UserProfileSecurityPanelView', () => {
   it('composes authentication, active devices, and the danger zone', () => {
-    renderView({ onDeleteAccount: vi.fn() });
+    renderView({ onDeleteAccount: vi.fn(() => Promise.resolve()) });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
@@ -83,7 +83,7 @@ describe('UserProfileSecurityPanelView', () => {
     const onAddMfaMethod = vi.fn();
     const onSignOutDevice = vi.fn();
     const onSignOutAllOtherDevices = vi.fn();
-    const onDeleteAccount = vi.fn();
+    const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
 
     renderView({
@@ -107,7 +107,6 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('menuitem', { name: 'SMS verification' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
-    await user.click(screen.getByRole('button', { name: 'Delete account' }));
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
@@ -117,6 +116,12 @@ describe('UserProfileSecurityPanelView', () => {
     const otherDevices = screen.getByRole('region', { name: 'Other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+
+    // The danger zone confirms in a modal, so it goes last: nothing else is clickable while it is open.
+    await user.click(screen.getByRole('button', { name: 'Delete account' }));
+    const deleteDialog = screen.getByRole('dialog');
+    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
+    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
     expect(onChangePassword).toHaveBeenCalledOnce();
     expect(onAddPasskey).toHaveBeenCalledOnce();

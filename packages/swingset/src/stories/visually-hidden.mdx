@@ -1,0 +1,51 @@
+import * as VisuallyHiddenStories from './visually-hidden.stories';
+
+# VisuallyHidden
+
+VisuallyHidden removes content from the page visually while leaving it in the accessibility tree, so screen readers still announce it. Reach for it when the surrounding UI already carries the meaning visually — an icon-only control, a redundant column header — or when nothing should be painted at all, as with a live region. It renders a `<span>` by default; pass `render` where a `<span>` is not valid in context.
+
+Prefer it over `display: none` or `visibility: hidden`, which remove the content from the accessibility tree too, and over `aria-label` when the text is real copy that should be translated and selectable by assistive tech.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={VisuallyHiddenStories}
+/>
+
+## Props
+
+<PropTable
+  meta={VisuallyHiddenStories.meta}
+  extra={[{ name: 'render', type: '(props) => ReactNode' }]}
+/>
+
+## Usage
+
+<Usage
+  component='VisuallyHidden'
+  module='@clerk/ui/mosaic/components/visually-hidden'
+>
+  Sign out
+</Usage>
+
+---
+
+## Examples
+
+### Live region
+
+<Story
+  name='LiveRegion'
+  storyModule={VisuallyHiddenStories}
+  composition={[
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Text', href: '/components/text', layer: 'Components' },
+  ]}
+/>
+
+A live region has no visual presence, so it is hidden rather than positioned. `render` supplies the `role` and `aria-live` the announcement needs.
+
+### Field labels
+
+`Field.Label` applies the same style through its own `visuallyHidden` prop, so a field whose purpose is clear from context keeps its accessible name without rendering a label. See [Field](/components/field).

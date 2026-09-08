@@ -7,14 +7,9 @@ export const styles = stylex.create({
   trigger: {
     padding: 0,
     borderStyle: 'none',
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
     backgroundColor: 'transparent',
     cursor: 'pointer',
     display: 'inline-flex',
-    outlineOffset: '2px',
   },
 
   // A labelled trigger sits in a host app's chrome, so it stays flush like the avatar-only form

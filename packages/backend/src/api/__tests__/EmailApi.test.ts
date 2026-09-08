@@ -25,6 +25,7 @@ describe('EmailApi', () => {
     status: 'queued',
     data: null,
     delivered_by_clerk: true,
+    suppression_reason: null,
   };
 
   it('sends a transactional email and snake_cases the body', async () => {
@@ -57,6 +58,107 @@ describe('EmailApi', () => {
     expect(response.toEmailAddress).toBe('admin@acme.com');
     expect(response.status).toBe('queued');
     expect(response.deliveredByClerk).toBe(true);
+  });
+
+  it('sends an idempotency key without adding it to the body', async () => {
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/email',
+        validateHeaders(async ({ request }) => {
+          expect(request.headers.get('Idempotency-Key')).toBe('campaign-123-contact-456');
+          const body = await request.json();
+          expect(body).not.toHaveProperty('idempotency_key');
+          return HttpResponse.json(mockEmail);
+        }),
+      ),
+    );
+
+    await apiClient.emails.create(
+      {
+        to: { address: 'admin@acme.com' },
+        from: { address: 'noreply@acme.com' },
+        subject: 'Hello',
+        html: '<p>hi</p>',
+      },
+      { idempotencyKey: 'campaign-123-contact-456' },
+    );
+  });
+
+  it.each([
+    ['an empty value', ''],
+    ['a null value', null],
+    ['a numeric value', 123],
+    ['unsupported characters', 'campaign:123'],
+    ['more than 255 characters', 'a'.repeat(256)],
+  ])('rejects idempotency keys with %s before sending a request', async (_, idempotencyKey) => {
+    let requestCount = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email', () => {
+        requestCount += 1;
+        return HttpResponse.json(mockEmail);
+      }),
+    );
+
+    await expect(
+      apiClient.emails.create(
+        {
+          to: { address: 'admin@acme.com' },
+          from: { address: 'noreply@acme.com' },
+          subject: 'Hello',
+          html: '<p>hi</p>',
+        },
+        // Exercise the runtime boundary that exists for JavaScript consumers.
+        { idempotencyKey: idempotencyKey as string },
+      ),
+    ).rejects.toThrow('Idempotency key must contain only ASCII letters, digits, underscores, and hyphens');
+    expect(requestCount).toBe(0);
+  });
+
+  it('gets the stored provider-acceptance status', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/email/ema_123',
+        validateHeaders(() => HttpResponse.json({ ...mockEmail, status: 'accepted' })),
+      ),
+    );
+
+    const response = await apiClient.emails.get('ema_123');
+    expect(response.id).toBe('ema_123');
+    expect(response.status).toBe('accepted');
+  });
+
+  it('surfaces transactional suppression state', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/email/ema_123',
+        validateHeaders(() =>
+          HttpResponse.json({
+            ...mockEmail,
+            status: 'suppressed',
+            delivered_by_clerk: false,
+            suppression_reason: 'application_communication_lock',
+          }),
+        ),
+      ),
+    );
+
+    const response = await apiClient.emails.get('ema_123');
+    expect(response.status).toBe('suppressed');
+    expect(response.deliveredByClerk).toBe(false);
+    expect(response.suppressionReason).toBe('application_communication_lock');
+  });
+
+  it('rejects an empty email ID before sending a request', async () => {
+    let requestCount = 0;
+    server.use(
+      http.get('https://api.clerk.test/v1/email/:emailId', () => {
+        requestCount += 1;
+        return HttpResponse.json(mockEmail);
+      }),
+    );
+
+    await expect(apiClient.emails.get('')).rejects.toThrow('A valid resource ID is required.');
+    expect(requestCount).toBe(0);
   });
 
   it('sends a transactional email with a text body', async () => {

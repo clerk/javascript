@@ -61,6 +61,12 @@ export type UseOrganizationParams = {
    * </ul>
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
+  /**
+   * Skip the development prompt that offers to enable Organizations.
+   *
+   * @internal
+   */
+  __internal_skipAttemptToEnableOrganizations?: boolean;
 };
 
 /**
@@ -275,10 +281,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
     invitations: invitationsListParams,
+    __internal_skipAttemptToEnableOrganizations,
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
-  useAttemptToEnableOrganizations('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization', {
+    enabled: !__internal_skipAttemptToEnableOrganizations,
+  });
 
   const organization = useOrganizationBase();
   const session = useSessionBase();

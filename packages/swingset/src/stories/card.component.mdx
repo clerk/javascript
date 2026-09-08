@@ -21,19 +21,11 @@ A styled surface container that groups related content into Header, Content, and
 import { Card } from '@clerk/ui/mosaic/components/card';
 
 <Card.Root>
-  <Card.Header>Heading</Card.Header>
+  <Card.Header>
+    <Card.Title>Title</Card.Title>
+    <Card.Description>Description</Card.Description>
+  </Card.Header>
   <Card.Content>Body content.</Card.Content>
   <Card.Footer>Footer actions</Card.Footer>
 </Card.Root>
 ```
-
----
-
-## Examples
-
-### Centered
-
-<Story
-  name='Centered'
-  storyModule={CardStories}
-/>

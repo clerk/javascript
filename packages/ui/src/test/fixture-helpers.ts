@@ -239,15 +239,39 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     expiresAt?: number;
     uiHints?: Record<string, string>;
     sdkUrl?: string;
+    /**
+     * Set for an OAuth sign-in that has no account yet: the server has recorded the account
+     * transfer and marked the first factor `transferable`, so the flow's continuation is a
+     * sign-up rather than any interactive sign-in step.
+     */
+    pendingOAuthTransfer?: boolean;
+    /** Overrides the gated status; `needs_identifier` is what a pending transfer carries. */
+    status?: SignInJSON['status'];
   }) => {
-    const { expiresAt, uiHints, sdkUrl = 'https://protect.example.com/sdk.js' } = params || {};
+    const {
+      expiresAt,
+      uiHints,
+      sdkUrl = 'https://protect.example.com/sdk.js',
+      pendingOAuthTransfer = false,
+      status = 'needs_protect_check',
+    } = params || {};
     baseClient.sign_in = {
       id: 'sia_2HseAXFGN12eqlwARPMxyyUa9o9',
-      status: 'needs_protect_check',
+      status,
       identifier: 'test@clerk.com',
       supported_first_factors: [],
       supported_second_factors: [],
-      first_factor_verification: null,
+      first_factor_verification: pendingOAuthTransfer
+        ? {
+            status: 'transferable',
+            strategy: 'oauth_google',
+            error: {
+              code: 'external_account_not_found',
+              message: 'Invalid external account',
+              long_message: 'The External Account was not found.',
+            },
+          }
+        : null,
       second_factor_verification: null,
       created_session_id: null,
       protect_check: {

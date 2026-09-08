@@ -28,6 +28,8 @@ describe('User', () => {
       strategy: 'oauth_dropbox',
       redirectUrl: 'https://www.example.com',
       additionalScopes: ['view'],
+      oidcPrompt: 'consent',
+      oidcLoginHint: 'test@test.com',
     });
 
     // @ts-ignore
@@ -38,6 +40,8 @@ describe('User', () => {
         redirect_url: 'https://www.example.com',
         strategy: 'oauth_dropbox',
         additional_scope: ['view'],
+        oidc_prompt: 'consent',
+        oidc_login_hint: 'test@test.com',
       },
     });
   });

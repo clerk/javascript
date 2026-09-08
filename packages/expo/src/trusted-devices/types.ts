@@ -1,47 +1,37 @@
-import type { SetActive, SignInResource, SignInStatus } from '@clerk/shared/types';
+import type {
+  BiometricCredential,
+  BiometricCredentialAvailability,
+  BiometricCredentialPlatform,
+  BiometricCredentialPolicy,
+  BiometricCredentialStatus,
+  BiometricCredentialUnavailableReason,
+  BiometricSignInResult,
+  GetBiometricCredentialAvailabilityParams,
+  SignInWithBiometricsParams,
+} from '../biometric-credentials/types';
 
-export type TrustedDeviceUnavailableReason =
-  | 'environment_unavailable'
-  | 'native_api_disabled'
-  | 'feature_disabled'
-  | 'unsupported_platform'
-  | 'biometric_authentication_unavailable'
-  | 'no_local_credential'
-  | 'local_key_missing'
-  | 'server_credential_missing'
-  | 'server_credential_revoked'
-  | (string & {});
+/** @deprecated Use `BiometricCredentialUnavailableReason` instead. */
+export type TrustedDeviceUnavailableReason = BiometricCredentialUnavailableReason;
 
-export type TrustedDeviceAvailability = {
-  isAvailable: boolean;
-  unavailableReason: TrustedDeviceUnavailableReason | null;
-};
+/** @deprecated Use `BiometricCredentialAvailability` instead. */
+export type TrustedDeviceAvailability = BiometricCredentialAvailability;
 
-export type TrustedDevicePolicy = 'biometry_current_set' | 'biometry_any' | 'biometry_or_device_passcode';
+/** @deprecated Use `BiometricCredentialPolicy` instead. */
+export type TrustedDevicePolicy = BiometricCredentialPolicy;
 
-export type TrustedDevicePlatform = 'ios' | 'android' | 'unknown';
+/** @deprecated Use `BiometricCredentialPlatform` instead. */
+export type TrustedDevicePlatform = BiometricCredentialPlatform;
 
-export type TrustedDeviceStatus = 'active' | 'revoked' | 'unknown';
+/** @deprecated Use `BiometricCredentialStatus` instead. */
+export type TrustedDeviceStatus = BiometricCredentialStatus;
 
-export type TrustedDevice = {
-  id: string;
-  object: 'trusted_device';
-  platform: TrustedDevicePlatform;
-  appIdentifier: string;
-  name: string | null;
-  algorithm: 'ES256' | (string & {});
-  status: TrustedDeviceStatus;
-  createdAt: Date;
-  updatedAt: Date;
-  lastUsedAt: Date | null;
-  revokedAt: Date | null;
-};
+/** @deprecated Use `BiometricCredential` instead. */
+export type TrustedDevice = BiometricCredential;
 
-export type GetTrustedDeviceAvailabilityParams = {
-  id?: string;
-  identifierHint?: string;
-};
+/** @deprecated Use `GetBiometricCredentialAvailabilityParams` instead. */
+export type GetTrustedDeviceAvailabilityParams = GetBiometricCredentialAvailabilityParams;
 
+/** @deprecated Use `EnrollBiometricCredentialParams` with `name` instead of `deviceName`. */
 export type EnrollTrustedDeviceParams = {
   deviceName?: string;
   identifierHint?: string;
@@ -49,21 +39,13 @@ export type EnrollTrustedDeviceParams = {
   policy?: TrustedDevicePolicy;
 };
 
-export type SignInWithTrustedDeviceParams = {
-  id?: string;
-  identifierHint?: string;
-  reason?: string;
-};
+/** @deprecated Use `SignInWithBiometricsParams` instead. */
+export type SignInWithTrustedDeviceParams = SignInWithBiometricsParams;
 
-export type TrustedDeviceSignInResult = {
-  status: SignInStatus | (string & {});
-  createdSessionId: string | null;
-  /** The synchronized JS sign-in resource used to continue any remaining authentication steps. */
-  signIn: SignInResource;
-  /** Activates a session after the sign-in reaches `complete`. */
-  setActive: SetActive;
-};
+/** @deprecated Use `BiometricSignInResult` instead. */
+export type TrustedDeviceSignInResult = BiometricSignInResult;
 
+/** @deprecated Use `UseBiometricCredentialsReturn` instead. */
 export type UseTrustedDevicesReturn = {
   getAvailability: (params?: GetTrustedDeviceAvailabilityParams) => Promise<TrustedDeviceAvailability>;
   list: () => Promise<TrustedDevice[]>;

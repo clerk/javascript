@@ -35,6 +35,15 @@ Explicit `id`, `htmlFor`, `aria-labelledby`, and `aria-describedby` values remai
 
 Field does not validate controls or render errors automatically. Its parts may also be used independently without `Field.Root`.
 
+### Visually hidden label
+
+<Story
+  name='VisuallyHiddenLabel'
+  storyModule={FieldStories}
+/>
+
+Pass `visuallyHidden` to `Field.Label` when the surrounding UI already makes the label redundant. The label is still rendered and still associated with the control, so the control keeps its accessible name — unlike dropping the label and relying on a `placeholder`, which is not an accessible name. It applies the same style as the [VisuallyHidden](/components/visually-hidden) component.
+
 ## Parts
 
 | Part                | Stable slot class       | Description                                       |

@@ -60,7 +60,7 @@ export function StoryEmbed({ name, storyModule, composition }: StoryEmbedProps) 
 
   return (
     <div className='not-prose border-border bg-background my-4 overflow-hidden rounded-lg border'>
-      <div className='flex min-h-20 items-center justify-center p-6'>
+      <div className='flex min-h-20 items-center justify-center p-2.5 sm:p-6'>
         <MosaicProvider>
           <StoryComp {...defaultValues} />
         </MosaicProvider>

@@ -35,7 +35,7 @@ const createCannotRenderComponentWhenPermissionIsMissing = (componentName: 'Invi
 
 const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checkout' | 'PlanDetails') => {
   return formatWarning(
-    `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable billing. Since billing is disabled, this is no-op.`,
+    `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/~/billing/settings' to follow the necessary steps to enable billing. Since billing is disabled, this is no-op.`,
   );
 };
 
@@ -82,6 +82,8 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
   cannotRenderOAuthConsentComponentWhenUserDoesNotExist:
     '<OAuthConsent/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
+  cannotRenderOAuthDeviceVerificationComponentWhenUserDoesNotExist:
+    '<OAuthDeviceVerification/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderConfigureSSOComponentWhenUserDoesNotExist:
     '<ConfigureSSO/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderConfigureSSOComponentWhenDisabled:

@@ -3,8 +3,8 @@ import XCTest
 
 final class ClerkNativeBridgeTests: XCTestCase {
   @MainActor
-  func testTrustedDeviceAvailabilityIsUnavailableBeforeConfiguration() async throws {
-    let availability = try await ClerkNativeBridge.shared.getTrustedDeviceAvailability(
+  func testBiometricCredentialAvailabilityIsUnavailableBeforeConfiguration() async throws {
+    let availability = try await ClerkNativeBridge.shared.getBiometricCredentialAvailability(
       id: nil,
       identifierHint: nil
     )
@@ -14,12 +14,12 @@ final class ClerkNativeBridgeTests: XCTestCase {
   }
 
   @MainActor
-  func testTrustedDeviceOperationsRejectBeforeConfiguration() async {
+  func testBiometricCredentialOperationsRejectBeforeConfiguration() async {
     await assertEnvironmentUnavailable {
-      try await ClerkNativeBridge.shared.listTrustedDevices()
+      try await ClerkNativeBridge.shared.listBiometricCredentials()
     }
     await assertEnvironmentUnavailable {
-      try await ClerkNativeBridge.shared.enrollTrustedDevice(
+      try await ClerkNativeBridge.shared.enrollBiometricCredential(
         deviceName: nil,
         identifierHint: nil,
         reason: nil,
@@ -27,10 +27,10 @@ final class ClerkNativeBridgeTests: XCTestCase {
       )
     }
     await assertEnvironmentUnavailable {
-      try await ClerkNativeBridge.shared.revokeTrustedDevice(id: "td_test")
+      try await ClerkNativeBridge.shared.revokeBiometricCredential(id: "td_test")
     }
     await assertEnvironmentUnavailable {
-      try await ClerkNativeBridge.shared.signInWithTrustedDevice(
+      try await ClerkNativeBridge.shared.signInWithBiometrics(
         id: nil,
         identifierHint: nil,
         reason: nil
@@ -46,9 +46,9 @@ final class ClerkNativeBridgeTests: XCTestCase {
   ) async {
     do {
       _ = try await operation()
-      XCTFail("Expected trusted-device operation to reject before configuration.", file: file, line: line)
+      XCTFail("Expected biometric-credential operation to reject before configuration.", file: file, line: line)
     } catch {
-      let descriptor = ClerkNativeBridge.trustedDeviceErrorDescriptor(
+      let descriptor = ClerkNativeBridge.biometricCredentialErrorDescriptor(
         error,
         fallbackCode: "unexpected_error"
       )

@@ -315,8 +315,24 @@ If you need a fake user to login to the test site, use `createTestUtils`.
 
 If you need to run a test suite inside a different environment (e.g. a different first factor or optional/new features) you can create a new [environment config](#environment-configs) inside [`presets/envs.ts`](../integration/presets/envs.ts).
 
+#### Using the Platform API (recommended)
+
+1. Create a new JavaScript file inside the `integration/configs` folder with a descriptive name such as `with-new-feature.js`.
+1. Import the `defineConfig` helper, and provide a valid PLAPI configuration object. (You can export a complete configuration object with the Clerk CLI by running `clerk config pull`)
+
+   ```js
+   import { defineConfig } from '../presets/platformApplication';
+   export default defineConfig({
+     config: {
+       /* ... */
+     },
+   });
+   ```
+
+#### Using a manually created instance
+
 1. Create a new instance inside the **Integration testing** organization on Clerk
-1. Add its secret and publishable key to the 1Password note with the name **JS SDKs integration tests**
+1. Add its secret and publishable key to the 1Password note with the name **JS SDKs integration tests**. Also ensure that your new keys are added to the `INTEGRATION_INSTANCE_KEYS` environment variable inside the repository so that GitHub actions can successfully run. If you also have staging keys, add them to `INTEGRATION_STAGING_INSTANCE_KEYS`.
 1. Add a new key to `.keys.json` (with a concise name) and add your keys to `sk` and `pk` respectively. Also add a placeholder to `.keys.json.sample`. For example:
 
    ```json
@@ -328,10 +344,12 @@ If you need to run a test suite inside a different environment (e.g. a different
    }
    ```
 
+#### Configuring the test suite
+
 1. Inside `presets/envs.ts`, create a new environment config wrapped with `withInstanceKeys`:
 
    ```ts
-   const yourConciseName = withInstanceKeys('your-concise-name', base.clone().setId('yourConciseName'));
+   const yourConciseName = await withInstanceKeys('your-concise-name', base.clone().setId('yourConciseName'));
    ```
 
    The `withInstanceKeys` wrapper sets PK/SK from the instance keys map and automatically swaps to staging keys when `E2E_STAGING=1` is set. The first argument is the production key name — the staging key is looked up as `clerkstage-your-concise-name`. See [Running tests against staging](#running-tests-against-staging) for more details.
@@ -344,8 +362,6 @@ If you need to run a test suite inside a different environment (e.g. a different
      yourConciseName,
    } as const;
    ```
-
-1. Ensure that your new keys are added to the `INTEGRATION_INSTANCE_KEYS` environment variable inside the repository so that GitHub actions can successfully run. If you also have staging keys, add them to `INTEGRATION_STAGING_INSTANCE_KEYS`.
 
 ## Debugging tests
 
@@ -562,7 +578,7 @@ await app.withEnv(appConfigs.envs.withEmailCodes);
 Inside [`presets/envs.ts`](../integration/presets/envs.ts) you can also create a completely new environment config. All new configs should be wrapped with `withInstanceKeys` to enable staging environment swapping:
 
 ```ts
-const withCustomRoles = withInstanceKeys(
+const withCustomRoles = await withInstanceKeys(
   'with-custom-roles',
   base
     .clone()
@@ -570,6 +586,32 @@ const withCustomRoles = withInstanceKeys(
     .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
     .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up'),
 );
+```
+
+For non-staging tests, when `CLERK_PLATFORM_API_KEY` is set and `integration/configs/<key-name>.js` exists, `withInstanceKeys` creates a development application through the Platform API. It applies the exported configuration and uses the keys from the new application. If the file does not exist, the wrapper uses the existing instance keys map.
+
+Use `defineConfig` for configuration files. JavaScript configuration files can read environment variables. The optional `setup` function receives a `ClerkClient` after the instance configuration is applied, along with a `patchConfig` method that can be used to make subsequent PATCH requests to the Platform API. Omit `setup` when no additional operations are required.
+
+```js
+import { defineConfig } from '../presets/platformApplication.js';
+
+export default defineConfig({
+  config: {
+    auth_attack_protection: {
+      user_lockout: {
+        max_attempts: Number(process.env.CLERK_E2E_USER_LOCKOUT_MAX_ATTEMPTS || 10),
+      },
+    },
+  },
+  setup: async ({ clerkClient, patchConfig }) => {
+    await clerkClient.instance.update({ allowedOrigins: ['clerk://app'] });
+    await patchConfig({
+      organization_settings: {
+        domains_default_role: 'org:viewer',
+      },
+    });
+  },
+});
 ```
 
 When `E2E_STAGING=1`, this will automatically look up `clerkstage-with-custom-roles` from the staging keys and swap the PK, SK, and API URL. If the staging key doesn't exist, the config will not be staging-ready and any long running apps using it will be gracefully skipped.

@@ -44,22 +44,22 @@ describe('Mosaic Item', () => {
     expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'md');
   });
 
-  it('reflects the label variant as a data attribute, defaulting to primary', () => {
+  it('reflects the label variant as a data attribute, defaulting to default', () => {
     const { rerender } = render(<Item.Label>Clerk</Item.Label>);
-    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'primary');
-    rerender(<Item.Label variant='secondary'>Clerk</Item.Label>);
-    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'secondary');
+    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'default');
+    rerender(<Item.Label variant='interactive'>Clerk</Item.Label>);
+    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'interactive');
   });
 
   // StyleX keeps only the last atom that declares a property, so the reset's `color: inherit`
-  // survives on the variant that declares no color of its own. That is what puts the secondary
+  // survives on the variant that declares no color of its own. That is what puts the interactive
   // label on the row's color and carries it through the row's hover promotion. `Item.Content`
   // declares no color either, so it stands in for the untouched reset.
-  it('lets the row color the secondary label, and not the primary one', () => {
+  it('lets the row color the interactive label, and not the default one', () => {
     render(
       <Item.Content data-testid='reset-only'>
-        <Item.Label>Primary</Item.Label>
-        <Item.Label variant='secondary'>Secondary</Item.Label>
+        <Item.Label>Default</Item.Label>
+        <Item.Label variant='interactive'>Interactive</Item.Label>
       </Item.Content>,
     );
 
@@ -67,7 +67,7 @@ describe('Mosaic Item', () => {
     const resetAtoms = atoms(screen.getByTestId('reset-only'));
     const inherited = (text: string) => resetAtoms.filter(atom => atoms(screen.getByText(text)).includes(atom));
 
-    expect(inherited('Secondary')).toHaveLength(inherited('Primary').length + 1);
+    expect(inherited('Interactive')).toHaveLength(inherited('Default').length + 1);
   });
 
   it('wires consumer className/style through to the element', () => {
@@ -146,6 +146,68 @@ describe('Mosaic Item', () => {
     expect(group).toHaveClass('cl-item-group');
     expect(group).not.toHaveAttribute('role');
     expect(screen.getByTestId('sep')).toHaveClass('cl-item-separator');
+  });
+
+  it('reflects the group variant as a data attribute, defaulting to default', () => {
+    const { rerender } = render(<Item.Group data-testid='group'>One</Item.Group>);
+    expect(screen.getByTestId('group')).toHaveAttribute('data-variant', 'default');
+    rerender(
+      <Item.Group
+        data-testid='group'
+        variant='outline'
+      >
+        One
+      </Item.Group>,
+    );
+    expect(screen.getByTestId('group')).toHaveAttribute('data-variant', 'outline');
+  });
+
+  it('reads the variant from the group in its rows', () => {
+    render(
+      <Item.Group variant='outline'>
+        <Item.Root>Outlined</Item.Root>
+      </Item.Group>,
+    );
+    expect(screen.getByText('Outlined')).toHaveAttribute('data-variant', 'outline');
+  });
+
+  it('falls back to the default variant when a row renders outside a group', () => {
+    render(<Item.Root>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'default');
+  });
+
+  it('gives an outlined row a border atom a default row does not carry', () => {
+    render(
+      <>
+        <Item.Root>Plain</Item.Root>
+        <Item.Group variant='outline'>
+          <Item.Root>Outlined</Item.Root>
+        </Item.Group>
+      </>,
+    );
+
+    const atoms = (text: string) => screen.getByText(text).className.split(' ');
+    expect(atoms('Outlined').filter(atom => !atoms('Plain').includes(atom))).not.toHaveLength(0);
+  });
+
+  it('takes a variant of its own, outside any group', () => {
+    render(<Item.Root variant='outline'>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'outline');
+  });
+
+  it('lets a row override the variant its group provides, in both directions', () => {
+    render(
+      <>
+        <Item.Group variant='outline'>
+          <Item.Root variant='default'>Opted out</Item.Root>
+        </Item.Group>
+        <Item.Group>
+          <Item.Root variant='outline'>Opted in</Item.Root>
+        </Item.Group>
+      </>,
+    );
+    expect(screen.getByText('Opted out')).toHaveAttribute('data-variant', 'default');
+    expect(screen.getByText('Opted in')).toHaveAttribute('data-variant', 'outline');
   });
 
   it('forwards the ref to the root element', () => {

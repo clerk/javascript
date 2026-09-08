@@ -139,7 +139,7 @@ describe('UserProfileProfilePanelView', () => {
   it('renders connected accounts and the danger zone when provided', async () => {
     const onConnectAccount = vi.fn();
     const onManageConnectedAccount = vi.fn();
-    const onDeleteAccount = vi.fn();
+    const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
     renderView({
       connectedAccounts: [
@@ -165,10 +165,27 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
     await user.click(screen.getByRole('button', { name: 'Connect' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
+    const deleteDialog = screen.getByRole('dialog');
+    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
+    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
     expect(onManageConnectedAccount).toHaveBeenCalledWith('google');
     expect(onConnectAccount).toHaveBeenCalledWith('apple');
     expect(onDeleteAccount).toHaveBeenCalledOnce();
+  });
+
+  it('renders provider images in icon frames', () => {
+    const { container } = renderView({
+      connectedAccounts: [{ id: 'google', provider: 'Google', iconUrl: '/google.svg' }],
+      web3Wallets: [{ id: 'metamask', provider: 'MetaMask', iconUrl: '/metamask.svg' }],
+    });
+
+    const frames = container.querySelectorAll('.cl-icon-frame');
+    const images = container.querySelectorAll('img');
+    expect(frames).toHaveLength(2);
+    expect(frames[0]).toContainElement(images[0]);
+    expect(frames[1]).toContainElement(images[1]);
+    frames.forEach(frame => expect(frame.closest('.cl-section-media')).toHaveAttribute('data-size', 'lg'));
   });
 
   it('renders Web3 wallets and forwards wallet actions', async () => {

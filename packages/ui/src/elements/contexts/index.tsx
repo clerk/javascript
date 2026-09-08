@@ -100,6 +100,7 @@ export type FlowMetadata = {
     | 'apiKeys'
     | 'configureSSO'
     | 'oauthConsent'
+    | 'oauthDeviceVerification'
     | 'subscriptionDetails'
     | 'tasks'
     | 'taskChooseOrganization'

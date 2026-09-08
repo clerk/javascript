@@ -58,7 +58,7 @@ test.describe('Keyless mode @quickstart', () => {
       publishableKey,
       secretKey,
       claimUrl: 'https://dashboard.clerk.com/apps/claim',
-      apiKeysUrl: 'https://dashboard.clerk.com/last-active?path=api-keys',
+      apiKeysUrl: 'https://dashboard.clerk.com/~/api-keys',
     });
     await app.keylessToEnv();
     /**

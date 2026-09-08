@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 export interface SpinDelayOptions {
-  /** Wait this long before showing the value, so quick actions never flash a spinner. */
+  /** Wait this long before showing the value, so quick actions never flash a spinner. `0` shows it straight away. */
   delay?: number;
   /** Once shown, keep the value up at least this long, so the spinner never flickers off. */
   minDuration?: number;
@@ -25,9 +25,15 @@ export function useSpinDelay<T>(value: T | null, options: SpinDelayOptions = {})
   const shownAt = useRef(0);
 
   useEffect(() => {
-    // Nothing showing yet: arm a timer so the value only surfaces if it outlasts `delay`.
+    // Nothing showing yet: arm a timer so the value only surfaces if it outlasts `delay`. With no
+    // delay there is nothing to outlast, so it surfaces in this pass rather than a timer's.
     if (shown === null) {
       if (value === null) {
+        return;
+      }
+      if (delay <= 0) {
+        shownAt.current = Date.now();
+        setShown(value);
         return;
       }
       const timer = setTimeout(() => {

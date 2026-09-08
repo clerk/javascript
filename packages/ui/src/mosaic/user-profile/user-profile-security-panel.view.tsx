@@ -8,7 +8,7 @@ import type {
   UserProfileDevice,
 } from './user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
-import { UserProfileDeleteSectionView } from './user-profile-delete-section.view';
+import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
@@ -30,7 +30,8 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
   onAddMfaMethod?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemoveMfaMethod?: (id: string) => void;
-  onDeleteAccount?: () => void;
+  /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
+  onDeleteAccount?: () => Promise<void>;
 }
 
 export function UserProfileSecurityPanelView({

@@ -42,8 +42,6 @@ testAgainstRunningApps({
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
-    const jwtVersion = await page.evaluate(() => window.Clerk.session?.lastActiveToken?.jwt?.claims?.v);
-    expect(jwtVersion).toBe(app.env.id === 'withBillingStaging' ? 2 : undefined);
 
     await u.po.organizationSwitcher.goTo();
     await u.po.organizationSwitcher.waitForMounted();

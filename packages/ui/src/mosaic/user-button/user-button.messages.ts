@@ -15,6 +15,7 @@ export const userButtonBase = {
   },
   workspaces: {
     personal: 'Personal account',
+    notSelected: 'No organization selected',
     loading: 'Loading organizations…',
     members: { one: '{count} member', other: '{count} members' },
     accept: 'Accept',
@@ -24,9 +25,8 @@ export const userButtonBase = {
     pending: 'pending',
   },
   accounts: {
-    heading: 'Accounts',
-    menu: 'Account actions',
     actionsFor: 'Actions for {identifier}',
+    switch: 'Switch account',
     add: 'Add account',
     signOut: 'Sign out',
     signOutAll: 'Sign out of all accounts',

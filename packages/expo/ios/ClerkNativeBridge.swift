@@ -404,7 +404,7 @@ struct ClerkNativeErrorDescriptor {
   let message: String
 }
 
-private struct ClerkExpoTrustedDeviceError: LocalizedError {
+private struct ClerkExpoBiometricCredentialError: LocalizedError {
   let code: String
   let message: String
 
@@ -741,10 +741,10 @@ final class ClerkNativeBridge {
     Self.authFlowStatePayload(Self.authFlowStateSnapshot())
   }
 
-  // MARK: - Trusted devices
+  // MARK: - Biometric credentials
 
   @MainActor
-  func getTrustedDeviceAvailability(id: String?, identifierHint: String?) async throws -> [String: Any] {
+  func getBiometricCredentialAvailability(id: String?, identifierHint: String?) async throws -> [String: Any] {
     guard Self.clerkConfigured else {
       return [
         "isAvailable": false,
@@ -752,7 +752,7 @@ final class ClerkNativeBridge {
       ]
     }
 
-    let availability = try await Clerk.shared.trustedDevices.availability(
+    let availability = try await Clerk.shared.biometricCredentials.availability(
       id: id,
       identifierHint: identifierHint
     )
@@ -760,57 +760,57 @@ final class ClerkNativeBridge {
     return [
       "isAvailable": availability.isAvailable,
       "unavailableReason": availability.unavailableReason
-        .map(Self.trustedDeviceUnavailableReason) ?? NSNull(),
+        .map(Self.biometricCredentialUnavailableReason) ?? NSNull(),
     ]
   }
 
   @MainActor
-  func listTrustedDevices() async throws -> [[String: Any]] {
-    try Self.requireTrustedDeviceEnvironment()
-    let trustedDevices = try await Clerk.shared.trustedDevices.list()
-    return trustedDevices.map(Self.trustedDevicePayload)
+  func listBiometricCredentials() async throws -> [[String: Any]] {
+    try Self.requireBiometricCredentialEnvironment()
+    let biometricCredentials = try await Clerk.shared.biometricCredentials.list()
+    return biometricCredentials.map(Self.biometricCredentialPayload)
   }
 
   @MainActor
-  func enrollTrustedDevice(
+  func enrollBiometricCredential(
     deviceName: String?,
     identifierHint: String?,
     reason: String?,
     policy: String
   ) async throws -> [String: Any] {
-    try Self.requireTrustedDeviceEnvironment()
+    try Self.requireBiometricCredentialEnvironment()
 
-    guard let trustedDevicePolicy = TrustedDevicePolicy(rawValue: policy) else {
-      throw ClerkExpoTrustedDeviceError(
+    guard let biometricCredentialPolicy = BiometricCredentialPolicy(rawValue: policy) else {
+      throw ClerkExpoBiometricCredentialError(
         code: "invalid_trusted_device_policy",
-        message: "Invalid trusted-device policy: \(policy)."
+        message: "Invalid biometric-credential policy: \(policy)."
       )
     }
 
-    let trustedDevice = try await Clerk.shared.trustedDevices.enroll(
-      deviceName: deviceName,
+    let biometricCredential = try await Clerk.shared.biometricCredentials.enroll(
+      name: deviceName,
       identifierHint: identifierHint,
       reason: reason,
-      policy: trustedDevicePolicy
+      policy: biometricCredentialPolicy
     )
-    return Self.trustedDevicePayload(trustedDevice)
+    return Self.biometricCredentialPayload(biometricCredential)
   }
 
   @MainActor
-  func revokeTrustedDevice(id: String) async throws -> [String: Any] {
-    try Self.requireTrustedDeviceEnvironment()
-    let trustedDevice = try await Clerk.shared.trustedDevices.revoke(id: id)
-    return Self.trustedDevicePayload(trustedDevice)
+  func revokeBiometricCredential(id: String) async throws -> [String: Any] {
+    try Self.requireBiometricCredentialEnvironment()
+    let biometricCredential = try await Clerk.shared.biometricCredentials.revoke(id: id)
+    return Self.biometricCredentialPayload(biometricCredential)
   }
 
   @MainActor
-  func signInWithTrustedDevice(
+  func signInWithBiometrics(
     id: String?,
     identifierHint: String?,
     reason: String?
   ) async throws -> [String: Any] {
-    try Self.requireTrustedDeviceEnvironment()
-    let signIn = try await Clerk.shared.auth.signInWithTrustedDevice(
+    try Self.requireBiometricCredentialEnvironment()
+    let signIn = try await Clerk.shared.auth.signInWithBiometrics(
       id: id,
       identifierHint: identifierHint,
       reason: reason
@@ -824,42 +824,42 @@ final class ClerkNativeBridge {
   }
 
   @MainActor
-  private static func requireTrustedDeviceEnvironment() throws {
+  private static func requireBiometricCredentialEnvironment() throws {
     guard clerkConfigured else {
-      throw ClerkExpoTrustedDeviceError(
+      throw ClerkExpoBiometricCredentialError(
         code: "environment_unavailable",
-        message: "Trusted-device operations are unavailable until Clerk finishes configuring."
+        message: "Biometric credential operations are unavailable until Clerk finishes configuring."
       )
     }
   }
 
-  private static func trustedDevicePayload(_ trustedDevice: TrustedDevice) -> [String: Any] {
+  private static func biometricCredentialPayload(_ biometricCredential: BiometricCredential) -> [String: Any] {
     [
-      "id": trustedDevice.id,
-      "object": trustedDevice.object,
-      "platform": trustedDevice.platform.rawValue,
-      "appIdentifier": trustedDevice.appIdentifier,
-      "name": bridgeValue(trustedDevice.name),
-      "algorithm": trustedDevice.algorithm.rawValue,
-      "status": trustedDevice.status.rawValue,
-      "createdAt": millisecondsSince1970(trustedDevice.createdAt),
-      "updatedAt": millisecondsSince1970(trustedDevice.updatedAt),
-      "lastUsedAt": optionalMillisecondsSince1970(trustedDevice.lastUsedAt),
-      "revokedAt": optionalMillisecondsSince1970(trustedDevice.revokedAt),
+      "id": biometricCredential.id,
+      "object": biometricCredential.object,
+      "platform": biometricCredential.platform.rawValue,
+      "appIdentifier": biometricCredential.appIdentifier,
+      "name": bridgeValue(biometricCredential.name),
+      "algorithm": biometricCredential.algorithm.rawValue,
+      "status": biometricCredential.status.rawValue,
+      "createdAt": millisecondsSince1970(biometricCredential.createdAt),
+      "updatedAt": millisecondsSince1970(biometricCredential.updatedAt),
+      "lastUsedAt": optionalMillisecondsSince1970(biometricCredential.lastUsedAt),
+      "revokedAt": optionalMillisecondsSince1970(biometricCredential.revokedAt),
     ]
   }
 
-  private static func trustedDeviceUnavailableReason(
-    _ reason: TrustedDeviceAvailability.UnavailableReason
+  private static func biometricCredentialUnavailableReason(
+    _ reason: BiometricCredentialAvailability.UnavailableReason
   ) -> String {
     snakeCase(reason.rawValue)
   }
 
-  static func trustedDeviceErrorDescriptor(
+  static func biometricCredentialErrorDescriptor(
     _ error: Error,
     fallbackCode: String
   ) -> ClerkNativeErrorDescriptor {
-    if let error = error as? ClerkExpoTrustedDeviceError {
+    if let error = error as? ClerkExpoBiometricCredentialError {
       return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
     }
 
@@ -867,9 +867,9 @@ final class ClerkNativeBridge {
       return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
     }
 
-    if let error = error as? TrustedDeviceKeyManagerError {
+    if let error = error as? BiometricCredentialKeyManagerError {
       return ClerkNativeErrorDescriptor(
-        code: trustedDeviceKeyManagerErrorCode(error),
+        code: biometricCredentialKeyManagerErrorCode(error),
         message: error.localizedDescription
       )
     }
@@ -877,8 +877,8 @@ final class ClerkNativeBridge {
     return ClerkNativeErrorDescriptor(code: fallbackCode, message: error.localizedDescription)
   }
 
-  private static func trustedDeviceKeyManagerErrorCode(
-    _ error: TrustedDeviceKeyManagerError
+  private static func biometricCredentialKeyManagerErrorCode(
+    _ error: BiometricCredentialKeyManagerError
   ) -> String {
     switch error {
     case .unsupportedPlatform:
@@ -958,11 +958,8 @@ final class ClerkNativeBridge {
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         logoState: logoState,
-        logoMaxHeight: logoMaxHeight
-      )
-      .environment(
-        \.clerkAuthFlowCompletionAction,
-        ClerkAuthFlowCompletionAction { onEvent(.dismissed, [:]) }
+        logoMaxHeight: logoMaxHeight,
+        onAuthComplete: { onEvent(.dismissed, [:]) }
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
@@ -1264,11 +1261,16 @@ struct ClerkInlineAuthWrapperView: View {
   let darkTheme: ClerkTheme?
   let logoState: ClerkInlineAuthLogoState
   let logoMaxHeight: CGFloat?
+  let onAuthComplete: @MainActor () -> Void
 
   @Environment(\.colorScheme) private var colorScheme
 
   @ViewBuilder private var themedAuthView: some View {
-    let view = AuthView(mode: mode, isDismissible: dismissible)
+    let view = AuthView(
+      mode: mode,
+      isDismissible: dismissible,
+      onAuthComplete: onAuthComplete
+    )
       .environment(Clerk.shared)
       .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme

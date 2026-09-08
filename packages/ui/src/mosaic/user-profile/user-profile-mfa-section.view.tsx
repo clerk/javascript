@@ -66,15 +66,17 @@ export function UserProfileMfaSectionView({
               />
               Add
             </Menu.Trigger>
-            <Menu.Content>
+            <Menu.Popup>
               {availableMethods.map(type => (
                 <Menu.Item
                   key={type}
                   label={labels[type]}
                   onClick={() => onAdd(type)}
-                />
+                >
+                  <Menu.Label>{labels[type]}</Menu.Label>
+                </Menu.Item>
               ))}
-            </Menu.Content>
+            </Menu.Popup>
           </Menu.Root>
         ) : null
       }

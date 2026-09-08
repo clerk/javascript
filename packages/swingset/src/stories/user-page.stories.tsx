@@ -121,7 +121,7 @@ export function Default() {
             isVerified: true,
           },
         ]),
-      onDeleteAccount: () => undefined,
+      onDeleteAccount: () => Promise.resolve(),
       onEditProfilePicture: () => undefined,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
@@ -162,7 +162,7 @@ export function Default() {
           { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
         ]),
       onChangePassword: () => undefined,
-      onDeleteAccount: () => undefined,
+      onDeleteAccount: () => Promise.resolve(),
       onManageDevice: () => undefined,
       onManagePasskey: () => undefined,
       onRegenerateBackupCodes: () =>

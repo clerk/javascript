@@ -1,5 +1,7 @@
 import { detectOverflow, type Middleware } from '@floating-ui/react';
 
+import { resolveSideOffset, type SideOffset } from './side-offset';
+
 /**
  * Positioning middleware that sets CSS custom properties on the floating element:
  *
@@ -12,13 +14,13 @@ import { detectOverflow, type Middleware } from '@floating-ui/react';
  *
  * Place **after** `arrow()` so arrow position data is available for transform-origin.
  */
-export function cssVars(opts?: { sideOffset?: number }): Middleware {
+export function cssVars(opts?: { sideOffset?: SideOffset }): Middleware {
   return {
     name: 'cssVars',
     async fn(state) {
       const { elements, rects, middlewareData, placement } = state;
       const style = elements.floating.style;
-      const sideOffset = opts?.sideOffset ?? 0;
+      const sideOffset = resolveSideOffset(opts?.sideOffset ?? 0, placement);
 
       // Anchor dimensions
       style.setProperty('--cl-anchor-width', `${rects.reference.width}px`);

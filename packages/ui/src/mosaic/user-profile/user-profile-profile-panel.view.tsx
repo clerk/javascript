@@ -11,12 +11,12 @@ import type {
 import { UserProfileAccountSectionView } from './user-profile-account-section.view';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
-import { UserProfileDeleteSectionView } from './user-profile-delete-section.view';
+import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
 import { styles } from './user-profile-profile-panel.styles';
 import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
-export type { UserProfileEmail, UserProfilePhone, UserProfileConnectedAccount, UserProfileWeb3Wallet };
+export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
@@ -28,7 +28,8 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   onManageWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
   onRemoveWeb3Wallet?: (id: string) => void;
-  onDeleteAccount?: () => void;
+  /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
+  onDeleteAccount?: () => Promise<void>;
 }
 
 export function UserProfileProfilePanelView({

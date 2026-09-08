@@ -13,7 +13,8 @@ export function validateHeaders<
 >(
   resolver: HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>,
 ): HttpResponseResolver<Params, RequestBodyType, ResponseBodyType> {
-  return async ({ request, requestId, params, cookies }) => {
+  return async info => {
+    const { request } = info;
     if (!request.headers.get('Authorization')) {
       return HttpResponse.json(
         {
@@ -42,6 +43,6 @@ export function validateHeaders<
       ) as ReturnType<HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>>;
     }
 
-    return resolver({ request, requestId, params, cookies });
+    return resolver(info);
   };
 }

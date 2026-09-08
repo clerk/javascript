@@ -15,6 +15,7 @@ export type FieldId =
   | 'identifier'
   | 'username'
   | 'code'
+  | 'userCode'
   | 'role'
   | 'deleteConfirmation'
   | 'deleteOrganizationConfirmation'

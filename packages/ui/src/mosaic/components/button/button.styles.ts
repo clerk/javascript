@@ -86,11 +86,6 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
     borderWidth: '1px',
-    // one ring for every color and variant — it reads as focus, not as the button's color
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
     alignItems: 'center',
     // Strips UA control styling so what's below is the whole appearance, not an override.
     appearance: 'none',
@@ -101,7 +96,6 @@ export const styles = stylex.create({
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
-    outlineOffset: '2px',
     // The duration a state carries governs the transition INTO it, so one declaration per
     // state gives an instant arrival and a 0.15s settle out. Instant because a hover or a
     // press confirms something the user just did, and confirmation cannot lag; see `motion.md`.
@@ -172,7 +166,7 @@ export const styles = stylex.create({
   },
 
   // state / modifiers
-  fullWidth: { width: '100%' },
+  fullWidth: { flex: '1', width: '100%' },
   disabled: { cursor: 'not-allowed', opacity: 0.5 },
 });
 

@@ -12,6 +12,26 @@ export type OAuthConsentScopeJSON = {
 /**
  * @internal
  */
+export type OAuthDeviceVerificationInfoJSON = {
+  oauth_application_name: string;
+  oauth_application_logo_url: string | null;
+  client_id: string;
+  scopes: OAuthConsentScopeJSON[];
+  status: OAuthDeviceVerificationStatus;
+  expires_at: number;
+};
+
+/**
+ * @internal
+ */
+export type OAuthDeviceVerificationResultJSON = {
+  object: 'oauth_device_verification';
+  status: Extract<OAuthDeviceVerificationStatus, 'approved' | 'denied'>;
+};
+
+/**
+ * @internal
+ */
 export interface OAuthConsentInfoJSON extends ClerkResourceJSON {
   object: 'oauth_consent_info';
   oauth_application_name: string;
@@ -81,6 +101,34 @@ export type OAuthConsentInfo = {
   scopes: OAuthConsentScope[];
 };
 
+export type OAuthDeviceVerificationStatus = 'pending' | 'approved' | 'denied' | 'consumed';
+
+/**
+ * A scope requested by an OAuth device authorization.
+ */
+export type OAuthDeviceVerificationScope = OAuthConsentScope;
+
+/**
+ * Information about an OAuth device authorization awaiting verification.
+ */
+export type OAuthDeviceVerificationInfo = {
+  oauthApplicationName: string;
+  oauthApplicationLogoUrl: string | null;
+  clientId: string;
+  scopes: OAuthDeviceVerificationScope[];
+  status: OAuthDeviceVerificationStatus;
+  /** Expiration time as Unix milliseconds. */
+  expiresAt: number;
+};
+
+/**
+ * The result of approving or denying an OAuth device authorization.
+ */
+export type OAuthDeviceVerificationResult = {
+  object: 'oauth_device_verification';
+  status: Extract<OAuthDeviceVerificationStatus, 'approved' | 'denied'>;
+};
+
 export type GetOAuthConsentInfoParams = {
   /** The OAuth `client_id` from the authorize request. The hook is disabled when this value is empty or omitted. */
   oauthClientId: string;
@@ -88,6 +136,16 @@ export type GetOAuthConsentInfoParams = {
   scope?: string;
   /** The redirect URI from the authorize request. When provided, the backend returns a PSL-resolved `redirectDomain`. */
   redirectUri?: string;
+};
+
+export type LookupOAuthDeviceVerificationParams = {
+  userCode: string;
+};
+
+export type SubmitOAuthDeviceVerificationParams = {
+  userCode: string;
+  approved: boolean;
+  organizationId?: string;
 };
 
 /**
@@ -98,6 +156,16 @@ export interface OAuthApplicationNamespace {
    * Loads consent metadata for the given OAuth client for the signed-in user.
    */
   getConsentInfo: (params: GetOAuthConsentInfoParams) => Promise<OAuthConsentInfo>;
+
+  /**
+   * Looks up an OAuth device authorization by its human-readable user code.
+   */
+  lookupDeviceVerification: (params: LookupOAuthDeviceVerificationParams) => Promise<OAuthDeviceVerificationInfo>;
+
+  /**
+   * Approves or denies an OAuth device authorization for the signed-in user.
+   */
+  submitDeviceVerification: (params: SubmitOAuthDeviceVerificationParams) => Promise<OAuthDeviceVerificationResult>;
 
   /**
    * Returns the URL to use as the `action` attribute of the consent form.

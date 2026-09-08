@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo-google-signin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Native Google Sign-In module to be used with Clerk for Expo",
   "keywords": [
     "react-native",
@@ -35,7 +35,7 @@
     "expo": "~54.0.36"
   },
   "peerDependencies": {
-    "expo": ">=54 <58"
+    "expo": "catalog:peer-expo"
   },
   "publishConfig": {
     "access": "public"

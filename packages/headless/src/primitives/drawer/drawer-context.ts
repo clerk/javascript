@@ -35,7 +35,10 @@ export interface NestedDrawerCallbacks {
 // `nestedOpenCount` / `onNested`, which is a different question from the dialog's: `isStacked`
 // asks whether a DIALOG sits above, and a drawer's stacked-child styling has nothing to read it
 // from. Inheriting them would oblige every drawer root to publish two values no drawer part uses.
-export interface DrawerContextValue extends Omit<DialogContextValue, 'isStacked' | 'stackedChildCount' | 'store'> {
+export interface DrawerContextValue extends Omit<
+  DialogContextValue,
+  'isStacked' | 'stackedChildCount' | 'store' | 'role'
+> {
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   backdropRef: React.RefObject<HTMLDivElement | null>;
   drag: DrawerDrag;

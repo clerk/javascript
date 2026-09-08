@@ -3,7 +3,7 @@
 import { type FloatingContext, FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
+import { type ComponentProps, type DefaultProps, Freeze, mergeProps, useRender } from '../../utils';
 import { type InteractionType, interactionTypeFromEvent } from '../../utils/interaction-modality';
 import { useDialogContext } from './dialog-context';
 
@@ -128,7 +128,7 @@ export interface DialogPopupProps extends ComponentProps<'div'> {
 
 /** The dialog content container. Manages focus trapping via `FloatingFocusManager` and wires ARIA attributes from `Dialog.Title` and `Dialog.Description`. */
 export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(props, ref) {
-  const { render, initialFocus, finalFocus, ...otherProps } = props;
+  const { render, initialFocus, finalFocus, children, ...otherProps } = props;
   const {
     open,
     popupRef,
@@ -164,6 +164,11 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
     ...(stackedChildCount > 0 ? { 'data-stack-base': '' } : {}),
     ...getFloatingProps(),
     ...transitionProps,
+    // The popup outlives `open` by the length of its exit animation, and whatever closed it has
+    // usually reset the state behind it — a machine returning to `idle`, a form clearing. The
+    // contents hold their last frame on the way out instead of snapping back under the fade. The
+    // popup element itself stays live, so `data-closed` / `data-ending-style` still land.
+    children: <Freeze frozen={!open}>{children}</Freeze>,
   };
 
   const element = useRender({

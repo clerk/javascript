@@ -1,9 +1,10 @@
-import stylexPlugin from '@stylexjs/unplugin/webpack';
 import createMDX from '@next/mdx';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import stylexPlugin from '@stylexjs/unplugin/webpack';
 import { resolve } from 'path';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 import { fileURLToPath } from 'url';
+
 import { mosaicLightningCssTargets } from '../ui/stylex-lightningcss.config.mjs';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -81,6 +82,15 @@ const nextConfig = {
         lightningcssOptions: { targets: mosaicLightningCssTargets },
       }),
     );
+
+    // Dev-only: StyleX's runtime injector drops named `@container` rules after the first per
+    // query — see the loader for the bug. Scoped to that one module.
+    if (isDev) {
+      config.module.rules.push({
+        test: /[\\/]@stylexjs[\\/]stylex[\\/]lib[\\/](es|cjs)[\\/]inject\.(mjs|js)$/,
+        use: [{ loader: resolve(__dirname, 'src/lib/loaders/stylex-inject-named-container.cjs') }],
+      });
+    }
 
     config.resolve.alias['@clerk/ui/mosaic'] = resolve(__dirname, '../ui/src/mosaic');
     // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.

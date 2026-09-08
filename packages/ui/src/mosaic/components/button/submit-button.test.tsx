@@ -67,6 +67,21 @@ describe('Mosaic SubmitButton', () => {
     expect(button).not.toHaveAttribute('data-pending');
   });
 
+  it('keeps the focusable-disabled marking when the button is disabled but not pending', () => {
+    render(
+      <SubmitButton
+        disabled
+        focusableWhenDisabled
+      >
+        Save
+      </SubmitButton>,
+    );
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).not.toHaveAttribute('disabled');
+    expect(button).not.toHaveAttribute('aria-busy');
+  });
+
   it('renders the spinner and reflects the pending state', () => {
     render(<SubmitButton isPending>Save</SubmitButton>);
     const button = screen.getByRole('button');
@@ -302,9 +317,21 @@ describe('Mosaic SubmitButton spin delay', () => {
     expect(atoms(spinner()).length).toBeLessThan(hidden.length);
   });
 
-  // A consumer who already knows the action is slow has nothing to gain by waiting.
+  // A consumer who already knows the action is slow has nothing to gain by waiting: there is no
+  // delay left to outlast, so the spinner shows in the render that starts the action rather than a
+  // timer's.
   it('lets the consumer opt out of the delay', () => {
-    render(
+    const { rerender } = render(
+      <SubmitButton
+        isPending
+        spinDelay={{ delay: 1000 }}
+      >
+        Save
+      </SubmitButton>,
+    );
+    const hidden = atoms(spinner());
+
+    rerender(
       <SubmitButton
         isPending
         spinDelay={{ delay: 0 }}
@@ -312,9 +339,7 @@ describe('Mosaic SubmitButton spin delay', () => {
         Save
       </SubmitButton>,
     );
-    const hidden = atoms(spinner());
 
-    advance(0);
     expect(atoms(spinner()).length).toBeLessThan(hidden.length);
   });
 

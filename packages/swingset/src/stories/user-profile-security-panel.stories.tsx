@@ -82,7 +82,7 @@ export function Default() {
         ])
       }
       onChangePassword={() => undefined}
-      onDeleteAccount={() => undefined}
+      onDeleteAccount={() => Promise.resolve()}
       onManageDevice={() => undefined}
       onManagePasskey={() => undefined}
       onRegenerateBackupCodes={() =>

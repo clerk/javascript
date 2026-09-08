@@ -77,7 +77,7 @@ export function Default(_args: Record<string, unknown>) {
         ])
       }
       onConnectAccount={() => undefined}
-      onDeleteAccount={() => undefined}
+      onDeleteAccount={() => Promise.resolve()}
       onEditProfilePicture={() => undefined}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}

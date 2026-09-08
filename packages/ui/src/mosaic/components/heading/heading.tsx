@@ -5,9 +5,9 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { useContextProps } from '../../utils/context';
-import { reset } from '../reset.styles';
-import type { TypographyColor, TypographySize } from '../typography.styles';
-import { colors, sizes, styles as typographyStyles } from '../typography.styles';
+import { reset } from '../../utils/reset.styles';
+import type { TypographyColor, TypographySize } from '../../utils/typography.styles';
+import { colors, sizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { styles as headingStyles } from './heading.styles';
 
 export interface HeadingProps extends MosaicComponentProps<'h2'> {

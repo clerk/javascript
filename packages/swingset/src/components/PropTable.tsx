@@ -15,6 +15,8 @@ interface ExtraProp {
 interface PropTableProps {
   meta: StoryMeta;
   extra?: ExtraProp[];
+  /** Set false for a component that styles itself and does not want `className`/`style` advertised. */
+  styleProps?: boolean;
 }
 
 const STYLEX_ROWS: ExtraProp[] = [
@@ -22,7 +24,7 @@ const STYLEX_ROWS: ExtraProp[] = [
   { name: 'style', type: 'CSSProperties' },
 ];
 
-export function PropTable({ meta, extra = [] }: PropTableProps) {
+export function PropTable({ meta, extra = [], styleProps = true }: PropTableProps) {
   const playground = usePlayground();
   const variants = meta.styles?._variants ?? {};
   const defaults = meta.styles?._defaultVariants ?? {};
@@ -38,7 +40,7 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
       return { name, type, default: defDisplay };
     }),
     ...extra,
-    ...STYLEX_ROWS,
+    ...(styleProps ? STYLEX_ROWS : []),
   ];
 
   return (

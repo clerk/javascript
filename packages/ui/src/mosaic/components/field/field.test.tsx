@@ -326,6 +326,19 @@ describe('Mosaic Field', () => {
     expect(screen.getByText('Error').closest('p')).toHaveStyle({ fontWeight: 600 });
   });
 
+  it('hides the label visually while keeping it associated with the control', () => {
+    render(
+      <Field.Root>
+        <Field.Label visuallyHidden>Email</Field.Label>
+        <Input />
+      </Field.Root>,
+    );
+
+    const label = screen.getByText('Email');
+    expect(label).toHaveAttribute('data-visually-hidden', '');
+    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveAttribute('id', label.getAttribute('for'));
+  });
+
   it('supports render escape hatches on every part', () => {
     render(
       <Field.Root render={props => <section {...props} />}>

@@ -90,6 +90,10 @@ test.describe('Custom Flows OAuth @custom', () => {
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
 
+    const allowAccessButton = u.page.getByRole('button', { name: 'Allow' });
+    await expect(allowAccessButton).toBeVisible();
+    await allowAccessButton.click();
+
     await u.page.waitForAppUrl('/protected');
     await u.po.expect.toBeSignedIn();
   });

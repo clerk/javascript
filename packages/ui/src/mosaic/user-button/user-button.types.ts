@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
-// Session-backed, discriminated resource rows. 1:1 with `useUserButtonController()`'s output, so the
-// controller and the view agree on a shape neither one owns.
+// Session-backed, discriminated resource rows. 1:1 with `useUserButtonModel()`'s output, so the
+// model and the view agree on a shape neither one owns.
 
 export interface UserButtonSession {
   sessionId: string;
@@ -51,7 +51,8 @@ export interface UserButtonData {
   activeSession: UserButtonSession;
   /**
    * The active organization, described whole rather than found in `memberships`, so the surface
-   * names it while the list it belongs to is still loading. `null` => the personal workspace.
+   * names it while the list it belongs to is still loading. `null` means none is active: the
+   * personal workspace when one exists, and no selection otherwise.
    */
   activeOrganization: UserButtonMembership | null;
   /**
@@ -156,8 +157,12 @@ export interface UserButtonBusyState {
  * A built-in action the foot of the popup lists as a row of its own, named by the id `menuItemOrder`
  * knows it by. The surface's other actions live in its header or behind a `⋯`, where there is no
  * list for an order to run in.
+ *
+ * `switchAccount` and `addAccount` share a slot: the foot carries the flyout of signed-in accounts
+ * where there is more than one, and the row it would have opened onto where there is not. Name both
+ * to place that slot whichever way it resolves.
  */
-export type UserButtonMenuItemId = 'createOrganization' | 'addAccount' | 'signOutAll';
+export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll';
 
 interface UserButtonMenuItemBase {
   /** Identifies the row, for ordering. */

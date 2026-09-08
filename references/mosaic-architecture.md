@@ -23,7 +23,7 @@ export const colorVars = stylex.defineVars({
 });
 ```
 
-Groups: `colorVars`, `radiusVars`, `targetVars`, `scrollbarVars`, `scrollFadeVars`, `spacingVars`, `space`, `typeScaleVars`, `fontFamilyVars`, `fontWeightVars`, `durationVars`, `easingVars`.
+Groups: `colorVars`, `radiusVars`, `targetVars`, `scrollbarVars`, `scrollFadeVars`, `spacingVars`, `space`, `typeScaleVars`, `fontFamilyVars`, `fontWeightVars`, `durationVars`, `easingVars`, `focusVars`.
 
 Light and dark come from CSS `light-dark()` on the default values, so there is no theme object and no re-render on theme change — the browser resolves it.
 
@@ -119,7 +119,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
 
 `mergeStyleProps` applies its arguments in order — stable class + data attrs, then StyleX atoms, then the consumer's `className` and `style`. Only `style` wins by that ordering: it is an inline style, which outranks any stylesheet rule. A consumer's `className` wins for a different reason — class order inside the attribute has no effect on the cascade, so the consumer's rule wins because the Mosaic sheet is imported into a cascade layer (`@import '@clerk/ui/styles.css' layer(components)`) and an unlayered rule beats any layered one.
 
-`components/reset.styles.ts` holds the per-element resets so a component does not re-declare UA-normalization.
+`utils/reset.styles.ts` holds the per-element resets so a component does not re-declare UA-normalization; `utils/typography.styles.ts` and `utils/focus-outline.styles.ts` do the same for the treatments several components share.
 
 For the full StyleX authoring rules (token usage, the local `s(n)` spacing helper, the CSS build), see the `mosaic` Claude Code skill's `references/stylex.md`.
 
@@ -131,143 +131,280 @@ Run it with `pnpm build:mosaic` in `packages/ui`.
 
 ## Flow and data architecture
 
-Mosaic flow UI follows a **machine → controller → view** split. This keeps Clerk resource logic out of visual components and makes most behavior testable without a running Clerk app.
+Mosaic flow UI follows a **model → controller → view** split. Read it as _where the
+data comes from_ → _what the user is doing to it_ → _what that looks like_. What
+crosses each boundary is plain data: no Clerk resource reaches the controller, and
+no machine snapshot reaches the view.
 
 ```text
-machine
-  Pure flow rules: states, events, guards, async invokes, errors.
-  No React hooks. No Clerk hooks. No Clerk resource objects.
+model
+  Clerk adapter. Reads Clerk hooks and resources, resolves the environment, gates
+  on permissions, and answers with plain data plus plain callbacks under an
+  explicit `status`. The only layer that may import Clerk hooks or call Clerk
+  resource methods.
 
 controller
-  Clerk/data adapter: reads Clerk hooks/resources, injects async effects, derives actor-driven view props.
-  This is the only layer in the flow that may import Clerk hooks or call Clerk resource methods.
+  Local state. Owns the interaction — what is open, what is in flight, what the
+  view may do next — held in React state or a state machine, whichever the
+  interaction's complexity calls for. Wraps the model's callbacks so an action
+  can report pending, hold the surface still while it runs, and close on
+  success. No Clerk imports.
 
 view
-  Rendering only: receives a snapshot plus explicit props, renders UI, sends events.
-  No Clerk imports. No data-fetching hooks. No mutation calls.
+  Rendering. Receives plain props and callbacks, renders UI, calls them back.
+  No Clerk imports. No data-fetching. No mutations. No machine snapshot.
 ```
+
+A machine is not a layer of its own, and not a requirement. It is one of the two
+ways a controller can hold its state, and which one a controller uses is a
+complexity call: `useState` for a boolean that never touches async, a machine
+once the interaction has an async lifecycle or two values that must change
+together. A controller can also do both — a machine for the coordinated subset,
+`useState` for the UI-only flags beside it. The choice is invisible from the
+outside: the controller returns plain props either way, so the view cannot tell
+and neither can its tests. `machine/ADOPTION.md` holds the criteria.
 
 ### File shape
 
-Flow slices should be split by role:
+A flow slice is split by role, one file per layer, prefixed with the feature name:
 
 ```text
-delete-organization.machine.ts        // pure state machine
-delete-organization.controller.tsx     // Clerk/mock adapter + actor wiring
-delete-organization.view.tsx           // view-only rendering
-delete-organization.tsx                // thin composition wrapper
+user-button.model.tsx        // Clerk adapter — the only file that imports Clerk
+user-button.controller.tsx   // local state (React state or a machine) + action wrapping
+user-button.view.tsx         // rendering only
+user-button.tsx              // composition wrapper and the public props type
 ```
 
-The exported component composes the controller and view:
+Supporting files carry the parts that would otherwise bloat those four:
+
+```text
+user-button.types.ts         // the data contract the model and view both agree on
+user-button.messages.ts      // every string the surface renders, in `@clerk/i18n` shape
+user-button.layout.ts        // pure derivation (which affordance goes in which slot)
+user-button.utils.ts         // pure helpers
+user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring rules)
+```
+
+`*.types.ts` is worth calling out: it holds the data contract so that neither the
+model nor the view owns it, and the two cannot drift.
+
+### Composition
+
+Two shapes, chosen by whether the slice fetches its own data.
+
+**A wrapper composes the layers** when the slice is a connected component. The
+wrapper resolves the model, hands it to the controller, and branches on `status`:
 
 ```tsx
-export function DeleteOrganization() {
-  const controller = useDeleteOrganizationController();
-  // Render nothing until the controller is ready (mirrors the legacy sections,
-  // which gate their own visibility and show no skeleton).
-  if (controller.status !== 'ready') {
+export function UserButton(props: UserButtonProps = {}) {
+  const { renderTriggerLabel, mode, modePriority, fallback, ...options } = props;
+  const model = useUserButtonModel(options);
+  const controller = useUserButtonController(model, { mode, modePriority });
+
+  if (controller.status === 'loading') {
+    return <>{fallback}</>;
+  }
+  // Signed out is an answer, so the placeholder goes too rather than promising a button.
+  if (controller.status === 'hidden') {
     return null;
   }
 
+  const { status: _status, ...viewController } = controller;
   return (
-    <DeleteOrganizationView
-      snapshot={controller.snapshot}
-      send={controller.send}
-      canSubmit={controller.canSubmit}
+    <UserButtonView
+      {...viewController}
+      renderTriggerLabel={renderTriggerLabel}
     />
   );
 }
 ```
 
-### Machines
-
-Machines own the flow rules. For destructive confirmation flows, the confirmation input value and the guard live in the machine, not the view block:
-
-```ts
-export type DeleteOrgEvent =
-  | { type: 'OPEN' }
-  | { type: 'TYPE_CONFIRMATION'; value: string }
-  | { type: 'CONFIRM' }
-  | { type: 'CANCEL' };
-
-CONFIRM: {
-  target: 'deleting',
-  guard: context => context.confirmationValue === context.organizationName,
-}
-```
-
-Async effects are injected through context and invoked by the machine:
-
-```ts
-deleting: {
-  invoke: fromPromise(ctx => ctx.destroyOrganization(), {
-    onDone: 'deleted',
-    onError: {
-      target: 'confirming',
-      actions: assign((_, event) => ({ error: String(event.error) })),
-    },
-  }),
-}
-```
-
-Machine tests should use `createActor()` directly. They should not render React and should not require Clerk fixtures.
-
-### Controllers
-
-Controllers are the adapter from Clerk resources into machine context and view props. They may call hooks like `useOrganization()` and inject live resource methods:
+**A view owns its controller** when the slice is a leaf that takes its effect as a
+prop. There is no model: the Clerk call arrives from whoever renders it.
 
 ```tsx
-export function useDeleteOrganizationController() {
-  const { isLoaded, organization } = useOrganization();
-  const [snapshot, send, actor] = useMachine(deleteOrgMachine, {
-    context: {
-      organizationName: organization?.name ?? '',
-      destroyOrganization: () => organization?.destroy() ?? Promise.resolve(),
-    },
+export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSectionViewProps) {
+  const { isOpen, onOpenChange, onConfirm, isDeleting, errorMessage } = useUserProfileDeleteSectionController({
+    onDelete,
   });
+  // …render…
+}
+```
 
-  if (!isLoaded || !organization) {
-    return { status: 'loading' as const };
+Either way the rule holds: the controller never imports Clerk, and its effects
+arrive as injected plain functions.
+
+### Models
+
+The model reads Clerk and answers with a discriminated `status`, so every consumer
+branches on one value rather than on a scatter of `isLoaded` flags. Every callback
+it exposes is a plain function over plain ids — never a Clerk resource:
+
+```tsx
+export type UserButtonModel =
+  | { status: 'loading' }
+  | { status: 'hidden' }
+  | (UserButtonData & UserButtonCallbacks & { status: 'ready'; organizationsEnabled: boolean });
+
+export function useUserButtonModel(options?: UserButtonModelOptions): UserButtonModel {
+  const { isLoaded: isUserLoaded, user } = useUser();
+  const { isLoaded: isSessionLoaded, session } = useSession();
+  const clerk = useClerk();
+  const environment = useMosaicEnvironment();
+
+  // These all affect layout, so wait for every one and avoid a reshuffle.
+  if (!isUserLoaded || !isSessionLoaded || !environment) {
+    return { status: 'loading' };
+  }
+  if (!user || !session) {
+    return { status: 'hidden' };
   }
 
   return {
-    status: 'ready' as const,
-    snapshot,
-    send,
-    canSubmit: actor.can({ type: 'CONFIRM' }),
+    status: 'ready',
+    activeSession: toSession(session.id, user),
+    memberships: membershipData.map(m => toMembership(m.organization)),
+    onSelectOrganization: organizationId => clerk.setActive({ organization: organizationId }),
+    // Single-session apps cannot hold a second account, so the action is meaningless there.
+    onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut(),
   };
 }
 ```
 
-Controllers should pass plain data and plain functions into machines. Do not pass Clerk resource objects through to views.
+An action the instance does not offer is `undefined` rather than a disabled flag —
+the view hides the affordance it drives, so the model never has to describe UI.
+
+### Controllers
+
+The controller is the layer between the view and the outside world. It holds the
+local state, wraps the model's actions to drive pending state, keeps the surface
+stable while an action runs, and closes the surface on the actions that should
+close it.
+
+How it holds that state is a complexity call. `UserButton` earns a machine — an
+action is async, `open` and `pendingKey` constrain each other, and dismissing
+must not abandon an in-flight invoke — so the machine is declared in the same
+file and its context carries the injected effect:
+
+```tsx
+const userButtonMachine = createMachine({
+  id: 'userButton',
+  initial: 'idle',
+  context: { open: false, pendingKey: null, run: () => Promise.resolve(), closeOnSuccess: false },
+  states: {
+    idle: {
+      on: {
+        OPEN: { actions: assign(() => ({ open: true })) },
+        RUN: {
+          target: 'busy',
+          guard: context => context.open,
+          actions: assign((_, event) => ({ pendingKey: event.key, run: event.run })),
+        },
+      },
+    },
+    // OPEN/CLOSE have no target so they do not leave this state and abandon the invoke.
+    busy: {
+      on: { OPEN: { actions: assign(() => ({ open: true })) } },
+      invoke: fromPromise(context => context.run(), { onDone: 'idle', onError: 'idle' }),
+    },
+  },
+});
+
+export function useUserButtonController(model: UserButtonModel, options = {}): UserButtonController {
+  const [{ context }, send] = useMachine(userButtonMachine);
+
+  if (model.status !== 'ready') {
+    return { status: model.status };
+  }
+
+  const runAction = (key, fn, closeOnSuccess = false) =>
+    fn ? (...args) => send({ type: 'RUN', key: key(...args), run: () => fn(...args), closeOnSuccess }) : undefined;
+
+  return {
+    status: 'ready',
+    ...data,
+    open: context.open,
+    onOpenChange: next => send(next ? { type: 'OPEN' } : { type: 'CLOSE' }),
+    pendingKey: context.pendingKey,
+    onSelectOrganization: runAction(userButtonBusyKeys.selectOrganization, model.onSelectOrganization, true),
+  };
+}
+```
+
+The controller passes the model's `status` through, so the wrapper has one thing to
+branch on rather than two.
+
+A controller whose interaction is a single boolean with no async and no second
+value to keep in step is the same layer with `useState` inside it — still no
+Clerk, still returning plain props:
+
+```tsx
+export function useSectionController({ onSave }: { onSave: () => void }) {
+  const [isEditing, setIsEditing] = React.useState(false);
+
+  return {
+    isEditing,
+    onEdit: () => setIsEditing(true),
+    onCancel: () => setIsEditing(false),
+    onSave: () => {
+      setIsEditing(false);
+      onSave();
+    },
+  };
+}
+```
+
+Reaching for a machine here would produce a two-state machine with one event,
+which is a boolean spelled long. Reaching for `useState` in `UserButton` would
+produce the flag soup the machine exists to prevent. `machine/ADOPTION.md` has
+the criteria and worked before/afters for the calls in between.
 
 ### Views
 
-Views render snapshots and emit events. They receive any derived booleans from the controller, including `actor.can(...)` results, so they do not duplicate machine guards:
+Views take plain props and callbacks. They branch on the props the controller
+derived — `open`, `pendingKey`, an absent callback — never on a machine snapshot,
+so a view test needs neither the machine nor Clerk:
 
 ```tsx
-export function DeleteOrganizationView({ snapshot, send, canSubmit }: DeleteOrganizationViewProps) {
+export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: UserButtonProps) {
   return (
-    <Field.Root>
-      <Field.Label>Type {snapshot.context.organizationName} to confirm</Field.Label>
-      <Input
-        value={snapshot.context.confirmationValue}
-        onChange={event => send({ type: 'TYPE_CONFIRMATION', value: event.target.value })}
-      />
-      {snapshot.context.error ? <Field.Error>{snapshot.context.error}</Field.Error> : null}
-      <Button
-        color='negative'
-        disabled={!canSubmit}
-        onClick={() => send({ type: 'CONFIRM' })}
-      >
-        Delete organization
-      </Button>
-    </Field.Root>
+    <Popover
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      {/* An action the instance does not offer arrives undefined, so the row is simply absent. */}
+      {onSignOutAll ? (
+        <Item
+          onClick={onSignOutAll}
+          busy={pendingKey === userButtonBusyKeys.signOutAll()}
+        >
+          {m.footer.signOutAll}
+        </Item>
+      ) : null}
+    </Popover>
   );
 }
 ```
 
-View tests should render the view directly with a fake snapshot and fake `send`. They should not use Clerk providers or Clerk fixtures.
+A **block** is a view fragment that owns one piece of state nothing outside it can
+use, and takes the rest as props. `blocks/destructive` is the example: it holds the
+half-typed confirmation phrase and compares it, while `open`, `isDeleting`, and
+`errorMessage` come from the controller, because those are what decide whether the
+dialog closes or explains itself.
+
+### Testing the layers
+
+Each layer is tested in isolation, and that isolation is the point — the model is
+the only test that mocks Clerk, and the view needs no machinery at all. See the
+`mosaic` skill's `references/testing.md` for the recipes.
+
+| Layer      | Test file                | What it needs                                   |
+| ---------- | ------------------------ | ----------------------------------------------- |
+| model      | `*.model.test.tsx`       | Mocked Clerk. The highest-risk layer.           |
+| controller | `*.controller.test.tsx`  | A fake model object. No Clerk.                  |
+| view       | `*.view.test.tsx`        | Plain props and `vi.fn()` callbacks.            |
+| wrapper    | `*.test.tsx`             | All three layers mocked; asserts the branching. |
+| whole      | `*.integration.test.tsx` | Mocked Clerk, real layers, real DOM.            |
 
 ## Coexistence with existing system
 
@@ -277,6 +414,7 @@ View tests should render the view directly with a fake snapshot and fake `send`.
 - **Do not** use Emotion in Mosaic — no `css` prop, no `styled`, no theme callbacks
 - **Do** export every new component from `styles/index.ts`, or its CSS never ships
 - **Do** import from `src/mosaic/` directly (no barrel files) inside `packages/ui`
+- **Do not** import Clerk hooks or call Clerk resource methods anywhere but a `*.model.tsx`
 
 ### What doesn't share
 
@@ -300,23 +438,34 @@ To migrate a component from the old system to Mosaic:
 4. Update token references — e.g. `theme.colors.$primary500` → `colorVars['--cl-color-primary']`.
 5. Export the component from `styles/index.ts` and run `pnpm build:mosaic`.
 
-The steps above cover the **styling** migration. For **flow** components — where the legacy component also fuses data-fetching and flow logic — splitting that logic into the machine/controller/view layers and verifying no implicit behavior is dropped is its own end-to-end workflow. See the `mosaic` Claude Code skill (`.claude/skills/mosaic/`), in particular its `references/migration.md`.
+The steps above cover the **styling** migration. For **flow** components — where the legacy component also fuses data-fetching and interaction state into the same file — splitting that into the model/controller/view layers and verifying no implicit behavior is dropped is its own end-to-end workflow. See the `mosaic` Claude Code skill (`.claude/skills/mosaic/`), in particular its `references/migration.md`.
 
 ## Files
 
-| File                                           | Purpose                                                              |
-| ---------------------------------------------- | -------------------------------------------------------------------- |
-| `src/mosaic/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`              |
-| `src/mosaic/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`              |
-| `src/mosaic/MosaicProvider.tsx`                | Provider for the `icons` prop (per-name glyph overrides)             |
-| `src/mosaic/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context              |
-| `src/mosaic/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                             |
-| `src/mosaic/components/reset.styles.ts`        | Per-element UA resets shared by every component                      |
-| `src/mosaic/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                   |
-| `src/mosaic/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`) |
-| `src/mosaic/<feature>/*.machine.ts`            | Pure flow rules for a Mosaic feature                                 |
-| `src/mosaic/<feature>/*.controller.tsx`        | Clerk/mock data adapters and actor wiring for a Mosaic feature       |
-| `src/mosaic/<feature>/*.view.tsx`              | Clerk-free view modules that render snapshots and send events        |
-| `src/mosaic/components/reset.test.tsx`         | Reset specs                                                          |
-| `src/mosaic/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                          |
-| `src/mosaic/components/button/button.test.tsx` | Component-level slot/state/variant specs                             |
+| File                                           | Purpose                                                                   |
+| ---------------------------------------------- | ------------------------------------------------------------------------- |
+| `src/mosaic/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`                   |
+| `src/mosaic/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`                   |
+| `src/mosaic/MosaicProvider.tsx`                | Provider for the `icons` prop (per-name glyph overrides)                  |
+| `src/mosaic/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context                   |
+| `src/mosaic/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                                  |
+| `src/mosaic/components/`                       | One subdirectory per component, and nothing else                          |
+| `src/mosaic/blocks/`                           | View fragments that own one piece of state of their own (`destructive`)   |
+| `src/mosaic/utils/*.styles.ts`                 | Atoms shared across components: `reset`, `typography`, `focus-outline`    |
+| `src/mosaic/hooks/`                            | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)          |
+| `src/mosaic/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                        |
+| `src/mosaic/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`)      |
+| `src/mosaic/machines/`                         | Standalone machines and the shared `__tests__/test-utils.ts`              |
+| `src/mosaic/<feature>/*.model.tsx`             | Clerk adapter — the only file in a feature that may import Clerk          |
+| `src/mosaic/<feature>/*.controller.tsx`        | Local state and action wrapping; holds the feature's machine              |
+| `src/mosaic/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                     |
+| `src/mosaic/<feature>/*.types.ts`              | The data contract the model and the view both agree on                    |
+| `src/mosaic/<feature>/*.messages.ts`           | Every string the surface renders, shaped the way `@clerk/i18n` takes them |
+| `src/mosaic/utils/reset.test.tsx`              | Reset specs                                                               |
+| `src/mosaic/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                               |
+| `src/mosaic/components/button/button.test.tsx` | Component-level slot/state/variant specs                                  |
+| `src/mosaic/user-button/__tests__/`            | The canonical per-layer test set to copy from                             |
+
+`machine/` is the runtime; `machines/` is machines written with it. The one-letter
+difference is easy to misread — a feature's own machine belongs in its
+`*.controller.tsx`, not in either directory.

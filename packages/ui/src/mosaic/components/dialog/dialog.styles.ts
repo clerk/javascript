@@ -7,12 +7,34 @@ import { colorVars, durationVars, easingVars, radiusVars, space } from '../../to
 // StyleX requires a referenced constant to be declared before the `create()` call that reads it.
 const STACK_VEIL_OPACITY = 0.4;
 
+// The scrim over the bare page. A black wash over `transparent` rather than a percentage of a
+// neutral token: it composites over whatever the host app renders, so the same value reads
+// consistently on any page.
+const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
+
+/**
+ * The width bands, queried against the VIEWPORT ELEMENT rather than the window — it is a
+ * `container-type: inline-size` named `cl-dialog`, and every `@container` below reads it.
+ *
+ * Over the page the viewport is `position: fixed; inset: 0`, so its width IS the window's and the
+ * bands resolve exactly as media queries would. The difference shows when the viewport is smaller
+ * than the window: an `inline` dialog fills its host, and its inset and phone-band treatment then
+ * follow the host's width, not the browser's. Content inside a dialog may query the same name for
+ * its own layout.
+ *
+ * The two bands are deliberately NON-OVERLAPPING. Overlapping `min-width` bands would leave the
+ * winner to source order, which `@stylexjs/sort-keys` reorders on autofix — and its string sort
+ * would put a future `100rem` band BEFORE `48rem`, silently inverting the ladder.
+ *
+ * `prefers-reduced-motion` and `forced-colors` stay `@media`: they are preferences, not sizes.
+ */
+const PHONE = '@container cl-dialog (max-width: 47.99rem)';
+const ABOVE_PHONE = '@container cl-dialog (min-width: 48rem)';
+const DESK = '@container cl-dialog (min-width: 48rem) and (max-width: 89.99rem)';
+const WIDE = '@container cl-dialog (min-width: 90rem)';
+
 export const styles = stylex.create({
-  // The scrim. A black wash over `transparent` rather than a percentage of a neutral
-  // token: it composites over whatever the host app renders, so the same value reads
-  // consistently on any page.
-  //
-  // Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
+  // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
   // than darkening it — and it read as haze over the page rather than as a surface lifting off it.
   //
   // A dialog opened over a `panel` or a `card` paints its OWN scrim, lighter than the base because
@@ -24,10 +46,19 @@ export const styles = stylex.create({
   backdrop: {
     inset: 0,
     backgroundColor: {
-      default: 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)',
+      default: BASE_SCRIM,
       ':where([data-nested])': 'color-mix(in oklab, oklch(0 0 0) 46.67%, transparent)',
     },
     position: 'fixed',
+  },
+
+  /**
+   * A dialog opened from inside an INLINE dialog is nested, but the surface it opens over paints
+   * no scrim for the nested value to composite with — so it takes the base one. Rides the same
+   * `stylex.props` call as `backdrop`, so this `backgroundColor` replaces that one outright.
+   */
+  backdropOverInline: {
+    backgroundColor: BASE_SCRIM,
   },
 
   /**
@@ -50,43 +81,59 @@ export const styles = stylex.create({
     backgroundColor: 'transparent',
   },
 
-  // Centering track inside the headless `FloatingOverlay`, which owns the fixed positioning and
-  // the scroll lock. Whether this box is a fixed height or grows with its content is the whole
-  // outside-scroll question, and it differs per size — see `viewportSizes` below.
-  //
-  // The gap between a dialog and the edge of the screen is a FIXED INSET, not a percentage.
-  // A percentage margin is asymmetric between the axes and the asymmetry tracks the viewport's
-  // aspect ratio: at 90vw/90dvh a 1920x1080 screen leaves 96px at the sides and 54px top and
-  // bottom, an ultrawide closer to 172 against 72, and a phone inverts it — 20px at the sides
-  // against 42px. The surround never reads as a frame and its character changes per device. One
-  // inset is even on all four sides everywhere, and steps up with available room rather than
-  // with aspect ratio.
-  //
-  // Published as a var so the two edges can be driven from one ladder and so anything inside can
-  // read it without plumbing — custom properties inherit. The popup needs no width math of its
-  // own: it is `width: 100%` inside this padding, so the inset is already subtracted.
-  //
-  // Square everywhere except the phone band, where the sides come in to `1rem` and the block edges
-  // stay at `1.25rem`. On a phone the horizontal inset is the expensive one — it is subtracted from
-  // a content box only ~380px wide, so every pixel there costs line length in a way the same pixel
-  // costs nothing vertically. The vertical edges are doing the opposite job: separating the surface
-  // from the browser's own chrome, which is closer on a phone than on any desktop.
-  //
-  // The two queries are deliberately NON-OVERLAPPING. Overlapping `min-width` bands would leave
-  // the winner to source order, which `@stylexjs/sort-keys` reorders on autofix — and its string
-  // sort would put a future `100rem` band BEFORE `48rem`, silently inverting the ladder.
+  /**
+   * The headless viewport element, inside the `FloatingOverlay` that owns the fixed positioning
+   * and the scroll lock. Two jobs: it is the query container every band reads — see `PHONE` and
+   * friends above — and it is the box the sizes measure against. Whether that box is a fixed
+   * height or grows with its content is the whole outside-scroll question, and it differs per
+   * size — see `viewportSizes` below.
+   *
+   * It carries NO band of its own, and cannot: an element is never its own query container, so a
+   * `@container cl-dialog` rule on this element would resolve against some OUTER dialog's viewport
+   * — or nothing. Everything width-dependent lives on `track`, the padded grid inside it.
+   *
+   * `inline-size` rather than `size`: block-size containment would stop the box growing with its
+   * content, which is exactly what the outside-scroll sizes need it to do, and no band queries
+   * height. A grid so the track fills it: an `auto` row stretches to the container's used height,
+   * `min-height` included, which is what hands the track a definite box to centre within.
+   */
   viewport: {
+    containerName: 'cl-dialog',
+    containerType: 'inline-size',
+    display: 'grid',
+    width: '100%',
+  },
+
+  /**
+   * The centering track: the inset, and the grid the popup is centred in. The gap between a
+   * dialog and the edge of the screen is a FIXED INSET, not a percentage. A percentage margin is
+   * asymmetric between the axes and the asymmetry tracks the viewport's aspect ratio: at 90vw/90dvh
+   * a 1920x1080 screen leaves 96px at the sides and 54px top and bottom, an ultrawide closer to
+   * 172 against 72, and a phone inverts it — 20px at the sides against 42px. One inset is even on
+   * all four sides everywhere, and steps up with available room rather than with aspect ratio.
+   *
+   * Published as a var so the two edges can be driven from one ladder and so anything inside can
+   * read it without plumbing — custom properties inherit. The popup needs no width math of its
+   * own: it is `width: 100%` inside this padding, so the inset is already subtracted.
+   *
+   * Square everywhere except the phone band, where the sides come in to `1rem` and the block edges
+   * stay at `1.25rem`. On a phone the horizontal inset is the expensive one — it is subtracted from
+   * a content box only ~380px wide, so every pixel there costs line length in a way the same pixel
+   * costs nothing vertically. The vertical edges are doing the opposite job: separating the surface
+   * from the browser's own chrome, which is closer on a phone than on any desktop.
+   */
+  track: {
     '--_cl-dialog-inset': {
+      [DESK]: space['8'],
+      [WIDE]: space['12'],
       default: space['5'],
-      '@media (min-width: 48rem) and (max-width: 89.99rem)': space['8'],
-      '@media (min-width: 90rem)': space['12'],
     },
     padding: 'var(--_cl-dialog-inset)',
     // Narrower sides under the phone band only. A longhand beside the `padding` shorthand above is
     // safe in either order — StyleX ranks a longhand higher regardless — which is the same reason
     // `paddingBlockEnd` below works. Above the phone band this resolves back to the ladder, so
     // there is exactly one place to retune each band.
-    paddingInline: { default: space['4'], '@media (min-width: 48rem)': 'var(--_cl-dialog-inset)' },
+    paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', default: space['4'] },
     // `safe center` rather than plain `center`, and it is what makes an over-tall popup reachable.
     // Centring an item TALLER than its box overflows it equally in both directions, leaving the
     // top half above the scroll origin and unreachable; `safe` falls back to start alignment in
@@ -98,7 +145,22 @@ export const styles = stylex.create({
     // regardless of order, so this wins without depending on argument order. Falls back to `0px`,
     // so it is inert until `acquireKeyboardInset` has something to report.
     paddingBlockEnd: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
+    // A grid item's automatic minimum would otherwise hold this to its content and defeat the
+    // definite row `viewportSizes.panel` pins.
+    minHeight: 0,
     width: '100%',
+  },
+
+  /**
+   * An inline dialog fills its host edge to edge: the inset is the gap between a surface and the
+   * screen, and a surface that IS the page's content has no screen edge to hold off.
+   *
+   * Only the var and the one longhand that departs from it need restating: `padding` and
+   * `paddingBlockEnd` both derive from the var, and the keyboard inset is never published inline.
+   */
+  trackInline: {
+    '--_cl-dialog-inset': '0px',
+    paddingInline: 0,
   },
 
   // The dialog surface. Unlike `Popover`, this one paints, because a `prompt` and a `panel` take
@@ -173,7 +235,7 @@ export const styles = stylex.create({
     width: '100%',
     '::after': {
       inset: 0,
-      // Follows the popup's own radius, counter-scale included.
+      // Follows the popup's own radius.
       borderRadius: 'inherit',
       backgroundColor: colorVars['--cl-color-card'],
       content: '""',
@@ -184,8 +246,8 @@ export const styles = stylex.create({
       // one gesture, and the phone band runs the transform at `slow`. Pinning the veil at `base`
       // there finishes the dim 100ms before the surface stops moving, in both directions.
       transitionDuration: {
+        [PHONE]: durationVars['--cl-duration-slow'],
         default: durationVars['--cl-duration-base'],
-        '@media (max-width: 47.99rem)': durationVars['--cl-duration-slow'],
       },
       transitionProperty: 'opacity',
       transitionTimingFunction: easingVars['--cl-ease-enter'],
@@ -210,6 +272,20 @@ export const styles = stylex.create({
     display: 'flex',
     position: 'absolute',
     zIndex: 1,
+  },
+
+  // The response row of an alert dialog. Grid, not flex: an even split needs `flex: 1` on each
+  // CHILD, and StyleX has no child selector to set it from the container. Keep DOM order visual
+  // order — the cancel is first so it is the first tabbable element, which is what opens it
+  // focused without any `initialFocus` plumbing.
+  actions: {
+    gap: space['3'],
+    display: 'grid',
+    gridAutoColumns: '1fr',
+    gridAutoFlow: 'column',
+    // On top of the popup's own `gap`, so the response separates from the question it answers
+    // rather than reading as a third paragraph.
+    marginBlockStart: space['2'],
   },
 });
 
@@ -237,11 +313,9 @@ export const closeInsets = stylex.create({
  * `card` sets only `max-width`; the popup is `width: 100%` and its height is whatever the
  * content needs, which is right for a confirmation or a two-field form.
  *
- * `panel` decides both axes. Its content NAVIGATES — a settings surface switches sections
- * in place — and a content-driven height would resize the window on every section change,
- * in both directions at once since the viewport centres it. `94rem` is 1504px at the
- * default root size; both axes stay in `rem`/`dvh` so a consumer scaling type scales with
- * them. `dvh` rather than `vh` for mobile browser chrome.
+ * `panel` fixes the height. Its content NAVIGATES — a settings surface switches sections in
+ * place — and a content-driven height would resize the window on every section change, in both
+ * directions at once since the viewport centres it. Its width is the surface's own.
  */
 /**
  * How the viewport behaves when the popup is taller than the screen — the "inside scroll" vs
@@ -249,18 +323,40 @@ export const closeInsets = stylex.create({
  * surface already is.
  *
  * A `panel` is a fixed-height window you navigate inside, so it scrolls INSIDE: the viewport stays
- * pinned to the overlay and the consumer composes a scroll region out of `scrollAreaRoot` /
- * `scrollAreaViewport()`. A `prompt` and a `card` take their height from their content and have no
- * obvious region to scroll, so they scroll OUTSIDE: the whole dialog moves within the overlay.
+ * pinned to the overlay and the surface scrolls its own region. A `prompt` and a `card` take their
+ * height from their content and have no obvious region to scroll, so they scroll OUTSIDE: the
+ * whole dialog moves within the overlay.
  *
  * The mechanism is one property. Pinned at `height: 100%` the viewport cannot grow, so an over-tall
- * popup spills past its padding box — the scrollable overflow reaches the overlay, but the
- * viewport's own `padding-block-end` stays behind at the fold, and the popup runs flush into the
- * bottom edge with none of the inset that surrounds it everywhere else. `min-height: 100%` lets the
- * box grow instead: the padding travels with the content, and short dialogs still fill the overlay
- * so `place-items: center` has something to centre against.
+ * popup spills past its padding box — the scrollable overflow reaches the overlay, but the track's
+ * `padding-block-end` stays behind at the fold, and the popup runs flush into the bottom edge with
+ * none of the inset that surrounds it everywhere else. `min-height: 100%` lets the box grow
+ * instead: the padding travels with the content, and short dialogs still fill the overlay so the
+ * track has something to centre against.
  */
 export const viewportSizes = stylex.create({
+  prompt: { minHeight: '100%' },
+  card: { minHeight: '100%' },
+  panel: {
+    // A definite container height is NOT enough on its own: an `auto` grid row still sizes to its
+    // content and happily exceeds the container, which is how a panel of rows measured 2208px
+    // inside a 1251px overlay. `minmax(0, 1fr)` pins the single row to the content box, so the row
+    // is what an item stretches to and what its overflow is measured against.
+    //
+    // Deliberately NOT applied to the scrolling sizes: it would clamp the row there too, which is
+    // exactly what has to stop happening for the popup to grow past the fold.
+    gridTemplateRows: 'minmax(0, 1fr)',
+    // A DEFINITE height, taken from the overlay (`position: fixed; inset: 0`), which makes the
+    // single grid row definite too. That is what lets `sizes.panel` fill the content box with
+    // `align-self: stretch` alone — no `dvh` arithmetic, so nothing can disagree with the box a
+    // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
+    // overlay measures 1251px while `100dvh` reports 844.
+    height: '100%',
+  },
+});
+
+/** The per-size half of `styles.track` — the rules that need the band, and so must sit inside the container. */
+export const trackSizes = stylex.create({
   prompt: {
     // Clips the sheet while it is outside the box, and ONLY for the size that translates. A
     // `prompt` enters from `translate: 0 100%` — a full height BELOW its resting place — and the
@@ -280,26 +376,11 @@ export const viewportSizes = stylex.create({
     // scrolled, because the same rule that contains the slide also contains the overflow. A prompt
     // asks one thing, so it should not reach that height; a tall surface on a phone wants `card`,
     // which does not translate and therefore is not clipped here.
-    overflow: { default: null, '@media (max-width: 47.99rem)': 'clip' },
-    minHeight: '100%',
+    overflow: { [PHONE]: 'clip', default: null },
   },
-  card: { minHeight: '100%' },
-  panel: {
-    // A definite container height is NOT enough on its own: an `auto` grid row still sizes to its
-    // content and happily exceeds the container, which is how a panel of rows measured 2208px
-    // inside a 1251px overlay. `minmax(0, 1fr)` pins the single row to the content box, so the row
-    // is what an item stretches to and what its overflow is measured against.
-    //
-    // Deliberately NOT applied to the scrolling sizes: it would clamp the row there too, which is
-    // exactly what has to stop happening for the popup to grow past the fold.
-    gridTemplateRows: 'minmax(0, 1fr)',
-    // A DEFINITE height, taken from the overlay (`position: fixed; inset: 0`), which makes the
-    // single grid row definite too. That is what lets `sizes.panel` fill the content box with
-    // `align-self: stretch` alone — no `dvh` arithmetic, so nothing can disagree with the box a
-    // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
-    // overlay measures 1251px while `100dvh` reports 844.
-    height: '100%',
-  },
+  card: {},
+  // Same definite row as the viewport's, one level down, so the popup's `stretch` lands on it.
+  panel: { gridTemplateRows: 'minmax(0, 1fr)' },
 });
 
 export const sizes = stylex.create({
@@ -321,21 +402,18 @@ export const sizes = stylex.create({
     // otherwise binds on larger phones — a 428px screen has 396px of content box against a 380px
     // cap — leaving the sheet inset further at the sides than at the bottom, which is exactly the
     // uneven frame the fixed inset exists to avoid.
-    alignSelf: { default: null, '@media (max-width: 47.99rem)': 'end' },
-    maxWidth: { default: '23.75rem', '@media (max-width: 47.99rem)': 'none' },
+    alignSelf: { [PHONE]: 'end', default: null },
+    maxWidth: { [PHONE]: 'none', default: '23.75rem' },
   },
-  // The one size that does NOT paint itself. A `card` is the sign-in / sign-up surface, which is
-  // a `Card` — so the surface comes from `Card`'s own `elevations.overlay` rather than from here,
-  // and the popup contributes only geometry and motion. Compose it by rendering the popup AS the
-  // card, not by nesting one inside the other:
+  // Does NOT paint itself. A `card` is the sign-in / sign-up surface, which is a `Card` — so the
+  // surface comes from `Card`'s own `elevations.overlay` rather than from here, and the popup
+  // contributes only geometry and motion. Compose it by rendering the card INSIDE the popup:
   //
-  //   <Dialog.Popup render={<Card.Root elevation='overlay' />}>
+  //   <Dialog.Popup size='card'><Card.Root elevation='overlay'>…</Card.Root></Dialog.Popup>
   //
-  // One element then both paints and animates, which is what keeps the radius counter-scale in
-  // `popupMotion.card` landing on the corners you actually see. Nested, the popup would scale a
-  // transparent box while the `Card` inside it took the scale on its painted corners with no
-  // correction. `borderRadius` stays here for that reason; `Card` declares the same token, so the
-  // two agree at rest and the counter-scale wins during the transition on specificity.
+  // The card reads `DialogContext` from there: `Card.Title` names the dialog and `Card.Header`
+  // carries its dismiss, so the surface stays self-contained. The popup is then a transparent
+  // box that scales, and the card's painted corners scale with it — see `ENTER_SCALE`.
   //
   // These are `null` rather than `transparent` / `none` / `0`. Within one `stylex.props` call a
   // later `null` REMOVES the earlier atom, so the popup emits no class for these properties at
@@ -346,52 +424,52 @@ export const sizes = stylex.create({
   // Consequence worth knowing: `size="card"` with no `Card` inside renders an unpainted box.
   card: {
     padding: null,
+    borderRadius: null,
     gap: null,
     backgroundColor: null,
     boxShadow: null,
     maxWidth: '25rem',
   },
+  /**
+   * Like `card`, the panel does NOT paint itself. It is the account-profile and settings surface,
+   * which is a `ProfilePage` — so the frame comes from `ProfilePage.Root`'s own styles and the
+   * popup contributes geometry and motion only. Compose it by rendering the page INSIDE the popup:
+   *
+   *   <Dialog.Popup size='panel'><UserPageView … /></Dialog.Popup>
+   *
+   * The page reads `DialogContext` from there — it names the dialog, carries its dismiss, and
+   * fills the popup's height — and that is also what makes `inline` a non-event for the surface:
+   * modal or in a page slot, the page paints itself the same way, and the dialog only decides
+   * where it sits. The `null`s remove the popup's own atoms outright — see the note on `card`.
+   * The width cap matches the page's, the way `card` matches the `Card`.
+   *
+   * Consequence worth knowing: `size="panel"` with no surface inside renders an unpainted box.
+   */
   panel: {
-    // No padding, unlike `card`. A panel's regions reach the popup's edges: a scroll region sits
-    // flush, so its scrollbar and edge fade land on the true edge rather than floating in a
-    // margin, and a sidebar can run the full height. Padding belongs to the children, which is
-    // the same trade `overflow: hidden` makes — the panel supplies the frame, the composition
-    // supplies the anatomy.
-    padding: space['0'],
+    padding: null,
+    borderColor: null,
+    borderRadius: null,
+    borderStyle: null,
+    borderWidth: null,
+    gap: null,
     // The panel does NOT scroll itself, and that is the whole design. A fixed-height surface
     // needs somewhere for overflow to go, but putting the scroll on the POPUP takes everything
-    // anchored to it along for the ride — the close button most obviously, and anything else a
-    // consumer positions against the corner.
-    //
-    // So the popup clips, and the scroll region is composed INSIDE it out of `scrollAreaRoot` /
-    // `scrollAreaViewport()`. That also buys the sidebar case for free: a fixed rail beside a
-    // scrolling column is just a flex row, where a Header/Body/Footer anatomy would have had to
-    // grow a second axis to express it. `overscroll-behavior` comes with the ScrollArea viewport,
-    // so it is not restated here.
+    // anchored to it along for the ride — the close button most obviously. So the popup clips,
+    // and the scroll region is the surface's own: `ProfilePage` scrolls its content column.
+    // Deliberately a flex column with no `align-items` override, so the surface inside stretches
+    // to the popup's width and grows to its height.
     //
     // `clip` rather than `hidden` for the same reason as the viewport: `hidden` would make the
     // panel a scroll container, and focusing anything inside it that sits outside its box would
-    // scroll the panel itself. The panel must never scroll — that is the composed region's job.
+    // scroll the panel itself.
     overflow: 'clip',
     // Fills the viewport's content box rather than computing a height from `dvh`. The grid row
-    // already stretches to the container (`place-items` sets `align-items`, not `align-content`,
-    // so the row keeps its default stretch), and that box is by definition "the viewport minus the
-    // inset on every side" — so `stretch` lands the panel's edges on exactly the same lines a
-    // bottom-anchored `prompt` sheet reaches with `align-self: end`.
-    //
-    // Deriving the height from `100dvh` let the two disagree: `dvh` is measured against the visual
-    // viewport while the grid box is 100% of the overlay, and wherever those differ — mobile
-    // browser chrome most obviously — the panel overhung the box and sat lower than the sheet.
-    // Stretching removes the arithmetic, and with it the class of bug.
-    // Fills the viewport's content box exactly, and clamps to it. Both follow from the row being
-    // definite (see `styles.viewport`) — without that a grid auto-row grows to its content, and
-    // `stretch` faithfully filled 2144px in an 800px viewport, so the composed scroll region never
-    // engaged. With it, the panel's edges land on the same lines a bottom-anchored sheet reaches
-    // and its overflow has somewhere to go.
+    // is definite (see `styles.viewport`), so `stretch` lands the panel's edges on exactly the
+    // lines a bottom-anchored `prompt` sheet reaches with `align-self: end`, and clamps to them.
     alignSelf: 'stretch',
-    // No `vw` term: the popup is `width: 100%` inside the viewport's padding, so the inset is
-    // already subtracted. This only caps how wide the panel may get — 1504px at the default root.
-    maxWidth: '94rem',
+    backgroundColor: null,
+    boxShadow: null,
+    maxWidth: null,
   },
 });
 
@@ -470,17 +548,6 @@ export const backdropMotion = stylex.create({
   },
 });
 
-// The entering/exiting scale, and the radius that survives it. `transform: scale()` scales the
-// RENDERED border-radius along with everything else, so a popup at 0.94 draws its corners at 94%
-// of their value and the roundness drifts over the transition. Dividing the radius by the same
-// factor cancels it exactly: `r/s` drawn at scale `s` renders as `r`.
-//
-// One same-file const feeds both, so the correction cannot drift from the scale it corrects. At
-// 0.94 it is worth about 0.77px on a 12px radius — well above the threshold it sat at when the
-// scale was 0.98 (0.24px), so this is now load-bearing rather than merely principled.
-//
-// Only the endpoints are exact. Both properties interpolate on the same curve over the same
-// duration, so the mid-transition error is second-order and stays well under a pixel.
 // The plain CSS `ease-out` — `cubic-bezier(0, 0, 0.58, 1)` — used ONLY for the sheet's slide out.
 //
 // `--cl-ease-exit` (In Quad) is right for a small delta: over ~11px its slow start is imperceptible
@@ -494,16 +561,23 @@ export const backdropMotion = stylex.create({
 // other in Mosaic. If a second large-travel exit appears, it should graduate to one.
 const SHEET_EXIT_EASE = 'ease-out';
 
+// The entering/exiting scale. `transform: scale()` scales the RENDERED border-radius along with
+// everything else, so a surface at 0.94 draws its corners at 94% of their value for the length of
+// the transition — about 0.77px on a 12px radius. An earlier version cancelled that by dividing
+// the popup's radius by the same factor, which only reaches corners the POPUP paints: since a
+// `card` and a `panel` are painted by the surface inside, the correction had stopped reaching the
+// corners that matter and was dropped rather than pushed into every surface's API. If it comes
+// back, it should come back self-contained — the popup publishing its current scale as a custom
+// property a surface can read to counter its own radius — not as a composition rule.
 const ENTER_SCALE = 0.94;
 
-// How far a prompt recedes while another prompt is stacked on it, and the radius that survives
-// that scale — the same `r/s` correction `ENTER_SCALE` documents above, for the same reason.
+// How far a prompt recedes while another prompt is stacked on it.
 //
 // Shallower than the entrance scale on purpose: the entrance is a surface arriving from nowhere,
 // while this is a surface that stays legible the whole time and only has to read as further back.
-// The lift (`STACK_LIFT`, at the top of this file) is what separates it from the entrance rather
-// than the depth of the scale — a surface that only shrinks reads as being pushed away, one that
-// shrinks and rises reads as being layered over, which is the relationship this actually is.
+// The lift (`STACK_LIFT`) is what separates it from the entrance rather than the depth of the
+// scale — a surface that only shrinks reads as being pushed away, one that shrinks and rises reads
+// as being layered over, which is the relationship this actually is.
 //
 // A single step rather than a `--cl-stack-index` formula: the headless layer counts DIRECT
 // children, so a third level would report the same 1 as the second and every level below the top
@@ -511,8 +585,6 @@ const ENTER_SCALE = 0.94;
 // whenever a stack deep enough to need them turns up.
 const STACK_SCALE = 0.96;
 const STACK_LIFT = '-0.5rem';
-
-const popupRadius = radiusVars['--cl-radius-xl'];
 
 export const popupMotion = stylex.create({
   /**
@@ -523,27 +595,6 @@ export const popupMotion = stylex.create({
    * Each cell is therefore self-contained and reads straight against the design matrix.
    */
   prompt: {
-    borderRadius: {
-      default: popupRadius,
-      // The recede is the one scale that survives the phone band, so unlike the entrance its
-      // radius correction is NOT pinned flat there — see `transform` below.
-      ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
-      ':where([data-starting-style], [data-ending-style])': `calc(${popupRadius} / ${ENTER_SCALE})`,
-      '@media (max-width: 47.99rem)': {
-        default: popupRadius,
-        ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
-        ':where([data-starting-style], [data-ending-style])': popupRadius,
-      },
-      // Both entrance branches resolve to the same value, so their order relative to each other
-      // cannot matter: there is no scale to counteract in either case. The recede is the
-      // exception — it still applies under `reduce`, just without a duration — so its correction
-      // has to come with it.
-      '@media (prefers-reduced-motion: reduce)': {
-        default: popupRadius,
-        ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
-        ':where([data-starting-style], [data-ending-style])': popupRadius,
-      },
-    },
     // One fade at every width, including the sheet. An earlier version pinned the sheet at
     // opacity 1 on the theory that a pure slide reads more like a native sheet — compared
     // side by side it did not; the fade gives the travel somewhere to resolve into rather than
@@ -575,6 +626,11 @@ export const popupMotion = stylex.create({
      * free to reorder them.
      */
     transform: {
+      [PHONE]: {
+        default: 'scale(1)',
+        ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
+        ':where([data-starting-style], [data-ending-style])': 'scale(1)',
+      },
       default: 'scale(1)',
       /**
        * The recede: what a prompt does while another prompt is stacked on it. There is no second
@@ -594,11 +650,6 @@ export const popupMotion = stylex.create({
        */
       ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
       ':where([data-starting-style], [data-ending-style])': `scale(${ENTER_SCALE})`,
-      '@media (max-width: 47.99rem)': {
-        default: 'scale(1)',
-        ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
-        ':where([data-starting-style], [data-ending-style])': 'scale(1)',
-      },
       // The recede is NOT dropped here, unlike the entrance scale. `reduce` asks for no
       // ANIMATION, not for no distinction: `transitionProperty` below narrows to `opacity` in
       // this mode, so the recede lands in one frame with nothing interpolating. Dropping it
@@ -618,9 +669,8 @@ export const popupMotion = stylex.create({
     // The FIRST slot tracks the fourth on the phone branch rather than staying at `fast`: opacity
     // and the slide are one gesture there, and a fade that finishes while the surface is still
     // travelling reads as a flash rather than as an arrival. Above the phone band the fade keeps
-    // `fast` and lands with the scrim, since the scale it accompanies barely moves. The third slot
-    // is inert under the phone band (no scale, so no radius counter-scale) but still has to be
-    // filled — the list is positional.
+    // `fast` and lands with the scrim, since the scale it accompanies barely moves. The list is
+    // positional against `transitionProperty` below.
     //
     // EXCEPT for a sheet arriving over another dialog, which takes the desktop `fast` fade back.
     // The long fade earns itself on the first sheet, where it gives the travel somewhere to
@@ -634,20 +684,20 @@ export const popupMotion = stylex.create({
     // arriving over something opaque, and a panel is as opaque as a prompt.
     //
     // The combined exiting branch restates `base` because `@stylexjs/sort-keys` puts it after the
-    // plain `data-stacked` one, which would otherwise hand a stacked sheet the four-value entrance
+    // plain `data-stacked` one, which would otherwise hand a stacked sheet the three-value entrance
     // list on its way out and slow its exit slide.
     transitionDuration: {
-      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
-      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
-      '@media (max-width: 47.99rem)': {
-        default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-slow']}`,
+      [PHONE]: {
+        default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
         ':where([data-ending-style])': durationVars['--cl-duration-base'],
-        ':where([data-stacked])': `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-slow']}`,
+        ':where([data-stacked])': `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
         ':where([data-stacked][data-ending-style])': durationVars['--cl-duration-base'],
       },
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
     transitionProperty: {
-      default: 'opacity, transform, border-radius, translate',
+      default: 'opacity, transform, translate',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     // Unchanged by the sheet: a translate is still something that moves, so it wants the arrival
@@ -655,14 +705,14 @@ export const popupMotion = stylex.create({
     // `--cl-ease-default` because a surface this size should land rather than settle — Swift Out's
     // ~2% overshoot reads as the sheet arriving past its inset and correcting.
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
-      // Positional against `transitionProperty`, so the fourth slot is `translate` — the sheet's
+      default: `linear, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
+      // Positional against `transitionProperty`, so the third slot is `translate` — the sheet's
       // slide, and the only one that departs from `--cl-ease-exit`. Set on the PLAIN
       // `[data-ending-style]` branch rather than behind a media query on purpose: `translate` is
       // unset above the phone band, so the slot is inert there, and a media-scoped branch would
       // have to out-rank a plain sibling on the same property — the fight documented on
       // `translate` below.
-      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
+      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
     },
     /**
      * The sheet's slide rides the independent `translate` property, NOT `transform` — and it
@@ -678,27 +728,24 @@ export const popupMotion = stylex.create({
      * Giving the slide its own property removes the contest entirely, and omitting the `default`
      * leaves nothing for it to lose to: at rest `translate` is simply unset. The
      * `no-preference` guard then makes reduced motion a no-op for free — no branch matches, so
-     * the sheet holds flat and only the scrim fades.
+     * the sheet holds flat and only the scrim fades. It nests inside the band rather than being
+     * written as one combined query, because a container query and a media query cannot share
+     * an `and`.
      */
     translate: {
-      default: null,
-      '@media (max-width: 47.99rem) and (prefers-reduced-motion: no-preference)': {
+      [PHONE]: {
         default: null,
-        ':where([data-starting-style], [data-ending-style])': '0 100%',
+        '@media (prefers-reduced-motion: no-preference)': {
+          default: null,
+          ':where([data-starting-style], [data-ending-style])': '0 100%',
+        },
       },
+      default: null,
     },
   },
 
   /** The sign-in / sign-up surface. Stays centred and centre-scaled at every width. */
   card: {
-    borderRadius: {
-      default: popupRadius,
-      ':where([data-starting-style], [data-ending-style])': `calc(${popupRadius} / ${ENTER_SCALE})`,
-      '@media (prefers-reduced-motion: reduce)': {
-        default: popupRadius,
-        ':where([data-starting-style], [data-ending-style])': popupRadius,
-      },
-    },
     opacity: {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
@@ -712,16 +759,16 @@ export const popupMotion = stylex.create({
       },
     },
     transitionDuration: {
-      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
       ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
     transitionProperty: {
-      default: 'opacity, transform, border-radius',
+      default: 'opacity, transform',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
-      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}, ${easingVars['--cl-ease-exit']}`,
+      default: `linear, ${easingVars['--cl-ease-enter']}`,
+      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
     },
   },
 

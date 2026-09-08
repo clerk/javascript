@@ -65,11 +65,11 @@ public class ClerkExpoModule: Module {
 
     AsyncFunction("getTrustedDeviceAvailability") {
       (id: String?, identifierHint: String?, promise: Promise) in
-      self.getTrustedDeviceAvailability(id: id, identifierHint: identifierHint, promise: promise)
+      self.getBiometricCredentialAvailability(id: id, identifierHint: identifierHint, promise: promise)
     }
 
     AsyncFunction("listTrustedDevices") { (promise: Promise) in
-      self.listTrustedDevices(promise: promise)
+      self.listBiometricCredentials(promise: promise)
     }
 
     AsyncFunction("enrollTrustedDevice") {
@@ -78,7 +78,7 @@ public class ClerkExpoModule: Module {
        reason: String?,
        policy: String,
        promise: Promise) in
-      self.enrollTrustedDevice(
+      self.enrollBiometricCredential(
         deviceName: deviceName,
         identifierHint: identifierHint,
         reason: reason,
@@ -88,12 +88,12 @@ public class ClerkExpoModule: Module {
     }
 
     AsyncFunction("revokeTrustedDevice") { (id: String, promise: Promise) in
-      self.revokeTrustedDevice(id: id, promise: promise)
+      self.revokeBiometricCredential(id: id, promise: promise)
     }
 
     AsyncFunction("signInWithTrustedDevice") {
       (id: String?, identifierHint: String?, reason: String?, promise: Promise) in
-      self.signInWithTrustedDevice(
+      self.signInWithBiometrics(
         id: id,
         identifierHint: identifierHint,
         reason: reason,
@@ -155,18 +155,18 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  // MARK: - Trusted devices
+  // MARK: - Biometric credentials
 
-  private func getTrustedDeviceAvailability(id: String?, identifierHint: String?, promise: Promise) {
+  private func getBiometricCredentialAvailability(id: String?, identifierHint: String?, promise: Promise) {
     Task { @MainActor in
       do {
-        let availability = try await ClerkNativeBridge.shared.getTrustedDeviceAvailability(
+        let availability = try await ClerkNativeBridge.shared.getBiometricCredentialAvailability(
           id: id,
           identifierHint: identifierHint
         )
         promise.resolve(availability)
       } catch {
-        rejectTrustedDeviceError(
+        rejectBiometricCredentialError(
           error,
           fallbackCode: "E_TRUSTED_DEVICE_AVAILABILITY_FAILED",
           promise: promise
@@ -175,13 +175,13 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  private func listTrustedDevices(promise: Promise) {
+  private func listBiometricCredentials(promise: Promise) {
     Task { @MainActor in
       do {
-        let trustedDevices = try await ClerkNativeBridge.shared.listTrustedDevices()
-        promise.resolve(trustedDevices)
+        let biometricCredentials = try await ClerkNativeBridge.shared.listBiometricCredentials()
+        promise.resolve(biometricCredentials)
       } catch {
-        rejectTrustedDeviceError(
+        rejectBiometricCredentialError(
           error,
           fallbackCode: "E_TRUSTED_DEVICE_LIST_FAILED",
           promise: promise
@@ -190,7 +190,7 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  private func enrollTrustedDevice(
+  private func enrollBiometricCredential(
     deviceName: String?,
     identifierHint: String?,
     reason: String?,
@@ -199,15 +199,15 @@ public class ClerkExpoModule: Module {
   ) {
     Task { @MainActor in
       do {
-        let trustedDevice = try await ClerkNativeBridge.shared.enrollTrustedDevice(
+        let biometricCredential = try await ClerkNativeBridge.shared.enrollBiometricCredential(
           deviceName: deviceName,
           identifierHint: identifierHint,
           reason: reason,
           policy: policy
         )
-        promise.resolve(trustedDevice)
+        promise.resolve(biometricCredential)
       } catch {
-        rejectTrustedDeviceError(
+        rejectBiometricCredentialError(
           error,
           fallbackCode: "E_TRUSTED_DEVICE_ENROLLMENT_FAILED",
           promise: promise
@@ -216,13 +216,13 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  private func revokeTrustedDevice(id: String, promise: Promise) {
+  private func revokeBiometricCredential(id: String, promise: Promise) {
     Task { @MainActor in
       do {
-        let trustedDevice = try await ClerkNativeBridge.shared.revokeTrustedDevice(id: id)
-        promise.resolve(trustedDevice)
+        let biometricCredential = try await ClerkNativeBridge.shared.revokeBiometricCredential(id: id)
+        promise.resolve(biometricCredential)
       } catch {
-        rejectTrustedDeviceError(
+        rejectBiometricCredentialError(
           error,
           fallbackCode: "E_TRUSTED_DEVICE_REVOCATION_FAILED",
           promise: promise
@@ -231,7 +231,7 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  private func signInWithTrustedDevice(
+  private func signInWithBiometrics(
     id: String?,
     identifierHint: String?,
     reason: String?,
@@ -239,14 +239,14 @@ public class ClerkExpoModule: Module {
   ) {
     Task { @MainActor in
       do {
-        let signIn = try await ClerkNativeBridge.shared.signInWithTrustedDevice(
+        let signIn = try await ClerkNativeBridge.shared.signInWithBiometrics(
           id: id,
           identifierHint: identifierHint,
           reason: reason
         )
         promise.resolve(signIn)
       } catch {
-        rejectTrustedDeviceError(
+        rejectBiometricCredentialError(
           error,
           fallbackCode: "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
           promise: promise
@@ -255,12 +255,12 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  private func rejectTrustedDeviceError(
+  private func rejectBiometricCredentialError(
     _ error: Error,
     fallbackCode: String,
     promise: Promise
   ) {
-    let descriptor = ClerkNativeBridge.trustedDeviceErrorDescriptor(
+    let descriptor = ClerkNativeBridge.biometricCredentialErrorDescriptor(
       error,
       fallbackCode: fallbackCode
     )
