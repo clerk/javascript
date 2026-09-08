@@ -39,13 +39,13 @@ describe('Typedoc output', () => {
     expect(hookReturn).toMatch(/^\| Property/);
   });
 
-  it('inlines OAuth device verification statuses while preserving their standalone page', async () => {
+  it('inlines OAuth device verification statuses without generating a standalone page', async () => {
     const info = await readFile(join(OUTPUT_LOCATION, 'shared/o-auth-device-verification-info.mdx'), 'utf8');
-    const status = await readFile(join(OUTPUT_LOCATION, 'shared/o-auth-device-verification-status.mdx'), 'utf8');
+    const sharedFiles = await readdir(join(OUTPUT_LOCATION, 'shared'));
 
     expect(info).toContain('<code>"pending" \\| "approved" \\| "denied" \\| "consumed"</code>');
     expect(info).not.toContain('[OAuthDeviceVerificationStatus]');
-    expect(status).toContain('The current status of an OAuth device authorization.');
+    expect(sharedFiles).not.toContain('o-auth-device-verification-status.mdx');
   });
 
   it('should only have these top-level folders', async () => {

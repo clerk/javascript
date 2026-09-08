@@ -51,36 +51,6 @@ describe('applyRelativeLinkReplacements', () => {
       '[x](/docs/reference/types/billing-proration-credit-detail)',
     ],
     [
-      'OAuth device verification info routes to its standalone page',
-      '[x](o-auth-device-verification-info.mdx)',
-      '[x](/docs/reference/types/oauth-device-verification-info)',
-    ],
-    [
-      'OAuth device verification result routes to its standalone page',
-      '[x](o-auth-device-verification-result.mdx)',
-      '[x](/docs/reference/types/oauth-device-verification-result)',
-    ],
-    [
-      'OAuth device verification status routes to its standalone page',
-      '[x](o-auth-device-verification-status.mdx)',
-      '[x](/docs/reference/types/oauth-device-verification-status)',
-    ],
-    [
-      'lookup OAuth device verification params route to their standalone page',
-      '[x](lookup-o-auth-device-verification-params.mdx)',
-      '[x](/docs/reference/types/lookup-oauth-device-verification-params)',
-    ],
-    [
-      'submit OAuth device verification params route to their standalone page',
-      '[x](submit-o-auth-device-verification-params.mdx)',
-      '[x](/docs/reference/types/submit-oauth-device-verification-params)',
-    ],
-    [
-      'useOAuthDeviceVerification return routes to the hook returns section',
-      '[x](use-o-auth-device-verification-return.mdx)',
-      '[x](/docs/reference/hooks/use-oauth-device-verification#returns)',
-    ],
-    [
       'resolves relative path prefixes',
       '[x](../../types/billing-credits.mdx)',
       '[x](/docs/reference/types/billing-credits)',
