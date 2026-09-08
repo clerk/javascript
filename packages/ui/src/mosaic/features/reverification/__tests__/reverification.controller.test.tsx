@@ -151,6 +151,23 @@ describe('reverificationMachine', () => {
     expect(cancel).toHaveBeenCalledOnce();
   });
 
+  it('cancels a successful attempt that settled after abort was requested', async () => {
+    const attempt = deferred<ReverificationResult>();
+    const finish = vi.fn(async () => {});
+    const cancel = vi.fn();
+    const actor = startActor(seatedDeps({ attempt: () => attempt.promise, finish, cancel }));
+    await tick();
+    actor.send({ type: 'TYPE', value: 'secret' });
+    actor.send({ type: 'SUBMIT' });
+    actor.send({ type: 'ABORT' });
+
+    attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+    await tick();
+    expect(actor.getSnapshot().value).toBe('done');
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(finish).not.toHaveBeenCalled();
+  });
+
   it('finishes on success without replacing the active method', async () => {
     const finish = deferred<void>();
     const actor = startActor(
