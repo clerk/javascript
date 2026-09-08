@@ -1,134 +1,25 @@
-import type { ClerkOptions, ClientJSONSnapshot, EnvironmentJSONSnapshot } from '@clerk/shared/types';
-
 import { Clerk } from '../core/clerk';
 import { eventBus, events } from '../core/events';
 import type { Environment } from '../core/resources/internal';
-import {
-  BillingPaymentMethod,
-  Client,
-  Organization,
-  OrganizationDomain,
-  OrganizationInvitation,
-  OrganizationMembership,
-  OrganizationMembershipRequest,
-  OrganizationSuggestion,
-  SessionWithActivities,
-  UserOrganizationInvitation,
-} from '../core/resources/internal';
+import { Client } from '../core/resources/internal';
 import { SessionTokenCache } from '../core/tokenCache';
-import { createBiometricCredentialOperations, type NativeBiometricCapability } from './biometricCredentials';
+import { createBiometricCredentialOperations } from './biometricCredentials';
+import { EmbeddedInvocationError, errorEnvelope, failure } from './errors';
 import { createHostedAuthOperations } from './hostedAuth';
 import { createEmbeddedLifecycle } from './lifecycle';
 import { createMagicLinkOperations } from './magicLink';
-import { createNativeAuthOperations, NativeAuthOperationError } from './nativeAuth';
-import type { NativeCrypto } from './nativeCrypto';
+import { createNativeAuthOperations } from './nativeAuth';
 import { createNativeResourceOperations } from './nativeResources';
-import type { NativeStorage } from './nativeStorage';
-
-export const EMBEDDED_PROTOCOL_VERSION = 1;
-
-export interface EmbeddedState {
-  protocolVersion: number;
-  generation: string;
-  revision: number;
-  status: string;
-  client: ClientJSONSnapshot | null;
-  environment: EnvironmentJSONSnapshot | null;
-  clientToken: string;
-  tokenEvent?: { sequence: number; sessionId: string; jwt: string };
-}
-
-export interface EmbeddedHost {
-  storage?: NativeStorage;
-  crypto?: NativeCrypto;
-  biometricCredential?: NativeBiometricCapability;
-  getToken(): Promise<string>;
-  saveToken(token: string): Promise<void>;
-  getCachedResources(): Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>;
-  saveCachedResources(resources: {
-    client: ClientJSONSnapshot | null;
-    environment: EnvironmentJSONSnapshot | null;
-  }): Promise<void>;
-  publish(state: EmbeddedState): void;
-  commitState?(state: EmbeddedState): Promise<void>;
-}
-
-export interface EmbeddedOptions {
-  protocolVersion: number;
-  generation: string;
-  publishableKey: string;
-  sdkVersion: string;
-  options?: ClerkOptions & { proxyUrl?: string };
-}
-
-export interface EmbeddedInvocation {
-  receiver: { kind: string; id?: string; collection?: string; scope?: string; listedKind?: string };
-  method: string;
-  arguments?: unknown[];
-}
-
-export interface EmbeddedError {
-  kind: 'api' | 'offline' | 'runtime' | 'resolution' | 'javascript';
-  code?: string;
-  message: string;
-  errors: unknown[];
-  status?: number;
-  clerkTraceId?: string;
-  stage?: string;
-  nativeError?: unknown;
-}
-
-type Resource = Record<string, any>;
-
-const resourceKinds = [
-  [Organization, 'organization'],
-  [OrganizationDomain, 'organizationDomain'],
-  [OrganizationInvitation, 'organizationInvitation'],
-  [OrganizationMembership, 'organizationMembership'],
-  [OrganizationMembershipRequest, 'organizationMembershipRequest'],
-  [OrganizationSuggestion, 'organizationSuggestion'],
-  [SessionWithActivities, 'sessionWithActivities'],
-  [UserOrganizationInvitation, 'userOrganizationInvitation'],
-  [BillingPaymentMethod, 'billingPaymentMethod'],
-] as const;
-
-function failure(code: string, message: string): never {
-  throw Object.assign(new Error(message), { kind: 'resolution', code, errors: [] });
-}
-
-class EmbeddedInvocationError extends Error {
-  constructor(readonly envelope: EmbeddedError) {
-    super(envelope.message);
-  }
-
-  toString() {
-    return JSON.stringify(this.envelope);
-  }
-}
-
-function errorEnvelope(error: any): EmbeddedError {
-  if (error instanceof NativeAuthOperationError) {
-    return { ...errorEnvelope(error.cause), stage: error.stage };
-  }
-  if (error?.kind && Array.isArray(error.errors)) {
-    return error;
-  }
-  const errors = Array.isArray(error?.errors) ? error.errors : [];
-  const code = errors[0]?.code || error?.code;
-  return {
-    kind: errors.length
-      ? 'api'
-      : code === 'network_error' || error?.name === 'ClerkOfflineError'
-        ? 'offline'
-        : 'javascript',
-    code,
-    message: errors[0]?.longMessage || errors[0]?.long_message || errors[0]?.message || error?.message || String(error),
-    errors,
-    nativeError: error?.nativeError,
-    status: error?.status,
-    clerkTraceId: error?.clerkTraceId || error?.clerk_trace_id,
-  };
-}
+import { createResourceRegistry } from './resources';
+import {
+  EMBEDDED_PROTOCOL_VERSION,
+  type EmbeddedHost,
+  type EmbeddedInvocation,
+  type EmbeddedOptions,
+  type EmbeddedState,
+} from './types';
+export { EMBEDDED_PROTOCOL_VERSION } from './types';
+export type { EmbeddedOptions, EmbeddedHost, EmbeddedInvocation, EmbeddedState, EmbeddedError } from './types';
 
 // One instance per isolated engine: clerk-js resources and token caches are module-scoped.
 let activeInstance = false;
@@ -162,7 +53,6 @@ export function createNativeAdapter(clerk: Clerk, config: EmbeddedOptions, host:
 }
 
 function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost, ownsRuntime: boolean) {
-  const registry = new Map<string, Resource>();
   if (ownsRuntime) {
     SessionTokenCache.setProactiveRefreshEnabled(false);
   }
@@ -216,6 +106,7 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
     },
   };
   const authController = createNativeAuthOperations(clerk, identityContext);
+  const registry = createResourceRegistry(clerk, authController.remember);
   const authOperations = authController.operations;
   const nativeAuth = {
     ...authOperations,
@@ -229,6 +120,32 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       (flow, result) => authController.finish(flow, result.id, result),
       host.crypto,
     ),
+  };
+  const clerkOperations = {
+    ...nativeAuth,
+    initialize: () => null,
+    async signOut(params?: { sessionId?: string }) {
+      await clerk.signOut(() => undefined, { ...params, redirectUrl: `https://${clerk.frontendApi}/` });
+      return null;
+    },
+    async setApplicationActive(active: boolean, refresh = true) {
+      await lifecycle?.setActive(active === true, refresh !== false);
+      return null;
+    },
+    async refreshClient() {
+      const client = await clerk.client?.reload();
+      if (client) {
+        clerk.updateClient(client);
+      }
+      return client;
+    },
+    async refreshEnvironment() {
+      const environment = await (clerk.__internal_environment as Environment | undefined)?.fetch();
+      if (environment) {
+        clerk.updateEnvironment(environment);
+      }
+      return environment;
+    },
   };
   let loadPromise: Promise<void> | undefined;
   const subscriptions: Array<() => void> = [];
@@ -323,23 +240,22 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
   if (ownsRuntime) {
     clerk.__internal_getCachedResources = () => host.getCachedResources();
   }
-  const removeBeforeRequest = clerk.__internal_onBeforeRequest(request => {
-    if (!ownsRuntime) {
-      return Promise.resolve();
-    }
-    ensureActive();
-    requestEpochs.set(request, identityEpoch);
-    request.credentials = 'omit';
-    request.url?.searchParams.set('_is_native', '1');
-    const headers = new Headers(request.headers);
-    request.headers = headers;
-    if (clientToken) {
-      headers.set('authorization', clientToken);
-    }
-    headers.set('x-mobile', '1');
-    headers.set('x-ios-sdk-version', config.sdkVersion);
-    return Promise.resolve();
-  });
+  const removeBeforeRequest = ownsRuntime
+    ? clerk.__internal_onBeforeRequest(request => {
+        ensureActive();
+        requestEpochs.set(request, identityEpoch);
+        request.credentials = 'omit';
+        request.url?.searchParams.set('_is_native', '1');
+        const headers = new Headers(request.headers);
+        request.headers = headers;
+        if (clientToken) {
+          headers.set('authorization', clientToken);
+        }
+        headers.set('x-mobile', '1');
+        headers.set('x-ios-sdk-version', config.sdkVersion);
+        return Promise.resolve();
+      })
+    : undefined;
   const removeAfterResponse = clerk.__internal_onAfterResponse(async (request, response) => {
     if (!ownsRuntime) {
       if (
@@ -377,86 +293,6 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       }
     }
   });
-
-  function remember(value: Resource) {
-    if (typeof value.id !== 'string') {
-      return;
-    }
-    for (const [type, kind] of resourceKinds) {
-      if (value instanceof type) {
-        registry.set(`${kind}:${value.id}`, value);
-        return;
-      }
-    }
-  }
-
-  function serialize(value: any): any {
-    if (value == null) {
-      return null;
-    }
-    if (typeof value !== 'object') {
-      return value;
-    }
-    if (value instanceof Date) {
-      return value.getTime();
-    }
-    if (Array.isArray(value)) {
-      return value.map(serialize);
-    }
-    remember(value);
-    authController.remember(value);
-    if (value.organization) {
-      remember(value.organization);
-    }
-    if (typeof value.__internal_toSnapshot === 'function') {
-      return value.__internal_toSnapshot();
-    }
-    return Object.fromEntries(
-      Object.entries(value)
-        .filter(([key, entry]) => key !== 'pathRoot' && typeof entry !== 'function')
-        .map(([key, entry]) => [key, serialize(entry)]),
-    );
-  }
-
-  async function resolve(receiver: EmbeddedInvocation['receiver'], method: string): Promise<Resource> {
-    const find = (items?: readonly { id: string }[]) => items?.find(item => item.id === receiver.id);
-    switch (receiver.kind) {
-      case 'clerk':
-        return clerk as unknown as Resource;
-      case 'signIn':
-        return clerk.client?.signIn as unknown as Resource;
-      case 'signUp':
-        return clerk.client?.signUp as unknown as Resource;
-      case 'user':
-        return clerk.user as unknown as Resource;
-      case 'billing':
-        return clerk.billing as unknown as Resource;
-      case 'userResource':
-        return find((clerk.user as unknown as Resource)?.[receiver.collection || '']) as Resource;
-      case 'session': {
-        const session = find(clerk.client?.sessions) as Resource;
-        if (typeof session?.[method] === 'function') {
-          return session;
-        }
-        let listed = registry.get(`sessionWithActivities:${receiver.id}`);
-        if (!listed && clerk.user) {
-          serialize(await clerk.user.getSessions());
-          listed = registry.get(`sessionWithActivities:${receiver.id}`);
-        }
-        return listed as Resource;
-      }
-      case 'organization':
-        return (
-          clerk.user?.organizationMemberships.find(m => m.organization.id === receiver.id)?.organization ||
-          registry.get(`organization:${receiver.id}`) ||
-          (await clerk.getOrganization(receiver.id || ''))
-        );
-      case 'listed':
-        return registry.get(`${receiver.scope || receiver.listedKind}:${receiver.id}`) as Resource;
-      default:
-        return failure('unknown_receiver', 'Unknown Clerk resource');
-    }
-  }
 
   async function load() {
     ensureActive();
@@ -540,51 +376,30 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
           args[0] as EmbeddedInvocation,
           args[1] as { clientId: string | null; sessionId: string | null },
         );
-      } else if (receiver.kind === 'clerk' && method === 'initialize') {
-        value = null;
-      } else if (receiver.kind === 'clerk' && method === 'signOut') {
-        await clerk.signOut(() => undefined, {
-          ...(args[0] as { sessionId?: string } | undefined),
-          redirectUrl: `https://${clerk.frontendApi}/`,
-        });
-        value = null;
-      } else if (receiver.kind === 'clerk' && method === 'setApplicationActive') {
-        await lifecycle?.setActive(args[0] === true, args[1] !== false);
-        value = null;
-      } else if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(nativeAuth, method)) {
-        value = await (nativeAuth[method as keyof typeof nativeAuth] as (...args: any[]) => unknown)(...args);
-      } else if (receiver.kind === 'clerk' && method === 'refreshClient') {
-        const client = await clerk.client?.reload();
-        if (client) {
-          clerk.updateClient(client);
-        }
-        value = client;
-      } else if (receiver.kind === 'clerk' && method === 'refreshEnvironment') {
-        const environment = await (clerk.__internal_environment as Environment | undefined)?.fetch();
-        if (environment) {
-          clerk.updateEnvironment(environment);
-        }
-        value = environment;
+      } else if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(clerkOperations, method)) {
+        const operation = Reflect.get(clerkOperations, method);
+        value = await Reflect.apply(operation, clerkOperations, args);
       } else {
-        const target = await resolve(receiver, method);
+        const target = await registry.resolve(receiver, method);
         ensureActive();
         if (!target) {
           failure('not_found', 'The Clerk resource is no longer available');
         }
+        const operation: unknown = Reflect.get(target, method);
         if (
           method.startsWith('_') ||
           ['constructor', 'toString', 'valueOf'].includes(method) ||
-          typeof target[method] !== 'function'
+          typeof operation !== 'function'
         ) {
           failure('unknown_method', `Unknown Clerk method: ${method}`);
         }
-        value = await target[method](...args);
+        value = await Reflect.apply(operation, target, args);
       }
       ensureActive();
-      const result = serialize(value);
+      const result = registry.serialize(value);
       await commitState();
       if ((method === 'destroy' || method === 'delete') && (value == null || value === true)) {
-        registry.delete(`${receiver.scope || receiver.listedKind}:${receiver.id}`);
+        registry.forget(receiver);
         return { id: receiver.id, deleted: true };
       }
       return result;
@@ -609,7 +424,7 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       }
       disposed = true;
       lifecycle?.dispose();
-      removeBeforeRequest();
+      removeBeforeRequest?.();
       removeAfterResponse();
       subscriptions.splice(0).forEach(unsubscribe => unsubscribe());
       registry.clear();

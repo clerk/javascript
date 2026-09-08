@@ -24,10 +24,10 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock('@clerk/clerk-js', () => ({
   __internal_createNativeAdapter: mocks.createAdapter,
-  __internal_installNativePasskeyHooks: vi.fn(),
-  __internal_installNativeAppleHooks: vi.fn(),
-  __internal_installNativeBiometricHooks: vi.fn(),
-  __internal_installNativeAppAttestHooks: vi.fn(),
+  __internal_installNativePasskeyHooks: () => () => undefined,
+  __internal_installNativeAppleHooks: () => () => undefined,
+  __internal_installNativeBiometricHooks: () => () => undefined,
+  __internal_installNativeAppAttestHooks: () => () => undefined,
 }));
 vi.mock('../../utils/native-module', () => ({ ClerkExpoModule: mocks.native }));
 vi.mock('react-native', () => ({

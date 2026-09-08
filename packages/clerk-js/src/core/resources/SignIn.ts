@@ -99,6 +99,7 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
+import type { NativePasskeyAttemptParams, NativePasskeyOptions, NativePasskeyPrepareParams } from './nativePasskeys';
 
 /**
  * Terminal states for email-link verification polling: `verified` (success), `expired`
@@ -110,18 +111,7 @@ import { BaseResource, UserData, Verification } from './internal';
 const isTerminalEmailLinkVerificationStatus = (status: string | null) =>
   status === 'verified' || status === 'expired' || status === 'transferable';
 
-export type NativePasskeyStage =
-  | 'preparingFirstFactor'
-  | 'preparingSecondFactor'
-  | 'requestingAuthorization'
-  | 'attemptingFirstFactor'
-  | 'attemptingSecondFactor';
-
-type NativePasskeyOptions = {
-  allowSecondFactor?: boolean;
-  onStage?: (stage: NativePasskeyStage) => void;
-  preferImmediatelyAvailableCredentials?: boolean;
-};
+export type { NativePasskeyStage } from './nativePasskeys';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -376,7 +366,7 @@ export class SignIn extends BaseResource implements SignInResource {
     return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
-  prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {
+  prepareSecondFactor = (params: PrepareSecondFactorParams | NativePasskeyPrepareParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.prepareSecondFactor', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
@@ -385,7 +375,7 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
+  attemptSecondFactor = (params: AttemptSecondFactorParams | NativePasskeyAttemptParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.attemptSecondFactor', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
@@ -596,7 +586,7 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     if (usesSecondFactor) {
-      await this.prepareSecondFactor({ strategy: 'passkey' } as unknown as PrepareSecondFactorParams);
+      await this.prepareSecondFactor({ strategy: 'passkey' });
     } else if (flow === 'autofill' || flow === 'discoverable') {
       // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
@@ -648,7 +638,7 @@ export class SignIn extends BaseResource implements SignInResource {
       return this.attemptSecondFactor({
         strategy: 'passkey',
         publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
-      } as unknown as AttemptSecondFactorParams);
+      });
     }
     return this.attemptFirstFactor({ publicKeyCredential, strategy: 'passkey' });
   };

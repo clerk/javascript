@@ -64,26 +64,12 @@ export async function connectNativeRuntime(
     prepareDeviceAttestation: (payload: string) => capability('prepareDeviceAttestation', payload),
     prepareDeviceAssertion: (payload: string) => capability('prepareDeviceAssertion', payload),
   };
-  // Restore the owner's hooks when this native channel is detached.
-  const hookNames = [
-    '__internal_isWebAuthnSupported',
-    '__internal_isWebAuthnAutofillSupported',
-    '__internal_isWebAuthnPlatformAuthenticatorSupported',
-    '__internal_createPublicCredentials',
-    '__internal_getPublicCredentials',
-    '__internal_startAppleAuthentication',
-    '__internal_biometricPresence',
-    '__internal_promptBiometrics',
-    '__internal_prepareDeviceAttestation',
-    '__internal_prepareDeviceAssertion',
+  const restoreHooks = [
+    __internal_installNativePasskeyHooks(clerk, hooks),
+    __internal_installNativeAppleHooks(clerk, hooks),
+    __internal_installNativeBiometricHooks(clerk, hooks),
+    __internal_installNativeAppAttestHooks(clerk, hooks),
   ];
-  const owner = clerk as unknown as Record<string, unknown>;
-  const previousHooks = hookNames.map(name => owner[name]);
-  __internal_installNativePasskeyHooks(clerk, hooks);
-  __internal_installNativeAppleHooks(clerk, hooks);
-  __internal_installNativeBiometricHooks(clerk, hooks);
-  __internal_installNativeAppAttestHooks(clerk, hooks);
-  const installedHooks = hookNames.map(name => owner[name]);
   const adapter = __internal_createNativeAdapter(
     clerk,
     {
@@ -142,11 +128,7 @@ export async function connectNativeRuntime(
     rejectConfiguration(new Error('The native runtime connection has been disposed'));
     applicationSubscription?.remove();
     subscription?.remove();
-    hookNames.forEach((name, index) => {
-      if (owner[name] === installedHooks[index]) {
-        owner[name] = previousHooks[index];
-      }
-    });
+    restoreHooks.forEach(restore => restore());
     await adapter.dispose();
     await native.detachRuntime(runtimeId);
   };

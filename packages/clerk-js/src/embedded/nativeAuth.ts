@@ -9,8 +9,8 @@ import type {
 
 import type { Clerk } from '../core/clerk';
 import { SignIn, SignUp } from '../core/resources/internal';
+import type { NativePasskeyStage } from '../core/resources/nativePasskeys';
 import type { Session } from '../core/resources/Session';
-import type { NativePasskeyStage } from '../core/resources/SignIn';
 import type { NativeIdentityContext } from './nativeIdentity';
 
 export class NativeAuthOperationError extends Error {

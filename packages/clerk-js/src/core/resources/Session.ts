@@ -53,6 +53,7 @@ import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
+import type { NativePasskeyAttemptParams, NativePasskeyPrepareParams } from './nativePasskeys';
 import { SessionVerification } from './SessionVerification';
 
 const focusedRefresh = (onRefresh: () => void): { onRefresh?: () => void } =>
@@ -330,7 +331,7 @@ export class Session extends BaseResource implements SessionResource {
     const prepareResponse = usesSecondFactor
       ? await this.prepareSecondFactorVerification({
           strategy: 'passkey',
-        } as unknown as SessionVerifyPrepareSecondFactorParams)
+        })
       : await this.prepareFirstFactorVerification({ strategy: 'passkey' });
 
     const { nonce = null } = usesSecondFactor
@@ -372,13 +373,13 @@ export class Session extends BaseResource implements SessionResource {
       return this.attemptSecondFactorVerification({
         strategy: 'passkey',
         publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
-      } as unknown as SessionVerifyAttemptSecondFactorParams);
+      });
     }
     return this.attemptFirstFactorVerification({ strategy: 'passkey', publicKeyCredential });
   };
 
   prepareSecondFactorVerification = async (
-    params: SessionVerifyPrepareSecondFactorParams,
+    params: SessionVerifyPrepareSecondFactorParams | NativePasskeyPrepareParams,
   ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
@@ -392,7 +393,7 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   attemptSecondFactorVerification = async (
-    attemptFactor: SessionVerifyAttemptSecondFactorParams,
+    attemptFactor: SessionVerifyAttemptSecondFactorParams | NativePasskeyAttemptParams,
   ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
