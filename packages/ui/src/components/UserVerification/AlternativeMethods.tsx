@@ -33,10 +33,11 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
   const card = useCardState();
   const { data } = useUserVerificationSession();
-  const { firstPartyFactors, hasAlternativeStrategies } = useReverificationAlternativeStrategies<SessionVerificationFirstFactor>({
-    filterOutFactor: props?.currentFactor,
-    supportedFirstFactors: data?.supportedFirstFactors,
-  });
+  const { firstPartyFactors, hasAlternativeStrategies } =
+    useReverificationAlternativeStrategies<SessionVerificationFirstFactor>({
+      filterOutFactor: props?.currentFactor,
+      supportedFirstFactors: data?.supportedFirstFactors,
+    });
 
   return (
     <Flow.Part part={'alternativeMethods'}>
