@@ -111,7 +111,6 @@ export const styles = stylex.create({
   layoutInline: {
     borderRadius: 0,
     borderWidth: '0px',
-    // As wide as the navigation, the gap and the pages' reading column, centred in the host.
     marginInline: 'auto',
     overflow: 'visible',
     backgroundColor: 'transparent',
@@ -120,6 +119,9 @@ export const styles = stylex.create({
     // No frame to inset from, so neither column carries padding; a gap holds them apart.
     columnGap: space['10'],
     gridTemplateRows: 'auto',
+    // As wide as the navigation, the gap and the pages' reading column, centred in the host. The
+    // explicit width matters: auto margins on a column-flex item otherwise shrink it to its content.
+    inlineSize: '100%',
     maxWidth: `calc(${NAV_WIDTH} + ${space['10']} + ${CONTENT_MAX_WIDTH})`,
   },
 
