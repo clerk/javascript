@@ -329,4 +329,14 @@ describe('useReverificationModel', () => {
     expect(setActive).toHaveBeenCalledWith({ session: 'sess_1' });
     expect(props.complete).toHaveBeenCalledOnce();
   });
+
+  it('does not call complete when setActive fails', async () => {
+    setActive.mockRejectedValue(new Error('Session could not be activated.'));
+    const props = activeProps();
+    const { result } = renderHook(() => useReverificationModel(props));
+
+    await expect(ready(result.current).finish()).rejects.toThrow('Session could not be activated.');
+    expect(setActive).toHaveBeenCalledWith({ session: 'sess_1' });
+    expect(props.complete).not.toHaveBeenCalled();
+  });
 });
