@@ -1,3 +1,4 @@
+import { __internal_useOrganizationDirectorySyncUsers } from '@clerk/shared/react';
 import type { DirectorySyncUserResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -85,19 +86,19 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
 
 export const TestSyncStep = (): JSX.Element => {
   const { goPrev } = useWizard();
-  const { providerMeta, users, onExit } = useConfigureDirectorySync();
+  const { providerMeta, directory, onExit } = useConfigureDirectorySync();
   const { t } = useLocalizations();
+  const users = __internal_useOrganizationDirectorySyncUsers({ directory });
 
   const rows = users.data ?? [];
   const providerName = t((providerMeta ?? DIRECTORY_SYNC_PROVIDERS.custom).name);
 
-  // The users hook lives in the wizard provider, which stays mounted across
-  // steps, so polling is armed and released by this step's own lifecycle.
-  const { startPolling, stopPolling } = users;
+  // Poll while this step is visible; the list doubles as a live feed while the
+  // admin pushes test users from the IdP. Unmounting the step ends the poll.
+  const { startPolling } = users;
   React.useEffect(() => {
     startPolling();
-    return () => stopPolling();
-  }, [startPolling, stopPolling]);
+  }, [startPolling]);
 
   return (
     <>

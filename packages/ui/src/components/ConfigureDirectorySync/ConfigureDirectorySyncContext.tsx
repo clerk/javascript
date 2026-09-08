@@ -1,29 +1,12 @@
 import {
   __internal_useOrganizationDirectorySync,
-  __internal_useOrganizationDirectorySyncUsers,
   __internal_useOrganizationEnterpriseConnections,
 } from '@clerk/shared/react';
-import type {
-  DirectorySyncProvider,
-  DirectorySyncResource,
-  DirectorySyncUserResource,
-  EnterpriseConnectionResource,
-} from '@clerk/shared/types';
+import type { DirectorySyncProvider, DirectorySyncResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 import type { DirectorySyncProviderMeta } from './providerMeta';
 import { DIRECTORY_SYNC_PROVIDERS, directorySyncProviderForConnection } from './providerMeta';
-
-export interface DirectorySyncUsersView {
-  data: DirectorySyncUserResource[] | undefined;
-  totalCount: number | undefined;
-  error: Error | null;
-  isLoading: boolean;
-  isPolling: boolean;
-  startPolling: () => void;
-  stopPolling: () => void;
-  revalidate: () => Promise<void>;
-}
 
 /**
  * Shared state for the ConfigureDirectorySync wizard, persisted across steps.
@@ -46,7 +29,6 @@ export interface ConfigureDirectorySyncData {
   createDirectory: () => Promise<DirectorySyncResource | undefined>;
   rotateToken: () => Promise<DirectorySyncResource | undefined>;
   setDirectoryEnabled: (enabled: boolean) => Promise<DirectorySyncResource | undefined>;
-  users: DirectorySyncUsersView;
   onExit?: () => void;
 }
 
@@ -79,8 +61,6 @@ export const ConfigureDirectorySyncProvider = ({
     updateDirectorySync,
     rotateDirectorySyncToken,
   } = __internal_useOrganizationDirectorySync({ enterpriseConnectionId });
-
-  const users = __internal_useOrganizationDirectorySyncUsers({ directory });
 
   // The token is stored with the connection it was issued for, so a response
   // that lands after the connection changed is never shown for the new one.
@@ -123,7 +103,6 @@ export const ConfigureDirectorySyncProvider = ({
     createDirectory,
     rotateToken,
     setDirectoryEnabled,
-    users,
     onExit,
   };
 
