@@ -43,7 +43,7 @@ describe('SignInAccountSwitcher', () => {
     const { wrapper } = await createFixtures(initConfig);
     const { userEvent, getByText } = render(<SignInAccountSwitcher />, { wrapper });
     await userEvent.click(getByText('Add account'));
-    expect(clerkWindowNavigate).toHaveBeenCalledWith(
+    expect(clerkWindowNavigate).toHaveBeenLastCalledWith(
       expect.anything(),
       expect.stringContaining('__clerk_add_account=true'),
     );

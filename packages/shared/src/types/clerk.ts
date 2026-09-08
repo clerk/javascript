@@ -1906,6 +1906,7 @@ export type SignInProps = RoutingOptions & {
    * On multi-session instances, where a signed-in visitor lands when opening the sign-in component.
    * `'form'` renders the identifier form. `'switcher'` renders the account switcher listing the signed-in accounts,
    * with "Add account" and "Sign out of all accounts". Ignored in single-session mode.
+   * "Add account" navigates to the sign-in page, so in a modal it leaves the current page.
    *
    * @default 'form'
    */

@@ -29,6 +29,7 @@ import type { SignInStartIdentifier } from '../../common';
 import {
   getIdentifierControlDisplayValues,
   groupIdentifiers,
+  withRedirect,
   withRedirectToAfterSignIn,
   withRedirectToSignInTask,
 } from '../../common';
@@ -39,6 +40,7 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
+import type { AvailableComponentProps } from '../../types';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
@@ -798,34 +800,33 @@ const InstantPasswordRow = ({
   );
 };
 
-const withRedirectToAccountSwitcher = <P extends object>(Component: ComponentType<P>) => {
+const withRedirectToAccountSwitcher = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
   const HOC = (props: P) => {
     const clerk = useClerk();
-    const { authConfig } = useEnvironment();
     const { multiSessionStart } = useSignInContext();
-    const { navigate, queryParams } = useRouter();
+    const { queryParams } = useRouter();
+    // Snapshot on mount: the sign-in POST adds a session before setActive navigates; keep the form until then.
+    const [hadSignedInSessions] = useState(() => clerk.client.signedInSessions.length > 0);
 
-    const shouldShowSwitcher =
-      multiSessionStart === 'switcher' &&
-      !authConfig.singleSessionMode &&
-      clerk.client.signedInSessions.length > 0 &&
-      queryParams[CLERK_ADD_ACCOUNT] === undefined;
-
-    useEffect(() => {
-      if (shouldShowSwitcher) {
-        void navigate('choose');
-      }
-    }, [shouldShowSwitcher, navigate]);
-
-    if (shouldShowSwitcher) {
-      return null;
-    }
-    return <Component {...props} />;
+    return withRedirect(
+      Component,
+      (_, environment) =>
+        multiSessionStart === 'switcher' &&
+        !environment?.authConfig.singleSessionMode &&
+        hadSignedInSessions &&
+        queryParams[CLERK_ADD_ACCOUNT] === undefined,
+      () => 'choose',
+      undefined,
+      { replace: true },
+    )(props);
   };
-  HOC.displayName = `withRedirectToAccountSwitcher(${Component.displayName || Component.name || 'Component'})`;
+  HOC.displayName = `withRedirectToAccountSwitcher(${displayName})`;
   return HOC;
 };
 
-export const SignInStart = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withRedirectToAccountSwitcher(withCardStateProvider(SignInStartInternal))),
+export const SignInStart = withRedirectToAccountSwitcher(
+  withRedirectToSignInTask(withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal))),
 );
