@@ -20,7 +20,10 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   return {
     ...actual,
     useSession: () => ({ session }),
-    useReverification: (_fetcher: unknown, options?: { onNeedsReverification?: (params: NeedsReverificationParameters) => void }) => {
+    useReverification: (
+      _fetcher: unknown,
+      options?: { onNeedsReverification?: (params: NeedsReverificationParameters) => void },
+    ) => {
       capturedOnNeeds = options?.onNeedsReverification;
       return wrapped;
     },

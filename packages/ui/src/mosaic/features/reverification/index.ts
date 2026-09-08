@@ -7,5 +7,8 @@ export type {
   ReverificationStrategy,
   ReverificationViewProps,
 } from './reverification.types';
-export type { UseReverificationWithStateOptions, UseReverificationWithStateResult } from './use-reverification-with-state';
+export type {
+  UseReverificationWithStateOptions,
+  UseReverificationWithStateResult,
+} from './use-reverification-with-state';
 export { useReverificationWithState } from './use-reverification-with-state';
