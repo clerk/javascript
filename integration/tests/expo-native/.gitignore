@@ -1,1 +1,2 @@
-*.png
+test-results/
+playwright-report/

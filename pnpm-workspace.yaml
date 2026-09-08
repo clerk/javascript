@@ -15,6 +15,9 @@ catalogs:
     react-dom: 18.3.1
   repo:
     '@floating-ui/react': 0.27.20
+    # Root and @clerk/testing must agree. Two copies in one process is a hard
+    # "Requiring @playwright/test second time" failure in the integration suite.
+    '@playwright/test': 1.63.0
     '@swc/helpers': 0.5.21
     '@tanstack/query-core': ^5.101.4
     core-js: 3.47.0
@@ -45,6 +48,9 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
+  # Drives the expo-native device e2e. Published by a Clerk maintainer and
+  # still on 0.x, so releases land faster than the 48h window allows.
+  - 'touchpress'
 
 trustPolicy: no-downgrade
 trustPolicyExclude:

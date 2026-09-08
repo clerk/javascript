@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - '.github/workflows/expo-native-build.yml'
+      - 'integration/playwright.expo-native.config.ts'
       - 'integration/templates/expo-native/**'
       - 'integration/tests/expo-native/**'
       - 'packages/expo/**'
@@ -27,7 +28,9 @@ env:
   SDK_PACK_DIR: /tmp/clerk-expo-pack
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
-  MAESTRO_VERSION: '2.8.0'
+  # Only keys the runner cache. Keep it equal to the agent-device version
+  # pinned in the root package.json, or the cache silently stops hitting.
+  AGENT_DEVICE_VERSION: '0.20.10'
 
 jobs:
   native-build:
@@ -103,16 +106,18 @@ jobs:
           # Bump the version when native build commands change.
           key: expo-native-build-v1-${{ runner.os }}-${{ matrix.expo-sdk }}-${{ matrix.platform }}-${{ matrix.run-e2e == true && 'e2e' || 'build' }}-${{ env.E2E_INSTANCE_NAME }}-${{ steps.native-build-key.outputs.hash }}
 
-      - if: steps.native-build-cache.outputs.cache-hit != 'true'
+      - if: steps.native-build-cache.outputs.cache-hit != 'true' || matrix.run-e2e == true
         uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-      - if: steps.native-build-cache.outputs.cache-hit != 'true'
+      - if: steps.native-build-cache.outputs.cache-hit != 'true' || matrix.run-e2e == true
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24.15.0
           cache: pnpm
 
+      # An e2e job installs even on a native-build cache hit: the suite runs on
+      # Playwright and touchpress out of the workspace's own node_modules.
       - name: Install monorepo dependencies
-        if: steps.native-build-cache.outputs.cache-hit != 'true'
+        if: steps.native-build-cache.outputs.cache-hit != 'true' || matrix.run-e2e == true
         run: pnpm install --frozen-lockfile
 
       - name: Build and pack Clerk packages
@@ -137,8 +142,8 @@ jobs:
           GOOGLE_SIGNIN_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
           pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" -w
           # expo-dev-client makes even release builds boot into the dev
-          # launcher (unreachable Metro in CI), which stalls every Maestro
-          # flow on a blank screen. Skip it on e2e jobs only.
+          # launcher (unreachable Metro in CI), which stalls every e2e spec on
+          # a blank screen. Skip it on e2e jobs only.
           DEV_CLIENT="expo-dev-client"
           if [ "$RUN_E2E" = "true" ]; then DEV_CLIENT=""; fi
           pnpm expo install expo-auth-session expo-constants expo-crypto $DEV_CLIENT expo-secure-store expo-web-browser
@@ -223,32 +228,21 @@ jobs:
           path: ${{ steps.native-build-key.outputs.artifact }}
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
 
-      - name: Cache maestro CLI
-        if: steps.keys.outputs.pk != ''
+      - name: Resolve Xcode version
+        id: xcode
+        if: matrix.platform == 'ios' && steps.keys.outputs.pk != ''
+        run: echo "version=$(xcodebuild -version | head -1 | tr ' ' '-')" >> "$GITHUB_OUTPUT"
+
+      # agent-device builds an XCTest runner the first time it drives a
+      # simulator, which costs minutes. Exact key on purpose: agent-device
+      # advises against restore-key fallbacks here, and prepare recovers a
+      # stale one anyway.
+      - name: Cache agent-device Apple runner
+        if: matrix.platform == 'ios' && steps.keys.outputs.pk != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
-          path: ~/.maestro
-          key: maestro-${{ runner.os }}-${{ env.MAESTRO_VERSION }}
-
-      - name: Install maestro CLI
-        if: steps.keys.outputs.pk != ''
-        run: |
-          set -o pipefail
-          if [ -x "$HOME/.maestro/bin/maestro" ]; then
-            echo "Using cached Maestro"
-          else
-            installed=0
-            for i in 1 2 3; do
-              if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | MAESTRO_VERSION="$MAESTRO_VERSION" bash; then
-                if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
-              fi
-              echo "Maestro install attempt $i failed (or binary missing); retrying"
-              sleep 5
-            done
-            [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
-          fi
-          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-          "$HOME/.maestro/bin/maestro" --version
+          path: ~/.agent-device/apple-runner/derived
+          key: agent-device-runner-${{ runner.os }}-${{ env.AGENT_DEVICE_VERSION }}-${{ steps.xcode.outputs.version }}
 
       - name: Boot iOS simulator
         id: sim
@@ -286,7 +280,7 @@ jobs:
             echo "user_id=$user_id"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Run iOS e2e (Maestro)
+      - name: Run iOS e2e
         id: run_e2e_ios
         if: matrix.platform == 'ios' && steps.user.outputs.user_id != ''
         working-directory: ${{ env.FIXTURE_DIR }}
@@ -305,22 +299,28 @@ jobs:
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
           # The one-time keyboard tutorial sheets carry their own Continue
-          # button, which can hijack taps on the AuthView's Continue.
+          # button, which makes the AuthView's Continue ambiguous.
           for key in DidShowContinuousPathIntroduction DidShowGestureKeyboardIntroduction KeyboardDidShowProductivityTutorial UIKeyboardDidShowInternationalInfoIntroduction; do
             xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.preferences "$key" -bool YES || true
           done
           xcrun simctl install "$SIM_UDID" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
           # Stream the app's console output into the debug artifact so a hang has
           # actionable evidence (keychain/network errors) instead of just screenshots.
-          mkdir -p "$RUNNER_TEMP/maestro-debug"
+          mkdir -p "$RUNNER_TEMP/e2e-debug"
           xcrun simctl spawn "$SIM_UDID" log stream --style compact \
             --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
-            > "$RUNNER_TEMP/maestro-debug/sim-console.log" 2>&1 &
+            > "$RUNNER_TEMP/e2e-debug/sim-console.log" 2>&1 &
           LOG_PID=$!
-          cd "$GITHUB_WORKSPACE/$E2E_DIR"
+          cd "$GITHUB_WORKSPACE"
+          # On a native-build cache hit no xcodebuild has run, so without this
+          # the first snapshot pays for the cold XCTest runner build and the
+          # launch times out. This is the only thing the repo still needs
+          # agent-device itself for; the specs reach the device through
+          # touchpress. Pinned to touchpress's own version, because a CLI at a
+          # different version replaces the daemon and drops its sessions.
+          ./node_modules/.bin/agent-device prepare ios-runner --platform ios --udid "$SIM_UDID" --timeout 600000
           rc=0
-          MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-flows.sh \
-            xcrun simctl terminate "$SIM_UDID" com.clerk.exponativebuildfixture || rc=$?
+          pnpm test:integration:expo-native --project=ios || rc=$?
           kill "$LOG_PID" 2>/dev/null || true
           exit "$rc"
 
@@ -353,7 +353,7 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Run Android e2e (Maestro)
+      - name: Run Android e2e
         id: run_e2e_android
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
@@ -370,9 +370,11 @@ jobs:
           # The action runs each script line in a separate sh -c; the folded
           # scalar (>-) plus && keeps everything in one shell invocation.
           script: >-
-            cd integration/tests/expo-native &&
-            MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-android-flows.sh
-            "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
+            mkdir -p "$RUNNER_TEMP/e2e-debug" &&
+            adb install -r "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk" &&
+            adb logcat -c &&
+            (adb logcat -v threadtime > "$RUNNER_TEMP/e2e-debug/android-logcat.log" 2>&1 &) &&
+            pnpm test:integration:expo-native --project=android
 
       # Runs before the artifact upload so the credentials are already dead
       # by the time the debug files become downloadable.
@@ -385,26 +387,30 @@ jobs:
           curl -fsS -X DELETE "$BAPI_URL/v1/users/$USER_ID" \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
 
-      # Test reports record flow env (and typed input) in plaintext;
-      # add-mask only covers step logs, not artifact contents.
-      - name: Scrub test credentials from Maestro debug output
+      # A driver error can quote the text it was handed, and add-mask only
+      # covers step logs, not artifact contents.
+      - name: Scrub test credentials from the e2e report
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         run: |
-          [ -d "$RUNNER_TEMP/maestro-debug" ] || exit 0
           [ -n "$CLERK_TEST_PASSWORD" ] || exit 0
+          mkdir -p "$RUNNER_TEMP/e2e-debug"
+          for dir in "$E2E_DIR/playwright-report" "$E2E_DIR/test-results"; do
+            [ -d "$dir" ] || continue
+            cp -R "$dir" "$RUNNER_TEMP/e2e-debug/"
+          done
           # shellcheck disable=SC2016
-          find "$RUNNER_TEMP/maestro-debug" -type f \
-            \( -name '*.html' -o -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' \) \
+          find "$RUNNER_TEMP/e2e-debug" -type f \
+            \( -name '*.html' -o -name '*.json' -o -name '*.jsonl' -o -name '*.md' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' -o -name '*.zip' \) \
             -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
 
-      - name: Upload Maestro artifacts on e2e failure
+      - name: Upload e2e artifacts on failure
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: maestro-${{ matrix.platform }}
-          path: ${{ runner.temp }}/maestro-debug
+          name: expo-native-e2e-${{ matrix.platform }}
+          path: ${{ runner.temp }}/e2e-debug
           retention-days: 7
 
       - name: Report e2e outcome
@@ -415,7 +421,7 @@ jobs:
         run: |
           outcome="$IOS_OUTCOME"
           [ "$outcome" = "skipped" ] && outcome="$ANDROID_OUTCOME"
-          echo "## Maestro e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Expo native e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
           if [ "$outcome" = "failure" ]; then
-            echo "::error::Maestro e2e failed. See the maestro-${{ matrix.platform }} artifact."
+            echo "::error::Expo native e2e failed. See the expo-native-e2e-${{ matrix.platform }} artifact."
           fi

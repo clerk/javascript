@@ -9,6 +9,9 @@ config({ path: path.resolve(import.meta.dirname, '.env.local') });
 
 export const common: PlaywrightTestConfig = {
   testDir: './tests',
+  // Device specs, run by playwright.expo-native.config.ts against a booted
+  // simulator or emulator. Nothing here can drive one.
+  testIgnore: '**/expo-native/**',
   snapshotDir: './tests/snapshots',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
