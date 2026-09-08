@@ -297,7 +297,10 @@ export const reverificationMachine = createMachine({
       on: { RESET: 'inactive' },
       invoke: fromPromise(ctx => ctx.deps.finish(), {
         onDone: 'done',
-        onError: 'done',
+        onError: {
+          target: 'verifying',
+          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
+        },
       }),
     },
 
