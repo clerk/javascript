@@ -292,7 +292,6 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
     >
       <Drawer.Popup
         aria-labelledby={titleId}
-        height='two-thirds'
         finalFocus={finalFocus}
       >
         {element}

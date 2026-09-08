@@ -7,21 +7,15 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { DialogContext } from '../dialog';
-import { heights, styles } from './drawer.styles';
+import { styles } from './drawer.styles';
 
 export type DrawerRootProps = HeadlessDrawerProps;
 export type DrawerTriggerProps = React.ComponentPropsWithoutRef<typeof Primitive.Trigger>;
 export type DrawerCloseProps = React.ComponentPropsWithoutRef<typeof Primitive.Close>;
 export type DrawerTitleProps = React.ComponentPropsWithoutRef<typeof Primitive.Title>;
 export type DrawerDescriptionProps = React.ComponentPropsWithoutRef<typeof Primitive.Description>;
-export type DrawerHeight = keyof typeof heights;
 
 export interface DrawerPopupProps extends MosaicComponentProps<'div'> {
-  /**
-   * How tall the sheet stands: from its content, at least two thirds of the screen, or the
-   * screen less a hand's width. @default 'content'
-   */
-  height?: DrawerHeight;
   /** Where focus returns when the sheet closes. Default: the trigger. */
   finalFocus?: DrawerFocusTarget;
 }
@@ -82,7 +76,7 @@ const Description = React.forwardRef<HTMLParagraphElement, DrawerDescriptionProp
  * `card` dialog it takes the nested scrim, the way a prompt does there.
  */
 const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function DrawerPopup(
-  { height = 'content', finalFocus, children, render, className, style, ...rest },
+  { finalFocus, children, render, className, style, ...rest },
   ref,
 ) {
   const host = React.useContext(DialogContext);
@@ -102,12 +96,7 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
           ref={ref}
           render={render}
           finalFocus={finalFocus}
-          {...mergeStyleProps(
-            themeProps('drawer-popup', { height }),
-            stylex.props(reset.base, styles.popup, heights[height]),
-            className,
-            style,
-          )}
+          {...mergeStyleProps(themeProps('drawer-popup'), stylex.props(reset.base, styles.popup), className, style)}
           {...rest}
         >
           <Primitive.Handle {...mergeStyleProps(themeProps('drawer-handle'), stylex.props(reset.base, styles.handle))}>

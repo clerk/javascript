@@ -91,6 +91,8 @@ export const styles = stylex.create({
     // Tall content scrolls inside the sheet; the drag engine yields to inner scroll away from the
     // top, so the two do not fight over the same gesture.
     maxBlockSize: `calc(100% - ${space['12']} + ${BLEED})`,
+    // At least two thirds of the screen; the bleed sits below it and is not part of what shows.
+    minBlockSize: `calc(66% + ${BLEED})`,
     overflowWrap: 'anywhere',
     // The bottom keeps clear of the home indicator, and carries the bleed. Inline padding belongs to
     // `content`, so the grip can span the sheet's own width.
@@ -158,20 +160,5 @@ export const styles = stylex.create({
     gap: space['3'],
     display: 'flex',
     flexDirection: 'column',
-  },
-});
-
-/**
- * How tall the sheet stands. `content` takes its height from what it holds; `two-thirds` is at
- * least that share of the screen; `full` stops `3rem` short of the top. Each includes the
- * bleed, which sits below the screen and is not part of what shows.
- */
-export const heights = stylex.create({
-  content: {},
-  'two-thirds': {
-    minBlockSize: `calc(66% + ${BLEED})`,
-  },
-  full: {
-    blockSize: `calc(100% - ${space['12']} + ${BLEED})`,
   },
 });

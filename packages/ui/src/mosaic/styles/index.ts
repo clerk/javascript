@@ -21,7 +21,6 @@ export { Drawer } from '../components/drawer';
 export type {
   DrawerCloseProps,
   DrawerDescriptionProps,
-  DrawerHeight,
   DrawerPopupProps,
   DrawerRootProps,
   DrawerTitleProps,
