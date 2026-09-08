@@ -33,7 +33,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
   const card = useCardState();
   const { data } = useUserVerificationSession();
-  const { firstPartyFactors, hasAnyStrategy } = useReverificationAlternativeStrategies<SessionVerificationFirstFactor>({
+  const { firstPartyFactors, hasAlternativeStrategies } = useReverificationAlternativeStrategies<SessionVerificationFirstFactor>({
     filterOutFactor: props?.currentFactor,
     supportedFirstFactors: data?.supportedFirstFactors,
   });
@@ -54,7 +54,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
             gap={6}
           >
             <Col gap={4}>
-              {hasAnyStrategy && (
+              {hasAlternativeStrategies && (
                 <Flex
                   elementDescriptor={descriptors.alternativeMethods}
                   direction='col'

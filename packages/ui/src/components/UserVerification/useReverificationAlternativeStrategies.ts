@@ -59,11 +59,8 @@ export function useReverificationAlternativeStrategies<T = SignInFirstFactor>({
     [supportedFirstFactors, filterOutFactor],
   );
 
-  const hasAnyStrategy = firstPartyFactors.length > 0;
-
   return {
-    hasAnyStrategy,
-    hasFirstParty: hasAnyStrategy,
+    hasAlternativeStrategies: firstPartyFactors.length > 0,
     firstPartyFactors,
   };
 }
