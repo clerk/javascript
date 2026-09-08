@@ -185,6 +185,22 @@ describe('reverificationMachine', () => {
     finish.resolve();
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('done'));
   });
+
+  it('returns to the current method with the error when finish fails', async () => {
+    const actor = startActor(
+      seatedDeps({
+        attempt: vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null })),
+        finish: vi.fn(async () => Promise.reject(new Error('Session could not be activated.'))),
+      }),
+    );
+    await tick();
+    actor.send({ type: 'TYPE', value: 'secret' });
+    actor.send({ type: 'SUBMIT' });
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifying'));
+    expect(actor.getSnapshot().context.activeMethod?.strategy).toBe('password');
+    expect(actor.getSnapshot().context.errorMessage).toBe('Session could not be activated.');
+    expect(actor.getSnapshot().context.deps.cancel).not.toHaveBeenCalled();
+  });
 });
 
 describe('useReverificationController', () => {
@@ -292,6 +308,34 @@ describe('useReverificationController', () => {
       finish.resolve();
     });
     await waitFor(() => expect(result.current.status).toBe('loading'));
+  });
+
+  it('stays on the current step with the error when finish fails', async () => {
+    const { result } = renderHook(() =>
+      useReverificationController(
+        readyModel({
+          attempt: vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null })),
+          finish: vi.fn(async () => Promise.reject(new Error('Session could not be activated.'))),
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onValueChange('secret');
+        result.current.onSubmit();
+      }
+    });
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.step).toBe('password');
+        expect(result.current.isPending).toBe(false);
+        expect(result.current.errorMessage).toBe('Session could not be activated.');
+      }
+    });
   });
 
   it('keeps the current step when the model flickers to loading', async () => {

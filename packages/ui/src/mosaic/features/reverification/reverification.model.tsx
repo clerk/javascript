@@ -233,11 +233,8 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
     },
     finish: async () => {
       try {
-        try {
-          await clerk.setActive({ session: session.id });
-        } finally {
-          complete?.();
-        }
+        await clerk.setActive({ session: session.id });
+        complete?.();
       } catch (error) {
         throw toError(error);
       }
