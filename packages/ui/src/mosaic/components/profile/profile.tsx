@@ -4,7 +4,7 @@ import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useContainerMaxWidth } from '../../hooks/useContainerMaxWidth';
+import { useMeasure } from '../../hooks/useMeasure';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
@@ -43,6 +43,15 @@ const TabPanelContext = React.createContext<string | undefined>(undefined);
  * CSS cannot make: one tablist, in the column or in the sheet, never both.
  */
 const COMPACT_MAX_WIDTH_REM = 48;
+
+/** `width <= 48rem`, the way the container query reads it. Unmeasured, or not laid out, is wide. */
+function isCompact(width: number | null): boolean {
+  if (width === null || width === 0) {
+    return false;
+  }
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  return width <= COMPACT_MAX_WIDTH_REM * rem;
+}
 
 function useProfileContext(part: string): ProfileContextValue {
   const context = React.useContext(ProfileContext);
@@ -110,7 +119,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  const compact = useContainerMaxWidth(node, COMPACT_MAX_WIDTH_REM);
+  const [measure, { width }] = useMeasure<HTMLDivElement>();
+  const compact = isCompact(width);
   const [navOpen, setNavOpen] = React.useState(false);
   const openNav = React.useCallback(() => setNavOpen(true), []);
   const closeNav = React.useCallback(() => setNavOpen(false), []);
@@ -128,7 +138,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const element = useRender({
     defaultTagName: 'div',
     render,
-    ref: [setNode, ref],
+    ref: [setNode, measure, ref],
     props: {
       ...mergeStyleProps(
         themeProps('profile'),

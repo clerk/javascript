@@ -167,10 +167,11 @@ describe('Profile', () => {
           this.callback = callback;
         }
         observe(target: Element) {
-          observe = width => {
-            vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({ width } as DOMRect);
-            this.callback([], this as unknown as ResizeObserver);
-          };
+          observe = width =>
+            this.callback(
+              [{ target, contentRect: { width, height: 600 } } as unknown as ResizeObserverEntry],
+              this as unknown as ResizeObserver,
+            );
         }
         disconnect() {}
         unobserve() {}
