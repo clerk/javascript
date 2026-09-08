@@ -8,6 +8,8 @@ import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import type { AvailableComponentProps } from '@/ui/types';
 
+import { useRouter } from '../../router';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import { hasMultipleEnterpriseConnections } from './shared';
 
 /**
@@ -16,6 +18,7 @@ import { hasMultipleEnterpriseConnections } from './shared';
 const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const ctx = useSignInContext();
   const clerk = useClerk();
+  const { navigate } = useRouter();
   const signIn = clerk.client.signIn;
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
@@ -30,11 +33,11 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     provider: ff.enterpriseConnectionProvider,
   }));
 
-  const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
+  const handleEnterpriseSSO = async (enterpriseConnectionId: string) => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    return signIn.authenticateWithRedirect({
+    await signIn.authenticateWithRedirect({
       strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
@@ -42,6 +45,11 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
       continueSignIn: true,
       enterpriseConnectionId,
     });
+
+    // Preparing the hand-off can itself raise a challenge, in which case no redirect was issued
+    // and the sign-in is sitting on the gate instead. Without this the picker looks inert: the
+    // user clicks their connection and nothing happens.
+    navigateOnSignInProtectGate(signIn, navigate, '../protect-check');
   };
 
   return (

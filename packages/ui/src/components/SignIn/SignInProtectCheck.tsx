@@ -82,6 +82,10 @@ function SignInProtectCheckInternal(): JSX.Element | null {
       }
       await resumeSignInAfterProtectCheck(updatedSignIn, {
         navigate,
+        // No `enterpriseConnectionId` is passed: this runs only under
+        // `shouldHandOffToEnterpriseConnection`, which requires a single connection, so the server
+        // has exactly one to prepare. If that guard is ever loosened to resume a connection the
+        // user chose, the id has to be carried across the challenge and passed here.
         resumeEnterpriseSSO: async () => {
           await signIn.authenticateWithRedirect({
             strategy: 'enterprise_sso',
