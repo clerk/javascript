@@ -244,6 +244,14 @@ export const styles = stylex.create({
     paddingBlock: 0,
   },
 
+  /**
+   * Inline the pages start level with the navigation: the same padding above the headline as
+   * above the first destination, so the two read as one row.
+   */
+  contentViewportInline: {
+    paddingBlockStart: space['4'],
+  },
+
   /** Inline, the branding closes out the pages' column instead of the navigation's. */
   contentBranding: {
     marginBlockStart: space['8'],

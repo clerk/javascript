@@ -437,7 +437,11 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
         <div
           {...mergeStyleProps(
             themeProps('profile-content-viewport'),
-            stylex.props(reset.base, styles.contentViewport, ...(inline ? [] : contentViewportScroll)),
+            stylex.props(
+              reset.base,
+              styles.contentViewport,
+              ...(inline ? [styles.contentViewportInline] : contentViewportScroll),
+            ),
           )}
         >
           <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
