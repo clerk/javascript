@@ -233,6 +233,7 @@ describe('useReverificationController', () => {
     });
 
     await waitFor(() => {
+      expect(result.current.status).toBe('ready');
       if (result.current.status === 'ready') {
         expect(result.current.isPending).toBe(true);
       }
