@@ -1,5 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
-import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
+import { CLERK_ADD_ACCOUNT, ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
@@ -11,6 +11,7 @@ import type {
   SignInResource,
 } from '@clerk/shared/types';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import type { ComponentType } from 'react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -28,6 +29,7 @@ import type { SignInStartIdentifier } from '../../common';
 import {
   getIdentifierControlDisplayValues,
   groupIdentifiers,
+  withRedirect,
   withRedirectToAfterSignIn,
   withRedirectToSignInTask,
 } from '../../common';
@@ -38,6 +40,7 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
+import type { AvailableComponentProps } from '../../types';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
@@ -797,6 +800,33 @@ const InstantPasswordRow = ({
   );
 };
 
-export const SignInStart = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
+const withRedirectToAccountSwitcher = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
+  const HOC = (props: P) => {
+    const clerk = useClerk();
+    const { multiSessionStart } = useSignInContext();
+    const { queryParams } = useRouter();
+    // Snapshot on mount: the sign-in POST adds a session before setActive navigates; keep the form until then.
+    const [hadSignedInSessions] = useState(() => clerk.client.signedInSessions.length > 0);
+
+    return withRedirect(
+      Component,
+      (_, environment) =>
+        multiSessionStart === 'switcher' &&
+        !environment?.authConfig.singleSessionMode &&
+        hadSignedInSessions &&
+        queryParams[CLERK_ADD_ACCOUNT] === undefined,
+      () => 'choose',
+      undefined,
+      { replace: true },
+    )(props);
+  };
+  HOC.displayName = `withRedirectToAccountSwitcher(${displayName})`;
+  return HOC;
+};
+
+export const SignInStart = withRedirectToAccountSwitcher(
+  withRedirectToSignInTask(withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal))),
 );

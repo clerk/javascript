@@ -1,7 +1,7 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
+import { CAPTCHA_ELEMENT_ID, CLERK_ADD_ACCOUNT } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import type { SignInResource } from '@clerk/shared/types';
+import type { SignedInSessionResource, SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -64,6 +64,91 @@ describe('SignInStart', () => {
     });
     render(<SignInStart />, { wrapper });
     screen.getAllByText(/sign in to .*/i);
+  });
+
+  describe('multi-session start', () => {
+    const withSignedInSessions = createFixtures.config(f => {
+      f.withEmailAddress();
+      f.withMultiSessionMode();
+      f.withUser({ email_addresses: ['test1@clerk.com'] });
+    });
+    const navigations = (fixtures: Awaited<ReturnType<typeof createFixtures>>['fixtures']) =>
+      fixtures.router.navigate.mock.calls.map(([to]) => to);
+    const { createFixtures: createFixturesWithAddAccount } = bindCreateFixtures('SignIn', {
+      router: { queryParams: { [CLERK_ADD_ACCOUNT]: 'true' } },
+    });
+
+    it('renders the identifier form when the prop is unset and signed-in sessions exist', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSignedInSessions);
+      render(<SignInStart />, { wrapper });
+      screen.getAllByText(/sign in to .*/i);
+      expect(navigations(fixtures)).not.toContain('choose');
+    });
+
+    it('replaces the route with the account switcher when the prop is "switcher" and signed-in sessions exist', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(withSignedInSessions);
+      props.setProps({ multiSessionStart: 'switcher' });
+      render(<SignInStart />, { wrapper });
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('choose', { replace: true }));
+      expect(fixtures.router.navigate).toHaveBeenCalledTimes(1);
+      expect(screen.queryByText(/sign in to .*/i)).toBeNull();
+    });
+
+    it('renders the identifier form when the prop is "switcher" and no signed-in sessions exist', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withMultiSessionMode();
+      });
+      props.setProps({ multiSessionStart: 'switcher' });
+      render(<SignInStart />, { wrapper });
+      screen.getAllByText(/sign in to .*/i);
+      expect(navigations(fixtures)).not.toContain('choose');
+    });
+
+    it('keeps the identifier form when a session appears after mount', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withMultiSessionMode();
+      });
+      props.setProps({ multiSessionStart: 'switcher' });
+      const { rerender } = render(<SignInStart />, { wrapper });
+      vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
+        { id: 'sess_1' } as unknown as SignedInSessionResource,
+      ]);
+      rerender(<SignInStart />);
+      screen.getAllByText(/sign in to .*/i);
+      expect(navigations(fixtures)).not.toContain('choose');
+    });
+
+    it('renders the identifier form when the add-account param is set', async () => {
+      const { wrapper, fixtures, props } = await createFixturesWithAddAccount(withSignedInSessions);
+      props.setProps({ multiSessionStart: 'switcher' });
+      render(<SignInStart />, { wrapper });
+      screen.getAllByText(/sign in to .*/i);
+      expect(navigations(fixtures)).not.toContain('choose');
+    });
+
+    it('carries the add-account param through the OAuth callback URL', async () => {
+      const { wrapper, fixtures } = await createFixturesWithAddAccount(f => {
+        f.withMultiSessionMode();
+        f.withSocialProvider({ provider: 'google' });
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.click(screen.getByText('Continue with Google'));
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ redirectUrl: expect.stringContaining('__clerk_add_account=true') }),
+      );
+    });
+
+    it('does not redirect to the account switcher in single-session mode', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withUser({ email_addresses: ['test1@clerk.com'] });
+      });
+      props.setProps({ multiSessionStart: 'switcher' });
+      render(<SignInStart />, { wrapper });
+      expect(navigations(fixtures)).not.toContain('choose');
+    });
   });
 
   describe('Login Methods', () => {
