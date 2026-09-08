@@ -11,7 +11,7 @@ import {
   UserOrganizationInvitation,
 } from '../core/resources/internal';
 import { failure } from './errors';
-import type { EmbeddedInvocation } from './types';
+import type { EmbeddedReceiver } from './invocation';
 
 const resourceKinds = [
   [Organization, 'organization'],
@@ -71,25 +71,29 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
     );
   }
 
-  async function resolve(receiver: EmbeddedInvocation['receiver'], method: string): Promise<object | null | undefined> {
-    const find = (items?: readonly { id: string }[]) => items?.find(item => item.id === receiver.id);
+  async function resolve(receiver: EmbeddedReceiver, method: string): Promise<object | null | undefined> {
     switch (receiver.kind) {
       case 'clerk':
         return clerk;
       case 'signIn':
-        return clerk.client?.signIn;
       case 'signUp':
-        return clerk.client?.signUp;
-      case 'user':
-        return clerk.user;
+      case 'user': {
+        const resource = receiver.kind === 'user' ? clerk.user : clerk.client?.[receiver.kind];
+        if (!resource || resource.id !== receiver.id) {
+          failure(
+            receiver.kind === 'user' ? 'stale_resource' : 'stale_authentication',
+            'The resource snapshot is no longer current',
+          );
+        }
+        return resource;
+      }
       case 'billing':
         return clerk.billing;
       case 'userResource': {
-        const collection: unknown = clerk.user && Reflect.get(clerk.user, receiver.collection || '');
-        return Array.isArray(collection) ? find(collection) : undefined;
+        return clerk.user?.[receiver.collection]?.find(item => item.id === receiver.id);
       }
       case 'session': {
-        const session = find(clerk.client?.sessions);
+        const session = clerk.client?.sessions.find(item => item.id === receiver.id);
         if (session && typeof Reflect.get(session, method) === 'function') {
           return session;
         }
@@ -104,12 +108,10 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
         return (
           clerk.user?.organizationMemberships.find(m => m.organization.id === receiver.id)?.organization ||
           registry.get(`organization:${receiver.id}`) ||
-          (await clerk.getOrganization(receiver.id || ''))
+          (await clerk.getOrganization(receiver.id))
         );
       case 'listed':
-        return registry.get(`${receiver.scope || receiver.listedKind}:${receiver.id}`);
-      default:
-        return failure('unknown_receiver', 'Unknown Clerk resource');
+        return registry.get(`${receiver.listedKind}:${receiver.id}`);
     }
   }
 
@@ -117,7 +119,14 @@ export function createResourceRegistry(clerk: Clerk, onResource: (value: unknown
     serialize,
     resolve,
     clear: () => registry.clear(),
-    forget: (receiver: EmbeddedInvocation['receiver']) =>
-      registry.delete(`${receiver.scope || receiver.listedKind}:${receiver.id}`),
+    forget: (receiver: EmbeddedReceiver) => {
+      if (receiver.kind === 'listed') {
+        registry.delete(`${receiver.listedKind}:${receiver.id}`);
+      } else if (receiver.kind === 'organization') {
+        registry.delete(`organization:${receiver.id}`);
+      } else if (receiver.kind === 'session') {
+        registry.delete(`sessionWithActivities:${receiver.id}`);
+      }
+    },
   };
 }

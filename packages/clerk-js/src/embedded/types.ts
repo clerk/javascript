@@ -4,6 +4,8 @@ import type { NativeBiometricCapability } from './biometricCredentials';
 import type { NativeCrypto } from './nativeCrypto';
 import type { NativeStorage } from './nativeStorage';
 
+export type { EmbeddedInvocation } from './invocation';
+
 export const EMBEDDED_PROTOCOL_VERSION = 1;
 
 export interface EmbeddedState {
@@ -38,12 +40,6 @@ export interface EmbeddedOptions {
   publishableKey: string;
   sdkVersion: string;
   options?: ClerkOptions & { proxyUrl?: string };
-}
-
-export interface EmbeddedInvocation {
-  receiver: { kind: string; id?: string; collection?: string; scope?: string; listedKind?: string };
-  method: string;
-  arguments?: unknown[];
 }
 
 export interface EmbeddedError {

@@ -6,18 +6,13 @@ import { SessionTokenCache } from '../core/tokenCache';
 import { createBiometricCredentialOperations } from './biometricCredentials';
 import { EmbeddedInvocationError, errorEnvelope, failure } from './errors';
 import { createHostedAuthOperations } from './hostedAuth';
+import { type ExpectedIdentity, parseExpectedIdentity, parseInvocation } from './invocation';
 import { createEmbeddedLifecycle } from './lifecycle';
 import { createMagicLinkOperations } from './magicLink';
 import { createNativeAuthOperations } from './nativeAuth';
 import { createNativeResourceOperations } from './nativeResources';
 import { createResourceRegistry } from './resources';
-import {
-  EMBEDDED_PROTOCOL_VERSION,
-  type EmbeddedHost,
-  type EmbeddedInvocation,
-  type EmbeddedOptions,
-  type EmbeddedState,
-} from './types';
+import { EMBEDDED_PROTOCOL_VERSION, type EmbeddedHost, type EmbeddedOptions, type EmbeddedState } from './types';
 export { EMBEDDED_PROTOCOL_VERSION } from './types';
 export type { EmbeddedOptions, EmbeddedHost, EmbeddedInvocation, EmbeddedState, EmbeddedError } from './types';
 
@@ -352,11 +347,9 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
     return loadPromise;
   }
 
-  async function invoke(
-    invocation: EmbeddedInvocation,
-    expectedIdentity?: { clientId: string | null; sessionId: string | null },
-  ): Promise<unknown> {
+  async function invoke(input: unknown, expectedIdentity?: ExpectedIdentity): Promise<unknown> {
     try {
+      const invocation = parseInvocation(input);
       await load();
       ensureActive();
       if (
@@ -372,10 +365,10 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
         identityEpoch += 1;
       }
       if (receiver.kind === 'clerk' && method === 'invokeForIdentity') {
-        return await invoke(
-          args[0] as EmbeddedInvocation,
-          args[1] as { clientId: string | null; sessionId: string | null },
-        );
+        if (args.length !== 2) {
+          failure('invalid_invocation', 'Identity-bound operations require an invocation and an identity');
+        }
+        return await invoke(args[0], parseExpectedIdentity(args[1]));
       } else if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(clerkOperations, method)) {
         const operation = Reflect.get(clerkOperations, method);
         value = await Reflect.apply(operation, clerkOperations, args);
@@ -400,7 +393,7 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       await commitState();
       if ((method === 'destroy' || method === 'delete') && (value == null || value === true)) {
         registry.forget(receiver);
-        return { id: receiver.id, deleted: true };
+        return { id: 'id' in receiver ? receiver.id : undefined, deleted: true };
       }
       return result;
     } catch (error) {

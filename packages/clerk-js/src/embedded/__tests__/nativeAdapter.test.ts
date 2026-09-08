@@ -62,6 +62,93 @@ afterEach(async () => {
 });
 
 describe('native adapter for an existing Clerk owner', () => {
+  it.each([
+    { receiver: { kind: 'user' }, method: 'delete' },
+    { receiver: { kind: 'signIn' }, method: 'prepareFirstFactor' },
+    { receiver: { kind: 'signUp', id: '' }, method: 'update' },
+    { receiver: { kind: 'userResource', id: 'idn_1', collection: 'sessions' }, method: 'destroy' },
+    { receiver: { kind: 'listed', id: 'inv_1', listedKind: 'unknown' }, method: 'revoke' },
+    {
+      receiver: { kind: 'listed', id: 'inv_1', listedKind: 'organizationInvitation', scope: 'organizationDomain' },
+      method: 'revoke',
+    },
+    { receiver: { kind: 'clerk', id: 'user_1' }, method: 'signOut' },
+    { receiver: { kind: 'clerk' }, method: 'signOut', arguments: {} },
+    { receiver: { kind: 'clerk' }, method: null },
+    {
+      receiver: { kind: 'clerk' },
+      method: 'invokeForIdentity',
+      arguments: [{ receiver: { kind: 'clerk' }, method: 'signOut' }, {}],
+    },
+  ])('rejects malformed native commands before executing them: %j', async invocation => {
+    const f = fixture();
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    await expect(f.adapter.invoke(invocation)).rejects.toMatchObject({ envelope: { code: 'invalid_invocation' } });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(f.clerk.session?.id).toBe('sess_owner');
+  });
+
+  it.each(['signIn', 'signUp', 'user'] as const)(
+    'rejects a retained %s snapshot before sending a request',
+    async kind => {
+      const f = fixture();
+      const resource = kind === 'user' ? f.clerk.user! : f.client[kind];
+      resource.id = `${kind}_current`;
+      const fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        json: () => Promise.resolve({ response: resource.__internal_toSnapshot() }),
+      });
+      vi.stubGlobal('fetch', fetch);
+      await expect(
+        f.adapter.invoke({ receiver: { kind, id: `${kind}_previous` }, method: 'reload' }),
+      ).rejects.toMatchObject({ envelope: { code: kind === 'user' ? 'stale_resource' : 'stale_authentication' } });
+      expect(fetch).not.toHaveBeenCalled();
+      expect(resource.id).toBe(`${kind}_current`);
+    },
+  );
+
+  it.each(['signIn', 'signUp', 'user'] as const)('allows operations on the current %s snapshot', async kind => {
+    const f = fixture();
+    const resource = kind === 'user' ? f.clerk.user! : f.client[kind];
+    resource.id = `${kind}_current`;
+    const fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () => Promise.resolve({ response: resource.__internal_toSnapshot() }),
+    });
+    vi.stubGlobal('fetch', fetch);
+    await expect(f.adapter.invoke({ receiver: { kind, id: resource.id }, method: 'reload' })).resolves.toMatchObject({
+      id: resource.id,
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('preserves a structured stale-resource error across identity wrapping and JSON transport', async () => {
+    const f = fixture();
+    try {
+      await f.adapter.invoke({
+        receiver: { kind: 'clerk' },
+        method: 'invokeForIdentity',
+        arguments: [
+          { receiver: { kind: 'user', id: 'previous_user' }, method: 'delete' },
+          { clientId: f.client.id, sessionId: f.clerk.session!.id },
+        ],
+      });
+      expect.fail('A stale user must be rejected');
+    } catch (error) {
+      expect(JSON.parse(String(error))).toMatchObject({
+        kind: 'resolution',
+        code: 'stale_resource',
+        message: 'The resource snapshot is no longer current',
+      });
+    }
+    expect(f.clerk.user?.id).toBeTruthy();
+  });
+
   it('preserves the loaded owner and its cache provider without starting a second lifecycle', async () => {
     const f = fixture();
     const load = vi.spyOn(f.clerk, 'load');
@@ -159,7 +246,7 @@ describe('native adapter for an existing Clerk owner', () => {
             })
           : await (async () => {
               await f.adapter.invoke({
-                receiver: { kind: 'signIn' },
+                receiver: { kind: 'signIn', id: 'sia_completed' },
                 method: 'attemptFirstFactor',
                 arguments: [{ strategy: 'email_code', code: '424242' }],
               });

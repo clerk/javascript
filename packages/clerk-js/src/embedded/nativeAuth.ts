@@ -118,8 +118,8 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
   }
 
   const operations = {
-    finishNativeSignIn: () => finish('signIn'),
-    finishNativeSignUp: () => finish('signUp'),
+    finishNativeSignIn: (expectedId?: string) => finish('signIn', expectedId),
+    finishNativeSignUp: (expectedId?: string) => finish('signUp', expectedId),
     completeNativeAuth,
     async verifyNativeSignInCode(options: { expectedId: string; code: string }) {
       const signIn = resource('signIn', options.expectedId) as SignInResource;
@@ -262,6 +262,7 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
       return { kind: flow, resource: await finish(flow) };
     },
     createNativeSignIn: (params: SignInCreateParams) => client().signIn.create(params),
+    createNativeSignUp: (params: SignUpCreateParams) => client().signUp.create(params),
     attemptNativeFirstFactor: (options: {
       expectedId: string;
       params: Parameters<NonNullable<Clerk['client']>['signIn']['attemptFirstFactor']>[0];

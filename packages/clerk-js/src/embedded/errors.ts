@@ -16,11 +16,14 @@ export class EmbeddedInvocationError extends Error {
 }
 
 export function errorEnvelope(error: any): EmbeddedError {
+  if (error instanceof EmbeddedInvocationError) {
+    return error.envelope;
+  }
   if (error instanceof NativeAuthOperationError) {
     return { ...errorEnvelope(error.cause), stage: error.stage };
   }
   if (error?.kind && Array.isArray(error.errors)) {
-    return error;
+    return { ...error, message: error.message };
   }
   const errors = Array.isArray(error?.errors) ? error.errors : [];
   const code = errors[0]?.code || error?.code;
