@@ -19,9 +19,11 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/profile/profile.tsx',
   styles: {
     _variants: {
+      elevation: { card: {}, flush: {} },
       renderBranding: { true: {}, false: {} },
     },
     _defaultVariants: {
+      elevation: 'card',
       renderBranding: true,
     },
   },

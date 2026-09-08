@@ -30,7 +30,7 @@ interface ProfileContextValue {
   navSheetHeight: DrawerHeight;
   /** The root element, for parts that have to find something inside the profile. */
   root: HTMLElement | null;
-  /** Presented as the page's content rather than over it — see `Dialog.Root`'s `inline`. */
+  /** Flush: the page's own content — `elevation='flush'`, or an `inline` dialog. */
   inline: boolean;
 }
 
@@ -63,6 +63,8 @@ function useProfileContext(part: string): ProfileContextValue {
   return context;
 }
 
+export type ProfileElevation = 'card' | 'flush';
+
 export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'children'> {
   /** The selected page, by the `value` of its `Profile.NavItem` and `Profile.TabPanel`. */
   value: string;
@@ -82,6 +84,15 @@ export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'chi
    * @default true
    */
   renderBranding?: boolean;
+  /**
+   * How the surface sits in its host, the way `Card`'s does. `card` is framed: border, radius, a
+   * fixed height with the pages scrolling inside. `flush` is the page's own content: no frame or
+   * background, the page scrolls, the columns a gap apart. Over the page, in a `profile` dialog,
+   * the popup decides and this is moot; an `inline` dialog implies `flush`.
+   *
+   * @default 'card'
+   */
+  elevation?: ProfileElevation;
   /**
    * TEMPORARY, for design review: how tall the compact navigation sheet stands. Removed once a
    * height is chosen.
@@ -106,6 +117,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     orientation = 'vertical',
     activationMode,
     renderBranding = true,
+    elevation = 'card',
     navSheetHeight = 'content',
     children,
     render,
@@ -116,7 +128,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
-  const inline = dialog?.inline ?? false;
+  const inline = elevation === 'flush' || (dialog?.inline ?? false);
   // Inside a dialog the title takes the id the popup points `aria-labelledby` at, so the surface
   // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
@@ -144,7 +156,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     ref: [setNode, measure, ref],
     props: {
       ...mergeStyleProps(
-        themeProps('profile'),
+        themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
         stylex.props(reset.base, styles.root, dialog !== null && !dialog.inline && styles.rootInDialog),
         className,
         style,

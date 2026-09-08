@@ -279,6 +279,23 @@ describe('Profile', () => {
     });
   });
 
+  // `flush` is the page-content presentation without a dialog around it: the same look an inline
+  // dialog implies, chosen the way `Card` chooses its elevation.
+  it('takes the flush presentation from its elevation prop', () => {
+    const probe = stylex.create({ frameless: { borderWidth: '0px', backgroundColor: 'transparent' } });
+    const flush = renderSurface({ elevation: 'flush' });
+    expect(flush.container.querySelector('.cl-profile')).toHaveAttribute('data-elevation', 'flush');
+    expect(Array.from(flush.container.querySelector('.cl-profile-layout')!.classList)).toEqual(
+      expect.arrayContaining(atomsOf(probe.frameless)),
+    );
+    expect(flush.container.querySelector('.cl-profile-content')).toHaveAttribute('data-inline');
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    flush.unmount();
+
+    const framed = renderSurface();
+    expect(framed.container.querySelector('.cl-profile')).toHaveAttribute('data-elevation', 'card');
+  });
+
   describe('inside a dialog', () => {
     function renderInDialog(inline = false) {
       return render(

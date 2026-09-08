@@ -1,6 +1,7 @@
 export { Profile } from './profile';
 export type {
   ProfileContentProps,
+  ProfileElevation,
   ProfileNavItemProps,
   ProfileNavProps,
   ProfileTabPanelProps,

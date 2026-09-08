@@ -31,23 +31,20 @@ function knobsAsProps(props: Record<string, unknown>) {
 }
 
 /**
- * The profile as a page's content: an `inline` dialog, so it is flush with its host, unframed, and
- * scrolls with the page. The fixture stands in for the model and controller: every page's data,
- * and actions that update it, so the surface behaves.
+ * The profile as a page's content — `elevation='flush'`, the way a `Card` chooses its elevation:
+ * unframed, flush with its host, scrolling with the page. The fixture stands in for the model and
+ * controller: every page's data, and actions that update it, so the surface behaves.
  */
 export function Default(props: Record<string, unknown>) {
   const { activePage, setActivePage, pages } = useUserProfileFixture();
   return (
-    <Dialog.Root inline>
-      <Dialog.Popup size='profile'>
-        <UserProfileView
-          activePage={activePage}
-          pages={pages}
-          onPageChange={setActivePage}
-          {...knobsAsProps(props)}
-        />
-      </Dialog.Popup>
-    </Dialog.Root>
+    <UserProfileView
+      activePage={activePage}
+      pages={pages}
+      onPageChange={setActivePage}
+      elevation='flush'
+      {...knobsAsProps(props)}
+    />
   );
 }
 

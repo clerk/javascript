@@ -104,6 +104,7 @@ export type {
 export { Profile } from '../components/profile';
 export type {
   ProfileContentProps,
+  ProfileElevation,
   ProfileNavItemProps,
   ProfileNavProps,
   ProfileTabPanelProps,

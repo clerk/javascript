@@ -22,6 +22,10 @@ const compact = '@container cl-profile (max-width: 48rem)' as const;
 /** How far the content's clip edge — and the scrollbar with it — sits inside the frame's corners. */
 const SCROLL_INSET = space['1.5'];
 
+const NAV_WIDTH = `calc(${space['40']} + ${space['15']})`;
+/** The pages' reading width — see `contentBody`. */
+const CONTENT_MAX_WIDTH = '56rem';
+
 const NAV_GAP = space['0.5'];
 const HALF_GAP = `calc(-1 * ${NAV_GAP} / 2)`;
 
@@ -94,7 +98,7 @@ export const styles = stylex.create({
     display: 'grid',
     gridTemplateColumns: {
       [compact]: 'minmax(0, 1fr)',
-      default: `calc(${space['40']} + ${space['15']}) minmax(0, 1fr)`,
+      default: `${NAV_WIDTH} minmax(0, 1fr)`,
     },
     gridTemplateRows: 'minmax(0, 1fr)',
     minHeight: 0,
@@ -107,6 +111,8 @@ export const styles = stylex.create({
   layoutInline: {
     borderRadius: 0,
     borderWidth: '0px',
+    // As wide as the navigation, the gap and the pages' reading column, centred in the host.
+    marginInline: 'auto',
     overflow: 'visible',
     backgroundColor: 'transparent',
     blockSize: 'auto',
@@ -114,6 +120,7 @@ export const styles = stylex.create({
     // No frame to inset from, so neither column carries padding; a gap holds them apart.
     columnGap: space['10'],
     gridTemplateRows: 'auto',
+    maxWidth: `calc(${NAV_WIDTH} + ${space['10']} + ${CONTENT_MAX_WIDTH})`,
   },
 
   layoutInDialog: {
@@ -272,7 +279,7 @@ export const styles = stylex.create({
   /** The pages' column: held to a reading width and centred, however wide the frame runs. */
   contentBody: {
     marginInline: 'auto',
-    maxInlineSize: '56rem',
+    maxInlineSize: CONTENT_MAX_WIDTH,
   },
 
   /** The headline row. */
