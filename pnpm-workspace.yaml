@@ -3,6 +3,8 @@ packages:
   - packages/electron-passkeys/npm/*
 
 catalogs:
+  peer-expo:
+    expo: '>=54 <58'
   peer-react:
     react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
     react-dom: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0

@@ -18,7 +18,7 @@ import type { VerifyTokenOptions } from './verify';
  */
 export type AuthenticateRequestOptions = {
   /**
-   * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard.
    */
   publishableKey?: string;
   /**
