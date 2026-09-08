@@ -1,11 +1,5 @@
 import { ClerkAPIResponseError, ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
-import type {
-  AuthenticateWithRedirectParams,
-  SignInCreateParams,
-  SignInResource,
-  SignUpCreateParams,
-  SignUpResource,
-} from '@clerk/shared/types';
+import type { AuthenticateWithRedirectParams, SignInCreateParams, SignUpCreateParams } from '@clerk/shared/types';
 
 import type { Clerk } from '../core/clerk';
 import { SignIn, SignUp } from '../core/resources/internal';
@@ -22,7 +16,8 @@ export class NativeAuthOperationError extends Error {
   }
 }
 
-type Flow = 'signIn' | 'signUp';
+type AuthResources = Pick<NonNullable<Clerk['client']>, 'signIn' | 'signUp'>;
+type Flow = keyof AuthResources;
 type CompletionOptions = {
   flow: Flow;
   expectedId?: string;
@@ -31,29 +26,33 @@ type CompletionOptions = {
 };
 
 export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentityContext) {
-  const completed = new Map<Flow, { resource: SignInResource | SignUpResource; epoch: number }>();
+  const completed: { [F in Flow]?: { resource: AuthResources[F]; epoch: number } } = {};
   const observe = () => {
-    for (const [flow, saved] of completed) {
+    for (const flow of ['signIn', 'signUp'] as const) {
+      const saved = completed[flow];
+      if (!saved) {
+        continue;
+      }
       const current = clerk.client?.[flow];
       if (
         saved.epoch !== identity.identityEpoch() ||
         (current?.id && current.id !== saved.resource.id) ||
         !clerk.client?.sessions.some(session => session.id === saved.resource.createdSessionId)
       ) {
-        completed.delete(flow);
+        delete completed[flow];
       }
     }
   };
+  function completion<R extends AuthResources[Flow]>(resource: R) {
+    return resource.status === 'complete' && resource.createdSessionId
+      ? { resource, epoch: identity.identityEpoch() }
+      : undefined;
+  }
   const remember = (value: unknown) => {
-    const flow = value instanceof SignIn ? 'signIn' : value instanceof SignUp ? 'signUp' : undefined;
-    if (!flow) {
-      return;
-    }
-    const resource = value as SignInResource | SignUpResource;
-    if (resource.status === 'complete' && resource.createdSessionId) {
-      completed.set(flow, { resource, epoch: identity.identityEpoch() });
-    } else {
-      completed.delete(flow);
+    if (value instanceof SignIn) {
+      completed.signIn = completion(value);
+    } else if (value instanceof SignUp) {
+      completed.signUp = completion(value);
     }
   };
   const client = () => {
@@ -62,18 +61,18 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
     }
     return clerk.client;
   };
-  const resource = (flow: Flow, expectedId?: string) => {
+  const resource = <F extends Flow>(flow: F, expectedId?: string): AuthResources[F] => {
     identity.ensureActive();
     observe();
     const current = clerk.client?.[flow];
-    const value = current?.id ? current : (completed.get(flow)?.resource ?? current);
+    const value = current?.id ? current : (completed[flow]?.resource ?? current);
     if (!value || (expectedId && value.id !== expectedId)) {
       throw new ClerkRuntimeError('The authentication attempt is no longer current', { code: 'stale_authentication' });
     }
     return value;
   };
 
-  async function finish(flow: Flow, expectedId?: string, result?: SignInResource | SignUpResource) {
+  async function finish(flow: Flow, expectedId?: string, result?: AuthResources[Flow]) {
     if (result) {
       remember(result);
     }
@@ -89,8 +88,8 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
   function checkVerificationError(flow: Flow) {
     const error =
       flow === 'signIn'
-        ? (resource('signIn') as SignInResource).firstFactorVerification.error
-        : (resource('signUp') as SignUpResource).verifications.externalAccount.error;
+        ? resource('signIn').firstFactorVerification.error
+        : resource('signUp').verifications.externalAccount.error;
     if (error) {
       throw new ClerkAPIResponseError(error.message, { data: [error], status: 422 });
     }
@@ -101,15 +100,12 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
     resource(flow, options.expectedId);
     if (
       flow === 'signIn' &&
-      (resource('signIn') as SignInResource).firstFactorVerification.status === 'transferable' &&
+      resource('signIn').firstFactorVerification.status === 'transferable' &&
       options.transferable !== false
     ) {
       remember(await client().signUp.create({ transfer: true, unsafeMetadata: options.unsafeMetadata }));
       flow = 'signUp';
-    } else if (
-      flow === 'signUp' &&
-      (resource('signUp') as SignUpResource).verifications.externalAccount.status === 'transferable'
-    ) {
+    } else if (flow === 'signUp' && resource('signUp').verifications.externalAccount.status === 'transferable') {
       remember(await client().signIn.create({ transfer: true }));
       flow = 'signIn';
     }
@@ -122,7 +118,7 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
     finishNativeSignUp: (expectedId?: string) => finish('signUp', expectedId),
     completeNativeAuth,
     async verifyNativeSignInCode(options: { expectedId: string; code: string }) {
-      const signIn = resource('signIn', options.expectedId) as SignInResource;
+      const signIn = resource('signIn', options.expectedId);
       const strategy = signIn.firstFactorVerification.strategy;
       if (!strategy) {
         throw Object.assign(new Error('Unable to verify code because no first factor strategy is set.'), {
@@ -227,7 +223,7 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
           throw error;
         }
         remember(await client().signIn.create({ strategy: 'oauth_token_apple', token }));
-        if ((resource('signIn') as SignInResource).firstFactorVerification.status === 'transferable') {
+        if (resource('signIn').firstFactorVerification.status === 'transferable') {
           throw error;
         }
         return completeNativeAuth({ flow: 'signIn', transferable: false });
@@ -250,9 +246,9 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
       const primary = resource(options.flow);
       const transferPending =
         options.flow === 'signIn'
-          ? (resource('signIn') as SignInResource).firstFactorVerification.status === 'transferable' &&
+          ? resource('signIn').firstFactorVerification.status === 'transferable' &&
             options.params.__internal_callbackParams?.transferable !== false
-          : (resource('signUp') as SignUpResource).verifications.externalAccount.status === 'transferable';
+          : resource('signUp').verifications.externalAccount.status === 'transferable';
       const alternateCompleted =
         current.createdSessionId &&
         current.createdSessionId === clerk.session?.id &&
@@ -267,8 +263,7 @@ export function createNativeAuthOperations(clerk: Clerk, identity: NativeIdentit
       expectedId: string;
       params: Parameters<NonNullable<Clerk['client']>['signIn']['attemptFirstFactor']>[0];
     }) => {
-      resource('signIn', options.expectedId);
-      return client().signIn.attemptFirstFactor(options.params);
+      return resource('signIn', options.expectedId).attemptFirstFactor(options.params);
     },
   };
   return { operations, remember, observe, finish };

@@ -106,6 +106,19 @@ export type PrepareFirstFactorParams =
   | OAuthConfig
   | EnterpriseSSOConfig;
 
+/** @internal */
+export type BiometricCredentialCreateParams = {
+  strategy: 'biometric_credential';
+  trustedDeviceId: string;
+};
+
+/** @internal */
+export type BiometricCredentialAttemptParams = BiometricCredentialCreateParams & {
+  clientData: string;
+  signature: string;
+  algorithm: string;
+};
+
 export type AttemptFirstFactorParams =
   | PasskeyAttempt
   | EmailCodeAttempt
@@ -113,7 +126,8 @@ export type AttemptFirstFactorParams =
   | PasswordAttempt
   | Web3Attempt
   | ResetPasswordPhoneCodeAttempt
-  | ResetPasswordEmailCodeAttempt;
+  | ResetPasswordEmailCodeAttempt
+  | BiometricCredentialAttemptParams;
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig | EmailLinkConfig;
 
@@ -166,6 +180,7 @@ export type SignInCreateParams = (
   | {
       transfer?: boolean;
     }
+  | BiometricCredentialCreateParams
 ) & {
   transfer?: boolean;
   signUpIfMissing?: boolean;

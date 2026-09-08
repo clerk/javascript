@@ -149,6 +149,45 @@ describe('native adapter for an existing Clerk owner', () => {
     expect(f.clerk.user?.id).toBeTruthy();
   });
 
+  it.each(['current', 'stale phone', 'stale watch'] as const)(
+    'checks every forwarding hop before executing an operation (%s)',
+    async state => {
+      const f = fixture();
+      const user = f.clerk.user!;
+      const fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        json: () => Promise.resolve({ response: user.__internal_toSnapshot() }),
+      });
+      vi.stubGlobal('fetch', fetch);
+      const currentIdentity = { clientId: f.client.id, sessionId: f.clerk.session!.id };
+      const invocation = {
+        receiver: { kind: 'clerk' },
+        method: 'invokeForIdentity',
+        arguments: [
+          {
+            receiver: { kind: 'clerk' },
+            method: 'invokeForIdentity',
+            arguments: [
+              { receiver: { kind: 'user', id: user.id }, method: 'reload' },
+              state === 'stale watch' ? { ...currentIdentity, sessionId: 'old_watch_session' } : currentIdentity,
+            ],
+          },
+          state === 'stale phone' ? { ...currentIdentity, sessionId: 'old_phone_session' } : currentIdentity,
+        ],
+      };
+      if (state === 'current') {
+        await expect(f.adapter.invoke(invocation)).resolves.toMatchObject({ id: user.id });
+        expect(fetch).toHaveBeenCalledTimes(1);
+      } else {
+        await expect(f.adapter.invoke(invocation)).rejects.toMatchObject({ envelope: { code: 'stale_identity' } });
+        expect(fetch).not.toHaveBeenCalled();
+      }
+      expect(f.clerk.session?.id).toBe('sess_owner');
+    },
+  );
+
   it('preserves the loaded owner and its cache provider without starting a second lifecycle', async () => {
     const f = fixture();
     const load = vi.spyOn(f.clerk, 'load');

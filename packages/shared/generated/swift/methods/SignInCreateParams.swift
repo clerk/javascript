@@ -14,6 +14,7 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
   public var ticket: String?
   public var token: String?
   public var password: String?
+  public var trustedDeviceId: String?
 
   public init(
     strategy: String? = nil,
@@ -26,7 +27,8 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
     signUpIfMissing: Bool? = nil,
     ticket: String? = nil,
     token: String? = nil,
-    password: String? = nil
+    password: String? = nil,
+    trustedDeviceId: String? = nil
   ) {
     self.strategy = strategy
     self.redirectUrl = redirectUrl
@@ -39,6 +41,7 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
     self.ticket = ticket
     self.token = token
     self.password = password
+    self.trustedDeviceId = trustedDeviceId
   }
 
   public enum CodingKeys: String, CodingKey {
@@ -53,6 +56,7 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
     case ticket
     case token
     case password
+    case trustedDeviceId
   }
 
   public init(from decoder: Decoder) throws {
@@ -68,6 +72,7 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
     self.ticket = try container.decodeIfPresentFlexible(String.self, snake: "ticket", camel: "ticket")
     self.token = try container.decodeIfPresentFlexible(String.self, snake: "token", camel: "token")
     self.password = try container.decodeIfPresentFlexible(String.self, snake: "password", camel: "password")
+    self.trustedDeviceId = try container.decodeIfPresentFlexible(String.self, snake: "trustedDeviceId", camel: "trustedDeviceId")
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -83,5 +88,6 @@ public struct SignInCreateParams: Codable, Equatable, Sendable {
     try container.encodeIfPresent(ticket, forKey: .ticket)
     try container.encodeIfPresent(token, forKey: .token)
     try container.encodeIfPresent(password, forKey: .password)
+    try container.encodeIfPresent(trustedDeviceId, forKey: .trustedDeviceId)
   }
 }

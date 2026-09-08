@@ -1,8 +1,25 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
+
 import type { Clerk } from '../core/clerk';
 import type { AuthConfig } from '../core/resources/AuthConfig';
 import { BaseResource } from '../core/resources/Base';
 import type { Verification } from '../core/resources/Verification';
+import type {
+  LocalBiometricCredential,
+  NativeBiometricCapability,
+  NativeBiometricSelection,
+} from './nativeBiometricCapability';
 import type { NativeIdentityContext } from './nativeIdentity';
+
+export type { NativeBiometricCapability } from './nativeBiometricCapability';
+
+type BiometricCredentialJSON = {
+  id: string;
+  app_identifier: string;
+  status: string;
+  created_at: number;
+  updated_at: number;
+};
 
 type EnrollmentParams = {
   platform: string;
@@ -16,29 +33,23 @@ type EnrollmentParams = {
 
 const enrollmentBody = ({ publicKeyJWK, ...params }: EnrollmentParams) => ({ ...params, publicKeyJwk: publicKeyJWK });
 
-type LocalCredential = {
-  id: string;
-  localKeyId: string;
-  userId: string;
-  appIdentifier: string;
-  identifierHint?: string;
-  policy: string;
-  createdAt: number;
-  updatedAt: number;
-};
-type Selection = { credentials?: LocalCredential[]; reason?: string };
 type SelectionOptions = { id?: string; identifierHint?: string; currentUser?: boolean };
-export type NativeBiometricCapability = (request: Record<string, unknown>) => Promise<any>;
 
 export function createBiometricCredentialOperations(
   clerk: Clerk,
   capability: NativeBiometricCapability | undefined,
   identity: NativeIdentityContext,
 ) {
-  const fetchResponse = async (request: Parameters<typeof BaseResource._fetch>[0]) =>
-    (await BaseResource._fetch(request))?.response;
+  const fetchResponse = async <T>(request: Parameters<typeof BaseResource._fetch>[0]): Promise<T> => {
+    const payload = await BaseResource._fetch<T>(request);
+    if (!payload) {
+      throw new Error('Biometric API did not return a response.');
+    }
+    return payload.response;
+  };
   const api = {
-    listNativeBiometricCredentials: () => fetchResponse({ path: '/me/biometric_credentials', method: 'GET' }),
+    listNativeBiometricCredentials: () =>
+      fetchResponse<BiometricCredentialJSON[]>({ path: '/me/biometric_credentials', method: 'GET' }),
     prepareNativeBiometricEnrollment: (sessionId: string, params: EnrollmentParams) =>
       fetchResponse({
         path: '/me/biometric_credentials/prepare',
@@ -47,26 +58,30 @@ export function createBiometricCredentialOperations(
         body: enrollmentBody(params) as any,
       }),
     attemptNativeBiometricEnrollment: (sessionId: string, params: EnrollmentParams) =>
-      fetchResponse({
+      fetchResponse<BiometricCredentialJSON>({
         path: '/me/biometric_credentials/attempt',
         method: 'POST',
         sessionId,
         body: enrollmentBody(params) as any,
       }),
     validateNativeBiometricCredential: (trustedDeviceId: string) =>
-      fetchResponse({
+      fetchResponse<{ valid: boolean }>({
         path: '/client/biometric_credentials/validate',
         method: 'POST',
         body: { trustedDeviceId } as any,
       }),
     revokeNativeBiometricCredential: (id: string, sessionId?: string) =>
-      fetchResponse({ path: `/me/biometric_credentials/${encodeURIComponent(id)}`, method: 'DELETE', sessionId }),
+      fetchResponse<BiometricCredentialJSON>({
+        path: `/me/biometric_credentials/${encodeURIComponent(id)}`,
+        method: 'DELETE',
+        sessionId,
+      }),
   };
-  const native = async (operation: string, args: Record<string, unknown> = {}) => {
+  const native: NativeBiometricCapability = async request => {
     if (!capability) {
       throw new Error('Biometric sign-in is unavailable.');
     }
-    return capability({ operation, ...args });
+    return capability(request);
   };
   const fence = () => {
     const epoch = identity.identityEpoch();
@@ -78,12 +93,13 @@ export function createBiometricCredentialOperations(
       }
     };
   };
-  const remove = (credential: LocalCredential) => native('remove', { credential });
-  const missingCredential = (error: any) => {
-    const entry = error?.errors?.[0];
+  const remove = (credential: LocalBiometricCredential) => native({ operation: 'remove', credential });
+  const missingCredential = (error: unknown) => {
+    const entry = isClerkAPIResponseError(error) ? error.errors[0] : undefined;
     return (
-      ['form_resource_not_found', 'trusted_device_not_registered'].includes(entry?.code) &&
-      (entry.meta?.paramName || entry.meta?.param_name) === 'trusted_device_id'
+      entry !== undefined &&
+      ['form_resource_not_found', 'trusted_device_not_registered'].includes(entry.code) &&
+      entry.meta?.paramName === 'trusted_device_id'
     );
   };
   const featureUnavailableReason = () => {
@@ -99,7 +115,7 @@ export function createBiometricCredentialOperations(
     }
     return undefined;
   };
-  const candidates = (options: SelectionOptions): Promise<Selection> => {
+  const candidates = (options: SelectionOptions): Promise<NativeBiometricSelection> => {
     if (options.currentUser && !clerk.user?.id) {
       return Promise.resolve({ reason: 'noLocalCredential' });
     }
@@ -107,13 +123,14 @@ export function createBiometricCredentialOperations(
     if (reason) {
       return Promise.resolve({ reason });
     }
-    return native('candidates', {
+    return native({
+      operation: 'candidates',
       id: options.id,
       identifierHint: options.identifierHint,
       userID: options.currentUser ? clerk.user?.id : undefined,
     });
   };
-  const select = async (options: SelectionOptions): Promise<Selection> => {
+  const select = async (options: SelectionOptions): Promise<NativeBiometricSelection> => {
     const check = fence();
     const local = await candidates(options);
     check();
@@ -124,7 +141,7 @@ export function createBiometricCredentialOperations(
     if (!matching.length) {
       return { reason: 'noLocalCredential' };
     }
-    const server = (await api.listNativeBiometricCredentials()) as unknown as any[];
+    const server = await api.listNativeBiometricCredentials();
     check();
     let reason: string | undefined;
     for (const entry of matching) {
@@ -138,7 +155,8 @@ export function createBiometricCredentialOperations(
     }
     return { reason: reason || 'serverCredentialMissing' };
   };
-  const challengeData = (challenge: any): string => {
+  const challengeData = (value: unknown): string => {
+    const challenge = value && typeof value === 'object' ? (value as Record<string, unknown>) : undefined;
     if (
       typeof challenge?.client_data !== 'string' ||
       typeof challenge?.challenge !== 'string' ||
@@ -161,7 +179,7 @@ export function createBiometricCredentialOperations(
     const check = fence();
     const result = await api.revokeNativeBiometricCredential(id, sessionId);
     check();
-    await native('removeById', { id }).catch(() => undefined);
+    await native({ operation: 'removeById', id }).catch(() => undefined);
     return result;
   };
   return {
@@ -175,7 +193,7 @@ export function createBiometricCredentialOperations(
     ) => {
       const session = requireEnrollmentSession('enroll');
       const check = fence();
-      const device = await native('context');
+      const device = await native({ operation: 'context' });
       check();
       const reason = featureUnavailableReason();
       if (reason) {
@@ -193,7 +211,7 @@ export function createBiometricCredentialOperations(
         throw new Error('Unable to enroll a biometric credential without a user for the current session.');
       }
       const userId = session.user.id;
-      const key = await native('createKey', { policy: options.policy || 'biometry_current_set' });
+      const key = await native({ operation: 'createKey', policy: options.policy || 'biometry_current_set' });
       try {
         check();
         const params = {
@@ -205,16 +223,18 @@ export function createBiometricCredentialOperations(
         };
         const challenge = await api.prepareNativeBiometricEnrollment(session.id, params);
         check();
-        const signature = await native('sign', {
+        const signature = await native({
+          operation: 'sign',
           clientData: challengeData(challenge),
           localKeyId: key.localKeyId,
           reason: options.reason ?? 'Use biometrics to enroll this device.',
         });
         check();
-        const credential = (await api.attemptNativeBiometricEnrollment(session.id, { ...params, ...signature })) as any;
+        const credential = await api.attemptNativeBiometricEnrollment(session.id, { ...params, ...signature });
         check();
         try {
-          await native('save', {
+          await native({
+            operation: 'save',
             credential: {
               id: credential.id,
               localKeyId: key.localKeyId,
@@ -231,7 +251,7 @@ export function createBiometricCredentialOperations(
           await api.revokeNativeBiometricCredential(credential.id, session.id).catch(() => undefined);
           throw error;
         }
-        const previous: LocalCredential[] = await native('records').catch(() => []);
+        const previous: LocalBiometricCredential[] = await native({ operation: 'records' }).catch(() => []);
         for (const entry of previous) {
           check();
           if (entry.id !== credential.id) {
@@ -240,7 +260,7 @@ export function createBiometricCredentialOperations(
         }
         return credential;
       } catch (error) {
-        await native('deleteKey', { localKeyId: key.localKeyId }).catch(() => undefined);
+        await native({ operation: 'deleteKey', localKeyId: key.localKeyId }).catch(() => undefined);
         throw error;
       }
     },
@@ -263,7 +283,7 @@ export function createBiometricCredentialOperations(
         throw new Error('The client is not initialized.');
       }
       try {
-        await signIn.create({ strategy: 'biometric_credential', trustedDeviceId: credential.id } as any);
+        await signIn.create({ strategy: 'biometric_credential', trustedDeviceId: credential.id });
         identity.ensureActive();
         check = fence();
         const id = signIn.id;
@@ -273,7 +293,8 @@ export function createBiometricCredentialOperations(
         if (!challenge) {
           throw new Error('Biometric sign-in did not return a challenge.');
         }
-        const signature = await native('sign', {
+        const signature = await native({
+          operation: 'sign',
           clientData: challengeData(challenge),
           localKeyId: credential.localKeyId,
           reason: options.reason ?? 'Use biometrics to sign in.',
@@ -312,15 +333,15 @@ export function createBiometricCredentialOperations(
         }
         for (const entry of local.credentials || []) {
           try {
-            const validation = (await api.validateNativeBiometricCredential(entry.id)) as any;
+            const validation = await api.validateNativeBiometricCredential(entry.id);
             check();
             if (validation.valid) {
               return { status: 'valid' };
             }
-          } catch (error: any) {
+          } catch (error: unknown) {
             check();
             if (!missingCredential(error)) {
-              const code = error?.errors?.[0]?.code;
+              const code = isClerkAPIResponseError(error) ? error.errors[0]?.code : undefined;
               if (code === 'native_api_disabled' || code === 'feature_not_enabled') {
                 return {
                   status: 'invalid',

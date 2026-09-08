@@ -6,7 +6,7 @@ import { SessionTokenCache } from '../core/tokenCache';
 import { createBiometricCredentialOperations } from './biometricCredentials';
 import { EmbeddedInvocationError, errorEnvelope, failure } from './errors';
 import { createHostedAuthOperations } from './hostedAuth';
-import { type ExpectedIdentity, parseExpectedIdentity, parseInvocation } from './invocation';
+import { parseInvocation } from './invocation';
 import { createEmbeddedLifecycle } from './lifecycle';
 import { createMagicLinkOperations } from './magicLink';
 import { createNativeAuthOperations } from './nativeAuth';
@@ -347,15 +347,16 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
     return loadPromise;
   }
 
-  async function invoke(input: unknown, expectedIdentity?: ExpectedIdentity): Promise<unknown> {
+  async function invoke(input: unknown): Promise<unknown> {
     try {
-      const invocation = parseInvocation(input);
+      const { invocation, expectedIdentities } = parseInvocation(input);
       await load();
       ensureActive();
       if (
-        expectedIdentity &&
-        ((clerk.client?.id ?? null) !== expectedIdentity.clientId ||
-          (clerk.session?.id ?? null) !== expectedIdentity.sessionId)
+        expectedIdentities.some(
+          expected =>
+            (clerk.client?.id ?? null) !== expected.clientId || (clerk.session?.id ?? null) !== expected.sessionId,
+        )
       ) {
         failure('stale_identity', 'The paired device has a different active identity. Retry after synchronizing.');
       }
@@ -364,12 +365,7 @@ function createAdapter(clerk: Clerk, config: EmbeddedOptions, host: EmbeddedHost
       if (receiver.kind === 'clerk' && ['signOut', 'setActive'].includes(method)) {
         identityEpoch += 1;
       }
-      if (receiver.kind === 'clerk' && method === 'invokeForIdentity') {
-        if (args.length !== 2) {
-          failure('invalid_invocation', 'Identity-bound operations require an invocation and an identity');
-        }
-        return await invoke(args[0], parseExpectedIdentity(args[1]));
-      } else if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(clerkOperations, method)) {
+      if (receiver.kind === 'clerk' && Object.prototype.hasOwnProperty.call(clerkOperations, method)) {
         const operation = Reflect.get(clerkOperations, method);
         value = await Reflect.apply(operation, clerkOperations, args);
       } else {

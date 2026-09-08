@@ -94,7 +94,7 @@ function receiver(value: unknown): EmbeddedReceiver {
   }
 }
 
-export function parseInvocation(value: unknown): EmbeddedInvocation {
+function parseResourceInvocation(value: unknown): EmbeddedInvocation {
   const input = object(value);
   keys(input, ['receiver', 'method', 'arguments']);
   if (typeof input.method !== 'string' || !input.method) {
@@ -106,11 +106,28 @@ export function parseInvocation(value: unknown): EmbeddedInvocation {
   return { receiver: receiver(input.receiver), method: input.method, arguments: input.arguments };
 }
 
-export function parseExpectedIdentity(value: unknown): ExpectedIdentity {
+function parseExpectedIdentity(value: unknown): ExpectedIdentity {
   const input = object(value);
   keys(input, ['clientId', 'sessionId']);
   return {
     clientId: input.clientId === null ? null : identifier(input.clientId),
     sessionId: input.sessionId === null ? null : identifier(input.sessionId),
   };
+}
+
+export function parseInvocation(value: unknown): {
+  invocation: EmbeddedInvocation;
+  expectedIdentities: ExpectedIdentity[];
+} {
+  let invocation = parseResourceInvocation(value);
+  const expectedIdentities: ExpectedIdentity[] = [];
+  while (invocation.receiver.kind === 'clerk' && invocation.method === 'invokeForIdentity') {
+    const args = invocation.arguments;
+    if (args?.length !== 2) {
+      failure('invalid_invocation', 'Identity-bound operations require an invocation and an identity');
+    }
+    expectedIdentities.push(parseExpectedIdentity(args[1]));
+    invocation = parseResourceInvocation(args[0]);
+  }
+  return { invocation, expectedIdentities };
 }

@@ -14,6 +14,7 @@ public enum AttemptFirstFactorParamsStrategy: Codable, Equatable, Hashable, Send
   case web3SolanaSignature
   case resetPasswordPhoneCode
   case resetPasswordEmailCode
+  case biometricCredential
   case unknown(String)
 
   public init(from decoder: Decoder) throws {
@@ -42,6 +43,8 @@ public enum AttemptFirstFactorParamsStrategy: Codable, Equatable, Hashable, Send
       self = .resetPasswordPhoneCode
     case "reset_password_email_code":
       self = .resetPasswordEmailCode
+    case "biometric_credential":
+      self = .biometricCredential
     default:
       self = .unknown(value)
     }
@@ -72,6 +75,8 @@ public enum AttemptFirstFactorParamsStrategy: Codable, Equatable, Hashable, Send
       try container.encode("reset_password_phone_code")
     case .resetPasswordEmailCode:
       try container.encode("reset_password_email_code")
+    case .biometricCredential:
+      try container.encode("biometric_credential")
     case .unknown(let value):
       try container.encode(value)
     }

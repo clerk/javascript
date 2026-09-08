@@ -8,19 +8,28 @@ public struct AttemptFirstFactorParams: Codable, Equatable, Sendable {
   public var code: String?
   public var password: String?
   public var signature: String?
+  public var trustedDeviceId: String?
+  public var clientData: String?
+  public var algorithm: String?
 
   public init(
     strategy: AttemptFirstFactorParamsStrategy,
     publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse? = nil,
     code: String? = nil,
     password: String? = nil,
-    signature: String? = nil
+    signature: String? = nil,
+    trustedDeviceId: String? = nil,
+    clientData: String? = nil,
+    algorithm: String? = nil
   ) {
     self.strategy = strategy
     self.publicKeyCredential = publicKeyCredential
     self.code = code
     self.password = password
     self.signature = signature
+    self.trustedDeviceId = trustedDeviceId
+    self.clientData = clientData
+    self.algorithm = algorithm
   }
 
   public enum CodingKeys: String, CodingKey {
@@ -29,6 +38,9 @@ public struct AttemptFirstFactorParams: Codable, Equatable, Sendable {
     case code
     case password
     case signature
+    case trustedDeviceId
+    case clientData
+    case algorithm
   }
 
   public init(from decoder: Decoder) throws {
@@ -38,6 +50,9 @@ public struct AttemptFirstFactorParams: Codable, Equatable, Sendable {
     self.code = try container.decodeIfPresentFlexible(String.self, snake: "code", camel: "code")
     self.password = try container.decodeIfPresentFlexible(String.self, snake: "password", camel: "password")
     self.signature = try container.decodeIfPresentFlexible(String.self, snake: "signature", camel: "signature")
+    self.trustedDeviceId = try container.decodeIfPresentFlexible(String.self, snake: "trustedDeviceId", camel: "trustedDeviceId")
+    self.clientData = try container.decodeIfPresentFlexible(String.self, snake: "clientData", camel: "clientData")
+    self.algorithm = try container.decodeIfPresentFlexible(String.self, snake: "algorithm", camel: "algorithm")
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -47,5 +62,8 @@ public struct AttemptFirstFactorParams: Codable, Equatable, Sendable {
     try container.encodeIfPresent(code, forKey: .code)
     try container.encodeIfPresent(password, forKey: .password)
     try container.encodeIfPresent(signature, forKey: .signature)
+    try container.encodeIfPresent(trustedDeviceId, forKey: .trustedDeviceId)
+    try container.encodeIfPresent(clientData, forKey: .clientData)
+    try container.encodeIfPresent(algorithm, forKey: .algorithm)
   }
 }
