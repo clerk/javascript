@@ -4,7 +4,9 @@ import * as Stories from './user-profile.stories';
 
 The complete user profile: a `Profile` whose navigation lists the Account, Security, Billing, and
 API Keys pages it was given content for, then any pages of the consumer's own, in the order asked
-for. Rendered inside a `profile` dialog it names it, carries its dismiss, and fills its height.
+for. Below it is a page's content — an `inline` dialog — so it is flush with the page, unframed, and
+scrolls with it. Rendered over the page instead, it names the dialog, carries its dismiss, and
+fills its height.
 
 <Story
   name='Default'
