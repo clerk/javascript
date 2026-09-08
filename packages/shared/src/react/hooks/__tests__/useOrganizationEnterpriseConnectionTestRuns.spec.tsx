@@ -166,4 +166,28 @@ describe('useOrganizationEnterpriseConnectionTestRuns — polling arm scope', ()
     rerender({ enterpriseConnectionId: 'ent_2' });
     expect(result.current.isPolling).toBe(false);
   });
+
+  it('does not resume polling when the original connection returns without a new revalidate', async () => {
+    getTestRunsSpy.mockImplementation(() => Promise.resolve({ data: [], total_count: 0 }));
+    const { result, rerender } = renderHook(
+      ({ enterpriseConnectionId }: { enterpriseConnectionId: string }) =>
+        __internal_useOrganizationEnterpriseConnectionTestRuns({ enterpriseConnectionId, pollIntervalMs: 20 }),
+      { wrapper, initialProps: { enterpriseConnectionId: 'ent_1' } },
+    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.revalidate();
+    });
+    expect(result.current.isPolling).toBe(true);
+
+    rerender({ enterpriseConnectionId: 'ent_2' });
+    rerender({ enterpriseConnectionId: 'ent_1' });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isPolling).toBe(false);
+
+    const callsAfterReturn = getTestRunsSpy.mock.calls.length;
+    await new Promise(resolve => setTimeout(resolve, 60));
+    expect(getTestRunsSpy.mock.calls.length).toBe(callsAfterReturn);
+  });
 });

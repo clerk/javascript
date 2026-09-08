@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type {
   DirectorySyncResource,
@@ -15,7 +15,7 @@ import { useOrganizationDirectorySyncUsersCacheKeys } from './useOrganizationDir
 const DEFAULT_POLL_INTERVAL_MS = 2_000;
 
 export type UseOrganizationDirectorySyncUsersParams = {
-  /** The directory to list users for, e.g. `data` from `useOrganizationDirectorySync`. Dormant while nullish. */
+  /** The directory to list users for, e.g. `data` from `useOrganizationDirectorySync`. Nothing is fetched while `null` or `undefined`. */
   directory: DirectorySyncResource | null | undefined;
   /**
    * Pass-through fetch parameters (pagination).
@@ -23,13 +23,13 @@ export type UseOrganizationDirectorySyncUsersParams = {
    */
   params?: GetDirectorySyncUsersParams;
   /**
-   * Polling interval (ms) applied while polling is armed via `startPolling`.
+   * Polling interval (ms) used while polling is active.
    *
    * @default 2000
    */
   pollIntervalMs?: number;
   /**
-   * If `false`, the hook is dormant — no fetch, no polling.
+   * If `false`, nothing is fetched and polling is paused.
    *
    * @default true
    */
@@ -38,25 +38,21 @@ export type UseOrganizationDirectorySyncUsersParams = {
 };
 
 export type UseOrganizationDirectorySyncUsersReturn = {
-  /** `undefined` while loading and while the hook is dormant. */
+  /** `undefined` while loading and while the hook is disabled. */
   data: DirectorySyncUserResource[] | undefined;
   totalCount: number | undefined;
   error: Error | null;
   isLoading: boolean;
   isFetching: boolean;
-  /**
-   * `true` while the hook is actively polling
-   */
+  /** `true` while the hook is polling. */
   isPolling: boolean;
   /**
-   * Start polling. Polling runs continuously (new provisions, updates, and
-   * deprovisions keep appearing) until `stopPolling` is called — callers
-   * should stop on unmount of the view that armed it.
+   * Start polling for changes to the list. Polling continues until `stopPolling`
+   * is called or the hook unmounts, so colocate the hook with the view that
+   * needs the feed and call this from an effect on mount.
    */
   startPolling: () => void;
-  /**
-   * Stop polling.
-   */
+  /** Stop polling. */
   stopPolling: () => void;
   /**
    * Force a refetch.
@@ -66,8 +62,8 @@ export type UseOrganizationDirectorySyncUsersReturn = {
 
 /**
  * The users provisioned into an enterprise connection's Directory Sync
- * directory, most recently touched first. Polls continuously while armed via
- * `startPolling`, so the setup flow doubles as a recent-activity feed.
+ * directory, most recently touched first. Polling is opt-in via `startPolling`,
+ * which lets the setup flow use the list as a live activity feed.
  *
  * @internal
  */
@@ -103,10 +99,16 @@ function useOrganizationDirectorySyncUsers(
 
   const queryEnabled = enabled && clerk.loaded && Boolean(organization) && Boolean(directory);
 
-  // Polling is armed for a specific directory and derived, not reset in an effect: a child
-  // effect arming it in the same commit the directory arrives would otherwise be cancelled.
-  const [armedForDirectoryId, setArmedForDirectoryId] = useState<string | null>(null);
-  const shouldPoll = armedForDirectoryId !== null && armedForDirectoryId === directoryId;
+  // Polling is requested for a specific directory, so a directory change stops it. This is
+  // derived rather than reset in an effect because a child component may call `startPolling`
+  // in the same commit the directory arrives, and an unconditional reset would cancel that.
+  const [pollingDirectoryId, setPollingDirectoryId] = useState<string | null>(null);
+  const shouldPoll = pollingDirectoryId !== null && pollingDirectoryId === directoryId;
+
+  useEffect(() => {
+    // Drop a request left over from a previous directory so it cannot resume if that directory returns.
+    setPollingDirectoryId(current => (current !== null && current !== directoryId ? null : current));
+  }, [directoryId]);
 
   const currentTracked = queryKey[2];
   const query = useClerkQuery({
@@ -137,11 +139,11 @@ function useOrganizationDirectorySyncUsers(
   });
 
   const startPolling = useCallback(() => {
-    setArmedForDirectoryId(directoryId);
+    setPollingDirectoryId(directoryId);
   }, [directoryId]);
 
   const stopPolling = useCallback(() => {
-    setArmedForDirectoryId(null);
+    setPollingDirectoryId(null);
   }, []);
 
   const revalidate = useCallback(async () => {
@@ -151,7 +153,7 @@ function useOrganizationDirectorySyncUsers(
   const isPolling = queryEnabled && shouldPoll;
 
   return {
-    // Dormant means dormant: never surface cached rows while the query cannot run.
+    // A disabled query still exposes rows cached under its key; report none until it can run.
     data: queryEnabled ? query.data?.data : undefined,
     totalCount: queryEnabled ? query.data?.total_count : undefined,
     error: query.error ?? null,

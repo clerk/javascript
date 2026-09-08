@@ -67,6 +67,10 @@ describe('useOrganizationDirectorySyncUsers', () => {
 
     act(() => result.current.stopPolling());
     expect(result.current.isPolling).toBe(false);
+
+    const callsAfterStop = getUsersSpy.mock.calls.length;
+    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS * 3));
+    expect(getUsersSpy.mock.calls.length).toBe(callsAfterStop);
   });
 
   it('disarms polling when the directory identity changes', async () => {
@@ -78,6 +82,23 @@ describe('useOrganizationDirectorySyncUsers', () => {
 
     rerender({ directory: createDirectory('dir_2') });
     expect(result.current.isPolling).toBe(false);
+  });
+
+  it('does not resume polling when the original directory returns', async () => {
+    const { result, rerender } = renderUsers(createDirectory('dir_1'));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.startPolling());
+    expect(result.current.isPolling).toBe(true);
+
+    rerender({ directory: createDirectory('dir_2') });
+    rerender({ directory: createDirectory('dir_1') });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isPolling).toBe(false);
+
+    const callsAfterReturn = getUsersSpy.mock.calls.length;
+    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS * 3));
+    expect(getUsersSpy.mock.calls.length).toBe(callsAfterReturn);
   });
 
   it('keeps polling armed by a child effect in the same commit the directory arrives', async () => {

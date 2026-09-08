@@ -20,11 +20,7 @@ export type UseOrganizationDirectorySyncParams = {
 };
 
 export type UseOrganizationDirectorySyncReturn = {
-  /**
-   * The connection's directory, `null` when none has been created yet, `undefined` while loading.
-   * Never carries the bearer token — that only exists on the resources resolved by
-   * `createDirectorySync` and `rotateDirectorySyncToken`.
-   */
+  /** The connection's directory, `null` when none has been created yet, `undefined` while loading. */
   data: DirectorySyncResource | null | undefined;
   error: Error | null;
   isLoading: boolean;

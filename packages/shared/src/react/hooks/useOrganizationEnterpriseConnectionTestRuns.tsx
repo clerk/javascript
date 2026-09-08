@@ -136,10 +136,16 @@ function useOrganizationEnterpriseConnectionTestRuns(
 
   const queryEnabled = enabled && clerk.loaded && Boolean(organization) && Boolean(enterpriseConnectionId);
 
-  // Polling is armed for a specific connection and derived, not reset in an effect: a child
-  // effect arming it in the same commit the connection arrives would otherwise be cancelled.
-  const [armedForConnectionId, setArmedForConnectionId] = useState<string | null>(null);
-  const shouldPoll = armedForConnectionId !== null && armedForConnectionId === enterpriseConnectionId;
+  // Polling is requested for a specific connection, so a connection change stops it. This is
+  // derived rather than reset in an effect because a child component may call `revalidate` in
+  // the same commit the connection arrives, and an unconditional reset would cancel that.
+  const [pollingConnectionId, setPollingConnectionId] = useState<string | null>(null);
+  const shouldPoll = pollingConnectionId !== null && pollingConnectionId === enterpriseConnectionId;
+
+  useEffect(() => {
+    // Drop a request left over from a previous connection so it cannot resume if that connection returns.
+    setPollingConnectionId(current => (current !== null && current !== enterpriseConnectionId ? null : current));
+  }, [enterpriseConnectionId]);
 
   const query = useClerkQuery({
     queryKey,
@@ -166,7 +172,7 @@ function useOrganizationEnterpriseConnectionTestRuns(
 
   useEffect(() => {
     if (shouldPoll && hasRows) {
-      setArmedForConnectionId(null);
+      setPollingConnectionId(null);
     }
   }, [shouldPoll, hasRows]);
 
@@ -181,7 +187,7 @@ function useOrganizationEnterpriseConnectionTestRuns(
       // off. Once any record has been seen, this is a one-shot refetch.
       const armPolling = options?.armPolling ?? true;
       if (armPolling && !hasRows) {
-        setArmedForConnectionId(enterpriseConnectionId);
+        setPollingConnectionId(enterpriseConnectionId);
       }
       // `invalidateQueries` awaits the refetch it triggers, so by the time it
       // resolves the cache already holds the fresh page. Read it back from the
