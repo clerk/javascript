@@ -111,6 +111,8 @@ export const styles = stylex.create({
     backgroundColor: 'transparent',
     blockSize: 'auto',
     boxShadow: 'none',
+    // No frame to inset from, so neither column carries padding; a gap holds them apart.
+    columnGap: space['10'],
     gridTemplateRows: 'auto',
   },
 
@@ -139,6 +141,7 @@ export const styles = stylex.create({
 
   /** Inline there is no frame, so no edge between the column and the pages either. */
   navInline: {
+    padding: 0,
     borderInlineEndWidth: '0px',
   },
 
@@ -244,12 +247,10 @@ export const styles = stylex.create({
     paddingBlock: 0,
   },
 
-  /**
-   * Inline the pages start level with the navigation: the same padding above the headline as
-   * above the first destination, so the two read as one row.
-   */
+  /** Inline the pages carry no padding of their own: the headline starts level with the first destination. */
   contentViewportInline: {
-    paddingBlockStart: space['4'],
+    paddingBlock: 0,
+    paddingInline: 0,
   },
 
   /** Inline, the branding closes out the pages' column instead of the navigation's. */
