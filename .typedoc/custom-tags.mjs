@@ -24,6 +24,7 @@ export const CUSTOM_MODIFIER_TAGS = [
   '@extractMethods',
   /** Type-only / router hints; not user-facing prose (see `notRenderedTags` in `typedoc.config.mjs`). */
   '@inline',
+  /** Expands references to the type while preserving its standalone page. */
   '@inlineType',
   /** With `@inline`, still emit a standalone `.mdx` page (see `.typedoc/standalone-page-tag.mjs`). */
   '@standalonePage',

@@ -5,7 +5,7 @@ import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { backTicks, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
-import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
+import { isInlineModifierWithoutStandalonePage, shouldInlineTypeReference } from './standalone-page-tag.mjs';
 import { unwrapOptional } from './type-utils.mjs';
 
 export { REFERENCE_OBJECTS_LIST };
@@ -68,7 +68,7 @@ function isArrayElementReferenceInliningToUnion(elementType) {
   if (!ref.reflection) {
     return false;
   }
-  if (!isInlineModifierWithoutStandalonePage(ref.reflection)) {
+  if (!shouldInlineTypeReference(ref.reflection)) {
     return false;
   }
   const decl = /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection);
@@ -1181,7 +1181,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {import('typedoc').ReferenceType} model
        */
       referenceType: model => {
-        if (isInlineModifierWithoutStandalonePage(model.reflection)) {
+        if (shouldInlineTypeReference(model.reflection)) {
           const decl = /** @type {import('typedoc').DeclarationReflection} */ (model.reflection);
           // Generic instantiation, e.g. `Fn<Args>` — let `someType` apply type arguments.
           if (model.typeArguments?.length) {

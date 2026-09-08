@@ -22,3 +22,18 @@ export function isInlineModifierWithoutStandalonePage(reflection) {
   }
   return true;
 }
+
+/**
+ * @param {import('typedoc').Reflection | undefined} reflection
+ * @returns {boolean} True when references to a type should render its underlying shape instead of a link.
+ */
+export function shouldInlineTypeReference(reflection) {
+  if (isInlineModifierWithoutStandalonePage(reflection)) {
+    return true;
+  }
+  const comment =
+    reflection && 'comment' in reflection
+      ? /** @type {{ comment?: import('typedoc').Comment | undefined }} */ (reflection).comment
+      : undefined;
+  return comment?.hasModifier('@inlineType') ?? false;
+}

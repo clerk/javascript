@@ -103,6 +103,8 @@ export type OAuthConsentInfo = {
 
 /**
  * The current status of an OAuth device authorization.
+ *
+ * @inlineType
  */
 export type OAuthDeviceVerificationStatus =
   /**
