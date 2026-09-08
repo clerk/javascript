@@ -20,14 +20,14 @@ function ready(model: ReverificationModel): ReverificationReadyModel {
 
 let session:
   | {
-    id: string;
-    startVerification: ReturnType<typeof vi.fn>;
-    prepareFirstFactorVerification: ReturnType<typeof vi.fn>;
-    prepareSecondFactorVerification: ReturnType<typeof vi.fn>;
-    attemptFirstFactorVerification: ReturnType<typeof vi.fn>;
-    attemptSecondFactorVerification: ReturnType<typeof vi.fn>;
-    verifyWithPasskey: ReturnType<typeof vi.fn>;
-  }
+      id: string;
+      startVerification: ReturnType<typeof vi.fn>;
+      prepareFirstFactorVerification: ReturnType<typeof vi.fn>;
+      prepareSecondFactorVerification: ReturnType<typeof vi.fn>;
+      attemptFirstFactorVerification: ReturnType<typeof vi.fn>;
+      attemptSecondFactorVerification: ReturnType<typeof vi.fn>;
+      verifyWithPasskey: ReturnType<typeof vi.fn>;
+    }
   | null
   | undefined;
 let environmentHydrated: boolean;
