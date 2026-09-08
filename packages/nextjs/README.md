@@ -38,11 +38,11 @@
 
 ### Installation
 
-The fastest way to get started is the Clerk CLI. In an existing Next.js project, run `npx -y clerk@latest init`. In an empty directory, run `npx -y clerk@latest init --framework next` and it scaffolds the Next.js app as well.
+The fastest way to get started is the Clerk CLI. In an existing Next.js project, run `npx -y clerk@latest init`. In an empty directory, run `npx -y clerk@latest init --framework next --pm npm` and it scaffolds the Next.js app as well; there is no lockfile to detect a package manager from, so name one.
 
 Either way it installs `@clerk/nextjs`, creates a Clerk application, writes the keys to your `.env.local` file, and adds `<ClerkProvider>`, the middleware, and sign-in and sign-up pages. No Clerk account required to get started — it can provision temporary development keys.
 
-To set things up by hand instead, follow the [Next.js Quickstart](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=clerk_nextjs).
+To set things up by hand instead, follow the [Next.js Quickstart](https://clerk.com/docs/nextjs/getting-started/quickstart?utm_source=github&utm_medium=clerk_nextjs).
 
 You'll learn how to install `@clerk/nextjs`, set up your environment keys, add `<ClerkProvider>` to your application, use the Clerk middleware, and use Clerk's prebuilt components.
 
