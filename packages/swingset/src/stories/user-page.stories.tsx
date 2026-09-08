@@ -20,6 +20,7 @@ export { default as __source } from './user-page.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserPage',
   label: 'User page',
   layout: 'wide',

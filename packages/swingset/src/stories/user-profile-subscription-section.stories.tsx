@@ -7,6 +7,7 @@ export { default as __source } from './user-profile-subscription-section.stories
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileSubscriptionSection',
   label: 'Subscription',
   navigation: { category: 'Sections' },

@@ -10,6 +10,7 @@ export { default as __source } from './menu.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Menu',
   source: 'packages/ui/src/mosaic/components/menu/menu.tsx',
 };

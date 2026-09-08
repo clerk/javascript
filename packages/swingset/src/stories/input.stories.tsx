@@ -9,6 +9,7 @@ export { default as __source } from './input.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Input',
   source: 'packages/ui/src/mosaic/components/input/input.tsx',
   styles: {

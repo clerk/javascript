@@ -10,6 +10,7 @@ export { default as __source } from './destructive.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Blocks',
+  status: 'wip',
   title: 'Destructive',
   source: 'packages/ui/src/mosaic/blocks/destructive/destructive.tsx',
 };
