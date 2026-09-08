@@ -22,7 +22,7 @@ describe('SignInFactorOne SSO fallback', () => {
     screen.getByText("Can't use SSO?");
   });
 
-  it('does not render the fallback when the instance does not offer one', async () => {
+  it('does not render the fallback when the user is not allowlisted for one', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
       f.withEnterpriseSso();

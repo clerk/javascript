@@ -339,7 +339,7 @@ export interface SignInFutureResource {
   readonly supportedSecondFactors: SignInSecondFactor[];
 
   /**
-   * Factors an enterprise-routed user can fall back to when they cannot reach their identity provider. Empty unless the instance allows a fallback; its contents never indicate whether this particular user is permitted to use one.
+   * Factors an enterprise-routed user can fall back to when they cannot reach their identity provider. Empty unless the instance has allowlisted this user for a fallback, so a non-empty list is itself the eligibility signal.
    */
   readonly ssoFallbackFirstFactors: SignInFirstFactor[];
 

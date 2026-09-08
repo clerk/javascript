@@ -20,11 +20,10 @@ type SignInFactorOneSSOFallbackProps = {
 };
 
 /**
- * Enterprise-routed sign-in with an instance-level fallback available.
+ * Enterprise-routed sign-in for a user the instance has allowlisted for a fallback.
  *
  * Replaces the automatic redirect to the identity provider with a screen the user can act on,
- * since the fallback is only reachable from one. Every screen here renders identically for
- * allowlisted and non-allowlisted users — the API never discloses which is which.
+ * since the fallback is only reachable from one.
  * @experimental
  */
 export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProps) => {

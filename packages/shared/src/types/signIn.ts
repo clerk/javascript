@@ -56,9 +56,9 @@ export interface SignInResource extends ClerkResource {
    * identity provider. Kept out of `supportedFirstFactors` so consumers that assert
    * that list is purely enterprise keep working.
    *
-   * Its presence says the instance allows a fallback, never that this particular
-   * user may use one — the API does not disclose that, and the UI must not branch
-   * on it.
+   * The API returns this only for users the instance has allowlisted for a fallback,
+   * so its presence is itself the eligibility signal. Anything rendered from it is
+   * visible to whoever supplied the identifier.
    */
   ssoFallbackFirstFactors: SignInFirstFactor[] | null;
   clientTrustState?: ClientTrustState;

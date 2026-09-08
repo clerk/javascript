@@ -111,9 +111,8 @@ function hasMultipleEnterpriseConnections(
 /**
  * Returns the email code factor an enterprise-routed sign-in may fall back to, or `null`.
  *
- * The list is populated purely from instance configuration: it says the instance allows a
- * fallback, never that this particular user is allowed one. Branching on anything more would
- * turn the UI into an enumeration oracle for the allowlist.
+ * The API populates the list only for allowlisted users, so a factor here means this user is
+ * eligible and anything rendered from it discloses that to whoever supplied the identifier.
  * @experimental
  */
 function getSSOFallbackFactor(signIn: SignInResource): EmailCodeFactor | null {
