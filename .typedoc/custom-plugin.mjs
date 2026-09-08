@@ -40,6 +40,7 @@ const FILES_WITHOUT_HEADINGS = [
   'use-organization-creation-defaults-params.mdx',
   'use-o-auth-consent-params.mdx',
   'use-o-auth-consent-return.mdx',
+  'use-o-auth-device-verification-return.mdx',
   'create-organization-domain-params.mdx',
 ];
 

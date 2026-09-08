@@ -8,8 +8,6 @@ import type {
 } from '../../types';
 
 /**
- * The current state and actions for an OAuth device verification flow.
- *
  * @interface
  */
 export type UseOAuthDeviceVerificationReturn = {

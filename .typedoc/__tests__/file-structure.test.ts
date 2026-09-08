@@ -28,6 +28,17 @@ function isTopLevelPath(filePath: string) {
 }
 
 describe('Typedoc output', () => {
+  it('renders the OAuth device verification hook return as an embeddable table', async () => {
+    const hookReturn = await readFile(
+      join(OUTPUT_LOCATION, 'shared/use-o-auth-device-verification-return.mdx'),
+      'utf8',
+    );
+
+    expect(hookReturn).not.toContain('The current state and actions for an OAuth device verification flow.');
+    expect(hookReturn).not.toContain('## Properties');
+    expect(hookReturn).toMatch(/^\| Property/);
+  });
+
   it('inlines OAuth device verification statuses while preserving their standalone page', async () => {
     const info = await readFile(join(OUTPUT_LOCATION, 'shared/o-auth-device-verification-info.mdx'), 'utf8');
     const status = await readFile(join(OUTPUT_LOCATION, 'shared/o-auth-device-verification-status.mdx'), 'utf8');
