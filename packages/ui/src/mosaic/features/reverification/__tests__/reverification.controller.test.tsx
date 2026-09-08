@@ -32,10 +32,10 @@ function firstFactorResult(overrides: Partial<ReverificationResult> = {}): Rever
 function seatedDeps(overrides: Partial<ReverificationDeps> = {}): ReverificationDeps {
   return {
     start: vi.fn(async () => firstFactorResult()),
-    prepare: vi.fn(async () => { }),
+    prepare: vi.fn(async () => {}),
     attempt: vi.fn(async () => firstFactorResult({ status: 'complete' })),
     verifyPasskey: vi.fn(async () => firstFactorResult({ status: 'complete' })),
-    finish: vi.fn(async () => { }),
+    finish: vi.fn(async () => {}),
     cancel: vi.fn(),
     ...overrides,
   };
@@ -53,10 +53,10 @@ function readyModel(overrides: Partial<ReverificationReadyModel> = {}): Reverifi
     isActive: true,
     supportEmail: 'support@example.com',
     start: vi.fn(async () => firstFactorResult()),
-    prepare: vi.fn(async () => { }),
+    prepare: vi.fn(async () => {}),
     attempt: vi.fn(async () => firstFactorResult({ status: 'complete' })),
     verifyPasskey: vi.fn(async () => firstFactorResult({ status: 'complete' })),
-    finish: vi.fn(async () => { }),
+    finish: vi.fn(async () => {}),
     cancel: vi.fn(),
     ...overrides,
   };
@@ -84,7 +84,7 @@ describe('reverificationMachine', () => {
   });
 
   it('prepares an email code once when that method is selected', async () => {
-    const prepare = vi.fn(async () => { });
+    const prepare = vi.fn(async () => {});
     const actor = startActor(seatedDeps({ prepare }));
     await tick();
     actor.send({ type: 'SHOW_METHODS' });
@@ -172,9 +172,7 @@ describe('reverificationMachine', () => {
 
 describe('useReverificationController', () => {
   it('is idle when reverification is not active', () => {
-    const { result } = renderHook(() =>
-      useReverificationController(readyModel({ isActive: false })),
-    );
+    const { result } = renderHook(() => useReverificationController(readyModel({ isActive: false })));
     expect(result.current.status).toBe('idle');
   });
 
@@ -224,9 +222,7 @@ describe('useReverificationController', () => {
 
   it('marks the current step pending while an attempt is in flight', async () => {
     const attempt = deferred<ReverificationResult>();
-    const { result } = renderHook(() =>
-      useReverificationController(readyModel({ attempt: () => attempt.promise })),
-    );
+    const { result } = renderHook(() => useReverificationController(readyModel({ attempt: () => attempt.promise })));
 
     await waitFor(() => expect(result.current.status).toBe('ready'));
     act(() => {
