@@ -1333,6 +1333,11 @@ export const idID: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Gunakan metode lain',
       subtitle: 'Masukkan kata sandi Anda untuk melanjutkan',
@@ -1481,6 +1486,10 @@ export const idID: LocalizationResource = {
       subtitle:
         'Menggunakan passkey mengonfirmasi bahwa ini adalah Anda. Perangkat Anda mungkin meminta sidik jari, wajah, atau kunci layar.',
       title: 'Gunakan passkey Anda',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gunakan metode lain',

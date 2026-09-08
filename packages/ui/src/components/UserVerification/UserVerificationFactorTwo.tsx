@@ -1,4 +1,5 @@
 import type { SessionVerificationResource, SessionVerificationSecondFactor } from '@clerk/shared/types';
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import { useEffect, useMemo } from 'react';
 
 import { withCardStateProvider } from '@/elements/contexts';
@@ -12,12 +13,14 @@ import { useUserVerificationSession, withUserVerificationSessionGuard } from './
 import { sortByPrimaryFactor } from './utils';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
 import { UVFactorTwoBackupCodeCard } from './UVFactorTwoBackupCodeCard';
+import { UVFactorTwoPasskeyCard } from './UVFactorTwoPasskeyCard';
 import { UVFactorTwoPhoneCodeCard } from './UVFactorTwoPhoneCodeCard';
 
 const SUPPORTED_STRATEGIES: SessionVerificationSecondFactor['strategy'][] = [
   'phone_code',
   'totp',
   'backup_code',
+  'passkey',
 ] as const;
 
 export function UserVerificationFactorTwoComponent(): JSX.Element {
@@ -29,6 +32,8 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
     return (
       sessionVerification.supportedSecondFactors
         ?.filter(factor => SUPPORTED_STRATEGIES.includes(factor.strategy))
+        // Only include passkey if the device supports it.
+        ?.filter(factor => factor.strategy !== 'passkey' || isWebAuthnSupported())
         ?.sort(sortByPrimaryFactor) || null
     );
   }, [sessionVerification.supportedSecondFactors]);
@@ -96,6 +101,13 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
       );
     case 'backup_code':
       return <UVFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+    case 'passkey':
+      return (
+        <UVFactorTwoPasskeyCard
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          showAlternativeMethods={hasAlternativeStrategies}
+        />
+      );
     default:
       return <LoadingCard />;
   }

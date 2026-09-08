@@ -1334,6 +1334,11 @@ export const beBY: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Вярнуцца да ўводу пароля',
       subtitle: 'Калі вы памятаеце свой пароль, вы можаце ўвесці яго для завершэння верыфікацыі.',
@@ -1481,6 +1486,10 @@ export const beBY: LocalizationResource = {
     passkey: {
       subtitle: 'Выкарыстоўвайце паскей для бяспечнага ўваходу.',
       title: 'Увядзіце паскей',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Выкарыстаць іншы метад',
