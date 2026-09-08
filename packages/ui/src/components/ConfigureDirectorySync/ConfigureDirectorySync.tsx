@@ -13,12 +13,11 @@ import { DirectorySyncNavbar } from './DirectorySyncNavbar';
 
 /**
  * Standalone host for the Directory Sync onboarding wizard, mirroring
- * ConfigureSSO's shell. Reuses the configureSSO flow id/appearance until the
- * flow gets its own appearance surface.
+ * ConfigureSSO's shell.
  */
 const ConfigureDirectorySyncInternal = (): JSX.Element => {
   return (
-    <Flow.Root flow='configureSSO'>
+    <Flow.Root flow='configureDirectorySync'>
       <Switch>
         <Route>
           <AuthenticatedContent />

@@ -11,7 +11,7 @@ import { mqu } from '@/styledSystem';
 
 type ConfigureSSONavbarProps = React.PropsWithChildren<{
   contentRef: React.RefObject<HTMLDivElement>;
-  title?: LocalizationKey | string;
+  title?: LocalizationKey;
 }>;
 
 export const ConfigureSSONavbar = ({
@@ -107,7 +107,7 @@ export const ConfigureSSONavbar = ({
   );
 };
 
-const ConfigureSSOMobileNavbar = ({ title }: { title: LocalizationKey | string }) => {
+const ConfigureSSOMobileNavbar = ({ title }: { title: LocalizationKey }) => {
   const { parsedOptions } = useAppearance();
   const {
     organizationSettings,

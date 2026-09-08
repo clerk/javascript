@@ -57,6 +57,11 @@ type ConfigureDirectorySyncProviderProps = PropsWithChildren<{
   onExit?: () => void;
 }>;
 
+type RevealedToken = {
+  enterpriseConnectionId: string;
+  token: string;
+};
+
 export const ConfigureDirectorySyncProvider = ({
   onExit,
   children,
@@ -75,29 +80,28 @@ export const ConfigureDirectorySyncProvider = ({
     rotateDirectorySyncToken,
   } = __internal_useOrganizationDirectorySync({ enterpriseConnectionId });
 
-  const usersHook = __internal_useOrganizationDirectorySyncUsers({ directory });
+  const users = __internal_useOrganizationDirectorySyncUsers({ directory });
 
-  const [revealedToken, setRevealedToken] = React.useState<string | null>(null);
+  // The token is stored with the connection it was issued for, so a response
+  // that lands after the connection changed is never shown for the new one.
+  const [revealed, setRevealed] = React.useState<RevealedToken | null>(null);
+  const revealedToken = revealed && revealed.enterpriseConnectionId === enterpriseConnectionId ? revealed.token : null;
 
-  React.useEffect(() => {
-    // The token belongs to the current connection's directory; drop it if the
-    // connection changes mid-session.
-    setRevealedToken(null);
-  }, [enterpriseConnectionId]);
+  const revealFrom = (result: DirectorySyncResource | undefined): void => {
+    if (result?.apiKey) {
+      setRevealed({ enterpriseConnectionId: result.enterpriseConnectionId, token: result.apiKey });
+    }
+  };
 
   const createDirectory = React.useCallback(async () => {
     const created = await createDirectorySync();
-    if (created?.apiKey) {
-      setRevealedToken(created.apiKey);
-    }
+    revealFrom(created);
     return created;
   }, [createDirectorySync]);
 
   const rotateToken = React.useCallback(async () => {
     const rotated = await rotateDirectorySyncToken();
-    if (rotated?.apiKey) {
-      setRevealedToken(rotated.apiKey);
-    }
+    revealFrom(rotated);
     return rotated;
   }, [rotateDirectorySyncToken]);
 
@@ -109,58 +113,19 @@ export const ConfigureDirectorySyncProvider = ({
   const provider =
     directory?.provider ?? (connection ? directorySyncProviderForConnection(connection.provider) : undefined);
 
-  const users = React.useMemo<DirectorySyncUsersView>(
-    () => ({
-      data: usersHook.data,
-      totalCount: usersHook.totalCount,
-      error: usersHook.error,
-      isLoading: usersHook.isLoading,
-      isPolling: usersHook.isPolling,
-      startPolling: usersHook.startPolling,
-      stopPolling: usersHook.stopPolling,
-      revalidate: usersHook.revalidate,
-    }),
-    [
-      usersHook.data,
-      usersHook.totalCount,
-      usersHook.error,
-      usersHook.isLoading,
-      usersHook.isPolling,
-      usersHook.startPolling,
-      usersHook.stopPolling,
-      usersHook.revalidate,
-    ],
-  );
-
-  const value = React.useMemo<ConfigureDirectorySyncData>(
-    () => ({
-      isLoading: isLoadingConnections || (Boolean(enterpriseConnectionId) && isLoadingDirectory),
-      connection,
-      provider,
-      providerMeta: provider ? DIRECTORY_SYNC_PROVIDERS[provider] : undefined,
-      directory,
-      revealedToken,
-      createDirectory,
-      rotateToken,
-      setDirectoryEnabled,
-      users,
-      onExit,
-    }),
-    [
-      isLoadingConnections,
-      isLoadingDirectory,
-      enterpriseConnectionId,
-      connection,
-      provider,
-      directory,
-      revealedToken,
-      createDirectory,
-      rotateToken,
-      setDirectoryEnabled,
-      users,
-      onExit,
-    ],
-  );
+  const value: ConfigureDirectorySyncData = {
+    isLoading: isLoadingConnections || (Boolean(enterpriseConnectionId) && isLoadingDirectory),
+    connection,
+    provider,
+    providerMeta: provider ? DIRECTORY_SYNC_PROVIDERS[provider] : undefined,
+    directory,
+    revealedToken,
+    createDirectory,
+    rotateToken,
+    setDirectoryEnabled,
+    users,
+    onExit,
+  };
 
   return <ConfigureDirectorySyncContext.Provider value={value}>{children}</ConfigureDirectorySyncContext.Provider>;
 };

@@ -43,7 +43,7 @@ export type NavbarRoute = {
   external?: boolean;
 };
 type NavBarProps = {
-  title: LocalizationKey | string;
+  title: LocalizationKey;
   titleSx?: ThemableCssProp;
   containerSx?: ThemableCssProp;
   description?: LocalizationKey;

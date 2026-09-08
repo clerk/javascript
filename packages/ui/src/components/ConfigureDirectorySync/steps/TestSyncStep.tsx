@@ -1,18 +1,30 @@
 import type { DirectorySyncUserResource } from '@clerk/shared/types';
 import React from 'react';
 
-import { Badge, Button, Col, Flex, Spinner, Text } from '@/customizables';
+import {
+  Badge,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '@/customizables';
 import { Alert } from '@/ui/elements/Alert';
 
 import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
 import { useConfigureDirectorySync } from '../ConfigureDirectorySyncContext';
+import { DIRECTORY_SYNC_PROVIDERS } from '../providerMeta';
 
 const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.Element => {
   const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ');
 
   return (
     <Flex
+      elementDescriptor={descriptors.configureDirectorySyncUsersRow}
       align='center'
       justify='between'
       sx={t => ({
@@ -25,6 +37,7 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
     >
       <Col sx={t => ({ gap: t.space.$0x5 })}>
         <Text
+          elementDescriptor={descriptors.configureDirectorySyncUserIdentifier}
           as='span'
           sx={t => ({ fontSize: t.fontSizes.$sm, fontWeight: t.fontWeights.$medium })}
         >
@@ -32,6 +45,7 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
         </Text>
         {displayName && user.identifier && (
           <Text
+            elementDescriptor={descriptors.configureDirectorySyncUserName}
             as='span'
             colorScheme='secondary'
             sx={t => ({ fontSize: t.fontSizes.$sm })}
@@ -46,6 +60,7 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
       >
         {user.provisionedAt && (
           <Text
+            elementDescriptor={descriptors.configureDirectorySyncUserTimestamp}
             as='span'
             colorScheme='secondary'
             sx={t => ({ fontSize: t.fontSizes.$xs })}
@@ -53,7 +68,16 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
             {user.provisionedAt.toLocaleString()}
           </Text>
         )}
-        <Badge colorScheme={user.active ? 'success' : 'danger'}>{user.active ? 'Active' : 'Deprovisioned'}</Badge>
+        <Badge
+          elementDescriptor={descriptors.configureDirectorySyncUserStatusBadge}
+          elementId={descriptors.configureDirectorySyncUserStatusBadge.setId(user.active ? 'active' : 'deprovisioned')}
+          colorScheme={user.active ? 'success' : 'danger'}
+          localizationKey={localizationKeys(
+            user.active
+              ? 'configureDirectorySync.testStep.badge__active'
+              : 'configureDirectorySync.testStep.badge__deprovisioned',
+          )}
+        />
       </Flex>
     </Flex>
   );
@@ -62,13 +86,13 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
 export const TestSyncStep = (): JSX.Element => {
   const { goPrev } = useWizard();
   const { providerMeta, users, onExit } = useConfigureDirectorySync();
+  const { t } = useLocalizations();
 
   const rows = users.data ?? [];
+  const providerName = t((providerMeta ?? DIRECTORY_SYNC_PROVIDERS.custom).name);
 
-  // Poll for the whole lifetime of this step: the list is ordered by most
-  // recent activity, so it doubles as a live feed while the admin pushes
-  // test users from the IdP. The context provider outlives the step, so
-  // polling must stop on step exit rather than riding on unmount of the hook.
+  // The users hook lives in the wizard provider, which stays mounted across
+  // steps, so polling is armed and released by this step's own lifecycle.
   const { startPolling, stopPolling } = users;
   React.useEffect(() => {
     startPolling();
@@ -78,8 +102,8 @@ export const TestSyncStep = (): JSX.Element => {
   return (
     <>
       <Step.Header
-        title='Test provisioning'
-        description={`Assign or push a test user from ${providerMeta?.name ?? 'your identity provider'} to verify provisioning reaches Clerk.`}
+        title={localizationKeys('configureDirectorySync.testStep.title')}
+        description={localizationKeys('configureDirectorySync.testStep.subtitle', { provider: providerName })}
       />
 
       <Step.Body>
@@ -87,9 +111,8 @@ export const TestSyncStep = (): JSX.Element => {
           <Text
             as='p'
             colorScheme='secondary'
-          >
-            Users appear here as your identity provider provisions them, most recent activity first.
-          </Text>
+            localizationKey={localizationKeys('configureDirectorySync.testStep.description')}
+          />
 
           <Text
             as='p'
@@ -98,15 +121,25 @@ export const TestSyncStep = (): JSX.Element => {
             <Text
               as='span'
               colorScheme='secondary'
+              localizationKey={localizationKeys('configureDirectorySync.testStep.noteLabel')}
               sx={t => ({ fontWeight: t.fontWeights.$medium })}
-            >
-              Note:
-            </Text>{' '}
-            only users with an email address from a configured domain will be processed.
+            />{' '}
+            <Text
+              as='span'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureDirectorySync.testStep.note')}
+            />
           </Text>
 
-          {rows.length === 0 ? (
+          {users.error ? (
+            <Alert
+              variant='danger'
+              title={localizationKeys('configureDirectorySync.testStep.error__loadUsers')}
+              subtitle={users.error.message}
+            />
+          ) : rows.length === 0 ? (
             <Flex
+              elementDescriptor={descriptors.configureDirectorySyncUsersEmpty}
               align='center'
               justify='center'
               sx={t => ({
@@ -119,18 +152,19 @@ export const TestSyncStep = (): JSX.Element => {
               })}
             >
               <Spinner
+                elementDescriptor={descriptors.spinner}
                 size='xs'
                 colorScheme='neutral'
               />
               <Text
                 as='span'
                 colorScheme='secondary'
-              >
-                Waiting for the first provisioned user…
-              </Text>
+                localizationKey={localizationKeys('configureDirectorySync.testStep.empty__waitingForFirstUser')}
+              />
             </Flex>
           ) : (
             <Col
+              elementDescriptor={descriptors.configureDirectorySyncUsersList}
               sx={t => ({
                 borderRadius: t.radii.$md,
                 borderWidth: t.borderWidths.$normal,
@@ -147,26 +181,18 @@ export const TestSyncStep = (): JSX.Element => {
               ))}
             </Col>
           )}
-
-          {users.error && (
-            <Alert
-              variant='danger'
-              title='Could not load provisioned users'
-              subtitle={users.error.message}
-            />
-          )}
         </Step.Section>
       </Step.Body>
 
       <Step.Footer>
         <Step.Footer.Previous onClick={() => goPrev()} />
         <Button
+          elementDescriptor={descriptors.configureDirectorySyncCompleteButton}
           variant='solid'
           size='sm'
           onClick={() => onExit?.()}
-        >
-          Complete
-        </Button>
+          localizationKey={localizationKeys('configureDirectorySync.testStep.actionLabel__complete')}
+        />
       </Step.Footer>
     </>
   );

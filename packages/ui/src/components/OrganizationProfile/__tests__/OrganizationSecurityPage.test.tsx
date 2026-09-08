@@ -544,6 +544,23 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(1);
     });
 
+    it('surfaces a load error when the directory request fails for any other reason', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getDirectorySync.mockRejectedValue(
+        new ClerkAPIResponseError('Server error', {
+          status: 500,
+          data: [{ code: 'internal_error', message: 'Something went wrong', long_message: 'Something went wrong' }],
+        }),
+      );
+
+      renderPage(wrapper);
+
+      expect(await screen.findByText('Could not load Directory Sync')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(1);
+    });
+
     it('disables setup and flags SSO as required when no connection exists', async () => {
       const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);

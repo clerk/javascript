@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { localizationKeys } from '@/customizables';
 import { CardStateProvider } from '@/elements/contexts';
 
 import { ConfigureSSOHeader } from '../ConfigureSSO/ConfigureSSOHeader';
@@ -34,9 +35,21 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'configure', label: 'Configure', isComplete: () => hasSsoConnection && hasDirectory },
-      { id: 'attributes', label: 'Attributes', isReachable: () => hasSsoConnection && hasDirectory },
-      { id: 'test', label: 'Test', isReachable: () => hasSsoConnection && hasDirectory },
+      {
+        id: 'configure',
+        label: localizationKeys('configureDirectorySync.stepper.configure'),
+        isComplete: () => hasSsoConnection && hasDirectory,
+      },
+      {
+        id: 'attributes',
+        label: localizationKeys('configureDirectorySync.stepper.attributes'),
+        isReachable: () => hasSsoConnection && hasDirectory,
+      },
+      {
+        id: 'test',
+        label: localizationKeys('configureDirectorySync.stepper.test'),
+        isReachable: () => hasSsoConnection && hasDirectory,
+      },
     ],
     [hasSsoConnection, hasDirectory],
   );

@@ -1,48 +1,43 @@
 import type { DirectorySyncProvider } from '@clerk/shared/types';
 
+import type { LocalizationKey } from '@/customizables';
+import { localizationKeys } from '@/customizables';
+
 export interface DirectorySyncProviderMeta {
-  name: string;
+  name: LocalizationKey;
   /** Whether the IdP can push SCIM to Clerk's endpoint (self-serve supported). */
   supportsScim: boolean;
   /** Where the admin pastes the endpoint + token, as numbered instructions. */
-  instructions: string[];
+  instructions: LocalizationKey[];
 }
+
+const instructionKeys = (provider: 'okta' | 'entra' | 'custom'): LocalizationKey[] => [
+  localizationKeys(`configureDirectorySync.configureStep.instructions.${provider}.step1`),
+  localizationKeys(`configureDirectorySync.configureStep.instructions.${provider}.step2`),
+  localizationKeys(`configureDirectorySync.configureStep.instructions.${provider}.step3`),
+  localizationKeys(`configureDirectorySync.configureStep.instructions.${provider}.step4`),
+];
 
 export const DIRECTORY_SYNC_PROVIDERS: Record<DirectorySyncProvider, DirectorySyncProviderMeta> = {
   okta: {
-    name: 'Okta Workforce',
+    name: localizationKeys('configureDirectorySync.providers.okta'),
     supportsScim: true,
-    instructions: [
-      'In the Okta Admin Console, open the application used for your SSO connection.',
-      'Open the Provisioning tab and select the Integration setting.',
-      'Paste the SCIM endpoint URL and bearer token found below.',
-      'For provisioning actions, enable pushing of New Users, Profile Updates, and Groups.',
-    ],
+    instructions: instructionKeys('okta'),
   },
   entra: {
-    name: 'Microsoft Entra ID',
+    name: localizationKeys('configureDirectorySync.providers.entra'),
     supportsScim: true,
-    instructions: [
-      'In the Microsoft Entra admin center, open Enterprise applications and select the application used for your SSO connection.',
-      'Under Connectivity, paste the SCIM endpoint URL as the Tenant URL and the bearer token as the Secret Token, then select Test Connection.',
-      'Select Provisioning and set the provisioning mode to Automatic.',
-      'Assign the users and groups to provision, then turn provisioning On.',
-    ],
+    instructions: instructionKeys('entra'),
   },
   google: {
-    name: 'Google Workspace',
+    name: localizationKeys('configureDirectorySync.providers.google'),
     supportsScim: false,
     instructions: [],
   },
   custom: {
-    name: 'Custom SCIM provider',
+    name: localizationKeys('configureDirectorySync.providers.custom'),
     supportsScim: true,
-    instructions: [
-      'Create a SCIM 2.0 provisioning integration in your identity provider.',
-      'Paste the SCIM endpoint URL as the base URL for the integration.',
-      'Configure the integration to authenticate with the bearer token below.',
-      'Enable provisioning for user create, update, and deactivate events.',
-    ],
+    instructions: instructionKeys('custom'),
   },
 };
 

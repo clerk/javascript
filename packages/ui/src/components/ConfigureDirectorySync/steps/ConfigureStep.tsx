@@ -1,6 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Badge, Button, Col, descriptors, Flex, Icon, Input, Spinner, Text } from '@/customizables';
+import type { LocalizationKey } from '@/customizables';
+import {
+  Badge,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Icon,
+  Input,
+  localizationKeys,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { Collapsible } from '@/elements/Collapsible';
 import { useCardState } from '@/elements/contexts';
@@ -12,19 +25,21 @@ import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
 import { useConfigureDirectorySync } from '../ConfigureDirectorySyncContext';
 
-const FieldLabel = ({ children }: { children: string }): JSX.Element => (
+const FieldLabel = ({ id, localizationKey }: { id: string; localizationKey: LocalizationKey }): JSX.Element => (
   <Text
+    elementDescriptor={descriptors.configureDirectorySyncFieldLabel}
+    elementId={descriptors.configureDirectorySyncFieldLabel.setId(id)}
     as='span'
+    localizationKey={localizationKey}
     sx={t => ({ fontSize: t.fontSizes.$sm, fontWeight: t.fontWeights.$medium })}
-  >
-    {children}
-  </Text>
+  />
 );
 
 export const ConfigureStep = (): JSX.Element => {
   const { goNext } = useWizard();
   const { connection, provider, providerMeta, directory, createDirectory, revealedToken, rotateToken } =
     useConfigureDirectorySync();
+  const { t } = useLocalizations();
   const card = useCardState();
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
 
@@ -62,8 +77,8 @@ export const ConfigureStep = (): JSX.Element => {
   return (
     <>
       <Step.Header
-        title='Configure'
-        description='Add these credentials to your identity provider to configure Directory Sync'
+        title={localizationKeys('configureDirectorySync.configureStep.title')}
+        description={localizationKeys('configureDirectorySync.configureStep.subtitle')}
       />
 
       <Step.Body>
@@ -71,12 +86,13 @@ export const ConfigureStep = (): JSX.Element => {
           {!connection ? (
             <Alert
               variant='warning'
-              title='Single Sign-On is not configured yet'
-              subtitle='Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.'
+              title={localizationKeys('configureDirectorySync.configureStep.error__ssoRequired.title')}
+              subtitle={localizationKeys('configureDirectorySync.configureStep.error__ssoRequired.subtitle')}
             />
           ) : (
             <>
               <Col
+                elementDescriptor={descriptors.configureDirectorySyncConnectionCard}
                 sx={t => ({
                   borderRadius: t.radii.$md,
                   borderWidth: t.borderWidths.$normal,
@@ -87,14 +103,17 @@ export const ConfigureStep = (): JSX.Element => {
               >
                 <Col sx={t => ({ gap: t.space.$2, padding: t.space.$4 })}>
                   <Text
+                    elementDescriptor={descriptors.configureDirectorySyncConnectionCardName}
                     as='span'
+                    localizationKey={providerMeta?.name}
                     sx={t => ({ fontWeight: t.fontWeights.$medium })}
                   >
-                    {providerMeta?.name ?? connection.name}
+                    {connection.name}
                   </Text>
 
                   {domains.length > 0 && (
                     <Flex
+                      elementDescriptor={descriptors.configureDirectorySyncConnectionCardDomains}
                       align='center'
                       wrap='wrap'
                       sx={t => ({ gap: t.space.$1x5 })}
@@ -102,12 +121,16 @@ export const ConfigureStep = (): JSX.Element => {
                       <Text
                         as='span'
                         colorScheme='secondary'
+                        localizationKey={localizationKeys('configureDirectorySync.configureStep.domainsLabel')}
                         sx={t => ({ fontSize: t.fontSizes.$sm })}
-                      >
-                        Domains:
-                      </Text>
+                      />
                       {domains.map(domain => (
-                        <Badge key={domain}>{domain}</Badge>
+                        <Badge
+                          key={domain}
+                          elementDescriptor={descriptors.configureDirectorySyncConnectionCardDomainBadge}
+                        >
+                          {domain}
+                        </Badge>
                       ))}
                     </Flex>
                   )}
@@ -123,6 +146,7 @@ export const ConfigureStep = (): JSX.Element => {
                     })}
                   >
                     <Button
+                      elementDescriptor={descriptors.configureDirectorySyncInstructionsToggle}
                       variant='ghost'
                       colorScheme='secondary'
                       size='sm'
@@ -139,10 +163,11 @@ export const ConfigureStep = (): JSX.Element => {
                     >
                       <Text
                         as='span'
+                        localizationKey={localizationKeys(
+                          'configureDirectorySync.configureStep.instructions.actionLabel__toggle',
+                        )}
                         sx={t => ({ fontSize: t.fontSizes.$sm, fontWeight: t.fontWeights.$medium })}
-                      >
-                        View instructions
-                      </Text>
+                      />
                       <Icon
                         icon={ChevronDown}
                         size='sm'
@@ -155,6 +180,7 @@ export const ConfigureStep = (): JSX.Element => {
 
                     <Collapsible open={isInstructionsOpen}>
                       <Col
+                        elementDescriptor={descriptors.configureDirectorySyncInstructionsList}
                         as='ol'
                         sx={t => ({
                           gap: t.space.$1x5,
@@ -165,13 +191,13 @@ export const ConfigureStep = (): JSX.Element => {
                       >
                         {instructions.map(instruction => (
                           <Text
-                            key={instruction}
+                            key={instruction.key}
+                            elementDescriptor={descriptors.configureDirectorySyncInstructionsListItem}
                             as='li'
                             colorScheme='secondary'
+                            localizationKey={instruction}
                             sx={t => ({ fontSize: t.fontSizes.$sm })}
-                          >
-                            {instruction}
-                          </Text>
+                          />
                         ))}
                       </Col>
                     </Collapsible>
@@ -182,23 +208,31 @@ export const ConfigureStep = (): JSX.Element => {
               {isGoogle && (
                 <Alert
                   variant='warning'
-                  title='Google Workspace connections are not supported here'
-                  subtitle='Google Workspace provisions through a credential-based integration instead of SCIM push. Set up Directory Sync for this connection from the Clerk Dashboard.'
+                  title={localizationKeys('configureDirectorySync.configureStep.warning__googleUnsupported.title')}
+                  subtitle={localizationKeys(
+                    'configureDirectorySync.configureStep.warning__googleUnsupported.subtitle',
+                  )}
                 />
               )}
 
               {!connection.active && !isGoogle && (
                 <Alert
                   variant='warning'
-                  title='Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.'
+                  title={localizationKeys('configureDirectorySync.configureStep.warning__ssoInactive')}
                 />
               )}
 
               {directory ? (
                 <>
                   <Col sx={t => ({ gap: t.space.$1x5 })}>
-                    <FieldLabel>SCIM endpoint URL</FieldLabel>
+                    <FieldLabel
+                      id='endpointUrl'
+                      localizationKey={localizationKeys(
+                        'configureDirectorySync.configureStep.formFieldLabel__endpointUrl',
+                      )}
+                    />
                     <ClipboardInput
+                      elementDescriptor={descriptors.configureDirectorySyncEndpointUrlInput}
                       value={directory.endpointUrl}
                       readOnly
                       copyIcon={Clipboard}
@@ -207,13 +241,17 @@ export const ConfigureStep = (): JSX.Element => {
                   </Col>
 
                   <Col sx={t => ({ gap: t.space.$1x5 })}>
-                    <FieldLabel>Bearer token</FieldLabel>
+                    <FieldLabel
+                      id='token'
+                      localizationKey={localizationKeys('configureDirectorySync.configureStep.formFieldLabel__token')}
+                    />
                     <Flex
                       align='center'
                       sx={t => ({ gap: t.space.$2 })}
                     >
                       {revealedToken ? (
                         <ClipboardInput
+                          elementDescriptor={descriptors.configureDirectorySyncTokenInput}
                           value={revealedToken}
                           readOnly
                           copyIcon={Clipboard}
@@ -222,23 +260,29 @@ export const ConfigureStep = (): JSX.Element => {
                         />
                       ) : (
                         <Input
+                          elementDescriptor={descriptors.configureDirectorySyncTokenInput}
                           value=''
                           readOnly
-                          placeholder='Generate a new token to reveal it'
+                          placeholder={t(
+                            localizationKeys('configureDirectorySync.configureStep.formFieldInputPlaceholder__token'),
+                          )}
                           sx={{ flex: 1 }}
                         />
                       )}
                       <Button
+                        elementDescriptor={descriptors.configureDirectorySyncGenerateTokenButton}
                         variant='outline'
                         size='sm'
                         isLoading={card.isLoading}
                         onClick={() => void run(rotateToken)}
+                        localizationKey={localizationKeys(
+                          'configureDirectorySync.configureStep.actionLabel__generateToken',
+                        )}
                         sx={{ flexShrink: 0 }}
-                      >
-                        Generate new token
-                      </Button>
+                      />
                     </Flex>
                     <Flex
+                      elementDescriptor={descriptors.configureDirectorySyncTokenNotice}
                       align='center'
                       sx={t => ({ gap: t.space.$1x5 })}
                     >
@@ -250,10 +294,11 @@ export const ConfigureStep = (): JSX.Element => {
                       <Text
                         as='span'
                         colorScheme='secondary'
+                        localizationKey={localizationKeys(
+                          'configureDirectorySync.configureStep.notice__tokenShownOnce',
+                        )}
                         sx={t => ({ fontSize: t.fontSizes.$sm })}
-                      >
-                        This token is only shown once. Generate a new token if you lose it.
-                      </Text>
+                      />
                     </Flex>
                   </Col>
                 </>
@@ -285,13 +330,13 @@ export const ConfigureStep = (): JSX.Element => {
 
           {!directory && canProvision && card.error && (
             <Button
+              elementDescriptor={descriptors.configureDirectorySyncRetryButton}
               variant='outline'
               size='sm'
               onClick={() => void run(createDirectory)}
+              localizationKey={localizationKeys('configureDirectorySync.configureStep.actionLabel__retry')}
               sx={{ alignSelf: 'start' }}
-            >
-              Try again
-            </Button>
+            />
           )}
         </Step.Section>
       </Step.Body>

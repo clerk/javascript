@@ -1721,8 +1721,9 @@ export class Clerk implements ClerkInterface {
 
   /**
    * Mount the Directory Sync onboarding component at the target element.
-   * Directory Sync rides on the self-serve SSO gates: it provisions through
-   * the organization's SSO connection, so the same preconditions apply.
+   * Directory Sync provisions members through the organization's SSO connection,
+   * so it requires organizations to be enabled and the self-serve Directory Sync
+   * feature to be turned on for the instance.
    *
    * @param targetNode Target to mount the ConfigureDirectorySync component.
    * @param props Configuration parameters.
@@ -1769,7 +1770,7 @@ export class Clerk implements ClerkInterface {
       .then(controls =>
         controls.mountComponent({
           name: component,
-          appearanceKey: 'configureSSO',
+          appearanceKey: 'configureDirectorySync',
           node,
           props,
         }),

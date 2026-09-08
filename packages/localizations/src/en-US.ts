@@ -221,6 +221,88 @@ export const enUS: LocalizationResource = {
     yearPerUnit: 'Year per {{unitName}}',
     years: 'Years',
   },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: 'Clerk user attributes',
+        directoryAttribute: 'Directory attributes',
+      },
+      subtitle: 'Standard directory attributes are pre-configured by Clerk. Attributes not listed here are ignored.',
+      title: 'Attribute review',
+    },
+    configureStep: {
+      actionLabel__generateToken: 'Generate new token',
+      actionLabel__retry: 'Try again',
+      domainsLabel: 'Domains:',
+      error__ssoRequired: {
+        subtitle:
+          'Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.',
+        title: 'Single Sign-On is not configured yet',
+      },
+      formFieldInputPlaceholder__token: 'Generate a new token to reveal it',
+      formFieldLabel__endpointUrl: 'SCIM endpoint URL',
+      formFieldLabel__token: 'Bearer token',
+      instructions: {
+        actionLabel__toggle: 'View instructions',
+        custom: {
+          step1: 'Create a SCIM 2.0 provisioning integration in your identity provider.',
+          step2: 'Paste the SCIM endpoint URL as the base URL for the integration.',
+          step3: 'Configure the integration to authenticate with the bearer token below.',
+          step4: 'Enable provisioning for user create, update, and deactivate events.',
+        },
+        entra: {
+          step1:
+            'In the Microsoft Entra admin center, open Enterprise applications and select the application used for your SSO connection.',
+          step2:
+            'Under Connectivity, paste the SCIM endpoint URL as the Tenant URL and the bearer token as the Secret Token, then select Test Connection.',
+          step3: 'Select Provisioning and set the provisioning mode to Automatic.',
+          step4: 'Assign the users and groups to provision, then turn provisioning On.',
+        },
+        okta: {
+          step1: 'In the Okta Admin Console, open the application used for your SSO connection.',
+          step2: 'Open the Provisioning tab and select the Integration setting.',
+          step3: 'Paste the SCIM endpoint URL and bearer token found below.',
+          step4: 'For provisioning actions, enable pushing of New Users, Profile Updates, and Groups.',
+        },
+      },
+      notice__tokenShownOnce: 'This token is only shown once. Generate a new token if you lose it.',
+      subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
+      title: 'Configure',
+      warning__googleUnsupported: {
+        subtitle:
+          'Google Workspace provisions through a credential-based integration instead of SCIM push. Set up Directory Sync for this connection from the Clerk Dashboard.',
+        title: 'Google Workspace connections are not supported here',
+      },
+      warning__ssoInactive:
+        'Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.',
+    },
+    navbar: {
+      title: 'Configure Directory Sync',
+    },
+    providers: {
+      custom: 'Custom SCIM provider',
+      entra: 'Microsoft Entra ID',
+      google: 'Google Workspace',
+      okta: 'Okta Workforce',
+    },
+    stepper: {
+      attributes: 'Attributes',
+      configure: 'Configure',
+      test: 'Test',
+    },
+    testStep: {
+      actionLabel__complete: 'Complete',
+      badge__active: 'Active',
+      badge__deprovisioned: 'Deprovisioned',
+      description: 'Users appear here as your identity provider provisions them, most recent activity first.',
+      empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
+      error__loadUsers: 'Could not load provisioned users',
+      note: 'only users with an email address from a configured domain will be processed.',
+      noteLabel: 'Note:',
+      subtitle: 'Assign or push a test user from {{provider}} to verify provisioning reaches Clerk.',
+      title: 'Test provisioning',
+    },
+  },
   configureSSO: {
     activate: {
       activateButton: 'Activate SSO',
@@ -1232,6 +1314,27 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: 'Active',
+        badge__inactive: 'Inactive',
+        badge__ssoRequired: 'SSO Required',
+        badge__unconfigured: 'Unconfigured',
+        description:
+          "Automatically add, update, and remove organization members from your identity provider's directory. Requires an SSO connection.",
+        error__load: 'Could not load Directory Sync',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__startConfiguration: 'Start configuration',
+        removeDialog: {
+          confirmButton: 'Remove Directory Sync',
+          subtitle:
+            'Are you sure you want to remove Directory Sync? This action is irreversible: the directory and its bearer token are deleted and your identity provider will no longer be able to provision members. Existing members keep their memberships.',
+          title: 'Remove Directory Sync',
+        },
+        title: 'Directory Sync',
+      },
       removeDialog: {
         confirmButton: 'Remove connection',
         subtitle:

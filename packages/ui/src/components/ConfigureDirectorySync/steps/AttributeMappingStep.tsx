@@ -1,11 +1,16 @@
-import { Table, Tbody, Td, Text, Th, Thead, Tr } from '@/customizables';
+import type { LocalizationKey } from '@/customizables';
+import { descriptors, localizationKeys, Table, Tbody, Td, Text, Th, Thead, Tr } from '@/customizables';
 
 import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
 import { useConfigureDirectorySync } from '../ConfigureDirectorySyncContext';
 
-const MonoText = ({ children }: { children: string }): JSX.Element => (
+type ColumnId = 'directory' | 'clerk';
+
+const AttributeValue = ({ column, children }: { column: ColumnId; children: string }): JSX.Element => (
   <Text
+    elementDescriptor={descriptors.configureDirectorySyncAttributeMappingValue}
+    elementId={descriptors.configureDirectorySyncAttributeMappingValue.setId(column)}
     as='code'
     sx={t => ({ fontFamily: 'monospace', fontSize: t.fontSizes.$sm })}
   >
@@ -13,14 +18,21 @@ const MonoText = ({ children }: { children: string }): JSX.Element => (
   </Text>
 );
 
-const HeaderText = ({ children }: { children: string }): JSX.Element => (
+const ColumnHeader = ({
+  column,
+  localizationKey,
+}: {
+  column: ColumnId;
+  localizationKey: LocalizationKey;
+}): JSX.Element => (
   <Text
+    elementDescriptor={descriptors.configureDirectorySyncAttributeMappingHeader}
+    elementId={descriptors.configureDirectorySyncAttributeMappingHeader.setId(column)}
     as='span'
     colorScheme='secondary'
+    localizationKey={localizationKey}
     sx={t => ({ fontSize: t.fontSizes.$sm, fontWeight: t.fontWeights.$normal })}
-  >
-    {children}
-  </Text>
+  />
 );
 
 export const AttributeMappingStep = (): JSX.Element => {
@@ -34,13 +46,14 @@ export const AttributeMappingStep = (): JSX.Element => {
   return (
     <>
       <Step.Header
-        title='Attribute review'
-        description='Standard directory attributes are pre-configured by Clerk. Attributes not listed here are ignored.'
+        title={localizationKeys('configureDirectorySync.attributeMappingStep.title')}
+        description={localizationKeys('configureDirectorySync.attributeMappingStep.subtitle')}
       />
 
       <Step.Body>
         <Step.Section sx={t => ({ gap: t.space.$5 })}>
           <Table
+            elementDescriptor={descriptors.configureDirectorySyncAttributeMappingTable}
             sx={t => ({
               'tr > th': { paddingBlock: t.space.$2, paddingInline: t.space.$4 },
               'tr > td': { paddingBlock: t.space.$3 },
@@ -49,10 +62,20 @@ export const AttributeMappingStep = (): JSX.Element => {
             <Thead>
               <Tr>
                 <Th>
-                  <HeaderText>Directory attributes</HeaderText>
+                  <ColumnHeader
+                    column='directory'
+                    localizationKey={localizationKeys(
+                      'configureDirectorySync.attributeMappingStep.columns.directoryAttribute',
+                    )}
+                  />
                 </Th>
                 <Th>
-                  <HeaderText>Clerk User attributes</HeaderText>
+                  <ColumnHeader
+                    column='clerk'
+                    localizationKey={localizationKeys(
+                      'configureDirectorySync.attributeMappingStep.columns.clerkAttribute',
+                    )}
+                  />
                 </Th>
               </Tr>
             </Thead>
@@ -60,10 +83,10 @@ export const AttributeMappingStep = (): JSX.Element => {
               {rows.map(({ clerkAttribute, scimPath }) => (
                 <Tr key={clerkAttribute}>
                   <Td>
-                    <MonoText>{scimPath}</MonoText>
+                    <AttributeValue column='directory'>{scimPath}</AttributeValue>
                   </Td>
                   <Td>
-                    <MonoText>{clerkAttribute}</MonoText>
+                    <AttributeValue column='clerk'>{clerkAttribute}</AttributeValue>
                   </Td>
                 </Tr>
               ))}

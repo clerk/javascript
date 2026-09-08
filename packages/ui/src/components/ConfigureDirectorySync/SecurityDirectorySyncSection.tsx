@@ -67,7 +67,7 @@ export const SecurityDirectorySyncSection = ({
     enterpriseConnectionId: connection?.id ?? null,
   });
 
-  // A 404 (no directory yet) resolves to `data: null` — errors here are real failures.
+  // The hook maps a 404 (no directory yet) to `data: null`, so any error here is unexpected.
   const isLoading = isLoadingConnections || (Boolean(connection) && isLoadingDirectory);
   const error = connectionsError ?? directoryError;
   const isSettled = !isLoading && !error;
@@ -104,7 +104,7 @@ export const SecurityDirectorySyncSection = ({
       ) : error ? (
         <Alert
           variant='danger'
-          title='Could not load Directory Sync'
+          title={localizationKeys('organizationProfile.securityPage.directorySyncSection.error__load')}
           subtitle={error.message}
         />
       ) : status === 'unconfigured' ? (
@@ -141,7 +141,7 @@ export const SecurityDirectorySyncSection = ({
         <CardStateProvider>
           <ConfiguredContent
             isActive={status === 'active'}
-            setActive={enabled => updateDirectorySync({ enabled })}
+            updateEnabled={enabled => updateDirectorySync({ enabled })}
             onDelete={deleteDirectorySync}
             organizationName={organizationName}
             contentRef={contentRef}
@@ -155,7 +155,7 @@ export const SecurityDirectorySyncSection = ({
 
 type ConfiguredContentProps = {
   isActive: boolean;
-  setActive: (enabled: boolean) => Promise<unknown>;
+  updateEnabled: (enabled: boolean) => Promise<unknown>;
   onDelete: () => Promise<unknown>;
   organizationName: string;
   contentRef: React.RefObject<HTMLDivElement>;
@@ -164,7 +164,7 @@ type ConfiguredContentProps = {
 
 const ConfiguredContent = ({
   isActive,
-  setActive,
+  updateEnabled,
   onDelete,
   organizationName,
   contentRef,
@@ -173,7 +173,7 @@ const ConfiguredContent = ({
   const card = useCardState();
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
 
-  const onSetActive = async (enabled: boolean) => {
+  const handleUpdateEnabled = async (enabled: boolean) => {
     if (card.isLoading) {
       return;
     }
@@ -182,7 +182,7 @@ const ConfiguredContent = ({
     card.setLoading();
 
     try {
-      await setActive(enabled);
+      await updateEnabled(enabled);
     } catch (err) {
       handleError(err as Error, [], card.setError);
     } finally {
@@ -212,12 +212,12 @@ const ConfiguredContent = ({
                     'organizationProfile.securityPage.directorySyncSection.menuAction__deactivate',
                   ),
                   isDisabled: card.isLoading,
-                  onClick: () => void onSetActive(false),
+                  onClick: () => void handleUpdateEnabled(false),
                 }
               : {
                   label: localizationKeys('organizationProfile.securityPage.directorySyncSection.menuAction__activate'),
                   isDisabled: card.isLoading,
-                  onClick: () => void onSetActive(true),
+                  onClick: () => void handleUpdateEnabled(true),
                 },
             {
               label: localizationKeys('organizationProfile.securityPage.directorySyncSection.menuAction__remove'),

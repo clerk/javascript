@@ -110,3 +110,24 @@ describe('ConfigureDirectorySyncWizard configure step', () => {
     expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
   });
 });
+
+describe('ConfigureDirectorySyncWizard test step', () => {
+  it('shows the load error instead of waiting for users when the request fails', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([oktaConnection]);
+    const existing = directory();
+    existing.getUsers.mockRejectedValue(new Error('users unavailable'));
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    expect(await screen.findByDisplayValue('https://api.example.com/scim/v2')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Could not load provisioned users')).toBeInTheDocument();
+    expect(screen.getByText('users unavailable')).toBeInTheDocument();
+    expect(screen.queryByText('Waiting for the first provisioned user…')).not.toBeInTheDocument();
+  });
+});
