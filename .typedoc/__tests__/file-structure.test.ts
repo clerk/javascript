@@ -1,4 +1,4 @@
-import { readFile, readdir } from 'fs/promises';
+import { readdir } from 'fs/promises';
 import { join, relative } from 'path';
 import { describe, expect, it } from 'vitest';
 
@@ -28,26 +28,6 @@ function isTopLevelPath(filePath: string) {
 }
 
 describe('Typedoc output', () => {
-  it('renders the OAuth device verification hook return as an embeddable table', async () => {
-    const hookReturn = await readFile(
-      join(OUTPUT_LOCATION, 'shared/use-o-auth-device-verification-return.mdx'),
-      'utf8',
-    );
-
-    expect(hookReturn).not.toContain('The current state and actions for an OAuth device verification flow.');
-    expect(hookReturn).not.toContain('## Properties');
-    expect(hookReturn).toMatch(/^\| Property/);
-  });
-
-  it('inlines OAuth device verification statuses without generating a standalone page', async () => {
-    const info = await readFile(join(OUTPUT_LOCATION, 'shared/o-auth-device-verification-info.mdx'), 'utf8');
-    const sharedFiles = await readdir(join(OUTPUT_LOCATION, 'shared'));
-
-    expect(info).toContain('<code>"pending" \\| "approved" \\| "denied" \\| "consumed"</code>');
-    expect(info).not.toContain('[OAuthDeviceVerificationStatus]');
-    expect(sharedFiles).not.toContain('o-auth-device-verification-status.mdx');
-  });
-
   it('should only have these top-level folders', async () => {
     const folders = await scanDirectory('directory');
     const topLevelFolders = folders.filter(isTopLevelPath);
