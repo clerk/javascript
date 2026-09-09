@@ -194,7 +194,7 @@ export async function fixture(options = {}) {
 export function response(payload, extra = {}) {
   return {
     status: 200,
-    headers: { authorization: 'fixture_client_credential' },
+    headers: payload?.object === 'environment' ? {} : { authorization: 'fixture_client_credential' },
     body: JSON.stringify({ response: payload }),
     ...extra,
   };

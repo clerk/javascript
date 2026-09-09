@@ -43,6 +43,49 @@ function fixture(initialCredential: string | null = 'original', options: { nativ
 }
 
 describe('mobile credential transport', () => {
+  it('refreshes a credential read that overlaps a completed rotation before issuing the request', async () => {
+    let before: any;
+    let after: any;
+    let credential = 'original';
+    let readCount = 0;
+    const started = deferred<void>();
+    const finish = deferred<void>();
+    installMobileCredentialTransport(
+      {
+        __internal_onBeforeRequest: callback => {
+          before = callback;
+        },
+        __internal_onAfterResponse: callback => {
+          after = callback;
+        },
+      },
+      {
+        read: async () => {
+          const value = credential;
+          if (++readCount === 2) {
+            started.resolve();
+            await finish.promise;
+          }
+          return value;
+        },
+        write: async value => {
+          credential = value;
+        },
+        remove: async () => {},
+      },
+    );
+    const first = { url: new URL('https://clerk.example/client') };
+    const second = { url: new URL('https://clerk.example/client'), headers: new Headers() };
+    await before(first);
+    const preparing = before(second);
+    await started.promise;
+    await after(first, new Response('{}', { headers: { authorization: 'rotated' } }));
+    finish.resolve();
+    await preparing;
+    expect(second.headers.get('authorization')).toBe('rotated');
+    await expect(after(second, new Response('{}', { headers: { authorization: 'rotated' } }))).resolves.toBeUndefined();
+  });
+
   it.each([true, false])('requires a credential for native client hydration: native=%s', async native => {
     const f = fixture(null, { native });
     const request = { url: new URL('https://clerk.example/client') };
@@ -135,12 +178,12 @@ describe('mobile credential transport', () => {
           payload: { response: { object: 'client', id: 'client_ordering', updated_at: updatedAt } },
         },
       );
-    await f.after(requests[1], response('second-request', 200, 2000));
-    await f.after(requests[2], response('third-request', 100, 1000));
-    expect(f.read()).toBe('third-request');
+    await f.after(requests[1], response('original', 200, 2000));
+    await f.after(requests[2], response('original', 100, 1000));
+    expect(f.read()).toBe('original');
     await expect(f.after(requests[0], response('late-first-request', 150, 3000))).rejects.toMatchObject({
       code: 'stale_client_response',
     });
-    expect(f.read()).toBe('third-request');
+    expect(f.read()).toBe('original');
   });
 });

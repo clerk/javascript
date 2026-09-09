@@ -48,8 +48,12 @@ export function installMobileCredentialTransport(
   let disposed = false;
   let writes: Promise<void> = Promise.resolve();
   let sequence = 0;
+  let credentialRevision = 0;
   let acceptedClient: { sequence: number; serverDate?: number; updatedAt?: number } | undefined;
-  const requests = new WeakMap<object, { generation: number; sequence: number }>();
+  const requests = new WeakMap<
+    object,
+    { generation: number; sequence: number; credentialRevision: number; credential: string | null }
+  >();
   const assertCurrent = (expected: number) => {
     if (disposed || expected !== generation) {
       throw Object.assign(new Error('The client changed while the request was in flight.'), {
@@ -57,14 +61,28 @@ export function installMobileCredentialTransport(
       });
     }
   };
+  const assertCredentialCurrent = (expected: number) => {
+    if (expected !== credentialRevision) {
+      throw Object.assign(new Error('The client credential changed while the request was in flight.'), {
+        code: 'stale_client_request',
+      });
+    }
+  };
 
   core.__internal_onBeforeRequest(async request => {
     const current = generation;
-    requests.set(request, { generation: current, sequence: ++sequence });
-    await writes;
-    assertCurrent(current);
-    const credential = await storage.read();
-    assertCurrent(current);
+    let credential: string | null;
+    let revision: number;
+    let pendingWrites: Promise<void>;
+    do {
+      pendingWrites = writes;
+      await pendingWrites;
+      assertCurrent(current);
+      revision = credentialRevision;
+      credential = await storage.read();
+      assertCurrent(current);
+    } while (pendingWrites !== writes || revision !== credentialRevision);
+    requests.set(request, { generation: current, sequence: ++sequence, credentialRevision: revision, credential });
     request.credentials = 'omit';
     request.url?.searchParams.set('_is_native', '1');
     const requestHeaders = request.headers instanceof Headers ? request.headers : new Headers(request.headers);
@@ -88,6 +106,7 @@ export function installMobileCredentialTransport(
     // credential write or FAPI resource hydration can occur.
     const commit = writes.then(async () => {
       assertCurrent(issued.generation);
+      assertCredentialCurrent(issued.credentialRevision);
       if (client && options.native !== false && !credential && !(await storage.read())) {
         throw Object.assign(new Error('The native client response has no client credential.'), {
           code: 'missing_client_credential',
@@ -110,6 +129,7 @@ export function installMobileCredentialTransport(
       }
       if (credential) await storage.write(credential);
       assertCurrent(issued.generation);
+      if (credential && credential !== issued.credential) ++credentialRevision;
       if (client) {
         acceptedClient = {
           sequence: Math.max(acceptedClient?.sequence ?? issued.sequence, issued.sequence),

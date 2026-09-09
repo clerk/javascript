@@ -120,7 +120,7 @@ for (const [name, oldDate, newDate, newerVersion, accepted, envelope = 'client']
           return late.promise;
         }
         return response(pending, {
-          headers: { authorization: 'newer-request-credential', ...(newDate ? { date: newDate } : {}) },
+          headers: { authorization: 'fixture_client_credential', ...(newDate ? { date: newDate } : {}) },
           body: JSON.stringify({ response: pending, client: pendingClient }),
         });
       },
@@ -152,7 +152,7 @@ for (const [name, oldDate, newDate, newerVersion, accepted, envelope = 'client']
       assert.equal(result.failure?.code, 'stale_client_response');
       assert.equal(f.resource(f.state.roots.session).status, 'pending');
       assert.equal(f.resource(f.state.roots.session).currentTask.key, 'choose-organization');
-      assert.equal(f.credential, 'newer-request-credential');
+      assert.equal(f.credential, 'fixture_client_credential');
     }
     // A rejected old reply must leave the current resource usable.
     const next = await f.invoke(f.state.roots.session, 'Session.reload');
@@ -178,7 +178,7 @@ test('an older foreground client reply cannot remove a task accepted by a newer 
       }
       if (path.endsWith(`/sessions/${active.id}`))
         return response(pending, {
-          headers: { date: later, authorization: 'newer-response-credential' },
+          headers: { date: later, authorization: 'fixture_client_credential' },
           body: JSON.stringify({ response: pending, client: { ...client, sessions: [pending] } }),
         });
     },
@@ -196,7 +196,7 @@ test('an older foreground client reply cannot remove a task accepted by a newer 
   assert.equal(f.messages.find(message => message.kind === 'lifecycleError')?.failure?.code, 'stale_client_response');
   assert.equal(f.resource(f.state.roots.session).status, 'pending');
   assert.equal(f.resource(f.state.roots.session).currentTask.key, 'choose-organization');
-  assert.equal(f.credential, 'newer-response-credential');
+  assert.equal(f.credential, 'fixture_client_credential');
 });
 
 test('authentication reset starts a new response-date history without signing out the session', async t => {
