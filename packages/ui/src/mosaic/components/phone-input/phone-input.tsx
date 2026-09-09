@@ -19,7 +19,6 @@ import { Combobox } from '../combobox';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
-import { Input } from '../input';
 import { InputGroup } from '../input-group';
 import { Popover } from '../popover';
 import { styles } from './phone-input.styles';
@@ -248,13 +247,13 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                   size='md'
                   {...mergeStyleProps(themeProps('phone-input-country-search'), stylex.props(styles.countrySearch))}
                 >
-                  <InputGroup.Text>
+                  <InputGroup.Start>
                     <Icon
                       name='search'
                       size='sm'
                       aria-hidden='true'
                     />
-                  </InputGroup.Text>
+                  </InputGroup.Start>
                   <Combobox.Input
                     variant='ghost'
                     aria-label='Search countries'
@@ -296,7 +295,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           </Popover.Popup>
         </Popover.Root>
 
-        <InputGroup.Text
+        <InputGroup.Start
           aria-hidden='true'
           {...mergeStyleProps(themeProps('phone-input-prefix'), stylex.props(styles.prefix))}
         >
@@ -305,8 +304,8 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
             {...mergeStyleProps(themeProps('phone-input-divider'), stylex.props(reset.base, styles.divider))}
           />
           +{country.code}
-        </InputGroup.Text>
-        <Input
+        </InputGroup.Start>
+        <InputGroup.Input
           ref={setInputRef}
           variant='ghost'
           {...mergeStyleProps(themeProps('phone-input-control'), stylex.props(styles.control))}
