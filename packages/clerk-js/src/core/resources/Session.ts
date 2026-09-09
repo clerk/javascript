@@ -1,5 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isNetworkOnline, isValidNetworkEnvironment } from '@clerk/shared/network';
+import { isNativeApplicationActive, isNetworkOnline, isValidNetworkEnvironment } from '@clerk/shared/network';
 import {
   ClerkOfflineError,
   ClerkRuntimeError,
@@ -580,6 +580,8 @@ export class Session extends BaseResource implements SessionResource {
     tokenId: string,
     shouldDispatchTokenUpdate: boolean,
   ): void {
+    if (isNativeApplicationActive() === false) return;
+
     // Prevent multiple concurrent background refreshes for the same token
     if (Session.#backgroundRefreshInProgress.has(tokenId)) {
       return;

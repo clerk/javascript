@@ -1,3 +1,4 @@
+import { setNativeNetworkEnvironment } from '@clerk/shared/network';
 import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
@@ -630,6 +631,36 @@ describe('Session', () => {
     describe('timer-based proactive refresh', () => {
       beforeEach(() => {
         setDocumentHasFocus(true);
+      });
+
+      it('suspends proactive native requests in background and allows foreground token recovery', async () => {
+        let active = true;
+        const dispose = setNativeNetworkEnvironment({ isOnline: () => true, isActive: () => active });
+        try {
+          const session = new Session({
+            status: 'active',
+            id: 'session_1',
+            object: 'session',
+            user: createUser({}),
+            last_active_organization_id: null,
+            last_active_token: { object: 'token', jwt: mockJwt },
+            actor: null,
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as SessionJSON);
+          await Promise.resolve();
+          const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+          requestSpy.mockClear();
+          active = false;
+          await vi.advanceTimersByTimeAsync(44 * 1000);
+          expect(requestSpy).not.toHaveBeenCalled();
+          active = true;
+          requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+          expect(await session.getToken({ skipCache: true })).toBe(mockJwt);
+          expect(requestSpy).toHaveBeenCalledTimes(1);
+        } finally {
+          dispose();
+        }
       });
 
       it('triggers background refresh via timer before leeway period', async () => {

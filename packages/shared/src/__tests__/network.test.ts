@@ -1,6 +1,11 @@
 // @vitest-environment node
 import { expect, test } from 'vitest';
-import { isNetworkOnline, isValidNetworkEnvironment, setNativeNetworkEnvironment } from '../network';
+import {
+  isNativeApplicationActive,
+  isNetworkOnline,
+  isValidNetworkEnvironment,
+  setNativeNetworkEnvironment,
+} from '../network';
 import { stripOrigin, toURL } from '../internal/clerk-js/url';
 
 test('native HTTP can run without making SSR or the host a browser', () => {
@@ -36,4 +41,18 @@ test('URL diagnostics support an environment without window', () => {
   expect(stripOrigin('/signed-out')).toBe('/signed-out');
   expect(stripOrigin(new URL('https://example.com/signed-out'))).toBe('/signed-out');
   expect(toURL('https://example.com/signed-out').pathname).toBe('/signed-out');
+});
+
+test('native activity tracks lifecycle without browser globals', () => {
+  let active = true;
+  const dispose = setNativeNetworkEnvironment({ isOnline: () => true, isActive: () => active });
+  try {
+    expect(isNativeApplicationActive()).toBe(true);
+    active = false;
+    expect(isNativeApplicationActive()).toBe(false);
+    expect(isNetworkOnline()).toBe(true);
+  } finally {
+    dispose();
+  }
+  expect(isNativeApplicationActive()).toBeUndefined();
 });

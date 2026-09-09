@@ -1,4 +1,8 @@
+import { isNativeApplicationActive } from '@clerk/shared/network';
+
 export function isTabFocused(): boolean | undefined {
+  const active = isNativeApplicationActive();
+  if (active !== undefined) return active;
   if (typeof document === 'undefined') {
     return undefined;
   }
@@ -22,6 +26,8 @@ export const getTabState = (): 'focused' | 'visible' | 'hidden' | undefined => {
   if (focused) {
     return 'focused';
   }
+
+  if (isNativeApplicationActive() === false) return 'hidden';
 
   try {
     return document.visibilityState === 'visible' ? 'visible' : 'hidden';
