@@ -83,7 +83,7 @@ export const styles = stylex.create({
       ':not([data-disabled]):hover': durationVars['--cl-duration-instant'],
     },
     borderColor: 'transparent',
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: `var(--_cl-button-radius, ${radiusVars['--cl-radius-md']})`,
     borderStyle: 'solid',
     borderWidth: '1px',
     alignItems: 'center',

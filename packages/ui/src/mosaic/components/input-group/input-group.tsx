@@ -137,6 +137,9 @@ function useAddon(
         color: 'neutral',
         variant: 'ghost',
         disabled: group.disabled,
+        styles: styles.button,
+        sizeStyles: styles.buttonSize,
+        iconStyles: styles.iconButton,
       }) as const,
     [group.disabled, group.size],
   );

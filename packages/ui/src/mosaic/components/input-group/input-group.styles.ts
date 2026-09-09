@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, radiusVars, space, targetVars, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  focusVars,
+  fontFamilyVars,
+  radiusVars,
+  space,
+  targetVars,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 export const styles = stylex.create({
   addon: {
@@ -10,10 +18,23 @@ export const styles = stylex.create({
     display: 'flex',
     flexShrink: 0,
   },
+  button: {
+    outlineOffset: {
+      default: null,
+      ':focus-visible': 0,
+    },
+  },
+  buttonSize: {
+    height: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
+  },
+  iconButton: {
+    width: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
+  },
   start: { paddingInlineStart: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))' },
   end: { paddingInlineEnd: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))' },
   root: {
-    overflow: 'hidden',
+    '--_cl-input-group-inset': `calc(${focusVars['--cl-focus-outline-width']} + 1px)`,
+    overflow: 'visible',
     alignItems: 'center',
     display: 'flex',
     minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
@@ -39,19 +60,19 @@ export const styles = stylex.create({
 
 export const sizes = stylex.create({
   sm: {
-    '--_cl-input-group-inset': `max(0px, calc((${space['7']} - ${space['6']}) / 2))`,
+    '--_cl-input-group-height': space['7'],
     '--_cl-input-group-radius': radiusVars['--cl-radius-md'],
     borderRadius: radiusVars['--cl-radius-md'],
     height: space['7'],
   },
   md: {
-    '--_cl-input-group-inset': `max(0px, calc((${space['8']} - ${space['7']}) / 2))`,
+    '--_cl-input-group-height': space['8'],
     '--_cl-input-group-radius': radiusVars['--cl-radius-md'],
     borderRadius: radiusVars['--cl-radius-md'],
     height: space['8'],
   },
   lg: {
-    '--_cl-input-group-inset': `max(0px, calc((${space['9']} - ${space['8']}) / 2))`,
+    '--_cl-input-group-height': space['9'],
     '--_cl-input-group-radius': radiusVars['--cl-radius-lg'],
     borderRadius: radiusVars['--cl-radius-lg'],
     height: space['9'],
