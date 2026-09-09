@@ -6783,11 +6783,12 @@ public data class ProtectCheck(public val `sdkUrl`: String, public val `expiresA
   }
 }
 
-public data class SignInCreateParams(public val `identifier`: String? = null, public val `password`: String? = null, public val `strategy`: SignInCreateParamsStrategy? = null, public val `redirectUrl`: String? = null, public val `actionCompleteRedirectUrl`: String? = null, public val `transfer`: Boolean? = null, public val `ticket`: String? = null, public val `signUpIfMissing`: Boolean? = null) {
+public data class SignInCreateParams(public val `identifier`: String? = null, public val `password`: String? = null, public val `strategy`: SignInCreateParamsStrategy? = null, public val `token`: String? = null, public val `redirectUrl`: String? = null, public val `actionCompleteRedirectUrl`: String? = null, public val `transfer`: Boolean? = null, public val `ticket`: String? = null, public val `signUpIfMissing`: Boolean? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("identifier", this@SignInCreateParams.`identifier`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("password", this@SignInCreateParams.`password`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("strategy", this@SignInCreateParams.`strategy`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("token", this@SignInCreateParams.`token`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("redirectUrl", this@SignInCreateParams.`redirectUrl`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("actionCompleteRedirectUrl", this@SignInCreateParams.`actionCompleteRedirectUrl`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("transfer", this@SignInCreateParams.`transfer`?.let { value -> JsonPrimitive(value) } ?: Undefined)
@@ -6798,12 +6799,13 @@ public data class SignInCreateParams(public val `identifier`: String? = null, pu
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInCreateParams {
       val values = value.jsonObject
 
-      return SignInCreateParams(`identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() }, `password` = (values["password"] ?: Undefined).decodeOptional { value -> value.requireString() }, `strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> SignInCreateParamsStrategy.fromJson(value, runtime) }, `redirectUrl` = (values["redirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `actionCompleteRedirectUrl` = (values["actionCompleteRedirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `transfer` = (values["transfer"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `ticket` = (values["ticket"] ?: Undefined).decodeOptional { value -> value.requireString() }, `signUpIfMissing` = (values["signUpIfMissing"] ?: Undefined).decodeOptional { value -> value.requireBoolean() })
+      return SignInCreateParams(`identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() }, `password` = (values["password"] ?: Undefined).decodeOptional { value -> value.requireString() }, `strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> SignInCreateParamsStrategy.fromJson(value, runtime) }, `token` = (values["token"] ?: Undefined).decodeOptional { value -> value.requireString() }, `redirectUrl` = (values["redirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `actionCompleteRedirectUrl` = (values["actionCompleteRedirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `transfer` = (values["transfer"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `ticket` = (values["ticket"] ?: Undefined).decodeOptional { value -> value.requireString() }, `signUpIfMissing` = (values["signUpIfMissing"] ?: Undefined).decodeOptional { value -> value.requireBoolean() })
     }
   }
 }
 
 public sealed class SignInCreateParamsStrategy(public val rawValue: String) {
+  public data object OauthTokenApple : SignInCreateParamsStrategy("oauth_token_apple")
   public data object Passkey : SignInCreateParamsStrategy("passkey")
   public data object Ticket : SignInCreateParamsStrategy("ticket")
   public data object EnterpriseSso : SignInCreateParamsStrategy("enterprise_sso")
@@ -6840,6 +6842,7 @@ public sealed class SignInCreateParamsStrategy(public val rawValue: String) {
   public fun toJson(): JsonElement = JsonPrimitive(rawValue)
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInCreateParamsStrategy = when (val raw = value.requireString()) {
+      "oauth_token_apple" -> OauthTokenApple
       "passkey" -> Passkey
       "ticket" -> Ticket
       "enterprise_sso" -> EnterpriseSso
@@ -7468,6 +7471,7 @@ public data class SignInSSOParams(public val `strategy`: SignInSSOParamsStrategy
 }
 
 public sealed class SignInSSOParamsStrategy(public val rawValue: String) {
+  public data object OauthTokenApple : SignInSSOParamsStrategy("oauth_token_apple")
   public data object EnterpriseSso : SignInSSOParamsStrategy("enterprise_sso")
   public data object OauthFacebook : SignInSSOParamsStrategy("oauth_facebook")
   public data object OauthGoogle : SignInSSOParamsStrategy("oauth_google")
@@ -7502,6 +7506,7 @@ public sealed class SignInSSOParamsStrategy(public val rawValue: String) {
   public fun toJson(): JsonElement = JsonPrimitive(rawValue)
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInSSOParamsStrategy = when (val raw = value.requireString()) {
+      "oauth_token_apple" -> OauthTokenApple
       "enterprise_sso" -> EnterpriseSso
       "oauth_facebook" -> OauthFacebook
       "oauth_google" -> OauthGoogle
@@ -8075,9 +8080,10 @@ public data class SignUpExistingSession(public val `sessionId`: String) {
   }
 }
 
-public data class SignUpCreateParams(public val `strategy`: SignUpCreateParamsStrategy? = null, public val `emailAddress`: String? = null, public val `phoneNumber`: String? = null, public val `username`: String? = null, public val `password`: String? = null, public val `transfer`: Boolean? = null, public val `ticket`: String? = null, public val `web3Wallet`: String? = null, public val `firstName`: String? = null, public val `lastName`: String? = null, public val `unsafeMetadata`: JsonObject? = null, public val `legalAccepted`: Boolean? = null, public val `locale`: String? = null) {
+public data class SignUpCreateParams(public val `strategy`: SignUpCreateParamsStrategy? = null, public val `token`: String? = null, public val `emailAddress`: String? = null, public val `phoneNumber`: String? = null, public val `username`: String? = null, public val `password`: String? = null, public val `transfer`: Boolean? = null, public val `ticket`: String? = null, public val `web3Wallet`: String? = null, public val `firstName`: String? = null, public val `lastName`: String? = null, public val `unsafeMetadata`: JsonObject? = null, public val `legalAccepted`: Boolean? = null, public val `locale`: String? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("strategy", this@SignUpCreateParams.`strategy`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("token", this@SignUpCreateParams.`token`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("emailAddress", this@SignUpCreateParams.`emailAddress`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("phoneNumber", this@SignUpCreateParams.`phoneNumber`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("username", this@SignUpCreateParams.`username`?.let { value -> JsonPrimitive(value) } ?: Undefined)
@@ -8095,7 +8101,7 @@ public data class SignUpCreateParams(public val `strategy`: SignUpCreateParamsSt
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignUpCreateParams {
       val values = value.jsonObject
 
-      return SignUpCreateParams(`strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> SignUpCreateParamsStrategy.fromJson(value, runtime) }, `emailAddress` = (values["emailAddress"] ?: Undefined).decodeOptional { value -> value.requireString() }, `phoneNumber` = (values["phoneNumber"] ?: Undefined).decodeOptional { value -> value.requireString() }, `username` = (values["username"] ?: Undefined).decodeOptional { value -> value.requireString() }, `password` = (values["password"] ?: Undefined).decodeOptional { value -> value.requireString() }, `transfer` = (values["transfer"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `ticket` = (values["ticket"] ?: Undefined).decodeOptional { value -> value.requireString() }, `web3Wallet` = (values["web3Wallet"] ?: Undefined).decodeOptional { value -> value.requireString() }, `firstName` = (values["firstName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `lastName` = (values["lastName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `unsafeMetadata` = (values["unsafeMetadata"] ?: Undefined).decodeOptional { value -> value.jsonObject }, `legalAccepted` = (values["legalAccepted"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `locale` = (values["locale"] ?: Undefined).decodeOptional { value -> value.requireString() })
+      return SignUpCreateParams(`strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> SignUpCreateParamsStrategy.fromJson(value, runtime) }, `token` = (values["token"] ?: Undefined).decodeOptional { value -> value.requireString() }, `emailAddress` = (values["emailAddress"] ?: Undefined).decodeOptional { value -> value.requireString() }, `phoneNumber` = (values["phoneNumber"] ?: Undefined).decodeOptional { value -> value.requireString() }, `username` = (values["username"] ?: Undefined).decodeOptional { value -> value.requireString() }, `password` = (values["password"] ?: Undefined).decodeOptional { value -> value.requireString() }, `transfer` = (values["transfer"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `ticket` = (values["ticket"] ?: Undefined).decodeOptional { value -> value.requireString() }, `web3Wallet` = (values["web3Wallet"] ?: Undefined).decodeOptional { value -> value.requireString() }, `firstName` = (values["firstName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `lastName` = (values["lastName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `unsafeMetadata` = (values["unsafeMetadata"] ?: Undefined).decodeOptional { value -> value.jsonObject }, `legalAccepted` = (values["legalAccepted"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `locale` = (values["locale"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
@@ -9042,7 +9048,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "65cc81da41b05e4f943f819c4f4801bb632dc9f05a359ff18f654c02cec8d6de"
+  public const val contractHash: String = "983e2af77110925cd292c13d1469cfd6918aae5521f929afc814db7bb385e63e"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

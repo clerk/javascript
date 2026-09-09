@@ -3,7 +3,7 @@ import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { ProtectCheckResource } from './signUpCommon';
-import type { OAuthStrategy, PasskeyStrategy, TicketStrategy, Web3Strategy } from './strategies';
+import type { AppleIdTokenStrategy, OAuthStrategy, PasskeyStrategy, TicketStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 import type { Web3Provider } from './web3';
 
@@ -20,7 +20,9 @@ export interface SignInFutureCreateParams {
   /**
    * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each authentication identifier supports different verification strategies.
    */
-  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy | TicketStrategy;
+  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy | TicketStrategy | AppleIdTokenStrategy;
+  /** Provider identity token for token-based strategies. */
+  token?: string;
   /**
    * The full URL or path that the OAuth provider should redirect to after successful authorization on their part.
    */
@@ -204,7 +206,7 @@ export interface SignInFutureSSOParams {
   /**
    * The strategy to use for authentication.
    */
-  strategy: OAuthStrategy | 'enterprise_sso';
+  strategy: OAuthStrategy | 'enterprise_sso' | AppleIdTokenStrategy;
   /**
    * The URL to redirect to after the user has completed the SSO flow.
    */

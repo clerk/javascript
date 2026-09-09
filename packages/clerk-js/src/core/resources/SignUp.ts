@@ -63,6 +63,7 @@ import {
 } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { getNativeAppleIdentity } from '../../utils/nativeAppleIdentity';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
@@ -1069,6 +1070,29 @@ class SignUpFuture implements SignUpFutureResource {
       locale,
     } = params;
     return runAsyncResourceTask(this.#resource, async () => {
+      if (strategy === 'oauth_token_apple') {
+        if (popup)
+          throw new ClerkRuntimeError('A popup cannot be combined with native Apple authentication.', {
+            code: 'oauth_transport_popup_conflict',
+          });
+        const identity = await getNativeAppleIdentity(SignUp.clerk);
+        const appleParams = {
+          strategy: 'oauth_token_apple' as const,
+          token: identity.token,
+          firstName: params.firstName ?? identity.firstName,
+          lastName: params.lastName ?? identity.lastName,
+          unsafeMetadata,
+          legalAccepted,
+          locale,
+        };
+        if (this.#resource.id) {
+          const captcha = await this.getCaptchaToken({ strategy });
+          await this.#resource.__internal_basePatch({ body: { ...appleParams, ...captcha } });
+        } else {
+          await this._create(appleParams);
+        }
+        return;
+      }
       const transport = SignUp.clerk.__internal_oauthTransport;
       if (transport && popup) {
         throw new ClerkRuntimeError('A popup cannot be combined with an OAuth transport.', {

@@ -9169,15 +9169,17 @@ public struct SignInCreateParams: Hashable, Sendable {
   public let `identifier`: String?
   public let `password`: String?
   public let `strategy`: SignInCreateParamsStrategy?
+  public let `token`: String?
   public let `redirectUrl`: String?
   public let `actionCompleteRedirectUrl`: String?
   public let `transfer`: Bool?
   public let `ticket`: String?
   public let `signUpIfMissing`: Bool?
-  public init(`identifier`: String? = nil, `password`: String? = nil, `strategy`: SignInCreateParamsStrategy? = nil, `redirectUrl`: String? = nil, `actionCompleteRedirectUrl`: String? = nil, `transfer`: Bool? = nil, `ticket`: String? = nil, `signUpIfMissing`: Bool? = nil) {
+  public init(`identifier`: String? = nil, `password`: String? = nil, `strategy`: SignInCreateParamsStrategy? = nil, `token`: String? = nil, `redirectUrl`: String? = nil, `actionCompleteRedirectUrl`: String? = nil, `transfer`: Bool? = nil, `ticket`: String? = nil, `signUpIfMissing`: Bool? = nil) {
     self.`identifier` = `identifier`
     self.`password` = `password`
     self.`strategy` = `strategy`
+    self.`token` = `token`
     self.`redirectUrl` = `redirectUrl`
     self.`actionCompleteRedirectUrl` = `actionCompleteRedirectUrl`
     self.`transfer` = `transfer`
@@ -9189,6 +9191,7 @@ public struct SignInCreateParams: Hashable, Sendable {
       "identifier": try self.`identifier`.map { value in .string(value) } ?? .undefined,
       "password": try self.`password`.map { value in .string(value) } ?? .undefined,
       "strategy": try self.`strategy`.map { value in try value.encode() } ?? .undefined,
+      "token": try self.`token`.map { value in .string(value) } ?? .undefined,
       "redirectUrl": try self.`redirectUrl`.map { value in .string(value) } ?? .undefined,
       "actionCompleteRedirectUrl": try self.`actionCompleteRedirectUrl`.map { value in .string(value) } ?? .undefined,
       "transfer": try self.`transfer`.map { value in .bool(value) } ?? .undefined,
@@ -9200,11 +9203,12 @@ public struct SignInCreateParams: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInCreateParams {
     let values = try value.object()
 
-    return try SignInCreateParams(`identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() }, `password`: try (values["password"] ?? .undefined).optional { value in try value.string() }, `strategy`: try (values["strategy"] ?? .undefined).optional { value in try SignInCreateParamsStrategy.decode(value, in: runtime) }, `redirectUrl`: try (values["redirectUrl"] ?? .undefined).optional { value in try value.string() }, `actionCompleteRedirectUrl`: try (values["actionCompleteRedirectUrl"] ?? .undefined).optional { value in try value.string() }, `transfer`: try (values["transfer"] ?? .undefined).optional { value in try value.bool() }, `ticket`: try (values["ticket"] ?? .undefined).optional { value in try value.string() }, `signUpIfMissing`: try (values["signUpIfMissing"] ?? .undefined).optional { value in try value.bool() })
+    return try SignInCreateParams(`identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() }, `password`: try (values["password"] ?? .undefined).optional { value in try value.string() }, `strategy`: try (values["strategy"] ?? .undefined).optional { value in try SignInCreateParamsStrategy.decode(value, in: runtime) }, `token`: try (values["token"] ?? .undefined).optional { value in try value.string() }, `redirectUrl`: try (values["redirectUrl"] ?? .undefined).optional { value in try value.string() }, `actionCompleteRedirectUrl`: try (values["actionCompleteRedirectUrl"] ?? .undefined).optional { value in try value.string() }, `transfer`: try (values["transfer"] ?? .undefined).optional { value in try value.bool() }, `ticket`: try (values["ticket"] ?? .undefined).optional { value in try value.string() }, `signUpIfMissing`: try (values["signUpIfMissing"] ?? .undefined).optional { value in try value.bool() })
   }
 }
 
 public enum SignInCreateParamsStrategy: Hashable, Sendable {
+  case `oauthTokenApple`
   case `passkey`
   case `ticket`
   case `enterpriseSso`
@@ -9240,6 +9244,7 @@ public enum SignInCreateParamsStrategy: Hashable, Sendable {
   case unrecognized(String)
   public var rawValue: String {
     switch self {
+    case .`oauthTokenApple`: return "oauth_token_apple"
     case .`passkey`: return "passkey"
     case .`ticket`: return "ticket"
     case .`enterpriseSso`: return "enterprise_sso"
@@ -9277,6 +9282,7 @@ public enum SignInCreateParamsStrategy: Hashable, Sendable {
   }
   public init(rawValue: String) {
     switch rawValue {
+    case "oauth_token_apple": self = .`oauthTokenApple`
     case "passkey": self = .`passkey`
     case "ticket": self = .`ticket`
     case "enterprise_sso": self = .`enterpriseSso`
@@ -10018,6 +10024,7 @@ public struct SignInSSOParams: Hashable, Sendable {
 }
 
 public enum SignInSSOParamsStrategy: Hashable, Sendable {
+  case `oauthTokenApple`
   case `enterpriseSso`
   case `oauthFacebook`
   case `oauthGoogle`
@@ -10051,6 +10058,7 @@ public enum SignInSSOParamsStrategy: Hashable, Sendable {
   case unrecognized(String)
   public var rawValue: String {
     switch self {
+    case .`oauthTokenApple`: return "oauth_token_apple"
     case .`enterpriseSso`: return "enterprise_sso"
     case .`oauthFacebook`: return "oauth_facebook"
     case .`oauthGoogle`: return "oauth_google"
@@ -10086,6 +10094,7 @@ public enum SignInSSOParamsStrategy: Hashable, Sendable {
   }
   public init(rawValue: String) {
     switch rawValue {
+    case "oauth_token_apple": self = .`oauthTokenApple`
     case "enterprise_sso": self = .`enterpriseSso`
     case "oauth_facebook": self = .`oauthFacebook`
     case "oauth_google": self = .`oauthGoogle`
@@ -10830,6 +10839,7 @@ public struct SignUpExistingSession: Hashable, Sendable {
 
 public struct SignUpCreateParams: Hashable, Sendable {
   public let `strategy`: SignUpCreateParamsStrategy?
+  public let `token`: String?
   public let `emailAddress`: String?
   public let `phoneNumber`: String?
   public let `username`: String?
@@ -10842,8 +10852,9 @@ public struct SignUpCreateParams: Hashable, Sendable {
   public let `unsafeMetadata`: [String: JSONValue]?
   public let `legalAccepted`: Bool?
   public let `locale`: String?
-  public init(`strategy`: SignUpCreateParamsStrategy? = nil, `emailAddress`: String? = nil, `phoneNumber`: String? = nil, `username`: String? = nil, `password`: String? = nil, `transfer`: Bool? = nil, `ticket`: String? = nil, `web3Wallet`: String? = nil, `firstName`: String? = nil, `lastName`: String? = nil, `unsafeMetadata`: [String: JSONValue]? = nil, `legalAccepted`: Bool? = nil, `locale`: String? = nil) {
+  public init(`strategy`: SignUpCreateParamsStrategy? = nil, `token`: String? = nil, `emailAddress`: String? = nil, `phoneNumber`: String? = nil, `username`: String? = nil, `password`: String? = nil, `transfer`: Bool? = nil, `ticket`: String? = nil, `web3Wallet`: String? = nil, `firstName`: String? = nil, `lastName`: String? = nil, `unsafeMetadata`: [String: JSONValue]? = nil, `legalAccepted`: Bool? = nil, `locale`: String? = nil) {
     self.`strategy` = `strategy`
+    self.`token` = `token`
     self.`emailAddress` = `emailAddress`
     self.`phoneNumber` = `phoneNumber`
     self.`username` = `username`
@@ -10860,6 +10871,7 @@ public struct SignUpCreateParams: Hashable, Sendable {
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
       "strategy": try self.`strategy`.map { value in try value.encode() } ?? .undefined,
+      "token": try self.`token`.map { value in .string(value) } ?? .undefined,
       "emailAddress": try self.`emailAddress`.map { value in .string(value) } ?? .undefined,
       "phoneNumber": try self.`phoneNumber`.map { value in .string(value) } ?? .undefined,
       "username": try self.`username`.map { value in .string(value) } ?? .undefined,
@@ -10878,7 +10890,7 @@ public struct SignUpCreateParams: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignUpCreateParams {
     let values = try value.object()
 
-    return try SignUpCreateParams(`strategy`: try (values["strategy"] ?? .undefined).optional { value in try SignUpCreateParamsStrategy.decode(value, in: runtime) }, `emailAddress`: try (values["emailAddress"] ?? .undefined).optional { value in try value.string() }, `phoneNumber`: try (values["phoneNumber"] ?? .undefined).optional { value in try value.string() }, `username`: try (values["username"] ?? .undefined).optional { value in try value.string() }, `password`: try (values["password"] ?? .undefined).optional { value in try value.string() }, `transfer`: try (values["transfer"] ?? .undefined).optional { value in try value.bool() }, `ticket`: try (values["ticket"] ?? .undefined).optional { value in try value.string() }, `web3Wallet`: try (values["web3Wallet"] ?? .undefined).optional { value in try value.string() }, `firstName`: try (values["firstName"] ?? .undefined).optional { value in try value.string() }, `lastName`: try (values["lastName"] ?? .undefined).optional { value in try value.string() }, `unsafeMetadata`: try (values["unsafeMetadata"] ?? .undefined).optional { value in try value.object() }, `legalAccepted`: try (values["legalAccepted"] ?? .undefined).optional { value in try value.bool() }, `locale`: try (values["locale"] ?? .undefined).optional { value in try value.string() })
+    return try SignUpCreateParams(`strategy`: try (values["strategy"] ?? .undefined).optional { value in try SignUpCreateParamsStrategy.decode(value, in: runtime) }, `token`: try (values["token"] ?? .undefined).optional { value in try value.string() }, `emailAddress`: try (values["emailAddress"] ?? .undefined).optional { value in try value.string() }, `phoneNumber`: try (values["phoneNumber"] ?? .undefined).optional { value in try value.string() }, `username`: try (values["username"] ?? .undefined).optional { value in try value.string() }, `password`: try (values["password"] ?? .undefined).optional { value in try value.string() }, `transfer`: try (values["transfer"] ?? .undefined).optional { value in try value.bool() }, `ticket`: try (values["ticket"] ?? .undefined).optional { value in try value.string() }, `web3Wallet`: try (values["web3Wallet"] ?? .undefined).optional { value in try value.string() }, `firstName`: try (values["firstName"] ?? .undefined).optional { value in try value.string() }, `lastName`: try (values["lastName"] ?? .undefined).optional { value in try value.string() }, `unsafeMetadata`: try (values["unsafeMetadata"] ?? .undefined).optional { value in try value.object() }, `legalAccepted`: try (values["legalAccepted"] ?? .undefined).optional { value in try value.bool() }, `locale`: try (values["locale"] ?? .undefined).optional { value in try value.string() })
   }
 }
 
@@ -12076,7 +12088,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "65cc81da41b05e4f943f819c4f4801bb632dc9f05a359ff18f654c02cec8d6de"
+  public static let contractHash = "983e2af77110925cd292c13d1469cfd6918aae5521f929afc814db7bb385e63e"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

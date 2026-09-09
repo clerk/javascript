@@ -951,8 +951,9 @@ SignInCreateParams.redirectUrl: String? = null
 SignInCreateParams.signUpIfMissing: Boolean? = null
 SignInCreateParams.strategy: SignInCreateParamsStrategy? = null
 SignInCreateParams.ticket: String? = null
+SignInCreateParams.token: String? = null
 SignInCreateParams.transfer: Boolean? = null
-SignInCreateParamsStrategy cases: passkey, ticket, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInCreateParamsStrategy cases: oauth_token_apple, passkey, ticket, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
 SignInData.second_factor: SignInDataSecond_factor
 SignInDataSecond_factor.enabled: Boolean
 SignInDataSecond_factor.required: Boolean
@@ -1019,7 +1020,7 @@ SignInSSOParams.enterpriseConnectionId: String? = null
 SignInSSOParams.identifier: String? = null
 SignInSSOParams.oidcPrompt: String? = null
 SignInSSOParams.strategy: SignInSSOParamsStrategy
-SignInSSOParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInSSOParamsStrategy cases: oauth_token_apple, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
 SignInSecondFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | TOTPFactor | BackupCodeFactor
 SignInSecondFactor.strategy: String [shared union field]
 SignInStatus cases: needs_identifier, needs_first_factor, needs_second_factor, needs_client_trust, needs_new_password, needs_protect_check, complete, unrecognized(String)
@@ -1067,6 +1068,7 @@ SignUpCreateParams.password: String? = null
 SignUpCreateParams.phoneNumber: String? = null
 SignUpCreateParams.strategy: SignUpCreateParamsStrategy? = null
 SignUpCreateParams.ticket: String? = null
+SignUpCreateParams.token: String? = null
 SignUpCreateParams.transfer: Boolean? = null
 SignUpCreateParams.unsafeMetadata: JsonObject? = null
 SignUpCreateParams.username: String? = null

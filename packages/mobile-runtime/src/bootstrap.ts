@@ -62,6 +62,11 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     },
     { [`x-${configuration.platform}-sdk-version`]: 'next' },
   );
+  clerk.__internal_getAppleIdentity = options => {
+    if (!configuration.capabilities.includes('appleIdentity'))
+      return Promise.reject(bridgeError('capability_unavailable'));
+    return hostRequest('appleIdentity', options);
+  };
   clerk.__internal_isWebAuthnSupported = () => configuration.capabilities.includes('passkeys');
   clerk.__internal_isWebAuthnAutofillSupported = async () => false;
   clerk.__internal_isWebAuthnPlatformAuthenticatorSupported = async () =>
@@ -88,7 +93,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
   });
   if (disposed) return;
   const facade = publicCore(clerk, async () => {
-    cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create']);
+    cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity']);
     runtime?.invalidate('Clerk.signOut');
     await mobile?.invalidate();
   });
@@ -103,7 +108,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     emit,
     beforeInvoke: async operation => {
       if (operation === 'SignIn.reset' || operation === 'SignUp.reset') {
-        cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create']);
+        cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity']);
         await mobile?.invalidate();
       }
     },

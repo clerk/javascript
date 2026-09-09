@@ -90,6 +90,7 @@ import {
   openAndReconcileOAuthTransport,
 } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
+import { getNativeAppleIdentity } from '../../utils/nativeAppleIdentity';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
@@ -1224,6 +1225,22 @@ class SignInFuture implements SignInFutureResource {
     const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId, identifier } =
       params;
     return runAsyncResourceTask(this.#resource, async () => {
+      if (strategy === 'oauth_token_apple') {
+        if (popup)
+          throw new ClerkRuntimeError('A popup cannot be combined with native Apple authentication.', {
+            code: 'oauth_transport_popup_conflict',
+          });
+        const identity = await getNativeAppleIdentity(SignIn.clerk);
+        if (this.#resource.id) {
+          await this.#resource.__internal_basePost({
+            action: 'attempt_first_factor',
+            body: { strategy, token: identity.token },
+          });
+        } else {
+          await this._create({ strategy, token: identity.token });
+        }
+        return;
+      }
       const transport = SignIn.clerk.__internal_oauthTransport;
       if (transport && popup) {
         throw new ClerkRuntimeError('A popup cannot be combined with an OAuth transport.', {

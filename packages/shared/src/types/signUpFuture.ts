@@ -63,6 +63,8 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
     | GoogleOneTapStrategy
     | AppleIdTokenStrategy
     | PhoneCodeStrategy;
+  /** Provider identity token for token-based strategies. */
+  token?: string;
   /**
    * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
    */

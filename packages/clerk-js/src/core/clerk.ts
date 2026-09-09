@@ -358,6 +358,10 @@ export class Clerk implements ClerkInterface {
       }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>)
     | undefined;
 
+  public __internal_getAppleIdentity:
+    | ((options: { fullName: boolean }) => Promise<{ token: string; firstName?: string; lastName?: string }>)
+    | undefined;
+
   public __internal_isWebAuthnSupported: (() => boolean) | undefined;
   public __internal_isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
   public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;

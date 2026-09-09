@@ -96,7 +96,8 @@ export async function fixture(options = {}) {
                 });
               result = response(payload);
             }
-          } else if (message.capability.startsWith('passkeys.')) result = await options.passkeys?.(message);
+          } else if (message.capability === 'appleIdentity') result = await options.appleIdentity?.(message.args);
+          else if (message.capability.startsWith('passkeys.')) result = await options.passkeys?.(message);
           else throw Object.assign(new Error('Unsupported fixture capability'), { code: 'capability_unavailable' });
           receive({ kind: 'hostReply', id: message.id, result });
         } catch (error) {

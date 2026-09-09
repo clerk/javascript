@@ -1167,9 +1167,10 @@ SignInCreateParams.redirectUrl: String? = nil
 SignInCreateParams.signUpIfMissing: Bool? = nil
 SignInCreateParams.strategy: SignInCreateParamsStrategy? = nil
 SignInCreateParams.ticket: String? = nil
+SignInCreateParams.token: String? = nil
 SignInCreateParams.transfer: Bool? = nil
 SignInCreateParams: Hashable
-SignInCreateParamsStrategy cases: passkey, ticket, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInCreateParamsStrategy cases: oauth_token_apple, passkey, ticket, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
 SignInCreateParamsStrategy: Hashable
 SignInData.second_factor: SignInDataSecond_factor
 SignInData: Hashable
@@ -1273,7 +1274,7 @@ SignInSSOParams.identifier: String? = nil
 SignInSSOParams.oidcPrompt: String? = nil
 SignInSSOParams.strategy: SignInSSOParamsStrategy
 SignInSSOParams: Hashable
-SignInSSOParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInSSOParamsStrategy cases: oauth_token_apple, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
 SignInSSOParamsStrategy: Hashable
 SignInSecondFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | TOTPFactor | BackupCodeFactor
 SignInSecondFactor.strategy: String [shared union field]
@@ -1328,6 +1329,7 @@ SignUpCreateParams.password: String? = nil
 SignUpCreateParams.phoneNumber: String? = nil
 SignUpCreateParams.strategy: SignUpCreateParamsStrategy? = nil
 SignUpCreateParams.ticket: String? = nil
+SignUpCreateParams.token: String? = nil
 SignUpCreateParams.transfer: Bool? = nil
 SignUpCreateParams.unsafeMetadata: [String: JSONValue]? = nil
 SignUpCreateParams.username: String? = nil
