@@ -146,6 +146,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
   const store = createTokenStore<TokenCacheValue>();
   const keyResolver = createKeyResolver(prefix);
   const tabId = generateTabId();
+  let generation = 0;
 
   let broadcastChannel: BroadcastChannel | null = null;
 
@@ -169,6 +170,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
   ensureBroadcastChannel();
 
   const clear = () => {
+    generation++;
     store.forEach(value => {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
@@ -314,6 +316,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
    * @param options - Configuration for cache behavior; broadcast controls whether to notify other tabs
    */
   const setInternal = (entry: TokenCacheEntry, options: { broadcast: boolean } = BROADCAST) => {
+    const entryGeneration = generation;
     const key = keyResolver.toKey({
       audience: entry.audience,
       tokenId: entry.tokenId,
@@ -350,6 +353,11 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
     entry.tokenResolver
       .then(newToken => {
+        // A replacement entry after clear() belongs to a new cache lifetime.
+        // Earlier requests must not contribute their tokens to its baseline.
+        if (entryGeneration !== generation) {
+          return;
+        }
         const live = store.get(key);
         if (!live) {
           // Cleared while pending; do not resurrect.

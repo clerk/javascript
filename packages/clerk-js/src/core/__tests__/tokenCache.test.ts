@@ -512,6 +512,30 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
     });
 
+    it.each([false, true])(
+      'does not fold a pre-clear resolver into a new entry (old resolves first: %s)',
+      async oldFirst => {
+        const oldRaw = createJwtWithOiat(1666648250, 1666648260, 120);
+        const freshRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+        const old = deferred();
+        const fresh = deferred();
+        SessionTokenCache.set({ tokenId, tokenResolver: old.promise });
+        SessionTokenCache.clear();
+        SessionTokenCache.set({ tokenId, tokenResolver: fresh.promise });
+        if (oldFirst) {
+          old.resolve(makeToken(oldRaw));
+          await tick();
+          fresh.resolve(makeToken(freshRaw));
+        } else {
+          fresh.resolve(makeToken(freshRaw));
+          await tick();
+          old.resolve(makeToken(oldRaw));
+        }
+        await tick();
+        expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(freshRaw);
+      },
+    );
+
     it('derives the deletion timer from the fresher token, not from a later staler resolve', async () => {
       // high: longer ttl AND fresher oiat; low: short ttl AND staler oiat.
       const highRaw = createJwtWithOiat(1666648250, 1666648260, 300);
