@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkWebAuthnError } from '@clerk/shared/error';
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/shared/types';
@@ -152,6 +152,32 @@ describe('SignInStart', () => {
             flow: 'autofill',
           });
         });
+      });
+
+      it('does not display related-origin errors from passkey autofill', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: true,
+          });
+        });
+
+        fixtures.signIn.authenticateWithPasskey.mockRejectedValue(
+          new ClerkWebAuthnError('The operation is insecure.', {
+            code: 'passkey_invalid_rpID_or_domain',
+          }),
+        );
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalledWith({
+            flow: 'autofill',
+          });
+        });
+        expect(screen.queryByText(/operation is insecure/i)).not.toBeInTheDocument();
+        screen.getByText('Use passkey instead');
       });
 
       it('skips autofill when the host reports no autofill support', async () => {
