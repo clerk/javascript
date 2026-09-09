@@ -35,6 +35,7 @@ for (const change of ['unchanged', 'timestamp', 'pending', 'expired', 'removed',
     const client = { ...fixtures.client, sessions: [session], last_active_session_id: session.id };
     const nextClient = {
       ...client,
+      id: change === 'replaced' ? 'replacement_client' : client.id,
       sessions:
         change === 'removed' ? [] : change === 'replaced' ? [{ ...session, id: 'replacement_session' }] : [next],
       last_active_session_id: change === 'replaced' ? 'replacement_session' : session.id,
@@ -62,6 +63,7 @@ for (const change of ['unchanged', 'timestamp', 'pending', 'expired', 'removed',
     }
     if (change === 'replaced') {
       const clerk = f.resource(f.state.roots.clerk);
+      assert.equal(clerk.clientId, 'replacement_client');
       assert.equal(f.resource(clerk.sessions[0].$ref).id, 'replacement_session');
     }
   });

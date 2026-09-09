@@ -125,3 +125,41 @@ test('an older foreground client reply cannot remove a task accepted by a newer 
   assert.equal(f.resource(f.state.roots.session).currentTask.key, 'choose-organization');
   assert.equal(f.credential, 'newer-response-credential');
 });
+
+test('authentication reset starts a new response-date history without signing out the session', async t => {
+  const active = sessionFixture();
+  const pending = { ...active, status: 'pending', tasks: [{ key: 'choose-organization' }] };
+  const client = { ...fixtures.client, sessions: [active], last_active_session_id: active.id };
+  const started = deferred(),
+    late = deferred();
+  let calls = 0;
+  const reply = (session, date) =>
+    response(session, {
+      headers: { date },
+      body: JSON.stringify({ response: session, client: { ...client, sessions: [session] } }),
+    });
+  const f = await fixture({
+    client,
+    http: request => {
+      if (!new URL(request.url).pathname.endsWith(`/sessions/${active.id}`)) return;
+      if (++calls === 1) return reply(active, after);
+      if (calls === 2) {
+        started.resolve();
+        return late.promise;
+      }
+      return reply(pending, earlier);
+    },
+  });
+  t.after(f.dispose);
+  assert.equal((await f.invoke(f.state.roots.session, 'Session.reload')).failure, undefined);
+  assert.equal((await f.invoke(f.state.roots.signIn, 'SignIn.reset')).failure, undefined);
+  assert.equal(f.resource(f.state.roots.session).status, 'active');
+  const first = f.invoke(f.state.roots.session, 'Session.reload');
+  await started.promise;
+  assert.equal((await f.invoke(f.state.roots.session, 'Session.reload')).failure, undefined);
+  assert.equal(f.resource(f.state.roots.session).status, 'pending');
+  late.resolve(reply(active, later));
+  const result = await first;
+  assert.equal(result.failure, undefined, JSON.stringify(result));
+  assert.equal(f.resource(f.state.roots.session).status, 'active');
+});
