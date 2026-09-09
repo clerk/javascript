@@ -28,6 +28,7 @@ import type {
   ResetPasswordPhoneCodeFactorConfig,
   TOTPAttempt,
   TOTPFactor,
+  TrustedDeviceFactor,
   Web3Attempt,
   Web3SignatureConfig,
   Web3SignatureFactor,
@@ -73,6 +74,7 @@ export type SignInIdentifier =
   | Web3WalletIdentifier;
 
 export type SignInFirstFactor =
+  | TrustedDeviceFactor
   | EmailCodeFactor
   | EmailLinkFactor
   | PhoneCodeFactor

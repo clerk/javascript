@@ -7016,6 +7016,7 @@ public sealed interface SignInFirstFactor {
   public data class Case8(val value: EnterpriseSSOFactor) : SignInFirstFactor
   public data class Case9(val value: ResetPasswordPhoneCodeFactor) : SignInFirstFactor
   public data class Case10(val value: ResetPasswordEmailCodeFactor) : SignInFirstFactor
+  public data class Case11(val value: TrustedDeviceFactor) : SignInFirstFactor
   public val `strategy`: String get() = when (this) {
     is Case1 -> value.`strategy`
     is Case2 -> value.`strategy`
@@ -7027,6 +7028,7 @@ public sealed interface SignInFirstFactor {
     is Case8 -> value.`strategy`
     is Case9 -> value.`strategy`
     is Case10 -> value.`strategy`
+    is Case11 -> value.`strategy`
   }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
@@ -7039,6 +7041,7 @@ public sealed interface SignInFirstFactor {
     is Case8 -> JsonObject(mapOf("\$case" to JsonPrimitive(7), "value" to value.toJson()))
     is Case9 -> JsonObject(mapOf("\$case" to JsonPrimitive(8), "value" to value.toJson()))
     is Case10 -> JsonObject(mapOf("\$case" to JsonPrimitive(9), "value" to value.toJson()))
+    is Case11 -> JsonObject(mapOf("\$case" to JsonPrimitive(10), "value" to value.toJson()))
   }
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInFirstFactor {
@@ -7055,6 +7058,7 @@ public sealed interface SignInFirstFactor {
         7 -> Case8(EnterpriseSSOFactor.fromJson(payload, runtime))
         8 -> Case9(ResetPasswordPhoneCodeFactor.fromJson(payload, runtime))
         9 -> Case10(ResetPasswordEmailCodeFactor.fromJson(payload, runtime))
+        10 -> Case11(TrustedDeviceFactor.fromJson(payload, runtime))
         else -> throw CoreException("invalid_value")
       }
     }
@@ -7137,6 +7141,25 @@ public data class ResetPasswordEmailCodeFactor(public val `emailAddressId`: Stri
       val values = value.jsonObject
       require(values["strategy"] == JsonPrimitive("reset_password_email_code"))
       return ResetPasswordEmailCodeFactor(`emailAddressId` = (values["emailAddressId"] ?: Undefined).requireString(), `safeIdentifier` = (values["safeIdentifier"] ?: Undefined).requireString(), `primary` = (values["primary"] ?: Undefined).decodeOptional { value -> value.requireBoolean() })
+    }
+  }
+}
+
+/**
+ * A device-bound credential offered by native sign-in.
+ */
+public data class TrustedDeviceFactor(public val `trustedDeviceId`: Field<String> = Field.Omitted, public val `safeIdentifier`: Field<String> = Field.Omitted) {
+  public val `strategy`: String get() = "trusted_device"
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("strategy", JsonPrimitive("trusted_device"))
+    putPresent("trustedDeviceId", this@TrustedDeviceFactor.`trustedDeviceId`.toJson { value -> JsonPrimitive(value) })
+    putPresent("safeIdentifier", this@TrustedDeviceFactor.`safeIdentifier`.toJson { value -> JsonPrimitive(value) })
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TrustedDeviceFactor {
+      val values = value.jsonObject
+      require(values["strategy"] == JsonPrimitive("trusted_device"))
+      return TrustedDeviceFactor(`trustedDeviceId` = Field.fromJson((values["trustedDeviceId"] ?: Undefined)) { value -> value.requireString() }, `safeIdentifier` = Field.fromJson((values["safeIdentifier"] ?: Undefined)) { value -> value.requireString() })
     }
   }
 }
@@ -9681,7 +9704,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "c93c04e868659c2ce38c509c54cc61ea2da62533f5f4caaf5f19a9afe7be5bdf"
+  public const val contractHash: String = "779dedc726a5c587629061d6e3ad89ef835e3f1f92566e8d19706c1cf5f14a33"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

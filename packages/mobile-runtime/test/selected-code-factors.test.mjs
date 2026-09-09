@@ -43,3 +43,69 @@ for (const [group, method, strategy, field, parameter, second] of [
     });
   }
 }
+
+test('native factor projection preserves known discriminants before unknown enum fallback', async t => {
+  const f = await fixture({
+    allowFailure: true,
+    client: {
+      ...fixtures.client,
+      sign_in: {
+        ...fixtures.signIn,
+        supported_first_factors: [
+          {
+            strategy: 'phone_code',
+            phone_number_id: 'idn_phone',
+            safe_identifier: '+15555550123',
+            primary: true,
+            default: true,
+          },
+          { strategy: 'trusted_device', trusted_device_id: 'tdc_123', safe_identifier: 'Test device' },
+          { strategy: 'reset_password_phone_code', phone_number_id: 'idn_reset', safe_identifier: 'reset-phone' },
+          { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_123', enterprise_connection_name: 'Acme' },
+          { strategy: 'oauth_custom_acme' },
+          { strategy: 'oauth_future_provider' },
+        ],
+      },
+    },
+  });
+  t.after(f.dispose);
+  assert.equal(f.ready.kind, 'ready', JSON.stringify(f.ready));
+  const factors = f.resource(f.state.roots.signIn).supportedFirstFactors.map(factor => factor.value);
+  assert.deepEqual(
+    factors.find(factor => factor.strategy === 'phone_code'),
+    {
+      strategy: 'phone_code',
+      phoneNumberId: 'idn_phone',
+      safeIdentifier: '+15555550123',
+      primary: true,
+      default: true,
+    },
+  );
+  assert.deepEqual(
+    factors.find(factor => factor.strategy === 'trusted_device'),
+    {
+      strategy: 'trusted_device',
+      trustedDeviceId: 'tdc_123',
+      safeIdentifier: 'Test device',
+    },
+  );
+  assert.deepEqual(
+    factors.find(factor => factor.strategy === 'reset_password_phone_code'),
+    {
+      strategy: 'reset_password_phone_code',
+      phoneNumberId: 'idn_reset',
+      safeIdentifier: 'reset-phone',
+    },
+  );
+  assert.deepEqual(
+    factors.find(factor => factor.strategy === 'enterprise_sso'),
+    {
+      strategy: 'enterprise_sso',
+      enterpriseConnectionId: 'ec_123',
+      enterpriseConnectionName: 'Acme',
+    },
+  );
+  assert.ok(factors.some(factor => factor.strategy === 'oauth_custom_acme'));
+  assert.ok(factors.some(factor => factor.strategy === 'oauth_future_provider'));
+  assert.equal(f.state.roots.session, null);
+});

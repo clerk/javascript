@@ -1311,7 +1311,7 @@ SignInEmailLinkVerificationStatus cases: verified, failed, expired, client_misma
 SignInEmailLinkVerificationStatus: Hashable
 SignInExistingSession.sessionId: String
 SignInExistingSession: Hashable
-SignInFirstFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | Web3SignatureFactor | PasswordFactor | PasskeyFactor | OauthFactor | EnterpriseSSOFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor
+SignInFirstFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | Web3SignatureFactor | PasswordFactor | PasskeyFactor | OauthFactor | EnterpriseSSOFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor | TrustedDeviceFactor
 SignInFirstFactor.strategy: String [shared union field]
 SignInFirstFactor: Hashable
 SignInMFAEmailCodeSendParams.emailAddressId: String? = nil
@@ -1610,6 +1610,10 @@ TelemetryLogEntry.userId: String? = nil
 TelemetryLogEntry: Hashable
 TelemetryLogEntryLevel cases: info, error, warn, debug, trace, unrecognized(String)
 TelemetryLogEntryLevel: Hashable
+TrustedDeviceFactor.safeIdentifier: Field<String> = .omitted
+TrustedDeviceFactor.strategy: String
+TrustedDeviceFactor.trustedDeviceId: Field<String> = .omitted
+TrustedDeviceFactor: Hashable
 UpdateEnrollmentModeParams.deletePending: Bool? = nil
 UpdateEnrollmentModeParams.enrollmentMode: OrganizationEnrollmentMode
 UpdateEnrollmentModeParams: Hashable
@@ -2044,6 +2048,7 @@ object TOTPAttempt
 object TOTPFactor
 object TelemetryEventRawRecord
 object TelemetryLogEntry
+object TrustedDeviceFactor
 object UpdateEnrollmentModeParams
 object UpdateMembershipParams
 object UpdateOrganizationEnterpriseConnectionParams

@@ -1054,7 +1054,7 @@ SignInEmailLinkVerification.status: SignInEmailLinkVerificationStatus
 SignInEmailLinkVerification.verifiedFromTheSameClient: Boolean
 SignInEmailLinkVerificationStatus cases: verified, failed, expired, client_mismatch, unrecognized(String)
 SignInExistingSession.sessionId: String
-SignInFirstFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | Web3SignatureFactor | PasswordFactor | PasskeyFactor | OauthFactor | EnterpriseSSOFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor
+SignInFirstFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | Web3SignatureFactor | PasswordFactor | PasskeyFactor | OauthFactor | EnterpriseSSOFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor | TrustedDeviceFactor
 SignInFirstFactor.strategy: String [shared union field]
 SignInMFAEmailCodeSendParams.emailAddressId: String? = null
 SignInMFAEmailCodeVerifyParams.code: String
@@ -1287,6 +1287,9 @@ TelemetryLogEntry.source: String? = null
 TelemetryLogEntry.timestamp: Double
 TelemetryLogEntry.userId: String? = null
 TelemetryLogEntryLevel cases: info, error, warn, debug, trace, unrecognized(String)
+TrustedDeviceFactor.safeIdentifier: Field<String> = Field.Omitted
+TrustedDeviceFactor.strategy: String
+TrustedDeviceFactor.trustedDeviceId: Field<String> = Field.Omitted
 UpdateEnrollmentModeParams.deletePending: Boolean? = null
 UpdateEnrollmentModeParams.enrollmentMode: OrganizationEnrollmentMode
 UpdateMembershipParams.role: String
@@ -1700,6 +1703,7 @@ object TOTPAttempt
 object TOTPFactor
 object TelemetryEventRawRecord
 object TelemetryLogEntry
+object TrustedDeviceFactor
 object UpdateEnrollmentModeParams
 object UpdateMembershipParams
 object UpdateOrganizationEnterpriseConnectionParams

@@ -21242,7 +21242,7 @@
       "name": "SignInFirstFactor",
       "source": {
         "file": "packages/shared/src/types/signInCommon.ts",
-        "line": 75,
+        "line": 76,
         "symbol": "SignInFirstFactor"
       },
       "kind": "union",
@@ -21288,6 +21288,10 @@
         {
           "kind": "ref",
           "name": "ResetPasswordEmailCodeFactor"
+        },
+        {
+          "kind": "ref",
+          "name": "TrustedDeviceFactor"
         }
       ]
     },
@@ -21601,11 +21605,73 @@
       ],
       "methods": []
     },
+    "TrustedDeviceFactor": {
+      "name": "TrustedDeviceFactor",
+      "source": {
+        "file": "packages/shared/src/types/factors.ts",
+        "line": 395,
+        "symbol": "TrustedDeviceFactor"
+      },
+      "documentation": "A device-bound credential offered by native sign-in.",
+      "kind": "object",
+      "properties": [
+        {
+          "name": "strategy",
+          "optional": false,
+          "type": {
+            "kind": "literal",
+            "value": "trusted_device"
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 396,
+            "symbol": "strategy"
+          }
+        },
+        {
+          "name": "trustedDeviceId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 398,
+            "symbol": "trustedDeviceId"
+          },
+          "documentation": "Credential identifier, when supplied by the server."
+        },
+        {
+          "name": "safeIdentifier",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 400,
+            "symbol": "safeIdentifier"
+          },
+          "documentation": "Server-provided display identifier for the device."
+        }
+      ],
+      "methods": []
+    },
     "SignInSecondFactor": {
       "name": "SignInSecondFactor",
       "source": {
         "file": "packages/shared/src/types/signInCommon.ts",
-        "line": 87,
+        "line": 89,
         "symbol": "SignInSecondFactor"
       },
       "kind": "union",
@@ -21642,7 +21708,7 @@
       "name": "SignInStatus",
       "source": {
         "file": "packages/shared/src/types/signInCommon.ts",
-        "line": 60,
+        "line": 61,
         "symbol": "SignInStatus"
       },
       "kind": "enum",
@@ -21689,7 +21755,7 @@
       "name": "UserData",
       "source": {
         "file": "packages/shared/src/types/signInCommon.ts",
-        "line": 95,
+        "line": 97,
         "symbol": "UserData"
       },
       "kind": "object",
@@ -21707,7 +21773,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInCommon.ts",
-            "line": 96,
+            "line": 98,
             "symbol": "firstName"
           }
         },
@@ -21724,7 +21790,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInCommon.ts",
-            "line": 97,
+            "line": 99,
             "symbol": "lastName"
           }
         },
@@ -21741,7 +21807,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInCommon.ts",
-            "line": 98,
+            "line": 100,
             "symbol": "imageUrl"
           }
         },
@@ -21758,7 +21824,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInCommon.ts",
-            "line": 99,
+            "line": 101,
             "symbol": "hasImage"
           }
         }
@@ -33201,6 +33267,18 @@
     },
     {
       "path": "ResetPasswordEmailCodeFactor.primary",
+      "disposition": "generated"
+    },
+    {
+      "path": "TrustedDeviceFactor.strategy",
+      "disposition": "generated"
+    },
+    {
+      "path": "TrustedDeviceFactor.trustedDeviceId",
+      "disposition": "generated"
+    },
+    {
+      "path": "TrustedDeviceFactor.safeIdentifier",
       "disposition": "generated"
     },
     {

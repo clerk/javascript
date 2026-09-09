@@ -390,3 +390,12 @@ export type ResetPasswordEmailCodeAttempt = {
    */
   password?: string;
 };
+
+/** A device-bound credential offered by native sign-in. */
+export type TrustedDeviceFactor = {
+  strategy: 'trusted_device';
+  /** Credential identifier, when supplied by the server. */
+  trustedDeviceId?: string | null;
+  /** Server-provided display identifier for the device. */
+  safeIdentifier?: string | null;
+};

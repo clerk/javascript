@@ -87,6 +87,62 @@ export function matches(shape: Shape, value: unknown, depth = 0): boolean {
   }
 }
 
+// Output enums preserve unknown values. Union selection must still favor a
+// recognized shared discriminator, or a broad enum branch can discard fields.
+function dereference(shape: Shape, depth = 0): Shape {
+  if (depth > 64) invalid();
+  return shape.kind === 'ref' ? dereference(schema[shape.name], depth + 1) : shape;
+}
+function stringDiscriminator(shape: Shape): boolean {
+  const resolved = dereference(shape);
+  return (
+    resolved.kind === 'string' ||
+    resolved.kind === 'enum' ||
+    (resolved.kind === 'literal' && typeof resolved.value === 'string')
+  );
+}
+function knownDiscriminator(shape: Shape, value: unknown): boolean {
+  const resolved = dereference(shape);
+  if (resolved.kind === 'literal') return value === resolved.value;
+  return (
+    resolved.kind === 'enum' &&
+    typeof value === 'string' &&
+    (resolved.values.includes(value) || resolved.patterns?.some((pattern: string) => new RegExp(pattern).test(value)))
+  );
+}
+function unionVariant(shape: Shape, value: unknown): number {
+  if (isObject(value)) {
+    const properties = shape.variants.map((variant: Shape) => dereference(variant).properties ?? []);
+    const keys = properties[0]
+      .filter(
+        (property: any) =>
+          !property.optional &&
+          stringDiscriminator(property.type) &&
+          properties.every((members: any[]) =>
+            members.some(
+              member => member.name === property.name && !member.optional && stringDiscriminator(member.type),
+            ),
+          ),
+      )
+      .map((property: any) => property.name);
+    const scores = properties.map(
+      (members: any[]) =>
+        keys.filter((key: string) => knownDiscriminator(members.find(member => member.name === key).type, value[key]))
+          .length,
+    );
+    const best = Math.max(...scores);
+    if (best > 0) {
+      const index = shape.variants.findIndex(
+        (variant: Shape, i: number) => scores[i] === best && matches(variant, value),
+      );
+      // A malformed known variant must not degrade into an unrelated enum fallback.
+      if (index < 0) invalid();
+      return index;
+    }
+  }
+  return shape.variants.findIndex((variant: Shape) => matches(variant, value));
+}
+
 function json(value: unknown, depth = 0): JSONValue {
   if (depth > 64) invalid();
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
@@ -122,7 +178,7 @@ export function encode(shape: Shape, value: any, resources: ResourceCodec, depth
     case 'tuple':
       return value.map((v: any, i: number) => encode(shape.elements[i], v, resources, depth + 1));
     case 'union': {
-      const index = shape.variants.findIndex((s: Shape) => matches(s, value));
+      const index = unionVariant(shape, value);
       return { $case: index, value: encode(shape.variants[index], value, resources, depth + 1) };
     }
     case 'object': {

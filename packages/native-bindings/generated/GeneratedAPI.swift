@@ -9475,6 +9475,7 @@ public indirect enum SignInFirstFactor: Hashable, Sendable {
   case case8(EnterpriseSSOFactor)
   case case9(ResetPasswordPhoneCodeFactor)
   case case10(ResetPasswordEmailCodeFactor)
+  case case11(TrustedDeviceFactor)
   @MainActor public var `strategy`: String {
     switch self {
     case .case1(let value): return value.`strategy`
@@ -9487,6 +9488,7 @@ public indirect enum SignInFirstFactor: Hashable, Sendable {
     case .case8(let value): return value.`strategy`
     case .case9(let value): return value.`strategy`
     case .case10(let value): return value.`strategy`
+    case .case11(let value): return value.`strategy`
     }
   }
   @MainActor public func encode() throws -> JSONValue {
@@ -9501,6 +9503,7 @@ public indirect enum SignInFirstFactor: Hashable, Sendable {
     case .case8(let value): return .object(["$case": .number(7), "value": try value.encode()])
     case .case9(let value): return .object(["$case": .number(8), "value": try value.encode()])
     case .case10(let value): return .object(["$case": .number(9), "value": try value.encode()])
+    case .case11(let value): return .object(["$case": .number(10), "value": try value.encode()])
     }
   }
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInFirstFactor {
@@ -9517,6 +9520,7 @@ public indirect enum SignInFirstFactor: Hashable, Sendable {
     case 7: return .case8(try EnterpriseSSOFactor.decode(payload, in: runtime))
     case 8: return .case9(try ResetPasswordPhoneCodeFactor.decode(payload, in: runtime))
     case 9: return .case10(try ResetPasswordEmailCodeFactor.decode(payload, in: runtime))
+    case 10: return .case11(try TrustedDeviceFactor.decode(payload, in: runtime))
     default: throw CoreError.invalidValue
     }
   }
@@ -9642,6 +9646,30 @@ public struct ResetPasswordEmailCodeFactor: Hashable, Sendable {
     let values = try value.object()
     guard values["strategy"] == .string("reset_password_email_code") else { throw CoreError.invalidValue }
     return try ResetPasswordEmailCodeFactor(`emailAddressId`: try (values["emailAddressId"] ?? .undefined).string(), `safeIdentifier`: try (values["safeIdentifier"] ?? .undefined).string(), `primary`: try (values["primary"] ?? .undefined).optional { value in try value.bool() })
+  }
+}
+
+/// A device-bound credential offered by native sign-in.
+public struct TrustedDeviceFactor: Hashable, Sendable {
+  public var `strategy`: String { "trusted_device" }
+  public let `trustedDeviceId`: Field<String>
+  public let `safeIdentifier`: Field<String>
+  public init(`trustedDeviceId`: Field<String> = .omitted, `safeIdentifier`: Field<String> = .omitted) {
+    self.`trustedDeviceId` = `trustedDeviceId`
+    self.`safeIdentifier` = `safeIdentifier`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "strategy": .string("trusted_device"),
+      "trustedDeviceId": try self.`trustedDeviceId`.encode { value in .string(value) },
+      "safeIdentifier": try self.`safeIdentifier`.encode { value in .string(value) }
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TrustedDeviceFactor {
+    let values = try value.object()
+    guard values["strategy"] == .string("trusted_device") else { throw CoreError.invalidValue }
+    return try TrustedDeviceFactor(`trustedDeviceId`: try Field.decode((values["trustedDeviceId"] ?? .undefined)) { value in try value.string() }, `safeIdentifier`: try Field.decode((values["safeIdentifier"] ?? .undefined)) { value in try value.string() })
   }
 }
 
@@ -12975,7 +13003,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "c93c04e868659c2ce38c509c54cc61ea2da62533f5f4caaf5f19a9afe7be5bdf"
+  public static let contractHash = "779dedc726a5c587629061d6e3ad89ef835e3f1f92566e8d19706c1cf5f14a33"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {
