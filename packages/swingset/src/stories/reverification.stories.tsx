@@ -40,10 +40,10 @@ const helpMessages = {
 };
 
 const allMethods: ReverificationMethod[] = [
-  { id: 'password', strategy: 'password' },
-  { id: 'passkey', strategy: 'passkey' },
-  { id: 'totp', strategy: 'totp' },
-  { id: 'backup_code', strategy: 'backup_code' },
+  { id: 'password', stage: 'first', strategy: 'password' },
+  { id: 'passkey', stage: 'first', strategy: 'passkey' },
+  { id: 'totp', stage: 'second', strategy: 'totp' },
+  { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
 ];
 
 function stepFor(id: string): ReverificationStep {

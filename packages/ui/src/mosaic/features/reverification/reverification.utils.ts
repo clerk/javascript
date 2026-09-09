@@ -1,11 +1,6 @@
 import type { PreferredSignInStrategy } from '@clerk/shared/types';
 
-import type {
-  ReverificationMethod,
-  ReverificationOtpChannel,
-  ReverificationResult,
-  ReverificationStrategy,
-} from './reverification.types';
+import type { ReverificationMethod, ReverificationOtpChannel, ReverificationStrategy } from './reverification.types';
 
 export function otpChannelFor(strategy: ReverificationStrategy): ReverificationOtpChannel | undefined {
   if (strategy === 'email_code') {
@@ -60,11 +55,10 @@ function pickStartingSecondFactor(methods: readonly ReverificationMethod[]): Rev
 
 export function pickStartingMethod(
   methods: readonly ReverificationMethod[],
-  status: ReverificationResult['status'],
   preferredSignInStrategy: PreferredSignInStrategy | undefined,
   webAuthnSupported: boolean,
 ): ReverificationMethod | null {
-  return status === 'needs_second_factor'
+  return methods[0]?.stage === 'second'
     ? pickStartingSecondFactor(methods)
     : pickStartingFirstFactor(methods, preferredSignInStrategy, webAuthnSupported);
 }
