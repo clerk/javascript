@@ -231,7 +231,13 @@ export abstract class BaseResource {
     const { action, body, method, path, signal } = params;
     // TODO @userland-errors:
     const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body, signal });
-    return this.fromJSON((json?.response || json) as J);
+    const resource = (json?.response || json) as J;
+    // A deletion receipt is not a replacement resource. The accompanying client
+    // has already been applied by _fetch; preserve fields on held references.
+    if (method === 'DELETE' && resource && 'deleted' in resource && resource.deleted === true) {
+      return this;
+    }
+    return this.fromJSON(resource);
   }
 
   protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {

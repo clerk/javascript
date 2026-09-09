@@ -108,6 +108,7 @@ for (const scenario of ['create', 'reauthorize', 'recreate']) {
     const body = new URLSearchParams(mutation.body);
     assert.equal(body.get('redirect_url'), callbackUrl);
     assert.equal(body.get('oidc_prompt'), 'consent login');
+    assert.deepEqual(body.getAll('additional_scope'), scopes);
     assert.equal(body.get('oidc_login_hint'), 'user@example.com');
     assert.equal(mutation.url.includes('/reauthorize'), scenario === 'reauthorize');
     const reload = requests.find(r => new URL(r.url).pathname.endsWith('/client'));
@@ -176,4 +177,51 @@ test('sign-out cancels pending account authorization and ignores a late callback
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(f.requests.length, before);
   assert.equal(f.state.roots.user, null);
+});
+
+test('external account deletion removes the account without corrupting a held resource', async t => {
+  const account = accountFixture();
+  const client = structuredClone(fixtures.authenticatedClient);
+  client.sessions[0].user.external_accounts = [account];
+  const f = await fixture({
+    client,
+    http: request => {
+      const url = new URL(request.url);
+      if (url.pathname.includes('/tokens')) return response(tokenFixture(), { body: JSON.stringify(tokenFixture()) });
+      if (url.pathname.endsWith('/touch')) return response(client.sessions[0]);
+      if (!url.pathname.includes('/external_accounts')) return;
+      assert.equal(url.pathname, '/v1/me/external_accounts/eac_native');
+      assert.equal(url.searchParams.get('_method') ?? request.method, 'DELETE');
+      client.sessions[0].user.external_accounts = [];
+      return response(null, {
+        body: JSON.stringify({ response: { object: 'external_account', id: account.id, deleted: true }, client }),
+      });
+    },
+  });
+  t.after(f.dispose);
+  const handle = f.resource(f.state.roots.user).externalAccounts[0].$ref;
+  const removed = await f.invoke(handle, 'ExternalAccount.destroy');
+  assert.equal(removed.failure, undefined, JSON.stringify(removed.failure));
+  assert.deepEqual(f.resource(f.state.roots.user).externalAccounts, []);
+  assert.equal(f.resource(handle).emailAddress, account.email_address);
+  assert.equal(f.resource(handle).provider, 'google');
+  assert.equal(
+    f.messages.some(message => message.kind === 'runtimeError'),
+    false,
+  );
+});
+
+test('external account reauthorization preserves multiple scopes and omits an absent OIDC prompt', async t => {
+  const f = await connectedFixture({ existing: true });
+  t.after(f.dispose);
+  const handle = f.resource(f.state.roots.user).externalAccounts[0].$ref;
+  const result = await f.invoke(handle, 'ExternalAccount.reauthorize', [{ additionalScopes: ['write', 'view'] }]);
+  assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+  const request = f.requests.find(r => r.url.includes('/reauthorize'));
+  assert.equal(request.method, 'POST');
+  assert.equal(new URL(request.url).searchParams.get('_method'), 'PATCH');
+  const body = new URLSearchParams(request.body);
+  assert.equal(body.get('redirect_url'), callbackUrl);
+  assert.deepEqual(body.getAll('additional_scope'), ['write', 'view']);
+  assert.equal(body.has('oidc_prompt'), false);
 });
