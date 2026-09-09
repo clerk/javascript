@@ -18,6 +18,12 @@ describe('getClerkQueryParam', () => {
     expect(getClerkQueryParam('__clerk_status')).toBeNull();
   });
 
+  it('returns null in React Native where window has no location', () => {
+    Object.defineProperty(window, 'location', { value: undefined, writable: true });
+    expect(getClerkQueryParam('__clerk_status')).toBeNull();
+    expect(getClerkQueryParam('__clerk_ticket')).toBeNull();
+  });
+
   it('returns the value when parameter is present', () => {
     Object.defineProperty(window, 'location', {
       value: {

@@ -76,6 +76,7 @@ async function fixture(options = {}) {
     invalidateCredentials: () => mobile.invalidate(),
   });
   await core.load({ standardBrowser: false, telemetry: false, experimental: { runtimeEnvironment: 'headless' } });
+  if (options.reactNativeWindow) context.window = context;
   const attachments = [];
   function attach(configuration = {}) {
     const messages = [],
@@ -130,6 +131,15 @@ test('attached handshake validates the existing owner and bindings without anoth
   assert.equal((await f.attach({ contractHash: 'wrong' }).ready).failure.code, 'incompatible_bindings');
   assert.equal((await f.attach().ready).kind, 'ready');
   assert.equal(f.requests.length, count);
+});
+
+test('native snapshots tolerate the React Native window without a browser location', async t => {
+  const f = await fixture({ reactNativeWindow: true });
+  t.after(f.dispose);
+  const projection = f.attach();
+  assert.equal((await projection.ready).kind, 'ready');
+  const emailLink = projection.group('signIn', 'emailLink');
+  assert.equal(projection.resource(emailLink).verification, null);
 });
 
 test('native calls mutate the existing JavaScript facade and direct JavaScript reset invalidates its native group', async t => {

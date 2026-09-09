@@ -44,6 +44,7 @@ type ClerkQueryParamsToValuesMap = {
  *
  */
 export function getClerkQueryParam<T extends ClerkQueryParam>(param: T): ClerkQueryParamsToValuesMap[T] | null {
+  if (typeof window === 'undefined' || !window.location?.href) return null;
   const val = new URL(window.location.href).searchParams.get(param);
   return val ? (val as ClerkQueryParamsToValuesMap[T]) : null;
 }
