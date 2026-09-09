@@ -2,8 +2,6 @@ import * as VisuallyHiddenStories from './visually-hidden.stories';
 
 # VisuallyHidden
 
-VisuallyHidden removes content from the page visually while leaving it in the accessibility tree, so screen readers still announce it. Reach for it when the surrounding UI already carries the meaning visually — an icon-only control, a redundant column header — or when nothing should be painted at all, as with a live region. It renders a `<span>` by default; pass `render` where a `<span>` is not valid in context.
-
 Prefer it over `display: none` or `visibility: hidden`, which remove the content from the accessibility tree too, and over `aria-label` when the text is real copy that should be translated and selectable by assistive tech.
 
 ## Playground
