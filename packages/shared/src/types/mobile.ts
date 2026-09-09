@@ -10,13 +10,14 @@ import type { OrganizationResource } from './organization';
 export type MobileSetActiveParams = Omit<SetActiveParams, 'navigate' | 'redirectUrl'>;
 export type MobileSignOutOptions = Omit<SignOutOptions, 'redirectUrl'>;
 
-export type MobileAuthenticationResources = Pick<ClientResource, 'sessions' | 'lastAuthenticationStrategy'> & {
-  signIn: SignInFutureResource;
-  signUp: SignUpFutureResource;
-  environment: EnvironmentResource;
-};
+export type MobileAuthenticationResources = Pick<ClientResource, 'sessions' | 'lastAuthenticationStrategy'> &
+  Pick<Clerk, 'telemetry'> & {
+    signIn: SignInFutureResource;
+    signUp: SignUpFutureResource;
+    environment: EnvironmentResource;
+  };
 
-export type MobileClerk = Pick<Clerk, 'status' | 'loaded' | 'createOrganization' | 'getOrganization'> &
+export type MobileClerk = Pick<Clerk, 'status' | 'loaded' | 'createOrganization' | 'getOrganization' | 'telemetry'> &
   Pick<ClientResource, 'sessions' | 'lastAuthenticationStrategy'> & {
     readonly environment: EnvironmentResource;
     readonly session: SessionResource | null;

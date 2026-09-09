@@ -25,6 +25,18 @@ export const operations = {
     result: {"kind":"void"},
     invoke: (target, args) => target["signOut"](...args),
   },
+  "TelemetryCollector.record": {
+    type: "TelemetryCollector",
+    parameters: [{"name":"event","optional":false,"type":{"kind":"ref","name":"TelemetryEventRawRecord"}}],
+    result: {"kind":"void"},
+    invoke: (target, args) => target["record"](...args),
+  },
+  "TelemetryCollector.recordLog": {
+    type: "TelemetryCollector",
+    parameters: [{"name":"entry","optional":false,"type":{"kind":"ref","name":"TelemetryLogEntry"}}],
+    result: {"kind":"void"},
+    invoke: (target, args) => target["recordLog"](...args),
+  },
   "Organization.update": {
     type: "Organization",
     parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"UpdateOrganizationParams"}}],

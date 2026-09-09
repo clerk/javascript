@@ -198,3 +198,23 @@ test('a sparse dictionary adapter retains value types and checks the targeted me
     compile(source, { sparseDictionaries: { 'SignInFutureResource.missing': 'Stale policy.' } }).failures.length,
   );
 });
+
+test('JSON object policy supports recursive payload aliases and preserves optional presence', () => {
+  const fixture =
+    source.replace('attributes: Record<string, string>', 'attributes?: Payload') +
+    `
+    type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
+    type Payload = Record<string, JSONValue>;
+  `;
+  const model = compile(fixture, { jsonObjectMembers: { 'SignInFutureResource.attributes': 'Explicit event data.' } });
+  assert.deepEqual(model.failures, []);
+  assert.deepEqual(model.definitions.SignIn.properties.find(p => p.name === 'attributes').type, {
+    kind: 'optional',
+    nullable: false,
+    omittable: true,
+    value: { kind: 'jsonObject' },
+  });
+  assert.doesNotThrow(() => generateNative(model, { protocolVersion: 1, contractHash: 'fixture' }));
+  const invalid = compile(source, { jsonObjectMembers: { 'SignInFutureResource.id': 'Wrong target.' } });
+  assert.ok(invalid.failures.some(f => /string-indexed object/.test(f.reason)));
+});

@@ -31,7 +31,7 @@
       "name": "Clerk",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 19,
+        "line": 20,
         "symbol": "MobileClerk"
       },
       "kind": "resource",
@@ -49,6 +49,25 @@
             "symbol": "status"
           },
           "documentation": "The status of the `Clerk` instance. Possible values are:\n<ul>\n <li>`\"error\"`: Set when hotloading `clerk-js` or `Clerk.load()` failed.</li>\n <li>`\"loading\"`: Set during initialization.</li>\n <li>`\"ready\"`: Set when Clerk is fully operational.</li>\n <li>`\"degraded\"`: Set when Clerk is partially operational.</li>\n</ul>"
+        },
+        {
+          "name": "telemetry",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "TelemetryCollector"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/clerk.ts",
+            "line": 414,
+            "symbol": "telemetry"
+          },
+          "documentation": "[Telemetry](https://clerk.com/docs/guides/how-clerk-works/security/clerk-telemetry) configuration."
         },
         {
           "name": "loaded",
@@ -108,7 +127,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 21,
+            "line": 22,
             "symbol": "environment"
           }
         },
@@ -126,7 +145,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 22,
+            "line": 23,
             "symbol": "session"
           }
         },
@@ -144,7 +163,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 23,
+            "line": 24,
             "symbol": "user"
           }
         },
@@ -162,7 +181,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 24,
+            "line": 25,
             "symbol": "organization"
           }
         },
@@ -175,7 +194,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 25,
+            "line": 26,
             "symbol": "signIn"
           }
         },
@@ -188,7 +207,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 26,
+            "line": 27,
             "symbol": "signUp"
           }
         }
@@ -250,7 +269,7 @@
           "nativeName": "setActive",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 27,
+            "line": 28,
             "symbol": "setActive"
           },
           "parameters": [
@@ -274,7 +293,7 @@
           "nativeName": "signOut",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 28,
+            "line": 29,
             "symbol": "signOut"
           },
           "parameters": [
@@ -315,6 +334,298 @@
         "error",
         "loading",
         "ready"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "TelemetryCollector": {
+      "name": "TelemetryCollector",
+      "source": {
+        "file": "packages/shared/src/types/telemetry.ts",
+        "line": 63,
+        "symbol": "TelemetryCollector"
+      },
+      "kind": "resource",
+      "properties": [
+        {
+          "name": "isEnabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 67,
+            "symbol": "isEnabled"
+          },
+          "documentation": "Indicates whether telemetry is enabled."
+        },
+        {
+          "name": "isDebug",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 71,
+            "symbol": "isDebug"
+          },
+          "documentation": "If `true`, telemetry events are only logged to the console and not sent to Clerk."
+        }
+      ],
+      "methods": [
+        {
+          "name": "record",
+          "nativeName": "record",
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 75,
+            "symbol": "record"
+          },
+          "documentation": "Records a telemetry event.",
+          "parameters": [
+            {
+              "name": "event",
+              "optional": false,
+              "type": {
+                "kind": "ref",
+                "name": "TelemetryEventRawRecord"
+              }
+            }
+          ],
+          "result": {
+            "kind": "void"
+          },
+          "errorResult": false,
+          "asynchronous": false
+        },
+        {
+          "name": "recordLog",
+          "nativeName": "recordLog",
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 79,
+            "symbol": "recordLog"
+          },
+          "documentation": "Records a telemetry log entry.",
+          "parameters": [
+            {
+              "name": "entry",
+              "optional": false,
+              "type": {
+                "kind": "ref",
+                "name": "TelemetryLogEntry"
+              }
+            }
+          ],
+          "result": {
+            "kind": "void"
+          },
+          "errorResult": false,
+          "asynchronous": false
+        }
+      ]
+    },
+    "TelemetryEventRawRecord": {
+      "name": "TelemetryEventRawRecord",
+      "source": {
+        "file": "packages/shared/src/types/telemetry.ts",
+        "line": 40,
+        "symbol": "TelemetryEventRaw"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "event",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 41,
+            "symbol": "event"
+          }
+        },
+        {
+          "name": "eventSamplingRate",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "number"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 42,
+            "symbol": "eventSamplingRate"
+          }
+        },
+        {
+          "name": "payload",
+          "optional": false,
+          "type": {
+            "kind": "jsonObject"
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 43,
+            "symbol": "payload"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "TelemetryLogEntry": {
+      "name": "TelemetryLogEntry",
+      "source": {
+        "file": "packages/shared/src/types/telemetry.ts",
+        "line": 49,
+        "symbol": "TelemetryLogEntry"
+      },
+      "documentation": "Debug log entry interface for telemetry collector",
+      "kind": "object",
+      "properties": [
+        {
+          "name": "context",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "jsonObject"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 50,
+            "symbol": "context"
+          }
+        },
+        {
+          "name": "level",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "TelemetryLogEntryLevel"
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 51,
+            "symbol": "level"
+          }
+        },
+        {
+          "name": "message",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 52,
+            "symbol": "message"
+          }
+        },
+        {
+          "name": "organizationId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 53,
+            "symbol": "organizationId"
+          }
+        },
+        {
+          "name": "sessionId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 54,
+            "symbol": "sessionId"
+          }
+        },
+        {
+          "name": "source",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 55,
+            "symbol": "source"
+          }
+        },
+        {
+          "name": "timestamp",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 56,
+            "symbol": "timestamp"
+          }
+        },
+        {
+          "name": "userId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/telemetry.ts",
+            "line": 57,
+            "symbol": "userId"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "TelemetryLogEntryLevel": {
+      "name": "TelemetryLogEntryLevel",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "info",
+        "error",
+        "warn",
+        "debug",
+        "trace"
       ],
       "open": false,
       "patterns": []
@@ -26354,6 +26665,72 @@
   "accounting": [
     {
       "path": "MobileClerk.status",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileClerk.telemetry",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryCollector.isEnabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryCollector.isDebug",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryCollector.record",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryEventRaw.event",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryEventRaw.eventSamplingRate",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryEventRaw.payload",
+      "disposition": "adapted",
+      "reason": "Explicit telemetry event payload; never observable state."
+    },
+    {
+      "path": "TelemetryCollector.recordLog",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryLogEntry.context",
+      "disposition": "adapted",
+      "reason": "Explicit telemetry log context; never observable state."
+    },
+    {
+      "path": "TelemetryLogEntry.level",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryLogEntry.message",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryLogEntry.organizationId",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryLogEntry.sessionId",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryLogEntry.source",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryLogEntry.timestamp",
+      "disposition": "generated"
+    },
+    {
+      "path": "TelemetryLogEntry.userId",
       "disposition": "generated"
     },
     {

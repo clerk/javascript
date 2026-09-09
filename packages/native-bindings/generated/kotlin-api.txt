@@ -109,6 +109,7 @@ Clerk.signIn: SignIn
 Clerk.signOut(options: MobileSignOutOptions? = null): Unit [return]
 Clerk.signUp: SignUp
 Clerk.status: ClerkStatus
+Clerk.telemetry: TelemetryCollector? = null
 Clerk.user: User?
 ClerkAPIError.code: String
 ClerkAPIError.longMessage: String? = null
@@ -1187,6 +1188,22 @@ TOTP.verified: Boolean
 TOTPAttempt.code: String
 TOTPAttempt.strategy: String
 TOTPFactor.strategy: String
+TelemetryCollector.isDebug: Boolean
+TelemetryCollector.isEnabled: Boolean
+TelemetryCollector.record(event: TelemetryEventRawRecord): Unit [return]
+TelemetryCollector.recordLog(entry: TelemetryLogEntry): Unit [return]
+TelemetryEventRawRecord.event: String
+TelemetryEventRawRecord.eventSamplingRate: Double? = null
+TelemetryEventRawRecord.payload: JsonObject
+TelemetryLogEntry.context: JsonObject? = null
+TelemetryLogEntry.level: TelemetryLogEntryLevel
+TelemetryLogEntry.message: String
+TelemetryLogEntry.organizationId: String? = null
+TelemetryLogEntry.sessionId: String? = null
+TelemetryLogEntry.source: String? = null
+TelemetryLogEntry.timestamp: Double
+TelemetryLogEntry.userId: String? = null
+TelemetryLogEntryLevel cases: info, error, warn, debug, trace, unrecognized(String)
 UpdateEnrollmentModeParams.deletePending: Boolean? = null
 UpdateEnrollmentModeParams.enrollmentMode: OrganizationEnrollmentMode
 UpdateMembershipParams.role: String
@@ -1385,6 +1402,7 @@ enum SignUpField
 enum SignUpIdentificationField
 enum SignUpModes
 enum SignUpStatus
+enum TelemetryLogEntryLevel
 enum VerificationStatus
 enum VerificationStrategy
 object APIKeysSettings
@@ -1574,6 +1592,8 @@ object StartEnterpriseSSOLinkFlowParams
 object TOTP
 object TOTPAttempt
 object TOTPFactor
+object TelemetryEventRawRecord
+object TelemetryLogEntry
 object UpdateEnrollmentModeParams
 object UpdateMembershipParams
 object UpdateOrganizationEnterpriseConnectionParams
@@ -1629,6 +1649,7 @@ resource SignInResetPasswordPhoneCode
 resource SignUp
 resource SignUpVerification
 resource SignUpVerifications
+resource TelemetryCollector
 resource User
 resource UserOrganizationInvitation
 resource Verification

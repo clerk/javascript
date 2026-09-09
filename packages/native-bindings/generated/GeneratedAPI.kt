@@ -10,9 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.*
 
-public data class ClerkState(public val `status`: ClerkStatus, public val `loaded`: Boolean, public val `sessions`: List<Session>, public val `lastAuthenticationStrategy`: LastAuthenticationStrategy?, public val `environment`: EnvironmentResource, public val `session`: Session?, public val `user`: User?, public val `organization`: Organization?, public val `signIn`: SignIn, public val `signUp`: SignUp) {
+public data class ClerkState(public val `status`: ClerkStatus, public val `telemetry`: TelemetryCollector? = null, public val `loaded`: Boolean, public val `sessions`: List<Session>, public val `lastAuthenticationStrategy`: LastAuthenticationStrategy?, public val `environment`: EnvironmentResource, public val `session`: Session?, public val `user`: User?, public val `organization`: Organization?, public val `signIn`: SignIn, public val `signUp`: SignUp) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("status", this@ClerkState.`status`.toJson())
+    putPresent("telemetry", this@ClerkState.`telemetry`?.let { value -> value.toJson() } ?: Undefined)
     putPresent("loaded", JsonPrimitive(this@ClerkState.`loaded`))
     putPresent("sessions", JsonArray(this@ClerkState.`sessions`.map { value -> value.toJson() }))
     putPresent("lastAuthenticationStrategy", this@ClerkState.`lastAuthenticationStrategy`?.let { value -> value.toJson() } ?: JsonNull)
@@ -27,7 +28,7 @@ public data class ClerkState(public val `status`: ClerkStatus, public val `loade
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): ClerkState {
       val values = value.jsonObject
 
-      return ClerkState(`status` = ClerkStatus.fromJson((values["status"] ?: Undefined), runtime), `loaded` = (values["loaded"] ?: Undefined).requireBoolean(), `sessions` = (values["sessions"] ?: Undefined).jsonArray.map { value -> Session.fromJson(value, runtime) }, `lastAuthenticationStrategy` = (values["lastAuthenticationStrategy"] ?: Undefined).decodeOptional { value -> LastAuthenticationStrategy.fromJson(value, runtime) }, `environment` = EnvironmentResource.fromJson((values["environment"] ?: Undefined), runtime), `session` = (values["session"] ?: Undefined).decodeOptional { value -> Session.fromJson(value, runtime) }, `user` = (values["user"] ?: Undefined).decodeOptional { value -> User.fromJson(value, runtime) }, `organization` = (values["organization"] ?: Undefined).decodeOptional { value -> Organization.fromJson(value, runtime) }, `signIn` = SignIn.fromJson((values["signIn"] ?: Undefined), runtime), `signUp` = SignUp.fromJson((values["signUp"] ?: Undefined), runtime))
+      return ClerkState(`status` = ClerkStatus.fromJson((values["status"] ?: Undefined), runtime), `telemetry` = (values["telemetry"] ?: Undefined).decodeOptional { value -> TelemetryCollector.fromJson(value, runtime) }, `loaded` = (values["loaded"] ?: Undefined).requireBoolean(), `sessions` = (values["sessions"] ?: Undefined).jsonArray.map { value -> Session.fromJson(value, runtime) }, `lastAuthenticationStrategy` = (values["lastAuthenticationStrategy"] ?: Undefined).decodeOptional { value -> LastAuthenticationStrategy.fromJson(value, runtime) }, `environment` = EnvironmentResource.fromJson((values["environment"] ?: Undefined), runtime), `session` = (values["session"] ?: Undefined).decodeOptional { value -> Session.fromJson(value, runtime) }, `user` = (values["user"] ?: Undefined).decodeOptional { value -> User.fromJson(value, runtime) }, `organization` = (values["organization"] ?: Undefined).decodeOptional { value -> Organization.fromJson(value, runtime) }, `signIn` = SignIn.fromJson((values["signIn"] ?: Undefined), runtime), `signUp` = SignUp.fromJson((values["signUp"] ?: Undefined), runtime))
     }
   }
 }
@@ -37,6 +38,7 @@ public class Clerk(override val handle: ResourceHandle, runtime: CoreRuntime) : 
   public val changes: Flow<ClerkState> = runtime.changes.map { state }
   override val isInvalidated: Boolean get() = context.isInvalidated(handle)
   public val `status`: ClerkStatus get() = state.`status`
+  public val `telemetry`: TelemetryCollector? get() = state.`telemetry`
   public val `loaded`: Boolean get() = state.`loaded`
   public val `sessions`: List<Session> get() = state.`sessions`
   public val `lastAuthenticationStrategy`: LastAuthenticationStrategy? get() = state.`lastAuthenticationStrategy`
@@ -99,6 +101,109 @@ public sealed class ClerkStatus(public val rawValue: String) {
       "error" -> Error
       "loading" -> Loading
       "ready" -> Ready
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public data class TelemetryCollectorState(public val `isEnabled`: Boolean, public val `isDebug`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("isEnabled", JsonPrimitive(this@TelemetryCollectorState.`isEnabled`))
+    putPresent("isDebug", JsonPrimitive(this@TelemetryCollectorState.`isDebug`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TelemetryCollectorState {
+      val values = value.jsonObject
+
+      return TelemetryCollectorState(`isEnabled` = (values["isEnabled"] ?: Undefined).requireBoolean(), `isDebug` = (values["isDebug"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+public class TelemetryCollector(override val handle: ResourceHandle, runtime: CoreRuntime) : CoreResource {
+  override val context: ResourceContext = ResourceContext(runtime, handle, false)
+  public val state: TelemetryCollectorState get() = context.state(handle)
+  public val changes: Flow<TelemetryCollectorState> = runtime.changes.map { state }
+  override val isInvalidated: Boolean get() = context.isInvalidated(handle)
+  public val `isEnabled`: Boolean get() = state.`isEnabled`
+  public val `isDebug`: Boolean get() = state.`isDebug`
+  override fun prepare(value: JsonElement): Any = TelemetryCollectorState.fromJson(value, context.requireRuntime())
+  public fun toJson(): JsonElement = buildJsonObject { put("\$ref", handle.toJson()) }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TelemetryCollector = runtime.resource(ResourceHandle.fromReference(value)) as TelemetryCollector
+  }
+  /**
+   * Records a telemetry event.
+   */
+  public suspend fun `record`(`event`: TelemetryEventRawRecord): Unit {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "TelemetryCollector.record", listOf(`event`.toJson())) { result ->
+      Unit
+    }
+  }
+  /**
+   * Records a telemetry log entry.
+   */
+  public suspend fun `recordLog`(`entry`: TelemetryLogEntry): Unit {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "TelemetryCollector.recordLog", listOf(`entry`.toJson())) { result ->
+      Unit
+    }
+  }
+}
+
+public data class TelemetryEventRawRecord(public val `event`: String, public val `eventSamplingRate`: Double? = null, public val `payload`: JsonObject) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("event", JsonPrimitive(this@TelemetryEventRawRecord.`event`))
+    putPresent("eventSamplingRate", this@TelemetryEventRawRecord.`eventSamplingRate`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("payload", this@TelemetryEventRawRecord.`payload`)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TelemetryEventRawRecord {
+      val values = value.jsonObject
+
+      return TelemetryEventRawRecord(`event` = (values["event"] ?: Undefined).requireString(), `eventSamplingRate` = (values["eventSamplingRate"] ?: Undefined).decodeOptional { value -> value.requireDouble() }, `payload` = (values["payload"] ?: Undefined).jsonObject)
+    }
+  }
+}
+
+/**
+ * Debug log entry interface for telemetry collector
+ */
+public data class TelemetryLogEntry(public val `context`: JsonObject? = null, public val `level`: TelemetryLogEntryLevel, public val `message`: String, public val `organizationId`: String? = null, public val `sessionId`: String? = null, public val `source`: String? = null, public val `timestamp`: Double, public val `userId`: String? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("context", this@TelemetryLogEntry.`context`?.let { value -> value } ?: Undefined)
+    putPresent("level", this@TelemetryLogEntry.`level`.toJson())
+    putPresent("message", JsonPrimitive(this@TelemetryLogEntry.`message`))
+    putPresent("organizationId", this@TelemetryLogEntry.`organizationId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("sessionId", this@TelemetryLogEntry.`sessionId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("source", this@TelemetryLogEntry.`source`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("timestamp", JsonPrimitive(this@TelemetryLogEntry.`timestamp`))
+    putPresent("userId", this@TelemetryLogEntry.`userId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TelemetryLogEntry {
+      val values = value.jsonObject
+
+      return TelemetryLogEntry(`context` = (values["context"] ?: Undefined).decodeOptional { value -> value.jsonObject }, `level` = TelemetryLogEntryLevel.fromJson((values["level"] ?: Undefined), runtime), `message` = (values["message"] ?: Undefined).requireString(), `organizationId` = (values["organizationId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `sessionId` = (values["sessionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `source` = (values["source"] ?: Undefined).decodeOptional { value -> value.requireString() }, `timestamp` = (values["timestamp"] ?: Undefined).requireDouble(), `userId` = (values["userId"] ?: Undefined).decodeOptional { value -> value.requireString() })
+    }
+  }
+}
+
+public sealed class TelemetryLogEntryLevel(public val rawValue: String) {
+  public data object Info : TelemetryLogEntryLevel("info")
+  public data object Error : TelemetryLogEntryLevel("error")
+  public data object Warn : TelemetryLogEntryLevel("warn")
+  public data object Debug : TelemetryLogEntryLevel("debug")
+  public data object Trace : TelemetryLogEntryLevel("trace")
+  public data class Unrecognized(val value: String) : TelemetryLogEntryLevel(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TelemetryLogEntryLevel = when (val raw = value.requireString()) {
+      "info" -> Info
+      "error" -> Error
+      "warn" -> Warn
+      "debug" -> Debug
+      "trace" -> Trace
       else -> Unrecognized(raw)
     }
   }
@@ -8937,10 +9042,11 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "bbc6f79351299de62809361ca0f66fd4b488bcbd7639c5c2e10bfb108fee1f28"
+  public const val contractHash: String = "65cc81da41b05e4f943f819c4f4801bb632dc9f05a359ff18f654c02cec8d6de"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)
+    "TelemetryCollector" -> TelemetryCollector(handle, runtime)
     "Organization" -> Organization(handle, runtime)
     "OrganizationMembership" -> OrganizationMembership(handle, runtime)
     "OrganizationInvitation" -> OrganizationInvitation(handle, runtime)

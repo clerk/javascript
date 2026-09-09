@@ -11,6 +11,10 @@ export const profile = {
     'ActClaim',
     'AgentActClaim',
   ],
+  jsonObjectMembers: {
+    'TelemetryEventRaw.payload': 'Explicit telemetry event payload; never observable state.',
+    'TelemetryLogEntry.context': 'Explicit telemetry log context; never observable state.',
+  },
   jsonMembers: {
     'ExternalAccountResource.publicMetadata': 'User-defined JSON metadata.',
     'EnterpriseAccountResource.publicMetadata': 'User-defined JSON metadata.',

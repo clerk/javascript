@@ -75,9 +75,21 @@ export function compileProfile(repository, policy = profile) {
   }
 
   function classify(symbol, owner, member) {
-    const declarationOwner = symbol.declarations?.[0]?.parent?.name?.getText();
+    const declarationParent = symbol.declarations?.[0]?.parent;
+    const declarationOwner =
+      declarationParent?.name?.getText() ??
+      (declarationParent &&
+      ts.isTypeLiteralNode(declarationParent) &&
+      ts.isTypeAliasDeclaration(declarationParent.parent)
+        ? declarationParent.parent.name.text
+        : undefined);
     const keys = [`${owner}.${member}`, `${declarationOwner}.${member}`];
     for (const key of keys) {
+      if (policy.jsonObjectMembers?.[key]) {
+        overridesUsed.add(key);
+        accounting.push({ path: `${owner}.${member}`, disposition: 'adapted', reason: policy.jsonObjectMembers[key] });
+        return 'jsonObject';
+      }
       if (policy.sparseDictionaries?.[key]) {
         overridesUsed.add(key);
         accounting.push({ path: `${owner}.${member}`, disposition: 'adapted', reason: policy.sparseDictionaries[key] });
@@ -399,7 +411,29 @@ export function compileProfile(repository, policy = profile) {
           asynchronous: awaited !== result,
         });
       } else {
-        let shape = lower(propertyType, memberHint, { ...resourceContext, jsonValue: disposition === 'json' });
+        let shape;
+        if (disposition === 'jsonObject') {
+          const present = checker.getNonNullableType(propertyType);
+          if (!checker.getIndexTypeOfType(present, ts.IndexKind.String))
+            unsupported(
+              propertyType,
+              `${owner}.${propertyName}`,
+              'JSON object policy requires a string-indexed object.',
+            );
+          shape = { kind: 'jsonObject' };
+          const nullish = propertyType.isUnion()
+            ? propertyType.types.filter(t => t.flags & (ts.TypeFlags.Null | ts.TypeFlags.Undefined))
+            : [];
+          if (nullish.length)
+            shape = {
+              kind: 'optional',
+              nullable: nullish.some(t => t.flags & ts.TypeFlags.Null),
+              omittable: nullish.some(t => t.flags & ts.TypeFlags.Undefined),
+              value: shape,
+            };
+        } else {
+          shape = lower(propertyType, memberHint, { ...resourceContext, jsonValue: disposition === 'json' });
+        }
         if (disposition === 'sparseDictionary') {
           if (shape.kind !== 'dictionary')
             unsupported(
@@ -436,6 +470,7 @@ export function compileProfile(repository, policy = profile) {
     ...Object.keys(policy.excluded),
     ...Object.keys(policy.adapted),
     ...Object.keys(policy.jsonMembers || {}),
+    ...Object.keys(policy.jsonObjectMembers || {}),
     ...Object.keys(policy.explicitReads || {}),
     ...Object.keys(policy.sparseDictionaries || {}),
   ]) {

@@ -133,6 +133,7 @@ Clerk.signIn: SignIn
 Clerk.signOut(options: MobileSignOutOptions? = nil): Void [return]
 Clerk.signUp: SignUp
 Clerk.status: ClerkStatus
+Clerk.telemetry: TelemetryCollector? = nil
 Clerk.user: User?
 Clerk: Hashable
 ClerkAPIError.code: String
@@ -1478,6 +1479,26 @@ TOTPAttempt.strategy: String
 TOTPAttempt: Hashable
 TOTPFactor.strategy: String
 TOTPFactor: Hashable
+TelemetryCollector.isDebug: Bool
+TelemetryCollector.isEnabled: Bool
+TelemetryCollector.record(event: TelemetryEventRawRecord): Void [return]
+TelemetryCollector.recordLog(entry: TelemetryLogEntry): Void [return]
+TelemetryCollector: Hashable
+TelemetryEventRawRecord.event: String
+TelemetryEventRawRecord.eventSamplingRate: Double? = nil
+TelemetryEventRawRecord.payload: [String: JSONValue]
+TelemetryEventRawRecord: Hashable
+TelemetryLogEntry.context: [String: JSONValue]? = nil
+TelemetryLogEntry.level: TelemetryLogEntryLevel
+TelemetryLogEntry.message: String
+TelemetryLogEntry.organizationId: String? = nil
+TelemetryLogEntry.sessionId: String? = nil
+TelemetryLogEntry.source: String? = nil
+TelemetryLogEntry.timestamp: Double
+TelemetryLogEntry.userId: String? = nil
+TelemetryLogEntry: Hashable
+TelemetryLogEntryLevel cases: info, error, warn, debug, trace, unrecognized(String)
+TelemetryLogEntryLevel: Hashable
 UpdateEnrollmentModeParams.deletePending: Bool? = nil
 UpdateEnrollmentModeParams.enrollmentMode: OrganizationEnrollmentMode
 UpdateEnrollmentModeParams: Hashable
@@ -1697,6 +1718,7 @@ enum SignUpField
 enum SignUpIdentificationField
 enum SignUpModes
 enum SignUpStatus
+enum TelemetryLogEntryLevel
 enum VerificationStatus
 enum VerificationStrategy
 object APIKeysSettings
@@ -1886,6 +1908,8 @@ object StartEnterpriseSSOLinkFlowParams
 object TOTP
 object TOTPAttempt
 object TOTPFactor
+object TelemetryEventRawRecord
+object TelemetryLogEntry
 object UpdateEnrollmentModeParams
 object UpdateMembershipParams
 object UpdateOrganizationEnterpriseConnectionParams
@@ -1941,6 +1965,7 @@ resource SignInResetPasswordPhoneCode
 resource SignUp
 resource SignUpVerification
 resource SignUpVerifications
+resource TelemetryCollector
 resource User
 resource UserOrganizationInvitation
 resource Verification

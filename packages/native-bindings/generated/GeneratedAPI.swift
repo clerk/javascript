@@ -4,6 +4,7 @@ import Observation
 
 public struct ClerkState: Hashable, Sendable {
   public let `status`: ClerkStatus
+  public let `telemetry`: TelemetryCollector?
   public let `loaded`: Bool
   public let `sessions`: [Session]
   public let `lastAuthenticationStrategy`: LastAuthenticationStrategy?
@@ -13,8 +14,9 @@ public struct ClerkState: Hashable, Sendable {
   public let `organization`: Organization?
   public let `signIn`: SignIn
   public let `signUp`: SignUp
-  public init(`status`: ClerkStatus, `loaded`: Bool, `sessions`: [Session], `lastAuthenticationStrategy`: LastAuthenticationStrategy?, `environment`: EnvironmentResource, `session`: Session?, `user`: User?, `organization`: Organization?, `signIn`: SignIn, `signUp`: SignUp) {
+  public init(`status`: ClerkStatus, `telemetry`: TelemetryCollector? = nil, `loaded`: Bool, `sessions`: [Session], `lastAuthenticationStrategy`: LastAuthenticationStrategy?, `environment`: EnvironmentResource, `session`: Session?, `user`: User?, `organization`: Organization?, `signIn`: SignIn, `signUp`: SignUp) {
     self.`status` = `status`
+    self.`telemetry` = `telemetry`
     self.`loaded` = `loaded`
     self.`sessions` = `sessions`
     self.`lastAuthenticationStrategy` = `lastAuthenticationStrategy`
@@ -28,6 +30,7 @@ public struct ClerkState: Hashable, Sendable {
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
       "status": try self.`status`.encode(),
+      "telemetry": try self.`telemetry`.map { value in try value.encode() } ?? .undefined,
       "loaded": .bool(self.`loaded`),
       "sessions": .array(try self.`sessions`.map { value in try value.encode() }),
       "lastAuthenticationStrategy": try self.`lastAuthenticationStrategy`.map { value in try value.encode() } ?? .null,
@@ -43,7 +46,7 @@ public struct ClerkState: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ClerkState {
     let values = try value.object()
 
-    return try ClerkState(`status`: try ClerkStatus.decode((values["status"] ?? .undefined), in: runtime), `loaded`: try (values["loaded"] ?? .undefined).bool(), `sessions`: try (values["sessions"] ?? .undefined).array().map { value in try Session.decode(value, in: runtime) }, `lastAuthenticationStrategy`: try (values["lastAuthenticationStrategy"] ?? .undefined).optional { value in try LastAuthenticationStrategy.decode(value, in: runtime) }, `environment`: try EnvironmentResource.decode((values["environment"] ?? .undefined), in: runtime), `session`: try (values["session"] ?? .undefined).optional { value in try Session.decode(value, in: runtime) }, `user`: try (values["user"] ?? .undefined).optional { value in try User.decode(value, in: runtime) }, `organization`: try (values["organization"] ?? .undefined).optional { value in try Organization.decode(value, in: runtime) }, `signIn`: try SignIn.decode((values["signIn"] ?? .undefined), in: runtime), `signUp`: try SignUp.decode((values["signUp"] ?? .undefined), in: runtime))
+    return try ClerkState(`status`: try ClerkStatus.decode((values["status"] ?? .undefined), in: runtime), `telemetry`: try (values["telemetry"] ?? .undefined).optional { value in try TelemetryCollector.decode(value, in: runtime) }, `loaded`: try (values["loaded"] ?? .undefined).bool(), `sessions`: try (values["sessions"] ?? .undefined).array().map { value in try Session.decode(value, in: runtime) }, `lastAuthenticationStrategy`: try (values["lastAuthenticationStrategy"] ?? .undefined).optional { value in try LastAuthenticationStrategy.decode(value, in: runtime) }, `environment`: try EnvironmentResource.decode((values["environment"] ?? .undefined), in: runtime), `session`: try (values["session"] ?? .undefined).optional { value in try Session.decode(value, in: runtime) }, `user`: try (values["user"] ?? .undefined).optional { value in try User.decode(value, in: runtime) }, `organization`: try (values["organization"] ?? .undefined).optional { value in try Organization.decode(value, in: runtime) }, `signIn`: try SignIn.decode((values["signIn"] ?? .undefined), in: runtime), `signUp`: try SignUp.decode((values["signUp"] ?? .undefined), in: runtime))
   }
 }
 @MainActor @Observable public final class Clerk: CoreResource {
@@ -53,6 +56,7 @@ public struct ClerkState: Hashable, Sendable {
   public var state: ClerkState { context.state(handle, as: ClerkState.self) }
   public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: true) }
   public var `status`: ClerkStatus { state.`status` }
+  public var `telemetry`: TelemetryCollector? { state.`telemetry` }
   public var `loaded`: Bool { state.`loaded` }
   public var `sessions`: [Session] { state.`sessions` }
   public var `lastAuthenticationStrategy`: LastAuthenticationStrategy? { state.`lastAuthenticationStrategy` }
@@ -122,6 +126,148 @@ public enum ClerkStatus: Hashable, Sendable {
   }
   public func encode() throws -> JSONValue { .string(rawValue) }
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ClerkStatus { .init(rawValue: try value.string()) }
+}
+
+public struct TelemetryCollectorState: Hashable, Sendable {
+  public let `isEnabled`: Bool
+  public let `isDebug`: Bool
+  public init(`isEnabled`: Bool, `isDebug`: Bool) {
+    self.`isEnabled` = `isEnabled`
+    self.`isDebug` = `isDebug`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "isEnabled": .bool(self.`isEnabled`),
+      "isDebug": .bool(self.`isDebug`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TelemetryCollectorState {
+    let values = try value.object()
+
+    return try TelemetryCollectorState(`isEnabled`: try (values["isEnabled"] ?? .undefined).bool(), `isDebug`: try (values["isDebug"] ?? .undefined).bool())
+  }
+}
+@MainActor @Observable public final class TelemetryCollector: CoreResource {
+  public let handle: ResourceHandle
+  public let context: ResourceContext
+  public var isInvalidated: Bool { context.isInvalidated(handle) }
+  public var state: TelemetryCollectorState { context.state(handle, as: TelemetryCollectorState.self) }
+  public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: false) }
+  public var `isEnabled`: Bool { state.`isEnabled` }
+  public var `isDebug`: Bool { state.`isDebug` }
+  public func prepare(_ value: JSONValue) throws -> any Sendable { try TelemetryCollectorState.decode(value, in: context.requireRuntime()) }
+  public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
+  public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TelemetryCollector { try runtime.resource(ResourceHandle.decodeReference(value), as: TelemetryCollector.self) }
+  /// Records a telemetry event.
+  public func `record`(_ `event`: TelemetryEventRawRecord) async throws {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "TelemetryCollector.record", arguments: [try `event`.encode()]) { result in
+      _ = result
+    }
+  }
+  /// Records a telemetry log entry.
+  public func `recordLog`(_ `entry`: TelemetryLogEntry) async throws {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "TelemetryCollector.recordLog", arguments: [try `entry`.encode()]) { result in
+      _ = result
+    }
+  }
+}
+
+public struct TelemetryEventRawRecord: Hashable, Sendable {
+  public let `event`: String
+  public let `eventSamplingRate`: Double?
+  public let `payload`: [String: JSONValue]
+  public init(`event`: String, `eventSamplingRate`: Double? = nil, `payload`: [String: JSONValue]) {
+    self.`event` = `event`
+    self.`eventSamplingRate` = `eventSamplingRate`
+    self.`payload` = `payload`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "event": .string(self.`event`),
+      "eventSamplingRate": try self.`eventSamplingRate`.map { value in .number(value) } ?? .undefined,
+      "payload": .object(self.`payload`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TelemetryEventRawRecord {
+    let values = try value.object()
+
+    return try TelemetryEventRawRecord(`event`: try (values["event"] ?? .undefined).string(), `eventSamplingRate`: try (values["eventSamplingRate"] ?? .undefined).optional { value in try value.number() }, `payload`: try (values["payload"] ?? .undefined).object())
+  }
+}
+
+/// Debug log entry interface for telemetry collector
+public struct TelemetryLogEntry: Hashable, Sendable {
+  public let `context`: [String: JSONValue]?
+  public let `level`: TelemetryLogEntryLevel
+  public let `message`: String
+  public let `organizationId`: String?
+  public let `sessionId`: String?
+  public let `source`: String?
+  public let `timestamp`: Double
+  public let `userId`: String?
+  public init(`context`: [String: JSONValue]? = nil, `level`: TelemetryLogEntryLevel, `message`: String, `organizationId`: String? = nil, `sessionId`: String? = nil, `source`: String? = nil, `timestamp`: Double, `userId`: String? = nil) {
+    self.`context` = `context`
+    self.`level` = `level`
+    self.`message` = `message`
+    self.`organizationId` = `organizationId`
+    self.`sessionId` = `sessionId`
+    self.`source` = `source`
+    self.`timestamp` = `timestamp`
+    self.`userId` = `userId`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "context": try self.`context`.map { value in .object(value) } ?? .undefined,
+      "level": try self.`level`.encode(),
+      "message": .string(self.`message`),
+      "organizationId": try self.`organizationId`.map { value in .string(value) } ?? .undefined,
+      "sessionId": try self.`sessionId`.map { value in .string(value) } ?? .undefined,
+      "source": try self.`source`.map { value in .string(value) } ?? .undefined,
+      "timestamp": .number(self.`timestamp`),
+      "userId": try self.`userId`.map { value in .string(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TelemetryLogEntry {
+    let values = try value.object()
+
+    return try TelemetryLogEntry(`context`: try (values["context"] ?? .undefined).optional { value in try value.object() }, `level`: try TelemetryLogEntryLevel.decode((values["level"] ?? .undefined), in: runtime), `message`: try (values["message"] ?? .undefined).string(), `organizationId`: try (values["organizationId"] ?? .undefined).optional { value in try value.string() }, `sessionId`: try (values["sessionId"] ?? .undefined).optional { value in try value.string() }, `source`: try (values["source"] ?? .undefined).optional { value in try value.string() }, `timestamp`: try (values["timestamp"] ?? .undefined).number(), `userId`: try (values["userId"] ?? .undefined).optional { value in try value.string() })
+  }
+}
+
+public enum TelemetryLogEntryLevel: Hashable, Sendable {
+  case `info`
+  case `error`
+  case `warn`
+  case `debug`
+  case `trace`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`info`: return "info"
+    case .`error`: return "error"
+    case .`warn`: return "warn"
+    case .`debug`: return "debug"
+    case .`trace`: return "trace"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "info": self = .`info`
+    case "error": self = .`error`
+    case "warn": self = .`warn`
+    case "debug": self = .`debug`
+    case "trace": self = .`trace`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TelemetryLogEntryLevel { .init(rawValue: try value.string()) }
 }
 
 public struct CreateOrganizationParams: Hashable, Sendable {
@@ -11930,11 +12076,12 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "bbc6f79351299de62809361ca0f66fd4b488bcbd7639c5c2e10bfb108fee1f28"
+  public static let contractHash = "65cc81da41b05e4f943f819c4f4801bb632dc9f05a359ff18f654c02cec8d6de"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {
     case "Clerk": return Clerk(handle: handle, runtime: runtime)
+    case "TelemetryCollector": return TelemetryCollector(handle: handle, runtime: runtime)
     case "Organization": return Organization(handle: handle, runtime: runtime)
     case "OrganizationMembership": return OrganizationMembership(handle: handle, runtime: runtime)
     case "OrganizationInvitation": return OrganizationInvitation(handle: handle, runtime: runtime)

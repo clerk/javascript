@@ -3200,6 +3200,7 @@ export class Clerk implements ClerkInterface {
       environment: this.environment,
       sessions: this.client.sessions,
       lastAuthenticationStrategy: this.client.lastAuthenticationStrategy,
+      telemetry: this.telemetry,
     };
   };
 
