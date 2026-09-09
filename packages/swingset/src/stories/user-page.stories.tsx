@@ -16,6 +16,8 @@ import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { usePreviewImage } from './fixtures/use-preview-image';
+
 export { default as __source } from './user-page.stories?raw';
 
 export const meta: StoryMeta = {
@@ -94,7 +96,7 @@ export function Default() {
   const [apiKeys, setAPIKeys] = useState(initialAPIKeys);
   const [apiKeysPageSize, setAPIKeysPageSize] = useState(10);
   const [searchValue, setSearchValue] = useState('');
-  const [imageUrl, setImageUrl] = useState<string | undefined>('https://avatars.githubusercontent.com/u/51144033?v=4');
+  const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const visibleAPIKeys = useMemo(
     () => apiKeys.filter(apiKey => apiKey.name.toLowerCase().includes(searchValue.toLowerCase())),
@@ -125,8 +127,8 @@ export function Default() {
           },
         ]),
       onDeleteAccount: () => Promise.resolve(),
-      onProfilePictureChange: (file: File) => setImageUrl(URL.createObjectURL(file)),
-      onRemoveProfilePicture: () => setImageUrl(undefined),
+      onProfilePictureChange: showFile,
+      onRemoveProfilePicture: clearImage,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onNameChange: () => undefined,

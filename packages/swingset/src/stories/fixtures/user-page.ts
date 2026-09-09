@@ -8,6 +8,8 @@ import type {
 import type { UserProfilePanelId } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
 import { useState } from 'react';
 
+import { usePreviewImage } from './use-preview-image';
+
 export interface UserPageFixtureOptions {
   /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
   onAddEmail?: () => void;
@@ -19,7 +21,7 @@ export interface UserPageFixtureOptions {
  */
 export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) {
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
-  const [imageUrl, setImageUrl] = useState<string | undefined>('https://avatars.githubusercontent.com/u/51144033?v=4');
+  const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
     { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
@@ -84,8 +86,8 @@ export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) 
           },
         ]),
       onDeleteAccount: () => Promise.resolve(),
-      onProfilePictureChange: (file: File) => setImageUrl(URL.createObjectURL(file)),
-      onRemoveProfilePicture: () => setImageUrl(undefined),
+      onProfilePictureChange: showFile,
+      onRemoveProfilePicture: clearImage,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onNameChange: () => undefined,

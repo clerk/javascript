@@ -48,8 +48,9 @@ export interface UserProfileAccountSectionViewProps {
   phones: UserProfilePhone[];
   onProfilePictureChange?: (file: File) => void;
   /**
-   * Called with the files the picker turned away for type or size. The row renders no error of its
-   * own, so a consumer that wants the user told has to surface these.
+   * Called with the files the picker turned away for type or size. The row already tells the user
+   * why, so this is for whatever else a consumer wants to do with them — logging, or a toast once
+   * there is one.
    */
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
   onRemoveProfilePicture?: () => void;

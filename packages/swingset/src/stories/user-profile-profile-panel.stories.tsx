@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { usePreviewImage } from './fixtures/use-preview-image';
+
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 const profileImageUrl = 'https://avatars.githubusercontent.com/u/51144033?v=4';
 
@@ -26,7 +28,7 @@ export function Default(_args: Record<string, unknown>) {
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
-  const [imageUrl, setImageUrl] = useState<string | undefined>(profileImageUrl);
+  const { imageUrl, showFile, clearImage } = usePreviewImage(profileImageUrl);
 
   return (
     <UserProfileProfilePanelView
@@ -83,9 +85,9 @@ export function Default(_args: Record<string, unknown>) {
       onDeleteAccount={() => Promise.resolve()}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
-      onProfilePictureChange={file => setImageUrl(URL.createObjectURL(file))}
+      onProfilePictureChange={showFile}
       onRemoveConnectedAccount={() => undefined}
-      onRemoveProfilePicture={() => setImageUrl(undefined)}
+      onRemoveProfilePicture={clearImage}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onConnectWeb3Wallet={() => undefined}
