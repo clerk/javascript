@@ -7,7 +7,7 @@ const compactCard = '@container card (max-width: 20rem)' as const;
 
 export const root = stylex.create({
   base: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     containerName: 'card',
     containerType: 'inline-size',
     display: 'flex',
@@ -18,7 +18,7 @@ export const root = stylex.create({
   card: {
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-background'],
     boxShadow: shadowVars['--cl-shadow-card'],
   },
   flush: {
@@ -30,7 +30,7 @@ export const root = stylex.create({
   overlay: {
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-background'],
     boxShadow: shadowVars['--cl-shadow-card'],
   },
 });
@@ -52,14 +52,14 @@ export const header = stylex.create({
     rowGap: space['1'],
   },
   title: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-base-size'],
     fontWeight: fontWeightVars['--cl-font-semibold'],
     lineHeight: typeScaleVars['--cl-text-base-leading'],
     textWrap: 'balance',
   },
   description: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textWrap: 'pretty',

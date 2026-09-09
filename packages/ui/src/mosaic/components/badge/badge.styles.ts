@@ -5,7 +5,7 @@ import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScale
 // warning/negative/positive fill with the subtle surface and use the saturated token as text;
 // primary fills with the solid token and uses its `-foreground` for text.
 //
-// Neutral has no subtle surface to fill — `--cl-color-neutral-faded` is a text gray, and its
+// Neutral has no subtle surface to fill — `--cl-color-foreground-secondary` is a text gray, and its
 // `-foreground` is a text color rather than an on-fill one, so it is unreadable against the solid
 // 900. It rides the same black/white scrim the button's neutral fill does, which composites against
 // any backdrop. Must be a local binding — StyleX inlines it; an imported one fails to compile.
@@ -29,12 +29,12 @@ export const styles = stylex.create({
 
 export const colors = stylex.create({
   primary: {
-    backgroundColor: colorVars['--cl-color-primary'],
-    color: colorVars['--cl-color-primary-foreground'],
+    backgroundColor: colorVars['--cl-color-brand'],
+    color: colorVars['--cl-color-brand-foreground'],
   },
   neutral: {
     backgroundColor: neutralScrim,
-    color: colorVars['--cl-color-neutral-foreground'],
+    color: colorVars['--cl-color-foreground'],
   },
   warning: {
     backgroundColor: colorVars['--cl-color-warning-subtle'],

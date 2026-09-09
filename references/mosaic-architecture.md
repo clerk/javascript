@@ -12,13 +12,13 @@ Once migration is complete, the old system is removed and Mosaic becomes the sol
 
 ## Token architecture
 
-Tokens are CSS custom properties declared through `stylex.defineVars` in `tokens.stylex.ts`. Each var is named explicitly (`'--cl-color-primary'`, not a generated hash) so it is a stable, documented handle a consumer can override:
+Tokens are CSS custom properties declared through `stylex.defineVars` in `tokens.stylex.ts`. Each var is named explicitly (`'--cl-color-brand'`, not a generated hash) so it is a stable, documented handle a consumer can override:
 
 ```ts
 // packages/ui/src/mosaic/tokens.stylex.ts
 export const colorVars = stylex.defineVars({
-  '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
-  '--cl-color-primary-foreground': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+  '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
   // …
 });
 ```
@@ -52,7 +52,7 @@ Two ways to style a part — both hit the same class + attributes:
   border-radius: 4px;
 }
 .cl-item[data-interactive] {
-  background-color: var(--cl-color-card);
+  background-color: var(--cl-color-background);
 }
 ```
 
@@ -92,9 +92,9 @@ const styles = stylex.create({
 // `color` and `variant` are independent props, but every pair resolves to one style, so they are
 // keyed compositely rather than merged at render time.
 const variants = stylex.create({
-  'filled-primary': { backgroundColor: colorVars['--cl-color-primary'], borderColor: 'transparent' },
+  'filled-primary': { backgroundColor: colorVars['--cl-color-brand'], borderColor: 'transparent' },
   'filled-negative': { backgroundColor: colorVars['--cl-color-negative'], borderColor: 'transparent' },
-  'outline-primary': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-primary'] },
+  'outline-primary': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-brand'] },
   'outline-negative': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-negative'] },
 });
 
@@ -437,7 +437,7 @@ To migrate a component from the old system to Mosaic:
    cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
    ```
 
-4. Update token references — e.g. `theme.colors.$primary500` → `colorVars['--cl-color-primary']`.
+4. Update token references — e.g. `theme.colors.$primary500` → `colorVars['--cl-color-brand']`.
 5. Export the component from `styles/index.ts` and run `pnpm build:mosaic`.
 
 The steps above cover the **styling** migration. For **flow** components — where the legacy component also fuses data-fetching and interaction state into the same file — splitting that into the model/controller/view layers and verifying no implicit behavior is dropped is its own end-to-end workflow. See the `mosaic` Claude Code skill (`.claude/skills/mosaic/`), in particular its `references/migration.md`.

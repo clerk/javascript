@@ -22,7 +22,7 @@ export type MosaicElementProps<Tag extends keyof React.JSX.IntrinsicElements> = 
 export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = ComponentProps<Tag>;
 
 // The public styling contract, emitted onto a component's root element:
-//   1. `--cl-*` vars      — from `tokens.stylex.ts` (`:root { --cl-color-primary: … }`)
+//   1. `--cl-*` vars      — from `tokens.stylex.ts` (`:root { --cl-color-brand: … }`)
 //   2. `.cl-<slot>` class — from `themeProps` (`.cl-button { … }`)
 //   3. `data-<axis>` attrs — from `themeProps` (`.cl-button[data-variant='outline']`)
 //

@@ -7,9 +7,9 @@ import * as stylex from '@stylexjs/stylex';
 // these become real, stable custom properties a consumer can override in plain
 // CSS without touching StyleX:
 //
-//   :root { --cl-color-primary: rebeccapurple; }
+//   :root { --cl-color-brand: rebeccapurple; }
 //
-// StyleX still emits `:root { --cl-color-primary: … }` as the default. Following
+// StyleX still emits `:root { --cl-color-brand: … }` as the default. Following
 // astryx's structure: each group is a plain `*Defaults` object wrapped by
 // `defineVars`. The `*VarName` unions are derived from the exported `*Vars` in
 // `styles/index.ts` — the `@stylexjs/enforce-extension` rule requires a
@@ -48,13 +48,20 @@ export const gray = stylex.defineVars({
 // colours are literal values there too, so they stay literal here.
 
 const colorDefaults = {
-  '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
-  '--cl-color-primary-foreground': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
-  '--cl-color-primary-faded': 'light-dark(oklch(0.9583 0.0214 291.74), oklch(0.3097 0.1008 285.05))',
+  '--cl-color-foreground': `light-dark(${gray['900']}, ${gray['50']})`,
+  '--cl-color-foreground-secondary': `light-dark(${gray['600']}, ${gray['400']})`,
+  '--cl-color-foreground-disabled': `light-dark(${gray['400']}, ${gray['500']})`,
 
-  '--cl-color-neutral': 'light-dark(oklch(0.2928 0.0163 285.35), oklch(0.9854 0.0013 286.38))',
-  '--cl-color-neutral-foreground': 'light-dark(oklch(0.24 0 0), oklch(0.96 0 0))',
-  '--cl-color-neutral-faded': 'light-dark(oklch(0.5697 0.0246 279.94), oklch(0.6953 0.0261 285.7))',
+  '--cl-color-background': `light-dark(oklch(1 0 0), ${gray['900']})`,
+  '--cl-color-background-subtle': `light-dark(${gray['100']}, ${gray['850']})`,
+
+  '--cl-color-border': `light-dark(${gray['200']}, ${gray['800']})`,
+  '--cl-color-border-subtle': `light-dark(${gray['100']}, ${gray['850']})`,
+
+  '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
+  '--cl-color-brand-secondary': 'light-dark(oklch(0.5555 0 0), oklch(0.7155 0 0))',
+  '--cl-color-brand-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
 
   '--cl-color-negative': 'light-dark(oklch(0.5903 0.213 26.78), oklch(0.7106 0.1661 22.22))',
   '--cl-color-negative-foreground': 'oklch(1 0 0)',
@@ -71,16 +78,8 @@ const colorDefaults = {
   '--cl-color-warning-subtle': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
   '--cl-color-warning-border': 'light-dark(oklch(0.8672 0.0902 63.47), oklch(0.4084 0.1165 38.17))',
 
-  '--cl-color-background': `light-dark(${gray['100']}, ${gray['850']})`,
-
-  '--cl-color-card': `light-dark(oklch(1 0 0), ${gray['900']})`,
-  '--cl-color-card-foreground': `light-dark(${gray['900']}, ${gray['50']})`,
-
   '--cl-color-input': `light-dark(oklch(1 0 0), ${gray['850']})`,
   '--cl-color-input-placeholder': gray['400'],
-
-  '--cl-color-border': `light-dark(${gray['200']}, ${gray['800']})`,
-  '--cl-color-border-subtle': `light-dark(${gray['100']}, ${gray['850']})`,
 
   '--cl-color-ring': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
 } as const;
@@ -150,9 +149,9 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
 // thumb's own two. Each derives from `--cl-scrollbar-thumb` rather than baking its value in, so
 // they resolve at use time — overriding the base re-derives all three, while any one stays
-// individually overridable. The base is itself mixed most of the way toward `--cl-color-card`,
+// individually overridable. The base is itself mixed most of the way toward `--cl-color-background`,
 // which keeps a 4px bar reading as a hairline rather than a hard rule; `idle` carries on in that
-// direction, and the other two step back toward `--cl-color-card-foreground`, deepening in light
+// direction, and the other two step back toward `--cl-color-foreground`, deepening in light
 // mode and lightening in dark, since that token already carries both.
 //
 // Only the idle → base step can animate. It is set on the scroller, which owns the transition;
@@ -173,10 +172,10 @@ const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
 const scrollbarDefaults = {
   '--cl-scrollbar-width': '8px',
   '--cl-scrollbar-thumb-inset': '2px',
-  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-neutral-faded']}, ${colorVars['--cl-color-card']} 55%)`,
-  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card']} 45%)`,
-  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 15%)`,
-  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 30%)`,
+  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-foreground-secondary']}, ${colorVars['--cl-color-background']} 55%)`,
+  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-background']} 45%)`,
+  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 15%)`,
+  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 30%)`,
 } as const;
 
 export const scrollbarVars = stylex.defineVars(scrollbarDefaults);

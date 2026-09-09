@@ -59,7 +59,7 @@ Each part carries its stable slot class alongside the generated StyleX atoms and
 | `Banner.Label`       | `neutral` \| `warning` \| `negative` |
 | `Banner.Description` | `neutral` \| `warning` \| `negative` |
 
-Warning and negative paint the color's `-subtle` surface inside its `-border` hairline and use the saturated token for the icon and copy, so retheme one by overriding `--cl-color-negative-subtle`, `--cl-color-negative-border`, and `--cl-color-negative` (or the `warning` equivalents). Neutral has no subtle surface of its own: its fill is a 4% mix of `--cl-color-neutral` over whatever it sits on, and `--cl-color-border` draws its hairline.
+Warning and negative paint the color's `-subtle` surface inside its `-border` hairline and use the saturated token for the icon and copy, so retheme one by overriding `--cl-color-negative-subtle`, `--cl-color-negative-border`, and `--cl-color-negative` (or the `warning` equivalents). Neutral has no subtle surface of its own: its fill is a 4% mix of `--cl-color-foreground` over whatever it sits on, and `--cl-color-border` draws its hairline.
 
 ---
 

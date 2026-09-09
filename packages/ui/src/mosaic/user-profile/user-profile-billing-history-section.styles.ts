@@ -7,7 +7,7 @@ export const styles = stylex.create({
     textAlign: 'end',
   },
   amountCell: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
   },
@@ -18,7 +18,7 @@ export const styles = stylex.create({
   },
   emptyCell: {
     paddingBlock: space['6'],
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textAlign: 'center',
@@ -29,7 +29,7 @@ export const styles = stylex.create({
   headerCell: {
     paddingBlock: space['2.5'],
     paddingInline: space['4'],
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
@@ -40,7 +40,7 @@ export const styles = stylex.create({
   },
   invoiceId: {
     overflow: 'hidden',
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
     marginBlockStart: space['0.5'],
@@ -48,7 +48,7 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
   },
   invoiceLabel: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
@@ -56,7 +56,7 @@ export const styles = stylex.create({
   pageSizeLabel: {
     gap: space['2'],
     alignItems: 'center',
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     display: 'flex',
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
@@ -68,8 +68,8 @@ export const styles = stylex.create({
     borderWidth: '1px',
     paddingBlock: space['1'],
     paddingInline: space['2'],
-    backgroundColor: colorVars['--cl-color-card'],
-    color: colorVars['--cl-color-card-foreground'],
+    backgroundColor: colorVars['--cl-color-background'],
+    color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
@@ -100,7 +100,7 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-background'],
     width: '100%',
   },
   statusColumn: {

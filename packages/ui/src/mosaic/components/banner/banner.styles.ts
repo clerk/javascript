@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-const neutralFill = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`;
+const neutralFill = `color-mix(in oklab, ${colorVars['--cl-color-foreground']} 4%, transparent)`;
 
 export const styles = stylex.create({
   root: {
@@ -40,7 +40,7 @@ export const rootColors = stylex.create({
   neutral: {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: neutralFill,
-    color: colorVars['--cl-color-neutral-foreground'],
+    color: colorVars['--cl-color-foreground'],
   },
   warning: {
     borderColor: colorVars['--cl-color-warning-border'],
@@ -55,7 +55,7 @@ export const rootColors = stylex.create({
 });
 
 export const descriptionColors = stylex.create({
-  neutral: { color: colorVars['--cl-color-neutral-faded'] },
+  neutral: { color: colorVars['--cl-color-foreground-secondary'] },
   warning: { color: colorVars['--cl-color-warning'] },
   negative: { color: colorVars['--cl-color-negative'] },
 });

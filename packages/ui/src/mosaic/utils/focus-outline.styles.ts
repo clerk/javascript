@@ -3,7 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, focusVars } from '../tokens.stylex';
 
 // The keyboard focus ring, in one place. Every focusable Mosaic surface drew the same
-// `2px solid --cl-color-primary` inline, so the ring was a dozen copies of one decision
+// `2px solid --cl-color-brand` inline, so the ring was a dozen copies of one decision
 // with nothing keeping them in step — the offsets had already drifted.
 //
 // Values come from tokens (`--cl-focus-outline-*` and `--cl-color-ring`), which is how a

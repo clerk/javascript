@@ -24,8 +24,8 @@ export const styles = stylex.create({
   },
   slot: {
     borderRadius: radiusVars['--cl-radius-lg'],
-    caretColor: colorVars['--cl-color-primary'],
-    color: colorVars['--cl-color-card-foreground'],
+    caretColor: colorVars['--cl-color-brand'],
+    color: colorVars['--cl-color-foreground'],
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-lg-size'],
     fontVariantNumeric: 'tabular-nums',

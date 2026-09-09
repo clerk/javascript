@@ -10,7 +10,7 @@ const invalidFocusShadow = `0 0 0 3px light-dark(
   color-mix(in oklab, ${colorVars['--cl-color-negative']} 12%, transparent),
   color-mix(in oklab, ${colorVars['--cl-color-negative']} 15%, transparent)
 )`;
-const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
+const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-brand']} 5%, transparent)`;
 
 export const inputStyles = stylex.create({
   base: {

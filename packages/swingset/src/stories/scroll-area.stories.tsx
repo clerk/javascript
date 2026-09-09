@@ -274,7 +274,7 @@ export function ThemedScrollbar() {
 
 /**
  * The mask retired for overlay scrims, each reading the progress var for its edge. The scrim mixes
- * from `--cl-color-card-foreground`, so it reads as a shadow on light and a glow on dark;
+ * from `--cl-color-foreground`, so it reads as a shadow on light and a glow on dark;
  * hardcoded black would vanish on a dark surface. `overflow: hidden` on the root keeps the scrims
  * inside its rounded corners.
  *
@@ -302,13 +302,13 @@ export function ShadowIndicators() {
         }
         .demo-scroll-shadows .cl-item-group::before {
           top: 0;
-          background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+          background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-start);
           transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
         }
         .demo-scroll-shadows .cl-item-group::after {
           bottom: 0;
-          background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+          background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-end);
           transform: translateY(calc((1 - var(--cl-scroll-area-progress-end)) * var(--cl-scroll-fade-size)));
         }

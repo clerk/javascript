@@ -15,11 +15,11 @@ export const popup = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-lg'],
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-background'],
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
                 0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
                 0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,
       ':is([data-ending-style])': 0,
@@ -73,9 +73,9 @@ export const item = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-foreground']} 4%, transparent)`,
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-foreground']} 4%, transparent)`,
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
