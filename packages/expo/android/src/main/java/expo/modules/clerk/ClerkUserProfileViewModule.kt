@@ -1,5 +1,3 @@
-@file:OptIn(FrameworkIntegrationApi::class)
-
 package expo.modules.clerk
 
 import android.content.Context
@@ -10,14 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.clerk.api.Clerk
-import com.clerk.api.FrameworkIntegrationApi
+import com.clerk.ui.core.composition.LocalClerk
 import com.clerk.ui.R
 import com.clerk.ui.navigation.ClerkHostBackActionProvider
 import com.clerk.ui.userprofile.UserProfileView
@@ -171,12 +166,17 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) :
 
   @Composable
   private fun ProfileView() {
-    val user by Clerk.userFlow.collectAsStateWithLifecycle()
+    ExpoClerkContent { ProfileContent() }
+  }
+
+  @Composable
+  private fun ProfileContent() {
+    val user = LocalClerk.current.user
 
     LaunchedEffect(user?.id) { customPageState.userDidChange(user?.id) }
 
     UserProfileView(
-      clerkTheme = Clerk.customTheme,
+      clerkTheme = ClerkExpoState.theme,
       customRows = customRows(),
       customDestination =
         if (customPageViews.isEmpty()) null

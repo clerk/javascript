@@ -2,12 +2,7 @@ import { type Clerk } from '@clerk/clerk-js';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
 import { is4xxError, isClerkRuntimeError } from '@clerk/shared/error';
 import { installMobileCredentialTransport } from '@clerk/shared/mobile';
-import type {
-  ClientJSONSnapshot,
-  EnvironmentJSONSnapshot,
-  PublicKeyCredentialCreationOptionsWithoutExtensions,
-  PublicKeyCredentialRequestOptionsWithoutExtensions,
-} from '@clerk/shared/types';
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from '@clerk/shared/types';
 import { Platform } from 'react-native';
 
 import packageJson from '../../../package.json';
@@ -62,6 +57,11 @@ let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
 let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
+const mobileTransports = new WeakMap<object, ReturnType<typeof installMobileCredentialTransport>>();
+export function invalidateMobileCredentials(clerk: object): Promise<void> {
+  return mobileTransports.get(clerk)?.invalidate() ?? Promise.resolve();
+}
+
 let __internal_mobileTransport: ReturnType<typeof installMobileCredentialTransport> | undefined;
 
 /**
@@ -137,43 +137,15 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       __internal_clerk = clerk;
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
-        // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_createPublicCredentials = (
-          publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,
-        ) => {
-          return options?.__experimental_passkeys?.create
-            ? options?.__experimental_passkeys?.create(publicKeyCredential)
-            : errorThrower.throw('create() for passkeys is missing');
-        };
-
-        // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_getPublicCredentials = ({
-          publicKeyOptions,
-        }: {
-          publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
-        }) => {
-          return options?.__experimental_passkeys?.get
-            ? options?.__experimental_passkeys?.get({ publicKeyOptions })
-            : errorThrower.throw('get() for passkeys is missing');
-        };
-        // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_isWebAuthnSupported = () => {
-          return options?.__experimental_passkeys?.isSupported
-            ? options?.__experimental_passkeys?.isSupported()
-            : errorThrower.throw('isSupported() for passkeys is missing');
-        };
-
-        // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_isWebAuthnAutofillSupported = () => {
-          return options?.__experimental_passkeys?.isAutoFillSupported
-            ? options?.__experimental_passkeys?.isAutoFillSupported()
-            : errorThrower.throw('isSupported() for passkeys is missing');
-        };
-
-        // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_isWebAuthnPlatformAuthenticatorSupported = () => {
-          return Promise.resolve(true);
-        };
+        if (options?.__experimental_passkeys) {
+          const passkeys = options.__experimental_passkeys;
+          const nativeClerk = clerk as unknown as Clerk;
+          nativeClerk.__internal_createPublicCredentials = publicKey => passkeys.create(publicKey);
+          nativeClerk.__internal_getPublicCredentials = ({ publicKeyOptions }) => passkeys.get({ publicKeyOptions });
+          nativeClerk.__internal_isWebAuthnSupported = () => passkeys.isSupported();
+          nativeClerk.__internal_isWebAuthnAutofillSupported = () => passkeys.isAutoFillSupported();
+          nativeClerk.__internal_isWebAuthnPlatformAuthenticatorSupported = async () => true;
+        }
 
         const isClerkNetworkError = (err: unknown): boolean => isClerkRuntimeError(err) && err.code === 'network_error';
 
@@ -293,7 +265,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         {
           read: async () => {
             await credentialReady;
-            return getToken(CLERK_CLIENT_JWT_KEY);
+            return (await getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
           },
           write: token => saveToken(CLERK_CLIENT_JWT_KEY, token),
           remove: async () => {
@@ -303,6 +275,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         isNative() ? { 'x-expo-sdk-version': packageJson.version } : {},
         { native: isNative() },
       );
+
+      mobileTransports.set(clerk, __internal_mobileTransport);
 
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API

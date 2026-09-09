@@ -66,7 +66,7 @@ public class ClerkNativeViewHost: ExpoView {
       object: nil,
       queue: .main
     ) { [weak self] _ in
-      guard let self, !hostingCoordinator.hasAttachedController else { return }
+      guard let self else { return }
       setNeedsHostedViewUpdate()
     }
   }
@@ -78,7 +78,10 @@ public class ClerkNativeViewHost: ExpoView {
   }
 
   private func updateHostedView() {
-    guard let controller = makeHostedController() else { return }
+    guard let controller = makeHostedController() else {
+      hostingCoordinator.detach()
+      return
+    }
     hostingCoordinator.attach(controller)
   }
 }
@@ -115,31 +118,31 @@ public class ClerkUserProfileCustomPageHost: ClerkNativeViewHost {
     parseUserProfileCustomPages(currentCustomPages, pageCount: customPageState.views.count)
   }
 
-#if RCT_NEW_ARCH_ENABLED
-  override public func mountChildComponentView(_ childComponentView: UIView, index: Int) {
-    customPageState.insertView(childComponentView, at: index)
-    setNeedsHostedViewUpdate()
-  }
+  #if RCT_NEW_ARCH_ENABLED
+    override public func mountChildComponentView(_ childComponentView: UIView, index: Int) {
+      customPageState.insertView(childComponentView, at: index)
+      setNeedsHostedViewUpdate()
+    }
 
-  override public func unmountChildComponentView(_ childComponentView: UIView, index: Int) {
-    customPageState.removeView(childComponentView)
-    setNeedsHostedViewUpdate()
-  }
-#else
-  override public func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
-    super.insertReactSubview(subview, at: atIndex)
-    customPageState.insertView(subview, at: atIndex)
-    setNeedsHostedViewUpdate()
-  }
+    override public func unmountChildComponentView(_ childComponentView: UIView, index: Int) {
+      customPageState.removeView(childComponentView)
+      setNeedsHostedViewUpdate()
+    }
+  #else
+    override public func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
+      super.insertReactSubview(subview, at: atIndex)
+      customPageState.insertView(subview, at: atIndex)
+      setNeedsHostedViewUpdate()
+    }
 
-  override public func removeReactSubview(_ subview: UIView!) {
-    customPageState.removeView(subview)
-    super.removeReactSubview(subview)
-    setNeedsHostedViewUpdate()
-  }
+    override public func removeReactSubview(_ subview: UIView!) {
+      customPageState.removeView(subview)
+      super.removeReactSubview(subview)
+      setNeedsHostedViewUpdate()
+    }
 
-  override public func didUpdateReactSubviews() {}
-#endif
+    override public func didUpdateReactSubviews() {}
+  #endif
 }
 
 private final class ClerkNativeHostingCoordinator {

@@ -2,19 +2,11 @@ import '../polyfills';
 
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
-import { useRef } from 'react';
 
 import type { TokenCache } from '../cache/types';
 import { isNative, isWeb } from '../utils/runtime';
 import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
-import {
-  type DeviceTokenCacheListener,
-  NativeClientSync,
-  type NativeRefreshFromJsController,
-  useNativeClientBootstrap,
-  useNativeClientEventSync,
-  useSyncableTokenCache,
-} from './nativeClientSync';
+import { NativeCoreConnection } from './NativeCoreConnection';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
@@ -50,7 +42,7 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderPro
    */
   __experimental_resourceCache?: BuildClerkOptions['__experimental_resourceCache'];
   /**
-   * Disables synchronization between the Clerk JS and native clients.
+   * Disables the native resource projection of the Expo Clerk instance.
    * Only use this when the application does not render Clerk native components.
    *
    * @experimental This API is experimental and may change at any moment.
@@ -78,44 +70,16 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   } = props;
   const pk = publishableKey;
   const nativeClientSyncEnabled = isNative() && !__experimental_disableNativeClientSync;
-  const tokenCacheListenersRef = useRef<Set<DeviceTokenCacheListener>>(new Set());
-  const suppressTokenCacheNotificationsRef = useRef(0);
-  const nativeRefreshFromJsControllerRef = useRef<NativeRefreshFromJsController | null>(null);
-  const syncableTokenCache = useSyncableTokenCache({
-    suppressTokenCacheNotificationsRef,
-    tokenCache,
-    tokenCacheListenersRef,
-  });
-
   const clerkInstance = isNative()
     ? getClerkInstance({
         publishableKey: pk,
-        tokenCache: syncableTokenCache,
+        tokenCache,
         proxyUrl,
         domain,
         __experimental_passkeys,
         __experimental_resourceCache,
       })
     : null;
-
-  const suppressJsClientChangedRef = useRef(0);
-  const { isMountedRef, isNativeClientReady } = useNativeClientBootstrap({
-    enabled: nativeClientSyncEnabled,
-    publishableKey: pk,
-    nativeRefreshFromJsControllerRef,
-    suppressTokenCacheNotificationsRef,
-    tokenCache: syncableTokenCache,
-    clerkInstance,
-  });
-  useNativeClientEventSync({
-    enabled: nativeClientSyncEnabled && isNativeClientReady,
-    clerkInstance,
-    isMountedRef,
-    nativeRefreshFromJsControllerRef,
-    suppressJsClientChangedRef,
-    suppressTokenCacheNotificationsRef,
-    tokenCache: syncableTokenCache,
-  });
 
   // Needed for `useOAuth` / `useSSO` to work correctly on web — must stay synchronous during render
   // so the redirect URL is caught before children mount. Resolves to a no-op on native via the
@@ -144,17 +108,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         ...(isNative() && { runtimeEnvironment: 'headless' as const }),
       }}
     >
-      {nativeClientSyncEnabled && (
-        <NativeClientSync
-          enabled={isNativeClientReady}
-          clerkInstance={clerkInstance}
-          nativeRefreshFromJsControllerRef={nativeRefreshFromJsControllerRef}
-          suppressJsClientChangedRef={suppressJsClientChangedRef}
-          suppressTokenCacheNotificationsRef={suppressTokenCacheNotificationsRef}
-          tokenCache={syncableTokenCache}
-          tokenCacheListenersRef={tokenCacheListenersRef}
-        />
-      )}
+      {nativeClientSyncEnabled && <NativeCoreConnection clerk={clerkInstance ?? null} />}
       {children}
     </ClerkReactProvider>
   );

@@ -111,6 +111,16 @@ const withClerkIOS = config => {
   });
 
   config = withInfoPlist(config, modConfig => {
+    const bundleIdentifier = modConfig.ios?.bundleIdentifier;
+    if (bundleIdentifier) {
+      modConfig.modResults.ClerkNativeCallbackURL = `clerk://${bundleIdentifier}.native-callback`;
+      const urlTypes = modConfig.modResults.CFBundleURLTypes || [];
+      if (!urlTypes.some(entry => entry.CFBundleURLSchemes?.includes('clerk'))) {
+        urlTypes.push({ CFBundleURLName: 'Clerk native auth', CFBundleURLSchemes: ['clerk'] });
+      }
+      modConfig.modResults.CFBundleURLTypes = urlTypes;
+    }
+
     modConfig.modResults.ClerkExpoVersion = packageJson.version;
     return modConfig;
   });
@@ -159,26 +169,6 @@ const withClerkAndroid = config => {
         }
       }
       console.log('✅ Clerk Android packaging exclusions added');
-    }
-
-    // --- Kotlin metadata version check skip ---
-    if (!buildGradle.includes('-Xskip-metadata-version-check')) {
-      const kotlinOptionsMatch = buildGradle.match(/kotlinOptions\s*\{/);
-      if (kotlinOptionsMatch) {
-        buildGradle = buildGradle.replace(
-          /kotlinOptions\s*\{/,
-          `kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']`,
-        );
-      } else {
-        const androidMatch = buildGradle.match(/android\s*\{/);
-        if (androidMatch) {
-          buildGradle = buildGradle.replace(
-            /android\s*\{/,
-            `android {\n    kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']\n    }`,
-          );
-        }
-      }
-      console.log('✅ Clerk Android Kotlin metadata version check skip added');
     }
 
     modConfig.modResults.contents = buildGradle;

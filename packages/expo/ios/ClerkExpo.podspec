@@ -18,7 +18,7 @@ else
 end
 
 clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
-clerk_ios_version = '1.5.4'
+clerk_ios_version = '2.0.0-alpha.0'
 
 Pod::Spec.new do |s|
   s.name           = 'ClerkExpo'
@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
   s.homepage       = package['homepage']
   # NOTE: Must match CLERK_MIN_IOS_VERSION in app.plugin.js
   s.platforms      = { :ios => '17.0' }  # Clerk iOS SDK requires iOS 17
-  s.swift_version  = '5.10'
+  s.swift_version  = '6.0'
   s.source         = { git: 'https://github.com/clerk/javascript' }
   s.static_framework = true
 
@@ -52,6 +52,7 @@ Pod::Spec.new do |s|
   end
 
   s.source_files = "ClerkNativeBridge.swift",
+                   "ClerkExpoCoreConnection.swift",
                    "ClerkAppDelegateSubscriber.swift",
                    "ClerkExpoModule.swift",
                    "ClerkNativeViewHost.swift",

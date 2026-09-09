@@ -106,10 +106,10 @@
     "app.plugin.d.ts"
   ],
   "scripts": {
-    "build": "tsdown",
+    "build": "node ../mobile-runtime/build-attached.mjs && tsdown",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
-    "dev": "tsdown --watch",
+    "dev": "node ../mobile-runtime/build-attached.mjs && tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",

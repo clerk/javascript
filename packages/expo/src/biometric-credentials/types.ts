@@ -58,7 +58,7 @@ export type SignInWithBiometricsParams = {
 export type BiometricSignInResult = {
   status: SignInStatus | (string & {});
   createdSessionId: string | null;
-  /** The synchronized JS sign-in resource used to continue any remaining authentication steps. */
+  /** The existing JS sign-in resource used to continue any remaining authentication steps. */
   signIn: SignInResource;
   /** Activates a session after the sign-in reaches `complete`. */
   setActive: SetActive;

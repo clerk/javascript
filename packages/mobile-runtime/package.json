@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
+    "build:attached": "node build-attached.mjs",
+    "check:attached": "node build-attached.mjs --check",
     "test": "node --no-opt --test test/*.test.mjs"
   },
   "dependencies": {

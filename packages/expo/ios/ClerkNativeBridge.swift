@@ -1,10 +1,10 @@
 // ClerkNativeBridge - Provides Clerk SDK operations and SwiftUI view controllers to ClerkExpo.
 
-import UIKit
-import SwiftUI
-import Observation
-@_spi(FrameworkIntegration) import ClerkKit
+import ClerkKit
 @_spi(FrameworkIntegration) import ClerkKitUI
+import Observation
+import SwiftUI
+import UIKit
 
 /// Events emitted by the native view wrappers to their React Native host views.
 public enum ClerkNativeViewEvent: String {
@@ -13,10 +13,11 @@ public enum ClerkNativeViewEvent: String {
 }
 
 extension Notification.Name {
-  static let clerkNativeSDKDidConfigure = Notification.Name("com.clerk.expo.native-sdk.did-configure")
+  static let clerkNativeSDKDidConfigure = Notification.Name(
+    "com.clerk.expo.native-sdk.did-configure")
 }
 
-@Observable
+@MainActor @Observable
 final class ClerkInlineAuthLogoState {
   struct Content {
     let view: UIView
@@ -142,7 +143,8 @@ final class ClerkUserProfileCustomPageState {
   }
 
   func navigationDepthDidChange(_ navigationDepth: Int) {
-    let removedPaths = retainedCustomPagePathsByDepth
+    let removedPaths =
+      retainedCustomPagePathsByDepth
       .filter { $0.key > navigationDepth }
       .sorted { $0.key > $1.key }
       .map(\.value)
@@ -153,13 +155,14 @@ final class ClerkUserProfileCustomPageState {
     retainedCustomPagePathsByDepth = remainingPathsByDepth
 
     var dismissedPaths = Set<String>()
-    for path in removedPaths where !remainingPaths.contains(path) && dismissedPaths.insert(path).inserted {
+    for path in removedPaths
+    where !remainingPaths.contains(path) && dismissedPaths.insert(path).inserted {
       dismissPage(path)
     }
 
     if let pagePresentation,
-       let presentedDepth = pagePresentation.navigationDepth,
-       navigationDepth < presentedDepth
+      let presentedDepth = pagePresentation.navigationDepth,
+      navigationDepth < presentedDepth
     {
       self.pagePresentation = nil
     }
@@ -209,7 +212,7 @@ final class ClerkUserProfileCustomPageState {
     case "push":
       if let routeKey {
         guard !retainedCustomPagePathsByDepth.values.contains(routeKey),
-              !retainedNavigatorPaths.contains(routeKey)
+          !retainedNavigatorPaths.contains(routeKey)
         else { return }
         if let pagePresentation, pagePresentation.navigationDepth == nil {
           retainNavigatorPath(routeKey)
@@ -232,12 +235,13 @@ final class ClerkUserProfileCustomPageState {
   }
 
   private func invalidateNavigation() {
-    var dismissedPaths = retainedCustomPagePathsByDepth
+    var dismissedPaths =
+      retainedCustomPagePathsByDepth
       .sorted { $0.key > $1.key }
       .map(\.value)
     dismissedPaths.append(contentsOf: retainedNavigatorPaths.reversed())
     if let presentedPath = pagePresentation?.path,
-       !dismissedPaths.contains(presentedPath)
+      !dismissedPaths.contains(presentedPath)
     {
       dismissedPaths.insert(presentedPath, at: 0)
     }
@@ -377,14 +381,16 @@ struct ClerkUserProfileCustomRowConfig: Decodable {
 
 func decodeUserProfileCustomPages(_ json: String) -> [ClerkUserProfileCustomRowConfig] {
   guard let data = json.data(using: .utf8),
-        let rows = try? JSONDecoder().decode([ClerkUserProfileCustomRowConfig].self, from: data)
+    let rows = try? JSONDecoder().decode([ClerkUserProfileCustomRowConfig].self, from: data)
   else {
     return []
   }
   return rows
 }
 
-func parseUserProfileCustomPages(_ json: String, pageCount: Int) -> [ClerkUserProfileCustomRowConfig] {
+func parseUserProfileCustomPages(_ json: String, pageCount: Int)
+  -> [ClerkUserProfileCustomRowConfig]
+{
   Array(decodeUserProfileCustomPages(json).prefix(pageCount))
 }
 
@@ -395,551 +401,118 @@ func userProfileCustomPageLabel(
   rows.first(where: { $0.path == path })?.label ?? ""
 }
 
-private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
-private var clerkNativeAuthFlowChangedEmitter: (([String: Any]?) -> Void)?
-private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
-
 struct ClerkNativeErrorDescriptor {
   let code: String
   let message: String
 }
 
-private struct ClerkExpoBiometricCredentialError: LocalizedError {
-  let code: String
-  let message: String
-
-  var errorDescription: String? {
-    message
-  }
-}
-
-private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
-  private static var hostSdkVersion: String? {
-    Bundle.main.object(forInfoDictionaryKey: "ClerkExpoVersion") as? String
-  }
-
-  func prepare(_ request: inout URLRequest) async throws {
-    request.addValue("expo", forHTTPHeaderField: "x-clerk-host-sdk")
-    if let hostSdkVersion = Self.hostSdkVersion, !hostSdkVersion.isEmpty {
-      request.addValue(hostSdkVersion, forHTTPHeaderField: "x-clerk-host-sdk-version")
-    }
-  }
-}
-
-// MARK: - Native Bridge Implementation
-
-final class ClerkNativeBridge {
+@MainActor final class ClerkNativeBridge {
   static let shared = ClerkNativeBridge()
-
-  private static let clerkLoadMaxAttempts = 30
-  private static let clerkLoadIntervalNs: UInt64 = 100_000_000
-  private static var clerkConfigured = false
-  private static var configuredPublishableKey: String?
-
-  /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
+  private(set) var clerk: Clerk?
+  private(set) var connection: ClerkExpoCoreConnection?
   var lightTheme: ClerkTheme?
   var darkTheme: ClerkTheme?
-
-  private var clientObservationGeneration = 0
-  private var lastObservedClientState: ClientStateSnapshot?
-  private var authFlowObservationGeneration = 0
-  private var lastObservedAuthFlowState: AuthFlowStateSnapshot?
-  private var configurationDepth = 0
-  private var jsOriginatedClientSyncDepth = 0
+  private var observationGeneration = 0
+  private static var authFlowEmitter: (([String: Any]?) -> Void)?
   private var pendingURL: URL?
-  private var shouldFlushPendingURL = false
-
   private init() {}
 
-  private struct ClientStateSnapshot: Equatable {
-    let client: Client?
-    let deviceToken: String?
+  func prepare(publishableKey: String, emit: @escaping (String, String) -> Void) throws -> [String:
+    Any]
+  {
+    detach()
+    let next = try ClerkExpoCoreConnection(publishableKey: publishableKey, emit: emit)
+    connection = next
+    return next.descriptor
   }
 
-  private struct AuthFlowStateSnapshot: Equatable {
-    let isLoaded: Bool
-    let isAuthFlowComplete: Bool
-  }
-
-  private struct ClientStateChanges {
-    let client: Bool
-    let deviceToken: Bool
-
-    static let all = ClientStateChanges(client: true, deviceToken: true)
-  }
-
-  /// Resolves the keychain service name, checking ClerkKeychainService in Info.plist first
-  /// (for extension apps sharing a keychain group), then falling back to the bundle identifier.
-  private static var keychainService: String? {
-    if let custom = Bundle.main.object(forInfoDictionaryKey: "ClerkKeychainService") as? String, !custom.isEmpty {
-      return custom
+  func requireConnection(_ id: String) throws -> ClerkExpoCoreConnection {
+    guard let connection, connection.id == id else {
+      throw CoreError(code: "native_host_unavailable")
     }
-    return Bundle.main.bundleIdentifier
+    return connection
   }
 
-  @MainActor
-  func configure(publishableKey: String, bearerToken: String? = nil) async throws {
-    configurationDepth += 1
-    defer {
-      lastObservedClientState = Self.clerkConfigured ? Self.clientStateSnapshot() : nil
-      let authFlowState = Self.authFlowStateSnapshot()
-      lastObservedAuthFlowState = authFlowState
-      configurationDepth = max(0, configurationDepth - 1)
-      Self.emitAuthFlowChanged(Self.authFlowStatePayload(authFlowState))
-
-      // Overlapping calls can finish out of order, so replay once the last one settles and any
-      // of them succeeded. A batch where every call threw keeps the URL for the next attempt.
-      if configurationDepth == 0, shouldFlushPendingURL {
-        shouldFlushPendingURL = false
-        flushPendingURL()
-      }
+  func start(_ id: String) async throws {
+    let connection = try requireConnection(id)
+    let owner = try await connection.start()
+    guard self.connection === connection else {
+      owner.close()
+      throw CoreError(code: "native_host_unavailable")
     }
-
+    clerk = owner
     loadThemes()
-
-    if Self.shouldReconfigure(for: publishableKey) {
-      try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
-      Self.clerkConfigured = true
-      Self.configuredPublishableKey = publishableKey
-      startClientObserver(reset: true)
-      startAuthFlowObserver(reset: true)
-
-      let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
-      await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
-      Self.postConfiguredNotification()
-      shouldFlushPendingURL = true
-      return
+    observeAuthFlow(generation: observationGeneration)
+    NotificationCenter.default.post(name: .clerkNativeSDKDidConfigure, object: nil)
+    if let pendingURL {
+      self.pendingURL = nil
+      handle(url: pendingURL)
     }
-
-    if Self.clerkConfigured {
-      startClientObserver()
-      startAuthFlowObserver()
-      let didUpdateDeviceToken = try await Self.syncTokenState(bearerToken: bearerToken)
-      if didUpdateDeviceToken {
-        await Self.waitForLoadedClient()
-      } else if let token = bearerToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
-        // A remounted JS runtime can have the same token while native client
-        // state is stale, so preserve one refresh in that case.
-        _ = try await Clerk.shared.refreshClient()
-        await Self.waitForLoadedClient()
-      }
-      shouldFlushPendingURL = true
-      return
-    }
-
-    Self.clerkConfigured = true
-    Self.configuredPublishableKey = publishableKey
-    Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
-    startClientObserver()
-    startAuthFlowObserver()
-
-    let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
-    await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
-    Self.postConfiguredNotification()
-    shouldFlushPendingURL = true
   }
 
-  @MainActor
-  private func flushPendingURL() {
-    guard let url = pendingURL else { return }
-    pendingURL = nil
-    handle(url: url)
+  func detach(_ id: String? = nil) {
+    if let id, id != connection?.id { return }
+    observationGeneration += 1
+    connection?.close()
+    connection = nil
+    clerk = nil
+    Self.authFlowEmitter?(getAuthFlowState())
+    NotificationCenter.default.post(name: .clerkNativeSDKDidConfigure, object: nil)
   }
 
-  /// `AuthView` only reaches `Clerk.handle(_:)` from `.onOpenURL`, which never fires for a UIKit-hosted controller.
-  @MainActor
   func handle(url: URL) {
-    // A cold launch delivers the callback before, or partway through, JS calling `configure`.
-    guard Self.clerkConfigured, configurationDepth == 0 else {
+    guard
+      let configured = Bundle.main.object(forInfoDictionaryKey: "ClerkNativeCallbackURL")
+        as? String,
+      let expected = URL(string: configured), url.scheme == expected.scheme,
+      url.host == expected.host, url.path == expected.path
+    else { return }
+    guard let clerk else {
       pendingURL = url
       return
     }
-
     Task { @MainActor in
-      do {
-        try await Clerk.shared.handle(url)
-      } catch {
-        NSLog("[Clerk] Failed to handle callback URL: \(error.localizedDescription)")
+      do { _ = try await clerk.handleAuthCallback(url) } catch {
+        guard self.clerk === clerk, !(error is CancellationError) else { return }
+        var presenter = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+          .flatMap(\.windows).first(where: \.isKeyWindow)?.rootViewController
+        while let presented = presenter?.presentedViewController { presenter = presented }
+        let alert = UIAlertController(
+          title: "Unable to complete sign-in", message: "Please try again.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        presenter?.present(alert, animated: true)
       }
     }
   }
 
-  @MainActor
-  private func startClientObserver(reset: Bool = false) {
-    guard reset || clientObservationGeneration == 0 else {
-      return
-    }
-
-    clientObservationGeneration += 1
-    let generation = clientObservationGeneration
-    lastObservedClientState = Self.clientStateSnapshot()
-    observeClient(generation: generation)
-  }
-
-  @MainActor
-  private func observeClient(generation: Int) {
-    withObservationTracking {
-      _ = Self.clientStateSnapshot()
-    } onChange: { [weak self] in
-      Task { @MainActor [weak self] in
-        await Task.yield()
-
-        guard let self, generation == self.clientObservationGeneration else { return }
-
-        let newClientState = Self.clientStateSnapshot()
-        if let previousClientState = self.lastObservedClientState, newClientState != previousClientState {
-          self.lastObservedClientState = newClientState
-          if self.configurationDepth == 0, self.jsOriginatedClientSyncDepth == 0 {
-            let payload = Self.clientChangedPayload(
-              changes: .init(
-                client: newClientState.client != previousClientState.client,
-                deviceToken: newClientState.deviceToken != previousClientState.deviceToken
-              )
-            )
-            Self.emitClientChanged(payload)
-          }
-        }
-
-        self.observeClient(generation: generation)
-      }
-    }
-  }
-
-  @MainActor
-  private func startAuthFlowObserver(reset: Bool = false) {
-    guard reset || authFlowObservationGeneration == 0 else {
-      return
-    }
-
-    authFlowObservationGeneration += 1
-    let generation = authFlowObservationGeneration
-    lastObservedAuthFlowState = Self.authFlowStateSnapshot()
-    observeAuthFlow(generation: generation)
-  }
-
-  @MainActor
-  private func observeAuthFlow(generation: Int) {
-    withObservationTracking {
-      _ = Self.authFlowStateSnapshot()
-    } onChange: { [weak self] in
-      Task { @MainActor [weak self] in
-        await Task.yield()
-
-        guard let self, generation == self.authFlowObservationGeneration else { return }
-
-        let newState = Self.authFlowStateSnapshot()
-        if let previousState = self.lastObservedAuthFlowState, newState != previousState {
-          self.lastObservedAuthFlowState = newState
-          if self.configurationDepth == 0 {
-            Self.emitAuthFlowChanged(Self.authFlowStatePayload(newState))
-          }
-        }
-
-        self.observeAuthFlow(generation: generation)
-      }
-    }
-  }
-
-  @MainActor
-  private static func authFlowStateSnapshot() -> AuthFlowStateSnapshot {
-    guard clerkConfigured else {
-      return AuthFlowStateSnapshot(isLoaded: false, isAuthFlowComplete: false)
-    }
-
-    return AuthFlowStateSnapshot(
-      isLoaded: Clerk.shared.isLoaded,
-      isAuthFlowComplete: Clerk.shared.isAuthFlowComplete
-    )
-  }
-
-  private static func authFlowStatePayload(_ state: AuthFlowStateSnapshot) -> [String: Any] {
-    [
-      "isLoaded": state.isLoaded,
-      "isAuthFlowComplete": state.isAuthFlowComplete,
-    ]
-  }
-
-  @MainActor
-  private static func clientStateSnapshot() -> ClientStateSnapshot {
-    let client = Clerk.shared.client
-
-    return ClientStateSnapshot(
-      client: client,
-      deviceToken: Clerk.shared.deviceToken
-    )
-  }
-
-  @MainActor
-  private static func clientChangedPayload(sourceId: String? = nil, changes: ClientStateChanges = .all) -> [String: Any] {
-    var payload: [String: Any] = [:]
-    payload["changed"] = [
-      "client": changes.client,
-      "deviceToken": changes.deviceToken,
-    ]
-    payload["deviceToken"] = Clerk.shared.deviceToken ?? NSNull()
-    if let sourceId, !sourceId.isEmpty {
-      payload["sourceId"] = sourceId
-    }
-
-    return payload
-  }
-
-  @MainActor
-  private static func syncTokenState(bearerToken: String?) async throws -> Bool {
-    await waitForLoadedClient()
-
-    guard let token = bearerToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty
-    else {
-      return false
-    }
-    guard Clerk.shared.deviceToken != token || Clerk.shared.client == nil else {
-      return false
-    }
-    _ = try await Clerk.shared.updateDeviceToken(token)
-    return true
-  }
-
-  private static func shouldReconfigure(for publishableKey: String) -> Bool {
-    guard clerkConfigured, let configuredPublishableKey else { return false }
-    return configuredPublishableKey != publishableKey
-  }
-
-  private static func makeClerkOptions() -> Clerk.Options {
-    let middleware = Clerk.Options.MiddlewareConfig(request: [ClerkExpoHeaderMiddleware()])
-    guard let service = keychainService else {
-      return .init(middleware: middleware)
-    }
-    return .init(keychainConfig: .init(service: service), middleware: middleware)
-  }
-
-  @MainActor
-  private static func waitForLoadedClient() async {
-    // Wait for Clerk to finish loading client state from cached data + API refresh.
-    // The bridge sync contract is device-token based, not session based.
-    for _ in 0..<clerkLoadMaxAttempts {
-      if Clerk.shared.isLoaded {
-        return
-      }
-      try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
-    }
-  }
-
-  @MainActor
-  private static func waitForLoadedClientIfNeeded(_ shouldWait: Bool) async {
-    guard shouldWait else { return }
-    await waitForLoadedClient()
-  }
-
-  @MainActor
-  func getClientToken() async -> String? {
-    guard Self.clerkConfigured else { return nil }
-    return Clerk.shared.deviceToken
-  }
-
-  @MainActor
   func getAuthFlowState() -> [String: Any] {
-    Self.authFlowStatePayload(Self.authFlowStateSnapshot())
-  }
-
-  // MARK: - Biometric credentials
-
-  @MainActor
-  func getBiometricCredentialAvailability(id: String?, identifierHint: String?) async throws -> [String: Any] {
-    guard Self.clerkConfigured else {
-      return [
-        "isAvailable": false,
-        "unavailableReason": "environment_unavailable",
-      ]
-    }
-
-    let availability = try await Clerk.shared.biometricCredentials.availability(
-      id: id,
-      identifierHint: identifierHint
-    )
-
-    return [
-      "isAvailable": availability.isAvailable,
-      "unavailableReason": availability.unavailableReason
-        .map(Self.biometricCredentialUnavailableReason) ?? NSNull(),
-    ]
-  }
-
-  @MainActor
-  func listBiometricCredentials() async throws -> [[String: Any]] {
-    try Self.requireBiometricCredentialEnvironment()
-    let biometricCredentials = try await Clerk.shared.biometricCredentials.list()
-    return biometricCredentials.map(Self.biometricCredentialPayload)
-  }
-
-  @MainActor
-  func enrollBiometricCredential(
-    deviceName: String?,
-    identifierHint: String?,
-    reason: String?,
-    policy: String
-  ) async throws -> [String: Any] {
-    try Self.requireBiometricCredentialEnvironment()
-
-    guard let biometricCredentialPolicy = BiometricCredentialPolicy(rawValue: policy) else {
-      throw ClerkExpoBiometricCredentialError(
-        code: "invalid_trusted_device_policy",
-        message: "Invalid biometric-credential policy: \(policy)."
-      )
-    }
-
-    let biometricCredential = try await Clerk.shared.biometricCredentials.enroll(
-      name: deviceName,
-      identifierHint: identifierHint,
-      reason: reason,
-      policy: biometricCredentialPolicy
-    )
-    return Self.biometricCredentialPayload(biometricCredential)
-  }
-
-  @MainActor
-  func revokeBiometricCredential(id: String) async throws -> [String: Any] {
-    try Self.requireBiometricCredentialEnvironment()
-    let biometricCredential = try await Clerk.shared.biometricCredentials.revoke(id: id)
-    return Self.biometricCredentialPayload(biometricCredential)
-  }
-
-  @MainActor
-  func signInWithBiometrics(
-    id: String?,
-    identifierHint: String?,
-    reason: String?
-  ) async throws -> [String: Any] {
-    try Self.requireBiometricCredentialEnvironment()
-    let signIn = try await Clerk.shared.auth.signInWithBiometrics(
-      id: id,
-      identifierHint: identifierHint,
-      reason: reason
-    )
-
-    return [
-      "id": signIn.id,
-      "status": signIn.status.rawValue,
-      "createdSessionId": Self.bridgeValue(signIn.createdSessionId),
-    ]
-  }
-
-  @MainActor
-  private static func requireBiometricCredentialEnvironment() throws {
-    guard clerkConfigured else {
-      throw ClerkExpoBiometricCredentialError(
-        code: "environment_unavailable",
-        message: "Biometric credential operations are unavailable until Clerk finishes configuring."
-      )
-    }
-  }
-
-  private static func biometricCredentialPayload(_ biometricCredential: BiometricCredential) -> [String: Any] {
     [
-      "id": biometricCredential.id,
-      "object": biometricCredential.object,
-      "platform": biometricCredential.platform.rawValue,
-      "appIdentifier": biometricCredential.appIdentifier,
-      "name": bridgeValue(biometricCredential.name),
-      "algorithm": biometricCredential.algorithm.rawValue,
-      "status": biometricCredential.status.rawValue,
-      "createdAt": millisecondsSince1970(biometricCredential.createdAt),
-      "updatedAt": millisecondsSince1970(biometricCredential.updatedAt),
-      "lastUsedAt": optionalMillisecondsSince1970(biometricCredential.lastUsedAt),
-      "revokedAt": optionalMillisecondsSince1970(biometricCredential.revokedAt),
+      "isLoaded": clerk?.loaded == true && connection?.runtime.isAvailable == true,
+      "isAuthFlowComplete": clerk?.isAuthFlowComplete == true
+        && connection?.runtime.isAvailable == true,
     ]
   }
 
-  private static func biometricCredentialUnavailableReason(
-    _ reason: BiometricCredentialAvailability.UnavailableReason
-  ) -> String {
-    snakeCase(reason.rawValue)
-  }
-
-  static func biometricCredentialErrorDescriptor(
-    _ error: Error,
-    fallbackCode: String
-  ) -> ClerkNativeErrorDescriptor {
-    if let error = error as? ClerkExpoBiometricCredentialError {
-      return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
+  private func observeAuthFlow(generation: Int) {
+    guard generation == observationGeneration else { return }
+    let state = withObservationTracking {
+      getAuthFlowState()
+    } onChange: { [weak self] in
+      Task { @MainActor in self?.observeAuthFlow(generation: generation) }
     }
-
-    if let error = error as? ClerkAPIError {
-      return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
-    }
-
-    if let error = error as? BiometricCredentialKeyManagerError {
-      return ClerkNativeErrorDescriptor(
-        code: biometricCredentialKeyManagerErrorCode(error),
-        message: error.localizedDescription
-      )
-    }
-
-    return ClerkNativeErrorDescriptor(code: fallbackCode, message: error.localizedDescription)
+    Self.authFlowEmitter?(state)
   }
 
-  private static func biometricCredentialKeyManagerErrorCode(
-    _ error: BiometricCredentialKeyManagerError
-  ) -> String {
-    switch error {
-    case .unsupportedPlatform:
-      "unsupported_platform"
-    case .biometricAuthenticationUnavailable:
-      "biometric_authentication_unavailable"
-    case .biometricAuthenticationCanceled:
-      "biometric_authentication_canceled"
-    case .biometricAuthenticationFailed:
-      "biometric_authentication_failed"
-    case .keyGenerationFailed:
-      "key_generation_failed"
-    case .keyNotFound:
-      "key_not_found"
-    case .invalidPublicKey:
-      "invalid_public_key"
-    case .publicKeyExportFailed:
-      "public_key_export_failed"
-    case .unsupportedAlgorithm:
-      "unsupported_algorithm"
-    case .signingFailed:
-      "signing_failed"
-    case .deletionFailed:
-      "key_deletion_failed"
-    @unknown default:
-      "trusted_device_key_manager_error"
-    }
+  static func setAuthFlowChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
+    authFlowEmitter = emitter
   }
 
-  private static func snakeCase(_ value: String) -> String {
-    value
-      .replacingOccurrences(
-        of: "([A-Z]+)([A-Z][a-z])",
-        with: "$1_$2",
-        options: .regularExpression
-      )
-      .replacingOccurrences(
-        of: "([a-z0-9])([A-Z])",
-        with: "$1_$2",
-        options: .regularExpression
-      )
-      .lowercased()
+  static func biometricCredentialErrorDescriptor(_ error: Error, fallbackCode: String)
+    -> ClerkNativeErrorDescriptor
+  {
+    .init(code: (error as? CoreError)?.code ?? fallbackCode, message: error.localizedDescription)
   }
 
-  private static func millisecondsSince1970(_ date: Date) -> Double {
-    date.timeIntervalSince1970 * 1_000
-  }
-
-  private static func optionalMillisecondsSince1970(_ date: Date?) -> Any {
-    guard let date else { return NSNull() }
-    return millisecondsSince1970(date)
-  }
-
-  private static func bridgeValue<Value>(_ value: Value?) -> Any {
-    guard let value else { return NSNull() }
-    return value
-  }
-
-  // MARK: - Inline View Creation
-
-  @MainActor
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
@@ -948,7 +521,7 @@ final class ClerkNativeBridge {
     hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
-    guard Self.clerkConfigured else { return nil }
+    guard let clerk, !clerk.isInvalidated else { return nil }
 
     return makeHostingController(
       rootView: ClerkInlineAuthWrapperView(
@@ -960,7 +533,7 @@ final class ClerkNativeBridge {
         logoState: logoState,
         logoMaxHeight: logoMaxHeight,
         onAuthComplete: { onEvent(.dismissed, [:]) }
-      ),
+      ).environment(clerk),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
@@ -973,7 +546,7 @@ final class ClerkNativeBridge {
     hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
-    guard Self.clerkConfigured else { return nil }
+    guard let clerk, !clerk.isInvalidated else { return nil }
 
     return makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
@@ -984,7 +557,7 @@ final class ClerkNativeBridge {
         customRows: customRows,
         customPageState: customPageState
       )
-      .environment(Clerk.shared),
+      .environment(clerk),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
@@ -994,7 +567,7 @@ final class ClerkNativeBridge {
     customRows: [ClerkUserProfileCustomRowConfig],
     customPageState: ClerkUserProfileCustomPageState
   ) -> UIViewController? {
-    guard Self.clerkConfigured else { return nil }
+    guard let clerk, !clerk.isInvalidated else { return nil }
 
     return makeHostingController(
       rootView: ClerkInlineUserButtonWrapperView(
@@ -1003,99 +576,8 @@ final class ClerkNativeBridge {
         customRows: customRows,
         customPageState: customPageState
       )
-      .environment(Clerk.shared)
+      .environment(clerk)
     )
-  }
-
-  @MainActor
-  func syncClientStateFromJs(
-    deviceToken: String?,
-    sourceId: String?,
-    didChangeClient: Bool,
-    didChangeDeviceToken: Bool
-  ) async throws {
-    guard Self.clerkConfigured else { return }
-
-    let previousClientState = Self.clientStateSnapshot()
-    var completedSuccessfully = false
-    jsOriginatedClientSyncDepth += 1
-    defer {
-      let finalClientState = Self.clientStateSnapshot()
-      lastObservedClientState = finalClientState
-      jsOriginatedClientSyncDepth = max(0, jsOriginatedClientSyncDepth - 1)
-
-      if !completedSuccessfully, finalClientState != previousClientState {
-        Self.emitClientChanged(
-          Self.clientChangedPayload(
-            changes: .init(
-              client: finalClientState.client != previousClientState.client,
-              deviceToken: finalClientState.deviceToken != previousClientState.deviceToken
-            )
-          )
-        )
-      }
-    }
-
-    var refreshedClientWhileUpdatingToken = false
-
-    if didChangeDeviceToken,
-      let token = deviceToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty
-    {
-      if Clerk.shared.deviceToken != token {
-        _ = try await Clerk.shared.updateDeviceToken(token)
-        await Self.waitForLoadedClient()
-        refreshedClientWhileUpdatingToken = true
-      }
-    }
-
-    if !refreshedClientWhileUpdatingToken, didChangeClient || didChangeDeviceToken {
-      _ = try await Clerk.shared.refreshClient()
-      await Self.waitForLoadedClient()
-    }
-
-    let newClientState = Self.clientStateSnapshot()
-    lastObservedClientState = newClientState
-    Self.emitClientChanged(
-      Self.clientChangedPayload(
-        sourceId: sourceId,
-        changes: .init(
-          client: newClientState.client != previousClientState.client,
-          deviceToken: newClientState.deviceToken != previousClientState.deviceToken
-        )
-      )
-    )
-    completedSuccessfully = true
-  }
-
-  private static func postConfiguredNotification() {
-    NotificationCenter.default.post(name: .clerkNativeSDKDidConfigure, object: nil)
-  }
-
-  static func setClientChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
-    clerkNativeClientEventQueue.sync {
-      clerkNativeClientChangedEmitter = emitter
-    }
-  }
-
-  static func setAuthFlowChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
-    clerkNativeClientEventQueue.sync {
-      clerkNativeAuthFlowChangedEmitter = emitter
-    }
-  }
-
-  static func emitAuthFlowChanged(_ body: [String: Any]? = nil) {
-    let emitter = clerkNativeClientEventQueue.sync {
-      clerkNativeAuthFlowChangedEmitter
-    }
-    emitter?(body)
-  }
-
-  /// Requests that ClerkProvider reload the JS client from native client state.
-  static func emitClientChanged(_ body: [String: Any]? = nil) {
-    let emitter = clerkNativeClientEventQueue.sync {
-      clerkNativeClientChangedEmitter
-    }
-    emitter?(body)
   }
 
   private static func authMode(from mode: String) -> AuthView.Mode {
@@ -1113,24 +595,30 @@ final class ClerkNativeBridge {
 
   /// Reads the "ClerkTheme" dictionary from Info.plist and builds light / dark themes.
   @MainActor func loadThemes() {
-    guard let themeDictionary = Bundle.main.object(forInfoDictionaryKey: "ClerkTheme") as? [String: Any] else {
+    guard
+      let themeDictionary = Bundle.main.object(forInfoDictionaryKey: "ClerkTheme") as? [String: Any]
+    else {
       return
     }
 
     // Build light theme from top-level "colors" and "design"
-    let lightColors = (themeDictionary["colors"] as? [String: String]).flatMap { parseColors(from: $0) }
+    let lightColors = (themeDictionary["colors"] as? [String: String]).flatMap {
+      parseColors(from: $0)
+    }
     let design = (themeDictionary["design"] as? [String: Any]).flatMap { parseDesign(from: $0) }
     let fonts = (themeDictionary["design"] as? [String: Any]).flatMap { parseFonts(from: $0) }
 
     if lightColors != nil || design != nil || fonts != nil {
-      lightTheme = ClerkTheme(colors: lightColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
+      lightTheme = ClerkTheme(
+        colors: lightColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
     }
 
     // Build dark theme from "darkColors" (inherits same design/fonts)
     if let darkColorsDict = themeDictionary["darkColors"] as? [String: String] {
       let darkColors = parseColors(from: darkColorsDict)
       if darkColors != nil || design != nil || fonts != nil {
-        darkTheme = ClerkTheme(colors: darkColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
+        darkTheme = ClerkTheme(
+          colors: darkColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
       }
     }
   }
@@ -1140,20 +628,30 @@ final class ClerkNativeBridge {
     guard hasAny else { return nil }
 
     return ClerkTheme.Colors(
-      primary: dict["primary"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultPrimaryColor,
-      background: dict["background"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultBackgroundColor,
+      primary: dict["primary"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultPrimaryColor,
+      background: dict["background"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultBackgroundColor,
       input: dict["input"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultInputColor,
       danger: dict["danger"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultDangerColor,
-      success: dict["success"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultSuccessColor,
-      warning: dict["warning"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultWarningColor,
-      foreground: dict["foreground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultForegroundColor,
-      mutedForeground: dict["mutedForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultMutedForegroundColor,
-      primaryForeground: dict["primaryForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultPrimaryForegroundColor,
-      inputForeground: dict["inputForeground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultInputForegroundColor,
-      neutral: dict["neutral"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultNeutralColor,
+      success: dict["success"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultSuccessColor,
+      warning: dict["warning"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultWarningColor,
+      foreground: dict["foreground"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultForegroundColor,
+      mutedForeground: dict["mutedForeground"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultMutedForegroundColor,
+      primaryForeground: dict["primaryForeground"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultPrimaryForegroundColor,
+      inputForeground: dict["inputForeground"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultInputForegroundColor,
+      neutral: dict["neutral"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultNeutralColor,
       ring: dict["ring"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultRingColor,
       muted: dict["muted"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultMutedColor,
-      secondaryButtonBackground: dict["secondaryButtonBackground"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultSecondaryButtonBackgroundColor,
+      secondaryButtonBackground: dict["secondaryButtonBackground"].flatMap { colorFromHex($0) }
+        ?? ClerkTheme.Colors.defaultSecondaryButtonBackgroundColor,
       secondaryButtonForeground: dict["secondaryButtonForeground"].flatMap { colorFromHex($0) },
       shadow: dict["shadow"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultShadowColor,
       border: dict["border"].flatMap { colorFromHex($0) } ?? ClerkTheme.Colors.defaultBorderColor
@@ -1271,8 +769,7 @@ struct ClerkInlineAuthWrapperView: View {
       isDismissible: dismissible,
       onAuthComplete: onAuthComplete
     )
-      .environment(Clerk.shared)
-      .environment(\.clerkHostBackAction, hostBackAction)
+    .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -1477,7 +974,7 @@ private struct ClerkReactUserProfileCustomPageContent: View {
   var body: some View {
     Group {
       if let index = rows.firstIndex(where: { $0.path == path }),
-         state.views.indices.contains(index)
+        state.views.indices.contains(index)
       {
         ClerkReactCustomPageView(view: state.views[index])
       }

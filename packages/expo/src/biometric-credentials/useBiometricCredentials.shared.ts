@@ -1,138 +1,72 @@
 import { useClerk } from '@clerk/react';
 import { useMemo } from 'react';
 
-import { synchronizeNativeClientToJs, waitForPendingJsToNativeSync } from '../provider/nativeClientSyncCoordinator';
-import type { NativeBiometricCredential, NativeBiometricCredentialModule } from '../specs/NativeClerkModule.types';
+import { waitForNativeResources } from '../provider/nativeResourceConnection';
+import { getClerkInstance } from '../provider/singleton';
 import { errorThrower } from '../utils/errors';
-import { ClerkExpoModule } from '../utils/native-module';
-import type {
-  BiometricCredential,
-  BiometricCredentialPlatform,
-  BiometricCredentialStatus,
-  UseBiometricCredentialsReturn,
-} from './types';
+import type { BiometricCredential, UseBiometricCredentialsReturn } from './types';
 
 const DEFAULT_POLICY = 'biometry_or_device_passcode';
 
-function toBiometricCredentialPlatform(platform: string): BiometricCredentialPlatform {
-  return platform === 'ios' || platform === 'android' ? platform : 'unknown';
-}
-
-function toBiometricCredentialStatus(status: string): BiometricCredentialStatus {
-  return status === 'active' || status === 'revoked' ? status : 'unknown';
-}
-
-function getNativeModule(): NativeBiometricCredentialModule {
-  const nativeModule = ClerkExpoModule;
-
-  if (
-    !nativeModule?.getTrustedDeviceAvailability ||
-    !nativeModule.listTrustedDevices ||
-    !nativeModule.enrollTrustedDevice ||
-    !nativeModule.revokeTrustedDevice ||
-    !nativeModule.signInWithTrustedDevice
-  ) {
+async function resources(clerk: ReturnType<typeof useClerk>) {
+  const owner = getClerkInstance();
+  if (!owner?.__internal_getMobileResources) {
     return errorThrower.throw(
       'Biometric credentials require a development build containing a compatible version of @clerk/expo.',
     );
   }
-
-  return nativeModule as NativeBiometricCredentialModule;
+  await waitForNativeResources(owner);
+  if (owner !== getClerkInstance() || owner.client !== clerk.client) {
+    return errorThrower.throw('The Clerk provider changed before the native operation could start.');
+  }
+  return owner.__internal_getMobileResources();
 }
 
-function toBiometricCredential(credential: NativeBiometricCredential): BiometricCredential {
+function toCredential(
+  value: Awaited<ReturnType<Awaited<ReturnType<typeof resources>>['biometricCredentials']['list']>>[number],
+): BiometricCredential {
   return {
-    ...credential,
-    platform: toBiometricCredentialPlatform(credential.platform),
-    status: toBiometricCredentialStatus(credential.status),
-    createdAt: new Date(credential.createdAt),
-    updatedAt: new Date(credential.updatedAt),
-    lastUsedAt: credential.lastUsedAt == null ? null : new Date(credential.lastUsedAt),
-    revokedAt: credential.revokedAt == null ? null : new Date(credential.revokedAt),
+    ...value,
+    object: 'trusted_device',
+    platform: value.platform === 'ios' ? 'ios' : value.platform === 'android' ? 'android' : 'unknown',
+    status: value.status === 'active' ? 'active' : value.status === 'revoked' ? 'revoked' : 'unknown',
   };
 }
 
 function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiometricCredentialsReturn {
   return {
     getAvailability: async params => {
-      const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
-      return nativeModule.getTrustedDeviceAvailability(params?.id ?? null, params?.identifierHint ?? null);
-    },
-    list: async () => {
-      const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
-      const credentials = await nativeModule.listTrustedDevices();
-      return credentials.map(toBiometricCredential);
-    },
-    enroll: async params => {
-      const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
-      const credential = await nativeModule.enrollTrustedDevice(
-        params?.name ?? null,
-        params?.identifierHint ?? null,
-        params?.reason ?? null,
-        params?.policy ?? DEFAULT_POLICY,
-      );
-      return toBiometricCredential(credential);
-    },
-    revoke: async id => {
-      const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
-      const credential = await nativeModule.revokeTrustedDevice(id);
-      return toBiometricCredential(credential);
-    },
-    signIn: async params => {
-      const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
-      const nativeSignIn = await nativeModule.signInWithTrustedDevice(
-        params?.id ?? null,
-        params?.identifierHint ?? null,
-        params?.reason ?? null,
-      );
-      await synchronizeNativeClientToJs();
-
-      const client = clerk.client;
-      const signIn = client?.signIn;
-      if (!client || !signIn) {
-        return errorThrower.throw(
-          'Unable to synchronize biometric sign-in with the Clerk JS client: the client sign-in resource is unavailable.',
-        );
-      }
-
-      const isComplete = nativeSignIn.status === 'complete';
-      if (isComplete) {
-        if (
-          !nativeSignIn.createdSessionId ||
-          !client.signedInSessions.some(session => session.id === nativeSignIn.createdSessionId)
-        ) {
-          return errorThrower.throw(
-            'Unable to synchronize biometric sign-in with the Clerk JS client: the created session is missing.',
-          );
-        }
-      } else if (!signIn.id || signIn.id !== nativeSignIn.id) {
-        return errorThrower.throw(
-          'Unable to synchronize biometric sign-in with the Clerk JS client: the sign-in attempt does not match.',
-        );
-      }
-
+      const result = await (await resources(clerk)).biometricCredentials.availability(params);
       return {
-        status: isComplete ? nativeSignIn.status : (signIn.status ?? nativeSignIn.status),
-        createdSessionId: isComplete
-          ? nativeSignIn.createdSessionId
-          : (signIn.createdSessionId ?? nativeSignIn.createdSessionId),
-        signIn,
+        ...result,
+        unavailableReason: result.unavailableReason?.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase() ?? null,
+      };
+    },
+    list: async () => (await (await resources(clerk)).biometricCredentials.list()).map(toCredential),
+    enroll: async params =>
+      toCredential(
+        await (
+          await resources(clerk)
+        ).biometricCredentials.enroll({ ...params, policy: params?.policy ?? DEFAULT_POLICY }),
+      ),
+    revoke: async id => toCredential(await (await resources(clerk)).biometricCredentials.revoke({ id })),
+    signIn: async params => {
+      const { signIn } = await resources(clerk);
+      const { error } = await signIn.biometricCredential(params);
+      if (error) throw error;
+      const legacySignIn = clerk.client?.signIn;
+      if (!legacySignIn) return errorThrower.throw('The Clerk sign-in resource is unavailable.');
+      return {
+        status: signIn.status,
+        createdSessionId: signIn.createdSessionId,
+        signIn: legacySignIn,
         setActive: clerk.setActive,
       };
     },
   };
 }
 
-/**
- * Accesses biometric credential enrollment and sign-in on iOS and Android.
- *
- * The private key and biometric prompt are managed by Clerk's native SDK.
- */
+/** The JavaScript owner manages credentials; native adapters present prompts and retain private keys. */
 export function useBiometricCredentials(): UseBiometricCredentialsReturn {
   const clerk = useClerk();
   return useMemo(() => createBiometricCredentials(clerk), [clerk]);

@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.clerk.api.Clerk
+import com.clerk.ui.core.composition.LocalClerk
 import com.clerk.ui.userprofile.custom.LocalUserProfileCustomNavigator
 import com.clerk.ui.userprofile.custom.UserProfileCustomRow
 import com.clerk.ui.userbutton.UserButton
@@ -31,13 +29,14 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
       onCustomPageEvent(mapOf("type" to type, "path" to path))
     }
 
-  init {
-    activity?.let { Clerk.attachActivity(it) }
+  @Composable
+  override fun Content() {
+    ExpoClerkContent { UserButtonContent() }
   }
 
   @Composable
-  override fun Content() {
-    val user by Clerk.userFlow.collectAsStateWithLifecycle()
+  private fun UserButtonContent() {
+    val user = LocalClerk.current.user
 
     LaunchedEffect(user?.id) { customPageState.userDidChange(user?.id) }
 
@@ -46,7 +45,7 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
       contentAlignment = Alignment.Center,
     ) {
       UserButton(
-        clerkTheme = Clerk.customTheme,
+        clerkTheme = ClerkExpoState.theme,
         customRows = customRows(),
         customDestination =
           if (customPageViews.isEmpty()) null

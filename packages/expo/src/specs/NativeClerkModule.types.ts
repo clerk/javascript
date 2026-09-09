@@ -1,7 +1,3 @@
-import type { SignInStatus } from '@clerk/shared/types';
-
-import type { BiometricCredentialAvailability, BiometricCredentialPolicy } from '../biometric-credentials/types';
-
 export type NativeAuthFlowState = {
   isLoaded: boolean;
   isAuthFlowComplete: boolean;
@@ -11,42 +7,30 @@ export type NativeAuthFlowModule = {
   getAuthFlowState(): Promise<NativeAuthFlowState>;
 };
 
-export type NativeBiometricCredential = {
-  id: string;
-  object: 'trusted_device';
-  platform: string;
-  appIdentifier: string;
-  name: string | null;
-  algorithm: 'ES256' | (string & {});
-  status: string;
-  createdAt: number;
-  updatedAt: number;
-  lastUsedAt: number | null;
-  revokedAt: number | null;
-};
-
-export type NativeBiometricSignInResult = {
-  id: string;
-  status: SignInStatus | (string & {});
-  createdSessionId: string | null;
-};
-
-export type NativeBiometricCredentialModule = {
-  getTrustedDeviceAvailability(
-    id: string | null,
-    identifierHint: string | null,
-  ): Promise<BiometricCredentialAvailability>;
-  listTrustedDevices(): Promise<NativeBiometricCredential[]>;
-  enrollTrustedDevice(
-    deviceName: string | null,
-    identifierHint: string | null,
-    reason: string | null,
-    policy: BiometricCredentialPolicy,
-  ): Promise<NativeBiometricCredential>;
-  revokeTrustedDevice(id: string): Promise<NativeBiometricCredential>;
-  signInWithTrustedDevice(
-    id: string | null,
-    identifierHint: string | null,
-    reason: string | null,
-  ): Promise<NativeBiometricSignInResult>;
+/** Internal transport for native views of the existing Expo owner. */
+export type NativeResourceModule = {
+  addListener(
+    eventName: 'clerkCoreMessage',
+    listener: (event: { connectionId: string; message: string }) => void,
+  ): { remove(): void };
+  addListener(
+    eventName: 'clerkNativeAuthFlowChanged',
+    listener: (state?: NativeAuthFlowState) => void,
+  ): { remove(): void };
+  prepareCore(publishableKey: string): Promise<{
+    connectionId: string;
+    callbackUrl: string;
+    platform: 'ios' | 'android';
+    capabilities: string[];
+  }>;
+  startCore(connectionId: string): Promise<void>;
+  receiveCoreMessage(connectionId: string, message: string): void;
+  detachCore(connectionId: string): void;
+  performCoreCapability(
+    connectionId: string,
+    requestId: string,
+    capability: string,
+    argumentsJSON: string,
+  ): Promise<string>;
+  cancelCoreCapabilities(connectionId: string, requestIds: string[]): void;
 };

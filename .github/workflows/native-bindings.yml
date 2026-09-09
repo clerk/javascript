@@ -6,6 +6,7 @@ on:
       - 'packages/shared/**'
       - 'packages/native-bindings/**'
       - 'packages/mobile-runtime/**'
+      - 'packages/expo/src/generated/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/native-bindings.yml'
   workflow_dispatch:
@@ -25,6 +26,7 @@ jobs:
       - run: pnpm --filter @clerk/shared build
       - run: pnpm --filter @clerk/native-bindings check
       - run: pnpm --filter @clerk/native-bindings test
+      - run: pnpm --filter @clerk/mobile-runtime check:attached
       - run: pnpm --filter @clerk/mobile-runtime build
       - run: pnpm --filter @clerk/mobile-runtime test
       - run: pnpm --dir packages/mobile-runtime exec tsc --noEmit
