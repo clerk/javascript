@@ -140,6 +140,7 @@ import {
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
+import { meta as toastMeta } from '../stories/toast.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import {
@@ -370,6 +371,7 @@ const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
 const tableModule: StoryModule = { meta: tableMeta };
+const toastModule: StoryModule = { meta: toastMeta };
 
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
@@ -515,6 +517,7 @@ export const registry: StoryModule[] = [
   sectionModule,
   tableModule,
   textModule,
+  toastModule,
   fieldModule,
   visuallyHiddenModule,
   // Primitives — alphabetical within the group.
