@@ -20,7 +20,7 @@ export type UseOAuthDeviceVerificationReturn = {
    */
   result: OAuthDeviceVerificationResult | undefined;
   /**
-   * The error from the most recent lookup or submission request, or `null` if the latest request succeeded or none has run yet. Preflight rejections (Clerk not loaded, or a conflicting request already in progress) reject the returned promise without setting this, so callers must also handle rejections from `lookup`, `approve`, and `deny`.
+   * The latest error recorded by a lookup or submission operation, or `null` if no error has been recorded since the state was last cleared. Preflight rejections (Clerk not loaded, or a conflicting request already in progress) reject the returned promise without setting this, so callers must also handle rejections from `lookup`, `approve`, and `deny`.
    */
   error: ClerkAPIResponseError | ClerkRuntimeError | null;
   /**
