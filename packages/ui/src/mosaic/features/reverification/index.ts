@@ -3,6 +3,7 @@ export type {
   ReverificationMethod,
   ReverificationOtpChannel,
   ReverificationProps,
+  ReverificationStage,
   ReverificationStep,
   ReverificationStrategy,
   ReverificationViewProps,

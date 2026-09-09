@@ -26,7 +26,7 @@ const methodIcon = {
 } as const satisfies Record<ReverificationMethod['strategy'], IconName>;
 
 function methodLabel(method: ReverificationMethod): string {
-  const identifier = method.identifier ?? '';
+  const identifier = 'identifier' in method ? method.identifier : '';
   switch (method.strategy) {
     case 'password':
       return m.alternativeMethods.blockButton__password;

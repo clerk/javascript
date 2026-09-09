@@ -11,14 +11,15 @@ import {
 import type { ReverificationModel, ReverificationReadyModel } from '../reverification.model';
 import type { ReverificationMethod, ReverificationResult } from '../reverification.types';
 
-const password: ReverificationMethod = { id: 'password', strategy: 'password' };
+const password: ReverificationMethod = { id: 'password', stage: 'first', strategy: 'password' };
 const email: ReverificationMethod = {
   id: 'email_code:idn_1',
+  stage: 'first',
   strategy: 'email_code',
   identifier: 'a***@ex.com',
   emailAddressId: 'idn_1',
 };
-const totp: ReverificationMethod = { id: 'totp', strategy: 'totp' };
+const totp: ReverificationMethod = { id: 'totp', stage: 'second', strategy: 'totp' };
 
 function firstFactorResult(overrides: Partial<ReverificationResult> = {}): ReverificationResult {
   return {
