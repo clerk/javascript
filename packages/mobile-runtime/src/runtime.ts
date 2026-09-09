@@ -155,10 +155,7 @@ export class ResourceRuntime implements ResourceCodec {
     }
   }
 
-  snapshot(settledTarget?: string): State {
-    if (this.#disposed) throw bridgeError('runtime_disposed');
-    this.#projectionParent = undefined;
-    this.#projectionEdge = undefined;
+  #reconcileRoots(settledTarget?: string): Record<string, Handle | null> {
     const roots: Record<string, Handle | null> = {};
     const currentRoots = this.#options.roots();
     for (const [key, descriptor] of Object.entries(rootSchema) as [string, { name: string }][]) {
@@ -188,6 +185,14 @@ export class ResourceRuntime implements ResourceCodec {
       this.#rootEntries.set(key, this.#entries.get(handle.id)!);
       roots[key] = handle;
     }
+    return roots;
+  }
+
+  snapshot(settledTarget?: string): State {
+    if (this.#disposed) throw bridgeError('runtime_disposed');
+    this.#projectionParent = undefined;
+    this.#projectionEdge = undefined;
+    const roots = this.#reconcileRoots(settledTarget);
     const resources: State['resources'] = [];
     for (const entry of this.#entries.values()) {
       if (!entry.active) continue;
@@ -241,6 +246,10 @@ export class ResourceRuntime implements ResourceCodec {
       await this.#options.beforeInvoke?.(call.operation);
       const target = this.resolve(call.target, operation.type);
       const output = await operation.invoke(target, args);
+      // A completed operation can remove its target from the roots. Retire the old
+      // handle before encoding a returned resource so completion never references
+      // a handle that its own snapshot invalidates.
+      this.#reconcileRoots(call.target.id);
       if (operation.result.kind === 'errorResult') {
         if (!output || typeof output !== 'object' || !('error' in output)) throw bridgeError('invalid_error_result');
         result = { error: output.error === null ? null : (failure(output.error, 'clerk') as unknown as JSONValue) };
