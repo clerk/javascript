@@ -201,7 +201,7 @@ test('background is nonfatal and foreground recovers resources through the core'
 test('native settings are projected from the owner with typed configuration', async t => {
   const f = await fixture();
   t.after(f.dispose);
-  const environment = f.resource(f.state.roots.clerk).environment;
+  const environment = f.resource(f.resource(f.state.roots.clerk).environment.$ref);
   assert.equal(environment.userSettings.signUp.mode, 'public');
   assert.equal(environment.userSettings.attributes.email_address.enabled, false);
   assert.equal(environment.displayConfig.applicationName, 'TestApp');
@@ -221,7 +221,7 @@ test('custom OAuth configuration survives the generated native settings projecti
     http: request => (new URL(request.url).pathname.endsWith('/environment') ? response(environment) : undefined),
   });
   t.after(f.dispose);
-  const social = f.resource(f.state.roots.clerk).environment.userSettings.social;
+  const social = f.resource(f.resource(f.state.roots.clerk).environment.$ref).userSettings.social;
   assert.equal(social.oauth_custom_corporate.name, 'Corporate');
   assert.equal(social.oauth_custom_corporate.strategy, 'oauth_custom_corporate');
   assert.equal(social.oauth_custom_corporate.enabled, true);
@@ -276,4 +276,25 @@ test('phone recovery codes use an explicit generated read and never enter observ
     f.messages.filter(m => m.state).some(m => JSON.stringify(m.state).includes(codes[0])),
     false,
   );
+});
+
+test('the canonical environment resource refreshes settings before generated completion', async t => {
+  let applicationName = 'Before';
+  const f = await fixture({
+    http: request => {
+      if (!new URL(request.url).pathname.endsWith('/environment')) return;
+      const environment = structuredClone(fixtures.environment);
+      environment.display_config.application_name = applicationName;
+      return response(environment);
+    },
+  });
+  t.after(f.dispose);
+  const handle = f.resource(f.state.roots.clerk).environment.$ref;
+  assert.equal(handle.type, 'EnvironmentResource');
+  assert.equal(f.resource(handle).displayConfig.applicationName, 'Before');
+  applicationName = 'After';
+  const result = await f.invoke(handle, 'EnvironmentResource.reload');
+  assert.equal(result.failure, undefined);
+  assert.deepEqual(result.result.$ref, handle);
+  assert.equal(f.resource(handle).displayConfig.applicationName, 'After');
 });

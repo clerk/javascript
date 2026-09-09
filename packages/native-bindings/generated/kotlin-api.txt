@@ -1,3 +1,6 @@
+APIKeysSettings.id: String? = null
+APIKeysSettings.orgs_api_keys_enabled: Boolean
+APIKeysSettings.user_api_keys_enabled: Boolean
 Actions.create_organization: Boolean
 Actions.delete_self: Boolean
 ActiveSession.abandonAt: Instant
@@ -144,6 +147,15 @@ ClerkPaginatedResponseUserOrganizationInvitation.data: List<UserOrganizationInvi
 ClerkPaginatedResponseUserOrganizationInvitation.total_count: Double
 ClerkResourceReloadParams.rotatingTokenNonce: String? = null
 ClerkStatus cases: degraded, error, loading, ready, unrecognized(String)
+CommerceSettings.billing: CommerceSettingsBilling
+CommerceSettings.id: String? = null
+CommerceSettingsBilling.organization: CommerceSettingsBillingOrganization
+CommerceSettingsBilling.stripePublishableKey: String?
+CommerceSettingsBilling.user: CommerceSettingsBillingUser
+CommerceSettingsBillingOrganization.enabled: Boolean
+CommerceSettingsBillingOrganization.hasPaidPlans: Boolean
+CommerceSettingsBillingUser.enabled: Boolean
+CommerceSettingsBillingUser.hasPaidPlans: Boolean
 CreateEmailAddressParams.email: String
 CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.cancelEmailLinkFlow(): Unit [return]
 CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.startEmailLinkFlow(params: StartEmailLinkFlowParams): EmailAddress [return]
@@ -358,10 +370,20 @@ EnterpriseSamlConnectionNested.idpSsoUrl: String
 EnterpriseSamlConnectionNested.name: String
 EnterpriseSamlConnectionNested.spEntityId: String
 EnterpriseSamlConnectionNested.spMetadataUrl: String
+EnvironmentResource.apiKeysSettings: APIKeysSettings
 EnvironmentResource.authConfig: AuthConfig
+EnvironmentResource.clientDebugMode: Boolean
+EnvironmentResource.commerceSettings: CommerceSettings
 EnvironmentResource.displayConfig: DisplayConfig
+EnvironmentResource.id: String? = null
+EnvironmentResource.isDevelopmentOrStaging(): Boolean [return]
+EnvironmentResource.isProduction(): Boolean [return]
+EnvironmentResource.isSingleSession(): Boolean [return]
 EnvironmentResource.maintenanceMode: Boolean
 EnvironmentResource.organizationSettings: OrganizationSettings
+EnvironmentResource.partitionedCookies: Boolean
+EnvironmentResource.protectConfig: ProtectConfig
+EnvironmentResource.reload(p: ClerkResourceReloadParams? = null): EnvironmentResource [return]
 EnvironmentResource.userSettings: UserSettings
 ExternalAccount.accountIdentifier(): String [return]
 ExternalAccount.approvedScopes: String
@@ -738,6 +760,20 @@ ProtectCheck.expiresAt: Double? = null
 ProtectCheck.sdkUrl: String
 ProtectCheck.status: String
 ProtectCheck.uiHints: Map<String, String>? = null
+ProtectConfig.challenge_load_timeout_ms: Double? = null
+ProtectConfig.id: String? = null
+ProtectConfig.loaders: List<ProtectLoader>? = null
+ProtectConfig.tokens_invalid_before: Double? = null
+ProtectLoader.attributes: Map<String, ProtectLoaderAttributesValue>? = null
+ProtectLoader.challenge_load_timeout_ms: Double? = null
+ProtectLoader.rollout: Double? = null
+ProtectLoader.target: ProtectLoaderTarget
+ProtectLoader.text_content: String? = null
+ProtectLoader.token_timeout_ms: Double? = null
+ProtectLoader.token_url: String? = null
+ProtectLoader.type: String
+ProtectLoaderAttributesValue variants: String | Double | Boolean | Boolean
+ProtectLoaderTarget cases: head, body, unrecognized(String)
 PublicKeyCredentialWithAuthenticatorAssertionResponse.authenticatorAttachment: String?
 PublicKeyCredentialWithAuthenticatorAssertionResponse.id: String
 PublicKeyCredentialWithAuthenticatorAssertionResponse.rawId: ByteArray
@@ -1266,7 +1302,7 @@ UserSettings.passkeySettings: PasskeySettingsData
 UserSettings.passwordSettings: PasswordSettingsData
 UserSettings.signIn: SignInData
 UserSettings.signUp: SignUpData
-UserSettings.social: Map<String, OAuthProviderSettings?>
+UserSettings.social: Map<String, OAuthProviderSettings>
 UserSettings.socialProviderStrategies: List<OAuthStrategy>
 UserSettings.usernameSettings: UsernameSettingsData
 UserSettings.web3FirstFactors: List<UserSettingsWeb3FirstFactorsElement>
@@ -1320,6 +1356,7 @@ enum OrganizationSuggestionStatus
 enum PermissionType
 enum PhoneCodeChannel
 enum PreferredSignInStrategy
+enum ProtectLoaderTarget
 enum SessionStatus
 enum SessionTaskKey
 enum SessionTouchIntent
@@ -1338,6 +1375,7 @@ enum SignUpStatus
 enum UserSettingsWeb3FirstFactorsElement
 enum VerificationStatus
 enum VerificationStrategy
+object APIKeysSettings
 object Actions
 object AddMemberParams
 object AddPaymentMethodParams
@@ -1368,6 +1406,10 @@ object ClerkPaginatedResponseOrganizationMembershipRequest
 object ClerkPaginatedResponseOrganizationSuggestion
 object ClerkPaginatedResponseUserOrganizationInvitation
 object ClerkResourceReloadParams
+object CommerceSettings
+object CommerceSettingsBilling
+object CommerceSettingsBillingOrganization
+object CommerceSettingsBillingUser
 object CreateEmailAddressParams
 object CreateExternalAccountParams
 object CreateOrganizationEnterpriseConnectionParams
@@ -1395,7 +1437,6 @@ object EnterpriseOAuthConfig
 object EnterpriseSSOFactor
 object EnterpriseSSOSettings
 object EnterpriseSamlConnectionNested
-object EnvironmentResource
 object GetDomainsParams
 object GetEnterpriseConnectionTestRunsParams
 object GetEnterpriseConnectionsParams
@@ -1448,6 +1489,8 @@ object PickCreateOrganizationDomainParamsAndenrollmentMode
 object PrepareAffiliationVerificationParams
 object PrepareWeb3WalletVerificationParams
 object ProtectCheck
+object ProtectConfig
+object ProtectLoader
 object PublicKeyCredentialWithAuthenticatorAssertionResponse
 object PublicUserData
 object ReauthorizeExternalAccountParams
@@ -1543,6 +1586,7 @@ resource EnterpriseAccount
 resource EnterpriseAccountConnection
 resource EnterpriseConnection
 resource EnterpriseConnectionTestRun
+resource EnvironmentResource
 resource ExternalAccount
 resource IdentificationLink
 resource ImageResource
@@ -1585,6 +1629,7 @@ union GetUserOrganizationSuggestionsParamsStatus
 union MobileSetActiveParamsOrganization
 union MobileSetActiveParamsSession
 union PrepareEmailAddressVerificationParams
+union ProtectLoaderAttributesValue
 union ReverificationConfig
 union SessionVerificationFirstFactor
 union SessionVerificationSecondFactor

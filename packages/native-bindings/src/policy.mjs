@@ -29,6 +29,11 @@ export const profile = {
   excluded: {
     'TOTPResource.reload': 'Enrollment secrets are explicit method return values, not shared observable resources.',
     'BackupCodeResource.reload': 'Recovery codes are explicit method return values, not shared observable resources.',
+    'EnvironmentResource.onWindowLocationHost': 'Browser host matching is not a native environment capability.',
+    'UserSettingsResource.reload': 'User settings are hydrated by the environment resource, not a separate endpoint.',
+    'CommerceSettingsResource.reload': 'Commerce settings are hydrated by the environment resource.',
+    'APIKeysSettingsResource.reload': 'API key settings are hydrated by the environment resource.',
+    'ProtectConfigResource.reload': 'Protect settings are hydrated by the environment resource.',
     'DisplayConfigResource.reload': 'Instance configuration is refreshed by the owning core lifecycle.',
     'AuthConfigResource.reload': 'Instance configuration is refreshed by the owning core lifecycle.',
     'OrganizationSettingsResource.reload': 'Instance configuration is refreshed by the owning core lifecycle.',
@@ -53,12 +58,14 @@ export const profile = {
       'Provider credentials are not included in general resource observation.',
     'SessionResource.lastActiveToken': 'Session JWTs are only returned by getToken, never broadcast as state.',
   },
+  sparseDictionaries: {
+    'UserSettingsResource.social': 'FAPI returns configured providers only; preserve their canonical value shape.',
+  },
   explicitReads: {
     'PhoneNumberResource.backupCodes': 'Return recovery codes only to an explicit reader, never in observable state.',
   },
   adapted: {
     'MobileClerk.environment': 'Read instance settings from the existing initialized core.',
-    'MobileUserSettings.social': 'Configured providers form a partial map; retain each declared provider shape.',
     'EmailAddressResource.toString': 'Generate stringValue to avoid an asynchronous Kotlin Any.toString override.',
     'PhoneNumberResource.toString': 'Generate stringValue to avoid an asynchronous Kotlin Any.toString override.',
     'Web3WalletResource.toString': 'Generate stringValue to avoid an asynchronous Kotlin Any.toString override.',
@@ -78,8 +85,7 @@ export const profile = {
 
 export function nativeName(name) {
   if (name === 'MobileClerk') return 'Clerk';
-  if (name === 'MobileEnvironment') return 'EnvironmentResource';
-  if (name === 'MobileUserSettings') return 'UserSettings';
+  if (name === 'EnvironmentResource') return name;
   if (name === 'ImageResource') return name;
   if (name === 'Color') return 'DisplayThemeColor';
   return name.replaceAll('Future', '').replace(/Resource$/, '');

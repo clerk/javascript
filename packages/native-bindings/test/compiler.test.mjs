@@ -184,3 +184,17 @@ test('utility-type parameters keep their exported contract alias', () => {
   assert.match(native['GeneratedAPI.kt'], /class UpdatePasskeyParams/);
   assert.doesNotMatch(native['GeneratedAPI.swift'], /Partialtype/);
 });
+
+test('a sparse dictionary adapter retains value types and checks the targeted member', () => {
+  const model = compile(source.replace('attributes: Record<string, string>', 'attributes: Record<"a" | "b", string>'), {
+    sparseDictionaries: { 'SignInFutureResource.attributes': 'Only configured keys are returned.' },
+  });
+  assert.deepEqual(model.failures, []);
+  const shape = model.definitions.SignIn.properties.find(p => p.name === 'attributes').type;
+  assert.deepEqual(shape.requiredKeys, []);
+  assert.deepEqual(shape.value, { kind: 'string' });
+  assert.ok(compile(source, { sparseDictionaries: { 'SignInFutureResource.id': 'Wrong shape.' } }).failures.length);
+  assert.ok(
+    compile(source, { sparseDictionaries: { 'SignInFutureResource.missing': 'Stale policy.' } }).failures.length,
+  );
+});

@@ -78,6 +78,11 @@ export function compileProfile(repository, policy = profile) {
     const declarationOwner = symbol.declarations?.[0]?.parent?.name?.getText();
     const keys = [`${owner}.${member}`, `${declarationOwner}.${member}`];
     for (const key of keys) {
+      if (policy.sparseDictionaries?.[key]) {
+        overridesUsed.add(key);
+        accounting.push({ path: `${owner}.${member}`, disposition: 'adapted', reason: policy.sparseDictionaries[key] });
+        return 'sparseDictionary';
+      }
       if (policy.explicitReads?.[key]) {
         overridesUsed.add(key);
         accounting.push({ path: `${owner}.${member}`, disposition: 'adapted', reason: policy.explicitReads[key] });
@@ -394,10 +399,20 @@ export function compileProfile(repository, policy = profile) {
           asynchronous: awaited !== result,
         });
       } else {
+        let shape = lower(propertyType, memberHint, { ...resourceContext, jsonValue: disposition === 'json' });
+        if (disposition === 'sparseDictionary') {
+          if (shape.kind !== 'dictionary')
+            unsupported(
+              propertyType,
+              `${owner}.${propertyName}`,
+              'Sparse dictionary policy requires a mapped dictionary.',
+            );
+          else shape = { ...shape, requiredKeys: [] };
+        }
         definition.properties.push({
           name: propertyName,
           optional: !!(property.flags & ts.SymbolFlags.Optional),
-          type: lower(propertyType, memberHint, { ...resourceContext, jsonValue: disposition === 'json' }),
+          type: shape,
           source: sourceOf(property),
           ...documentationOf(property),
         });
@@ -422,6 +437,7 @@ export function compileProfile(repository, policy = profile) {
     ...Object.keys(policy.adapted),
     ...Object.keys(policy.jsonMembers || {}),
     ...Object.keys(policy.explicitReads || {}),
+    ...Object.keys(policy.sparseDictionaries || {}),
   ]) {
     if (!overridesUsed.has(key)) failures.push({ path: key, reason: 'Binding policy target was not reached.' });
   }

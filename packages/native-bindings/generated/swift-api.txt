@@ -1,3 +1,7 @@
+APIKeysSettings.id: String? = nil
+APIKeysSettings.orgs_api_keys_enabled: Bool
+APIKeysSettings.user_api_keys_enabled: Bool
+APIKeysSettings: Hashable
 Actions.create_organization: Bool
 Actions.delete_self: Bool
 Actions: Hashable
@@ -183,6 +187,19 @@ ClerkResourceReloadParams.rotatingTokenNonce: String? = nil
 ClerkResourceReloadParams: Hashable
 ClerkStatus cases: degraded, error, loading, ready, unrecognized(String)
 ClerkStatus: Hashable
+CommerceSettings.billing: CommerceSettingsBilling
+CommerceSettings.id: String? = nil
+CommerceSettings: Hashable
+CommerceSettingsBilling.organization: CommerceSettingsBillingOrganization
+CommerceSettingsBilling.stripePublishableKey: String?
+CommerceSettingsBilling.user: CommerceSettingsBillingUser
+CommerceSettingsBilling: Hashable
+CommerceSettingsBillingOrganization.enabled: Bool
+CommerceSettingsBillingOrganization.hasPaidPlans: Bool
+CommerceSettingsBillingOrganization: Hashable
+CommerceSettingsBillingUser.enabled: Bool
+CommerceSettingsBillingUser.hasPaidPlans: Bool
+CommerceSettingsBillingUser: Hashable
 CreateEmailAddressParams.email: String
 CreateEmailAddressParams: Hashable
 CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.cancelEmailLinkFlow(): Void [return]
@@ -438,10 +455,20 @@ EnterpriseSamlConnectionNested.name: String
 EnterpriseSamlConnectionNested.spEntityId: String
 EnterpriseSamlConnectionNested.spMetadataUrl: String
 EnterpriseSamlConnectionNested: Hashable
+EnvironmentResource.apiKeysSettings: APIKeysSettings
 EnvironmentResource.authConfig: AuthConfig
+EnvironmentResource.clientDebugMode: Bool
+EnvironmentResource.commerceSettings: CommerceSettings
 EnvironmentResource.displayConfig: DisplayConfig
+EnvironmentResource.id: String? = nil
+EnvironmentResource.isDevelopmentOrStaging(): Bool [return]
+EnvironmentResource.isProduction(): Bool [return]
+EnvironmentResource.isSingleSession(): Bool [return]
 EnvironmentResource.maintenanceMode: Bool
 EnvironmentResource.organizationSettings: OrganizationSettings
+EnvironmentResource.partitionedCookies: Bool
+EnvironmentResource.protectConfig: ProtectConfig
+EnvironmentResource.reload(p: ClerkResourceReloadParams? = nil): EnvironmentResource [return]
 EnvironmentResource.userSettings: UserSettings
 EnvironmentResource: Hashable
 ExternalAccount.accountIdentifier(): String [return]
@@ -903,6 +930,24 @@ ProtectCheck.sdkUrl: String
 ProtectCheck.status: String
 ProtectCheck.uiHints: [String: String]? = nil
 ProtectCheck: Hashable
+ProtectConfig.challenge_load_timeout_ms: Double? = nil
+ProtectConfig.id: String? = nil
+ProtectConfig.loaders: [ProtectLoader]? = nil
+ProtectConfig.tokens_invalid_before: Double? = nil
+ProtectConfig: Hashable
+ProtectLoader.attributes: [String: ProtectLoaderAttributesValue]? = nil
+ProtectLoader.challenge_load_timeout_ms: Double? = nil
+ProtectLoader.rollout: Double? = nil
+ProtectLoader.target: ProtectLoaderTarget
+ProtectLoader.text_content: String? = nil
+ProtectLoader.token_timeout_ms: Double? = nil
+ProtectLoader.token_url: String? = nil
+ProtectLoader.type: String
+ProtectLoader: Hashable
+ProtectLoaderAttributesValue variants: String | Double | Bool | Bool
+ProtectLoaderAttributesValue: Hashable
+ProtectLoaderTarget cases: head, body, unrecognized(String)
+ProtectLoaderTarget: Hashable
 PublicKeyCredentialWithAuthenticatorAssertionResponse.authenticatorAttachment: String?
 PublicKeyCredentialWithAuthenticatorAssertionResponse.id: String
 PublicKeyCredentialWithAuthenticatorAssertionResponse.rawId: Data
@@ -1558,7 +1603,7 @@ UserSettings.passkeySettings: PasskeySettingsData
 UserSettings.passwordSettings: PasswordSettingsData
 UserSettings.signIn: SignInData
 UserSettings.signUp: SignUpData
-UserSettings.social: [String: OAuthProviderSettings?]
+UserSettings.social: [String: OAuthProviderSettings]
 UserSettings.socialProviderStrategies: [OAuthStrategy]
 UserSettings.usernameSettings: UsernameSettingsData
 UserSettings.web3FirstFactors: [UserSettingsWeb3FirstFactorsElement]
@@ -1621,6 +1666,7 @@ enum OrganizationSuggestionStatus
 enum PermissionType
 enum PhoneCodeChannel
 enum PreferredSignInStrategy
+enum ProtectLoaderTarget
 enum SessionStatus
 enum SessionTaskKey
 enum SessionTouchIntent
@@ -1639,6 +1685,7 @@ enum SignUpStatus
 enum UserSettingsWeb3FirstFactorsElement
 enum VerificationStatus
 enum VerificationStrategy
+object APIKeysSettings
 object Actions
 object AddMemberParams
 object AddPaymentMethodParams
@@ -1669,6 +1716,10 @@ object ClerkPaginatedResponseOrganizationMembershipRequest
 object ClerkPaginatedResponseOrganizationSuggestion
 object ClerkPaginatedResponseUserOrganizationInvitation
 object ClerkResourceReloadParams
+object CommerceSettings
+object CommerceSettingsBilling
+object CommerceSettingsBillingOrganization
+object CommerceSettingsBillingUser
 object CreateEmailAddressParams
 object CreateExternalAccountParams
 object CreateOrganizationEnterpriseConnectionParams
@@ -1696,7 +1747,6 @@ object EnterpriseOAuthConfig
 object EnterpriseSSOFactor
 object EnterpriseSSOSettings
 object EnterpriseSamlConnectionNested
-object EnvironmentResource
 object GetDomainsParams
 object GetEnterpriseConnectionTestRunsParams
 object GetEnterpriseConnectionsParams
@@ -1749,6 +1799,8 @@ object PickCreateOrganizationDomainParamsAndenrollmentMode
 object PrepareAffiliationVerificationParams
 object PrepareWeb3WalletVerificationParams
 object ProtectCheck
+object ProtectConfig
+object ProtectLoader
 object PublicKeyCredentialWithAuthenticatorAssertionResponse
 object PublicUserData
 object ReauthorizeExternalAccountParams
@@ -1844,6 +1896,7 @@ resource EnterpriseAccount
 resource EnterpriseAccountConnection
 resource EnterpriseConnection
 resource EnterpriseConnectionTestRun
+resource EnvironmentResource
 resource ExternalAccount
 resource IdentificationLink
 resource ImageResource
@@ -1886,6 +1939,7 @@ union GetUserOrganizationSuggestionsParamsStatus
 union MobileSetActiveParamsOrganization
 union MobileSetActiveParamsSession
 union PrepareEmailAddressVerificationParams
+union ProtectLoaderAttributesValue
 union ReverificationConfig
 union SessionVerificationFirstFactor
 union SessionVerificationSecondFactor
