@@ -1,6 +1,7 @@
 import { type Clerk } from '@clerk/clerk-js';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
 import { is4xxError, isClerkRuntimeError } from '@clerk/shared/error';
+import { installMobileCredentialTransport } from '@clerk/shared/mobile';
 import type {
   ClientJSONSnapshot,
   EnvironmentJSONSnapshot,
@@ -61,6 +62,7 @@ let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
 let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
+let __internal_mobileTransport: ReturnType<typeof installMobileCredentialTransport> | undefined;
 
 /**
  * Resolves the next native singleton config while preserving existing values for omitted options.
@@ -119,9 +121,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       __internal_cancelResourceRetries?.();
       __internal_cancelResourceRetries = undefined;
 
-      if (hasConfigChanged) {
-        void __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
-      }
+      const previousTransport = __internal_mobileTransport;
+      const invalidation = previousTransport?.invalidate();
+      previousTransport?.dispose();
+      const resetCache = __internal_tokenCache;
+      const credentialReady = hasConfigChanged
+        ? Promise.resolve(invalidation).then(() => resetCache.clearToken?.(CLERK_CLIENT_JWT_KEY))
+        : Promise.resolve(invalidation);
 
       const getToken = (key: string) => __internal_tokenCache.getToken(key);
       const saveToken = (key: string, token: string) => __internal_tokenCache.saveToken(key, token);
@@ -282,33 +288,25 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         }
       }
 
-      // @ts-expect-error - This is an internal API
-      __internal_clerk.__internal_onBeforeRequest(async (requestInit: FapiRequestInit) => {
-        // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
-        requestInit.credentials = 'omit';
-
-        // Instructs the backend to parse the api token from the Authorization header.
-        requestInit.url?.searchParams.append('_is_native', '1');
-
-        const jwt = await getToken(CLERK_CLIENT_JWT_KEY);
-        (requestInit.headers as Headers).set('authorization', jwt || '');
-
-        // Instructs the backend that the request is from a mobile device.
-        // Some iOS devices have an empty user-agent, so we can't rely on that.
-        if (isNative()) {
-          (requestInit.headers as Headers).set('x-mobile', '1');
-          (requestInit.headers as Headers).set('x-expo-sdk-version', packageJson.version);
-        }
-      });
+      __internal_mobileTransport = installMobileCredentialTransport(
+        clerk as unknown as Clerk,
+        {
+          read: async () => {
+            await credentialReady;
+            return getToken(CLERK_CLIENT_JWT_KEY);
+          },
+          write: token => saveToken(CLERK_CLIENT_JWT_KEY, token),
+          remove: async () => {
+            await __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
+          },
+        },
+        isNative() ? { 'x-expo-sdk-version': packageJson.version } : {},
+        { native: isNative() },
+      );
 
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
       __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse) => {
-        const authHeader = response.headers.get('authorization');
-        if (authHeader) {
-          await saveToken(CLERK_CLIENT_JWT_KEY, authHeader);
-        }
-
         if (__DEV__ && !nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
           console.error(
             'The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/~/native-applications',

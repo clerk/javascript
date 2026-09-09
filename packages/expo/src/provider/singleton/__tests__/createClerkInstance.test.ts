@@ -438,16 +438,12 @@ describe('createClerkInstance', () => {
     });
 
     const afterResponse = clerk.__internal_onAfterResponse.mock.calls[0][0];
-    await afterResponse(
-      {
-        headers: new Headers(),
-        url: new URL('https://clerk.example.com/v1/client'),
-      },
-      {
-        headers: new Headers({ authorization: 'fresh-token' }),
-        payload: null,
-      },
-    );
+    const request = { headers: new Headers(), url: new URL('https://clerk.example.com/v1/client') };
+    await clerk.__internal_onBeforeRequest.mock.calls[0][0](request);
+    await afterResponse(request, {
+      headers: new Headers({ authorization: 'fresh-token' }),
+      payload: null,
+    });
 
     expect(initialTokenCache.saveToken).not.toHaveBeenCalled();
     expect(latestTokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'fresh-token');
