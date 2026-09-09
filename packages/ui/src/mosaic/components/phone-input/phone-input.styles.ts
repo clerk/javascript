@@ -4,13 +4,14 @@ import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex
 
 export const styles = stylex.create({
   trigger: {
-    paddingInlineEnd: 0,
-    paddingInlineStart: space['2.5'],
+    paddingInlineEnd: space['2'],
+    paddingInlineStart: space['2'],
+    width: 'auto',
   },
   triggerContent: {
+    gap: space['0.5'],
     alignItems: 'center',
     display: 'flex',
-    gap: space['0.5'],
   },
   flag: {
     fontSize: typeScaleVars['--cl-text-sm-size'],

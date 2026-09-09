@@ -14,6 +14,7 @@ import {
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
+import { Button } from '../button';
 import { Combobox } from '../combobox';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
@@ -201,31 +202,30 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           onOpenChange={setOpen}
           placement='bottom-start'
         >
-          <Popover.Trigger
-            render={
-              <InputGroup.Action
-                size='xs'
-                {...mergeStyleProps(themeProps('phone-input-country-trigger'), stylex.props(styles.trigger))}
-              />
-            }
-            type='button'
-            disabled={disabled}
-            aria-label={`Country, ${country.name}`}
-          >
-            <span {...stylex.props(reset.base, styles.triggerContent)}>
-              <span
-                aria-hidden='true'
-                {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
-              >
-                {getFlagEmojiFromCountryIso(country.iso)}
+          <InputGroup.Start>
+            <Popover.Trigger
+              render={
+                <Button {...mergeStyleProps(themeProps('phone-input-country-trigger'), stylex.props(styles.trigger))} />
+              }
+              type='button'
+              disabled={disabled}
+              aria-label={`Country, ${country.name}`}
+            >
+              <span {...stylex.props(reset.base, styles.triggerContent)}>
+                <span
+                  aria-hidden='true'
+                  {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
+                >
+                  {getFlagEmojiFromCountryIso(country.iso)}
+                </span>
+                <Icon
+                  name='chevron-down'
+                  size='sm'
+                  aria-hidden='true'
+                />
               </span>
-              <Icon
-                name='chevron-down'
-                size='sm'
-                aria-hidden='true'
-              />
-            </span>
-          </Popover.Trigger>
+            </Popover.Trigger>
+          </InputGroup.Start>
           <Popover.Popup
             aria-label='Choose a country'
             size='sm'

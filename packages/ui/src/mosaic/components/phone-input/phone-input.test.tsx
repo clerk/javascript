@@ -13,6 +13,19 @@ const rootClasses = stylex.props(scrollAreaRoot).className?.split(' ') ?? [];
 const viewportOnlyClasses = scrollClasses.filter(name => !rootClasses.includes(name));
 
 describe('Mosaic PhoneInput', () => {
+  it.each([
+    ['sm', 'xs'],
+    ['md', 'sm'],
+    ['lg', 'md'],
+  ] as const)('sizes the country trigger for a %s input', (size, triggerSize) => {
+    render(
+      <PhoneInput
+        size={size}
+        aria-label='Phone number'
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Country, United States' })).toHaveAttribute('data-size', triggerSize);
+  });
   it('renders one grouped telephone control with the default country', () => {
     render(<PhoneInput aria-label='Phone number' />);
 
@@ -22,8 +35,9 @@ describe('Mosaic PhoneInput', () => {
     expect(input).toHaveClass('cl-input', 'cl-phone-input-control');
     expect(input).toHaveAttribute('data-variant', 'ghost');
     const countryTrigger = screen.getByRole('button', { name: 'Country, United States' });
-    expect(countryTrigger).toHaveClass('cl-input-group-action', 'cl-phone-input-country-trigger');
-    expect(countryTrigger).toHaveAttribute('data-size', 'xs');
+    expect(countryTrigger).toHaveClass('cl-button', 'cl-phone-input-country-trigger');
+    expect(countryTrigger.closest('.cl-input-group-start')).not.toBeNull();
+    expect(countryTrigger).toHaveAttribute('data-size', 'sm');
     expect(countryTrigger).toHaveAttribute('data-variant', 'ghost');
     expect(screen.queryByText('us')).not.toBeInTheDocument();
     expect(document.querySelector('.cl-phone-input-divider')).toHaveAttribute('aria-hidden', 'true');
