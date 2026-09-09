@@ -12,7 +12,7 @@ import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useAfterVerification } from './use-after-verification';
 
 type UVFactorTwoBackupCodeCardProps = {
-  onShowAlternativeMethodsClicked: React.MouseEventHandler;
+  onShowAlternativeMethodsClicked?: React.MouseEventHandler;
 };
 
 export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps) => {

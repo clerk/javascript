@@ -150,7 +150,7 @@ const FieldError = React.forwardRef<HTMLParagraphElement, FieldErrorProps>(funct
             name='alert-circle'
             size='sm'
             aria-hidden='true'
-            {...stylex.props(styles.errorIcon)}
+            xstyle={styles.errorIcon}
           />
           <span>{children}</span>
         </>
