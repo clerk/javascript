@@ -21,7 +21,7 @@ export function UserProfileProviderIcon(props: UserProfileProviderIconProps) {
           <Icon
             aria-hidden
             name={props.name}
-            {...stylex.props(styles.providerIcon)}
+            xstyle={styles.providerIcon}
           />
         )}
       </IconFrame>
