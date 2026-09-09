@@ -9,14 +9,19 @@ import {
   targetVars,
   typeScaleVars,
 } from '../../tokens.stylex';
+import { buttonScope } from '../button/button.markers.stylex';
 
+/* eslint-disable @stylexjs/no-lookahead-selectors -- Supported browsers include :has(); the marker scopes matching to Mosaic buttons. */
 export const styles = stylex.create({
   addon: {
     '--_cl-button-radius': 'max(0px, calc(var(--_cl-input-group-radius) - var(--_cl-input-group-inset)))',
     gap: space['1'],
     alignItems: 'center',
+    alignSelf: 'stretch',
+    color: colorVars['--cl-color-input-placeholder'],
     display: 'flex',
     flexShrink: 0,
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
   },
   button: {
     outlineOffset: {
@@ -30,8 +35,24 @@ export const styles = stylex.create({
   iconButton: {
     width: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
   },
-  start: { paddingInlineStart: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))' },
-  end: { paddingInlineEnd: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))' },
+  start: {
+    borderEndStartRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
+    borderStartStartRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
+    paddingInlineEnd: { default: space['3'], [stylex.when.descendant(':where(*)', buttonScope)]: 0 },
+    paddingInlineStart: {
+      default: space['3'],
+      [stylex.when.descendant(':where(*)', buttonScope)]: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))',
+    },
+  },
+  end: {
+    borderEndEndRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
+    borderStartEndRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
+    paddingInlineEnd: {
+      default: space['3'],
+      [stylex.when.descendant(':where(*)', buttonScope)]: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))',
+    },
+    paddingInlineStart: { default: space['3'], [stylex.when.descendant(':where(*)', buttonScope)]: 0 },
+  },
   root: {
     '--_cl-input-group-inset': `calc(${focusVars['--cl-focus-outline-width']} + 1px)`,
     overflow: 'visible',
@@ -40,23 +61,9 @@ export const styles = stylex.create({
     minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
     width: '100%',
   },
-  text: {
-    alignItems: 'center',
-    color: colorVars['--cl-color-input-placeholder'],
-    display: 'flex',
-    flexShrink: 0,
-    fontFamily: fontFamilyVars['--cl-font-family-sans'],
-    paddingInlineEnd: {
-      default: 0,
-      ':last-child': space['3'],
-    },
-    paddingInlineStart: {
-      default: 0,
-      ':first-child': space['3'],
-    },
-    pointerEvents: 'none',
-  },
 });
+
+/* eslint-enable @stylexjs/no-lookahead-selectors */
 
 export const sizes = stylex.create({
   sm: {

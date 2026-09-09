@@ -8,6 +8,7 @@ import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { truncationStyles } from '../../utils/typography.styles';
 import { ButtonContext } from './button.context';
+import { buttonScope } from './button.markers.stylex';
 import { iconSizes, sizes, styles, variants } from './button.styles';
 
 export interface ButtonProps extends MosaicElementProps<'button'> {
@@ -127,6 +128,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
         themeProps('button', { color, variant, size, shape, fullWidth, disabled }),
         stylex.props(
           reset.base,
+          buttonScope,
           // one ring for every color and variant — it reads as focus, not as the button's color
           focusOutline.visible,
           styles.base,

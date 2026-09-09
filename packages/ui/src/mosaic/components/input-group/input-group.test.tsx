@@ -173,9 +173,9 @@ describe('Mosaic InputGroup', () => {
   it('composes text and a ghost input inside one control', () => {
     render(
       <InputGroup.Root>
-        <InputGroup.Text>https://</InputGroup.Text>
+        <InputGroup.Start>https://</InputGroup.Start>
         <Input aria-label='Domain' />
-        <InputGroup.Text>.com</InputGroup.Text>
+        <InputGroup.End>.com</InputGroup.End>
       </InputGroup.Root>,
     );
 
@@ -184,8 +184,8 @@ describe('Mosaic InputGroup', () => {
     expect(group).toHaveAttribute('data-size', 'md');
     expect(input).toHaveClass('cl-input');
     expect(input).toHaveAttribute('data-variant', 'ghost');
-    expect(screen.getByText('https://')).toHaveClass('cl-input-group-text');
-    expect(screen.getByText('.com')).toHaveClass('cl-input-group-text');
+    expect(screen.getByText('https://')).toHaveClass('cl-input-group-start');
+    expect(screen.getByText('.com')).toHaveClass('cl-input-group-end');
   });
 
   it('preserves an explicitly supplied input variant', () => {
@@ -204,7 +204,7 @@ describe('Mosaic InputGroup', () => {
   it.each(['sm', 'md', 'lg'] as const)('shares the %s size with its parts', size => {
     render(
       <InputGroup.Root size={size}>
-        <InputGroup.Text>Prefix</InputGroup.Text>
+        <InputGroup.Start>Prefix</InputGroup.Start>
         <Input aria-label='Value' />
       </InputGroup.Root>,
     );
@@ -257,7 +257,7 @@ describe('Mosaic InputGroup', () => {
       >
         <Field.Label>Website</Field.Label>
         <InputGroup.Root>
-          <InputGroup.Text>https://</InputGroup.Text>
+          <InputGroup.Start>https://</InputGroup.Start>
           <Input />
         </InputGroup.Root>
         <Field.Error>Enter a valid website</Field.Error>
@@ -279,7 +279,7 @@ describe('Mosaic InputGroup', () => {
     render(
       <InputGroup.Root>
         <Input aria-label='Email username' />
-        <InputGroup.Text>@acme.com</InputGroup.Text>
+        <InputGroup.End>@acme.com</InputGroup.End>
       </InputGroup.Root>,
     );
 

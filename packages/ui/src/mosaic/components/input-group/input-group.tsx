@@ -68,30 +68,6 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
   return <InputGroupContext.Provider value={context}>{element}</InputGroupContext.Provider>;
 });
 
-export type InputGroupTextProps = MosaicComponentProps<'span'>;
-
-const Text = React.forwardRef<HTMLSpanElement, InputGroupTextProps>(function MosaicInputGroupText(
-  { render, className, style, ...otherProps },
-  ref,
-) {
-  const group = useInputGroupContext();
-
-  return useRender({
-    defaultTagName: 'span',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('input-group-text', { size: group.size, disabled: group.disabled }),
-        stylex.props(reset.base, styles.text, textSizes[group.size]),
-        className,
-        style,
-      ),
-      ...otherProps,
-    },
-  });
-});
-
 export type InputGroupActionProps = ButtonProps;
 
 const Action = React.forwardRef<HTMLButtonElement, InputGroupActionProps>(function MosaicInputGroupAction(
@@ -150,8 +126,8 @@ function useAddon(
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps(`input-group-${side}`),
-        stylex.props(reset.base, styles.addon, styles[side]),
+        themeProps(`input-group-${side}`, { size: group.size, disabled: group.disabled }),
+        stylex.props(reset.base, styles.addon, textSizes[group.size], styles[side]),
         className,
         style,
       ),
@@ -169,4 +145,4 @@ const End = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function Mos
   return useAddon('end', props, ref);
 });
 
-export const InputGroup = { Root, Input, Text, Action, Start, End };
+export const InputGroup = { Root, Input, Action, Start, End };
