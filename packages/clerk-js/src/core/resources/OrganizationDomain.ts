@@ -84,6 +84,8 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
       this.id = data.id;
       this.name = data.name;
       this.organizationId = data.organization_id;
+      this.createdAt = new Date(data.created_at);
+      this.updatedAt = new Date(data.updated_at);
       this.enrollmentMode = data.enrollment_mode;
       this.affiliationEmailAddress = data.affiliation_email_address;
       this.totalPendingSuggestions = data.total_pending_suggestions;
