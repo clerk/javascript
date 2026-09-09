@@ -16,6 +16,27 @@ import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
 import type { Waitlist } from './resources/Waitlist';
 
+const retiredAuthResources = new WeakSet<object>();
+
+export function retireAuthResource(resource: SignIn | SignUp | null): void {
+  if (resource) retiredAuthResources.add(resource);
+}
+
+export function isRetiredAuthResource(resource: object): boolean {
+  return retiredAuthResources.has(resource);
+}
+
+export function resetAuthResourceSignals(): void {
+  retireAuthResource(signInResourceSignal().resource);
+  retireAuthResource(signUpResourceSignal().resource);
+  signInResourceSignal({ resource: null });
+  signUpResourceSignal({ resource: null });
+  signInErrorSignal({ error: null });
+  signUpErrorSignal({ error: null });
+  signInFetchSignal({ status: 'idle' });
+  signUpFetchSignal({ status: 'idle' });
+}
+
 export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
 export const signInErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
 export const signInFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });

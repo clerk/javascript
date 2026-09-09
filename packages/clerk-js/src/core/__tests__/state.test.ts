@@ -103,7 +103,10 @@ describe('State', () => {
             eventBus.emit('resource:update', { resource: newSignUpFromReset });
           }),
         };
-        SignUp.clerk = { client: mockClient } as any;
+        SignUp.clerk = {
+          client: mockClient,
+          __internal_withNativeAuthReset: (_reason: string, commit: () => unknown) => commit(),
+        } as any;
 
         // Create a SignUp with id
         const existingSignUp = new SignUp({ id: 'signup_123', status: 'missing_requirements' } as any);
@@ -123,6 +126,8 @@ describe('State', () => {
         // The previous id 'signup_123' should be gone
         expect(signUpResourceSignal().resource).toBe(newSignUpFromReset);
         expect(signUpResourceSignal().resource?.id).toBeUndefined();
+        existingSignUp.__internal_updateFromJSON(null);
+        expect(signUpResourceSignal().resource).toBe(newSignUpFromReset);
       });
 
       it('should allow resource update when new resource has an id (not a null update)', () => {
@@ -205,7 +210,10 @@ describe('State', () => {
             eventBus.emit('resource:update', { resource: newSignInFromReset });
           }),
         };
-        SignIn.clerk = { client: mockClient } as any;
+        SignIn.clerk = {
+          client: mockClient,
+          __internal_withNativeAuthReset: (_reason: string, commit: () => unknown) => commit(),
+        } as any;
 
         // Create a SignIn with id
         const existingSignIn = new SignIn({ id: 'signin_123', status: 'needs_identifier' } as any);
@@ -220,6 +228,8 @@ describe('State', () => {
         expect(existingSignIn.__internal_future.canBeDiscarded).toBe(true);
         expect(signInResourceSignal().resource).toBe(newSignInFromReset);
         expect(signInResourceSignal().resource?.id).toBeUndefined();
+        existingSignIn.__internal_updateFromJSON(null);
+        expect(signInResourceSignal().resource).toBe(newSignInFromReset);
       });
 
       it('should allow resource update when new resource has an id (not a null update)', () => {

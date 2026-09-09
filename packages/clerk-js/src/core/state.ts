@@ -8,6 +8,8 @@ import { SignIn } from './resources/SignIn';
 import { SignUp } from './resources/SignUp';
 import { Waitlist } from './resources/Waitlist';
 import {
+  isRetiredAuthResource,
+  retireAuthResource,
   signInComputedSignal,
   signInErrorSignal,
   signInFetchSignal,
@@ -57,6 +59,7 @@ export class State implements StateInterface {
   }
 
   private onResourceError = (payload: { resource: BaseResource; error: ClerkError | null }) => {
+    if (isRetiredAuthResource(payload.resource)) return;
     if (payload.resource instanceof SignIn) {
       this.signInErrorSignal({ error: payload.error });
     }
@@ -71,19 +74,24 @@ export class State implements StateInterface {
   };
 
   private onResourceUpdated = (payload: { resource: BaseResource }) => {
+    if (isRetiredAuthResource(payload.resource)) return;
     if (payload.resource instanceof SignIn) {
       const previousResource = this.signInResourceSignal().resource;
-      if (shouldIgnoreNullUpdate(previousResource, payload.resource)) {
+      if (shouldIgnoreResourceUpdate(previousResource, payload.resource)) {
         return;
       }
+      if (previousResource !== payload.resource && previousResource?.__internal_future.canBeDiscarded)
+        retireAuthResource(previousResource);
       this.signInResourceSignal({ resource: payload.resource });
     }
 
     if (payload.resource instanceof SignUp) {
       const previousResource = this.signUpResourceSignal().resource;
-      if (shouldIgnoreNullUpdate(previousResource, payload.resource)) {
+      if (shouldIgnoreResourceUpdate(previousResource, payload.resource)) {
         return;
       }
+      if (previousResource !== payload.resource && previousResource?.__internal_future.canBeDiscarded)
+        retireAuthResource(previousResource);
       this.signUpResourceSignal({ resource: payload.resource });
     }
 
@@ -94,6 +102,7 @@ export class State implements StateInterface {
   };
 
   private onResourceFetch = (payload: { resource: BaseResource; status: 'idle' | 'fetching' }) => {
+    if (isRetiredAuthResource(payload.resource)) return;
     if (payload.resource instanceof SignIn) {
       this.signInFetchSignal({ status: payload.status });
     }
@@ -108,12 +117,10 @@ export class State implements StateInterface {
   };
 }
 
-/**
- * Returns true if the new resource is null and the previous resource cannot be discarded. This is used to prevent
- * nullifying the resource after it's been completed or explicitly reset.
- */
-function shouldIgnoreNullUpdate(previousResource: SignIn | null, newResource: SignIn | null): boolean;
-function shouldIgnoreNullUpdate(previousResource: SignUp | null, newResource: SignUp | null): boolean;
-function shouldIgnoreNullUpdate(previousResource: SignIn | SignUp | null, newResource: SignIn | SignUp | null) {
+/** Keep retained attempts across null updates and ignore late updates after an attempt has been discarded. */
+function shouldIgnoreResourceUpdate(previousResource: SignIn | null, newResource: SignIn | null): boolean;
+function shouldIgnoreResourceUpdate(previousResource: SignUp | null, newResource: SignUp | null): boolean;
+function shouldIgnoreResourceUpdate(previousResource: SignIn | SignUp | null, newResource: SignIn | SignUp | null) {
+  if (previousResource !== newResource && newResource?.__internal_future.canBeDiscarded) return true;
   return !newResource?.id && previousResource && previousResource.__internal_future?.canBeDiscarded === false;
 }

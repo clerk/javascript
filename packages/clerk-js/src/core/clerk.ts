@@ -3254,6 +3254,8 @@ export class Clerk implements ClerkInterface {
 
   __internal_getMobileResources = (): MobileAuthenticationResources => {
     if (!this.client || !this.environment) throw new Error('Clerk must be loaded before attaching native resources.');
+    const signIn = this.__internal_state.signInResourceSignal().resource;
+    const signUp = this.__internal_state.signUpResourceSignal().resource;
     return {
       clientId: this.client.id ?? null,
       biometricCredentials: this.__internal_nativeBiometrics,
@@ -3268,8 +3270,8 @@ export class Clerk implements ClerkInterface {
       },
       authenticateWithSSO: params => authenticateWithMobileSSO(this, params),
       startAuthentication: params => startMobileAuthentication(this, params),
-      signIn: this.client.signIn.__internal_future,
-      signUp: this.client.signUp.__internal_future,
+      signIn: (signIn?.id ? signIn : this.client.signIn).__internal_future,
+      signUp: (signUp?.id ? signUp : this.client.signUp).__internal_future,
       environment: this.environment,
       sessions: this.client.sessions,
       lastAuthenticationStrategy: this.client.lastAuthenticationStrategy,

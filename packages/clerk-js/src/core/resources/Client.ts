@@ -11,6 +11,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { eventBus } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
+import { resetAuthResourceSignals } from '../signals';
 import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
@@ -82,6 +83,7 @@ export class Client extends BaseResource implements ClientResource {
     // TODO: Make it restful by introducing a DELETE /client/:id endpoint
     return this._baseDelete({ path: '/client' }).then(() => {
       SessionTokenCache.clear();
+      resetAuthResourceSignals();
       this.id = '';
       this.sessions = [];
       this.signUp = new SignUp(null);
@@ -99,6 +101,7 @@ export class Client extends BaseResource implements ClientResource {
       path: this.path() + '/sessions',
     }).then(e => {
       SessionTokenCache.clear();
+      resetAuthResourceSignals();
       return e as unknown as ClientResource;
     });
   }
@@ -141,6 +144,7 @@ export class Client extends BaseResource implements ClientResource {
 
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
     if (data) {
+      if (this.id && this.id !== data.id) resetAuthResourceSignals();
       this.id = data.id;
       // Rebuilt session objects replace the live ones, so a stale piggybacked token must not win.
       const previousTokens = new Map(this.sessions.map(session => [session.id, session.lastActiveToken]));

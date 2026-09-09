@@ -167,23 +167,31 @@ describe('mobile credential transport', () => {
     });
   });
 
-  it('keeps the server-date watermark when a newer request returns an older date', async () => {
-    const f = fixture();
-    const requests = Array.from({ length: 3 }, () => ({ url: new URL('https://clerk.example/client') }));
-    for (const request of requests) await f.before(request);
-    const response = (credential: string, seconds: number, updatedAt: number) =>
-      Object.assign(
-        new Response('{}', { headers: { authorization: credential, date: new Date(seconds * 1000).toUTCString() } }),
-        {
-          payload: { response: { object: 'client', id: 'client_ordering', updated_at: updatedAt } },
-        },
-      );
-    await f.after(requests[1], response('original', 200, 2000));
-    await f.after(requests[2], response('original', 100, 1000));
-    expect(f.read()).toBe('original');
-    await expect(f.after(requests[0], response('late-first-request', 150, 3000))).rejects.toMatchObject({
-      code: 'stale_client_response',
-    });
-    expect(f.read()).toBe('original');
-  });
+  it.each([100, undefined])(
+    'keeps the server-date watermark when a newer request returns date=%s',
+    async latestDate => {
+      const f = fixture();
+      const requests = Array.from({ length: 3 }, () => ({ url: new URL('https://clerk.example/client') }));
+      for (const request of requests) await f.before(request);
+      const response = (credential: string, seconds: number | undefined, updatedAt: number) =>
+        Object.assign(
+          new Response('{}', {
+            headers: {
+              authorization: credential,
+              ...(seconds === undefined ? {} : { date: new Date(seconds * 1000).toUTCString() }),
+            },
+          }),
+          {
+            payload: { response: { object: 'client', id: 'client_ordering', updated_at: updatedAt } },
+          },
+        );
+      await f.after(requests[1], response('original', 200, 2000));
+      await f.after(requests[2], response('original', latestDate, 1000));
+      expect(f.read()).toBe('original');
+      await expect(f.after(requests[0], response('late-first-request', 150, 3000))).rejects.toMatchObject({
+        code: 'stale_client_response',
+      });
+      expect(f.read()).toBe('original');
+    },
+  );
 });
