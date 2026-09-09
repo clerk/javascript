@@ -167,12 +167,12 @@ describe('Mosaic Combobox', () => {
     render(
       <Combobox.Root open>
         <InputGroup.Root size='lg'>
-          <InputGroup.Text>
+          <InputGroup.Start>
             <Icon
               name='search'
               aria-hidden='true'
             />
-          </InputGroup.Text>
+          </InputGroup.Start>
           <Combobox.Input
             variant='ghost'
             aria-label='Search countries'

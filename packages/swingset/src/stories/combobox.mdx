@@ -27,9 +27,9 @@ This avoids both a second input implementation and a nested popup.
 ```tsx
 <Combobox.Root open inputValue={query} onInputValueChange={setQuery}>
   <InputGroup.Root>
-    <InputGroup.Text>
+    <InputGroup.Start>
       <Icon name='search' aria-hidden='true' />
-    </InputGroup.Text>
+    </InputGroup.Start>
     <Combobox.Input variant='ghost' aria-label='Search countries' />
   </InputGroup.Root>
   <Combobox.List>
