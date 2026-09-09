@@ -44,6 +44,7 @@ export interface FapiResponseJSON<T> {
   response: T;
   client?: ClientJSON;
   errors?: ClerkAPIErrorJSON[];
+  clerk_trace_id?: string;
   meta?: {
     client?: ClientJSON;
     session_id?: string;

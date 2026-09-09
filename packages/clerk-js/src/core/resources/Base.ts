@@ -156,7 +156,11 @@ export abstract class BaseResource {
 
       assertProductionKeysOnDev(status, errors);
 
-      const apiResponseOptions: ConstructorParameters<typeof ClerkAPIResponseError>[1] = { data: errors, status };
+      const apiResponseOptions: ConstructorParameters<typeof ClerkAPIResponseError>[1] = {
+        data: errors,
+        status,
+        ...(typeof payload?.clerk_trace_id === 'string' ? { clerkTraceId: payload.clerk_trace_id } : {}),
+      };
       if (status === 429 && headers) {
         const retryAfter = headers.get('retry-after');
         if (retryAfter) {

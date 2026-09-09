@@ -7,6 +7,9 @@ export type Failure = {
   code: string;
   message: string;
   passkeyStage?: PasskeyFailureStage;
+  status?: number;
+  retryAfter?: number;
+  clerkTraceId?: string;
   errors?: { code: string; message: string; longMessage?: string; meta?: Record<string, JSONValue> }[];
 };
 export type Projection = { handle: Handle; state: Record<string, JSONValue> };
@@ -50,6 +53,13 @@ export function failure(error: unknown, kind: Failure['kind'] = 'rejection'): Fa
     message:
       kind === 'clerk' && typeof value.message === 'string' ? value.message : 'The operation could not be completed.',
     ...(errors ? { errors } : {}),
+    ...(typeof value.status === 'number' && Number.isInteger(value.status) && value.status >= 100 && value.status <= 599
+      ? { status: value.status }
+      : {}),
+    ...(typeof value.retryAfter === 'number' && Number.isFinite(value.retryAfter) && value.retryAfter >= 0
+      ? { retryAfter: value.retryAfter }
+      : {}),
+    ...(typeof value.clerkTraceId === 'string' ? { clerkTraceId: value.clerkTraceId } : {}),
     ...(getPasskeyFailureStage(error) ? { passkeyStage: getPasskeyFailureStage(error) } : {}),
   };
 }
