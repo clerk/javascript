@@ -143,6 +143,7 @@ import {
   MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import { meta as tableMeta } from '../stories/table.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
   Colors as TextColors,
@@ -393,6 +394,9 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+// Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
+const tableModule: StoryModule = { meta: tableMeta };
+
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
   Default: UserProfileApiKeysPanelDefault,
@@ -538,6 +542,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   sectionModule,
+  tableModule,
   textModule,
   fieldModule,
   visuallyHiddenModule,
