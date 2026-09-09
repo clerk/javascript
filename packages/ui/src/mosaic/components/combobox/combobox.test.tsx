@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Button } from '../button';
 import { Field } from '../field';
 import { Icon } from '../icon';
 import { InputGroup } from '../input-group';
@@ -17,21 +18,18 @@ function FloatingCombobox(props?: { onValueChange?: (value: string) => void }) {
           aria-label='Fruit'
           placeholder='Search fruit'
         />
-        <Combobox.Trigger
-          aria-label='Toggle fruit options'
-          render={
-            <InputGroup.Action
-              size='xs'
-              shape='square'
+        <InputGroup.End>
+          <Combobox.Trigger
+            aria-label='Toggle fruit options'
+            render={<Button />}
+          >
+            <Icon
+              name='chevron-down'
+              size='sm'
+              aria-hidden='true'
             />
-          }
-        >
-          <Icon
-            name='chevron-down'
-            size='sm'
-            aria-hidden='true'
-          />
-        </Combobox.Trigger>
+          </Combobox.Trigger>
+        </InputGroup.End>
       </InputGroup.Root>
       <Combobox.Popup>
         <Combobox.Option
@@ -58,8 +56,8 @@ describe('Mosaic Combobox', () => {
 
     const input = screen.getByRole('combobox', { name: 'Fruit' });
     const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
-    expect(trigger).toHaveClass('cl-button', 'cl-input-group-action', 'cl-combobox-trigger');
-    expect(trigger).toHaveAttribute('data-size', 'xs');
+    expect(trigger).toHaveClass('cl-button', 'cl-combobox-trigger');
+    expect(trigger).toHaveAttribute('data-size', 'sm');
     expect(trigger).toHaveAttribute('data-variant', 'ghost');
     expect(trigger).toHaveAttribute('data-color', 'neutral');
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@clerk/ui/mosaic/components/button';
 import { Combobox } from '@clerk/ui/mosaic/components/combobox';
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
@@ -35,21 +36,18 @@ function FruitCombobox({ options = fruits }: { options?: string[] }) {
             variant='ghost'
             placeholder='Search fruit…'
           />
-          <Combobox.Trigger
-            aria-label='Toggle fruit options'
-            render={
-              <InputGroup.Action
-                size='xs'
-                shape='square'
+          <InputGroup.End>
+            <Combobox.Trigger
+              aria-label='Toggle fruit options'
+              render={<Button />}
+            >
+              <Icon
+                name='chevron-down'
+                size='sm'
+                aria-hidden='true'
               />
-            }
-          >
-            <Icon
-              name='chevron-down'
-              size='sm'
-              aria-hidden='true'
-            />
-          </Combobox.Trigger>
+            </Combobox.Trigger>
+          </InputGroup.End>
         </InputGroup.Root>
       </Field.Root>
       <Combobox.Popup>
