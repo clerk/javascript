@@ -12,10 +12,7 @@ describe('Mosaic InputGroup', () => {
     render(
       <InputGroup.Root>
         <InputGroup.Text>https://</InputGroup.Text>
-        <Input
-          variant='ghost'
-          aria-label='Domain'
-        />
+        <Input aria-label='Domain' />
         <InputGroup.Text>.com</InputGroup.Text>
       </InputGroup.Root>,
     );
@@ -29,14 +26,24 @@ describe('Mosaic InputGroup', () => {
     expect(screen.getByText('.com')).toHaveClass('cl-input-group-text');
   });
 
+  it('preserves an explicitly supplied input variant', () => {
+    render(
+      <InputGroup.Root>
+        <Input
+          variant='default'
+          aria-label='Value'
+        />
+      </InputGroup.Root>,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Value' })).toHaveAttribute('data-variant', 'default');
+  });
+
   it.each(['sm', 'md', 'lg'] as const)('shares the %s size with its parts', size => {
     render(
       <InputGroup.Root size={size}>
         <InputGroup.Text>Prefix</InputGroup.Text>
-        <Input
-          variant='ghost'
-          aria-label='Value'
-        />
+        <Input aria-label='Value' />
       </InputGroup.Root>,
     );
 
@@ -51,10 +58,7 @@ describe('Mosaic InputGroup', () => {
         size={size}
         disabled
       >
-        <Input
-          variant='ghost'
-          aria-label='Value'
-        />
+        <Input aria-label='Value' />
         <InputGroup.Action aria-label='Show options' />
       </InputGroup.Root>,
     );
@@ -70,10 +74,7 @@ describe('Mosaic InputGroup', () => {
   it('allows an action to use a more compact button size', () => {
     render(
       <InputGroup.Root>
-        <Input
-          variant='ghost'
-          aria-label='Value'
-        />
+        <Input aria-label='Value' />
         <InputGroup.Action
           size='xs'
           shape='square'
@@ -95,7 +96,7 @@ describe('Mosaic InputGroup', () => {
         <Field.Label>Website</Field.Label>
         <InputGroup.Root>
           <InputGroup.Text>https://</InputGroup.Text>
-          <Input variant='ghost' />
+          <Input />
         </InputGroup.Root>
         <Field.Error>Enter a valid website</Field.Error>
       </Field.Root>,
@@ -115,10 +116,7 @@ describe('Mosaic InputGroup', () => {
     const user = userEvent.setup();
     render(
       <InputGroup.Root>
-        <Input
-          variant='ghost'
-          aria-label='Email username'
-        />
+        <Input aria-label='Email username' />
         <InputGroup.Text>@acme.com</InputGroup.Text>
       </InputGroup.Root>,
     );
@@ -134,7 +132,6 @@ describe('Mosaic InputGroup', () => {
       <InputGroup.Root>
         <Input
           ref={ref}
-          variant='ghost'
           name='domain'
           placeholder='example'
         />

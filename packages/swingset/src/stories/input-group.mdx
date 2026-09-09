@@ -4,6 +4,8 @@ import * as InputGroupStories from './input-group.stories';
 
 `InputGroup` composes a ghost `Input` and supporting content inside one shared field surface.
 
+Inputs inside the group default to `variant='ghost'`. An explicit `variant` overrides this default.
+
 ## Playground
 
 <Preview
@@ -28,7 +30,7 @@ function PasswordField() {
 
   return (
     <InputGroup.Root>
-      <Input variant='ghost' type={visible ? 'text' : 'password'} aria-label='Password' />
+      <Input type={visible ? 'text' : 'password'} aria-label='Password' />
       <InputGroup.Action
         type='button'
         size='xs'

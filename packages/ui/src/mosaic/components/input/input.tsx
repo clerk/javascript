@@ -15,14 +15,14 @@ export type InputVariant = 'default' | 'ghost';
 
 export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> {
   size?: 'sm' | 'md' | 'lg';
-  /** Removes field chrome so a parent composition can provide it. @default 'default' */
+  /** Defaults to `ghost` inside InputGroup and `default` elsewhere. */
   variant?: InputVariant;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(function MosaicInput(
   {
     size: sizeProp,
-    variant = 'default',
+    variant: variantProp,
     disabled: disabledProp,
     required: requiredProp,
     render,
@@ -37,6 +37,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
   forwardedRef,
 ) {
   const inputGroup = useOptionalInputGroupContext();
+  const variant = variantProp ?? (inputGroup ? 'ghost' : 'default');
   const fieldProps = useOptionalFieldControlProps({
     id,
     disabled: disabledProp,

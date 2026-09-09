@@ -36,7 +36,6 @@ export function Default(props: Record<string, unknown>) {
       <Field.Label>Password</Field.Label>
       <InputGroup.Root {...groupProps}>
         <Input
-          variant='ghost'
           type={visible ? 'text' : 'password'}
           placeholder='Enter password'
           autoComplete='current-password'
@@ -68,7 +67,6 @@ export function Sizes(props: Record<string, unknown>) {
           size={size}
         >
           <Input
-            variant='ghost'
             aria-label={`${size} email username`}
             placeholder='username'
           />
@@ -87,10 +85,7 @@ export function Disabled(props: Record<string, unknown>) {
     >
       <Field.Label>Email address</Field.Label>
       <InputGroup.Root {...knobsAsProps(props)}>
-        <Input
-          variant='ghost'
-          defaultValue='austin'
-        />
+        <Input defaultValue='austin' />
         <InputGroup.Text>@acme.com</InputGroup.Text>
       </InputGroup.Root>
     </Field.Root>
@@ -109,7 +104,6 @@ export function Invalid(props: Record<string, unknown>) {
       <Field.Label>Password</Field.Label>
       <InputGroup.Root {...groupProps}>
         <Input
-          variant='ghost'
           type={visible ? 'text' : 'password'}
           defaultValue='short'
           autoComplete='new-password'
