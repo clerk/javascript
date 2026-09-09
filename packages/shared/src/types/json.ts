@@ -208,6 +208,7 @@ export interface SessionVerificationJSON extends ClerkResourceJSON {
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
+  created_at?: number | null;
   object: 'email_address';
   email_address: string;
   verification: VerificationJSON | null;
@@ -221,6 +222,7 @@ export interface IdentificationLinkJSON extends ClerkResourceJSON {
 }
 
 export interface PhoneNumberJSON extends ClerkResourceJSON {
+  created_at?: number | null;
   object: 'phone_number';
   id: string;
   phone_number: string;
@@ -249,6 +251,7 @@ export interface Web3WalletJSON extends ClerkResourceJSON {
 }
 
 export interface ExternalAccountJSON extends ClerkResourceJSON {
+  created_at?: number | null;
   object: 'external_account';
   provider: OAuthProvider;
   identification_id: string;

@@ -2644,9 +2644,10 @@ public class User(override val handle: ResourceHandle, runtime: CoreRuntime) : C
   }
 }
 
-public data class EmailAddressState(public val `id`: String, public val `emailAddress`: String, public val `verification`: Verification, public val `matchesSsoConnection`: Boolean, public val `linkedTo`: List<IdentificationLink>) {
+public data class EmailAddressState(public val `id`: String, public val `createdAt`: Field<Instant> = Field.Omitted, public val `emailAddress`: String, public val `verification`: Verification, public val `matchesSsoConnection`: Boolean, public val `linkedTo`: List<IdentificationLink>) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("id", JsonPrimitive(this@EmailAddressState.`id`))
+    putPresent("createdAt", this@EmailAddressState.`createdAt`.toJson { value -> JsonPrimitive(value.toString()) })
     putPresent("emailAddress", JsonPrimitive(this@EmailAddressState.`emailAddress`))
     putPresent("verification", this@EmailAddressState.`verification`.toJson())
     putPresent("matchesSsoConnection", JsonPrimitive(this@EmailAddressState.`matchesSsoConnection`))
@@ -2656,7 +2657,7 @@ public data class EmailAddressState(public val `id`: String, public val `emailAd
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): EmailAddressState {
       val values = value.jsonObject
 
-      return EmailAddressState(`id` = (values["id"] ?: Undefined).requireString(), `emailAddress` = (values["emailAddress"] ?: Undefined).requireString(), `verification` = Verification.fromJson((values["verification"] ?: Undefined), runtime), `matchesSsoConnection` = (values["matchesSsoConnection"] ?: Undefined).requireBoolean(), `linkedTo` = (values["linkedTo"] ?: Undefined).jsonArray.map { value -> IdentificationLink.fromJson(value, runtime) })
+      return EmailAddressState(`id` = (values["id"] ?: Undefined).requireString(), `createdAt` = Field.fromJson((values["createdAt"] ?: Undefined)) { value -> Instant.parse(value.requireString()) }, `emailAddress` = (values["emailAddress"] ?: Undefined).requireString(), `verification` = Verification.fromJson((values["verification"] ?: Undefined), runtime), `matchesSsoConnection` = (values["matchesSsoConnection"] ?: Undefined).requireBoolean(), `linkedTo` = (values["linkedTo"] ?: Undefined).jsonArray.map { value -> IdentificationLink.fromJson(value, runtime) })
     }
   }
 }
@@ -2666,6 +2667,7 @@ public class EmailAddress(override val handle: ResourceHandle, runtime: CoreRunt
   public val changes: Flow<EmailAddressState> = runtime.changes.map { state }
   override val isInvalidated: Boolean get() = context.isInvalidated(handle)
   public val `id`: String get() = state.`id`
+  public val `createdAt`: Field<Instant> get() = state.`createdAt`
   public val `emailAddress`: String get() = state.`emailAddress`
   public val `verification`: Verification get() = state.`verification`
   public val `matchesSsoConnection`: Boolean get() = state.`matchesSsoConnection`
@@ -3119,9 +3121,10 @@ public data class StartEnterpriseSSOLinkFlowParams(public val `redirectUrl`: Str
   }
 }
 
-public data class PhoneNumberState(public val `id`: String, public val `phoneNumber`: String, public val `verification`: Verification, public val `reservedForSecondFactor`: Boolean, public val `defaultSecondFactor`: Boolean, public val `linkedTo`: List<IdentificationLink>) {
+public data class PhoneNumberState(public val `id`: String, public val `createdAt`: Field<Instant> = Field.Omitted, public val `phoneNumber`: String, public val `verification`: Verification, public val `reservedForSecondFactor`: Boolean, public val `defaultSecondFactor`: Boolean, public val `linkedTo`: List<IdentificationLink>) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("id", JsonPrimitive(this@PhoneNumberState.`id`))
+    putPresent("createdAt", this@PhoneNumberState.`createdAt`.toJson { value -> JsonPrimitive(value.toString()) })
     putPresent("phoneNumber", JsonPrimitive(this@PhoneNumberState.`phoneNumber`))
     putPresent("verification", this@PhoneNumberState.`verification`.toJson())
     putPresent("reservedForSecondFactor", JsonPrimitive(this@PhoneNumberState.`reservedForSecondFactor`))
@@ -3132,7 +3135,7 @@ public data class PhoneNumberState(public val `id`: String, public val `phoneNum
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): PhoneNumberState {
       val values = value.jsonObject
 
-      return PhoneNumberState(`id` = (values["id"] ?: Undefined).requireString(), `phoneNumber` = (values["phoneNumber"] ?: Undefined).requireString(), `verification` = Verification.fromJson((values["verification"] ?: Undefined), runtime), `reservedForSecondFactor` = (values["reservedForSecondFactor"] ?: Undefined).requireBoolean(), `defaultSecondFactor` = (values["defaultSecondFactor"] ?: Undefined).requireBoolean(), `linkedTo` = (values["linkedTo"] ?: Undefined).jsonArray.map { value -> IdentificationLink.fromJson(value, runtime) })
+      return PhoneNumberState(`id` = (values["id"] ?: Undefined).requireString(), `createdAt` = Field.fromJson((values["createdAt"] ?: Undefined)) { value -> Instant.parse(value.requireString()) }, `phoneNumber` = (values["phoneNumber"] ?: Undefined).requireString(), `verification` = Verification.fromJson((values["verification"] ?: Undefined), runtime), `reservedForSecondFactor` = (values["reservedForSecondFactor"] ?: Undefined).requireBoolean(), `defaultSecondFactor` = (values["defaultSecondFactor"] ?: Undefined).requireBoolean(), `linkedTo` = (values["linkedTo"] ?: Undefined).jsonArray.map { value -> IdentificationLink.fromJson(value, runtime) })
     }
   }
 }
@@ -3142,6 +3145,7 @@ public class PhoneNumber(override val handle: ResourceHandle, runtime: CoreRunti
   public val changes: Flow<PhoneNumberState> = runtime.changes.map { state }
   override val isInvalidated: Boolean get() = context.isInvalidated(handle)
   public val `id`: String get() = state.`id`
+  public val `createdAt`: Field<Instant> get() = state.`createdAt`
   public val `phoneNumber`: String get() = state.`phoneNumber`
   public val `verification`: Verification get() = state.`verification`
   public val `reservedForSecondFactor`: Boolean get() = state.`reservedForSecondFactor`
@@ -3358,9 +3362,10 @@ public data class AttemptWeb3WalletVerificationParams(public val `signature`: St
   }
 }
 
-public data class ExternalAccountState(public val `id`: String, public val `identificationId`: String, public val `provider`: OAuthProvider, public val `providerUserId`: String, public val `emailAddress`: String, public val `approvedScopes`: String, public val `firstName`: String, public val `lastName`: String, public val `imageUrl`: String, public val `username`: String? = null, public val `phoneNumber`: String? = null, public val `publicMetadata`: Map<String, JsonElement>, public val `label`: String? = null, public val `verification`: Verification?) {
+public data class ExternalAccountState(public val `id`: String, public val `createdAt`: Field<Instant> = Field.Omitted, public val `identificationId`: String, public val `provider`: OAuthProvider, public val `providerUserId`: String, public val `emailAddress`: String, public val `approvedScopes`: String, public val `firstName`: String, public val `lastName`: String, public val `imageUrl`: String, public val `username`: String? = null, public val `phoneNumber`: String? = null, public val `publicMetadata`: Map<String, JsonElement>, public val `label`: String? = null, public val `verification`: Verification?) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("id", JsonPrimitive(this@ExternalAccountState.`id`))
+    putPresent("createdAt", this@ExternalAccountState.`createdAt`.toJson { value -> JsonPrimitive(value.toString()) })
     putPresent("identificationId", JsonPrimitive(this@ExternalAccountState.`identificationId`))
     putPresent("provider", this@ExternalAccountState.`provider`.toJson())
     putPresent("providerUserId", JsonPrimitive(this@ExternalAccountState.`providerUserId`))
@@ -3379,7 +3384,7 @@ public data class ExternalAccountState(public val `id`: String, public val `iden
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): ExternalAccountState {
       val values = value.jsonObject
 
-      return ExternalAccountState(`id` = (values["id"] ?: Undefined).requireString(), `identificationId` = (values["identificationId"] ?: Undefined).requireString(), `provider` = OAuthProvider.fromJson((values["provider"] ?: Undefined), runtime), `providerUserId` = (values["providerUserId"] ?: Undefined).requireString(), `emailAddress` = (values["emailAddress"] ?: Undefined).requireString(), `approvedScopes` = (values["approvedScopes"] ?: Undefined).requireString(), `firstName` = (values["firstName"] ?: Undefined).requireString(), `lastName` = (values["lastName"] ?: Undefined).requireString(), `imageUrl` = (values["imageUrl"] ?: Undefined).requireString(), `username` = (values["username"] ?: Undefined).decodeOptional { value -> value.requireString() }, `phoneNumber` = (values["phoneNumber"] ?: Undefined).decodeOptional { value -> value.requireString() }, `publicMetadata` = (values["publicMetadata"] ?: Undefined).jsonObject.mapValues { (_, value) -> value }, `label` = (values["label"] ?: Undefined).decodeOptional { value -> value.requireString() }, `verification` = (values["verification"] ?: Undefined).decodeOptional { value -> Verification.fromJson(value, runtime) })
+      return ExternalAccountState(`id` = (values["id"] ?: Undefined).requireString(), `createdAt` = Field.fromJson((values["createdAt"] ?: Undefined)) { value -> Instant.parse(value.requireString()) }, `identificationId` = (values["identificationId"] ?: Undefined).requireString(), `provider` = OAuthProvider.fromJson((values["provider"] ?: Undefined), runtime), `providerUserId` = (values["providerUserId"] ?: Undefined).requireString(), `emailAddress` = (values["emailAddress"] ?: Undefined).requireString(), `approvedScopes` = (values["approvedScopes"] ?: Undefined).requireString(), `firstName` = (values["firstName"] ?: Undefined).requireString(), `lastName` = (values["lastName"] ?: Undefined).requireString(), `imageUrl` = (values["imageUrl"] ?: Undefined).requireString(), `username` = (values["username"] ?: Undefined).decodeOptional { value -> value.requireString() }, `phoneNumber` = (values["phoneNumber"] ?: Undefined).decodeOptional { value -> value.requireString() }, `publicMetadata` = (values["publicMetadata"] ?: Undefined).jsonObject.mapValues { (_, value) -> value }, `label` = (values["label"] ?: Undefined).decodeOptional { value -> value.requireString() }, `verification` = (values["verification"] ?: Undefined).decodeOptional { value -> Verification.fromJson(value, runtime) })
     }
   }
 }
@@ -3389,6 +3394,7 @@ public class ExternalAccount(override val handle: ResourceHandle, runtime: CoreR
   public val changes: Flow<ExternalAccountState> = runtime.changes.map { state }
   override val isInvalidated: Boolean get() = context.isInvalidated(handle)
   public val `id`: String get() = state.`id`
+  public val `createdAt`: Field<Instant> get() = state.`createdAt`
   public val `identificationId`: String get() = state.`identificationId`
   public val `provider`: OAuthProvider get() = state.`provider`
   public val `providerUserId`: String get() = state.`providerUserId`
@@ -8914,7 +8920,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "91341bb20490c21fabf544da51ead3dfdda0dd21c07c43fb59dc0995a66400e5"
+  public const val contractHash: String = "895b30bab43d2a88eb615d02c8d6b36154bcc4bd65238d7181b35abdef759e18"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

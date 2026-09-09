@@ -8651,6 +8651,23 @@
           "documentation": "The unique identifier of the resource."
         },
         {
+          "name": "createdAt",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": true,
+            "value": {
+              "kind": "date"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/emailAddress.ts",
+            "line": 28,
+            "symbol": "createdAt"
+          }
+        },
+        {
           "name": "emailAddress",
           "optional": false,
           "type": {
@@ -8658,7 +8675,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 28,
+            "line": 29,
             "symbol": "emailAddress"
           }
         },
@@ -8671,7 +8688,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 29,
+            "line": 30,
             "symbol": "verification"
           }
         },
@@ -8683,7 +8700,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 30,
+            "line": 31,
             "symbol": "matchesSsoConnection"
           }
         },
@@ -8699,7 +8716,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 31,
+            "line": 32,
             "symbol": "linkedTo"
           }
         }
@@ -8710,7 +8727,7 @@
           "nativeName": "stringValue",
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 32,
+            "line": 33,
             "symbol": "toString"
           },
           "documentation": "Returns a string representation of an object.",
@@ -8726,7 +8743,7 @@
           "nativeName": "prepareVerification",
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 33,
+            "line": 34,
             "symbol": "prepareVerification"
           },
           "parameters": [
@@ -8751,7 +8768,7 @@
           "nativeName": "attemptVerification",
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 34,
+            "line": 35,
             "symbol": "attemptVerification"
           },
           "parameters": [
@@ -8776,7 +8793,7 @@
           "nativeName": "createEmailLinkFlow",
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 35,
+            "line": 36,
             "symbol": "createEmailLinkFlow"
           },
           "parameters": [],
@@ -8792,7 +8809,7 @@
           "nativeName": "createEnterpriseSSOLinkFlow",
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 36,
+            "line": 37,
             "symbol": "createEnterpriseSSOLinkFlow"
           },
           "parameters": [],
@@ -8808,7 +8825,7 @@
           "nativeName": "destroy",
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 40,
+            "line": 41,
             "symbol": "destroy"
           },
           "parameters": [],
@@ -8823,7 +8840,7 @@
           "nativeName": "create",
           "source": {
             "file": "packages/shared/src/types/emailAddress.ts",
-            "line": 41,
+            "line": 42,
             "symbol": "create"
           },
           "parameters": [],
@@ -9871,6 +9888,23 @@
           "documentation": "The unique identifier of the resource."
         },
         {
+          "name": "createdAt",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": true,
+            "value": {
+              "kind": "date"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/phoneNumber.ts",
+            "line": 25,
+            "symbol": "createdAt"
+          }
+        },
+        {
           "name": "phoneNumber",
           "optional": false,
           "type": {
@@ -9878,7 +9912,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 25,
+            "line": 26,
             "symbol": "phoneNumber"
           }
         },
@@ -9891,7 +9925,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 26,
+            "line": 27,
             "symbol": "verification"
           }
         },
@@ -9903,7 +9937,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 27,
+            "line": 28,
             "symbol": "reservedForSecondFactor"
           }
         },
@@ -9915,7 +9949,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 28,
+            "line": 29,
             "symbol": "defaultSecondFactor"
           }
         },
@@ -9931,7 +9965,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 29,
+            "line": 30,
             "symbol": "linkedTo"
           }
         }
@@ -9942,7 +9976,7 @@
           "invocation": "readProperty",
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 30,
+            "line": 31,
             "symbol": "backupCodes"
           },
           "parameters": [],
@@ -9965,7 +9999,7 @@
           "nativeName": "stringValue",
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 31,
+            "line": 32,
             "symbol": "toString"
           },
           "documentation": "Returns a string representation of an object.",
@@ -9981,7 +10015,7 @@
           "nativeName": "prepareVerification",
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 32,
+            "line": 33,
             "symbol": "prepareVerification"
           },
           "parameters": [],
@@ -9997,7 +10031,7 @@
           "nativeName": "attemptVerification",
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 33,
+            "line": 34,
             "symbol": "attemptVerification"
           },
           "parameters": [
@@ -10022,7 +10056,7 @@
           "nativeName": "makeDefaultSecondFactor",
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 34,
+            "line": 35,
             "symbol": "makeDefaultSecondFactor"
           },
           "parameters": [],
@@ -10038,7 +10072,7 @@
           "nativeName": "setReservedForSecondFactor",
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 35,
+            "line": 36,
             "symbol": "setReservedForSecondFactor"
           },
           "parameters": [
@@ -10063,7 +10097,7 @@
           "nativeName": "destroy",
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 36,
+            "line": 37,
             "symbol": "destroy"
           },
           "parameters": [],
@@ -10078,7 +10112,7 @@
           "nativeName": "create",
           "source": {
             "file": "packages/shared/src/types/phoneNumber.ts",
-            "line": 37,
+            "line": 38,
             "symbol": "create"
           },
           "parameters": [],
@@ -10454,6 +10488,23 @@
           "documentation": "The unique identifier of the resource."
         },
         {
+          "name": "createdAt",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": true,
+            "value": {
+              "kind": "date"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/externalAccount.ts",
+            "line": 15,
+            "symbol": "createdAt"
+          }
+        },
+        {
           "name": "identificationId",
           "optional": false,
           "type": {
@@ -10461,7 +10512,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 15,
+            "line": 16,
             "symbol": "identificationId"
           }
         },
@@ -10474,7 +10525,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 16,
+            "line": 17,
             "symbol": "provider"
           }
         },
@@ -10486,7 +10537,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 17,
+            "line": 18,
             "symbol": "providerUserId"
           }
         },
@@ -10498,7 +10549,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 18,
+            "line": 19,
             "symbol": "emailAddress"
           }
         },
@@ -10510,7 +10561,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 19,
+            "line": 20,
             "symbol": "approvedScopes"
           }
         },
@@ -10522,7 +10573,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 20,
+            "line": 21,
             "symbol": "firstName"
           }
         },
@@ -10534,7 +10585,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 21,
+            "line": 22,
             "symbol": "lastName"
           }
         },
@@ -10546,7 +10597,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 22,
+            "line": 23,
             "symbol": "imageUrl"
           }
         },
@@ -10563,7 +10614,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 23,
+            "line": 24,
             "symbol": "username"
           }
         },
@@ -10580,7 +10631,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 24,
+            "line": 25,
             "symbol": "phoneNumber"
           }
         },
@@ -10601,7 +10652,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 25,
+            "line": 26,
             "symbol": "publicMetadata"
           }
         },
@@ -10618,7 +10669,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 26,
+            "line": 27,
             "symbol": "label"
           }
         },
@@ -10636,7 +10687,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 27,
+            "line": 28,
             "symbol": "verification"
           }
         }
@@ -10647,7 +10698,7 @@
           "nativeName": "reauthorize",
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 28,
+            "line": 29,
             "symbol": "reauthorize"
           },
           "parameters": [
@@ -10672,7 +10723,7 @@
           "nativeName": "destroy",
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 29,
+            "line": 30,
             "symbol": "destroy"
           },
           "parameters": [],
@@ -10687,7 +10738,7 @@
           "nativeName": "providerSlug",
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 30,
+            "line": 31,
             "symbol": "providerSlug"
           },
           "parameters": [],
@@ -10703,7 +10754,7 @@
           "nativeName": "providerTitle",
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 31,
+            "line": 32,
             "symbol": "providerTitle"
           },
           "parameters": [],
@@ -10718,7 +10769,7 @@
           "nativeName": "accountIdentifier",
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 32,
+            "line": 33,
             "symbol": "accountIdentifier"
           },
           "parameters": [],
@@ -27665,6 +27716,10 @@
       "disposition": "generated"
     },
     {
+      "path": "EmailAddressResource.createdAt",
+      "disposition": "generated"
+    },
+    {
       "path": "EmailAddressResource.emailAddress",
       "disposition": "generated"
     },
@@ -27951,6 +28006,10 @@
       "disposition": "generated"
     },
     {
+      "path": "PhoneNumberResource.createdAt",
+      "disposition": "generated"
+    },
+    {
       "path": "PhoneNumberResource.phoneNumber",
       "disposition": "generated"
     },
@@ -28135,6 +28194,10 @@
     },
     {
       "path": "ExternalAccountResource.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "ExternalAccountResource.createdAt",
       "disposition": "generated"
     },
     {

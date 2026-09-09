@@ -17,6 +17,7 @@ import { BaseResource, IdentificationLink, Verification } from './internal';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;
+  createdAt: Date | null = null;
   emailAddress = '';
   matchesSsoConnection = false;
   linkedTo: IdentificationLinkResource[] = [];
@@ -123,6 +124,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     }
 
     this.id = data.id;
+    this.createdAt = data.created_at == null ? null : new Date(data.created_at);
     this.emailAddress = data.email_address;
     this.verification = new Verification(data.verification);
     this.matchesSsoConnection = data.matches_sso_connection;
@@ -134,6 +136,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     return {
       object: 'email_address',
       id: this.id,
+      created_at: this.createdAt?.getTime() ?? null,
       email_address: this.emailAddress,
       verification: this.verification.__internal_toSnapshot(),
       linked_to: this.linkedTo.map(link => link.__internal_toSnapshot()),

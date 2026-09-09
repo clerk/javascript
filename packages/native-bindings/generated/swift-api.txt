@@ -301,6 +301,7 @@ EmailAddress.attemptVerification(params: AttemptEmailAddressVerificationParams):
 EmailAddress.create(): EmailAddress [return]
 EmailAddress.createEmailLinkFlow(): CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress [return]
 EmailAddress.createEnterpriseSSOLinkFlow(): CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress [return]
+EmailAddress.createdAt: Field<Date> = .omitted
 EmailAddress.destroy(): Void [return]
 EmailAddress.emailAddress: String
 EmailAddress.id: String
@@ -475,6 +476,7 @@ EnvironmentResource.userSettings: UserSettings
 EnvironmentResource: Hashable
 ExternalAccount.accountIdentifier(): String [return]
 ExternalAccount.approvedScopes: String
+ExternalAccount.createdAt: Field<Date> = .omitted
 ExternalAccount.destroy(): Void [return]
 ExternalAccount.emailAddress: String
 ExternalAccount.firstName: String
@@ -905,6 +907,7 @@ PhoneCodeSecondFactorConfig: Hashable
 PhoneNumber.attemptVerification(params: AttemptPhoneNumberVerificationParams): PhoneNumber [return]
 PhoneNumber.backupCodes(): [String]? [explicit-read]
 PhoneNumber.create(): PhoneNumber [return]
+PhoneNumber.createdAt: Field<Date> = .omitted
 PhoneNumber.defaultSecondFactor: Bool
 PhoneNumber.destroy(): Void [return]
 PhoneNumber.id: String

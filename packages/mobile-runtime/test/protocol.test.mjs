@@ -311,3 +311,68 @@ test('native client metadata uses the existing client without exposing legacy au
   assert.equal(clerk.signUp.$ref.type, 'SignUp');
   assert.equal(clerk.client, undefined);
 });
+
+test('identification timestamps survive core hydration and generated state projection', async t => {
+  const session = sessionFixture();
+  const verification = {
+    status: 'verified',
+    strategy: 'email_code',
+    attempts: null,
+    expire_at: null,
+    error: null,
+    verified_at_client: null,
+  };
+  session.user.email_addresses = [
+    {
+      object: 'email_address',
+      id: 'email_timestamp',
+      email_address: 'time@example.com',
+      verification,
+      linked_to: [],
+      matches_sso_connection: false,
+      created_at: 0,
+    },
+  ];
+  session.user.phone_numbers = [
+    {
+      object: 'phone_number',
+      id: 'phone_timestamp',
+      phone_number: '+15555550123',
+      verification: { ...verification, strategy: 'phone_code' },
+      linked_to: [],
+      reserved_for_second_factor: false,
+      default_second_factor: false,
+      created_at: 1700000000000,
+    },
+  ];
+  session.user.external_accounts = [
+    {
+      object: 'external_account',
+      id: 'external_timestamp',
+      provider: 'google',
+      identification_id: 'ident_timestamp',
+      provider_user_id: 'provider_timestamp',
+      approved_scopes: '',
+      email_address: 'time@example.com',
+      first_name: '',
+      last_name: '',
+      image_url: '',
+      username: '',
+      phone_number: '',
+      public_metadata: {},
+      label: '',
+      verification,
+      created_at: 1700000001000,
+    },
+  ];
+  const f = await fixture({ client: { ...fixtures.authenticatedClient, sessions: [session] } });
+  t.after(f.dispose);
+  const user = f.resource(f.state.roots.user);
+  for (const [field, timestamp] of [
+    ['emailAddresses', 0],
+    ['phoneNumbers', 1700000000000],
+    ['externalAccounts', 1700000001000],
+  ]) {
+    assert.equal(f.resource(user[field][0].$ref).createdAt, new Date(timestamp).toISOString());
+  }
+});

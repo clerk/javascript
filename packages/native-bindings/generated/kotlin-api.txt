@@ -241,6 +241,7 @@ EmailAddress.attemptVerification(params: AttemptEmailAddressVerificationParams):
 EmailAddress.create(): EmailAddress [return]
 EmailAddress.createEmailLinkFlow(): CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress [return]
 EmailAddress.createEnterpriseSSOLinkFlow(): CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress [return]
+EmailAddress.createdAt: Field<Instant> = Field.Omitted
 EmailAddress.destroy(): Unit [return]
 EmailAddress.emailAddress: String
 EmailAddress.id: String
@@ -389,6 +390,7 @@ EnvironmentResource.reload(p: ClerkResourceReloadParams? = null): EnvironmentRes
 EnvironmentResource.userSettings: UserSettings
 ExternalAccount.accountIdentifier(): String [return]
 ExternalAccount.approvedScopes: String
+ExternalAccount.createdAt: Field<Instant> = Field.Omitted
 ExternalAccount.destroy(): Unit [return]
 ExternalAccount.emailAddress: String
 ExternalAccount.firstName: String
@@ -741,6 +743,7 @@ PhoneCodeSecondFactorConfig.strategy: String
 PhoneNumber.attemptVerification(params: AttemptPhoneNumberVerificationParams): PhoneNumber [return]
 PhoneNumber.backupCodes(): List<String>? [explicit-read]
 PhoneNumber.create(): PhoneNumber [return]
+PhoneNumber.createdAt: Field<Instant> = Field.Omitted
 PhoneNumber.defaultSecondFactor: Boolean
 PhoneNumber.destroy(): Unit [return]
 PhoneNumber.id: String

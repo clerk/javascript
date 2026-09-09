@@ -12,6 +12,7 @@ export type ReauthorizeExternalAccountParams = {
 
 export interface ExternalAccountResource extends ClerkResource {
   id: string;
+  createdAt?: Date | null;
   identificationId: string;
   provider: OAuthProvider;
   providerUserId: string;
