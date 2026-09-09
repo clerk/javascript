@@ -10,6 +10,7 @@ import { manifest } from '../../native-bindings/generated/schema.mjs';
 type Configuration = {
   publishableKey: string;
   locale?: string;
+  sdkVersion?: string;
   callbackUrl: string;
   platform: 'ios' | 'android';
   protocolVersion: number;
@@ -47,6 +48,11 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     callback.hash
   )
     throw bridgeError('invalid_callback_url');
+  if (
+    configuration.sdkVersion !== undefined &&
+    (typeof configuration.sdkVersion !== 'string' || !/^[0-9A-Za-z.+-]+$/.test(configuration.sdkVersion))
+  )
+    throw bridgeError('invalid_sdk_version');
   initializing = true;
   removeNetworkEnvironment = setNativeNetworkEnvironment({ isOnline: () => online, isActive: () => active });
   const clerk = new Clerk(configuration.publishableKey);
@@ -59,7 +65,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
       write: value => hostRequest('storage.write', { scope, key: 'client', value }),
       remove: () => hostRequest('storage.remove', { scope, key: 'client' }),
     },
-    { [`x-${configuration.platform}-sdk-version`]: 'next' },
+    configuration.sdkVersion ? { [`x-${configuration.platform}-sdk-version`]: configuration.sdkVersion } : {},
   );
   removeNativeHost = await clerk.__internal_configureNativeHost({
     platform: configuration.platform,
