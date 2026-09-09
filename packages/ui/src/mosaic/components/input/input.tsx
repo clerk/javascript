@@ -50,23 +50,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
   const disabled = inputGroup?.disabled || fieldProps?.disabled || disabledProp || false;
   const required = fieldProps?.required ?? requiredProp;
   const ariaInvalidValue = inputGroup?.invalid ? true : (fieldProps?.['aria-invalid'] ?? ariaInvalid);
-  const groupInputRef = inputGroup?.inputRef;
-  const setInputRef = React.useCallback(
-    (node: HTMLInputElement | null) => {
-      groupInputRef?.(node);
-      if (typeof forwardedRef === 'function') {
-        forwardedRef(node);
-      } else if (forwardedRef) {
-        forwardedRef.current = node;
-      }
-    },
-    [forwardedRef, groupInputRef],
-  );
 
   return useRender({
     defaultTagName: 'input',
     render,
-    ref: setInputRef,
+    ref: [forwardedRef, inputGroup?.inputRef],
     props: {
       disabled,
       required,
