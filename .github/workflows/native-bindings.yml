@@ -28,6 +28,7 @@ jobs:
       - run: pnpm --filter @clerk/native-bindings test
       - run: pnpm --filter @clerk/mobile-runtime check:attached
       - run: pnpm --filter @clerk/mobile-runtime build
+      - run: pnpm --filter @clerk/mobile-runtime check:reproducibility
       - run: pnpm --filter @clerk/mobile-runtime test
       - run: pnpm --dir packages/mobile-runtime exec tsc --noEmit
       - name: Record native public API changes
@@ -47,4 +48,6 @@ jobs:
           path: |
             packages/native-bindings/generated/
             packages/mobile-runtime/dist/clerk-core.js
+            packages/mobile-runtime/dist/THIRD_PARTY_NOTICES.txt
+            packages/mobile-runtime/dist/bundled-dependencies.json
             native-api-diff.json

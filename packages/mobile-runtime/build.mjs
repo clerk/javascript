@@ -2,6 +2,7 @@ import { build } from 'rolldown';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { bundleNotices } from './licenses.mjs';
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const repository = path.resolve(directory, '../..');
@@ -9,8 +10,9 @@ const clerk = path.join(repository, 'packages/clerk-js');
 for (const [entry, output] of [
   ['src/embedded.ts', 'clerk-core.js'],
   ['test/entry.ts', 'clerk-core-test.js'],
-])
-  await build({
+]) {
+  const result = await build({
+    cwd: repository,
     input: path.join(directory, entry),
     platform: 'neutral',
     resolve: { alias: { '@': `${clerk}/src` }, mainFields: ['module', 'main'] },
@@ -44,3 +46,14 @@ for (const [entry, output] of [
     ],
     output: { file: path.join(directory, 'dist', output), format: 'iife', name: 'ClerkCore', codeSplitting: false },
   });
+
+  if (output === 'clerk-core.js') {
+    const ids = result.output.filter(item => item.type === 'chunk').flatMap(chunk => chunk.moduleIds);
+    const notices = bundleNotices(ids, repository);
+    fs.writeFileSync(path.join(directory, 'dist/THIRD_PARTY_NOTICES.txt'), notices.text);
+    fs.writeFileSync(
+      path.join(directory, 'dist/bundled-dependencies.json'),
+      JSON.stringify(notices.inventory, null, 2) + '\n',
+    );
+  }
+}

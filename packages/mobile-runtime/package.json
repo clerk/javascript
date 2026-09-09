@@ -7,6 +7,7 @@
     "build": "node build.mjs",
     "build:attached": "node build-attached.mjs",
     "check:attached": "node build-attached.mjs --check",
+    "check:reproducibility": "node check-reproducibility.mjs",
     "test": "node --no-opt --test test/*.test.mjs"
   },
   "dependencies": {

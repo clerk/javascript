@@ -34,6 +34,10 @@ const manifest = {
   coreRevision,
   bundleSHA256: createHash('sha256').update(bundle).digest('hex'),
   bundleBytes: bundle.length,
+  thirdPartyNoticesSHA256: createHash('sha256')
+    .update(fs.readFileSync(path.join(directory, 'dist/THIRD_PARTY_NOTICES.txt')))
+    .digest('hex'),
+  bundledDependencies: JSON.parse(fs.readFileSync(path.join(directory, 'dist/bundled-dependencies.json'), 'utf8')),
   runtime: { apple: 'JavaScriptCore (system)', android: 'quickjs-ng v0.15.1 fd0a0210b7be00957751871e7e01b8291268fc29' },
 };
 fs.writeFileSync(path.join(directory, 'dist/core-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
@@ -44,6 +48,8 @@ for (const [index, target] of targets.entries()) {
   const assets = path.join(root, 'Resources');
   fs.mkdirSync(assets, { recursive: true });
   fs.copyFileSync(path.join(directory, 'dist/clerk-core.js'), path.join(assets, 'clerk-core.js'));
+  fs.copyFileSync(path.join(directory, 'dist/THIRD_PARTY_NOTICES.txt'), path.join(assets, 'THIRD_PARTY_NOTICES.txt'));
+  if (index === 1) fs.copyFileSync(path.join(root, 'cpp/quickjs/LICENSE'), path.join(assets, 'QuickJS-LICENSE.txt'));
   fs.copyFileSync(path.join(directory, 'dist/core-manifest.json'), path.join(assets, 'core-manifest.json'));
   fs.copyFileSync(
     path.join(generated, index === 0 ? 'GeneratedAPI.swift' : 'GeneratedAPI.kt'),
