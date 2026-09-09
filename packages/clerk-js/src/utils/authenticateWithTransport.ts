@@ -60,6 +60,50 @@ async function resetFailedAttempt(resource: SignInResource | SignUpResource): Pr
   }
 }
 
+export async function getOAuthTransportRedirectUrl(transport: OAuthTransport): Promise<string> {
+  const url = new URL(String(await transport.getRedirectUrl()));
+  if (['javascript:', 'data:', 'file:', 'about:'].includes(url.protocol)) {
+    throw new ClerkRuntimeError('OAuth transport callback URL is not supported.', {
+      code: 'oauth_transport_invalid_callback_url',
+    });
+  }
+  return url.toString();
+}
+
+export async function openAndReconcileOAuthTransport(opts: {
+  transport: OAuthTransport;
+  resource: SignInResource | SignUpResource;
+  verificationUrl: URL | string;
+  redirectUrl: string;
+  onCallbackFailure?: () => Promise<void>;
+}): Promise<void> {
+  const { callbackUrl } = await opts.transport.open(new URL(opts.verificationUrl.toString()));
+  const callback = new URL(callbackUrl);
+  const expected = new URL(opts.redirectUrl);
+  if (
+    callback.protocol !== expected.protocol ||
+    callback.host !== expected.host ||
+    callback.pathname !== expected.pathname ||
+    callback.username !== expected.username ||
+    callback.password !== expected.password ||
+    Array.from(expected.searchParams).some(([key, value]) => callback.searchParams.get(key) !== value)
+  ) {
+    throw new ClerkRuntimeError('OAuth transport received an unexpected callback URL.', {
+      code: 'oauth_transport_callback_mismatch',
+    });
+  }
+
+  const failure = getNativeOAuthCallbackFailure(callbackUrl);
+  if (failure && opts.onCallbackFailure) {
+    await opts.onCallbackFailure();
+  } else {
+    const nonce = callback.searchParams.get('rotating_token_nonce');
+    if (nonce) await opts.resource.reload({ rotatingTokenNonce: nonce });
+    else await opts.resource.reload();
+  }
+  if (failure) throw new ClerkRuntimeError(failure.message, { code: failure.code });
+}
+
 export async function _authenticateWithTransport(opts: {
   clerk: ClerkWithResourceCallback;
   transport: OAuthTransport;
@@ -68,7 +112,7 @@ export async function _authenticateWithTransport(opts: {
   params: AuthenticateWithRedirectParams;
   callbackParams: HandleOAuthCallbackParams;
 }): Promise<void> {
-  const redirectUrl = String(await opts.transport.getRedirectUrl());
+  const redirectUrl = await getOAuthTransportRedirectUrl(opts.transport);
 
   let verificationUrl: URL | string | undefined;
   // Production FAPI validates both URLs against the redirect allowlist and only the transport
@@ -83,23 +127,13 @@ export async function _authenticateWithTransport(opts: {
     });
   }
 
-  const { callbackUrl } = await opts.transport.open(new URL(verificationUrl.toString()));
-  const failure = getNativeOAuthCallbackFailure(callbackUrl);
-
-  if (failure) {
-    // The failed verification persists on the client and would resurface on the next reload (the native
-    // flow never navigates away from the card), so reset the attempt before surfacing the error.
-    await resetFailedAttempt(opts.resource);
-    throw new ClerkRuntimeError(failure.message, { code: failure.code });
-  }
-
-  const nonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce');
-
-  if (nonce) {
-    await opts.resource.reload({ rotatingTokenNonce: nonce });
-  } else {
-    await opts.resource.reload();
-  }
+  await openAndReconcileOAuthTransport({
+    transport: opts.transport,
+    resource: opts.resource,
+    verificationUrl,
+    redirectUrl,
+    onCallbackFailure: () => resetFailedAttempt(opts.resource),
+  });
 
   await opts.clerk.__internal_handleResourceCallback(opts.resource, opts.callbackParams);
 }

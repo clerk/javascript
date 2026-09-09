@@ -56,7 +56,11 @@ import {
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
-import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
+import {
+  _authenticateWithTransport,
+  getOAuthTransportRedirectUrl,
+  openAndReconcileOAuthTransport,
+} from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
@@ -1065,17 +1069,24 @@ class SignUpFuture implements SignUpFutureResource {
       locale,
     } = params;
     return runAsyncResourceTask(this.#resource, async () => {
+      const transport = SignUp.clerk.__internal_oauthTransport;
+      if (transport && popup) {
+        throw new ClerkRuntimeError('A popup cannot be combined with an OAuth transport.', {
+          code: 'oauth_transport_popup_conflict',
+        });
+      }
+      const transportRedirectUrl = transport ? await getOAuthTransportRedirectUrl(transport) : undefined;
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken({ strategy });
 
-      let redirectUrlComplete = redirectUrl;
+      let redirectUrlComplete = transportRedirectUrl || redirectUrl;
       try {
-        new URL(redirectUrl);
+        new URL(redirectUrlComplete);
       } catch {
         redirectUrlComplete = window.location.origin + redirectUrl;
       }
 
       const routes = {
-        redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
+        redirectUrl: transportRedirectUrl || SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
         actionCompleteRedirectUrl: redirectUrlComplete,
       };
       if (popup) {
@@ -1122,7 +1133,14 @@ class SignUpFuture implements SignUpFutureResource {
       const { status, externalVerificationRedirectURL } = this.#resource.verifications.externalAccount;
 
       if (status === 'unverified' && externalVerificationRedirectURL) {
-        if (popup) {
+        if (transport && transportRedirectUrl) {
+          await openAndReconcileOAuthTransport({
+            transport,
+            resource: this.#resource,
+            verificationUrl: externalVerificationRedirectURL,
+            redirectUrl: transportRedirectUrl,
+          });
+        } else if (popup) {
           await _futureAuthenticateWithPopup(SignUp.clerk, { popup, externalVerificationRedirectURL });
           // Pick up the modified SignUp resource
           await this.#resource.reload();
