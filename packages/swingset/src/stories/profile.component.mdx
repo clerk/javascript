@@ -60,14 +60,15 @@ sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 ## Parts
 
-| Part                   | Element               | Slot                       |
-| ---------------------- | --------------------- | -------------------------- |
-| `Profile.Root`         | `div` (the container) | `cl-profile`               |
-| `Profile.Nav`          | `nav` (labelled)      | `cl-profile-nav`           |
-| —                      | tablist               | `cl-profile-nav-list`      |
-| `Profile.NavItem`      | `button[role=tab]`    | `cl-profile-nav-item`      |
-| `Profile.Content`      | `div` (scroll region) | `cl-profile-content`       |
-| `Profile.ContentPanel` | `div[role=tabpanel]`  | `cl-profile-content-panel` |
+| Part                   | Element                 | Slot                       |
+| ---------------------- | ----------------------- | -------------------------- |
+| `Profile.Root`         | `div` (the container)   | `cl-profile`               |
+| —                      | `span` (query sentinel) | `cl-profile-sentinel`      |
+| `Profile.Nav`          | `nav` (labelled)        | `cl-profile-nav`           |
+| —                      | tablist                 | `cl-profile-nav-list`      |
+| `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`      |
+| `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`       |
+| `Profile.ContentPanel` | `div[role=tabpanel]`    | `cl-profile-content-panel` |
 
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog.
@@ -76,10 +77,11 @@ sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 Below `48rem` of the profile's **own** width the frame goes — the profile is the page there, flush
 with whatever holds it — and the navigation leaves the column for a sheet: `Profile.PageTitle`
-grows a caret that opens a `Drawer` holding the tablist, and a choice closes it. The width is
-measured on the root rather than queried, because where the tablist renders is a DOM decision: one
-tablist, in the column or in the sheet, never both. The same surface collapses in a narrow layout
-slot, an inline dialog, or a phone alike.
+grows a caret that opens a `Drawer` holding the tablist, and a choice closes it. Where the tablist
+renders is a DOM decision — one tablist, in the column or in the sheet, never both — so the root
+reads the query's answer off a sentinel it renders, `1px` wide and `2px` once the query matches,
+rather than measuring itself: the breakpoint lives in CSS alone. The same surface collapses in a
+narrow layout slot, an inline dialog, or a phone alike.
 
 ## Customising the marks
 

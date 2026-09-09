@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { breakpoints } from '../../breakpoints.stylex';
 import {
   colorVars,
   fontWeightVars,
@@ -17,7 +18,7 @@ import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
  * dialog, or a phone alike. A container cannot query itself, which is why the grid lives on an
  * inner element: the root is the container, the layout inside it is what the query reshapes.
  */
-const compact = '@container cl-profile (max-width: 48rem)' as const;
+const compact = `@container cl-profile (width < ${breakpoints.phone})`;
 
 /** How far the content's clip edge — and the scrollbar with it — sits inside the frame's corners. */
 const SCROLL_INSET = space['1.5'];
@@ -47,6 +48,22 @@ export const styles = stylex.create({
     position: 'relative',
     maxWidth: '94.625rem',
     width: '100%',
+  },
+
+  /**
+   * The compact query's answer, for `Profile.Root` to read: `1px` wide, `2px` once the query
+   * matches. Inside the root because an element is never its own query container; out of flow,
+   * unpainted and untouchable, so it costs the layout nothing.
+   */
+  sentinel: {
+    blockSize: '1px',
+    inlineSize: {
+      [compact]: '2px',
+      default: '1px',
+    },
+    pointerEvents: 'none',
+    position: 'absolute',
+    visibility: 'hidden',
   },
 
   /**

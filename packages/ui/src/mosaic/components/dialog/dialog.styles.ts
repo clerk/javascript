@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { breakpoints } from '../../breakpoints.stylex';
 import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
 
 // How far the contents of a surface beneath a stacked prompt are veiled toward its own background.
@@ -28,10 +29,10 @@ const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
  *
  * `prefers-reduced-motion` and `forced-colors` stay `@media`: they are preferences, not sizes.
  */
-const PHONE = '@container cl-dialog (max-width: 47.99rem)';
-const ABOVE_PHONE = '@container cl-dialog (min-width: 48rem)';
-const DESK = '@container cl-dialog (min-width: 48rem) and (max-width: 89.99rem)';
-const WIDE = '@container cl-dialog (min-width: 90rem)';
+const PHONE = `@container cl-dialog (width < ${breakpoints.phone})`;
+const ABOVE_PHONE = `@container cl-dialog (width >= ${breakpoints.phone})`;
+const DESK = `@container cl-dialog (${breakpoints.phone} <= width < ${breakpoints.wide})`;
+const WIDE = `@container cl-dialog (width >= ${breakpoints.wide})`;
 
 export const styles = stylex.create({
   // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
@@ -639,6 +640,7 @@ export const popupMotion = stylex.create({
      * free to reorder them.
      */
     transform: {
+      // eslint-disable-next-line @stylexjs/valid-styles -- the rule cannot resolve a `defineConsts` key; the compiler can
       [PHONE]: {
         default: 'scale(1)',
         ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
@@ -700,6 +702,7 @@ export const popupMotion = stylex.create({
     // plain `data-stacked` one, which would otherwise hand a stacked sheet the three-value entrance
     // list on its way out and slow its exit slide.
     transitionDuration: {
+      // eslint-disable-next-line @stylexjs/valid-styles -- the rule cannot resolve a `defineConsts` key; the compiler can
       [PHONE]: {
         default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
         ':where([data-ending-style])': durationVars['--cl-duration-base'],
@@ -746,6 +749,7 @@ export const popupMotion = stylex.create({
      * an `and`.
      */
     translate: {
+      // eslint-disable-next-line @stylexjs/valid-styles -- the rule cannot resolve a `defineConsts` key; the compiler can
       [PHONE]: {
         default: null,
         '@media (prefers-reduced-motion: no-preference)': {

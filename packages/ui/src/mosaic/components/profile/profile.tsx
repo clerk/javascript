@@ -26,31 +26,31 @@ interface ProfileContextValue {
   navOpen: boolean;
   openNav: () => void;
   closeNav: () => void;
-  /** The root element, for parts that have to find something inside the profile. */
-  root: HTMLElement | null;
+  /** The selected page, by `value`. */
+  value: string;
+  /**
+   * `Profile.PageTitle` registers the control it renders under its page's `value`, the way a tab
+   * registers with the tabs root; the sheet returns focus through `pageTitleFor`.
+   */
+  registerPageTitle: (value: string, element: HTMLElement | null) => void;
+  pageTitleFor: (value: string) => HTMLElement | null;
   /** Flush: the page's own content — `elevation='flush'`, or an `inline` dialog. */
   inline: boolean;
 }
 
 const ProfileContext = React.createContext<ProfileContextValue | null>(null);
 
-/** The id a `Profile.PageTitle` renders under, so the panel around it can be named by it. */
-const ContentPanelContext = React.createContext<string | undefined>(undefined);
+/** The page a `Profile.PageTitle` is in: the id it renders under, so the panel can be named by it, and the page's `value`. */
+const ContentPanelContext = React.createContext<{ titleId: string; value: string } | null>(null);
 
 /**
- * The width below which the layout is compact — the same `48rem` the container query in
- * `profile.styles.ts` reads, measured here because WHERE the navigation renders is a DOM decision
- * CSS cannot make: one tablist, in the column or in the sheet, never both.
+ * Whether the compact container query matches, read off the sentinel `Profile.Root` renders: `1px`
+ * wide, `2px` once the query in `profile.styles.ts` matches. Measured because WHERE the navigation
+ * renders is a DOM decision CSS cannot make — one tablist, in the column or in the sheet, never
+ * both — and read this way so the breakpoint lives in CSS alone. Unmeasured is wide.
  */
-const COMPACT_MAX_WIDTH_REM = 48;
-
-/** `width <= 48rem`, the way the container query reads it. Unmeasured, or not laid out, is wide. */
-function isCompact(width: number | null): boolean {
-  if (width === null || width === 0) {
-    return false;
-  }
-  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-  return width <= COMPACT_MAX_WIDTH_REM * rem;
+function isCompact(sentinelWidth: number | null): boolean {
+  return sentinelWidth !== null && sentinelWidth >= 2;
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -125,9 +125,17 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
-  const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  const [measure, { width }] = useMeasure<HTMLDivElement>();
+  const [measure, { width }] = useMeasure<HTMLSpanElement>();
   const compact = isCompact(width);
+  const pageTitles = React.useRef(new Map<string, HTMLElement>());
+  const registerPageTitle = React.useCallback((page: string, element: HTMLElement | null) => {
+    if (element) {
+      pageTitles.current.set(page, element);
+    } else {
+      pageTitles.current.delete(page);
+    }
+  }, []);
+  const pageTitleFor = React.useCallback((page: string) => pageTitles.current.get(page) ?? null, []);
   const [navOpen, setNavOpen] = React.useState(false);
   const openNav = React.useCallback(() => setNavOpen(true), []);
   const closeNav = React.useCallback(() => setNavOpen(false), []);
@@ -139,13 +147,24 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     }
   }, [compact]);
   const context = React.useMemo(
-    () => ({ titleId, renderBranding, compact, navOpen, openNav, closeNav, root: node, inline }),
-    [titleId, renderBranding, compact, navOpen, openNav, closeNav, node, inline],
+    () => ({
+      titleId,
+      renderBranding,
+      compact,
+      navOpen,
+      openNav,
+      closeNav,
+      value,
+      registerPageTitle,
+      pageTitleFor,
+      inline,
+    }),
+    [titleId, renderBranding, compact, navOpen, openNav, closeNav, value, registerPageTitle, pageTitleFor, inline],
   );
   const element = useRender({
     defaultTagName: 'div',
     render,
-    ref: [setNode, measure, ref],
+    ref,
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
@@ -156,6 +175,11 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       ...rest,
       children: (
         <>
+          <span
+            aria-hidden
+            ref={measure}
+            {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
+          />
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Card.Header` renders its dismiss first. Never inline, which
               nothing closes. */}
@@ -241,17 +265,11 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
-  const { titleId, renderBranding, compact, navOpen, closeNav, root, inline } = profile;
+  const { titleId, renderBranding, compact, navOpen, closeNav, value, pageTitleFor, inline } = profile;
   // The headline that opened the sheet belongs to the page a choice just left, so the sheet's own
   // return-focus would land on nothing. The headline of the page now showing is the same control,
-  // on the destination.
-  const finalFocus = React.useCallback(
-    () =>
-      root?.querySelector<HTMLElement>(
-        '.cl-profile-content-panel:not([hidden]):not([inert]) .cl-profile-nav-trigger',
-      ) ?? null,
-    [root],
-  );
+  // on the destination — resolved when focus is restored, by which time `value` is that page's.
+  const finalFocus = React.useCallback(() => pageTitleFor(value), [pageTitleFor, value]);
   const list = (
     <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
       {children}
@@ -365,7 +383,18 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
   ref,
 ) {
   const profile = React.useContext(ProfileContext);
-  const panelTitleId = React.useContext(ContentPanelContext);
+  const panel = React.useContext(ContentPanelContext);
+  const registerPageTitle = profile?.registerPageTitle;
+  const page = panel?.value;
+  // The sheet's return-focus target. A no-op outside a profile's page, where there is no sheet.
+  const registerTrigger = React.useCallback(
+    (element: HTMLButtonElement | null) => {
+      if (page !== undefined) {
+        registerPageTitle?.(page, element);
+      }
+    },
+    [registerPageTitle, page],
+  );
   return useRender({
     defaultTagName: 'div',
     render,
@@ -380,12 +409,13 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
       ...rest,
       children: (
         <Heading
-          id={panelTitleId}
+          id={panel?.titleId}
           render={<h3 />}
           size='2xl'
         >
           {profile?.compact ? (
             <button
+              ref={registerTrigger}
               type='button'
               aria-haspopup='dialog'
               aria-expanded={profile.navOpen}
@@ -490,8 +520,9 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
 ) {
   const { compact } = useProfileContext('Profile.ContentPanel');
   const titleId = React.useId();
+  const panel = React.useMemo(() => ({ titleId, value }), [titleId, value]);
   return (
-    <ContentPanelContext.Provider value={titleId}>
+    <ContentPanelContext.Provider value={panel}>
       <Tabs.Panel
         ref={ref}
         value={value}

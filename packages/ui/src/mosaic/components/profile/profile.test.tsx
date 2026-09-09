@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { breakpoints } from '../../breakpoints.stylex';
 import { MosaicProvider } from '../../MosaicProvider';
 import { Dialog } from '../dialog';
 import { Icon } from '../icon';
@@ -140,7 +141,7 @@ describe('Profile', () => {
   // at any width; the compact query must hide it, or a phone shows the tablist over the page.
   it('hides the in-place navigation under the compact query', () => {
     const probe = stylex.create({
-      hidden: { display: { default: 'flex', '@container cl-profile (max-width: 48rem)': 'none' } },
+      hidden: { display: { default: 'flex', [`@container cl-profile (width < ${breakpoints.phone})`]: 'none' } },
     });
     renderSurface();
 
@@ -165,7 +166,8 @@ describe('Profile', () => {
     });
   });
 
-  // Compact is measured, not styled: which box the tablist renders in is a DOM decision.
+  // Compact is measured, not styled: which box the tablist renders in is a DOM decision. The
+  // measurement is the root's sentinel — `1px` wide, `2px` once the compact query matches.
   describe('compact', () => {
     let observe: ((width: number) => void) | null = null;
     const original = globalThis.ResizeObserver;
@@ -198,7 +200,7 @@ describe('Profile', () => {
       const user = userEvent.setup();
       const onValueChange = vi.fn();
       renderSurface({ onValueChange });
-      act(() => observe?.(400));
+      act(() => observe?.(2));
 
       // Nothing in the column; the headline is the way in, and still a heading.
       expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
@@ -248,7 +250,7 @@ describe('Profile', () => {
           <Controlled />
         </MosaicProvider>,
       );
-      act(() => observe?.(400));
+      act(() => observe?.(2));
 
       await user.click(screen.getByRole('button', { name: 'Account' }));
       await user.click(screen.getByRole('tab', { name: 'Security' }));
@@ -261,7 +263,7 @@ describe('Profile', () => {
     // panel is named by its own title.
     it('names the visible panel by its title while the tablist is away', () => {
       renderSurface();
-      act(() => observe?.(400));
+      act(() => observe?.(2));
       const panel = screen.getByRole('tabpanel');
       const title = screen.getByRole('heading', { level: 3, name: 'Account' });
       expect(panel).toHaveAttribute('aria-labelledby', title.id);
@@ -271,21 +273,21 @@ describe('Profile', () => {
     it('closes the sheet when the layout widens, and does not bring it back on narrowing', async () => {
       const user = userEvent.setup();
       renderSurface();
-      act(() => observe?.(400));
+      act(() => observe?.(2));
       await user.click(screen.getByRole('button', { name: 'Account' }));
       expect(screen.getByRole('dialog')).toBeInTheDocument();
 
-      act(() => observe?.(1000));
+      act(() => observe?.(1));
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-      act(() => observe?.(400));
+      act(() => observe?.(2));
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('returns the tablist to the column when the width comes back', () => {
       renderSurface();
-      act(() => observe?.(400));
+      act(() => observe?.(2));
       expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
-      act(() => observe?.(1000));
+      act(() => observe?.(1));
       expect(screen.getByRole('navigation', { name: 'User profile' })).toContainElement(screen.getByRole('tablist'));
     });
   });

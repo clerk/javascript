@@ -19,6 +19,7 @@ import { scrollAreaViewport } from '../components/scroll-area';
 import { Spinner } from '../components/spinner';
 import type { IconName } from '../icons/registry';
 import { fontWeightVars } from '../tokens.stylex';
+import { applyOrder } from '../utils/apply-order';
 import { focusOutline } from '../utils/focus-outline.styles';
 import { truncationStyles } from '../utils/typography.styles';
 import type { UserButtonLayout } from './user-button.layout';
@@ -36,7 +37,6 @@ import type {
   UserButtonModeProps,
   UserButtonSession,
 } from './user-button.types';
-import { applyOrder } from '../utils/apply-order';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
 // what the model and the view agree on, so neither file owns them.
