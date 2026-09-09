@@ -9,6 +9,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { inputStyles } from '../../utils/input.styles';
 import { reset } from '../../utils/reset.styles';
 import { Button, type ButtonProps } from '../button';
+import { ButtonContext } from '../button/button.context';
 import { useOptionalFieldContext } from '../field/field.context';
 import type { InputGroupSize } from './input-group.context';
 import { InputGroupContext, useInputGroupContext } from './input-group.context';
@@ -113,4 +114,41 @@ const Action = React.forwardRef<HTMLButtonElement, InputGroupActionProps>(functi
   );
 });
 
-export const InputGroup = { Root, Text, Action };
+export type InputGroupAddonProps = MosaicComponentProps<'span'>;
+
+function useAddon(
+  side: 'start' | 'end',
+  { render, className, style, ...props }: InputGroupAddonProps,
+  ref: React.ForwardedRef<HTMLSpanElement>,
+) {
+  const group = useInputGroupContext();
+  const defaults = React.useMemo(
+    () => ({ size: 'sm', shape: 'square', color: 'neutral', variant: 'ghost', disabled: group.disabled }) as const,
+    [group.disabled],
+  );
+  const element = useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps(`input-group-${side}`),
+        stylex.props(reset.base, styles.addon, styles[side]),
+        className,
+        style,
+      ),
+      ...props,
+    },
+  });
+  return <ButtonContext.Provider value={defaults}>{element}</ButtonContext.Provider>;
+}
+
+const Start = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function MosaicInputGroupStart(props, ref) {
+  return useAddon('start', props, ref);
+});
+
+const End = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function MosaicInputGroupEnd(props, ref) {
+  return useAddon('end', props, ref);
+});
+
+export const InputGroup = { Root, Text, Action, Start, End };

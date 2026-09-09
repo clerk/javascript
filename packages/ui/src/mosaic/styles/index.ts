@@ -51,7 +51,12 @@ export type { IconFrameProps, IconProps } from '../components/icon';
 export { Input } from '../components/input';
 export type { InputProps, InputVariant } from '../components/input';
 export { InputGroup } from '../components/input-group';
-export type { InputGroupActionProps, InputGroupRootProps, InputGroupTextProps } from '../components/input-group';
+export type {
+  InputGroupActionProps,
+  InputGroupAddonProps,
+  InputGroupRootProps,
+  InputGroupTextProps,
+} from '../components/input-group';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';

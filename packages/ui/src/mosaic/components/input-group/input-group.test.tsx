@@ -3,11 +3,56 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { Button } from '../button';
 import { Field } from '../field';
 import { Input } from '../input';
 import { InputGroup } from './input-group';
 
 describe('Mosaic InputGroup', () => {
+  it.each(['Start', 'End'] as const)('provides button defaults inside %s', side => {
+    const Slot = InputGroup[side];
+    render(
+      <InputGroup.Root disabled>
+        <Input aria-label='Value' />
+        <Slot>
+          <Button aria-label='Action' />
+        </Slot>
+      </InputGroup.Root>,
+    );
+    const button = screen.getByRole('button', { name: 'Action' });
+    expect(button).toHaveAttribute('data-size', 'sm');
+    expect(button).toHaveAttribute('data-shape', 'square');
+    expect(button).toHaveAttribute('data-variant', 'ghost');
+    expect(button).toHaveAttribute('data-color', 'neutral');
+    expect(button).toBeDisabled();
+  });
+
+  it('allows explicit button defaults to be overridden without affecting buttons outside the slot', () => {
+    render(
+      <>
+        <InputGroup.Root>
+          <InputGroup.End>
+            <Button
+              size='xs'
+              shape='circle'
+              variant='outline'
+              color='primary'
+            >
+              Inside
+            </Button>
+          </InputGroup.End>
+        </InputGroup.Root>
+        <Button>Outside</Button>
+      </>,
+    );
+    const inside = screen.getByRole('button', { name: 'Inside' });
+    expect(inside).toHaveAttribute('data-size', 'xs');
+    expect(inside).toHaveAttribute('data-shape', 'circle');
+    expect(inside).toHaveAttribute('data-variant', 'outline');
+    expect(inside).toHaveAttribute('data-color', 'primary');
+    expect(screen.getByRole('button', { name: 'Outside' })).toHaveAttribute('data-size', 'md');
+    expect(screen.getByRole('button', { name: 'Outside' })).toHaveAttribute('data-shape', 'default');
+  });
   it('composes text and a ghost input inside one control', () => {
     render(
       <InputGroup.Root>

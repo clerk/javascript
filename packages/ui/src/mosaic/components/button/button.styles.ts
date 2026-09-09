@@ -125,7 +125,7 @@ export const styles = stylex.create({
   // shape — icon buttons zero their inline padding; width tracks the height. Longhands because
   // StyleX ranks a longhand above a shorthand, so `paddingInline` would lose to what `sizes` sets.
   shapeSquare: {
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: `var(--_cl-button-radius, ${radiusVars['--cl-radius-md']})`,
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
   },

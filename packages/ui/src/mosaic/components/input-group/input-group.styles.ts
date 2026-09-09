@@ -3,6 +3,15 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontFamilyVars, radiusVars, space, targetVars, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  addon: {
+    '--_cl-button-radius': 'max(0px, calc(var(--_cl-input-group-radius) - var(--_cl-input-group-inset)))',
+    gap: space['1'],
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+  },
+  start: { paddingInlineStart: 'var(--_cl-input-group-inset)' },
+  end: { paddingInlineEnd: 'var(--_cl-input-group-inset)' },
   root: {
     overflow: 'hidden',
     alignItems: 'center',
@@ -29,14 +38,20 @@ export const styles = stylex.create({
 
 export const sizes = stylex.create({
   sm: {
+    '--_cl-input-group-inset': `max(0px, calc((${space['7']} - ${space['7']}) / 2))`,
+    '--_cl-input-group-radius': radiusVars['--cl-radius-md'],
     borderRadius: radiusVars['--cl-radius-md'],
     height: space['7'],
   },
   md: {
+    '--_cl-input-group-inset': `max(0px, calc((${space['8']} - ${space['7']}) / 2))`,
+    '--_cl-input-group-radius': radiusVars['--cl-radius-md'],
     borderRadius: radiusVars['--cl-radius-md'],
     height: space['8'],
   },
   lg: {
+    '--_cl-input-group-inset': `max(0px, calc((${space['9']} - ${space['7']}) / 2))`,
+    '--_cl-input-group-radius': radiusVars['--cl-radius-lg'],
     borderRadius: radiusVars['--cl-radius-lg'],
     height: space['9'],
   },

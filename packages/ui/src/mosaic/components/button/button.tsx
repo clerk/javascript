@@ -7,6 +7,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { truncationStyles } from '../../utils/typography.styles';
+import { ButtonContext } from './button.context';
 import { iconSizes, sizes, styles, variants } from './button.styles';
 
 export interface ButtonProps extends MosaicElementProps<'button'> {
@@ -94,13 +95,13 @@ export function withTruncatableLabel(children: React.ReactNode): React.ReactNode
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(
   {
-    color = 'primary',
-    variant = 'filled',
-    size = 'md',
-    shape = 'default',
+    color: colorProp,
+    variant: variantProp,
+    size: sizeProp,
+    shape: shapeProp,
     fullWidth = false,
     touchTarget = true,
-    disabled = false,
+    disabled: disabledProp,
     focusableWhenDisabled = false,
     className,
     style,
@@ -109,6 +110,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
   },
   ref,
 ) {
+  const defaults = React.useContext(ButtonContext);
+  const color = colorProp ?? defaults.color ?? 'primary';
+  const variant = variantProp ?? defaults.variant ?? 'filled';
+  const size = sizeProp ?? defaults.size ?? 'md';
+  const shape = shapeProp ?? defaults.shape ?? 'default';
+  const disabled = defaults.disabled || disabledProp || false;
   const isIconShape = shape === 'square' || shape === 'circle';
   const hasTouchTarget = touchTarget && variant !== 'link';
   return (
