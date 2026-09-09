@@ -11,6 +11,7 @@ import { reset } from '../../utils/reset.styles';
 import { Button, type ButtonProps } from '../button';
 import { ButtonContext } from '../button/button.context';
 import { useOptionalFieldContext } from '../field/field.context';
+import { Input } from '../input';
 import type { InputGroupSize } from './input-group.context';
 import { InputGroupContext, useInputGroupContext } from './input-group.context';
 import { compactActionInsets, sizes, styles, textSizes } from './input-group.styles';
@@ -168,4 +169,4 @@ const End = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function Mos
   return useAddon('end', props, ref);
 });
 
-export const InputGroup = { Root, Text, Action, Start, End };
+export const InputGroup = { Root, Input, Text, Action, Start, End };

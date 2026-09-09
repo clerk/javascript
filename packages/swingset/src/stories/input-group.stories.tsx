@@ -1,7 +1,6 @@
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { Input } from '@clerk/ui/mosaic/components/input';
 import type { InputGroupRootProps } from '@clerk/ui/mosaic/components/input-group';
 import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
 import { useState } from 'react';
@@ -37,7 +36,7 @@ export function Default(props: Record<string, unknown>) {
     <Field.Root style={{ width: 320 }}>
       <Field.Label>Password</Field.Label>
       <InputGroup.Root {...groupProps}>
-        <Input
+        <InputGroup.Input
           type={visible ? 'text' : 'password'}
           placeholder='Enter password'
           autoComplete='current-password'
@@ -65,7 +64,7 @@ export function Sizes(props: Record<string, unknown>) {
           key={size}
           size={size}
         >
-          <Input
+          <InputGroup.Input
             aria-label={`${size} email username`}
             placeholder='username'
           />
@@ -84,7 +83,7 @@ export function Disabled(props: Record<string, unknown>) {
     >
       <Field.Label>Email address</Field.Label>
       <InputGroup.Root {...knobsAsProps(props)}>
-        <Input defaultValue='austin' />
+        <InputGroup.Input defaultValue='austin' />
         <InputGroup.Text>@acme.com</InputGroup.Text>
       </InputGroup.Root>
     </Field.Root>
@@ -102,7 +101,7 @@ export function Invalid(props: Record<string, unknown>) {
     >
       <Field.Label>Password</Field.Label>
       <InputGroup.Root {...groupProps}>
-        <Input
+        <InputGroup.Input
           type={visible ? 'text' : 'password'}
           defaultValue='short'
           autoComplete='new-password'

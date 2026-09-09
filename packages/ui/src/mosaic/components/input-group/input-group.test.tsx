@@ -9,6 +9,30 @@ import { Input } from '../input';
 import { InputGroup } from './input-group';
 
 describe('Mosaic InputGroup', () => {
+  it('exposes Input with group defaults and composed refs', () => {
+    expect(InputGroup.Input).toBe(Input);
+    const ref = React.createRef<HTMLInputElement>();
+    render(
+      <InputGroup.Root
+        size='sm'
+        data-testid='group'
+      >
+        <InputGroup.Input
+          ref={ref}
+          aria-label='Value'
+          name='value'
+        />
+      </InputGroup.Root>,
+    );
+    const input = screen.getByRole('textbox', { name: 'Value' });
+    expect(input).toHaveAttribute('data-variant', 'ghost');
+    expect(input).toHaveAttribute('data-size', 'sm');
+    expect(input).toHaveAttribute('name', 'value');
+    expect(ref.current).toBe(input);
+    fireEvent.click(screen.getByTestId('group'));
+    expect(input).toHaveFocus();
+  });
+
   it('focuses the input when clicking the group or non-interactive slot content', () => {
     render(
       <InputGroup.Root data-testid='group'>
