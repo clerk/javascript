@@ -654,7 +654,7 @@ MobileIdentifierParams.unsafeMetadata: [String: JSONValue]? = nil
 MobileIdentifierParams: Hashable
 MobileIdentifierParamsIdentifierType cases: username, emailAddress, phoneNumber, unrecognized(String)
 MobileIdentifierParamsIdentifierType: Hashable
-MobileIdentifierParamsMode cases: signUp, signIn, signInOrUp, unrecognized(String)
+MobileIdentifierParamsMode cases: signIn, signUp, signInOrUp, unrecognized(String)
 MobileIdentifierParamsMode: Hashable
 MobileSSOParams.enterpriseConnectionId: String? = nil
 MobileSSOParams.firstName: String? = nil
@@ -669,7 +669,7 @@ MobileSSOParams.strategy: SignInSSOParamsStrategy
 MobileSSOParams.transferable: Bool
 MobileSSOParams.unsafeMetadata: [String: JSONValue]? = nil
 MobileSSOParams: Hashable
-MobileSSOParamsStart cases: signUp, signIn, auto, unrecognized(String)
+MobileSSOParamsStart cases: signIn, signUp, auto, unrecognized(String)
 MobileSSOParamsStart: Hashable
 MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = .omitted
 MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = .omitted

@@ -9154,15 +9154,15 @@ public data class MobileSSOParams(public val `strategy`: SignInSSOParamsStrategy
 }
 
 public sealed class MobileSSOParamsStart(public val rawValue: String) {
-  public data object SignUp : MobileSSOParamsStart("signUp")
   public data object SignIn : MobileSSOParamsStart("signIn")
+  public data object SignUp : MobileSSOParamsStart("signUp")
   public data object Auto : MobileSSOParamsStart("auto")
   public data class Unrecognized(val value: String) : MobileSSOParamsStart(value)
   public fun toJson(): JsonElement = JsonPrimitive(rawValue)
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileSSOParamsStart = when (val raw = value.requireString()) {
-      "signUp" -> SignUp
       "signIn" -> SignIn
+      "signUp" -> SignUp
       "auto" -> Auto
       else -> Unrecognized(raw)
     }
@@ -9205,15 +9205,15 @@ public sealed class MobileIdentifierParamsIdentifierType(public val rawValue: St
 }
 
 public sealed class MobileIdentifierParamsMode(public val rawValue: String) {
-  public data object SignUp : MobileIdentifierParamsMode("signUp")
   public data object SignIn : MobileIdentifierParamsMode("signIn")
+  public data object SignUp : MobileIdentifierParamsMode("signUp")
   public data object SignInOrUp : MobileIdentifierParamsMode("signInOrUp")
   public data class Unrecognized(val value: String) : MobileIdentifierParamsMode(value)
   public fun toJson(): JsonElement = JsonPrimitive(rawValue)
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileIdentifierParamsMode = when (val raw = value.requireString()) {
-      "signUp" -> SignUp
       "signIn" -> SignIn
+      "signUp" -> SignUp
       "signInOrUp" -> SignInOrUp
       else -> Unrecognized(raw)
     }
@@ -9681,7 +9681,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "6ddbd6b9ae47c552373f1959973d24eeb1e24d979342c240962cf85a68d023bd"
+  public const val contractHash: String = "c93c04e868659c2ce38c509c54cc61ea2da62533f5f4caaf5f19a9afe7be5bdf"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

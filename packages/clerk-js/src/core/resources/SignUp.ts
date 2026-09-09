@@ -1289,9 +1289,13 @@ class SignUpFuture implements SignUpFutureResource {
     if (!SignUp.clerk.client) {
       throw new Error('Cannot reset sign-up without a client.');
     }
-    this.#canBeDiscarded = true;
-    SignUp.clerk.client.resetSignUp();
-    return Promise.resolve({ error: null });
+    return Promise.resolve(
+      SignUp.clerk.__internal_withNativeAuthReset('signUp', () => {
+        this.#canBeDiscarded = true;
+        SignUp.clerk.client!.resetSignUp();
+        return { error: null };
+      }),
+    );
   }
 }
 

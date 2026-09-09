@@ -525,7 +525,7 @@ MobileIdentifierParams.identifierType: MobileIdentifierParamsIdentifierType
 MobileIdentifierParams.mode: MobileIdentifierParamsMode
 MobileIdentifierParams.unsafeMetadata: JsonObject? = null
 MobileIdentifierParamsIdentifierType cases: username, emailAddress, phoneNumber, unrecognized(String)
-MobileIdentifierParamsMode cases: signUp, signIn, signInOrUp, unrecognized(String)
+MobileIdentifierParamsMode cases: signIn, signUp, signInOrUp, unrecognized(String)
 MobileSSOParams.enterpriseConnectionId: String? = null
 MobileSSOParams.firstName: String? = null
 MobileSSOParams.identifier: String? = null
@@ -538,7 +538,7 @@ MobileSSOParams.start: MobileSSOParamsStart
 MobileSSOParams.strategy: SignInSSOParamsStrategy
 MobileSSOParams.transferable: Boolean
 MobileSSOParams.unsafeMetadata: JsonObject? = null
-MobileSSOParamsStart cases: signUp, signIn, auto, unrecognized(String)
+MobileSSOParamsStart cases: signIn, signUp, auto, unrecognized(String)
 MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = Field.Omitted
 MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = Field.Omitted
 MobileSetActiveParamsOrganization variants: String | Organization

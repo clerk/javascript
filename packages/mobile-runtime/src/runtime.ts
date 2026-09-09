@@ -12,8 +12,18 @@ import {
 } from './protocol.ts';
 
 type Entry = { handle: Handle; value: any; parent?: string; edge?: string; active: boolean };
-type Pending = { epoch: number; cancelled: boolean; target: string; operation: string; completed?: boolean };
+type Pending = {
+  epoch: number;
+  cancelled: boolean;
+  target: string;
+  operation: string;
+  completed?: boolean;
+  stale?: boolean;
+};
+let runtimeSequence = 0;
+
 type RuntimeOptions = {
+  namespace?: string;
   roots: () => Record<string, object | null | undefined>;
   emit: (message: Completion | { kind: 'state'; state: State }) => void;
   beforeInvoke?: (operation: string) => void | Promise<void>;
@@ -33,9 +43,13 @@ export class ResourceRuntime implements ResourceCodec {
   #projectionEdge?: string;
   #invalidated: Handle[] = [];
   #options: RuntimeOptions;
+  #namespace: string;
 
   constructor(options: RuntimeOptions) {
     this.#options = options;
+    const namespace = options.namespace ?? crypto.randomUUID();
+    if (!namespace || namespace.length > 128) throw bridgeError('invalid_resource_namespace');
+    this.#namespace = `${++runtimeSequence}:${namespace}`;
   }
 
   get epoch(): number {
@@ -62,7 +76,7 @@ export class ResourceRuntime implements ResourceCodec {
     if (entry) this.#bind(entry, value);
     else {
       entry = {
-        handle: { id: `r${++this.#sequence}`, generation: this.#epoch, type },
+        handle: { id: `${this.#namespace}:r${++this.#sequence}`, generation: this.#epoch, type },
         value,
         active: true,
         parent: this.#projectionParent,
@@ -110,6 +124,27 @@ export class ResourceRuntime implements ResourceCodec {
     for (const pending of this.#pending.values())
       if (pending.operation === preserveOperation) pending.epoch = this.#epoch;
     this.#rootEntries.clear();
+  }
+
+  invalidateRoot(root: string, preserveOperation?: string): void {
+    const entry = this.#rootEntries.get(root);
+    if (!entry) return;
+    const affected = new Set([entry.handle.id]);
+    let added = true;
+    while (added) {
+      added = false;
+      for (const child of this.#entries.values()) {
+        if (child.parent && affected.has(child.parent) && !affected.has(child.handle.id)) {
+          affected.add(child.handle.id);
+          added = true;
+        }
+      }
+    }
+    for (const pending of this.#pending.values()) {
+      if (affected.has(pending.target) && pending.operation !== preserveOperation) pending.stale = true;
+    }
+    this.#invalidate(entry);
+    this.#rootEntries.delete(root);
   }
 
   release(handle: Handle): void {
@@ -217,7 +252,7 @@ export class ResourceRuntime implements ResourceCodec {
     } finally {
       this.#pending.delete(call.id);
       if (this.#disposed) return;
-      if (pending.epoch !== this.#epoch) {
+      if (pending.stale || pending.epoch !== this.#epoch) {
         result = undefined;
         error = failure(bridgeError('stale_operation'), 'bridge');
       }

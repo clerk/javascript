@@ -3024,6 +3024,7 @@ describe('SignIn', () => {
         };
         SignIn.clerk = {
           client: mockClient,
+          __internal_withNativeAuthReset: (_reason: unknown, commit: () => unknown) => commit(),
         } as any;
       });
 

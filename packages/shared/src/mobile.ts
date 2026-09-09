@@ -1,5 +1,7 @@
 export type {
   MobileClerk,
+  MobileAuthResetReason,
+  MobileResourceObserver,
   MobileAuthenticationResources,
   MobileAuthenticationResult,
   MobileAuthCallback,

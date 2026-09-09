@@ -266,7 +266,7 @@
           "nativeName": "createOrganization",
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 1259,
+            "line": 1262,
             "symbol": "createOrganization"
           },
           "documentation": "Creates an Organization programmatically, adding the current user as admin. Returns an [`Organization`](https://clerk.com/docs/reference/objects/organization) object.\n\n> [!NOTE]\n> For React-based apps, consider using the [`<CreateOrganization />`](https://clerk.com/docs/reference/components/organization/create-organization) component.",
@@ -292,7 +292,7 @@
           "nativeName": "getOrganization",
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 1266,
+            "line": 1269,
             "symbol": "getOrganization"
           },
           "documentation": "Gets a single [Organization](https://clerk.com/docs/reference/objects/organization) by ID.",
@@ -784,7 +784,7 @@
       "name": "CreateOrganizationParams",
       "source": {
         "file": "packages/shared/src/types/clerk.ts",
-        "line": 2927,
+        "line": 2930,
         "symbol": "CreateOrganizationParams"
       },
       "kind": "object",
@@ -797,7 +797,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 2931,
+            "line": 2934,
             "symbol": "name"
           },
           "documentation": "The name of the Organization."
@@ -815,7 +815,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 2935,
+            "line": 2938,
             "symbol": "slug"
           },
           "documentation": "The slug of the Organization."
@@ -27029,8 +27029,8 @@
       "properties": [],
       "methods": [],
       "values": [
-        "signUp",
         "signIn",
+        "signUp",
         "auto"
       ],
       "open": false,
@@ -27123,8 +27123,8 @@
       "properties": [],
       "methods": [],
       "values": [
-        "signUp",
         "signIn",
+        "signUp",
         "signInOrUp"
       ],
       "open": false,
@@ -27153,7 +27153,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 1804,
+            "line": 1807,
             "symbol": "organization"
           },
           "documentation": "The Organization resource or Organization ID/slug (string version) to be set as active in the current session. If `null`, the currently Active Organization is removed as active."
@@ -27172,7 +27172,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 1799,
+            "line": 1802,
             "symbol": "session"
           },
           "documentation": "The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted."

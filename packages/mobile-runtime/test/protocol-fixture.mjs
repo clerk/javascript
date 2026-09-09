@@ -28,7 +28,7 @@ export async function fixture(options = {}) {
     sequence = 0;
   let client = structuredClone(options.client ?? fixtures.client);
   const context = vm.createContext({
-    __clerkNativeRandom: length => randomBytes(length).toString('base64'),
+    __clerkNativeRandom: length => (options.randomBytes?.(length) ?? randomBytes(length)).toString('base64'),
     __clerkNativeEmit: encoded => {
       const message = JSON.parse(encoded);
       messages.push(message);

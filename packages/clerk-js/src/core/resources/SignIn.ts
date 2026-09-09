@@ -1652,9 +1652,13 @@ class SignInFuture implements SignInFutureResource {
     if (!SignIn.clerk.client) {
       throw new Error('Cannot reset sign-in without a client.');
     }
-    this.#canBeDiscarded = true;
-    SignIn.clerk.client.resetSignIn();
-    return Promise.resolve({ error: null });
+    return Promise.resolve(
+      SignIn.clerk.__internal_withNativeAuthReset('signIn', () => {
+        this.#canBeDiscarded = true;
+        SignIn.clerk.client!.resetSignIn();
+        return { error: null };
+      }),
+    );
   }
 
   private selectFirstFactor(

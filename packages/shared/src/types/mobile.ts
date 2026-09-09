@@ -65,3 +65,12 @@ export type MobileIdentifierParams = {
   mode: 'signIn' | 'signUp' | 'signInOrUp';
   unsafeMetadata?: SignUpFutureSSOParams['unsafeMetadata'];
 };
+
+/** @internal Lifecycle notifications for a projection of an existing mobile core. */
+export type MobileAuthResetReason = 'signIn' | 'signUp' | 'signOut';
+
+/** @internal Native views observe this core; they do not synchronize a second client. */
+export type MobileResourceObserver = {
+  onState(): void;
+  onReset(reason: MobileAuthResetReason): void;
+};

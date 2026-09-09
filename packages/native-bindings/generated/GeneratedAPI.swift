@@ -12393,22 +12393,22 @@ public struct MobileSSOParams: Hashable, Sendable {
 }
 
 public enum MobileSSOParamsStart: Hashable, Sendable {
-  case `signUp`
   case `signIn`
+  case `signUp`
   case `auto`
   case unrecognized(String)
   public var rawValue: String {
     switch self {
-    case .`signUp`: return "signUp"
     case .`signIn`: return "signIn"
+    case .`signUp`: return "signUp"
     case .`auto`: return "auto"
     case .unrecognized(let value): return value
     }
   }
   public init(rawValue: String) {
     switch rawValue {
-    case "signUp": self = .`signUp`
     case "signIn": self = .`signIn`
+    case "signUp": self = .`signUp`
     case "auto": self = .`auto`
     default: self = .unrecognized(rawValue)
     }
@@ -12471,22 +12471,22 @@ public enum MobileIdentifierParamsIdentifierType: Hashable, Sendable {
 }
 
 public enum MobileIdentifierParamsMode: Hashable, Sendable {
-  case `signUp`
   case `signIn`
+  case `signUp`
   case `signInOrUp`
   case unrecognized(String)
   public var rawValue: String {
     switch self {
-    case .`signUp`: return "signUp"
     case .`signIn`: return "signIn"
+    case .`signUp`: return "signUp"
     case .`signInOrUp`: return "signInOrUp"
     case .unrecognized(let value): return value
     }
   }
   public init(rawValue: String) {
     switch rawValue {
-    case "signUp": self = .`signUp`
     case "signIn": self = .`signIn`
+    case "signUp": self = .`signUp`
     case "signInOrUp": self = .`signInOrUp`
     default: self = .unrecognized(rawValue)
     }
@@ -12975,7 +12975,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "6ddbd6b9ae47c552373f1959973d24eeb1e24d979342c240962cf85a68d023bd"
+  public static let contractHash = "c93c04e868659c2ce38c509c54cc61ea2da62533f5f4caaf5f19a9afe7be5bdf"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

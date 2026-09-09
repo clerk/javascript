@@ -3,6 +3,8 @@ import type { MobileClerk } from '@clerk/shared/mobile';
 
 export type CoreOwner = Pick<
   ClerkType,
+  | 'publishableKey'
+  | '__internal_subscribeNativeResources'
   | 'status'
   | 'loaded'
   | 'session'
@@ -26,7 +28,7 @@ export function authenticationRoots(clerk: CoreOwner): { signIn: SignInFutureRes
   return { signIn, signUp };
 }
 
-export function publicCore(clerk: CoreOwner, beforeSignOut: () => Promise<void>): MobileClerk {
+export function publicCore(clerk: CoreOwner, beforeSignOut: () => Promise<void> = async () => undefined): MobileClerk {
   return {
     get clientId() {
       return mobileResources(clerk).clientId;

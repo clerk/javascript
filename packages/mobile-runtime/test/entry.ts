@@ -5,3 +5,4 @@ export { authenticationRoots } from '../src/core.ts';
 export { ResourceRuntime } from '../src/runtime.ts';
 export { hostReply } from '../src/host.ts';
 export { installMobileCredentialTransport } from '@clerk/shared/mobile';
+export { attachResourceCore } from '../src/attached-core.ts';

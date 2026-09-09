@@ -2,7 +2,11 @@ import { NativeBiometricCredentials } from '../utils/NativeBiometricCredentials'
 import type { NativeMagicLink } from '../utils/NativeMagicLink';
 import { startMobileAuthentication } from '../utils/startMobileAuthentication';
 import { authenticateWithMobileSSO } from '../utils/authenticateWithMobileSSO';
-import type { MobileAuthenticationResources } from '@clerk/shared/mobile';
+import type {
+  MobileAuthenticationResources,
+  MobileAuthResetReason,
+  MobileResourceObserver,
+} from '@clerk/shared/mobile';
 import { inBrowser as inClientSide } from '@clerk/shared/browser';
 import { isValidNetworkEnvironment } from '@clerk/shared/network';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
@@ -363,6 +367,32 @@ export class Clerk implements ClerkInterface {
         preferImmediatelyAvailableCredentials?: boolean;
       }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>)
     | undefined;
+
+  #nativeResourceObservers = new Set<MobileResourceObserver>();
+  public __internal_beforeNativeAuthReset: ((reason: MobileAuthResetReason) => Promise<void>) | undefined;
+
+  __internal_withNativeAuthReset<T>(reason: MobileAuthResetReason, commit: () => T): T | Promise<T> {
+    const complete = () => {
+      for (const observer of this.#nativeResourceObservers) observer.onReset(reason);
+      return commit();
+    };
+    const preparation = this.__internal_beforeNativeAuthReset?.(reason);
+    return preparation ? preparation.then(complete) : complete();
+  }
+
+  __internal_subscribeNativeResources = (observer: MobileResourceObserver): (() => void) => {
+    this.#nativeResourceObservers.add(observer);
+    const publish = () => observer.onState();
+    const unsubscribe = this.addListener(publish, { skipInitialEmit: true });
+    eventBus.on(events.ResourceUpdate, publish);
+    eventBus.on(events.ResourceFetch, publish);
+    return () => {
+      this.#nativeResourceObservers.delete(observer);
+      unsubscribe();
+      eventBus.off(events.ResourceUpdate, publish);
+      eventBus.off(events.ResourceFetch, publish);
+    };
+  };
 
   public __internal_nativeMagicLink: NativeMagicLink | undefined;
   public __internal_nativeBiometrics = new NativeBiometricCredentials(this);
@@ -742,6 +772,8 @@ export class Clerk implements ClerkInterface {
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
+    const preparation = this.__internal_withNativeAuthReset('signOut', noop);
+    if (preparation) await preparation;
     if (!this.client || this.client.sessions.length === 0) {
       return;
     }

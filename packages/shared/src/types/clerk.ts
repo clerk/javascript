@@ -1,4 +1,4 @@
-import type { MobileAuthenticationResources } from './mobile';
+import type { MobileAuthenticationResources, MobileResourceObserver } from './mobile';
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
 import type { ModuleManager } from '../moduleManager';
@@ -1162,6 +1162,9 @@ export interface Clerk {
 
   /** @internal Returns the current canonical facades owned by this initialized core. */
   __internal_getMobileResources?: () => MobileAuthenticationResources;
+
+  /** @internal Observe the same resource owner used by JavaScript and native views. */
+  __internal_subscribeNativeResources?: (observer: MobileResourceObserver) => () => void;
 
   /**
    * Completes an OAuth/SAML callback using a sign-in or sign-up resource already in hand
