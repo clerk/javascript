@@ -1,5 +1,11 @@
 # @clerk/expo-google-signin
 
+## 1.0.4
+
+### Patch Changes
+
+- Fix Android builds failing on Android Gradle Plugin 9 with `Cannot add extension with name 'kotlin'`. ([#9662](https://github.com/clerk/javascript/pull/9662)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.0.3
 
 ### Patch Changes
