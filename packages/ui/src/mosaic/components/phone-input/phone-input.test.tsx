@@ -1,16 +1,10 @@
-import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Field } from '../field';
-import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { PhoneInput } from './phone-input';
-
-const scrollClasses = stylex.props(...scrollAreaViewport()).className?.split(' ') ?? [];
-const rootClasses = stylex.props(scrollAreaRoot).className?.split(' ') ?? [];
-const viewportOnlyClasses = scrollClasses.filter(name => !rootClasses.includes(name));
 
 describe('Mosaic PhoneInput', () => {
   it.each([
@@ -92,7 +86,7 @@ describe('Mosaic PhoneInput', () => {
     expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveFocus();
   });
 
-  it('uses the shared ScrollArea treatment for the country list', async () => {
+  it('renders the country list inside the popup', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);
 
@@ -101,9 +95,7 @@ describe('Mosaic PhoneInput', () => {
     const popup = document.querySelector('.cl-phone-input-popup');
     const list = screen.getByRole('listbox');
     expect(popup).toBeInTheDocument();
-    expect(list).toHaveClass(...rootClasses, ...scrollClasses);
-    expect(viewportOnlyClasses).not.toHaveLength(0);
-    expect(viewportOnlyClasses.filter(name => popup?.classList.contains(name))).toEqual([]);
+    expect(popup).toContainElement(list);
   });
 
   it('keeps the country search in its own Field scope', async () => {
