@@ -133,7 +133,7 @@ describe('reverificationMachine', () => {
     expect(actor.getSnapshot().value).toBe('methodPicker');
   });
 
-  it('does not leave submitting when abort is requested until the attempt settles', async () => {
+  it('does not leave submitting when reset until the attempt settles', async () => {
     const attempt = deferred<ReverificationResult>();
     const cancel = vi.fn();
     const actor = startActor(seatedDeps({ attempt: () => attempt.promise, cancel }));
@@ -142,7 +142,7 @@ describe('reverificationMachine', () => {
     actor.send({ type: 'SUBMIT' });
     expect(actor.getSnapshot().value).toBe('submitting');
 
-    actor.send({ type: 'ABORT' });
+    actor.send({ type: 'RESET' });
     expect(actor.getSnapshot().value).toBe('submitting');
     expect(cancel).not.toHaveBeenCalled();
 
@@ -152,7 +152,7 @@ describe('reverificationMachine', () => {
     expect(cancel).toHaveBeenCalledOnce();
   });
 
-  it('cancels a successful attempt that settled after abort was requested', async () => {
+  it('cancels a successful attempt that settled after reset', async () => {
     const attempt = deferred<ReverificationResult>();
     const finish = vi.fn(async () => {});
     const cancel = vi.fn();
@@ -160,7 +160,7 @@ describe('reverificationMachine', () => {
     await tick();
     actor.send({ type: 'TYPE', value: 'secret' });
     actor.send({ type: 'SUBMIT' });
-    actor.send({ type: 'ABORT' });
+    actor.send({ type: 'RESET' });
 
     attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
     await tick();
@@ -220,21 +220,28 @@ describe('useReverificationController', () => {
   });
 
   it('is unavailable when start fails', async () => {
+    const cancel = vi.fn();
     const { result } = renderHook(() =>
-      useReverificationController(readyModel({ start: vi.fn(async () => Promise.reject(new Error('no session'))) })),
+      useReverificationController(
+        readyModel({ start: vi.fn(async () => Promise.reject(new Error('no session'))), cancel }),
+      ),
     );
     await waitFor(() => expect(result.current.status).toBe('unavailable'));
+    expect(cancel).toHaveBeenCalledOnce();
   });
 
   it('is unavailable when start returns no methods', async () => {
+    const cancel = vi.fn();
     const { result } = renderHook(() =>
       useReverificationController(
         readyModel({
           start: vi.fn(async () => firstFactorResult({ methods: [], startingMethod: null })),
+          cancel,
         }),
       ),
     );
     await waitFor(() => expect(result.current.status).toBe('unavailable'));
+    expect(cancel).toHaveBeenCalledOnce();
   });
 
   it('still passes onShowMethods when only one method is available', async () => {
