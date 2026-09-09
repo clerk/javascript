@@ -40,7 +40,7 @@ const challenge = {
 async function biometricFixture(options = {}) {
   let records = options.records ?? [localRecord()];
   let cleanup = options.cleanup ?? [];
-  const keys = new Set(records.map(record => record.localKeyId));
+  const keys = new Set(records.map(record => record.localKeyId ?? record.local_key_id));
   const deleted = [];
   let signed = 0;
   const remote = options.remote ?? [remoteRecord()];
@@ -52,6 +52,7 @@ async function biometricFixture(options = {}) {
   };
   const f = await fixture({
     client,
+    configuration: { platform: options.platform ?? 'ios' },
     capabilities: options.noCapability ? [] : ['biometrics'],
     biometrics: async message => {
       const { capability, args } = message;
@@ -334,3 +335,44 @@ test('canonical account deletion removes local biometric metadata and retains a 
   assert.deepEqual(f.cleanup(), ['user_native']);
   assert.equal(f.records().length, 1);
 });
+
+for (const policy of [undefined, 'biometry_current_set']) {
+  test(`legacy Android metadata remains usable with policy ${policy ?? '(omitted default)'}`, async t => {
+    // clerk-android 1ea9f972: ClerkApi.json uses SnakeCase and omits defaults,
+    // including BiometricCredentialLocalRecord's device-passcode policy.
+    const records = [
+      {
+        id: 'td_fixture',
+        local_key_id: 'tdlk_fixture',
+        user_id: 'user_native',
+        app_identifier: 'com.example.native',
+        identifier_hint: 'test@example.com',
+        created_at: now,
+        updated_at: now,
+        ...(policy ? { policy } : {}),
+      },
+    ];
+    const policies = [];
+    const f = await biometricFixture({
+      platform: 'android',
+      records,
+      biometrics: message => {
+        if (message.capability === 'biometrics.supports') policies.push(message.args.policy);
+      },
+    });
+    t.after(f.dispose);
+    assert.deepEqual((await call(f, 'localAvailability')).result, { isAvailable: true, unavailableReason: null });
+    const result = await f.invoke(f.state.roots.signIn, 'SignIn.biometricCredential', [
+      { identifierHint: 'test@example.com' },
+    ]);
+    assert.equal(result.failure, undefined, JSON.stringify(result));
+    assert.equal(f.resource(f.state.roots.signIn).status, 'complete');
+    assert.ok(policies.length > 0);
+    assert.ok(policies.every(value => value === (policy ?? 'biometry_or_device_passcode')));
+    assert.equal(f.signed(), 1);
+    assert.equal(f.state.roots.session, null);
+    const forgotten = await call(f, 'forgetLocalCredentials', [{ userId: 'user_native' }]);
+    assert.equal(forgotten.result, 1);
+    assert.deepEqual(f.records(), []);
+  });
+}

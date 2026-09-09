@@ -464,6 +464,29 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
       return [];
     }
     return values
+      .map(record => {
+        // The previous Android SDK serialized local metadata through ClerkApi.json
+        // (SnakeCase, encodeDefaults=false). Apple and current records use camelCase.
+        if (
+          this.host?.platform !== 'android' ||
+          !record ||
+          typeof record !== 'object' ||
+          'localKeyId' in record ||
+          !('local_key_id' in record)
+        ) {
+          return record;
+        }
+        return {
+          id: record.id,
+          localKeyId: record.local_key_id,
+          userId: record.user_id,
+          appIdentifier: record.app_identifier,
+          identifierHint: record.identifier_hint,
+          policy: record.policy === undefined ? 'biometry_or_device_passcode' : record.policy,
+          createdAt: record.created_at,
+          updatedAt: record.updated_at,
+        };
+      })
       .filter(
         (record): record is LocalRecord =>
           record !== null &&
