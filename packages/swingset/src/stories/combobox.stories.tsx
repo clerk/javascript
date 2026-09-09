@@ -18,10 +18,9 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/combobox/combobox.tsx',
 };
 
-const fruits = ['Apple', 'Apricot', 'Banana', 'Blackberry', 'Cherry', 'Fig', 'Grape', 'Pear', 'Plum'];
-
-function FruitCombobox({ options = fruits }: { options?: string[] }) {
+export function Default() {
   const [query, setQuery] = useState('');
+  const options = ['Apple', 'Apricot', 'Banana', 'Blackberry', 'Cherry', 'Fig', 'Grape', 'Pear', 'Plum'];
   const filtered = options.filter(option => option.toLowerCase().includes(query.toLowerCase()));
 
   return (
@@ -69,12 +68,52 @@ function FruitCombobox({ options = fruits }: { options?: string[] }) {
   );
 }
 
-export function Default() {
-  return <FruitCombobox />;
-}
-
-const manyFruits = Array.from({ length: 40 }, (_, index) => `Fruit ${index + 1}`);
-
 export function Scrolling() {
-  return <FruitCombobox options={manyFruits} />;
+  const [query, setQuery] = useState('');
+  const options = Array.from({ length: 40 }, (_, index) => `Fruit ${index + 1}`);
+  const filtered = options.filter(option => option.toLowerCase().includes(query.toLowerCase()));
+
+  return (
+    <Combobox.Root
+      inputValue={query}
+      onInputValueChange={setQuery}
+    >
+      <Field.Root style={{ width: 320 }}>
+        <Field.Label>Fruit</Field.Label>
+        <InputGroup.Root>
+          <Combobox.Input
+            variant='ghost'
+            placeholder='Search fruit…'
+          />
+          <InputGroup.End>
+            <Combobox.Trigger
+              aria-label='Toggle fruit options'
+              render={<Button />}
+            >
+              <Icon
+                name='chevron-down'
+                size='sm'
+                aria-hidden='true'
+              />
+            </Combobox.Trigger>
+          </InputGroup.End>
+        </InputGroup.Root>
+      </Field.Root>
+      <Combobox.Popup>
+        {filtered.length > 0 ? (
+          filtered.map(option => (
+            <Combobox.Option
+              key={option}
+              value={option.toLowerCase()}
+              label={option}
+            >
+              {option}
+            </Combobox.Option>
+          ))
+        ) : (
+          <Combobox.Empty>No fruit found</Combobox.Empty>
+        )}
+      </Combobox.Popup>
+    </Combobox.Root>
+  );
 }
