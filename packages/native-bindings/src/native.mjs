@@ -376,8 +376,8 @@ export function generateNative(model, manifest) {
   swift += `@MainActor public enum GeneratedBindings {\n  public static let contractHash = ${JSON.stringify(manifest.contractHash)}\n  public static let protocolVersion = ${manifest.protocolVersion}\n  public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {\n    switch handle.type {\n${resourceNames.map(name => `    case ${JSON.stringify(name)}: return ${name}(handle: handle, runtime: runtime)`).join('\n')}\n    default: throw CoreError.invalidResource\n    }\n  }\n}\n`;
   kotlin += `public object GeneratedBindings {\n  public const val contractHash: String = ${JSON.stringify(manifest.contractHash)}\n  public const val protocolVersion: Int = ${manifest.protocolVersion}\n  public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {\n${resourceNames.map(name => `    ${JSON.stringify(name)} -> ${name}(handle, runtime)`).join('\n')}\n    else -> throw CoreException("invalid_resource")\n  }\n}\n`;
   return {
-    'GeneratedAPI.swift': swift,
-    'GeneratedAPI.kt': kotlin,
+    'GeneratedAPI.swift': swift.replace(/[ \t]+$/gm, ''),
+    'GeneratedAPI.kt': kotlin.replace(/[ \t]+$/gm, ''),
     'swift-api.txt': swiftSurface.sort().join('\n') + '\n',
     'kotlin-api.txt': kotlinSurface.sort().join('\n') + '\n',
   };

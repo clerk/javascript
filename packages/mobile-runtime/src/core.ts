@@ -28,6 +28,12 @@ export function authenticationRoots(clerk: CoreOwner): { signIn: SignInFutureRes
 
 export function publicCore(clerk: CoreOwner, beforeSignOut: () => Promise<void>): MobileClerk {
   return {
+    get sessions() {
+      return mobileResources(clerk).sessions;
+    },
+    get lastAuthenticationStrategy() {
+      return mobileResources(clerk).lastAuthenticationStrategy;
+    },
     get environment() {
       return mobileResources(clerk).environment;
     },

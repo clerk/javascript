@@ -3198,6 +3198,8 @@ export class Clerk implements ClerkInterface {
       signIn: this.client.signIn.__internal_future,
       signUp: this.client.signUp.__internal_future,
       environment: this.environment,
+      sessions: this.client.sessions,
+      lastAuthenticationStrategy: this.client.lastAuthenticationStrategy,
     };
   };
 

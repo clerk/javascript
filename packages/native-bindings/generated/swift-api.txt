@@ -53,7 +53,7 @@ AttemptEmailAddressVerificationParams: Hashable
 AttemptPhoneNumberVerificationParams.code: String
 AttemptPhoneNumberVerificationParams: Hashable
 AttemptWeb3WalletVerificationParams.signature: String
-AttemptWeb3WalletVerificationParams.strategy: UserSettingsWeb3FirstFactorsElement? = nil
+AttemptWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy? = nil
 AttemptWeb3WalletVerificationParams: Hashable
 Attribute cases: passkey, password, backup_code, email_address, phone_number, username, first_name, last_name, web3_wallet, authenticator_app, unrecognized(String)
 Attribute: Hashable
@@ -115,16 +115,18 @@ BillingPaymentMethod.walletType: Field<String> = .omitted
 BillingPaymentMethod: Hashable
 BillingPaymentMethodRemoveParams.orgId: String? = nil
 BillingPaymentMethodRemoveParams: Hashable
-BillingPaymentMethodStatus cases: active, expired, disconnected, unrecognized(String)
+BillingPaymentMethodStatus cases: expired, active, disconnected, unrecognized(String)
 BillingPaymentMethodStatus: Hashable
 CheckAuthorizationParams variants: SessionCheckAuthorizationIsAuthorizedParamsCase1 | SessionCheckAuthorizationIsAuthorizedParamsCase2 | SessionCheckAuthorizationIsAuthorizedParamsCase3 | SessionCheckAuthorizationIsAuthorizedParamsCase4 | SessionCheckAuthorizationIsAuthorizedParamsCase5
 CheckAuthorizationParams: Hashable
 Clerk.createOrganization(params: CreateOrganizationParams): Organization [return]
 Clerk.environment: EnvironmentResource
 Clerk.getOrganization(organizationId: String): Organization [return]
+Clerk.lastAuthenticationStrategy: LastAuthenticationStrategy?
 Clerk.loaded: Bool
 Clerk.organization: Organization?
 Clerk.session: Session?
+Clerk.sessions: [Session]
 Clerk.setActive(params: MobileSetActiveParams): Void [return]
 Clerk.signIn: SignIn
 Clerk.signOut(options: MobileSignOutOptions? = nil): Void [return]
@@ -411,7 +413,7 @@ EnterpriseConnectionTestRunSamlPayload.relayState: String? = nil
 EnterpriseConnectionTestRunSamlPayload.samlRequest: String? = nil
 EnterpriseConnectionTestRunSamlPayload.samlResponse: String? = nil
 EnterpriseConnectionTestRunSamlPayload: Hashable
-EnterpriseConnectionTestRunStatus cases: pending, failed, success, unrecognized(String)
+EnterpriseConnectionTestRunStatus cases: failed, pending, success, unrecognized(String)
 EnterpriseConnectionTestRunStatus: Hashable
 EnterpriseOAuthConfig.authUrl: String? = nil
 EnterpriseOAuthConfig.clientId: String
@@ -564,6 +566,8 @@ InviteMemberParams: Hashable
 InviteMembersParams.emailAddresses: [String]
 InviteMembersParams.role: String
 InviteMembersParams: Hashable
+LastAuthenticationStrategy cases: password, phone_code, email_code, email_link, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, web3_solana_signature, web3_metamask_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_base_signature, email_address, username, unrecognized(String)
+LastAuthenticationStrategy: Hashable
 MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = .omitted
 MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = .omitted
 MobileSetActiveParams: Hashable
@@ -678,7 +682,7 @@ OrganizationDomainOwnershipVerification.txtRecordName: String?
 OrganizationDomainOwnershipVerification.txtRecordValue: String?
 OrganizationDomainOwnershipVerification.verifiedAt: Date?
 OrganizationDomainOwnershipVerification: Hashable
-OrganizationDomainOwnershipVerificationStatus cases: expired, unverified, verified, unrecognized(String)
+OrganizationDomainOwnershipVerificationStatus cases: unverified, verified, expired, unrecognized(String)
 OrganizationDomainOwnershipVerificationStatus: Hashable
 OrganizationDomainOwnershipVerificationStrategy cases: txt, legacy, manual_override, parent_domain, unrecognized(String)
 OrganizationDomainOwnershipVerificationStrategy: Hashable
@@ -687,7 +691,7 @@ OrganizationDomainVerification.expiresAt: Date
 OrganizationDomainVerification.status: OrganizationDomainVerificationStatus
 OrganizationDomainVerification.strategy: String
 OrganizationDomainVerification: Hashable
-OrganizationDomainVerificationStatus cases: expired, failed, unverified, verified, unrecognized(String)
+OrganizationDomainVerificationStatus cases: unverified, verified, failed, expired, unrecognized(String)
 OrganizationDomainVerificationStatus: Hashable
 OrganizationDomainsBulkOwnershipVerification.data: [OrganizationDomain]
 OrganizationDomainsBulkOwnershipVerification.errors: [OrganizationDomainBulkOwnershipVerificationError]
@@ -728,7 +732,7 @@ OrganizationInvitation.roleName: String
 OrganizationInvitation.status: OrganizationInvitationStatus
 OrganizationInvitation.updatedAt: Date
 OrganizationInvitation: Hashable
-OrganizationInvitationStatus cases: expired, pending, accepted, revoked, unrecognized(String)
+OrganizationInvitationStatus cases: expired, accepted, pending, revoked, unrecognized(String)
 OrganizationInvitationStatus: Hashable
 OrganizationMembership.createdAt: Date
 OrganizationMembership.destroy(): OrganizationMembership [return]
@@ -786,7 +790,7 @@ OrganizationSuggestionPublicOrganizationData.imageUrl: String
 OrganizationSuggestionPublicOrganizationData.name: String
 OrganizationSuggestionPublicOrganizationData.slug: String?
 OrganizationSuggestionPublicOrganizationData: Hashable
-OrganizationSuggestionStatus cases: pending, accepted, unrecognized(String)
+OrganizationSuggestionStatus cases: accepted, pending, unrecognized(String)
 OrganizationSuggestionStatus: Hashable
 Partialtype.name: Field<String> = .omitted
 Partialtype: Hashable
@@ -923,8 +927,10 @@ PrepareAffiliationVerificationParams: Hashable
 PrepareEmailAddressVerificationParams variants: EmailAddressPrepareVerificationParamsCase1 | EmailAddressPrepareVerificationParamsCase2
 PrepareEmailAddressVerificationParams.strategy: String [shared union field]
 PrepareEmailAddressVerificationParams: Hashable
-PrepareWeb3WalletVerificationParams.strategy: UserSettingsWeb3FirstFactorsElement
+PrepareWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy
 PrepareWeb3WalletVerificationParams: Hashable
+PrepareWeb3WalletVerificationParamsStrategy cases: web3_solana_signature, web3_metamask_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_base_signature, unrecognized(String)
+PrepareWeb3WalletVerificationParamsStrategy: Hashable
 ProtectCheck.expiresAt: Double? = nil
 ProtectCheck.sdkUrl: String
 ProtectCheck.status: String
@@ -1054,7 +1060,7 @@ SessionCheckAuthorizationIsAuthorizedParamsCase5.reverification: ReverificationC
 SessionCheckAuthorizationIsAuthorizedParamsCase5: Hashable
 SessionFactorVerificationAgeValue tuple: Double, Double
 SessionFactorVerificationAgeValue: Hashable
-SessionStatus cases: active, ended, expired, pending, abandoned, revoked, removed, replaced, unrecognized(String)
+SessionStatus cases: expired, abandoned, active, ended, pending, revoked, removed, replaced, unrecognized(String)
 SessionStatus: Hashable
 SessionTask.key: SessionTaskKey
 SessionTask: Hashable
@@ -1188,7 +1194,7 @@ SignInEmailLinkVerification.createdSessionId: String
 SignInEmailLinkVerification.status: SignInEmailLinkVerificationStatus
 SignInEmailLinkVerification.verifiedFromTheSameClient: Bool
 SignInEmailLinkVerification: Hashable
-SignInEmailLinkVerificationStatus cases: expired, failed, verified, client_mismatch, unrecognized(String)
+SignInEmailLinkVerificationStatus cases: verified, failed, expired, client_mismatch, unrecognized(String)
 SignInEmailLinkVerificationStatus: Hashable
 SignInExistingSession.sessionId: String
 SignInExistingSession: Hashable
@@ -1606,10 +1612,8 @@ UserSettings.signUp: SignUpData
 UserSettings.social: [String: OAuthProviderSettings]
 UserSettings.socialProviderStrategies: [OAuthStrategy]
 UserSettings.usernameSettings: UsernameSettingsData
-UserSettings.web3FirstFactors: [UserSettingsWeb3FirstFactorsElement]
+UserSettings.web3FirstFactors: [PrepareWeb3WalletVerificationParamsStrategy]
 UserSettings: Hashable
-UserSettingsWeb3FirstFactorsElement cases: web3_solana_signature, web3_metamask_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_base_signature, unrecognized(String)
-UserSettingsWeb3FirstFactorsElement: Hashable
 UsernameSettingsData.max_length: Double
 UsernameSettingsData.min_length: Double
 UsernameSettingsData: Hashable
@@ -1624,14 +1628,14 @@ Verification.strategy: String?
 Verification.verifiedAtClient: String?
 Verification.verifiedFromTheSameClient(): Bool [return]
 Verification: Hashable
-VerificationStatus cases: expired, failed, unverified, verified, transferable, unrecognized(String)
+VerificationStatus cases: unverified, verified, failed, expired, transferable, unrecognized(String)
 VerificationStatus: Hashable
 VerificationStrategy cases: phone_code, email_code, email_link, totp, backup_code, unrecognized(String)
 VerificationStrategy: Hashable
 VerifyTOTPParams.code: String
 VerifyTOTPParams: Hashable
 Web3SignatureFactor.primary: Bool? = nil
-Web3SignatureFactor.strategy: UserSettingsWeb3FirstFactorsElement
+Web3SignatureFactor.strategy: PrepareWeb3WalletVerificationParamsStrategy
 Web3SignatureFactor.walletName: String? = nil
 Web3SignatureFactor.web3WalletId: String
 Web3SignatureFactor: Hashable
@@ -1654,6 +1658,7 @@ enum EnterpriseConnectionTestRunConnectionType
 enum EnterpriseConnectionTestRunStatus
 enum EnterpriseProtocol
 enum EnterpriseProvider
+enum LastAuthenticationStrategy
 enum OAuthProvider
 enum OAuthStrategy
 enum OrganizationDomainOwnershipVerificationStatus
@@ -1666,6 +1671,7 @@ enum OrganizationSuggestionStatus
 enum PermissionType
 enum PhoneCodeChannel
 enum PreferredSignInStrategy
+enum PrepareWeb3WalletVerificationParamsStrategy
 enum ProtectLoaderTarget
 enum SessionStatus
 enum SessionTaskKey
@@ -1682,7 +1688,6 @@ enum SignUpField
 enum SignUpIdentificationField
 enum SignUpModes
 enum SignUpStatus
-enum UserSettingsWeb3FirstFactorsElement
 enum VerificationStatus
 enum VerificationStrategy
 object APIKeysSettings

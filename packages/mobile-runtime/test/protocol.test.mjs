@@ -298,3 +298,16 @@ test('the canonical environment resource refreshes settings before generated com
   assert.deepEqual(result.result.$ref, handle);
   assert.equal(f.resource(handle).displayConfig.applicationName, 'After');
 });
+
+test('native client metadata uses the existing client without exposing legacy auth resources', async t => {
+  const client = { ...fixtures.authenticatedClient, last_authentication_strategy: 'oauth_google' };
+  const f = await fixture({ client });
+  t.after(f.dispose);
+  const clerk = f.resource(f.state.roots.clerk);
+  assert.equal(clerk.lastAuthenticationStrategy, 'oauth_google');
+  assert.equal(clerk.sessions.length, 1);
+  assert.deepEqual(clerk.sessions[0].$ref, f.state.roots.session);
+  assert.equal(clerk.signIn.$ref.type, 'SignIn');
+  assert.equal(clerk.signUp.$ref.type, 'SignUp');
+  assert.equal(clerk.client, undefined);
+});

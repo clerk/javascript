@@ -1,3 +1,4 @@
+import type { ClientResource } from './client';
 import type { EnvironmentResource } from './environment';
 import type { Clerk, SetActiveParams, SignOutOptions } from './clerk';
 import type { SignInFutureResource } from './signInFuture';
@@ -9,19 +10,20 @@ import type { OrganizationResource } from './organization';
 export type MobileSetActiveParams = Omit<SetActiveParams, 'navigate' | 'redirectUrl'>;
 export type MobileSignOutOptions = Omit<SignOutOptions, 'redirectUrl'>;
 
-export type MobileAuthenticationResources = {
+export type MobileAuthenticationResources = Pick<ClientResource, 'sessions' | 'lastAuthenticationStrategy'> & {
   signIn: SignInFutureResource;
   signUp: SignUpFutureResource;
   environment: EnvironmentResource;
 };
 
-export type MobileClerk = Pick<Clerk, 'status' | 'loaded' | 'createOrganization' | 'getOrganization'> & {
-  readonly environment: EnvironmentResource;
-  readonly session: SessionResource | null;
-  readonly user: UserResource | null;
-  readonly organization: OrganizationResource | null;
-  readonly signIn: SignInFutureResource;
-  readonly signUp: SignUpFutureResource;
-  setActive: (params: MobileSetActiveParams) => ReturnType<Clerk['setActive']>;
-  signOut: (options?: MobileSignOutOptions) => ReturnType<Clerk['signOut']>;
-};
+export type MobileClerk = Pick<Clerk, 'status' | 'loaded' | 'createOrganization' | 'getOrganization'> &
+  Pick<ClientResource, 'sessions' | 'lastAuthenticationStrategy'> & {
+    readonly environment: EnvironmentResource;
+    readonly session: SessionResource | null;
+    readonly user: UserResource | null;
+    readonly organization: OrganizationResource | null;
+    readonly signIn: SignInFutureResource;
+    readonly signUp: SignUpFutureResource;
+    setActive: (params: MobileSetActiveParams) => ReturnType<Clerk['setActive']>;
+    signOut: (options?: MobileSignOutOptions) => ReturnType<Clerk['signOut']>;
+  };

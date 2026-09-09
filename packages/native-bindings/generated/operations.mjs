@@ -313,30 +313,6 @@ export const operations = {
     result: {"kind":"ref","name":"BillingPaymentMethod"},
     invoke: (target, args) => target["reload"](...args),
   },
-  "EnvironmentResource.isSingleSession": {
-    type: "EnvironmentResource",
-    parameters: [],
-    result: {"kind":"boolean"},
-    invoke: (target, args) => target["isSingleSession"](...args),
-  },
-  "EnvironmentResource.isProduction": {
-    type: "EnvironmentResource",
-    parameters: [],
-    result: {"kind":"boolean"},
-    invoke: (target, args) => target["isProduction"](...args),
-  },
-  "EnvironmentResource.isDevelopmentOrStaging": {
-    type: "EnvironmentResource",
-    parameters: [],
-    result: {"kind":"boolean"},
-    invoke: (target, args) => target["isDevelopmentOrStaging"](...args),
-  },
-  "EnvironmentResource.reload": {
-    type: "EnvironmentResource",
-    parameters: [{"name":"p","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"ClerkResourceReloadParams"}}}],
-    result: {"kind":"ref","name":"EnvironmentResource"},
-    invoke: (target, args) => target["reload"](...args),
-  },
   "Session.end": {
     type: "Session",
     parameters: [],
@@ -893,6 +869,30 @@ export const operations = {
     type: "SessionVerification",
     parameters: [{"name":"p","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"ClerkResourceReloadParams"}}}],
     result: {"kind":"ref","name":"SessionVerification"},
+    invoke: (target, args) => target["reload"](...args),
+  },
+  "EnvironmentResource.isSingleSession": {
+    type: "EnvironmentResource",
+    parameters: [],
+    result: {"kind":"boolean"},
+    invoke: (target, args) => target["isSingleSession"](...args),
+  },
+  "EnvironmentResource.isProduction": {
+    type: "EnvironmentResource",
+    parameters: [],
+    result: {"kind":"boolean"},
+    invoke: (target, args) => target["isProduction"](...args),
+  },
+  "EnvironmentResource.isDevelopmentOrStaging": {
+    type: "EnvironmentResource",
+    parameters: [],
+    result: {"kind":"boolean"},
+    invoke: (target, args) => target["isDevelopmentOrStaging"](...args),
+  },
+  "EnvironmentResource.reload": {
+    type: "EnvironmentResource",
+    parameters: [{"name":"p","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"ClerkResourceReloadParams"}}}],
+    result: {"kind":"ref","name":"EnvironmentResource"},
     invoke: (target, args) => target["reload"](...args),
   },
   "SignIn.create": {

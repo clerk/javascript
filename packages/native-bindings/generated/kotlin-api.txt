@@ -42,7 +42,7 @@ AttemptAffiliationVerificationParams.code: String
 AttemptEmailAddressVerificationParams.code: String
 AttemptPhoneNumberVerificationParams.code: String
 AttemptWeb3WalletVerificationParams.signature: String
-AttemptWeb3WalletVerificationParams.strategy: UserSettingsWeb3FirstFactorsElement? = null
+AttemptWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy? = null
 Attribute cases: passkey, password, backup_code, email_address, phone_number, username, first_name, last_name, web3_wallet, authenticator_app, unrecognized(String)
 AttributeData.channels: List<PhoneCodeChannel>? = null
 AttributeData.enabled: Boolean
@@ -93,14 +93,16 @@ BillingPaymentMethod.status: BillingPaymentMethodStatus
 BillingPaymentMethod.updatedAt: Field<Instant> = Field.Omitted
 BillingPaymentMethod.walletType: Field<String> = Field.Omitted
 BillingPaymentMethodRemoveParams.orgId: String? = null
-BillingPaymentMethodStatus cases: active, expired, disconnected, unrecognized(String)
+BillingPaymentMethodStatus cases: expired, active, disconnected, unrecognized(String)
 CheckAuthorizationParams variants: SessionCheckAuthorizationIsAuthorizedParamsCase1 | SessionCheckAuthorizationIsAuthorizedParamsCase2 | SessionCheckAuthorizationIsAuthorizedParamsCase3 | SessionCheckAuthorizationIsAuthorizedParamsCase4 | SessionCheckAuthorizationIsAuthorizedParamsCase5
 Clerk.createOrganization(params: CreateOrganizationParams): Organization [return]
 Clerk.environment: EnvironmentResource
 Clerk.getOrganization(organizationId: String): Organization [return]
+Clerk.lastAuthenticationStrategy: LastAuthenticationStrategy?
 Clerk.loaded: Boolean
 Clerk.organization: Organization?
 Clerk.session: Session?
+Clerk.sessions: List<Session>
 Clerk.setActive(params: MobileSetActiveParams): Unit [return]
 Clerk.signIn: SignIn
 Clerk.signOut(options: MobileSignOutOptions? = null): Unit [return]
@@ -333,7 +335,7 @@ EnterpriseConnectionTestRunParsedUserInfo.userId: String? = null
 EnterpriseConnectionTestRunSamlPayload.relayState: String? = null
 EnterpriseConnectionTestRunSamlPayload.samlRequest: String? = null
 EnterpriseConnectionTestRunSamlPayload.samlResponse: String? = null
-EnterpriseConnectionTestRunStatus cases: pending, failed, success, unrecognized(String)
+EnterpriseConnectionTestRunStatus cases: failed, pending, success, unrecognized(String)
 EnterpriseOAuthConfig.authUrl: String? = null
 EnterpriseOAuthConfig.clientId: String
 EnterpriseOAuthConfig.createdAt: Instant?
@@ -457,6 +459,7 @@ InviteMemberParams.emailAddress: String
 InviteMemberParams.role: String
 InviteMembersParams.emailAddresses: List<String>
 InviteMembersParams.role: String
+LastAuthenticationStrategy cases: password, phone_code, email_code, email_link, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, web3_solana_signature, web3_metamask_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_base_signature, email_address, username, unrecognized(String)
 MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = Field.Omitted
 MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = Field.Omitted
 MobileSetActiveParamsOrganization variants: String | Organization
@@ -555,13 +558,13 @@ OrganizationDomainOwnershipVerification.strategy: OrganizationDomainOwnershipVer
 OrganizationDomainOwnershipVerification.txtRecordName: String?
 OrganizationDomainOwnershipVerification.txtRecordValue: String?
 OrganizationDomainOwnershipVerification.verifiedAt: Instant?
-OrganizationDomainOwnershipVerificationStatus cases: expired, unverified, verified, unrecognized(String)
+OrganizationDomainOwnershipVerificationStatus cases: unverified, verified, expired, unrecognized(String)
 OrganizationDomainOwnershipVerificationStrategy cases: txt, legacy, manual_override, parent_domain, unrecognized(String)
 OrganizationDomainVerification.attempts: Double
 OrganizationDomainVerification.expiresAt: Instant
 OrganizationDomainVerification.status: OrganizationDomainVerificationStatus
 OrganizationDomainVerification.strategy: String
-OrganizationDomainVerificationStatus cases: expired, failed, unverified, verified, unrecognized(String)
+OrganizationDomainVerificationStatus cases: unverified, verified, failed, expired, unrecognized(String)
 OrganizationDomainsBulkOwnershipVerification.data: List<OrganizationDomain>
 OrganizationDomainsBulkOwnershipVerification.errors: List<OrganizationDomainBulkOwnershipVerificationError>
 OrganizationEnrollmentMode cases: enterprise_sso, manual_invitation, automatic_invitation, automatic_suggestion, unrecognized(String)
@@ -594,7 +597,7 @@ OrganizationInvitation.role: String
 OrganizationInvitation.roleName: String
 OrganizationInvitation.status: OrganizationInvitationStatus
 OrganizationInvitation.updatedAt: Instant
-OrganizationInvitationStatus cases: expired, pending, accepted, revoked, unrecognized(String)
+OrganizationInvitationStatus cases: expired, accepted, pending, revoked, unrecognized(String)
 OrganizationMembership.createdAt: Instant
 OrganizationMembership.destroy(): OrganizationMembership [return]
 OrganizationMembership.id: String
@@ -642,7 +645,7 @@ OrganizationSuggestionPublicOrganizationData.id: String
 OrganizationSuggestionPublicOrganizationData.imageUrl: String
 OrganizationSuggestionPublicOrganizationData.name: String
 OrganizationSuggestionPublicOrganizationData.slug: String?
-OrganizationSuggestionStatus cases: pending, accepted, unrecognized(String)
+OrganizationSuggestionStatus cases: accepted, pending, unrecognized(String)
 Partialtype.name: Field<String> = Field.Omitted
 Passkey.createdAt: Instant
 Passkey.delete(): DeletedObject [return]
@@ -755,7 +758,8 @@ PreferredSignInStrategy cases: password, otp, unrecognized(String)
 PrepareAffiliationVerificationParams.affiliationEmailAddress: String
 PrepareEmailAddressVerificationParams variants: EmailAddressPrepareVerificationParamsCase1 | EmailAddressPrepareVerificationParamsCase2
 PrepareEmailAddressVerificationParams.strategy: String [shared union field]
-PrepareWeb3WalletVerificationParams.strategy: UserSettingsWeb3FirstFactorsElement
+PrepareWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy
+PrepareWeb3WalletVerificationParamsStrategy cases: web3_solana_signature, web3_metamask_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_base_signature, unrecognized(String)
 ProtectCheck.expiresAt: Double? = null
 ProtectCheck.sdkUrl: String
 ProtectCheck.status: String
@@ -862,7 +866,7 @@ SessionCheckAuthorizationIsAuthorizedParamsCase4.plan: String
 SessionCheckAuthorizationIsAuthorizedParamsCase4.reverification: ReverificationConfig? = null
 SessionCheckAuthorizationIsAuthorizedParamsCase5.reverification: ReverificationConfig? = null
 SessionFactorVerificationAgeValue tuple: Double, Double
-SessionStatus cases: active, ended, expired, pending, abandoned, revoked, removed, replaced, unrecognized(String)
+SessionStatus cases: expired, abandoned, active, ended, pending, revoked, removed, replaced, unrecognized(String)
 SessionTask.key: SessionTaskKey
 SessionTaskKey cases: choose-organization, reset-password, setup-mfa, unrecognized(String)
 SessionTouchIntent cases: focus, select_session, select_org, unrecognized(String)
@@ -961,7 +965,7 @@ SignInEmailLinkSendParams.verificationUrl: String [shared union field]
 SignInEmailLinkVerification.createdSessionId: String
 SignInEmailLinkVerification.status: SignInEmailLinkVerificationStatus
 SignInEmailLinkVerification.verifiedFromTheSameClient: Boolean
-SignInEmailLinkVerificationStatus cases: expired, failed, verified, client_mismatch, unrecognized(String)
+SignInEmailLinkVerificationStatus cases: verified, failed, expired, client_mismatch, unrecognized(String)
 SignInExistingSession.sessionId: String
 SignInFirstFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | Web3SignatureFactor | PasswordFactor | PasskeyFactor | OauthFactor | EnterpriseSSOFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor
 SignInFirstFactor.strategy: String [shared union field]
@@ -1305,8 +1309,7 @@ UserSettings.signUp: SignUpData
 UserSettings.social: Map<String, OAuthProviderSettings>
 UserSettings.socialProviderStrategies: List<OAuthStrategy>
 UserSettings.usernameSettings: UsernameSettingsData
-UserSettings.web3FirstFactors: List<UserSettingsWeb3FirstFactorsElement>
-UserSettingsWeb3FirstFactorsElement cases: web3_solana_signature, web3_metamask_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_base_signature, unrecognized(String)
+UserSettings.web3FirstFactors: List<PrepareWeb3WalletVerificationParamsStrategy>
 UsernameSettingsData.max_length: Double
 UsernameSettingsData.min_length: Double
 Verification.attempts: Double?
@@ -1319,11 +1322,11 @@ Verification.status: VerificationStatus?
 Verification.strategy: String?
 Verification.verifiedAtClient: String?
 Verification.verifiedFromTheSameClient(): Boolean [return]
-VerificationStatus cases: expired, failed, unverified, verified, transferable, unrecognized(String)
+VerificationStatus cases: unverified, verified, failed, expired, transferable, unrecognized(String)
 VerificationStrategy cases: phone_code, email_code, email_link, totp, backup_code, unrecognized(String)
 VerifyTOTPParams.code: String
 Web3SignatureFactor.primary: Boolean? = null
-Web3SignatureFactor.strategy: UserSettingsWeb3FirstFactorsElement
+Web3SignatureFactor.strategy: PrepareWeb3WalletVerificationParamsStrategy
 Web3SignatureFactor.walletName: String? = null
 Web3SignatureFactor.web3WalletId: String
 Web3Wallet.attemptVerification(params: AttemptWeb3WalletVerificationParams): Web3Wallet [return]
@@ -1344,6 +1347,7 @@ enum EnterpriseConnectionTestRunConnectionType
 enum EnterpriseConnectionTestRunStatus
 enum EnterpriseProtocol
 enum EnterpriseProvider
+enum LastAuthenticationStrategy
 enum OAuthProvider
 enum OAuthStrategy
 enum OrganizationDomainOwnershipVerificationStatus
@@ -1356,6 +1360,7 @@ enum OrganizationSuggestionStatus
 enum PermissionType
 enum PhoneCodeChannel
 enum PreferredSignInStrategy
+enum PrepareWeb3WalletVerificationParamsStrategy
 enum ProtectLoaderTarget
 enum SessionStatus
 enum SessionTaskKey
@@ -1372,7 +1377,6 @@ enum SignUpField
 enum SignUpIdentificationField
 enum SignUpModes
 enum SignUpStatus
-enum UserSettingsWeb3FirstFactorsElement
 enum VerificationStatus
 enum VerificationStrategy
 object APIKeysSettings
