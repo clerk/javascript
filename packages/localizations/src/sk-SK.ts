@@ -1455,6 +1455,9 @@ export const skSK: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Overovací kód pre obnovenie hesla',
       resendButton: 'Znovu poslať kód',
@@ -1520,6 +1523,15 @@ export const skSK: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Pred obnovením hesla je potrebné overiť vašu totožnosť.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrovať sa',

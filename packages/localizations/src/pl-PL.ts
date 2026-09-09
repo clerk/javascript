@@ -1455,6 +1455,9 @@ export const plPL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod werfikacyjny resetowania hasła',
       resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
@@ -1520,6 +1523,15 @@ export const plPL: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Przed zresetowaniem hasła musimy zweryfikować tożsamość użytkownika.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Zarejestruj się',

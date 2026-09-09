@@ -1445,6 +1445,9 @@ export const zhTW: LocalizationResource = {
       subtitle: '請選擇您想要繼續使用的企業帳戶。',
       title: '選擇一個企業帳戶',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: '重設密碼代碼',
       resendButton: '重新傳送代碼',
@@ -1508,6 +1511,15 @@ export const zhTW: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: '我們需要驗證您的身份才能重設您的密碼。',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: '註冊',

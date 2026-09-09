@@ -1452,6 +1452,9 @@ export const ukUA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код відновлення пароля',
       resendButton: 'Надіслати код ще раз',
@@ -1516,6 +1519,15 @@ export const ukUA: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Необхідно верифікувати вашу особу перед відновленням пароля',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Зареєструватися',

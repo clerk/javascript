@@ -1450,6 +1450,9 @@ export const koKR: LocalizationResource = {
       subtitle: '계속할 기업 계정을 선택해 주세요.',
       title: '기업 계정 선택',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: '비밀번호 재설정 코드',
       resendButton: '코드 재전송',
@@ -1513,6 +1516,15 @@ export const koKR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: '비밀번호를 재설정하기 전에 신원을 확인해야 해요.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: '회원가입',
