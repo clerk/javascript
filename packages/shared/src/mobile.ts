@@ -1,3 +1,5 @@
+export type { MobileClerk } from './types/mobile';
+
 export interface MobileCredentialStorage {
   read(): Promise<string | null>;
   write(credential: string): Promise<void>;
@@ -8,7 +10,7 @@ type MobileRequest = RequestInit & { url?: URL };
 type MobileResponse = Response & { payload?: unknown };
 type MobileCore = {
   __internal_onBeforeRequest(callback: (request: MobileRequest) => Promise<void>): void;
-  __internal_onAfterResponse(callback: (request: MobileRequest, response: MobileResponse) => Promise<void>): void;
+  __internal_onAfterResponse(callback: (request: MobileRequest, response?: MobileResponse) => Promise<void>): void;
 };
 
 export function installMobileCredentialTransport(
@@ -46,6 +48,7 @@ export function installMobileCredentialTransport(
   });
 
   core.__internal_onAfterResponse(async (request, response) => {
+    if (!response) return;
     const current = requests.get(request);
     if (current === undefined) throw new Error('Missing mobile request generation.');
     assertCurrent(current);
