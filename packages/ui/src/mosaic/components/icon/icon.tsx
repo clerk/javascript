@@ -13,6 +13,8 @@ export interface IconProps extends React.ComponentPropsWithRef<'svg'> {
   name: IconName;
   size?: 'sm' | 'md' | 'lg' | 'inherit';
   placement?: 'inline-start' | 'inline-end';
+  /** StyleX atoms from the container; merged last so they win over the icon's own size atoms. */
+  xstyle?: stylex.StyleXStyles;
 }
 
 /**
@@ -26,7 +28,7 @@ export interface IconProps extends React.ComponentPropsWithRef<'svg'> {
  * follow the writing mode rather than naming a physical edge.
  */
 export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIcon(
-  { name, size = 'md', placement, className, style, ...rest },
+  { name, size = 'md', placement, xstyle, className, style, ...rest },
   ref,
 ) {
   const override = useMosaicIcons()[name];
@@ -34,7 +36,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
   // child by what it is: `:has([data-icon='inline-end'])` can't match some other placed descendant.
   const props = mergeStyleProps(
     themeProps('icon', { size, icon: placement }),
-    stylex.props(reset.base, styles.base, sizes[size], iconScope),
+    stylex.props(reset.base, styles.base, sizes[size], iconScope, xstyle),
     className,
     style,
   );

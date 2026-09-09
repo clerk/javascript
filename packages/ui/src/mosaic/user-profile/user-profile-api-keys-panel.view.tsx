@@ -72,7 +72,7 @@ export function UserProfileApiKeysPanelView({
             aria-hidden
             name='search'
             size='sm'
-            {...stylex.props(styles.searchIcon)}
+            xstyle={styles.searchIcon}
           />
           <Input
             aria-label='Search API keys'
