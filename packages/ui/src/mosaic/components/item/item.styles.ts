@@ -158,7 +158,7 @@ export const group = stylex.create({
 export const separator = stylex.create({
   base: {
     borderStyle: 'none',
-    backgroundColor: colorVars['--cl-color-border-faded'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     flexShrink: 0,
     height: '1px',
     width: '100%',

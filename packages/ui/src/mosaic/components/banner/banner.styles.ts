@@ -3,10 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 const neutralFill = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`;
-const warningFill = `color-mix(in oklab, ${colorVars['--cl-color-warning']} 4%, transparent)`;
-const negativeFill = `color-mix(in oklab, ${colorVars['--cl-color-negative']} 4%, transparent)`;
-const warningBorder = `color-mix(in oklab, ${colorVars['--cl-color-warning']} 20%, transparent)`;
-const negativeBorder = `color-mix(in oklab, ${colorVars['--cl-color-negative']} 20%, transparent)`;
 
 export const styles = stylex.create({
   root: {
@@ -47,13 +43,13 @@ export const rootColors = stylex.create({
     color: colorVars['--cl-color-neutral-foreground'],
   },
   warning: {
-    borderColor: warningBorder,
-    backgroundColor: warningFill,
+    borderColor: colorVars['--cl-color-warning-border'],
+    backgroundColor: colorVars['--cl-color-warning-subtle'],
     color: colorVars['--cl-color-warning'],
   },
   negative: {
-    borderColor: negativeBorder,
-    backgroundColor: negativeFill,
+    borderColor: colorVars['--cl-color-negative-border'],
+    backgroundColor: colorVars['--cl-color-negative-subtle'],
     color: colorVars['--cl-color-negative'],
   },
 });

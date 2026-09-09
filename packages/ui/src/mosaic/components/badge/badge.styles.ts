@@ -2,10 +2,10 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-// warning/negative/positive tint a faded fill and use the saturated token as text;
+// warning/negative/positive fill with the subtle surface and use the saturated token as text;
 // primary fills with the solid token and uses its `-foreground` for text.
 //
-// Neutral has no faded surface to tint — `--cl-color-neutral-faded` is a text gray, and its
+// Neutral has no subtle surface to fill — `--cl-color-neutral-faded` is a text gray, and its
 // `-foreground` is a text color rather than an on-fill one, so it is unreadable against the solid
 // 900. It rides the same black/white scrim the button's neutral fill does, which composites against
 // any backdrop. Must be a local binding — StyleX inlines it; an imported one fails to compile.
@@ -37,15 +37,15 @@ export const colors = stylex.create({
     color: colorVars['--cl-color-neutral-foreground'],
   },
   warning: {
-    backgroundColor: colorVars['--cl-color-warning-faded'],
+    backgroundColor: colorVars['--cl-color-warning-subtle'],
     color: colorVars['--cl-color-warning'],
   },
   negative: {
-    backgroundColor: colorVars['--cl-color-negative-faded'],
+    backgroundColor: colorVars['--cl-color-negative-subtle'],
     color: colorVars['--cl-color-negative'],
   },
   positive: {
-    backgroundColor: colorVars['--cl-color-positive-faded'],
+    backgroundColor: colorVars['--cl-color-positive-subtle'],
     color: colorVars['--cl-color-positive'],
   },
 });

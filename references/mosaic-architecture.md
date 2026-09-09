@@ -25,6 +25,8 @@ export const colorVars = stylex.defineVars({
 
 Groups: `colorVars`, `radiusVars`, `targetVars`, `scrollbarVars`, `scrollFadeVars`, `spacingVars`, `space`, `typeScaleVars`, `fontFamilyVars`, `fontWeightVars`, `durationVars`, `easingVars`, `focusVars`.
 
+`gray` is the one group that is not public: its keys carry no `--cl-` prefix, so StyleX hashes the names and there is no `--cl-gray-*` to override. The gray-backed `--cl-color-*` tokens read from it; consumers retheme those, not the scale.
+
 Light and dark come from CSS `light-dark()` on the default values, so there is no theme object and no re-render on theme change — the browser resolves it.
 
 `@stylexjs/enforce-extension` requires a `.stylex.ts` file to export nothing but its `defineVars` results, so the derived token-name unions (`ColorVarName`, `RadiusVarName`, …) live in `styles/index.ts` as `keyof typeof colorVars`.

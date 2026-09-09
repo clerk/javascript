@@ -20,8 +20,32 @@ import * as stylex from '@stylexjs/stylex';
 // the vars so they never collide with a host app's own custom properties.
 
 // =============================================================================
+// Gray Scale
+// =============================================================================
+// Figma's `base/gray/*`, internal only. The keys carry no `--cl-` prefix on purpose:
+// StyleX hashes them, so there is no `--cl-gray-*` for a consumer to override and the
+// semantic `--cl-color-*` tokens below stay the whole public colour surface. Pure grays,
+// so chroma and hue are 0 and only lightness varies.
+
+export const gray = stylex.defineVars({
+  '50': 'oklch(0.9851 0 0)',
+  '100': 'oklch(0.9702 0 0)',
+  '200': 'oklch(0.9461 0 0)',
+  '300': 'oklch(0.8699 0 0)',
+  '400': 'oklch(0.7155 0 0)',
+  '500': 'oklch(0.5555 0 0)',
+  '600': 'oklch(0.4386 0 0)',
+  '700': 'oklch(0.3715 0 0)',
+  '800': 'oklch(0.2686 0 0)',
+  '850': 'oklch(0.2393 0 0)',
+  '900': 'oklch(0.2046 0 0)',
+});
+
+// =============================================================================
 // Color Tokens
 // =============================================================================
+// Tokens Figma maps to `base/gray/*` read from the scale above. Brand and status
+// colours are literal values there too, so they stay literal here.
 
 const colorDefaults = {
   '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
@@ -32,28 +56,31 @@ const colorDefaults = {
   '--cl-color-neutral-foreground': 'light-dark(oklch(0.24 0 0), oklch(0.96 0 0))',
   '--cl-color-neutral-faded': 'light-dark(oklch(0.5697 0.0246 279.94), oklch(0.6953 0.0261 285.7))',
 
-  '--cl-color-negative': 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
-  '--cl-color-negative-foreground': 'oklch(0.985 0 0)',
-  '--cl-color-negative-faded': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
+  '--cl-color-negative': 'light-dark(oklch(0.5903 0.213 26.78), oklch(0.7106 0.1661 22.22))',
+  '--cl-color-negative-foreground': 'oklch(1 0 0)',
+  '--cl-color-negative-subtle': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
+  '--cl-color-negative-border': 'light-dark(oklch(0.8155 0.0983 19.41), oklch(0.3958 0.1331 25.72))',
 
-  '--cl-color-positive': 'light-dark(oklch(0.548 0.153 152.535), oklch(0.696 0.17 162.48))',
-  '--cl-color-positive-foreground': 'oklch(0.985 0 0)',
-  '--cl-color-positive-faded': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
+  '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
+  '--cl-color-positive-foreground': 'oklch(1 0 0)',
+  '--cl-color-positive-subtle': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
+  '--cl-color-positive-border': 'light-dark(oklch(0.7922 0.1959 148.18), oklch(0.4479 0.1083 151.33))',
 
-  '--cl-color-warning': 'light-dark(oklch(0.646 0.222 41.116), oklch(0.75 0.183 55.934))',
-  '--cl-color-warning-foreground': 'oklch(0.985 0 0)',
-  '--cl-color-warning-faded': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
+  '--cl-color-warning': 'light-dark(oklch(0.7099 0.1888 44.94), oklch(0.7576 0.159 55.93))',
+  '--cl-color-warning-foreground': 'oklch(1 0 0)',
+  '--cl-color-warning-subtle': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
+  '--cl-color-warning-border': 'light-dark(oklch(0.8672 0.0902 63.47), oklch(0.4084 0.1165 38.17))',
 
-  '--cl-color-background': 'light-dark(oklch(0.985 0 0), oklch(0.2686 0 0))',
+  '--cl-color-background': `light-dark(${gray['100']}, ${gray['850']})`,
 
-  '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
-  '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
+  '--cl-color-card': `light-dark(oklch(1 0 0), ${gray['900']})`,
+  '--cl-color-card-foreground': `light-dark(${gray['900']}, ${gray['50']})`,
 
-  '--cl-color-input': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
-  '--cl-color-input-placeholder': '#a3a3a3',
+  '--cl-color-input': `light-dark(oklch(1 0 0), ${gray['850']})`,
+  '--cl-color-input-placeholder': gray['400'],
 
-  '--cl-color-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
-  '--cl-color-border-faded': 'light-dark(oklch(0.9702 0 0), oklch(0.296 0.0126 285.61))',
+  '--cl-color-border': `light-dark(${gray['200']}, ${gray['800']})`,
+  '--cl-color-border-subtle': `light-dark(${gray['100']}, ${gray['850']})`,
 
   '--cl-color-ring': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
 } as const;

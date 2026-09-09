@@ -18,7 +18,7 @@ export const styles = stylex.create({
     width: space['4.5'],
   },
   media: {
-    borderColor: colorVars['--cl-color-border-faded'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
     borderWidth: '1px',

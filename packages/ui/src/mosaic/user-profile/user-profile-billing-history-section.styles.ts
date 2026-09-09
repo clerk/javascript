@@ -24,7 +24,7 @@ export const styles = stylex.create({
     textAlign: 'center',
   },
   header: {
-    backgroundColor: colorVars['--cl-color-border-faded'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
   },
   headerCell: {
     paddingBlock: space['2.5'],

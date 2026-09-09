@@ -45,7 +45,7 @@ const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']},
 // that carry hue fade toward the tint that belongs to them, and the light-on-fill pairs fade toward
 // their own fill, which is the only backdrop they can ever sit on.
 const iconFadedNeutral = colorVars['--cl-color-neutral-faded'];
-const iconFadedNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-faded']} 50%)`;
+const iconFadedNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-subtle']} 50%)`;
 const iconFadedOnPrimary = `color-mix(in oklab, ${colorVars['--cl-color-primary-foreground']}, ${colorVars['--cl-color-primary']} 40%)`;
 const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative-foreground']}, ${colorVars['--cl-color-negative']} 40%)`;
 
@@ -361,11 +361,11 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
-      ':not([data-disabled])[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':not([data-disabled]):not([data-pending]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':not([data-disabled])[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-faded'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-subtle'],
       },
     },
     color: colorVars['--cl-color-negative'],
