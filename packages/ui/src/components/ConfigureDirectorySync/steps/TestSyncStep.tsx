@@ -1,6 +1,5 @@
 import { __internal_useOrganizationDirectorySyncUsers } from '@clerk/shared/react';
 import type { DirectorySyncUserResource } from '@clerk/shared/types';
-import React from 'react';
 
 import {
   Badge,
@@ -88,17 +87,12 @@ export const TestSyncStep = (): JSX.Element => {
   const { goPrev } = useWizard();
   const { providerMeta, directory, onExit } = useConfigureDirectorySync();
   const { t } = useLocalizations();
-  const users = __internal_useOrganizationDirectorySyncUsers({ directory });
+  // The list doubles as a live feed while the admin pushes test users from the
+  // IdP, so poll for as long as this step is mounted.
+  const users = __internal_useOrganizationDirectorySyncUsers({ directory, poll: true });
 
   const rows = users.data ?? [];
   const providerName = t((providerMeta ?? DIRECTORY_SYNC_PROVIDERS.custom).name);
-
-  // Poll while this step is visible; the list doubles as a live feed while the
-  // admin pushes test users from the IdP. Unmounting the step ends the poll.
-  const { startPolling } = users;
-  React.useEffect(() => {
-    startPolling();
-  }, [startPolling]);
 
   return (
     <>
