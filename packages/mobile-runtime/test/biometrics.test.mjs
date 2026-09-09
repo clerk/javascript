@@ -40,6 +40,8 @@ const challenge = {
 async function biometricFixture(options = {}) {
   let records = options.records ?? [localRecord()];
   let cleanup = options.cleanup ?? [];
+  let installationCurrent = options.installationCurrent ?? true;
+  let installationMarks = 0;
   const keys = new Set(records.map(record => record.localKeyId ?? record.local_key_id));
   const deleted = [];
   let signed = 0;
@@ -53,11 +55,19 @@ async function biometricFixture(options = {}) {
   const f = await fixture({
     client,
     configuration: { platform: options.platform ?? 'ios' },
-    capabilities: options.noCapability ? [] : ['biometrics'],
+    capabilities: options.noCapability
+      ? []
+      : ['biometrics', ...(options.installationCurrent === undefined ? [] : ['biometrics.installation'])],
     biometrics: async message => {
       const { capability, args } = message;
       const result = await options.biometrics?.(message);
       if (result !== undefined) return result;
+      if (capability === 'biometrics.installation.isCurrent') return installationCurrent;
+      if (capability === 'biometrics.installation.markCurrent') {
+        installationCurrent = true;
+        installationMarks++;
+        return null;
+      }
       if (capability === 'biometrics.appIdentifier') return 'com.example.native';
       if (capability === 'biometrics.storage.read')
         return JSON.stringify(args.key === 'credentials' ? records : cleanup);
@@ -114,7 +124,15 @@ async function biometricFixture(options = {}) {
         return response({ ...fixtures.signIn, status: 'complete', created_session_id: 'sess_bio' });
     },
   });
-  return Object.assign(f, { records: () => records, cleanup: () => cleanup, signed: () => signed, keys, deleted });
+  return Object.assign(f, {
+    records: () => records,
+    cleanup: () => cleanup,
+    signed: () => signed,
+    keys,
+    deleted,
+    installationCurrent: () => installationCurrent,
+    installationMarks: () => installationMarks,
+  });
 }
 const call = (f, operation, args = []) =>
   f.invoke(f.resource(f.state.roots.clerk).biometricCredentials.$ref, `BiometricCredentials.${operation}`, args);
@@ -373,6 +391,90 @@ for (const policy of [undefined, 'biometry_current_set']) {
     assert.equal(f.state.roots.session, null);
     const forgotten = await call(f, 'forgetLocalCredentials', [{ userId: 'user_native' }]);
     assert.equal(forgotten.result, 1);
+    assert.deepEqual(f.records(), []);
+  });
+}
+
+test('a new Apple installation deletes only its own surviving biometric keys before becoming available', async t => {
+  const other = { ...localRecord('td_other', 'user_other', 'key_other'), appIdentifier: 'com.example.other' };
+  const malformedOwn = { localKeyId: 'key_malformed', appIdentifier: 'com.example.native' };
+  const f = await biometricFixture({ installationCurrent: false, records: [localRecord(), other, malformedOwn] });
+  t.after(f.dispose);
+  assert.deepEqual(f.deleted.sort(), ['key_malformed', 'tdlk_fixture']);
+  assert.deepEqual(f.records(), [other]);
+  assert.equal(f.installationCurrent(), true);
+  assert.equal(f.installationMarks(), 1);
+  assert.deepEqual((await call(f, 'localAvailability')).result, {
+    isAvailable: false,
+    unavailableReason: 'noLocalCredential',
+  });
+  assert.equal(f.signed(), 0);
+});
+
+test('an existing Apple installation preserves its enrolled credential', async t => {
+  const f = await biometricFixture({ installationCurrent: true });
+  t.after(f.dispose);
+  assert.deepEqual(f.deleted, []);
+  assert.deepEqual((await call(f, 'localAvailability')).result, { isAvailable: true, unavailableReason: null });
+  assert.equal(f.records().length, 1);
+});
+
+test('failed installation cleanup blocks use and coalesces a later successful retry', async t => {
+  let failDeletion = true;
+  const deleting = deferred(),
+    release = deferred();
+  const f = await biometricFixture({
+    installationCurrent: false,
+    biometrics: async ({ capability }) => {
+      if (capability !== 'biometrics.deleteKey') return;
+      if (failDeletion) throw Object.assign(new Error('Locked'), { code: 'secure_storage_locked' });
+      deleting.resolve();
+      await release.promise;
+    },
+  });
+  t.after(f.dispose);
+  assert.equal(f.installationCurrent(), false);
+  assert.equal(f.records().length, 1);
+  const attempt = await f.invoke(f.state.roots.signIn, 'SignIn.biometricCredential');
+  assert.equal(attempt.result?.error?.code ?? attempt.failure?.code, 'secure_storage_locked', JSON.stringify(attempt));
+  assert.equal(f.signed(), 0);
+  failDeletion = false;
+  const first = call(f, 'localAvailability');
+  await deleting.promise;
+  const second = call(f, 'localAvailability');
+  release.resolve();
+  for (const result of await Promise.all([first, second]))
+    assert.deepEqual(result.result, { isAvailable: false, unavailableReason: 'noLocalCredential' });
+  assert.equal(f.installationCurrent(), true);
+  assert.equal(f.installationMarks(), 1);
+  assert.deepEqual(f.deleted, ['tdlk_fixture']);
+  assert.deepEqual(f.records(), []);
+});
+
+for (const failingCapability of [
+  'biometrics.storage.read',
+  'biometrics.storage.write',
+  'biometrics.installation.markCurrent',
+]) {
+  test(`installation completion waits for successful ${failingCapability}`, async t => {
+    let fail = true;
+    const f = await biometricFixture({
+      installationCurrent: false,
+      biometrics: ({ capability }) => {
+        if (fail && capability === failingCapability)
+          throw Object.assign(new Error('Unavailable'), { code: 'installation_fixture_failure' });
+      },
+    });
+    t.after(f.dispose);
+    assert.equal(f.installationCurrent(), false);
+    assert.equal((await call(f, 'localAvailability')).failure?.code, 'installation_fixture_failure');
+    assert.equal(f.signed(), 0);
+    fail = false;
+    assert.deepEqual((await call(f, 'localAvailability')).result, {
+      isAvailable: false,
+      unavailableReason: 'noLocalCredential',
+    });
+    assert.equal(f.installationCurrent(), true);
     assert.deepEqual(f.records(), []);
   });
 }

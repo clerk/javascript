@@ -69,6 +69,12 @@ export function configureNativeHost(clerk: Clerk, host: MobileNativeHost) {
         appIdentifier: () => request('biometrics.appIdentifier', {}),
         storage: storage('credentials'),
         cleanupStorage: storage('cleanup'),
+        installation: supports('biometrics.installation')
+          ? {
+              isCurrent: () => request('biometrics.installation.isCurrent', { scope }),
+              markCurrent: () => request('biometrics.installation.markCurrent', { scope }),
+            }
+          : undefined,
         supports: policy => request('biometrics.supports', { policy }),
         hasKey: localKeyId => request('biometrics.hasKey', { localKeyId }),
         createKey: policy => request('biometrics.createKey', { policy }),

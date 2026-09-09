@@ -352,3 +352,51 @@ test('replacing and removing a native host changes subsequent auth request local
   second();
   await create(null);
 });
+
+test('an attached Apple host reconciles installation metadata on the existing core owner', async t => {
+  const f = await fixture();
+  t.after(f.dispose);
+  const native = f.attach();
+  await native.ready;
+  const owner = native.state.roots.clerk;
+  const requests = f.requests.length;
+  const credential = f.credential();
+  let current = false;
+  let records = '[{"id":"td_old","localKeyId":"old_key","userId":"old_user","appIdentifier":"com.example.app"}]';
+  const deleted = [];
+  const removeHost = await f.core.__internal_configureNativeHost({
+    platform: 'ios',
+    callbackUrl: 'test://auth-callback',
+    capabilities: ['biometrics', 'biometrics.installation'],
+    request: async (capability, args) => {
+      switch (capability) {
+        case 'biometrics.installation.isCurrent':
+          return current;
+        case 'biometrics.installation.markCurrent':
+          current = true;
+          return null;
+        case 'biometrics.appIdentifier':
+          return 'com.example.app';
+        case 'biometrics.storage.read':
+          return args.key === 'credentials' ? records : '[]';
+        case 'biometrics.storage.write':
+          records = args.value;
+          return null;
+        case 'biometrics.deleteKey':
+          deleted.push(args.localKeyId);
+          return null;
+        default:
+          throw new Error(`Unexpected capability ${capability}`);
+      }
+    },
+    cancelAuthentication() {},
+    invalidateCredentials: async () => {},
+  });
+  t.after(removeHost);
+  assert.equal(current, true);
+  assert.deepEqual(deleted, ['old_key']);
+  assert.equal(records, '[]');
+  assert.deepEqual(native.state.roots.clerk, owner);
+  assert.equal(f.requests.length, requests);
+  assert.equal(f.credential(), credential);
+});

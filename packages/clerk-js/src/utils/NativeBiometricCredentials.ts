@@ -33,6 +33,7 @@ export type NativeBiometricHost = {
   appIdentifier(): Promise<string>;
   storage: Storage;
   cleanupStorage: Storage;
+  installation?: { isCurrent(): Promise<boolean>; markCurrent(): Promise<void> };
   supports(policy: BiometricCredentialPolicy): Promise<boolean>;
   hasKey(localKeyId: string): Promise<boolean>;
   createKey(policy: BiometricCredentialPolicy): Promise<LocalKey>;
@@ -84,6 +85,8 @@ const isMissingKey = (error: unknown) =>
 export class NativeBiometricCredentials implements BiometricCredentialsResource {
   #generation = 0;
   #writes: Promise<unknown> = Promise.resolve();
+  #installationReady = false;
+  #installationPromise?: Promise<void>;
   constructor(
     private readonly clerk: Clerk,
     private readonly host?: NativeBiometricHost,
@@ -170,6 +173,7 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
   }
 
   async enroll(params: BiometricCredentialEnrollmentParams = {}): Promise<BiometricCredential> {
+    await this.ensureInstallation();
     const session = this.clerk.session;
     if (!session || !['active', 'pending'].includes(session.status) || !session.user?.id) {
       throw fail('biometric_session_required');
@@ -299,6 +303,7 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
   }
 
   async forgetLocalCredentials({ userId }: { userId: string }): Promise<number> {
+    await this.ensureInstallation();
     const host = this.requireHost();
     const appIdentifier = await host.appIdentifier();
     await this.updateCleanup(users => [...new Set([...users, userId])]);
@@ -316,6 +321,7 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
     if (!this.host) {
       return;
     }
+    await this.ensureInstallation();
     for (const userId of await this.cleanupUsers()) {
       await this.forgetLocalCredentials({ userId }).catch(() => undefined);
     }
@@ -449,7 +455,47 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
     return { records: [], reason: reason ?? 'serverCredentialMissing' };
   }
 
+  private async ensureInstallation(): Promise<void> {
+    const host = this.host;
+    if (!host?.installation || this.#installationReady) return;
+    if (!this.#installationPromise) {
+      const installation = host.installation;
+      this.#installationPromise = this.serialized(async () => {
+        if (!(await installation.isCurrent())) {
+          const appIdentifier = await host.appIdentifier();
+          if (!appIdentifier) throw fail('missing_app_identifier');
+          const raw = await host.storage.read();
+          let records: unknown;
+          try {
+            records = raw ? JSON.parse(raw) : [];
+          } catch {
+            throw fail('invalid_biometric_metadata');
+          }
+          if (!Array.isArray(records)) throw fail('invalid_biometric_metadata');
+          const belongsToApp = (record: unknown): record is Record<string, unknown> =>
+            !!record &&
+            typeof record === 'object' &&
+            'appIdentifier' in record &&
+            record.appIdentifier === appIdentifier;
+          for (const record of records) {
+            if (belongsToApp(record) && typeof record.localKeyId === 'string' && record.localKeyId)
+              await host.deleteKey(record.localKeyId);
+          }
+          // Preserve other applications' records, including unknown/malformed fields.
+          // If key deletion or persistence fails, leave the marker unset for retry.
+          await host.storage.write(JSON.stringify(records.filter(record => !belongsToApp(record))));
+        }
+        await installation.markCurrent();
+        this.#installationReady = true;
+      }).finally(() => {
+        this.#installationPromise = undefined;
+      });
+    }
+    await this.#installationPromise;
+  }
+
   private async records(): Promise<LocalRecord[]> {
+    await this.ensureInstallation();
     const raw = await this.requireHost().storage.read();
     if (!raw) {
       return [];
