@@ -9,6 +9,7 @@ import { manifest } from '../../native-bindings/generated/schema.mjs';
 
 type Configuration = {
   publishableKey: string;
+  locale?: string;
   callbackUrl: string;
   platform: 'ios' | 'android';
   protocolVersion: number;
@@ -59,6 +60,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
   );
   removeNativeHost = await clerk.__internal_configureNativeHost({
     platform: configuration.platform,
+    locale: configuration.locale,
     callbackUrl: configuration.callbackUrl,
     capabilities: configuration.capabilities,
     request: (capability, args) => hostRequest(capability, args as JSONValue),

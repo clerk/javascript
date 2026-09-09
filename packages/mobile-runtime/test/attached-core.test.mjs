@@ -321,3 +321,34 @@ test('an OS host attaches after load and preserves an application passkey adapte
   assert.equal(f.core.loaded, true);
   assert.equal(f.requests.length, count);
 });
+
+test('replacing and removing a native host changes subsequent auth request locales', async t => {
+  const f = await fixture({
+    http: request => (new URL(request.url).pathname.endsWith('/sign_ins') ? response(fixtures.signIn) : undefined),
+  });
+  t.after(f.dispose);
+  const install = locale =>
+    f.core.__internal_configureNativeHost({
+      platform: 'ios',
+      locale,
+      callbackUrl: 'application://auth',
+      capabilities: [],
+      request: async () => {
+        throw new Error('Unexpected OS request');
+      },
+      cancelAuthentication() {},
+      invalidateCredentials: async () => {},
+    });
+  const create = async expected => {
+    const result = await f.core.client.signIn.__internal_future.create({ identifier: 'test@example.com' });
+    assert.equal(result.error, null);
+    assert.equal(new URLSearchParams(f.requests.at(-1).body).get('locale'), expected);
+  };
+  const first = await install('fr-CA');
+  await create('fr-CA');
+  const second = await install('ja-JP');
+  first();
+  await create('ja-JP');
+  second();
+  await create(null);
+});

@@ -50,7 +50,7 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
-import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
+import { getClientLocale, getClerkQueryParam, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -165,11 +165,11 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     let finalParams = { ...params };
 
-    // Inject browser locale if not already provided
+    // Inject the client locale if not already provided
     if (!finalParams.locale) {
-      const browserLocale = getBrowserLocale();
-      if (browserLocale) {
-        finalParams.locale = browserLocale;
+      const clientLocale = getClientLocale(SignUp.clerk.__internal_nativeLocale);
+      if (clientLocale) {
+        finalParams.locale = clientLocale;
       }
     }
 
@@ -927,7 +927,7 @@ class SignUpFuture implements SignUpFutureResource {
       captchaError,
       ...params,
       unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
-      locale: params.locale ?? getBrowserLocale(),
+      locale: params.locale ?? getClientLocale(SignUp.clerk.__internal_nativeLocale),
     };
 
     await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
@@ -966,9 +966,9 @@ class SignUpFuture implements SignUpFutureResource {
       if (this.#resource.id) {
         await this.#resource.__internal_basePatch({ body });
       } else {
-        // Inject browser locale only when creating the sign-up, so an existing
+        // Inject the client locale only when creating the sign-up, so an existing
         // sign-up's locale is not overwritten on update.
-        body.locale = params.locale ?? getBrowserLocale();
+        body.locale = params.locale ?? getClientLocale(SignUp.clerk.__internal_nativeLocale);
         await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       }
     });
@@ -1143,9 +1143,9 @@ class SignUpFuture implements SignUpFutureResource {
         if (this.#resource.id) {
           return this.#resource.__internal_basePatch({ body });
         }
-        // Inject browser locale only when creating the sign-up, so an existing
+        // Inject the client locale only when creating the sign-up, so an existing
         // sign-up's locale is not overwritten on update.
-        body.locale = locale ?? getBrowserLocale();
+        body.locale = locale ?? getClientLocale(SignUp.clerk.__internal_nativeLocale);
         return this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       };
 

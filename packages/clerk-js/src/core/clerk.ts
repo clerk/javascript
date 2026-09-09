@@ -293,6 +293,7 @@ export class Clerk implements ClerkInterface {
   #protectAssertionSet = false;
   #oauthTransport: OAuthTransport | null = null;
   #nativeHost: ReturnType<typeof configureNativeHost> | undefined;
+  __internal_nativeLocale?: string;
 
   __internal_configureNativeHost = async (host: MobileNativeHost): Promise<() => void> => {
     this.#nativeHost?.dispose();

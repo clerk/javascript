@@ -78,6 +78,8 @@ export type MobileResourceObserver = {
 /** @internal Platform effects for the existing mobile Clerk owner. */
 export type MobileNativeHost = {
   platform: 'ios' | 'android';
+  /** Preferred OS locale in BCP 47 format. */
+  locale?: string;
   callbackUrl: string;
   capabilities: readonly string[];
   request<T>(capability: string, args: unknown): Promise<T>;

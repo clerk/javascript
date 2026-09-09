@@ -25,6 +25,7 @@ export function configureNativeHost(clerk: Clerk, host: MobileNativeHost) {
   const unavailable = () =>
     Promise.reject(new ClerkRuntimeError('This native capability is unavailable.', { code: 'capability_unavailable' }));
   const previous = {
+    __internal_nativeLocale: clerk.__internal_nativeLocale,
     __internal_getGoogleIdentity: clerk.__internal_getGoogleIdentity,
     __internal_getAppleIdentity: clerk.__internal_getAppleIdentity,
     __internal_nativeMagicLink: clerk.__internal_nativeMagicLink,
@@ -36,6 +37,7 @@ export function configureNativeHost(clerk: Clerk, host: MobileNativeHost) {
     __internal_getPublicCredentials: clerk.__internal_getPublicCredentials,
     __internal_beforeNativeAuthReset: clerk.__internal_beforeNativeAuthReset,
   };
+  clerk.__internal_nativeLocale = host.locale;
   const scope = clerk.publishableKey;
   clerk.__internal_getGoogleIdentity = supports('googleIdentity')
     ? options => request('googleIdentity', options)

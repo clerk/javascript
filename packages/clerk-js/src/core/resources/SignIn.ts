@@ -82,7 +82,7 @@ import {
 
 import { debugLogger } from '@/utils/debug';
 
-import { getBrowserLocale, web3 } from '../../utils';
+import { getClientLocale, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -202,10 +202,10 @@ export class SignIn extends BaseResource implements SignInResource {
 
     let body: Record<string, unknown> = { ...params };
 
-    // Inject browser locale
-    const browserLocale = getBrowserLocale();
-    if (browserLocale) {
-      body.locale = browserLocale;
+    // Inject the client locale
+    const clientLocale = getClientLocale(SignIn.clerk.__internal_nativeLocale);
+    if (clientLocale) {
+      body.locale = clientLocale;
     }
 
     if (
@@ -1059,7 +1059,7 @@ class SignInFuture implements SignInFutureResource {
       captchaToken,
       captchaWidgetType,
       captchaError,
-      locale: getBrowserLocale() || undefined,
+      locale: getClientLocale(SignIn.clerk.__internal_nativeLocale) || undefined,
     };
 
     await this.#resource.__internal_basePost({
@@ -1102,7 +1102,7 @@ class SignInFuture implements SignInFutureResource {
       // TODO @userland-errors:
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.#resource.identifier;
-      const locale = getBrowserLocale();
+      const locale = getClientLocale(SignIn.clerk.__internal_nativeLocale);
       await this.#resource.__internal_basePost({
         path: this.#resource.pathRoot,
         body: {

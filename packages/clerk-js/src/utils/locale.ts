@@ -26,3 +26,8 @@ export function getBrowserLocale(): string | null {
     return DEFAULT_LOCALE;
   }
 }
+
+/** Uses the current native owner's OS preference, with the existing browser fallback. */
+export function getClientLocale(nativeLocale?: string): string | null {
+  return nativeLocale?.trim() || getBrowserLocale();
+}
