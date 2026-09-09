@@ -3,11 +3,14 @@ import type {
   ExternalAccountJSONSnapshot,
   ExternalAccountResource,
   OAuthProvider,
+  OAuthStrategy,
   ReauthorizeExternalAccountParams,
   VerificationResource,
 } from '@clerk/shared/types';
 import { titleize } from '@clerk/shared/underscore';
 
+import { getOAuthTransportRedirectUrl } from '../../utils/authenticateWithTransport';
+import { completeExternalAccountWithTransport } from '../../utils/completeExternalAccountWithTransport';
 import { BaseResource } from './Base';
 import { Verification } from './Verification';
 
@@ -35,18 +38,33 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     this.fromJSON(data);
   }
 
-  reauthorize = (params: ReauthorizeExternalAccountParams): Promise<ExternalAccountResource> => {
+  reauthorize = async (params: ReauthorizeExternalAccountParams): Promise<ExternalAccountResource> => {
     const { additionalScopes, redirectUrl, oidcPrompt, oidcLoginHint } = params || {};
+    const transport = ExternalAccount.clerk?.__internal_oauthTransport;
+    const owner = ExternalAccount.clerk?.user;
+    const ownerId = owner?.id;
+    if (transport && owner && this.verification?.error) {
+      const approved = new Set((this.approvedScopes || '').split(' '));
+      const needsAdditionalScopes = additionalScopes?.some(scope => !approved.has(scope)) ?? false;
+      if (!needsAdditionalScopes) {
+        const strategy: OAuthStrategy = `oauth_${this.provider}`;
+        return owner.createExternalAccount({ strategy, additionalScopes, oidcPrompt, oidcLoginHint });
+      }
+    }
+    const callback = transport ? await getOAuthTransportRedirectUrl(transport) : redirectUrl;
 
-    return this._basePatch({
+    const account = await this._basePatch({
       action: 'reauthorize',
       body: {
         additional_scope: additionalScopes,
-        redirect_url: redirectUrl,
+        redirect_url: callback,
         oidc_prompt: oidcPrompt,
         oidc_login_hint: oidcLoginHint,
       },
     });
+    return transport
+      ? completeExternalAccountWithTransport(ExternalAccount.clerk, account, ownerId || '', callback)
+      : account;
   };
   destroy = (): Promise<void> => this._baseDelete();
 

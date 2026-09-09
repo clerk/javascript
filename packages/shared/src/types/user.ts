@@ -18,7 +18,7 @@ import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
 import type { SessionWithActivitiesResource } from './session';
 import type { UserJSONSnapshot } from './snapshots';
-import type { OAuthStrategy } from './strategies';
+import type { AppleIdTokenStrategy, OAuthStrategy } from './strategies';
 import type { TOTPResource } from './totp';
 import type { UserOrganizationInvitationResource } from './userOrganizationInvitation';
 import type { SnakeToCamel } from './utils';
@@ -379,7 +379,9 @@ export type CreateExternalAccountParams = {
   /**
    * The strategy corresponding to the OAuth provider. For example: `'oauth_google'`.
    */
-  strategy?: OAuthStrategy;
+  strategy?: OAuthStrategy | AppleIdTokenStrategy;
+  /** Apple identity token; native runtimes request one when omitted. */
+  token?: string;
   /**
    * The ID of the enterprise connection to connect to the user.
    */

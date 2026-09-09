@@ -4329,7 +4329,7 @@
       "name": "GetEnterpriseConnectionsParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 491,
+        "line": 493,
         "symbol": "GetEnterpriseConnectionsParams"
       },
       "kind": "object",
@@ -4347,7 +4347,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 492,
+            "line": 494,
             "symbol": "withOrganizationAccountLinking"
           }
         }
@@ -11225,23 +11225,6 @@
           }
         },
         {
-          "name": "redirectUrl",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/externalAccount.ts",
-            "line": 8,
-            "symbol": "redirectUrl"
-          }
-        },
-        {
           "name": "oidcPrompt",
           "optional": true,
           "type": {
@@ -12239,7 +12222,7 @@
       "name": "UpdateUserParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 424,
+        "line": 426,
         "symbol": "UpdateUserParams"
       },
       "kind": "object",
@@ -12329,7 +12312,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 430,
+            "line": 432,
             "symbol": "unsafeMetadata"
           },
           "deprecated": "Updating `unsafeMetadata` via `user.update()` is deprecated.\nUse `user.updateMetadata({ unsafeMetadata })` for partial updates (deep\nmerge). The parameter will be removed in a future major version."
@@ -12341,7 +12324,7 @@
       "name": "UpdateUserMetadataParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 434,
+        "line": 436,
         "symbol": "UpdateUserMetadataParams"
       },
       "kind": "object",
@@ -12354,7 +12337,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 438,
+            "line": 440,
             "symbol": "unsafeMetadata"
           },
           "documentation": "The metadata to deep-merge with the user's existing `unsafeMetadata`. Keys at any nesting level whose value is `null` are removed."
@@ -12366,7 +12349,7 @@
       "name": "UpdateUserPasswordParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 442,
+        "line": 444,
         "symbol": "UpdateUserPasswordParams"
       },
       "kind": "object",
@@ -12379,7 +12362,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 446,
+            "line": 448,
             "symbol": "newPassword"
           },
           "documentation": "The user's new password."
@@ -12397,7 +12380,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 450,
+            "line": 452,
             "symbol": "currentPassword"
           },
           "documentation": "The user's current password."
@@ -12415,7 +12398,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 454,
+            "line": 456,
             "symbol": "signOutOfOtherSessions"
           },
           "documentation": "Whether to sign out the user from all their active sessions once their password is updated."
@@ -12427,7 +12410,7 @@
       "name": "RemoveUserPasswordParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 458,
+        "line": 460,
         "symbol": "RemoveUserPasswordParams"
       },
       "kind": "object",
@@ -12445,7 +12428,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 462,
+            "line": 464,
             "symbol": "currentPassword"
           },
           "documentation": "The user's current password."
@@ -12990,7 +12973,7 @@
             "omittable": true,
             "value": {
               "kind": "ref",
-              "name": "OAuthStrategy"
+              "name": "CreateExternalAccountParamsStrategy"
             }
           },
           "source": {
@@ -12999,6 +12982,24 @@
             "symbol": "strategy"
           },
           "documentation": "The strategy corresponding to the OAuth provider. For example: `'oauth_google'`."
+        },
+        {
+          "name": "token",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/user.ts",
+            "line": 384,
+            "symbol": "token"
+          },
+          "documentation": "Apple identity token; native runtimes request one when omitted."
         },
         {
           "name": "enterpriseConnectionId",
@@ -13013,28 +13014,10 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 386,
+            "line": 388,
             "symbol": "enterpriseConnectionId"
           },
           "documentation": "The ID of the enterprise connection to connect to the user."
-        },
-        {
-          "name": "redirectUrl",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/user.ts",
-            "line": 391,
-            "symbol": "redirectUrl"
-          },
-          "documentation": "The full URL or path that the OAuth provider should redirect to, on successful authorization on their part. Typically, this will be a simple `/sso-callback` route that calls [`Clerk.handleRedirectCallback`](https://clerk.com/docs/reference/objects/clerk#handle-redirect-callback) or mounts the [`<AuthenticateWithRedirectCallback />`](https://clerk.com/docs/reference/components/control/authenticate-with-redirect-callback) component. See the [custom flow](https://clerk.com/docs/guides/development/custom-flows/authentication/oauth-connections) for implementation details."
         },
         {
           "name": "additionalScopes",
@@ -13052,7 +13035,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 395,
+            "line": 397,
             "symbol": "additionalScopes"
           },
           "documentation": "Additional scopes for your user to be prompted to approve."
@@ -13070,7 +13053,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 399,
+            "line": 401,
             "symbol": "oidcPrompt"
           },
           "documentation": "The value to pass to the [OIDC `prompt` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL."
@@ -13088,7 +13071,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 403,
+            "line": 405,
             "symbol": "oidcLoginHint"
           },
           "documentation": "The value to pass to the [OIDC `login_hint` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=login_hint,in%20\\(if%20necessary\\).) in the generated OAuth redirect URL."
@@ -13096,18 +13079,13 @@
       ],
       "methods": []
     },
-    "OAuthStrategy": {
-      "name": "OAuthStrategy",
-      "source": {
-        "file": "packages/shared/src/types/strategies.ts",
-        "line": 34,
-        "symbol": "OAuthStrategy"
-      },
-      "documentation": "OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).",
+    "CreateExternalAccountParamsStrategy": {
+      "name": "CreateExternalAccountParamsStrategy",
       "kind": "enum",
       "properties": [],
       "methods": [],
       "values": [
+        "oauth_token_apple",
         "oauth_facebook",
         "oauth_google",
         "oauth_hubspot",
@@ -13147,7 +13125,7 @@
       "name": "GetUserOrganizationMembershipParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 481,
+        "line": 483,
         "symbol": "GetUserOrganizationMembershipParams"
       },
       "kind": "object",
@@ -13195,7 +13173,7 @@
       "name": "GetUserOrganizationInvitationsParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 466,
+        "line": 468,
         "symbol": "GetUserOrganizationInvitationsParams"
       },
       "kind": "object",
@@ -13250,7 +13228,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 470,
+            "line": 472,
             "symbol": "status"
           },
           "documentation": "The status an invitation can have."
@@ -13542,7 +13520,7 @@
       "name": "GetUserOrganizationSuggestionsParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 474,
+        "line": 476,
         "symbol": "GetUserOrganizationSuggestionsParams"
       },
       "kind": "object",
@@ -13597,7 +13575,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 478,
+            "line": 480,
             "symbol": "status"
           },
           "documentation": "The status a suggestion can have."
@@ -14260,7 +14238,7 @@
       "name": "VerifyTOTPParams",
       "source": {
         "file": "packages/shared/src/types/user.ts",
-        "line": 406,
+        "line": 408,
         "symbol": "VerifyTOTPParams"
       },
       "kind": "object",
@@ -14273,7 +14251,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/user.ts",
-            "line": 410,
+            "line": 412,
             "symbol": "code"
           },
           "documentation": "The code to verify."
@@ -17066,6 +17044,53 @@
         }
       ],
       "methods": []
+    },
+    "OAuthStrategy": {
+      "name": "OAuthStrategy",
+      "source": {
+        "file": "packages/shared/src/types/strategies.ts",
+        "line": 34,
+        "symbol": "OAuthStrategy"
+      },
+      "documentation": "OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "oauth_facebook",
+        "oauth_google",
+        "oauth_hubspot",
+        "oauth_github",
+        "oauth_tiktok",
+        "oauth_gitlab",
+        "oauth_discord",
+        "oauth_twitter",
+        "oauth_twitch",
+        "oauth_linkedin",
+        "oauth_linkedin_oidc",
+        "oauth_dropbox",
+        "oauth_atlassian",
+        "oauth_bitbucket",
+        "oauth_microsoft",
+        "oauth_notion",
+        "oauth_apple",
+        "oauth_line",
+        "oauth_instagram",
+        "oauth_coinbase",
+        "oauth_spotify",
+        "oauth_xero",
+        "oauth_box",
+        "oauth_slack",
+        "oauth_linear",
+        "oauth_x",
+        "oauth_enstall",
+        "oauth_huggingface",
+        "oauth_vercel"
+      ],
+      "open": false,
+      "patterns": [
+        "^oauth_custom_.*$"
+      ]
     },
     "EnterpriseSSOSettings": {
       "name": "EnterpriseSSOSettings",
@@ -29100,7 +29125,8 @@
     },
     {
       "path": "ExternalAccountResource.reauthorize",
-      "disposition": "generated"
+      "disposition": "adapted",
+      "reason": "Native reauthorization completes through the injected browser capability."
     },
     {
       "path": "ReauthorizeExternalAccountParams.additionalScopes",
@@ -29108,7 +29134,8 @@
     },
     {
       "path": "ReauthorizeExternalAccountParams.redirectUrl",
-      "disposition": "generated"
+      "disposition": "excluded",
+      "reason": "Connected accounts use the configured native browser callback."
     },
     {
       "path": "ReauthorizeExternalAccountParams.oidcPrompt",
@@ -29677,10 +29704,15 @@
     },
     {
       "path": "UserResource.createExternalAccount",
-      "disposition": "generated"
+      "disposition": "adapted",
+      "reason": "Native authorization completes through the injected browser or Apple credential capability."
     },
     {
       "path": "CreateExternalAccountParams.strategy",
+      "disposition": "generated"
+    },
+    {
+      "path": "CreateExternalAccountParams.token",
       "disposition": "generated"
     },
     {
@@ -29689,7 +29721,8 @@
     },
     {
       "path": "CreateExternalAccountParams.redirectUrl",
-      "disposition": "generated"
+      "disposition": "excluded",
+      "reason": "Connected accounts use the configured native browser callback."
     },
     {
       "path": "CreateExternalAccountParams.additionalScopes",

@@ -31,6 +31,8 @@ export const profile = {
     organization: ['organization.ts', 'OrganizationResource'],
   },
   excluded: {
+    'CreateExternalAccountParams.redirectUrl': 'Connected accounts use the configured native browser callback.',
+    'ReauthorizeExternalAccountParams.redirectUrl': 'Connected accounts use the configured native browser callback.',
     'TOTPResource.reload': 'Enrollment secrets are explicit method return values, not shared observable resources.',
     'BackupCodeResource.reload': 'Recovery codes are explicit method return values, not shared observable resources.',
     'EnvironmentResource.onWindowLocationHost': 'Browser host matching is not a native environment capability.',
@@ -69,6 +71,9 @@ export const profile = {
     'PhoneNumberResource.backupCodes': 'Return recovery codes only to an explicit reader, never in observable state.',
   },
   adapted: {
+    'UserResource.createExternalAccount':
+      'Native authorization completes through the injected browser or Apple credential capability.',
+    'ExternalAccountResource.reauthorize': 'Native reauthorization completes through the injected browser capability.',
     'MobileClerk.environment': 'Read instance settings from the existing initialized core.',
     'EmailAddressResource.toString': 'Generate stringValue to avoid an asynchronous Kotlin Any.toString override.',
     'PhoneNumberResource.toString': 'Generate stringValue to avoid an asynchronous Kotlin Any.toString override.',

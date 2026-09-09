@@ -3636,10 +3636,9 @@ public sealed class OAuthProvider(public val rawValue: String) {
   }
 }
 
-public data class ReauthorizeExternalAccountParams(public val `additionalScopes`: List<String>? = null, public val `redirectUrl`: String? = null, public val `oidcPrompt`: String? = null, public val `oidcLoginHint`: String? = null) {
+public data class ReauthorizeExternalAccountParams(public val `additionalScopes`: List<String>? = null, public val `oidcPrompt`: String? = null, public val `oidcLoginHint`: String? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("additionalScopes", this@ReauthorizeExternalAccountParams.`additionalScopes`?.let { value -> JsonArray(value.map { value -> JsonPrimitive(value) }) } ?: Undefined)
-    putPresent("redirectUrl", this@ReauthorizeExternalAccountParams.`redirectUrl`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("oidcPrompt", this@ReauthorizeExternalAccountParams.`oidcPrompt`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("oidcLoginHint", this@ReauthorizeExternalAccountParams.`oidcLoginHint`?.let { value -> JsonPrimitive(value) } ?: Undefined)
   }
@@ -3647,7 +3646,7 @@ public data class ReauthorizeExternalAccountParams(public val `additionalScopes`
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): ReauthorizeExternalAccountParams {
       val values = value.jsonObject
 
-      return ReauthorizeExternalAccountParams(`additionalScopes` = (values["additionalScopes"] ?: Undefined).decodeOptional { value -> value.jsonArray.map { value -> value.requireString() } }, `redirectUrl` = (values["redirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcLoginHint` = (values["oidcLoginHint"] ?: Undefined).decodeOptional { value -> value.requireString() })
+      return ReauthorizeExternalAccountParams(`additionalScopes` = (values["additionalScopes"] ?: Undefined).decodeOptional { value -> value.jsonArray.map { value -> value.requireString() } }, `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcLoginHint` = (values["oidcLoginHint"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
@@ -4243,11 +4242,11 @@ public class ImageResource(override val handle: ResourceHandle, runtime: CoreRun
   }
 }
 
-public data class CreateExternalAccountParams(public val `strategy`: OAuthStrategy? = null, public val `enterpriseConnectionId`: String? = null, public val `redirectUrl`: String? = null, public val `additionalScopes`: List<String>? = null, public val `oidcPrompt`: String? = null, public val `oidcLoginHint`: String? = null) {
+public data class CreateExternalAccountParams(public val `strategy`: CreateExternalAccountParamsStrategy? = null, public val `token`: String? = null, public val `enterpriseConnectionId`: String? = null, public val `additionalScopes`: List<String>? = null, public val `oidcPrompt`: String? = null, public val `oidcLoginHint`: String? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("strategy", this@CreateExternalAccountParams.`strategy`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("token", this@CreateExternalAccountParams.`token`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("enterpriseConnectionId", this@CreateExternalAccountParams.`enterpriseConnectionId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
-    putPresent("redirectUrl", this@CreateExternalAccountParams.`redirectUrl`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("additionalScopes", this@CreateExternalAccountParams.`additionalScopes`?.let { value -> JsonArray(value.map { value -> JsonPrimitive(value) }) } ?: Undefined)
     putPresent("oidcPrompt", this@CreateExternalAccountParams.`oidcPrompt`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("oidcLoginHint", this@CreateExternalAccountParams.`oidcLoginHint`?.let { value -> JsonPrimitive(value) } ?: Undefined)
@@ -4256,48 +4255,47 @@ public data class CreateExternalAccountParams(public val `strategy`: OAuthStrate
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): CreateExternalAccountParams {
       val values = value.jsonObject
 
-      return CreateExternalAccountParams(`strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> OAuthStrategy.fromJson(value, runtime) }, `enterpriseConnectionId` = (values["enterpriseConnectionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `redirectUrl` = (values["redirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `additionalScopes` = (values["additionalScopes"] ?: Undefined).decodeOptional { value -> value.jsonArray.map { value -> value.requireString() } }, `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcLoginHint` = (values["oidcLoginHint"] ?: Undefined).decodeOptional { value -> value.requireString() })
+      return CreateExternalAccountParams(`strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> CreateExternalAccountParamsStrategy.fromJson(value, runtime) }, `token` = (values["token"] ?: Undefined).decodeOptional { value -> value.requireString() }, `enterpriseConnectionId` = (values["enterpriseConnectionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `additionalScopes` = (values["additionalScopes"] ?: Undefined).decodeOptional { value -> value.jsonArray.map { value -> value.requireString() } }, `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcLoginHint` = (values["oidcLoginHint"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
 
-/**
- * OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).
- */
-public sealed class OAuthStrategy(public val rawValue: String) {
-  public data object OauthFacebook : OAuthStrategy("oauth_facebook")
-  public data object OauthGoogle : OAuthStrategy("oauth_google")
-  public data object OauthHubspot : OAuthStrategy("oauth_hubspot")
-  public data object OauthGithub : OAuthStrategy("oauth_github")
-  public data object OauthTiktok : OAuthStrategy("oauth_tiktok")
-  public data object OauthGitlab : OAuthStrategy("oauth_gitlab")
-  public data object OauthDiscord : OAuthStrategy("oauth_discord")
-  public data object OauthTwitter : OAuthStrategy("oauth_twitter")
-  public data object OauthTwitch : OAuthStrategy("oauth_twitch")
-  public data object OauthLinkedin : OAuthStrategy("oauth_linkedin")
-  public data object OauthLinkedinOidc : OAuthStrategy("oauth_linkedin_oidc")
-  public data object OauthDropbox : OAuthStrategy("oauth_dropbox")
-  public data object OauthAtlassian : OAuthStrategy("oauth_atlassian")
-  public data object OauthBitbucket : OAuthStrategy("oauth_bitbucket")
-  public data object OauthMicrosoft : OAuthStrategy("oauth_microsoft")
-  public data object OauthNotion : OAuthStrategy("oauth_notion")
-  public data object OauthApple : OAuthStrategy("oauth_apple")
-  public data object OauthLine : OAuthStrategy("oauth_line")
-  public data object OauthInstagram : OAuthStrategy("oauth_instagram")
-  public data object OauthCoinbase : OAuthStrategy("oauth_coinbase")
-  public data object OauthSpotify : OAuthStrategy("oauth_spotify")
-  public data object OauthXero : OAuthStrategy("oauth_xero")
-  public data object OauthBox : OAuthStrategy("oauth_box")
-  public data object OauthSlack : OAuthStrategy("oauth_slack")
-  public data object OauthLinear : OAuthStrategy("oauth_linear")
-  public data object OauthX : OAuthStrategy("oauth_x")
-  public data object OauthEnstall : OAuthStrategy("oauth_enstall")
-  public data object OauthHuggingface : OAuthStrategy("oauth_huggingface")
-  public data object OauthVercel : OAuthStrategy("oauth_vercel")
-  public data class Unrecognized(val value: String) : OAuthStrategy(value)
+public sealed class CreateExternalAccountParamsStrategy(public val rawValue: String) {
+  public data object OauthTokenApple : CreateExternalAccountParamsStrategy("oauth_token_apple")
+  public data object OauthFacebook : CreateExternalAccountParamsStrategy("oauth_facebook")
+  public data object OauthGoogle : CreateExternalAccountParamsStrategy("oauth_google")
+  public data object OauthHubspot : CreateExternalAccountParamsStrategy("oauth_hubspot")
+  public data object OauthGithub : CreateExternalAccountParamsStrategy("oauth_github")
+  public data object OauthTiktok : CreateExternalAccountParamsStrategy("oauth_tiktok")
+  public data object OauthGitlab : CreateExternalAccountParamsStrategy("oauth_gitlab")
+  public data object OauthDiscord : CreateExternalAccountParamsStrategy("oauth_discord")
+  public data object OauthTwitter : CreateExternalAccountParamsStrategy("oauth_twitter")
+  public data object OauthTwitch : CreateExternalAccountParamsStrategy("oauth_twitch")
+  public data object OauthLinkedin : CreateExternalAccountParamsStrategy("oauth_linkedin")
+  public data object OauthLinkedinOidc : CreateExternalAccountParamsStrategy("oauth_linkedin_oidc")
+  public data object OauthDropbox : CreateExternalAccountParamsStrategy("oauth_dropbox")
+  public data object OauthAtlassian : CreateExternalAccountParamsStrategy("oauth_atlassian")
+  public data object OauthBitbucket : CreateExternalAccountParamsStrategy("oauth_bitbucket")
+  public data object OauthMicrosoft : CreateExternalAccountParamsStrategy("oauth_microsoft")
+  public data object OauthNotion : CreateExternalAccountParamsStrategy("oauth_notion")
+  public data object OauthApple : CreateExternalAccountParamsStrategy("oauth_apple")
+  public data object OauthLine : CreateExternalAccountParamsStrategy("oauth_line")
+  public data object OauthInstagram : CreateExternalAccountParamsStrategy("oauth_instagram")
+  public data object OauthCoinbase : CreateExternalAccountParamsStrategy("oauth_coinbase")
+  public data object OauthSpotify : CreateExternalAccountParamsStrategy("oauth_spotify")
+  public data object OauthXero : CreateExternalAccountParamsStrategy("oauth_xero")
+  public data object OauthBox : CreateExternalAccountParamsStrategy("oauth_box")
+  public data object OauthSlack : CreateExternalAccountParamsStrategy("oauth_slack")
+  public data object OauthLinear : CreateExternalAccountParamsStrategy("oauth_linear")
+  public data object OauthX : CreateExternalAccountParamsStrategy("oauth_x")
+  public data object OauthEnstall : CreateExternalAccountParamsStrategy("oauth_enstall")
+  public data object OauthHuggingface : CreateExternalAccountParamsStrategy("oauth_huggingface")
+  public data object OauthVercel : CreateExternalAccountParamsStrategy("oauth_vercel")
+  public data class Unrecognized(val value: String) : CreateExternalAccountParamsStrategy(value)
   public fun toJson(): JsonElement = JsonPrimitive(rawValue)
   public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OAuthStrategy = when (val raw = value.requireString()) {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): CreateExternalAccountParamsStrategy = when (val raw = value.requireString()) {
+      "oauth_token_apple" -> OauthTokenApple
       "oauth_facebook" -> OauthFacebook
       "oauth_google" -> OauthGoogle
       "oauth_hubspot" -> OauthHubspot
@@ -5676,6 +5674,77 @@ public data class OAuthProviderSettings(public val `enabled`: Boolean, public va
       val values = value.jsonObject
 
       return OAuthProviderSettings(`enabled` = (values["enabled"] ?: Undefined).requireBoolean(), `required` = (values["required"] ?: Undefined).requireBoolean(), `authenticatable` = (values["authenticatable"] ?: Undefined).requireBoolean(), `strategy` = OAuthStrategy.fromJson((values["strategy"] ?: Undefined), runtime), `name` = (values["name"] ?: Undefined).requireString(), `logoUrl` = (values["logo_url"] ?: Undefined).decodeOptional { value -> value.requireString() })
+    }
+  }
+}
+
+/**
+ * OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).
+ */
+public sealed class OAuthStrategy(public val rawValue: String) {
+  public data object OauthFacebook : OAuthStrategy("oauth_facebook")
+  public data object OauthGoogle : OAuthStrategy("oauth_google")
+  public data object OauthHubspot : OAuthStrategy("oauth_hubspot")
+  public data object OauthGithub : OAuthStrategy("oauth_github")
+  public data object OauthTiktok : OAuthStrategy("oauth_tiktok")
+  public data object OauthGitlab : OAuthStrategy("oauth_gitlab")
+  public data object OauthDiscord : OAuthStrategy("oauth_discord")
+  public data object OauthTwitter : OAuthStrategy("oauth_twitter")
+  public data object OauthTwitch : OAuthStrategy("oauth_twitch")
+  public data object OauthLinkedin : OAuthStrategy("oauth_linkedin")
+  public data object OauthLinkedinOidc : OAuthStrategy("oauth_linkedin_oidc")
+  public data object OauthDropbox : OAuthStrategy("oauth_dropbox")
+  public data object OauthAtlassian : OAuthStrategy("oauth_atlassian")
+  public data object OauthBitbucket : OAuthStrategy("oauth_bitbucket")
+  public data object OauthMicrosoft : OAuthStrategy("oauth_microsoft")
+  public data object OauthNotion : OAuthStrategy("oauth_notion")
+  public data object OauthApple : OAuthStrategy("oauth_apple")
+  public data object OauthLine : OAuthStrategy("oauth_line")
+  public data object OauthInstagram : OAuthStrategy("oauth_instagram")
+  public data object OauthCoinbase : OAuthStrategy("oauth_coinbase")
+  public data object OauthSpotify : OAuthStrategy("oauth_spotify")
+  public data object OauthXero : OAuthStrategy("oauth_xero")
+  public data object OauthBox : OAuthStrategy("oauth_box")
+  public data object OauthSlack : OAuthStrategy("oauth_slack")
+  public data object OauthLinear : OAuthStrategy("oauth_linear")
+  public data object OauthX : OAuthStrategy("oauth_x")
+  public data object OauthEnstall : OAuthStrategy("oauth_enstall")
+  public data object OauthHuggingface : OAuthStrategy("oauth_huggingface")
+  public data object OauthVercel : OAuthStrategy("oauth_vercel")
+  public data class Unrecognized(val value: String) : OAuthStrategy(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OAuthStrategy = when (val raw = value.requireString()) {
+      "oauth_facebook" -> OauthFacebook
+      "oauth_google" -> OauthGoogle
+      "oauth_hubspot" -> OauthHubspot
+      "oauth_github" -> OauthGithub
+      "oauth_tiktok" -> OauthTiktok
+      "oauth_gitlab" -> OauthGitlab
+      "oauth_discord" -> OauthDiscord
+      "oauth_twitter" -> OauthTwitter
+      "oauth_twitch" -> OauthTwitch
+      "oauth_linkedin" -> OauthLinkedin
+      "oauth_linkedin_oidc" -> OauthLinkedinOidc
+      "oauth_dropbox" -> OauthDropbox
+      "oauth_atlassian" -> OauthAtlassian
+      "oauth_bitbucket" -> OauthBitbucket
+      "oauth_microsoft" -> OauthMicrosoft
+      "oauth_notion" -> OauthNotion
+      "oauth_apple" -> OauthApple
+      "oauth_line" -> OauthLine
+      "oauth_instagram" -> OauthInstagram
+      "oauth_coinbase" -> OauthCoinbase
+      "oauth_spotify" -> OauthSpotify
+      "oauth_xero" -> OauthXero
+      "oauth_box" -> OauthBox
+      "oauth_slack" -> OauthSlack
+      "oauth_linear" -> OauthLinear
+      "oauth_x" -> OauthX
+      "oauth_enstall" -> OauthEnstall
+      "oauth_huggingface" -> OauthHuggingface
+      "oauth_vercel" -> OauthVercel
+      else -> Unrecognized(raw)
     }
   }
 }
@@ -9152,7 +9221,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "003c8b215d8623697ce170a41bfbdc1a7400b7d456109a881df6cbc020f8b17f"
+  public const val contractHash: String = "e390d86fcaf1054ac1a42aeeab9c1f8c6333d143b9b407de301b6037e7c77e4f"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

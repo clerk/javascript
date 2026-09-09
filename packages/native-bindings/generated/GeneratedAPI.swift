@@ -4673,19 +4673,16 @@ public enum OAuthProvider: Hashable, Sendable {
 
 public struct ReauthorizeExternalAccountParams: Hashable, Sendable {
   public let `additionalScopes`: [String]?
-  public let `redirectUrl`: String?
   public let `oidcPrompt`: String?
   public let `oidcLoginHint`: String?
-  public init(`additionalScopes`: [String]? = nil, `redirectUrl`: String? = nil, `oidcPrompt`: String? = nil, `oidcLoginHint`: String? = nil) {
+  public init(`additionalScopes`: [String]? = nil, `oidcPrompt`: String? = nil, `oidcLoginHint`: String? = nil) {
     self.`additionalScopes` = `additionalScopes`
-    self.`redirectUrl` = `redirectUrl`
     self.`oidcPrompt` = `oidcPrompt`
     self.`oidcLoginHint` = `oidcLoginHint`
   }
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
       "additionalScopes": try self.`additionalScopes`.map { value in .array(try value.map { value in .string(value) }) } ?? .undefined,
-      "redirectUrl": try self.`redirectUrl`.map { value in .string(value) } ?? .undefined,
       "oidcPrompt": try self.`oidcPrompt`.map { value in .string(value) } ?? .undefined,
       "oidcLoginHint": try self.`oidcLoginHint`.map { value in .string(value) } ?? .undefined
     ]
@@ -4694,7 +4691,7 @@ public struct ReauthorizeExternalAccountParams: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ReauthorizeExternalAccountParams {
     let values = try value.object()
 
-    return try ReauthorizeExternalAccountParams(`additionalScopes`: try (values["additionalScopes"] ?? .undefined).optional { value in try value.array().map { value in try value.string() } }, `redirectUrl`: try (values["redirectUrl"] ?? .undefined).optional { value in try value.string() }, `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `oidcLoginHint`: try (values["oidcLoginHint"] ?? .undefined).optional { value in try value.string() })
+    return try ReauthorizeExternalAccountParams(`additionalScopes`: try (values["additionalScopes"] ?? .undefined).optional { value in try value.array().map { value in try value.string() } }, `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `oidcLoginHint`: try (values["oidcLoginHint"] ?? .undefined).optional { value in try value.string() })
   }
 }
 
@@ -5515,16 +5512,16 @@ public struct ImageResourceState: Hashable, Sendable {
 }
 
 public struct CreateExternalAccountParams: Hashable, Sendable {
-  public let `strategy`: OAuthStrategy?
+  public let `strategy`: CreateExternalAccountParamsStrategy?
+  public let `token`: String?
   public let `enterpriseConnectionId`: String?
-  public let `redirectUrl`: String?
   public let `additionalScopes`: [String]?
   public let `oidcPrompt`: String?
   public let `oidcLoginHint`: String?
-  public init(`strategy`: OAuthStrategy? = nil, `enterpriseConnectionId`: String? = nil, `redirectUrl`: String? = nil, `additionalScopes`: [String]? = nil, `oidcPrompt`: String? = nil, `oidcLoginHint`: String? = nil) {
+  public init(`strategy`: CreateExternalAccountParamsStrategy? = nil, `token`: String? = nil, `enterpriseConnectionId`: String? = nil, `additionalScopes`: [String]? = nil, `oidcPrompt`: String? = nil, `oidcLoginHint`: String? = nil) {
     self.`strategy` = `strategy`
+    self.`token` = `token`
     self.`enterpriseConnectionId` = `enterpriseConnectionId`
-    self.`redirectUrl` = `redirectUrl`
     self.`additionalScopes` = `additionalScopes`
     self.`oidcPrompt` = `oidcPrompt`
     self.`oidcLoginHint` = `oidcLoginHint`
@@ -5532,8 +5529,8 @@ public struct CreateExternalAccountParams: Hashable, Sendable {
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
       "strategy": try self.`strategy`.map { value in try value.encode() } ?? .undefined,
+      "token": try self.`token`.map { value in .string(value) } ?? .undefined,
       "enterpriseConnectionId": try self.`enterpriseConnectionId`.map { value in .string(value) } ?? .undefined,
-      "redirectUrl": try self.`redirectUrl`.map { value in .string(value) } ?? .undefined,
       "additionalScopes": try self.`additionalScopes`.map { value in .array(try value.map { value in .string(value) }) } ?? .undefined,
       "oidcPrompt": try self.`oidcPrompt`.map { value in .string(value) } ?? .undefined,
       "oidcLoginHint": try self.`oidcLoginHint`.map { value in .string(value) } ?? .undefined
@@ -5543,12 +5540,12 @@ public struct CreateExternalAccountParams: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> CreateExternalAccountParams {
     let values = try value.object()
 
-    return try CreateExternalAccountParams(`strategy`: try (values["strategy"] ?? .undefined).optional { value in try OAuthStrategy.decode(value, in: runtime) }, `enterpriseConnectionId`: try (values["enterpriseConnectionId"] ?? .undefined).optional { value in try value.string() }, `redirectUrl`: try (values["redirectUrl"] ?? .undefined).optional { value in try value.string() }, `additionalScopes`: try (values["additionalScopes"] ?? .undefined).optional { value in try value.array().map { value in try value.string() } }, `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `oidcLoginHint`: try (values["oidcLoginHint"] ?? .undefined).optional { value in try value.string() })
+    return try CreateExternalAccountParams(`strategy`: try (values["strategy"] ?? .undefined).optional { value in try CreateExternalAccountParamsStrategy.decode(value, in: runtime) }, `token`: try (values["token"] ?? .undefined).optional { value in try value.string() }, `enterpriseConnectionId`: try (values["enterpriseConnectionId"] ?? .undefined).optional { value in try value.string() }, `additionalScopes`: try (values["additionalScopes"] ?? .undefined).optional { value in try value.array().map { value in try value.string() } }, `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `oidcLoginHint`: try (values["oidcLoginHint"] ?? .undefined).optional { value in try value.string() })
   }
 }
 
-/// OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).
-public enum OAuthStrategy: Hashable, Sendable {
+public enum CreateExternalAccountParamsStrategy: Hashable, Sendable {
+  case `oauthTokenApple`
   case `oauthFacebook`
   case `oauthGoogle`
   case `oauthHubspot`
@@ -5581,6 +5578,7 @@ public enum OAuthStrategy: Hashable, Sendable {
   case unrecognized(String)
   public var rawValue: String {
     switch self {
+    case .`oauthTokenApple`: return "oauth_token_apple"
     case .`oauthFacebook`: return "oauth_facebook"
     case .`oauthGoogle`: return "oauth_google"
     case .`oauthHubspot`: return "oauth_hubspot"
@@ -5615,6 +5613,7 @@ public enum OAuthStrategy: Hashable, Sendable {
   }
   public init(rawValue: String) {
     switch rawValue {
+    case "oauth_token_apple": self = .`oauthTokenApple`
     case "oauth_facebook": self = .`oauthFacebook`
     case "oauth_google": self = .`oauthGoogle`
     case "oauth_hubspot": self = .`oauthHubspot`
@@ -5648,7 +5647,7 @@ public enum OAuthStrategy: Hashable, Sendable {
     }
   }
   public func encode() throws -> JSONValue { .string(rawValue) }
-  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OAuthStrategy { .init(rawValue: try value.string()) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> CreateExternalAccountParamsStrategy { .init(rawValue: try value.string()) }
 }
 
 public struct GetUserOrganizationMembershipParams: Hashable, Sendable {
@@ -7502,6 +7501,110 @@ public struct OAuthProviderSettings: Hashable, Sendable {
 
     return try OAuthProviderSettings(`enabled`: try (values["enabled"] ?? .undefined).bool(), `required`: try (values["required"] ?? .undefined).bool(), `authenticatable`: try (values["authenticatable"] ?? .undefined).bool(), `strategy`: try OAuthStrategy.decode((values["strategy"] ?? .undefined), in: runtime), `name`: try (values["name"] ?? .undefined).string(), `logoUrl`: try (values["logo_url"] ?? .undefined).optional { value in try value.string() })
   }
+}
+
+/// OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).
+public enum OAuthStrategy: Hashable, Sendable {
+  case `oauthFacebook`
+  case `oauthGoogle`
+  case `oauthHubspot`
+  case `oauthGithub`
+  case `oauthTiktok`
+  case `oauthGitlab`
+  case `oauthDiscord`
+  case `oauthTwitter`
+  case `oauthTwitch`
+  case `oauthLinkedin`
+  case `oauthLinkedinOidc`
+  case `oauthDropbox`
+  case `oauthAtlassian`
+  case `oauthBitbucket`
+  case `oauthMicrosoft`
+  case `oauthNotion`
+  case `oauthApple`
+  case `oauthLine`
+  case `oauthInstagram`
+  case `oauthCoinbase`
+  case `oauthSpotify`
+  case `oauthXero`
+  case `oauthBox`
+  case `oauthSlack`
+  case `oauthLinear`
+  case `oauthX`
+  case `oauthEnstall`
+  case `oauthHuggingface`
+  case `oauthVercel`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`oauthFacebook`: return "oauth_facebook"
+    case .`oauthGoogle`: return "oauth_google"
+    case .`oauthHubspot`: return "oauth_hubspot"
+    case .`oauthGithub`: return "oauth_github"
+    case .`oauthTiktok`: return "oauth_tiktok"
+    case .`oauthGitlab`: return "oauth_gitlab"
+    case .`oauthDiscord`: return "oauth_discord"
+    case .`oauthTwitter`: return "oauth_twitter"
+    case .`oauthTwitch`: return "oauth_twitch"
+    case .`oauthLinkedin`: return "oauth_linkedin"
+    case .`oauthLinkedinOidc`: return "oauth_linkedin_oidc"
+    case .`oauthDropbox`: return "oauth_dropbox"
+    case .`oauthAtlassian`: return "oauth_atlassian"
+    case .`oauthBitbucket`: return "oauth_bitbucket"
+    case .`oauthMicrosoft`: return "oauth_microsoft"
+    case .`oauthNotion`: return "oauth_notion"
+    case .`oauthApple`: return "oauth_apple"
+    case .`oauthLine`: return "oauth_line"
+    case .`oauthInstagram`: return "oauth_instagram"
+    case .`oauthCoinbase`: return "oauth_coinbase"
+    case .`oauthSpotify`: return "oauth_spotify"
+    case .`oauthXero`: return "oauth_xero"
+    case .`oauthBox`: return "oauth_box"
+    case .`oauthSlack`: return "oauth_slack"
+    case .`oauthLinear`: return "oauth_linear"
+    case .`oauthX`: return "oauth_x"
+    case .`oauthEnstall`: return "oauth_enstall"
+    case .`oauthHuggingface`: return "oauth_huggingface"
+    case .`oauthVercel`: return "oauth_vercel"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "oauth_facebook": self = .`oauthFacebook`
+    case "oauth_google": self = .`oauthGoogle`
+    case "oauth_hubspot": self = .`oauthHubspot`
+    case "oauth_github": self = .`oauthGithub`
+    case "oauth_tiktok": self = .`oauthTiktok`
+    case "oauth_gitlab": self = .`oauthGitlab`
+    case "oauth_discord": self = .`oauthDiscord`
+    case "oauth_twitter": self = .`oauthTwitter`
+    case "oauth_twitch": self = .`oauthTwitch`
+    case "oauth_linkedin": self = .`oauthLinkedin`
+    case "oauth_linkedin_oidc": self = .`oauthLinkedinOidc`
+    case "oauth_dropbox": self = .`oauthDropbox`
+    case "oauth_atlassian": self = .`oauthAtlassian`
+    case "oauth_bitbucket": self = .`oauthBitbucket`
+    case "oauth_microsoft": self = .`oauthMicrosoft`
+    case "oauth_notion": self = .`oauthNotion`
+    case "oauth_apple": self = .`oauthApple`
+    case "oauth_line": self = .`oauthLine`
+    case "oauth_instagram": self = .`oauthInstagram`
+    case "oauth_coinbase": self = .`oauthCoinbase`
+    case "oauth_spotify": self = .`oauthSpotify`
+    case "oauth_xero": self = .`oauthXero`
+    case "oauth_box": self = .`oauthBox`
+    case "oauth_slack": self = .`oauthSlack`
+    case "oauth_linear": self = .`oauthLinear`
+    case "oauth_x": self = .`oauthX`
+    case "oauth_enstall": self = .`oauthEnstall`
+    case "oauth_huggingface": self = .`oauthHuggingface`
+    case "oauth_vercel": self = .`oauthVercel`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OAuthStrategy { .init(rawValue: try value.string()) }
 }
 
 public struct EnterpriseSSOSettings: Hashable, Sendable {
@@ -12240,7 +12343,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "003c8b215d8623697ce170a41bfbdc1a7400b7d456109a881df6cbc020f8b17f"
+  public static let contractHash = "e390d86fcaf1054ac1a42aeeab9c1f8c6333d143b9b407de301b6037e7c77e4f"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

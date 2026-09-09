@@ -37,8 +37,11 @@ import type {
   Web3WalletResource,
 } from '@clerk/shared/types';
 
+import { getOAuthTransportRedirectUrl } from '../../utils/authenticateWithTransport';
+import { completeExternalAccountWithTransport } from '../../utils/completeExternalAccountWithTransport';
 import { unixEpochToDate } from '../../utils/date';
 import { computeMergePatch } from '../../utils/mergePatch';
+import { getNativeAppleIdentity } from '../../utils/nativeAppleIdentity';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -164,6 +167,10 @@ export class User extends BaseResource implements UserResource {
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
     const { strategy, redirectUrl, additionalScopes, enterpriseConnectionId, oidcPrompt, oidcLoginHint } = params || {};
+    const transport = User.clerk?.__internal_oauthTransport;
+    const apple = strategy === 'oauth_token_apple';
+    const token = apple ? (params.token ?? (await getNativeAppleIdentity(User.clerk)).token) : undefined;
+    const callback = transport && !apple ? await getOAuthTransportRedirectUrl(transport) : redirectUrl;
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
@@ -171,7 +178,8 @@ export class User extends BaseResource implements UserResource {
         method: 'POST',
         body: {
           strategy,
-          redirect_url: redirectUrl,
+          ...(token === undefined ? {} : { token }),
+          redirect_url: callback,
           additional_scope: additionalScopes,
           enterprise_connection_id: enterpriseConnectionId,
           oidc_prompt: oidcPrompt,
@@ -180,7 +188,10 @@ export class User extends BaseResource implements UserResource {
       })
     )?.response as unknown as ExternalAccountJSON;
 
-    return new ExternalAccount(json, this.path() + '/external_accounts');
+    const account = new ExternalAccount(json, this.path() + '/external_accounts');
+    return transport
+      ? completeExternalAccountWithTransport(User.clerk, account, this.id, apple ? undefined : callback)
+      : account;
   };
 
   createTOTP = async (): Promise<TOTPResource> => {

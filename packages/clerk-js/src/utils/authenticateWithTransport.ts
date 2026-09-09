@@ -2,6 +2,7 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   AuthenticateWithRedirectParams,
+  ClientResource,
   HandleOAuthCallbackParams,
   OAuthTransport,
   SignInResource,
@@ -72,7 +73,7 @@ export async function getOAuthTransportRedirectUrl(transport: OAuthTransport): P
 
 export async function openAndReconcileOAuthTransport(opts: {
   transport: OAuthTransport;
-  resource: SignInResource | SignUpResource;
+  resource: SignInResource | SignUpResource | ClientResource;
   verificationUrl: URL | string;
   redirectUrl: string;
   onCallbackFailure?: () => Promise<void>;
@@ -109,10 +110,15 @@ export async function openAndReconcileOAuthTransport(opts: {
     await opts.onCallbackFailure();
   } else {
     const nonce = callback.searchParams.get('rotating_token_nonce');
-    if (nonce) await opts.resource.reload({ rotatingTokenNonce: nonce });
-    else await opts.resource.reload();
+    if (nonce) {
+      await opts.resource.reload({ rotatingTokenNonce: nonce });
+    } else {
+      await opts.resource.reload();
+    }
   }
-  if (failure) throw new ClerkRuntimeError(failure.message, { code: failure.code });
+  if (failure) {
+    throw new ClerkRuntimeError(failure.message, { code: failure.code });
+  }
 }
 
 export async function _authenticateWithTransport(opts: {

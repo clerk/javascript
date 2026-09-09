@@ -223,9 +223,11 @@ CreateExternalAccountParams.additionalScopes: [String]? = nil
 CreateExternalAccountParams.enterpriseConnectionId: String? = nil
 CreateExternalAccountParams.oidcLoginHint: String? = nil
 CreateExternalAccountParams.oidcPrompt: String? = nil
-CreateExternalAccountParams.redirectUrl: String? = nil
-CreateExternalAccountParams.strategy: OAuthStrategy? = nil
+CreateExternalAccountParams.strategy: CreateExternalAccountParamsStrategy? = nil
+CreateExternalAccountParams.token: String? = nil
 CreateExternalAccountParams: Hashable
+CreateExternalAccountParamsStrategy cases: oauth_token_apple, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+CreateExternalAccountParamsStrategy: Hashable
 CreateOrganizationEnterpriseConnectionParams.domains: [String]? = nil
 CreateOrganizationEnterpriseConnectionParams.name: String? = nil
 CreateOrganizationEnterpriseConnectionParams.oidc: Field<OrganizationEnterpriseConnectionOidcInput> = .omitted
@@ -1009,7 +1011,6 @@ PublicUserData: Hashable
 ReauthorizeExternalAccountParams.additionalScopes: [String]? = nil
 ReauthorizeExternalAccountParams.oidcLoginHint: String? = nil
 ReauthorizeExternalAccountParams.oidcPrompt: String? = nil
-ReauthorizeExternalAccountParams.redirectUrl: String? = nil
 ReauthorizeExternalAccountParams: Hashable
 RemoveUserPasswordParams.currentPassword: String? = nil
 RemoveUserPasswordParams: Hashable
@@ -1709,6 +1710,7 @@ Web3Wallet: Hashable
 enum Attribute
 enum BillingPaymentMethodStatus
 enum ClerkStatus
+enum CreateExternalAccountParamsStrategy
 enum DisplayConfigCaptchaWidgetType
 enum EmailAddressPrepareVerificationParamsCase2Strategy
 enum EnterpriseConnectionTestRunConnectionType
