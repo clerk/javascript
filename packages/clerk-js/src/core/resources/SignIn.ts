@@ -1292,6 +1292,7 @@ class SignInFuture implements SignInFutureResource {
           await openAndReconcileOAuthTransport({
             transport,
             resource: this.#resource,
+            isCurrent: () => SignIn.clerk.client?.signIn?.id === this.#resource.id,
             verificationUrl: externalVerificationRedirectURL,
             redirectUrl: transportRedirectUrl,
           });

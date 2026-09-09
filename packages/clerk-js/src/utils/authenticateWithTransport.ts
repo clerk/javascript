@@ -76,8 +76,19 @@ export async function openAndReconcileOAuthTransport(opts: {
   verificationUrl: URL | string;
   redirectUrl: string;
   onCallbackFailure?: () => Promise<void>;
+  isCurrent?: () => boolean;
 }): Promise<void> {
+  const resourceId = opts.resource.id;
+  const assertCurrent = () => {
+    if (opts.resource.id !== resourceId || opts.isCurrent?.() === false) {
+      throw new ClerkRuntimeError('The authentication attempt changed before OAuth completed.', {
+        code: 'oauth_transport_stale_attempt',
+      });
+    }
+  };
+  assertCurrent();
   const { callbackUrl } = await opts.transport.open(new URL(opts.verificationUrl.toString()));
+  assertCurrent();
   const callback = new URL(callbackUrl);
   const expected = new URL(opts.redirectUrl);
   if (

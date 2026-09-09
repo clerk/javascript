@@ -39,7 +39,9 @@ describe.each([
         },
       } as any;
     });
-    const attempt = new Resource().__internal_future;
+    const resource = new Resource();
+    (BaseResource.clerk.client as any)[name] = resource;
+    const attempt = resource.__internal_future;
     return { attempt, fetch, open, setActive, navigate };
   }
 
@@ -76,6 +78,22 @@ describe.each([
       redirectCallbackUrl: '/callback',
     });
     expect(result.error).toBe(cancelled);
+    expect(f.fetch).toHaveBeenCalledTimes(1);
+    expect(f.setActive).not.toHaveBeenCalled();
+  });
+
+  it('rejects a browser result after the active attempt has been replaced', async () => {
+    const f = setup();
+    f.open.mockImplementation(async () => {
+      (BaseResource.clerk.client as any)[name] = new Resource();
+      return { callbackUrl: 'app://callback?rotating_token_nonce=old' };
+    });
+    const result = await f.attempt.sso({
+      strategy: 'oauth_google',
+      redirectUrl: '/destination',
+      redirectCallbackUrl: '/callback',
+    });
+    expect(result.error).toMatchObject({ code: 'oauth_transport_stale_attempt' });
     expect(f.fetch).toHaveBeenCalledTimes(1);
     expect(f.setActive).not.toHaveBeenCalled();
   });
