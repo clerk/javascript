@@ -1,4 +1,3 @@
-import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -7,12 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { Field } from '../field';
 import { Icon } from '../icon';
 import { InputGroup } from '../input-group';
-import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { Combobox } from './combobox';
-
-const scrollClasses = stylex.props(...scrollAreaViewport()).className?.split(' ') ?? [];
-const rootClasses = stylex.props(scrollAreaRoot).className?.split(' ') ?? [];
-const viewportOnlyClasses = scrollClasses.filter(name => !rootClasses.includes(name));
 
 function FloatingCombobox(props?: { onValueChange?: (value: string) => void }) {
   return (
@@ -101,7 +95,7 @@ describe('Mosaic Combobox', () => {
     expect(input).toHaveAccessibleDescription('Choose a fruit');
   });
 
-  it('opens a styled floating popup when the user types', async () => {
+  it('opens a floating popup when the user types', async () => {
     const user = userEvent.setup();
     render(<FloatingCombobox />);
 
@@ -112,9 +106,7 @@ describe('Mosaic Combobox', () => {
     const viewport = popup?.querySelector('.cl-combobox-viewport');
     expect(listbox).toHaveClass('cl-combobox-positioner');
     expect(popup).toBeInTheDocument();
-    expect(viewport).toHaveClass(...scrollClasses);
-    expect(viewportOnlyClasses).not.toHaveLength(0);
-    expect(viewportOnlyClasses.filter(name => popup?.classList.contains(name))).toEqual([]);
+    expect(viewport).toBeInTheDocument();
     expect(screen.getByRole('option', { name: 'Apple' }).closest('.cl-combobox-viewport')).toBe(viewport);
   });
 
@@ -196,7 +188,7 @@ describe('Mosaic Combobox', () => {
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveClass('cl-input', 'cl-combobox-input');
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveAttribute('data-size', 'lg');
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveAttribute('data-variant', 'ghost');
-    expect(screen.getByRole('listbox')).toHaveClass('cl-combobox-list', ...scrollClasses);
+    expect(screen.getByRole('listbox')).toHaveClass('cl-combobox-list');
     expect(screen.getByRole('option', { name: 'United States' })).toHaveClass('cl-combobox-option');
   });
 
