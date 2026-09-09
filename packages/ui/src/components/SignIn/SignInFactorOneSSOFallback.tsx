@@ -56,13 +56,23 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
     });
   };
 
+  const handleSSOError = (err: Error) => handleError(err, [], card.setError);
+
   const handleContinueWithSSO = () => {
     setIsRedirecting(true);
     authenticateWithEnterpriseSSO().catch(err => {
       setIsRedirecting(false);
-      handleError(err, [], card.setError);
+      handleSSOError(err);
     });
   };
+
+  // The connection button only resets its own loading state on rejection, so surface the error
+  // here and rethrow to keep that reset.
+  const handleSelectEnterpriseConnection = (enterpriseConnectionId: string) =>
+    authenticateWithEnterpriseSSO(enterpriseConnectionId).catch(err => {
+      handleSSOError(err);
+      throw err;
+    });
 
   if (step === 'code') {
     return (
@@ -103,7 +113,7 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
         <ChooseEnterpriseConnectionCard
           title={localizationKeys('signIn.enterpriseConnections.title')}
           subtitle={localizationKeys('signIn.enterpriseConnections.subtitle')}
-          onClick={authenticateWithEnterpriseSSO}
+          onClick={handleSelectEnterpriseConnection}
           enterpriseConnections={enterpriseConnections}
         >
           {fallbackAction}
