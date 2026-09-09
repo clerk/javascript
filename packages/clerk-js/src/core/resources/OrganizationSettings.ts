@@ -30,7 +30,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
   };
   enabled: boolean = false;
   maxAllowedMemberships: number = 1;
-  forceOrganizationSelection!: boolean;
+  forceOrganizationSelection: boolean = false;
 
   public constructor(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null = null) {
     super();
