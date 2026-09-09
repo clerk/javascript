@@ -81,12 +81,10 @@ export function Invalid(props: Record<string, unknown>) {
 
 export function Ghost(props: Record<string, unknown>) {
   return (
-    <div style={{ border: '1px solid currentColor', borderRadius: 8 }}>
-      <Input
-        {...knobsAsProps(props)}
-        variant='ghost'
-        placeholder='Parent provides the field chrome'
-      />
-    </div>
+    <Input
+      {...knobsAsProps(props)}
+      variant='ghost'
+      placeholder='Enter text…'
+    />
   );
 }
