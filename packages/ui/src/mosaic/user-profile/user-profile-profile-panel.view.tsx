@@ -41,7 +41,8 @@ export function UserProfileProfilePanelView({
   phones = [],
   connectedAccounts = [],
   web3Wallets = [],
-  onEditProfilePicture,
+  onProfilePictureChange,
+  onRemoveProfilePicture,
   onNameChange,
   onUsernameChange,
   onAddEmail,
@@ -81,11 +82,12 @@ export function UserProfileProfilePanelView({
           username={username}
           onAddEmail={onAddEmail}
           onAddPhone={onAddPhone}
-          onEditProfilePicture={onEditProfilePicture}
           onManageEmail={onManageEmail}
           onManagePhone={onManagePhone}
+          onProfilePictureChange={onProfilePictureChange}
           onRemoveEmail={onRemoveEmail}
           onRemovePhone={onRemovePhone}
+          onRemoveProfilePicture={onRemoveProfilePicture}
           onSetPrimaryEmail={onSetPrimaryEmail}
           onSetPrimaryPhone={onSetPrimaryPhone}
           onVerifyEmail={onVerifyEmail}

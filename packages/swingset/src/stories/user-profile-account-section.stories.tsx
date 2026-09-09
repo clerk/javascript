@@ -30,12 +30,13 @@ function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: bool
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
+  const [imageUrl, setImageUrl] = useState<string | undefined>('https://avatars.githubusercontent.com/u/51144033?v=4');
 
   return (
     <UserProfileAccountSectionView
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
-      imageUrl='https://avatars.githubusercontent.com/u/51144033?v=4'
+      imageUrl={imageUrl}
       name='Preston Booth'
       phones={phones}
       username='prestonxyz'
@@ -55,11 +56,12 @@ function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: bool
           },
         ])
       }
-      onEditProfilePicture={() => undefined}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
+      onProfilePictureChange={file => setImageUrl(URL.createObjectURL(file))}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
+      onRemoveProfilePicture={() => setImageUrl(undefined)}
       onNameChange={() => undefined}
       onUsernameChange={() => undefined}
     />

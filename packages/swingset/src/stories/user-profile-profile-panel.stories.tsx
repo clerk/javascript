@@ -79,10 +79,11 @@ export function Default(_args: Record<string, unknown>) {
       }
       onConnectAccount={() => undefined}
       onDeleteAccount={() => Promise.resolve()}
-      onEditProfilePicture={() => undefined}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
+      onProfilePictureChange={() => undefined}
       onRemoveConnectedAccount={() => undefined}
+      onRemoveProfilePicture={() => undefined}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onConnectWeb3Wallet={() => undefined}

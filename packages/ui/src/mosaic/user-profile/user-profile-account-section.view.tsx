@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import { useRef } from 'react';
 
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
@@ -8,6 +9,8 @@ import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { styles } from './user-profile-profile-panel.styles';
+
+const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 
 export interface UserProfileEmail {
   id: string;
@@ -32,7 +35,8 @@ export interface UserProfileAccountSectionViewProps {
   username: string;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
-  onEditProfilePicture?: () => void;
+  onProfilePictureChange?: (file: File) => void;
+  onRemoveProfilePicture?: () => void;
   onNameChange?: (value: string) => void;
   onUsernameChange?: (value: string) => void;
   onAddEmail?: () => void;
@@ -54,7 +58,8 @@ export function UserProfileAccountSectionView({
   username,
   emails,
   phones,
-  onEditProfilePicture,
+  onProfilePictureChange,
+  onRemoveProfilePicture,
   onNameChange,
   onUsernameChange,
   onAddEmail,
@@ -74,11 +79,39 @@ export function UserProfileAccountSectionView({
     .join('')
     .slice(0, 2)
     .toUpperCase();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const openFilePicker = () => fileInputRef.current?.click();
+  const pictureActions: UserProfileMenuAction[] = [];
+
+  if (imageUrl && onProfilePictureChange) {
+    pictureActions.push({ label: 'Change avatar', icon: 'pen', onClick: openFilePicker });
+  }
+
+  if (imageUrl && onRemoveProfilePicture) {
+    pictureActions.push({ label: 'Remove avatar', icon: 'close', onClick: onRemoveProfilePicture });
+  }
+
   const updateName = onNameChange ? () => onNameChange(name) : undefined;
   const updateUsername = onUsernameChange ? () => onUsernameChange(username) : undefined;
 
   return (
     <div {...stylex.props(styles.sections)}>
+      {onProfilePictureChange ? (
+        <input
+          ref={fileInputRef}
+          accept={PROFILE_PICTURE_MIME_TYPES}
+          hidden
+          type='file'
+          onChange={event => {
+            const file = event.currentTarget.files?.[0];
+            // Clear the input so re-picking the same file still fires a change event.
+            event.currentTarget.value = '';
+            if (file) {
+              onProfilePictureChange(file);
+            }
+          }}
+        />
+      ) : null}
       <Section.Root aria-label='Account'>
         <Section.Title>Profile</Section.Title>
         <Section.Group>
@@ -97,13 +130,20 @@ export function UserProfileAccountSectionView({
                 <Section.Label>Profile picture</Section.Label>
                 <Section.Description>Recommend size 1:1, up to 10MB.</Section.Description>
               </Section.Content>
-              {onEditProfilePicture ? (
+              {pictureActions.length > 0 ? (
+                <Section.Actions>
+                  <UserProfileActionMenu
+                    actions={pictureActions}
+                    label='Manage profile picture'
+                  />
+                </Section.Actions>
+              ) : !imageUrl && onProfilePictureChange ? (
                 <Section.Actions>
                   <Button
                     color='neutral'
                     size='sm'
                     variant='outline'
-                    onClick={onEditProfilePicture}
+                    onClick={openFilePicker}
                   >
                     Upload
                   </Button>
