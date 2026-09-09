@@ -12,6 +12,9 @@ export type MobileSignOutOptions = Omit<SignOutOptions, 'redirectUrl'>;
 
 export type MobileAuthenticationResources = Pick<ClientResource, 'sessions' | 'lastAuthenticationStrategy'> &
   Pick<Clerk, 'telemetry'> & {
+    readonly authCallback: MobileAuthCallback | null;
+    handleAuthCallback: (url: URL) => Promise<MobileAuthenticationResult | null>;
+    clearAuthCallback: (id: number) => Promise<void>;
     authenticateWithSSO: (params: MobileSSOParams) => Promise<MobileAuthenticationResult>;
     signIn: SignInFutureResource;
     signUp: SignUpFutureResource;
@@ -24,6 +27,9 @@ export type MobileClerk = Pick<Clerk, 'status' | 'loaded' | 'createOrganization'
     readonly session: SessionResource | null;
     readonly user: UserResource | null;
     readonly organization: OrganizationResource | null;
+    readonly authCallback: MobileAuthCallback | null;
+    handleAuthCallback: (url: URL) => Promise<MobileAuthenticationResult | null>;
+    clearAuthCallback: (id: number) => Promise<void>;
     authenticateWithSSO: (params: MobileSSOParams) => Promise<MobileAuthenticationResult>;
     readonly signIn: SignInFutureResource;
     readonly signUp: SignUpFutureResource;
@@ -40,3 +46,5 @@ export type MobileSSOParams = Omit<SignInFutureSSOParams, 'popup' | 'redirectUrl
 export type MobileAuthenticationResult =
   | { kind: 'signIn'; signIn: SignInFutureResource }
   | { kind: 'signUp'; signUp: SignUpFutureResource };
+
+export type MobileAuthCallback = { id: number; result: MobileAuthenticationResult };

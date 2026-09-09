@@ -31,6 +31,10 @@ export const profile = {
     organization: ['organization.ts', 'OrganizationResource'],
   },
   excluded: {
+    'SignInFutureEmailLinkSendParams.verificationUrl':
+      'Native email links use the configured callback and persisted PKCE verifier.',
+    'SignUpFutureEmailLinkSendParams.verificationUrl':
+      'Native email links use the configured callback and persisted PKCE verifier.',
     'CreateExternalAccountParams.redirectUrl': 'Connected accounts use the configured native browser callback.',
     'ReauthorizeExternalAccountParams.redirectUrl': 'Connected accounts use the configured native browser callback.',
     'TOTPResource.reload': 'Enrollment secrets are explicit method return values, not shared observable resources.',

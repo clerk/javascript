@@ -31,7 +31,7 @@
       "name": "Clerk",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 21,
+        "line": 24,
         "symbol": "MobileClerk"
       },
       "kind": "resource",
@@ -127,7 +127,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 23,
+            "line": 26,
             "symbol": "environment"
           }
         },
@@ -145,7 +145,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 24,
+            "line": 27,
             "symbol": "session"
           }
         },
@@ -163,7 +163,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 25,
+            "line": 28,
             "symbol": "user"
           }
         },
@@ -181,8 +181,26 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 26,
+            "line": 29,
             "symbol": "organization"
+          }
+        },
+        {
+          "name": "authCallback",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "ref",
+              "name": "MobileAuthCallback"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 30,
+            "symbol": "authCallback"
           }
         },
         {
@@ -194,7 +212,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 28,
+            "line": 34,
             "symbol": "signIn"
           }
         },
@@ -207,7 +225,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 29,
+            "line": 35,
             "symbol": "signUp"
           }
         }
@@ -265,11 +283,63 @@
           "asynchronous": true
         },
         {
+          "name": "handleAuthCallback",
+          "nativeName": "handleAuthCallback",
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 31,
+            "symbol": "handleAuthCallback"
+          },
+          "parameters": [
+            {
+              "name": "url",
+              "optional": false,
+              "type": {
+                "kind": "url"
+              }
+            }
+          ],
+          "result": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "ref",
+              "name": "MobileAuthenticationResult"
+            }
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
+          "name": "clearAuthCallback",
+          "nativeName": "clearAuthCallback",
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 32,
+            "symbol": "clearAuthCallback"
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "optional": false,
+              "type": {
+                "kind": "number"
+              }
+            }
+          ],
+          "result": {
+            "kind": "void"
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
           "name": "authenticateWithSSO",
           "nativeName": "authenticateWithSSO",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 27,
+            "line": 33,
             "symbol": "authenticateWithSSO"
           },
           "parameters": [
@@ -294,7 +364,7 @@
           "nativeName": "setActive",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 30,
+            "line": 36,
             "symbol": "setActive"
           },
           "parameters": [
@@ -318,7 +388,7 @@
           "nativeName": "signOut",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 31,
+            "line": 37,
             "symbol": "signOut"
           },
           "parameters": [
@@ -19697,262 +19767,48 @@
         }
       ]
     },
-    "MobileSSOParams": {
-      "name": "MobileSSOParams",
+    "MobileAuthCallback": {
+      "name": "MobileAuthCallback",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 34,
-        "symbol": "MobileSSOParams"
+        "line": 50,
+        "symbol": "MobileAuthCallback"
       },
       "kind": "object",
       "properties": [
         {
-          "name": "strategy",
+          "name": "id",
           "optional": false,
           "type": {
-            "kind": "ref",
-            "name": "MobileSSOParamsStrategy"
-          },
-          "source": {
-            "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 209,
-            "symbol": "strategy"
-          },
-          "documentation": "The strategy to use for authentication."
-        },
-        {
-          "name": "identifier",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 244,
-            "symbol": "identifier"
-          },
-          "documentation": "The unique identifier of the user. Only supported with the `enterprise_sso` strategy."
-        },
-        {
-          "name": "enterpriseConnectionId",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 240,
-            "symbol": "enterpriseConnectionId"
-          },
-          "documentation": "The identifier of the enterprise connection to target when using the `enterprise_sso` strategy."
-        },
-        {
-          "name": "oidcPrompt",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 235,
-            "symbol": "oidcPrompt"
-          },
-          "documentation": "The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL."
-        },
-        {
-          "name": "legalAccepted",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "boolean"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/signUpFuture.ts",
-            "line": 39,
-            "symbol": "legalAccepted"
-          },
-          "documentation": "Indicates whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents."
-        },
-        {
-          "name": "firstName",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/signUpFuture.ts",
-            "line": 27,
-            "symbol": "firstName"
-          },
-          "documentation": "The user's first name. Only supported if [First and last name](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#user-model) is enabled in the instance settings."
-        },
-        {
-          "name": "lastName",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/signUpFuture.ts",
-            "line": 31,
-            "symbol": "lastName"
-          },
-          "documentation": "The user's last name. Only supported if [First and last name](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#user-model) is enabled in the instance settings."
-        },
-        {
-          "name": "locale",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/signUpFuture.ts",
-            "line": 43,
-            "symbol": "locale"
-          },
-          "documentation": "The locale to assign to the user in [BCP 47](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag) format (e.g., \"en-US\", \"fr-FR\"). If omitted, defaults to the browser's locale."
-        },
-        {
-          "name": "unsafeMetadata",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "jsonObject"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/signUpFuture.ts",
-            "line": 35,
-            "symbol": "unsafeMetadata"
-          },
-          "documentation": "Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created User object."
-        },
-        {
-          "name": "start",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "MobileSSOParamsStart"
+            "kind": "number"
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 36,
-            "symbol": "start"
+            "line": 50,
+            "symbol": "id"
           }
         },
         {
-          "name": "transferable",
+          "name": "result",
           "optional": false,
           "type": {
-            "kind": "boolean"
+            "kind": "ref",
+            "name": "MobileAuthenticationResult"
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 37,
-            "symbol": "transferable"
+            "line": 50,
+            "symbol": "result"
           }
         }
       ],
       "methods": []
     },
-    "MobileSSOParamsStrategy": {
-      "name": "MobileSSOParamsStrategy",
-      "kind": "enum",
-      "properties": [],
-      "methods": [],
-      "values": [
-        "oauth_token_apple",
-        "enterprise_sso",
-        "oauth_facebook",
-        "oauth_google",
-        "oauth_hubspot",
-        "oauth_github",
-        "oauth_tiktok",
-        "oauth_gitlab",
-        "oauth_discord",
-        "oauth_twitter",
-        "oauth_twitch",
-        "oauth_linkedin",
-        "oauth_linkedin_oidc",
-        "oauth_dropbox",
-        "oauth_atlassian",
-        "oauth_bitbucket",
-        "oauth_microsoft",
-        "oauth_notion",
-        "oauth_apple",
-        "oauth_line",
-        "oauth_instagram",
-        "oauth_coinbase",
-        "oauth_spotify",
-        "oauth_xero",
-        "oauth_box",
-        "oauth_slack",
-        "oauth_linear",
-        "oauth_x",
-        "oauth_enstall",
-        "oauth_huggingface",
-        "oauth_vercel"
-      ],
-      "open": false,
-      "patterns": [
-        "^oauth_custom_.*$"
-      ]
-    },
-    "MobileSSOParamsStart": {
-      "name": "MobileSSOParamsStart",
-      "kind": "enum",
-      "properties": [],
-      "methods": [],
-      "values": [
-        "signUp",
-        "signIn",
-        "auto"
-      ],
-      "open": false,
-      "patterns": []
-    },
     "MobileAuthenticationResult": {
       "name": "MobileAuthenticationResult",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 40,
+        "line": 46,
         "symbol": "MobileAuthenticationResult"
       },
       "kind": "union",
@@ -19961,19 +19817,19 @@
       "variants": [
         {
           "kind": "ref",
-          "name": "ClerkAuthenticateWithSSOResultCase1"
+          "name": "MobileAuthCallbackResultCase1"
         },
         {
           "kind": "ref",
-          "name": "ClerkAuthenticateWithSSOResultCase2"
+          "name": "MobileAuthCallbackResultCase2"
         }
       ]
     },
-    "ClerkAuthenticateWithSSOResultCase1": {
-      "name": "ClerkAuthenticateWithSSOResultCase1",
+    "MobileAuthCallbackResultCase1": {
+      "name": "MobileAuthCallbackResultCase1",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 41,
+        "line": 47,
         "symbol": "__type"
       },
       "kind": "object",
@@ -19987,7 +19843,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 41,
+            "line": 47,
             "symbol": "kind"
           }
         },
@@ -20000,7 +19856,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 41,
+            "line": 47,
             "symbol": "signIn"
           }
         }
@@ -21886,19 +21742,6 @@
       "kind": "object",
       "properties": [
         {
-          "name": "verificationUrl",
-          "optional": false,
-          "type": {
-            "kind": "string"
-          },
-          "source": {
-            "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 110,
-            "symbol": "verificationUrl"
-          },
-          "documentation": "The full URL that the user will be redirected to when they visit the email link."
-        },
-        {
           "name": "emailAddress",
           "optional": true,
           "type": {
@@ -21935,19 +21778,6 @@
       "name": "SignInEmailLinkSendLinkParamsCase2",
       "kind": "object",
       "properties": [
-        {
-          "name": "verificationUrl",
-          "optional": false,
-          "type": {
-            "kind": "string"
-          },
-          "source": {
-            "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 110,
-            "symbol": "verificationUrl"
-          },
-          "documentation": "The full URL that the user will be redirected to when they visit the email link."
-        },
         {
           "name": "emailAddressId",
           "optional": true,
@@ -22549,7 +22379,7 @@
           "optional": false,
           "type": {
             "kind": "ref",
-            "name": "MobileSSOParamsStrategy"
+            "name": "SignInSSOParamsStrategy"
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
@@ -22614,6 +22444,49 @@
         }
       ],
       "methods": []
+    },
+    "SignInSSOParamsStrategy": {
+      "name": "SignInSSOParamsStrategy",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "oauth_token_apple",
+        "enterprise_sso",
+        "oauth_facebook",
+        "oauth_google",
+        "oauth_hubspot",
+        "oauth_github",
+        "oauth_tiktok",
+        "oauth_gitlab",
+        "oauth_discord",
+        "oauth_twitter",
+        "oauth_twitch",
+        "oauth_linkedin",
+        "oauth_linkedin_oidc",
+        "oauth_dropbox",
+        "oauth_atlassian",
+        "oauth_bitbucket",
+        "oauth_microsoft",
+        "oauth_notion",
+        "oauth_apple",
+        "oauth_line",
+        "oauth_instagram",
+        "oauth_coinbase",
+        "oauth_spotify",
+        "oauth_xero",
+        "oauth_box",
+        "oauth_slack",
+        "oauth_linear",
+        "oauth_x",
+        "oauth_enstall",
+        "oauth_huggingface",
+        "oauth_vercel"
+      ],
+      "open": false,
+      "patterns": [
+        "^oauth_custom_.*$"
+      ]
     },
     "SignInMfa": {
       "name": "SignInMfa",
@@ -22970,11 +22843,11 @@
       ],
       "methods": []
     },
-    "ClerkAuthenticateWithSSOResultCase2": {
-      "name": "ClerkAuthenticateWithSSOResultCase2",
+    "MobileAuthCallbackResultCase2": {
+      "name": "MobileAuthCallbackResultCase2",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 42,
+        "line": 48,
         "symbol": "__type"
       },
       "kind": "object",
@@ -22988,7 +22861,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 42,
+            "line": 48,
             "symbol": "kind"
           }
         },
@@ -23001,7 +22874,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 42,
+            "line": 48,
             "symbol": "signUp"
           }
         }
@@ -24767,21 +24640,7 @@
         "symbol": "SignUpFutureEmailLinkSendParams"
       },
       "kind": "object",
-      "properties": [
-        {
-          "name": "verificationUrl",
-          "optional": false,
-          "type": {
-            "kind": "string"
-          },
-          "source": {
-            "file": "packages/shared/src/types/signUpFuture.ts",
-            "line": 135,
-            "symbol": "verificationUrl"
-          },
-          "documentation": "The full URL that the user will be redirected to when they visit the email link."
-        }
-      ],
+      "properties": [],
       "methods": []
     },
     "SignUpPhoneCodeSendParams": {
@@ -25818,6 +25677,214 @@
         }
       ],
       "methods": []
+    },
+    "MobileSSOParams": {
+      "name": "MobileSSOParams",
+      "source": {
+        "file": "packages/shared/src/types/mobile.ts",
+        "line": 40,
+        "symbol": "MobileSSOParams"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "strategy",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "SignInSSOParamsStrategy"
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 209,
+            "symbol": "strategy"
+          },
+          "documentation": "The strategy to use for authentication."
+        },
+        {
+          "name": "identifier",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 244,
+            "symbol": "identifier"
+          },
+          "documentation": "The unique identifier of the user. Only supported with the `enterprise_sso` strategy."
+        },
+        {
+          "name": "enterpriseConnectionId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 240,
+            "symbol": "enterpriseConnectionId"
+          },
+          "documentation": "The identifier of the enterprise connection to target when using the `enterprise_sso` strategy."
+        },
+        {
+          "name": "oidcPrompt",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 235,
+            "symbol": "oidcPrompt"
+          },
+          "documentation": "The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL."
+        },
+        {
+          "name": "legalAccepted",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "boolean"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signUpFuture.ts",
+            "line": 39,
+            "symbol": "legalAccepted"
+          },
+          "documentation": "Indicates whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents."
+        },
+        {
+          "name": "firstName",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signUpFuture.ts",
+            "line": 27,
+            "symbol": "firstName"
+          },
+          "documentation": "The user's first name. Only supported if [First and last name](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#user-model) is enabled in the instance settings."
+        },
+        {
+          "name": "lastName",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signUpFuture.ts",
+            "line": 31,
+            "symbol": "lastName"
+          },
+          "documentation": "The user's last name. Only supported if [First and last name](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#user-model) is enabled in the instance settings."
+        },
+        {
+          "name": "locale",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signUpFuture.ts",
+            "line": 43,
+            "symbol": "locale"
+          },
+          "documentation": "The locale to assign to the user in [BCP 47](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag) format (e.g., \"en-US\", \"fr-FR\"). If omitted, defaults to the browser's locale."
+        },
+        {
+          "name": "unsafeMetadata",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "jsonObject"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signUpFuture.ts",
+            "line": 35,
+            "symbol": "unsafeMetadata"
+          },
+          "documentation": "Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created User object."
+        },
+        {
+          "name": "start",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "MobileSSOParamsStart"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 42,
+            "symbol": "start"
+          }
+        },
+        {
+          "name": "transferable",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 43,
+            "symbol": "transferable"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "MobileSSOParamsStart": {
+      "name": "MobileSSOParamsStart",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "signUp",
+        "signIn",
+        "auto"
+      ],
+      "open": false,
+      "patterns": []
     },
     "MobileSetActiveParams": {
       "name": "MobileSetActiveParams",
@@ -31653,59 +31720,23 @@
       "reason": "Normalize unloaded undefined to null."
     },
     {
-      "path": "MobileClerk.authenticateWithSSO",
+      "path": "MobileClerk.authCallback",
       "disposition": "generated"
     },
     {
-      "path": "MobileSSOParams.strategy",
+      "path": "MobileAuthCallback.id",
       "disposition": "generated"
     },
     {
-      "path": "MobileSSOParams.identifier",
+      "path": "MobileAuthCallback.result",
       "disposition": "generated"
     },
     {
-      "path": "MobileSSOParams.enterpriseConnectionId",
+      "path": "MobileAuthCallbackResultCase1.kind",
       "disposition": "generated"
     },
     {
-      "path": "MobileSSOParams.oidcPrompt",
-      "disposition": "generated"
-    },
-    {
-      "path": "MobileSSOParams.legalAccepted",
-      "disposition": "generated"
-    },
-    {
-      "path": "MobileSSOParams.firstName",
-      "disposition": "generated"
-    },
-    {
-      "path": "MobileSSOParams.lastName",
-      "disposition": "generated"
-    },
-    {
-      "path": "MobileSSOParams.locale",
-      "disposition": "generated"
-    },
-    {
-      "path": "MobileSSOParams.unsafeMetadata",
-      "disposition": "generated"
-    },
-    {
-      "path": "MobileSSOParams.start",
-      "disposition": "generated"
-    },
-    {
-      "path": "MobileSSOParams.transferable",
-      "disposition": "generated"
-    },
-    {
-      "path": "ClerkAuthenticateWithSSOResultCase1.kind",
-      "disposition": "generated"
-    },
-    {
-      "path": "ClerkAuthenticateWithSSOResultCase1.signIn",
+      "path": "MobileAuthCallbackResultCase1.signIn",
       "disposition": "generated"
     },
     {
@@ -32019,7 +32050,8 @@
     },
     {
       "path": "SignInEmailLinkSendLinkParamsCase1.verificationUrl",
-      "disposition": "generated"
+      "disposition": "excluded",
+      "reason": "Native email links use the configured callback and persisted PKCE verifier."
     },
     {
       "path": "SignInEmailLinkSendLinkParamsCase1.emailAddress",
@@ -32031,7 +32063,8 @@
     },
     {
       "path": "SignInEmailLinkSendLinkParamsCase2.verificationUrl",
-      "disposition": "generated"
+      "disposition": "excluded",
+      "reason": "Native email links use the configured callback and persisted PKCE verifier."
     },
     {
       "path": "SignInEmailLinkSendLinkParamsCase2.emailAddressId",
@@ -32271,11 +32304,11 @@
       "disposition": "generated"
     },
     {
-      "path": "ClerkAuthenticateWithSSOResultCase2.kind",
+      "path": "MobileAuthCallbackResultCase2.kind",
       "disposition": "generated"
     },
     {
-      "path": "ClerkAuthenticateWithSSOResultCase2.signUp",
+      "path": "MobileAuthCallbackResultCase2.signUp",
       "disposition": "generated"
     },
     {
@@ -32597,7 +32630,8 @@
     },
     {
       "path": "SignUpFutureEmailLinkSendParams.verificationUrl",
-      "disposition": "generated"
+      "disposition": "excluded",
+      "reason": "Native email links use the configured callback and persisted PKCE verifier."
     },
     {
       "path": "SignUpFutureVerifications.waitForEmailLinkVerification",
@@ -32870,6 +32904,62 @@
     },
     {
       "path": "SignUpFutureResource.reset",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileClerk.handleAuthCallback",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileClerk.clearAuthCallback",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileClerk.authenticateWithSSO",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.strategy",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.identifier",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.enterpriseConnectionId",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.oidcPrompt",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.legalAccepted",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.firstName",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.lastName",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.locale",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.unsafeMetadata",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.start",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.transferable",
       "disposition": "generated"
     },
     {

@@ -75,14 +75,17 @@ export function compileProfile(repository, policy = profile) {
   }
 
   function classify(symbol, owner, member) {
-    const declarationParent = symbol.declarations?.[0]?.parent;
-    const declarationOwner =
-      declarationParent?.name?.getText() ??
-      (declarationParent &&
-      ts.isTypeLiteralNode(declarationParent) &&
-      ts.isTypeAliasDeclaration(declarationParent.parent)
-        ? declarationParent.parent.name.text
-        : undefined);
+    let declarationParent = symbol.declarations?.[0]?.parent;
+    while (
+      declarationParent &&
+      (ts.isTypeLiteralNode(declarationParent) ||
+        ts.isIntersectionTypeNode(declarationParent) ||
+        ts.isUnionTypeNode(declarationParent) ||
+        ts.isParenthesizedTypeNode(declarationParent))
+    ) {
+      declarationParent = declarationParent.parent;
+    }
+    const declarationOwner = declarationParent?.name?.getText();
     const keys = [`${owner}.${member}`, `${declarationOwner}.${member}`];
     for (const key of keys) {
       if (policy.jsonObjectMembers?.[key]) {

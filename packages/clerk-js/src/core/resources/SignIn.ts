@@ -91,7 +91,7 @@ import {
 } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { getNativeAppleIdentity, type NativeAppleIdentity } from '../../utils/nativeAppleIdentity';
-import { recordPasskeyFailureStage, type PasskeyFailureStage } from '../../utils/passkeyFailureStage';
+import { type PasskeyFailureStage, recordPasskeyFailureStage } from '../../utils/passkeyFailureStage';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
@@ -1141,17 +1141,20 @@ class SignInFuture implements SignInFutureResource {
         throw new ClerkRuntimeError('Email link factor not found', { code: 'factor_not_found' });
       }
 
+      const nativeParams = await SignIn.clerk.__internal_nativeMagicLink?.prepare('signIn', this.#resource.id);
       let absoluteVerificationUrl = verificationUrl;
-      try {
-        new URL(verificationUrl);
-      } catch {
-        absoluteVerificationUrl = window.location.origin + verificationUrl;
+      if (!nativeParams) {
+        try {
+          new URL(verificationUrl);
+        } catch {
+          absoluteVerificationUrl = window.location.origin + verificationUrl;
+        }
       }
 
       await this.#resource.__internal_basePost({
         body: {
           emailAddressId: emailLinkFactor.emailAddressId,
-          redirectUrl: absoluteVerificationUrl,
+          ...(nativeParams ?? { redirectUrl: absoluteVerificationUrl }),
           strategy: 'email_link',
         },
         action: 'prepare_first_factor',
@@ -1227,10 +1230,11 @@ class SignInFuture implements SignInFutureResource {
       params;
     return runAsyncResourceTask(this.#resource, async () => {
       if (strategy === 'oauth_token_apple') {
-        if (popup)
+        if (popup) {
           throw new ClerkRuntimeError('A popup cannot be combined with native Apple authentication.', {
             code: 'oauth_transport_popup_conflict',
           });
+        }
         const identity = appleIdentity ?? (await getNativeAppleIdentity(SignIn.clerk));
         if (this.#resource.id) {
           await this.#resource.__internal_basePost({
@@ -1483,7 +1487,9 @@ class SignInFuture implements SignInFutureResource {
         });
 
         if (!publicKeyCredential) {
-          if (SignIn.clerk.__internal_getPublicCredentials) throw error;
+          if (SignIn.clerk.__internal_getPublicCredentials) {
+            throw error;
+          }
           throw new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_failed' });
         }
 

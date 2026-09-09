@@ -2,6 +2,7 @@ export type {
   MobileClerk,
   MobileAuthenticationResources,
   MobileAuthenticationResult,
+  MobileAuthCallback,
   MobileSSOParams,
 } from './types/mobile';
 

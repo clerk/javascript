@@ -218,3 +218,17 @@ test('JSON object policy supports recursive payload aliases and preserves option
   const invalid = compile(source, { jsonObjectMembers: { 'SignInFutureResource.id': 'Wrong target.' } });
   assert.ok(invalid.failures.some(f => /string-indexed object/.test(f.reason)));
 });
+
+test('accounts for policy members declared in nested intersection and union aliases', () => {
+  const model = compile(
+    `
+    export interface SignInFutureResource { send(params: EmailParams): Promise<void>; }
+    type EmailParams = { verificationUrl: string } & ({ email: string; id?: never } | { id: string; email?: never });
+  `,
+    { excluded: { 'EmailParams.verificationUrl': 'Native callback URL is configured on the host.' } },
+  );
+  assert.deepEqual(model.failures, []);
+  for (const definition of Object.values(model.definitions)) {
+    assert.equal(definition.properties?.some(property => property.name === 'verificationUrl') ?? false, false);
+  }
+});

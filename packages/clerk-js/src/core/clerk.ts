@@ -1,3 +1,4 @@
+import type { NativeMagicLink } from '../utils/NativeMagicLink';
 import { authenticateWithMobileSSO } from '../utils/authenticateWithMobileSSO';
 import type { MobileAuthenticationResources } from '@clerk/shared/mobile';
 import { inBrowser as inClientSide } from '@clerk/shared/browser';
@@ -360,6 +361,8 @@ export class Clerk implements ClerkInterface {
         preferImmediatelyAvailableCredentials?: boolean;
       }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>)
     | undefined;
+
+  public __internal_nativeMagicLink: NativeMagicLink | undefined;
 
   public __internal_getAppleIdentity:
     | ((options: { fullName: boolean }) => Promise<{ token: string; firstName?: string; lastName?: string }>)
@@ -3202,6 +3205,15 @@ export class Clerk implements ClerkInterface {
   __internal_getMobileResources = (): MobileAuthenticationResources => {
     if (!this.client || !this.environment) throw new Error('Clerk must be loaded before attaching native resources.');
     return {
+      authCallback: this.__internal_nativeMagicLink?.authCallback ?? null,
+      handleAuthCallback: async url => {
+        if (!this.__internal_nativeMagicLink)
+          throw new ClerkRuntimeError('Native email links are unavailable.', { code: 'capability_unavailable' });
+        return this.__internal_nativeMagicLink.handle(url);
+      },
+      clearAuthCallback: async id => {
+        this.__internal_nativeMagicLink?.clearCallback(id);
+      },
       authenticateWithSSO: params => authenticateWithMobileSSO(this, params),
       signIn: this.client.signIn.__internal_future,
       signUp: this.client.signUp.__internal_future,

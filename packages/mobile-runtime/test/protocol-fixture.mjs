@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, createHash } from 'node:crypto';
 import { fixtures } from './native-fixtures.mjs';
 export { sessionFixture, tokenFixture } from './native-fixtures.mjs';
 
@@ -22,6 +22,7 @@ export async function fixture(options = {}) {
     requests = [],
     waits = new Map(),
     jobs = new Map();
+  let authRecord = options.authRecord ?? null;
   let credential = options.credential ?? null,
     state,
     sequence = 0;
@@ -69,6 +70,17 @@ export async function fixture(options = {}) {
           } else if (message.capability === 'storage.remove') {
             credential = null;
             result = null;
+          } else if (message.capability === 'authStorage.read') result = authRecord;
+          else if (message.capability === 'authStorage.write') {
+            await options.authWrite?.(message.args.value);
+            authRecord = message.args.value;
+            result = null;
+          } else if (message.capability === 'authStorage.remove') {
+            authRecord = null;
+            result = null;
+          } else if (message.capability === 'crypto.sha256') {
+            await options.digest?.();
+            result = createHash('sha256').update(message.args.value).digest('base64url');
           } else if (message.capability === 'browser')
             result = (await options.browser?.(message.args)) ?? {
               callbackUrl: `${callbackUrl}?rotating_token_nonce=fixture_nonce`,
@@ -140,6 +152,9 @@ export async function fixture(options = {}) {
     dispose,
     get state() {
       return state;
+    },
+    get authRecord() {
+      return authRecord;
     },
     get credential() {
       return credential;

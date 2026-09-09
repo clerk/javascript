@@ -13,6 +13,18 @@ export const operations = {
     result: {"kind":"ref","name":"Organization"},
     invoke: (target, args) => target["getOrganization"](...args),
   },
+  "Clerk.handleAuthCallback": {
+    type: "Clerk",
+    parameters: [{"name":"url","optional":false,"type":{"kind":"url"}}],
+    result: {"kind":"optional","nullable":true,"omittable":false,"value":{"kind":"ref","name":"MobileAuthenticationResult"}},
+    invoke: (target, args) => target["handleAuthCallback"](...args),
+  },
+  "Clerk.clearAuthCallback": {
+    type: "Clerk",
+    parameters: [{"name":"id","optional":false,"type":{"kind":"number"}}],
+    result: {"kind":"void"},
+    invoke: (target, args) => target["clearAuthCallback"](...args),
+  },
   "Clerk.authenticateWithSSO": {
     type: "Clerk",
     parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"MobileSSOParams"}}],

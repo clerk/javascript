@@ -62,8 +62,8 @@ import {
   openAndReconcileOAuthTransport,
 } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
-import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getNativeAppleIdentity, type NativeAppleIdentity } from '../../utils/nativeAppleIdentity';
+import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
@@ -645,7 +645,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       path: `/client/sign_ups/${this.id}/enterprise_connections`,
       method: 'GET',
     }).then(res => {
-      const enterpriseConnections = res?.response as unknown as SignUpEnterpriseConnectionJSON[];
+      const enterpriseConnections = res?.response as SignUpEnterpriseConnectionJSON[];
 
       return enterpriseConnections.map(enterpriseConnection => new SignUpEnterpriseConnection(enterpriseConnection));
     });
@@ -1018,15 +1018,18 @@ class SignUpFuture implements SignUpFutureResource {
   async sendEmailLink(params: SignUpFutureEmailLinkSendParams): Promise<{ error: ClerkError | null }> {
     const { verificationUrl } = params;
     return runAsyncResourceTask(this.#resource, async () => {
+      const nativeParams = await SignUp.clerk.__internal_nativeMagicLink?.prepare('signUp', this.#resource.id);
       let absoluteVerificationUrl = verificationUrl;
-      try {
-        new URL(verificationUrl);
-      } catch {
-        absoluteVerificationUrl = window.location.origin + verificationUrl;
+      if (!nativeParams) {
+        try {
+          new URL(verificationUrl);
+        } catch {
+          absoluteVerificationUrl = window.location.origin + verificationUrl;
+        }
       }
 
       await this.#resource.__internal_basePost({
-        body: { strategy: 'email_link', redirectUrl: absoluteVerificationUrl },
+        body: { strategy: 'email_link', ...(nativeParams ?? { redirectUrl: absoluteVerificationUrl }) },
         action: 'prepare_verification',
         coalesce: true,
       });
@@ -1071,10 +1074,11 @@ class SignUpFuture implements SignUpFutureResource {
     } = params;
     return runAsyncResourceTask(this.#resource, async () => {
       if (strategy === 'oauth_token_apple') {
-        if (popup)
+        if (popup) {
           throw new ClerkRuntimeError('A popup cannot be combined with native Apple authentication.', {
             code: 'oauth_transport_popup_conflict',
           });
+        }
         const identity = appleIdentity ?? (await getNativeAppleIdentity(SignUp.clerk));
         const appleParams = {
           strategy: 'oauth_token_apple' as const,

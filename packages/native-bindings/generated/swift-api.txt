@@ -120,10 +120,13 @@ BillingPaymentMethodStatus cases: expired, active, disconnected, unrecognized(St
 BillingPaymentMethodStatus: Hashable
 CheckAuthorizationParams variants: SessionCheckAuthorizationIsAuthorizedParamsCase1 | SessionCheckAuthorizationIsAuthorizedParamsCase2 | SessionCheckAuthorizationIsAuthorizedParamsCase3 | SessionCheckAuthorizationIsAuthorizedParamsCase4 | SessionCheckAuthorizationIsAuthorizedParamsCase5
 CheckAuthorizationParams: Hashable
+Clerk.authCallback: MobileAuthCallback?
 Clerk.authenticateWithSSO(params: MobileSSOParams): MobileAuthenticationResult [return]
+Clerk.clearAuthCallback(id: Double): Void [return]
 Clerk.createOrganization(params: CreateOrganizationParams): Organization [return]
 Clerk.environment: EnvironmentResource
 Clerk.getOrganization(organizationId: String): Organization [return]
+Clerk.handleAuthCallback(url: URL): MobileAuthenticationResult? [return]
 Clerk.lastAuthenticationStrategy: LastAuthenticationStrategy?
 Clerk.loaded: Bool
 Clerk.organization: Organization?
@@ -164,12 +167,6 @@ ClerkAPIErrorMetaZxcvbn: Hashable
 ClerkAPIErrorMetaZxcvbnSuggestionsElement.code: String
 ClerkAPIErrorMetaZxcvbnSuggestionsElement.message: String
 ClerkAPIErrorMetaZxcvbnSuggestionsElement: Hashable
-ClerkAuthenticateWithSSOResultCase1.kind: String
-ClerkAuthenticateWithSSOResultCase1.signIn: SignIn
-ClerkAuthenticateWithSSOResultCase1: Hashable
-ClerkAuthenticateWithSSOResultCase2.kind: String
-ClerkAuthenticateWithSSOResultCase2.signUp: SignUp
-ClerkAuthenticateWithSSOResultCase2: Hashable
 ClerkPaginatedResponseBillingPaymentMethod.data: [BillingPaymentMethod]
 ClerkPaginatedResponseBillingPaymentMethod.total_count: Double
 ClerkPaginatedResponseBillingPaymentMethod: Hashable
@@ -581,7 +578,16 @@ InviteMembersParams.role: String
 InviteMembersParams: Hashable
 LastAuthenticationStrategy cases: password, phone_code, email_code, email_link, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, web3_solana_signature, web3_metamask_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_base_signature, email_address, username, unrecognized(String)
 LastAuthenticationStrategy: Hashable
-MobileAuthenticationResult variants: ClerkAuthenticateWithSSOResultCase1 | ClerkAuthenticateWithSSOResultCase2
+MobileAuthCallback.id: Double
+MobileAuthCallback.result: MobileAuthenticationResult
+MobileAuthCallback: Hashable
+MobileAuthCallbackResultCase1.kind: String
+MobileAuthCallbackResultCase1.signIn: SignIn
+MobileAuthCallbackResultCase1: Hashable
+MobileAuthCallbackResultCase2.kind: String
+MobileAuthCallbackResultCase2.signUp: SignUp
+MobileAuthCallbackResultCase2: Hashable
+MobileAuthenticationResult variants: MobileAuthCallbackResultCase1 | MobileAuthCallbackResultCase2
 MobileAuthenticationResult.kind: String [shared union field]
 MobileAuthenticationResult: Hashable
 MobileSSOParams.enterpriseConnectionId: String? = nil
@@ -592,14 +598,12 @@ MobileSSOParams.legalAccepted: Bool? = nil
 MobileSSOParams.locale: String? = nil
 MobileSSOParams.oidcPrompt: String? = nil
 MobileSSOParams.start: MobileSSOParamsStart
-MobileSSOParams.strategy: MobileSSOParamsStrategy
+MobileSSOParams.strategy: SignInSSOParamsStrategy
 MobileSSOParams.transferable: Bool
 MobileSSOParams.unsafeMetadata: [String: JSONValue]? = nil
 MobileSSOParams: Hashable
 MobileSSOParamsStart cases: signUp, signIn, auto, unrecognized(String)
 MobileSSOParamsStart: Hashable
-MobileSSOParamsStrategy cases: oauth_token_apple, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
-MobileSSOParamsStrategy: Hashable
 MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = .omitted
 MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = .omitted
 MobileSetActiveParams: Hashable
@@ -1220,13 +1224,10 @@ SignInEmailLink.verification: SignInEmailLinkVerification?
 SignInEmailLink.waitForVerification(): Void [error-envelope]
 SignInEmailLink: Hashable
 SignInEmailLinkSendLinkParamsCase1.emailAddress: String? = nil
-SignInEmailLinkSendLinkParamsCase1.verificationUrl: String
 SignInEmailLinkSendLinkParamsCase1: Hashable
 SignInEmailLinkSendLinkParamsCase2.emailAddressId: String? = nil
-SignInEmailLinkSendLinkParamsCase2.verificationUrl: String
 SignInEmailLinkSendLinkParamsCase2: Hashable
 SignInEmailLinkSendParams variants: SignInEmailLinkSendLinkParamsCase1 | SignInEmailLinkSendLinkParamsCase2
-SignInEmailLinkSendParams.verificationUrl: String [shared union field]
 SignInEmailLinkSendParams: Hashable
 SignInEmailLinkVerification.createdSessionId: String
 SignInEmailLinkVerification.status: SignInEmailLinkVerificationStatus
@@ -1300,8 +1301,10 @@ SignInResetPasswordSubmitParams: Hashable
 SignInSSOParams.enterpriseConnectionId: String? = nil
 SignInSSOParams.identifier: String? = nil
 SignInSSOParams.oidcPrompt: String? = nil
-SignInSSOParams.strategy: MobileSSOParamsStrategy
+SignInSSOParams.strategy: SignInSSOParamsStrategy
 SignInSSOParams: Hashable
+SignInSSOParamsStrategy cases: oauth_token_apple, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInSSOParamsStrategy: Hashable
 SignInSecondFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | PasskeyFactor | TOTPFactor | BackupCodeFactor
 SignInSecondFactor.strategy: String [shared union field]
 SignInSecondFactor: Hashable
@@ -1374,7 +1377,6 @@ SignUpDataMfa.required: Bool
 SignUpDataMfa: Hashable
 SignUpEmailCodeVerifyParams.code: String
 SignUpEmailCodeVerifyParams: Hashable
-SignUpEmailLinkSendParams.verificationUrl: String
 SignUpEmailLinkSendParams: Hashable
 SignUpExistingSession.sessionId: String
 SignUpExistingSession: Hashable
@@ -1719,7 +1721,6 @@ enum EnterpriseProtocol
 enum EnterpriseProvider
 enum LastAuthenticationStrategy
 enum MobileSSOParamsStart
-enum MobileSSOParamsStrategy
 enum OAuthProvider
 enum OAuthStrategy
 enum OrganizationDomainOwnershipVerificationStatus
@@ -1742,6 +1743,7 @@ enum SessionVerificationStatus
 enum SignInCreateParamsStrategy
 enum SignInEmailLinkVerificationStatus
 enum SignInPasskeyParamsFlow
+enum SignInSSOParamsStrategy
 enum SignInStatus
 enum SignUpCreateParamsStrategy
 enum SignUpField
@@ -1773,8 +1775,6 @@ object ClerkAPIErrorMeta
 object ClerkAPIErrorMetaPlan
 object ClerkAPIErrorMetaZxcvbn
 object ClerkAPIErrorMetaZxcvbnSuggestionsElement
-object ClerkAuthenticateWithSSOResultCase1
-object ClerkAuthenticateWithSSOResultCase2
 object ClerkPaginatedResponseBillingPaymentMethod
 object ClerkPaginatedResponseEnterpriseConnectionTestRun
 object ClerkPaginatedResponseOrganizationDomain
@@ -1832,6 +1832,9 @@ object HslaColor
 object InitializePaymentMethodParams
 object InviteMemberParams
 object InviteMembersParams
+object MobileAuthCallback
+object MobileAuthCallbackResultCase1
+object MobileAuthCallbackResultCase2
 object MobileSSOParams
 object MobileSetActiveParams
 object MobileSignOutOptions

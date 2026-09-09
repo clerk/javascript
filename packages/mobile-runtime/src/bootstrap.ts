@@ -1,3 +1,4 @@
+import { NativeMagicLink } from '../../clerk-js/src/utils/NativeMagicLink';
 import type {
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
@@ -67,6 +68,25 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
       return Promise.reject(bridgeError('capability_unavailable'));
     return hostRequest('appleIdentity', options);
   };
+  const authStorageArgs = { scope: configuration.publishableKey, key: 'magicLink' };
+  clerk.__internal_nativeMagicLink = new NativeMagicLink(
+    clerk,
+    configuration.callbackUrl,
+    configuration.capabilities.includes('authStorage')
+      ? {
+          read: () => hostRequest('authStorage.read', authStorageArgs),
+          write: value => hostRequest('authStorage.write', { ...authStorageArgs, value }),
+          remove: () => hostRequest('authStorage.remove', authStorageArgs),
+        }
+      : undefined,
+    value =>
+      configuration.capabilities.includes('crypto.sha256')
+        ? hostRequest('crypto.sha256', { value })
+        : Promise.reject(bridgeError('capability_unavailable:crypto.sha256')),
+    configuration.capabilities.includes('magicLink.attestation')
+      ? () => hostRequest('magicLink.attestation', {})
+      : undefined,
+  );
   clerk.__internal_isWebAuthnSupported = () => configuration.capabilities.includes('passkeys');
   clerk.__internal_isWebAuthnAutofillSupported = async () => configuration.capabilities.includes('passkeys.autofill');
   clerk.__internal_isWebAuthnPlatformAuthenticatorSupported = async () =>
@@ -104,6 +124,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity']);
     runtime?.invalidate('Clerk.signOut');
     await mobile?.invalidate();
+    await clerk.__internal_nativeMagicLink?.reset();
   });
   runtime = new ResourceRuntime({
     roots: () => ({
@@ -118,6 +139,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
       if (operation === 'SignIn.reset' || operation === 'SignUp.reset') {
         cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity']);
         await mobile?.invalidate();
+        await clerk.__internal_nativeMagicLink?.reset();
       }
     },
   });
