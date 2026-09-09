@@ -1051,7 +1051,7 @@ class SignInFuture implements SignInFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
-  private async _create(params: SignInFutureCreateParams): Promise<void> {
+  private async _create(params: SignInFutureCreateParams & Pick<SignInFutureSSOParams, 'oidcPrompt'>): Promise<void> {
     const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
 
     const body: Record<string, unknown> = {
@@ -1330,6 +1330,7 @@ class SignInFuture implements SignInFutureResource {
           strategy,
           ...routes,
           identifier,
+          oidcPrompt,
         });
       }
 

@@ -133,7 +133,7 @@ async function fixture(root, transportResult, finalStatus = 'complete') {
   });
   const initial = runtime.snapshot();
   const name = root === 'signIn' ? 'SignIn' : 'SignUp';
-  const run = () =>
+  const run = (params = {}) =>
     runtime.invoke({
       kind: 'invoke',
       id: 'sso-1',
@@ -142,6 +142,7 @@ async function fixture(root, transportResult, finalStatus = 'complete') {
       args: [
         {
           strategy: 'oauth_google',
+          ...params,
         },
       ],
     });
@@ -224,6 +225,27 @@ for (const root of ['signIn', 'signUp']) {
       assert.ok(reload);
       assert.equal(new URL(reload.url).searchParams.get('rotating_token_nonce'), nonce);
       assert.equal(f.core.session, null);
+    }
+  });
+}
+
+for (const root of ['signIn', 'signUp']) {
+  test(`${root}.sso preserves the caller's raw OIDC prompt string`, async () => {
+    for (const prompt of [
+      undefined,
+      'none',
+      'consent',
+      'login',
+      'select_account',
+      'login consent',
+      'login login',
+      'none login',
+    ]) {
+      const f = await fixture(root);
+      await f.run(prompt === undefined ? {} : { oidcPrompt: prompt });
+      assert.deepEqual(f.messages.at(-1).result, { error: null });
+      const request = f.requests.find(r => /sign_ins|sign_ups/.test(r.url));
+      assert.equal(new URLSearchParams(request.body).get('oidc_prompt'), prompt ?? null);
     }
   });
 }
