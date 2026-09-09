@@ -23,6 +23,47 @@ describe('SignInFactorTwo', () => {
   });
 
   describe('Submitting', () => {
+    it('offers a passkey second factor and activates the completed session', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => f.startSignInFactorTwo());
+      fixtures.signIn.supportedSecondFactors = [{ strategy: 'passkey' }];
+      fixtures.signIn.authenticateWithPasskey.mockResolvedValue({
+        status: 'complete',
+        createdSessionId: 'session_passkey',
+      } as SignInResource);
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+
+      await screen.findByText('Use your passkey');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() =>
+        expect(fixtures.clerk.setActive).toHaveBeenCalledWith(expect.objectContaining({ session: 'session_passkey' })),
+      );
+    });
+
+    it('keeps passkey second-factor failures on the verification screen', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => f.startSignInFactorTwo());
+      fixtures.signIn.supportedSecondFactors = [{ strategy: 'passkey' }];
+      fixtures.signIn.authenticateWithPasskey.mockRejectedValue(
+        new ClerkAPIResponseError('Credential rejected', {
+          data: [
+            {
+              code: 'passkey_verification_failed',
+              message: 'Credential rejected',
+              long_message: 'Credential rejected',
+            },
+          ],
+          status: 422,
+        }),
+      );
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+
+      await userEvent.click(screen.getByText('Continue'));
+
+      await screen.findByText(/Credential rejected|Something went wrong/i);
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+      expect(screen.getByText('Use your passkey')).toBeVisible();
+    });
+
     it('correctly shows the input for code submission', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignInFactorTwo();

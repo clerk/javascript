@@ -95,6 +95,8 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 
 export function getButtonLabel(factor: SignInSecondFactor): LocalizationKey {
   switch (factor.strategy) {
+    case 'passkey':
+      return localizationKeys('signIn.alternativeMethods.blockButton__passkey');
     case 'phone_code':
       return localizationKeys('signIn.alternativeMethods.blockButton__phoneCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',

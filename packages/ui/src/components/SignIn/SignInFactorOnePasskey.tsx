@@ -1,4 +1,3 @@
-import type { ResetPasswordCodeFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -15,7 +14,6 @@ import { useHandleAuthenticateWithPasskey } from './shared';
 
 type SignInFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
-  onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
 };
 
 export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {

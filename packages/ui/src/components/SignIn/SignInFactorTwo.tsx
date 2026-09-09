@@ -7,6 +7,7 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useRouter } from '../../router';
+import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
@@ -65,6 +66,8 @@ function SignInFactorTwoInternal(): JSX.Element {
   }
 
   switch (currentFactor?.strategy) {
+    case 'passkey':
+      return <SignInFactorOnePasskey onShowAlternativeMethodsClick={onShowAlternativeMethodsClicked} />;
     case 'phone_code':
       return (
         <SignInFactorTwoPhoneCodeCard

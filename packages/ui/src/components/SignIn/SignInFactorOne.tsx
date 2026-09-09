@@ -209,12 +209,7 @@ function SignInFactorOneInternal(): JSX.Element {
 
   switch (currentFactor?.strategy) {
     case 'passkey':
-      return (
-        <SignInFactorOnePasskey
-          onFactorPrepare={handleFactorPrepare}
-          onShowAlternativeMethodsClick={toggleAllStrategies}
-        />
-      );
+      return <SignInFactorOnePasskey onShowAlternativeMethodsClick={toggleAllStrategies} />;
     case 'password':
       return (
         <SignInFactorOnePasswordCard

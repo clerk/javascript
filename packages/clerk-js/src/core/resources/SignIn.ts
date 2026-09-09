@@ -564,6 +564,16 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
+    if (
+      (this.status === 'needs_second_factor' || this.status === 'needs_client_trust') &&
+      this.supportedSecondFactors?.some(factor => factor.strategy === 'passkey')
+    ) {
+      const { error } = await this.__internal_future.passkey(params);
+      if (error) {
+        throw error;
+      }
+      return this;
+    }
     const { flow } = params || {};
 
     /**
