@@ -47,12 +47,14 @@ export const profile = {
       'Authentication redirect is delivered only to the browser host.',
     'ProtectCheckResource.token': 'Anti-abuse challenge token is available only to a scoped capability.',
     'PasskeyVerificationResource.publicKey': 'Passkey challenge is delivered only to the credential host.',
-    'PhoneNumberResource.backupCodes': 'Recovery secrets are not included in general resource observation.',
     'EnterpriseConnectionTestRunOauthPayloadResource.idToken':
       'Provider credentials are not included in general resource observation.',
     'EnterpriseConnectionTestRunOauthPayloadResource.accessToken':
       'Provider credentials are not included in general resource observation.',
     'SessionResource.lastActiveToken': 'Session JWTs are only returned by getToken, never broadcast as state.',
+  },
+  explicitReads: {
+    'PhoneNumberResource.backupCodes': 'Return recovery codes only to an explicit reader, never in observable state.',
   },
   adapted: {
     'MobileClerk.environment': 'Read instance settings from the existing initialized core.',

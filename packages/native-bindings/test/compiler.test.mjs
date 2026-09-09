@@ -127,3 +127,22 @@ test('discriminated unions expose common string fields without duplicating varia
   assert.match(native['GeneratedAPI.kt'], /public val `strategy`: String/);
   assert.match(native['swift-api.txt'], /strategy: String \[shared union field\]/);
 });
+
+test('explicit resource property reads retain source types without broadcasting values', () => {
+  const model = compile(source.replace('id: string;', 'id: string; backupCodes?: string[];'), {
+    explicitReads: { 'SignInFutureResource.backupCodes': 'Return sensitive values to the caller only.' },
+  });
+  assert.deepEqual(model.failures, []);
+  assert.equal(
+    model.definitions.SignIn.properties.some(p => p.name === 'backupCodes'),
+    false,
+  );
+  const read = model.definitions.SignIn.methods.find(m => m.name === 'backupCodes');
+  assert.equal(read.invocation, 'readProperty');
+  assert.deepEqual(read.parameters, []);
+  const native = generateNative(model, { protocolVersion: 1, contractHash: 'fixture' });
+  assert.match(native['GeneratedAPI.swift'], /func `backupCodes`\(\) async throws -> \[String\]\?/);
+  assert.match(native['GeneratedAPI.kt'], /suspend fun `backupCodes`\(\): List<String>\?/);
+  const wrongKind = compile(source, { explicitReads: { 'SignInFutureResource.reload': 'Invalid target.' } });
+  assert.ok(wrongKind.failures.some(f => /data property on a resource/.test(f.reason)));
+});

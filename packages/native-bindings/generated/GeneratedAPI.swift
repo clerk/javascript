@@ -5250,6 +5250,11 @@ public struct PhoneNumberState: Hashable, Sendable {
   public func prepare(_ value: JSONValue) throws -> any Sendable { try PhoneNumberState.decode(value, in: context.requireRuntime()) }
   public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
   public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PhoneNumber { try runtime.resource(ResourceHandle.decodeReference(value), as: PhoneNumber.self) }
+  public func `backupCodes`() async throws -> [String]? {
+    let runtime = try context.requireRuntime()
+    let result = try await runtime.invoke(owner: self, target: handle, operation: "PhoneNumber.backupCodes", arguments: [])
+    return try result.optional { value in try value.array().map { value in try value.string() } }
+  }
   /// Returns a string representation of an object.
   public func `stringValue`() async throws -> String {
     let runtime = try context.requireRuntime()
@@ -11377,7 +11382,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "433f633d39fae8991468af0323aba52d7956b097f3fe695cdccce0ae62146450"
+  public static let contractHash = "2721ce28a167ddaf394b2c72d8b5c65d9e79a783f02e8b8ee1046df01f3b1cd6"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

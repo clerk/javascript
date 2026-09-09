@@ -3795,6 +3795,11 @@ public class PhoneNumber(override val handle: ResourceHandle, runtime: CoreRunti
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): PhoneNumber = runtime.resource(ResourceHandle.fromReference(value)) as PhoneNumber
   }
+  public suspend fun `backupCodes`(): List<String>? {
+    val runtime = context.requireRuntime()
+    val result = runtime.invoke(this, handle, "PhoneNumber.backupCodes", listOf())
+    return result.decodeOptional { value -> value.jsonArray.map { value -> value.requireString() } }
+  }
   /**
    * Returns a string representation of an object.
    */
@@ -8440,7 +8445,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "433f633d39fae8991468af0323aba52d7956b097f3fe695cdccce0ae62146450"
+  public const val contractHash: String = "2721ce28a167ddaf394b2c72d8b5c65d9e79a783f02e8b8ee1046df01f3b1cd6"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

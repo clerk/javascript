@@ -64,6 +64,11 @@ export function compileProfile(repository, policy = profile) {
     const declarationOwner = symbol.declarations?.[0]?.parent?.name?.getText();
     const keys = [`${owner}.${member}`, `${declarationOwner}.${member}`];
     for (const key of keys) {
+      if (policy.explicitReads?.[key]) {
+        overridesUsed.add(key);
+        accounting.push({ path: `${owner}.${member}`, disposition: 'adapted', reason: policy.explicitReads[key] });
+        return 'explicitRead';
+      }
       if (policy.jsonMembers?.[key]) {
         overridesUsed.add(key);
         accounting.push({ path: `${owner}.${member}`, disposition: 'adapted', reason: policy.jsonMembers[key] });
@@ -243,7 +248,26 @@ export function compileProfile(repository, policy = profile) {
       const propertyType = checker.getTypeOfSymbol(property);
       const calls = checker.getSignaturesOfType(propertyType, ts.SignatureKind.Call);
       const memberHint = `${name}${upper(propertyName)}`;
-      if (calls.length) {
+      if (disposition === 'explicitRead') {
+        if (!isBehavior || calls.length) {
+          unsupported(
+            propertyType,
+            `${owner}.${propertyName}`,
+            'Explicit reads require a data property on a resource.',
+          );
+          continue;
+        }
+        definition.methods.push({
+          name: propertyName,
+          invocation: 'readProperty',
+          source: sourceOf(property),
+          ...documentationOf(property),
+          parameters: [],
+          result: lower(propertyType, memberHint, resourceContext),
+          errorResult: false,
+          asynchronous: true,
+        });
+      } else if (calls.length) {
         if (calls.length > 1) {
           unsupported(propertyType, `${owner}.${propertyName}`, 'Overloaded method needs a reviewed lowering rule.');
           continue;
@@ -332,6 +356,7 @@ export function compileProfile(repository, policy = profile) {
     ...Object.keys(policy.excluded),
     ...Object.keys(policy.adapted),
     ...Object.keys(policy.jsonMembers || {}),
+    ...Object.keys(policy.explicitReads || {}),
   ]) {
     if (!overridesUsed.has(key)) failures.push({ path: key, reason: 'Binding policy target was not reached.' });
   }

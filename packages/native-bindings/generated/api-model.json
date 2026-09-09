@@ -12878,6 +12878,29 @@
       ],
       "methods": [
         {
+          "name": "backupCodes",
+          "invocation": "readProperty",
+          "source": {
+            "file": "packages/shared/src/types/phoneNumber.ts",
+            "line": 30,
+            "symbol": "backupCodes"
+          },
+          "parameters": [],
+          "result": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "array",
+              "element": {
+                "kind": "string"
+              }
+            }
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
           "name": "toString",
           "nativeName": "stringValue",
           "source": {
@@ -28378,8 +28401,8 @@
     },
     {
       "path": "PhoneNumberResource.backupCodes",
-      "disposition": "excluded",
-      "reason": "Recovery secrets are not included in general resource observation."
+      "disposition": "adapted",
+      "reason": "Return recovery codes only to an explicit reader, never in observable state."
     },
     {
       "path": "PhoneNumberResource.toString",

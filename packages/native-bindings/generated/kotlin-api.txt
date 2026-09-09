@@ -771,6 +771,7 @@ PhoneCodeFactor.strategy: String
 PhoneCodeSecondFactorConfig.phoneNumberId: String? = null
 PhoneCodeSecondFactorConfig.strategy: String
 PhoneNumber.attemptVerification(params: AttemptPhoneNumberVerificationParams): PhoneNumber [return]
+PhoneNumber.backupCodes(): List<String>? [explicit-read]
 PhoneNumber.create(): PhoneNumber [return]
 PhoneNumber.defaultSecondFactor: Boolean
 PhoneNumber.destroy(): Unit [return]

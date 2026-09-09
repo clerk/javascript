@@ -933,6 +933,7 @@ PhoneCodeSecondFactorConfig.phoneNumberId: String? = nil
 PhoneCodeSecondFactorConfig.strategy: String
 PhoneCodeSecondFactorConfig: Hashable
 PhoneNumber.attemptVerification(params: AttemptPhoneNumberVerificationParams): PhoneNumber [return]
+PhoneNumber.backupCodes(): [String]? [explicit-read]
 PhoneNumber.create(): PhoneNumber [return]
 PhoneNumber.defaultSecondFactor: Bool
 PhoneNumber.destroy(): Void [return]

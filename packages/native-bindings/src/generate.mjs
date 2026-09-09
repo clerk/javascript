@@ -32,7 +32,7 @@ const operations = [];
 for (const definition of Object.values(model.definitions)) {
   for (const method of definition.methods || []) {
     operations.push(
-      `  ${JSON.stringify(`${definition.name}.${method.name}`)}: {\n    type: ${JSON.stringify(definition.name)},\n    parameters: ${JSON.stringify(method.parameters)},\n    result: ${JSON.stringify(method.result)},\n    invoke: (target, args) => target[${JSON.stringify(method.name)}](...args),\n  }`,
+      `  ${JSON.stringify(`${definition.name}.${method.name}`)}: {\n    type: ${JSON.stringify(definition.name)},\n    parameters: ${JSON.stringify(method.parameters)},\n    result: ${JSON.stringify(method.result)},\n    invoke: (target, args) => ${method.invocation === 'readProperty' ? `target[${JSON.stringify(method.name)}]` : `target[${JSON.stringify(method.name)}](...args)`},\n  }`,
     );
   }
 }

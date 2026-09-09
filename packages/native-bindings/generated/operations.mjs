@@ -643,6 +643,12 @@ export const operations = {
     result: {"kind":"void"},
     invoke: (target, args) => target["cancelEnterpriseSSOLinkFlow"](...args),
   },
+  "PhoneNumber.backupCodes": {
+    type: "PhoneNumber",
+    parameters: [],
+    result: {"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"array","element":{"kind":"string"}}},
+    invoke: (target, args) => target["backupCodes"],
+  },
   "PhoneNumber.toString": {
     type: "PhoneNumber",
     parameters: [],

@@ -206,3 +206,54 @@ test('native settings are projected from the owner with typed configuration', as
   assert.equal(environment.userSettings.attributes.email_address.enabled, false);
   assert.equal(environment.displayConfig.applicationName, 'TestApp');
 });
+
+test('phone recovery codes use an explicit generated read and never enter observable state', async t => {
+  const codes = ['recovery-secret-one', 'recovery-secret-two'];
+  const phone = {
+    object: 'phone_number',
+    id: 'phone_native',
+    phone_number: '+15555550123',
+    reserved_for_second_factor: false,
+    default_second_factor: false,
+    linked_to: [],
+    verification: {
+      status: 'verified',
+      strategy: 'phone_code',
+      attempts: null,
+      expire_at: null,
+      error: null,
+      verified_at_client: null,
+    },
+  };
+  const session = sessionFixture();
+  session.user.phone_numbers = [phone];
+  session.user.primary_phone_number_id = phone.id;
+  const client = { ...fixtures.authenticatedClient, sessions: [session] };
+  const f = await fixture({
+    client,
+    http: request => {
+      if (request.url.includes('/phone_numbers/')) {
+        assert.equal(request.method, 'POST');
+        assert.equal(new URL(request.url).searchParams.get('_method'), 'PATCH');
+        assert.equal(new URLSearchParams(request.body).get('reserved_for_second_factor'), 'true');
+        return response({ ...phone, reserved_for_second_factor: true, backup_codes: codes });
+      }
+      if (request.url.includes('/tokens')) return response(tokenFixture(), { body: JSON.stringify(tokenFixture()) });
+      if (request.url.includes('/touch')) return response(session);
+    },
+  });
+  t.after(f.dispose);
+  const resource = f.resource(f.state.roots.user).phoneNumbers[0].$ref;
+  const reserved = await f.invoke(resource, 'PhoneNumber.setReservedForSecondFactor', [{ reserved: true }]);
+  assert.equal(reserved.failure, undefined, JSON.stringify(reserved.failure));
+  assert.equal(f.resource(resource).reservedForSecondFactor, true);
+  assert.equal('backupCodes' in f.resource(resource), false);
+  const requestCount = f.requests.length;
+  const read = await f.invoke(resource, 'PhoneNumber.backupCodes');
+  assert.deepEqual(read.result, codes);
+  assert.equal(f.requests.length, requestCount);
+  assert.equal(
+    f.messages.filter(m => m.state).some(m => JSON.stringify(m.state).includes(codes[0])),
+    false,
+  );
+});

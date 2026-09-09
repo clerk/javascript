@@ -290,7 +290,7 @@ export function generateNative(model, manifest) {
         surface.push(`${name}.${property.name}: ${type(property.type, language)}${defaults(property, language)}`);
       for (const method of definition.methods || [])
         surface.push(
-          `${name}.${method.nativeName || method.name}(${method.parameters.map(p => `${p.name}: ${type(p.type, language)}${defaults(p, language)}`).join(', ')}): ${type(method.result, language)} [${method.errorResult ? 'error-envelope' : 'return'}]`,
+          `${name}.${method.nativeName || method.name}(${method.parameters.map(p => `${p.name}: ${type(p.type, language)}${defaults(p, language)}`).join(', ')}): ${type(method.result, language)} [${method.errorResult ? 'error-envelope' : method.invocation === 'readProperty' ? 'explicit-read' : 'return'}]`,
         );
       for (const property of commonStringFields(definition))
         surface.push(`${name}.${property.name}: String [shared union field]`);
