@@ -67,6 +67,8 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     },
     { [`x-${configuration.platform}-sdk-version`]: 'next' },
   );
+  if (configuration.capabilities.includes('googleIdentity'))
+    clerk.__internal_getGoogleIdentity = options => hostRequest('googleIdentity', options);
   clerk.__internal_getAppleIdentity = options => {
     if (!configuration.capabilities.includes('appleIdentity'))
       return Promise.reject(bridgeError('capability_unavailable'));
@@ -144,7 +146,14 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
   if (disposed) return;
   await clerk.__internal_nativeBiometrics.retryPendingCleanup().catch(() => undefined);
   const facade = publicCore(clerk, async () => {
-    cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity', 'biometrics.sign']);
+    cancelCapabilities([
+      'browser',
+      'passkeys.get',
+      'passkeys.create',
+      'appleIdentity',
+      'googleIdentity',
+      'biometrics.sign',
+    ]);
     clerk.__internal_nativeBiometrics.invalidate();
     runtime?.invalidate('Clerk.signOut');
     await mobile?.invalidate();
@@ -161,7 +170,14 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     emit,
     beforeInvoke: async operation => {
       if (operation === 'SignIn.reset' || operation === 'SignUp.reset') {
-        cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity', 'biometrics.sign']);
+        cancelCapabilities([
+          'browser',
+          'passkeys.get',
+          'passkeys.create',
+          'appleIdentity',
+          'googleIdentity',
+          'biometrics.sign',
+        ]);
         clerk.__internal_nativeBiometrics.invalidate();
         await mobile?.invalidate();
         await clerk.__internal_nativeMagicLink?.reset();

@@ -19,6 +19,7 @@ export type MobileAuthenticationResources = Pick<ClientResource, 'sessions' | 'l
     handleAuthCallback: (url: URL) => Promise<MobileAuthenticationResult | null>;
     clearAuthCallback: (id: number) => Promise<void>;
     authenticateWithSSO: (params: MobileSSOParams) => Promise<MobileAuthenticationResult>;
+    startAuthentication: (params: MobileIdentifierParams) => Promise<MobileAuthenticationResult>;
     signIn: SignInFutureResource;
     signUp: SignUpFutureResource;
     environment: EnvironmentResource;
@@ -36,6 +37,7 @@ export type MobileClerk = Pick<Clerk, 'status' | 'loaded' | 'createOrganization'
     handleAuthCallback: (url: URL) => Promise<MobileAuthenticationResult | null>;
     clearAuthCallback: (id: number) => Promise<void>;
     authenticateWithSSO: (params: MobileSSOParams) => Promise<MobileAuthenticationResult>;
+    startAuthentication: (params: MobileIdentifierParams) => Promise<MobileAuthenticationResult>;
     readonly signIn: SignInFutureResource;
     readonly signUp: SignUpFutureResource;
     setActive: (params: MobileSetActiveParams) => ReturnType<Clerk['setActive']>;
@@ -46,6 +48,8 @@ export type MobileSSOParams = Omit<SignInFutureSSOParams, 'popup' | 'redirectUrl
   Pick<SignUpFutureSSOParams, 'unsafeMetadata' | 'legalAccepted' | 'locale' | 'firstName' | 'lastName'> & {
     start: 'auto' | 'signIn' | 'signUp';
     transferable: boolean;
+    /** Prefer the platform Google credential picker when available; an empty picker falls back to browser OAuth. */
+    preferGoogleOneTap?: boolean;
   };
 
 export type MobileAuthenticationResult =
@@ -53,3 +57,11 @@ export type MobileAuthenticationResult =
   | { kind: 'signUp'; signUp: SignUpFutureResource };
 
 export type MobileAuthCallback = { id: number; result: MobileAuthenticationResult };
+
+/** Shared entry behavior for the identifier screen in prebuilt mobile authentication. Does not finalize a session. */
+export type MobileIdentifierParams = {
+  identifier: string;
+  identifierType: 'emailAddress' | 'phoneNumber' | 'username';
+  mode: 'signIn' | 'signUp' | 'signInOrUp';
+  unsafeMetadata?: SignUpFutureSSOParams['unsafeMetadata'];
+};

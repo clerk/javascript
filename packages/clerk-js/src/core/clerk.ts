@@ -1,5 +1,6 @@
 import { NativeBiometricCredentials } from '../utils/NativeBiometricCredentials';
 import type { NativeMagicLink } from '../utils/NativeMagicLink';
+import { startMobileAuthentication } from '../utils/startMobileAuthentication';
 import { authenticateWithMobileSSO } from '../utils/authenticateWithMobileSSO';
 import type { MobileAuthenticationResources } from '@clerk/shared/mobile';
 import { inBrowser as inClientSide } from '@clerk/shared/browser';
@@ -365,6 +366,8 @@ export class Clerk implements ClerkInterface {
 
   public __internal_nativeMagicLink: NativeMagicLink | undefined;
   public __internal_nativeBiometrics = new NativeBiometricCredentials(this);
+
+  public __internal_getGoogleIdentity: ((options: { clientId: string }) => Promise<{ token: string }>) | undefined;
 
   public __internal_getAppleIdentity:
     | ((options: { fullName: boolean }) => Promise<{ token: string; firstName?: string; lastName?: string }>)
@@ -3219,6 +3222,7 @@ export class Clerk implements ClerkInterface {
         this.__internal_nativeMagicLink?.clearCallback(id);
       },
       authenticateWithSSO: params => authenticateWithMobileSSO(this, params),
+      startAuthentication: params => startMobileAuthentication(this, params),
       signIn: this.client.signIn.__internal_future,
       signUp: this.client.signUp.__internal_future,
       environment: this.environment,

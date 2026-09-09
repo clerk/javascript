@@ -15,7 +15,7 @@ export async function authenticateWithMobileSSO(
   const signUpResource: SignUp = clerk.client.signUp;
   const signIn = signInResource.__internal_future;
   const signUp = signUpResource.__internal_future;
-  const { start, transferable, ...ssoParams } = params;
+  const { start, transferable, preferGoogleOneTap, ...ssoParams } = params;
   const apple = params.strategy === 'oauth_token_apple';
   const identity = apple ? await getNativeAppleIdentity(clerk) : undefined;
   const routes = { redirectUrl: '', redirectCallbackUrl: '' };
@@ -38,6 +38,49 @@ export async function authenticateWithMobileSSO(
     }
     return signInResult();
   };
+  const googleClientId = clerk.__internal_environment?.displayConfig.googleOneTapClientId;
+  if (
+    preferGoogleOneTap &&
+    params.strategy === 'oauth_google' &&
+    googleClientId &&
+    clerk.__internal_getGoogleIdentity
+  ) {
+    let identity: { token: string } | undefined;
+    try {
+      identity = await clerk.__internal_getGoogleIdentity({ clientId: googleClientId });
+    } catch (error) {
+      // Only an empty Google picker falls back. Cancellation and provider/server failures stay terminal.
+      if (!error || typeof error !== 'object' || !('code' in error) || error.code !== 'google_account_unavailable')
+        throw error;
+    }
+    if (identity) {
+      if (typeof identity.token !== 'string' || !identity.token.trim())
+        throw new ClerkRuntimeError('Google did not return an identity token.', { code: 'invalid_credential_result' });
+      try {
+        await signInResource.create({ strategy: 'google_one_tap', token: identity.token });
+        return signInResult();
+      } catch (error) {
+        if (!transferable || !isClerkAPIResponseError(error) || error.errors[0]?.code !== 'external_account_not_found')
+          throw error;
+        const result = await signUp.create({
+          strategy: 'google_one_tap',
+          token: identity.token,
+          unsafeMetadata: params.unsafeMetadata,
+          legalAccepted: params.legalAccepted,
+          locale: params.locale,
+          firstName: params.firstName,
+          lastName: params.lastName,
+        });
+        if (result.error) throw result.error;
+        if (signUp.isTransferable) {
+          const result = await signIn.create({ transfer: true });
+          if (result.error) throw result.error;
+          return signInResult();
+        }
+        return { kind: 'signUp', signUp };
+      }
+    }
+  }
   if (start === 'signUp' || (start === 'auto' && apple && transferable)) {
     const { error } = await signUp.sso({ ...ssoParams, ...routes, emailAddress: params.identifier }, identity);
     if (error) {

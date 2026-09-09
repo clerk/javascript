@@ -31,6 +31,12 @@ export const operations = {
     result: {"kind":"ref","name":"MobileAuthenticationResult"},
     invoke: (target, args) => target["authenticateWithSSO"](...args),
   },
+  "Clerk.startAuthentication": {
+    type: "Clerk",
+    parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"MobileIdentifierParams"}}],
+    result: {"kind":"ref","name":"MobileAuthenticationResult"},
+    invoke: (target, args) => target["startAuthentication"](...args),
+  },
   "Clerk.setActive": {
     type: "Clerk",
     parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"MobileSetActiveParams"}}],

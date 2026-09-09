@@ -154,6 +154,7 @@ Clerk.setActive(params: MobileSetActiveParams): Unit [return]
 Clerk.signIn: SignIn
 Clerk.signOut(options: MobileSignOutOptions? = null): Unit [return]
 Clerk.signUp: SignUp
+Clerk.startAuthentication(params: MobileIdentifierParams): MobileAuthenticationResult [return]
 Clerk.status: ClerkStatus
 Clerk.telemetry: TelemetryCollector? = null
 Clerk.user: User?
@@ -519,6 +520,12 @@ MobileAuthCallbackResultCase2.kind: String
 MobileAuthCallbackResultCase2.signUp: SignUp
 MobileAuthenticationResult variants: MobileAuthCallbackResultCase1 | MobileAuthCallbackResultCase2
 MobileAuthenticationResult.kind: String [shared union field]
+MobileIdentifierParams.identifier: String
+MobileIdentifierParams.identifierType: MobileIdentifierParamsIdentifierType
+MobileIdentifierParams.mode: MobileIdentifierParamsMode
+MobileIdentifierParams.unsafeMetadata: JsonObject? = null
+MobileIdentifierParamsIdentifierType cases: username, emailAddress, phoneNumber, unrecognized(String)
+MobileIdentifierParamsMode cases: signUp, signIn, signInOrUp, unrecognized(String)
 MobileSSOParams.enterpriseConnectionId: String? = null
 MobileSSOParams.firstName: String? = null
 MobileSSOParams.identifier: String? = null
@@ -526,6 +533,7 @@ MobileSSOParams.lastName: String? = null
 MobileSSOParams.legalAccepted: Boolean? = null
 MobileSSOParams.locale: String? = null
 MobileSSOParams.oidcPrompt: String? = null
+MobileSSOParams.preferGoogleOneTap: Boolean? = null
 MobileSSOParams.start: MobileSSOParamsStart
 MobileSSOParams.strategy: SignInSSOParamsStrategy
 MobileSSOParams.transferable: Boolean
@@ -1448,6 +1456,8 @@ enum EnterpriseConnectionTestRunStatus
 enum EnterpriseProtocol
 enum EnterpriseProvider
 enum LastAuthenticationStrategy
+enum MobileIdentifierParamsIdentifierType
+enum MobileIdentifierParamsMode
 enum MobileSSOParamsStart
 enum OAuthProvider
 enum OAuthStrategy
@@ -1570,6 +1580,7 @@ object InviteMembersParams
 object MobileAuthCallback
 object MobileAuthCallbackResultCase1
 object MobileAuthCallbackResultCase2
+object MobileIdentifierParams
 object MobileSSOParams
 object MobileSetActiveParams
 object MobileSignOutOptions

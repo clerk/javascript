@@ -1,12 +1,7 @@
 import { isValidNetworkEnvironment } from '@clerk/shared/network';
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
-import type {
-  ClerkAPIErrorJSON,
-  ClerkResourceJSON,
-  ClerkResourceReloadParams,
-  DeletedObjectJSON,
-} from '@clerk/shared/types';
+import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams } from '@clerk/shared/types';
 
 import { debugLogger } from '@/utils/debug';
 

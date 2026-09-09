@@ -98,6 +98,12 @@ public class Clerk(override val handle: ResourceHandle, runtime: CoreRuntime) : 
       MobileAuthenticationResult.fromJson(result, runtime)
     }
   }
+  public suspend fun `startAuthentication`(`params`: MobileIdentifierParams): MobileAuthenticationResult {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "Clerk.startAuthentication", listOf(`params`.toJson())) { result ->
+      MobileAuthenticationResult.fromJson(result, runtime)
+    }
+  }
   public suspend fun `setActive`(`params`: MobileSetActiveParams): Unit {
     val runtime = context.requireRuntime()
     return runtime.invoke(this, handle, "Clerk.setActive", listOf(`params`.toJson())) { result ->
@@ -9083,7 +9089,7 @@ public data class SignUpSubmitProtectCheckParams(public val `proofToken`: String
   }
 }
 
-public data class MobileSSOParams(public val `strategy`: SignInSSOParamsStrategy, public val `identifier`: String? = null, public val `enterpriseConnectionId`: String? = null, public val `oidcPrompt`: String? = null, public val `legalAccepted`: Boolean? = null, public val `firstName`: String? = null, public val `lastName`: String? = null, public val `locale`: String? = null, public val `unsafeMetadata`: JsonObject? = null, public val `start`: MobileSSOParamsStart, public val `transferable`: Boolean) {
+public data class MobileSSOParams(public val `strategy`: SignInSSOParamsStrategy, public val `identifier`: String? = null, public val `enterpriseConnectionId`: String? = null, public val `oidcPrompt`: String? = null, public val `legalAccepted`: Boolean? = null, public val `firstName`: String? = null, public val `lastName`: String? = null, public val `locale`: String? = null, public val `unsafeMetadata`: JsonObject? = null, public val `start`: MobileSSOParamsStart, public val `transferable`: Boolean, public val `preferGoogleOneTap`: Boolean? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("strategy", this@MobileSSOParams.`strategy`.toJson())
     putPresent("identifier", this@MobileSSOParams.`identifier`?.let { value -> JsonPrimitive(value) } ?: Undefined)
@@ -9096,12 +9102,13 @@ public data class MobileSSOParams(public val `strategy`: SignInSSOParamsStrategy
     putPresent("unsafeMetadata", this@MobileSSOParams.`unsafeMetadata`?.let { value -> value } ?: Undefined)
     putPresent("start", this@MobileSSOParams.`start`.toJson())
     putPresent("transferable", JsonPrimitive(this@MobileSSOParams.`transferable`))
+    putPresent("preferGoogleOneTap", this@MobileSSOParams.`preferGoogleOneTap`?.let { value -> JsonPrimitive(value) } ?: Undefined)
   }
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileSSOParams {
       val values = value.jsonObject
 
-      return MobileSSOParams(`strategy` = SignInSSOParamsStrategy.fromJson((values["strategy"] ?: Undefined), runtime), `identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() }, `enterpriseConnectionId` = (values["enterpriseConnectionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `legalAccepted` = (values["legalAccepted"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `firstName` = (values["firstName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `lastName` = (values["lastName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `locale` = (values["locale"] ?: Undefined).decodeOptional { value -> value.requireString() }, `unsafeMetadata` = (values["unsafeMetadata"] ?: Undefined).decodeOptional { value -> value.jsonObject }, `start` = MobileSSOParamsStart.fromJson((values["start"] ?: Undefined), runtime), `transferable` = (values["transferable"] ?: Undefined).requireBoolean())
+      return MobileSSOParams(`strategy` = SignInSSOParamsStrategy.fromJson((values["strategy"] ?: Undefined), runtime), `identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() }, `enterpriseConnectionId` = (values["enterpriseConnectionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `legalAccepted` = (values["legalAccepted"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `firstName` = (values["firstName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `lastName` = (values["lastName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `locale` = (values["locale"] ?: Undefined).decodeOptional { value -> value.requireString() }, `unsafeMetadata` = (values["unsafeMetadata"] ?: Undefined).decodeOptional { value -> value.jsonObject }, `start` = MobileSSOParamsStart.fromJson((values["start"] ?: Undefined), runtime), `transferable` = (values["transferable"] ?: Undefined).requireBoolean(), `preferGoogleOneTap` = (values["preferGoogleOneTap"] ?: Undefined).decodeOptional { value -> value.requireBoolean() })
     }
   }
 }
@@ -9117,6 +9124,57 @@ public sealed class MobileSSOParamsStart(public val rawValue: String) {
       "signUp" -> SignUp
       "signIn" -> SignIn
       "auto" -> Auto
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+/**
+ * Shared entry behavior for the identifier screen in prebuilt mobile authentication. Does not finalize a session.
+ */
+public data class MobileIdentifierParams(public val `identifier`: String, public val `identifierType`: MobileIdentifierParamsIdentifierType, public val `mode`: MobileIdentifierParamsMode, public val `unsafeMetadata`: JsonObject? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("identifier", JsonPrimitive(this@MobileIdentifierParams.`identifier`))
+    putPresent("identifierType", this@MobileIdentifierParams.`identifierType`.toJson())
+    putPresent("mode", this@MobileIdentifierParams.`mode`.toJson())
+    putPresent("unsafeMetadata", this@MobileIdentifierParams.`unsafeMetadata`?.let { value -> value } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileIdentifierParams {
+      val values = value.jsonObject
+
+      return MobileIdentifierParams(`identifier` = (values["identifier"] ?: Undefined).requireString(), `identifierType` = MobileIdentifierParamsIdentifierType.fromJson((values["identifierType"] ?: Undefined), runtime), `mode` = MobileIdentifierParamsMode.fromJson((values["mode"] ?: Undefined), runtime), `unsafeMetadata` = (values["unsafeMetadata"] ?: Undefined).decodeOptional { value -> value.jsonObject })
+    }
+  }
+}
+
+public sealed class MobileIdentifierParamsIdentifierType(public val rawValue: String) {
+  public data object Username : MobileIdentifierParamsIdentifierType("username")
+  public data object EmailAddress : MobileIdentifierParamsIdentifierType("emailAddress")
+  public data object PhoneNumber : MobileIdentifierParamsIdentifierType("phoneNumber")
+  public data class Unrecognized(val value: String) : MobileIdentifierParamsIdentifierType(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileIdentifierParamsIdentifierType = when (val raw = value.requireString()) {
+      "username" -> Username
+      "emailAddress" -> EmailAddress
+      "phoneNumber" -> PhoneNumber
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public sealed class MobileIdentifierParamsMode(public val rawValue: String) {
+  public data object SignUp : MobileIdentifierParamsMode("signUp")
+  public data object SignIn : MobileIdentifierParamsMode("signIn")
+  public data object SignInOrUp : MobileIdentifierParamsMode("signInOrUp")
+  public data class Unrecognized(val value: String) : MobileIdentifierParamsMode(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileIdentifierParamsMode = when (val raw = value.requireString()) {
+      "signUp" -> SignUp
+      "signIn" -> SignIn
+      "signInOrUp" -> SignInOrUp
       else -> Unrecognized(raw)
     }
   }
@@ -9583,7 +9641,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "db0edcf151926939c7031f50b51514339c6787c28e4518d71b4c6b331b074a5a"
+  public const val contractHash: String = "1e4efdbbf7882dd957b0ca1bc502cd28ee090f8c2e22fd752eb14743b7981d6a"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

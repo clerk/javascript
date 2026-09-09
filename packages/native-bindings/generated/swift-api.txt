@@ -192,6 +192,7 @@ Clerk.setActive(params: MobileSetActiveParams): Void [return]
 Clerk.signIn: SignIn
 Clerk.signOut(options: MobileSignOutOptions? = nil): Void [return]
 Clerk.signUp: SignUp
+Clerk.startAuthentication(params: MobileIdentifierParams): MobileAuthenticationResult [return]
 Clerk.status: ClerkStatus
 Clerk.telemetry: TelemetryCollector? = nil
 Clerk.user: User?
@@ -646,6 +647,15 @@ MobileAuthCallbackResultCase2: Hashable
 MobileAuthenticationResult variants: MobileAuthCallbackResultCase1 | MobileAuthCallbackResultCase2
 MobileAuthenticationResult.kind: String [shared union field]
 MobileAuthenticationResult: Hashable
+MobileIdentifierParams.identifier: String
+MobileIdentifierParams.identifierType: MobileIdentifierParamsIdentifierType
+MobileIdentifierParams.mode: MobileIdentifierParamsMode
+MobileIdentifierParams.unsafeMetadata: [String: JSONValue]? = nil
+MobileIdentifierParams: Hashable
+MobileIdentifierParamsIdentifierType cases: username, emailAddress, phoneNumber, unrecognized(String)
+MobileIdentifierParamsIdentifierType: Hashable
+MobileIdentifierParamsMode cases: signUp, signIn, signInOrUp, unrecognized(String)
+MobileIdentifierParamsMode: Hashable
 MobileSSOParams.enterpriseConnectionId: String? = nil
 MobileSSOParams.firstName: String? = nil
 MobileSSOParams.identifier: String? = nil
@@ -653,6 +663,7 @@ MobileSSOParams.lastName: String? = nil
 MobileSSOParams.legalAccepted: Bool? = nil
 MobileSSOParams.locale: String? = nil
 MobileSSOParams.oidcPrompt: String? = nil
+MobileSSOParams.preferGoogleOneTap: Bool? = nil
 MobileSSOParams.start: MobileSSOParamsStart
 MobileSSOParams.strategy: SignInSSOParamsStrategy
 MobileSSOParams.transferable: Bool
@@ -1786,6 +1797,8 @@ enum EnterpriseConnectionTestRunStatus
 enum EnterpriseProtocol
 enum EnterpriseProvider
 enum LastAuthenticationStrategy
+enum MobileIdentifierParamsIdentifierType
+enum MobileIdentifierParamsMode
 enum MobileSSOParamsStart
 enum OAuthProvider
 enum OAuthStrategy
@@ -1908,6 +1921,7 @@ object InviteMembersParams
 object MobileAuthCallback
 object MobileAuthCallbackResultCase1
 object MobileAuthCallbackResultCase2
+object MobileIdentifierParams
 object MobileSSOParams
 object MobileSetActiveParams
 object MobileSignOutOptions

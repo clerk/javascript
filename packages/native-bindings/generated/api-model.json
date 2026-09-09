@@ -31,7 +31,7 @@
       "name": "Clerk",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 27,
+        "line": 28,
         "symbol": "MobileClerk"
       },
       "kind": "resource",
@@ -127,7 +127,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 29,
+            "line": 30,
             "symbol": "environment"
           }
         },
@@ -145,7 +145,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 30,
+            "line": 31,
             "symbol": "session"
           }
         },
@@ -163,7 +163,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 31,
+            "line": 32,
             "symbol": "user"
           }
         },
@@ -181,7 +181,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 32,
+            "line": 33,
             "symbol": "organization"
           }
         },
@@ -198,7 +198,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 33,
+            "line": 34,
             "symbol": "clientId"
           }
         },
@@ -211,7 +211,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 34,
+            "line": 35,
             "symbol": "biometricCredentials"
           }
         },
@@ -229,7 +229,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 35,
+            "line": 36,
             "symbol": "authCallback"
           }
         },
@@ -242,7 +242,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 39,
+            "line": 41,
             "symbol": "signIn"
           }
         },
@@ -255,7 +255,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 40,
+            "line": 42,
             "symbol": "signUp"
           }
         }
@@ -317,7 +317,7 @@
           "nativeName": "handleAuthCallback",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 36,
+            "line": 37,
             "symbol": "handleAuthCallback"
           },
           "parameters": [
@@ -346,7 +346,7 @@
           "nativeName": "clearAuthCallback",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 37,
+            "line": 38,
             "symbol": "clearAuthCallback"
           },
           "parameters": [
@@ -369,7 +369,7 @@
           "nativeName": "authenticateWithSSO",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 38,
+            "line": 39,
             "symbol": "authenticateWithSSO"
           },
           "parameters": [
@@ -390,11 +390,36 @@
           "asynchronous": true
         },
         {
+          "name": "startAuthentication",
+          "nativeName": "startAuthentication",
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 40,
+            "symbol": "startAuthentication"
+          },
+          "parameters": [
+            {
+              "name": "params",
+              "optional": false,
+              "type": {
+                "kind": "ref",
+                "name": "MobileIdentifierParams"
+              }
+            }
+          ],
+          "result": {
+            "kind": "ref",
+            "name": "MobileAuthenticationResult"
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
           "name": "setActive",
           "nativeName": "setActive",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 41,
+            "line": 43,
             "symbol": "setActive"
           },
           "parameters": [
@@ -418,7 +443,7 @@
           "nativeName": "signOut",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 42,
+            "line": 44,
             "symbol": "signOut"
           },
           "parameters": [
@@ -20600,7 +20625,7 @@
       "name": "MobileAuthCallback",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 55,
+        "line": 59,
         "symbol": "MobileAuthCallback"
       },
       "kind": "object",
@@ -20613,7 +20638,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 55,
+            "line": 59,
             "symbol": "id"
           }
         },
@@ -20626,7 +20651,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 55,
+            "line": 59,
             "symbol": "result"
           }
         }
@@ -20637,7 +20662,7 @@
       "name": "MobileAuthenticationResult",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 51,
+        "line": 55,
         "symbol": "MobileAuthenticationResult"
       },
       "kind": "union",
@@ -20658,7 +20683,7 @@
       "name": "MobileAuthCallbackResultCase1",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 52,
+        "line": 56,
         "symbol": "__type"
       },
       "kind": "object",
@@ -20672,7 +20697,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 52,
+            "line": 56,
             "symbol": "kind"
           }
         },
@@ -20685,7 +20710,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 52,
+            "line": 56,
             "symbol": "signIn"
           }
         }
@@ -23804,7 +23829,7 @@
       "name": "MobileAuthCallbackResultCase2",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 53,
+        "line": 57,
         "symbol": "__type"
       },
       "kind": "object",
@@ -23818,7 +23843,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 53,
+            "line": 57,
             "symbol": "kind"
           }
         },
@@ -23831,7 +23856,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 53,
+            "line": 57,
             "symbol": "signUp"
           }
         }
@@ -26639,7 +26664,7 @@
       "name": "MobileSSOParams",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 45,
+        "line": 47,
         "symbol": "MobileSSOParams"
       },
       "kind": "object",
@@ -26811,7 +26836,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 47,
+            "line": 49,
             "symbol": "start"
           }
         },
@@ -26823,9 +26848,27 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 48,
+            "line": 50,
             "symbol": "transferable"
           }
+        },
+        {
+          "name": "preferGoogleOneTap",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "boolean"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 52,
+            "symbol": "preferGoogleOneTap"
+          },
+          "documentation": "Prefer the platform Google credential picker when available; an empty picker falls back to browser OAuth."
         }
       ],
       "methods": []
@@ -26839,6 +26882,100 @@
         "signUp",
         "signIn",
         "auto"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "MobileIdentifierParams": {
+      "name": "MobileIdentifierParams",
+      "source": {
+        "file": "packages/shared/src/types/mobile.ts",
+        "line": 62,
+        "symbol": "MobileIdentifierParams"
+      },
+      "documentation": "Shared entry behavior for the identifier screen in prebuilt mobile authentication. Does not finalize a session.",
+      "kind": "object",
+      "properties": [
+        {
+          "name": "identifier",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 63,
+            "symbol": "identifier"
+          }
+        },
+        {
+          "name": "identifierType",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "MobileIdentifierParamsIdentifierType"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 64,
+            "symbol": "identifierType"
+          }
+        },
+        {
+          "name": "mode",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "MobileIdentifierParamsMode"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 65,
+            "symbol": "mode"
+          }
+        },
+        {
+          "name": "unsafeMetadata",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "jsonObject"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 66,
+            "symbol": "unsafeMetadata"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "MobileIdentifierParamsIdentifierType": {
+      "name": "MobileIdentifierParamsIdentifierType",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "username",
+        "emailAddress",
+        "phoneNumber"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "MobileIdentifierParamsMode": {
+      "name": "MobileIdentifierParamsMode",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "signUp",
+        "signIn",
+        "signInOrUp"
       ],
       "open": false,
       "patterns": []
@@ -34085,6 +34222,30 @@
     },
     {
       "path": "MobileSSOParams.transferable",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileSSOParams.preferGoogleOneTap",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileClerk.startAuthentication",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileIdentifierParams.identifier",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileIdentifierParams.identifierType",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileIdentifierParams.mode",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileIdentifierParams.unsafeMetadata",
       "disposition": "generated"
     },
     {

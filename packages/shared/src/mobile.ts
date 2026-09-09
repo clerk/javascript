@@ -4,6 +4,7 @@ export type {
   MobileAuthenticationResult,
   MobileAuthCallback,
   MobileSSOParams,
+  MobileIdentifierParams,
 } from './types/mobile';
 
 export interface MobileCredentialStorage {

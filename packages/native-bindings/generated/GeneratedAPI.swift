@@ -116,6 +116,12 @@ public struct ClerkState: Hashable, Sendable {
       return try MobileAuthenticationResult.decode(result, in: runtime)
     }
   }
+  public func `startAuthentication`(_ `params`: MobileIdentifierParams) async throws -> MobileAuthenticationResult {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "Clerk.startAuthentication", arguments: [try `params`.encode()]) { result in
+      return try MobileAuthenticationResult.decode(result, in: runtime)
+    }
+  }
   public func `setActive`(_ `params`: MobileSetActiveParams) async throws {
     let runtime = try context.requireRuntime()
     return try await runtime.invoke(owner: self, target: handle, operation: "Clerk.setActive", arguments: [try `params`.encode()]) { result in
@@ -12290,7 +12296,8 @@ public struct MobileSSOParams: Hashable, Sendable {
   public let `unsafeMetadata`: [String: JSONValue]?
   public let `start`: MobileSSOParamsStart
   public let `transferable`: Bool
-  public init(`strategy`: SignInSSOParamsStrategy, `identifier`: String? = nil, `enterpriseConnectionId`: String? = nil, `oidcPrompt`: String? = nil, `legalAccepted`: Bool? = nil, `firstName`: String? = nil, `lastName`: String? = nil, `locale`: String? = nil, `unsafeMetadata`: [String: JSONValue]? = nil, `start`: MobileSSOParamsStart, `transferable`: Bool) {
+  public let `preferGoogleOneTap`: Bool?
+  public init(`strategy`: SignInSSOParamsStrategy, `identifier`: String? = nil, `enterpriseConnectionId`: String? = nil, `oidcPrompt`: String? = nil, `legalAccepted`: Bool? = nil, `firstName`: String? = nil, `lastName`: String? = nil, `locale`: String? = nil, `unsafeMetadata`: [String: JSONValue]? = nil, `start`: MobileSSOParamsStart, `transferable`: Bool, `preferGoogleOneTap`: Bool? = nil) {
     self.`strategy` = `strategy`
     self.`identifier` = `identifier`
     self.`enterpriseConnectionId` = `enterpriseConnectionId`
@@ -12302,6 +12309,7 @@ public struct MobileSSOParams: Hashable, Sendable {
     self.`unsafeMetadata` = `unsafeMetadata`
     self.`start` = `start`
     self.`transferable` = `transferable`
+    self.`preferGoogleOneTap` = `preferGoogleOneTap`
   }
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
@@ -12315,14 +12323,15 @@ public struct MobileSSOParams: Hashable, Sendable {
       "locale": try self.`locale`.map { value in .string(value) } ?? .undefined,
       "unsafeMetadata": try self.`unsafeMetadata`.map { value in .object(value) } ?? .undefined,
       "start": try self.`start`.encode(),
-      "transferable": .bool(self.`transferable`)
+      "transferable": .bool(self.`transferable`),
+      "preferGoogleOneTap": try self.`preferGoogleOneTap`.map { value in .bool(value) } ?? .undefined
     ]
     return .object(values.filter { !$0.value.isUndefined })
   }
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileSSOParams {
     let values = try value.object()
 
-    return try MobileSSOParams(`strategy`: try SignInSSOParamsStrategy.decode((values["strategy"] ?? .undefined), in: runtime), `identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() }, `enterpriseConnectionId`: try (values["enterpriseConnectionId"] ?? .undefined).optional { value in try value.string() }, `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `legalAccepted`: try (values["legalAccepted"] ?? .undefined).optional { value in try value.bool() }, `firstName`: try (values["firstName"] ?? .undefined).optional { value in try value.string() }, `lastName`: try (values["lastName"] ?? .undefined).optional { value in try value.string() }, `locale`: try (values["locale"] ?? .undefined).optional { value in try value.string() }, `unsafeMetadata`: try (values["unsafeMetadata"] ?? .undefined).optional { value in try value.object() }, `start`: try MobileSSOParamsStart.decode((values["start"] ?? .undefined), in: runtime), `transferable`: try (values["transferable"] ?? .undefined).bool())
+    return try MobileSSOParams(`strategy`: try SignInSSOParamsStrategy.decode((values["strategy"] ?? .undefined), in: runtime), `identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() }, `enterpriseConnectionId`: try (values["enterpriseConnectionId"] ?? .undefined).optional { value in try value.string() }, `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `legalAccepted`: try (values["legalAccepted"] ?? .undefined).optional { value in try value.bool() }, `firstName`: try (values["firstName"] ?? .undefined).optional { value in try value.string() }, `lastName`: try (values["lastName"] ?? .undefined).optional { value in try value.string() }, `locale`: try (values["locale"] ?? .undefined).optional { value in try value.string() }, `unsafeMetadata`: try (values["unsafeMetadata"] ?? .undefined).optional { value in try value.object() }, `start`: try MobileSSOParamsStart.decode((values["start"] ?? .undefined), in: runtime), `transferable`: try (values["transferable"] ?? .undefined).bool(), `preferGoogleOneTap`: try (values["preferGoogleOneTap"] ?? .undefined).optional { value in try value.bool() })
   }
 }
 
@@ -12349,6 +12358,84 @@ public enum MobileSSOParamsStart: Hashable, Sendable {
   }
   public func encode() throws -> JSONValue { .string(rawValue) }
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileSSOParamsStart { .init(rawValue: try value.string()) }
+}
+
+/// Shared entry behavior for the identifier screen in prebuilt mobile authentication. Does not finalize a session.
+public struct MobileIdentifierParams: Hashable, Sendable {
+  public let `identifier`: String
+  public let `identifierType`: MobileIdentifierParamsIdentifierType
+  public let `mode`: MobileIdentifierParamsMode
+  public let `unsafeMetadata`: [String: JSONValue]?
+  public init(`identifier`: String, `identifierType`: MobileIdentifierParamsIdentifierType, `mode`: MobileIdentifierParamsMode, `unsafeMetadata`: [String: JSONValue]? = nil) {
+    self.`identifier` = `identifier`
+    self.`identifierType` = `identifierType`
+    self.`mode` = `mode`
+    self.`unsafeMetadata` = `unsafeMetadata`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "identifier": .string(self.`identifier`),
+      "identifierType": try self.`identifierType`.encode(),
+      "mode": try self.`mode`.encode(),
+      "unsafeMetadata": try self.`unsafeMetadata`.map { value in .object(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileIdentifierParams {
+    let values = try value.object()
+
+    return try MobileIdentifierParams(`identifier`: try (values["identifier"] ?? .undefined).string(), `identifierType`: try MobileIdentifierParamsIdentifierType.decode((values["identifierType"] ?? .undefined), in: runtime), `mode`: try MobileIdentifierParamsMode.decode((values["mode"] ?? .undefined), in: runtime), `unsafeMetadata`: try (values["unsafeMetadata"] ?? .undefined).optional { value in try value.object() })
+  }
+}
+
+public enum MobileIdentifierParamsIdentifierType: Hashable, Sendable {
+  case `username`
+  case `emailAddress`
+  case `phoneNumber`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`username`: return "username"
+    case .`emailAddress`: return "emailAddress"
+    case .`phoneNumber`: return "phoneNumber"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "username": self = .`username`
+    case "emailAddress": self = .`emailAddress`
+    case "phoneNumber": self = .`phoneNumber`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileIdentifierParamsIdentifierType { .init(rawValue: try value.string()) }
+}
+
+public enum MobileIdentifierParamsMode: Hashable, Sendable {
+  case `signUp`
+  case `signIn`
+  case `signInOrUp`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`signUp`: return "signUp"
+    case .`signIn`: return "signIn"
+    case .`signInOrUp`: return "signInOrUp"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "signUp": self = .`signUp`
+    case "signIn": self = .`signIn`
+    case "signInOrUp": self = .`signInOrUp`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileIdentifierParamsMode { .init(rawValue: try value.string()) }
 }
 
 public struct MobileSetActiveParams: Hashable, Sendable {
@@ -12831,7 +12918,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "db0edcf151926939c7031f50b51514339c6787c28e4518d71b4c6b331b074a5a"
+  public static let contractHash = "1e4efdbbf7882dd957b0ca1bc502cd28ee090f8c2e22fd752eb14743b7981d6a"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {
