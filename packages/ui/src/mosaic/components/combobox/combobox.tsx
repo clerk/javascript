@@ -18,6 +18,24 @@ export type ComboboxRootProps = AutocompleteProps;
 export type ComboboxSize = 'sm' | 'md' | 'lg';
 export type ComboboxTriggerProps = MosaicComponentProps<'button'>;
 
+const ComboboxAnchorContext = React.createContext<{
+  anchor: HTMLElement | null;
+  setAnchor: React.Dispatch<React.SetStateAction<HTMLElement | null>>;
+} | null>(null);
+
+export function ComboboxRoot({ sideOffset = 8, ...props }: ComboboxRootProps) {
+  const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
+  const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
+  return (
+    <ComboboxAnchorContext.Provider value={context}>
+      <Primitive.Root
+        sideOffset={sideOffset}
+        {...props}
+      />
+    </ComboboxAnchorContext.Provider>
+  );
+}
+
 export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTriggerProps>(function MosaicComboboxTrigger(
   { className, style, ...props },
   ref,
@@ -41,6 +59,12 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
   ref,
 ) {
   const inputGroup = useOptionalInputGroupContext();
+  const setAnchor = React.useContext(ComboboxAnchorContext)?.setAnchor;
+  const groupElement = inputGroup?.element;
+  React.useLayoutEffect(() => {
+    setAnchor?.(groupElement ?? null);
+    return () => setAnchor?.(null);
+  }, [groupElement, setAnchor]);
   const size = inputGroup?.size ?? sizeProp ?? 'md';
 
   return (
@@ -61,18 +85,22 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
 });
 
 export interface ComboboxPopupProps extends MosaicComponentProps<'div'> {
+  /** Overrides positioning against the input group or standalone input. */
+  anchor?: React.ComponentPropsWithoutRef<typeof Primitive.Positioner>['anchor'];
   /** Container the combobox portals into. Defaults to `document.body`. */
   portalRoot?: React.ComponentPropsWithoutRef<typeof Primitive.Portal>['root'];
 }
 
 /** Floating listbox surface. Portal and positioning are handled internally. */
 export const ComboboxPopup = React.forwardRef<HTMLDivElement, ComboboxPopupProps>(function MosaicComboboxPopup(
-  { portalRoot, className, style, children, ...rest },
+  { anchor, portalRoot, className, style, children, ...rest },
   ref,
 ) {
+  const context = React.useContext(ComboboxAnchorContext);
   return (
     <Primitive.Portal root={portalRoot}>
       <Primitive.Positioner
+        anchor={anchor ?? context?.anchor}
         {...mergeStyleProps(themeProps('combobox-positioner'), stylex.props(reset.base, styles.positioner))}
       >
         <Primitive.Popup
@@ -157,7 +185,7 @@ export const ComboboxEmpty = React.forwardRef<HTMLParagraphElement, ComboboxEmpt
 });
 
 export const Combobox = {
-  Root: Primitive.Root,
+  Root: ComboboxRoot,
   Input: ComboboxInput,
   Trigger: ComboboxTrigger,
   Popup: ComboboxPopup,

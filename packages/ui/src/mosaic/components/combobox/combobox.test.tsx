@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -9,10 +9,10 @@ import { Icon } from '../icon';
 import { InputGroup } from '../input-group';
 import { Combobox } from './combobox';
 
-function FloatingCombobox(props?: { onValueChange?: (value: string) => void }) {
+function FloatingCombobox(props?: { onValueChange?: (value: string) => void; anchor?: HTMLElement }) {
   return (
     <Combobox.Root onValueChange={props?.onValueChange}>
-      <InputGroup.Root>
+      <InputGroup.Root data-testid='fruit-group'>
         <Combobox.Input
           variant='ghost'
           aria-label='Fruit'
@@ -31,7 +31,7 @@ function FloatingCombobox(props?: { onValueChange?: (value: string) => void }) {
           </Combobox.Trigger>
         </InputGroup.End>
       </InputGroup.Root>
-      <Combobox.Popup>
+      <Combobox.Popup anchor={props?.anchor}>
         <Combobox.Option
           value='apple'
           label='Apple'
@@ -50,6 +50,17 @@ function FloatingCombobox(props?: { onValueChange?: (value: string) => void }) {
 }
 
 describe('Mosaic Combobox', () => {
+  it('positions the popup against the full input group', async () => {
+    const user = userEvent.setup();
+    render(<FloatingCombobox />);
+    const measureGroup = vi.spyOn(screen.getByTestId('fruit-group'), 'getBoundingClientRect');
+
+    await user.click(screen.getByRole('button', { name: 'Toggle fruit options' }));
+
+    await waitFor(() => expect(measureGroup).toHaveBeenCalled());
+    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
+  });
+
   it('opens its options from a composed trigger', async () => {
     const user = userEvent.setup();
     render(<FloatingCombobox />);
@@ -65,6 +76,40 @@ describe('Mosaic Combobox', () => {
 
     expect(screen.getByRole('listbox')).toBeInTheDocument();
     expect(trigger).toHaveAttribute('data-open', '');
+    expect(input).toHaveFocus();
+  });
+
+  it('allows an explicit anchor to override the input group', async () => {
+    const user = userEvent.setup();
+    const anchor = document.createElement('div');
+    const measureAnchor = vi.spyOn(anchor, 'getBoundingClientRect');
+    render(<FloatingCombobox anchor={anchor} />);
+    const measureGroup = vi.spyOn(screen.getByTestId('fruit-group'), 'getBoundingClientRect');
+
+    await user.click(screen.getByRole('button', { name: 'Toggle fruit options' }));
+
+    await waitFor(() => expect(measureAnchor).toHaveBeenCalled());
+    expect(measureGroup).not.toHaveBeenCalled();
+  });
+
+  it('anchors to the input without a group and opens with the keyboard', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <Combobox.Input aria-label='Fruit' />
+        <Combobox.Popup>
+          <Combobox.Option value='apple'>Apple</Combobox.Option>
+        </Combobox.Popup>
+      </Combobox.Root>,
+    );
+    const input = screen.getByRole('combobox', { name: 'Fruit' });
+    const measureInput = vi.spyOn(input, 'getBoundingClientRect');
+
+    await user.tab();
+    await user.keyboard('{ArrowDown}');
+
+    await waitFor(() => expect(measureInput).toHaveBeenCalled());
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
     expect(input).toHaveFocus();
   });
 

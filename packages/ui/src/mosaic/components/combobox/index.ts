@@ -5,6 +5,7 @@ export {
   ComboboxList,
   ComboboxOption,
   ComboboxPopup,
+  ComboboxRoot,
   ComboboxTrigger,
 } from './combobox';
 export type {
