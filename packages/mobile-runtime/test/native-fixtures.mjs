@@ -122,7 +122,20 @@ export function tokenFixture() {
 
 export const fixtures = {
   environment: createNativeEnvironmentJSON(),
-  client: { ...createBaseClientJSON(), sessions: [], captcha_bypass: true },
+  client: {
+    ...createBaseClientJSON(),
+    object: 'client',
+    id: 'client_native',
+    sessions: [],
+    sign_in: null,
+    sign_up: null,
+    last_active_session_id: null,
+    last_authentication_strategy: null,
+    cookie_expires_at: null,
+    created_at: 1700000000000,
+    updated_at: 1700000000000,
+    captcha_bypass: true,
+  },
   signIn,
   signUp,
   session: sessionFixture(),

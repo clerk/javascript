@@ -66,3 +66,75 @@ for (const change of ['unchanged', 'timestamp', 'pending', 'expired', 'removed',
     }
   });
 }
+
+const membership = id => ({
+  object: 'organization_membership',
+  id: `membership_${id}`,
+  role: 'org:admin',
+  role_name: 'Admin',
+  permissions: ['org:memberships:manage'],
+  public_metadata: {},
+  created_at: 1700000000000,
+  updated_at: 1700000000000,
+  organization: {
+    object: 'organization',
+    id,
+    name: `Organization ${id}`,
+    slug: id,
+    image_url: '',
+    has_image: false,
+    public_metadata: {},
+    created_at: 1700000000000,
+    updated_at: 1700000000000,
+  },
+});
+
+for (const selected of ['org_one', null, 'org_missing']) {
+  test(`the active organization is derived from session membership: ${selected}`, async t => {
+    const session = sessionFixture();
+    session.last_active_organization_id = selected;
+    session.user.organization_memberships = [membership('org_one'), membership('org_two')];
+    const f = await fixture({
+      client: { ...fixtures.client, sessions: [session], last_active_session_id: session.id },
+    });
+    t.after(f.dispose);
+    if (selected === 'org_one') {
+      const organization = f.resource(f.state.roots.organization);
+      assert.equal(organization.id, selected);
+      assert.equal(organization.name, 'Organization org_one');
+    } else assert.equal(f.state.roots.organization, null);
+    const user = f.resource(f.state.roots.user);
+    const memberships = user.organizationMemberships.map(value => f.resource(value.$ref));
+    assert.deepEqual(
+      memberships.map(value => value.id),
+      ['membership_org_one', 'membership_org_two'],
+    );
+  });
+}
+
+for (const selected of ['org_two', null]) {
+  test(`session reload publishes the changed organization before completion: ${selected}`, async t => {
+    const session = sessionFixture();
+    session.last_active_organization_id = 'org_one';
+    session.user.organization_memberships = [membership('org_one'), membership('org_two')];
+    const client = { ...fixtures.client, sessions: [session], last_active_session_id: session.id };
+    const updated = { ...session, last_active_organization_id: selected };
+    const f = await fixture({
+      client,
+      http: request => {
+        if (new URL(request.url).pathname.endsWith(`/sessions/${session.id}`))
+          return response(updated, {
+            body: JSON.stringify({ response: updated, client: { ...client, sessions: [updated] } }),
+          });
+      },
+    });
+    t.after(f.dispose);
+    const handle = f.state.roots.session;
+    const result = await f.invoke(handle, 'Session.reload');
+    assert.equal(result.failure, undefined, JSON.stringify(result));
+    assert.deepEqual(f.state.roots.session, handle);
+    assert.equal(f.resource(handle).lastActiveOrganizationId, selected);
+    assert.equal(f.state.roots.organization && f.resource(f.state.roots.organization).id, selected);
+    assert.equal(f.resource(f.state.roots.user).organizationMemberships.length, 2);
+  });
+}

@@ -23,6 +23,21 @@ type MobileCore = {
   __internal_onAfterResponse(callback: (request: MobileRequest, response?: MobileResponse) => Promise<void>): void;
 };
 
+function responseClientVersion(payload: unknown): { updatedAt?: number } | undefined {
+  const object = (value: unknown): Record<string, unknown> | undefined =>
+    value !== null && typeof value === 'object' && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : undefined;
+  const body = object(payload);
+  // FAPI carries the client beside a resource, in meta, or as the /client result.
+  const client = object(body?.client) || object(object(body?.meta)?.client) || object(body?.response);
+  if (client?.object !== 'client') return;
+  return {
+    updatedAt:
+      typeof client.updated_at === 'number' && Number.isFinite(client.updated_at) ? client.updated_at : undefined,
+  };
+}
+
 export function installMobileCredentialTransport(
   core: MobileCore,
   storage: MobileCredentialStorage,
@@ -32,7 +47,9 @@ export function installMobileCredentialTransport(
   let generation = 0;
   let disposed = false;
   let writes: Promise<void> = Promise.resolve();
-  const requests = new WeakMap<object, number>();
+  let sequence = 0;
+  let acceptedClient: { sequence: number; serverDate?: number; updatedAt?: number } | undefined;
+  const requests = new WeakMap<object, { generation: number; sequence: number }>();
   const assertCurrent = (expected: number) => {
     if (disposed || expected !== generation) {
       throw Object.assign(new Error('The client changed while the request was in flight.'), {
@@ -43,7 +60,7 @@ export function installMobileCredentialTransport(
 
   core.__internal_onBeforeRequest(async request => {
     const current = generation;
-    requests.set(request, current);
+    requests.set(request, { generation: current, sequence: ++sequence });
     await writes;
     assertCurrent(current);
     const credential = await storage.read();
@@ -59,24 +76,54 @@ export function installMobileCredentialTransport(
 
   core.__internal_onAfterResponse(async (request, response) => {
     if (!response) return;
-    const current = requests.get(request);
-    if (current === undefined) throw new Error('Missing mobile request generation.');
-    assertCurrent(current);
+    const issued = requests.get(request);
+    if (issued === undefined) throw new Error('Missing mobile request generation.');
+    assertCurrent(issued.generation);
     const credential = response.headers.get('authorization');
-    if (credential) {
-      const write = writes.then(async () => {
-        assertCurrent(current);
-        await storage.write(credential);
-      });
-      writes = write.catch(() => undefined);
-      await write;
-    }
-    assertCurrent(current);
+    const client = responseClientVersion(response.payload);
+    if (!credential && !client) return;
+    const parsedDate = Date.parse(response.headers.get('date') || '');
+    const serverDate = Number.isFinite(parsedDate) ? parsedDate : undefined;
+    // Decide freshness in the same queue as persistence, before either a stale
+    // credential write or FAPI resource hydration can occur.
+    const commit = writes.then(async () => {
+      assertCurrent(issued.generation);
+      if (client && acceptedClient && issued.sequence <= acceptedClient.sequence) {
+        const newerServerState =
+          serverDate !== undefined &&
+          acceptedClient.serverDate !== undefined &&
+          (serverDate > acceptedClient.serverDate ||
+            (serverDate === acceptedClient.serverDate &&
+              client.updatedAt !== undefined &&
+              acceptedClient.updatedAt !== undefined &&
+              client.updatedAt > acceptedClient.updatedAt));
+        if (!newerServerState)
+          throw Object.assign(new Error('A newer client response has already been accepted.'), {
+            code: 'stale_client_response',
+          });
+      }
+      if (credential) await storage.write(credential);
+      assertCurrent(issued.generation);
+      if (client) {
+        acceptedClient = {
+          sequence: Math.max(acceptedClient?.sequence ?? issued.sequence, issued.sequence),
+          serverDate:
+            serverDate === undefined
+              ? acceptedClient?.serverDate
+              : Math.max(acceptedClient?.serverDate ?? serverDate, serverDate),
+          updatedAt: client.updatedAt,
+        };
+      }
+    });
+    writes = commit.catch(() => undefined);
+    await commit;
+    assertCurrent(issued.generation);
   });
 
   return {
     async invalidate({ clearCredential = false } = {}): Promise<void> {
       ++generation;
+      acceptedClient = undefined;
       if (clearCredential) {
         const remove = writes.then(() => storage.remove());
         writes = remove.catch(() => undefined);
