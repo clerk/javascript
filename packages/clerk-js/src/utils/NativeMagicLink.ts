@@ -84,19 +84,23 @@ export class NativeMagicLink {
     const expected = new URL(this.callbackUrl);
     if (
       url.protocol !== expected.protocol ||
-      url.host !== expected.host ||
-      url.pathname !== expected.pathname ||
+      url.host.toLowerCase() !== expected.host.toLowerCase() ||
+      (url.pathname === '/' ? '' : url.pathname) !== (expected.pathname === '/' ? '' : expected.pathname) ||
       url.username !== expected.username ||
       url.password !== expected.password ||
       Array.from(expected.searchParams).some(([key, value]) => url.searchParams.get(key) !== value)
     ) {
       return null;
     }
-    if (!url.searchParams.has('flow_id') || !url.searchParams.has('approval_token')) {
+    // Released native SDKs also accept email-link parameters in the fragment.
+    // Query values retain precedence, including an explicitly empty value.
+    const fragment = new URLSearchParams(url.hash.slice(1));
+    const parameter = (name: string) => url.searchParams.get(name) ?? fragment.get(name);
+    if (parameter('flow_id') === null || parameter('approval_token') === null) {
       return null;
     }
-    const flowId = url.searchParams.get('flow_id')?.trim();
-    const approvalToken = url.searchParams.get('approval_token')?.trim();
+    const flowId = parameter('flow_id')?.trim();
+    const approvalToken = parameter('approval_token')?.trim();
     if (!flowId || !approvalToken) {
       throw fail('invalid_email_link_callback');
     }

@@ -206,3 +206,24 @@ for (const root of ['signIn', 'signUp']) {
     assert.equal(f.requests.filter(r => /sign_ins|sign_ups/.test(r.url)).length, 1);
   });
 }
+
+for (const root of ['signIn', 'signUp']) {
+  test(`${root}.sso preserves native query nonce semantics`, async () => {
+    for (const [suffix, nonce] of [
+      ['?other=param&another=value', null],
+      ['?first=value&rotating_token_nonce=xyz789&last=value', 'xyz789'],
+      ['?rotating_token_nonce=', null],
+      ['', null],
+      ['?rotating_token_nonce=test123#fragment', 'test123'],
+    ]) {
+      const f = await fixture(root, callbackURL + suffix);
+      await f.run();
+      assert.equal(f.messages.at(-1).failure, undefined);
+      assert.equal(f.messages.at(-1).result.error, null);
+      const reload = f.requests.find(r => r.method === 'GET' && /sign_ins|sign_ups/.test(r.url));
+      assert.ok(reload);
+      assert.equal(new URL(reload.url).searchParams.get('rotating_token_nonce'), nonce);
+      assert.equal(f.core.session, null);
+    }
+  });
+}

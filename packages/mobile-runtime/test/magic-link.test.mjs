@@ -231,3 +231,58 @@ test('reset fences a delayed completion response and its credential write', asyn
     false,
   );
 });
+
+for (const route of [
+  `${callbackUrl}#flow_id=sia_native&approval_token=fixture_approval`,
+  `${callbackUrl}/?flow_id=sia_native&approval_token=fixture_approval`,
+  'CLERK-TEST://SSO-CALLBACK/#flow_id=sia_native&approval_token=fixture_approval',
+]) {
+  test(`preserves the previous native email-link route form ${route}`, async t => {
+    const f = await magicFixture();
+    t.after(f.dispose);
+    await sendLink(f);
+    const result = await f.invoke(f.state.roots.clerk, 'Clerk.handleAuthCallback', [route]);
+    assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+    assert.ok(result.result, 'The previous SDK accepted this callback route');
+    assert.equal(result.result.value.signIn.$ref.id, f.state.roots.signIn.id);
+    assert.equal(f.state.roots.session, null);
+    assert.equal(f.authRecord, null);
+    const completion = f.requests.find(request => request.url.includes('/magic_links/complete'));
+    assert.equal(new URLSearchParams(completion.body).get('approval_token'), 'fixture_approval');
+  });
+}
+
+test('email-link route mismatches and incomplete callbacks do not consume stored credentials', async t => {
+  const f = await magicFixture();
+  t.after(f.dispose);
+  await sendLink(f);
+  const saved = f.authRecord;
+  const count = f.requests.length;
+  for (const route of [
+    'clerk-test:/sso-callback?flow_id=sia_native&approval_token=x',
+    'clerk-test://wrong?flow_id=sia_native&approval_token=x',
+    'clerk-test://sso-callback/extra?flow_id=sia_native&approval_token=x',
+    'other://sso-callback?flow_id=sia_native&approval_token=x',
+    `${callbackUrl}?approval_token=x`,
+    `${callbackUrl}#flow_id=sia_native`,
+  ]) {
+    const result = await f.invoke(f.state.roots.clerk, 'Clerk.handleAuthCallback', [route]);
+    assert.equal(result.failure, undefined);
+    assert.equal(result.result, null);
+  }
+  assert.equal(f.requests.length, count);
+  assert.equal(f.authRecord, saved);
+});
+
+test('email-link query values take precedence over fragment values', async t => {
+  const f = await magicFixture();
+  t.after(f.dispose);
+  await sendLink(f);
+  const count = f.requests.length;
+  const result = await f.invoke(f.state.roots.clerk, 'Clerk.handleAuthCallback', [
+    `${callbackUrl}?flow_id=wrong&approval_token=query#flow_id=sia_native&approval_token=fragment`,
+  ]);
+  assert.equal(result.failure.code, 'email_link_flow_mismatch');
+  assert.equal(f.requests.length, count);
+  assert.ok(f.authRecord);
+});
