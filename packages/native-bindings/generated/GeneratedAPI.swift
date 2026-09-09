@@ -2,7 +2,7 @@
 import Foundation
 import Observation
 
-public struct ClerkState: Sendable {
+public struct ClerkState: Hashable, Sendable {
   public let `status`: ClerkStatus
   public let `loaded`: Bool
   public let `environment`: MobileEnvironment
@@ -112,7 +112,7 @@ public enum ClerkStatus: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ClerkStatus { .init(rawValue: try value.string()) }
 }
 
-public struct CreateOrganizationParams: Sendable {
+public struct CreateOrganizationParams: Hashable, Sendable {
   public let `name`: String
   public let `slug`: String?
   public init(`name`: String, `slug`: String? = nil) {
@@ -136,7 +136,7 @@ public struct CreateOrganizationParams: Sendable {
 /// The `Organization` object holds information about an Organization, as well as methods for managing it.
 /// 
 /// To use these methods, you must have the **Organizations** feature [enabled in your app's settings in the Clerk Dashboard](https://clerk.com/docs/guides/organizations/configure#enable-organizations).
-public struct OrganizationState: Sendable {
+public struct OrganizationState: Hashable, Sendable {
   public let `id`: String
   public let `name`: String
   public let `slug`: String?
@@ -375,7 +375,7 @@ public struct OrganizationState: Sendable {
   }
 }
 
-public struct UpdateOrganizationParams: Sendable {
+public struct UpdateOrganizationParams: Hashable, Sendable {
   public let `name`: String
   public let `slug`: String?
   public init(`name`: String, `slug`: String? = nil) {
@@ -396,7 +396,7 @@ public struct UpdateOrganizationParams: Sendable {
   }
 }
 
-public struct GetMembersParams: Sendable {
+public struct GetMembersParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public let `role`: [String]?
@@ -427,7 +427,7 @@ public struct GetMembersParams: Sendable {
 /// 
 /// > [!TIP]
 /// > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
-public struct ClerkPaginatedResponseOrganizationMembership: Sendable {
+public struct ClerkPaginatedResponseOrganizationMembership: Hashable, Sendable {
   public let `data`: [OrganizationMembership]
   public let `totalCount`: Double
   public init(`data`: [OrganizationMembership], `totalCount`: Double) {
@@ -449,7 +449,7 @@ public struct ClerkPaginatedResponseOrganizationMembership: Sendable {
 }
 
 /// The `OrganizationMembership` object is the model around a user's membership in an Organization.
-public struct OrganizationMembershipState: Sendable {
+public struct OrganizationMembershipState: Hashable, Sendable {
   public let `id`: String
   public let `organization`: Organization
   public let `permissions`: [String]
@@ -529,7 +529,7 @@ public struct OrganizationMembershipState: Sendable {
 }
 
 /// Information about the user that's publicly available.
-public struct PublicUserData: Sendable {
+public struct PublicUserData: Hashable, Sendable {
   public let `firstName`: String?
   public let `lastName`: String?
   public let `imageUrl`: String
@@ -571,7 +571,7 @@ public struct PublicUserData: Sendable {
   }
 }
 
-public struct UpdateOrganizationMembershipParams: Sendable {
+public struct UpdateOrganizationMembershipParams: Hashable, Sendable {
   public let `role`: String
   public init(`role`: String) {
     self.`role` = `role`
@@ -589,7 +589,7 @@ public struct UpdateOrganizationMembershipParams: Sendable {
   }
 }
 
-public struct ClerkResourceReloadParams: Sendable {
+public struct ClerkResourceReloadParams: Hashable, Sendable {
   public let `rotatingTokenNonce`: String?
   public init(`rotatingTokenNonce`: String? = nil) {
     self.`rotatingTokenNonce` = `rotatingTokenNonce`
@@ -607,7 +607,7 @@ public struct ClerkResourceReloadParams: Sendable {
   }
 }
 
-public struct GetInvitationsParams: Sendable {
+public struct GetInvitationsParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public let `status`: [OrganizationInvitationStatus]?
@@ -663,7 +663,7 @@ public enum OrganizationInvitationStatus: Hashable, Sendable {
 /// 
 /// > [!TIP]
 /// > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
-public struct ClerkPaginatedResponseOrganizationInvitation: Sendable {
+public struct ClerkPaginatedResponseOrganizationInvitation: Hashable, Sendable {
   public let `data`: [OrganizationInvitation]
   public let `totalCount`: Double
   public init(`data`: [OrganizationInvitation], `totalCount`: Double) {
@@ -685,7 +685,7 @@ public struct ClerkPaginatedResponseOrganizationInvitation: Sendable {
 }
 
 /// The `OrganizationInvitation` object is the model around [an invitation to join an Organization](https://clerk.com/docs/guides/organizations/add-members/invitations).
-public struct OrganizationInvitationState: Sendable {
+public struct OrganizationInvitationState: Hashable, Sendable {
   public let `id`: String
   public let `emailAddress`: String
   public let `organizationId`: String
@@ -758,7 +758,7 @@ public struct OrganizationInvitationState: Sendable {
   }
 }
 
-public struct GetRolesParams: Sendable {
+public struct GetRolesParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public init(`initialPage`: Double? = nil, `pageSize`: Double? = nil) {
@@ -779,7 +779,7 @@ public struct GetRolesParams: Sendable {
   }
 }
 
-public struct GetRolesResponse: Sendable {
+public struct GetRolesResponse: Hashable, Sendable {
   public let `hasRoleSetMigration`: Bool?
   public let `data`: [Role]
   public let `totalCount`: Double
@@ -803,7 +803,7 @@ public struct GetRolesResponse: Sendable {
   }
 }
 
-public struct RoleState: Sendable {
+public struct RoleState: Hashable, Sendable {
   public let `id`: String
   public let `key`: String
   public let `name`: String
@@ -862,7 +862,7 @@ public struct RoleState: Sendable {
   }
 }
 
-public struct PermissionState: Sendable {
+public struct PermissionState: Hashable, Sendable {
   public let `id`: String
   public let `key`: String
   public let `name`: String
@@ -943,7 +943,7 @@ public enum PermissionType: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PermissionType { .init(rawValue: try value.string()) }
 }
 
-public struct GetDomainsParams: Sendable {
+public struct GetDomainsParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public let `enrollmentMode`: OrganizationEnrollmentMode?
@@ -999,7 +999,7 @@ public enum OrganizationEnrollmentMode: Hashable, Sendable {
 /// 
 /// > [!TIP]
 /// > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
-public struct ClerkPaginatedResponseOrganizationDomain: Sendable {
+public struct ClerkPaginatedResponseOrganizationDomain: Hashable, Sendable {
   public let `data`: [OrganizationDomain]
   public let `totalCount`: Double
   public init(`data`: [OrganizationDomain], `totalCount`: Double) {
@@ -1021,7 +1021,7 @@ public struct ClerkPaginatedResponseOrganizationDomain: Sendable {
 }
 
 /// The `OrganizationDomain` object is the model around an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains).
-public struct OrganizationDomainState: Sendable {
+public struct OrganizationDomainState: Hashable, Sendable {
   public let `id`: String
   public let `name`: String
   public let `organizationId`: String
@@ -1125,7 +1125,7 @@ public struct OrganizationDomainState: Sendable {
 }
 
 /// The `OrganizationDomainVerification` object holds the affiliation verification details of an Organization's [Verified Domain](/docs/guides/organizations/add-members/verified-domains). Affiliation proves that the current user controls an email address that belongs to the domain.
-public struct OrganizationDomainVerification: Sendable {
+public struct OrganizationDomainVerification: Hashable, Sendable {
   public let `status`: OrganizationDomainVerificationStatus
   public var `strategy`: String { "email_code" }
   public let `attempts`: Double
@@ -1188,7 +1188,7 @@ public enum OrganizationDomainVerificationStatus: Hashable, Sendable {
 }
 
 /// Holds the ownership verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains). Ownership proves control of the underlying DNS domain, typically by publishing a TXT record, and is required before the domain can be used for enterprise SSO.
-public struct OrganizationDomainOwnershipVerification: Sendable {
+public struct OrganizationDomainOwnershipVerification: Hashable, Sendable {
   public let `status`: OrganizationDomainOwnershipVerificationStatus
   public let `strategy`: OrganizationDomainOwnershipVerificationStrategy
   public let `attempts`: Double?
@@ -1285,7 +1285,7 @@ public enum OrganizationDomainOwnershipVerificationStrategy: Hashable, Sendable 
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OrganizationDomainOwnershipVerificationStrategy { .init(rawValue: try value.string()) }
 }
 
-public struct PrepareAffiliationVerificationParams: Sendable {
+public struct PrepareAffiliationVerificationParams: Hashable, Sendable {
   public let `affiliationEmailAddress`: String
   public init(`affiliationEmailAddress`: String) {
     self.`affiliationEmailAddress` = `affiliationEmailAddress`
@@ -1303,7 +1303,7 @@ public struct PrepareAffiliationVerificationParams: Sendable {
   }
 }
 
-public struct AttemptAffiliationVerificationParams: Sendable {
+public struct AttemptAffiliationVerificationParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -1321,7 +1321,7 @@ public struct AttemptAffiliationVerificationParams: Sendable {
   }
 }
 
-public struct UpdateEnrollmentModeParams: Sendable {
+public struct UpdateEnrollmentModeParams: Hashable, Sendable {
   public let `enrollmentMode`: OrganizationEnrollmentMode
   public let `deletePending`: Bool?
   public init(`enrollmentMode`: OrganizationEnrollmentMode, `deletePending`: Bool? = nil) {
@@ -1342,7 +1342,7 @@ public struct UpdateEnrollmentModeParams: Sendable {
   }
 }
 
-public struct GetMembershipRequestParams: Sendable {
+public struct GetMembershipRequestParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public let `status`: OrganizationInvitationStatus?
@@ -1370,7 +1370,7 @@ public struct GetMembershipRequestParams: Sendable {
 /// 
 /// > [!TIP]
 /// > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
-public struct ClerkPaginatedResponseOrganizationMembershipRequest: Sendable {
+public struct ClerkPaginatedResponseOrganizationMembershipRequest: Hashable, Sendable {
   public let `data`: [OrganizationMembershipRequest]
   public let `totalCount`: Double
   public init(`data`: [OrganizationMembershipRequest], `totalCount`: Double) {
@@ -1392,7 +1392,7 @@ public struct ClerkPaginatedResponseOrganizationMembershipRequest: Sendable {
 }
 
 /// The `OrganizationMembershipRequest` object is the model that describes [the request of a user to join an Organization](https://clerk.com/docs/guides/organizations/add-members/verified-domains#membership-requests).
-public struct OrganizationMembershipRequestState: Sendable {
+public struct OrganizationMembershipRequestState: Hashable, Sendable {
   public let `id`: String
   public let `organizationId`: String
   public let `status`: OrganizationInvitationStatus
@@ -1459,7 +1459,7 @@ public struct OrganizationMembershipRequestState: Sendable {
   }
 }
 
-public struct AddMemberParams: Sendable {
+public struct AddMemberParams: Hashable, Sendable {
   public let `userId`: String
   public let `role`: String
   public init(`userId`: String, `role`: String) {
@@ -1480,7 +1480,7 @@ public struct AddMemberParams: Sendable {
   }
 }
 
-public struct InviteMemberParams: Sendable {
+public struct InviteMemberParams: Hashable, Sendable {
   public let `emailAddress`: String
   public let `role`: String
   public init(`emailAddress`: String, `role`: String) {
@@ -1501,7 +1501,7 @@ public struct InviteMemberParams: Sendable {
   }
 }
 
-public struct InviteMembersParams: Sendable {
+public struct InviteMembersParams: Hashable, Sendable {
   public let `emailAddresses`: [String]
   public let `role`: String
   public init(`emailAddresses`: [String], `role`: String) {
@@ -1522,7 +1522,7 @@ public struct InviteMembersParams: Sendable {
   }
 }
 
-public struct UpdateMembershipParams: Sendable {
+public struct UpdateMembershipParams: Hashable, Sendable {
   public let `userId`: String
   public let `role`: String
   public init(`userId`: String, `role`: String) {
@@ -1544,7 +1544,7 @@ public struct UpdateMembershipParams: Sendable {
 }
 
 /// From T, pick a set of properties whose keys are in the union K
-public struct PickCreateOrganizationDomainParamsAndenrollmentMode: Sendable {
+public struct PickCreateOrganizationDomainParamsAndenrollmentMode: Hashable, Sendable {
   public let `enrollmentMode`: OrganizationEnrollmentMode?
   public init(`enrollmentMode`: OrganizationEnrollmentMode? = nil) {
     self.`enrollmentMode` = `enrollmentMode`
@@ -1563,7 +1563,7 @@ public struct PickCreateOrganizationDomainParamsAndenrollmentMode: Sendable {
 }
 
 /// The `OrganizationDomainsBulkOwnershipVerificationResource` object is the result of a bulk ownership verification flow, such as [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#prepare-ownership-verification) or [`attemptOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#attempt-ownership-verification), where ownership is verified for several of an Organization's [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) at once. Because the operation can partially succeed, each requested domain is reported in either `data` or `errors`.
-public struct OrganizationDomainsBulkOwnershipVerification: Sendable {
+public struct OrganizationDomainsBulkOwnershipVerification: Hashable, Sendable {
   public let `data`: [OrganizationDomain]
   public let `errors`: [OrganizationDomainBulkOwnershipVerificationError]
   public init(`data`: [OrganizationDomain], `errors`: [OrganizationDomainBulkOwnershipVerificationError]) {
@@ -1584,7 +1584,7 @@ public struct OrganizationDomainsBulkOwnershipVerification: Sendable {
   }
 }
 
-public struct OrganizationDomainBulkOwnershipVerificationError: Sendable {
+public struct OrganizationDomainBulkOwnershipVerificationError: Hashable, Sendable {
   public let `id`: String
   public let `code`: String
   public init(`id`: String, `code`: String) {
@@ -1605,7 +1605,7 @@ public struct OrganizationDomainBulkOwnershipVerificationError: Sendable {
   }
 }
 
-public struct OrganizationGetDomain__0: Sendable {
+public struct OrganizationGetDomain__0: Hashable, Sendable {
   public let `domainId`: String
   public init(`domainId`: String) {
     self.`domainId` = `domainId`
@@ -1623,7 +1623,7 @@ public struct OrganizationGetDomain__0: Sendable {
   }
 }
 
-public struct GetEnterpriseConnectionsParams: Sendable {
+public struct GetEnterpriseConnectionsParams: Hashable, Sendable {
   public let `withOrganizationAccountLinking`: Bool?
   public init(`withOrganizationAccountLinking`: Bool? = nil) {
     self.`withOrganizationAccountLinking` = `withOrganizationAccountLinking`
@@ -1641,7 +1641,7 @@ public struct GetEnterpriseConnectionsParams: Sendable {
   }
 }
 
-public struct EnterpriseConnectionState: Sendable {
+public struct EnterpriseConnectionState: Hashable, Sendable {
   public let `id`: String
   public let `name`: String
   public let `active`: Bool
@@ -1732,7 +1732,7 @@ public struct EnterpriseConnectionState: Sendable {
   }
 }
 
-public struct EnterpriseOAuthConfig: Sendable {
+public struct EnterpriseOAuthConfig: Hashable, Sendable {
   public let `id`: String
   public let `name`: String
   public let `clientId`: String
@@ -1786,7 +1786,7 @@ public struct EnterpriseOAuthConfig: Sendable {
   }
 }
 
-public struct EnterpriseSamlConnectionNested: Sendable {
+public struct EnterpriseSamlConnectionNested: Hashable, Sendable {
   public let `id`: String
   public let `name`: String
   public let `active`: Bool
@@ -1849,7 +1849,7 @@ public struct EnterpriseSamlConnectionNested: Sendable {
   }
 }
 
-public struct CreateOrganizationEnterpriseConnectionParams: Sendable {
+public struct CreateOrganizationEnterpriseConnectionParams: Hashable, Sendable {
   public let `provider`: OrganizationEnterpriseConnectionProvider
   public let `name`: String?
   public let `domains`: [String]?
@@ -1919,7 +1919,7 @@ public enum OrganizationEnterpriseConnectionProvider: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OrganizationEnterpriseConnectionProvider { .init(rawValue: try value.string()) }
 }
 
-public struct OrganizationEnterpriseConnectionSamlInput: Sendable {
+public struct OrganizationEnterpriseConnectionSamlInput: Hashable, Sendable {
   public let `idpEntityId`: Field<String>
   public let `idpSsoUrl`: Field<String>
   public let `idpCertificate`: Field<String>
@@ -1961,7 +1961,7 @@ public struct OrganizationEnterpriseConnectionSamlInput: Sendable {
   }
 }
 
-public struct OrganizationEnterpriseConnectionOidcInput: Sendable {
+public struct OrganizationEnterpriseConnectionOidcInput: Hashable, Sendable {
   public let `clientId`: Field<String>
   public let `clientSecret`: Field<String>
   public let `discoveryUrl`: Field<String>
@@ -1997,7 +1997,7 @@ public struct OrganizationEnterpriseConnectionOidcInput: Sendable {
   }
 }
 
-public struct UpdateOrganizationEnterpriseConnectionParams: Sendable {
+public struct UpdateOrganizationEnterpriseConnectionParams: Hashable, Sendable {
   public let `name`: Field<String>
   public let `domains`: [String]?
   public let `active`: Field<Bool>
@@ -2040,7 +2040,7 @@ public struct UpdateOrganizationEnterpriseConnectionParams: Sendable {
 }
 
 /// The `DeletedObjectResource` type represents an item that has been deleted from the database.
-public struct DeletedObject: Sendable {
+public struct DeletedObject: Hashable, Sendable {
   public let `object`: String
   public let `id`: String?
   public let `slug`: String?
@@ -2067,7 +2067,7 @@ public struct DeletedObject: Sendable {
   }
 }
 
-public struct EnterpriseConnectionTestRunInit: Sendable {
+public struct EnterpriseConnectionTestRunInit: Hashable, Sendable {
   public let `url`: String
   public init(`url`: String) {
     self.`url` = `url`
@@ -2085,7 +2085,7 @@ public struct EnterpriseConnectionTestRunInit: Sendable {
   }
 }
 
-public struct GetEnterpriseConnectionTestRunsParams: Sendable {
+public struct GetEnterpriseConnectionTestRunsParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public let `status`: [EnterpriseConnectionTestRunStatus]?
@@ -2138,7 +2138,7 @@ public enum EnterpriseConnectionTestRunStatus: Hashable, Sendable {
 /// 
 /// > [!TIP]
 /// > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
-public struct ClerkPaginatedResponseEnterpriseConnectionTestRun: Sendable {
+public struct ClerkPaginatedResponseEnterpriseConnectionTestRun: Hashable, Sendable {
   public let `data`: [EnterpriseConnectionTestRun]
   public let `totalCount`: Double
   public init(`data`: [EnterpriseConnectionTestRun], `totalCount`: Double) {
@@ -2159,7 +2159,7 @@ public struct ClerkPaginatedResponseEnterpriseConnectionTestRun: Sendable {
   }
 }
 
-public struct EnterpriseConnectionTestRunState: Sendable {
+public struct EnterpriseConnectionTestRunState: Hashable, Sendable {
   public let `id`: String
   public let `status`: String
   public let `connectionType`: EnterpriseConnectionTestRunConnectionType
@@ -2244,7 +2244,7 @@ public enum EnterpriseConnectionTestRunConnectionType: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> EnterpriseConnectionTestRunConnectionType { .init(rawValue: try value.string()) }
 }
 
-public struct EnterpriseConnectionTestRunParsedUserInfo: Sendable {
+public struct EnterpriseConnectionTestRunParsedUserInfo: Hashable, Sendable {
   public let `emailAddress`: String?
   public let `firstName`: String?
   public let `lastName`: String?
@@ -2271,7 +2271,7 @@ public struct EnterpriseConnectionTestRunParsedUserInfo: Sendable {
   }
 }
 
-public struct EnterpriseConnectionTestRunLog: Sendable {
+public struct EnterpriseConnectionTestRunLog: Hashable, Sendable {
   public let `level`: String?
   public let `code`: String?
   public let `shortMessage`: String?
@@ -2298,7 +2298,7 @@ public struct EnterpriseConnectionTestRunLog: Sendable {
   }
 }
 
-public struct EnterpriseConnectionTestRunSamlPayload: Sendable {
+public struct EnterpriseConnectionTestRunSamlPayload: Hashable, Sendable {
   public let `samlRequest`: String?
   public let `samlResponse`: String?
   public let `relayState`: String?
@@ -2322,7 +2322,7 @@ public struct EnterpriseConnectionTestRunSamlPayload: Sendable {
   }
 }
 
-public struct EnterpriseConnectionTestRunOauthPayload: Sendable {
+public struct EnterpriseConnectionTestRunOauthPayload: Hashable, Sendable {
   public let `userInfo`: String?
   public init(`userInfo`: String? = nil) {
     self.`userInfo` = `userInfo`
@@ -2340,7 +2340,7 @@ public struct EnterpriseConnectionTestRunOauthPayload: Sendable {
   }
 }
 
-public struct SetOrganizationLogoParams: Sendable {
+public struct SetOrganizationLogoParams: Hashable, Sendable {
   public let `file`: SetOrganizationLogoParamsFile?
   public init(`file`: SetOrganizationLogoParamsFile?) {
     self.`file` = `file`
@@ -2358,7 +2358,7 @@ public struct SetOrganizationLogoParams: Sendable {
   }
 }
 
-public indirect enum SetOrganizationLogoParamsFile: Sendable {
+public indirect enum SetOrganizationLogoParamsFile: Hashable, Sendable {
   case case1(String)
   case case2(UploadFile)
   case case3(UploadFile)
@@ -2381,7 +2381,7 @@ public indirect enum SetOrganizationLogoParamsFile: Sendable {
   }
 }
 
-public struct InitializePaymentMethodParams: Sendable {
+public struct InitializePaymentMethodParams: Hashable, Sendable {
   public var `gateway`: String { "stripe" }
   public init() {
 
@@ -2400,7 +2400,7 @@ public struct InitializePaymentMethodParams: Sendable {
 }
 
 /// The `BillingInitializedPaymentMethodResource` type represents a payment method that has been initialized for checkout session.
-public struct BillingInitializedPaymentMethodState: Sendable {
+public struct BillingInitializedPaymentMethodState: Hashable, Sendable {
   public let `externalClientSecret`: String
   public let `externalGatewayId`: String
   public let `paymentMethodOrder`: [String]
@@ -2447,7 +2447,7 @@ public struct BillingInitializedPaymentMethodState: Sendable {
   }
 }
 
-public struct AddPaymentMethodParams: Sendable {
+public struct AddPaymentMethodParams: Hashable, Sendable {
   public var `gateway`: String { "stripe" }
   public let `paymentToken`: String
   public init(`paymentToken`: String) {
@@ -2468,7 +2468,7 @@ public struct AddPaymentMethodParams: Sendable {
 }
 
 /// The `BillingPaymentMethodResource` type represents a payment method for a checkout session.
-public struct BillingPaymentMethodState: Sendable {
+public struct BillingPaymentMethodState: Hashable, Sendable {
   public let `id`: String
   public let `last4`: String?
   public let `paymentType`: String?
@@ -2591,7 +2591,7 @@ public enum BillingPaymentMethodStatus: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BillingPaymentMethodStatus { .init(rawValue: try value.string()) }
 }
 
-public struct BillingPaymentMethodRemoveParams: Sendable {
+public struct BillingPaymentMethodRemoveParams: Hashable, Sendable {
   public let `orgId`: String?
   public init(`orgId`: String? = nil) {
     self.`orgId` = `orgId`
@@ -2609,7 +2609,7 @@ public struct BillingPaymentMethodRemoveParams: Sendable {
   }
 }
 
-public struct GetPaymentMethodsParams: Sendable {
+public struct GetPaymentMethodsParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public init(`initialPage`: Double? = nil, `pageSize`: Double? = nil) {
@@ -2634,7 +2634,7 @@ public struct GetPaymentMethodsParams: Sendable {
 /// 
 /// > [!TIP]
 /// > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
-public struct ClerkPaginatedResponseBillingPaymentMethod: Sendable {
+public struct ClerkPaginatedResponseBillingPaymentMethod: Hashable, Sendable {
   public let `data`: [BillingPaymentMethod]
   public let `totalCount`: Double
   public init(`data`: [BillingPaymentMethod], `totalCount`: Double) {
@@ -2655,7 +2655,7 @@ public struct ClerkPaginatedResponseBillingPaymentMethod: Sendable {
   }
 }
 
-public struct MobileEnvironment: Sendable {
+public struct MobileEnvironment: Hashable, Sendable {
   public let `organizationSettings`: OrganizationSettings
   public let `authConfig`: AuthConfig
   public let `displayConfig`: DisplayConfig
@@ -2686,7 +2686,7 @@ public struct MobileEnvironment: Sendable {
 }
 
 /// The `OrganizationSettings` object holds the Organization-related settings configured for the instance.
-public struct OrganizationSettings: Sendable {
+public struct OrganizationSettings: Hashable, Sendable {
   public let `enabled`: Bool
   public let `maxAllowedMemberships`: Double
   public let `forceOrganizationSelection`: Bool
@@ -2725,7 +2725,7 @@ public struct OrganizationSettings: Sendable {
   }
 }
 
-public struct OrganizationSettingsActions: Sendable {
+public struct OrganizationSettingsActions: Hashable, Sendable {
   public let `adminDelete`: Bool
   public init(`adminDelete`: Bool) {
     self.`adminDelete` = `adminDelete`
@@ -2743,7 +2743,7 @@ public struct OrganizationSettingsActions: Sendable {
   }
 }
 
-public struct OrganizationSettingsDomains: Sendable {
+public struct OrganizationSettingsDomains: Hashable, Sendable {
   public let `enabled`: Bool
   public let `enrollmentModes`: [OrganizationEnrollmentMode]
   public let `defaultRole`: String?
@@ -2767,7 +2767,7 @@ public struct OrganizationSettingsDomains: Sendable {
   }
 }
 
-public struct OrganizationSettingsSlug: Sendable {
+public struct OrganizationSettingsSlug: Hashable, Sendable {
   public let `disabled`: Bool
   public init(`disabled`: Bool) {
     self.`disabled` = `disabled`
@@ -2785,7 +2785,7 @@ public struct OrganizationSettingsSlug: Sendable {
   }
 }
 
-public struct OrganizationSettingsOrganizationCreationDefaults: Sendable {
+public struct OrganizationSettingsOrganizationCreationDefaults: Hashable, Sendable {
   public let `enabled`: Bool
   public init(`enabled`: Bool) {
     self.`enabled` = `enabled`
@@ -2803,7 +2803,7 @@ public struct OrganizationSettingsOrganizationCreationDefaults: Sendable {
   }
 }
 
-public struct AuthConfig: Sendable {
+public struct AuthConfig: Hashable, Sendable {
   public let `singleSessionMode`: Bool
   public let `claimedAt`: Date?
   public let `reverification`: Bool
@@ -2858,7 +2858,7 @@ public enum PhoneCodeChannel: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PhoneCodeChannel { .init(rawValue: try value.string()) }
 }
 
-public struct DisplayConfig: Sendable {
+public struct DisplayConfig: Hashable, Sendable {
   public let `id`: String
   public let `afterSignInUrl`: String
   public let `afterSignOutAllUrl`: String
@@ -3131,7 +3131,7 @@ public enum PreferredSignInStrategy: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PreferredSignInStrategy { .init(rawValue: try value.string()) }
 }
 
-public struct DisplayThemeJSON: Sendable {
+public struct DisplayThemeJSON: Hashable, Sendable {
   public let `general`: DisplayThemeJSONGeneral
   public let `buttons`: DisplayThemeJSONButtons
   public let `accounts`: DisplayThemeJSONAccounts
@@ -3155,7 +3155,7 @@ public struct DisplayThemeJSON: Sendable {
   }
 }
 
-public struct DisplayThemeJSONGeneral: Sendable {
+public struct DisplayThemeJSONGeneral: Hashable, Sendable {
   public let `color`: String
   public let `backgroundColor`: Color
   public let `fontFamily`: String
@@ -3194,7 +3194,7 @@ public struct DisplayThemeJSONGeneral: Sendable {
   }
 }
 
-public indirect enum Color: Sendable {
+public indirect enum Color: Hashable, Sendable {
   case case1(String)
   case case2(HslaColor)
   case case3(RgbaColor)
@@ -3217,7 +3217,7 @@ public indirect enum Color: Sendable {
   }
 }
 
-public struct HslaColor: Sendable {
+public struct HslaColor: Hashable, Sendable {
   public let `h`: Double
   public let `s`: Double
   public let `l`: Double
@@ -3244,7 +3244,7 @@ public struct HslaColor: Sendable {
   }
 }
 
-public struct RgbaColor: Sendable {
+public struct RgbaColor: Hashable, Sendable {
   public let `r`: Double
   public let `g`: Double
   public let `b`: Double
@@ -3271,7 +3271,7 @@ public struct RgbaColor: Sendable {
   }
 }
 
-public struct DisplayThemeJSONButtons: Sendable {
+public struct DisplayThemeJSONButtons: Hashable, Sendable {
   public let `fontColor`: String
   public let `fontFamily`: String
   public let `fontWeight`: String
@@ -3295,7 +3295,7 @@ public struct DisplayThemeJSONButtons: Sendable {
   }
 }
 
-public struct DisplayThemeJSONAccounts: Sendable {
+public struct DisplayThemeJSONAccounts: Hashable, Sendable {
   public let `backgroundColor`: Color
   public init(`backgroundColor`: Color) {
     self.`backgroundColor` = `backgroundColor`
@@ -3313,7 +3313,7 @@ public struct DisplayThemeJSONAccounts: Sendable {
   }
 }
 
-public struct MobileUserSettings: Sendable {
+public struct MobileUserSettings: Hashable, Sendable {
   public let `enterpriseSSO`: EnterpriseSSOSettings
   public let `attributes`: Attributes
   public let `actions`: Actions
@@ -3379,7 +3379,7 @@ public struct MobileUserSettings: Sendable {
   }
 }
 
-public struct EnterpriseSSOSettings: Sendable {
+public struct EnterpriseSSOSettings: Hashable, Sendable {
   public let `enabled`: Bool
   public let `selfServeSso`: Bool
   public init(`enabled`: Bool, `selfServeSso`: Bool) {
@@ -3400,7 +3400,7 @@ public struct EnterpriseSSOSettings: Sendable {
   }
 }
 
-public struct Attributes: Sendable {
+public struct Attributes: Hashable, Sendable {
   public let `password`: AttributeData
   public let `emailAddress`: AttributeData
   public let `phoneNumber`: AttributeData
@@ -3445,7 +3445,7 @@ public struct Attributes: Sendable {
   }
 }
 
-public struct AttributeData: Sendable {
+public struct AttributeData: Hashable, Sendable {
   public let `enabled`: Bool
   public let `required`: Bool
   public let `immutable`: Bool?
@@ -3570,7 +3570,7 @@ public enum Attribute: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> Attribute { .init(rawValue: try value.string()) }
 }
 
-public struct Actions: Sendable {
+public struct Actions: Hashable, Sendable {
   public let `deleteSelf`: Bool
   public let `createOrganization`: Bool
   public init(`deleteSelf`: Bool, `createOrganization`: Bool) {
@@ -3591,7 +3591,7 @@ public struct Actions: Sendable {
   }
 }
 
-public struct SignInData: Sendable {
+public struct SignInData: Hashable, Sendable {
   public let `secondFactor`: SignInDataSecond_factor
   public init(`secondFactor`: SignInDataSecond_factor) {
     self.`secondFactor` = `secondFactor`
@@ -3609,7 +3609,7 @@ public struct SignInData: Sendable {
   }
 }
 
-public struct SignInDataSecond_factor: Sendable {
+public struct SignInDataSecond_factor: Hashable, Sendable {
   public let `required`: Bool
   public let `enabled`: Bool
   public init(`required`: Bool, `enabled`: Bool) {
@@ -3630,7 +3630,7 @@ public struct SignInDataSecond_factor: Sendable {
   }
 }
 
-public struct SignUpData: Sendable {
+public struct SignUpData: Hashable, Sendable {
   public let `allowlistOnly`: Bool
   public let `progressive`: Bool
   public let `captchaEnabled`: Bool
@@ -3688,7 +3688,7 @@ public enum SignUpModes: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignUpModes { .init(rawValue: try value.string()) }
 }
 
-public struct SignUpDataMfa: Sendable {
+public struct SignUpDataMfa: Hashable, Sendable {
   public let `required`: Bool
   public init(`required`: Bool) {
     self.`required` = `required`
@@ -3706,7 +3706,7 @@ public struct SignUpDataMfa: Sendable {
   }
 }
 
-public struct PasswordSettingsData: Sendable {
+public struct PasswordSettingsData: Hashable, Sendable {
   public let `allowedSpecialCharacters`: String
   public let `disableHibp`: Bool
   public let `minLength`: Double
@@ -3751,7 +3751,7 @@ public struct PasswordSettingsData: Sendable {
   }
 }
 
-public struct UsernameSettingsData: Sendable {
+public struct UsernameSettingsData: Hashable, Sendable {
   public let `minLength`: Double
   public let `maxLength`: Double
   public init(`minLength`: Double, `maxLength`: Double) {
@@ -3772,7 +3772,7 @@ public struct UsernameSettingsData: Sendable {
   }
 }
 
-public struct AttackProtectionData: Sendable {
+public struct AttackProtectionData: Hashable, Sendable {
   public let `enumerationProtection`: AttackProtectionDataEnumeration_protection
   public init(`enumerationProtection`: AttackProtectionDataEnumeration_protection) {
     self.`enumerationProtection` = `enumerationProtection`
@@ -3790,7 +3790,7 @@ public struct AttackProtectionData: Sendable {
   }
 }
 
-public struct AttackProtectionDataEnumeration_protection: Sendable {
+public struct AttackProtectionDataEnumeration_protection: Hashable, Sendable {
   public let `enabled`: Bool
   public init(`enabled`: Bool) {
     self.`enabled` = `enabled`
@@ -3808,7 +3808,7 @@ public struct AttackProtectionDataEnumeration_protection: Sendable {
   }
 }
 
-public struct PasskeySettingsData: Sendable {
+public struct PasskeySettingsData: Hashable, Sendable {
   public let `allowAutofill`: Bool
   public let `showSignInButton`: Bool
   public init(`allowAutofill`: Bool, `showSignInButton`: Bool) {
@@ -3861,7 +3861,7 @@ public enum MobileUserSettingsWeb3FirstFactorsElement: Hashable, Sendable {
 }
 
 /// Make all properties in T optional
-public struct PartialOAuthProviders: Sendable {
+public struct PartialOAuthProviders: Hashable, Sendable {
   public let `oauthFacebook`: OAuthProviderSettings?
   public let `oauthGoogle`: OAuthProviderSettings?
   public let `oauthHubspot`: OAuthProviderSettings?
@@ -3963,7 +3963,7 @@ public struct PartialOAuthProviders: Sendable {
   }
 }
 
-public struct OAuthProviderSettings: Sendable {
+public struct OAuthProviderSettings: Hashable, Sendable {
   public let `enabled`: Bool
   public let `required`: Bool
   public let `authenticatable`: Bool
@@ -4008,7 +4008,7 @@ public struct OAuthProviderSettings: Sendable {
 /// 
 /// > [!NOTE]
 /// > For more information regarding the different session states, see the [guide on session management](https://clerk.com/docs/guides/secure/session-options).
-public struct SessionState: Sendable {
+public struct SessionState: Hashable, Sendable {
   public let `id`: String
   public let `status`: SessionStatus
   public let `expireAt`: Date
@@ -4217,7 +4217,7 @@ public enum SessionStatus: Hashable, Sendable {
 }
 
 /// Represents the current pending task of a session.
-public struct SessionTask: Sendable {
+public struct SessionTask: Hashable, Sendable {
   public let `key`: SessionTaskKey
   public init(`key`: SessionTaskKey) {
     self.`key` = `key`
@@ -4265,7 +4265,7 @@ public enum SessionTaskKey: Hashable, Sendable {
 /// A user can be contacted at their primary email address or primary phone number. They can have more than one registered email address or phone number, but only one of them will be their primary email address (`User.primaryEmailAddress`) or primary phone number (`User.primaryPhoneNumber`). At the same time, a user can also have one or more external accounts by connecting to [social providers](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/overview) such as Google, Apple, Facebook, and many more (`User.externalAccounts`).
 /// 
 /// Finally, a `User` object holds profile data like the user's name, profile picture, and a set of [metadata](https://clerk.com/docs/guides/users/extending) that can be used internally to store arbitrary information. The metadata are split into `publicMetadata` and `privateMetadata`. Both types are set from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}, but public metadata can also be accessed from the [Frontend API](https://clerk.com/docs/reference/frontend-api){{ target: '_blank' }}.
-public struct UserState: Sendable {
+public struct UserState: Hashable, Sendable {
   public let `id`: String
   public let `externalId`: String?
   public let `primaryEmailAddressId`: String?
@@ -4619,7 +4619,7 @@ public struct UserState: Sendable {
   }
 }
 
-public struct EmailAddressState: Sendable {
+public struct EmailAddressState: Hashable, Sendable {
   public let `id`: String
   public let `emailAddress`: String
   public let `verification`: Verification
@@ -4706,7 +4706,7 @@ public struct EmailAddressState: Sendable {
   }
 }
 
-public struct VerificationState: Sendable {
+public struct VerificationState: Hashable, Sendable {
   public let `attempts`: Double?
   public let `error`: ClerkAPIError?
   public let `expireAt`: Date?
@@ -4775,7 +4775,7 @@ public struct VerificationState: Sendable {
 }
 
 /// An interface that represents an error returned by the Clerk API.
-public struct ClerkAPIError: Sendable {
+public struct ClerkAPIError: Hashable, Sendable {
   public let `code`: String
   public let `message`: String
   public let `longMessage`: String?
@@ -4802,7 +4802,7 @@ public struct ClerkAPIError: Sendable {
   }
 }
 
-public struct ClerkAPIErrorMeta: Sendable {
+public struct ClerkAPIErrorMeta: Hashable, Sendable {
   public let `paramName`: String?
   public let `sessionId`: String?
   public let `emailAddresses`: [String]?
@@ -4847,7 +4847,7 @@ public struct ClerkAPIErrorMeta: Sendable {
   }
 }
 
-public struct ClerkAPIErrorMetaZxcvbn: Sendable {
+public struct ClerkAPIErrorMetaZxcvbn: Hashable, Sendable {
   public let `suggestions`: [ClerkAPIErrorMetaZxcvbnSuggestionsElement]
   public init(`suggestions`: [ClerkAPIErrorMetaZxcvbnSuggestionsElement]) {
     self.`suggestions` = `suggestions`
@@ -4865,7 +4865,7 @@ public struct ClerkAPIErrorMetaZxcvbn: Sendable {
   }
 }
 
-public struct ClerkAPIErrorMetaZxcvbnSuggestionsElement: Sendable {
+public struct ClerkAPIErrorMetaZxcvbnSuggestionsElement: Hashable, Sendable {
   public let `code`: String
   public let `message`: String
   public init(`code`: String, `message`: String) {
@@ -4886,7 +4886,7 @@ public struct ClerkAPIErrorMetaZxcvbnSuggestionsElement: Sendable {
   }
 }
 
-public struct ClerkAPIErrorMetaPlan: Sendable {
+public struct ClerkAPIErrorMetaPlan: Hashable, Sendable {
   public let `amountFormatted`: String
   public let `annualMonthlyAmountFormatted`: String
   public let `currencySymbol`: String
@@ -4947,7 +4947,7 @@ public enum VerificationStatus: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> VerificationStatus { .init(rawValue: try value.string()) }
 }
 
-public struct IdentificationLinkState: Sendable {
+public struct IdentificationLinkState: Hashable, Sendable {
   public let `id`: String
   public let `type`: String
   public init(`id`: String, `type`: String) {
@@ -4986,7 +4986,7 @@ public struct IdentificationLinkState: Sendable {
   }
 }
 
-public indirect enum PrepareEmailAddressVerificationParams: Sendable {
+public indirect enum PrepareEmailAddressVerificationParams: Hashable, Sendable {
   case case1(EmailAddressPrepareVerificationParamsCase1)
   case case2(EmailAddressPrepareVerificationParamsCase2)
   @MainActor public var `strategy`: String {
@@ -5012,7 +5012,7 @@ public indirect enum PrepareEmailAddressVerificationParams: Sendable {
   }
 }
 
-public struct EmailAddressPrepareVerificationParamsCase1: Sendable {
+public struct EmailAddressPrepareVerificationParamsCase1: Hashable, Sendable {
   public var `strategy`: String { "email_code" }
   public init() {
 
@@ -5030,7 +5030,7 @@ public struct EmailAddressPrepareVerificationParamsCase1: Sendable {
   }
 }
 
-public struct EmailAddressPrepareVerificationParamsCase2: Sendable {
+public struct EmailAddressPrepareVerificationParamsCase2: Hashable, Sendable {
   public let `strategy`: EmailAddressPrepareVerificationParamsCase2Strategy
   public let `redirectUrl`: String
   public init(`strategy`: EmailAddressPrepareVerificationParamsCase2Strategy, `redirectUrl`: String) {
@@ -5073,7 +5073,7 @@ public enum EmailAddressPrepareVerificationParamsCase2Strategy: Hashable, Sendab
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> EmailAddressPrepareVerificationParamsCase2Strategy { .init(rawValue: try value.string()) }
 }
 
-public struct AttemptEmailAddressVerificationParams: Sendable {
+public struct AttemptEmailAddressVerificationParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -5091,7 +5091,7 @@ public struct AttemptEmailAddressVerificationParams: Sendable {
   }
 }
 
-public struct CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddressState: Sendable {
+public struct CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddressState: Hashable, Sendable {
 
   public init() {
 
@@ -5129,7 +5129,7 @@ public struct CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddressSt
   }
 }
 
-public struct StartEmailLinkFlowParams: Sendable {
+public struct StartEmailLinkFlowParams: Hashable, Sendable {
   public let `redirectUrl`: String
   public init(`redirectUrl`: String) {
     self.`redirectUrl` = `redirectUrl`
@@ -5147,7 +5147,7 @@ public struct StartEmailLinkFlowParams: Sendable {
   }
 }
 
-public struct CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddressState: Sendable {
+public struct CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddressState: Hashable, Sendable {
 
   public init() {
 
@@ -5185,7 +5185,7 @@ public struct CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsA
   }
 }
 
-public struct StartEnterpriseSSOLinkFlowParams: Sendable {
+public struct StartEnterpriseSSOLinkFlowParams: Hashable, Sendable {
   public let `redirectUrl`: String
   public init(`redirectUrl`: String) {
     self.`redirectUrl` = `redirectUrl`
@@ -5203,7 +5203,7 @@ public struct StartEnterpriseSSOLinkFlowParams: Sendable {
   }
 }
 
-public struct PhoneNumberState: Sendable {
+public struct PhoneNumberState: Hashable, Sendable {
   public let `id`: String
   public let `phoneNumber`: String
   public let `verification`: Verification
@@ -5294,7 +5294,7 @@ public struct PhoneNumberState: Sendable {
   }
 }
 
-public struct AttemptPhoneNumberVerificationParams: Sendable {
+public struct AttemptPhoneNumberVerificationParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -5312,7 +5312,7 @@ public struct AttemptPhoneNumberVerificationParams: Sendable {
   }
 }
 
-public struct SetReservedForSecondFactorParams: Sendable {
+public struct SetReservedForSecondFactorParams: Hashable, Sendable {
   public let `reserved`: Bool
   public init(`reserved`: Bool) {
     self.`reserved` = `reserved`
@@ -5330,7 +5330,7 @@ public struct SetReservedForSecondFactorParams: Sendable {
   }
 }
 
-public struct Web3WalletState: Sendable {
+public struct Web3WalletState: Hashable, Sendable {
   public let `id`: String
   public let `web3Wallet`: String
   public let `verification`: Verification
@@ -5399,7 +5399,7 @@ public struct Web3WalletState: Sendable {
   }
 }
 
-public struct PrepareWeb3WalletVerificationParams: Sendable {
+public struct PrepareWeb3WalletVerificationParams: Hashable, Sendable {
   public let `strategy`: MobileUserSettingsWeb3FirstFactorsElement
   public init(`strategy`: MobileUserSettingsWeb3FirstFactorsElement) {
     self.`strategy` = `strategy`
@@ -5417,7 +5417,7 @@ public struct PrepareWeb3WalletVerificationParams: Sendable {
   }
 }
 
-public struct AttemptWeb3WalletVerificationParams: Sendable {
+public struct AttemptWeb3WalletVerificationParams: Hashable, Sendable {
   public let `signature`: String
   public let `strategy`: MobileUserSettingsWeb3FirstFactorsElement?
   public init(`signature`: String, `strategy`: MobileUserSettingsWeb3FirstFactorsElement? = nil) {
@@ -5438,7 +5438,7 @@ public struct AttemptWeb3WalletVerificationParams: Sendable {
   }
 }
 
-public struct ExternalAccountState: Sendable {
+public struct ExternalAccountState: Hashable, Sendable {
   public let `id`: String
   public let `identificationId`: String
   public let `provider`: OAuthProvider
@@ -5654,7 +5654,7 @@ public enum OAuthProvider: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OAuthProvider { .init(rawValue: try value.string()) }
 }
 
-public struct ReauthorizeExternalAccountParams: Sendable {
+public struct ReauthorizeExternalAccountParams: Hashable, Sendable {
   public let `additionalScopes`: [String]?
   public let `redirectUrl`: String?
   public let `oidcPrompt`: String?
@@ -5681,7 +5681,7 @@ public struct ReauthorizeExternalAccountParams: Sendable {
   }
 }
 
-public struct EnterpriseAccountState: Sendable {
+public struct EnterpriseAccountState: Hashable, Sendable {
   public let `active`: Bool
   public let `emailAddress`: String
   public let `enterpriseConnection`: EnterpriseAccountConnection?
@@ -5769,7 +5769,7 @@ public struct EnterpriseAccountState: Sendable {
   }
 }
 
-public struct EnterpriseAccountConnectionState: Sendable {
+public struct EnterpriseAccountConnectionState: Hashable, Sendable {
   public let `active`: Bool
   public let `allowIdpInitiated`: Bool
   public let `allowSubdomains`: Bool
@@ -5989,7 +5989,7 @@ public enum EnterpriseProvider: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> EnterpriseProvider { .init(rawValue: try value.string()) }
 }
 
-public struct PasskeyState: Sendable {
+public struct PasskeyState: Hashable, Sendable {
   public let `id`: String
   public let `name`: String?
   public let `verification`: PasskeyVerification?
@@ -6054,7 +6054,7 @@ public struct PasskeyState: Sendable {
   }
 }
 
-public struct PasskeyVerificationState: Sendable {
+public struct PasskeyVerificationState: Hashable, Sendable {
   public let `attempts`: Double?
   public let `error`: ClerkAPIError?
   public let `expireAt`: Date?
@@ -6123,7 +6123,7 @@ public struct PasskeyVerificationState: Sendable {
 }
 
 /// Make all properties in T optional
-public struct Partialtype: Sendable {
+public struct Partialtype: Hashable, Sendable {
   public let `name`: Field<String>
   public init(`name`: Field<String> = .omitted) {
     self.`name` = `name`
@@ -6141,7 +6141,7 @@ public struct Partialtype: Sendable {
   }
 }
 
-public struct UpdateUserParams: Sendable {
+public struct UpdateUserParams: Hashable, Sendable {
   public let `username`: Field<String>
   public let `firstName`: Field<String>
   public let `lastName`: Field<String>
@@ -6177,7 +6177,7 @@ public struct UpdateUserParams: Sendable {
   }
 }
 
-public struct UpdateUserMetadataParams: Sendable {
+public struct UpdateUserMetadataParams: Hashable, Sendable {
   public let `unsafeMetadata`: [String: JSONValue]
   public init(`unsafeMetadata`: [String: JSONValue]) {
     self.`unsafeMetadata` = `unsafeMetadata`
@@ -6195,7 +6195,7 @@ public struct UpdateUserMetadataParams: Sendable {
   }
 }
 
-public struct UpdateUserPasswordParams: Sendable {
+public struct UpdateUserPasswordParams: Hashable, Sendable {
   public let `newPassword`: String
   public let `currentPassword`: String?
   public let `signOutOfOtherSessions`: Bool?
@@ -6219,7 +6219,7 @@ public struct UpdateUserPasswordParams: Sendable {
   }
 }
 
-public struct RemoveUserPasswordParams: Sendable {
+public struct RemoveUserPasswordParams: Hashable, Sendable {
   public let `currentPassword`: String?
   public init(`currentPassword`: String? = nil) {
     self.`currentPassword` = `currentPassword`
@@ -6237,7 +6237,7 @@ public struct RemoveUserPasswordParams: Sendable {
   }
 }
 
-public struct CreateEmailAddressParams: Sendable {
+public struct CreateEmailAddressParams: Hashable, Sendable {
   public let `email`: String
   public init(`email`: String) {
     self.`email` = `email`
@@ -6255,7 +6255,7 @@ public struct CreateEmailAddressParams: Sendable {
   }
 }
 
-public struct CreatePhoneNumberParams: Sendable {
+public struct CreatePhoneNumberParams: Hashable, Sendable {
   public let `phoneNumber`: String
   public init(`phoneNumber`: String) {
     self.`phoneNumber` = `phoneNumber`
@@ -6273,7 +6273,7 @@ public struct CreatePhoneNumberParams: Sendable {
   }
 }
 
-public struct CreateWeb3WalletParams: Sendable {
+public struct CreateWeb3WalletParams: Hashable, Sendable {
   public let `web3Wallet`: String
   public init(`web3Wallet`: String) {
     self.`web3Wallet` = `web3Wallet`
@@ -6291,7 +6291,7 @@ public struct CreateWeb3WalletParams: Sendable {
   }
 }
 
-public indirect enum UserIsPrimaryIdentificationIdent: Sendable {
+public indirect enum UserIsPrimaryIdentificationIdent: Hashable, Sendable {
   case case1(EmailAddress)
   case case2(PhoneNumber)
   case case3(Web3Wallet)
@@ -6321,7 +6321,7 @@ public indirect enum UserIsPrimaryIdentificationIdent: Sendable {
   }
 }
 
-public struct SessionWithActivitiesState: Sendable {
+public struct SessionWithActivitiesState: Hashable, Sendable {
   public let `id`: String
   public let `status`: String
   public let `expireAt`: Date
@@ -6385,7 +6385,7 @@ public struct SessionWithActivitiesState: Sendable {
   }
 }
 
-public struct SessionActivity: Sendable {
+public struct SessionActivity: Hashable, Sendable {
   public let `id`: String
   public let `browserName`: String?
   public let `browserVersion`: String?
@@ -6424,7 +6424,7 @@ public struct SessionActivity: Sendable {
   }
 }
 
-public struct SetProfileImageParams: Sendable {
+public struct SetProfileImageParams: Hashable, Sendable {
   public let `file`: SetOrganizationLogoParamsFile?
   public init(`file`: SetOrganizationLogoParamsFile?) {
     self.`file` = `file`
@@ -6443,7 +6443,7 @@ public struct SetProfileImageParams: Sendable {
 }
 
 /// Represents information about an image.
-public struct ImageState: Sendable {
+public struct ImageState: Hashable, Sendable {
   public let `id`: String?
   public let `name`: String?
   public let `publicUrl`: String?
@@ -6486,7 +6486,7 @@ public struct ImageState: Sendable {
   }
 }
 
-public struct CreateExternalAccountParams: Sendable {
+public struct CreateExternalAccountParams: Hashable, Sendable {
   public let `strategy`: OAuthStrategy?
   public let `enterpriseConnectionId`: String?
   public let `redirectUrl`: String?
@@ -6519,7 +6519,7 @@ public struct CreateExternalAccountParams: Sendable {
   }
 }
 
-public struct GetUserOrganizationMembershipParams: Sendable {
+public struct GetUserOrganizationMembershipParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public init(`initialPage`: Double? = nil, `pageSize`: Double? = nil) {
@@ -6540,7 +6540,7 @@ public struct GetUserOrganizationMembershipParams: Sendable {
   }
 }
 
-public struct GetUserOrganizationInvitationsParams: Sendable {
+public struct GetUserOrganizationInvitationsParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public let `status`: OrganizationInvitationStatus?
@@ -6568,7 +6568,7 @@ public struct GetUserOrganizationInvitationsParams: Sendable {
 /// 
 /// > [!TIP]
 /// > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
-public struct ClerkPaginatedResponseUserOrganizationInvitation: Sendable {
+public struct ClerkPaginatedResponseUserOrganizationInvitation: Hashable, Sendable {
   public let `data`: [UserOrganizationInvitation]
   public let `totalCount`: Double
   public init(`data`: [UserOrganizationInvitation], `totalCount`: Double) {
@@ -6590,7 +6590,7 @@ public struct ClerkPaginatedResponseUserOrganizationInvitation: Sendable {
 }
 
 /// The `OrganizationInvitation` object is the model around an organization invitation.
-public struct UserOrganizationInvitationState: Sendable {
+public struct UserOrganizationInvitationState: Hashable, Sendable {
   public let `id`: String
   public let `emailAddress`: String
   public let `publicOrganizationData`: UserOrganizationInvitationPublicOrganizationData
@@ -6658,7 +6658,7 @@ public struct UserOrganizationInvitationState: Sendable {
   }
 }
 
-public struct UserOrganizationInvitationPublicOrganizationData: Sendable {
+public struct UserOrganizationInvitationPublicOrganizationData: Hashable, Sendable {
   public let `hasImage`: Bool
   public let `imageUrl`: String
   public let `name`: String
@@ -6688,7 +6688,7 @@ public struct UserOrganizationInvitationPublicOrganizationData: Sendable {
   }
 }
 
-public struct GetUserOrganizationSuggestionsParams: Sendable {
+public struct GetUserOrganizationSuggestionsParams: Hashable, Sendable {
   public let `initialPage`: Double?
   public let `pageSize`: Double?
   public let `status`: GetUserOrganizationSuggestionsParamsStatus?
@@ -6712,7 +6712,7 @@ public struct GetUserOrganizationSuggestionsParams: Sendable {
   }
 }
 
-public indirect enum GetUserOrganizationSuggestionsParamsStatus: Sendable {
+public indirect enum GetUserOrganizationSuggestionsParamsStatus: Hashable, Sendable {
   case case1(String)
   case case2(String)
   case case3([OrganizationSuggestionStatus])
@@ -6761,7 +6761,7 @@ public enum OrganizationSuggestionStatus: Hashable, Sendable {
 /// 
 /// > [!TIP]
 /// > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
-public struct ClerkPaginatedResponseOrganizationSuggestion: Sendable {
+public struct ClerkPaginatedResponseOrganizationSuggestion: Hashable, Sendable {
   public let `data`: [OrganizationSuggestion]
   public let `totalCount`: Double
   public init(`data`: [OrganizationSuggestion], `totalCount`: Double) {
@@ -6783,7 +6783,7 @@ public struct ClerkPaginatedResponseOrganizationSuggestion: Sendable {
 }
 
 /// The `OrganizationSuggestion` object is the model around [a suggestion to join an Organization](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions).
-public struct OrganizationSuggestionState: Sendable {
+public struct OrganizationSuggestionState: Hashable, Sendable {
   public let `id`: String
   public let `publicOrganizationData`: OrganizationSuggestionPublicOrganizationData
   public let `status`: OrganizationSuggestionStatus
@@ -6840,7 +6840,7 @@ public struct OrganizationSuggestionState: Sendable {
   }
 }
 
-public struct OrganizationSuggestionPublicOrganizationData: Sendable {
+public struct OrganizationSuggestionPublicOrganizationData: Hashable, Sendable {
   public let `hasImage`: Bool
   public let `imageUrl`: String
   public let `name`: String
@@ -6871,7 +6871,7 @@ public struct OrganizationSuggestionPublicOrganizationData: Sendable {
 }
 
 /// The `OrganizationCreationDefaults` object holds the suggested default values to use when creating an Organization, along with an advisory surfacing a potential issue with the suggested defaults.
-public struct OrganizationCreationDefaultsState: Sendable {
+public struct OrganizationCreationDefaultsState: Hashable, Sendable {
   public let `advisory`: OrganizationCreationDefaultsAdvisory?
   public let `form`: OrganizationCreationDefaultsForm
   public let `id`: String?
@@ -6914,7 +6914,7 @@ public struct OrganizationCreationDefaultsState: Sendable {
   }
 }
 
-public struct OrganizationCreationDefaultsAdvisory: Sendable {
+public struct OrganizationCreationDefaultsAdvisory: Hashable, Sendable {
   public var `code`: String { "organization_already_exists" }
   public var `severity`: String { "warning" }
   public let `meta`: [String: String]
@@ -6937,7 +6937,7 @@ public struct OrganizationCreationDefaultsAdvisory: Sendable {
   }
 }
 
-public struct OrganizationCreationDefaultsForm: Sendable {
+public struct OrganizationCreationDefaultsForm: Hashable, Sendable {
   public let `name`: String
   public let `slug`: String
   public let `logo`: String?
@@ -6964,7 +6964,7 @@ public struct OrganizationCreationDefaultsForm: Sendable {
   }
 }
 
-public struct TOTP: Sendable {
+public struct TOTP: Hashable, Sendable {
   public let `id`: String
   public let `secret`: String?
   public let `uri`: String?
@@ -7000,7 +7000,7 @@ public struct TOTP: Sendable {
   }
 }
 
-public struct VerifyTOTPParams: Sendable {
+public struct VerifyTOTPParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -7018,7 +7018,7 @@ public struct VerifyTOTPParams: Sendable {
   }
 }
 
-public struct BackupCode: Sendable {
+public struct BackupCode: Hashable, Sendable {
   public let `id`: String
   public let `codes`: [String]
   public let `createdAt`: Date?
@@ -7045,7 +7045,7 @@ public struct BackupCode: Sendable {
   }
 }
 
-public struct SessionTouchParams: Sendable {
+public struct SessionTouchParams: Hashable, Sendable {
   public let `intent`: SessionTouchIntent?
   public init(`intent`: SessionTouchIntent? = nil) {
     self.`intent` = `intent`
@@ -7088,7 +7088,7 @@ public enum SessionTouchIntent: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SessionTouchIntent { .init(rawValue: try value.string()) }
 }
 
-public struct GetTokenOptions: Sendable {
+public struct GetTokenOptions: Hashable, Sendable {
   public let `organizationId`: String?
   public let `skipCache`: Bool?
   public let `template`: String?
@@ -7112,7 +7112,7 @@ public struct GetTokenOptions: Sendable {
   }
 }
 
-public indirect enum CheckAuthorizationParams: Sendable {
+public indirect enum CheckAuthorizationParams: Hashable, Sendable {
   case case1(SessionCheckAuthorizationIsAuthorizedParamsCase1)
   case case2(SessionCheckAuthorizationIsAuthorizedParamsCase2)
   case case3(SessionCheckAuthorizationIsAuthorizedParamsCase3)
@@ -7141,7 +7141,7 @@ public indirect enum CheckAuthorizationParams: Sendable {
   }
 }
 
-public struct SessionCheckAuthorizationIsAuthorizedParamsCase1: Sendable {
+public struct SessionCheckAuthorizationIsAuthorizedParamsCase1: Hashable, Sendable {
   public let `role`: String
   public let `reverification`: ReverificationConfig?
   public init(`role`: String, `reverification`: ReverificationConfig? = nil) {
@@ -7163,7 +7163,7 @@ public struct SessionCheckAuthorizationIsAuthorizedParamsCase1: Sendable {
 }
 
 /// The `ReverificationConfig` type has the following properties:
-public indirect enum ReverificationConfig: Sendable {
+public indirect enum ReverificationConfig: Hashable, Sendable {
   case case1(String)
   case case2(String)
   case case3(String)
@@ -7192,7 +7192,7 @@ public indirect enum ReverificationConfig: Sendable {
   }
 }
 
-public struct SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5: Sendable {
+public struct SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5: Hashable, Sendable {
   public let `level`: SessionVerificationLevel
   public let `afterMinutes`: Double
   public init(`level`: SessionVerificationLevel, `afterMinutes`: Double) {
@@ -7238,7 +7238,7 @@ public enum SessionVerificationLevel: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SessionVerificationLevel { .init(rawValue: try value.string()) }
 }
 
-public struct SessionCheckAuthorizationIsAuthorizedParamsCase2: Sendable {
+public struct SessionCheckAuthorizationIsAuthorizedParamsCase2: Hashable, Sendable {
   public let `permission`: String
   public let `reverification`: ReverificationConfig?
   public init(`permission`: String, `reverification`: ReverificationConfig? = nil) {
@@ -7259,7 +7259,7 @@ public struct SessionCheckAuthorizationIsAuthorizedParamsCase2: Sendable {
   }
 }
 
-public struct SessionCheckAuthorizationIsAuthorizedParamsCase3: Sendable {
+public struct SessionCheckAuthorizationIsAuthorizedParamsCase3: Hashable, Sendable {
   public let `feature`: String
   public let `reverification`: ReverificationConfig?
   public init(`feature`: String, `reverification`: ReverificationConfig? = nil) {
@@ -7280,7 +7280,7 @@ public struct SessionCheckAuthorizationIsAuthorizedParamsCase3: Sendable {
   }
 }
 
-public struct SessionCheckAuthorizationIsAuthorizedParamsCase4: Sendable {
+public struct SessionCheckAuthorizationIsAuthorizedParamsCase4: Hashable, Sendable {
   public let `plan`: String
   public let `reverification`: ReverificationConfig?
   public init(`plan`: String, `reverification`: ReverificationConfig? = nil) {
@@ -7301,7 +7301,7 @@ public struct SessionCheckAuthorizationIsAuthorizedParamsCase4: Sendable {
   }
 }
 
-public struct SessionCheckAuthorizationIsAuthorizedParamsCase5: Sendable {
+public struct SessionCheckAuthorizationIsAuthorizedParamsCase5: Hashable, Sendable {
   public let `reverification`: ReverificationConfig?
   public init(`reverification`: ReverificationConfig? = nil) {
     self.`reverification` = `reverification`
@@ -7319,7 +7319,7 @@ public struct SessionCheckAuthorizationIsAuthorizedParamsCase5: Sendable {
   }
 }
 
-public struct SessionVerifyCreateParams: Sendable {
+public struct SessionVerifyCreateParams: Hashable, Sendable {
   public let `level`: SessionVerificationLevel
   public init(`level`: SessionVerificationLevel) {
     self.`level` = `level`
@@ -7337,7 +7337,7 @@ public struct SessionVerifyCreateParams: Sendable {
   }
 }
 
-public struct SessionVerificationState: Sendable {
+public struct SessionVerificationState: Hashable, Sendable {
   public let `status`: SessionVerificationStatus
   public let `level`: SessionVerificationLevel
   public let `session`: Session
@@ -7425,7 +7425,7 @@ public enum SessionVerificationStatus: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SessionVerificationStatus { .init(rawValue: try value.string()) }
 }
 
-public indirect enum SessionVerificationFirstFactor: Sendable {
+public indirect enum SessionVerificationFirstFactor: Hashable, Sendable {
   case case1(EmailCodeFactor)
   case case2(PhoneCodeFactor)
   case case3(PasswordFactor)
@@ -7463,7 +7463,7 @@ public indirect enum SessionVerificationFirstFactor: Sendable {
   }
 }
 
-public struct EmailCodeFactor: Sendable {
+public struct EmailCodeFactor: Hashable, Sendable {
   public var `strategy`: String { "email_code" }
   public let `emailAddressId`: String
   public let `safeIdentifier`: String
@@ -7489,7 +7489,7 @@ public struct EmailCodeFactor: Sendable {
   }
 }
 
-public struct PhoneCodeFactor: Sendable {
+public struct PhoneCodeFactor: Hashable, Sendable {
   public var `strategy`: String { "phone_code" }
   public let `phoneNumberId`: String
   public let `safeIdentifier`: String
@@ -7521,7 +7521,7 @@ public struct PhoneCodeFactor: Sendable {
   }
 }
 
-public struct PasswordFactor: Sendable {
+public struct PasswordFactor: Hashable, Sendable {
   public var `strategy`: String { "password" }
   public init() {
 
@@ -7539,7 +7539,7 @@ public struct PasswordFactor: Sendable {
   }
 }
 
-public struct PasskeyFactor: Sendable {
+public struct PasskeyFactor: Hashable, Sendable {
   public var `strategy`: String { "passkey" }
   public init() {
 
@@ -7557,7 +7557,7 @@ public struct PasskeyFactor: Sendable {
   }
 }
 
-public struct EnterpriseSSOFactor: Sendable {
+public struct EnterpriseSSOFactor: Hashable, Sendable {
   public var `strategy`: String { "enterprise_sso" }
   public let `enterpriseConnectionId`: String?
   public let `enterpriseConnectionName`: String?
@@ -7580,7 +7580,7 @@ public struct EnterpriseSSOFactor: Sendable {
   }
 }
 
-public indirect enum SessionVerificationSecondFactor: Sendable {
+public indirect enum SessionVerificationSecondFactor: Hashable, Sendable {
   case case1(PhoneCodeFactor)
   case case2(TOTPFactor)
   case case3(BackupCodeFactor)
@@ -7610,7 +7610,7 @@ public indirect enum SessionVerificationSecondFactor: Sendable {
   }
 }
 
-public struct TOTPFactor: Sendable {
+public struct TOTPFactor: Hashable, Sendable {
   public var `strategy`: String { "totp" }
   public init() {
 
@@ -7628,7 +7628,7 @@ public struct TOTPFactor: Sendable {
   }
 }
 
-public struct BackupCodeFactor: Sendable {
+public struct BackupCodeFactor: Hashable, Sendable {
   public var `strategy`: String { "backup_code" }
   public init() {
 
@@ -7646,7 +7646,7 @@ public struct BackupCodeFactor: Sendable {
   }
 }
 
-public indirect enum SessionVerifyPrepareFirstFactorParams: Sendable {
+public indirect enum SessionVerifyPrepareFirstFactorParams: Hashable, Sendable {
   case case1(PasskeyFactor)
   case case2(EmailCodeConfig)
   case case3(PhoneCodeConfig)
@@ -7680,7 +7680,7 @@ public indirect enum SessionVerifyPrepareFirstFactorParams: Sendable {
   }
 }
 
-public struct EmailCodeConfig: Sendable {
+public struct EmailCodeConfig: Hashable, Sendable {
   public let `primary`: Bool?
   public let `emailAddressId`: String
   public var `strategy`: String { "email_code" }
@@ -7703,7 +7703,7 @@ public struct EmailCodeConfig: Sendable {
   }
 }
 
-public struct PhoneCodeConfig: Sendable {
+public struct PhoneCodeConfig: Hashable, Sendable {
   public let `primary`: Bool?
   public let `phoneNumberId`: String
   public var `strategy`: String { "phone_code" }
@@ -7733,7 +7733,7 @@ public struct PhoneCodeConfig: Sendable {
 }
 
 /// Construct a type with the properties of T except for those in type K.
-public struct OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl: Sendable {
+public struct OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl: Hashable, Sendable {
   public let `emailAddressId`: String?
   public var `strategy`: String { "enterprise_sso" }
   public let `enterpriseConnectionId`: String?
@@ -7765,7 +7765,7 @@ public struct OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl: Sendable {
   }
 }
 
-public indirect enum SessionVerifyAttemptFirstFactorParams: Sendable {
+public indirect enum SessionVerifyAttemptFirstFactorParams: Hashable, Sendable {
   case case1(EmailCodeAttempt)
   case case2(PhoneCodeAttempt)
   case case3(PasswordAttempt)
@@ -7799,7 +7799,7 @@ public indirect enum SessionVerifyAttemptFirstFactorParams: Sendable {
   }
 }
 
-public struct EmailCodeAttempt: Sendable {
+public struct EmailCodeAttempt: Hashable, Sendable {
   public var `strategy`: String { "email_code" }
   public let `code`: String
   public init(`code`: String) {
@@ -7819,7 +7819,7 @@ public struct EmailCodeAttempt: Sendable {
   }
 }
 
-public struct PhoneCodeAttempt: Sendable {
+public struct PhoneCodeAttempt: Hashable, Sendable {
   public var `strategy`: String { "phone_code" }
   public let `code`: String
   public init(`code`: String) {
@@ -7839,7 +7839,7 @@ public struct PhoneCodeAttempt: Sendable {
   }
 }
 
-public struct PasswordAttempt: Sendable {
+public struct PasswordAttempt: Hashable, Sendable {
   public var `strategy`: String { "password" }
   public let `password`: String
   public init(`password`: String) {
@@ -7859,7 +7859,7 @@ public struct PasswordAttempt: Sendable {
   }
 }
 
-public struct PasskeyAttempt: Sendable {
+public struct PasskeyAttempt: Hashable, Sendable {
   public var `strategy`: String { "passkey" }
   public let `publicKeyCredential`: PublicKeyCredentialWithAuthenticatorAssertionResponse
   public init(`publicKeyCredential`: PublicKeyCredentialWithAuthenticatorAssertionResponse) {
@@ -7879,7 +7879,7 @@ public struct PasskeyAttempt: Sendable {
   }
 }
 
-public struct PublicKeyCredentialWithAuthenticatorAssertionResponse: Sendable {
+public struct PublicKeyCredentialWithAuthenticatorAssertionResponse: Hashable, Sendable {
   public let `id`: String
   public let `authenticatorAttachment`: String?
   public let `rawId`: Data
@@ -7913,7 +7913,7 @@ public struct PublicKeyCredentialWithAuthenticatorAssertionResponse: Sendable {
 /// Available only in secure contexts.
 /// 
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAssertionResponse)
-public struct AuthenticatorAssertionResponse: Sendable {
+public struct AuthenticatorAssertionResponse: Hashable, Sendable {
   public let `authenticatorData`: Data
   public let `signature`: Data
   public let `userHandle`: Data?
@@ -7940,7 +7940,7 @@ public struct AuthenticatorAssertionResponse: Sendable {
   }
 }
 
-public struct PhoneCodeSecondFactorConfig: Sendable {
+public struct PhoneCodeSecondFactorConfig: Hashable, Sendable {
   public var `strategy`: String { "phone_code" }
   public let `phoneNumberId`: String?
   public init(`phoneNumberId`: String? = nil) {
@@ -7960,7 +7960,7 @@ public struct PhoneCodeSecondFactorConfig: Sendable {
   }
 }
 
-public indirect enum SessionVerifyAttemptSecondFactorParams: Sendable {
+public indirect enum SessionVerifyAttemptSecondFactorParams: Hashable, Sendable {
   case case1(PhoneCodeAttempt)
   case case2(TOTPAttempt)
   case case3(BackupCodeAttempt)
@@ -7997,7 +7997,7 @@ public indirect enum SessionVerifyAttemptSecondFactorParams: Sendable {
   }
 }
 
-public struct TOTPAttempt: Sendable {
+public struct TOTPAttempt: Hashable, Sendable {
   public var `strategy`: String { "totp" }
   public let `code`: String
   public init(`code`: String) {
@@ -8017,7 +8017,7 @@ public struct TOTPAttempt: Sendable {
   }
 }
 
-public struct BackupCodeAttempt: Sendable {
+public struct BackupCodeAttempt: Hashable, Sendable {
   public var `strategy`: String { "backup_code" }
   public let `code`: String
   public init(`code`: String) {
@@ -8038,7 +8038,7 @@ public struct BackupCodeAttempt: Sendable {
 }
 
 /// The `SignInFuture` class holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.
-public struct SignInState: Sendable {
+public struct SignInState: Hashable, Sendable {
   public let `id`: String?
   public let `supportedFirstFactors`: [SignInFirstFactor]
   public let `supportedSecondFactors`: [SignInSecondFactor]
@@ -8196,7 +8196,7 @@ public struct SignInState: Sendable {
   }
 }
 
-public indirect enum SignInFirstFactor: Sendable {
+public indirect enum SignInFirstFactor: Hashable, Sendable {
   case case1(EmailCodeFactor)
   case case2(PhoneCodeFactor)
   case case3(PasswordFactor)
@@ -8254,7 +8254,7 @@ public indirect enum SignInFirstFactor: Sendable {
   }
 }
 
-public struct EmailLinkFactor: Sendable {
+public struct EmailLinkFactor: Hashable, Sendable {
   public var `strategy`: String { "email_link" }
   public let `emailAddressId`: String
   public let `safeIdentifier`: String
@@ -8280,7 +8280,7 @@ public struct EmailLinkFactor: Sendable {
   }
 }
 
-public struct ResetPasswordPhoneCodeFactor: Sendable {
+public struct ResetPasswordPhoneCodeFactor: Hashable, Sendable {
   public var `strategy`: String { "reset_password_phone_code" }
   public let `phoneNumberId`: String
   public let `safeIdentifier`: String
@@ -8306,7 +8306,7 @@ public struct ResetPasswordPhoneCodeFactor: Sendable {
   }
 }
 
-public struct ResetPasswordEmailCodeFactor: Sendable {
+public struct ResetPasswordEmailCodeFactor: Hashable, Sendable {
   public var `strategy`: String { "reset_password_email_code" }
   public let `emailAddressId`: String
   public let `safeIdentifier`: String
@@ -8332,7 +8332,7 @@ public struct ResetPasswordEmailCodeFactor: Sendable {
   }
 }
 
-public struct Web3SignatureFactor: Sendable {
+public struct Web3SignatureFactor: Hashable, Sendable {
   public let `strategy`: MobileUserSettingsWeb3FirstFactorsElement
   public let `web3WalletId`: String
   public let `primary`: Bool?
@@ -8359,7 +8359,7 @@ public struct Web3SignatureFactor: Sendable {
   }
 }
 
-public struct OauthFactor: Sendable {
+public struct OauthFactor: Hashable, Sendable {
   public let `strategy`: OAuthStrategy
   public init(`strategy`: OAuthStrategy) {
     self.`strategy` = `strategy`
@@ -8377,7 +8377,7 @@ public struct OauthFactor: Sendable {
   }
 }
 
-public indirect enum SignInSecondFactor: Sendable {
+public indirect enum SignInSecondFactor: Hashable, Sendable {
   case case1(EmailCodeFactor)
   case case2(PhoneCodeFactor)
   case case3(TOTPFactor)
@@ -8452,7 +8452,7 @@ public enum SignInStatus: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInStatus { .init(rawValue: try value.string()) }
 }
 
-public struct SignInExistingSession: Sendable {
+public struct SignInExistingSession: Hashable, Sendable {
   public let `sessionId`: String
   public init(`sessionId`: String) {
     self.`sessionId` = `sessionId`
@@ -8470,7 +8470,7 @@ public struct SignInExistingSession: Sendable {
   }
 }
 
-public struct UserData: Sendable {
+public struct UserData: Hashable, Sendable {
   public let `firstName`: String?
   public let `lastName`: String?
   public let `imageUrl`: String?
@@ -8500,7 +8500,7 @@ public struct UserData: Sendable {
 /// A pending Clerk Protect challenge that must be completed before the current sign-in or sign-up attempt can continue.
 /// 
 /// This resource is only returned when Protect mid-flow challenges are enabled for the instance. When present, load the challenge SDK from `sdkUrl`, initialize it with `token` and `uiHints`, and submit the proof token returned by the SDK with `submitProtectCheck()`.
-public struct ProtectCheck: Sendable {
+public struct ProtectCheck: Hashable, Sendable {
   public var `status`: String { "pending" }
   public let `sdkUrl`: String
   public let `expiresAt`: Double?
@@ -8526,7 +8526,7 @@ public struct ProtectCheck: Sendable {
   }
 }
 
-public struct SignInCreateParams: Sendable {
+public struct SignInCreateParams: Hashable, Sendable {
   public let `identifier`: String?
   public let `password`: String?
   public let `strategy`: SignInCreateParamsStrategy?
@@ -8678,7 +8678,7 @@ public enum SignInCreateParamsStrategy: Hashable, Sendable {
 }
 
 /// Parameters for submitting a password to sign-in.
-public indirect enum SignInPasswordParams: Sendable {
+public indirect enum SignInPasswordParams: Hashable, Sendable {
   case case1(SignInPasswordParamsCase1)
   case case2(SignInPasswordParamsCase2)
   case case3(SignInPasswordParamsCase3)
@@ -8712,7 +8712,7 @@ public indirect enum SignInPasswordParams: Sendable {
   }
 }
 
-public struct SignInPasswordParamsCase1: Sendable {
+public struct SignInPasswordParamsCase1: Hashable, Sendable {
   public let `password`: String
   public let `identifier`: String
   public init(`password`: String, `identifier`: String) {
@@ -8733,7 +8733,7 @@ public struct SignInPasswordParamsCase1: Sendable {
   }
 }
 
-public struct SignInPasswordParamsCase2: Sendable {
+public struct SignInPasswordParamsCase2: Hashable, Sendable {
   public let `password`: String
   public let `emailAddress`: String
   public init(`password`: String, `emailAddress`: String) {
@@ -8754,7 +8754,7 @@ public struct SignInPasswordParamsCase2: Sendable {
   }
 }
 
-public struct SignInPasswordParamsCase3: Sendable {
+public struct SignInPasswordParamsCase3: Hashable, Sendable {
   public let `password`: String
   public let `phoneNumber`: String
   public init(`password`: String, `phoneNumber`: String) {
@@ -8775,7 +8775,7 @@ public struct SignInPasswordParamsCase3: Sendable {
   }
 }
 
-public struct SignInPasswordParamsCase4: Sendable {
+public struct SignInPasswordParamsCase4: Hashable, Sendable {
   public let `password`: String
   public init(`password`: String) {
     self.`password` = `password`
@@ -8793,7 +8793,7 @@ public struct SignInPasswordParamsCase4: Sendable {
   }
 }
 
-public struct SignInEmailCodeState: Sendable {
+public struct SignInEmailCodeState: Hashable, Sendable {
 
   public init() {
 
@@ -8834,7 +8834,7 @@ public struct SignInEmailCodeState: Sendable {
 }
 
 /// Parameters for sending a sign-in email verification code.
-public indirect enum SignInEmailCodeSendParams: Sendable {
+public indirect enum SignInEmailCodeSendParams: Hashable, Sendable {
   case case1(SignInEmailCodeSendCodeParamsCase1)
   case case2(SignInEmailCodeSendCodeParamsCase2)
   @MainActor public func encode() throws -> JSONValue {
@@ -8854,7 +8854,7 @@ public indirect enum SignInEmailCodeSendParams: Sendable {
   }
 }
 
-public struct SignInEmailCodeSendCodeParamsCase1: Sendable {
+public struct SignInEmailCodeSendCodeParamsCase1: Hashable, Sendable {
   public let `emailAddress`: String?
   public init(`emailAddress`: String? = nil) {
     self.`emailAddress` = `emailAddress`
@@ -8872,7 +8872,7 @@ public struct SignInEmailCodeSendCodeParamsCase1: Sendable {
   }
 }
 
-public struct SignInEmailCodeSendCodeParamsCase2: Sendable {
+public struct SignInEmailCodeSendCodeParamsCase2: Hashable, Sendable {
   public let `emailAddressId`: String?
   public init(`emailAddressId`: String? = nil) {
     self.`emailAddressId` = `emailAddressId`
@@ -8890,7 +8890,7 @@ public struct SignInEmailCodeSendCodeParamsCase2: Sendable {
   }
 }
 
-public struct SignInEmailCodeVerifyParams: Sendable {
+public struct SignInEmailCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -8908,7 +8908,7 @@ public struct SignInEmailCodeVerifyParams: Sendable {
   }
 }
 
-public struct SignInEmailLinkState: Sendable {
+public struct SignInEmailLinkState: Hashable, Sendable {
   public let `verification`: SignInEmailLinkVerification?
   public init(`verification`: SignInEmailLinkVerification?) {
     self.`verification` = `verification`
@@ -8950,7 +8950,7 @@ public struct SignInEmailLinkState: Sendable {
 }
 
 /// Parameters for sending a sign-in email link.
-public indirect enum SignInEmailLinkSendParams: Sendable {
+public indirect enum SignInEmailLinkSendParams: Hashable, Sendable {
   case case1(SignInEmailLinkSendLinkParamsCase1)
   case case2(SignInEmailLinkSendLinkParamsCase2)
   @MainActor public var `verificationUrl`: String {
@@ -8976,7 +8976,7 @@ public indirect enum SignInEmailLinkSendParams: Sendable {
   }
 }
 
-public struct SignInEmailLinkSendLinkParamsCase1: Sendable {
+public struct SignInEmailLinkSendLinkParamsCase1: Hashable, Sendable {
   public let `verificationUrl`: String
   public let `emailAddress`: String?
   public init(`verificationUrl`: String, `emailAddress`: String? = nil) {
@@ -8997,7 +8997,7 @@ public struct SignInEmailLinkSendLinkParamsCase1: Sendable {
   }
 }
 
-public struct SignInEmailLinkSendLinkParamsCase2: Sendable {
+public struct SignInEmailLinkSendLinkParamsCase2: Hashable, Sendable {
   public let `verificationUrl`: String
   public let `emailAddressId`: String?
   public init(`verificationUrl`: String, `emailAddressId`: String? = nil) {
@@ -9018,7 +9018,7 @@ public struct SignInEmailLinkSendLinkParamsCase2: Sendable {
   }
 }
 
-public struct SignInEmailLinkVerification: Sendable {
+public struct SignInEmailLinkVerification: Hashable, Sendable {
   public let `status`: SignInEmailLinkVerificationStatus
   public let `createdSessionId`: String
   public let `verifiedFromTheSameClient`: Bool
@@ -9070,7 +9070,7 @@ public enum SignInEmailLinkVerificationStatus: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInEmailLinkVerificationStatus { .init(rawValue: try value.string()) }
 }
 
-public struct SignInPhoneCodeState: Sendable {
+public struct SignInPhoneCodeState: Hashable, Sendable {
 
   public init() {
 
@@ -9110,7 +9110,7 @@ public struct SignInPhoneCodeState: Sendable {
   }
 }
 
-public indirect enum SignInPhoneCodeSendParams: Sendable {
+public indirect enum SignInPhoneCodeSendParams: Hashable, Sendable {
   case case1(SignInPhoneCodeSendCodeParamsCase1)
   case case2(SignInPhoneCodeSendCodeParamsCase2)
   @MainActor public func encode() throws -> JSONValue {
@@ -9130,7 +9130,7 @@ public indirect enum SignInPhoneCodeSendParams: Sendable {
   }
 }
 
-public struct SignInPhoneCodeSendCodeParamsCase1: Sendable {
+public struct SignInPhoneCodeSendCodeParamsCase1: Hashable, Sendable {
   public let `channel`: PhoneCodeChannel?
   public let `phoneNumber`: String?
   public init(`channel`: PhoneCodeChannel? = nil, `phoneNumber`: String? = nil) {
@@ -9151,7 +9151,7 @@ public struct SignInPhoneCodeSendCodeParamsCase1: Sendable {
   }
 }
 
-public struct SignInPhoneCodeSendCodeParamsCase2: Sendable {
+public struct SignInPhoneCodeSendCodeParamsCase2: Hashable, Sendable {
   public let `channel`: PhoneCodeChannel?
   public let `phoneNumberId`: String
   public init(`channel`: PhoneCodeChannel? = nil, `phoneNumberId`: String) {
@@ -9172,7 +9172,7 @@ public struct SignInPhoneCodeSendCodeParamsCase2: Sendable {
   }
 }
 
-public struct SignInPhoneCodeVerifyParams: Sendable {
+public struct SignInPhoneCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -9190,7 +9190,7 @@ public struct SignInPhoneCodeVerifyParams: Sendable {
   }
 }
 
-public struct SignInResetPasswordEmailCodeState: Sendable {
+public struct SignInResetPasswordEmailCodeState: Hashable, Sendable {
 
   public init() {
 
@@ -9236,7 +9236,7 @@ public struct SignInResetPasswordEmailCodeState: Sendable {
   }
 }
 
-public struct SignInResetPasswordSubmitParams: Sendable {
+public struct SignInResetPasswordSubmitParams: Hashable, Sendable {
   public let `password`: String
   public let `signOutOfOtherSessions`: Bool?
   public init(`password`: String, `signOutOfOtherSessions`: Bool? = nil) {
@@ -9257,7 +9257,7 @@ public struct SignInResetPasswordSubmitParams: Sendable {
   }
 }
 
-public struct SignInResetPasswordPhoneCodeState: Sendable {
+public struct SignInResetPasswordPhoneCodeState: Hashable, Sendable {
 
   public init() {
 
@@ -9303,7 +9303,7 @@ public struct SignInResetPasswordPhoneCodeState: Sendable {
   }
 }
 
-public struct SignInResetPasswordPhoneCodeSendParams: Sendable {
+public struct SignInResetPasswordPhoneCodeSendParams: Hashable, Sendable {
   public let `phoneNumber`: String?
   public init(`phoneNumber`: String? = nil) {
     self.`phoneNumber` = `phoneNumber`
@@ -9321,7 +9321,7 @@ public struct SignInResetPasswordPhoneCodeSendParams: Sendable {
   }
 }
 
-public struct SignInResetPasswordPhoneCodeVerifyParams: Sendable {
+public struct SignInResetPasswordPhoneCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -9339,7 +9339,7 @@ public struct SignInResetPasswordPhoneCodeVerifyParams: Sendable {
   }
 }
 
-public struct SignInSSOParams: Sendable {
+public struct SignInSSOParams: Hashable, Sendable {
   public let `strategy`: SignInSSOParamsStrategy
   public let `oidcPrompt`: String?
   public let `enterpriseConnectionId`: String?
@@ -9472,7 +9472,7 @@ public enum SignInSSOParamsStrategy: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInSSOParamsStrategy { .init(rawValue: try value.string()) }
 }
 
-public struct SignInMfaState: Sendable {
+public struct SignInMfaState: Hashable, Sendable {
 
   public init() {
 
@@ -9536,7 +9536,7 @@ public struct SignInMfaState: Sendable {
   }
 }
 
-public struct SignInMFAPhoneCodeVerifyParams: Sendable {
+public struct SignInMFAPhoneCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -9554,7 +9554,7 @@ public struct SignInMFAPhoneCodeVerifyParams: Sendable {
   }
 }
 
-public struct SignInMFAEmailCodeVerifyParams: Sendable {
+public struct SignInMFAEmailCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -9572,7 +9572,7 @@ public struct SignInMFAEmailCodeVerifyParams: Sendable {
   }
 }
 
-public struct SignInTOTPVerifyParams: Sendable {
+public struct SignInTOTPVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -9590,7 +9590,7 @@ public struct SignInTOTPVerifyParams: Sendable {
   }
 }
 
-public struct SignInBackupCodeVerifyParams: Sendable {
+public struct SignInBackupCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -9608,7 +9608,7 @@ public struct SignInBackupCodeVerifyParams: Sendable {
   }
 }
 
-public struct SignInTicketParams: Sendable {
+public struct SignInTicketParams: Hashable, Sendable {
   public let `ticket`: String
   public init(`ticket`: String) {
     self.`ticket` = `ticket`
@@ -9626,7 +9626,7 @@ public struct SignInTicketParams: Sendable {
   }
 }
 
-public struct SignInPasskeyParams: Sendable {
+public struct SignInPasskeyParams: Hashable, Sendable {
   public let `flow`: SignInPasskeyParamsFlow?
   public init(`flow`: SignInPasskeyParamsFlow? = nil) {
     self.`flow` = `flow`
@@ -9666,7 +9666,7 @@ public enum SignInPasskeyParamsFlow: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInPasskeyParamsFlow { .init(rawValue: try value.string()) }
 }
 
-public struct SignInSubmitProtectCheckParams: Sendable {
+public struct SignInSubmitProtectCheckParams: Hashable, Sendable {
   public let `proofToken`: String
   public init(`proofToken`: String) {
     self.`proofToken` = `proofToken`
@@ -9685,7 +9685,7 @@ public struct SignInSubmitProtectCheckParams: Sendable {
 }
 
 /// The `SignUpFuture` class holds the state of the current sign-up attempt and provides methods to drive custom sign-up flows, including email/phone verification, password, SSO, ticket-based, and Web3-based account creation.
-public struct SignUpState: Sendable {
+public struct SignUpState: Hashable, Sendable {
   public let `id`: String?
   public let `status`: SignUpStatus
   public let `requiredFields`: [SignUpField]
@@ -10145,7 +10145,7 @@ public enum SignUpIdentificationField: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignUpIdentificationField { .init(rawValue: try value.string()) }
 }
 
-public struct SignUpExistingSession: Sendable {
+public struct SignUpExistingSession: Hashable, Sendable {
   public let `sessionId`: String
   public init(`sessionId`: String) {
     self.`sessionId` = `sessionId`
@@ -10163,7 +10163,7 @@ public struct SignUpExistingSession: Sendable {
   }
 }
 
-public struct SignUpCreateParams: Sendable {
+public struct SignUpCreateParams: Hashable, Sendable {
   public let `strategy`: SignUpCreateParamsStrategy?
   public let `emailAddress`: String?
   public let `phoneNumber`: String?
@@ -10335,7 +10335,7 @@ public enum SignUpCreateParamsStrategy: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignUpCreateParamsStrategy { .init(rawValue: try value.string()) }
 }
 
-public struct SignUpUpdateParams: Sendable {
+public struct SignUpUpdateParams: Hashable, Sendable {
   public let `emailAddress`: String?
   public let `phoneNumber`: String?
   public let `username`: String?
@@ -10375,7 +10375,7 @@ public struct SignUpUpdateParams: Sendable {
 }
 
 /// Contains information about the available verification strategies for a sign-up attempt.
-public struct SignUpVerificationsState: Sendable {
+public struct SignUpVerificationsState: Hashable, Sendable {
   public let `emailAddress`: SignUpVerification
   public let `phoneNumber`: SignUpVerification
   public let `web3Wallet`: Verification
@@ -10456,7 +10456,7 @@ public struct SignUpVerificationsState: Sendable {
   }
 }
 
-public struct SignUpVerificationState: Sendable {
+public struct SignUpVerificationState: Hashable, Sendable {
   public let `supportedStrategies`: [String]
   public let `nextAction`: String
   public let `attempts`: Double?
@@ -10532,7 +10532,7 @@ public struct SignUpVerificationState: Sendable {
   }
 }
 
-public struct SignUpVerificationsEmailLinkVerification: Sendable {
+public struct SignUpVerificationsEmailLinkVerification: Hashable, Sendable {
   public let `status`: SignInEmailLinkVerificationStatus
   public let `createdSessionId`: String
   public let `verifiedFromTheSameClient`: Bool
@@ -10556,7 +10556,7 @@ public struct SignUpVerificationsEmailLinkVerification: Sendable {
   }
 }
 
-public struct SignUpEmailCodeVerifyParams: Sendable {
+public struct SignUpEmailCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -10574,7 +10574,7 @@ public struct SignUpEmailCodeVerifyParams: Sendable {
   }
 }
 
-public struct SignUpEmailLinkSendParams: Sendable {
+public struct SignUpEmailLinkSendParams: Hashable, Sendable {
   public let `verificationUrl`: String
   public init(`verificationUrl`: String) {
     self.`verificationUrl` = `verificationUrl`
@@ -10592,7 +10592,7 @@ public struct SignUpEmailLinkSendParams: Sendable {
   }
 }
 
-public struct SignUpPhoneCodeSendParams: Sendable {
+public struct SignUpPhoneCodeSendParams: Hashable, Sendable {
   public let `channel`: PhoneCodeChannel?
   public init(`channel`: PhoneCodeChannel? = nil) {
     self.`channel` = `channel`
@@ -10610,7 +10610,7 @@ public struct SignUpPhoneCodeSendParams: Sendable {
   }
 }
 
-public struct SignUpPhoneCodeVerifyParams: Sendable {
+public struct SignUpPhoneCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
     self.`code` = `code`
@@ -10628,7 +10628,7 @@ public struct SignUpPhoneCodeVerifyParams: Sendable {
   }
 }
 
-public indirect enum SignUpPasswordParams: Sendable {
+public indirect enum SignUpPasswordParams: Hashable, Sendable {
   case case1(SignUpPasswordParamsCase1)
   case case2(SignUpPasswordParamsCase2)
   case case3(SignUpPasswordParamsCase3)
@@ -10662,7 +10662,7 @@ public indirect enum SignUpPasswordParams: Sendable {
   }
 }
 
-public struct SignUpPasswordParamsCase1: Sendable {
+public struct SignUpPasswordParamsCase1: Hashable, Sendable {
   public let `firstName`: String?
   public let `lastName`: String?
   public let `unsafeMetadata`: [String: JSONValue]?
@@ -10704,7 +10704,7 @@ public struct SignUpPasswordParamsCase1: Sendable {
   }
 }
 
-public struct SignUpPasswordParamsCase2: Sendable {
+public struct SignUpPasswordParamsCase2: Hashable, Sendable {
   public let `firstName`: String?
   public let `lastName`: String?
   public let `unsafeMetadata`: [String: JSONValue]?
@@ -10746,7 +10746,7 @@ public struct SignUpPasswordParamsCase2: Sendable {
   }
 }
 
-public struct SignUpPasswordParamsCase3: Sendable {
+public struct SignUpPasswordParamsCase3: Hashable, Sendable {
   public let `firstName`: String?
   public let `lastName`: String?
   public let `unsafeMetadata`: [String: JSONValue]?
@@ -10788,7 +10788,7 @@ public struct SignUpPasswordParamsCase3: Sendable {
   }
 }
 
-public struct SignUpPasswordParamsCase4: Sendable {
+public struct SignUpPasswordParamsCase4: Hashable, Sendable {
   public let `firstName`: String?
   public let `lastName`: String?
   public let `unsafeMetadata`: [String: JSONValue]?
@@ -10830,7 +10830,7 @@ public struct SignUpPasswordParamsCase4: Sendable {
   }
 }
 
-public struct SignUpSSOParams: Sendable {
+public struct SignUpSSOParams: Hashable, Sendable {
   public let `strategy`: String
   public let `oidcPrompt`: String?
   public let `enterpriseConnectionId`: String?
@@ -10872,7 +10872,7 @@ public struct SignUpSSOParams: Sendable {
   }
 }
 
-public struct SignUpTicketParams: Sendable {
+public struct SignUpTicketParams: Hashable, Sendable {
   public let `ticket`: String
   public let `firstName`: String?
   public let `lastName`: String?
@@ -10905,7 +10905,7 @@ public struct SignUpTicketParams: Sendable {
   }
 }
 
-public struct SignUpSubmitProtectCheckParams: Sendable {
+public struct SignUpSubmitProtectCheckParams: Hashable, Sendable {
   public let `proofToken`: String
   public init(`proofToken`: String) {
     self.`proofToken` = `proofToken`
@@ -10923,7 +10923,7 @@ public struct SignUpSubmitProtectCheckParams: Sendable {
   }
 }
 
-public struct MobileSetActiveParams: Sendable {
+public struct MobileSetActiveParams: Hashable, Sendable {
   public let `session`: Field<MobileSetActiveParamsSession>
   public let `organization`: Field<MobileSetActiveParamsOrganization>
   public init(`session`: Field<MobileSetActiveParamsSession> = .omitted, `organization`: Field<MobileSetActiveParamsOrganization> = .omitted) {
@@ -10944,7 +10944,7 @@ public struct MobileSetActiveParams: Sendable {
   }
 }
 
-public indirect enum MobileSetActiveParamsSession: Sendable {
+public indirect enum MobileSetActiveParamsSession: Hashable, Sendable {
   case case1(String)
   case case2(ActiveSession)
   case case3(PendingSession)
@@ -10969,7 +10969,7 @@ public indirect enum MobileSetActiveParamsSession: Sendable {
 
 /// Represents a session resource that has completed all pending tasks
 /// and authentication factors
-public struct ActiveSessionState: Sendable {
+public struct ActiveSessionState: Hashable, Sendable {
   public var `status`: String { "active" }
   public let `user`: User
   public let `id`: String
@@ -11136,7 +11136,7 @@ public struct ActiveSessionState: Sendable {
 }
 
 /// Represents a session resource that has completed sign-in but has pending tasks
-public struct PendingSessionState: Sendable {
+public struct PendingSessionState: Hashable, Sendable {
   public var `status`: String { "pending" }
   public let `user`: User
   public let `currentTask`: SessionTask
@@ -11302,7 +11302,7 @@ public struct PendingSessionState: Sendable {
   }
 }
 
-public indirect enum MobileSetActiveParamsOrganization: Sendable {
+public indirect enum MobileSetActiveParamsOrganization: Hashable, Sendable {
   case case1(String)
   case case2(Organization)
   @MainActor public func encode() throws -> JSONValue {
@@ -11322,7 +11322,7 @@ public indirect enum MobileSetActiveParamsOrganization: Sendable {
   }
 }
 
-public struct MobileSignOutOptions: Sendable {
+public struct MobileSignOutOptions: Hashable, Sendable {
   public let `sessionId`: String?
   public init(`sessionId`: String? = nil) {
     self.`sessionId` = `sessionId`
@@ -11340,7 +11340,7 @@ public struct MobileSignOutOptions: Sendable {
   }
 }
 
-public struct SessionFactorVerificationAgeValue: Sendable {
+public struct SessionFactorVerificationAgeValue: Hashable, Sendable {
   public let item0: Double
   public let item1: Double
   public init(item0: Double, item1: Double) { self.item0 = item0; self.item1 = item1 }
@@ -11352,7 +11352,7 @@ public struct SessionFactorVerificationAgeValue: Sendable {
   }
 }
 
-public struct ActiveSessionFactorVerificationAgeValue: Sendable {
+public struct ActiveSessionFactorVerificationAgeValue: Hashable, Sendable {
   public let item0: Double
   public let item1: Double
   public init(item0: Double, item1: Double) { self.item0 = item0; self.item1 = item1 }
@@ -11364,7 +11364,7 @@ public struct ActiveSessionFactorVerificationAgeValue: Sendable {
   }
 }
 
-public struct PendingSessionFactorVerificationAgeValue: Sendable {
+public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
   public let item0: Double
   public let item1: Double
   public init(item0: Double, item1: Double) { self.item0 = item0; self.item1 = item1 }
