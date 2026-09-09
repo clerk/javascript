@@ -1,3 +1,5 @@
+import type { EnvironmentResource } from '@clerk/shared/types';
+
 export class Client {
   static getOrCreateInstance() {
     return { fetch: async () => new Client() };
@@ -11,3 +13,6 @@ export class Environment {
   }
   constructor(_data?: unknown) {}
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- class/interface merge
+export interface Environment extends EnvironmentResource {}
