@@ -20,3 +20,7 @@ Continue reverification using the owning Session methods. Do not substitute Sess
 - Passkey credential data uses the supported typed/platform capability path, not an arbitrary pre-serialized string.
 
 The native migration audits identify the exact legacy assertions covered and retain the remaining tests.
+
+## Revocation and task state
+
+`test/session-revocation.test.mjs` exercises the generated `User.getSessions` / `SessionWithActivities.revoke` path. A selected-session revoke applies the accompanying client update, clears selection and invalidates the old selected handle; its returned revoked resource remains readable. Another session's revoke and a rejected revoke preserve selection. Known and future task keys remain pending and are preserved in both tasks and currentTask. A separate missing-user fixture confirms that canonical authorization denies feature, plan and reverification checks despite matching claims and fresh factors.
