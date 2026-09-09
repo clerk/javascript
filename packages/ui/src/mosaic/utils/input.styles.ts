@@ -59,8 +59,8 @@ export const inputStyles = stylex.create({
     borderColor: {
       default: colorVars['--cl-color-border'],
       ':where([data-invalid])': colorVars['--cl-color-negative'],
-      ':has(:focus-visible)': hoverBorderColor,
-      ':has(:focus-visible):where([data-invalid])': colorVars['--cl-color-negative'],
+      ':has(input:focus-visible, textarea:focus-visible)': hoverBorderColor,
+      ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': colorVars['--cl-color-negative'],
       '@media (hover: hover)': {
         ':hover:not([data-invalid])': hoverBorderColor,
       },
@@ -71,30 +71,30 @@ export const inputStyles = stylex.create({
       default: 'none',
       '@media (forced-colors: active)': {
         default: null,
-        ':has(:focus-visible)': '2px solid CanvasText',
+        ':has(input:focus-visible, textarea:focus-visible)': '2px solid CanvasText',
       },
     },
     backgroundColor: colorVars['--cl-color-input'],
     boxShadow: {
       default: null,
-      ':has(:focus-visible)': focusShadow,
-      ':has(:focus-visible):where([data-invalid])': invalidFocusShadow,
+      ':has(input:focus-visible, textarea:focus-visible)': focusShadow,
+      ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': invalidFocusShadow,
     },
     outlineOffset: {
       default: null,
       '@media (forced-colors: active)': {
         default: null,
-        ':has(:focus-visible)': '2px',
+        ':has(input:focus-visible, textarea:focus-visible)': '2px',
       },
     },
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
-      ':has(:focus-visible)': durationVars['--cl-duration-fast'],
+      ':has(input:focus-visible, textarea:focus-visible)': durationVars['--cl-duration-fast'],
     },
     transitionProperty: 'color, background-color, border-color, box-shadow',
     transitionTimingFunction: {
       default: 'linear',
-      ':has(:focus-visible)': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
+      ':has(input:focus-visible, textarea:focus-visible)': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
     },
   },
   disabled: {
