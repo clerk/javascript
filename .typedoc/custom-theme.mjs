@@ -446,7 +446,40 @@ function hasDefaultValuesForParameters(parameters) {
 }
 
 /**
- * Object shape for a parameter: inline `{ … }`, optional-wrapped, or reference to a type alias / interface.
+ * Collects string literal members from a type used as `Pick`'s key argument.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {string[] | undefined}
+ */
+function getPickPropertyNames(t) {
+  const unwrapped = unwrapOptional(t);
+  if (!unwrapped || typeof unwrapped !== 'object') {
+    return undefined;
+  }
+  if (unwrapped.type === 'literal') {
+    const literal = /** @type {import('typedoc').LiteralType} */ (unwrapped);
+    if (typeof literal.value === 'string') {
+      return [literal.value];
+    }
+    return undefined;
+  }
+  if (!isUnionTypeDoc(unwrapped)) {
+    return undefined;
+  }
+  const names = [];
+  const union = /** @type {import('typedoc').UnionType} */ (unwrapped);
+  for (const type of union.types) {
+    const nestedNames = getPickPropertyNames(type);
+    if (!nestedNames) {
+      return undefined;
+    }
+    names.push(...nestedNames);
+  }
+  return names;
+}
+
+/**
+ * Object shape for a parameter: inline `{ … }`, optional-wrapped, reference to a type alias / interface, or `Pick<T, K>` with literal keys.
  *
  * @param {import('typedoc').Type | undefined} t
  * @returns {import('typedoc').DeclarationReflection | undefined}
@@ -470,6 +503,33 @@ function getParameterObjectShapeDeclaration(t) {
   }
   if (o.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
+    if (ref.name === 'Pick' && ref.package === 'typescript' && ref.typeArguments?.length === 2) {
+      const [sourceType, keysType] = ref.typeArguments;
+      const propertyNames = getPickPropertyNames(keysType);
+      if (!propertyNames?.length) {
+        return undefined;
+      }
+      const sourceDecl = getParameterObjectShapeDeclaration(sourceType);
+      const sourceRef = sourceType.type === 'reference' ? sourceType.reflection : undefined;
+      const sourceWithChildren =
+        sourceDecl ??
+        (sourceRef && 'children' in sourceRef
+          ? /** @type {import('typedoc').DeclarationReflection} */ (sourceRef)
+          : undefined);
+      if (!sourceWithChildren?.children?.length) {
+        return undefined;
+      }
+      const selected = new Set(propertyNames);
+      const children = sourceWithChildren.children.filter(child => selected.has(child.name));
+      if (children.length !== selected.size) {
+        return undefined;
+      }
+      return /** @type {import('typedoc').DeclarationReflection} */ ({
+        ...sourceWithChildren,
+        kind: ReflectionKind.TypeLiteral,
+        children,
+      });
+    }
     const sym = ref.reflection;
     if (!sym) {
       return undefined;

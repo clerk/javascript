@@ -1,0 +1,21 @@
+### `createDomain()`
+
+Creates a new domain.
+
+Returns an [`OrganizationDomainResource`](/docs/reference/types/organization-domain-resource) object.
+
+> [!WARNING]
+> You must have [**Verified domains**](/docs/guides/organizations/add-members/verified-domains) enabled in your app's settings in the Clerk Dashboard.
+
+```typescript
+function createDomain(domainName: string, params?: Pick<CreateOrganizationDomainParams, "enrollmentMode">): Promise<OrganizationDomainResource>
+```
+
+#### Parameters
+
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `domainName` | `string` | The name of the domain to create. |
+| `params?` | `Pick`\<[`CreateOrganizationDomainParams`](#create-organization-domain-params), `"enrollmentMode"`\> | Optional parameters, including the `enrollmentMode` to assign to the new domain. |
+| `params?.enrollmentMode?` | <code>"manual_invitation" \| "automatic_invitation" \| "automatic_suggestion" \| "enterprise_sso"</code> | The enrollment mode that determines how matching users are added to the Organization. Defaults to `manual_invitation`. |
