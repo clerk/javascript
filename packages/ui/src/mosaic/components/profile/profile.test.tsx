@@ -141,7 +141,7 @@ describe('Profile', () => {
   // at any width; the compact query must hide it, or a phone shows the tablist over the page.
   it('hides the in-place navigation under the compact query', () => {
     const probe = stylex.create({
-      hidden: { display: { default: 'flex', [`@container cl-profile (width < ${breakpoints.phone})`]: 'none' } },
+      hidden: { display: { default: 'flex', [`@container (width < ${breakpoints.phone})`]: 'none' } },
     });
     renderSurface();
 

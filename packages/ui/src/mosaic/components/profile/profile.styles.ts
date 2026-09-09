@@ -13,12 +13,17 @@ import {
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 
 /**
- * The compact layout — navigation on top, as a row — queried against the profile's OWN width
- * rather than the window's, so the same surface collapses in a narrow layout slot, an inline
- * dialog, or a phone alike. A container cannot query itself, which is why the grid lives on an
- * inner element: the root is the container, the layout inside it is what the query reshapes.
+ * The compact layout, queried against the nearest container rather than the window: the root
+ * itself standalone or inline, so the same surface collapses in a narrow layout slot or an inline
+ * dialog alike — and over the page the dialog's viewport, since the root stops being a container
+ * there (`rootInDialog`). The popup floats inside an inset, so its content is always narrower than
+ * the screen; measured on its own the profile would collapse a step before the dialog filled the
+ * screen, and for that stretch stand frameless inside a floating popup. Reading the same box the
+ * dialog reads, the two change together. Unnamed on purpose: a name would bind it to one of them.
+ * A container cannot query itself, which is why the grid lives on an inner element: the root is
+ * the container, the layout inside it is what the query reshapes.
  */
-const compact = `@container cl-profile (width < ${breakpoints.phone})`;
+const compact = `@container (width < ${breakpoints.phone})`;
 
 /** How far the content's clip edge — and the scrollbar with it — sits inside the frame's corners. */
 const SCROLL_INSET = space['1.5'];
@@ -72,6 +77,9 @@ export const styles = stylex.create({
    * of its own to hand down, so the frame keeps its fixed one.
    */
   rootInDialog: {
+    // Not a container over the page: the compact query then reaches the dialog's viewport, and the
+    // profile collapses exactly when the dialog fills the screen — see `compact`.
+    containerType: 'normal',
     flexGrow: 1,
     minHeight: 0,
   },
