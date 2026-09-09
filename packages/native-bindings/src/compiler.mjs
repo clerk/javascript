@@ -29,6 +29,18 @@ export function compileProfile(repository, policy = profile) {
   const errorSymbol =
     errorSource?.symbol && checker.getExportsOfModule(errorSource.symbol).find(s => s.getName() === 'ClerkError');
   const clerkErrorType = errorSymbol && checker.getDeclaredTypeOfSymbol(errorSymbol);
+  const exportedAliases = new Map();
+  for (const source of program.getSourceFiles()) {
+    if (!source.fileName.startsWith(path.join(shared, 'src/types')) || !source.symbol) continue;
+    for (const symbol of checker.getExportsOfModule(source.symbol)) {
+      const declaration = symbol.declarations?.find(ts.isTypeAliasDeclaration);
+      if (!declaration || declaration.typeParameters?.length) continue;
+      const type = checker.getDeclaredTypeOfSymbol(symbol);
+      const aliases = exportedAliases.get(type.id) || [];
+      aliases.push(symbol);
+      exportedAliases.set(type.id, aliases);
+    }
+  }
   const definitions = {};
   const accounting = [];
   const names = new Map();
@@ -139,7 +151,12 @@ export function compileProfile(repository, policy = profile) {
         elements: checker.getTypeArguments(type).map((t, i) => lower(t, `${hint}Item${i}`, context)),
       };
     }
-    const symbol = type.aliasSymbol || type.getSymbol();
+    const underlyingSymbol = type.aliasSymbol || type.getSymbol();
+    const aliases = exportedAliases.get(type.id) || [];
+    const exportedAlias = ['Partial', 'Required', 'Readonly', 'Pick', 'Omit'].includes(underlyingSymbol?.getName())
+      ? aliases.find(symbol => symbol.getName() === hint) || (aliases.length === 1 ? aliases[0] : undefined)
+      : undefined;
+    const symbol = exportedAlias || underlyingSymbol;
     const symbolName = symbol?.getName();
     if (policy.jsonObjects.includes(symbolName)) return { kind: 'jsonObject' };
     if (type.objectFlags & ts.ObjectFlags.Mapped) {
@@ -213,8 +230,9 @@ export function compileProfile(repository, policy = profile) {
           value: lower(checker.getNonNullableType(type), hint, context),
         };
     }
-    const typeArguments =
-      type.aliasTypeArguments || (type.objectFlags & ts.ObjectFlags.Reference ? checker.getTypeArguments(type) : []);
+    const typeArguments = exportedAlias
+      ? []
+      : type.aliasTypeArguments || (type.objectFlags & ts.ObjectFlags.Reference ? checker.getTypeArguments(type) : []);
     const suffix = typeArguments.length
       ? typeArguments
           .map(t =>

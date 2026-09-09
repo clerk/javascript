@@ -172,3 +172,15 @@ test('unsupported pattern indices fail instead of disappearing from named object
   );
   assert.ok(model.failures.some(f => /Pattern or numeric index/.test(f.reason)));
 });
+
+test('utility-type parameters keep their exported contract alias', () => {
+  const model = compile(
+    source.replace('params: VerifyParams', 'params: UpdatePasskeyParams') +
+      'export type UpdatePasskeyParams = Partial<{ name: string | null }>;',
+  );
+  assert.deepEqual(model.failures, []);
+  const native = generateNative(model, { protocolVersion: 1, contractHash: 'fixture' });
+  assert.match(native['GeneratedAPI.swift'], /struct UpdatePasskeyParams/);
+  assert.match(native['GeneratedAPI.kt'], /class UpdatePasskeyParams/);
+  assert.doesNotMatch(native['GeneratedAPI.swift'], /Partialtype/);
+});

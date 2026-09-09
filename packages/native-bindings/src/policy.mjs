@@ -78,5 +78,9 @@ export const profile = {
 
 export function nativeName(name) {
   if (name === 'MobileClerk') return 'Clerk';
+  if (name === 'MobileEnvironment') return 'EnvironmentResource';
+  if (name === 'MobileUserSettings') return 'UserSettings';
+  if (name === 'ImageResource') return name;
+  if (name === 'Color') return 'DisplayThemeColor';
   return name.replaceAll('Future', '').replace(/Resource$/, '');
 }

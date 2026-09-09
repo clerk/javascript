@@ -460,7 +460,7 @@ export const operations = {
   "User.setProfileImage": {
     type: "User",
     parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"SetProfileImageParams"}}],
-    result: {"kind":"ref","name":"Image"},
+    result: {"kind":"ref","name":"ImageResource"},
     invoke: (target, args) => target["setProfileImage"](...args),
   },
   "User.createExternalAccount": {
@@ -829,10 +829,10 @@ export const operations = {
     result: {"kind":"ref","name":"SessionWithActivities"},
     invoke: (target, args) => target["reload"](...args),
   },
-  "Image.reload": {
-    type: "Image",
+  "ImageResource.reload": {
+    type: "ImageResource",
     parameters: [{"name":"p","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"ClerkResourceReloadParams"}}}],
-    result: {"kind":"ref","name":"Image"},
+    result: {"kind":"ref","name":"ImageResource"},
     invoke: (target, args) => target["reload"](...args),
   },
   "UserOrganizationInvitation.accept": {

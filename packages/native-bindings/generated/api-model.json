@@ -68,7 +68,7 @@
           "optional": false,
           "type": {
             "kind": "ref",
-            "name": "MobileEnvironment"
+            "name": "EnvironmentResource"
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
@@ -1975,10 +1975,10 @@
       "properties": [],
       "methods": [],
       "values": [
+        "expired",
         "pending",
         "accepted",
-        "revoked",
-        "expired"
+        "revoked"
       ],
       "open": false,
       "patterns": []
@@ -2582,8 +2582,8 @@
       "properties": [],
       "methods": [],
       "values": [
-        "system",
-        "user"
+        "user",
+        "system"
       ],
       "open": false,
       "patterns": []
@@ -2666,10 +2666,10 @@
       "properties": [],
       "methods": [],
       "values": [
+        "enterprise_sso",
         "manual_invitation",
         "automatic_invitation",
-        "automatic_suggestion",
-        "enterprise_sso"
+        "automatic_suggestion"
       ],
       "open": false,
       "patterns": []
@@ -3117,9 +3117,9 @@
       "methods": [],
       "values": [
         "expired",
+        "failed",
         "unverified",
-        "verified",
-        "failed"
+        "verified"
       ],
       "open": false,
       "patterns": []
@@ -4810,10 +4810,10 @@
       "properties": [],
       "methods": [],
       "values": [
-        "saml_custom",
         "saml_okta",
         "saml_google",
         "saml_microsoft",
+        "saml_custom",
         "oidc_custom",
         "oidc_github_enterprise",
         "oidc_gitlab"
@@ -6511,8 +6511,8 @@
       "properties": [],
       "methods": [],
       "values": [
-        "expired",
         "active",
+        "expired",
         "disconnected"
       ],
       "open": false,
@@ -6639,8 +6639,8 @@
       ],
       "methods": []
     },
-    "MobileEnvironment": {
-      "name": "MobileEnvironment",
+    "EnvironmentResource": {
+      "name": "EnvironmentResource",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
         "line": 18,
@@ -6704,7 +6704,7 @@
           "optional": false,
           "type": {
             "kind": "ref",
-            "name": "MobileUserSettings"
+            "name": "UserSettings"
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
@@ -7757,7 +7757,7 @@
           "optional": false,
           "type": {
             "kind": "ref",
-            "name": "Color"
+            "name": "DisplayThemeColor"
           },
           "source": {
             "file": "packages/shared/src/types/json.ts",
@@ -7841,8 +7841,8 @@
       ],
       "methods": []
     },
-    "Color": {
-      "name": "Color",
+    "DisplayThemeColor": {
+      "name": "DisplayThemeColor",
       "source": {
         "file": "packages/shared/src/types/theme.ts",
         "line": 30,
@@ -8058,7 +8058,7 @@
           "optional": false,
           "type": {
             "kind": "ref",
-            "name": "Color"
+            "name": "DisplayThemeColor"
           },
           "source": {
             "file": "packages/shared/src/types/json.ts",
@@ -8069,8 +8069,8 @@
       ],
       "methods": []
     },
-    "MobileUserSettings": {
-      "name": "MobileUserSettings",
+    "UserSettings": {
+      "name": "UserSettings",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
         "line": 14,
@@ -8115,31 +8115,31 @@
             },
             "keys": {
               "values": [
+                "passkey",
                 "password",
+                "backup_code",
                 "email_address",
                 "phone_number",
                 "username",
                 "first_name",
                 "last_name",
                 "web3_wallet",
-                "authenticator_app",
-                "backup_code",
-                "passkey"
+                "authenticator_app"
               ],
               "patterns": [],
               "open": false
             },
             "requiredKeys": [
+              "passkey",
               "password",
+              "backup_code",
               "email_address",
               "phone_number",
               "username",
               "first_name",
               "last_name",
               "web3_wallet",
-              "authenticator_app",
-              "backup_code",
-              "passkey"
+              "authenticator_app"
             ]
           },
           "source": {
@@ -8278,7 +8278,7 @@
             "kind": "array",
             "element": {
               "kind": "ref",
-              "name": "MobileUserSettingsWeb3FirstFactorsElement"
+              "name": "UserSettingsWeb3FirstFactorsElement"
             }
           },
           "source": {
@@ -8623,11 +8623,11 @@
       "properties": [],
       "methods": [],
       "values": [
-        "email_code",
-        "backup_code",
-        "email_link",
         "phone_code",
-        "totp"
+        "email_code",
+        "email_link",
+        "totp",
+        "backup_code"
       ],
       "open": false,
       "patterns": []
@@ -8643,16 +8643,16 @@
       "properties": [],
       "methods": [],
       "values": [
+        "passkey",
         "password",
+        "backup_code",
         "email_address",
         "phone_number",
         "username",
         "first_name",
         "last_name",
         "web3_wallet",
-        "authenticator_app",
-        "backup_code",
-        "passkey"
+        "authenticator_app"
       ],
       "open": false,
       "patterns": []
@@ -9140,17 +9140,17 @@
       ],
       "methods": []
     },
-    "MobileUserSettingsWeb3FirstFactorsElement": {
-      "name": "MobileUserSettingsWeb3FirstFactorsElement",
+    "UserSettingsWeb3FirstFactorsElement": {
+      "name": "UserSettingsWeb3FirstFactorsElement",
       "kind": "enum",
       "properties": [],
       "methods": [],
       "values": [
+        "web3_solana_signature",
         "web3_metamask_signature",
-        "web3_base_signature",
         "web3_coinbase_wallet_signature",
         "web3_okx_wallet_signature",
-        "web3_solana_signature"
+        "web3_base_signature"
       ],
       "open": false,
       "patterns": []
@@ -9836,12 +9836,12 @@
       "properties": [],
       "methods": [],
       "values": [
-        "pending",
-        "revoked",
-        "expired",
         "active",
-        "abandoned",
         "ended",
+        "expired",
+        "pending",
+        "abandoned",
+        "revoked",
         "removed",
         "replaced"
       ],
@@ -10806,7 +10806,7 @@
           ],
           "result": {
             "kind": "ref",
-            "name": "Image"
+            "name": "ImageResource"
           },
           "errorResult": false,
           "asynchronous": true
@@ -12053,9 +12053,9 @@
       "methods": [],
       "values": [
         "expired",
+        "failed",
         "unverified",
         "verified",
-        "failed",
         "transferable"
       ],
       "open": false,
@@ -12219,8 +12219,8 @@
       "properties": [],
       "methods": [],
       "values": [
-        "enterprise_sso",
-        "email_link"
+        "email_link",
+        "enterprise_sso"
       ],
       "open": false,
       "patterns": []
@@ -12916,7 +12916,7 @@
           "optional": false,
           "type": {
             "kind": "ref",
-            "name": "MobileUserSettingsWeb3FirstFactorsElement"
+            "name": "UserSettingsWeb3FirstFactorsElement"
           },
           "source": {
             "file": "packages/shared/src/types/web3Wallet.ts",
@@ -12957,7 +12957,7 @@
             "omittable": true,
             "value": {
               "kind": "ref",
-              "name": "MobileUserSettingsWeb3FirstFactorsElement"
+              "name": "UserSettingsWeb3FirstFactorsElement"
             }
           },
           "source": {
@@ -13949,10 +13949,6 @@
       "properties": [],
       "methods": [],
       "values": [
-        "saml_custom",
-        "saml_okta",
-        "saml_google",
-        "saml_microsoft",
         "oauth_facebook",
         "oauth_google",
         "oauth_hubspot",
@@ -13981,7 +13977,11 @@
         "oauth_x",
         "oauth_enstall",
         "oauth_huggingface",
-        "oauth_vercel"
+        "oauth_vercel",
+        "saml_okta",
+        "saml_google",
+        "saml_microsoft",
+        "saml_custom"
       ],
       "open": false,
       "patterns": [
@@ -15024,8 +15024,8 @@
       ],
       "methods": []
     },
-    "Image": {
-      "name": "Image",
+    "ImageResource": {
+      "name": "ImageResource",
       "source": {
         "file": "packages/shared/src/types/image.ts",
         "line": 4,
@@ -15116,7 +15116,7 @@
           ],
           "result": {
             "kind": "ref",
-            "name": "Image"
+            "name": "ImageResource"
           },
           "errorResult": false,
           "asynchronous": true
@@ -17721,6 +17721,20 @@
       "kind": "object",
       "properties": [
         {
+          "name": "strategy",
+          "optional": false,
+          "type": {
+            "kind": "literal",
+            "value": "email_code"
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 23,
+            "symbol": "strategy"
+          },
+          "documentation": "The strategy type."
+        },
+        {
           "name": "primary",
           "optional": true,
           "type": {
@@ -17750,20 +17764,6 @@
             "symbol": "emailAddressId"
           },
           "documentation": "The ID of the email address used for the email code factor."
-        },
-        {
-          "name": "strategy",
-          "optional": false,
-          "type": {
-            "kind": "literal",
-            "value": "email_code"
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 23,
-            "symbol": "strategy"
-          },
-          "documentation": "The strategy type."
         }
       ],
       "methods": []
@@ -17777,6 +17777,33 @@
       },
       "kind": "object",
       "properties": [
+        {
+          "name": "strategy",
+          "optional": false,
+          "type": {
+            "kind": "literal",
+            "value": "phone_code"
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 63,
+            "symbol": "strategy"
+          },
+          "documentation": "The strategy type."
+        },
+        {
+          "name": "phoneNumberId",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 67,
+            "symbol": "phoneNumberId"
+          },
+          "documentation": "The ID of the phone number used for the phone code factor."
+        },
         {
           "name": "primary",
           "optional": true,
@@ -17794,33 +17821,6 @@
             "symbol": "primary"
           },
           "documentation": "Indicates whether the phone number is set as the primary phone number, as multiple can be added to a user's profile."
-        },
-        {
-          "name": "phoneNumberId",
-          "optional": false,
-          "type": {
-            "kind": "string"
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 67,
-            "symbol": "phoneNumberId"
-          },
-          "documentation": "The ID of the phone number used for the phone code factor."
-        },
-        {
-          "name": "strategy",
-          "optional": false,
-          "type": {
-            "kind": "literal",
-            "value": "phone_code"
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 63,
-            "symbol": "strategy"
-          },
-          "documentation": "The strategy type."
         },
         {
           "name": "default",
@@ -17873,6 +17873,20 @@
       "kind": "object",
       "properties": [
         {
+          "name": "strategy",
+          "optional": false,
+          "type": {
+            "kind": "literal",
+            "value": "enterprise_sso"
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 126,
+            "symbol": "strategy"
+          },
+          "documentation": "The strategy type."
+        },
+        {
           "name": "emailAddressId",
           "optional": true,
           "type": {
@@ -17889,20 +17903,6 @@
             "symbol": "emailAddressId"
           },
           "documentation": "The ID of the email address used for the enterprise SSO factor."
-        },
-        {
-          "name": "strategy",
-          "optional": false,
-          "type": {
-            "kind": "literal",
-            "value": "enterprise_sso"
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 126,
-            "symbol": "strategy"
-          },
-          "documentation": "The strategy type."
         },
         {
           "name": "enterpriseConnectionId",
@@ -18170,19 +18170,6 @@
       "kind": "object",
       "properties": [
         {
-          "name": "id",
-          "optional": false,
-          "type": {
-            "kind": "string"
-          },
-          "source": {
-            "file": "node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/lib/lib.dom.d.ts",
-            "line": 11103,
-            "symbol": "id"
-          },
-          "documentation": "The **`id`** read-only property of the Credential interface returns a string containing the credential's identifier. This might be a GUID, username, or email address, or some other value, depending on the type of credential.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/Credential/id)"
-        },
-        {
           "name": "authenticatorAttachment",
           "optional": false,
           "type": {
@@ -18212,6 +18199,19 @@
             "symbol": "rawId"
           },
           "documentation": "The **`rawId`** read-only property of the PublicKeyCredential interface is an ArrayBuffer object containing the identifier of the credentials.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential/rawId)"
+        },
+        {
+          "name": "id",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/lib/lib.dom.d.ts",
+            "line": 11103,
+            "symbol": "id"
+          },
+          "documentation": "The **`id`** read-only property of the Credential interface returns a string containing the credential's identifier. This might be a GUID, username, or email address, or some other value, depending on the type of credential.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/Credential/id)"
         },
         {
           "name": "type",
@@ -18968,7 +18968,15 @@
         },
         {
           "kind": "ref",
+          "name": "EmailLinkFactor"
+        },
+        {
+          "kind": "ref",
           "name": "PhoneCodeFactor"
+        },
+        {
+          "kind": "ref",
+          "name": "Web3SignatureFactor"
         },
         {
           "kind": "ref",
@@ -18980,11 +18988,11 @@
         },
         {
           "kind": "ref",
-          "name": "EnterpriseSSOFactor"
+          "name": "OauthFactor"
         },
         {
           "kind": "ref",
-          "name": "EmailLinkFactor"
+          "name": "EnterpriseSSOFactor"
         },
         {
           "kind": "ref",
@@ -18993,14 +19001,6 @@
         {
           "kind": "ref",
           "name": "ResetPasswordEmailCodeFactor"
-        },
-        {
-          "kind": "ref",
-          "name": "Web3SignatureFactor"
-        },
-        {
-          "kind": "ref",
-          "name": "OauthFactor"
         }
       ]
     },
@@ -19070,6 +19070,106 @@
             "symbol": "primary"
           },
           "documentation": "Indicates whether the email address is set as the primary email address, as multiple can be added to a user's profile."
+        }
+      ],
+      "methods": []
+    },
+    "Web3SignatureFactor": {
+      "name": "Web3SignatureFactor",
+      "source": {
+        "file": "packages/shared/src/types/factors.ts",
+        "line": 87,
+        "symbol": "Web3SignatureFactor"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "strategy",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "UserSettingsWeb3FirstFactorsElement"
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 91,
+            "symbol": "strategy"
+          },
+          "documentation": "The strategy type."
+        },
+        {
+          "name": "web3WalletId",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 95,
+            "symbol": "web3WalletId"
+          },
+          "documentation": "The ID of the Web3 Wallet."
+        },
+        {
+          "name": "primary",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "boolean"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 99,
+            "symbol": "primary"
+          },
+          "documentation": "Indicates whether the Web3 Wallet is set as the primary Web3 Wallet, as multiple can be added to a user's profile."
+        },
+        {
+          "name": "walletName",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 103,
+            "symbol": "walletName"
+          },
+          "documentation": "The name of the Web3 Wallet."
+        }
+      ],
+      "methods": []
+    },
+    "OauthFactor": {
+      "name": "OauthFactor",
+      "source": {
+        "file": "packages/shared/src/types/factors.ts",
+        "line": 117,
+        "symbol": "OauthFactor"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "strategy",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "OAuthStrategy"
+          },
+          "source": {
+            "file": "packages/shared/src/types/factors.ts",
+            "line": 118,
+            "symbol": "strategy"
+          }
         }
       ],
       "methods": []
@@ -19214,106 +19314,6 @@
       ],
       "methods": []
     },
-    "Web3SignatureFactor": {
-      "name": "Web3SignatureFactor",
-      "source": {
-        "file": "packages/shared/src/types/factors.ts",
-        "line": 87,
-        "symbol": "Web3SignatureFactor"
-      },
-      "kind": "object",
-      "properties": [
-        {
-          "name": "strategy",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "MobileUserSettingsWeb3FirstFactorsElement"
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 91,
-            "symbol": "strategy"
-          },
-          "documentation": "The strategy type."
-        },
-        {
-          "name": "web3WalletId",
-          "optional": false,
-          "type": {
-            "kind": "string"
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 95,
-            "symbol": "web3WalletId"
-          },
-          "documentation": "The ID of the Web3 Wallet."
-        },
-        {
-          "name": "primary",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "boolean"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 99,
-            "symbol": "primary"
-          },
-          "documentation": "Indicates whether the Web3 Wallet is set as the primary Web3 Wallet, as multiple can be added to a user's profile."
-        },
-        {
-          "name": "walletName",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "string"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 103,
-            "symbol": "walletName"
-          },
-          "documentation": "The name of the Web3 Wallet."
-        }
-      ],
-      "methods": []
-    },
-    "OauthFactor": {
-      "name": "OauthFactor",
-      "source": {
-        "file": "packages/shared/src/types/factors.ts",
-        "line": 117,
-        "symbol": "OauthFactor"
-      },
-      "kind": "object",
-      "properties": [
-        {
-          "name": "strategy",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "OAuthStrategy"
-          },
-          "source": {
-            "file": "packages/shared/src/types/factors.ts",
-            "line": 118,
-            "symbol": "strategy"
-          }
-        }
-      ],
-      "methods": []
-    },
     "SignInSecondFactor": {
       "name": "SignInSecondFactor",
       "source": {
@@ -19331,6 +19331,10 @@
         },
         {
           "kind": "ref",
+          "name": "EmailLinkFactor"
+        },
+        {
+          "kind": "ref",
           "name": "PhoneCodeFactor"
         },
         {
@@ -19340,10 +19344,6 @@
         {
           "kind": "ref",
           "name": "BackupCodeFactor"
-        },
-        {
-          "kind": "ref",
-          "name": "EmailLinkFactor"
         }
       ]
     },
@@ -19358,13 +19358,13 @@
       "properties": [],
       "methods": [],
       "values": [
+        "needs_identifier",
         "needs_first_factor",
         "needs_second_factor",
-        "complete",
-        "needs_identifier",
         "needs_client_trust",
         "needs_new_password",
-        "needs_protect_check"
+        "needs_protect_check",
+        "complete"
       ],
       "open": false,
       "patterns": []
@@ -19722,6 +19722,8 @@
       "properties": [],
       "methods": [],
       "values": [
+        "passkey",
+        "ticket",
         "enterprise_sso",
         "oauth_facebook",
         "oauth_google",
@@ -19751,9 +19753,7 @@
         "oauth_x",
         "oauth_enstall",
         "oauth_huggingface",
-        "oauth_vercel",
-        "passkey",
-        "ticket"
+        "oauth_vercel"
       ],
       "open": false,
       "patterns": [
@@ -20469,8 +20469,8 @@
       "methods": [],
       "values": [
         "expired",
-        "verified",
         "failed",
+        "verified",
         "client_mismatch"
       ],
       "open": false,
@@ -22037,9 +22037,9 @@
       "properties": [],
       "methods": [],
       "values": [
-        "abandoned",
         "complete",
-        "missing_requirements"
+        "missing_requirements",
+        "abandoned"
       ],
       "open": false,
       "patterns": []
@@ -22055,6 +22055,7 @@
       "properties": [],
       "methods": [],
       "values": [
+        "password",
         "enterprise_sso",
         "oauth_facebook",
         "oauth_google",
@@ -22085,15 +22086,14 @@
         "oauth_enstall",
         "oauth_huggingface",
         "oauth_vercel",
-        "password",
         "email_address",
         "phone_number",
         "username",
         "first_name",
         "last_name",
         "web3_wallet",
-        "legal_accepted",
         "email_address_or_phone_number",
+        "legal_accepted",
         "protect_check"
       ],
       "open": false,
@@ -22431,6 +22431,10 @@
       "properties": [],
       "methods": [],
       "values": [
+        "google_one_tap",
+        "oauth_token_apple",
+        "phone_code",
+        "ticket",
         "enterprise_sso",
         "oauth_facebook",
         "oauth_google",
@@ -22460,11 +22464,7 @@
         "oauth_x",
         "oauth_enstall",
         "oauth_huggingface",
-        "oauth_vercel",
-        "phone_code",
-        "ticket",
-        "google_one_tap",
-        "oauth_token_apple"
+        "oauth_vercel"
       ],
       "open": false,
       "patterns": [
@@ -24226,25 +24226,6 @@
       "kind": "object",
       "properties": [
         {
-          "name": "session",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": true,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "MobileSetActiveParamsSession"
-            }
-          },
-          "source": {
-            "file": "packages/shared/src/types/clerk.ts",
-            "line": 1799,
-            "symbol": "session"
-          },
-          "documentation": "The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted."
-        },
-        {
           "name": "organization",
           "optional": true,
           "type": {
@@ -24262,9 +24243,43 @@
             "symbol": "organization"
           },
           "documentation": "The Organization resource or Organization ID/slug (string version) to be set as active in the current session. If `null`, the currently Active Organization is removed as active."
+        },
+        {
+          "name": "session",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "MobileSetActiveParamsSession"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/clerk.ts",
+            "line": 1799,
+            "symbol": "session"
+          },
+          "documentation": "The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted."
         }
       ],
       "methods": []
+    },
+    "MobileSetActiveParamsOrganization": {
+      "name": "MobileSetActiveParamsOrganization",
+      "kind": "union",
+      "properties": [],
+      "methods": [],
+      "variants": [
+        {
+          "kind": "string"
+        },
+        {
+          "kind": "ref",
+          "name": "Organization"
+        }
+      ]
     },
     "MobileSetActiveParamsSession": {
       "name": "MobileSetActiveParamsSession",
@@ -25425,21 +25440,6 @@
           },
           "errorResult": false,
           "asynchronous": true
-        }
-      ]
-    },
-    "MobileSetActiveParamsOrganization": {
-      "name": "MobileSetActiveParamsOrganization",
-      "kind": "union",
-      "properties": [],
-      "methods": [],
-      "variants": [
-        {
-          "kind": "string"
-        },
-        {
-          "kind": "ref",
-          "name": "Organization"
         }
       ]
     },
@@ -27250,7 +27250,15 @@
       "disposition": "generated"
     },
     {
+      "path": "Attributes.passkey",
+      "disposition": "generated"
+    },
+    {
       "path": "Attributes.password",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.backup_code",
       "disposition": "generated"
     },
     {
@@ -27279,14 +27287,6 @@
     },
     {
       "path": "Attributes.authenticator_app",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.backup_code",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.passkey",
       "disposition": "generated"
     },
     {
@@ -29528,6 +29528,10 @@
       "disposition": "generated"
     },
     {
+      "path": "EmailCodeConfig.strategy",
+      "disposition": "generated"
+    },
+    {
       "path": "EmailCodeConfig.primary",
       "disposition": "generated"
     },
@@ -29536,11 +29540,7 @@
       "disposition": "generated"
     },
     {
-      "path": "EmailCodeConfig.strategy",
-      "disposition": "generated"
-    },
-    {
-      "path": "PhoneCodeConfig.primary",
+      "path": "PhoneCodeConfig.strategy",
       "disposition": "generated"
     },
     {
@@ -29548,7 +29548,7 @@
       "disposition": "generated"
     },
     {
-      "path": "PhoneCodeConfig.strategy",
+      "path": "PhoneCodeConfig.primary",
       "disposition": "generated"
     },
     {
@@ -29560,11 +29560,11 @@
       "disposition": "generated"
     },
     {
-      "path": "Omit.emailAddressId",
+      "path": "Omit.strategy",
       "disposition": "generated"
     },
     {
-      "path": "Omit.strategy",
+      "path": "Omit.emailAddressId",
       "disposition": "generated"
     },
     {
@@ -29620,10 +29620,6 @@
       "disposition": "generated"
     },
     {
-      "path": "PublicKeyCredentialWithAuthenticatorAssertionResponse.id",
-      "disposition": "generated"
-    },
-    {
       "path": "PublicKeyCredentialWithAuthenticatorAssertionResponse.authenticatorAttachment",
       "disposition": "generated"
     },
@@ -29635,6 +29631,10 @@
       "path": "PublicKeyCredentialWithAuthenticatorAssertionResponse.toJSON",
       "disposition": "excluded",
       "reason": "The bridge serializes credential data; DOM serialization methods do not cross it."
+    },
+    {
+      "path": "PublicKeyCredentialWithAuthenticatorAssertionResponse.id",
+      "disposition": "generated"
     },
     {
       "path": "PublicKeyCredentialWithAuthenticatorAssertionResponse.type",
@@ -29755,6 +29755,26 @@
       "disposition": "generated"
     },
     {
+      "path": "Web3SignatureFactor.strategy",
+      "disposition": "generated"
+    },
+    {
+      "path": "Web3SignatureFactor.web3WalletId",
+      "disposition": "generated"
+    },
+    {
+      "path": "Web3SignatureFactor.primary",
+      "disposition": "generated"
+    },
+    {
+      "path": "Web3SignatureFactor.walletName",
+      "disposition": "generated"
+    },
+    {
+      "path": "OauthFactor.strategy",
+      "disposition": "generated"
+    },
+    {
       "path": "ResetPasswordPhoneCodeFactor.strategy",
       "disposition": "generated"
     },
@@ -29784,26 +29804,6 @@
     },
     {
       "path": "ResetPasswordEmailCodeFactor.primary",
-      "disposition": "generated"
-    },
-    {
-      "path": "Web3SignatureFactor.strategy",
-      "disposition": "generated"
-    },
-    {
-      "path": "Web3SignatureFactor.web3WalletId",
-      "disposition": "generated"
-    },
-    {
-      "path": "Web3SignatureFactor.primary",
-      "disposition": "generated"
-    },
-    {
-      "path": "Web3SignatureFactor.walletName",
-      "disposition": "generated"
-    },
-    {
-      "path": "OauthFactor.strategy",
       "disposition": "generated"
     },
     {
@@ -30885,6 +30885,10 @@
       "reason": "Navigation-free selection; retain pending session tasks."
     },
     {
+      "path": "MobileSetActiveParams.organization",
+      "disposition": "generated"
+    },
+    {
       "path": "MobileSetActiveParams.session",
       "disposition": "generated"
     },
@@ -31150,10 +31154,6 @@
     },
     {
       "path": "PendingSessionResource.reload",
-      "disposition": "generated"
-    },
-    {
-      "path": "MobileSetActiveParams.organization",
       "disposition": "generated"
     },
     {
