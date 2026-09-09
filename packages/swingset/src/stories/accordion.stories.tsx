@@ -11,6 +11,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Accordion',
   source: 'packages/headless/src/primitives/accordion/index.ts',
 };

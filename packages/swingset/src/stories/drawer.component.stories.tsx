@@ -15,6 +15,7 @@ export { default as __source } from './drawer.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Drawer',
   source: 'packages/ui/src/mosaic/components/drawer/drawer.tsx',
 };

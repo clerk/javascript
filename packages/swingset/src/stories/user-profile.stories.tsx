@@ -10,6 +10,7 @@ export { default as __source } from './user-profile.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfile',
   label: 'User profile',
   layout: 'wide',

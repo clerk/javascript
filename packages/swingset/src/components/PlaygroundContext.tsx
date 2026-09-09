@@ -7,6 +7,8 @@ import { generateKnobs, initKnobValues } from '@/lib/generateKnobs';
 import type { KnobRecord, KnobValues, StoryMeta } from '@/lib/types';
 
 interface PlaygroundContextValue {
+  /** The page's story meta, so MDX overrides (e.g. the h1 status dot) can read it. */
+  meta?: StoryMeta;
   /** Knob definitions derived from `meta.styles._variants`. */
   knobs: KnobRecord;
   /** Current value for each knob (props passed into the live preview). */
@@ -29,12 +31,13 @@ export function PlaygroundProvider({ meta, children }: { meta?: StoryMeta; child
 
   const value = useMemo<PlaygroundContextValue>(
     () => ({
+      meta,
       knobs,
       values,
       setValue: (key, v) => setValues(prev => ({ ...prev, [key]: v })),
       reset: () => setValues(initKnobValues(knobs)),
     }),
-    [knobs, values],
+    [meta, knobs, values],
   );
 
   return <PlaygroundContext.Provider value={value}>{children}</PlaygroundContext.Provider>;

@@ -12,6 +12,7 @@ export { default as __source } from './popover.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Popover',
   source: 'packages/ui/src/mosaic/components/popover/popover.tsx',
 };

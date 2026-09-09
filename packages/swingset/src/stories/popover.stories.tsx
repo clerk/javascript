@@ -11,6 +11,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Popover',
   source: 'packages/headless/src/primitives/popover/index.ts',
 };
