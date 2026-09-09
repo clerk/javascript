@@ -1,5 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import { isNetworkOnline, isValidNetworkEnvironment } from '@clerk/shared/network';
 import {
   ClerkOfflineError,
   ClerkRuntimeError,
@@ -176,7 +176,7 @@ export class Session extends BaseResource implements SessionResource {
             return false;
           }
 
-          if (!isValidBrowserOnline()) {
+          if (!isValidNetworkEnvironment()) {
             return iterationsCount <= 3;
           }
           return iterationsCount <= 8;
@@ -186,14 +186,14 @@ export class Session extends BaseResource implements SessionResource {
       // If we're offline and got a null/empty result, this is likely due to
       // BaseResource._baseFetch returning null when offline (silent failure mode).
       // Throw ClerkOfflineError to make the offline state explicit.
-      if (!result && !isValidBrowserOnline()) {
+      if (!result && !isValidNetworkEnvironment()) {
         throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
       }
 
       return result;
     } catch (error) {
       // If the browser is offline after retries, throw ClerkOfflineError
-      if (!isValidBrowserOnline()) {
+      if (!isValidNetworkEnvironment()) {
         throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
       }
       throw error;
@@ -470,7 +470,7 @@ export class Session extends BaseResource implements SessionResource {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       result = cachedToken.getRawString() || null;
-    } else if (!isBrowserOnline()) {
+    } else if (!isNetworkOnline()) {
       throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
     } else {
       result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
@@ -478,7 +478,7 @@ export class Session extends BaseResource implements SessionResource {
 
     // Throw when offline and no token so retry() in getToken() can fire.
     // Without this, _getToken returns null (success) and retry() never calls shouldRetry.
-    if (result === null && !isValidBrowserOnline()) {
+    if (result === null && !isValidNetworkEnvironment()) {
       throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
     }
 

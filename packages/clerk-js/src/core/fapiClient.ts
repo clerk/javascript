@@ -1,4 +1,4 @@
-import { isBrowserOnline } from '@clerk/shared/browser';
+import { isNetworkOnline } from '@clerk/shared/network';
 import { buildEmailAddress as buildEmailAddressUtil } from '@clerk/shared/internal/clerk-js/email';
 import { stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { retry } from '@clerk/shared/retry';
@@ -291,7 +291,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
     try {
       if (beforeRequestCallbacksResult) {
-        const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
+        const maxTries = requestOptions?.fetchMaxTries ?? (isNetworkOnline() ? 4 : 11);
         // TODO @userland-errors:
         response = await retry(() => fetch(url, fetchOpts), {
           // This retry handles only network errors, not 4xx or 5xx responses,

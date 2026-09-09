@@ -1,4 +1,4 @@
-import { isValidBrowserOnline } from '@clerk/shared/browser';
+import { isValidNetworkEnvironment } from '@clerk/shared/network';
 import type { createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { clerkEvents } from '@clerk/shared/clerkEventBus';
 import type { createCookieHandler } from '@clerk/shared/cookie';
@@ -211,7 +211,7 @@ export class AuthCookieService {
       return;
     }
 
-    if (!token && !isValidBrowserOnline()) {
+    if (!token && !isValidNetworkEnvironment()) {
       debugLogger.warn('Removing session cookie (offline)', { sessionId: this.clerk.session?.id }, 'authCookieService');
     }
 

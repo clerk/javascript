@@ -1,4 +1,4 @@
-import { isValidBrowserOnline } from '@clerk/shared/browser';
+import { isValidNetworkEnvironment } from '@clerk/shared/network';
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type {
@@ -112,7 +112,7 @@ export abstract class BaseResource {
         throw new ClerkRuntimeError(e?.message || e, {
           code: 'network_error',
         });
-      } else if (!isValidBrowserOnline()) {
+      } else if (!isValidNetworkEnvironment()) {
         debugLogger.warn(
           'Network request failed while offline, returning null',
           {

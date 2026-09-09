@@ -1,4 +1,5 @@
-import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
+import { inBrowser as inClientSide } from '@clerk/shared/browser';
+import { isValidNetworkEnvironment } from '@clerk/shared/network';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import {
   ClerkOfflineError,
@@ -3175,7 +3176,7 @@ export class Clerk implements ClerkInterface {
       this.#updateAccessors(newSession, { dangerouslySkipEmit: true });
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
-      if (!this.session?.lastActiveToken && !isValidBrowserOnline()) {
+      if (!this.session?.lastActiveToken && !isValidNetworkEnvironment()) {
         debugLogger.warn(
           'No last active token when updating client (offline)',
           { sessionId: this.session?.id },
@@ -3487,7 +3488,7 @@ export class Clerk implements ClerkInterface {
       } catch (err) {
         if (isError(err, 'dev_browser_unauthenticated')) {
           await this.#authService.handleUnauthenticatedDevBrowser();
-        } else if (!isValidBrowserOnline()) {
+        } else if (!isValidNetworkEnvironment()) {
           console.warn(err);
           return;
         } else {
