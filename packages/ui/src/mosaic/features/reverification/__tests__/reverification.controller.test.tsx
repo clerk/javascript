@@ -237,7 +237,7 @@ describe('useReverificationController', () => {
     await waitFor(() => expect(result.current.status).toBe('unavailable'));
   });
 
-  it('omits onShowMethods when only one method is available', async () => {
+  it('still passes onShowMethods when only one method is available', async () => {
     const { result } = renderHook(() =>
       useReverificationController(
         readyModel({
@@ -250,8 +250,38 @@ describe('useReverificationController', () => {
     if (result.current.status !== 'ready') {
       throw new Error('expected ready');
     }
-    expect(result.current.onShowMethods).toBeUndefined();
+    expect(result.current.onShowMethods).toEqual(expect.any(Function));
+    expect(result.current.methods).toEqual([]);
     expect(result.current.step).toBe('password');
+  });
+
+  it('keeps onResend during the resend cooldown', async () => {
+    const { result } = renderHook(() =>
+      useReverificationController(
+        readyModel({
+          start: vi.fn(async () => firstFactorResult({ methods: [email], startingMethod: email })),
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    if (result.current.status !== 'ready') {
+      throw new Error('expected ready');
+    }
+    expect(result.current.onResend).toEqual(expect.any(Function));
+    expect(result.current.canResend).toBe(true);
+
+    act(() => {
+      result.current.onResend();
+    });
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.canResend).toBe(false);
+        expect(result.current.onResend).toEqual(expect.any(Function));
+      }
+    });
   });
 
   it('marks the current step pending while an attempt is in flight', async () => {

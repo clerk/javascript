@@ -16,6 +16,8 @@ function viewProps(overrides: Partial<ReverificationViewProps> = {}): Reverifica
     onShowMethods: vi.fn(),
     onShowHelp: vi.fn(),
     onEmailSupport: vi.fn(),
+    onResend: vi.fn(),
+    canResend: true,
     methods: [],
     onSelectMethod: vi.fn(),
     ...overrides,
@@ -64,6 +66,16 @@ describe('ReverificationView', () => {
     const otpStep = screen.getByRole('group', { name: 'Verification code' }).closest('.cl-flow-step');
     expect(otpStep).toBeInTheDocument();
     expect(otpStep?.style.getPropertyValue('--cl-flow-transition-direction')).toBe('-1');
+  });
+
+  it('keeps a disabled resend control during the cooldown', () => {
+    renderView({
+      step: 'otp',
+      otpChannel: 'email',
+      canResend: false,
+    });
+
+    expect(screen.getByRole('button', { name: 'Didn’t receive a code? Resend' })).toBeDisabled();
   });
 
   it('does not render Card branding', () => {

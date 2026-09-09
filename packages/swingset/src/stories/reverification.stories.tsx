@@ -7,6 +7,7 @@ import { ReverificationMethodPicker } from '@clerk/ui/mosaic/features/reverifica
 import { ReverificationOTP } from '@clerk/ui/mosaic/features/reverification/panels/reverification-otp';
 import { ReverificationPasskey } from '@clerk/ui/mosaic/features/reverification/panels/reverification-passkey';
 import { ReverificationPassword } from '@clerk/ui/mosaic/features/reverification/panels/reverification-password';
+import { otpChannelFor } from '@clerk/ui/mosaic/features/reverification/reverification.utils';
 import { ReverificationView } from '@clerk/ui/mosaic/features/reverification/reverification.view';
 import { useRef, useState } from 'react';
 
@@ -42,18 +43,37 @@ const helpMessages = {
 const allMethods: ReverificationMethod[] = [
   { id: 'password', stage: 'first', strategy: 'password' },
   { id: 'passkey', stage: 'first', strategy: 'passkey' },
+  {
+    id: 'email_code:idn_1',
+    stage: 'first',
+    strategy: 'email_code',
+    emailAddressId: 'idn_1',
+    identifier: 'a***@ex.com',
+  },
+  {
+    id: 'phone_code:pn_1',
+    stage: 'first',
+    strategy: 'phone_code',
+    phoneNumberId: 'pn_1',
+    identifier: '+1••••1',
+  },
   { id: 'totp', stage: 'second', strategy: 'totp' },
   { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
 ];
 
+function methodById(id: string): ReverificationMethod | undefined {
+  return allMethods.find(method => method.id === id);
+}
+
 function stepFor(id: string): ReverificationStep {
-  if (id === 'passkey') {
+  const strategy = methodById(id)?.strategy;
+  if (strategy === 'passkey') {
     return 'passkey';
   }
-  if (id === 'backup_code') {
+  if (strategy === 'backup_code') {
     return 'backup-code';
   }
-  if (id === 'totp') {
+  if (strategy === 'email_code' || strategy === 'phone_code' || strategy === 'totp') {
     return 'otp';
   }
   return 'password';
@@ -67,7 +87,9 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
   const valueRef = useRef(value);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isPending, setIsPending] = useState(false);
+  const [canResend, setCanResend] = useState(true);
   const [supportRequested, setSupportRequested] = useState(false);
+  const activeMethod = methodById(methodId);
 
   const navigate = (next: ReverificationStep, nextDirection: -1 | 1) => {
     setDirection(nextDirection);
@@ -75,6 +97,7 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
     valueRef.current = '';
     setValue('');
     setErrorMessage(undefined);
+    setCanResend(true);
   };
 
   const onValueChange = (nextValue: string) => {
@@ -146,6 +169,20 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
     navigate(stepFor(id), 1);
   };
 
+  const onResend = () => {
+    if (!canResend || isPending) {
+      return;
+    }
+    void (async () => {
+      setIsPending(true);
+      await settleAfter(700);
+      setIsPending(false);
+      setCanResend(false);
+      await settleAfter(3_000);
+      setCanResend(true);
+    })();
+  };
+
   const onSubmit = () => {
     if (step === 'backup-code') {
       void submitBackupCode();
@@ -170,6 +207,8 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
         onSubmit={onSubmit}
         onVerifyPasskey={() => void submitPasskey()}
         onShowMethods={() => navigate('method-picker', 1)}
+        onResend={onResend}
+        canResend={canResend}
         onShowHelp={() => navigate('help', 1)}
         onBack={
           step === 'help'
@@ -181,7 +220,7 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
         onEmailSupport={() => setSupportRequested(true)}
         methods={allMethods.filter(method => method.id !== methodId)}
         onSelectMethod={id => void selectMethod(id)}
-        otpChannel='totp'
+        otpChannel={activeMethod ? otpChannelFor(activeMethod.strategy) : undefined}
       />
       {supportRequested ? <p>Email support requested.</p> : null}
     </>

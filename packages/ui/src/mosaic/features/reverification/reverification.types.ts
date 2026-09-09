@@ -25,7 +25,7 @@ export type ReverificationViewProps = {
   isPending: boolean;
   onSubmit: () => void;
   onVerifyPasskey: () => void;
-  onShowMethods?: () => void;
+  onShowMethods: () => void;
   onShowHelp: () => void;
   onBack?: () => void;
   onEmailSupport: () => void;
@@ -33,8 +33,8 @@ export type ReverificationViewProps = {
   onSelectMethod: (id: string) => void;
   otpChannel?: ReverificationOtpChannel;
   identifier?: string;
-  onResend?: () => void;
-  canResend?: boolean;
+  onResend: () => void;
+  canResend: boolean;
 };
 
 export type ReverificationProps =
