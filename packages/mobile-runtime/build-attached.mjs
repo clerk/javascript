@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const target = path.resolve(directory, '../expo/src/generated/attached-core.js');
 const result = await build({
+  cwd: path.resolve(directory, '../..'),
   input: path.join(directory, 'src/attached-core.ts'),
   platform: 'neutral',
   write: false,

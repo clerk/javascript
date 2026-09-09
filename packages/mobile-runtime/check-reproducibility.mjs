@@ -19,3 +19,17 @@ for (const [index, name] of artifacts.entries())
     `${name} depends on the invocation directory or nondeterministic build state`,
   );
 console.log(`Reproducible across repository/package invocations: ${artifacts.join(', ')}`);
+
+const attached = path.resolve(directory, '../expo/src/generated/attached-core.js');
+const buildAttached = cwd => {
+  execFileSync(process.execPath, [path.join(directory, 'build-attached.mjs')], { cwd, stdio: 'inherit' });
+  return fs.readFileSync(attached);
+};
+const attachedFromRepository = buildAttached(repository);
+for (const cwd of [directory, path.resolve(directory, '../expo')]) {
+  assert.ok(
+    attachedFromRepository.equals(buildAttached(cwd)),
+    'The Expo attached resource transport depends on the invocation directory',
+  );
+}
+console.log('Expo attached transport is reproducible across repository/runtime/Expo package invocations');
