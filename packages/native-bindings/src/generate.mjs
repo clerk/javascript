@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 import { compileProfile } from './compiler.mjs';
 import { generateNative } from './native.mjs';
 
@@ -13,11 +12,6 @@ if (model.failures.length) throw new Error(JSON.stringify(model.failures, null, 
 const manifest = {
   protocolVersion: 1,
   hostCapabilityVersion: 1,
-  coreRevision: execFileSync(
-    'git',
-    ['log', '-1', '--format=%H', '--', 'packages/clerk-js/src', 'packages/shared/src'],
-    { cwd: repository, encoding: 'utf8' },
-  ).trim(),
   contractHash: createHash('sha256')
     .update(
       JSON.stringify(model, (key, value) =>

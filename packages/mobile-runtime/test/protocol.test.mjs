@@ -176,3 +176,24 @@ test('sign-out fences a finalization response and its credential before it can r
     false,
   );
 });
+
+test('background is nonfatal and foreground recovers resources through the core', async t => {
+  const reloaded = deferred();
+  let reads = 0;
+  const f = await fixture({
+    http: request => {
+      if (new URL(request.url).pathname.endsWith('/client') && ++reads > 1) reloaded.resolve();
+    },
+  });
+  t.after(f.dispose);
+  f.receive({ kind: 'lifecycle', state: 'background' });
+  const reset = await f.invoke(f.state.roots.signIn, 'SignIn.reset');
+  assert.equal(reset.failure, undefined);
+  assert.equal(reads, 1);
+  f.receive({ kind: 'lifecycle', state: 'foreground' });
+  await reloaded.promise;
+  assert.equal(
+    f.messages.some(message => message.kind === 'runtimeError'),
+    false,
+  );
+});

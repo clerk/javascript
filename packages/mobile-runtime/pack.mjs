@@ -2,13 +2,36 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const generated = path.resolve(directory, '../native-bindings/generated');
-const bundle = fs.readFileSync(path.join(directory, 'dist/clerk-core.js'));
 const contract = JSON.parse(fs.readFileSync(path.join(generated, 'manifest.json'), 'utf8'));
+const repository = path.resolve(directory, '../..');
+const inputs = [
+  'packages/clerk-js',
+  'packages/shared',
+  'packages/mobile-runtime',
+  'packages/native-bindings',
+  'pnpm-lock.yaml',
+  'pnpm-workspace.yaml',
+];
+const dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=all', '--', ...inputs], {
+  cwd: repository,
+  encoding: 'utf8',
+}).trim();
+if (dirty)
+  throw new Error('Commit core, generator, runtime, and dependency changes before packaging a pinned release.');
+execFileSync(process.execPath, [path.join(generated, '../src/generate.mjs'), '--check'], {
+  cwd: repository,
+  stdio: 'inherit',
+});
+execFileSync(process.execPath, [path.join(directory, 'build.mjs')], { cwd: directory, stdio: 'inherit' });
+const bundle = fs.readFileSync(path.join(directory, 'dist/clerk-core.js'));
+const coreRevision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repository, encoding: 'utf8' }).trim();
 const manifest = {
   ...contract,
+  coreRevision,
   bundleSHA256: createHash('sha256').update(bundle).digest('hex'),
   bundleBytes: bundle.length,
   runtime: { apple: 'JavaScriptCore (system)', android: 'quickjs-ng v0.15.1 fd0a0210b7be00957751871e7e01b8291268fc29' },

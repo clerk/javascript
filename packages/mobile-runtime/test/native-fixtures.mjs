@@ -45,10 +45,81 @@ const signUp = {
   legal_accepted_at: null,
   locale: null,
 };
+export function sessionFixture(status = 'active') {
+  const now = Date.now();
+  return {
+    object: 'session',
+    id: 'sess_native',
+    status,
+    expire_at: now + 86400000,
+    abandon_at: now + 86400000,
+    created_at: now,
+    updated_at: now,
+    last_active_at: now,
+    last_active_organization_id: null,
+    actor: null,
+    factor_verification_age: [0, 0],
+    tasks: status === 'pending' ? [{ key: 'choose-organization' }] : [],
+    public_user_data: {
+      first_name: 'Test',
+      last_name: 'User',
+      image_url: '',
+      identifier: 'test@example.com',
+      user_id: 'user_native',
+    },
+    user: {
+      object: 'user',
+      id: 'user_native',
+      first_name: 'Test',
+      last_name: 'User',
+      image_url: '',
+      username: null,
+      primary_email_address_id: null,
+      primary_phone_number_id: null,
+      primary_web3_wallet_id: null,
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+      enterprise_accounts: [],
+      organization_memberships: [],
+      passkeys: [],
+      password_enabled: true,
+      totp_enabled: false,
+      backup_code_enabled: false,
+      two_factor_enabled: false,
+      public_metadata: {},
+      unsafe_metadata: {},
+      created_at: now,
+      updated_at: now,
+      last_sign_in_at: now,
+    },
+  };
+}
+
+export function tokenFixture() {
+  const now = Math.floor(Date.now() / 1000);
+  const base64 = object => Buffer.from(JSON.stringify(object)).toString('base64url');
+  return {
+    object: 'token',
+    jwt: `${base64({ alg: 'RS256', typ: 'JWT' })}.${base64({ sub: 'user_native', sid: 'sess_native', iat: now, exp: now + 60, iss: 'https://native-core.clerk.accounts.dev' })}.fixture_signature`,
+  };
+}
+
 export const fixtures = {
   environment: createBaseEnvironmentJSON(),
   client: { ...createBaseClientJSON(), sessions: [], captcha_bypass: true },
   signIn,
   signUp,
+  session: sessionFixture(),
+  token: tokenFixture(),
+};
+fixtures.authenticatedClient = {
+  ...fixtures.client,
+  id: 'client_native',
+  sessions: [fixtures.session],
+  last_active_session_id: fixtures.session.id,
+  sign_in: { ...signIn, status: 'complete', created_session_id: fixtures.session.id },
+  sign_up: { ...signUp, status: 'complete', created_session_id: fixtures.session.id },
 };
 if (process.argv[1] === fileURLToPath(import.meta.url)) fs.writeFileSync(process.argv[2], JSON.stringify(fixtures));

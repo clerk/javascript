@@ -27,6 +27,7 @@ let mobile: ReturnType<typeof installMobileCredentialTransport> | undefined;
 let initializing = false;
 let unsubscribe: (() => void) | undefined;
 let disposed = false;
+let active = true;
 let removeNetworkEnvironment: (() => void) | undefined;
 
 async function initialize(id: string, configuration: Configuration): Promise<void> {
@@ -47,7 +48,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
   )
     throw bridgeError('invalid_callback_url');
   initializing = true;
-  removeNetworkEnvironment = setNativeNetworkEnvironment({ isOnline: () => true });
+  removeNetworkEnvironment = setNativeNetworkEnvironment({ isOnline: () => true, isActive: () => active });
   const clerk = new Clerk(configuration.publishableKey);
   core = clerk;
   const scope = configuration.publishableKey;
@@ -74,6 +75,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
   await clerk.load({
     standardBrowser: false,
     telemetry: false,
+    experimental: { runtimeEnvironment: 'headless' },
     __internal_oauthTransport: {
       getRedirectUrl: () => configuration.callbackUrl,
       open: url => {
@@ -162,11 +164,15 @@ export function receive(encoded: string): void {
         .catch(error => emit({ kind: 'runtimeError', failure: failure(error, 'bridge') }));
     } else if (message.kind === 'cancel') runtime.cancel(message.id);
     else if (message.kind === 'release') runtime.release(message.target);
-    else if (message.kind === 'lifecycle' && message.state === 'foreground') {
-      void core?.__internal_reloadInitialResources().then(
-        () => runtime?.publish(),
-        error => emit({ kind: 'runtimeError', failure: failure(error) }),
-      );
+    else if (message.kind === 'lifecycle') {
+      if (!['foreground', 'background'].includes(message.state)) throw bridgeError('invalid_lifecycle_state');
+      const wasActive = active;
+      active = message.state === 'foreground';
+      if (active && !wasActive)
+        void core?.__internal_reloadInitialResources().then(
+          () => runtime?.publish(),
+          error => emit({ kind: 'lifecycleError', failure: failure(error) }),
+        );
     } else throw bridgeError('unknown_message');
   } catch (error) {
     emit({ kind: 'runtimeError', failure: failure(error, 'bridge') });
