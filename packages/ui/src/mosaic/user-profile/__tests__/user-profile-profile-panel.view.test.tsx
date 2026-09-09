@@ -85,6 +85,20 @@ describe('UserProfileProfilePanelView', () => {
 
     expect(onProfilePictureChange).not.toHaveBeenCalled();
     expect(onProfilePictureReject).toHaveBeenCalledWith([{ file: oversized, reason: 'size' }]);
+    expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
+    expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toBeInTheDocument();
+  });
+
+  it('clears the rejection once an acceptable file is picked', async () => {
+    const user = userEvent.setup();
+    const { container } = renderView({ onProfilePictureChange: vi.fn() });
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]') as HTMLInputElement;
+
+    await user.upload(input, new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'big.png', { type: 'image/png' }));
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+
+    await user.upload(input, new File(['small'], 'small.png', { type: 'image/png' }));
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('offers Upload while the avatar is only a generated default', () => {

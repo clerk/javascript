@@ -1,10 +1,12 @@
-import type { FileRejection } from '@clerk/headless/file-upload';
+import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
 import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
+import { useState } from 'react';
 
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
+import { Field } from '../components/field';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
@@ -96,6 +98,7 @@ export function UserProfileAccountSectionView({
     .join('')
     .slice(0, 2)
     .toUpperCase();
+  const [rejection, setRejection] = useState<FileRejectionReason | null>(null);
   const updateName = onNameChange ? () => onNameChange(name) : undefined;
   const updateUsername = onUsernameChange ? () => onUsernameChange(username) : undefined;
 
@@ -104,10 +107,14 @@ export function UserProfileAccountSectionView({
       accept={PROFILE_PICTURE_MIME_TYPES}
       maxSize={PROFILE_PICTURE_MAX_BYTES}
       render={<div {...stylex.props(styles.sections)} />}
-      onReject={onProfilePictureReject}
+      onReject={rejections => {
+        setRejection(rejections[0]?.reason ?? null);
+        onProfilePictureReject?.(rejections);
+      }}
       onValueChange={files => {
         const file = files[0];
         if (file) {
+          setRejection(null);
           onProfilePictureChange?.(file);
         }
       }}
@@ -129,6 +136,11 @@ export function UserProfileAccountSectionView({
               <Section.Content>
                 <Section.Label>{m.picture.label}</Section.Label>
                 <Section.Description>{m.picture.description}</Section.Description>
+                {rejection ? (
+                  // Standalone: `Field.Error` tolerates a missing field context, so the row borrows
+                  // its icon and tone without pretending to be a form control.
+                  <Field.Error role='alert'>{m.picture.errors[rejection]}</Field.Error>
+                ) : null}
               </Section.Content>
               <ProfilePictureActions
                 canChange={Boolean(onProfilePictureChange)}

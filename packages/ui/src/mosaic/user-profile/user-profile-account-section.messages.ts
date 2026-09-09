@@ -20,6 +20,12 @@ export const userProfileAccountSectionBase = {
     manage: 'Manage profile picture',
     change: 'Change avatar',
     remove: 'Remove avatar',
+    /** Shown under the description when the picker turns a file away. Keyed by rejection reason. */
+    errors: {
+      accept: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
+      size: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+      overflow: 'Only one file can be uploaded at a time.',
+    },
   },
   name: {
     label: 'Name',
