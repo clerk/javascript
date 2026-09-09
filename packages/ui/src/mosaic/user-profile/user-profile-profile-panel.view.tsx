@@ -43,6 +43,7 @@ export function UserProfileProfilePanelView({
   connectedAccounts = [],
   web3Wallets = [],
   onProfilePictureChange,
+  onProfilePictureReject,
   onRemoveProfilePicture,
   onNameChange,
   onUsernameChange,
@@ -87,6 +88,7 @@ export function UserProfileProfilePanelView({
           onManageEmail={onManageEmail}
           onManagePhone={onManagePhone}
           onProfilePictureChange={onProfilePictureChange}
+          onProfilePictureReject={onProfilePictureReject}
           onRemoveEmail={onRemoveEmail}
           onRemovePhone={onRemovePhone}
           onRemoveProfilePicture={onRemoveProfilePicture}

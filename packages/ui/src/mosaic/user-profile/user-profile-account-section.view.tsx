@@ -1,5 +1,6 @@
+import type { FileRejection } from '@clerk/headless/file-upload';
+import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
-import { useRef } from 'react';
 
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
@@ -12,6 +13,8 @@ import { UserProfileActionMenu } from './user-profile-action-menu';
 import { styles } from './user-profile-profile-panel.styles';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
+/** Matches the limit the row's own description advertises. */
+const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
 
 export interface UserProfileEmail {
   id: string;
@@ -43,6 +46,11 @@ export interface UserProfileAccountSectionViewProps {
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
   onProfilePictureChange?: (file: File) => void;
+  /**
+   * Called with the files the picker turned away for type or size. The row renders no error of its
+   * own, so a consumer that wants the user told has to surface these.
+   */
+  onProfilePictureReject?: (rejections: FileRejection[]) => void;
   onRemoveProfilePicture?: () => void;
   onNameChange?: (value: string) => void;
   onUsernameChange?: (value: string) => void;
@@ -67,6 +75,7 @@ export function UserProfileAccountSectionView({
   emails,
   phones,
   onProfilePictureChange,
+  onProfilePictureReject,
   onRemoveProfilePicture,
   onNameChange,
   onUsernameChange,
@@ -87,39 +96,22 @@ export function UserProfileAccountSectionView({
     .join('')
     .slice(0, 2)
     .toUpperCase();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const openFilePicker = () => fileInputRef.current?.click();
-  const pictureActions: UserProfileMenuAction[] = [];
-
-  if (hasImage && onProfilePictureChange) {
-    pictureActions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
-  }
-
-  if (hasImage && onRemoveProfilePicture) {
-    pictureActions.push({ label: m.picture.remove, icon: 'close', onClick: onRemoveProfilePicture });
-  }
-
   const updateName = onNameChange ? () => onNameChange(name) : undefined;
   const updateUsername = onUsernameChange ? () => onUsernameChange(username) : undefined;
 
   return (
-    <div {...stylex.props(styles.sections)}>
-      {onProfilePictureChange ? (
-        <input
-          ref={fileInputRef}
-          accept={PROFILE_PICTURE_MIME_TYPES}
-          hidden
-          type='file'
-          onChange={event => {
-            const file = event.currentTarget.files?.[0];
-            // Clear the input so re-picking the same file still fires a change event.
-            event.currentTarget.value = '';
-            if (file) {
-              onProfilePictureChange(file);
-            }
-          }}
-        />
-      ) : null}
+    <FileUpload.Root
+      accept={PROFILE_PICTURE_MIME_TYPES}
+      maxSize={PROFILE_PICTURE_MAX_BYTES}
+      render={<div {...stylex.props(styles.sections)} />}
+      onReject={onProfilePictureReject}
+      onValueChange={files => {
+        const file = files[0];
+        if (file) {
+          onProfilePictureChange?.(file);
+        }
+      }}
+    >
       <Section.Root aria-label={m.sectionLabel}>
         <Section.Title>{m.sectionTitle}</Section.Title>
         <Section.Group>
@@ -138,25 +130,11 @@ export function UserProfileAccountSectionView({
                 <Section.Label>{m.picture.label}</Section.Label>
                 <Section.Description>{m.picture.description}</Section.Description>
               </Section.Content>
-              {pictureActions.length > 0 ? (
-                <Section.Actions>
-                  <UserProfileActionMenu
-                    actions={pictureActions}
-                    label={m.picture.manage}
-                  />
-                </Section.Actions>
-              ) : !hasImage && onProfilePictureChange ? (
-                <Section.Actions>
-                  <Button
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    onClick={openFilePicker}
-                  >
-                    {m.picture.upload}
-                  </Button>
-                </Section.Actions>
-              ) : null}
+              <ProfilePictureActions
+                canChange={Boolean(onProfilePictureChange)}
+                hasImage={hasImage}
+                onRemove={onRemoveProfilePicture}
+              />
             </Section.Item>
           </Section.Row>
           <Section.Row>
@@ -243,8 +221,64 @@ export function UserProfileAccountSectionView({
           onVerify={onVerifyPhone}
         />
       ) : null}
-    </div>
+    </FileUpload.Root>
   );
+}
+
+/**
+ * Sits inside `FileUpload.Root` so it can open the picker from a menu item, which is a plain
+ * callback rather than a `FileUpload.Trigger` button.
+ */
+function ProfilePictureActions({
+  hasImage,
+  canChange,
+  onRemove,
+}: {
+  hasImage: boolean;
+  canChange: boolean;
+  onRemove?: () => void;
+}) {
+  const { openFilePicker } = FileUpload.useFileUpload();
+  const actions: UserProfileMenuAction[] = [];
+
+  if (hasImage && canChange) {
+    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
+  }
+
+  if (hasImage && onRemove) {
+    actions.push({ label: m.picture.remove, icon: 'close', onClick: onRemove });
+  }
+
+  if (actions.length > 0) {
+    return (
+      <Section.Actions>
+        <UserProfileActionMenu
+          actions={actions}
+          label={m.picture.manage}
+        />
+      </Section.Actions>
+    );
+  }
+
+  if (!hasImage && canChange) {
+    return (
+      <Section.Actions>
+        <FileUpload.Trigger
+          render={
+            <Button
+              color='neutral'
+              size='sm'
+              variant='outline'
+            />
+          }
+        >
+          {m.picture.upload}
+        </FileUpload.Trigger>
+      </Section.Actions>
+    );
+  }
+
+  return null;
 }
 
 interface ContactSectionProps {

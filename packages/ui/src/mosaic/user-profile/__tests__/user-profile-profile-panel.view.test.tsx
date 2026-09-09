@@ -74,6 +74,19 @@ describe('UserProfileProfilePanelView', () => {
     expect(onProfilePictureChange).toHaveBeenCalledWith(file);
   });
 
+  it('turns away a file past the size the row advertises', async () => {
+    const onProfilePictureChange = vi.fn();
+    const onProfilePictureReject = vi.fn();
+    const user = userEvent.setup();
+    const { container } = renderView({ onProfilePictureChange, onProfilePictureReject });
+
+    const oversized = new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'big.png', { type: 'image/png' });
+    await user.upload(container.querySelector<HTMLInputElement>('input[type="file"]') as HTMLInputElement, oversized);
+
+    expect(onProfilePictureChange).not.toHaveBeenCalled();
+    expect(onProfilePictureReject).toHaveBeenCalledWith([{ file: oversized, reason: 'size' }]);
+  });
+
   it('offers Upload while the avatar is only a generated default', () => {
     renderView({
       hasImage: false,
