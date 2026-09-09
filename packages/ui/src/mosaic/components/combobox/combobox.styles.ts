@@ -89,4 +89,10 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     textAlign: 'center',
   },
+  indicator: {
+    alignItems: 'center',
+    display: 'inline-flex',
+    flexShrink: 0,
+    marginInlineStart: 'auto',
+  },
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import type { AutocompleteProps } from '@clerk/headless/autocomplete';
-import { Autocomplete as Primitive } from '@clerk/headless/autocomplete';
+import { Autocomplete } from '@clerk/headless/autocomplete';
 import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -9,14 +9,16 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
+import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { styles } from './combobox.styles';
 
-export type ComboboxRootProps = AutocompleteProps;
+export type ComboboxRootProps = Omit<AutocompleteProps, 'allowsCustomValue'>;
 export type ComboboxSize = 'sm' | 'md' | 'lg';
 export type ComboboxTriggerProps = MosaicComponentProps<'button'>;
+export const ComboboxCollection = Autocomplete.Collection;
 
 const ComboboxAnchorContext = React.createContext<{
   anchor: HTMLElement | null;
@@ -28,9 +30,10 @@ export function ComboboxRoot({ sideOffset = 8, ...props }: ComboboxRootProps) {
   const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
   return (
     <ComboboxAnchorContext.Provider value={context}>
-      <Primitive.Root
+      <Autocomplete.Root
         sideOffset={sideOffset}
         {...props}
+        allowsCustomValue={false}
       />
     </ComboboxAnchorContext.Provider>
   );
@@ -41,7 +44,7 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
   ref,
 ) {
   return (
-    <Primitive.Trigger
+    <Autocomplete.Trigger
       ref={ref}
       {...mergeStyleProps(themeProps('combobox-trigger'), className, style)}
       {...props}
@@ -68,7 +71,7 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
   const size = inputGroup?.size ?? sizeProp ?? 'md';
 
   return (
-    <Primitive.Input
+    <Autocomplete.Input
       ref={ref}
       render={
         render ?? (
@@ -86,9 +89,9 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
 
 export interface ComboboxPopupProps extends MosaicComponentProps<'div'> {
   /** Overrides positioning against the input group or standalone input. */
-  anchor?: React.ComponentPropsWithoutRef<typeof Primitive.Positioner>['anchor'];
+  anchor?: React.ComponentPropsWithoutRef<typeof Autocomplete.Positioner>['anchor'];
   /** Container the combobox portals into. Defaults to `document.body`. */
-  portalRoot?: React.ComponentPropsWithoutRef<typeof Primitive.Portal>['root'];
+  portalRoot?: React.ComponentPropsWithoutRef<typeof Autocomplete.Portal>['root'];
 }
 
 /** Floating listbox surface. Portal and positioning are handled internally. */
@@ -98,12 +101,12 @@ export const ComboboxPopup = React.forwardRef<HTMLDivElement, ComboboxPopupProps
 ) {
   const context = React.useContext(ComboboxAnchorContext);
   return (
-    <Primitive.Portal root={portalRoot}>
-      <Primitive.Positioner
+    <Autocomplete.Portal root={portalRoot}>
+      <Autocomplete.Positioner
         anchor={anchor ?? context?.anchor}
         {...mergeStyleProps(themeProps('combobox-positioner'), stylex.props(reset.base, styles.positioner))}
       >
-        <Primitive.Popup
+        <Autocomplete.Popup
           ref={ref}
           {...mergeStyleProps(
             themeProps('combobox-popup'),
@@ -121,9 +124,9 @@ export const ComboboxPopup = React.forwardRef<HTMLDivElement, ComboboxPopupProps
           >
             {children}
           </div>
-        </Primitive.Popup>
-      </Primitive.Positioner>
-    </Primitive.Portal>
+        </Autocomplete.Popup>
+      </Autocomplete.Positioner>
+    </Autocomplete.Portal>
   );
 });
 
@@ -135,7 +138,7 @@ export const ComboboxList = React.forwardRef<HTMLDivElement, ComboboxListProps>(
   ref,
 ) {
   return (
-    <Primitive.List
+    <Autocomplete.List
       ref={ref}
       {...mergeStyleProps(
         themeProps('combobox-list'),
@@ -159,7 +162,7 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
   ref,
 ) {
   return (
-    <Primitive.Option
+    <Autocomplete.Option
       ref={ref}
       {...mergeStyleProps(themeProps('combobox-option'), stylex.props(reset.base, styles.option), className, style)}
       {...rest}
@@ -168,6 +171,27 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
 });
 
 export type ComboboxEmptyProps = MosaicComponentProps<'p'>;
+
+export type ComboboxOptionIndicatorProps = MosaicComponentProps<'span'>;
+
+export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, ComboboxOptionIndicatorProps>(
+  function MosaicComboboxOptionIndicator({ className, style, children, ...props }, ref) {
+    return (
+      <Autocomplete.OptionIndicator
+        ref={ref}
+        {...mergeStyleProps(themeProps('combobox-option-indicator'), stylex.props(styles.indicator), className, style)}
+        {...props}
+      >
+        {children ?? (
+          <Icon
+            name='check'
+            size='sm'
+          />
+        )}
+      </Autocomplete.OptionIndicator>
+    );
+  },
+);
 
 export const ComboboxEmpty = React.forwardRef<HTMLParagraphElement, ComboboxEmptyProps>(function MosaicComboboxEmpty(
   { render, className, style, ...rest },
@@ -186,10 +210,12 @@ export const ComboboxEmpty = React.forwardRef<HTMLParagraphElement, ComboboxEmpt
 
 export const Combobox = {
   Root: ComboboxRoot,
+  Collection: ComboboxCollection,
   Input: ComboboxInput,
   Trigger: ComboboxTrigger,
   Popup: ComboboxPopup,
   List: ComboboxList,
   Option: ComboboxOption,
+  OptionIndicator: ComboboxOptionIndicator,
   Empty: ComboboxEmpty,
 };

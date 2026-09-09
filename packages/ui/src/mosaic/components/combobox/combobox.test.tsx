@@ -9,7 +9,7 @@ import { Icon } from '../icon';
 import { InputGroup } from '../input-group';
 import { Combobox } from './combobox';
 
-function FloatingCombobox(props?: { onValueChange?: (value: string) => void; anchor?: HTMLElement }) {
+function FloatingCombobox(props?: { onValueChange?: (value: string | null) => void; anchor?: HTMLElement }) {
   return (
     <Combobox.Root onValueChange={props?.onValueChange}>
       <InputGroup.Root data-testid='fruit-group'>
@@ -37,12 +37,14 @@ function FloatingCombobox(props?: { onValueChange?: (value: string) => void; anc
           label='Apple'
         >
           Apple
+          <Combobox.OptionIndicator data-testid='apple-check' />
         </Combobox.Option>
         <Combobox.Option
           value='banana'
           label='Banana'
         >
           Banana
+          <Combobox.OptionIndicator data-testid='banana-check' />
         </Combobox.Option>
       </Combobox.Popup>
     </Combobox.Root>
@@ -50,6 +52,37 @@ function FloatingCombobox(props?: { onValueChange?: (value: string) => void; anc
 }
 
 describe('Mosaic Combobox', () => {
+  it('removes the check and selection when the input is cleared', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<FloatingCombobox onValueChange={onValueChange} />);
+    await user.click(screen.getByRole('button', { name: 'Toggle fruit options' }));
+    await user.click(screen.getByRole('option', { name: 'Apple' }));
+    await user.clear(screen.getByRole('combobox'));
+    expect(onValueChange).toHaveBeenLastCalledWith(null);
+    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'false');
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('combobox')).toHaveValue('');
+  });
+  it('keeps the check on the selection while another option is highlighted', async () => {
+    const user = userEvent.setup();
+    render(<FloatingCombobox />);
+    const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
+    await user.click(trigger);
+    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('option', { name: 'Apple' }));
+    await user.click(trigger);
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+    expect(screen.getByTestId('apple-check')).toBeVisible();
+    expect(screen.getByTestId('apple-check')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByTestId('banana-check')).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'true');
+    await user.click(screen.getByRole('option', { name: 'Banana' }));
+    await user.click(trigger);
+    expect(screen.getByTestId('banana-check')).toBeVisible();
+    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+  });
   it('positions the popup against the full input group', async () => {
     const user = userEvent.setup();
     render(<FloatingCombobox />);
@@ -177,6 +210,57 @@ describe('Mosaic Combobox', () => {
     await user.keyboard('{Enter}');
 
     expect(onValueChange).toHaveBeenCalledWith('apple');
+  });
+
+  it('discards search text on dismiss without changing the selected value', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<FloatingCombobox onValueChange={onValueChange} />);
+    const input = screen.getByRole('combobox', { name: 'Fruit' });
+    await user.type(input, 'a');
+    await user.keyboard('{Enter}');
+    await user.type(input, ' not a fruit');
+    await user.keyboard('{Escape}');
+
+    expect(input).toHaveValue('Apple');
+    expect(onValueChange).toHaveBeenCalledExactlyOnceWith('apple');
+  });
+
+  it('keeps the selected label while reopening the unfiltered collection', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <Combobox.Input aria-label='Fruit' />
+        <Combobox.Trigger aria-label='Show fruits' />
+        <Combobox.Popup>
+          <Combobox.Collection
+            items={['Apple', 'Banana']}
+            itemToStringLabel={item => item}
+            empty={<Combobox.Empty>No matches</Combobox.Empty>}
+          >
+            {item => (
+              <Combobox.Option
+                key={item}
+                value={item}
+              >
+                {item}
+              </Combobox.Option>
+            )}
+          </Combobox.Collection>
+        </Combobox.Popup>
+      </Combobox.Root>,
+    );
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'Ban');
+    expect(screen.getAllByRole('option')).toHaveLength(1);
+    await user.click(screen.getByRole('option', { name: 'Banana' }));
+    await user.click(screen.getByRole('button', { name: 'Show fruits' }));
+    expect(input).toHaveValue('Banana');
+    expect(screen.getAllByRole('option')).toHaveLength(2);
+    await user.type(input, 'unknown');
+    expect(screen.getByText('No matches')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(input).toHaveValue('Banana');
   });
 
   it('styles disabled options and prevents their selection', async () => {
