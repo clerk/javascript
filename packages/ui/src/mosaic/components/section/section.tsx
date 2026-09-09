@@ -282,7 +282,7 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
             name='alert-circle'
             size='sm'
             aria-hidden='true'
-            {...stylex.props(styles.errorIcon)}
+            xstyle={styles.errorIcon}
           />
           <span>{children}</span>
         </>
