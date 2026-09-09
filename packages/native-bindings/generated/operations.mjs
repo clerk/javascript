@@ -901,12 +901,6 @@ export const operations = {
     result: {"kind":"ref","name":"OrganizationCreationDefaults"},
     invoke: (target, args) => target["reload"](...args),
   },
-  "SessionVerification.reload": {
-    type: "SessionVerification",
-    parameters: [{"name":"p","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"ClerkResourceReloadParams"}}}],
-    result: {"kind":"ref","name":"SessionVerification"},
-    invoke: (target, args) => target["reload"](...args),
-  },
   "EnvironmentResource.isSingleSession": {
     type: "EnvironmentResource",
     parameters: [],

@@ -4997,15 +4997,6 @@ public class SessionVerification(override val handle: ResourceHandle, runtime: C
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SessionVerification = runtime.resource(ResourceHandle.fromReference(value)) as SessionVerification
   }
-  /**
-   * Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).
-   */
-  public suspend fun `reload`(`p`: ClerkResourceReloadParams? = null): SessionVerification {
-    val runtime = context.requireRuntime()
-    return runtime.invoke(this, handle, "SessionVerification.reload", listOf(`p`?.let { value -> value.toJson() } ?: Undefined)) { result ->
-      SessionVerification.fromJson(result, runtime)
-    }
-  }
 }
 
 public sealed class SessionVerificationStatus(public val rawValue: String) {
@@ -9704,7 +9695,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "779dedc726a5c587629061d6e3ad89ef835e3f1f92566e8d19706c1cf5f14a33"
+  public const val contractHash: String = "fc919ded53c772af190eb2a07f5fdec94a7f1f47fbc2b04b4a3ab76c4d39bf16"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

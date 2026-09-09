@@ -232,3 +232,23 @@ test('accounts for policy members declared in nested intersection and union alia
     assert.equal(definition.properties?.some(property => property.name === 'verificationUrl') ?? false, false);
   }
 });
+
+test('an explicit resource identity policy survives exclusion of the last method', () => {
+  const input = `interface ClerkResource { id?: string; reload(): Promise<this>; }
+    export interface SignInFutureResource { verification: SessionVerificationResource; }
+    export interface SessionVerificationResource extends ClerkResource { status: 'initial' | 'complete'; }`;
+  const model = compile(input, {
+    excluded: { 'SessionVerificationResource.reload': 'No reload endpoint.' },
+    resourceTypes: { SessionVerificationResource: 'Retain identity and observation.' },
+  });
+  assert.deepEqual(model.failures, []);
+  assert.equal(model.definitions.SessionVerification.kind, 'resource');
+  assert.equal(model.definitions.SessionVerification.methods.length, 0);
+  const native = generateNative(model, { protocolVersion: 1, contractHash: 'fixture' });
+  assert.match(native['GeneratedAPI.swift'], /class SessionVerification: CoreResource/);
+  assert.match(native['GeneratedAPI.kt'], /class SessionVerification/);
+  assert.equal(native['swift-api.txt'].includes('SessionVerification.reload'), false);
+  assert.equal(native['kotlin-api.txt'].includes('SessionVerification.reload'), false);
+  const stale = compile(input, { resourceTypes: { MissingResource: 'Stale policy.' } });
+  assert.ok(stale.failures.some(f => f.path === 'MissingResource' && /not reached/.test(f.reason)));
+});

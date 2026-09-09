@@ -22,6 +22,10 @@ export const profile = {
     'OrganizationEnterpriseConnectionSamlInput.attributeMapping': 'User-defined SAML attribute mapping.',
     'UpdateOrganizationEnterpriseConnectionParams.customAttributes': 'User-defined JSON attributes.',
   },
+  resourceTypes: {
+    SessionVerificationResource:
+      'Preserve resource identity and observation when its unsupported inherited reload is excluded.',
+  },
   roots: {
     clerk: ['mobile.ts', 'MobileClerk'],
     signIn: ['signInFuture.ts', 'SignInFutureResource'],
@@ -37,6 +41,8 @@ export const profile = {
       'Native email links use the configured callback and persisted PKCE verifier.',
     'CreateExternalAccountParams.redirectUrl': 'Connected accounts use the configured native browser callback.',
     'ReauthorizeExternalAccountParams.redirectUrl': 'Connected accounts use the configured native browser callback.',
+    'SessionVerificationResource.reload':
+      'Canonical SessionVerification has no reload endpoint; advance reverification through its owning Session methods.',
     'TOTPResource.reload': 'Enrollment secrets are explicit method return values, not shared observable resources.',
     'BackupCodeResource.reload': 'Recovery codes are explicit method return values, not shared observable resources.',
     'EnvironmentResource.onWindowLocationHost': 'Browser host matching is not a native environment capability.',

@@ -1181,7 +1181,6 @@ SessionTouchParams: Hashable
 SessionVerification.firstFactorVerification: Verification
 SessionVerification.id: String? = nil
 SessionVerification.level: SessionVerificationLevel
-SessionVerification.reload(p: ClerkResourceReloadParams? = nil): SessionVerification [return]
 SessionVerification.secondFactorVerification: Verification
 SessionVerification.session: Session
 SessionVerification.status: SessionVerificationStatus

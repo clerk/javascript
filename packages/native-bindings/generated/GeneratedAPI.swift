@@ -6558,13 +6558,6 @@ public struct SessionVerificationState: Hashable, Sendable {
   public func prepare(_ value: JSONValue) throws -> any Sendable { try SessionVerificationState.decode(value, in: context.requireRuntime()) }
   public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
   public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SessionVerification { try runtime.resource(ResourceHandle.decodeReference(value), as: SessionVerification.self) }
-  /// Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).
-  public func `reload`(_ `p`: ClerkResourceReloadParams? = nil) async throws -> SessionVerification {
-    let runtime = try context.requireRuntime()
-    return try await runtime.invoke(owner: self, target: handle, operation: "SessionVerification.reload", arguments: [try `p`.map { value in try value.encode() } ?? .undefined]) { result in
-      return try SessionVerification.decode(result, in: runtime)
-    }
-  }
 }
 
 public enum SessionVerificationStatus: Hashable, Sendable {
@@ -13003,7 +12996,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "779dedc726a5c587629061d6e3ad89ef835e3f1f92566e8d19706c1cf5f14a33"
+  public static let contractHash = "fc919ded53c772af190eb2a07f5fdec94a7f1f47fbc2b04b4a3ab76c4d39bf16"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

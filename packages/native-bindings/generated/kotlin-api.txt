@@ -957,7 +957,6 @@ SessionTouchParams.intent: SessionTouchIntent? = null
 SessionVerification.firstFactorVerification: Verification
 SessionVerification.id: String? = null
 SessionVerification.level: SessionVerificationLevel
-SessionVerification.reload(p: ClerkResourceReloadParams? = null): SessionVerification [return]
 SessionVerification.secondFactorVerification: Verification
 SessionVerification.session: Session
 SessionVerification.status: SessionVerificationStatus

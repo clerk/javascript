@@ -309,17 +309,24 @@ export function compileProfile(repository, policy = profile) {
     }
     const properties = checker.getPropertiesOfType(type);
     const owner = symbolName && !symbolName.startsWith('__') ? symbolName : hint;
-    const isBehavior = properties.some(p => {
-      const declarationOwner = p.declarations?.[0]?.parent?.name?.getText();
-      if (
-        policy.excluded[`${owner}.${p.getName()}`] ||
-        policy.excluded[`${declarationOwner}.${p.getName()}`] ||
-        p.getName().startsWith('__internal') ||
-        p.getName().startsWith('__experimental')
-      )
-        return false;
-      return checker.getSignaturesOfType(checker.getTypeOfSymbol(p), ts.SignatureKind.Call).length;
-    });
+    const retainedResource = policy.resourceTypes?.[owner];
+    if (retainedResource) {
+      overridesUsed.add(owner);
+      accounting.push({ path: owner, disposition: 'adapted', reason: retainedResource });
+    }
+    const isBehavior =
+      Boolean(retainedResource) ||
+      properties.some(p => {
+        const declarationOwner = p.declarations?.[0]?.parent?.name?.getText();
+        if (
+          policy.excluded[`${owner}.${p.getName()}`] ||
+          policy.excluded[`${declarationOwner}.${p.getName()}`] ||
+          p.getName().startsWith('__internal') ||
+          p.getName().startsWith('__experimental')
+        )
+          return false;
+        return checker.getSignaturesOfType(checker.getTypeOfSymbol(p), ts.SignatureKind.Call).length;
+      });
     if (isBehavior && context.direction === 'input' && !symbolName?.endsWith('Resource'))
       return unsupported(type, hint, 'Behavior in an input type requires a callback adapter.');
     definition.kind = isBehavior ? 'resource' : 'object';
@@ -476,6 +483,7 @@ export function compileProfile(repository, policy = profile) {
     ...Object.keys(policy.jsonObjectMembers || {}),
     ...Object.keys(policy.explicitReads || {}),
     ...Object.keys(policy.sparseDictionaries || {}),
+    ...Object.keys(policy.resourceTypes || {}),
   ]) {
     if (!overridesUsed.has(key)) failures.push({ path: key, reason: 'Binding policy target was not reached.' });
   }
