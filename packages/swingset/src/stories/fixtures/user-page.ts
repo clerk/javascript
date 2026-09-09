@@ -66,6 +66,7 @@ export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) 
   const panels: UserPageViewProps['panels'] = {
     account: {
       allowMultipleAccounts: true,
+      hasImage: true,
       imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
       name: 'Preston Booth',
       username: 'prestonxyz',

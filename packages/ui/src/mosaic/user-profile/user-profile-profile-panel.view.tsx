@@ -35,6 +35,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
 export function UserProfileProfilePanelView({
   allowMultipleAccounts,
   imageUrl,
+  hasImage,
   name = '',
   username = '',
   emails = [],
@@ -76,6 +77,7 @@ export function UserProfileProfilePanelView({
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
+          hasImage={hasImage}
           imageUrl={imageUrl}
           name={name}
           phones={phones}

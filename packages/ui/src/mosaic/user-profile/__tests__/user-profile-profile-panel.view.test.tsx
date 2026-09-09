@@ -74,11 +74,28 @@ describe('UserProfileProfilePanelView', () => {
     expect(onProfilePictureChange).toHaveBeenCalledWith(file);
   });
 
+  it('offers Upload while the avatar is only a generated default', () => {
+    renderView({
+      hasImage: false,
+      imageUrl: 'https://img.clerk.com/generated-default.png',
+      onProfilePictureChange: vi.fn(),
+      onRemoveProfilePicture: vi.fn(),
+    });
+
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Manage profile picture' })).toBeNull();
+  });
+
   it('offers change and remove in a menu once a profile picture is set', async () => {
     const onProfilePictureChange = vi.fn();
     const onRemoveProfilePicture = vi.fn();
     const user = userEvent.setup();
-    renderView({ imageUrl: 'https://example.com/avatar.png', onProfilePictureChange, onRemoveProfilePicture });
+    renderView({
+      hasImage: true,
+      imageUrl: 'https://example.com/avatar.png',
+      onProfilePictureChange,
+      onRemoveProfilePicture,
+    });
 
     expect(screen.queryByRole('button', { name: 'Upload' })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));

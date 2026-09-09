@@ -36,6 +36,7 @@ function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: bool
     <UserProfileAccountSectionView
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
+      hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}
       name='Preston Booth'
       phones={phones}

@@ -57,6 +57,7 @@ export function Default(_args: Record<string, unknown>) {
           connected: false,
         },
       ]}
+      hasImage
       imageUrl={profileImageUrl}
       name='Preston Booth'
       phones={phones}
