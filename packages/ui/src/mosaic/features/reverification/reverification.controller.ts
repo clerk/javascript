@@ -4,7 +4,7 @@ import type { FlowDirection } from '../../components/flow';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/useMachine';
-import type { ReverificationModel } from './reverification.model';
+import type { ReverificationModel, ReverificationReadyModel } from './reverification.model';
 import type { ReverificationMethod, ReverificationResult, ReverificationViewProps } from './reverification.types';
 import { needsPrepare, otpChannelFor } from './reverification.utils';
 
@@ -16,14 +16,10 @@ export type ReverificationController =
 
 type OverlayFrom = 'factor' | 'method-picker';
 
-export type ReverificationDeps = {
-  start: () => Promise<ReverificationResult>;
-  prepare: (method: ReverificationMethod) => Promise<void>;
-  attempt: (method: ReverificationMethod, value: string) => Promise<ReverificationResult>;
-  verifyPasskey: () => Promise<ReverificationResult>;
-  finish: () => Promise<void>;
-  cancel: () => void;
-};
+export type ReverificationDeps = Pick<
+  ReverificationReadyModel,
+  'start' | 'prepare' | 'attempt' | 'verifyPasskey' | 'finish' | 'cancel'
+>;
 
 interface ReverificationContext {
   inputValue: string;
@@ -52,12 +48,16 @@ type ReverificationEvent =
 
 const { createMachine, assign, fromPromise } = setup<ReverificationContext, ReverificationEvent>();
 
+function notSeated(): Promise<never> {
+  return Promise.reject(new Error('reverification deps are not seated'));
+}
+
 const unseatedDeps: ReverificationDeps = {
-  start: () => Promise.reject(new Error('start is not seated')),
-  prepare: () => Promise.resolve(),
-  attempt: () => Promise.reject(new Error('attempt is not seated')),
-  verifyPasskey: () => Promise.reject(new Error('verifyPasskey is not seated')),
-  finish: () => Promise.resolve(),
+  start: notSeated,
+  prepare: notSeated,
+  attempt: notSeated,
+  verifyPasskey: notSeated,
+  finish: notSeated,
   cancel: () => {},
 };
 
@@ -350,14 +350,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
       ? {
           context: {
             supportEmail: ready.supportEmail,
-            deps: {
-              start: ready.start,
-              prepare: ready.prepare,
-              attempt: ready.attempt,
-              verifyPasskey: ready.verifyPasskey,
-              finish: ready.finish,
-              cancel: ready.cancel,
-            },
+            deps: ready,
           },
         }
       : undefined,
