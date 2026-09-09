@@ -75,6 +75,15 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
   } = props;
 
   const otp = otpCopy(otpChannel);
+  const hasAlternatives = methods.length > 0;
+  const resend =
+    otpChannel === 'email' || otpChannel === 'phone'
+      ? {
+          label: otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton,
+          disabled: !canResend || isPending,
+          onClick: onResend,
+        }
+      : undefined;
 
   return (
     <Card.Root renderBranding={false}>
@@ -99,7 +108,7 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
                 isPending={isPending}
                 onValueChange={onValueChange}
                 onSubmit={onSubmit}
-                onCancel={onShowMethods}
+                onCancel={hasAlternatives ? onShowMethods : undefined}
               />
             </Flow.Step>
 
@@ -113,7 +122,7 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
                 errorMessage={errorMessage}
                 isPending={isPending}
                 onVerify={onVerifyPasskey}
-                onCancel={onShowMethods}
+                onCancel={hasAlternatives ? onShowMethods : undefined}
               />
             </Flow.Step>
 
@@ -128,22 +137,14 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
                 value={value}
                 errorMessage={errorMessage}
                 isPending={isPending}
-                resend={
-                  onResend
-                    ? {
-                        label: otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton,
-                        disabled: !canResend || isPending,
-                        onClick: onResend,
-                      }
-                    : undefined
-                }
+                resend={resend}
                 onValueChange={onValueChange}
                 onComplete={code => {
                   onValueChange(code);
                   onSubmit();
                 }}
                 onSubmit={onSubmit}
-                onCancel={onShowMethods}
+                onCancel={hasAlternatives ? onShowMethods : undefined}
               />
             </Flow.Step>
 
@@ -160,7 +161,7 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
                 isPending={isPending}
                 onValueChange={onValueChange}
                 onSubmit={onSubmit}
-                onCancel={onShowMethods}
+                onCancel={hasAlternatives ? onShowMethods : undefined}
               />
             </Flow.Step>
 
