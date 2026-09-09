@@ -46,6 +46,11 @@ export interface UseDrawerDragReturn {
   isDragging: boolean;
 }
 
+function scrolls(el: HTMLElement): boolean {
+  const { overflowY } = getComputedStyle(el);
+  return overflowY === 'auto' || overflowY === 'scroll';
+}
+
 /**
  * Pointer/transform drag engine for a bottom sheet (Y axis only). Down-to-dismiss
  * with velocity and distance thresholds, an inner-scroll-aware gate, and snap-point
@@ -54,6 +59,7 @@ export interface UseDrawerDragReturn {
  * Movement is written via the `swipeY` CSS var (no direct `transform`), so the
  * `curSwipe` ref — not `getComputedStyle` — is the source of truth for decisions.
  */
+
 export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
   const { open, now } = opts;
   const [isDragging, setIsDragging] = useState(false);
@@ -173,12 +179,16 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     // at the sheet: nothing above it is inner content, and its box may well be taller than the
     // screen, while the page behind must never veto a drag.
     for (let el: HTMLElement | null = target; el; el = el.parentElement) {
-      const room = down ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1;
-      if (el.scrollHeight > el.clientHeight && room) {
-        if (down) {
-          lastScrollAt.current = clock();
+      // Only a box that can scroll is inner content: a clipped or overflowing one has the same
+      // geometry and none of the behaviour, and would swallow every upward drag at rest.
+      if (el.scrollHeight > el.clientHeight && scrolls(el)) {
+        const room = down ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1;
+        if (room) {
+          if (down) {
+            lastScrollAt.current = clock();
+          }
+          return false;
         }
-        return false;
       }
       if (el === sheet) {
         break;

@@ -202,10 +202,16 @@ function stubMeasuredHeight(el: HTMLElement, naturalHeight: number) {
 
 function makeScrollable(
   el: HTMLElement,
-  { scrollHeight, clientHeight, scrollTop }: { scrollHeight: number; clientHeight: number; scrollTop: number },
+  {
+    scrollHeight,
+    clientHeight,
+    scrollTop,
+    overflowY = 'auto',
+  }: { scrollHeight: number; clientHeight: number; scrollTop: number; overflowY?: string },
 ) {
   Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true });
   Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true });
+  el.style.overflowY = overflowY;
   el.scrollTop = scrollTop;
 }
 
@@ -701,6 +707,25 @@ describe('Drawer', () => {
       expect(parseFloat(swipeY(popup))).toBeLessThan(0);
 
       fireEvent.pointerUp(popup, { pointerId: 1, clientY: 100 });
+    });
+
+    // A clipped box with a fixed height overflows the same way a scroller does and scrolls not at
+    // all; it is not inner content.
+    it('rubber-bands upward at rest over a box that overflows but cannot scroll', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      const box = screen.getByTestId('scrollable');
+      makeScrollable(box, { scrollHeight: 500, clientHeight: 100, scrollTop: 0, overflowY: 'clip' });
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(box, { pointerId: 1, clientY: 300, button: 0, pointerType: 'touch' });
+      clock.t += 30;
+      fireEvent.pointerMove(box, { pointerId: 1, clientY: 100 });
+
+      expect(parseFloat(swipeY(popup))).toBeLessThan(0);
+
+      fireEvent.pointerUp(box, { pointerId: 1, clientY: 100 });
     });
 
     it('lets inner content scroll on an upward drag at rest when it has room to', () => {
