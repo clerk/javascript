@@ -1,10 +1,17 @@
+import * as stylex from '@stylexjs/stylex';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import type { MosaicIconOverrides } from '../../icons/overrides';
 import { MosaicProvider } from '../../MosaicProvider';
+import { space } from '../../tokens.stylex';
 import { Icon } from './icon';
+
+const containerStyles = stylex.create({
+  lineBox: { height: '1lh' },
+  mdHeight: { height: space['4'] },
+});
 
 const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
   render(<MosaicProvider icons={icons}>{ui}</MosaicProvider>);
@@ -59,6 +66,18 @@ describe('Mosaic Icon', () => {
     expect(svg).toHaveAttribute('data-size', 'lg');
     expect(svg).toHaveClass('cl-icon', 'my-icon');
     expect(svg).toHaveStyle({ marginTop: '8px' });
+  });
+
+  it('lets a container xstyle override the size atoms instead of stacking a second class', () => {
+    const { container } = wrap(
+      <Icon
+        name='chevron-right'
+        xstyle={containerStyles.lineBox}
+      />,
+    );
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveClass(stylex.props(containerStyles.lineBox).className ?? '');
+    expect(svg).not.toHaveClass(stylex.props(containerStyles.mdHeight).className ?? '');
   });
 
   it('emits no placement attribute when the icon is not placed', () => {

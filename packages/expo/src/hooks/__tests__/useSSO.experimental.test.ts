@@ -202,6 +202,25 @@ describe('experimental useSSO', () => {
     expect(response.signIn).toBe(reloadedSignIn);
   });
 
+  test.each([
+    { strategy: 'oauth_google', oidcPrompt: 'select_account', oidcLoginHint: 'user@example.com' },
+    {
+      strategy: 'enterprise_sso',
+      identifier: 'user@example.com',
+      oidcPrompt: 'consent',
+      oidcLoginHint: 'user@example.com',
+    },
+  ] as const)('forwards SSO options to sign-in creation: %j', async params => {
+    const { result } = renderHook(() => useSSO());
+
+    await result.current.startSSOFlow(params);
+
+    expect(mockSignIn.create).toHaveBeenCalledWith({
+      ...params,
+      redirectUrl: 'myapp://sso-callback',
+    });
+  });
+
   test('ignores a session retained by an unrelated sign-up resource', async () => {
     mockSignUp.createdSessionId = 'sess_stale_signup';
     const { result } = renderHook(() => useSSO());

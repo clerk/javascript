@@ -12,6 +12,7 @@ export { default as __source } from './card.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Card',
   source: 'packages/ui/src/mosaic/components/card/card.tsx',
   styles: {
