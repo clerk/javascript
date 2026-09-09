@@ -47,6 +47,12 @@ describe('AuthConfig', () => {
       reverification: true,
       single_session_mode: true,
       session_minter: false,
+      native_settings: {
+        api_enabled: false,
+        trusted_device_sign_in_enabled: false,
+        trusted_device_enrollment_prompt_after_sign_in_enabled: false,
+        trusted_device_enrollment_prompt_after_sign_up_enabled: false,
+      },
     });
   });
 });

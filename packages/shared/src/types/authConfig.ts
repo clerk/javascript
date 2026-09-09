@@ -2,6 +2,13 @@ import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { ClerkResource } from './resource';
 import type { AuthConfigJSONSnapshot } from './snapshots';
 
+export interface NativeAuthSettings {
+  apiEnabled: boolean;
+  trustedDeviceSignInEnabled: boolean;
+  trustedDeviceEnrollmentPromptAfterSignInEnabled: boolean;
+  trustedDeviceEnrollmentPromptAfterSignUpEnabled: boolean;
+}
+
 export interface AuthConfigResource extends ClerkResource {
   /**
    * Enabled single session configuration at the instance level.
@@ -22,5 +29,6 @@ export interface AuthConfigResource extends ClerkResource {
    */
   preferredChannels: Record<string, PhoneCodeChannel> | null;
   sessionMinter: boolean;
+  nativeSettings?: NativeAuthSettings;
   __internal_toSnapshot: () => AuthConfigJSONSnapshot;
 }

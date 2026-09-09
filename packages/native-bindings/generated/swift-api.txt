@@ -71,6 +71,7 @@ AttributeData.verify_at_sign_up: Bool
 AttributeData: Hashable
 AuthConfig.claimedAt: Date?
 AuthConfig.id: String? = nil
+AuthConfig.nativeSettings: NativeAuthSettings? = nil
 AuthConfig.preferredChannels: [String: PhoneCodeChannel]?
 AuthConfig.reverification: Bool
 AuthConfig.sessionMinter: Bool
@@ -301,7 +302,7 @@ EmailAddress.attemptVerification(params: AttemptEmailAddressVerificationParams):
 EmailAddress.create(): EmailAddress [return]
 EmailAddress.createEmailLinkFlow(): CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress [return]
 EmailAddress.createEnterpriseSSOLinkFlow(): CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress [return]
-EmailAddress.createdAt: Field<Date> = .omitted
+EmailAddress.createdAt: Date? = nil
 EmailAddress.destroy(): Void [return]
 EmailAddress.emailAddress: String
 EmailAddress.id: String
@@ -476,7 +477,7 @@ EnvironmentResource.userSettings: UserSettings
 EnvironmentResource: Hashable
 ExternalAccount.accountIdentifier(): String [return]
 ExternalAccount.approvedScopes: String
-ExternalAccount.createdAt: Field<Date> = .omitted
+ExternalAccount.createdAt: Date? = nil
 ExternalAccount.destroy(): Void [return]
 ExternalAccount.emailAddress: String
 ExternalAccount.firstName: String
@@ -579,6 +580,11 @@ MobileSetActiveParamsSession variants: String | ActiveSession | PendingSession
 MobileSetActiveParamsSession: Hashable
 MobileSignOutOptions.sessionId: String? = nil
 MobileSignOutOptions: Hashable
+NativeAuthSettings.apiEnabled: Bool
+NativeAuthSettings.trustedDeviceEnrollmentPromptAfterSignInEnabled: Bool
+NativeAuthSettings.trustedDeviceEnrollmentPromptAfterSignUpEnabled: Bool
+NativeAuthSettings.trustedDeviceSignInEnabled: Bool
+NativeAuthSettings: Hashable
 OAuthProvider cases: facebook, google, hubspot, github, tiktok, gitlab, discord, twitter, twitch, linkedin, linkedin_oidc, dropbox, atlassian, bitbucket, microsoft, notion, apple, line, instagram, coinbase, spotify, xero, box, slack, linear, x, enstall, huggingface, vercel, unrecognized(String)
 OAuthProvider: Hashable
 OAuthProviderSettings.authenticatable: Bool
@@ -907,7 +913,7 @@ PhoneCodeSecondFactorConfig: Hashable
 PhoneNumber.attemptVerification(params: AttemptPhoneNumberVerificationParams): PhoneNumber [return]
 PhoneNumber.backupCodes(): [String]? [explicit-read]
 PhoneNumber.create(): PhoneNumber [return]
-PhoneNumber.createdAt: Field<Date> = .omitted
+PhoneNumber.createdAt: Date? = nil
 PhoneNumber.defaultSecondFactor: Bool
 PhoneNumber.destroy(): Void [return]
 PhoneNumber.id: String
@@ -1774,6 +1780,7 @@ object InviteMemberParams
 object InviteMembersParams
 object MobileSetActiveParams
 object MobileSignOutOptions
+object NativeAuthSettings
 object OAuthProviderSettings
 object OauthFactor
 object OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl

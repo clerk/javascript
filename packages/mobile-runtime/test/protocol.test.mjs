@@ -376,3 +376,37 @@ test('identification timestamps survive core hydration and generated state proje
     assert.equal(f.resource(user[field][0].$ref).createdAt, new Date(timestamp).toISOString());
   }
 });
+
+test('native auth settings refresh through the canonical environment and default to disabled', async t => {
+  let settings = {
+    api_enabled: true,
+    trusted_device_sign_in_enabled: true,
+    trusted_device_enrollment_prompt_after_sign_in_enabled: true,
+    trusted_device_enrollment_prompt_after_sign_up_enabled: false,
+  };
+  const f = await fixture({
+    http: request => {
+      if (!new URL(request.url).pathname.endsWith('/environment')) return;
+      const environment = structuredClone(fixtures.environment);
+      environment.auth_config.native_settings = settings;
+      return response(environment);
+    },
+  });
+  t.after(f.dispose);
+  const handle = f.resource(f.state.roots.clerk).environment.$ref;
+  assert.deepEqual(f.resource(handle).authConfig.nativeSettings, {
+    apiEnabled: true,
+    trustedDeviceSignInEnabled: true,
+    trustedDeviceEnrollmentPromptAfterSignInEnabled: true,
+    trustedDeviceEnrollmentPromptAfterSignUpEnabled: false,
+  });
+  settings = undefined;
+  const result = await f.invoke(handle, 'EnvironmentResource.reload');
+  assert.equal(result.failure, undefined);
+  assert.deepEqual(f.resource(handle).authConfig.nativeSettings, {
+    apiEnabled: false,
+    trustedDeviceSignInEnabled: false,
+    trustedDeviceEnrollmentPromptAfterSignInEnabled: false,
+    trustedDeviceEnrollmentPromptAfterSignUpEnabled: false,
+  });
+});

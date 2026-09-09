@@ -22,7 +22,7 @@ export type SetReservedForSecondFactorParams = {
 
 export interface PhoneNumberResource extends ClerkResource {
   id: string;
-  createdAt?: Date | null;
+  createdAt?: Date;
   phoneNumber: string;
   verification: VerificationResource;
   reservedForSecondFactor: boolean;

@@ -12,7 +12,7 @@ import { BaseResource, IdentificationLink, Verification } from './internal';
 
 export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   id!: string;
-  createdAt: Date | null = null;
+  createdAt: Date | undefined;
   phoneNumber = '';
   reservedForSecondFactor = false;
   defaultSecondFactor = false;
@@ -79,7 +79,7 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     }
 
     this.id = data.id;
-    this.createdAt = data.created_at == null ? null : new Date(data.created_at);
+    this.createdAt = data.created_at == null ? undefined : new Date(data.created_at);
     this.phoneNumber = data.phone_number;
     this.reservedForSecondFactor = data.reserved_for_second_factor;
     this.defaultSecondFactor = data.default_second_factor;

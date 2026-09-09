@@ -57,6 +57,7 @@ AttributeData.verifications: List<VerificationStrategy>
 AttributeData.verify_at_sign_up: Boolean
 AuthConfig.claimedAt: Instant?
 AuthConfig.id: String? = null
+AuthConfig.nativeSettings: NativeAuthSettings? = null
 AuthConfig.preferredChannels: Map<String, PhoneCodeChannel>?
 AuthConfig.reverification: Boolean
 AuthConfig.sessionMinter: Boolean
@@ -241,7 +242,7 @@ EmailAddress.attemptVerification(params: AttemptEmailAddressVerificationParams):
 EmailAddress.create(): EmailAddress [return]
 EmailAddress.createEmailLinkFlow(): CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress [return]
 EmailAddress.createEnterpriseSSOLinkFlow(): CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress [return]
-EmailAddress.createdAt: Field<Instant> = Field.Omitted
+EmailAddress.createdAt: Instant? = null
 EmailAddress.destroy(): Unit [return]
 EmailAddress.emailAddress: String
 EmailAddress.id: String
@@ -390,7 +391,7 @@ EnvironmentResource.reload(p: ClerkResourceReloadParams? = null): EnvironmentRes
 EnvironmentResource.userSettings: UserSettings
 ExternalAccount.accountIdentifier(): String [return]
 ExternalAccount.approvedScopes: String
-ExternalAccount.createdAt: Field<Instant> = Field.Omitted
+ExternalAccount.createdAt: Instant? = null
 ExternalAccount.destroy(): Unit [return]
 ExternalAccount.emailAddress: String
 ExternalAccount.firstName: String
@@ -467,6 +468,10 @@ MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = Field.Omitt
 MobileSetActiveParamsOrganization variants: String | Organization
 MobileSetActiveParamsSession variants: String | ActiveSession | PendingSession
 MobileSignOutOptions.sessionId: String? = null
+NativeAuthSettings.apiEnabled: Boolean
+NativeAuthSettings.trustedDeviceEnrollmentPromptAfterSignInEnabled: Boolean
+NativeAuthSettings.trustedDeviceEnrollmentPromptAfterSignUpEnabled: Boolean
+NativeAuthSettings.trustedDeviceSignInEnabled: Boolean
 OAuthProvider cases: facebook, google, hubspot, github, tiktok, gitlab, discord, twitter, twitch, linkedin, linkedin_oidc, dropbox, atlassian, bitbucket, microsoft, notion, apple, line, instagram, coinbase, spotify, xero, box, slack, linear, x, enstall, huggingface, vercel, unrecognized(String)
 OAuthProviderSettings.authenticatable: Boolean
 OAuthProviderSettings.enabled: Boolean
@@ -743,7 +748,7 @@ PhoneCodeSecondFactorConfig.strategy: String
 PhoneNumber.attemptVerification(params: AttemptPhoneNumberVerificationParams): PhoneNumber [return]
 PhoneNumber.backupCodes(): List<String>? [explicit-read]
 PhoneNumber.create(): PhoneNumber [return]
-PhoneNumber.createdAt: Field<Instant> = Field.Omitted
+PhoneNumber.createdAt: Instant? = null
 PhoneNumber.defaultSecondFactor: Boolean
 PhoneNumber.destroy(): Unit [return]
 PhoneNumber.id: String
@@ -1463,6 +1468,7 @@ object InviteMemberParams
 object InviteMembersParams
 object MobileSetActiveParams
 object MobileSignOutOptions
+object NativeAuthSettings
 object OAuthProviderSettings
 object OauthFactor
 object OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl

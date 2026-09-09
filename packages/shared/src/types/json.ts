@@ -353,7 +353,15 @@ export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
   latest_activity: SessionActivityJSON;
 }
 
+export interface NativeAuthSettingsJSON {
+  api_enabled?: boolean;
+  trusted_device_sign_in_enabled?: boolean;
+  trusted_device_enrollment_prompt_after_sign_in_enabled?: boolean;
+  trusted_device_enrollment_prompt_after_sign_up_enabled?: boolean;
+}
+
 export interface AuthConfigJSON extends ClerkResourceJSON {
+  native_settings?: NativeAuthSettingsJSON | null;
   single_session_mode: boolean;
   claimed_at: number | null;
   reverification: boolean;

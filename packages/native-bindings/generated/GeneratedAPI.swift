@@ -3380,12 +3380,12 @@ public struct UserState: Hashable, Sendable {
 
 public struct EmailAddressState: Hashable, Sendable {
   public let `id`: String
-  public let `createdAt`: Field<Date>
+  public let `createdAt`: Date?
   public let `emailAddress`: String
   public let `verification`: Verification
   public let `matchesSsoConnection`: Bool
   public let `linkedTo`: [IdentificationLink]
-  public init(`id`: String, `createdAt`: Field<Date> = .omitted, `emailAddress`: String, `verification`: Verification, `matchesSsoConnection`: Bool, `linkedTo`: [IdentificationLink]) {
+  public init(`id`: String, `createdAt`: Date? = nil, `emailAddress`: String, `verification`: Verification, `matchesSsoConnection`: Bool, `linkedTo`: [IdentificationLink]) {
     self.`id` = `id`
     self.`createdAt` = `createdAt`
     self.`emailAddress` = `emailAddress`
@@ -3396,7 +3396,7 @@ public struct EmailAddressState: Hashable, Sendable {
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
       "id": .string(self.`id`),
-      "createdAt": try self.`createdAt`.encode { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) },
+      "createdAt": try self.`createdAt`.map { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) } ?? .undefined,
       "emailAddress": .string(self.`emailAddress`),
       "verification": try self.`verification`.encode(),
       "matchesSsoConnection": .bool(self.`matchesSsoConnection`),
@@ -3407,7 +3407,7 @@ public struct EmailAddressState: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> EmailAddressState {
     let values = try value.object()
 
-    return try EmailAddressState(`id`: try (values["id"] ?? .undefined).string(), `createdAt`: try Field.decode((values["createdAt"] ?? .undefined)) { value in try value.date() }, `emailAddress`: try (values["emailAddress"] ?? .undefined).string(), `verification`: try Verification.decode((values["verification"] ?? .undefined), in: runtime), `matchesSsoConnection`: try (values["matchesSsoConnection"] ?? .undefined).bool(), `linkedTo`: try (values["linkedTo"] ?? .undefined).array().map { value in try IdentificationLink.decode(value, in: runtime) })
+    return try EmailAddressState(`id`: try (values["id"] ?? .undefined).string(), `createdAt`: try (values["createdAt"] ?? .undefined).optional { value in try value.date() }, `emailAddress`: try (values["emailAddress"] ?? .undefined).string(), `verification`: try Verification.decode((values["verification"] ?? .undefined), in: runtime), `matchesSsoConnection`: try (values["matchesSsoConnection"] ?? .undefined).bool(), `linkedTo`: try (values["linkedTo"] ?? .undefined).array().map { value in try IdentificationLink.decode(value, in: runtime) })
   }
 }
 @MainActor @Observable public final class EmailAddress: CoreResource {
@@ -3417,7 +3417,7 @@ public struct EmailAddressState: Hashable, Sendable {
   public var state: EmailAddressState { context.state(handle, as: EmailAddressState.self) }
   public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: false) }
   public var `id`: String { state.`id` }
-  public var `createdAt`: Field<Date> { state.`createdAt` }
+  public var `createdAt`: Date? { state.`createdAt` }
   public var `emailAddress`: String { state.`emailAddress` }
   public var `verification`: Verification { state.`verification` }
   public var `matchesSsoConnection`: Bool { state.`matchesSsoConnection` }
@@ -4005,13 +4005,13 @@ public struct StartEnterpriseSSOLinkFlowParams: Hashable, Sendable {
 
 public struct PhoneNumberState: Hashable, Sendable {
   public let `id`: String
-  public let `createdAt`: Field<Date>
+  public let `createdAt`: Date?
   public let `phoneNumber`: String
   public let `verification`: Verification
   public let `reservedForSecondFactor`: Bool
   public let `defaultSecondFactor`: Bool
   public let `linkedTo`: [IdentificationLink]
-  public init(`id`: String, `createdAt`: Field<Date> = .omitted, `phoneNumber`: String, `verification`: Verification, `reservedForSecondFactor`: Bool, `defaultSecondFactor`: Bool, `linkedTo`: [IdentificationLink]) {
+  public init(`id`: String, `createdAt`: Date? = nil, `phoneNumber`: String, `verification`: Verification, `reservedForSecondFactor`: Bool, `defaultSecondFactor`: Bool, `linkedTo`: [IdentificationLink]) {
     self.`id` = `id`
     self.`createdAt` = `createdAt`
     self.`phoneNumber` = `phoneNumber`
@@ -4023,7 +4023,7 @@ public struct PhoneNumberState: Hashable, Sendable {
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
       "id": .string(self.`id`),
-      "createdAt": try self.`createdAt`.encode { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) },
+      "createdAt": try self.`createdAt`.map { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) } ?? .undefined,
       "phoneNumber": .string(self.`phoneNumber`),
       "verification": try self.`verification`.encode(),
       "reservedForSecondFactor": .bool(self.`reservedForSecondFactor`),
@@ -4035,7 +4035,7 @@ public struct PhoneNumberState: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PhoneNumberState {
     let values = try value.object()
 
-    return try PhoneNumberState(`id`: try (values["id"] ?? .undefined).string(), `createdAt`: try Field.decode((values["createdAt"] ?? .undefined)) { value in try value.date() }, `phoneNumber`: try (values["phoneNumber"] ?? .undefined).string(), `verification`: try Verification.decode((values["verification"] ?? .undefined), in: runtime), `reservedForSecondFactor`: try (values["reservedForSecondFactor"] ?? .undefined).bool(), `defaultSecondFactor`: try (values["defaultSecondFactor"] ?? .undefined).bool(), `linkedTo`: try (values["linkedTo"] ?? .undefined).array().map { value in try IdentificationLink.decode(value, in: runtime) })
+    return try PhoneNumberState(`id`: try (values["id"] ?? .undefined).string(), `createdAt`: try (values["createdAt"] ?? .undefined).optional { value in try value.date() }, `phoneNumber`: try (values["phoneNumber"] ?? .undefined).string(), `verification`: try Verification.decode((values["verification"] ?? .undefined), in: runtime), `reservedForSecondFactor`: try (values["reservedForSecondFactor"] ?? .undefined).bool(), `defaultSecondFactor`: try (values["defaultSecondFactor"] ?? .undefined).bool(), `linkedTo`: try (values["linkedTo"] ?? .undefined).array().map { value in try IdentificationLink.decode(value, in: runtime) })
   }
 }
 @MainActor @Observable public final class PhoneNumber: CoreResource {
@@ -4045,7 +4045,7 @@ public struct PhoneNumberState: Hashable, Sendable {
   public var state: PhoneNumberState { context.state(handle, as: PhoneNumberState.self) }
   public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: false) }
   public var `id`: String { state.`id` }
-  public var `createdAt`: Field<Date> { state.`createdAt` }
+  public var `createdAt`: Date? { state.`createdAt` }
   public var `phoneNumber`: String { state.`phoneNumber` }
   public var `verification`: Verification { state.`verification` }
   public var `reservedForSecondFactor`: Bool { state.`reservedForSecondFactor` }
@@ -4295,7 +4295,7 @@ public struct AttemptWeb3WalletVerificationParams: Hashable, Sendable {
 
 public struct ExternalAccountState: Hashable, Sendable {
   public let `id`: String
-  public let `createdAt`: Field<Date>
+  public let `createdAt`: Date?
   public let `identificationId`: String
   public let `provider`: OAuthProvider
   public let `providerUserId`: String
@@ -4309,7 +4309,7 @@ public struct ExternalAccountState: Hashable, Sendable {
   public let `publicMetadata`: [String: JSONValue]
   public let `label`: String?
   public let `verification`: Verification?
-  public init(`id`: String, `createdAt`: Field<Date> = .omitted, `identificationId`: String, `provider`: OAuthProvider, `providerUserId`: String, `emailAddress`: String, `approvedScopes`: String, `firstName`: String, `lastName`: String, `imageUrl`: String, `username`: String? = nil, `phoneNumber`: String? = nil, `publicMetadata`: [String: JSONValue], `label`: String? = nil, `verification`: Verification?) {
+  public init(`id`: String, `createdAt`: Date? = nil, `identificationId`: String, `provider`: OAuthProvider, `providerUserId`: String, `emailAddress`: String, `approvedScopes`: String, `firstName`: String, `lastName`: String, `imageUrl`: String, `username`: String? = nil, `phoneNumber`: String? = nil, `publicMetadata`: [String: JSONValue], `label`: String? = nil, `verification`: Verification?) {
     self.`id` = `id`
     self.`createdAt` = `createdAt`
     self.`identificationId` = `identificationId`
@@ -4329,7 +4329,7 @@ public struct ExternalAccountState: Hashable, Sendable {
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
       "id": .string(self.`id`),
-      "createdAt": try self.`createdAt`.encode { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) },
+      "createdAt": try self.`createdAt`.map { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) } ?? .undefined,
       "identificationId": .string(self.`identificationId`),
       "provider": try self.`provider`.encode(),
       "providerUserId": .string(self.`providerUserId`),
@@ -4349,7 +4349,7 @@ public struct ExternalAccountState: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ExternalAccountState {
     let values = try value.object()
 
-    return try ExternalAccountState(`id`: try (values["id"] ?? .undefined).string(), `createdAt`: try Field.decode((values["createdAt"] ?? .undefined)) { value in try value.date() }, `identificationId`: try (values["identificationId"] ?? .undefined).string(), `provider`: try OAuthProvider.decode((values["provider"] ?? .undefined), in: runtime), `providerUserId`: try (values["providerUserId"] ?? .undefined).string(), `emailAddress`: try (values["emailAddress"] ?? .undefined).string(), `approvedScopes`: try (values["approvedScopes"] ?? .undefined).string(), `firstName`: try (values["firstName"] ?? .undefined).string(), `lastName`: try (values["lastName"] ?? .undefined).string(), `imageUrl`: try (values["imageUrl"] ?? .undefined).string(), `username`: try (values["username"] ?? .undefined).optional { value in try value.string() }, `phoneNumber`: try (values["phoneNumber"] ?? .undefined).optional { value in try value.string() }, `publicMetadata`: try (values["publicMetadata"] ?? .undefined).object().mapValues { value in value }, `label`: try (values["label"] ?? .undefined).optional { value in try value.string() }, `verification`: try (values["verification"] ?? .undefined).optional { value in try Verification.decode(value, in: runtime) })
+    return try ExternalAccountState(`id`: try (values["id"] ?? .undefined).string(), `createdAt`: try (values["createdAt"] ?? .undefined).optional { value in try value.date() }, `identificationId`: try (values["identificationId"] ?? .undefined).string(), `provider`: try OAuthProvider.decode((values["provider"] ?? .undefined), in: runtime), `providerUserId`: try (values["providerUserId"] ?? .undefined).string(), `emailAddress`: try (values["emailAddress"] ?? .undefined).string(), `approvedScopes`: try (values["approvedScopes"] ?? .undefined).string(), `firstName`: try (values["firstName"] ?? .undefined).string(), `lastName`: try (values["lastName"] ?? .undefined).string(), `imageUrl`: try (values["imageUrl"] ?? .undefined).string(), `username`: try (values["username"] ?? .undefined).optional { value in try value.string() }, `phoneNumber`: try (values["phoneNumber"] ?? .undefined).optional { value in try value.string() }, `publicMetadata`: try (values["publicMetadata"] ?? .undefined).object().mapValues { value in value }, `label`: try (values["label"] ?? .undefined).optional { value in try value.string() }, `verification`: try (values["verification"] ?? .undefined).optional { value in try Verification.decode(value, in: runtime) })
   }
 }
 @MainActor @Observable public final class ExternalAccount: CoreResource {
@@ -4359,7 +4359,7 @@ public struct ExternalAccountState: Hashable, Sendable {
   public var state: ExternalAccountState { context.state(handle, as: ExternalAccountState.self) }
   public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: false) }
   public var `id`: String { state.`id` }
-  public var `createdAt`: Field<Date> { state.`createdAt` }
+  public var `createdAt`: Date? { state.`createdAt` }
   public var `identificationId`: String { state.`identificationId` }
   public var `provider`: OAuthProvider { state.`provider` }
   public var `providerUserId`: String { state.`providerUserId` }
@@ -7881,13 +7881,15 @@ public struct AuthConfig: Hashable, Sendable {
   public let `reverification`: Bool
   public let `preferredChannels`: [String: PhoneCodeChannel]?
   public let `sessionMinter`: Bool
+  public let `nativeSettings`: NativeAuthSettings?
   public let `id`: String?
-  public init(`singleSessionMode`: Bool, `claimedAt`: Date?, `reverification`: Bool, `preferredChannels`: [String: PhoneCodeChannel]?, `sessionMinter`: Bool, `id`: String? = nil) {
+  public init(`singleSessionMode`: Bool, `claimedAt`: Date?, `reverification`: Bool, `preferredChannels`: [String: PhoneCodeChannel]?, `sessionMinter`: Bool, `nativeSettings`: NativeAuthSettings? = nil, `id`: String? = nil) {
     self.`singleSessionMode` = `singleSessionMode`
     self.`claimedAt` = `claimedAt`
     self.`reverification` = `reverification`
     self.`preferredChannels` = `preferredChannels`
     self.`sessionMinter` = `sessionMinter`
+    self.`nativeSettings` = `nativeSettings`
     self.`id` = `id`
   }
   @MainActor public func encode() throws -> JSONValue {
@@ -7897,6 +7899,7 @@ public struct AuthConfig: Hashable, Sendable {
       "reverification": .bool(self.`reverification`),
       "preferredChannels": try self.`preferredChannels`.map { value in .object(try value.mapValues { value in try value.encode() }) } ?? .null,
       "sessionMinter": .bool(self.`sessionMinter`),
+      "nativeSettings": try self.`nativeSettings`.map { value in try value.encode() } ?? .undefined,
       "id": try self.`id`.map { value in .string(value) } ?? .undefined
     ]
     return .object(values.filter { !$0.value.isUndefined })
@@ -7904,7 +7907,34 @@ public struct AuthConfig: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> AuthConfig {
     let values = try value.object()
 
-    return try AuthConfig(`singleSessionMode`: try (values["singleSessionMode"] ?? .undefined).bool(), `claimedAt`: try (values["claimedAt"] ?? .undefined).optional { value in try value.date() }, `reverification`: try (values["reverification"] ?? .undefined).bool(), `preferredChannels`: try (values["preferredChannels"] ?? .undefined).optional { value in try value.object().mapValues { value in try PhoneCodeChannel.decode(value, in: runtime) } }, `sessionMinter`: try (values["sessionMinter"] ?? .undefined).bool(), `id`: try (values["id"] ?? .undefined).optional { value in try value.string() })
+    return try AuthConfig(`singleSessionMode`: try (values["singleSessionMode"] ?? .undefined).bool(), `claimedAt`: try (values["claimedAt"] ?? .undefined).optional { value in try value.date() }, `reverification`: try (values["reverification"] ?? .undefined).bool(), `preferredChannels`: try (values["preferredChannels"] ?? .undefined).optional { value in try value.object().mapValues { value in try PhoneCodeChannel.decode(value, in: runtime) } }, `sessionMinter`: try (values["sessionMinter"] ?? .undefined).bool(), `nativeSettings`: try (values["nativeSettings"] ?? .undefined).optional { value in try NativeAuthSettings.decode(value, in: runtime) }, `id`: try (values["id"] ?? .undefined).optional { value in try value.string() })
+  }
+}
+
+public struct NativeAuthSettings: Hashable, Sendable {
+  public let `apiEnabled`: Bool
+  public let `trustedDeviceSignInEnabled`: Bool
+  public let `trustedDeviceEnrollmentPromptAfterSignInEnabled`: Bool
+  public let `trustedDeviceEnrollmentPromptAfterSignUpEnabled`: Bool
+  public init(`apiEnabled`: Bool, `trustedDeviceSignInEnabled`: Bool, `trustedDeviceEnrollmentPromptAfterSignInEnabled`: Bool, `trustedDeviceEnrollmentPromptAfterSignUpEnabled`: Bool) {
+    self.`apiEnabled` = `apiEnabled`
+    self.`trustedDeviceSignInEnabled` = `trustedDeviceSignInEnabled`
+    self.`trustedDeviceEnrollmentPromptAfterSignInEnabled` = `trustedDeviceEnrollmentPromptAfterSignInEnabled`
+    self.`trustedDeviceEnrollmentPromptAfterSignUpEnabled` = `trustedDeviceEnrollmentPromptAfterSignUpEnabled`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "apiEnabled": .bool(self.`apiEnabled`),
+      "trustedDeviceSignInEnabled": .bool(self.`trustedDeviceSignInEnabled`),
+      "trustedDeviceEnrollmentPromptAfterSignInEnabled": .bool(self.`trustedDeviceEnrollmentPromptAfterSignInEnabled`),
+      "trustedDeviceEnrollmentPromptAfterSignUpEnabled": .bool(self.`trustedDeviceEnrollmentPromptAfterSignUpEnabled`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> NativeAuthSettings {
+    let values = try value.object()
+
+    return try NativeAuthSettings(`apiEnabled`: try (values["apiEnabled"] ?? .undefined).bool(), `trustedDeviceSignInEnabled`: try (values["trustedDeviceSignInEnabled"] ?? .undefined).bool(), `trustedDeviceEnrollmentPromptAfterSignInEnabled`: try (values["trustedDeviceEnrollmentPromptAfterSignInEnabled"] ?? .undefined).bool(), `trustedDeviceEnrollmentPromptAfterSignUpEnabled`: try (values["trustedDeviceEnrollmentPromptAfterSignUpEnabled"] ?? .undefined).bool())
   }
 }
 
@@ -11900,7 +11930,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "895b30bab43d2a88eb615d02c8d6b36154bcc4bd65238d7181b35abdef759e18"
+  public static let contractHash = "bbc6f79351299de62809361ca0f66fd4b488bcbd7639c5c2e10bfb108fee1f28"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

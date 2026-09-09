@@ -25,7 +25,7 @@ export type AttemptEmailAddressVerificationParams = {
 
 export interface EmailAddressResource extends ClerkResource {
   id: string;
-  createdAt?: Date | null;
+  createdAt?: Date;
   emailAddress: string;
   verification: VerificationResource;
   matchesSsoConnection: boolean;

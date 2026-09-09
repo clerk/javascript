@@ -13,7 +13,7 @@ import { Verification } from './Verification';
 
 export class ExternalAccount extends BaseResource implements ExternalAccountResource {
   id!: string;
-  createdAt: Date | null = null;
+  createdAt: Date | undefined;
   identificationId!: string;
   provider!: OAuthProvider;
   providerUserId = '';
@@ -56,7 +56,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     }
 
     this.id = data.id;
-    this.createdAt = data.created_at == null ? null : new Date(data.created_at);
+    this.createdAt = data.created_at == null ? undefined : new Date(data.created_at);
     this.identificationId = data.identification_id;
     this.providerUserId = data.provider_user_id;
     this.approvedScopes = data.approved_scopes;
@@ -81,7 +81,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     return {
       object: 'external_account',
       id: this.id,
-      created_at: this.createdAt?.getTime() ?? null,
+      created_at: this.createdAt?.getTime(),
       identification_id: this.identificationId,
       provider: this.provider,
       provider_user_id: this.providerUserId,

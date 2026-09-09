@@ -8655,7 +8655,7 @@
           "optional": true,
           "type": {
             "kind": "optional",
-            "nullable": true,
+            "nullable": false,
             "omittable": true,
             "value": {
               "kind": "date"
@@ -9892,7 +9892,7 @@
           "optional": true,
           "type": {
             "kind": "optional",
-            "nullable": true,
+            "nullable": false,
             "omittable": true,
             "value": {
               "kind": "date"
@@ -10492,7 +10492,7 @@
           "optional": true,
           "type": {
             "kind": "optional",
-            "nullable": true,
+            "nullable": false,
             "omittable": true,
             "value": {
               "kind": "date"
@@ -17731,7 +17731,7 @@
       "name": "AuthConfig",
       "source": {
         "file": "packages/shared/src/types/authConfig.ts",
-        "line": 5,
+        "line": 12,
         "symbol": "AuthConfigResource"
       },
       "kind": "object",
@@ -17744,7 +17744,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/authConfig.ts",
-            "line": 9,
+            "line": 16,
             "symbol": "singleSessionMode"
           },
           "documentation": "Enabled single session configuration at the instance level."
@@ -17762,7 +17762,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/authConfig.ts",
-            "line": 15,
+            "line": 22,
             "symbol": "claimedAt"
           },
           "documentation": "Timestamp of when the instance was claimed. This only applies to applications created with the Keyless mode."
@@ -17775,7 +17775,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/authConfig.ts",
-            "line": 19,
+            "line": 26,
             "symbol": "reverification"
           },
           "documentation": "Whether Reverification is enabled at the instance level."
@@ -17803,7 +17803,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/authConfig.ts",
-            "line": 23,
+            "line": 30,
             "symbol": "preferredChannels"
           },
           "documentation": "Preferred channels for phone code providers."
@@ -17816,8 +17816,26 @@
           },
           "source": {
             "file": "packages/shared/src/types/authConfig.ts",
-            "line": 24,
+            "line": 31,
             "symbol": "sessionMinter"
+          }
+        },
+        {
+          "name": "nativeSettings",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "NativeAuthSettings"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 32,
+            "symbol": "nativeSettings"
           }
         },
         {
@@ -17837,6 +17855,66 @@
             "symbol": "id"
           },
           "documentation": "The unique identifier of the resource."
+        }
+      ],
+      "methods": []
+    },
+    "NativeAuthSettings": {
+      "name": "NativeAuthSettings",
+      "source": {
+        "file": "packages/shared/src/types/authConfig.ts",
+        "line": 5,
+        "symbol": "NativeAuthSettings"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "apiEnabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 6,
+            "symbol": "apiEnabled"
+          }
+        },
+        {
+          "name": "trustedDeviceSignInEnabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 7,
+            "symbol": "trustedDeviceSignInEnabled"
+          }
+        },
+        {
+          "name": "trustedDeviceEnrollmentPromptAfterSignInEnabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 8,
+            "symbol": "trustedDeviceEnrollmentPromptAfterSignInEnabled"
+          }
+        },
+        {
+          "name": "trustedDeviceEnrollmentPromptAfterSignUpEnabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 9,
+            "symbol": "trustedDeviceEnrollmentPromptAfterSignUpEnabled"
+          }
         }
       ],
       "methods": []
@@ -30250,6 +30328,26 @@
     },
     {
       "path": "AuthConfigResource.sessionMinter",
+      "disposition": "generated"
+    },
+    {
+      "path": "AuthConfigResource.nativeSettings",
+      "disposition": "generated"
+    },
+    {
+      "path": "NativeAuthSettings.apiEnabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "NativeAuthSettings.trustedDeviceSignInEnabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "NativeAuthSettings.trustedDeviceEnrollmentPromptAfterSignInEnabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "NativeAuthSettings.trustedDeviceEnrollmentPromptAfterSignUpEnabled",
       "disposition": "generated"
     },
     {
