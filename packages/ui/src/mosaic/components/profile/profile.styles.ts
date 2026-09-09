@@ -154,14 +154,11 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
-  /** Inline there is no frame, so no edge between the column and the pages either. */
-  navInline: {
-    padding: 0,
-    borderInlineEndWidth: '0px',
-  },
-
-  /** Inside the sheet: no column edge, and the sheet's own content padding frames it. */
-  navInSheet: {
+  /**
+   * Nothing to inset from and no pages beside it to edge: inline there is no frame, and in the
+   * sheet the sheet's own content padding frames it.
+   */
+  navFlush: {
     padding: 0,
     borderInlineEndWidth: '0px',
   },

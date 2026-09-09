@@ -1,3 +1,4 @@
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import React from 'react';
 
 export interface Measurement {
@@ -24,7 +25,7 @@ export function useMeasure<T extends Element = Element>(): [(node: T | null) => 
   const [node, setNode] = React.useState<T | null>(null);
   const [measurement, setMeasurement] = React.useState<Measurement>(UNMEASURED);
 
-  React.useLayoutEffect(() => {
+  useSafeLayoutEffect(() => {
     if (!node || typeof ResizeObserver === 'undefined') {
       return;
     }

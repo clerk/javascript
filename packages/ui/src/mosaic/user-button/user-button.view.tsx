@@ -36,7 +36,7 @@ import type {
   UserButtonModeProps,
   UserButtonSession,
 } from './user-button.types';
-import { applyOrder } from './user-button.utils';
+import { applyOrder } from '../utils/apply-order';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
 // what the model and the view agree on, so neither file owns them.

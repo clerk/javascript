@@ -44,8 +44,8 @@ import { Profile } from '@clerk/ui/mosaic/components/profile';
     </Profile.NavItem>
   </Profile.Nav>
   <Profile.Content>
-    <Profile.TabPanel value='account'>…</Profile.TabPanel>
-    <Profile.TabPanel value='security'>…</Profile.TabPanel>
+    <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
+    <Profile.ContentPanel value='security'>…</Profile.ContentPanel>
   </Profile.Content>
 </Profile.Root>;
 ```
@@ -60,14 +60,14 @@ sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 ## Parts
 
-| Part               | Element               | Slot                   |
-| ------------------ | --------------------- | ---------------------- |
-| `Profile.Root`     | `div` (the container) | `cl-profile`           |
-| `Profile.Nav`      | `nav` (labelled)      | `cl-profile-nav`       |
-| —                  | tablist               | `cl-profile-nav-list`  |
-| `Profile.NavItem`  | `button[role=tab]`    | `cl-profile-nav-item`  |
-| `Profile.Content`  | `div` (scroll region) | `cl-profile-content`   |
-| `Profile.TabPanel` | `div[role=tabpanel]`  | `cl-profile-tab-panel` |
+| Part                   | Element               | Slot                       |
+| ---------------------- | --------------------- | -------------------------- |
+| `Profile.Root`         | `div` (the container) | `cl-profile`               |
+| `Profile.Nav`          | `nav` (labelled)      | `cl-profile-nav`           |
+| —                      | tablist               | `cl-profile-nav-list`      |
+| `Profile.NavItem`      | `button[role=tab]`    | `cl-profile-nav-item`      |
+| `Profile.Content`      | `div` (scroll region) | `cl-profile-content`       |
+| `Profile.ContentPanel` | `div[role=tabpanel]`  | `cl-profile-content-panel` |
 
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog.
@@ -102,7 +102,7 @@ An unselected page carries the `hidden` attribute, and a transition across it is
 the CSS a customer adds against a `<UserProfile />` they do not render. `@starting-style` gives the
 page that just lost `hidden` a frame to enter from; `transition-behavior: allow-discrete` on
 `display` holds the page that just gained it until its exit finishes. Stack the pages in one grid
-cell and the two cross-fade in place. `shouldForceMount` on `TabPanel` is there for a transition
+cell and the two cross-fade in place. `shouldForceMount` on `ContentPanel` is there for a transition
 that needs the primitive's own timing attributes instead (`data-starting-style` /
 `data-ending-style`, `--cl-tab-transition-direction`).
 

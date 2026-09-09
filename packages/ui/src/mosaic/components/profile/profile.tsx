@@ -10,7 +10,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Branding } from '../branding';
-import { Dialog, DialogContext } from '../dialog';
+import { Dialog, DialogContext, isOverlayDialog } from '../dialog';
 import { Drawer } from '../drawer';
 import { Heading } from '../heading';
 import { Icon } from '../icon';
@@ -35,7 +35,7 @@ interface ProfileContextValue {
 const ProfileContext = React.createContext<ProfileContextValue | null>(null);
 
 /** The id a `Profile.PageTitle` renders under, so the panel around it can be named by it. */
-const TabPanelContext = React.createContext<string | undefined>(undefined);
+const ContentPanelContext = React.createContext<string | undefined>(undefined);
 
 /**
  * The width below which the layout is compact — the same `48rem` the container query in
@@ -64,7 +64,7 @@ function useProfileContext(part: string): ProfileContextValue {
 export type ProfileElevation = 'card' | 'flush';
 
 export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'children'> {
-  /** The selected page, by the `value` of its `Profile.NavItem` and `Profile.TabPanel`. */
+  /** The selected page, by the `value` of its `Profile.NavItem` and `Profile.ContentPanel`. */
   value: string;
   onValueChange?: (value: string) => void;
   /**
@@ -149,7 +149,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
-        stylex.props(reset.base, styles.root, dialog !== null && !dialog.inline && styles.rootInDialog),
+        stylex.props(reset.base, styles.root, isOverlayDialog(dialog) && styles.rootInDialog),
         className,
         style,
       ),
@@ -159,7 +159,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Card.Header` renders its dismiss first. Never inline, which
               nothing closes. */}
-          {dialog && !dialog.inline ? <Dialog.CloseButton /> : null}
+          {isOverlayDialog(dialog) ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),
@@ -247,8 +247,9 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   // on the destination.
   const finalFocus = React.useCallback(
     () =>
-      root?.querySelector<HTMLElement>('.cl-profile-tab-panel:not([hidden]):not([inert]) .cl-profile-nav-trigger') ??
-      null,
+      root?.querySelector<HTMLElement>(
+        '.cl-profile-content-panel:not([hidden]):not([inert]) .cl-profile-nav-trigger',
+      ) ?? null,
     [root],
   );
   const list = (
@@ -264,7 +265,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       'aria-labelledby': titleId,
       ...mergeStyleProps(
         themeProps('profile-nav', { compact }),
-        stylex.props(reset.base, styles.nav, inline && styles.navInline, compact && styles.navInSheet),
+        stylex.props(reset.base, styles.nav, (inline || compact) && styles.navFlush),
         className,
         style,
       ),
@@ -301,14 +302,14 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
 });
 
 export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
-  /** Matches the `value` of the `Profile.TabPanel` this destination opens. */
+  /** Matches the `value` of the `Profile.ContentPanel` this destination opens. */
   value: string;
   /** Leads the label. Any node, so a page of the consumer's own can bring its own mark. */
   icon?: React.ReactNode;
   disabled?: boolean;
 }
 
-/** A destination. Selecting it shows the `Profile.TabPanel` sharing its `value`. */
+/** A destination. Selecting it shows the `Profile.ContentPanel` sharing its `value`. */
 const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(function ProfileNavItem(
   { value, icon, disabled, children, render, className, style, onClick, ...rest },
   ref,
@@ -364,7 +365,7 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
   ref,
 ) {
   const profile = React.useContext(ProfileContext);
-  const panelTitleId = React.useContext(TabPanelContext);
+  const panelTitleId = React.useContext(ContentPanelContext);
   return useRender({
     defaultTagName: 'div',
     render,
@@ -466,7 +467,7 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
   });
 });
 
-export interface ProfileTabPanelProps extends MosaicComponentProps<'div'> {
+export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
   /** Matches the `value` of the `Profile.NavItem` that opens this page. */
   value: string;
   /**
@@ -483,14 +484,14 @@ export interface ProfileTabPanelProps extends MosaicComponentProps<'div'> {
  * — `data-open` / `data-closed`, `data-starting-style` / `data-ending-style`, and
  * `--cl-tab-transition-direction` — so a page transition is a styling change rather than a new part.
  */
-const TabPanel = React.forwardRef<HTMLDivElement, ProfileTabPanelProps>(function ProfileTabPanel(
+const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
   { value, shouldForceMount, className, style, ...rest },
   ref,
 ) {
-  const { compact } = useProfileContext('Profile.TabPanel');
+  const { compact } = useProfileContext('Profile.ContentPanel');
   const titleId = React.useId();
   return (
-    <TabPanelContext.Provider value={titleId}>
+    <ContentPanelContext.Provider value={titleId}>
       <Tabs.Panel
         ref={ref}
         value={value}
@@ -499,16 +500,16 @@ const TabPanel = React.forwardRef<HTMLDivElement, ProfileTabPanelProps>(function
         // is named by its own title instead — `Profile.PageTitle` takes this id. Spread only then:
         // an explicit `undefined` would displace the primitive's own `aria-labelledby`.
         {...(compact ? { 'aria-labelledby': titleId } : null)}
-        {...mergeStyleProps(themeProps('profile-tab-panel', { value }), className, style)}
+        {...mergeStyleProps(themeProps('profile-content-panel', { value }), className, style)}
         {...rest}
       />
-    </TabPanelContext.Provider>
+    </ContentPanelContext.Provider>
   );
 });
 
 /**
  * A surface you navigate, composed through `Profile.Root`, `Profile.Title`, `Profile.Nav`,
- * `Profile.NavItem`, `Profile.Content`, `Profile.TabPanel`, and `Profile.PageTitle`. Every part
+ * `Profile.NavItem`, `Profile.Content`, `Profile.ContentPanel`, and `Profile.PageTitle`. Every part
  * accepts the Mosaic `render` prop and forwards its ref.
  *
  * ```tsx
@@ -518,9 +519,9 @@ const TabPanel = React.forwardRef<HTMLDivElement, ProfileTabPanelProps>(function
  *     <Profile.NavItem value='account' icon={<Icon name='user-circle' size='sm' />}>Account</Profile.NavItem>
  *   </Profile.Nav>
  *   <Profile.Content>
- *     <Profile.TabPanel value='account'>…</Profile.TabPanel>
+ *     <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
  *   </Profile.Content>
  * </Profile.Root>
  * ```
  */
-export const Profile = { Root, Title, Nav, NavItem, PageTitle, Content, TabPanel };
+export const Profile = { Root, Title, Nav, NavItem, PageTitle, Content, ContentPanel };

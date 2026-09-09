@@ -1,15 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
 import { getAvailableUserProfilePages, resolveUserProfilePages } from '../user-profile.layout';
-import type { CustomProfilePage } from '../user-profile.types';
+import type { CustomProfilePage, UserProfilePages } from '../user-profile.types';
 
 const terms: CustomProfilePage = { label: 'Terms', path: 'terms', content: null };
 const help: CustomProfilePage = { label: 'Help', path: 'help', content: null };
 
 describe('getAvailableUserProfilePages', () => {
   it('keeps the built-in order and drops pages without content', () => {
-    expect(getAvailableUserProfilePages({ account: {}, apiKeys: { apiKeys: [] } })).toEqual(['account', 'apiKeys']);
-    expect(getAvailableUserProfilePages({ account: {}, security: {}, billing: {} })).toEqual([
+    expect(getAvailableUserProfilePages({ account: {}, apiKeys: {} } as UserProfilePages)).toEqual([
+      'account',
+      'apiKeys',
+    ]);
+    expect(getAvailableUserProfilePages({ account: {}, security: {}, billing: {} } as UserProfilePages)).toEqual([
       'account',
       'security',
       'billing',

@@ -6,7 +6,7 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
-import { DialogContext } from '../dialog';
+import { DialogContext, isOverlayDialog } from '../dialog';
 import { styles } from './drawer.styles';
 
 export type DrawerRootProps = HeadlessDrawerProps;
@@ -32,44 +32,6 @@ function Root(props: DrawerRootProps) {
   return <Primitive.Root {...props} />;
 }
 
-const Trigger = React.forwardRef<HTMLButtonElement, DrawerTriggerProps>(function DrawerTrigger(props, ref) {
-  return (
-    <Primitive.Trigger
-      ref={ref}
-      {...props}
-    />
-  );
-});
-
-const Close = React.forwardRef<HTMLButtonElement, DrawerCloseProps>(function DrawerClose(props, ref) {
-  return (
-    <Primitive.Close
-      ref={ref}
-      {...props}
-    />
-  );
-});
-
-const Title = React.forwardRef<HTMLHeadingElement, DrawerTitleProps>(function DrawerTitle(props, ref) {
-  return (
-    <Primitive.Title
-      ref={ref}
-      {...props}
-    />
-  );
-});
-
-const Description = React.forwardRef<HTMLParagraphElement, DrawerDescriptionProps>(
-  function DrawerDescription(props, ref) {
-    return (
-      <Primitive.Description
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
-
 /**
  * The sheet, and everything it needs to be one: the portal, the scrim, the box it rises in, and
  * the grip at its top. Closed, it sits entirely below the screen. Opened from inside a `profile` or
@@ -80,7 +42,7 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
   ref,
 ) {
   const host = React.useContext(DialogContext);
-  const nested = host !== null && !host.inline;
+  const nested = isOverlayDialog(host);
   return (
     <Primitive.Portal>
       <Primitive.Backdrop
@@ -117,4 +79,11 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
  * and describe it; `Drawer.Close` dismisses it from inside. Drag it down, press Escape, or press
  * outside to dismiss.
  */
-export const Drawer = { Root, Trigger, Popup, Title, Description, Close };
+export const Drawer = {
+  Root,
+  Popup,
+  Trigger: Primitive.Trigger,
+  Title: Primitive.Title,
+  Description: Primitive.Description,
+  Close: Primitive.Close,
+};

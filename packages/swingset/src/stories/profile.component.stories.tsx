@@ -176,7 +176,7 @@ function Surface({
       </Profile.Nav>
       <Profile.Content>
         {pages.map(item => (
-          <Profile.TabPanel
+          <Profile.ContentPanel
             key={item.id}
             value={item.id}
             shouldForceMount={forceMountPages}
@@ -189,7 +189,7 @@ function Surface({
             ) : (
               <Placeholder title={item.label} />
             )}
-          </Profile.TabPanel>
+          </Profile.ContentPanel>
         ))}
       </Profile.Content>
     </Profile.Root>
@@ -308,7 +308,7 @@ export function Transitions() {
           .cl-profile-content-body {
             display: grid;
           }
-          .cl-profile-tab-panel {
+          .cl-profile-content-panel {
             grid-area: 1 / 1;
             /* Seven tenths of the scale's steps: quick enough to feel like a swap, slow enough to see. */
             --enter: calc(var(--cl-duration-slow) * 0.7);
@@ -330,7 +330,7 @@ export function Transitions() {
               filter: blur(4px);
             }
           }
-          .cl-profile-tab-panel[hidden] {
+          .cl-profile-content-panel[hidden] {
             opacity: 0;
             scale: 0.98;
             filter: blur(4px);
@@ -339,7 +339,7 @@ export function Transitions() {
             transition-delay: 0s;
           }
           @media (prefers-reduced-motion: reduce) {
-            .cl-profile-tab-panel {
+            .cl-profile-content-panel {
               transition: none;
             }
           }

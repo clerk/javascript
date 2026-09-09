@@ -53,6 +53,11 @@ export interface DialogContextValue {
 
 export const DialogContext = React.createContext<DialogContextValue | null>(null);
 
+/** Over the page — in a dialog, and not an `inline` one — as opposed to standalone or in the host's flow. */
+export function isOverlayDialog(dialog: DialogContextValue | null): boolean {
+  return dialog !== null && !dialog.inline;
+}
+
 /**
  * What the root decided about how its dialog is presented, for the parts it does not render
  * itself. Only `Dialog.Popup` reads it; a consumer never sets it.

@@ -27,11 +27,11 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
         <Profile.NavItem value='security'>Security</Profile.NavItem>
       </Profile.Nav>
       <Profile.Content>
-        <Profile.TabPanel value='account'>
+        <Profile.ContentPanel value='account'>
           <Profile.PageTitle>Account</Profile.PageTitle>
           Account page
-        </Profile.TabPanel>
-        <Profile.TabPanel value='security'>Security page</Profile.TabPanel>
+        </Profile.ContentPanel>
+        <Profile.ContentPanel value='security'>Security page</Profile.ContentPanel>
       </Profile.Content>
     </Profile.Root>
   );
@@ -94,7 +94,7 @@ describe('Profile', () => {
     expect(security).toHaveClass('cl-profile-nav-item');
     expect(security).toHaveAttribute('data-selected');
     expect(screen.getByRole('tab', { name: 'Account' })).not.toHaveAttribute('data-selected');
-    expect(screen.getByRole('tabpanel')).toHaveClass('cl-profile-tab-panel');
+    expect(screen.getByRole('tabpanel')).toHaveClass('cl-profile-content-panel');
     expect(screen.getByRole('tabpanel')).toHaveAttribute('data-value', 'security');
     expect(container.querySelector('.cl-profile-content')).toContainElement(screen.getByRole('tabpanel'));
   });
@@ -233,12 +233,12 @@ describe('Profile', () => {
               <Profile.NavItem value='security'>Security</Profile.NavItem>
             </Profile.Nav>
             <Profile.Content>
-              <Profile.TabPanel value='account'>
+              <Profile.ContentPanel value='account'>
                 <Profile.PageTitle>Account</Profile.PageTitle>
-              </Profile.TabPanel>
-              <Profile.TabPanel value='security'>
+              </Profile.ContentPanel>
+              <Profile.ContentPanel value='security'>
                 <Profile.PageTitle>Security</Profile.PageTitle>
-              </Profile.TabPanel>
+              </Profile.ContentPanel>
             </Profile.Content>
           </Profile.Root>
         );

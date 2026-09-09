@@ -9,15 +9,9 @@ import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
-import type {
-  CustomProfileItem,
-  CustomProfileLink,
-  CustomProfilePage,
-  UserProfilePageId,
-} from '../user-profile/user-profile.types';
-import { applyOrder } from './user-button.utils';
-
-export type { CustomProfileItem, CustomProfileLink, CustomProfilePage, UserProfilePageId };
+import { USER_PROFILE_PAGE_IDS } from '../user-profile/user-profile.layout';
+import type { CustomProfileItem, CustomProfileLink, UserProfilePageId } from '../user-profile/user-profile.types';
+import { applyOrder } from '../utils/apply-order';
 
 /**
  * The UserProfile's own pages, in the order it lists them, minus the ones this instance has turned
@@ -32,14 +26,11 @@ export function useUserProfilePages(): UserProfilePageId[] {
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
 
-  const pages: UserProfilePageId[] = ['account', 'security'];
-  if (!disabledUserBillingFeature(clerk, environment)) {
-    pages.push('billing');
-  }
-  if (!disabledUserAPIKeysFeature(clerk, environment)) {
-    pages.push('apiKeys');
-  }
-  return pages;
+  const disabled: Partial<Record<UserProfilePageId, boolean>> = {
+    billing: disabledUserBillingFeature(clerk, environment),
+    apiKeys: disabledUserAPIKeysFeature(clerk, environment),
+  };
+  return USER_PROFILE_PAGE_IDS.filter(id => !disabled[id]);
 }
 
 export interface CustomPagesOptions {

@@ -83,7 +83,7 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
       </Profile.Nav>
       <Profile.Content>
         {entries.map(entry => (
-          <Profile.TabPanel
+          <Profile.ContentPanel
             key={entry.id}
             value={entry.id}
           >
@@ -95,7 +95,7 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
                 pages={pages}
               />
             )}
-          </Profile.TabPanel>
+          </Profile.ContentPanel>
         ))}
       </Profile.Content>
     </Profile.Root>

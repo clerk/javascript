@@ -4,7 +4,7 @@ export type {
   ProfileElevation,
   ProfileNavItemProps,
   ProfileNavProps,
-  ProfileTabPanelProps,
+  ProfileContentPanelProps,
   ProfilePageTitleProps,
   ProfileRootProps,
   ProfileTitleProps,

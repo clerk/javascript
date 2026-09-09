@@ -33,14 +33,13 @@ export function resolveUserProfilePages(
   order?: readonly string[],
 ): UserProfileNavEntry[] {
   const customById = new Map(customPages.map(page => [page.path, page]));
+  const builtInIds = new Set<string>(builtIn);
   const entries: UserProfileNavEntry[] = [
     ...builtIn.map((id): UserProfileNavEntry => {
       const custom = customById.get(id);
       return custom ? { id, custom } : { id };
     }),
-    ...customPages
-      .filter(page => !builtIn.includes(page.path as UserProfilePageId))
-      .map(page => ({ id: page.path, custom: page })),
+    ...customPages.filter(page => !builtInIds.has(page.path)).map(page => ({ id: page.path, custom: page })),
   ];
   return applyOrder(order, entries, entry => entry.id);
 }
