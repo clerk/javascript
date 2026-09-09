@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { breakpoints } from '../../breakpoints.stylex';
 import { MosaicProvider } from '../../MosaicProvider';
 import { Dialog } from '../dialog';
 import { Icon } from '../icon';
@@ -141,7 +140,7 @@ describe('Profile', () => {
   // at any width; the compact query must hide it, or a phone shows the tablist over the page.
   it('hides the in-place navigation under the compact query', () => {
     const probe = stylex.create({
-      hidden: { display: { default: 'flex', [`@container (width < ${breakpoints.phone})`]: 'none' } },
+      hidden: { display: { default: 'flex', '@container (width < 48rem)': 'none' } },
     });
     renderSurface();
 

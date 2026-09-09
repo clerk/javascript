@@ -1,6 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { breakpoints } from '../../breakpoints.stylex';
 import {
   colorVars,
   fontWeightVars,
@@ -22,8 +21,12 @@ import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
  * dialog reads, the two change together. Unnamed on purpose: a name would bind it to one of them.
  * A container cannot query itself, which is why the grid lives on an inner element: the root is
  * the container, the layout inside it is what the query reshapes.
+ *
+ * `48rem` is the dialog's phone band too (`PHONE` in `dialog.styles.ts`); the two must agree, and
+ * a literal in each is what StyleX allows — a value shared through `defineConsts` reaches an
+ * at-rule prelude as a placeholder that swingset's bundler does not always resolve.
  */
-const compact = `@container (width < ${breakpoints.phone})`;
+const compact = '@container (width < 48rem)';
 
 /** How far the content's clip edge — and the scrollbar with it — sits inside the frame's corners. */
 const SCROLL_INSET = space['1.5'];
