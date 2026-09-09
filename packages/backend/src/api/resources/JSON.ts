@@ -324,7 +324,6 @@ export interface InstanceSettingsJSON extends ClerkResourceJSON {
   restricted_to_allowlist: boolean;
   from_email_address: string;
   progressive_sign_up: boolean;
-  enhanced_email_deliverability: boolean;
 }
 
 export interface InvitationJSON extends ClerkResourceJSON {
