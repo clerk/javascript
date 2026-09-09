@@ -63,6 +63,11 @@ describe('stringifyQueryParams(object)', () => {
     expect(stringifyQueryParams({ unsafe_metadata: { bar: '1' } })).toBe('unsafe_metadata=%7B%22bar%22%3A%221%22%7D');
   });
 
+  it('preserves nested nulls when metadata is stringified', () => {
+    const params = new URLSearchParams(stringifyQueryParams({ unsafe_metadata: { kept: 'yes', removed: null } }));
+    expect(JSON.parse(params.get('unsafe_metadata')!)).toEqual({ kept: 'yes', removed: null });
+  });
+
   it('converts an object to querystring when value contains invalid url symbols', () => {
     expect(stringifyQueryParams({ test: 'ena=duo' })).toBe('test=ena%3Dduo');
   });

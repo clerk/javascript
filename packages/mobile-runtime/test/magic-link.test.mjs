@@ -53,6 +53,8 @@ for (const kind of ['signIn', 'signUp']) {
     assert.equal(sent.failure, undefined, JSON.stringify(sent.failure));
     const stored = JSON.parse(f.authRecord);
     assert.equal(stored.kind, kind);
+    assert.equal(stored.codeVerifier.length, 43);
+    assert.match(stored.codeVerifier, /^[A-Za-z0-9_-]+$/);
     assert.equal(stored.expiresAt - stored.createdAt, 600_000);
     const request = f.requests.find(r => /prepare_first_factor|prepare_verification/.test(r.url));
     const params = new URLSearchParams(request.body);
