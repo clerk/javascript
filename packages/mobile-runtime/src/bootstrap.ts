@@ -1,21 +1,10 @@
-import {
-  NativeBiometricCredentials,
-  type NativeBiometricHost,
-} from '../../clerk-js/src/utils/NativeBiometricCredentials';
-import { NativeMagicLink } from '../../clerk-js/src/utils/NativeMagicLink';
-import type {
-  PublicKeyCredentialCreationOptionsWithoutExtensions,
-  PublicKeyCredentialRequestOptionsWithoutExtensions,
-} from '@clerk/shared/types';
 import { setNativeNetworkEnvironment } from '@clerk/shared/network';
 import { installMobileCredentialTransport } from '@clerk/shared/mobile';
-import { eventBus, events } from '../../clerk-js/src/core/events';
 import { Clerk } from '../../clerk-js/src/core/clerk';
 import { authenticationRoots, publicCore } from './core.ts';
 import { cancelCapabilities, disposeHost, emit, hostReply, hostRequest } from './host.ts';
-import { bridgeError, failure, type Invocation } from './protocol.ts';
+import { bridgeError, failure, type Invocation, type JSONValue } from './protocol.ts';
 import { ResourceRuntime } from './runtime.ts';
-import { binaryToJSON, nativeCredential } from './passkeys.ts';
 import { manifest } from '../../native-bindings/generated/schema.mjs';
 
 type Configuration = {
@@ -34,6 +23,7 @@ let initializing = false;
 let unsubscribe: (() => void) | undefined;
 let disposed = false;
 let active = true;
+let removeNativeHost: (() => void) | undefined;
 let removeNetworkEnvironment: (() => void) | undefined;
 
 async function initialize(id: string, configuration: Configuration): Promise<void> {
@@ -67,98 +57,31 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     },
     { [`x-${configuration.platform}-sdk-version`]: 'next' },
   );
-  if (configuration.capabilities.includes('googleIdentity'))
-    clerk.__internal_getGoogleIdentity = options => hostRequest('googleIdentity', options);
-  clerk.__internal_getAppleIdentity = options => {
-    if (!configuration.capabilities.includes('appleIdentity'))
-      return Promise.reject(bridgeError('capability_unavailable'));
-    return hostRequest('appleIdentity', options);
-  };
-  const authStorageArgs = { scope: configuration.publishableKey, key: 'magicLink' };
-  clerk.__internal_nativeMagicLink = new NativeMagicLink(
-    clerk,
-    configuration.callbackUrl,
-    configuration.capabilities.includes('authStorage')
-      ? {
-          read: () => hostRequest('authStorage.read', authStorageArgs),
-          write: value => hostRequest('authStorage.write', { ...authStorageArgs, value }),
-          remove: () => hostRequest('authStorage.remove', authStorageArgs),
-        }
-      : undefined,
-    value =>
-      configuration.capabilities.includes('crypto.sha256')
-        ? hostRequest('crypto.sha256', { value })
-        : Promise.reject(bridgeError('capability_unavailable:crypto.sha256')),
-    configuration.capabilities.includes('magicLink.attestation')
-      ? () => hostRequest('magicLink.attestation', {})
-      : undefined,
-  );
-  const biometricStorage = (key: string) => ({
-    read: (): Promise<string | null> => hostRequest('biometrics.storage.read', { scope, key }),
-    write: (value: string): Promise<void> => hostRequest('biometrics.storage.write', { scope, key, value }),
+  removeNativeHost = await clerk.__internal_configureNativeHost({
+    platform: configuration.platform,
+    callbackUrl: configuration.callbackUrl,
+    capabilities: configuration.capabilities,
+    request: (capability, args) => hostRequest(capability, args as JSONValue),
+    cancelAuthentication: () =>
+      cancelCapabilities([
+        'browser',
+        'passkeys.get',
+        'passkeys.create',
+        'appleIdentity',
+        'googleIdentity',
+        'biometrics.sign',
+      ]),
+    invalidateCredentials: async () => {
+      await mobile?.invalidate();
+    },
   });
-  const biometricHost: NativeBiometricHost | undefined = configuration.capabilities.includes('biometrics')
-    ? {
-        platform: configuration.platform,
-        appIdentifier: () => hostRequest('biometrics.appIdentifier', {}),
-        storage: biometricStorage('credentials'),
-        cleanupStorage: biometricStorage('cleanup'),
-        supports: policy => hostRequest('biometrics.supports', { policy }),
-        hasKey: localKeyId => hostRequest('biometrics.hasKey', { localKeyId }),
-        createKey: policy => hostRequest('biometrics.createKey', { policy }),
-        sign: params => hostRequest('biometrics.sign', params),
-        deleteKey: localKeyId => hostRequest('biometrics.deleteKey', { localKeyId }),
-      }
-    : undefined;
-  clerk.__internal_nativeBiometrics = new NativeBiometricCredentials(clerk, biometricHost);
-  clerk.__internal_isWebAuthnSupported = () => configuration.capabilities.includes('passkeys');
-  clerk.__internal_isWebAuthnAutofillSupported = async () => configuration.capabilities.includes('passkeys.autofill');
-  clerk.__internal_isWebAuthnPlatformAuthenticatorSupported = async () =>
-    configuration.capabilities.includes('passkeys');
-  clerk.__internal_createPublicCredentials = (options: PublicKeyCredentialCreationOptionsWithoutExtensions) =>
-    nativeCredential('create', binaryToJSON(options));
-  clerk.__internal_getPublicCredentials = ({
-    publicKeyOptions,
-    conditionalUI,
-    preferImmediatelyAvailableCredentials,
-  }: {
-    publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
-    conditionalUI?: boolean;
-    preferImmediatelyAvailableCredentials?: boolean;
-  }) =>
-    nativeCredential(
-      'get',
-      binaryToJSON({ ...publicKeyOptions, conditionalUI, preferImmediatelyAvailableCredentials }),
-    );
   await clerk.load({
     standardBrowser: false,
     telemetry: false,
     experimental: { runtimeEnvironment: 'headless' },
-    __internal_oauthTransport: {
-      getRedirectUrl: () => configuration.callbackUrl,
-      open: url => {
-        if (!configuration.capabilities.includes('browser'))
-          return Promise.reject(bridgeError('capability_unavailable'));
-        return hostRequest('browser', { url: url.toString(), callbackUrl: configuration.callbackUrl });
-      },
-    },
   });
   if (disposed) return;
-  await clerk.__internal_nativeBiometrics.retryPendingCleanup().catch(() => undefined);
-  const facade = publicCore(clerk, async () => {
-    cancelCapabilities([
-      'browser',
-      'passkeys.get',
-      'passkeys.create',
-      'appleIdentity',
-      'googleIdentity',
-      'biometrics.sign',
-    ]);
-    clerk.__internal_nativeBiometrics.invalidate();
-    runtime?.invalidate('Clerk.signOut');
-    await mobile?.invalidate();
-    await clerk.__internal_nativeMagicLink?.reset();
-  });
+  const facade = publicCore(clerk);
   runtime = new ResourceRuntime({
     roots: () => ({
       clerk: facade,
@@ -168,21 +91,6 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
       organization: clerk.organization,
     }),
     emit,
-    beforeInvoke: async operation => {
-      if (operation === 'SignIn.reset' || operation === 'SignUp.reset') {
-        cancelCapabilities([
-          'browser',
-          'passkeys.get',
-          'passkeys.create',
-          'appleIdentity',
-          'googleIdentity',
-          'biometrics.sign',
-        ]);
-        clerk.__internal_nativeBiometrics.invalidate();
-        await mobile?.invalidate();
-        await clerk.__internal_nativeMagicLink?.reset();
-      }
-    },
   });
   let queued = false;
   const publish = () => {
@@ -197,14 +105,13 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
       }
     });
   };
-  const removeListener = clerk.addListener(publish, { skipInitialEmit: true });
-  eventBus.on(events.ResourceUpdate, publish);
-  eventBus.on(events.ResourceFetch, publish);
-  unsubscribe = () => {
-    removeListener();
-    eventBus.off(events.ResourceUpdate, publish);
-    eventBus.off(events.ResourceFetch, publish);
-  };
+  unsubscribe = clerk.__internal_subscribeNativeResources({
+    onState: publish,
+    onReset: reason => {
+      if (reason === 'signOut') runtime?.invalidate('Clerk.signOut');
+      else runtime?.invalidateRoot(reason, reason === 'signIn' ? 'SignIn.reset' : 'SignUp.reset');
+    },
+  });
   initializing = false;
   emit({ kind: 'ready', id, manifest, state: runtime.snapshot() });
 }
@@ -229,6 +136,7 @@ export function receive(encoded: string): void {
       disposed = true;
       unsubscribe?.();
       removeNetworkEnvironment?.();
+      removeNativeHost?.();
       mobile?.dispose();
       runtime?.dispose();
       disposeHost();

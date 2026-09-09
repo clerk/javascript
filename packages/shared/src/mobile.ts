@@ -1,5 +1,6 @@
 export type {
   MobileClerk,
+  MobileNativeHost,
   MobileAuthResetReason,
   MobileResourceObserver,
   MobileAuthenticationResources,

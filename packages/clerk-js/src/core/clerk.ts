@@ -1,3 +1,4 @@
+import { configureNativeHost } from '../utils/configureNativeHost';
 import { NativeBiometricCredentials } from '../utils/NativeBiometricCredentials';
 import type { NativeMagicLink } from '../utils/NativeMagicLink';
 import { startMobileAuthentication } from '../utils/startMobileAuthentication';
@@ -5,6 +6,7 @@ import { authenticateWithMobileSSO } from '../utils/authenticateWithMobileSSO';
 import type {
   MobileAuthenticationResources,
   MobileAuthResetReason,
+  MobileNativeHost,
   MobileResourceObserver,
 } from '@clerk/shared/mobile';
 import { inBrowser as inClientSide } from '@clerk/shared/browser';
@@ -290,6 +292,19 @@ export class Clerk implements ClerkInterface {
   // Distinguishes never-set from cleared-with-undefined, so clearing does not fall back to the option.
   #protectAssertionSet = false;
   #oauthTransport: OAuthTransport | null = null;
+  #nativeHost: ReturnType<typeof configureNativeHost> | undefined;
+
+  __internal_configureNativeHost = async (host: MobileNativeHost): Promise<() => void> => {
+    this.#nativeHost?.dispose();
+    const installed = configureNativeHost(this, host);
+    this.#nativeHost = installed;
+    await installed.retryCleanup().catch(() => undefined);
+    return () => {
+      if (this.#nativeHost !== installed) return;
+      installed.dispose();
+      this.#nativeHost = undefined;
+    };
+  };
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
@@ -331,11 +346,11 @@ export class Clerk implements ClerkInterface {
   }
 
   get __internal_hasOAuthTransport(): boolean {
-    return this.#oauthTransport !== null;
+    return this.__internal_oauthTransport !== null;
   }
 
   get __internal_oauthTransport(): OAuthTransport | null {
-    return this.#oauthTransport;
+    return this.#oauthTransport ?? this.#nativeHost?.oauthTransport ?? null;
   }
 
   /**
@@ -372,12 +387,9 @@ export class Clerk implements ClerkInterface {
   public __internal_beforeNativeAuthReset: ((reason: MobileAuthResetReason) => Promise<void>) | undefined;
 
   __internal_withNativeAuthReset<T>(reason: MobileAuthResetReason, commit: () => T): T | Promise<T> {
-    const complete = () => {
-      for (const observer of this.#nativeResourceObservers) observer.onReset(reason);
-      return commit();
-    };
+    for (const observer of this.#nativeResourceObservers) observer.onReset(reason);
     const preparation = this.__internal_beforeNativeAuthReset?.(reason);
-    return preparation ? preparation.then(complete) : complete();
+    return preparation ? preparation.then(commit) : commit();
   }
 
   __internal_subscribeNativeResources = (observer: MobileResourceObserver): (() => void) => {

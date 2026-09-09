@@ -74,3 +74,13 @@ export type MobileResourceObserver = {
   onState(): void;
   onReset(reason: MobileAuthResetReason): void;
 };
+
+/** @internal Platform effects for the existing mobile Clerk owner. */
+export type MobileNativeHost = {
+  platform: 'ios' | 'android';
+  callbackUrl: string;
+  capabilities: readonly string[];
+  request<T>(capability: string, args: unknown): Promise<T>;
+  cancelAuthentication(): void;
+  invalidateCredentials(): Promise<void>;
+};

@@ -76,7 +76,7 @@ test('reset fences a pending Apple identity result before an authentication requ
   await opened.promise;
   const reset = await f.invoke(f.state.roots.signIn, 'SignIn.reset');
   assert.equal(reset.failure, undefined);
-  assert.ok((await attempt).result.error);
+  assert.equal((await attempt).failure.code, 'stale_operation');
   credential.resolve({ token: 'late_apple_identity_token' });
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(f.requests.length, before);

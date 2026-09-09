@@ -81,7 +81,7 @@ test('reset cancels an outstanding browser effect and ignores its late callback'
   await opened.promise;
   await f.invoke(f.state.roots.signIn, 'SignIn.reset');
   const result = await sso;
-  assert.equal(result.result.error.code, 'stale_authentication_attempt');
+  assert.equal(result.failure.code, 'stale_operation');
   browser.resolve({ callbackUrl: 'clerk-test://sso-callback?rotating_token_nonce=late' });
   await new Promise(r => setImmediate(r));
   assert.equal(f.requests.filter(r => r.method === 'GET' && r.url.includes('sign_ins')).length, 0);

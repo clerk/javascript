@@ -3,8 +3,11 @@ import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/shared/types';
-import { hostRequest } from './host.ts';
-import { bridgeError, type JSONValue } from './protocol.ts';
+import { ClerkRuntimeError } from '@clerk/shared/error';
+import type { MobileNativeHost } from '@clerk/shared/mobile';
+
+type JSONValue = unknown;
+const bridgeError = (code: string) => new ClerkRuntimeError('The native credential operation failed.', { code });
 
 export function binaryToJSON(value: any): JSONValue {
   if (value instanceof ArrayBuffer || ArrayBuffer.isView(value)) {
@@ -14,8 +17,8 @@ export function binaryToJSON(value: any): JSONValue {
         : new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
     return {
       base64url: btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(''))
-        .replaceAll('+', '-')
-        .replaceAll('/', '_')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
         .replace(/=+$/, ''),
     };
   }
@@ -37,6 +40,7 @@ function binary(value: unknown): ArrayBuffer {
 export function nativeCredential(
   kind: 'get',
   options: JSONValue,
+  request: MobileNativeHost['request'],
 ): Promise<
   | { publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse; error: null }
   | { publicKeyCredential: null; error: Error }
@@ -44,13 +48,18 @@ export function nativeCredential(
 export function nativeCredential(
   kind: 'create',
   options: JSONValue,
+  request: MobileNativeHost['request'],
 ): Promise<
   | { publicKeyCredential: PublicKeyCredentialWithAuthenticatorAttestationResponse; error: null }
   | { publicKeyCredential: null; error: Error }
 >;
-export async function nativeCredential(kind: 'get' | 'create', options: JSONValue) {
+export async function nativeCredential(
+  kind: 'get' | 'create',
+  options: JSONValue,
+  request: MobileNativeHost['request'],
+) {
   try {
-    const result = await hostRequest<any>(`passkeys.${kind}`, options);
+    const result = await request<any>(`passkeys.${kind}`, options);
     if (!result || result.type !== 'public-key' || typeof result.id !== 'string' || !result.response)
       throw bridgeError('invalid_credential_result');
     const response = result.response;

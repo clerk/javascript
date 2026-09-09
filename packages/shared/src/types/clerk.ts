@@ -1,4 +1,4 @@
-import type { MobileAuthenticationResources, MobileResourceObserver } from './mobile';
+import type { MobileAuthenticationResources, MobileNativeHost, MobileResourceObserver } from './mobile';
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
 import type { ModuleManager } from '../moduleManager';
@@ -1164,6 +1164,7 @@ export interface Clerk {
   __internal_getMobileResources?: () => MobileAuthenticationResources;
 
   /** @internal Observe the same resource owner used by JavaScript and native views. */
+  __internal_configureNativeHost?: (host: MobileNativeHost) => Promise<() => void>;
   __internal_subscribeNativeResources?: (observer: MobileResourceObserver) => () => void;
 
   /**

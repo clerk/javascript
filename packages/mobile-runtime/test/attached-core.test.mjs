@@ -63,10 +63,18 @@ async function fixture(options = {}) {
       credential = null;
     },
   });
-  core.__internal_beforeNativeAuthReset = async () => {
-    resets++;
-    await mobile.invalidate();
-  };
+  const removeHost = await core.__internal_configureNativeHost({
+    platform: 'ios',
+    callbackUrl: 'test://auth-callback',
+    capabilities: [],
+    request: async () => {
+      throw new Error('Unexpected platform operation');
+    },
+    cancelAuthentication: () => {
+      resets++;
+    },
+    invalidateCredentials: () => mobile.invalidate(),
+  });
   await core.load({ standardBrowser: false, telemetry: false, experimental: { runtimeEnvironment: 'headless' } });
   const attachments = [];
   function attach(configuration = {}) {
@@ -105,6 +113,7 @@ async function fixture(options = {}) {
     return result;
   }
   function dispose() {
+    removeHost();
     for (const attachment of attachments) attachment.bridge.dispose();
     mobile.dispose();
     context.ClerkCore.receive(JSON.stringify({ kind: 'dispose' }));
@@ -263,4 +272,42 @@ test('native reset preserves its own completion and rejects references from anot
   assert.equal(a.resource(a.state.roots.signIn).status, 'needs_identifier');
   await tick();
   assert.equal(b.resource(b.state.roots.signIn).status, 'needs_identifier');
+});
+
+test('an OS host attaches after load and preserves an application passkey adapter', async t => {
+  const f = await fixture();
+  t.after(f.dispose);
+  const count = f.requests.length;
+  const calls = [];
+  const customCredential = async () => ({ publicKeyCredential: null, error: new Error('application passkey adapter') });
+  f.core.__internal_createPublicCredentials = customCredential;
+  const remove = await f.core.__internal_configureNativeHost({
+    platform: 'ios',
+    callbackUrl: 'application://auth',
+    capabilities: ['browser', 'passkeys'],
+    request: async (capability, args) => {
+      calls.push({ capability, args });
+      return { callbackUrl: 'application://auth?rotating_token_nonce=value' };
+    },
+    cancelAuthentication() {},
+    invalidateCredentials: async () => {},
+  });
+  assert.equal(f.requests.length, count);
+  assert.equal(f.core.__internal_createPublicCredentials, customCredential);
+  assert.equal(f.core.__internal_isWebAuthnSupported(), true);
+  assert.equal(await f.core.__internal_oauthTransport.getRedirectUrl(), 'application://auth');
+  const transport = f.core.__internal_oauthTransport;
+  assert.equal(
+    (await transport.open(new URL('https://provider.test/auth'))).callbackUrl,
+    'application://auth?rotating_token_nonce=value',
+  );
+  assert.equal(calls[0].capability, 'browser');
+  remove();
+  await assert.rejects(
+    transport.open(new URL('https://provider.test/auth')),
+    error => error.code === 'capability_unavailable',
+  );
+  assert.equal(f.core.__internal_createPublicCredentials, customCredential);
+  assert.equal(f.core.loaded, true);
+  assert.equal(f.requests.length, count);
 });
