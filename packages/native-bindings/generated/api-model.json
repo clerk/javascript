@@ -4926,7 +4926,13 @@
               "kind": "dictionary",
               "value": {
                 "kind": "json"
-              }
+              },
+              "keys": {
+                "values": [],
+                "patterns": [],
+                "open": true
+              },
+              "requiredKeys": []
             }
           },
           "source": {
@@ -5245,7 +5251,13 @@
               "kind": "dictionary",
               "value": {
                 "kind": "json"
-              }
+              },
+              "keys": {
+                "values": [],
+                "patterns": [],
+                "open": true
+              },
+              "requiredKeys": []
             }
           },
           "source": {
@@ -7029,7 +7041,13 @@
               "value": {
                 "kind": "ref",
                 "name": "PhoneCodeChannel"
-              }
+              },
+              "keys": {
+                "values": [],
+                "patterns": [],
+                "open": true
+              },
+              "requiredKeys": []
             }
           },
           "source": {
@@ -8090,8 +8108,39 @@
           "name": "attributes",
           "optional": false,
           "type": {
-            "kind": "ref",
-            "name": "Attributes"
+            "kind": "dictionary",
+            "value": {
+              "kind": "ref",
+              "name": "AttributeData"
+            },
+            "keys": {
+              "values": [
+                "password",
+                "email_address",
+                "phone_number",
+                "username",
+                "first_name",
+                "last_name",
+                "web3_wallet",
+                "authenticator_app",
+                "backup_code",
+                "passkey"
+              ],
+              "patterns": [],
+              "open": false
+            },
+            "requiredKeys": [
+              "password",
+              "email_address",
+              "phone_number",
+              "username",
+              "first_name",
+              "last_name",
+              "web3_wallet",
+              "authenticator_app",
+              "backup_code",
+              "passkey"
+            ]
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
@@ -8298,8 +8347,54 @@
           "name": "social",
           "optional": false,
           "type": {
-            "kind": "ref",
-            "name": "PartialOAuthProviders"
+            "kind": "dictionary",
+            "value": {
+              "kind": "optional",
+              "nullable": false,
+              "omittable": true,
+              "value": {
+                "kind": "ref",
+                "name": "OAuthProviderSettings"
+              }
+            },
+            "keys": {
+              "values": [
+                "oauth_facebook",
+                "oauth_google",
+                "oauth_hubspot",
+                "oauth_github",
+                "oauth_tiktok",
+                "oauth_gitlab",
+                "oauth_discord",
+                "oauth_twitter",
+                "oauth_twitch",
+                "oauth_linkedin",
+                "oauth_linkedin_oidc",
+                "oauth_dropbox",
+                "oauth_atlassian",
+                "oauth_bitbucket",
+                "oauth_microsoft",
+                "oauth_notion",
+                "oauth_apple",
+                "oauth_line",
+                "oauth_instagram",
+                "oauth_coinbase",
+                "oauth_spotify",
+                "oauth_xero",
+                "oauth_box",
+                "oauth_slack",
+                "oauth_linear",
+                "oauth_x",
+                "oauth_enstall",
+                "oauth_huggingface",
+                "oauth_vercel"
+              ],
+              "patterns": [
+                "^oauth_custom_.*$"
+              ],
+              "open": false
+            },
+            "requiredKeys": []
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
@@ -8341,98 +8436,6 @@
             "file": "packages/shared/src/types/userSettings.ts",
             "line": 101,
             "symbol": "self_serve_sso"
-          }
-        }
-      ],
-      "methods": []
-    },
-    "Attributes": {
-      "name": "Attributes",
-      "source": {
-        "file": "packages/shared/src/types/userSettings.ts",
-        "line": 108,
-        "symbol": "Attributes"
-      },
-      "kind": "object",
-      "properties": [
-        {
-          "name": "password",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "email_address",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "phone_number",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "username",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "first_name",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "last_name",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "web3_wallet",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "authenticator_app",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "backup_code",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
-          }
-        },
-        {
-          "name": "passkey",
-          "optional": false,
-          "type": {
-            "kind": "ref",
-            "name": "AttributeData"
           }
         }
       ],
@@ -9151,396 +9154,6 @@
       ],
       "open": false,
       "patterns": []
-    },
-    "PartialOAuthProviders": {
-      "name": "PartialOAuthProviders",
-      "source": {
-        "file": "node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/lib/lib.es5.d.ts",
-        "line": 1583,
-        "symbol": "Partial"
-      },
-      "documentation": "Make all properties in T optional",
-      "kind": "object",
-      "properties": [
-        {
-          "name": "oauth_facebook",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_google",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_hubspot",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_github",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_tiktok",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_gitlab",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_discord",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_twitter",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_twitch",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_linkedin",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_linkedin_oidc",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_dropbox",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_atlassian",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_bitbucket",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_microsoft",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_notion",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_apple",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_line",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_instagram",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_coinbase",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_spotify",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_xero",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_box",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_slack",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_linear",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_x",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_enstall",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_huggingface",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        },
-        {
-          "name": "oauth_vercel",
-          "optional": true,
-          "type": {
-            "kind": "optional",
-            "nullable": false,
-            "omittable": true,
-            "value": {
-              "kind": "ref",
-              "name": "OAuthProviderSettings"
-            }
-          }
-        }
-      ],
-      "methods": []
     },
     "OAuthProviderSettings": {
       "name": "OAuthProviderSettings",
@@ -13516,7 +13129,13 @@
             "kind": "dictionary",
             "value": {
               "kind": "json"
-            }
+            },
+            "keys": {
+              "values": [],
+              "patterns": [],
+              "open": true
+            },
+            "requiredKeys": []
           },
           "source": {
             "file": "packages/shared/src/types/externalAccount.ts",
@@ -13966,7 +13585,13 @@
               "kind": "dictionary",
               "value": {
                 "kind": "json"
-              }
+              },
+              "keys": {
+                "values": [],
+                "patterns": [],
+                "open": true
+              },
+              "requiredKeys": []
             }
           },
           "source": {
@@ -16518,7 +16143,13 @@
             "kind": "dictionary",
             "value": {
               "kind": "string"
-            }
+            },
+            "keys": {
+              "values": [],
+              "patterns": [],
+              "open": true
+            },
+            "requiredKeys": []
           },
           "source": {
             "file": "packages/shared/src/types/organizationCreationDefaults.ts",
@@ -19909,7 +19540,13 @@
               "kind": "dictionary",
               "value": {
                 "kind": "string"
-              }
+              },
+              "keys": {
+                "values": [],
+                "patterns": [],
+                "open": true
+              },
+              "requiredKeys": []
             }
           },
           "source": {
@@ -26790,6 +26427,10 @@
       "reason": "User-defined SAML attribute mapping."
     },
     {
+      "path": "Record[string]",
+      "disposition": "generated"
+    },
+    {
       "path": "OrganizationEnterpriseConnectionSamlInput.allowSubdomains",
       "disposition": "generated"
     },
@@ -27295,6 +26936,10 @@
       "disposition": "generated"
     },
     {
+      "path": "Record[string]",
+      "disposition": "generated"
+    },
+    {
       "path": "AuthConfigResource.sessionMinter",
       "disposition": "generated"
     },
@@ -27609,6 +27254,42 @@
       "disposition": "generated"
     },
     {
+      "path": "Attributes.email_address",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.phone_number",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.username",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.first_name",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.last_name",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.web3_wallet",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.authenticator_app",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.backup_code",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.passkey",
+      "disposition": "generated"
+    },
+    {
       "path": "AttributeData.enabled",
       "disposition": "generated"
     },
@@ -27650,42 +27331,6 @@
     },
     {
       "path": "AttributeData.name",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.email_address",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.phone_number",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.username",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.first_name",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.last_name",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.web3_wallet",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.authenticator_app",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.backup_code",
-      "disposition": "generated"
-    },
-    {
-      "path": "Attributes.passkey",
       "disposition": "generated"
     },
     {
@@ -27876,30 +27521,6 @@
       "disposition": "generated"
     },
     {
-      "path": "OAuthProviderSettings.enabled",
-      "disposition": "generated"
-    },
-    {
-      "path": "OAuthProviderSettings.required",
-      "disposition": "generated"
-    },
-    {
-      "path": "OAuthProviderSettings.authenticatable",
-      "disposition": "generated"
-    },
-    {
-      "path": "OAuthProviderSettings.strategy",
-      "disposition": "generated"
-    },
-    {
-      "path": "OAuthProviderSettings.name",
-      "disposition": "generated"
-    },
-    {
-      "path": "OAuthProviderSettings.logo_url",
-      "disposition": "generated"
-    },
-    {
       "path": "Partial.oauth_google",
       "disposition": "generated"
     },
@@ -28009,6 +27630,34 @@
     },
     {
       "path": "Partial.oauth_vercel",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial[`oauth_custom_${string}`]",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.required",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.authenticatable",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.strategy",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.name",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.logo_url",
       "disposition": "generated"
     },
     {
@@ -29420,6 +29069,10 @@
     },
     {
       "path": "OrganizationCreationDefaultsAdvisory.meta",
+      "disposition": "generated"
+    },
+    {
+      "path": "Record[string]",
       "disposition": "generated"
     },
     {

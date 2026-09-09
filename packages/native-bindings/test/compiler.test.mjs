@@ -146,3 +146,29 @@ test('explicit resource property reads retain source types without broadcasting 
   const wrongKind = compile(source, { explicitReads: { 'SignInFutureResource.reload': 'Invalid target.' } });
   assert.ok(wrongKind.failures.some(f => /data property on a resource/.test(f.reason)));
 });
+
+test('mapped dictionaries preserve finite keys, optional values, and custom provider patterns', () => {
+  const model = compile(
+    source.replace(
+      'id: string;',
+      'id: string; providers: Partial<{ [key in "oauth_google" | "oauth_apple" | `oauth_custom_${string}`]: Provider }>;',
+    ) + 'interface Provider { name: string; enabled: boolean; }',
+  );
+  assert.deepEqual(model.failures, []);
+  const shape = model.definitions.SignIn.properties.find(p => p.name === 'providers').type;
+  assert.equal(shape.kind, 'dictionary');
+  assert.deepEqual(shape.keys.values.sort(), ['oauth_apple', 'oauth_google']);
+  assert.deepEqual(shape.keys.patterns, ['^oauth_custom_.*$']);
+  assert.deepEqual(shape.requiredKeys, []);
+  assert.equal(shape.value.kind, 'optional');
+  const native = generateNative(model, { protocolVersion: 1, contractHash: 'fixture' });
+  assert.match(native['GeneratedAPI.swift'], /\[String: Provider\?\]/);
+  assert.match(native['GeneratedAPI.kt'], /Map<String, Provider\?>/);
+});
+
+test('unsupported pattern indices fail instead of disappearing from named objects', () => {
+  const model = compile(
+    source.replace('id: string;', 'id: string; providers: { primary: string; [key: `custom_${string}`]: number };'),
+  );
+  assert.ok(model.failures.some(f => /Pattern or numeric index/.test(f.reason)));
+});

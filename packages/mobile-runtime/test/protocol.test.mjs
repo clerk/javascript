@@ -207,6 +207,26 @@ test('native settings are projected from the owner with typed configuration', as
   assert.equal(environment.displayConfig.applicationName, 'TestApp');
 });
 
+test('custom OAuth configuration survives the generated native settings projection', async t => {
+  const environment = structuredClone(fixtures.environment);
+  environment.user_settings.social.oauth_custom_corporate = {
+    enabled: true,
+    required: false,
+    authenticatable: true,
+    strategy: 'oauth_custom_corporate',
+    name: 'Corporate',
+    logo_url: 'https://example.com/logo.png',
+  };
+  const f = await fixture({
+    http: request => (new URL(request.url).pathname.endsWith('/environment') ? response(environment) : undefined),
+  });
+  t.after(f.dispose);
+  const social = f.resource(f.state.roots.clerk).environment.userSettings.social;
+  assert.equal(social.oauth_custom_corporate.name, 'Corporate');
+  assert.equal(social.oauth_custom_corporate.strategy, 'oauth_custom_corporate');
+  assert.equal(social.oauth_custom_corporate.enabled, true);
+});
+
 test('phone recovery codes use an explicit generated read and never enter observable state', async t => {
   const codes = ['recovery-secret-one', 'recovery-secret-two'];
   const phone = {

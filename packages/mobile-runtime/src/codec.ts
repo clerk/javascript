@@ -61,8 +61,13 @@ export function matches(shape: Shape, value: unknown, depth = 0): boolean {
     case 'json':
       return true;
     case 'jsonObject':
-    case 'dictionary':
       return isObject(value);
+    case 'dictionary':
+      return (
+        isObject(value) &&
+        (shape.requiredKeys || []).every((key: string) => Object.hasOwn(value, key)) &&
+        Object.values(value).every(v => matches(shape.value, v, depth + 1))
+      );
     case 'resource':
       return (
         isObject(value) &&
@@ -202,7 +207,17 @@ export function decode(shape: Shape, value: any, resources: ResourceCodec, depth
       return output;
     }
     case 'dictionary':
-      if (!isObject(value)) invalid();
+      if (!isObject(value) || (shape.requiredKeys || []).some((key: string) => !Object.hasOwn(value, key))) invalid();
+      if (
+        shape.keys &&
+        !shape.keys.open &&
+        Object.keys(value).some(
+          key =>
+            !shape.keys.values.includes(key) &&
+            !shape.keys.patterns.some((pattern: string) => new RegExp(pattern).test(key)),
+        )
+      )
+        invalid();
       return Object.fromEntries(
         Object.entries(value).map(([key, v]) => [key, decode(shape.value, v, resources, depth + 1)]),
       );

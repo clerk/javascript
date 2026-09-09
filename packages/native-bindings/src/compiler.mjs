@@ -33,6 +33,8 @@ export function compileProfile(repository, policy = profile) {
   const accounting = [];
   const names = new Map();
   const seen = new Map();
+  const mappedShapes = new Map();
+  const loweringMapped = new Set();
   const overridesUsed = new Set();
   const roots = {};
   const failures = [];
@@ -140,8 +142,51 @@ export function compileProfile(repository, policy = profile) {
     const symbol = type.aliasSymbol || type.getSymbol();
     const symbolName = symbol?.getName();
     if (policy.jsonObjects.includes(symbolName)) return { kind: 'jsonObject' };
-    if (symbolName === 'Record' && type.aliasTypeArguments?.[0]?.flags & ts.TypeFlags.String) {
-      return { kind: 'dictionary', value: lower(type.aliasTypeArguments[1], `${hint}Value`, context) };
+    if (type.objectFlags & ts.ObjectFlags.Mapped) {
+      if (mappedShapes.has(type.id)) return mappedShapes.get(type.id);
+      const properties = checker.getPropertiesOfType(type);
+      const indices = checker.getIndexInfosOfType(type);
+      const values = [...properties.map(p => checker.getTypeOfSymbol(p)), ...indices.map(i => i.type)];
+      if (
+        (properties.length > 1 || indices.length) &&
+        values.length &&
+        values.every(t => t === values[0]) &&
+        !checker.getSignaturesOfType(values[0], ts.SignatureKind.Call).length
+      ) {
+        if (loweringMapped.has(type.id))
+          return unsupported(
+            type,
+            hint,
+            'Recursive mapped dictionaries require a supported recursive value representation.',
+          );
+        loweringMapped.add(type.id);
+        const owner = symbolName || hint;
+        for (const property of properties) {
+          if (classify(property, owner, property.getName()) !== 'generated')
+            unsupported(
+              type,
+              `${owner}.${property.getName()}`,
+              'A mapped dictionary cannot erase a member-specific binding policy.',
+            );
+        }
+        const keyShapes = indices.map(index => lower(index.keyType, `${hint}Key`, context));
+        if (keyShapes.some(key => key.kind !== 'string')) unsupported(type, hint, 'Dictionary keys must be strings.');
+        for (const index of indices)
+          accounting.push({ path: `${owner}[${checker.typeToString(index.keyType)}]`, disposition: 'generated' });
+        const shape = {
+          kind: 'dictionary',
+          value: lower(values[0], `${hint}Value`, context),
+          keys: {
+            values: properties.map(p => p.getName()),
+            patterns: keyShapes.filter(key => key.pattern).map(key => key.pattern),
+            open: keyShapes.some(key => !key.pattern),
+          },
+          requiredKeys: properties.filter(p => !(p.flags & ts.SymbolFlags.Optional)).map(p => p.getName()),
+        };
+        loweringMapped.delete(type.id);
+        mappedShapes.set(type.id, shape);
+        return shape;
+      }
     }
     if (symbolName === 'Autocomplete') return { kind: 'string' };
     if (symbolName === 'Date') return { kind: 'date' };
@@ -340,6 +385,8 @@ export function compileProfile(repository, policy = profile) {
         });
       }
     }
+    if (checker.getIndexInfosOfType(type).some(index => !(index.keyType.flags & ts.TypeFlags.String)))
+      unsupported(type, hint, 'Pattern or numeric index signatures need a supported dictionary representation.');
     const index = checker.getIndexTypeOfType(type, ts.IndexKind.String);
     if (index) definition.index = lower(index, `${name}Value`, context);
     return { kind: 'ref', name };

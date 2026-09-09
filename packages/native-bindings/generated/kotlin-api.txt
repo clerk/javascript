@@ -52,16 +52,6 @@ AttributeData.used_for_first_factor: Boolean
 AttributeData.used_for_second_factor: Boolean
 AttributeData.verifications: List<VerificationStrategy>
 AttributeData.verify_at_sign_up: Boolean
-Attributes.authenticator_app: AttributeData
-Attributes.backup_code: AttributeData
-Attributes.email_address: AttributeData
-Attributes.first_name: AttributeData
-Attributes.last_name: AttributeData
-Attributes.passkey: AttributeData
-Attributes.password: AttributeData
-Attributes.phone_number: AttributeData
-Attributes.username: AttributeData
-Attributes.web3_wallet: AttributeData
 AuthConfig.claimedAt: Instant?
 AuthConfig.id: String? = null
 AuthConfig.preferredChannels: Map<String, PhoneCodeChannel>?
@@ -453,7 +443,7 @@ MobileSignOutOptions.sessionId: String? = null
 MobileUserSettings.actions: Actions
 MobileUserSettings.alternativePhoneCodeChannels: List<PhoneCodeChannel>
 MobileUserSettings.attackProtection: AttackProtectionData
-MobileUserSettings.attributes: Attributes
+MobileUserSettings.attributes: Map<String, AttributeData>
 MobileUserSettings.authenticatableSocialStrategies: List<OAuthStrategy>
 MobileUserSettings.enabledFirstFactorIdentifiers: List<Attribute>
 MobileUserSettings.enterpriseSSO: EnterpriseSSOSettings
@@ -463,7 +453,7 @@ MobileUserSettings.passkeySettings: PasskeySettingsData
 MobileUserSettings.passwordSettings: PasswordSettingsData
 MobileUserSettings.signIn: SignInData
 MobileUserSettings.signUp: SignUpData
-MobileUserSettings.social: PartialOAuthProviders
+MobileUserSettings.social: Map<String, OAuthProviderSettings?>
 MobileUserSettings.socialProviderStrategies: List<OAuthStrategy>
 MobileUserSettings.usernameSettings: UsernameSettingsData
 MobileUserSettings.web3FirstFactors: List<MobileUserSettingsWeb3FirstFactorsElement>
@@ -649,35 +639,6 @@ OrganizationSuggestionPublicOrganizationData.imageUrl: String
 OrganizationSuggestionPublicOrganizationData.name: String
 OrganizationSuggestionPublicOrganizationData.slug: String?
 OrganizationSuggestionStatus cases: pending, accepted, unrecognized(String)
-PartialOAuthProviders.oauth_apple: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_atlassian: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_bitbucket: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_box: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_coinbase: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_discord: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_dropbox: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_enstall: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_facebook: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_github: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_gitlab: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_google: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_hubspot: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_huggingface: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_instagram: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_line: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_linear: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_linkedin: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_linkedin_oidc: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_microsoft: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_notion: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_slack: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_spotify: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_tiktok: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_twitch: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_twitter: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_vercel: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_x: OAuthProviderSettings? = null
-PartialOAuthProviders.oauth_xero: OAuthProviderSettings? = null
 Partialtype.name: Field<String> = Field.Omitted
 Passkey.createdAt: Instant
 Passkey.delete(): DeletedObject [return]
@@ -1387,7 +1348,6 @@ object AttemptEmailAddressVerificationParams
 object AttemptPhoneNumberVerificationParams
 object AttemptWeb3WalletVerificationParams
 object AttributeData
-object Attributes
 object AuthConfig
 object AuthenticatorAssertionResponse
 object BackupCode
@@ -1474,7 +1434,6 @@ object OrganizationSettingsDomains
 object OrganizationSettingsOrganizationCreationDefaults
 object OrganizationSettingsSlug
 object OrganizationSuggestionPublicOrganizationData
-object PartialOAuthProviders
 object Partialtype
 object PasskeyAttempt
 object PasskeyFactor

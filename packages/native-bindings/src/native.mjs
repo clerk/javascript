@@ -354,19 +354,20 @@ export function generateNative(model, manifest) {
         swift += docs(method, 'swift', '  ');
         kotlin += docs(method, 'kotlin', '  ');
         const args = method.parameters;
-        swift += `  public func ${quoted(method.nativeName || method.name)}(${args.map((p, i) => `${i === 0 ? '_ ' : ''}${quoted(p.name)}: ${type(p.type, 'swift')}${defaults(p, 'swift')}`).join(', ')}) async throws${type(method.result, 'swift') === 'Void' ? '' : ` -> ${type(method.result, 'swift')}`} {\n    let runtime = try context.requireRuntime()\n    let result = try await runtime.invoke(owner: self, target: handle, operation: ${operation}, arguments: [${args.map(p => encode(p.type, quoted(p.name), 'swift')).join(', ')}])\n`;
-        kotlin += `  public suspend fun ${quoted(method.nativeName || method.name)}(${args.map(p => `${quoted(p.name)}: ${type(p.type, 'kotlin')}${defaults(p, 'kotlin')}`).join(', ')}): ${type(method.result, 'kotlin')} {\n    val runtime = context.requireRuntime()\n    val result = runtime.invoke(this, handle, ${operation}, listOf(${args.map(p => encode(p.type, quoted(p.name), 'kotlin')).join(', ')}))\n`;
+        swift += `  public func ${quoted(method.nativeName || method.name)}(${args.map((p, i) => `${i === 0 ? '_ ' : ''}${quoted(p.name)}: ${type(p.type, 'swift')}${defaults(p, 'swift')}`).join(', ')}) async throws${type(method.result, 'swift') === 'Void' ? '' : ` -> ${type(method.result, 'swift')}`} {\n    let runtime = try context.requireRuntime()\n    return try await runtime.invoke(owner: self, target: handle, operation: ${operation}, arguments: [${args.map(p => encode(p.type, quoted(p.name), 'swift')).join(', ')}]) { result in\n`;
+        kotlin += `  public suspend fun ${quoted(method.nativeName || method.name)}(${args.map(p => `${quoted(p.name)}: ${type(p.type, 'kotlin')}${defaults(p, 'kotlin')}`).join(', ')}): ${type(method.result, 'kotlin')} {\n    val runtime = context.requireRuntime()\n    return runtime.invoke(this, handle, ${operation}, listOf(${args.map(p => encode(p.type, quoted(p.name), 'kotlin')).join(', ')})) { result ->\n`;
         if (method.errorResult) {
-          swift += '    try runtime.checkErrorResult(result)\n';
-          kotlin += '    runtime.checkErrorResult(result)\n';
+          swift += '      try runtime.checkErrorResult(result)\n';
+          kotlin += '      runtime.checkErrorResult(result)\n';
         } else if (['void', 'undefined'].includes(method.result.kind)) {
-          swift += '    _ = result\n';
+          swift += '      _ = result\n';
+          kotlin += '      Unit\n';
         } else {
-          swift += `    return ${decode(method.result, 'result', 'swift')}\n`;
-          kotlin += `    return ${decode(method.result, 'result', 'kotlin')}\n`;
+          swift += `      return ${decode(method.result, 'result', 'swift')}\n`;
+          kotlin += `      ${decode(method.result, 'result', 'kotlin')}\n`;
         }
-        swift += '  }\n';
-        kotlin += '  }\n';
+        swift += '    }\n  }\n';
+        kotlin += '    }\n  }\n';
       }
       swift += '}\n\n';
       kotlin += '}\n\n';

@@ -65,17 +65,6 @@ AttributeData.used_for_second_factor: Bool
 AttributeData.verifications: [VerificationStrategy]
 AttributeData.verify_at_sign_up: Bool
 AttributeData: Hashable
-Attributes.authenticator_app: AttributeData
-Attributes.backup_code: AttributeData
-Attributes.email_address: AttributeData
-Attributes.first_name: AttributeData
-Attributes.last_name: AttributeData
-Attributes.passkey: AttributeData
-Attributes.password: AttributeData
-Attributes.phone_number: AttributeData
-Attributes.username: AttributeData
-Attributes.web3_wallet: AttributeData
-Attributes: Hashable
 AuthConfig.claimedAt: Date?
 AuthConfig.id: String? = nil
 AuthConfig.preferredChannels: [String: PhoneCodeChannel]?
@@ -560,7 +549,7 @@ MobileSignOutOptions: Hashable
 MobileUserSettings.actions: Actions
 MobileUserSettings.alternativePhoneCodeChannels: [PhoneCodeChannel]
 MobileUserSettings.attackProtection: AttackProtectionData
-MobileUserSettings.attributes: Attributes
+MobileUserSettings.attributes: [String: AttributeData]
 MobileUserSettings.authenticatableSocialStrategies: [OAuthStrategy]
 MobileUserSettings.enabledFirstFactorIdentifiers: [Attribute]
 MobileUserSettings.enterpriseSSO: EnterpriseSSOSettings
@@ -570,7 +559,7 @@ MobileUserSettings.passkeySettings: PasskeySettingsData
 MobileUserSettings.passwordSettings: PasswordSettingsData
 MobileUserSettings.signIn: SignInData
 MobileUserSettings.signUp: SignUpData
-MobileUserSettings.social: PartialOAuthProviders
+MobileUserSettings.social: [String: OAuthProviderSettings?]
 MobileUserSettings.socialProviderStrategies: [OAuthStrategy]
 MobileUserSettings.usernameSettings: UsernameSettingsData
 MobileUserSettings.web3FirstFactors: [MobileUserSettingsWeb3FirstFactorsElement]
@@ -792,36 +781,6 @@ OrganizationSuggestionPublicOrganizationData.slug: String?
 OrganizationSuggestionPublicOrganizationData: Hashable
 OrganizationSuggestionStatus cases: pending, accepted, unrecognized(String)
 OrganizationSuggestionStatus: Hashable
-PartialOAuthProviders.oauth_apple: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_atlassian: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_bitbucket: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_box: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_coinbase: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_discord: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_dropbox: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_enstall: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_facebook: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_github: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_gitlab: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_google: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_hubspot: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_huggingface: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_instagram: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_line: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_linear: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_linkedin: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_linkedin_oidc: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_microsoft: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_notion: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_slack: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_spotify: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_tiktok: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_twitch: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_twitter: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_vercel: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_x: OAuthProviderSettings? = nil
-PartialOAuthProviders.oauth_xero: OAuthProviderSettings? = nil
-PartialOAuthProviders: Hashable
 Partialtype.name: Field<String> = .omitted
 Partialtype: Hashable
 Passkey.createdAt: Date
@@ -1690,7 +1649,6 @@ object AttemptEmailAddressVerificationParams
 object AttemptPhoneNumberVerificationParams
 object AttemptWeb3WalletVerificationParams
 object AttributeData
-object Attributes
 object AuthConfig
 object AuthenticatorAssertionResponse
 object BackupCode
@@ -1777,7 +1735,6 @@ object OrganizationSettingsDomains
 object OrganizationSettingsOrganizationCreationDefaults
 object OrganizationSettingsSlug
 object OrganizationSuggestionPublicOrganizationData
-object PartialOAuthProviders
 object Partialtype
 object PasskeyAttempt
 object PasskeyFactor
