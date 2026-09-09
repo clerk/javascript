@@ -116,6 +116,8 @@ const Action = React.forwardRef<HTMLButtonElement, InputGroupActionProps>(functi
 
 export type InputGroupAddonProps = MosaicComponentProps<'span'>;
 
+const addonButtonSizes = { sm: 'xs', md: 'sm', lg: 'md' } as const;
+
 function useAddon(
   side: 'start' | 'end',
   { render, className, style, ...props }: InputGroupAddonProps,
@@ -123,8 +125,15 @@ function useAddon(
 ) {
   const group = useInputGroupContext();
   const defaults = React.useMemo(
-    () => ({ size: 'sm', shape: 'square', color: 'neutral', variant: 'ghost', disabled: group.disabled }) as const,
-    [group.disabled],
+    () =>
+      ({
+        size: addonButtonSizes[group.size],
+        shape: 'square',
+        color: 'neutral',
+        variant: 'ghost',
+        disabled: group.disabled,
+      }) as const,
+    [group.disabled, group.size],
   );
   const element = useRender({
     defaultTagName: 'span',

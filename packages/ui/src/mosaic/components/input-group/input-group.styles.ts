@@ -10,8 +10,8 @@ export const styles = stylex.create({
     display: 'flex',
     flexShrink: 0,
   },
-  start: { paddingInlineStart: 'var(--_cl-input-group-inset)' },
-  end: { paddingInlineEnd: 'var(--_cl-input-group-inset)' },
+  start: { paddingInlineStart: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))' },
+  end: { paddingInlineEnd: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))' },
   root: {
     overflow: 'hidden',
     alignItems: 'center',
@@ -38,7 +38,7 @@ export const styles = stylex.create({
 
 export const sizes = stylex.create({
   sm: {
-    '--_cl-input-group-inset': `max(0px, calc((${space['7']} - ${space['7']}) / 2))`,
+    '--_cl-input-group-inset': `max(0px, calc((${space['7']} - ${space['6']}) / 2))`,
     '--_cl-input-group-radius': radiusVars['--cl-radius-md'],
     borderRadius: radiusVars['--cl-radius-md'],
     height: space['7'],
@@ -50,7 +50,7 @@ export const sizes = stylex.create({
     height: space['8'],
   },
   lg: {
-    '--_cl-input-group-inset': `max(0px, calc((${space['9']} - ${space['7']}) / 2))`,
+    '--_cl-input-group-inset': `max(0px, calc((${space['9']} - ${space['8']}) / 2))`,
     '--_cl-input-group-radius': radiusVars['--cl-radius-lg'],
     borderRadius: radiusVars['--cl-radius-lg'],
     height: space['9'],

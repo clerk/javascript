@@ -9,6 +9,27 @@ import { Input } from '../input';
 import { InputGroup } from './input-group';
 
 describe('Mosaic InputGroup', () => {
+  it.each([
+    ['sm', 'xs'],
+    ['md', 'sm'],
+    ['lg', 'md'],
+  ] as const)('uses a %s group with a %s slot button', (size, buttonSize) => {
+    render(
+      <InputGroup.Root size={size}>
+        <InputGroup.Start>
+          <Button>Start</Button>
+        </InputGroup.Start>
+        <Input aria-label='Value' />
+        <InputGroup.End>
+          <Button>End</Button>
+        </InputGroup.End>
+      </InputGroup.Root>,
+    );
+    for (const button of screen.getAllByRole('button')) {
+      expect(button).toHaveAttribute('data-size', buttonSize);
+    }
+  });
+
   it.each(['Start', 'End'] as const)('provides button defaults inside %s', side => {
     const Slot = InputGroup[side];
     render(
