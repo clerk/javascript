@@ -933,7 +933,9 @@ describe('Drawer', () => {
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
-    it('does not drag when a scrollable ancestor of the popup is scrolled', () => {
+    // Nothing above the sheet is inner content: the walk ends at the sheet in either direction, so
+    // a scrolled box the sheet happens to sit in never takes the gesture from it.
+    it('drags when a scrollable ancestor of the popup is scrolled', () => {
       const onOpenChange = vi.fn();
       render(
         <AncestorScrollFixture
@@ -947,8 +949,7 @@ describe('Drawer', () => {
 
       drag(screen.getByTestId('ancestor-item'), 0, 120, 200);
 
-      expect(onOpenChange).not.toHaveBeenCalledWith(false);
-      expect(swipeY(popup)).toBe('');
+      expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
     // A portalled sheet's ancestors above the viewport are the page itself; the walk used to reach a
