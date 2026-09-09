@@ -9,10 +9,10 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-function fixture() {
+function fixture(initialCredential: string | null = 'original', options: { native?: boolean } = {}) {
   let before: any;
   let after: any;
-  let credential: string | null = 'original';
+  let credential = initialCredential;
   const transport = installMobileCredentialTransport(
     {
       __internal_onBeforeRequest: callback => {
@@ -32,6 +32,7 @@ function fixture() {
       },
     },
     { 'x-ios-sdk-version': 'next' },
+    options,
   );
   return {
     before: (r: any) => before(r),
@@ -42,6 +43,18 @@ function fixture() {
 }
 
 describe('mobile credential transport', () => {
+  it.each([true, false])('requires a credential for native client hydration: native=%s', async native => {
+    const f = fixture(null, { native });
+    const request = { url: new URL('https://clerk.example/client') };
+    await f.before(request);
+    const response = Object.assign(new Response('{}'), {
+      payload: { response: { object: 'client', id: 'client_native', updated_at: 1 } },
+    });
+    if (native) await expect(f.after(request, response)).rejects.toMatchObject({ code: 'missing_client_credential' });
+    else await expect(f.after(request, response)).resolves.toBeUndefined();
+    expect(f.read()).toBeNull();
+  });
+
   it('uses the native client credential independently of session JWTs and cookies', async () => {
     const f = fixture();
     const request = { url: new URL('https://clerk.example/client'), headers: new Headers() };

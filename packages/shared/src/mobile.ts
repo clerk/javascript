@@ -88,6 +88,12 @@ export function installMobileCredentialTransport(
     // credential write or FAPI resource hydration can occur.
     const commit = writes.then(async () => {
       assertCurrent(issued.generation);
+      if (client && options.native !== false && !credential && !(await storage.read())) {
+        throw Object.assign(new Error('The native client response has no client credential.'), {
+          code: 'missing_client_credential',
+        });
+      }
+      assertCurrent(issued.generation);
       if (client && acceptedClient && issued.sequence <= acceptedClient.sequence) {
         const newerServerState =
           serverDate !== undefined &&
