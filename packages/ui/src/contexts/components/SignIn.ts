@@ -1,7 +1,7 @@
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
-import { buildURL } from '@clerk/shared/internal/clerk-js/url';
+import { buildURL, trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { isAbsoluteUrl } from '@clerk/shared/url';
@@ -31,6 +31,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
+  signUpUrlIsSignInPage: boolean;
   signUpIfMissingEnabled: boolean;
   navigateOnSetActive: (opts: {
     session: SessionResource;
@@ -38,6 +39,17 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
     decorateUrl: DecorateUrl;
   }) => Promise<unknown>;
   taskUrl: string | null;
+};
+
+const sameDestination = (a: string, b: string): boolean => {
+  const absolute = (url: string) => {
+    try {
+      return trimTrailingSlash(new URL(url, window.location.href).href);
+    } catch {
+      return url;
+    }
+  };
+  return absolute(a) === absolute(b);
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -95,6 +107,11 @@ export const useSignInContext = (): SignInContextType => {
     ? (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl
     : ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
   let waitlistUrl = ctx.waitlistUrl || options.waitlistUrl || displayConfig.waitlistUrl;
+
+  // An instance whose sign-up URL is its sign-in page gives ticket hand-offs nowhere to go — see
+  // SignInStart. Compared here, before `buildURL` decorates both with the same params, and resolved
+  // because `signInUrl` is relative under path routing while `signUpUrl` usually is not.
+  const signUpUrlIsSignInPage = !isCombinedFlow && sameDestination(signInUrl, signUpUrl);
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
@@ -217,6 +234,7 @@ export const useSignInContext = (): SignInContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    signUpUrlIsSignInPage,
     signUpIfMissingEnabled,
     navigateOnSetActive,
     taskUrl,

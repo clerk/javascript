@@ -1,7 +1,7 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import type { SignInResource } from '@clerk/shared/types';
+import type { SignInResource, SignUpResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -982,6 +982,100 @@ describe('SignInStart', () => {
         '',
         expect.not.stringContaining('__clerk_ticket'),
       );
+    });
+
+    // An IdP-initiated ticket for an unknown user is redirected to the instance's sign-up URL with
+    // `__clerk_status=sign_up`. When that URL is the sign-in page itself, the hand-off below has
+    // nowhere to go, so the ticket is consumed here instead of hanging on the loading card.
+    describe('sign_up status', () => {
+      // The fixture's sign-in URL. Pointing the sign-up URL at it reproduces the instance config
+      // that leaves the hand-off with nowhere to go.
+      const SIGN_IN_URL = 'https://dashboard.clerk.com/sign-in';
+
+      const landOnTicket = () => {
+        Object.defineProperty(window, 'location', {
+          writable: true,
+          value: { href: `${SIGN_IN_URL}?__clerk_ticket=test_ticket&__clerk_status=sign_up` },
+        });
+        Object.defineProperty(window, 'history', { writable: true, value: { replaceState: vi.fn() } });
+      };
+
+      it('consumes the ticket in place when the sign-up URL is the sign-in page', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withRestrictedMode();
+          f.withSignUpUrl(SIGN_IN_URL);
+        });
+        fixtures.signUp.create.mockResolvedValueOnce({
+          status: 'complete',
+          createdSessionId: 'sess_123',
+        } as SignUpResource);
+
+        landOnTicket();
+
+        render(
+          <CardStateProvider>
+            <SignInStart />
+          </CardStateProvider>,
+          { wrapper },
+        );
+
+        await waitFor(() =>
+          expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
+        );
+        await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalled());
+        expect(fixtures.router.navigate).not.toHaveBeenCalled();
+      });
+
+      it('hands the ticket off when the sign-up URL is a separate page', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withRestrictedMode();
+        });
+
+        landOnTicket();
+
+        render(
+          <CardStateProvider>
+            <SignInStart />
+          </CardStateProvider>,
+          { wrapper },
+        );
+
+        await waitFor(() =>
+          expect(fixtures.router.navigate).toHaveBeenCalledWith(
+            'https://dashboard.clerk.com/sign-up',
+            expect.anything(),
+          ),
+        );
+        expect(fixtures.signUp.create).not.toHaveBeenCalled();
+      });
+
+      // The ticket cannot supply every required field, so only a sign-up form could finish — and
+      // there is none to reach. Release the loading card rather than spinning forever.
+      it('falls back to the sign-in form when the ticket sign-up needs more fields', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withRestrictedMode();
+          f.withSignUpUrl(SIGN_IN_URL);
+        });
+        fixtures.signUp.create.mockResolvedValueOnce({
+          status: 'missing_requirements',
+          missingFields: ['phone_number'],
+        } as unknown as SignUpResource);
+
+        landOnTicket();
+
+        render(
+          <CardStateProvider>
+            <SignInStart />
+          </CardStateProvider>,
+          { wrapper },
+        );
+
+        await waitFor(() => expect(screen.getByLabelText(/email address/i)).toBeInTheDocument());
+        expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+      });
     });
   });
 
