@@ -1,9 +1,12 @@
+import { getPasskeyFailureStage, type PasskeyFailureStage } from '../../clerk-js/src/utils/passkeyFailureStage.ts';
+
 export type JSONValue = null | boolean | number | string | JSONValue[] | { [key: string]: JSONValue };
 export type Handle = { id: string; generation: number; type: string };
 export type Failure = {
   kind: 'clerk' | 'rejection' | 'bridge' | 'cancelled';
   code: string;
   message: string;
+  passkeyStage?: PasskeyFailureStage;
   errors?: { code: string; message: string; longMessage?: string; meta?: Record<string, JSONValue> }[];
 };
 export type Projection = { handle: Handle; state: Record<string, JSONValue> };
@@ -47,6 +50,7 @@ export function failure(error: unknown, kind: Failure['kind'] = 'rejection'): Fa
     message:
       kind === 'clerk' && typeof value.message === 'string' ? value.message : 'The operation could not be completed.',
     ...(errors ? { errors } : {}),
+    ...(getPasskeyFailureStage(error) ? { passkeyStage: getPasskeyFailureStage(error) } : {}),
   };
 }
 

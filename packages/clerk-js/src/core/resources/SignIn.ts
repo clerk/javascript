@@ -91,6 +91,7 @@ import {
 } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { getNativeAppleIdentity, type NativeAppleIdentity } from '../../utils/nativeAppleIdentity';
+import { recordPasskeyFailureStage, type PasskeyFailureStage } from '../../utils/passkeyFailureStage';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
@@ -1416,7 +1417,10 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: ClerkError | null }> {
-    const { flow } = params || {};
+    const { flow, preferImmediatelyAvailableCredentials } = params || {};
+    const usesSecondFactor =
+      (this.status === 'needs_second_factor' || this.status === 'needs_client_trust') &&
+      this.supportedSecondFactors.some(factor => factor.strategy === 'passkey');
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -1435,55 +1439,66 @@ class SignInFuture implements SignInFutureResource {
     }
 
     return runAsyncResourceTask(this.#resource, async () => {
-      if (flow === 'autofill' || flow === 'discoverable') {
-        await this._create({ strategy: 'passkey' });
-      } else {
-        const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
+      let stage: PasskeyFailureStage = usesSecondFactor ? 'preparingSecondFactor' : 'preparingFirstFactor';
+      try {
+        if (!usesSecondFactor && (flow === 'autofill' || flow === 'discoverable')) {
+          await this._create({ strategy: 'passkey' });
+        } else {
+          const passKeyFactor = (usesSecondFactor ? this.supportedSecondFactors : this.supportedFirstFactors).find(
+            f => f.strategy === 'passkey',
+          );
 
-        if (!passKeyFactor) {
-          throw new ClerkRuntimeError('Passkey factor not found', { code: 'factor_not_found' });
+          if (!passKeyFactor) {
+            throw new ClerkRuntimeError('Passkey factor not found', { code: 'factor_not_found' });
+          }
+          await this.#resource.__internal_basePost({
+            body: { strategy: 'passkey' },
+            action: usesSecondFactor ? 'prepare_second_factor' : 'prepare_first_factor',
+            coalesce: true,
+          });
         }
-        await this.#resource.__internal_basePost({
-          body: { strategy: 'passkey' },
-          action: 'prepare_first_factor',
-          coalesce: true,
+
+        const { nonce } = usesSecondFactor ? this.secondFactorVerification : this.firstFactorVerification;
+        const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+        if (!publicKeyOptions) {
+          throw new ClerkRuntimeError('Missing public key options', { code: 'missing_public_key_options' });
+        }
+
+        let canUseConditionalUI = false;
+
+        if (!usesSecondFactor && flow === 'autofill') {
+          /**
+           * If autofill is not supported gracefully handle the result, we don't need to throw.
+           * The caller should always check this before calling this method.
+           */
+          canUseConditionalUI = await isWebAuthnAutofillSupported();
+        }
+
+        stage = 'requestingAuthorization';
+        const { publicKeyCredential, error } = await webAuthnGetCredential({
+          publicKeyOptions,
+          conditionalUI: canUseConditionalUI,
+          ...(preferImmediatelyAvailableCredentials === undefined ? {} : { preferImmediatelyAvailableCredentials }),
         });
+
+        if (!publicKeyCredential) {
+          if (SignIn.clerk.__internal_getPublicCredentials) throw error;
+          throw new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_failed' });
+        }
+
+        stage = usesSecondFactor ? 'attemptingSecondFactor' : 'attemptingFirstFactor';
+        await this.#resource.__internal_basePost({
+          body: {
+            publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+            strategy: 'passkey',
+          },
+          action: usesSecondFactor ? 'attempt_second_factor' : 'attempt_first_factor',
+        });
+      } catch (error) {
+        recordPasskeyFailureStage(error, stage);
+        throw error;
       }
-
-      const { nonce } = this.firstFactorVerification;
-      const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
-
-      if (!publicKeyOptions) {
-        throw new ClerkRuntimeError('Missing public key options', { code: 'missing_public_key_options' });
-      }
-
-      let canUseConditionalUI = false;
-
-      if (flow === 'autofill') {
-        /**
-         * If autofill is not supported gracefully handle the result, we don't need to throw.
-         * The caller should always check this before calling this method.
-         */
-        canUseConditionalUI = await isWebAuthnAutofillSupported();
-      }
-
-      // Invoke the navigator.create.get() method.
-      const { publicKeyCredential, error } = await webAuthnGetCredential({
-        publicKeyOptions,
-        conditionalUI: canUseConditionalUI,
-      });
-
-      if (!publicKeyCredential) {
-        throw new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_failed' });
-      }
-
-      await this.#resource.__internal_basePost({
-        body: {
-          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
-          strategy: 'passkey',
-        },
-        action: 'attempt_first_factor',
-      });
     });
   }
 

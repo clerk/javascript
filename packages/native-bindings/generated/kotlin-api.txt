@@ -1008,6 +1008,7 @@ SignInMfa.verifyEmailCode(params: SignInMFAEmailCodeVerifyParams): Unit [error-e
 SignInMfa.verifyPhoneCode(params: SignInMFAPhoneCodeVerifyParams): Unit [error-envelope]
 SignInMfa.verifyTOTP(params: SignInTOTPVerifyParams): Unit [error-envelope]
 SignInPasskeyParams.flow: SignInPasskeyParamsFlow? = null
+SignInPasskeyParams.preferImmediatelyAvailableCredentials: Boolean? = null
 SignInPasskeyParamsFlow cases: autofill, discoverable, unrecognized(String)
 SignInPasswordParams variants: SignInPasswordParamsCase1 | SignInPasswordParamsCase2 | SignInPasswordParamsCase3 | SignInPasswordParamsCase4
 SignInPasswordParams.password: String [shared union field]
@@ -1040,7 +1041,7 @@ SignInSSOParams.enterpriseConnectionId: String? = null
 SignInSSOParams.identifier: String? = null
 SignInSSOParams.oidcPrompt: String? = null
 SignInSSOParams.strategy: MobileSSOParamsStrategy
-SignInSecondFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | TOTPFactor | BackupCodeFactor
+SignInSecondFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | PasskeyFactor | TOTPFactor | BackupCodeFactor
 SignInSecondFactor.strategy: String [shared union field]
 SignInStatus cases: needs_identifier, needs_first_factor, needs_second_factor, needs_client_trust, needs_new_password, needs_protect_check, complete, unrecognized(String)
 SignInSubmitProtectCheckParams.proofToken: String

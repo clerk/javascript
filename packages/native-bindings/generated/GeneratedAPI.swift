@@ -9254,8 +9254,9 @@ public indirect enum SignInSecondFactor: Hashable, Sendable {
   case case1(EmailCodeFactor)
   case case2(EmailLinkFactor)
   case case3(PhoneCodeFactor)
-  case case4(TOTPFactor)
-  case case5(BackupCodeFactor)
+  case case4(PasskeyFactor)
+  case case5(TOTPFactor)
+  case case6(BackupCodeFactor)
   @MainActor public var `strategy`: String {
     switch self {
     case .case1(let value): return value.`strategy`
@@ -9263,6 +9264,7 @@ public indirect enum SignInSecondFactor: Hashable, Sendable {
     case .case3(let value): return value.`strategy`
     case .case4(let value): return value.`strategy`
     case .case5(let value): return value.`strategy`
+    case .case6(let value): return value.`strategy`
     }
   }
   @MainActor public func encode() throws -> JSONValue {
@@ -9272,6 +9274,7 @@ public indirect enum SignInSecondFactor: Hashable, Sendable {
     case .case3(let value): return .object(["$case": .number(2), "value": try value.encode()])
     case .case4(let value): return .object(["$case": .number(3), "value": try value.encode()])
     case .case5(let value): return .object(["$case": .number(4), "value": try value.encode()])
+    case .case6(let value): return .object(["$case": .number(5), "value": try value.encode()])
     }
   }
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInSecondFactor {
@@ -9281,8 +9284,9 @@ public indirect enum SignInSecondFactor: Hashable, Sendable {
     case 0: return .case1(try EmailCodeFactor.decode(payload, in: runtime))
     case 1: return .case2(try EmailLinkFactor.decode(payload, in: runtime))
     case 2: return .case3(try PhoneCodeFactor.decode(payload, in: runtime))
-    case 3: return .case4(try TOTPFactor.decode(payload, in: runtime))
-    case 4: return .case5(try BackupCodeFactor.decode(payload, in: runtime))
+    case 3: return .case4(try PasskeyFactor.decode(payload, in: runtime))
+    case 4: return .case5(try TOTPFactor.decode(payload, in: runtime))
+    case 5: return .case6(try BackupCodeFactor.decode(payload, in: runtime))
     default: throw CoreError.invalidValue
     }
   }
@@ -10419,19 +10423,22 @@ public struct SignInTicketParams: Hashable, Sendable {
 
 public struct SignInPasskeyParams: Hashable, Sendable {
   public let `flow`: SignInPasskeyParamsFlow?
-  public init(`flow`: SignInPasskeyParamsFlow? = nil) {
+  public let `preferImmediatelyAvailableCredentials`: Bool?
+  public init(`flow`: SignInPasskeyParamsFlow? = nil, `preferImmediatelyAvailableCredentials`: Bool? = nil) {
     self.`flow` = `flow`
+    self.`preferImmediatelyAvailableCredentials` = `preferImmediatelyAvailableCredentials`
   }
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
-      "flow": try self.`flow`.map { value in try value.encode() } ?? .undefined
+      "flow": try self.`flow`.map { value in try value.encode() } ?? .undefined,
+      "preferImmediatelyAvailableCredentials": try self.`preferImmediatelyAvailableCredentials`.map { value in .bool(value) } ?? .undefined
     ]
     return .object(values.filter { !$0.value.isUndefined })
   }
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInPasskeyParams {
     let values = try value.object()
 
-    return try SignInPasskeyParams(`flow`: try (values["flow"] ?? .undefined).optional { value in try SignInPasskeyParamsFlow.decode(value, in: runtime) })
+    return try SignInPasskeyParams(`flow`: try (values["flow"] ?? .undefined).optional { value in try SignInPasskeyParamsFlow.decode(value, in: runtime) }, `preferImmediatelyAvailableCredentials`: try (values["preferImmediatelyAvailableCredentials"] ?? .undefined).optional { value in try value.bool() })
   }
 }
 
@@ -12233,7 +12240,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "e904897c14e2c4091cb5c19a465198af034b541af3da69ab6442b1e4e381cdf3"
+  public static let contractHash = "003c8b215d8623697ce170a41bfbdc1a7400b7d456109a881df6cbc020f8b17f"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

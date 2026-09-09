@@ -1250,6 +1250,7 @@ SignInMfa.verifyPhoneCode(params: SignInMFAPhoneCodeVerifyParams): Void [error-e
 SignInMfa.verifyTOTP(params: SignInTOTPVerifyParams): Void [error-envelope]
 SignInMfa: Hashable
 SignInPasskeyParams.flow: SignInPasskeyParamsFlow? = nil
+SignInPasskeyParams.preferImmediatelyAvailableCredentials: Bool? = nil
 SignInPasskeyParams: Hashable
 SignInPasskeyParamsFlow cases: autofill, discoverable, unrecognized(String)
 SignInPasskeyParamsFlow: Hashable
@@ -1300,7 +1301,7 @@ SignInSSOParams.identifier: String? = nil
 SignInSSOParams.oidcPrompt: String? = nil
 SignInSSOParams.strategy: MobileSSOParamsStrategy
 SignInSSOParams: Hashable
-SignInSecondFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | TOTPFactor | BackupCodeFactor
+SignInSecondFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | PasskeyFactor | TOTPFactor | BackupCodeFactor
 SignInSecondFactor.strategy: String [shared union field]
 SignInSecondFactor: Hashable
 SignInStatus cases: needs_identifier, needs_first_factor, needs_second_factor, needs_client_trust, needs_new_password, needs_protect_check, complete, unrecognized(String)

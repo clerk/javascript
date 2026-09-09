@@ -311,6 +311,8 @@ export interface SignInFuturePasskeyParams {
    * </ul>
    */
   flow?: 'autofill' | 'discoverable';
+  /** Ask native credential presentation to avoid a cross-device prompt when no local credential is available. */
+  preferImmediatelyAvailableCredentials?: boolean;
 }
 
 /** @generateWithEmptyComment */

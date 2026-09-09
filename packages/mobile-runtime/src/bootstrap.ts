@@ -68,16 +68,24 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     return hostRequest('appleIdentity', options);
   };
   clerk.__internal_isWebAuthnSupported = () => configuration.capabilities.includes('passkeys');
-  clerk.__internal_isWebAuthnAutofillSupported = async () => false;
+  clerk.__internal_isWebAuthnAutofillSupported = async () => configuration.capabilities.includes('passkeys.autofill');
   clerk.__internal_isWebAuthnPlatformAuthenticatorSupported = async () =>
     configuration.capabilities.includes('passkeys');
   clerk.__internal_createPublicCredentials = (options: PublicKeyCredentialCreationOptionsWithoutExtensions) =>
     nativeCredential('create', binaryToJSON(options));
   clerk.__internal_getPublicCredentials = ({
     publicKeyOptions,
+    conditionalUI,
+    preferImmediatelyAvailableCredentials,
   }: {
     publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
-  }) => nativeCredential('get', binaryToJSON(publicKeyOptions));
+    conditionalUI?: boolean;
+    preferImmediatelyAvailableCredentials?: boolean;
+  }) =>
+    nativeCredential(
+      'get',
+      binaryToJSON({ ...publicKeyOptions, conditionalUI, preferImmediatelyAvailableCredentials }),
+    );
   await clerk.load({
     standardBrowser: false,
     telemetry: false,

@@ -6832,14 +6832,16 @@ public sealed interface SignInSecondFactor {
   public data class Case1(val value: EmailCodeFactor) : SignInSecondFactor
   public data class Case2(val value: EmailLinkFactor) : SignInSecondFactor
   public data class Case3(val value: PhoneCodeFactor) : SignInSecondFactor
-  public data class Case4(val value: TOTPFactor) : SignInSecondFactor
-  public data class Case5(val value: BackupCodeFactor) : SignInSecondFactor
+  public data class Case4(val value: PasskeyFactor) : SignInSecondFactor
+  public data class Case5(val value: TOTPFactor) : SignInSecondFactor
+  public data class Case6(val value: BackupCodeFactor) : SignInSecondFactor
   public val `strategy`: String get() = when (this) {
     is Case1 -> value.`strategy`
     is Case2 -> value.`strategy`
     is Case3 -> value.`strategy`
     is Case4 -> value.`strategy`
     is Case5 -> value.`strategy`
+    is Case6 -> value.`strategy`
   }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
@@ -6847,6 +6849,7 @@ public sealed interface SignInSecondFactor {
     is Case3 -> JsonObject(mapOf("\$case" to JsonPrimitive(2), "value" to value.toJson()))
     is Case4 -> JsonObject(mapOf("\$case" to JsonPrimitive(3), "value" to value.toJson()))
     is Case5 -> JsonObject(mapOf("\$case" to JsonPrimitive(4), "value" to value.toJson()))
+    is Case6 -> JsonObject(mapOf("\$case" to JsonPrimitive(5), "value" to value.toJson()))
   }
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInSecondFactor {
@@ -6856,8 +6859,9 @@ public sealed interface SignInSecondFactor {
         0 -> Case1(EmailCodeFactor.fromJson(payload, runtime))
         1 -> Case2(EmailLinkFactor.fromJson(payload, runtime))
         2 -> Case3(PhoneCodeFactor.fromJson(payload, runtime))
-        3 -> Case4(TOTPFactor.fromJson(payload, runtime))
-        4 -> Case5(BackupCodeFactor.fromJson(payload, runtime))
+        3 -> Case4(PasskeyFactor.fromJson(payload, runtime))
+        4 -> Case5(TOTPFactor.fromJson(payload, runtime))
+        5 -> Case6(BackupCodeFactor.fromJson(payload, runtime))
         else -> throw CoreException("invalid_value")
       }
     }
@@ -7770,15 +7774,16 @@ public data class SignInTicketParams(public val `ticket`: String) {
   }
 }
 
-public data class SignInPasskeyParams(public val `flow`: SignInPasskeyParamsFlow? = null) {
+public data class SignInPasskeyParams(public val `flow`: SignInPasskeyParamsFlow? = null, public val `preferImmediatelyAvailableCredentials`: Boolean? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("flow", this@SignInPasskeyParams.`flow`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("preferImmediatelyAvailableCredentials", this@SignInPasskeyParams.`preferImmediatelyAvailableCredentials`?.let { value -> JsonPrimitive(value) } ?: Undefined)
   }
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInPasskeyParams {
       val values = value.jsonObject
 
-      return SignInPasskeyParams(`flow` = (values["flow"] ?: Undefined).decodeOptional { value -> SignInPasskeyParamsFlow.fromJson(value, runtime) })
+      return SignInPasskeyParams(`flow` = (values["flow"] ?: Undefined).decodeOptional { value -> SignInPasskeyParamsFlow.fromJson(value, runtime) }, `preferImmediatelyAvailableCredentials` = (values["preferImmediatelyAvailableCredentials"] ?: Undefined).decodeOptional { value -> value.requireBoolean() })
     }
   }
 }
@@ -9147,7 +9152,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "e904897c14e2c4091cb5c19a465198af034b541af3da69ab6442b1e4e381cdf3"
+  public const val contractHash: String = "003c8b215d8623697ce170a41bfbdc1a7400b7d456109a881df6cbc020f8b17f"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)
