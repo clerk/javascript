@@ -53,10 +53,13 @@ export async function fixture(options = {}) {
       if (message.capability === 'timer') {
         jobs.set(
           message.id,
-          setTimeout(() => {
-            jobs.delete(message.id);
-            receive({ kind: 'hostReply', id: message.id, result: null });
-          }, message.args.milliseconds),
+          setTimeout(
+            () => {
+              jobs.delete(message.id);
+              receive({ kind: 'hostReply', id: message.id, result: null });
+            },
+            options.timerMilliseconds?.(message.args.milliseconds) ?? message.args.milliseconds,
+          ),
         );
         return;
       }
