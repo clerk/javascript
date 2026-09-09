@@ -1,0 +1,91 @@
+{
+  "date": "2026-09-09",
+  "platform": "iPhone Air Simulator, iOS 26.5, arm64",
+  "configuration": "Debug",
+  "engine": "Hermes",
+  "expo": "57.0.21",
+  "reactNative": "0.86.0",
+  "javascriptRevision": "3260b879799448630c20d459f207c3d0f78fc3ae",
+  "iosRevision": "b5c7b90c4b338c9a2a3055098229c5efa3238063",
+  "contractHash": "d0e44f4d5307614738d237be8326540031290579f49e2b098be85596ced06d98",
+  "nativePackagedBundleSHA256": "3d5cb56dc9efa48e30b5280656f430dbf524bea874914a53826b2022627c07e0",
+  "installedExpoAttachedModuleSHA256": "12ecbaf444fcee101cd91d61704adebde9ee3d6f3211f3869a931b77989a73a0",
+  "packageSHA256": {
+    "clerk-shared-4.31.0.tgz": "b2022e3f077897d7c584dec85fce4b02b025084f220a890f41ef862d9dc08535",
+    "clerk-expo-4.6.5.tgz": "a13c0ed93854988816996ef229239079c7e2c817828905648c056369aaa892e9",
+    "clerk-clerk-js-6.31.0.tgz": "518e66086793648bb6634a41c014b99daf3b892c32d11479eb04142c2f7a53d7"
+  },
+  "fixtureSHA256": {
+    "ProofApp.tsx": "d1053bd2e42d4f71b4776d9103f9a4f659d895c6b7c60b597faf89ad79c13c4c",
+    "index.js": "7799ca761e362619deeba2300d6a64513b8dad15100a2360c3be07526997c990",
+    "proof-network.js": "c07943483e618b069d835f9342ee42621ab945a5266831a6fdfc94c8e7dfe83b",
+    "proof-fixtures.json": "95cd2b2d8344feeafd289a9c5edadb094d839ed062e006b934b76053f3cbc719"
+  },
+  "video": {
+    "file": "expo-ios-reproducible-shared-owner.mov",
+    "sha256": "420113e6e949c70b6947d4b3ef576f47470b9a8d833e27db35593ebf3078a496",
+    "bytes": 1285870
+  },
+  "observations": [
+    "Initial JavaScript and SwiftUI profiles show Test User; owner identity remains the same; loaded and signed in; engine reports Hermes.",
+    "Native Edit profile changes firstName to Native; both JavaScript useUser and SwiftUI show Native User; request count 5 to 6.",
+    "JavaScript user.update changes firstName to JavaScript; both views show JavaScript User; request count 6 to 7.",
+    "Native sign-out settles Loaded true and Signed in false with an empty user and removed native profile; same owner; request count 7 to 8."
+  ],
+  "requests": [
+    {
+      "path": "/v1/environment",
+      "method": "GET",
+      "logicalMethod": "GET",
+      "body": null
+    },
+    {
+      "path": "/v1/client",
+      "method": "GET",
+      "logicalMethod": "GET",
+      "body": null
+    },
+    {
+      "path": "/v1/me/sessions/active",
+      "method": "GET",
+      "logicalMethod": "GET",
+      "body": null
+    },
+    {
+      "path": "/v1/environment",
+      "method": "GET",
+      "logicalMethod": "GET",
+      "body": null
+    },
+    {
+      "path": "/v1/me",
+      "method": "GET",
+      "logicalMethod": "GET",
+      "body": null
+    },
+    {
+      "path": "/v1/me",
+      "method": "POST",
+      "logicalMethod": "PATCH",
+      "body": "first_name=Native&last_name=User"
+    },
+    {
+      "path": "/v1/me",
+      "method": "POST",
+      "logicalMethod": "PATCH",
+      "body": "first_name=JavaScript"
+    },
+    {
+      "path": "/v1/client/sessions",
+      "method": "POST",
+      "logicalMethod": "DELETE",
+      "body": null
+    }
+  ],
+  "limitations": [
+    "Deterministic service fixtures, no real account or service acceptance.",
+    "iOS Simulator development build; no physical device, release latency, or memory conclusion.",
+    "Android shared-owner device journey and actual old-major upgrade remain unverified.",
+    "An unchanged native embedded bundle is packaged as an SDK resource; matching hashes do not by themselves prove whether an engine is instantiated. The attached bridge source and its tests establish ownership."
+  ]
+}

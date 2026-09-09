@@ -29,6 +29,8 @@ Preserved behavior is covered by:
 
 These replacements do not establish live-device prompt behavior or production upgrade continuity. Full Expo app builds, device journeys, and old-major upgrade checks remain release gates.
 
+The [iOS Simulator shared-owner journey](shared-owner-simulator-proof.md) now demonstrates native-to-JavaScript and JavaScript-to-native profile changes plus native sign-out on Hermes for the recorded commits. Android interaction, physical-device prompts, old-major upgrades and release-performance gates remain separate.
+
 | Retired suite                                                | Retired two-client case                                                                                |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
 | `provider/__tests__/ClerkProvider.nativeClientSync.test.tsx` | does not start native client synchronization when disabled                                             |
