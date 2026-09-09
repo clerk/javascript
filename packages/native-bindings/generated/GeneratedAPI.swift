@@ -12996,7 +12996,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "fc919ded53c772af190eb2a07f5fdec94a7f1f47fbc2b04b4a3ab76c4d39bf16"
+  public static let contractHash = "d0e44f4d5307614738d237be8326540031290579f49e2b098be85596ced06d98"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

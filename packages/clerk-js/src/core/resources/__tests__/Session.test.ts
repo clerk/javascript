@@ -1092,6 +1092,51 @@ describe('Session', () => {
     });
   });
 
+  describe.each(['touch', '__internal_touch'] as const)('%s proposed organization', method => {
+    beforeEach(() => {
+      BaseResource.clerk = clerkMock();
+    });
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it('keeps the old organization while pending and after rejection, then uses an accepted response', async () => {
+      const data = {
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'org_previous',
+        actor: null,
+        created_at: Date.now(),
+        updated_at: Date.now(),
+      } as SessionJSON;
+      const session = new Session(data);
+      const request = BaseResource.clerk.getFapiClient().request as Mock;
+      let rejectRequest!: (error: Error) => void;
+      const pending = new Promise<never>((_, reject) => {
+        rejectRequest = reject;
+      });
+      request.mockReturnValueOnce(pending);
+      const call = session[method]({ intent: 'select_org', __internal_organizationId: 'org_proposed' });
+      const failure = expect(call).rejects.toThrow('Organization rejected');
+      expect(session.lastActiveOrganizationId).toBe('org_previous');
+      rejectRequest(new Error('Organization rejected'));
+      await failure;
+      expect(session.lastActiveOrganizationId).toBe('org_previous');
+      expect(request).toHaveBeenCalledWith(
+        expect.objectContaining({ body: { active_organization_id: 'org_proposed', intent: 'select_org' } }),
+        expect.anything(),
+      );
+      request.mockResolvedValueOnce({
+        payload: { response: { ...data, last_active_organization_id: 'org_accepted' } },
+        status: 200,
+      });
+      await session[method]({ intent: 'select_org', __internal_organizationId: 'org_proposed' });
+      expect(session.lastActiveOrganizationId).toBe('org_accepted');
+    });
+  });
+
   describe('__internal_touch()', () => {
     const mockSessionData = {
       status: 'active',

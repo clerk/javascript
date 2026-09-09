@@ -2180,7 +2180,7 @@
       "name": "PublicUserData",
       "source": {
         "file": "packages/shared/src/types/session.ts",
-        "line": 451,
+        "line": 453,
         "symbol": "PublicUserData"
       },
       "documentation": "Information about the user that's publicly available.",
@@ -2199,7 +2199,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 455,
+            "line": 457,
             "symbol": "firstName"
           },
           "documentation": "The user's first name."
@@ -2217,7 +2217,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 459,
+            "line": 461,
             "symbol": "lastName"
           },
           "documentation": "The user's last name."
@@ -2230,7 +2230,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 463,
+            "line": 465,
             "symbol": "imageUrl"
           },
           "documentation": "Holds the default avatar or user's uploaded profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization)."
@@ -2243,7 +2243,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 467,
+            "line": 469,
             "symbol": "hasImage"
           },
           "documentation": "Indicates whether the user has a profile picture."
@@ -2256,7 +2256,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 471,
+            "line": 473,
             "symbol": "identifier"
           },
           "documentation": "The user's identifier, such as their email address or phone number. Can be used for user identification."
@@ -2274,7 +2274,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 475,
+            "line": 477,
             "symbol": "userId"
           },
           "documentation": "The user's unique identifier."
@@ -2292,7 +2292,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 479,
+            "line": 481,
             "symbol": "username"
           },
           "documentation": "The user's username."
@@ -2310,7 +2310,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 483,
+            "line": 485,
             "symbol": "banned"
           },
           "documentation": "Indicates whether the user is banned."
@@ -2328,7 +2328,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 487,
+            "line": 489,
             "symbol": "deprovisioned"
           },
           "documentation": "Indicates whether the user has been deprovisioned by their identity provider."
@@ -7743,7 +7743,7 @@
       "name": "SessionTask",
       "source": {
         "file": "packages/shared/src/types/session.ts",
-        "line": 493,
+        "line": 495,
         "symbol": "SessionTask"
       },
       "documentation": "Represents the current pending task of a session.",
@@ -7758,7 +7758,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 497,
+            "line": 499,
             "symbol": "key"
           },
           "documentation": "A unique identifier for the task"
@@ -14481,7 +14481,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 445,
+            "line": 447,
             "symbol": "intent"
           },
           "documentation": "The intent of the touch operation."
@@ -14511,7 +14511,7 @@
       "name": "GetTokenOptions",
       "source": {
         "file": "packages/shared/src/types/session.ts",
-        "line": 501,
+        "line": 503,
         "symbol": "GetTokenOptions"
       },
       "kind": "object",
@@ -14529,7 +14529,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 505,
+            "line": 507,
             "symbol": "organizationId"
           },
           "documentation": "The Organization associated with the generated session token. _Does not modify the session's currently [Active Organization](!active-organization)._"
@@ -14547,7 +14547,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 509,
+            "line": 511,
             "symbol": "skipCache"
           },
           "documentation": "Whether to skip the cache lookup and force a call to the server instead, even within the TTL. Useful if the token claims are time-sensitive or depend on data that can be updated (e.g., user fields). Defaults to `false`."
@@ -14565,7 +14565,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 513,
+            "line": 515,
             "symbol": "template"
           },
           "documentation": "The name of the JWT template from the [Clerk Dashboard](https://dashboard.clerk.com/~/jwt-templates) to generate a new token from. E.g., 'firebase', 'grafbase', or your custom template's name."
@@ -15075,7 +15075,7 @@
       "name": "SessionVerifyCreateParams",
       "source": {
         "file": "packages/shared/src/types/session.ts",
-        "line": 521,
+        "line": 523,
         "symbol": "SessionVerifyCreateParams"
       },
       "kind": "object",
@@ -15089,7 +15089,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/session.ts",
-            "line": 525,
+            "line": 527,
             "symbol": "level"
           },
           "documentation": "The level of the verification to create."
@@ -15653,7 +15653,7 @@
       "name": "SessionVerifyPrepareFirstFactorParams",
       "source": {
         "file": "packages/shared/src/types/session.ts",
-        "line": 528,
+        "line": 530,
         "symbol": "SessionVerifyPrepareFirstFactorParams"
       },
       "kind": "union",
@@ -15945,7 +15945,7 @@
       "name": "SessionVerifyAttemptFirstFactorParams",
       "source": {
         "file": "packages/shared/src/types/session.ts",
-        "line": 537,
+        "line": 539,
         "symbol": "SessionVerifyAttemptFirstFactorParams"
       },
       "kind": "union",
@@ -16327,7 +16327,7 @@
       "name": "SessionVerifyAttemptSecondFactorParams",
       "source": {
         "file": "packages/shared/src/types/session.ts",
-        "line": 544,
+        "line": 546,
         "symbol": "SessionVerifyAttemptSecondFactorParams"
       },
       "kind": "union",
@@ -31469,6 +31469,11 @@
     {
       "path": "SessionResource.touch",
       "disposition": "generated"
+    },
+    {
+      "path": "SessionTouchParams.__internal_organizationId",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
     },
     {
       "path": "SessionTouchParams.intent",

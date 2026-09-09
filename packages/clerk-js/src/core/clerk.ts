@@ -1911,16 +1911,17 @@ export class Clerk implements ClerkInterface {
 
       // At this point, the `session` variable should contain either an `SignedInSessionResource`
       // ,`null` or `undefined`.
-      // We now want to set the last active organization id on that session (if it exists).
+      // Resolve the organization for the request without publishing a tentative local selection.
       // However, if the `organization` parameter is not given (i.e. `undefined`), we want
       // to keep the organization id that the session had.
       const shouldSwitchOrganization = organization !== undefined;
+      let requestedOrganizationId: string | null | undefined;
 
       if (newSession && shouldSwitchOrganization) {
         const organizationIdOrSlug = typeof organization === 'string' ? organization : organization?.id;
 
         if (isOrganizationId(organizationIdOrSlug)) {
-          newSession.lastActiveOrganizationId = organizationIdOrSlug || null;
+          requestedOrganizationId = organizationIdOrSlug || null;
         } else {
           const matchingOrganization = newSession.user.organizationMemberships.find(
             mem => mem.organization.slug === organizationIdOrSlug,
@@ -1934,7 +1935,7 @@ export class Clerk implements ClerkInterface {
             return;
           }
 
-          newSession.lastActiveOrganizationId = newLastActiveOrganizationId;
+          requestedOrganizationId = newLastActiveOrganizationId;
         }
       }
 
@@ -1967,12 +1968,16 @@ export class Clerk implements ClerkInterface {
         Because we want to minimize behavioral changes until we can tackle this properly,
         this was refactored so that updateClient does not emit under these circumstances.
       */
-      if (inActiveBrowserTab() || !this.#options.standardBrowser) {
+      // An explicit organization switch must be accepted by FAPI before it becomes observable.
+      if (shouldSwitchOrganization || inActiveBrowserTab() || !this.#options.standardBrowser) {
         let updatedClient: ClientResource | undefined;
         if (shouldNavigate && newSession) {
           try {
             // __internal_touch does not call updateClient automatically
-            updatedClient = await newSession.__internal_touch({ intent: touchIntent });
+            updatedClient = await newSession.__internal_touch({
+              intent: touchIntent,
+              ...(requestedOrganizationId !== undefined ? { __internal_organizationId: requestedOrganizationId } : {}),
+            });
             if (updatedClient) {
               // We call updateClient manually, but without letting it emit
               // It's important that the setTransitiveState call happens somewhat
@@ -1988,7 +1993,7 @@ export class Clerk implements ClerkInterface {
             }
           }
         } else {
-          await this.#touchCurrentSession(newSession, touchIntent);
+          await this.#touchCurrentSession(newSession, touchIntent, requestedOrganizationId);
         }
         // If we do have the updatedClient, read from that, otherwise getSessionFromClient
         // will fallback to this.client. This makes no difference now, but will if we
@@ -3705,18 +3710,21 @@ export class Clerk implements ClerkInterface {
   #touchCurrentSession = async (
     session?: SignedInSessionResource | null,
     intent: SessionTouchParams['intent'] = 'focus',
+    organizationId?: string | null,
   ): Promise<void> => {
     if (!session) {
       return Promise.resolve();
     }
 
-    await session.touch({ intent }).catch(e => {
-      if (isUnauthenticatedError(e)) {
-        void this.handleUnauthenticated();
-      } else {
-        throw e;
-      }
-    });
+    await session
+      .touch({ intent, ...(organizationId !== undefined ? { __internal_organizationId: organizationId } : {}) })
+      .catch(e => {
+        if (isUnauthenticatedError(e)) {
+          void this.handleUnauthenticated();
+        } else {
+          throw e;
+        }
+      });
   };
 
   public __internal_lastEmittedResources: Resources | undefined;

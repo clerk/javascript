@@ -314,7 +314,8 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
 
-        mockSession2.touch.mockImplementationOnce(() => {
+        mockSession2.touch.mockImplementationOnce(({ __internal_organizationId }) => {
+          Object.assign(mockSession2, { lastActiveOrganizationId: __internal_organizationId });
           sut.session = mockSession2 as any;
           return Promise.resolve();
         });
@@ -323,7 +324,10 @@ describe('Clerk singleton', () => {
         await sut.setActive({ organization: 'some-org-slug' });
 
         await waitFor(() => {
-          expect(mockSession2.touch).toHaveBeenCalledWith({ intent: 'select_org' });
+          expect(mockSession2.touch).toHaveBeenCalledWith({
+            intent: 'select_org',
+            __internal_organizationId: 'org_id',
+          });
           expect(mockSession2.getToken).toHaveBeenCalled();
           expect((mockSession2 as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
           expect(sut.session).toMatchObject(mockSession2);
@@ -494,7 +498,8 @@ describe('Clerk singleton', () => {
           const sut = new Clerk(productionPublishableKey);
           await sut.load({ standardBrowser: false });
 
-          mockSession.touch.mockImplementationOnce(() => {
+          mockSession.touch.mockImplementationOnce(({ __internal_organizationId }) => {
+            Object.assign(mockSession, { lastActiveOrganizationId: __internal_organizationId });
             sut.session = mockSession as any;
             return Promise.resolve();
           });
@@ -674,7 +679,8 @@ describe('Clerk singleton', () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
 
-        mockSessionWithOrganization.touch.mockImplementationOnce(() => {
+        mockSessionWithOrganization.touch.mockImplementationOnce(({ __internal_organizationId }) => {
+          Object.assign(mockSessionWithOrganization, { lastActiveOrganizationId: __internal_organizationId });
           sut.session = mockSessionWithOrganization as any;
           return Promise.resolve();
         });

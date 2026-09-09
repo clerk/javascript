@@ -439,6 +439,8 @@ export type SessionTouchIntent = 'focus' | 'select_session' | 'select_org';
 
 /** @generateWithEmptyComment */
 export type SessionTouchParams = {
+  /** @internal Proposed organization for this request; hydrated only from an accepted response. */
+  __internal_organizationId?: string | null;
   /**
    * The intent of the touch operation.
    */

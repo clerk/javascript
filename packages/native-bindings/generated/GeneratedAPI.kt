@@ -9695,7 +9695,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "fc919ded53c772af190eb2a07f5fdec94a7f1f47fbc2b04b4a3ab76c4d39bf16"
+  public const val contractHash: String = "d0e44f4d5307614738d237be8326540031290579f49e2b098be85596ced06d98"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)
