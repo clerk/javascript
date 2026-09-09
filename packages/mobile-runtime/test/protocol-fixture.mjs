@@ -128,6 +128,19 @@ export async function fixture(options = {}) {
     receive({ ...message, id });
     return waiter.promise;
   };
+  if (options.now !== undefined) {
+    assert.equal(Number.isFinite(options.now), true);
+    vm.runInContext(
+      `{
+      const NativeDate = Date;
+      globalThis.Date = class extends NativeDate {
+        constructor(...args) { super(...(args.length ? args : [${options.now}])); }
+        static now() { return ${options.now}; }
+      };
+    }`,
+      context,
+    );
+  }
   vm.runInContext(bundle, context, { timeout: 10000 });
   const ready = await send({
     kind: 'init',
