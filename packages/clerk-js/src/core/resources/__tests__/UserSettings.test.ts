@@ -4,6 +4,43 @@ import { describe, expect, it } from 'vitest';
 import { UserSettings } from '../internal';
 
 describe('UserSettings', () => {
+  it('hydrates omitted legacy environment settings without overriding explicit server values', () => {
+    const settings = new UserSettings({
+      sign_in: { second_factor: { required: true } },
+      sign_up: { mode: 'restricted', progressive: false, captcha_enabled: true },
+      enterprise_sso: { enabled: true },
+    } as UserSettingsJSON);
+    expect(settings.signIn.second_factor).toEqual({ required: true, enabled: false });
+    expect(settings.signUp).toMatchObject({
+      mode: 'restricted',
+      progressive: false,
+      captcha_enabled: true,
+      allowlist_only: false,
+      legal_consent_enabled: false,
+    });
+    expect(settings.enterpriseSSO).toEqual({ enabled: true, self_serve_sso: false });
+
+    const explicit = new UserSettings({
+      sign_in: { second_factor: { required: false, enabled: true } },
+      sign_up: {
+        mode: 'public',
+        progressive: false,
+        captcha_enabled: false,
+        allowlist_only: true,
+        legal_consent_enabled: true,
+      },
+      enterprise_sso: { enabled: false, self_serve_sso: true },
+    } as UserSettingsJSON);
+    expect(explicit.signIn.second_factor).toEqual({ required: false, enabled: true });
+    expect(explicit.signUp).toMatchObject({
+      allowlist_only: true,
+      legal_consent_enabled: true,
+      progressive: false,
+      captcha_enabled: false,
+    });
+    expect(explicit.enterpriseSSO).toEqual({ enabled: false, self_serve_sso: true });
+  });
+
   it('defaults values when instantiated with no arguments', function () {
     expect(new UserSettings()).toMatchObject({
       actions: {

@@ -203,6 +203,9 @@ test('native settings are projected from the owner with typed configuration', as
   t.after(f.dispose);
   const environment = f.resource(f.resource(f.state.roots.clerk).environment.$ref);
   assert.equal(environment.userSettings.signUp.mode, 'public');
+  assert.equal(environment.userSettings.signUp.allowlist_only, false);
+  assert.equal(environment.userSettings.signIn.second_factor.enabled, false);
+  assert.equal(environment.userSettings.enterpriseSSO.self_serve_sso, false);
   assert.equal(environment.userSettings.attributes.email_address.enabled, false);
   assert.equal(environment.displayConfig.applicationName, 'TestApp');
 });

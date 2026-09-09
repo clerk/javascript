@@ -121,10 +121,13 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   actions: Actions;
   social: OAuthProviders;
 
-  enterprise_sso: EnterpriseSSOSettings;
+  enterprise_sso: Omit<EnterpriseSSOSettings, 'self_serve_sso'> &
+    Partial<Pick<EnterpriseSSOSettings, 'self_serve_sso'>>;
 
-  sign_in: SignInData;
-  sign_up: SignUpData;
+  // These legacy fields are absent from some environment responses; the resource hydrates defaults.
+  sign_in: { second_factor: { required: boolean; enabled?: boolean } };
+  sign_up: Omit<SignUpData, 'allowlist_only' | 'legal_consent_enabled'> &
+    Partial<Pick<SignUpData, 'allowlist_only' | 'legal_consent_enabled'>>;
   password_settings: PasswordSettingsData;
   passkey_settings: PasskeySettingsData;
   username_settings: UsernameSettingsData;

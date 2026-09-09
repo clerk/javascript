@@ -10,9 +10,6 @@ function createNativeEnvironmentJSON() {
       { ...provider, name: strategy, logo_url: null },
     ]),
   );
-  settings.enterprise_sso = { ...settings.enterprise_sso, self_serve_sso: false };
-  settings.sign_in.second_factor.enabled = false;
-  settings.sign_up = { ...settings.sign_up, allowlist_only: false, legal_consent_enabled: false };
   settings.username_settings = { min_length: 4, max_length: 64 };
   environment.organization_settings.actions = { admin_delete: false };
   environment.organization_settings.domains.default_role = null;

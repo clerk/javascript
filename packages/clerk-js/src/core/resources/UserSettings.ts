@@ -225,7 +225,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
           this.attackProtection.enumeration_protection.enabled,
       },
     };
-    this.enterpriseSSO = this.withDefault(data.enterprise_sso, this.enterpriseSSO);
+    this.enterpriseSSO = { ...this.enterpriseSSO, ...data.enterprise_sso };
     this.passkeySettings = this.withDefault(data.passkey_settings, this.passkeySettings);
     this.passwordSettings = data.password_settings
       ? {
@@ -240,8 +240,12 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
               : Math.min(data.password_settings?.max_length ?? defaultMaxPasswordLength, defaultMaxPasswordLength),
         }
       : this.passwordSettings;
-    this.signIn = this.withDefault(data.sign_in, this.signIn);
-    this.signUp = this.withDefault(data.sign_up, this.signUp);
+    // Environment responses can omit older settings while retaining their parent
+    // object. Preserve the resource defaults for those absent fields.
+    this.signIn = {
+      second_factor: { ...this.signIn.second_factor, ...data.sign_in?.second_factor },
+    };
+    this.signUp = { ...this.signUp, ...data.sign_up };
     this.social = this.withDefault(data.social, this.social);
     this.usernameSettings = data.username_settings
       ? {

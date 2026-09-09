@@ -16753,7 +16753,7 @@
       "name": "UserSettings",
       "source": {
         "file": "packages/shared/src/types/userSettings.ts",
-        "line": 138,
+        "line": 141,
         "symbol": "UserSettingsResource"
       },
       "kind": "object",
@@ -16766,7 +16766,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 139,
+            "line": 142,
             "symbol": "id"
           },
           "documentation": "The unique identifier of the resource."
@@ -16821,7 +16821,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 140,
+            "line": 143,
             "symbol": "social"
           }
         },
@@ -16834,7 +16834,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 142,
+            "line": 145,
             "symbol": "enterpriseSSO"
           }
         },
@@ -16878,7 +16878,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 144,
+            "line": 147,
             "symbol": "attributes"
           }
         },
@@ -16891,7 +16891,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 145,
+            "line": 148,
             "symbol": "actions"
           }
         },
@@ -16904,7 +16904,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 146,
+            "line": 149,
             "symbol": "signIn"
           }
         },
@@ -16917,7 +16917,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 147,
+            "line": 150,
             "symbol": "signUp"
           }
         },
@@ -16930,7 +16930,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 148,
+            "line": 151,
             "symbol": "passwordSettings"
           }
         },
@@ -16943,7 +16943,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 149,
+            "line": 152,
             "symbol": "usernameSettings"
           }
         },
@@ -16956,7 +16956,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 150,
+            "line": 153,
             "symbol": "attackProtection"
           }
         },
@@ -16969,7 +16969,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 151,
+            "line": 154,
             "symbol": "passkeySettings"
           }
         },
@@ -16985,7 +16985,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 152,
+            "line": 155,
             "symbol": "socialProviderStrategies"
           }
         },
@@ -17001,7 +17001,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 153,
+            "line": 156,
             "symbol": "authenticatableSocialStrategies"
           }
         },
@@ -17017,7 +17017,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 154,
+            "line": 157,
             "symbol": "web3FirstFactors"
           }
         },
@@ -17033,7 +17033,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 155,
+            "line": 158,
             "symbol": "alternativePhoneCodeChannels"
           }
         },
@@ -17049,7 +17049,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 156,
+            "line": 159,
             "symbol": "enabledFirstFactorIdentifiers"
           }
         },
@@ -17061,7 +17061,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 157,
+            "line": 160,
             "symbol": "instanceIsPasswordBased"
           }
         },
@@ -17073,7 +17073,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/userSettings.ts",
-            "line": 158,
+            "line": 161,
             "symbol": "hasValidAuthFactor"
           }
         }
