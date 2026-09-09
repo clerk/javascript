@@ -8,7 +8,7 @@ interface InputGroupContextValue {
   disabled: boolean;
   focusInput: () => void;
   invalid: boolean;
-  setInput: (node: HTMLInputElement | null) => void;
+  inputRef: (node: HTMLInputElement | null) => void;
   size: InputGroupSize;
 }
 

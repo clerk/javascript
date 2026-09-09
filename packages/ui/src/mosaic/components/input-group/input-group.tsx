@@ -28,14 +28,14 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
   const field = useOptionalFieldContext();
   const disabled = disabledProp ?? field?.disabled ?? false;
   const invalid = invalidProp ?? field?.invalid ?? false;
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const focusInput = React.useCallback(() => inputRef.current?.focus(), []);
-  const setInput = React.useCallback((node: HTMLInputElement | null) => {
-    inputRef.current = node;
+  const inputElementRef = React.useRef<HTMLInputElement | null>(null);
+  const focusInput = React.useCallback(() => inputElementRef.current?.focus(), []);
+  const inputRef = React.useCallback((node: HTMLInputElement | null) => {
+    inputElementRef.current = node;
   }, []);
   const context = React.useMemo(
-    () => ({ disabled, focusInput, invalid, setInput, size }),
-    [disabled, focusInput, invalid, setInput, size],
+    () => ({ disabled, focusInput, invalid, inputRef, size }),
+    [disabled, focusInput, invalid, inputRef, size],
   );
   const element = useRender({
     defaultTagName: 'div',
