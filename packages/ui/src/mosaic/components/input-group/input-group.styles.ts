@@ -109,18 +109,3 @@ export const textSizes = stylex.create({
     lineHeight: 1.375,
   },
 });
-
-export const compactActionInsets = stylex.create({
-  sm: {
-    marginInlineEnd: { default: 0, ':last-child': space['0.5'] },
-    marginInlineStart: { default: 0, ':first-child': space['0.5'] },
-  },
-  md: {
-    marginInlineEnd: { default: 0, ':last-child': space['1'] },
-    marginInlineStart: { default: 0, ':first-child': space['1'] },
-  },
-  lg: {
-    marginInlineEnd: { default: 0, ':last-child': space['1.5'] },
-    marginInlineStart: { default: 0, ':first-child': space['1.5'] },
-  },
-});

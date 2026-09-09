@@ -9,6 +9,9 @@ import { Input } from '../input';
 import { InputGroup } from './input-group';
 
 describe('Mosaic InputGroup', () => {
+  it('exposes slots rather than a separate action component', () => {
+    expect(InputGroup).not.toHaveProperty('Action');
+  });
   it('exposes Input with group defaults and composed refs', () => {
     expect(InputGroup.Input).toBe(Input);
     const ref = React.createRef<HTMLInputElement>();
@@ -214,34 +217,42 @@ describe('Mosaic InputGroup', () => {
     expect(screen.getByText('Prefix')).toHaveAttribute('data-size', size);
   });
 
-  it.each(['sm', 'md', 'lg'] as const)('shares the %s size and disabled state with an action', size => {
+  it.each([
+    ['sm', 'xs'],
+    ['md', 'sm'],
+    ['lg', 'md'],
+  ] as const)('shares the %s group defaults with a %s slot button', (size, buttonSize) => {
     render(
       <InputGroup.Root
         size={size}
         disabled
       >
         <Input aria-label='Value' />
-        <InputGroup.Action aria-label='Show options' />
+        <InputGroup.End>
+          <Button aria-label='Show options' />
+        </InputGroup.End>
       </InputGroup.Root>,
     );
 
     const action = screen.getByRole('button', { name: 'Show options' });
-    expect(action).toHaveClass('cl-button', 'cl-input-group-action');
-    expect(action).toHaveAttribute('data-size', size);
+    expect(action).toHaveClass('cl-button');
+    expect(action).toHaveAttribute('data-size', buttonSize);
     expect(action).toHaveAttribute('data-variant', 'ghost');
     expect(action).toHaveAttribute('data-color', 'neutral');
     expect(action).toBeDisabled();
   });
 
-  it('allows an action to use a more compact button size', () => {
+  it('allows a slot button to use an explicit size', () => {
     render(
       <InputGroup.Root>
         <Input aria-label='Value' />
-        <InputGroup.Action
-          size='xs'
-          shape='square'
-          aria-label='Show options'
-        />
+        <InputGroup.End>
+          <Button
+            size='xs'
+            shape='square'
+            aria-label='Show options'
+          />
+        </InputGroup.End>
       </InputGroup.Root>,
     );
 

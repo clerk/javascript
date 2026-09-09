@@ -8,13 +8,12 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { inputStyles } from '../../utils/input.styles';
 import { reset } from '../../utils/reset.styles';
-import { Button, type ButtonProps } from '../button';
 import { ButtonContext } from '../button/button.context';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Input } from '../input';
 import type { InputGroupSize } from './input-group.context';
 import { InputGroupContext, useInputGroupContext } from './input-group.context';
-import { compactActionInsets, sizes, styles, textSizes } from './input-group.styles';
+import { sizes, styles, textSizes } from './input-group.styles';
 
 export interface InputGroupRootProps extends MosaicComponentProps<'div'> {
   disabled?: boolean;
@@ -68,34 +67,6 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
   return <InputGroupContext.Provider value={context}>{element}</InputGroupContext.Provider>;
 });
 
-export type InputGroupActionProps = ButtonProps;
-
-const Action = React.forwardRef<HTMLButtonElement, InputGroupActionProps>(function MosaicInputGroupAction(
-  { color = 'neutral', variant = 'ghost', size: sizeProp, disabled: disabledProp, className, style, ...otherProps },
-  ref,
-) {
-  const group = useInputGroupContext();
-  const disabled = group.disabled || disabledProp || false;
-  const size = sizeProp ?? group.size;
-
-  return (
-    <Button
-      ref={ref}
-      color={color}
-      variant={variant}
-      size={size}
-      disabled={disabled}
-      {...mergeStyleProps(
-        themeProps('input-group-action', { size, disabled }),
-        stylex.props(size === 'xs' && compactActionInsets[group.size]),
-        className,
-        style,
-      )}
-      {...otherProps}
-    />
-  );
-});
-
 export type InputGroupAddonProps = MosaicComponentProps<'span'>;
 
 const addonButtonSizes = { sm: 'xs', md: 'sm', lg: 'md' } as const;
@@ -145,4 +116,4 @@ const End = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function Mos
   return useAddon('end', props, ref);
 });
 
-export const InputGroup = { Root, Input, Action, Start, End };
+export const InputGroup = { Root, Input, Start, End };
