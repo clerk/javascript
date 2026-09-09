@@ -8,6 +8,8 @@ The native dependencies are `ClerkKit`/`ClerkKitUI` 2.0.0-alpha.0 and `clerk-and
 
 The iOS bridge uses Swift 6 and iOS 17 or newer. The Android config plugin defaults to Kotlin 2.3.20 when the app has no explicit Kotlin version. Expo SDK 57's native module compiles with that compiler against the SDK built with Kotlin 2.4.10. Configure custom Kotlin/Compose versions consistently; Expo's optional compiler plugins may not support newer compilers immediately. The plugin no longer suppresses incompatible Kotlin metadata checks. Client credentials remain in the Expo token cache. Native secure storage is used only for magic-link and biometric platform state.
 
+The Android plugin enables core-library desugaring in the application for the generated date API on supported Android versions below API 26. Full Expo SDK 57 iOS and Android development-app builds have been verified with the local prerelease SDKs.
+
 On iOS the config plugin registers `clerk://<bundle-id>.native-callback`. On Android the 2.x SDK manifest registers `<application-id>.clerk://oauth/callback`. Existing hosted-auth routes remain separate. Regenerate the development build when moving to this transport.
 
 The attached bridge is generated from `packages/mobile-runtime/src/attached-core.ts` and the canonical binding artifacts using `pnpm --filter @clerk/mobile-runtime build:attached`; Expo's build performs this step. CI runs `check:attached` to detect an out-of-date bundled projection. It contains no Clerk constructor, network environment, or second credential transport.

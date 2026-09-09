@@ -187,6 +187,13 @@ const withClerkAndroid = config => {
       console.log('✅ Clerk Android packaging exclusions added');
     }
 
+    if (!buildGradle.includes('// Clerk core library desugaring')) {
+      buildGradle += `\n// Clerk core library desugaring
+android { compileOptions { coreLibraryDesugaringEnabled true } }
+dependencies { coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5' }
+`;
+    }
+
     modConfig.modResults.contents = buildGradle;
     return modConfig;
   });
