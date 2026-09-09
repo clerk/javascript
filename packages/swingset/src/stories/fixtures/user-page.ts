@@ -19,6 +19,7 @@ export interface UserPageFixtureOptions {
  */
 export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) {
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
+  const [imageUrl, setImageUrl] = useState<string | undefined>('https://avatars.githubusercontent.com/u/51144033?v=4');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
     { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
@@ -66,8 +67,8 @@ export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) 
   const panels: UserPageViewProps['panels'] = {
     account: {
       allowMultipleAccounts: true,
-      hasImage: true,
-      imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
+      hasImage: Boolean(imageUrl),
+      imageUrl,
       name: 'Preston Booth',
       username: 'prestonxyz',
       emails,
@@ -83,8 +84,8 @@ export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) 
           },
         ]),
       onDeleteAccount: () => Promise.resolve(),
-      onProfilePictureChange: () => undefined,
-      onRemoveProfilePicture: () => undefined,
+      onProfilePictureChange: (file: File) => setImageUrl(URL.createObjectURL(file)),
+      onRemoveProfilePicture: () => setImageUrl(undefined),
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onNameChange: () => undefined,

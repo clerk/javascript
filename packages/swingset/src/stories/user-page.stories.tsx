@@ -94,6 +94,7 @@ export function Default() {
   const [apiKeys, setAPIKeys] = useState(initialAPIKeys);
   const [apiKeysPageSize, setAPIKeysPageSize] = useState(10);
   const [searchValue, setSearchValue] = useState('');
+  const [imageUrl, setImageUrl] = useState<string | undefined>('https://avatars.githubusercontent.com/u/51144033?v=4');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const visibleAPIKeys = useMemo(
     () => apiKeys.filter(apiKey => apiKey.name.toLowerCase().includes(searchValue.toLowerCase())),
@@ -103,8 +104,8 @@ export function Default() {
   const panels: UserPageViewProps['panels'] = {
     account: {
       allowMultipleAccounts: true,
-      hasImage: true,
-      imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
+      hasImage: Boolean(imageUrl),
+      imageUrl,
       name: 'Preston Booth',
       username: 'prestonxyz',
       emails,
@@ -124,8 +125,8 @@ export function Default() {
           },
         ]),
       onDeleteAccount: () => Promise.resolve(),
-      onProfilePictureChange: () => undefined,
-      onRemoveProfilePicture: () => undefined,
+      onProfilePictureChange: (file: File) => setImageUrl(URL.createObjectURL(file)),
+      onRemoveProfilePicture: () => setImageUrl(undefined),
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onNameChange: () => undefined,

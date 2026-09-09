@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
-import { Field } from '../components/field';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
@@ -136,11 +135,6 @@ export function UserProfileAccountSectionView({
               <Section.Content>
                 <Section.Label>{m.picture.label}</Section.Label>
                 <Section.Description>{m.picture.description}</Section.Description>
-                {rejection ? (
-                  // Standalone: `Field.Error` tolerates a missing field context, so the row borrows
-                  // its icon and tone without pretending to be a form control.
-                  <Field.Error role='alert'>{m.picture.errors[rejection]}</Field.Error>
-                ) : null}
               </Section.Content>
               <ProfilePictureActions
                 canChange={Boolean(onProfilePictureChange)}
@@ -148,6 +142,7 @@ export function UserProfileAccountSectionView({
                 onRemove={onRemoveProfilePicture}
               />
             </Section.Item>
+            {rejection ? <Section.Error>{m.picture.errors[rejection]}</Section.Error> : null}
           </Section.Row>
           <Section.Row>
             <Section.Item>

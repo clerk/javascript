@@ -26,6 +26,7 @@ export function Default(_args: Record<string, unknown>) {
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
+  const [imageUrl, setImageUrl] = useState<string | undefined>(profileImageUrl);
 
   return (
     <UserProfileProfilePanelView
@@ -57,8 +58,8 @@ export function Default(_args: Record<string, unknown>) {
           connected: false,
         },
       ]}
-      hasImage
-      imageUrl={profileImageUrl}
+      hasImage={Boolean(imageUrl)}
+      imageUrl={imageUrl}
       name='Preston Booth'
       phones={phones}
       username='prestonxyz'
@@ -82,9 +83,9 @@ export function Default(_args: Record<string, unknown>) {
       onDeleteAccount={() => Promise.resolve()}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
-      onProfilePictureChange={() => undefined}
+      onProfilePictureChange={file => setImageUrl(URL.createObjectURL(file))}
       onRemoveConnectedAccount={() => undefined}
-      onRemoveProfilePicture={() => undefined}
+      onRemoveProfilePicture={() => setImageUrl(undefined)}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onConnectWeb3Wallet={() => undefined}
