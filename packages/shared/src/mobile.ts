@@ -1,4 +1,9 @@
-export type { MobileClerk, MobileAuthenticationResources } from './types/mobile';
+export type {
+  MobileClerk,
+  MobileAuthenticationResources,
+  MobileAuthenticationResult,
+  MobileSSOParams,
+} from './types/mobile';
 
 export interface MobileCredentialStorage {
   read(): Promise<string | null>;

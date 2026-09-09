@@ -96,6 +96,7 @@ BillingPaymentMethod.walletType: Field<String> = Field.Omitted
 BillingPaymentMethodRemoveParams.orgId: String? = null
 BillingPaymentMethodStatus cases: expired, active, disconnected, unrecognized(String)
 CheckAuthorizationParams variants: SessionCheckAuthorizationIsAuthorizedParamsCase1 | SessionCheckAuthorizationIsAuthorizedParamsCase2 | SessionCheckAuthorizationIsAuthorizedParamsCase3 | SessionCheckAuthorizationIsAuthorizedParamsCase4 | SessionCheckAuthorizationIsAuthorizedParamsCase5
+Clerk.authenticateWithSSO(params: MobileSSOParams): MobileAuthenticationResult [return]
 Clerk.createOrganization(params: CreateOrganizationParams): Organization [return]
 Clerk.environment: EnvironmentResource
 Clerk.getOrganization(organizationId: String): Organization [return]
@@ -133,6 +134,10 @@ ClerkAPIErrorMetaPlan.name: String
 ClerkAPIErrorMetaZxcvbn.suggestions: List<ClerkAPIErrorMetaZxcvbnSuggestionsElement>
 ClerkAPIErrorMetaZxcvbnSuggestionsElement.code: String
 ClerkAPIErrorMetaZxcvbnSuggestionsElement.message: String
+ClerkAuthenticateWithSSOResultCase1.kind: String
+ClerkAuthenticateWithSSOResultCase1.signIn: SignIn
+ClerkAuthenticateWithSSOResultCase2.kind: String
+ClerkAuthenticateWithSSOResultCase2.signUp: SignUp
 ClerkPaginatedResponseBillingPaymentMethod.data: List<BillingPaymentMethod>
 ClerkPaginatedResponseBillingPaymentMethod.total_count: Double
 ClerkPaginatedResponseEnterpriseConnectionTestRun.data: List<EnterpriseConnectionTestRun>
@@ -464,6 +469,21 @@ InviteMemberParams.role: String
 InviteMembersParams.emailAddresses: List<String>
 InviteMembersParams.role: String
 LastAuthenticationStrategy cases: password, phone_code, email_code, email_link, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, web3_solana_signature, web3_metamask_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_base_signature, email_address, username, unrecognized(String)
+MobileAuthenticationResult variants: ClerkAuthenticateWithSSOResultCase1 | ClerkAuthenticateWithSSOResultCase2
+MobileAuthenticationResult.kind: String [shared union field]
+MobileSSOParams.enterpriseConnectionId: String? = null
+MobileSSOParams.firstName: String? = null
+MobileSSOParams.identifier: String? = null
+MobileSSOParams.lastName: String? = null
+MobileSSOParams.legalAccepted: Boolean? = null
+MobileSSOParams.locale: String? = null
+MobileSSOParams.oidcPrompt: String? = null
+MobileSSOParams.start: MobileSSOParamsStart
+MobileSSOParams.strategy: MobileSSOParamsStrategy
+MobileSSOParams.transferable: Boolean
+MobileSSOParams.unsafeMetadata: JsonObject? = null
+MobileSSOParamsStart cases: signUp, signIn, auto, unrecognized(String)
+MobileSSOParamsStrategy cases: oauth_token_apple, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
 MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = Field.Omitted
 MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = Field.Omitted
 MobileSetActiveParamsOrganization variants: String | Organization
@@ -1019,8 +1039,7 @@ SignInResetPasswordSubmitParams.signOutOfOtherSessions: Boolean? = null
 SignInSSOParams.enterpriseConnectionId: String? = null
 SignInSSOParams.identifier: String? = null
 SignInSSOParams.oidcPrompt: String? = null
-SignInSSOParams.strategy: SignInSSOParamsStrategy
-SignInSSOParamsStrategy cases: oauth_token_apple, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInSSOParams.strategy: MobileSSOParamsStrategy
 SignInSecondFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | TOTPFactor | BackupCodeFactor
 SignInSecondFactor.strategy: String [shared union field]
 SignInStatus cases: needs_identifier, needs_first_factor, needs_second_factor, needs_client_trust, needs_new_password, needs_protect_check, complete, unrecognized(String)
@@ -1375,6 +1394,8 @@ enum EnterpriseConnectionTestRunStatus
 enum EnterpriseProtocol
 enum EnterpriseProvider
 enum LastAuthenticationStrategy
+enum MobileSSOParamsStart
+enum MobileSSOParamsStrategy
 enum OAuthProvider
 enum OAuthStrategy
 enum OrganizationDomainOwnershipVerificationStatus
@@ -1397,7 +1418,6 @@ enum SessionVerificationStatus
 enum SignInCreateParamsStrategy
 enum SignInEmailLinkVerificationStatus
 enum SignInPasskeyParamsFlow
-enum SignInSSOParamsStrategy
 enum SignInStatus
 enum SignUpCreateParamsStrategy
 enum SignUpField
@@ -1429,6 +1449,8 @@ object ClerkAPIErrorMeta
 object ClerkAPIErrorMetaPlan
 object ClerkAPIErrorMetaZxcvbn
 object ClerkAPIErrorMetaZxcvbnSuggestionsElement
+object ClerkAuthenticateWithSSOResultCase1
+object ClerkAuthenticateWithSSOResultCase2
 object ClerkPaginatedResponseBillingPaymentMethod
 object ClerkPaginatedResponseEnterpriseConnectionTestRun
 object ClerkPaginatedResponseOrganizationDomain
@@ -1486,6 +1508,7 @@ object HslaColor
 object InitializePaymentMethodParams
 object InviteMemberParams
 object InviteMembersParams
+object MobileSSOParams
 object MobileSetActiveParams
 object MobileSignOutOptions
 object NativeAuthSettings
@@ -1662,6 +1685,7 @@ tuple SessionFactorVerificationAgeValue
 union CheckAuthorizationParams
 union DisplayThemeColor
 union GetUserOrganizationSuggestionsParamsStatus
+union MobileAuthenticationResult
 union MobileSetActiveParamsOrganization
 union MobileSetActiveParamsSession
 union PrepareEmailAddressVerificationParams

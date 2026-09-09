@@ -61,6 +61,7 @@ export function publicCore(clerk: CoreOwner, beforeSignOut: () => Promise<void>)
     get signUp() {
       return authenticationRoots(clerk).signUp;
     },
+    authenticateWithSSO: params => mobileResources(clerk).authenticateWithSSO(params),
     setActive: params => clerk.setActive(params),
     signOut: async options => {
       await beforeSignOut();

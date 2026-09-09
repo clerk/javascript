@@ -90,7 +90,7 @@ import {
   openAndReconcileOAuthTransport,
 } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
-import { getNativeAppleIdentity } from '../../utils/nativeAppleIdentity';
+import { getNativeAppleIdentity, type NativeAppleIdentity } from '../../utils/nativeAppleIdentity';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
@@ -1221,7 +1221,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sso(params: SignInFutureSSOParams): Promise<{ error: ClerkError | null }> {
+  async sso(params: SignInFutureSSOParams, appleIdentity?: NativeAppleIdentity): Promise<{ error: ClerkError | null }> {
     const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId, identifier } =
       params;
     return runAsyncResourceTask(this.#resource, async () => {
@@ -1230,7 +1230,7 @@ class SignInFuture implements SignInFutureResource {
           throw new ClerkRuntimeError('A popup cannot be combined with native Apple authentication.', {
             code: 'oauth_transport_popup_conflict',
           });
-        const identity = await getNativeAppleIdentity(SignIn.clerk);
+        const identity = appleIdentity ?? (await getNativeAppleIdentity(SignIn.clerk));
         if (this.#resource.id) {
           await this.#resource.__internal_basePost({
             action: 'attempt_first_factor',

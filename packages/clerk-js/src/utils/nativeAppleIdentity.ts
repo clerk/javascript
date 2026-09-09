@@ -2,6 +2,8 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 
 import type { Clerk } from '../core/clerk';
 
+export type NativeAppleIdentity = { token: string; firstName?: string; lastName?: string };
+
 export async function getNativeAppleIdentity(clerk: Clerk) {
   const provider = clerk.__internal_getAppleIdentity;
   if (!provider)

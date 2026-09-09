@@ -13,6 +13,12 @@ export const operations = {
     result: {"kind":"ref","name":"Organization"},
     invoke: (target, args) => target["getOrganization"](...args),
   },
+  "Clerk.authenticateWithSSO": {
+    type: "Clerk",
+    parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"MobileSSOParams"}}],
+    result: {"kind":"ref","name":"MobileAuthenticationResult"},
+    invoke: (target, args) => target["authenticateWithSSO"](...args),
+  },
   "Clerk.setActive": {
     type: "Clerk",
     parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"MobileSetActiveParams"}}],

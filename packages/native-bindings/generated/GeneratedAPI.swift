@@ -86,6 +86,12 @@ public struct ClerkState: Hashable, Sendable {
       return try Organization.decode(result, in: runtime)
     }
   }
+  public func `authenticateWithSSO`(_ `params`: MobileSSOParams) async throws -> MobileAuthenticationResult {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "Clerk.authenticateWithSSO", arguments: [try `params`.encode()]) { result in
+      return try MobileAuthenticationResult.decode(result, in: runtime)
+    }
+  }
   public func `setActive`(_ `params`: MobileSetActiveParams) async throws {
     let runtime = try context.requireRuntime()
     return try await runtime.invoke(owner: self, target: handle, operation: "Clerk.setActive", arguments: [try `params`.encode()]) { result in
@@ -8668,6 +8674,234 @@ public indirect enum ProtectLoaderAttributesValue: Hashable, Sendable {
   }
 }
 
+public struct MobileSSOParams: Hashable, Sendable {
+  public let `strategy`: MobileSSOParamsStrategy
+  public let `identifier`: String?
+  public let `enterpriseConnectionId`: String?
+  public let `oidcPrompt`: String?
+  public let `legalAccepted`: Bool?
+  public let `firstName`: String?
+  public let `lastName`: String?
+  public let `locale`: String?
+  public let `unsafeMetadata`: [String: JSONValue]?
+  public let `start`: MobileSSOParamsStart
+  public let `transferable`: Bool
+  public init(`strategy`: MobileSSOParamsStrategy, `identifier`: String? = nil, `enterpriseConnectionId`: String? = nil, `oidcPrompt`: String? = nil, `legalAccepted`: Bool? = nil, `firstName`: String? = nil, `lastName`: String? = nil, `locale`: String? = nil, `unsafeMetadata`: [String: JSONValue]? = nil, `start`: MobileSSOParamsStart, `transferable`: Bool) {
+    self.`strategy` = `strategy`
+    self.`identifier` = `identifier`
+    self.`enterpriseConnectionId` = `enterpriseConnectionId`
+    self.`oidcPrompt` = `oidcPrompt`
+    self.`legalAccepted` = `legalAccepted`
+    self.`firstName` = `firstName`
+    self.`lastName` = `lastName`
+    self.`locale` = `locale`
+    self.`unsafeMetadata` = `unsafeMetadata`
+    self.`start` = `start`
+    self.`transferable` = `transferable`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "strategy": try self.`strategy`.encode(),
+      "identifier": try self.`identifier`.map { value in .string(value) } ?? .undefined,
+      "enterpriseConnectionId": try self.`enterpriseConnectionId`.map { value in .string(value) } ?? .undefined,
+      "oidcPrompt": try self.`oidcPrompt`.map { value in .string(value) } ?? .undefined,
+      "legalAccepted": try self.`legalAccepted`.map { value in .bool(value) } ?? .undefined,
+      "firstName": try self.`firstName`.map { value in .string(value) } ?? .undefined,
+      "lastName": try self.`lastName`.map { value in .string(value) } ?? .undefined,
+      "locale": try self.`locale`.map { value in .string(value) } ?? .undefined,
+      "unsafeMetadata": try self.`unsafeMetadata`.map { value in .object(value) } ?? .undefined,
+      "start": try self.`start`.encode(),
+      "transferable": .bool(self.`transferable`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileSSOParams {
+    let values = try value.object()
+
+    return try MobileSSOParams(`strategy`: try MobileSSOParamsStrategy.decode((values["strategy"] ?? .undefined), in: runtime), `identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() }, `enterpriseConnectionId`: try (values["enterpriseConnectionId"] ?? .undefined).optional { value in try value.string() }, `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `legalAccepted`: try (values["legalAccepted"] ?? .undefined).optional { value in try value.bool() }, `firstName`: try (values["firstName"] ?? .undefined).optional { value in try value.string() }, `lastName`: try (values["lastName"] ?? .undefined).optional { value in try value.string() }, `locale`: try (values["locale"] ?? .undefined).optional { value in try value.string() }, `unsafeMetadata`: try (values["unsafeMetadata"] ?? .undefined).optional { value in try value.object() }, `start`: try MobileSSOParamsStart.decode((values["start"] ?? .undefined), in: runtime), `transferable`: try (values["transferable"] ?? .undefined).bool())
+  }
+}
+
+public enum MobileSSOParamsStrategy: Hashable, Sendable {
+  case `oauthTokenApple`
+  case `enterpriseSso`
+  case `oauthFacebook`
+  case `oauthGoogle`
+  case `oauthHubspot`
+  case `oauthGithub`
+  case `oauthTiktok`
+  case `oauthGitlab`
+  case `oauthDiscord`
+  case `oauthTwitter`
+  case `oauthTwitch`
+  case `oauthLinkedin`
+  case `oauthLinkedinOidc`
+  case `oauthDropbox`
+  case `oauthAtlassian`
+  case `oauthBitbucket`
+  case `oauthMicrosoft`
+  case `oauthNotion`
+  case `oauthApple`
+  case `oauthLine`
+  case `oauthInstagram`
+  case `oauthCoinbase`
+  case `oauthSpotify`
+  case `oauthXero`
+  case `oauthBox`
+  case `oauthSlack`
+  case `oauthLinear`
+  case `oauthX`
+  case `oauthEnstall`
+  case `oauthHuggingface`
+  case `oauthVercel`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`oauthTokenApple`: return "oauth_token_apple"
+    case .`enterpriseSso`: return "enterprise_sso"
+    case .`oauthFacebook`: return "oauth_facebook"
+    case .`oauthGoogle`: return "oauth_google"
+    case .`oauthHubspot`: return "oauth_hubspot"
+    case .`oauthGithub`: return "oauth_github"
+    case .`oauthTiktok`: return "oauth_tiktok"
+    case .`oauthGitlab`: return "oauth_gitlab"
+    case .`oauthDiscord`: return "oauth_discord"
+    case .`oauthTwitter`: return "oauth_twitter"
+    case .`oauthTwitch`: return "oauth_twitch"
+    case .`oauthLinkedin`: return "oauth_linkedin"
+    case .`oauthLinkedinOidc`: return "oauth_linkedin_oidc"
+    case .`oauthDropbox`: return "oauth_dropbox"
+    case .`oauthAtlassian`: return "oauth_atlassian"
+    case .`oauthBitbucket`: return "oauth_bitbucket"
+    case .`oauthMicrosoft`: return "oauth_microsoft"
+    case .`oauthNotion`: return "oauth_notion"
+    case .`oauthApple`: return "oauth_apple"
+    case .`oauthLine`: return "oauth_line"
+    case .`oauthInstagram`: return "oauth_instagram"
+    case .`oauthCoinbase`: return "oauth_coinbase"
+    case .`oauthSpotify`: return "oauth_spotify"
+    case .`oauthXero`: return "oauth_xero"
+    case .`oauthBox`: return "oauth_box"
+    case .`oauthSlack`: return "oauth_slack"
+    case .`oauthLinear`: return "oauth_linear"
+    case .`oauthX`: return "oauth_x"
+    case .`oauthEnstall`: return "oauth_enstall"
+    case .`oauthHuggingface`: return "oauth_huggingface"
+    case .`oauthVercel`: return "oauth_vercel"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "oauth_token_apple": self = .`oauthTokenApple`
+    case "enterprise_sso": self = .`enterpriseSso`
+    case "oauth_facebook": self = .`oauthFacebook`
+    case "oauth_google": self = .`oauthGoogle`
+    case "oauth_hubspot": self = .`oauthHubspot`
+    case "oauth_github": self = .`oauthGithub`
+    case "oauth_tiktok": self = .`oauthTiktok`
+    case "oauth_gitlab": self = .`oauthGitlab`
+    case "oauth_discord": self = .`oauthDiscord`
+    case "oauth_twitter": self = .`oauthTwitter`
+    case "oauth_twitch": self = .`oauthTwitch`
+    case "oauth_linkedin": self = .`oauthLinkedin`
+    case "oauth_linkedin_oidc": self = .`oauthLinkedinOidc`
+    case "oauth_dropbox": self = .`oauthDropbox`
+    case "oauth_atlassian": self = .`oauthAtlassian`
+    case "oauth_bitbucket": self = .`oauthBitbucket`
+    case "oauth_microsoft": self = .`oauthMicrosoft`
+    case "oauth_notion": self = .`oauthNotion`
+    case "oauth_apple": self = .`oauthApple`
+    case "oauth_line": self = .`oauthLine`
+    case "oauth_instagram": self = .`oauthInstagram`
+    case "oauth_coinbase": self = .`oauthCoinbase`
+    case "oauth_spotify": self = .`oauthSpotify`
+    case "oauth_xero": self = .`oauthXero`
+    case "oauth_box": self = .`oauthBox`
+    case "oauth_slack": self = .`oauthSlack`
+    case "oauth_linear": self = .`oauthLinear`
+    case "oauth_x": self = .`oauthX`
+    case "oauth_enstall": self = .`oauthEnstall`
+    case "oauth_huggingface": self = .`oauthHuggingface`
+    case "oauth_vercel": self = .`oauthVercel`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileSSOParamsStrategy { .init(rawValue: try value.string()) }
+}
+
+public enum MobileSSOParamsStart: Hashable, Sendable {
+  case `signUp`
+  case `signIn`
+  case `auto`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`signUp`: return "signUp"
+    case .`signIn`: return "signIn"
+    case .`auto`: return "auto"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "signUp": self = .`signUp`
+    case "signIn": self = .`signIn`
+    case "auto": self = .`auto`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileSSOParamsStart { .init(rawValue: try value.string()) }
+}
+
+public indirect enum MobileAuthenticationResult: Hashable, Sendable {
+  case case1(ClerkAuthenticateWithSSOResultCase1)
+  case case2(ClerkAuthenticateWithSSOResultCase2)
+  @MainActor public var `kind`: String {
+    switch self {
+    case .case1(let value): return value.`kind`
+    case .case2(let value): return value.`kind`
+    }
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    switch self {
+    case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
+    case .case2(let value): return .object(["$case": .number(1), "value": try value.encode()])
+    }
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileAuthenticationResult {
+    let values = try value.object()
+    let payload = values["value"] ?? .undefined
+    switch try (values["$case"] ?? .undefined).number() {
+    case 0: return .case1(try ClerkAuthenticateWithSSOResultCase1.decode(payload, in: runtime))
+    case 1: return .case2(try ClerkAuthenticateWithSSOResultCase2.decode(payload, in: runtime))
+    default: throw CoreError.invalidValue
+    }
+  }
+}
+
+public struct ClerkAuthenticateWithSSOResultCase1: Hashable, Sendable {
+  public var `kind`: String { "signIn" }
+  public let `signIn`: SignIn
+  public init(`signIn`: SignIn) {
+    self.`signIn` = `signIn`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "kind": .string("signIn"),
+      "signIn": try self.`signIn`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ClerkAuthenticateWithSSOResultCase1 {
+    let values = try value.object()
+    guard values["kind"] == .string("signIn") else { throw CoreError.invalidValue }
+    return try ClerkAuthenticateWithSSOResultCase1(`signIn`: try SignIn.decode((values["signIn"] ?? .undefined), in: runtime))
+  }
+}
+
 /// The `SignInFuture` class holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.
 public struct SignInState: Hashable, Sendable {
   public let `id`: String?
@@ -9997,11 +10231,11 @@ public struct SignInResetPasswordPhoneCodeVerifyParams: Hashable, Sendable {
 }
 
 public struct SignInSSOParams: Hashable, Sendable {
-  public let `strategy`: SignInSSOParamsStrategy
+  public let `strategy`: MobileSSOParamsStrategy
   public let `oidcPrompt`: String?
   public let `enterpriseConnectionId`: String?
   public let `identifier`: String?
-  public init(`strategy`: SignInSSOParamsStrategy, `oidcPrompt`: String? = nil, `enterpriseConnectionId`: String? = nil, `identifier`: String? = nil) {
+  public init(`strategy`: MobileSSOParamsStrategy, `oidcPrompt`: String? = nil, `enterpriseConnectionId`: String? = nil, `identifier`: String? = nil) {
     self.`strategy` = `strategy`
     self.`oidcPrompt` = `oidcPrompt`
     self.`enterpriseConnectionId` = `enterpriseConnectionId`
@@ -10019,117 +10253,8 @@ public struct SignInSSOParams: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInSSOParams {
     let values = try value.object()
 
-    return try SignInSSOParams(`strategy`: try SignInSSOParamsStrategy.decode((values["strategy"] ?? .undefined), in: runtime), `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `enterpriseConnectionId`: try (values["enterpriseConnectionId"] ?? .undefined).optional { value in try value.string() }, `identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() })
+    return try SignInSSOParams(`strategy`: try MobileSSOParamsStrategy.decode((values["strategy"] ?? .undefined), in: runtime), `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `enterpriseConnectionId`: try (values["enterpriseConnectionId"] ?? .undefined).optional { value in try value.string() }, `identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() })
   }
-}
-
-public enum SignInSSOParamsStrategy: Hashable, Sendable {
-  case `oauthTokenApple`
-  case `enterpriseSso`
-  case `oauthFacebook`
-  case `oauthGoogle`
-  case `oauthHubspot`
-  case `oauthGithub`
-  case `oauthTiktok`
-  case `oauthGitlab`
-  case `oauthDiscord`
-  case `oauthTwitter`
-  case `oauthTwitch`
-  case `oauthLinkedin`
-  case `oauthLinkedinOidc`
-  case `oauthDropbox`
-  case `oauthAtlassian`
-  case `oauthBitbucket`
-  case `oauthMicrosoft`
-  case `oauthNotion`
-  case `oauthApple`
-  case `oauthLine`
-  case `oauthInstagram`
-  case `oauthCoinbase`
-  case `oauthSpotify`
-  case `oauthXero`
-  case `oauthBox`
-  case `oauthSlack`
-  case `oauthLinear`
-  case `oauthX`
-  case `oauthEnstall`
-  case `oauthHuggingface`
-  case `oauthVercel`
-  case unrecognized(String)
-  public var rawValue: String {
-    switch self {
-    case .`oauthTokenApple`: return "oauth_token_apple"
-    case .`enterpriseSso`: return "enterprise_sso"
-    case .`oauthFacebook`: return "oauth_facebook"
-    case .`oauthGoogle`: return "oauth_google"
-    case .`oauthHubspot`: return "oauth_hubspot"
-    case .`oauthGithub`: return "oauth_github"
-    case .`oauthTiktok`: return "oauth_tiktok"
-    case .`oauthGitlab`: return "oauth_gitlab"
-    case .`oauthDiscord`: return "oauth_discord"
-    case .`oauthTwitter`: return "oauth_twitter"
-    case .`oauthTwitch`: return "oauth_twitch"
-    case .`oauthLinkedin`: return "oauth_linkedin"
-    case .`oauthLinkedinOidc`: return "oauth_linkedin_oidc"
-    case .`oauthDropbox`: return "oauth_dropbox"
-    case .`oauthAtlassian`: return "oauth_atlassian"
-    case .`oauthBitbucket`: return "oauth_bitbucket"
-    case .`oauthMicrosoft`: return "oauth_microsoft"
-    case .`oauthNotion`: return "oauth_notion"
-    case .`oauthApple`: return "oauth_apple"
-    case .`oauthLine`: return "oauth_line"
-    case .`oauthInstagram`: return "oauth_instagram"
-    case .`oauthCoinbase`: return "oauth_coinbase"
-    case .`oauthSpotify`: return "oauth_spotify"
-    case .`oauthXero`: return "oauth_xero"
-    case .`oauthBox`: return "oauth_box"
-    case .`oauthSlack`: return "oauth_slack"
-    case .`oauthLinear`: return "oauth_linear"
-    case .`oauthX`: return "oauth_x"
-    case .`oauthEnstall`: return "oauth_enstall"
-    case .`oauthHuggingface`: return "oauth_huggingface"
-    case .`oauthVercel`: return "oauth_vercel"
-    case .unrecognized(let value): return value
-    }
-  }
-  public init(rawValue: String) {
-    switch rawValue {
-    case "oauth_token_apple": self = .`oauthTokenApple`
-    case "enterprise_sso": self = .`enterpriseSso`
-    case "oauth_facebook": self = .`oauthFacebook`
-    case "oauth_google": self = .`oauthGoogle`
-    case "oauth_hubspot": self = .`oauthHubspot`
-    case "oauth_github": self = .`oauthGithub`
-    case "oauth_tiktok": self = .`oauthTiktok`
-    case "oauth_gitlab": self = .`oauthGitlab`
-    case "oauth_discord": self = .`oauthDiscord`
-    case "oauth_twitter": self = .`oauthTwitter`
-    case "oauth_twitch": self = .`oauthTwitch`
-    case "oauth_linkedin": self = .`oauthLinkedin`
-    case "oauth_linkedin_oidc": self = .`oauthLinkedinOidc`
-    case "oauth_dropbox": self = .`oauthDropbox`
-    case "oauth_atlassian": self = .`oauthAtlassian`
-    case "oauth_bitbucket": self = .`oauthBitbucket`
-    case "oauth_microsoft": self = .`oauthMicrosoft`
-    case "oauth_notion": self = .`oauthNotion`
-    case "oauth_apple": self = .`oauthApple`
-    case "oauth_line": self = .`oauthLine`
-    case "oauth_instagram": self = .`oauthInstagram`
-    case "oauth_coinbase": self = .`oauthCoinbase`
-    case "oauth_spotify": self = .`oauthSpotify`
-    case "oauth_xero": self = .`oauthXero`
-    case "oauth_box": self = .`oauthBox`
-    case "oauth_slack": self = .`oauthSlack`
-    case "oauth_linear": self = .`oauthLinear`
-    case "oauth_x": self = .`oauthX`
-    case "oauth_enstall": self = .`oauthEnstall`
-    case "oauth_huggingface": self = .`oauthHuggingface`
-    case "oauth_vercel": self = .`oauthVercel`
-    default: self = .unrecognized(rawValue)
-    }
-  }
-  public func encode() throws -> JSONValue { .string(rawValue) }
-  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInSSOParamsStrategy { .init(rawValue: try value.string()) }
 }
 
 public struct SignInMfaState: Hashable, Sendable {
@@ -10347,6 +10472,26 @@ public struct SignInSubmitProtectCheckParams: Hashable, Sendable {
     let values = try value.object()
 
     return try SignInSubmitProtectCheckParams(`proofToken`: try (values["proofToken"] ?? .undefined).string())
+  }
+}
+
+public struct ClerkAuthenticateWithSSOResultCase2: Hashable, Sendable {
+  public var `kind`: String { "signUp" }
+  public let `signUp`: SignUp
+  public init(`signUp`: SignUp) {
+    self.`signUp` = `signUp`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "kind": .string("signUp"),
+      "signUp": try self.`signUp`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ClerkAuthenticateWithSSOResultCase2 {
+    let values = try value.object()
+    guard values["kind"] == .string("signUp") else { throw CoreError.invalidValue }
+    return try ClerkAuthenticateWithSSOResultCase2(`signUp`: try SignUp.decode((values["signUp"] ?? .undefined), in: runtime))
   }
 }
 
@@ -12088,7 +12233,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "983e2af77110925cd292c13d1469cfd6918aae5521f929afc814db7bb385e63e"
+  public static let contractHash = "e904897c14e2c4091cb5c19a465198af034b541af3da69ab6442b1e4e381cdf3"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

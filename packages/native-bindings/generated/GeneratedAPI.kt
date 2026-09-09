@@ -74,6 +74,12 @@ public class Clerk(override val handle: ResourceHandle, runtime: CoreRuntime) : 
       Organization.fromJson(result, runtime)
     }
   }
+  public suspend fun `authenticateWithSSO`(`params`: MobileSSOParams): MobileAuthenticationResult {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "Clerk.authenticateWithSSO", listOf(`params`.toJson())) { result ->
+      MobileAuthenticationResult.fromJson(result, runtime)
+    }
+  }
   public suspend fun `setActive`(`params`: MobileSetActiveParams): Unit {
     val runtime = context.requireRuntime()
     return runtime.invoke(this, handle, "Clerk.setActive", listOf(`params`.toJson())) { result ->
@@ -6391,6 +6397,156 @@ public sealed interface ProtectLoaderAttributesValue {
   }
 }
 
+public data class MobileSSOParams(public val `strategy`: MobileSSOParamsStrategy, public val `identifier`: String? = null, public val `enterpriseConnectionId`: String? = null, public val `oidcPrompt`: String? = null, public val `legalAccepted`: Boolean? = null, public val `firstName`: String? = null, public val `lastName`: String? = null, public val `locale`: String? = null, public val `unsafeMetadata`: JsonObject? = null, public val `start`: MobileSSOParamsStart, public val `transferable`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("strategy", this@MobileSSOParams.`strategy`.toJson())
+    putPresent("identifier", this@MobileSSOParams.`identifier`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("enterpriseConnectionId", this@MobileSSOParams.`enterpriseConnectionId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("oidcPrompt", this@MobileSSOParams.`oidcPrompt`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("legalAccepted", this@MobileSSOParams.`legalAccepted`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("firstName", this@MobileSSOParams.`firstName`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("lastName", this@MobileSSOParams.`lastName`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("locale", this@MobileSSOParams.`locale`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("unsafeMetadata", this@MobileSSOParams.`unsafeMetadata`?.let { value -> value } ?: Undefined)
+    putPresent("start", this@MobileSSOParams.`start`.toJson())
+    putPresent("transferable", JsonPrimitive(this@MobileSSOParams.`transferable`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileSSOParams {
+      val values = value.jsonObject
+
+      return MobileSSOParams(`strategy` = MobileSSOParamsStrategy.fromJson((values["strategy"] ?: Undefined), runtime), `identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() }, `enterpriseConnectionId` = (values["enterpriseConnectionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `legalAccepted` = (values["legalAccepted"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `firstName` = (values["firstName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `lastName` = (values["lastName"] ?: Undefined).decodeOptional { value -> value.requireString() }, `locale` = (values["locale"] ?: Undefined).decodeOptional { value -> value.requireString() }, `unsafeMetadata` = (values["unsafeMetadata"] ?: Undefined).decodeOptional { value -> value.jsonObject }, `start` = MobileSSOParamsStart.fromJson((values["start"] ?: Undefined), runtime), `transferable` = (values["transferable"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public sealed class MobileSSOParamsStrategy(public val rawValue: String) {
+  public data object OauthTokenApple : MobileSSOParamsStrategy("oauth_token_apple")
+  public data object EnterpriseSso : MobileSSOParamsStrategy("enterprise_sso")
+  public data object OauthFacebook : MobileSSOParamsStrategy("oauth_facebook")
+  public data object OauthGoogle : MobileSSOParamsStrategy("oauth_google")
+  public data object OauthHubspot : MobileSSOParamsStrategy("oauth_hubspot")
+  public data object OauthGithub : MobileSSOParamsStrategy("oauth_github")
+  public data object OauthTiktok : MobileSSOParamsStrategy("oauth_tiktok")
+  public data object OauthGitlab : MobileSSOParamsStrategy("oauth_gitlab")
+  public data object OauthDiscord : MobileSSOParamsStrategy("oauth_discord")
+  public data object OauthTwitter : MobileSSOParamsStrategy("oauth_twitter")
+  public data object OauthTwitch : MobileSSOParamsStrategy("oauth_twitch")
+  public data object OauthLinkedin : MobileSSOParamsStrategy("oauth_linkedin")
+  public data object OauthLinkedinOidc : MobileSSOParamsStrategy("oauth_linkedin_oidc")
+  public data object OauthDropbox : MobileSSOParamsStrategy("oauth_dropbox")
+  public data object OauthAtlassian : MobileSSOParamsStrategy("oauth_atlassian")
+  public data object OauthBitbucket : MobileSSOParamsStrategy("oauth_bitbucket")
+  public data object OauthMicrosoft : MobileSSOParamsStrategy("oauth_microsoft")
+  public data object OauthNotion : MobileSSOParamsStrategy("oauth_notion")
+  public data object OauthApple : MobileSSOParamsStrategy("oauth_apple")
+  public data object OauthLine : MobileSSOParamsStrategy("oauth_line")
+  public data object OauthInstagram : MobileSSOParamsStrategy("oauth_instagram")
+  public data object OauthCoinbase : MobileSSOParamsStrategy("oauth_coinbase")
+  public data object OauthSpotify : MobileSSOParamsStrategy("oauth_spotify")
+  public data object OauthXero : MobileSSOParamsStrategy("oauth_xero")
+  public data object OauthBox : MobileSSOParamsStrategy("oauth_box")
+  public data object OauthSlack : MobileSSOParamsStrategy("oauth_slack")
+  public data object OauthLinear : MobileSSOParamsStrategy("oauth_linear")
+  public data object OauthX : MobileSSOParamsStrategy("oauth_x")
+  public data object OauthEnstall : MobileSSOParamsStrategy("oauth_enstall")
+  public data object OauthHuggingface : MobileSSOParamsStrategy("oauth_huggingface")
+  public data object OauthVercel : MobileSSOParamsStrategy("oauth_vercel")
+  public data class Unrecognized(val value: String) : MobileSSOParamsStrategy(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileSSOParamsStrategy = when (val raw = value.requireString()) {
+      "oauth_token_apple" -> OauthTokenApple
+      "enterprise_sso" -> EnterpriseSso
+      "oauth_facebook" -> OauthFacebook
+      "oauth_google" -> OauthGoogle
+      "oauth_hubspot" -> OauthHubspot
+      "oauth_github" -> OauthGithub
+      "oauth_tiktok" -> OauthTiktok
+      "oauth_gitlab" -> OauthGitlab
+      "oauth_discord" -> OauthDiscord
+      "oauth_twitter" -> OauthTwitter
+      "oauth_twitch" -> OauthTwitch
+      "oauth_linkedin" -> OauthLinkedin
+      "oauth_linkedin_oidc" -> OauthLinkedinOidc
+      "oauth_dropbox" -> OauthDropbox
+      "oauth_atlassian" -> OauthAtlassian
+      "oauth_bitbucket" -> OauthBitbucket
+      "oauth_microsoft" -> OauthMicrosoft
+      "oauth_notion" -> OauthNotion
+      "oauth_apple" -> OauthApple
+      "oauth_line" -> OauthLine
+      "oauth_instagram" -> OauthInstagram
+      "oauth_coinbase" -> OauthCoinbase
+      "oauth_spotify" -> OauthSpotify
+      "oauth_xero" -> OauthXero
+      "oauth_box" -> OauthBox
+      "oauth_slack" -> OauthSlack
+      "oauth_linear" -> OauthLinear
+      "oauth_x" -> OauthX
+      "oauth_enstall" -> OauthEnstall
+      "oauth_huggingface" -> OauthHuggingface
+      "oauth_vercel" -> OauthVercel
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public sealed class MobileSSOParamsStart(public val rawValue: String) {
+  public data object SignUp : MobileSSOParamsStart("signUp")
+  public data object SignIn : MobileSSOParamsStart("signIn")
+  public data object Auto : MobileSSOParamsStart("auto")
+  public data class Unrecognized(val value: String) : MobileSSOParamsStart(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileSSOParamsStart = when (val raw = value.requireString()) {
+      "signUp" -> SignUp
+      "signIn" -> SignIn
+      "auto" -> Auto
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public sealed interface MobileAuthenticationResult {
+  public data class Case1(val value: ClerkAuthenticateWithSSOResultCase1) : MobileAuthenticationResult
+  public data class Case2(val value: ClerkAuthenticateWithSSOResultCase2) : MobileAuthenticationResult
+  public val `kind`: String get() = when (this) {
+    is Case1 -> value.`kind`
+    is Case2 -> value.`kind`
+  }
+  public fun toJson(): JsonElement = when (this) {
+    is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
+    is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileAuthenticationResult {
+      val values = value.jsonObject
+      val payload = values["value"] ?: Undefined
+      return when (values.getValue("\$case").jsonPrimitive.int) {
+        0 -> Case1(ClerkAuthenticateWithSSOResultCase1.fromJson(payload, runtime))
+        1 -> Case2(ClerkAuthenticateWithSSOResultCase2.fromJson(payload, runtime))
+        else -> throw CoreException("invalid_value")
+      }
+    }
+  }
+}
+
+public data class ClerkAuthenticateWithSSOResultCase1(public val `signIn`: SignIn) {
+  public val `kind`: String get() = "signIn"
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("kind", JsonPrimitive("signIn"))
+    putPresent("signIn", this@ClerkAuthenticateWithSSOResultCase1.`signIn`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): ClerkAuthenticateWithSSOResultCase1 {
+      val values = value.jsonObject
+      require(values["kind"] == JsonPrimitive("signIn"))
+      return ClerkAuthenticateWithSSOResultCase1(`signIn` = SignIn.fromJson((values["signIn"] ?: Undefined), runtime))
+    }
+  }
+}
+
 /**
  * The `SignInFuture` class holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.
  */
@@ -7454,7 +7610,7 @@ public data class SignInResetPasswordPhoneCodeVerifyParams(public val `code`: St
   }
 }
 
-public data class SignInSSOParams(public val `strategy`: SignInSSOParamsStrategy, public val `oidcPrompt`: String? = null, public val `enterpriseConnectionId`: String? = null, public val `identifier`: String? = null) {
+public data class SignInSSOParams(public val `strategy`: MobileSSOParamsStrategy, public val `oidcPrompt`: String? = null, public val `enterpriseConnectionId`: String? = null, public val `identifier`: String? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("strategy", this@SignInSSOParams.`strategy`.toJson())
     putPresent("oidcPrompt", this@SignInSSOParams.`oidcPrompt`?.let { value -> JsonPrimitive(value) } ?: Undefined)
@@ -7465,79 +7621,7 @@ public data class SignInSSOParams(public val `strategy`: SignInSSOParamsStrategy
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInSSOParams {
       val values = value.jsonObject
 
-      return SignInSSOParams(`strategy` = SignInSSOParamsStrategy.fromJson((values["strategy"] ?: Undefined), runtime), `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `enterpriseConnectionId` = (values["enterpriseConnectionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() })
-    }
-  }
-}
-
-public sealed class SignInSSOParamsStrategy(public val rawValue: String) {
-  public data object OauthTokenApple : SignInSSOParamsStrategy("oauth_token_apple")
-  public data object EnterpriseSso : SignInSSOParamsStrategy("enterprise_sso")
-  public data object OauthFacebook : SignInSSOParamsStrategy("oauth_facebook")
-  public data object OauthGoogle : SignInSSOParamsStrategy("oauth_google")
-  public data object OauthHubspot : SignInSSOParamsStrategy("oauth_hubspot")
-  public data object OauthGithub : SignInSSOParamsStrategy("oauth_github")
-  public data object OauthTiktok : SignInSSOParamsStrategy("oauth_tiktok")
-  public data object OauthGitlab : SignInSSOParamsStrategy("oauth_gitlab")
-  public data object OauthDiscord : SignInSSOParamsStrategy("oauth_discord")
-  public data object OauthTwitter : SignInSSOParamsStrategy("oauth_twitter")
-  public data object OauthTwitch : SignInSSOParamsStrategy("oauth_twitch")
-  public data object OauthLinkedin : SignInSSOParamsStrategy("oauth_linkedin")
-  public data object OauthLinkedinOidc : SignInSSOParamsStrategy("oauth_linkedin_oidc")
-  public data object OauthDropbox : SignInSSOParamsStrategy("oauth_dropbox")
-  public data object OauthAtlassian : SignInSSOParamsStrategy("oauth_atlassian")
-  public data object OauthBitbucket : SignInSSOParamsStrategy("oauth_bitbucket")
-  public data object OauthMicrosoft : SignInSSOParamsStrategy("oauth_microsoft")
-  public data object OauthNotion : SignInSSOParamsStrategy("oauth_notion")
-  public data object OauthApple : SignInSSOParamsStrategy("oauth_apple")
-  public data object OauthLine : SignInSSOParamsStrategy("oauth_line")
-  public data object OauthInstagram : SignInSSOParamsStrategy("oauth_instagram")
-  public data object OauthCoinbase : SignInSSOParamsStrategy("oauth_coinbase")
-  public data object OauthSpotify : SignInSSOParamsStrategy("oauth_spotify")
-  public data object OauthXero : SignInSSOParamsStrategy("oauth_xero")
-  public data object OauthBox : SignInSSOParamsStrategy("oauth_box")
-  public data object OauthSlack : SignInSSOParamsStrategy("oauth_slack")
-  public data object OauthLinear : SignInSSOParamsStrategy("oauth_linear")
-  public data object OauthX : SignInSSOParamsStrategy("oauth_x")
-  public data object OauthEnstall : SignInSSOParamsStrategy("oauth_enstall")
-  public data object OauthHuggingface : SignInSSOParamsStrategy("oauth_huggingface")
-  public data object OauthVercel : SignInSSOParamsStrategy("oauth_vercel")
-  public data class Unrecognized(val value: String) : SignInSSOParamsStrategy(value)
-  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
-  public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInSSOParamsStrategy = when (val raw = value.requireString()) {
-      "oauth_token_apple" -> OauthTokenApple
-      "enterprise_sso" -> EnterpriseSso
-      "oauth_facebook" -> OauthFacebook
-      "oauth_google" -> OauthGoogle
-      "oauth_hubspot" -> OauthHubspot
-      "oauth_github" -> OauthGithub
-      "oauth_tiktok" -> OauthTiktok
-      "oauth_gitlab" -> OauthGitlab
-      "oauth_discord" -> OauthDiscord
-      "oauth_twitter" -> OauthTwitter
-      "oauth_twitch" -> OauthTwitch
-      "oauth_linkedin" -> OauthLinkedin
-      "oauth_linkedin_oidc" -> OauthLinkedinOidc
-      "oauth_dropbox" -> OauthDropbox
-      "oauth_atlassian" -> OauthAtlassian
-      "oauth_bitbucket" -> OauthBitbucket
-      "oauth_microsoft" -> OauthMicrosoft
-      "oauth_notion" -> OauthNotion
-      "oauth_apple" -> OauthApple
-      "oauth_line" -> OauthLine
-      "oauth_instagram" -> OauthInstagram
-      "oauth_coinbase" -> OauthCoinbase
-      "oauth_spotify" -> OauthSpotify
-      "oauth_xero" -> OauthXero
-      "oauth_box" -> OauthBox
-      "oauth_slack" -> OauthSlack
-      "oauth_linear" -> OauthLinear
-      "oauth_x" -> OauthX
-      "oauth_enstall" -> OauthEnstall
-      "oauth_huggingface" -> OauthHuggingface
-      "oauth_vercel" -> OauthVercel
-      else -> Unrecognized(raw)
+      return SignInSSOParams(`strategy` = MobileSSOParamsStrategy.fromJson((values["strategy"] ?: Undefined), runtime), `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `enterpriseConnectionId` = (values["enterpriseConnectionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
@@ -7722,6 +7806,21 @@ public data class SignInSubmitProtectCheckParams(public val `proofToken`: String
       val values = value.jsonObject
 
       return SignInSubmitProtectCheckParams(`proofToken` = (values["proofToken"] ?: Undefined).requireString())
+    }
+  }
+}
+
+public data class ClerkAuthenticateWithSSOResultCase2(public val `signUp`: SignUp) {
+  public val `kind`: String get() = "signUp"
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("kind", JsonPrimitive("signUp"))
+    putPresent("signUp", this@ClerkAuthenticateWithSSOResultCase2.`signUp`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): ClerkAuthenticateWithSSOResultCase2 {
+      val values = value.jsonObject
+      require(values["kind"] == JsonPrimitive("signUp"))
+      return ClerkAuthenticateWithSSOResultCase2(`signUp` = SignUp.fromJson((values["signUp"] ?: Undefined), runtime))
     }
   }
 }
@@ -9048,7 +9147,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "983e2af77110925cd292c13d1469cfd6918aae5521f929afc814db7bb385e63e"
+  public const val contractHash: String = "e904897c14e2c4091cb5c19a465198af034b541af3da69ab6442b1e4e381cdf3"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)
