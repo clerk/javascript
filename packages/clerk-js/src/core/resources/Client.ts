@@ -99,10 +99,10 @@ export class Client extends BaseResource implements ClientResource {
   removeSessions(): Promise<ClientResource> {
     return this._baseDelete({
       path: this.path() + '/sessions',
-    }).then(e => {
+    }).then(() => {
       SessionTokenCache.clear();
       resetAuthResourceSignals();
-      return e as unknown as ClientResource;
+      return this;
     });
   }
 

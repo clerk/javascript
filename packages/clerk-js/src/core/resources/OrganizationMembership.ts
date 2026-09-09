@@ -50,11 +50,11 @@ export class OrganizationMembership extends BaseResource implements Organization
   };
 
   destroy = async (): Promise<OrganizationMembership> => {
-    // TODO: Revise the return type of _baseDelete
     // TODO: Handle case where publicUserData is not present
-    return (await this._baseDelete({
+    await this._baseDelete({
       path: `/organizations/${this.organization.id}/memberships/${this.publicUserData?.userId}`,
-    })) as unknown as OrganizationMembership;
+    });
+    return this;
   };
 
   update = async ({ role }: UpdateOrganizationMembershipParams): Promise<OrganizationMembership> => {

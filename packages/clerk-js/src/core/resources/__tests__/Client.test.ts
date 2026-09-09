@@ -2,6 +2,7 @@ import type { ClientJSON, ClientJSONSnapshot } from '@clerk/shared/types';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createSession, createSignIn, createSignUp, createUser } from '@/test/core-fixtures';
+import { createBaseClientJSON } from '@/test/fixtures';
 
 import { BaseResource, Client } from '../internal';
 
@@ -17,6 +18,31 @@ afterAll(() => {
 });
 
 describe('Client Singleton', () => {
+  it('removeSessions returns the updated client resource promised by its type', async () => {
+    const user = createUser({ id: 'user_removal' });
+    const session = createSession({ id: 'sess_removal' }, user);
+    const initial = {
+      ...createBaseClientJSON(),
+      id: 'client_removal',
+      sessions: [session],
+      last_active_session_id: session.id,
+    };
+    const cleared = { ...initial, sessions: [], last_active_session_id: null };
+    Client.clearInstance();
+    const client = Client.getOrCreateInstance(initial);
+    const fetch = vi.spyOn(BaseResource, '_fetch').mockResolvedValue({ response: cleared });
+    try {
+      const result = await client.removeSessions();
+      expect(result).toBe(client);
+      expect(result.sessions).toEqual([]);
+      expect(result.lastActiveSessionId).toBeNull();
+      expect(result.id).toBe('client_removal');
+    } finally {
+      fetch.mockRestore();
+      Client.clearInstance();
+    }
+  });
+
   describe('__internal_sendCaptchaToken', () => {
     it('sends captcha token', async () => {
       const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });

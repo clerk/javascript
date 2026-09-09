@@ -54,3 +54,76 @@ test('generated organization lookup returns the requested organization resource'
   const request = f.requests.find(value => new URL(value.url).pathname.endsWith(`/organizations/${organization.id}`));
   assert.equal(request.method, 'GET');
 });
+
+for (const outcome of ['receipt', 'resource', 'rejected']) {
+  test(`generated membership deletion returns its declared resource: ${outcome}`, async t => {
+    const member = {
+      object: 'organization_membership',
+      id: 'orgmem_contract',
+      organization,
+      role: 'org:member',
+      role_name: 'Member',
+      permissions: [],
+      public_metadata: { source: 'before' },
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+      public_user_data: {
+        user_id: 'user_native',
+        first_name: 'Test',
+        last_name: 'User',
+        image_url: '',
+        has_image: false,
+        identifier: 'test@example.com',
+      },
+    };
+    const client = structuredClone(fixtures.authenticatedClient);
+    client.sessions[0].user.organization_memberships = [member];
+    client.sessions[0].last_active_organization_id = organization.id;
+    const f = await fixture({
+      client,
+      http: request => {
+        const url = new URL(request.url);
+        if (!url.pathname.includes('/memberships/')) return;
+        assert.equal(url.pathname, `/v1/organizations/${organization.id}/memberships/user_native`);
+        assert.equal(url.searchParams.get('_method') ?? request.method, 'DELETE');
+        assert.equal(url.searchParams.get('_clerk_session_id'), 'sess_native');
+        if (outcome === 'rejected')
+          return response(null, {
+            status: 403,
+            body: JSON.stringify({
+              errors: [{ code: 'not_allowed_access', message: 'Not allowed', long_message: 'Not allowed', meta: {} }],
+            }),
+          });
+        client.sessions[0].user.organization_memberships = [];
+        client.sessions[0].last_active_organization_id = null;
+        const returned =
+          outcome === 'receipt'
+            ? { object: member.object, id: member.id, deleted: true }
+            : { ...member, public_metadata: { source: 'server' }, updated_at: 1700000001000 };
+        return response(null, { body: JSON.stringify({ response: returned, client }) });
+      },
+    });
+    t.after(f.dispose);
+    assert.equal(f.state.roots.organization.type, 'Organization');
+    const before = f.resource(f.state.roots.user).organizationMemberships[0].$ref;
+    const result = await f.invoke(before, 'OrganizationMembership.destroy');
+    if (outcome === 'rejected') {
+      assert.equal(result.failure.errors[0].code, 'not_allowed_access');
+      assert.equal(f.resource(f.state.roots.user).organizationMemberships.length, 1);
+      assert.equal(f.resource(f.state.roots.organization).id, organization.id);
+      return;
+    }
+    assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+    const removed = f.resource(result.result.$ref);
+    assert.equal(removed.id, member.id);
+    assert.equal(removed.role, 'org:member');
+    assert.equal(removed.publicMetadata.source, outcome === 'receipt' ? 'before' : 'server');
+    assert.equal(f.resource(removed.organization.$ref).name, organization.name);
+    assert.deepEqual(f.resource(f.state.roots.user).organizationMemberships, []);
+    assert.equal(f.state.roots.organization, null);
+    assert.equal(
+      f.messages.some(message => message.kind === 'runtimeError'),
+      false,
+    );
+  });
+}
