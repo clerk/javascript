@@ -20,6 +20,7 @@ Inputs inside the group default to `variant='ghost'`. An explicit `variant` over
 ## Usage
 
 ```tsx
+import { Button } from '@clerk/ui/mosaic/components/button';
 import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
 import { Input } from '@clerk/ui/mosaic/components/input';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
@@ -31,15 +32,15 @@ function PasswordField() {
   return (
     <InputGroup.Root>
       <Input type={visible ? 'text' : 'password'} aria-label='Password' />
-      <InputGroup.Action
-        type='button'
-        size='xs'
-        shape='square'
-        aria-label={visible ? 'Hide password' : 'Show password'}
-        onClick={() => setVisible(value => !value)}
-      >
-        <Icon name={visible ? 'eye-slash' : 'eye'} size='sm' />
-      </InputGroup.Action>
+      <InputGroup.End>
+        <Button
+          type='button'
+          aria-label={visible ? 'Hide password' : 'Show password'}
+          onClick={() => setVisible(value => !value)}
+        >
+          <Icon name={visible ? 'eye-slash' : 'eye'} />
+        </Button>
+      </InputGroup.End>
     </InputGroup.Root>
   );
 }

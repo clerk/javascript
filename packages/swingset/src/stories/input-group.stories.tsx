@@ -1,3 +1,4 @@
+import { Button } from '@clerk/ui/mosaic/components/button';
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Input } from '@clerk/ui/mosaic/components/input';
@@ -40,18 +41,15 @@ export function Default(props: Record<string, unknown>) {
           placeholder='Enter password'
           autoComplete='current-password'
         />
-        <InputGroup.Action
-          type='button'
-          size='xs'
-          shape='square'
-          aria-label={visible ? 'Hide password' : 'Show password'}
-          onClick={() => setVisible(value => !value)}
-        >
-          <Icon
-            name={visible ? 'eye-slash' : 'eye'}
-            size='sm'
-          />
-        </InputGroup.Action>
+        <InputGroup.End>
+          <Button
+            type='button'
+            aria-label={visible ? 'Hide password' : 'Show password'}
+            onClick={() => setVisible(value => !value)}
+          >
+            <Icon name={visible ? 'eye-slash' : 'eye'} />
+          </Button>
+        </InputGroup.End>
       </InputGroup.Root>
     </Field.Root>
   );
@@ -108,18 +106,15 @@ export function Invalid(props: Record<string, unknown>) {
           defaultValue='short'
           autoComplete='new-password'
         />
-        <InputGroup.Action
-          type='button'
-          size='xs'
-          shape='square'
-          aria-label={visible ? 'Hide password' : 'Show password'}
-          onClick={() => setVisible(value => !value)}
-        >
-          <Icon
-            name={visible ? 'eye-slash' : 'eye'}
-            size='sm'
-          />
-        </InputGroup.Action>
+        <InputGroup.End>
+          <Button
+            type='button'
+            aria-label={visible ? 'Hide password' : 'Show password'}
+            onClick={() => setVisible(value => !value)}
+          >
+            <Icon name={visible ? 'eye-slash' : 'eye'} />
+          </Button>
+        </InputGroup.End>
       </InputGroup.Root>
       <Field.Error>Password must be at least 8 characters</Field.Error>
     </Field.Root>
