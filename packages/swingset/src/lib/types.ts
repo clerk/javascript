@@ -34,7 +34,7 @@ export type KnobRecord = Record<string, KnobDef>;
 
 export type KnobValues = Record<string, string | boolean | number>;
 
-export type StoryStatus = 'stable' | 'wip';
+export type StoryStatus = 'stable' | 'wip' | 'todo';
 
 export type WipSubstatus =
   /** View renders against mock/static data; not yet connected to its model/controller. */

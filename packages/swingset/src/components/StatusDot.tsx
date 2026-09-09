@@ -2,9 +2,17 @@ import { Badge } from '@/components/ui/badge';
 import type { StoryStatus, WipSubstatus } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
-function dotColor(status: StoryStatus) {
-  return status === 'stable' ? 'bg-emerald-500' : 'bg-amber-400';
-}
+const dotColor: Record<StoryStatus, string> = {
+  stable: 'bg-emerald-500',
+  wip: 'bg-amber-400',
+  todo: 'bg-neutral-400',
+};
+
+const statusLabel: Record<StoryStatus, string> = {
+  stable: 'Stable',
+  wip: 'Work in progress',
+  todo: 'To do',
+};
 
 // A substatus only ever refines a wip entry; a stable one's is ignored.
 function substatusFor(status: StoryStatus, substatus?: WipSubstatus) {
@@ -21,11 +29,11 @@ export function StatusDot({
   className?: string;
 }) {
   const refinement = substatusFor(status, substatus);
-  const label = (status === 'stable' ? 'Stable' : 'Work in progress') + (refinement ? `: ${refinement}` : '');
+  const label = statusLabel[status] + (refinement ? `: ${refinement}` : '');
   return (
     <span
       title={label}
-      className={cn('size-1.5 shrink-0 rounded-full', dotColor(status), className)}
+      className={cn('size-1.5 shrink-0 rounded-full', dotColor[status], className)}
     >
       <span className='sr-only'>{label}</span>
     </span>
@@ -49,7 +57,7 @@ export function StatusBadge({
     >
       <span
         aria-hidden='true'
-        className={cn('size-1.5 shrink-0 rounded-full', dotColor(status))}
+        className={cn('size-1.5 shrink-0 rounded-full', dotColor[status])}
       />
       {/* One text child, so the Badge's flex gap separates only the dot from the text. */}
       <span>
