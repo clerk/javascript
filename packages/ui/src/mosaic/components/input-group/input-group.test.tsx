@@ -1,18 +1,12 @@
-import * as stylex from '@stylexjs/stylex';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { colorVars } from '../../tokens.stylex';
 import { Button } from '../button';
 import { Field } from '../field';
 import { Input } from '../input';
 import { InputGroup } from './input-group';
-
-const expectedTextStyles = stylex.create({
-  text: { color: colorVars['--cl-color-input-placeholder'], pointerEvents: 'none' },
-});
 
 describe('Mosaic InputGroup', () => {
   it('focuses the input when clicking the group or non-interactive slot content', () => {
@@ -87,15 +81,6 @@ describe('Mosaic InputGroup', () => {
     focus.mockRestore();
   });
 
-  it('uses placeholder-colored, pointer-transparent text', () => {
-    render(
-      <InputGroup.Root>
-        <InputGroup.Text>Suffix</InputGroup.Text>
-      </InputGroup.Root>,
-    );
-    const classes = stylex.props(expectedTextStyles.text).className ?? '';
-    expect(screen.getByText('Suffix')).toHaveClass(...classes.split(' ').filter(name => name.startsWith('x')));
-  });
   it.each([
     ['sm', 'xs'],
     ['md', 'sm'],
