@@ -4,17 +4,17 @@ import type { FlowDirection } from '../../components/flow';
 
 export type ReverificationStrategy = 'password' | 'passkey' | 'email_code' | 'phone_code' | 'totp' | 'backup_code';
 
+export type ReverificationStage = 'first' | 'second';
+
 export type ReverificationOtpChannel = 'email' | 'phone' | 'totp';
 
 export type ReverificationStep = 'password' | 'passkey' | 'otp' | 'backup-code' | 'method-picker' | 'help';
 
-export type ReverificationMethod = {
-  id: string;
-  strategy: ReverificationStrategy;
-  identifier?: string;
-  emailAddressId?: string;
-  phoneNumberId?: string;
-};
+export type ReverificationMethod =
+  | { id: string; stage: 'first'; strategy: 'password' | 'passkey' }
+  | { id: string; stage: 'first'; strategy: 'email_code'; emailAddressId: string; identifier: string }
+  | { id: string; stage: 'first' | 'second'; strategy: 'phone_code'; phoneNumberId: string; identifier: string }
+  | { id: string; stage: 'second'; strategy: 'totp' | 'backup_code' };
 
 export type ReverificationViewProps = {
   step: ReverificationStep;
@@ -46,5 +46,3 @@ export type ReverificationResult = {
   methods: readonly ReverificationMethod[];
   startingMethod: ReverificationMethod | null;
 };
-
-export type ReverificationFactorStatus = 'needs_first_factor' | 'needs_second_factor';

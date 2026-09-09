@@ -138,6 +138,7 @@ describe('useReverificationModel', () => {
     expect(started.startingMethod?.strategy).toBe('password');
     expect(started.methods.find(method => method.strategy === 'email_code')).toEqual({
       id: 'email_code:idn_1',
+      stage: 'first',
       strategy: 'email_code',
       identifier: 'a***@ex.com',
       emailAddressId: 'idn_1',
@@ -172,7 +173,14 @@ describe('useReverificationModel', () => {
     const { result } = renderHook(() => useReverificationModel({ ...activeProps(), level: 'second_factor' }));
     const started = await ready(result.current).start();
     expect(started.status).toBe('needs_second_factor');
-    expect(started.startingMethod?.strategy).toBe('totp');
+    expect(started.startingMethod).toEqual({ id: 'totp', stage: 'second', strategy: 'totp' });
+    expect(started.methods.find(method => method.strategy === 'phone_code')).toEqual({
+      id: 'phone_code:pn_1',
+      stage: 'second',
+      strategy: 'phone_code',
+      identifier: '+1••••1',
+      phoneNumberId: 'pn_1',
+    });
   });
 
   it('prepares and attempts with the Clerk param shape for the active method', async () => {
@@ -182,24 +190,34 @@ describe('useReverificationModel', () => {
 
     const { result } = renderHook(() => useReverificationModel(activeProps()));
     await ready(result.current).start();
-    await ready(result.current).prepare(
-      {
-        id: 'email_code:idn_1',
-        strategy: 'email_code',
-        identifier: 'a***@ex.com',
-        emailAddressId: 'idn_1',
-      },
-      'needs_first_factor',
-    );
+    await ready(result.current).prepare({
+      id: 'email_code:idn_1',
+      stage: 'first',
+      strategy: 'email_code',
+      identifier: 'a***@ex.com',
+      emailAddressId: 'idn_1',
+    });
     expect(session?.prepareFirstFactorVerification).toHaveBeenCalledWith({
       strategy: 'email_code',
       emailAddressId: 'idn_1',
     });
 
-    await ready(result.current).attempt({ id: 'password', strategy: 'password' }, 'secret', 'needs_first_factor');
+    await ready(result.current).attempt({ id: 'password', stage: 'first', strategy: 'password' }, 'secret');
     expect(session?.attemptFirstFactorVerification).toHaveBeenCalledWith({
       strategy: 'password',
       password: 'secret',
+    });
+
+    await ready(result.current).prepare({
+      id: 'phone_code:pn_1',
+      stage: 'first',
+      strategy: 'phone_code',
+      phoneNumberId: 'pn_1',
+      identifier: '+1••••1',
+    });
+    expect(session?.prepareFirstFactorVerification).toHaveBeenCalledWith({
+      strategy: 'phone_code',
+      phoneNumberId: 'pn_1',
     });
   });
 
@@ -216,86 +234,38 @@ describe('useReverificationModel', () => {
 
     const { result } = renderHook(() => useReverificationModel({ ...activeProps(), level: 'second_factor' }));
     await ready(result.current).start();
-    await ready(result.current).prepare(
-      { id: 'phone_code:pn_1', strategy: 'phone_code', phoneNumberId: 'pn_1' },
-      'needs_second_factor',
-    );
+    await ready(result.current).prepare({
+      id: 'phone_code:pn_1',
+      stage: 'second',
+      strategy: 'phone_code',
+      phoneNumberId: 'pn_1',
+      identifier: '+1••••1',
+    });
     expect(session?.prepareSecondFactorVerification).toHaveBeenCalledWith({
       strategy: 'phone_code',
       phoneNumberId: 'pn_1',
     });
 
-    await ready(result.current).attempt({ id: 'totp', strategy: 'totp' }, '123456', 'needs_second_factor');
+    await ready(result.current).attempt({ id: 'totp', stage: 'second', strategy: 'totp' }, '123456');
     expect(session?.attemptSecondFactorVerification).toHaveBeenCalledWith({ strategy: 'totp', code: '123456' });
   });
 
   it('no-ops prepare for methods that have no prepare step', async () => {
     const { result } = renderHook(() => useReverificationModel(activeProps()));
-    await ready(result.current).prepare({ id: 'password', strategy: 'password' }, 'needs_first_factor');
-    await ready(result.current).prepare({ id: 'passkey', strategy: 'passkey' }, 'needs_first_factor');
-    await ready(result.current).prepare({ id: 'totp', strategy: 'totp' }, 'needs_second_factor');
-    await ready(result.current).prepare({ id: 'backup_code', strategy: 'backup_code' }, 'needs_second_factor');
+    await ready(result.current).prepare({ id: 'password', stage: 'first', strategy: 'password' });
+    await ready(result.current).prepare({ id: 'passkey', stage: 'first', strategy: 'passkey' });
+    await ready(result.current).prepare({ id: 'totp', stage: 'second', strategy: 'totp' });
+    await ready(result.current).prepare({ id: 'backup_code', stage: 'second', strategy: 'backup_code' });
 
     expect(session?.prepareFirstFactorVerification).not.toHaveBeenCalled();
     expect(session?.prepareSecondFactorVerification).not.toHaveBeenCalled();
   });
 
-  it('rejects prepare when the method does not belong to the verification stage', async () => {
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    const model = ready(result.current);
-
-    await expect(model.prepare({ id: 'totp', strategy: 'totp' }, 'needs_first_factor')).rejects.toThrow(
-      'Cannot prepare totp when verification is needs_first_factor.',
-    );
-    await expect(model.prepare({ id: 'password', strategy: 'password' }, 'needs_second_factor')).rejects.toThrow(
-      'Cannot prepare password when verification is needs_second_factor.',
-    );
-    expect(session?.prepareFirstFactorVerification).not.toHaveBeenCalled();
-    expect(session?.prepareSecondFactorVerification).not.toHaveBeenCalled();
-  });
-
-  it('rejects prepare when a code method is missing its factor id', async () => {
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    const model = ready(result.current);
-
-    await expect(model.prepare({ id: 'email_code:', strategy: 'email_code' }, 'needs_first_factor')).rejects.toThrow(
-      'Cannot prepare email_code without an email address.',
-    );
-    await expect(model.prepare({ id: 'phone_code:', strategy: 'phone_code' }, 'needs_first_factor')).rejects.toThrow(
-      'Cannot prepare phone_code without a phone number.',
-    );
-    await expect(model.prepare({ id: 'phone_code:', strategy: 'phone_code' }, 'needs_second_factor')).rejects.toThrow(
-      'Cannot prepare phone_code without a phone number.',
-    );
-    expect(session?.prepareFirstFactorVerification).not.toHaveBeenCalled();
-    expect(session?.prepareSecondFactorVerification).not.toHaveBeenCalled();
-  });
-
-  it('rejects attempt when the method does not belong to the verification stage', async () => {
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    const model = ready(result.current);
-
-    await expect(model.attempt({ id: 'passkey', strategy: 'passkey' }, 'x', 'needs_first_factor')).rejects.toThrow(
-      'Cannot attempt passkey when verification is needs_first_factor.',
-    );
-    await expect(model.attempt({ id: 'password', strategy: 'password' }, 'x', 'needs_second_factor')).rejects.toThrow(
-      'Cannot attempt password when verification is needs_second_factor.',
-    );
-    expect(session?.attemptFirstFactorVerification).not.toHaveBeenCalled();
-    expect(session?.attemptSecondFactorVerification).not.toHaveBeenCalled();
-  });
-
-  it('verifies a passkey only during first-factor verification', async () => {
+  it('verifies a passkey', async () => {
     session?.verifyWithPasskey.mockResolvedValue(resource({ status: 'complete' }));
     const { result } = renderHook(() => useReverificationModel(activeProps()));
-    const model = ready(result.current);
 
-    await expect(model.verifyPasskey('needs_second_factor')).rejects.toThrow(
-      'Cannot verify passkey when verification is needs_second_factor.',
-    );
-    expect(session?.verifyWithPasskey).not.toHaveBeenCalled();
-
-    await model.verifyPasskey('needs_first_factor');
+    await ready(result.current).verifyPasskey();
     expect(session?.verifyWithPasskey).toHaveBeenCalledOnce();
   });
 
@@ -315,7 +285,7 @@ describe('useReverificationModel', () => {
 
     const { result } = renderHook(() => useReverificationModel(activeProps()));
     await expect(
-      ready(result.current).attempt({ id: 'password', strategy: 'password' }, 'bad', 'needs_first_factor'),
+      ready(result.current).attempt({ id: 'password', stage: 'first', strategy: 'password' }, 'bad'),
     ).rejects.toThrow('That password is incorrect.');
   });
 
