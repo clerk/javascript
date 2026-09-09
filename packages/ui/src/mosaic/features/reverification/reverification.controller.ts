@@ -402,7 +402,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
     isPending: pendingStates.has(snapshot.value),
     onSubmit: () => send({ type: 'SUBMIT' }),
     onVerifyPasskey: () => send({ type: 'SUBMIT' }),
-    onShowMethods: alternativeMethods.length > 0 ? () => send({ type: 'SHOW_METHODS' }) : undefined,
+    onShowMethods: () => send({ type: 'SHOW_METHODS' }),
     onShowHelp: () => send({ type: 'SHOW_HELP' }),
     onBack: step === 'method-picker' || step === 'help' ? () => send({ type: 'BACK' }) : undefined,
     onEmailSupport: () => {
@@ -414,10 +414,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
     onSelectMethod: id => send({ type: 'SELECT_METHOD', id }),
     otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
     identifier: activeMethod && 'identifier' in activeMethod ? activeMethod.identifier : undefined,
-    onResend:
-      activeMethod && needsPrepare(activeMethod.strategy) && context.canResend
-        ? () => send({ type: 'RESEND' })
-        : undefined,
+    onResend: () => send({ type: 'RESEND' }),
     canResend: context.canResend,
   };
 }
