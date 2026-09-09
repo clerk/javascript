@@ -224,10 +224,10 @@ export const enUS: LocalizationResource = {
   configureDirectorySync: {
     attributeMappingStep: {
       columns: {
-        clerkAttribute: 'Clerk user attributes',
+        clerkAttribute: 'User attributes',
         directoryAttribute: 'Directory attributes',
       },
-      subtitle: 'Standard directory attributes are pre-configured by Clerk. Attributes not listed here are ignored.',
+      subtitle: 'Standard directory attributes are pre-configured. Attributes not listed here are ignored.',
       title: 'Attribute review',
     },
     configureStep: {
@@ -269,8 +269,7 @@ export const enUS: LocalizationResource = {
       subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
       title: 'Configure',
       warning__googleUnsupported: {
-        subtitle:
-          'Google Workspace provisions through a credential-based integration instead of SCIM push. Set up Directory Sync for this connection from the Clerk Dashboard.',
+        subtitle: 'Google Workspace provisions through a credential-based integration instead of SCIM push.',
         title: 'Google Workspace connections are not supported here',
       },
       warning__ssoInactive:
@@ -299,7 +298,7 @@ export const enUS: LocalizationResource = {
       error__loadUsers: 'Could not load provisioned users',
       note: 'only users with an email address from a configured domain will be processed.',
       noteLabel: 'Note:',
-      subtitle: 'Assign or push a test user from {{provider}} to verify provisioning reaches Clerk.',
+      subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',
       title: 'Test provisioning',
     },
   },
