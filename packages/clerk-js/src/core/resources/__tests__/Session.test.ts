@@ -744,6 +744,100 @@ describe('Session', () => {
         await vi.advanceTimersByTimeAsync(0);
       });
 
+      it.each([false, true])(
+        'ignores a background refresh after cache clear (replacement fetched: %s)',
+        async replacement => {
+          const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+          const session = new Session({
+            status: 'active',
+            id: 'session_1',
+            object: 'session',
+            user: createUser({}),
+            last_active_organization_id: null,
+            last_active_token: { object: 'token', jwt: mockJwt },
+            actor: null,
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as SessionJSON);
+          await Promise.resolve();
+          const jwt = (origin: number) => {
+            const encode = (value: object) => btoa(JSON.stringify(value)).replace(/=/g, '');
+            return `${encode({ alg: 'none', oiat: origin })}.${encode({ sid: 'session_1', iat: 1666648250, exp: 1666649250 })}.fixture`;
+          };
+          const late = jwt(200);
+          const fresh = jwt(100);
+          let release!: (value: unknown) => void;
+          requestSpy.mockReturnValueOnce(
+            new Promise(resolve => {
+              release = resolve;
+            }),
+          );
+          await vi.advanceTimersByTimeAsync(44 * 1000);
+          expect(release).toBeDefined();
+          session.clearCache();
+          requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: fresh }, status: 200 });
+          if (replacement) expect(await session.getToken()).toBe(fresh);
+          release({ payload: { object: 'token', jwt: late }, status: 200 });
+          await vi.advanceTimersByTimeAsync(0);
+          expect(session.lastActiveToken?.getRawString()).toBe(replacement ? fresh : mockJwt);
+          expect(await session.getToken()).toBe(fresh);
+        },
+      );
+
+      it("a cleared refresh neither blocks nor releases the next cache lifetime's refresh", async () => {
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+        const jwt = (origin: number) => {
+          const now = Math.floor(Date.now() / 1000);
+          const encode = (value: object) => btoa(JSON.stringify(value)).replace(/=/g, '');
+          return `${encode({ alg: 'none', oiat: origin })}.${encode({ sid: 'session_1', iat: now, exp: now + 60 })}.fixture`;
+        };
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        } as SessionJSON);
+        await Promise.resolve();
+        requestSpy.mockClear();
+        let releaseOld!: (value: unknown) => void;
+        requestSpy.mockReturnValueOnce(
+          new Promise(resolve => {
+            releaseOld = resolve;
+          }),
+        );
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+        expect(releaseOld).toBeDefined();
+        session.clearCache();
+        const replacement = jwt(100);
+        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: replacement }, status: 200 });
+        expect(await session.getToken()).toBe(replacement);
+        let releaseNew!: (value: unknown) => void;
+        requestSpy.mockReturnValueOnce(
+          new Promise(resolve => {
+            releaseNew = resolve;
+          }),
+        );
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+        expect(releaseNew).toBeDefined();
+        releaseOld({ payload: { object: 'token', jwt: jwt(500) }, status: 200 });
+        await vi.advanceTimersByTimeAsync(0);
+        const renewed = jwt(200);
+        requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: renewed }, status: 200 });
+        expect(await session.getToken({ skipCache: true })).toBe(renewed);
+        await vi.advanceTimersByTimeAsync(44 * 1000);
+        // The replacement background request is still pending; the later timer must coalesce.
+        expect(requestSpy).toHaveBeenCalledTimes(4);
+        const completed = jwt(300);
+        releaseNew({ payload: { object: 'token', jwt: completed }, status: 200 });
+        await vi.advanceTimersByTimeAsync(0);
+        expect(await session.getToken()).toBe(completed);
+      });
+
       it('continues returning tokens after timer-triggered refresh failure', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;

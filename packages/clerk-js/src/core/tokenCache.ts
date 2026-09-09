@@ -69,6 +69,8 @@ export interface TokenCacheGetResult {
 }
 
 export interface TokenCache {
+  /** Identifies the cache lifetime for asynchronous work started before set(). */
+  getGeneration(): number;
   /**
    * Removes all cached entries and clears associated timeouts.
    * Side effects: Clears all scheduled expiration timers and empties the cache.
@@ -519,7 +521,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     return store.size();
   };
 
-  return { clear, close, get, set, size };
+  return { clear, close, get, set, size, getGeneration: () => generation };
 };
 
 export const SessionTokenCache = MemoryTokenCache();

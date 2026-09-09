@@ -62,10 +62,10 @@ export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
 
   /**
-   * Tracks token IDs with in-flight background refresh requests.
-   * Prevents multiple concurrent background refreshes for the same token.
+   * Tracks token IDs and cache lifetimes with in-flight background refresh requests.
+   * Prevents duplicate refreshes without letting invalidated work block a new lifetime.
    */
-  static #backgroundRefreshInProgress = new Set<string>();
+  static #backgroundRefreshInProgress = new Map<string, number>();
 
   id!: string;
   status!: SessionStatus;
@@ -572,7 +572,7 @@ export class Session extends BaseResource implements SessionResource {
    * This allows concurrent getToken() calls to continue returning the stale cached token
    * while the refresh is in progress. The cache is only updated after the refresh succeeds.
    *
-   * Uses a static Set to prevent multiple concurrent background refreshes for the same token.
+   * Tracks each cache lifetime to prevent duplicate refreshes for the same token.
    */
   #refreshTokenInBackground(
     template: string | undefined,
@@ -583,11 +583,12 @@ export class Session extends BaseResource implements SessionResource {
     if (isNativeApplicationActive() === false) return;
 
     // Prevent multiple concurrent background refreshes for the same token
-    if (Session.#backgroundRefreshInProgress.has(tokenId)) {
+    const cacheGeneration = SessionTokenCache.getGeneration();
+    if (Session.#backgroundRefreshInProgress.get(tokenId) === cacheGeneration) {
       return;
     }
 
-    Session.#backgroundRefreshInProgress.add(tokenId);
+    Session.#backgroundRefreshInProgress.set(tokenId, cacheGeneration);
 
     // Mobile only: skip this refresh if the token is already expired.
     // On iOS, the OS throttles background JS threads for hours (e.g. overnight audio apps).
@@ -609,6 +610,9 @@ export class Session extends BaseResource implements SessionResource {
     // This allows concurrent calls to continue using the stale token
     tokenResolver
       .then(token => {
+        if (SessionTokenCache.getGeneration() !== cacheGeneration) {
+          return;
+        }
         // Never cache or dispatch empty tokens — preserve the stale-but-valid
         // token in cache instead of replacing it with an empty one.
         if (!token.getRawString()) {
@@ -631,7 +635,9 @@ export class Session extends BaseResource implements SessionResource {
         debugLogger.warn('Background token refresh failed', { error, tokenId }, 'session');
       })
       .finally(() => {
-        Session.#backgroundRefreshInProgress.delete(tokenId);
+        if (Session.#backgroundRefreshInProgress.get(tokenId) === cacheGeneration) {
+          Session.#backgroundRefreshInProgress.delete(tokenId);
+        }
       });
   }
 
