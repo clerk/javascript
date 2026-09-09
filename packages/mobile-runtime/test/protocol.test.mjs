@@ -197,3 +197,12 @@ test('background is nonfatal and foreground recovers resources through the core'
     false,
   );
 });
+
+test('native settings are projected from the owner with typed configuration', async t => {
+  const f = await fixture();
+  t.after(f.dispose);
+  const environment = f.resource(f.state.roots.clerk).environment;
+  assert.equal(environment.userSettings.signUp.mode, 'public');
+  assert.equal(environment.userSettings.attributes.email_address.enabled, false);
+  assert.equal(environment.displayConfig.applicationName, 'TestApp');
+});

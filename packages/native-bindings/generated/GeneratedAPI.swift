@@ -5,14 +5,16 @@ import Observation
 public struct ClerkState: Sendable {
   public let `status`: ClerkStatus
   public let `loaded`: Bool
+  public let `environment`: MobileEnvironment
   public let `session`: Session?
   public let `user`: User?
   public let `organization`: Organization?
   public let `signIn`: SignIn
   public let `signUp`: SignUp
-  public init(`status`: ClerkStatus, `loaded`: Bool, `session`: Session?, `user`: User?, `organization`: Organization?, `signIn`: SignIn, `signUp`: SignUp) {
+  public init(`status`: ClerkStatus, `loaded`: Bool, `environment`: MobileEnvironment, `session`: Session?, `user`: User?, `organization`: Organization?, `signIn`: SignIn, `signUp`: SignUp) {
     self.`status` = `status`
     self.`loaded` = `loaded`
+    self.`environment` = `environment`
     self.`session` = `session`
     self.`user` = `user`
     self.`organization` = `organization`
@@ -23,6 +25,7 @@ public struct ClerkState: Sendable {
     let values: [String: JSONValue] = [
       "status": try self.`status`.encode(),
       "loaded": .bool(self.`loaded`),
+      "environment": try self.`environment`.encode(),
       "session": try self.`session`.map { value in try value.encode() } ?? .null,
       "user": try self.`user`.map { value in try value.encode() } ?? .null,
       "organization": try self.`organization`.map { value in try value.encode() } ?? .null,
@@ -34,7 +37,7 @@ public struct ClerkState: Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ClerkState {
     let values = try value.object()
 
-    return try ClerkState(`status`: try ClerkStatus.decode((values["status"] ?? .undefined), in: runtime), `loaded`: try (values["loaded"] ?? .undefined).bool(), `session`: try (values["session"] ?? .undefined).optional { value in try Session.decode(value, in: runtime) }, `user`: try (values["user"] ?? .undefined).optional { value in try User.decode(value, in: runtime) }, `organization`: try (values["organization"] ?? .undefined).optional { value in try Organization.decode(value, in: runtime) }, `signIn`: try SignIn.decode((values["signIn"] ?? .undefined), in: runtime), `signUp`: try SignUp.decode((values["signUp"] ?? .undefined), in: runtime))
+    return try ClerkState(`status`: try ClerkStatus.decode((values["status"] ?? .undefined), in: runtime), `loaded`: try (values["loaded"] ?? .undefined).bool(), `environment`: try MobileEnvironment.decode((values["environment"] ?? .undefined), in: runtime), `session`: try (values["session"] ?? .undefined).optional { value in try Session.decode(value, in: runtime) }, `user`: try (values["user"] ?? .undefined).optional { value in try User.decode(value, in: runtime) }, `organization`: try (values["organization"] ?? .undefined).optional { value in try Organization.decode(value, in: runtime) }, `signIn`: try SignIn.decode((values["signIn"] ?? .undefined), in: runtime), `signUp`: try SignUp.decode((values["signUp"] ?? .undefined), in: runtime))
   }
 }
 @MainActor @Observable public final class Clerk: CoreResource {
@@ -45,6 +48,7 @@ public struct ClerkState: Sendable {
   public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: true) }
   public var `status`: ClerkStatus { state.`status` }
   public var `loaded`: Bool { state.`loaded` }
+  public var `environment`: MobileEnvironment { state.`environment` }
   public var `session`: Session? { state.`session` }
   public var `user`: User? { state.`user` }
   public var `organization`: Organization? { state.`organization` }
@@ -2651,6 +2655,1347 @@ public struct ClerkPaginatedResponseBillingPaymentMethod: Sendable {
   }
 }
 
+public struct MobileEnvironment: Sendable {
+  public let `organizationSettings`: OrganizationSettings
+  public let `authConfig`: AuthConfig
+  public let `displayConfig`: DisplayConfig
+  public let `maintenanceMode`: Bool
+  public let `userSettings`: MobileUserSettings
+  public init(`organizationSettings`: OrganizationSettings, `authConfig`: AuthConfig, `displayConfig`: DisplayConfig, `maintenanceMode`: Bool, `userSettings`: MobileUserSettings) {
+    self.`organizationSettings` = `organizationSettings`
+    self.`authConfig` = `authConfig`
+    self.`displayConfig` = `displayConfig`
+    self.`maintenanceMode` = `maintenanceMode`
+    self.`userSettings` = `userSettings`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "organizationSettings": try self.`organizationSettings`.encode(),
+      "authConfig": try self.`authConfig`.encode(),
+      "displayConfig": try self.`displayConfig`.encode(),
+      "maintenanceMode": .bool(self.`maintenanceMode`),
+      "userSettings": try self.`userSettings`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileEnvironment {
+    let values = try value.object()
+
+    return try MobileEnvironment(`organizationSettings`: try OrganizationSettings.decode((values["organizationSettings"] ?? .undefined), in: runtime), `authConfig`: try AuthConfig.decode((values["authConfig"] ?? .undefined), in: runtime), `displayConfig`: try DisplayConfig.decode((values["displayConfig"] ?? .undefined), in: runtime), `maintenanceMode`: try (values["maintenanceMode"] ?? .undefined).bool(), `userSettings`: try MobileUserSettings.decode((values["userSettings"] ?? .undefined), in: runtime))
+  }
+}
+
+/// The `OrganizationSettings` object holds the Organization-related settings configured for the instance.
+public struct OrganizationSettings: Sendable {
+  public let `enabled`: Bool
+  public let `maxAllowedMemberships`: Double
+  public let `forceOrganizationSelection`: Bool
+  public let `actions`: OrganizationSettingsActions
+  public let `domains`: OrganizationSettingsDomains
+  public let `slug`: OrganizationSettingsSlug
+  public let `organizationCreationDefaults`: OrganizationSettingsOrganizationCreationDefaults
+  public let `id`: String?
+  public init(`enabled`: Bool, `maxAllowedMemberships`: Double, `forceOrganizationSelection`: Bool, `actions`: OrganizationSettingsActions, `domains`: OrganizationSettingsDomains, `slug`: OrganizationSettingsSlug, `organizationCreationDefaults`: OrganizationSettingsOrganizationCreationDefaults, `id`: String? = nil) {
+    self.`enabled` = `enabled`
+    self.`maxAllowedMemberships` = `maxAllowedMemberships`
+    self.`forceOrganizationSelection` = `forceOrganizationSelection`
+    self.`actions` = `actions`
+    self.`domains` = `domains`
+    self.`slug` = `slug`
+    self.`organizationCreationDefaults` = `organizationCreationDefaults`
+    self.`id` = `id`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enabled": .bool(self.`enabled`),
+      "maxAllowedMemberships": .number(self.`maxAllowedMemberships`),
+      "forceOrganizationSelection": .bool(self.`forceOrganizationSelection`),
+      "actions": try self.`actions`.encode(),
+      "domains": try self.`domains`.encode(),
+      "slug": try self.`slug`.encode(),
+      "organizationCreationDefaults": try self.`organizationCreationDefaults`.encode(),
+      "id": try self.`id`.map { value in .string(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OrganizationSettings {
+    let values = try value.object()
+
+    return try OrganizationSettings(`enabled`: try (values["enabled"] ?? .undefined).bool(), `maxAllowedMemberships`: try (values["maxAllowedMemberships"] ?? .undefined).number(), `forceOrganizationSelection`: try (values["forceOrganizationSelection"] ?? .undefined).bool(), `actions`: try OrganizationSettingsActions.decode((values["actions"] ?? .undefined), in: runtime), `domains`: try OrganizationSettingsDomains.decode((values["domains"] ?? .undefined), in: runtime), `slug`: try OrganizationSettingsSlug.decode((values["slug"] ?? .undefined), in: runtime), `organizationCreationDefaults`: try OrganizationSettingsOrganizationCreationDefaults.decode((values["organizationCreationDefaults"] ?? .undefined), in: runtime), `id`: try (values["id"] ?? .undefined).optional { value in try value.string() })
+  }
+}
+
+public struct OrganizationSettingsActions: Sendable {
+  public let `adminDelete`: Bool
+  public init(`adminDelete`: Bool) {
+    self.`adminDelete` = `adminDelete`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "adminDelete": .bool(self.`adminDelete`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OrganizationSettingsActions {
+    let values = try value.object()
+
+    return try OrganizationSettingsActions(`adminDelete`: try (values["adminDelete"] ?? .undefined).bool())
+  }
+}
+
+public struct OrganizationSettingsDomains: Sendable {
+  public let `enabled`: Bool
+  public let `enrollmentModes`: [OrganizationEnrollmentMode]
+  public let `defaultRole`: String?
+  public init(`enabled`: Bool, `enrollmentModes`: [OrganizationEnrollmentMode], `defaultRole`: String?) {
+    self.`enabled` = `enabled`
+    self.`enrollmentModes` = `enrollmentModes`
+    self.`defaultRole` = `defaultRole`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enabled": .bool(self.`enabled`),
+      "enrollmentModes": .array(try self.`enrollmentModes`.map { value in try value.encode() }),
+      "defaultRole": try self.`defaultRole`.map { value in .string(value) } ?? .null
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OrganizationSettingsDomains {
+    let values = try value.object()
+
+    return try OrganizationSettingsDomains(`enabled`: try (values["enabled"] ?? .undefined).bool(), `enrollmentModes`: try (values["enrollmentModes"] ?? .undefined).array().map { value in try OrganizationEnrollmentMode.decode(value, in: runtime) }, `defaultRole`: try (values["defaultRole"] ?? .undefined).optional { value in try value.string() })
+  }
+}
+
+public struct OrganizationSettingsSlug: Sendable {
+  public let `disabled`: Bool
+  public init(`disabled`: Bool) {
+    self.`disabled` = `disabled`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "disabled": .bool(self.`disabled`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OrganizationSettingsSlug {
+    let values = try value.object()
+
+    return try OrganizationSettingsSlug(`disabled`: try (values["disabled"] ?? .undefined).bool())
+  }
+}
+
+public struct OrganizationSettingsOrganizationCreationDefaults: Sendable {
+  public let `enabled`: Bool
+  public init(`enabled`: Bool) {
+    self.`enabled` = `enabled`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enabled": .bool(self.`enabled`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OrganizationSettingsOrganizationCreationDefaults {
+    let values = try value.object()
+
+    return try OrganizationSettingsOrganizationCreationDefaults(`enabled`: try (values["enabled"] ?? .undefined).bool())
+  }
+}
+
+public struct AuthConfig: Sendable {
+  public let `singleSessionMode`: Bool
+  public let `claimedAt`: Date?
+  public let `reverification`: Bool
+  public let `preferredChannels`: [String: PhoneCodeChannel]?
+  public let `sessionMinter`: Bool
+  public let `id`: String?
+  public init(`singleSessionMode`: Bool, `claimedAt`: Date?, `reverification`: Bool, `preferredChannels`: [String: PhoneCodeChannel]?, `sessionMinter`: Bool, `id`: String? = nil) {
+    self.`singleSessionMode` = `singleSessionMode`
+    self.`claimedAt` = `claimedAt`
+    self.`reverification` = `reverification`
+    self.`preferredChannels` = `preferredChannels`
+    self.`sessionMinter` = `sessionMinter`
+    self.`id` = `id`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "singleSessionMode": .bool(self.`singleSessionMode`),
+      "claimedAt": try self.`claimedAt`.map { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) } ?? .null,
+      "reverification": .bool(self.`reverification`),
+      "preferredChannels": try self.`preferredChannels`.map { value in .object(try value.mapValues { value in try value.encode() }) } ?? .null,
+      "sessionMinter": .bool(self.`sessionMinter`),
+      "id": try self.`id`.map { value in .string(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> AuthConfig {
+    let values = try value.object()
+
+    return try AuthConfig(`singleSessionMode`: try (values["singleSessionMode"] ?? .undefined).bool(), `claimedAt`: try (values["claimedAt"] ?? .undefined).optional { value in try value.date() }, `reverification`: try (values["reverification"] ?? .undefined).bool(), `preferredChannels`: try (values["preferredChannels"] ?? .undefined).optional { value in try value.object().mapValues { value in try PhoneCodeChannel.decode(value, in: runtime) } }, `sessionMinter`: try (values["sessionMinter"] ?? .undefined).bool(), `id`: try (values["id"] ?? .undefined).optional { value in try value.string() })
+  }
+}
+
+public enum PhoneCodeChannel: Hashable, Sendable {
+  case `sms`
+  case `whatsapp`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`sms`: return "sms"
+    case .`whatsapp`: return "whatsapp"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "sms": self = .`sms`
+    case "whatsapp": self = .`whatsapp`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PhoneCodeChannel { .init(rawValue: try value.string()) }
+}
+
+public struct DisplayConfig: Sendable {
+  public let `id`: String
+  public let `afterSignInUrl`: String
+  public let `afterSignOutAllUrl`: String
+  public let `afterSignOutOneUrl`: String
+  public let `afterSignUpUrl`: String
+  public let `afterSwitchSessionUrl`: String
+  public let `applicationName`: String
+  public let `backendHost`: String
+  public let `branded`: Bool
+  public let `captchaPublicKey`: String?
+  public let `captchaWidgetType`: DisplayConfigCaptchaWidgetType?
+  public var `captchaProvider`: String { "turnstile" }
+  public let `captchaPublicKeyInvisible`: String?
+  public let `captchaOauthBypass`: [OAuthStrategy]
+  public let `captchaHeartbeat`: Bool
+  public let `captchaHeartbeatIntervalMs`: Double?
+  public let `homeUrl`: String
+  public let `instanceEnvironmentType`: String
+  public let `logoImageUrl`: String
+  public let `faviconImageUrl`: String
+  public let `preferredSignInStrategy`: PreferredSignInStrategy
+  public let `signInUrl`: String
+  public let `signUpUrl`: String
+  public let `supportEmail`: String
+  public let `theme`: DisplayThemeJSON
+  public let `userProfileUrl`: String
+  public let `clerkJSVersion`: String?
+  public let `organizationProfileUrl`: String
+  public let `createOrganizationUrl`: String
+  public let `afterLeaveOrganizationUrl`: String
+  public let `afterCreateOrganizationUrl`: String
+  public let `googleOneTapClientId`: String?
+  public let `showDevModeWarning`: Bool
+  public let `termsUrl`: String
+  public let `privacyPolicyUrl`: String
+  public let `waitlistUrl`: String
+  public let `afterJoinWaitlistUrl`: String
+  public init(`id`: String, `afterSignInUrl`: String, `afterSignOutAllUrl`: String, `afterSignOutOneUrl`: String, `afterSignUpUrl`: String, `afterSwitchSessionUrl`: String, `applicationName`: String, `backendHost`: String, `branded`: Bool, `captchaPublicKey`: String?, `captchaWidgetType`: DisplayConfigCaptchaWidgetType?, `captchaPublicKeyInvisible`: String?, `captchaOauthBypass`: [OAuthStrategy], `captchaHeartbeat`: Bool, `captchaHeartbeatIntervalMs`: Double? = nil, `homeUrl`: String, `instanceEnvironmentType`: String, `logoImageUrl`: String, `faviconImageUrl`: String, `preferredSignInStrategy`: PreferredSignInStrategy, `signInUrl`: String, `signUpUrl`: String, `supportEmail`: String, `theme`: DisplayThemeJSON, `userProfileUrl`: String, `clerkJSVersion`: String? = nil, `organizationProfileUrl`: String, `createOrganizationUrl`: String, `afterLeaveOrganizationUrl`: String, `afterCreateOrganizationUrl`: String, `googleOneTapClientId`: String? = nil, `showDevModeWarning`: Bool, `termsUrl`: String, `privacyPolicyUrl`: String, `waitlistUrl`: String, `afterJoinWaitlistUrl`: String) {
+    self.`id` = `id`
+    self.`afterSignInUrl` = `afterSignInUrl`
+    self.`afterSignOutAllUrl` = `afterSignOutAllUrl`
+    self.`afterSignOutOneUrl` = `afterSignOutOneUrl`
+    self.`afterSignUpUrl` = `afterSignUpUrl`
+    self.`afterSwitchSessionUrl` = `afterSwitchSessionUrl`
+    self.`applicationName` = `applicationName`
+    self.`backendHost` = `backendHost`
+    self.`branded` = `branded`
+    self.`captchaPublicKey` = `captchaPublicKey`
+    self.`captchaWidgetType` = `captchaWidgetType`
+    self.`captchaPublicKeyInvisible` = `captchaPublicKeyInvisible`
+    self.`captchaOauthBypass` = `captchaOauthBypass`
+    self.`captchaHeartbeat` = `captchaHeartbeat`
+    self.`captchaHeartbeatIntervalMs` = `captchaHeartbeatIntervalMs`
+    self.`homeUrl` = `homeUrl`
+    self.`instanceEnvironmentType` = `instanceEnvironmentType`
+    self.`logoImageUrl` = `logoImageUrl`
+    self.`faviconImageUrl` = `faviconImageUrl`
+    self.`preferredSignInStrategy` = `preferredSignInStrategy`
+    self.`signInUrl` = `signInUrl`
+    self.`signUpUrl` = `signUpUrl`
+    self.`supportEmail` = `supportEmail`
+    self.`theme` = `theme`
+    self.`userProfileUrl` = `userProfileUrl`
+    self.`clerkJSVersion` = `clerkJSVersion`
+    self.`organizationProfileUrl` = `organizationProfileUrl`
+    self.`createOrganizationUrl` = `createOrganizationUrl`
+    self.`afterLeaveOrganizationUrl` = `afterLeaveOrganizationUrl`
+    self.`afterCreateOrganizationUrl` = `afterCreateOrganizationUrl`
+    self.`googleOneTapClientId` = `googleOneTapClientId`
+    self.`showDevModeWarning` = `showDevModeWarning`
+    self.`termsUrl` = `termsUrl`
+    self.`privacyPolicyUrl` = `privacyPolicyUrl`
+    self.`waitlistUrl` = `waitlistUrl`
+    self.`afterJoinWaitlistUrl` = `afterJoinWaitlistUrl`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "id": .string(self.`id`),
+      "afterSignInUrl": .string(self.`afterSignInUrl`),
+      "afterSignOutAllUrl": .string(self.`afterSignOutAllUrl`),
+      "afterSignOutOneUrl": .string(self.`afterSignOutOneUrl`),
+      "afterSignUpUrl": .string(self.`afterSignUpUrl`),
+      "afterSwitchSessionUrl": .string(self.`afterSwitchSessionUrl`),
+      "applicationName": .string(self.`applicationName`),
+      "backendHost": .string(self.`backendHost`),
+      "branded": .bool(self.`branded`),
+      "captchaPublicKey": try self.`captchaPublicKey`.map { value in .string(value) } ?? .null,
+      "captchaWidgetType": try self.`captchaWidgetType`.map { value in try value.encode() } ?? .null,
+      "captchaProvider": .string("turnstile"),
+      "captchaPublicKeyInvisible": try self.`captchaPublicKeyInvisible`.map { value in .string(value) } ?? .null,
+      "captchaOauthBypass": .array(try self.`captchaOauthBypass`.map { value in try value.encode() }),
+      "captchaHeartbeat": .bool(self.`captchaHeartbeat`),
+      "captchaHeartbeatIntervalMs": try self.`captchaHeartbeatIntervalMs`.map { value in .number(value) } ?? .undefined,
+      "homeUrl": .string(self.`homeUrl`),
+      "instanceEnvironmentType": .string(self.`instanceEnvironmentType`),
+      "logoImageUrl": .string(self.`logoImageUrl`),
+      "faviconImageUrl": .string(self.`faviconImageUrl`),
+      "preferredSignInStrategy": try self.`preferredSignInStrategy`.encode(),
+      "signInUrl": .string(self.`signInUrl`),
+      "signUpUrl": .string(self.`signUpUrl`),
+      "supportEmail": .string(self.`supportEmail`),
+      "theme": try self.`theme`.encode(),
+      "userProfileUrl": .string(self.`userProfileUrl`),
+      "clerkJSVersion": try self.`clerkJSVersion`.map { value in .string(value) } ?? .undefined,
+      "organizationProfileUrl": .string(self.`organizationProfileUrl`),
+      "createOrganizationUrl": .string(self.`createOrganizationUrl`),
+      "afterLeaveOrganizationUrl": .string(self.`afterLeaveOrganizationUrl`),
+      "afterCreateOrganizationUrl": .string(self.`afterCreateOrganizationUrl`),
+      "googleOneTapClientId": try self.`googleOneTapClientId`.map { value in .string(value) } ?? .undefined,
+      "showDevModeWarning": .bool(self.`showDevModeWarning`),
+      "termsUrl": .string(self.`termsUrl`),
+      "privacyPolicyUrl": .string(self.`privacyPolicyUrl`),
+      "waitlistUrl": .string(self.`waitlistUrl`),
+      "afterJoinWaitlistUrl": .string(self.`afterJoinWaitlistUrl`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> DisplayConfig {
+    let values = try value.object()
+    guard values["captchaProvider"] == .string("turnstile") else { throw CoreError.invalidValue }
+    return try DisplayConfig(`id`: try (values["id"] ?? .undefined).string(), `afterSignInUrl`: try (values["afterSignInUrl"] ?? .undefined).string(), `afterSignOutAllUrl`: try (values["afterSignOutAllUrl"] ?? .undefined).string(), `afterSignOutOneUrl`: try (values["afterSignOutOneUrl"] ?? .undefined).string(), `afterSignUpUrl`: try (values["afterSignUpUrl"] ?? .undefined).string(), `afterSwitchSessionUrl`: try (values["afterSwitchSessionUrl"] ?? .undefined).string(), `applicationName`: try (values["applicationName"] ?? .undefined).string(), `backendHost`: try (values["backendHost"] ?? .undefined).string(), `branded`: try (values["branded"] ?? .undefined).bool(), `captchaPublicKey`: try (values["captchaPublicKey"] ?? .undefined).optional { value in try value.string() }, `captchaWidgetType`: try (values["captchaWidgetType"] ?? .undefined).optional { value in try DisplayConfigCaptchaWidgetType.decode(value, in: runtime) }, `captchaPublicKeyInvisible`: try (values["captchaPublicKeyInvisible"] ?? .undefined).optional { value in try value.string() }, `captchaOauthBypass`: try (values["captchaOauthBypass"] ?? .undefined).array().map { value in try OAuthStrategy.decode(value, in: runtime) }, `captchaHeartbeat`: try (values["captchaHeartbeat"] ?? .undefined).bool(), `captchaHeartbeatIntervalMs`: try (values["captchaHeartbeatIntervalMs"] ?? .undefined).optional { value in try value.number() }, `homeUrl`: try (values["homeUrl"] ?? .undefined).string(), `instanceEnvironmentType`: try (values["instanceEnvironmentType"] ?? .undefined).string(), `logoImageUrl`: try (values["logoImageUrl"] ?? .undefined).string(), `faviconImageUrl`: try (values["faviconImageUrl"] ?? .undefined).string(), `preferredSignInStrategy`: try PreferredSignInStrategy.decode((values["preferredSignInStrategy"] ?? .undefined), in: runtime), `signInUrl`: try (values["signInUrl"] ?? .undefined).string(), `signUpUrl`: try (values["signUpUrl"] ?? .undefined).string(), `supportEmail`: try (values["supportEmail"] ?? .undefined).string(), `theme`: try DisplayThemeJSON.decode((values["theme"] ?? .undefined), in: runtime), `userProfileUrl`: try (values["userProfileUrl"] ?? .undefined).string(), `clerkJSVersion`: try (values["clerkJSVersion"] ?? .undefined).optional { value in try value.string() }, `organizationProfileUrl`: try (values["organizationProfileUrl"] ?? .undefined).string(), `createOrganizationUrl`: try (values["createOrganizationUrl"] ?? .undefined).string(), `afterLeaveOrganizationUrl`: try (values["afterLeaveOrganizationUrl"] ?? .undefined).string(), `afterCreateOrganizationUrl`: try (values["afterCreateOrganizationUrl"] ?? .undefined).string(), `googleOneTapClientId`: try (values["googleOneTapClientId"] ?? .undefined).optional { value in try value.string() }, `showDevModeWarning`: try (values["showDevModeWarning"] ?? .undefined).bool(), `termsUrl`: try (values["termsUrl"] ?? .undefined).string(), `privacyPolicyUrl`: try (values["privacyPolicyUrl"] ?? .undefined).string(), `waitlistUrl`: try (values["waitlistUrl"] ?? .undefined).string(), `afterJoinWaitlistUrl`: try (values["afterJoinWaitlistUrl"] ?? .undefined).string())
+  }
+}
+
+public enum DisplayConfigCaptchaWidgetType: Hashable, Sendable {
+  case `smart`
+  case `invisible`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`smart`: return "smart"
+    case .`invisible`: return "invisible"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "smart": self = .`smart`
+    case "invisible": self = .`invisible`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> DisplayConfigCaptchaWidgetType { .init(rawValue: try value.string()) }
+}
+
+/// OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).
+public enum OAuthStrategy: Hashable, Sendable {
+  case `oauthFacebook`
+  case `oauthGoogle`
+  case `oauthHubspot`
+  case `oauthGithub`
+  case `oauthTiktok`
+  case `oauthGitlab`
+  case `oauthDiscord`
+  case `oauthTwitter`
+  case `oauthTwitch`
+  case `oauthLinkedin`
+  case `oauthLinkedinOidc`
+  case `oauthDropbox`
+  case `oauthAtlassian`
+  case `oauthBitbucket`
+  case `oauthMicrosoft`
+  case `oauthNotion`
+  case `oauthApple`
+  case `oauthLine`
+  case `oauthInstagram`
+  case `oauthCoinbase`
+  case `oauthSpotify`
+  case `oauthXero`
+  case `oauthBox`
+  case `oauthSlack`
+  case `oauthLinear`
+  case `oauthX`
+  case `oauthEnstall`
+  case `oauthHuggingface`
+  case `oauthVercel`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`oauthFacebook`: return "oauth_facebook"
+    case .`oauthGoogle`: return "oauth_google"
+    case .`oauthHubspot`: return "oauth_hubspot"
+    case .`oauthGithub`: return "oauth_github"
+    case .`oauthTiktok`: return "oauth_tiktok"
+    case .`oauthGitlab`: return "oauth_gitlab"
+    case .`oauthDiscord`: return "oauth_discord"
+    case .`oauthTwitter`: return "oauth_twitter"
+    case .`oauthTwitch`: return "oauth_twitch"
+    case .`oauthLinkedin`: return "oauth_linkedin"
+    case .`oauthLinkedinOidc`: return "oauth_linkedin_oidc"
+    case .`oauthDropbox`: return "oauth_dropbox"
+    case .`oauthAtlassian`: return "oauth_atlassian"
+    case .`oauthBitbucket`: return "oauth_bitbucket"
+    case .`oauthMicrosoft`: return "oauth_microsoft"
+    case .`oauthNotion`: return "oauth_notion"
+    case .`oauthApple`: return "oauth_apple"
+    case .`oauthLine`: return "oauth_line"
+    case .`oauthInstagram`: return "oauth_instagram"
+    case .`oauthCoinbase`: return "oauth_coinbase"
+    case .`oauthSpotify`: return "oauth_spotify"
+    case .`oauthXero`: return "oauth_xero"
+    case .`oauthBox`: return "oauth_box"
+    case .`oauthSlack`: return "oauth_slack"
+    case .`oauthLinear`: return "oauth_linear"
+    case .`oauthX`: return "oauth_x"
+    case .`oauthEnstall`: return "oauth_enstall"
+    case .`oauthHuggingface`: return "oauth_huggingface"
+    case .`oauthVercel`: return "oauth_vercel"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "oauth_facebook": self = .`oauthFacebook`
+    case "oauth_google": self = .`oauthGoogle`
+    case "oauth_hubspot": self = .`oauthHubspot`
+    case "oauth_github": self = .`oauthGithub`
+    case "oauth_tiktok": self = .`oauthTiktok`
+    case "oauth_gitlab": self = .`oauthGitlab`
+    case "oauth_discord": self = .`oauthDiscord`
+    case "oauth_twitter": self = .`oauthTwitter`
+    case "oauth_twitch": self = .`oauthTwitch`
+    case "oauth_linkedin": self = .`oauthLinkedin`
+    case "oauth_linkedin_oidc": self = .`oauthLinkedinOidc`
+    case "oauth_dropbox": self = .`oauthDropbox`
+    case "oauth_atlassian": self = .`oauthAtlassian`
+    case "oauth_bitbucket": self = .`oauthBitbucket`
+    case "oauth_microsoft": self = .`oauthMicrosoft`
+    case "oauth_notion": self = .`oauthNotion`
+    case "oauth_apple": self = .`oauthApple`
+    case "oauth_line": self = .`oauthLine`
+    case "oauth_instagram": self = .`oauthInstagram`
+    case "oauth_coinbase": self = .`oauthCoinbase`
+    case "oauth_spotify": self = .`oauthSpotify`
+    case "oauth_xero": self = .`oauthXero`
+    case "oauth_box": self = .`oauthBox`
+    case "oauth_slack": self = .`oauthSlack`
+    case "oauth_linear": self = .`oauthLinear`
+    case "oauth_x": self = .`oauthX`
+    case "oauth_enstall": self = .`oauthEnstall`
+    case "oauth_huggingface": self = .`oauthHuggingface`
+    case "oauth_vercel": self = .`oauthVercel`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OAuthStrategy { .init(rawValue: try value.string()) }
+}
+
+public enum PreferredSignInStrategy: Hashable, Sendable {
+  case `password`
+  case `otp`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`password`: return "password"
+    case .`otp`: return "otp"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "password": self = .`password`
+    case "otp": self = .`otp`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PreferredSignInStrategy { .init(rawValue: try value.string()) }
+}
+
+public struct DisplayThemeJSON: Sendable {
+  public let `general`: DisplayThemeJSONGeneral
+  public let `buttons`: DisplayThemeJSONButtons
+  public let `accounts`: DisplayThemeJSONAccounts
+  public init(`general`: DisplayThemeJSONGeneral, `buttons`: DisplayThemeJSONButtons, `accounts`: DisplayThemeJSONAccounts) {
+    self.`general` = `general`
+    self.`buttons` = `buttons`
+    self.`accounts` = `accounts`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "general": try self.`general`.encode(),
+      "buttons": try self.`buttons`.encode(),
+      "accounts": try self.`accounts`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> DisplayThemeJSON {
+    let values = try value.object()
+
+    return try DisplayThemeJSON(`general`: try DisplayThemeJSONGeneral.decode((values["general"] ?? .undefined), in: runtime), `buttons`: try DisplayThemeJSONButtons.decode((values["buttons"] ?? .undefined), in: runtime), `accounts`: try DisplayThemeJSONAccounts.decode((values["accounts"] ?? .undefined), in: runtime))
+  }
+}
+
+public struct DisplayThemeJSONGeneral: Sendable {
+  public let `color`: String
+  public let `backgroundColor`: Color
+  public let `fontFamily`: String
+  public let `fontColor`: String
+  public let `labelFontWeight`: String
+  public let `padding`: String
+  public let `borderRadius`: String
+  public let `boxShadow`: String
+  public init(`color`: String, `backgroundColor`: Color, `fontFamily`: String, `fontColor`: String, `labelFontWeight`: String, `padding`: String, `borderRadius`: String, `boxShadow`: String) {
+    self.`color` = `color`
+    self.`backgroundColor` = `backgroundColor`
+    self.`fontFamily` = `fontFamily`
+    self.`fontColor` = `fontColor`
+    self.`labelFontWeight` = `labelFontWeight`
+    self.`padding` = `padding`
+    self.`borderRadius` = `borderRadius`
+    self.`boxShadow` = `boxShadow`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "color": .string(self.`color`),
+      "background_color": try self.`backgroundColor`.encode(),
+      "font_family": .string(self.`fontFamily`),
+      "font_color": .string(self.`fontColor`),
+      "label_font_weight": .string(self.`labelFontWeight`),
+      "padding": .string(self.`padding`),
+      "border_radius": .string(self.`borderRadius`),
+      "box_shadow": .string(self.`boxShadow`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> DisplayThemeJSONGeneral {
+    let values = try value.object()
+
+    return try DisplayThemeJSONGeneral(`color`: try (values["color"] ?? .undefined).string(), `backgroundColor`: try Color.decode((values["background_color"] ?? .undefined), in: runtime), `fontFamily`: try (values["font_family"] ?? .undefined).string(), `fontColor`: try (values["font_color"] ?? .undefined).string(), `labelFontWeight`: try (values["label_font_weight"] ?? .undefined).string(), `padding`: try (values["padding"] ?? .undefined).string(), `borderRadius`: try (values["border_radius"] ?? .undefined).string(), `boxShadow`: try (values["box_shadow"] ?? .undefined).string())
+  }
+}
+
+public indirect enum Color: Sendable {
+  case case1(String)
+  case case2(HslaColor)
+  case case3(RgbaColor)
+  @MainActor public func encode() throws -> JSONValue {
+    switch self {
+    case .case1(let value): return .object(["$case": .number(0), "value": .string(value)])
+    case .case2(let value): return .object(["$case": .number(1), "value": try value.encode()])
+    case .case3(let value): return .object(["$case": .number(2), "value": try value.encode()])
+    }
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> Color {
+    let values = try value.object()
+    let payload = values["value"] ?? .undefined
+    switch try (values["$case"] ?? .undefined).number() {
+    case 0: return .case1(try payload.string())
+    case 1: return .case2(try HslaColor.decode(payload, in: runtime))
+    case 2: return .case3(try RgbaColor.decode(payload, in: runtime))
+    default: throw CoreError.invalidValue
+    }
+  }
+}
+
+public struct HslaColor: Sendable {
+  public let `h`: Double
+  public let `s`: Double
+  public let `l`: Double
+  public let `a`: Double?
+  public init(`h`: Double, `s`: Double, `l`: Double, `a`: Double? = nil) {
+    self.`h` = `h`
+    self.`s` = `s`
+    self.`l` = `l`
+    self.`a` = `a`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "h": .number(self.`h`),
+      "s": .number(self.`s`),
+      "l": .number(self.`l`),
+      "a": try self.`a`.map { value in .number(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> HslaColor {
+    let values = try value.object()
+
+    return try HslaColor(`h`: try (values["h"] ?? .undefined).number(), `s`: try (values["s"] ?? .undefined).number(), `l`: try (values["l"] ?? .undefined).number(), `a`: try (values["a"] ?? .undefined).optional { value in try value.number() })
+  }
+}
+
+public struct RgbaColor: Sendable {
+  public let `r`: Double
+  public let `g`: Double
+  public let `b`: Double
+  public let `a`: Double?
+  public init(`r`: Double, `g`: Double, `b`: Double, `a`: Double? = nil) {
+    self.`r` = `r`
+    self.`g` = `g`
+    self.`b` = `b`
+    self.`a` = `a`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "r": .number(self.`r`),
+      "g": .number(self.`g`),
+      "b": .number(self.`b`),
+      "a": try self.`a`.map { value in .number(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> RgbaColor {
+    let values = try value.object()
+
+    return try RgbaColor(`r`: try (values["r"] ?? .undefined).number(), `g`: try (values["g"] ?? .undefined).number(), `b`: try (values["b"] ?? .undefined).number(), `a`: try (values["a"] ?? .undefined).optional { value in try value.number() })
+  }
+}
+
+public struct DisplayThemeJSONButtons: Sendable {
+  public let `fontColor`: String
+  public let `fontFamily`: String
+  public let `fontWeight`: String
+  public init(`fontColor`: String, `fontFamily`: String, `fontWeight`: String) {
+    self.`fontColor` = `fontColor`
+    self.`fontFamily` = `fontFamily`
+    self.`fontWeight` = `fontWeight`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "font_color": .string(self.`fontColor`),
+      "font_family": .string(self.`fontFamily`),
+      "font_weight": .string(self.`fontWeight`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> DisplayThemeJSONButtons {
+    let values = try value.object()
+
+    return try DisplayThemeJSONButtons(`fontColor`: try (values["font_color"] ?? .undefined).string(), `fontFamily`: try (values["font_family"] ?? .undefined).string(), `fontWeight`: try (values["font_weight"] ?? .undefined).string())
+  }
+}
+
+public struct DisplayThemeJSONAccounts: Sendable {
+  public let `backgroundColor`: Color
+  public init(`backgroundColor`: Color) {
+    self.`backgroundColor` = `backgroundColor`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "background_color": try self.`backgroundColor`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> DisplayThemeJSONAccounts {
+    let values = try value.object()
+
+    return try DisplayThemeJSONAccounts(`backgroundColor`: try Color.decode((values["background_color"] ?? .undefined), in: runtime))
+  }
+}
+
+public struct MobileUserSettings: Sendable {
+  public let `enterpriseSSO`: EnterpriseSSOSettings
+  public let `attributes`: Attributes
+  public let `actions`: Actions
+  public let `signIn`: SignInData
+  public let `signUp`: SignUpData
+  public let `passwordSettings`: PasswordSettingsData
+  public let `usernameSettings`: UsernameSettingsData
+  public let `attackProtection`: AttackProtectionData
+  public let `passkeySettings`: PasskeySettingsData
+  public let `socialProviderStrategies`: [OAuthStrategy]
+  public let `authenticatableSocialStrategies`: [OAuthStrategy]
+  public let `web3FirstFactors`: [MobileUserSettingsWeb3FirstFactorsElement]
+  public let `alternativePhoneCodeChannels`: [PhoneCodeChannel]
+  public let `enabledFirstFactorIdentifiers`: [Attribute]
+  public let `instanceIsPasswordBased`: Bool
+  public let `hasValidAuthFactor`: Bool
+  public let `social`: PartialOAuthProviders
+  public init(`enterpriseSSO`: EnterpriseSSOSettings, `attributes`: Attributes, `actions`: Actions, `signIn`: SignInData, `signUp`: SignUpData, `passwordSettings`: PasswordSettingsData, `usernameSettings`: UsernameSettingsData, `attackProtection`: AttackProtectionData, `passkeySettings`: PasskeySettingsData, `socialProviderStrategies`: [OAuthStrategy], `authenticatableSocialStrategies`: [OAuthStrategy], `web3FirstFactors`: [MobileUserSettingsWeb3FirstFactorsElement], `alternativePhoneCodeChannels`: [PhoneCodeChannel], `enabledFirstFactorIdentifiers`: [Attribute], `instanceIsPasswordBased`: Bool, `hasValidAuthFactor`: Bool, `social`: PartialOAuthProviders) {
+    self.`enterpriseSSO` = `enterpriseSSO`
+    self.`attributes` = `attributes`
+    self.`actions` = `actions`
+    self.`signIn` = `signIn`
+    self.`signUp` = `signUp`
+    self.`passwordSettings` = `passwordSettings`
+    self.`usernameSettings` = `usernameSettings`
+    self.`attackProtection` = `attackProtection`
+    self.`passkeySettings` = `passkeySettings`
+    self.`socialProviderStrategies` = `socialProviderStrategies`
+    self.`authenticatableSocialStrategies` = `authenticatableSocialStrategies`
+    self.`web3FirstFactors` = `web3FirstFactors`
+    self.`alternativePhoneCodeChannels` = `alternativePhoneCodeChannels`
+    self.`enabledFirstFactorIdentifiers` = `enabledFirstFactorIdentifiers`
+    self.`instanceIsPasswordBased` = `instanceIsPasswordBased`
+    self.`hasValidAuthFactor` = `hasValidAuthFactor`
+    self.`social` = `social`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enterpriseSSO": try self.`enterpriseSSO`.encode(),
+      "attributes": try self.`attributes`.encode(),
+      "actions": try self.`actions`.encode(),
+      "signIn": try self.`signIn`.encode(),
+      "signUp": try self.`signUp`.encode(),
+      "passwordSettings": try self.`passwordSettings`.encode(),
+      "usernameSettings": try self.`usernameSettings`.encode(),
+      "attackProtection": try self.`attackProtection`.encode(),
+      "passkeySettings": try self.`passkeySettings`.encode(),
+      "socialProviderStrategies": .array(try self.`socialProviderStrategies`.map { value in try value.encode() }),
+      "authenticatableSocialStrategies": .array(try self.`authenticatableSocialStrategies`.map { value in try value.encode() }),
+      "web3FirstFactors": .array(try self.`web3FirstFactors`.map { value in try value.encode() }),
+      "alternativePhoneCodeChannels": .array(try self.`alternativePhoneCodeChannels`.map { value in try value.encode() }),
+      "enabledFirstFactorIdentifiers": .array(try self.`enabledFirstFactorIdentifiers`.map { value in try value.encode() }),
+      "instanceIsPasswordBased": .bool(self.`instanceIsPasswordBased`),
+      "hasValidAuthFactor": .bool(self.`hasValidAuthFactor`),
+      "social": try self.`social`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileUserSettings {
+    let values = try value.object()
+
+    return try MobileUserSettings(`enterpriseSSO`: try EnterpriseSSOSettings.decode((values["enterpriseSSO"] ?? .undefined), in: runtime), `attributes`: try Attributes.decode((values["attributes"] ?? .undefined), in: runtime), `actions`: try Actions.decode((values["actions"] ?? .undefined), in: runtime), `signIn`: try SignInData.decode((values["signIn"] ?? .undefined), in: runtime), `signUp`: try SignUpData.decode((values["signUp"] ?? .undefined), in: runtime), `passwordSettings`: try PasswordSettingsData.decode((values["passwordSettings"] ?? .undefined), in: runtime), `usernameSettings`: try UsernameSettingsData.decode((values["usernameSettings"] ?? .undefined), in: runtime), `attackProtection`: try AttackProtectionData.decode((values["attackProtection"] ?? .undefined), in: runtime), `passkeySettings`: try PasskeySettingsData.decode((values["passkeySettings"] ?? .undefined), in: runtime), `socialProviderStrategies`: try (values["socialProviderStrategies"] ?? .undefined).array().map { value in try OAuthStrategy.decode(value, in: runtime) }, `authenticatableSocialStrategies`: try (values["authenticatableSocialStrategies"] ?? .undefined).array().map { value in try OAuthStrategy.decode(value, in: runtime) }, `web3FirstFactors`: try (values["web3FirstFactors"] ?? .undefined).array().map { value in try MobileUserSettingsWeb3FirstFactorsElement.decode(value, in: runtime) }, `alternativePhoneCodeChannels`: try (values["alternativePhoneCodeChannels"] ?? .undefined).array().map { value in try PhoneCodeChannel.decode(value, in: runtime) }, `enabledFirstFactorIdentifiers`: try (values["enabledFirstFactorIdentifiers"] ?? .undefined).array().map { value in try Attribute.decode(value, in: runtime) }, `instanceIsPasswordBased`: try (values["instanceIsPasswordBased"] ?? .undefined).bool(), `hasValidAuthFactor`: try (values["hasValidAuthFactor"] ?? .undefined).bool(), `social`: try PartialOAuthProviders.decode((values["social"] ?? .undefined), in: runtime))
+  }
+}
+
+public struct EnterpriseSSOSettings: Sendable {
+  public let `enabled`: Bool
+  public let `selfServeSso`: Bool
+  public init(`enabled`: Bool, `selfServeSso`: Bool) {
+    self.`enabled` = `enabled`
+    self.`selfServeSso` = `selfServeSso`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enabled": .bool(self.`enabled`),
+      "self_serve_sso": .bool(self.`selfServeSso`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> EnterpriseSSOSettings {
+    let values = try value.object()
+
+    return try EnterpriseSSOSettings(`enabled`: try (values["enabled"] ?? .undefined).bool(), `selfServeSso`: try (values["self_serve_sso"] ?? .undefined).bool())
+  }
+}
+
+public struct Attributes: Sendable {
+  public let `password`: AttributeData
+  public let `emailAddress`: AttributeData
+  public let `phoneNumber`: AttributeData
+  public let `username`: AttributeData
+  public let `firstName`: AttributeData
+  public let `lastName`: AttributeData
+  public let `web3Wallet`: AttributeData
+  public let `authenticatorApp`: AttributeData
+  public let `backupCode`: AttributeData
+  public let `passkey`: AttributeData
+  public init(`password`: AttributeData, `emailAddress`: AttributeData, `phoneNumber`: AttributeData, `username`: AttributeData, `firstName`: AttributeData, `lastName`: AttributeData, `web3Wallet`: AttributeData, `authenticatorApp`: AttributeData, `backupCode`: AttributeData, `passkey`: AttributeData) {
+    self.`password` = `password`
+    self.`emailAddress` = `emailAddress`
+    self.`phoneNumber` = `phoneNumber`
+    self.`username` = `username`
+    self.`firstName` = `firstName`
+    self.`lastName` = `lastName`
+    self.`web3Wallet` = `web3Wallet`
+    self.`authenticatorApp` = `authenticatorApp`
+    self.`backupCode` = `backupCode`
+    self.`passkey` = `passkey`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "password": try self.`password`.encode(),
+      "email_address": try self.`emailAddress`.encode(),
+      "phone_number": try self.`phoneNumber`.encode(),
+      "username": try self.`username`.encode(),
+      "first_name": try self.`firstName`.encode(),
+      "last_name": try self.`lastName`.encode(),
+      "web3_wallet": try self.`web3Wallet`.encode(),
+      "authenticator_app": try self.`authenticatorApp`.encode(),
+      "backup_code": try self.`backupCode`.encode(),
+      "passkey": try self.`passkey`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> Attributes {
+    let values = try value.object()
+
+    return try Attributes(`password`: try AttributeData.decode((values["password"] ?? .undefined), in: runtime), `emailAddress`: try AttributeData.decode((values["email_address"] ?? .undefined), in: runtime), `phoneNumber`: try AttributeData.decode((values["phone_number"] ?? .undefined), in: runtime), `username`: try AttributeData.decode((values["username"] ?? .undefined), in: runtime), `firstName`: try AttributeData.decode((values["first_name"] ?? .undefined), in: runtime), `lastName`: try AttributeData.decode((values["last_name"] ?? .undefined), in: runtime), `web3Wallet`: try AttributeData.decode((values["web3_wallet"] ?? .undefined), in: runtime), `authenticatorApp`: try AttributeData.decode((values["authenticator_app"] ?? .undefined), in: runtime), `backupCode`: try AttributeData.decode((values["backup_code"] ?? .undefined), in: runtime), `passkey`: try AttributeData.decode((values["passkey"] ?? .undefined), in: runtime))
+  }
+}
+
+public struct AttributeData: Sendable {
+  public let `enabled`: Bool
+  public let `required`: Bool
+  public let `immutable`: Bool?
+  public let `verifications`: [VerificationStrategy]
+  public let `usedForFirstFactor`: Bool
+  public let `firstFactors`: [VerificationStrategy]
+  public let `usedForSecondFactor`: Bool
+  public let `secondFactors`: [VerificationStrategy]
+  public let `verifyAtSignUp`: Bool
+  public let `channels`: [PhoneCodeChannel]?
+  public let `name`: Attribute
+  public init(`enabled`: Bool, `required`: Bool, `immutable`: Bool? = nil, `verifications`: [VerificationStrategy], `usedForFirstFactor`: Bool, `firstFactors`: [VerificationStrategy], `usedForSecondFactor`: Bool, `secondFactors`: [VerificationStrategy], `verifyAtSignUp`: Bool, `channels`: [PhoneCodeChannel]? = nil, `name`: Attribute) {
+    self.`enabled` = `enabled`
+    self.`required` = `required`
+    self.`immutable` = `immutable`
+    self.`verifications` = `verifications`
+    self.`usedForFirstFactor` = `usedForFirstFactor`
+    self.`firstFactors` = `firstFactors`
+    self.`usedForSecondFactor` = `usedForSecondFactor`
+    self.`secondFactors` = `secondFactors`
+    self.`verifyAtSignUp` = `verifyAtSignUp`
+    self.`channels` = `channels`
+    self.`name` = `name`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enabled": .bool(self.`enabled`),
+      "required": .bool(self.`required`),
+      "immutable": try self.`immutable`.map { value in .bool(value) } ?? .undefined,
+      "verifications": .array(try self.`verifications`.map { value in try value.encode() }),
+      "used_for_first_factor": .bool(self.`usedForFirstFactor`),
+      "first_factors": .array(try self.`firstFactors`.map { value in try value.encode() }),
+      "used_for_second_factor": .bool(self.`usedForSecondFactor`),
+      "second_factors": .array(try self.`secondFactors`.map { value in try value.encode() }),
+      "verify_at_sign_up": .bool(self.`verifyAtSignUp`),
+      "channels": try self.`channels`.map { value in .array(try value.map { value in try value.encode() }) } ?? .undefined,
+      "name": try self.`name`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> AttributeData {
+    let values = try value.object()
+
+    return try AttributeData(`enabled`: try (values["enabled"] ?? .undefined).bool(), `required`: try (values["required"] ?? .undefined).bool(), `immutable`: try (values["immutable"] ?? .undefined).optional { value in try value.bool() }, `verifications`: try (values["verifications"] ?? .undefined).array().map { value in try VerificationStrategy.decode(value, in: runtime) }, `usedForFirstFactor`: try (values["used_for_first_factor"] ?? .undefined).bool(), `firstFactors`: try (values["first_factors"] ?? .undefined).array().map { value in try VerificationStrategy.decode(value, in: runtime) }, `usedForSecondFactor`: try (values["used_for_second_factor"] ?? .undefined).bool(), `secondFactors`: try (values["second_factors"] ?? .undefined).array().map { value in try VerificationStrategy.decode(value, in: runtime) }, `verifyAtSignUp`: try (values["verify_at_sign_up"] ?? .undefined).bool(), `channels`: try (values["channels"] ?? .undefined).optional { value in try value.array().map { value in try PhoneCodeChannel.decode(value, in: runtime) } }, `name`: try Attribute.decode((values["name"] ?? .undefined), in: runtime))
+  }
+}
+
+public enum VerificationStrategy: Hashable, Sendable {
+  case `emailCode`
+  case `backupCode`
+  case `emailLink`
+  case `phoneCode`
+  case `totp`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`emailCode`: return "email_code"
+    case .`backupCode`: return "backup_code"
+    case .`emailLink`: return "email_link"
+    case .`phoneCode`: return "phone_code"
+    case .`totp`: return "totp"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "email_code": self = .`emailCode`
+    case "backup_code": self = .`backupCode`
+    case "email_link": self = .`emailLink`
+    case "phone_code": self = .`phoneCode`
+    case "totp": self = .`totp`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> VerificationStrategy { .init(rawValue: try value.string()) }
+}
+
+public enum Attribute: Hashable, Sendable {
+  case `password`
+  case `emailAddress`
+  case `phoneNumber`
+  case `username`
+  case `firstName`
+  case `lastName`
+  case `web3Wallet`
+  case `authenticatorApp`
+  case `backupCode`
+  case `passkey`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`password`: return "password"
+    case .`emailAddress`: return "email_address"
+    case .`phoneNumber`: return "phone_number"
+    case .`username`: return "username"
+    case .`firstName`: return "first_name"
+    case .`lastName`: return "last_name"
+    case .`web3Wallet`: return "web3_wallet"
+    case .`authenticatorApp`: return "authenticator_app"
+    case .`backupCode`: return "backup_code"
+    case .`passkey`: return "passkey"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "password": self = .`password`
+    case "email_address": self = .`emailAddress`
+    case "phone_number": self = .`phoneNumber`
+    case "username": self = .`username`
+    case "first_name": self = .`firstName`
+    case "last_name": self = .`lastName`
+    case "web3_wallet": self = .`web3Wallet`
+    case "authenticator_app": self = .`authenticatorApp`
+    case "backup_code": self = .`backupCode`
+    case "passkey": self = .`passkey`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> Attribute { .init(rawValue: try value.string()) }
+}
+
+public struct Actions: Sendable {
+  public let `deleteSelf`: Bool
+  public let `createOrganization`: Bool
+  public init(`deleteSelf`: Bool, `createOrganization`: Bool) {
+    self.`deleteSelf` = `deleteSelf`
+    self.`createOrganization` = `createOrganization`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "delete_self": .bool(self.`deleteSelf`),
+      "create_organization": .bool(self.`createOrganization`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> Actions {
+    let values = try value.object()
+
+    return try Actions(`deleteSelf`: try (values["delete_self"] ?? .undefined).bool(), `createOrganization`: try (values["create_organization"] ?? .undefined).bool())
+  }
+}
+
+public struct SignInData: Sendable {
+  public let `secondFactor`: SignInDataSecond_factor
+  public init(`secondFactor`: SignInDataSecond_factor) {
+    self.`secondFactor` = `secondFactor`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "second_factor": try self.`secondFactor`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInData {
+    let values = try value.object()
+
+    return try SignInData(`secondFactor`: try SignInDataSecond_factor.decode((values["second_factor"] ?? .undefined), in: runtime))
+  }
+}
+
+public struct SignInDataSecond_factor: Sendable {
+  public let `required`: Bool
+  public let `enabled`: Bool
+  public init(`required`: Bool, `enabled`: Bool) {
+    self.`required` = `required`
+    self.`enabled` = `enabled`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "required": .bool(self.`required`),
+      "enabled": .bool(self.`enabled`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInDataSecond_factor {
+    let values = try value.object()
+
+    return try SignInDataSecond_factor(`required`: try (values["required"] ?? .undefined).bool(), `enabled`: try (values["enabled"] ?? .undefined).bool())
+  }
+}
+
+public struct SignUpData: Sendable {
+  public let `allowlistOnly`: Bool
+  public let `progressive`: Bool
+  public let `captchaEnabled`: Bool
+  public let `mode`: SignUpModes
+  public let `legalConsentEnabled`: Bool
+  public let `mfa`: SignUpDataMfa?
+  public init(`allowlistOnly`: Bool, `progressive`: Bool, `captchaEnabled`: Bool, `mode`: SignUpModes, `legalConsentEnabled`: Bool, `mfa`: SignUpDataMfa? = nil) {
+    self.`allowlistOnly` = `allowlistOnly`
+    self.`progressive` = `progressive`
+    self.`captchaEnabled` = `captchaEnabled`
+    self.`mode` = `mode`
+    self.`legalConsentEnabled` = `legalConsentEnabled`
+    self.`mfa` = `mfa`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "allowlist_only": .bool(self.`allowlistOnly`),
+      "progressive": .bool(self.`progressive`),
+      "captcha_enabled": .bool(self.`captchaEnabled`),
+      "mode": try self.`mode`.encode(),
+      "legal_consent_enabled": .bool(self.`legalConsentEnabled`),
+      "mfa": try self.`mfa`.map { value in try value.encode() } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignUpData {
+    let values = try value.object()
+
+    return try SignUpData(`allowlistOnly`: try (values["allowlist_only"] ?? .undefined).bool(), `progressive`: try (values["progressive"] ?? .undefined).bool(), `captchaEnabled`: try (values["captcha_enabled"] ?? .undefined).bool(), `mode`: try SignUpModes.decode((values["mode"] ?? .undefined), in: runtime), `legalConsentEnabled`: try (values["legal_consent_enabled"] ?? .undefined).bool(), `mfa`: try (values["mfa"] ?? .undefined).optional { value in try SignUpDataMfa.decode(value, in: runtime) })
+  }
+}
+
+public enum SignUpModes: Hashable, Sendable {
+  case `public`
+  case `restricted`
+  case `waitlist`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`public`: return "public"
+    case .`restricted`: return "restricted"
+    case .`waitlist`: return "waitlist"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "public": self = .`public`
+    case "restricted": self = .`restricted`
+    case "waitlist": self = .`waitlist`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignUpModes { .init(rawValue: try value.string()) }
+}
+
+public struct SignUpDataMfa: Sendable {
+  public let `required`: Bool
+  public init(`required`: Bool) {
+    self.`required` = `required`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "required": .bool(self.`required`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignUpDataMfa {
+    let values = try value.object()
+
+    return try SignUpDataMfa(`required`: try (values["required"] ?? .undefined).bool())
+  }
+}
+
+public struct PasswordSettingsData: Sendable {
+  public let `allowedSpecialCharacters`: String
+  public let `disableHibp`: Bool
+  public let `minLength`: Double
+  public let `maxLength`: Double
+  public let `requireSpecialChar`: Bool
+  public let `requireNumbers`: Bool
+  public let `requireUppercase`: Bool
+  public let `requireLowercase`: Bool
+  public let `showZxcvbn`: Bool
+  public let `minZxcvbnStrength`: Double
+  public init(`allowedSpecialCharacters`: String, `disableHibp`: Bool, `minLength`: Double, `maxLength`: Double, `requireSpecialChar`: Bool, `requireNumbers`: Bool, `requireUppercase`: Bool, `requireLowercase`: Bool, `showZxcvbn`: Bool, `minZxcvbnStrength`: Double) {
+    self.`allowedSpecialCharacters` = `allowedSpecialCharacters`
+    self.`disableHibp` = `disableHibp`
+    self.`minLength` = `minLength`
+    self.`maxLength` = `maxLength`
+    self.`requireSpecialChar` = `requireSpecialChar`
+    self.`requireNumbers` = `requireNumbers`
+    self.`requireUppercase` = `requireUppercase`
+    self.`requireLowercase` = `requireLowercase`
+    self.`showZxcvbn` = `showZxcvbn`
+    self.`minZxcvbnStrength` = `minZxcvbnStrength`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "allowed_special_characters": .string(self.`allowedSpecialCharacters`),
+      "disable_hibp": .bool(self.`disableHibp`),
+      "min_length": .number(self.`minLength`),
+      "max_length": .number(self.`maxLength`),
+      "require_special_char": .bool(self.`requireSpecialChar`),
+      "require_numbers": .bool(self.`requireNumbers`),
+      "require_uppercase": .bool(self.`requireUppercase`),
+      "require_lowercase": .bool(self.`requireLowercase`),
+      "show_zxcvbn": .bool(self.`showZxcvbn`),
+      "min_zxcvbn_strength": .number(self.`minZxcvbnStrength`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PasswordSettingsData {
+    let values = try value.object()
+
+    return try PasswordSettingsData(`allowedSpecialCharacters`: try (values["allowed_special_characters"] ?? .undefined).string(), `disableHibp`: try (values["disable_hibp"] ?? .undefined).bool(), `minLength`: try (values["min_length"] ?? .undefined).number(), `maxLength`: try (values["max_length"] ?? .undefined).number(), `requireSpecialChar`: try (values["require_special_char"] ?? .undefined).bool(), `requireNumbers`: try (values["require_numbers"] ?? .undefined).bool(), `requireUppercase`: try (values["require_uppercase"] ?? .undefined).bool(), `requireLowercase`: try (values["require_lowercase"] ?? .undefined).bool(), `showZxcvbn`: try (values["show_zxcvbn"] ?? .undefined).bool(), `minZxcvbnStrength`: try (values["min_zxcvbn_strength"] ?? .undefined).number())
+  }
+}
+
+public struct UsernameSettingsData: Sendable {
+  public let `minLength`: Double
+  public let `maxLength`: Double
+  public init(`minLength`: Double, `maxLength`: Double) {
+    self.`minLength` = `minLength`
+    self.`maxLength` = `maxLength`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "min_length": .number(self.`minLength`),
+      "max_length": .number(self.`maxLength`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> UsernameSettingsData {
+    let values = try value.object()
+
+    return try UsernameSettingsData(`minLength`: try (values["min_length"] ?? .undefined).number(), `maxLength`: try (values["max_length"] ?? .undefined).number())
+  }
+}
+
+public struct AttackProtectionData: Sendable {
+  public let `enumerationProtection`: AttackProtectionDataEnumeration_protection
+  public init(`enumerationProtection`: AttackProtectionDataEnumeration_protection) {
+    self.`enumerationProtection` = `enumerationProtection`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enumeration_protection": try self.`enumerationProtection`.encode()
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> AttackProtectionData {
+    let values = try value.object()
+
+    return try AttackProtectionData(`enumerationProtection`: try AttackProtectionDataEnumeration_protection.decode((values["enumeration_protection"] ?? .undefined), in: runtime))
+  }
+}
+
+public struct AttackProtectionDataEnumeration_protection: Sendable {
+  public let `enabled`: Bool
+  public init(`enabled`: Bool) {
+    self.`enabled` = `enabled`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enabled": .bool(self.`enabled`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> AttackProtectionDataEnumeration_protection {
+    let values = try value.object()
+
+    return try AttackProtectionDataEnumeration_protection(`enabled`: try (values["enabled"] ?? .undefined).bool())
+  }
+}
+
+public struct PasskeySettingsData: Sendable {
+  public let `allowAutofill`: Bool
+  public let `showSignInButton`: Bool
+  public init(`allowAutofill`: Bool, `showSignInButton`: Bool) {
+    self.`allowAutofill` = `allowAutofill`
+    self.`showSignInButton` = `showSignInButton`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "allow_autofill": .bool(self.`allowAutofill`),
+      "show_sign_in_button": .bool(self.`showSignInButton`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PasskeySettingsData {
+    let values = try value.object()
+
+    return try PasskeySettingsData(`allowAutofill`: try (values["allow_autofill"] ?? .undefined).bool(), `showSignInButton`: try (values["show_sign_in_button"] ?? .undefined).bool())
+  }
+}
+
+public enum MobileUserSettingsWeb3FirstFactorsElement: Hashable, Sendable {
+  case `web3MetamaskSignature`
+  case `web3BaseSignature`
+  case `web3CoinbaseWalletSignature`
+  case `web3OkxWalletSignature`
+  case `web3SolanaSignature`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`web3MetamaskSignature`: return "web3_metamask_signature"
+    case .`web3BaseSignature`: return "web3_base_signature"
+    case .`web3CoinbaseWalletSignature`: return "web3_coinbase_wallet_signature"
+    case .`web3OkxWalletSignature`: return "web3_okx_wallet_signature"
+    case .`web3SolanaSignature`: return "web3_solana_signature"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "web3_metamask_signature": self = .`web3MetamaskSignature`
+    case "web3_base_signature": self = .`web3BaseSignature`
+    case "web3_coinbase_wallet_signature": self = .`web3CoinbaseWalletSignature`
+    case "web3_okx_wallet_signature": self = .`web3OkxWalletSignature`
+    case "web3_solana_signature": self = .`web3SolanaSignature`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> MobileUserSettingsWeb3FirstFactorsElement { .init(rawValue: try value.string()) }
+}
+
+/// Make all properties in T optional
+public struct PartialOAuthProviders: Sendable {
+  public let `oauthFacebook`: OAuthProviderSettings?
+  public let `oauthGoogle`: OAuthProviderSettings?
+  public let `oauthHubspot`: OAuthProviderSettings?
+  public let `oauthGithub`: OAuthProviderSettings?
+  public let `oauthTiktok`: OAuthProviderSettings?
+  public let `oauthGitlab`: OAuthProviderSettings?
+  public let `oauthDiscord`: OAuthProviderSettings?
+  public let `oauthTwitter`: OAuthProviderSettings?
+  public let `oauthTwitch`: OAuthProviderSettings?
+  public let `oauthLinkedin`: OAuthProviderSettings?
+  public let `oauthLinkedinOidc`: OAuthProviderSettings?
+  public let `oauthDropbox`: OAuthProviderSettings?
+  public let `oauthAtlassian`: OAuthProviderSettings?
+  public let `oauthBitbucket`: OAuthProviderSettings?
+  public let `oauthMicrosoft`: OAuthProviderSettings?
+  public let `oauthNotion`: OAuthProviderSettings?
+  public let `oauthApple`: OAuthProviderSettings?
+  public let `oauthLine`: OAuthProviderSettings?
+  public let `oauthInstagram`: OAuthProviderSettings?
+  public let `oauthCoinbase`: OAuthProviderSettings?
+  public let `oauthSpotify`: OAuthProviderSettings?
+  public let `oauthXero`: OAuthProviderSettings?
+  public let `oauthBox`: OAuthProviderSettings?
+  public let `oauthSlack`: OAuthProviderSettings?
+  public let `oauthLinear`: OAuthProviderSettings?
+  public let `oauthX`: OAuthProviderSettings?
+  public let `oauthEnstall`: OAuthProviderSettings?
+  public let `oauthHuggingface`: OAuthProviderSettings?
+  public let `oauthVercel`: OAuthProviderSettings?
+  public init(`oauthFacebook`: OAuthProviderSettings? = nil, `oauthGoogle`: OAuthProviderSettings? = nil, `oauthHubspot`: OAuthProviderSettings? = nil, `oauthGithub`: OAuthProviderSettings? = nil, `oauthTiktok`: OAuthProviderSettings? = nil, `oauthGitlab`: OAuthProviderSettings? = nil, `oauthDiscord`: OAuthProviderSettings? = nil, `oauthTwitter`: OAuthProviderSettings? = nil, `oauthTwitch`: OAuthProviderSettings? = nil, `oauthLinkedin`: OAuthProviderSettings? = nil, `oauthLinkedinOidc`: OAuthProviderSettings? = nil, `oauthDropbox`: OAuthProviderSettings? = nil, `oauthAtlassian`: OAuthProviderSettings? = nil, `oauthBitbucket`: OAuthProviderSettings? = nil, `oauthMicrosoft`: OAuthProviderSettings? = nil, `oauthNotion`: OAuthProviderSettings? = nil, `oauthApple`: OAuthProviderSettings? = nil, `oauthLine`: OAuthProviderSettings? = nil, `oauthInstagram`: OAuthProviderSettings? = nil, `oauthCoinbase`: OAuthProviderSettings? = nil, `oauthSpotify`: OAuthProviderSettings? = nil, `oauthXero`: OAuthProviderSettings? = nil, `oauthBox`: OAuthProviderSettings? = nil, `oauthSlack`: OAuthProviderSettings? = nil, `oauthLinear`: OAuthProviderSettings? = nil, `oauthX`: OAuthProviderSettings? = nil, `oauthEnstall`: OAuthProviderSettings? = nil, `oauthHuggingface`: OAuthProviderSettings? = nil, `oauthVercel`: OAuthProviderSettings? = nil) {
+    self.`oauthFacebook` = `oauthFacebook`
+    self.`oauthGoogle` = `oauthGoogle`
+    self.`oauthHubspot` = `oauthHubspot`
+    self.`oauthGithub` = `oauthGithub`
+    self.`oauthTiktok` = `oauthTiktok`
+    self.`oauthGitlab` = `oauthGitlab`
+    self.`oauthDiscord` = `oauthDiscord`
+    self.`oauthTwitter` = `oauthTwitter`
+    self.`oauthTwitch` = `oauthTwitch`
+    self.`oauthLinkedin` = `oauthLinkedin`
+    self.`oauthLinkedinOidc` = `oauthLinkedinOidc`
+    self.`oauthDropbox` = `oauthDropbox`
+    self.`oauthAtlassian` = `oauthAtlassian`
+    self.`oauthBitbucket` = `oauthBitbucket`
+    self.`oauthMicrosoft` = `oauthMicrosoft`
+    self.`oauthNotion` = `oauthNotion`
+    self.`oauthApple` = `oauthApple`
+    self.`oauthLine` = `oauthLine`
+    self.`oauthInstagram` = `oauthInstagram`
+    self.`oauthCoinbase` = `oauthCoinbase`
+    self.`oauthSpotify` = `oauthSpotify`
+    self.`oauthXero` = `oauthXero`
+    self.`oauthBox` = `oauthBox`
+    self.`oauthSlack` = `oauthSlack`
+    self.`oauthLinear` = `oauthLinear`
+    self.`oauthX` = `oauthX`
+    self.`oauthEnstall` = `oauthEnstall`
+    self.`oauthHuggingface` = `oauthHuggingface`
+    self.`oauthVercel` = `oauthVercel`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "oauth_facebook": try self.`oauthFacebook`.map { value in try value.encode() } ?? .undefined,
+      "oauth_google": try self.`oauthGoogle`.map { value in try value.encode() } ?? .undefined,
+      "oauth_hubspot": try self.`oauthHubspot`.map { value in try value.encode() } ?? .undefined,
+      "oauth_github": try self.`oauthGithub`.map { value in try value.encode() } ?? .undefined,
+      "oauth_tiktok": try self.`oauthTiktok`.map { value in try value.encode() } ?? .undefined,
+      "oauth_gitlab": try self.`oauthGitlab`.map { value in try value.encode() } ?? .undefined,
+      "oauth_discord": try self.`oauthDiscord`.map { value in try value.encode() } ?? .undefined,
+      "oauth_twitter": try self.`oauthTwitter`.map { value in try value.encode() } ?? .undefined,
+      "oauth_twitch": try self.`oauthTwitch`.map { value in try value.encode() } ?? .undefined,
+      "oauth_linkedin": try self.`oauthLinkedin`.map { value in try value.encode() } ?? .undefined,
+      "oauth_linkedin_oidc": try self.`oauthLinkedinOidc`.map { value in try value.encode() } ?? .undefined,
+      "oauth_dropbox": try self.`oauthDropbox`.map { value in try value.encode() } ?? .undefined,
+      "oauth_atlassian": try self.`oauthAtlassian`.map { value in try value.encode() } ?? .undefined,
+      "oauth_bitbucket": try self.`oauthBitbucket`.map { value in try value.encode() } ?? .undefined,
+      "oauth_microsoft": try self.`oauthMicrosoft`.map { value in try value.encode() } ?? .undefined,
+      "oauth_notion": try self.`oauthNotion`.map { value in try value.encode() } ?? .undefined,
+      "oauth_apple": try self.`oauthApple`.map { value in try value.encode() } ?? .undefined,
+      "oauth_line": try self.`oauthLine`.map { value in try value.encode() } ?? .undefined,
+      "oauth_instagram": try self.`oauthInstagram`.map { value in try value.encode() } ?? .undefined,
+      "oauth_coinbase": try self.`oauthCoinbase`.map { value in try value.encode() } ?? .undefined,
+      "oauth_spotify": try self.`oauthSpotify`.map { value in try value.encode() } ?? .undefined,
+      "oauth_xero": try self.`oauthXero`.map { value in try value.encode() } ?? .undefined,
+      "oauth_box": try self.`oauthBox`.map { value in try value.encode() } ?? .undefined,
+      "oauth_slack": try self.`oauthSlack`.map { value in try value.encode() } ?? .undefined,
+      "oauth_linear": try self.`oauthLinear`.map { value in try value.encode() } ?? .undefined,
+      "oauth_x": try self.`oauthX`.map { value in try value.encode() } ?? .undefined,
+      "oauth_enstall": try self.`oauthEnstall`.map { value in try value.encode() } ?? .undefined,
+      "oauth_huggingface": try self.`oauthHuggingface`.map { value in try value.encode() } ?? .undefined,
+      "oauth_vercel": try self.`oauthVercel`.map { value in try value.encode() } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PartialOAuthProviders {
+    let values = try value.object()
+
+    return try PartialOAuthProviders(`oauthFacebook`: try (values["oauth_facebook"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthGoogle`: try (values["oauth_google"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthHubspot`: try (values["oauth_hubspot"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthGithub`: try (values["oauth_github"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthTiktok`: try (values["oauth_tiktok"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthGitlab`: try (values["oauth_gitlab"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthDiscord`: try (values["oauth_discord"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthTwitter`: try (values["oauth_twitter"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthTwitch`: try (values["oauth_twitch"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthLinkedin`: try (values["oauth_linkedin"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthLinkedinOidc`: try (values["oauth_linkedin_oidc"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthDropbox`: try (values["oauth_dropbox"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthAtlassian`: try (values["oauth_atlassian"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthBitbucket`: try (values["oauth_bitbucket"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthMicrosoft`: try (values["oauth_microsoft"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthNotion`: try (values["oauth_notion"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthApple`: try (values["oauth_apple"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthLine`: try (values["oauth_line"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthInstagram`: try (values["oauth_instagram"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthCoinbase`: try (values["oauth_coinbase"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthSpotify`: try (values["oauth_spotify"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthXero`: try (values["oauth_xero"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthBox`: try (values["oauth_box"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthSlack`: try (values["oauth_slack"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthLinear`: try (values["oauth_linear"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthX`: try (values["oauth_x"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthEnstall`: try (values["oauth_enstall"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthHuggingface`: try (values["oauth_huggingface"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) }, `oauthVercel`: try (values["oauth_vercel"] ?? .undefined).optional { value in try OAuthProviderSettings.decode(value, in: runtime) })
+  }
+}
+
+public struct OAuthProviderSettings: Sendable {
+  public let `enabled`: Bool
+  public let `required`: Bool
+  public let `authenticatable`: Bool
+  public let `strategy`: OAuthStrategy
+  public let `name`: String
+  public let `logoUrl`: String?
+  public init(`enabled`: Bool, `required`: Bool, `authenticatable`: Bool, `strategy`: OAuthStrategy, `name`: String, `logoUrl`: String?) {
+    self.`enabled` = `enabled`
+    self.`required` = `required`
+    self.`authenticatable` = `authenticatable`
+    self.`strategy` = `strategy`
+    self.`name` = `name`
+    self.`logoUrl` = `logoUrl`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "enabled": .bool(self.`enabled`),
+      "required": .bool(self.`required`),
+      "authenticatable": .bool(self.`authenticatable`),
+      "strategy": try self.`strategy`.encode(),
+      "name": .string(self.`name`),
+      "logo_url": try self.`logoUrl`.map { value in .string(value) } ?? .null
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OAuthProviderSettings {
+    let values = try value.object()
+
+    return try OAuthProviderSettings(`enabled`: try (values["enabled"] ?? .undefined).bool(), `required`: try (values["required"] ?? .undefined).bool(), `authenticatable`: try (values["authenticatable"] ?? .undefined).bool(), `strategy`: try OAuthStrategy.decode((values["strategy"] ?? .undefined), in: runtime), `name`: try (values["name"] ?? .undefined).string(), `logoUrl`: try (values["logo_url"] ?? .undefined).optional { value in try value.string() })
+  }
+}
+
 /// The `Session` object is an abstraction over an HTTP session. It models the period of information exchange between a user and the server.
 /// 
 /// The `Session` object includes methods for recording session activity and ending the session client-side. For security reasons, sessions can also expire server-side.
@@ -3602,28 +4947,6 @@ public enum VerificationStatus: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> VerificationStatus { .init(rawValue: try value.string()) }
 }
 
-public enum PhoneCodeChannel: Hashable, Sendable {
-  case `sms`
-  case `whatsapp`
-  case unrecognized(String)
-  public var rawValue: String {
-    switch self {
-    case .`sms`: return "sms"
-    case .`whatsapp`: return "whatsapp"
-    case .unrecognized(let value): return value
-    }
-  }
-  public init(rawValue: String) {
-    switch rawValue {
-    case "sms": self = .`sms`
-    case "whatsapp": self = .`whatsapp`
-    default: self = .unrecognized(rawValue)
-    }
-  }
-  public func encode() throws -> JSONValue { .string(rawValue) }
-  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PhoneCodeChannel { .init(rawValue: try value.string()) }
-}
-
 public struct IdentificationLinkState: Sendable {
   public let `id`: String
   public let `type`: String
@@ -3666,6 +4989,12 @@ public struct IdentificationLinkState: Sendable {
 public indirect enum PrepareEmailAddressVerificationParams: Sendable {
   case case1(EmailAddressPrepareVerificationParamsCase1)
   case case2(EmailAddressPrepareVerificationParamsCase2)
+  @MainActor public var `strategy`: String {
+    switch self {
+    case .case1(let value): return value.`strategy`
+    case .case2(let value): return value.`strategy`.rawValue
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -4071,8 +5400,8 @@ public struct Web3WalletState: Sendable {
 }
 
 public struct PrepareWeb3WalletVerificationParams: Sendable {
-  public let `strategy`: PrepareWeb3WalletVerificationParamsStrategy
-  public init(`strategy`: PrepareWeb3WalletVerificationParamsStrategy) {
+  public let `strategy`: MobileUserSettingsWeb3FirstFactorsElement
+  public init(`strategy`: MobileUserSettingsWeb3FirstFactorsElement) {
     self.`strategy` = `strategy`
   }
   @MainActor public func encode() throws -> JSONValue {
@@ -4084,45 +5413,14 @@ public struct PrepareWeb3WalletVerificationParams: Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PrepareWeb3WalletVerificationParams {
     let values = try value.object()
 
-    return try PrepareWeb3WalletVerificationParams(`strategy`: try PrepareWeb3WalletVerificationParamsStrategy.decode((values["strategy"] ?? .undefined), in: runtime))
+    return try PrepareWeb3WalletVerificationParams(`strategy`: try MobileUserSettingsWeb3FirstFactorsElement.decode((values["strategy"] ?? .undefined), in: runtime))
   }
-}
-
-public enum PrepareWeb3WalletVerificationParamsStrategy: Hashable, Sendable {
-  case `web3MetamaskSignature`
-  case `web3BaseSignature`
-  case `web3CoinbaseWalletSignature`
-  case `web3OkxWalletSignature`
-  case `web3SolanaSignature`
-  case unrecognized(String)
-  public var rawValue: String {
-    switch self {
-    case .`web3MetamaskSignature`: return "web3_metamask_signature"
-    case .`web3BaseSignature`: return "web3_base_signature"
-    case .`web3CoinbaseWalletSignature`: return "web3_coinbase_wallet_signature"
-    case .`web3OkxWalletSignature`: return "web3_okx_wallet_signature"
-    case .`web3SolanaSignature`: return "web3_solana_signature"
-    case .unrecognized(let value): return value
-    }
-  }
-  public init(rawValue: String) {
-    switch rawValue {
-    case "web3_metamask_signature": self = .`web3MetamaskSignature`
-    case "web3_base_signature": self = .`web3BaseSignature`
-    case "web3_coinbase_wallet_signature": self = .`web3CoinbaseWalletSignature`
-    case "web3_okx_wallet_signature": self = .`web3OkxWalletSignature`
-    case "web3_solana_signature": self = .`web3SolanaSignature`
-    default: self = .unrecognized(rawValue)
-    }
-  }
-  public func encode() throws -> JSONValue { .string(rawValue) }
-  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> PrepareWeb3WalletVerificationParamsStrategy { .init(rawValue: try value.string()) }
 }
 
 public struct AttemptWeb3WalletVerificationParams: Sendable {
   public let `signature`: String
-  public let `strategy`: PrepareWeb3WalletVerificationParamsStrategy?
-  public init(`signature`: String, `strategy`: PrepareWeb3WalletVerificationParamsStrategy? = nil) {
+  public let `strategy`: MobileUserSettingsWeb3FirstFactorsElement?
+  public init(`signature`: String, `strategy`: MobileUserSettingsWeb3FirstFactorsElement? = nil) {
     self.`signature` = `signature`
     self.`strategy` = `strategy`
   }
@@ -4136,7 +5434,7 @@ public struct AttemptWeb3WalletVerificationParams: Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> AttemptWeb3WalletVerificationParams {
     let values = try value.object()
 
-    return try AttemptWeb3WalletVerificationParams(`signature`: try (values["signature"] ?? .undefined).string(), `strategy`: try (values["strategy"] ?? .undefined).optional { value in try PrepareWeb3WalletVerificationParamsStrategy.decode(value, in: runtime) })
+    return try AttemptWeb3WalletVerificationParams(`signature`: try (values["signature"] ?? .undefined).string(), `strategy`: try (values["strategy"] ?? .undefined).optional { value in try MobileUserSettingsWeb3FirstFactorsElement.decode(value, in: runtime) })
   }
 }
 
@@ -4997,6 +6295,13 @@ public indirect enum UserIsPrimaryIdentificationIdent: Sendable {
   case case1(EmailAddress)
   case case2(PhoneNumber)
   case case3(Web3Wallet)
+  @MainActor public var `id`: String {
+    switch self {
+    case .case1(let value): return value.`id`
+    case .case2(let value): return value.`id`
+    case .case3(let value): return value.`id`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -5212,110 +6517,6 @@ public struct CreateExternalAccountParams: Sendable {
 
     return try CreateExternalAccountParams(`strategy`: try (values["strategy"] ?? .undefined).optional { value in try OAuthStrategy.decode(value, in: runtime) }, `enterpriseConnectionId`: try (values["enterpriseConnectionId"] ?? .undefined).optional { value in try value.string() }, `redirectUrl`: try (values["redirectUrl"] ?? .undefined).optional { value in try value.string() }, `additionalScopes`: try (values["additionalScopes"] ?? .undefined).optional { value in try value.array().map { value in try value.string() } }, `oidcPrompt`: try (values["oidcPrompt"] ?? .undefined).optional { value in try value.string() }, `oidcLoginHint`: try (values["oidcLoginHint"] ?? .undefined).optional { value in try value.string() })
   }
-}
-
-/// OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).
-public enum OAuthStrategy: Hashable, Sendable {
-  case `oauthFacebook`
-  case `oauthGoogle`
-  case `oauthHubspot`
-  case `oauthGithub`
-  case `oauthTiktok`
-  case `oauthGitlab`
-  case `oauthDiscord`
-  case `oauthTwitter`
-  case `oauthTwitch`
-  case `oauthLinkedin`
-  case `oauthLinkedinOidc`
-  case `oauthDropbox`
-  case `oauthAtlassian`
-  case `oauthBitbucket`
-  case `oauthMicrosoft`
-  case `oauthNotion`
-  case `oauthApple`
-  case `oauthLine`
-  case `oauthInstagram`
-  case `oauthCoinbase`
-  case `oauthSpotify`
-  case `oauthXero`
-  case `oauthBox`
-  case `oauthSlack`
-  case `oauthLinear`
-  case `oauthX`
-  case `oauthEnstall`
-  case `oauthHuggingface`
-  case `oauthVercel`
-  case unrecognized(String)
-  public var rawValue: String {
-    switch self {
-    case .`oauthFacebook`: return "oauth_facebook"
-    case .`oauthGoogle`: return "oauth_google"
-    case .`oauthHubspot`: return "oauth_hubspot"
-    case .`oauthGithub`: return "oauth_github"
-    case .`oauthTiktok`: return "oauth_tiktok"
-    case .`oauthGitlab`: return "oauth_gitlab"
-    case .`oauthDiscord`: return "oauth_discord"
-    case .`oauthTwitter`: return "oauth_twitter"
-    case .`oauthTwitch`: return "oauth_twitch"
-    case .`oauthLinkedin`: return "oauth_linkedin"
-    case .`oauthLinkedinOidc`: return "oauth_linkedin_oidc"
-    case .`oauthDropbox`: return "oauth_dropbox"
-    case .`oauthAtlassian`: return "oauth_atlassian"
-    case .`oauthBitbucket`: return "oauth_bitbucket"
-    case .`oauthMicrosoft`: return "oauth_microsoft"
-    case .`oauthNotion`: return "oauth_notion"
-    case .`oauthApple`: return "oauth_apple"
-    case .`oauthLine`: return "oauth_line"
-    case .`oauthInstagram`: return "oauth_instagram"
-    case .`oauthCoinbase`: return "oauth_coinbase"
-    case .`oauthSpotify`: return "oauth_spotify"
-    case .`oauthXero`: return "oauth_xero"
-    case .`oauthBox`: return "oauth_box"
-    case .`oauthSlack`: return "oauth_slack"
-    case .`oauthLinear`: return "oauth_linear"
-    case .`oauthX`: return "oauth_x"
-    case .`oauthEnstall`: return "oauth_enstall"
-    case .`oauthHuggingface`: return "oauth_huggingface"
-    case .`oauthVercel`: return "oauth_vercel"
-    case .unrecognized(let value): return value
-    }
-  }
-  public init(rawValue: String) {
-    switch rawValue {
-    case "oauth_facebook": self = .`oauthFacebook`
-    case "oauth_google": self = .`oauthGoogle`
-    case "oauth_hubspot": self = .`oauthHubspot`
-    case "oauth_github": self = .`oauthGithub`
-    case "oauth_tiktok": self = .`oauthTiktok`
-    case "oauth_gitlab": self = .`oauthGitlab`
-    case "oauth_discord": self = .`oauthDiscord`
-    case "oauth_twitter": self = .`oauthTwitter`
-    case "oauth_twitch": self = .`oauthTwitch`
-    case "oauth_linkedin": self = .`oauthLinkedin`
-    case "oauth_linkedin_oidc": self = .`oauthLinkedinOidc`
-    case "oauth_dropbox": self = .`oauthDropbox`
-    case "oauth_atlassian": self = .`oauthAtlassian`
-    case "oauth_bitbucket": self = .`oauthBitbucket`
-    case "oauth_microsoft": self = .`oauthMicrosoft`
-    case "oauth_notion": self = .`oauthNotion`
-    case "oauth_apple": self = .`oauthApple`
-    case "oauth_line": self = .`oauthLine`
-    case "oauth_instagram": self = .`oauthInstagram`
-    case "oauth_coinbase": self = .`oauthCoinbase`
-    case "oauth_spotify": self = .`oauthSpotify`
-    case "oauth_xero": self = .`oauthXero`
-    case "oauth_box": self = .`oauthBox`
-    case "oauth_slack": self = .`oauthSlack`
-    case "oauth_linear": self = .`oauthLinear`
-    case "oauth_x": self = .`oauthX`
-    case "oauth_enstall": self = .`oauthEnstall`
-    case "oauth_huggingface": self = .`oauthHuggingface`
-    case "oauth_vercel": self = .`oauthVercel`
-    default: self = .unrecognized(rawValue)
-    }
-  }
-  public func encode() throws -> JSONValue { .string(rawValue) }
-  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> OAuthStrategy { .init(rawValue: try value.string()) }
 }
 
 public struct GetUserOrganizationMembershipParams: Sendable {
@@ -5763,7 +6964,7 @@ public struct OrganizationCreationDefaultsForm: Sendable {
   }
 }
 
-public struct TOTPState: Sendable {
+public struct TOTP: Sendable {
   public let `id`: String
   public let `secret`: String?
   public let `uri`: String?
@@ -5792,33 +6993,10 @@ public struct TOTPState: Sendable {
     ]
     return .object(values.filter { !$0.value.isUndefined })
   }
-  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TOTPState {
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TOTP {
     let values = try value.object()
 
-    return try TOTPState(`id`: try (values["id"] ?? .undefined).string(), `secret`: try (values["secret"] ?? .undefined).optional { value in try value.string() }, `uri`: try (values["uri"] ?? .undefined).optional { value in try value.string() }, `verified`: try (values["verified"] ?? .undefined).bool(), `backupCodes`: try (values["backupCodes"] ?? .undefined).optional { value in try value.array().map { value in try value.string() } }, `createdAt`: try (values["createdAt"] ?? .undefined).optional { value in try value.date() }, `updatedAt`: try (values["updatedAt"] ?? .undefined).optional { value in try value.date() })
-  }
-}
-@MainActor @Observable public final class TOTP: CoreResource {
-  public let handle: ResourceHandle
-  public let context: ResourceContext
-  public var isInvalidated: Bool { context.isInvalidated(handle) }
-  public var state: TOTPState { context.state(handle, as: TOTPState.self) }
-  public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: false) }
-  public var `id`: String { state.`id` }
-  public var `secret`: String? { state.`secret` }
-  public var `uri`: String? { state.`uri` }
-  public var `verified`: Bool { state.`verified` }
-  public var `backupCodes`: [String]? { state.`backupCodes` }
-  public var `createdAt`: Date? { state.`createdAt` }
-  public var `updatedAt`: Date? { state.`updatedAt` }
-  public func prepare(_ value: JSONValue) throws -> any Sendable { try TOTPState.decode(value, in: context.requireRuntime()) }
-  public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
-  public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> TOTP { try runtime.resource(ResourceHandle.decodeReference(value), as: TOTP.self) }
-  /// Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).
-  public func `reload`(_ `p`: ClerkResourceReloadParams? = nil) async throws -> TOTP {
-    let runtime = try context.requireRuntime()
-    let result = try await runtime.invoke(owner: self, target: handle, operation: "TOTP.reload", arguments: [try `p`.map { value in try value.encode() } ?? .undefined])
-    return try TOTP.decode(result, in: runtime)
+    return try TOTP(`id`: try (values["id"] ?? .undefined).string(), `secret`: try (values["secret"] ?? .undefined).optional { value in try value.string() }, `uri`: try (values["uri"] ?? .undefined).optional { value in try value.string() }, `verified`: try (values["verified"] ?? .undefined).bool(), `backupCodes`: try (values["backupCodes"] ?? .undefined).optional { value in try value.array().map { value in try value.string() } }, `createdAt`: try (values["createdAt"] ?? .undefined).optional { value in try value.date() }, `updatedAt`: try (values["updatedAt"] ?? .undefined).optional { value in try value.date() })
   }
 }
 
@@ -5840,7 +7018,7 @@ public struct VerifyTOTPParams: Sendable {
   }
 }
 
-public struct BackupCodeState: Sendable {
+public struct BackupCode: Sendable {
   public let `id`: String
   public let `codes`: [String]
   public let `createdAt`: Date?
@@ -5860,30 +7038,10 @@ public struct BackupCodeState: Sendable {
     ]
     return .object(values.filter { !$0.value.isUndefined })
   }
-  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BackupCodeState {
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BackupCode {
     let values = try value.object()
 
-    return try BackupCodeState(`id`: try (values["id"] ?? .undefined).string(), `codes`: try (values["codes"] ?? .undefined).array().map { value in try value.string() }, `createdAt`: try (values["createdAt"] ?? .undefined).optional { value in try value.date() }, `updatedAt`: try (values["updatedAt"] ?? .undefined).optional { value in try value.date() })
-  }
-}
-@MainActor @Observable public final class BackupCode: CoreResource {
-  public let handle: ResourceHandle
-  public let context: ResourceContext
-  public var isInvalidated: Bool { context.isInvalidated(handle) }
-  public var state: BackupCodeState { context.state(handle, as: BackupCodeState.self) }
-  public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: false) }
-  public var `id`: String { state.`id` }
-  public var `codes`: [String] { state.`codes` }
-  public var `createdAt`: Date? { state.`createdAt` }
-  public var `updatedAt`: Date? { state.`updatedAt` }
-  public func prepare(_ value: JSONValue) throws -> any Sendable { try BackupCodeState.decode(value, in: context.requireRuntime()) }
-  public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
-  public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BackupCode { try runtime.resource(ResourceHandle.decodeReference(value), as: BackupCode.self) }
-  /// Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).
-  public func `reload`(_ `p`: ClerkResourceReloadParams? = nil) async throws -> BackupCode {
-    let runtime = try context.requireRuntime()
-    let result = try await runtime.invoke(owner: self, target: handle, operation: "BackupCode.reload", arguments: [try `p`.map { value in try value.encode() } ?? .undefined])
-    return try BackupCode.decode(result, in: runtime)
+    return try BackupCode(`id`: try (values["id"] ?? .undefined).string(), `codes`: try (values["codes"] ?? .undefined).array().map { value in try value.string() }, `createdAt`: try (values["createdAt"] ?? .undefined).optional { value in try value.date() }, `updatedAt`: try (values["updatedAt"] ?? .undefined).optional { value in try value.date() })
   }
 }
 
@@ -6273,6 +7431,15 @@ public indirect enum SessionVerificationFirstFactor: Sendable {
   case case3(PasswordFactor)
   case case4(PasskeyFactor)
   case case5(EnterpriseSSOFactor)
+  @MainActor public var `strategy`: String {
+    switch self {
+    case .case1(let value): return value.`strategy`
+    case .case2(let value): return value.`strategy`
+    case .case3(let value): return value.`strategy`
+    case .case4(let value): return value.`strategy`
+    case .case5(let value): return value.`strategy`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -6417,6 +7584,13 @@ public indirect enum SessionVerificationSecondFactor: Sendable {
   case case1(PhoneCodeFactor)
   case case2(TOTPFactor)
   case case3(BackupCodeFactor)
+  @MainActor public var `strategy`: String {
+    switch self {
+    case .case1(let value): return value.`strategy`
+    case .case2(let value): return value.`strategy`
+    case .case3(let value): return value.`strategy`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -6477,6 +7651,14 @@ public indirect enum SessionVerifyPrepareFirstFactorParams: Sendable {
   case case2(EmailCodeConfig)
   case case3(PhoneCodeConfig)
   case case4(OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl)
+  @MainActor public var `strategy`: String {
+    switch self {
+    case .case1(let value): return value.`strategy`
+    case .case2(let value): return value.`strategy`
+    case .case3(let value): return value.`strategy`
+    case .case4(let value): return value.`strategy`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -6588,6 +7770,14 @@ public indirect enum SessionVerifyAttemptFirstFactorParams: Sendable {
   case case2(PhoneCodeAttempt)
   case case3(PasswordAttempt)
   case case4(PasskeyAttempt)
+  @MainActor public var `strategy`: String {
+    switch self {
+    case .case1(let value): return value.`strategy`
+    case .case2(let value): return value.`strategy`
+    case .case3(let value): return value.`strategy`
+    case .case4(let value): return value.`strategy`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -6774,6 +7964,20 @@ public indirect enum SessionVerifyAttemptSecondFactorParams: Sendable {
   case case1(PhoneCodeAttempt)
   case case2(TOTPAttempt)
   case case3(BackupCodeAttempt)
+  @MainActor public var `strategy`: String {
+    switch self {
+    case .case1(let value): return value.`strategy`
+    case .case2(let value): return value.`strategy`
+    case .case3(let value): return value.`strategy`
+    }
+  }
+  @MainActor public var `code`: String {
+    switch self {
+    case .case1(let value): return value.`code`
+    case .case2(let value): return value.`code`
+    case .case3(let value): return value.`code`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -7003,6 +8207,20 @@ public indirect enum SignInFirstFactor: Sendable {
   case case8(ResetPasswordEmailCodeFactor)
   case case9(Web3SignatureFactor)
   case case10(OauthFactor)
+  @MainActor public var `strategy`: String {
+    switch self {
+    case .case1(let value): return value.`strategy`
+    case .case2(let value): return value.`strategy`
+    case .case3(let value): return value.`strategy`
+    case .case4(let value): return value.`strategy`
+    case .case5(let value): return value.`strategy`
+    case .case6(let value): return value.`strategy`
+    case .case7(let value): return value.`strategy`
+    case .case8(let value): return value.`strategy`
+    case .case9(let value): return value.`strategy`.rawValue
+    case .case10(let value): return value.`strategy`.rawValue
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -7115,11 +8333,11 @@ public struct ResetPasswordEmailCodeFactor: Sendable {
 }
 
 public struct Web3SignatureFactor: Sendable {
-  public let `strategy`: PrepareWeb3WalletVerificationParamsStrategy
+  public let `strategy`: MobileUserSettingsWeb3FirstFactorsElement
   public let `web3WalletId`: String
   public let `primary`: Bool?
   public let `walletName`: String?
-  public init(`strategy`: PrepareWeb3WalletVerificationParamsStrategy, `web3WalletId`: String, `primary`: Bool? = nil, `walletName`: String? = nil) {
+  public init(`strategy`: MobileUserSettingsWeb3FirstFactorsElement, `web3WalletId`: String, `primary`: Bool? = nil, `walletName`: String? = nil) {
     self.`strategy` = `strategy`
     self.`web3WalletId` = `web3WalletId`
     self.`primary` = `primary`
@@ -7137,7 +8355,7 @@ public struct Web3SignatureFactor: Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> Web3SignatureFactor {
     let values = try value.object()
 
-    return try Web3SignatureFactor(`strategy`: try PrepareWeb3WalletVerificationParamsStrategy.decode((values["strategy"] ?? .undefined), in: runtime), `web3WalletId`: try (values["web3WalletId"] ?? .undefined).string(), `primary`: try (values["primary"] ?? .undefined).optional { value in try value.bool() }, `walletName`: try (values["walletName"] ?? .undefined).optional { value in try value.string() })
+    return try Web3SignatureFactor(`strategy`: try MobileUserSettingsWeb3FirstFactorsElement.decode((values["strategy"] ?? .undefined), in: runtime), `web3WalletId`: try (values["web3WalletId"] ?? .undefined).string(), `primary`: try (values["primary"] ?? .undefined).optional { value in try value.bool() }, `walletName`: try (values["walletName"] ?? .undefined).optional { value in try value.string() })
   }
 }
 
@@ -7165,6 +8383,15 @@ public indirect enum SignInSecondFactor: Sendable {
   case case3(TOTPFactor)
   case case4(BackupCodeFactor)
   case case5(EmailLinkFactor)
+  @MainActor public var `strategy`: String {
+    switch self {
+    case .case1(let value): return value.`strategy`
+    case .case2(let value): return value.`strategy`
+    case .case3(let value): return value.`strategy`
+    case .case4(let value): return value.`strategy`
+    case .case5(let value): return value.`strategy`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -7456,6 +8683,14 @@ public indirect enum SignInPasswordParams: Sendable {
   case case2(SignInPasswordParamsCase2)
   case case3(SignInPasswordParamsCase3)
   case case4(SignInPasswordParamsCase4)
+  @MainActor public var `password`: String {
+    switch self {
+    case .case1(let value): return value.`password`
+    case .case2(let value): return value.`password`
+    case .case3(let value): return value.`password`
+    case .case4(let value): return value.`password`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -7718,6 +8953,12 @@ public struct SignInEmailLinkState: Sendable {
 public indirect enum SignInEmailLinkSendParams: Sendable {
   case case1(SignInEmailLinkSendLinkParamsCase1)
   case case2(SignInEmailLinkSendLinkParamsCase2)
+  @MainActor public var `verificationUrl`: String {
+    switch self {
+    case .case1(let value): return value.`verificationUrl`
+    case .case2(let value): return value.`verificationUrl`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -8678,15 +9919,15 @@ public enum SignUpField: Hashable, Sendable {
   case `oauthEnstall`
   case `oauthHuggingface`
   case `oauthVercel`
+  case `password`
+  case `emailAddress`
+  case `phoneNumber`
   case `username`
   case `firstName`
   case `lastName`
-  case `password`
-  case `legalAccepted`
-  case `emailAddress`
-  case `phoneNumber`
-  case `emailAddressOrPhoneNumber`
   case `web3Wallet`
+  case `legalAccepted`
+  case `emailAddressOrPhoneNumber`
   case `protectCheck`
   case unrecognized(String)
   public var rawValue: String {
@@ -8721,15 +9962,15 @@ public enum SignUpField: Hashable, Sendable {
     case .`oauthEnstall`: return "oauth_enstall"
     case .`oauthHuggingface`: return "oauth_huggingface"
     case .`oauthVercel`: return "oauth_vercel"
+    case .`password`: return "password"
+    case .`emailAddress`: return "email_address"
+    case .`phoneNumber`: return "phone_number"
     case .`username`: return "username"
     case .`firstName`: return "first_name"
     case .`lastName`: return "last_name"
-    case .`password`: return "password"
-    case .`legalAccepted`: return "legal_accepted"
-    case .`emailAddress`: return "email_address"
-    case .`phoneNumber`: return "phone_number"
-    case .`emailAddressOrPhoneNumber`: return "email_address_or_phone_number"
     case .`web3Wallet`: return "web3_wallet"
+    case .`legalAccepted`: return "legal_accepted"
+    case .`emailAddressOrPhoneNumber`: return "email_address_or_phone_number"
     case .`protectCheck`: return "protect_check"
     case .unrecognized(let value): return value
     }
@@ -8766,15 +10007,15 @@ public enum SignUpField: Hashable, Sendable {
     case "oauth_enstall": self = .`oauthEnstall`
     case "oauth_huggingface": self = .`oauthHuggingface`
     case "oauth_vercel": self = .`oauthVercel`
+    case "password": self = .`password`
+    case "email_address": self = .`emailAddress`
+    case "phone_number": self = .`phoneNumber`
     case "username": self = .`username`
     case "first_name": self = .`firstName`
     case "last_name": self = .`lastName`
-    case "password": self = .`password`
-    case "legal_accepted": self = .`legalAccepted`
-    case "email_address": self = .`emailAddress`
-    case "phone_number": self = .`phoneNumber`
-    case "email_address_or_phone_number": self = .`emailAddressOrPhoneNumber`
     case "web3_wallet": self = .`web3Wallet`
+    case "legal_accepted": self = .`legalAccepted`
+    case "email_address_or_phone_number": self = .`emailAddressOrPhoneNumber`
     case "protect_check": self = .`protectCheck`
     default: self = .unrecognized(rawValue)
     }
@@ -8814,11 +10055,11 @@ public enum SignUpIdentificationField: Hashable, Sendable {
   case `oauthEnstall`
   case `oauthHuggingface`
   case `oauthVercel`
-  case `username`
   case `emailAddress`
   case `phoneNumber`
-  case `emailAddressOrPhoneNumber`
+  case `username`
   case `web3Wallet`
+  case `emailAddressOrPhoneNumber`
   case unrecognized(String)
   public var rawValue: String {
     switch self {
@@ -8852,11 +10093,11 @@ public enum SignUpIdentificationField: Hashable, Sendable {
     case .`oauthEnstall`: return "oauth_enstall"
     case .`oauthHuggingface`: return "oauth_huggingface"
     case .`oauthVercel`: return "oauth_vercel"
-    case .`username`: return "username"
     case .`emailAddress`: return "email_address"
     case .`phoneNumber`: return "phone_number"
-    case .`emailAddressOrPhoneNumber`: return "email_address_or_phone_number"
+    case .`username`: return "username"
     case .`web3Wallet`: return "web3_wallet"
+    case .`emailAddressOrPhoneNumber`: return "email_address_or_phone_number"
     case .unrecognized(let value): return value
     }
   }
@@ -8892,11 +10133,11 @@ public enum SignUpIdentificationField: Hashable, Sendable {
     case "oauth_enstall": self = .`oauthEnstall`
     case "oauth_huggingface": self = .`oauthHuggingface`
     case "oauth_vercel": self = .`oauthVercel`
-    case "username": self = .`username`
     case "email_address": self = .`emailAddress`
     case "phone_number": self = .`phoneNumber`
-    case "email_address_or_phone_number": self = .`emailAddressOrPhoneNumber`
+    case "username": self = .`username`
     case "web3_wallet": self = .`web3Wallet`
+    case "email_address_or_phone_number": self = .`emailAddressOrPhoneNumber`
     default: self = .unrecognized(rawValue)
     }
   }
@@ -9392,6 +10633,14 @@ public indirect enum SignUpPasswordParams: Sendable {
   case case2(SignUpPasswordParamsCase2)
   case case3(SignUpPasswordParamsCase3)
   case case4(SignUpPasswordParamsCase4)
+  @MainActor public var `password`: String {
+    switch self {
+    case .case1(let value): return value.`password`
+    case .case2(let value): return value.`password`
+    case .case3(let value): return value.`password`
+    case .case4(let value): return value.`password`
+    }
+  }
   @MainActor public func encode() throws -> JSONValue {
     switch self {
     case .case1(let value): return .object(["$case": .number(0), "value": try value.encode()])
@@ -10128,7 +11377,7 @@ public struct PendingSessionFactorVerificationAgeValue: Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "0a52bc1140be0af0d047410ae267d11c38ed7c2244a335deb211c30131b85616"
+  public static let contractHash = "433f633d39fae8991468af0323aba52d7956b097f3fe695cdccce0ae62146450"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {
@@ -10163,8 +11412,6 @@ public struct PendingSessionFactorVerificationAgeValue: Sendable {
     case "UserOrganizationInvitation": return UserOrganizationInvitation(handle: handle, runtime: runtime)
     case "OrganizationSuggestion": return OrganizationSuggestion(handle: handle, runtime: runtime)
     case "OrganizationCreationDefaults": return OrganizationCreationDefaults(handle: handle, runtime: runtime)
-    case "TOTP": return TOTP(handle: handle, runtime: runtime)
-    case "BackupCode": return BackupCode(handle: handle, runtime: runtime)
     case "SessionVerification": return SessionVerification(handle: handle, runtime: runtime)
     case "SignIn": return SignIn(handle: handle, runtime: runtime)
     case "SignInEmailCode": return SignInEmailCode(handle: handle, runtime: runtime)

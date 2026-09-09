@@ -31,7 +31,7 @@
       "name": "Clerk",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 11,
+        "line": 31,
         "symbol": "MobileClerk"
       },
       "kind": "resource",
@@ -45,7 +45,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 290,
+            "line": 291,
             "symbol": "status"
           },
           "documentation": "The status of the `Clerk` instance. Possible values are:\n<ul>\n <li>`\"error\"`: Set when hotloading `clerk-js` or `Clerk.load()` failed.</li>\n <li>`\"loading\"`: Set during initialization.</li>\n <li>`\"ready\"`: Set when Clerk is fully operational.</li>\n <li>`\"degraded\"`: Set when Clerk is partially operational.</li>\n</ul>"
@@ -58,10 +58,23 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 279,
+            "line": 280,
             "symbol": "loaded"
           },
           "documentation": "Indicates whether the `Clerk` object is ready for use. Set to `false` when the `status` is `\"loading\"`. Set to `true` when the `status` is `\"ready\"` or `\"degraded\"`."
+        },
+        {
+          "name": "environment",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "MobileEnvironment"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 32,
+            "symbol": "environment"
+          }
         },
         {
           "name": "session",
@@ -77,7 +90,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 12,
+            "line": 33,
             "symbol": "session"
           }
         },
@@ -95,7 +108,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 13,
+            "line": 34,
             "symbol": "user"
           }
         },
@@ -113,7 +126,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 14,
+            "line": 35,
             "symbol": "organization"
           }
         },
@@ -126,7 +139,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 15,
+            "line": 36,
             "symbol": "signIn"
           }
         },
@@ -139,7 +152,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 16,
+            "line": 37,
             "symbol": "signUp"
           }
         }
@@ -150,7 +163,7 @@
           "nativeName": "createOrganization",
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 1255,
+            "line": 1259,
             "symbol": "createOrganization"
           },
           "documentation": "Creates an Organization programmatically, adding the current user as admin. Returns an [`Organization`](https://clerk.com/docs/reference/objects/organization) object.\n\n> [!NOTE]\n> For React-based apps, consider using the [`<CreateOrganization />`](https://clerk.com/docs/reference/components/organization/create-organization) component.",
@@ -176,7 +189,7 @@
           "nativeName": "getOrganization",
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 1262,
+            "line": 1266,
             "symbol": "getOrganization"
           },
           "documentation": "Gets a single [Organization](https://clerk.com/docs/reference/objects/organization) by ID.",
@@ -201,7 +214,7 @@
           "nativeName": "setActive",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 17,
+            "line": 38,
             "symbol": "setActive"
           },
           "parameters": [
@@ -225,7 +238,7 @@
           "nativeName": "signOut",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 18,
+            "line": 39,
             "symbol": "signOut"
           },
           "parameters": [
@@ -255,7 +268,7 @@
       "name": "ClerkStatus",
       "source": {
         "file": "packages/shared/src/types/clerk.ts",
-        "line": 254,
+        "line": 255,
         "symbol": "ClerkStatus"
       },
       "kind": "enum",
@@ -274,7 +287,7 @@
       "name": "CreateOrganizationParams",
       "source": {
         "file": "packages/shared/src/types/clerk.ts",
-        "line": 2923,
+        "line": 2927,
         "symbol": "CreateOrganizationParams"
       },
       "kind": "object",
@@ -287,7 +300,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 2927,
+            "line": 2931,
             "symbol": "name"
           },
           "documentation": "The name of the Organization."
@@ -305,7 +318,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 2931,
+            "line": 2935,
             "symbol": "slug"
           },
           "documentation": "The slug of the Organization."
@@ -6614,6 +6627,3011 @@
       ],
       "methods": []
     },
+    "MobileEnvironment": {
+      "name": "MobileEnvironment",
+      "source": {
+        "file": "packages/shared/src/types/mobile.ts",
+        "line": 18,
+        "symbol": "MobileEnvironment"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "organizationSettings",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "OrganizationSettings"
+          },
+          "source": {
+            "file": "packages/shared/src/types/environment.ts",
+            "line": 14,
+            "symbol": "organizationSettings"
+          }
+        },
+        {
+          "name": "authConfig",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AuthConfig"
+          },
+          "source": {
+            "file": "packages/shared/src/types/environment.ts",
+            "line": 15,
+            "symbol": "authConfig"
+          }
+        },
+        {
+          "name": "displayConfig",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "DisplayConfig"
+          },
+          "source": {
+            "file": "packages/shared/src/types/environment.ts",
+            "line": 16,
+            "symbol": "displayConfig"
+          }
+        },
+        {
+          "name": "maintenanceMode",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/environment.ts",
+            "line": 24,
+            "symbol": "maintenanceMode"
+          }
+        },
+        {
+          "name": "userSettings",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "MobileUserSettings"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 22,
+            "symbol": "userSettings"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "OrganizationSettings": {
+      "name": "OrganizationSettings",
+      "source": {
+        "file": "packages/shared/src/types/organizationSettings.ts",
+        "line": 33,
+        "symbol": "OrganizationSettingsResource"
+      },
+      "documentation": "The `OrganizationSettings` object holds the Organization-related settings configured for the instance.",
+      "kind": "object",
+      "properties": [
+        {
+          "name": "enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 37,
+            "symbol": "enabled"
+          },
+          "documentation": "Whether Organizations are enabled for the instance."
+        },
+        {
+          "name": "maxAllowedMemberships",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 41,
+            "symbol": "maxAllowedMemberships"
+          },
+          "documentation": "The maximum number of memberships allowed per Organization."
+        },
+        {
+          "name": "forceOrganizationSelection",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 45,
+            "symbol": "forceOrganizationSelection"
+          },
+          "documentation": "Whether users are required to select an Organization after signing in."
+        },
+        {
+          "name": "actions",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "OrganizationSettingsActions"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 49,
+            "symbol": "actions"
+          },
+          "documentation": "The Organization-related actions that are enabled for the instance."
+        },
+        {
+          "name": "domains",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "OrganizationSettingsDomains"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 58,
+            "symbol": "domains"
+          },
+          "documentation": "The settings that control Organization [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) and member enrollment."
+        },
+        {
+          "name": "slug",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "OrganizationSettingsSlug"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 81,
+            "symbol": "slug"
+          },
+          "documentation": "The settings that control Organization slugs."
+        },
+        {
+          "name": "organizationCreationDefaults",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "OrganizationSettingsOrganizationCreationDefaults"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 90,
+            "symbol": "organizationCreationDefaults"
+          },
+          "documentation": "The settings that control the defaults used when creating an Organization."
+        },
+        {
+          "name": "id",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/resource.ts",
+            "line": 16,
+            "symbol": "id"
+          },
+          "documentation": "The unique identifier of the resource."
+        }
+      ],
+      "methods": []
+    },
+    "OrganizationSettingsActions": {
+      "name": "OrganizationSettingsActions",
+      "source": {
+        "file": "packages/shared/src/types/organizationSettings.ts",
+        "line": 49,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "adminDelete",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 53,
+            "symbol": "adminDelete"
+          },
+          "documentation": "Whether admins are allowed to delete Organizations."
+        }
+      ],
+      "methods": []
+    },
+    "OrganizationSettingsDomains": {
+      "name": "OrganizationSettingsDomains",
+      "source": {
+        "file": "packages/shared/src/types/organizationSettings.ts",
+        "line": 58,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 62,
+            "symbol": "enabled"
+          },
+          "documentation": "Whether Verified Domains are enabled."
+        },
+        {
+          "name": "enrollmentModes",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "OrganizationEnrollmentMode"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 72,
+            "symbol": "enrollmentModes"
+          },
+          "documentation": "The enrollment modes that are available for Verified Domains.\n\n<ul>\n <li>`manual_invitation`: No automatic enrollment. Users with a matching email domain are not given any [invitation](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-invitations) or [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions); an admin must invite them manually.</li>\n <li>`automatic_invitation`: Users with a matching email domain automatically receive a pending [invitation](https://clerk.com/docs/reference/types/organization-invitation) (assigned the Organization's default role) which they can accept to join.</li>\n <li>`automatic_suggestion`: Users with a matching email domain automatically receive a [suggestion](https://clerk.com/docs/guides/organizations/add-members/verified-domains#automatic-suggestions) to join, which they can request.</li>\n</ul>"
+        },
+        {
+          "name": "defaultRole",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 76,
+            "symbol": "defaultRole"
+          },
+          "documentation": "The default Role assigned to users enrolled through a domain, or `null` if there is none."
+        }
+      ],
+      "methods": []
+    },
+    "OrganizationSettingsSlug": {
+      "name": "OrganizationSettingsSlug",
+      "source": {
+        "file": "packages/shared/src/types/organizationSettings.ts",
+        "line": 81,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "disabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 85,
+            "symbol": "disabled"
+          },
+          "documentation": "Whether Organization slugs are disabled."
+        }
+      ],
+      "methods": []
+    },
+    "OrganizationSettingsOrganizationCreationDefaults": {
+      "name": "OrganizationSettingsOrganizationCreationDefaults",
+      "source": {
+        "file": "packages/shared/src/types/organizationSettings.ts",
+        "line": 90,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/organizationSettings.ts",
+            "line": 94,
+            "symbol": "enabled"
+          },
+          "documentation": "Whether Organization creation defaults are enabled."
+        }
+      ],
+      "methods": []
+    },
+    "AuthConfig": {
+      "name": "AuthConfig",
+      "source": {
+        "file": "packages/shared/src/types/authConfig.ts",
+        "line": 5,
+        "symbol": "AuthConfigResource"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "singleSessionMode",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 9,
+            "symbol": "singleSessionMode"
+          },
+          "documentation": "Enabled single session configuration at the instance level."
+        },
+        {
+          "name": "claimedAt",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "date"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 15,
+            "symbol": "claimedAt"
+          },
+          "documentation": "Timestamp of when the instance was claimed. This only applies to applications created with the Keyless mode."
+        },
+        {
+          "name": "reverification",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 19,
+            "symbol": "reverification"
+          },
+          "documentation": "Whether Reverification is enabled at the instance level."
+        },
+        {
+          "name": "preferredChannels",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "dictionary",
+              "value": {
+                "kind": "ref",
+                "name": "PhoneCodeChannel"
+              }
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 23,
+            "symbol": "preferredChannels"
+          },
+          "documentation": "Preferred channels for phone code providers."
+        },
+        {
+          "name": "sessionMinter",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/authConfig.ts",
+            "line": 24,
+            "symbol": "sessionMinter"
+          }
+        },
+        {
+          "name": "id",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/resource.ts",
+            "line": 16,
+            "symbol": "id"
+          },
+          "documentation": "The unique identifier of the resource."
+        }
+      ],
+      "methods": []
+    },
+    "PhoneCodeChannel": {
+      "name": "PhoneCodeChannel",
+      "source": {
+        "file": "packages/shared/src/types/phoneCodeChannel.ts",
+        "line": 12,
+        "symbol": "PhoneCodeChannel"
+      },
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "sms",
+        "whatsapp"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "DisplayConfig": {
+      "name": "DisplayConfig",
+      "source": {
+        "file": "packages/shared/src/types/displayConfig.ts",
+        "line": 50,
+        "symbol": "DisplayConfigResource"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "id",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 51,
+            "symbol": "id"
+          },
+          "documentation": "The unique identifier of the resource."
+        },
+        {
+          "name": "afterSignInUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 52,
+            "symbol": "afterSignInUrl"
+          }
+        },
+        {
+          "name": "afterSignOutAllUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 53,
+            "symbol": "afterSignOutAllUrl"
+          }
+        },
+        {
+          "name": "afterSignOutOneUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 54,
+            "symbol": "afterSignOutOneUrl"
+          }
+        },
+        {
+          "name": "afterSignUpUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 55,
+            "symbol": "afterSignUpUrl"
+          }
+        },
+        {
+          "name": "afterSwitchSessionUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 56,
+            "symbol": "afterSwitchSessionUrl"
+          }
+        },
+        {
+          "name": "applicationName",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 57,
+            "symbol": "applicationName"
+          }
+        },
+        {
+          "name": "backendHost",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 58,
+            "symbol": "backendHost"
+          }
+        },
+        {
+          "name": "branded",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 59,
+            "symbol": "branded"
+          }
+        },
+        {
+          "name": "captchaPublicKey",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 60,
+            "symbol": "captchaPublicKey"
+          }
+        },
+        {
+          "name": "captchaWidgetType",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "ref",
+              "name": "DisplayConfigCaptchaWidgetType"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 61,
+            "symbol": "captchaWidgetType"
+          }
+        },
+        {
+          "name": "captchaProvider",
+          "optional": false,
+          "type": {
+            "kind": "literal",
+            "value": "turnstile"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 62,
+            "symbol": "captchaProvider"
+          }
+        },
+        {
+          "name": "captchaPublicKeyInvisible",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 63,
+            "symbol": "captchaPublicKeyInvisible"
+          }
+        },
+        {
+          "name": "captchaOauthBypass",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "OAuthStrategy"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 69,
+            "symbol": "captchaOauthBypass"
+          },
+          "documentation": "An array of OAuth strategies for which we will bypass the captcha.\nWe trust that the provider will verify that the user is not a bot on their end.\nThis can also be used to bypass the captcha for a specific OAuth provider on a per-instance basis."
+        },
+        {
+          "name": "captchaHeartbeat",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 70,
+            "symbol": "captchaHeartbeat"
+          }
+        },
+        {
+          "name": "captchaHeartbeatIntervalMs",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "number"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 71,
+            "symbol": "captchaHeartbeatIntervalMs"
+          }
+        },
+        {
+          "name": "homeUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 72,
+            "symbol": "homeUrl"
+          }
+        },
+        {
+          "name": "instanceEnvironmentType",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 73,
+            "symbol": "instanceEnvironmentType"
+          }
+        },
+        {
+          "name": "logoImageUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 74,
+            "symbol": "logoImageUrl"
+          }
+        },
+        {
+          "name": "faviconImageUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 75,
+            "symbol": "faviconImageUrl"
+          }
+        },
+        {
+          "name": "preferredSignInStrategy",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "PreferredSignInStrategy"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 76,
+            "symbol": "preferredSignInStrategy"
+          }
+        },
+        {
+          "name": "signInUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 77,
+            "symbol": "signInUrl"
+          }
+        },
+        {
+          "name": "signUpUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 78,
+            "symbol": "signUpUrl"
+          }
+        },
+        {
+          "name": "supportEmail",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 79,
+            "symbol": "supportEmail"
+          }
+        },
+        {
+          "name": "theme",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "DisplayThemeJSON"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 80,
+            "symbol": "theme"
+          }
+        },
+        {
+          "name": "userProfileUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 81,
+            "symbol": "userProfileUrl"
+          }
+        },
+        {
+          "name": "clerkJSVersion",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 82,
+            "symbol": "clerkJSVersion"
+          }
+        },
+        {
+          "name": "organizationProfileUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 83,
+            "symbol": "organizationProfileUrl"
+          }
+        },
+        {
+          "name": "createOrganizationUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 84,
+            "symbol": "createOrganizationUrl"
+          }
+        },
+        {
+          "name": "afterLeaveOrganizationUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 85,
+            "symbol": "afterLeaveOrganizationUrl"
+          }
+        },
+        {
+          "name": "afterCreateOrganizationUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 86,
+            "symbol": "afterCreateOrganizationUrl"
+          }
+        },
+        {
+          "name": "googleOneTapClientId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 87,
+            "symbol": "googleOneTapClientId"
+          }
+        },
+        {
+          "name": "showDevModeWarning",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 88,
+            "symbol": "showDevModeWarning"
+          }
+        },
+        {
+          "name": "termsUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 89,
+            "symbol": "termsUrl"
+          }
+        },
+        {
+          "name": "privacyPolicyUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 90,
+            "symbol": "privacyPolicyUrl"
+          }
+        },
+        {
+          "name": "waitlistUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 91,
+            "symbol": "waitlistUrl"
+          }
+        },
+        {
+          "name": "afterJoinWaitlistUrl",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/displayConfig.ts",
+            "line": 92,
+            "symbol": "afterJoinWaitlistUrl"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "DisplayConfigCaptchaWidgetType": {
+      "name": "DisplayConfigCaptchaWidgetType",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "smart",
+        "invisible"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "OAuthStrategy": {
+      "name": "OAuthStrategy",
+      "source": {
+        "file": "packages/shared/src/types/strategies.ts",
+        "line": 34,
+        "symbol": "OAuthStrategy"
+      },
+      "documentation": "OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "oauth_facebook",
+        "oauth_google",
+        "oauth_hubspot",
+        "oauth_github",
+        "oauth_tiktok",
+        "oauth_gitlab",
+        "oauth_discord",
+        "oauth_twitter",
+        "oauth_twitch",
+        "oauth_linkedin",
+        "oauth_linkedin_oidc",
+        "oauth_dropbox",
+        "oauth_atlassian",
+        "oauth_bitbucket",
+        "oauth_microsoft",
+        "oauth_notion",
+        "oauth_apple",
+        "oauth_line",
+        "oauth_instagram",
+        "oauth_coinbase",
+        "oauth_spotify",
+        "oauth_xero",
+        "oauth_box",
+        "oauth_slack",
+        "oauth_linear",
+        "oauth_x",
+        "oauth_enstall",
+        "oauth_huggingface",
+        "oauth_vercel"
+      ],
+      "open": false,
+      "patterns": [
+        "^oauth_custom_.*$"
+      ]
+    },
+    "PreferredSignInStrategy": {
+      "name": "PreferredSignInStrategy",
+      "source": {
+        "file": "packages/shared/src/types/displayConfig.ts",
+        "line": 6,
+        "symbol": "PreferredSignInStrategy"
+      },
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "password",
+        "otp"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "DisplayThemeJSON": {
+      "name": "DisplayThemeJSON",
+      "source": {
+        "file": "packages/shared/src/types/json.ts",
+        "line": 61,
+        "symbol": "DisplayThemeJSON"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "general",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "DisplayThemeJSONGeneral"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 62,
+            "symbol": "general"
+          }
+        },
+        {
+          "name": "buttons",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "DisplayThemeJSONButtons"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 72,
+            "symbol": "buttons"
+          }
+        },
+        {
+          "name": "accounts",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "DisplayThemeJSONAccounts"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 77,
+            "symbol": "accounts"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "DisplayThemeJSONGeneral": {
+      "name": "DisplayThemeJSONGeneral",
+      "source": {
+        "file": "packages/shared/src/types/json.ts",
+        "line": 62,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "color",
+          "optional": false,
+          "type": {
+            "kind": "string",
+            "pattern": "^#.*$"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 63,
+            "symbol": "color"
+          }
+        },
+        {
+          "name": "background_color",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "Color"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 64,
+            "symbol": "background_color"
+          }
+        },
+        {
+          "name": "font_family",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 65,
+            "symbol": "font_family"
+          }
+        },
+        {
+          "name": "font_color",
+          "optional": false,
+          "type": {
+            "kind": "string",
+            "pattern": "^#.*$"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 66,
+            "symbol": "font_color"
+          }
+        },
+        {
+          "name": "label_font_weight",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 67,
+            "symbol": "label_font_weight"
+          }
+        },
+        {
+          "name": "padding",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 68,
+            "symbol": "padding"
+          }
+        },
+        {
+          "name": "border_radius",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 69,
+            "symbol": "border_radius"
+          }
+        },
+        {
+          "name": "box_shadow",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 70,
+            "symbol": "box_shadow"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "Color": {
+      "name": "Color",
+      "source": {
+        "file": "packages/shared/src/types/theme.ts",
+        "line": 30,
+        "symbol": "Color"
+      },
+      "kind": "union",
+      "properties": [],
+      "methods": [],
+      "variants": [
+        {
+          "kind": "string"
+        },
+        {
+          "kind": "ref",
+          "name": "HslaColor"
+        },
+        {
+          "kind": "ref",
+          "name": "RgbaColor"
+        }
+      ]
+    },
+    "HslaColor": {
+      "name": "HslaColor",
+      "source": {
+        "file": "packages/shared/src/types/theme.ts",
+        "line": 12,
+        "symbol": "HslaColor"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "h",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/theme.ts",
+            "line": 13,
+            "symbol": "h"
+          }
+        },
+        {
+          "name": "s",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/theme.ts",
+            "line": 14,
+            "symbol": "s"
+          }
+        },
+        {
+          "name": "l",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/theme.ts",
+            "line": 15,
+            "symbol": "l"
+          }
+        },
+        {
+          "name": "a",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "number"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/theme.ts",
+            "line": 16,
+            "symbol": "a"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "RgbaColor": {
+      "name": "RgbaColor",
+      "source": {
+        "file": "packages/shared/src/types/theme.ts",
+        "line": 19,
+        "symbol": "RgbaColor"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "r",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/theme.ts",
+            "line": 20,
+            "symbol": "r"
+          }
+        },
+        {
+          "name": "g",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/theme.ts",
+            "line": 21,
+            "symbol": "g"
+          }
+        },
+        {
+          "name": "b",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/theme.ts",
+            "line": 22,
+            "symbol": "b"
+          }
+        },
+        {
+          "name": "a",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "number"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/theme.ts",
+            "line": 23,
+            "symbol": "a"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "DisplayThemeJSONButtons": {
+      "name": "DisplayThemeJSONButtons",
+      "source": {
+        "file": "packages/shared/src/types/json.ts",
+        "line": 72,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "font_color",
+          "optional": false,
+          "type": {
+            "kind": "string",
+            "pattern": "^#.*$"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 73,
+            "symbol": "font_color"
+          }
+        },
+        {
+          "name": "font_family",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 74,
+            "symbol": "font_family"
+          }
+        },
+        {
+          "name": "font_weight",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 75,
+            "symbol": "font_weight"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "DisplayThemeJSONAccounts": {
+      "name": "DisplayThemeJSONAccounts",
+      "source": {
+        "file": "packages/shared/src/types/json.ts",
+        "line": 77,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "background_color",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "Color"
+          },
+          "source": {
+            "file": "packages/shared/src/types/json.ts",
+            "line": 78,
+            "symbol": "background_color"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "MobileUserSettings": {
+      "name": "MobileUserSettings",
+      "source": {
+        "file": "packages/shared/src/types/mobile.ts",
+        "line": 14,
+        "symbol": "MobileUserSettings"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "id",
+          "optional": true,
+          "type": {
+            "kind": "undefined"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 139,
+            "symbol": "id"
+          },
+          "documentation": "The unique identifier of the resource."
+        },
+        {
+          "name": "enterpriseSSO",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "EnterpriseSSOSettings"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 142,
+            "symbol": "enterpriseSSO"
+          }
+        },
+        {
+          "name": "attributes",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "Attributes"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 144,
+            "symbol": "attributes"
+          }
+        },
+        {
+          "name": "actions",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "Actions"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 145,
+            "symbol": "actions"
+          }
+        },
+        {
+          "name": "signIn",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "SignInData"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 146,
+            "symbol": "signIn"
+          }
+        },
+        {
+          "name": "signUp",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "SignUpData"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 147,
+            "symbol": "signUp"
+          }
+        },
+        {
+          "name": "passwordSettings",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "PasswordSettingsData"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 148,
+            "symbol": "passwordSettings"
+          }
+        },
+        {
+          "name": "usernameSettings",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "UsernameSettingsData"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 149,
+            "symbol": "usernameSettings"
+          }
+        },
+        {
+          "name": "attackProtection",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttackProtectionData"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 150,
+            "symbol": "attackProtection"
+          }
+        },
+        {
+          "name": "passkeySettings",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "PasskeySettingsData"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 151,
+            "symbol": "passkeySettings"
+          }
+        },
+        {
+          "name": "socialProviderStrategies",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "OAuthStrategy"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 152,
+            "symbol": "socialProviderStrategies"
+          }
+        },
+        {
+          "name": "authenticatableSocialStrategies",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "OAuthStrategy"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 153,
+            "symbol": "authenticatableSocialStrategies"
+          }
+        },
+        {
+          "name": "web3FirstFactors",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "MobileUserSettingsWeb3FirstFactorsElement"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 154,
+            "symbol": "web3FirstFactors"
+          }
+        },
+        {
+          "name": "alternativePhoneCodeChannels",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "PhoneCodeChannel"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 155,
+            "symbol": "alternativePhoneCodeChannels"
+          }
+        },
+        {
+          "name": "enabledFirstFactorIdentifiers",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "Attribute"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 156,
+            "symbol": "enabledFirstFactorIdentifiers"
+          }
+        },
+        {
+          "name": "instanceIsPasswordBased",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 157,
+            "symbol": "instanceIsPasswordBased"
+          }
+        },
+        {
+          "name": "hasValidAuthFactor",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 158,
+            "symbol": "hasValidAuthFactor"
+          }
+        },
+        {
+          "name": "social",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "PartialOAuthProviders"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 15,
+            "symbol": "social"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "EnterpriseSSOSettings": {
+      "name": "EnterpriseSSOSettings",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 99,
+        "symbol": "EnterpriseSSOSettings"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 100,
+            "symbol": "enabled"
+          }
+        },
+        {
+          "name": "self_serve_sso",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 101,
+            "symbol": "self_serve_sso"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "Attributes": {
+      "name": "Attributes",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 108,
+        "symbol": "Attributes"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "password",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "email_address",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "phone_number",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "username",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "first_name",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "last_name",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "web3_wallet",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "authenticator_app",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "backup_code",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        },
+        {
+          "name": "passkey",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttributeData"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "AttributeData": {
+      "name": "AttributeData",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 43,
+        "symbol": "AttributeData"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 31,
+            "symbol": "enabled"
+          }
+        },
+        {
+          "name": "required",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 32,
+            "symbol": "required"
+          }
+        },
+        {
+          "name": "immutable",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "boolean"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 33,
+            "symbol": "immutable"
+          }
+        },
+        {
+          "name": "verifications",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "VerificationStrategy"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 34,
+            "symbol": "verifications"
+          }
+        },
+        {
+          "name": "used_for_first_factor",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 35,
+            "symbol": "used_for_first_factor"
+          }
+        },
+        {
+          "name": "first_factors",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "VerificationStrategy"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 36,
+            "symbol": "first_factors"
+          }
+        },
+        {
+          "name": "used_for_second_factor",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 37,
+            "symbol": "used_for_second_factor"
+          }
+        },
+        {
+          "name": "second_factors",
+          "optional": false,
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "VerificationStrategy"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 38,
+            "symbol": "second_factors"
+          }
+        },
+        {
+          "name": "verify_at_sign_up",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 39,
+            "symbol": "verify_at_sign_up"
+          }
+        },
+        {
+          "name": "channels",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "array",
+              "element": {
+                "kind": "ref",
+                "name": "PhoneCodeChannel"
+              }
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 40,
+            "symbol": "channels"
+          }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "Attribute"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 44,
+            "symbol": "name"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "VerificationStrategy": {
+      "name": "VerificationStrategy",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 19,
+        "symbol": "VerificationStrategy"
+      },
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "email_code",
+        "backup_code",
+        "email_link",
+        "phone_code",
+        "totp"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "Attribute": {
+      "name": "Attribute",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 7,
+        "symbol": "Attribute"
+      },
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "password",
+        "email_address",
+        "phone_number",
+        "username",
+        "first_name",
+        "last_name",
+        "web3_wallet",
+        "authenticator_app",
+        "backup_code",
+        "passkey"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "Actions": {
+      "name": "Actions",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 112,
+        "symbol": "Actions"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "delete_self",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 113,
+            "symbol": "delete_self"
+          }
+        },
+        {
+          "name": "create_organization",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 114,
+            "symbol": "create_organization"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "SignInData": {
+      "name": "SignInData",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 47,
+        "symbol": "SignInData"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "second_factor",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "SignInDataSecond_factor"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 48,
+            "symbol": "second_factor"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "SignInDataSecond_factor": {
+      "name": "SignInDataSecond_factor",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 48,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "required",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 49,
+            "symbol": "required"
+          }
+        },
+        {
+          "name": "enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 50,
+            "symbol": "enabled"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "SignUpData": {
+      "name": "SignUpData",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 56,
+        "symbol": "SignUpData"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "allowlist_only",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 57,
+            "symbol": "allowlist_only"
+          }
+        },
+        {
+          "name": "progressive",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 58,
+            "symbol": "progressive"
+          }
+        },
+        {
+          "name": "captcha_enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 59,
+            "symbol": "captcha_enabled"
+          }
+        },
+        {
+          "name": "mode",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "SignUpModes"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 60,
+            "symbol": "mode"
+          }
+        },
+        {
+          "name": "legal_consent_enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 61,
+            "symbol": "legal_consent_enabled"
+          }
+        },
+        {
+          "name": "mfa",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "SignUpDataMfa"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 62,
+            "symbol": "mfa"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "SignUpModes": {
+      "name": "SignUpModes",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 54,
+        "symbol": "SignUpModes"
+      },
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "public",
+        "restricted",
+        "waitlist"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "SignUpDataMfa": {
+      "name": "SignUpDataMfa",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 62,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "required",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 63,
+            "symbol": "required"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "PasswordSettingsData": {
+      "name": "PasswordSettingsData",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 67,
+        "symbol": "PasswordSettingsData"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "allowed_special_characters",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 68,
+            "symbol": "allowed_special_characters"
+          }
+        },
+        {
+          "name": "disable_hibp",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 69,
+            "symbol": "disable_hibp"
+          }
+        },
+        {
+          "name": "min_length",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 70,
+            "symbol": "min_length"
+          }
+        },
+        {
+          "name": "max_length",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 71,
+            "symbol": "max_length"
+          }
+        },
+        {
+          "name": "require_special_char",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 72,
+            "symbol": "require_special_char"
+          }
+        },
+        {
+          "name": "require_numbers",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 73,
+            "symbol": "require_numbers"
+          }
+        },
+        {
+          "name": "require_uppercase",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 74,
+            "symbol": "require_uppercase"
+          }
+        },
+        {
+          "name": "require_lowercase",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 75,
+            "symbol": "require_lowercase"
+          }
+        },
+        {
+          "name": "show_zxcvbn",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 76,
+            "symbol": "show_zxcvbn"
+          }
+        },
+        {
+          "name": "min_zxcvbn_strength",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 77,
+            "symbol": "min_zxcvbn_strength"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "UsernameSettingsData": {
+      "name": "UsernameSettingsData",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 80,
+        "symbol": "UsernameSettingsData"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "min_length",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 81,
+            "symbol": "min_length"
+          }
+        },
+        {
+          "name": "max_length",
+          "optional": false,
+          "type": {
+            "kind": "number"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 82,
+            "symbol": "max_length"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "AttackProtectionData": {
+      "name": "AttackProtectionData",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 85,
+        "symbol": "AttackProtectionData"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "enumeration_protection",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "AttackProtectionDataEnumeration_protection"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 86,
+            "symbol": "enumeration_protection"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "AttackProtectionDataEnumeration_protection": {
+      "name": "AttackProtectionDataEnumeration_protection",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 86,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 87,
+            "symbol": "enabled"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "PasskeySettingsData": {
+      "name": "PasskeySettingsData",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 91,
+        "symbol": "PasskeySettingsData"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "allow_autofill",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 92,
+            "symbol": "allow_autofill"
+          }
+        },
+        {
+          "name": "show_sign_in_button",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 93,
+            "symbol": "show_sign_in_button"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "MobileUserSettingsWeb3FirstFactorsElement": {
+      "name": "MobileUserSettingsWeb3FirstFactorsElement",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "web3_metamask_signature",
+        "web3_base_signature",
+        "web3_coinbase_wallet_signature",
+        "web3_okx_wallet_signature",
+        "web3_solana_signature"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "PartialOAuthProviders": {
+      "name": "PartialOAuthProviders",
+      "source": {
+        "file": "node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/lib/lib.es5.d.ts",
+        "line": 1583,
+        "symbol": "Partial"
+      },
+      "documentation": "Make all properties in T optional",
+      "kind": "object",
+      "properties": [
+        {
+          "name": "oauth_facebook",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_google",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_hubspot",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_github",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_tiktok",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_gitlab",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_discord",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_twitter",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_twitch",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_linkedin",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_linkedin_oidc",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_dropbox",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_atlassian",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_bitbucket",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_microsoft",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_notion",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_apple",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_line",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_instagram",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_coinbase",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_spotify",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_xero",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_box",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_slack",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_linear",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_x",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_enstall",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_huggingface",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        },
+        {
+          "name": "oauth_vercel",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "OAuthProviderSettings"
+            }
+          }
+        }
+      ],
+      "methods": []
+    },
+    "OAuthProviderSettings": {
+      "name": "OAuthProviderSettings",
+      "source": {
+        "file": "packages/shared/src/types/userSettings.ts",
+        "line": 21,
+        "symbol": "OAuthProviderSettings"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "enabled",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 22,
+            "symbol": "enabled"
+          }
+        },
+        {
+          "name": "required",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 23,
+            "symbol": "required"
+          }
+        },
+        {
+          "name": "authenticatable",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 24,
+            "symbol": "authenticatable"
+          }
+        },
+        {
+          "name": "strategy",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "OAuthStrategy"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 25,
+            "symbol": "strategy"
+          }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 26,
+            "symbol": "name"
+          }
+        },
+        {
+          "name": "logo_url",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/userSettings.ts",
+            "line": 27,
+            "symbol": "logo_url"
+          }
+        }
+      ],
+      "methods": []
+    },
     "Session": {
       "name": "Session",
       "source": {
@@ -9430,23 +12448,6 @@
       "open": false,
       "patterns": []
     },
-    "PhoneCodeChannel": {
-      "name": "PhoneCodeChannel",
-      "source": {
-        "file": "packages/shared/src/types/phoneCodeChannel.ts",
-        "line": 12,
-        "symbol": "PhoneCodeChannel"
-      },
-      "kind": "enum",
-      "properties": [],
-      "methods": [],
-      "values": [
-        "sms",
-        "whatsapp"
-      ],
-      "open": false,
-      "patterns": []
-    },
     "IdentificationLink": {
       "name": "IdentificationLink",
       "source": {
@@ -10279,7 +13280,7 @@
           "optional": false,
           "type": {
             "kind": "ref",
-            "name": "PrepareWeb3WalletVerificationParamsStrategy"
+            "name": "MobileUserSettingsWeb3FirstFactorsElement"
           },
           "source": {
             "file": "packages/shared/src/types/web3Wallet.ts",
@@ -10289,21 +13290,6 @@
         }
       ],
       "methods": []
-    },
-    "PrepareWeb3WalletVerificationParamsStrategy": {
-      "name": "PrepareWeb3WalletVerificationParamsStrategy",
-      "kind": "enum",
-      "properties": [],
-      "methods": [],
-      "values": [
-        "web3_metamask_signature",
-        "web3_base_signature",
-        "web3_coinbase_wallet_signature",
-        "web3_okx_wallet_signature",
-        "web3_solana_signature"
-      ],
-      "open": false,
-      "patterns": []
     },
     "AttemptWeb3WalletVerificationParams": {
       "name": "AttemptWeb3WalletVerificationParams",
@@ -10335,7 +13321,7 @@
             "omittable": true,
             "value": {
               "kind": "ref",
-              "name": "PrepareWeb3WalletVerificationParamsStrategy"
+              "name": "MobileUserSettingsWeb3FirstFactorsElement"
             }
           },
           "source": {
@@ -12613,53 +15599,6 @@
       ],
       "methods": []
     },
-    "OAuthStrategy": {
-      "name": "OAuthStrategy",
-      "source": {
-        "file": "packages/shared/src/types/strategies.ts",
-        "line": 34,
-        "symbol": "OAuthStrategy"
-      },
-      "documentation": "OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).",
-      "kind": "enum",
-      "properties": [],
-      "methods": [],
-      "values": [
-        "oauth_facebook",
-        "oauth_google",
-        "oauth_hubspot",
-        "oauth_github",
-        "oauth_tiktok",
-        "oauth_gitlab",
-        "oauth_discord",
-        "oauth_twitter",
-        "oauth_twitch",
-        "oauth_linkedin",
-        "oauth_linkedin_oidc",
-        "oauth_dropbox",
-        "oauth_atlassian",
-        "oauth_bitbucket",
-        "oauth_microsoft",
-        "oauth_notion",
-        "oauth_apple",
-        "oauth_line",
-        "oauth_instagram",
-        "oauth_coinbase",
-        "oauth_spotify",
-        "oauth_xero",
-        "oauth_box",
-        "oauth_slack",
-        "oauth_linear",
-        "oauth_x",
-        "oauth_enstall",
-        "oauth_huggingface",
-        "oauth_vercel"
-      ],
-      "open": false,
-      "patterns": [
-        "^oauth_custom_.*$"
-      ]
-    },
     "GetUserOrganizationMembershipParams": {
       "name": "GetUserOrganizationMembershipParams",
       "source": {
@@ -13649,7 +16588,7 @@
         "line": 3,
         "symbol": "TOTPResource"
       },
-      "kind": "resource",
+      "kind": "object",
       "properties": [
         {
           "name": "id",
@@ -13765,39 +16704,7 @@
           }
         }
       ],
-      "methods": [
-        {
-          "name": "reload",
-          "nativeName": "reload",
-          "source": {
-            "file": "packages/shared/src/types/resource.ts",
-            "line": 21,
-            "symbol": "reload"
-          },
-          "documentation": "Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).",
-          "parameters": [
-            {
-              "name": "p",
-              "optional": true,
-              "type": {
-                "kind": "optional",
-                "nullable": false,
-                "omittable": true,
-                "value": {
-                  "kind": "ref",
-                  "name": "ClerkResourceReloadParams"
-                }
-              }
-            }
-          ],
-          "result": {
-            "kind": "ref",
-            "name": "TOTP"
-          },
-          "errorResult": false,
-          "asynchronous": true
-        }
-      ]
+      "methods": []
     },
     "VerifyTOTPParams": {
       "name": "VerifyTOTPParams",
@@ -13831,7 +16738,7 @@
         "line": 3,
         "symbol": "BackupCodeResource"
       },
-      "kind": "resource",
+      "kind": "object",
       "properties": [
         {
           "name": "id",
@@ -13896,39 +16803,7 @@
           }
         }
       ],
-      "methods": [
-        {
-          "name": "reload",
-          "nativeName": "reload",
-          "source": {
-            "file": "packages/shared/src/types/resource.ts",
-            "line": 21,
-            "symbol": "reload"
-          },
-          "documentation": "Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).",
-          "parameters": [
-            {
-              "name": "p",
-              "optional": true,
-              "type": {
-                "kind": "optional",
-                "nullable": false,
-                "omittable": true,
-                "value": {
-                  "kind": "ref",
-                  "name": "ClerkResourceReloadParams"
-                }
-              }
-            }
-          ],
-          "result": {
-            "kind": "ref",
-            "name": "BackupCode"
-          },
-          "errorResult": false,
-          "asynchronous": true
-        }
-      ]
+      "methods": []
     },
     "SessionTouchParams": {
       "name": "SessionTouchParams",
@@ -16699,7 +19574,7 @@
           "optional": false,
           "type": {
             "kind": "ref",
-            "name": "PrepareWeb3WalletVerificationParamsStrategy"
+            "name": "MobileUserSettingsWeb3FirstFactorsElement"
           },
           "source": {
             "file": "packages/shared/src/types/factors.ts",
@@ -19550,15 +22425,15 @@
         "oauth_enstall",
         "oauth_huggingface",
         "oauth_vercel",
+        "password",
+        "email_address",
+        "phone_number",
         "username",
         "first_name",
         "last_name",
-        "password",
-        "legal_accepted",
-        "email_address",
-        "phone_number",
-        "email_address_or_phone_number",
         "web3_wallet",
+        "legal_accepted",
+        "email_address_or_phone_number",
         "protect_check"
       ],
       "open": false,
@@ -19607,11 +22482,11 @@
         "oauth_enstall",
         "oauth_huggingface",
         "oauth_vercel",
-        "username",
         "email_address",
         "phone_number",
-        "email_address_or_phone_number",
-        "web3_wallet"
+        "username",
+        "web3_wallet",
+        "email_address_or_phone_number"
       ],
       "open": false,
       "patterns": [
@@ -21685,7 +24560,7 @@
       "name": "MobileSetActiveParams",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 8,
+        "line": 10,
         "symbol": "MobileSetActiveParams"
       },
       "kind": "object",
@@ -21704,7 +24579,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 1795,
+            "line": 1799,
             "symbol": "session"
           },
           "documentation": "The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted."
@@ -21723,7 +24598,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 1800,
+            "line": 1804,
             "symbol": "organization"
           },
           "documentation": "The Organization resource or Organization ID/slug (string version) to be set as active in the current session. If `null`, the currently Active Organization is removed as active."
@@ -22912,7 +25787,7 @@
       "name": "MobileSignOutOptions",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 9,
+        "line": 11,
         "symbol": "MobileSignOutOptions"
       },
       "kind": "object",
@@ -22930,7 +25805,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/clerk.ts",
-            "line": 207,
+            "line": 208,
             "symbol": "sessionId"
           },
           "documentation": "Specify a specific session to sign out. Useful for multi-session applications."
@@ -24294,6 +27169,823 @@
     },
     {
       "path": "MobileClerk.getOrganization",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileClerk.environment",
+      "disposition": "adapted",
+      "reason": "Read instance settings from the existing initialized core."
+    },
+    {
+      "path": "MobileEnvironment.organizationSettings",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.maxAllowedMemberships",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.forceOrganizationSelection",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.actions",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsActions.adminDelete",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.domains",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsDomains.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsDomains.enrollmentModes",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsDomains.defaultRole",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.slug",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsSlug.disabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.organizationCreationDefaults",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsOrganizationCreationDefaults.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.__internal_toSnapshot",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
+    },
+    {
+      "path": "OrganizationSettingsResource.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "OrganizationSettingsResource.pathRoot",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
+    },
+    {
+      "path": "OrganizationSettingsResource.reload",
+      "disposition": "excluded",
+      "reason": "Instance configuration is refreshed by the owning core lifecycle."
+    },
+    {
+      "path": "MobileEnvironment.authConfig",
+      "disposition": "generated"
+    },
+    {
+      "path": "AuthConfigResource.singleSessionMode",
+      "disposition": "generated"
+    },
+    {
+      "path": "AuthConfigResource.claimedAt",
+      "disposition": "generated"
+    },
+    {
+      "path": "AuthConfigResource.reverification",
+      "disposition": "generated"
+    },
+    {
+      "path": "AuthConfigResource.preferredChannels",
+      "disposition": "generated"
+    },
+    {
+      "path": "AuthConfigResource.sessionMinter",
+      "disposition": "generated"
+    },
+    {
+      "path": "AuthConfigResource.__internal_toSnapshot",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
+    },
+    {
+      "path": "AuthConfigResource.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "AuthConfigResource.pathRoot",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
+    },
+    {
+      "path": "AuthConfigResource.reload",
+      "disposition": "excluded",
+      "reason": "Instance configuration is refreshed by the owning core lifecycle."
+    },
+    {
+      "path": "MobileEnvironment.displayConfig",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.afterSignInUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.afterSignOutAllUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.afterSignOutOneUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.afterSignUpUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.afterSwitchSessionUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.applicationName",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.backendHost",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.branded",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.captchaPublicKey",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.captchaWidgetType",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.captchaProvider",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.captchaPublicKeyInvisible",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.captchaOauthBypass",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.captchaHeartbeat",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.captchaHeartbeatIntervalMs",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.homeUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.instanceEnvironmentType",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.logoImageUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.faviconImageUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.preferredSignInStrategy",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.signInUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.signUpUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.supportEmail",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.theme",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSON.general",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONGeneral.color",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONGeneral.background_color",
+      "disposition": "generated"
+    },
+    {
+      "path": "HslaColor.h",
+      "disposition": "generated"
+    },
+    {
+      "path": "HslaColor.s",
+      "disposition": "generated"
+    },
+    {
+      "path": "HslaColor.l",
+      "disposition": "generated"
+    },
+    {
+      "path": "HslaColor.a",
+      "disposition": "generated"
+    },
+    {
+      "path": "RgbaColor.r",
+      "disposition": "generated"
+    },
+    {
+      "path": "RgbaColor.g",
+      "disposition": "generated"
+    },
+    {
+      "path": "RgbaColor.b",
+      "disposition": "generated"
+    },
+    {
+      "path": "RgbaColor.a",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONGeneral.font_family",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONGeneral.font_color",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONGeneral.label_font_weight",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONGeneral.padding",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONGeneral.border_radius",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONGeneral.box_shadow",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSON.buttons",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONButtons.font_color",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONButtons.font_family",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONButtons.font_weight",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSON.accounts",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayThemeJSONAccounts.background_color",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.userProfileUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.clerkJSVersion",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.organizationProfileUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.createOrganizationUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.afterLeaveOrganizationUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.afterCreateOrganizationUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.googleOneTapClientId",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.showDevModeWarning",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.termsUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.privacyPolicyUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.waitlistUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.afterJoinWaitlistUrl",
+      "disposition": "generated"
+    },
+    {
+      "path": "DisplayConfigResource.__internal_toSnapshot",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
+    },
+    {
+      "path": "DisplayConfigResource.pathRoot",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
+    },
+    {
+      "path": "DisplayConfigResource.reload",
+      "disposition": "excluded",
+      "reason": "Instance configuration is refreshed by the owning core lifecycle."
+    },
+    {
+      "path": "MobileEnvironment.maintenanceMode",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileEnvironment.userSettings",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.enterpriseSSO",
+      "disposition": "generated"
+    },
+    {
+      "path": "EnterpriseSSOSettings.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "EnterpriseSSOSettings.self_serve_sso",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.attributes",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.password",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.required",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.immutable",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.verifications",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.used_for_first_factor",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.first_factors",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.used_for_second_factor",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.second_factors",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.verify_at_sign_up",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.channels",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttributeData.name",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.email_address",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.phone_number",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.username",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.first_name",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.last_name",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.web3_wallet",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.authenticator_app",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.backup_code",
+      "disposition": "generated"
+    },
+    {
+      "path": "Attributes.passkey",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.actions",
+      "disposition": "generated"
+    },
+    {
+      "path": "Actions.delete_self",
+      "disposition": "generated"
+    },
+    {
+      "path": "Actions.create_organization",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.signIn",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInData.second_factor",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInDataSecond_factor.required",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInDataSecond_factor.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.signUp",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignUpData.allowlist_only",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignUpData.progressive",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignUpData.captcha_enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignUpData.mode",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignUpData.legal_consent_enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignUpData.mfa",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignUpDataMfa.required",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.passwordSettings",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.allowed_special_characters",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.disable_hibp",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.min_length",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.max_length",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.require_special_char",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.require_numbers",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.require_uppercase",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.require_lowercase",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.show_zxcvbn",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasswordSettingsData.min_zxcvbn_strength",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.usernameSettings",
+      "disposition": "generated"
+    },
+    {
+      "path": "UsernameSettingsData.min_length",
+      "disposition": "generated"
+    },
+    {
+      "path": "UsernameSettingsData.max_length",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.attackProtection",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttackProtectionData.enumeration_protection",
+      "disposition": "generated"
+    },
+    {
+      "path": "AttackProtectionDataEnumeration_protection.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.passkeySettings",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasskeySettingsData.allow_autofill",
+      "disposition": "generated"
+    },
+    {
+      "path": "PasskeySettingsData.show_sign_in_button",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.socialProviderStrategies",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.authenticatableSocialStrategies",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.web3FirstFactors",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.alternativePhoneCodeChannels",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.enabledFirstFactorIdentifiers",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.instanceIsPasswordBased",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.hasValidAuthFactor",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileUserSettings.__internal_toSnapshot",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
+    },
+    {
+      "path": "MobileUserSettings.pathRoot",
+      "disposition": "excluded",
+      "reason": "Internal implementation contract."
+    },
+    {
+      "path": "MobileUserSettings.social",
+      "disposition": "adapted",
+      "reason": "Configured providers form a partial map; retain each declared provider shape."
+    },
+    {
+      "path": "Partial.oauth_facebook",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.enabled",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.required",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.authenticatable",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.strategy",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.name",
+      "disposition": "generated"
+    },
+    {
+      "path": "OAuthProviderSettings.logo_url",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_google",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_hubspot",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_github",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_tiktok",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_gitlab",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_discord",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_twitter",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_twitch",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_linkedin",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_linkedin_oidc",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_dropbox",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_atlassian",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_bitbucket",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_microsoft",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_notion",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_apple",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_line",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_instagram",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_coinbase",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_spotify",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_xero",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_box",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_slack",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_linear",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_x",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_enstall",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_huggingface",
+      "disposition": "generated"
+    },
+    {
+      "path": "Partial.oauth_vercel",
       "disposition": "generated"
     },
     {
@@ -25787,7 +29479,8 @@
     },
     {
       "path": "TOTPResource.reload",
-      "disposition": "generated"
+      "disposition": "excluded",
+      "reason": "Enrollment secrets are explicit method return values, not shared observable resources."
     },
     {
       "path": "UserResource.verifyTOTP",
@@ -25828,7 +29521,8 @@
     },
     {
       "path": "BackupCodeResource.reload",
-      "disposition": "generated"
+      "disposition": "excluded",
+      "reason": "Recovery codes are explicit method return values, not shared observable resources."
     },
     {
       "path": "UserResource.verifiedExternalAccounts",

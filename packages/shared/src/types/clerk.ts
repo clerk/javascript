@@ -1,3 +1,4 @@
+import type { MobileAuthenticationResources } from './mobile';
 import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 
 import type { ModuleManager } from '../moduleManager';
@@ -1158,6 +1159,9 @@ export interface Clerk {
    * @internal
    */
   __internal_oauthTransport: OAuthTransport | null;
+
+  /** @internal Returns the current canonical facades owned by this initialized core. */
+  __internal_getMobileResources?: () => MobileAuthenticationResources;
 
   /**
    * Completes an OAuth/SAML callback using a sign-in or sign-up resource already in hand

@@ -1,6 +1,23 @@
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createBaseClientJSON, createBaseEnvironmentJSON } from '../../clerk-js/src/test/fixtures.ts';
+function createNativeEnvironmentJSON() {
+  const environment = createBaseEnvironmentJSON();
+  const settings = environment.user_settings;
+  settings.social = Object.fromEntries(
+    Object.entries(settings.social).map(([strategy, provider]) => [
+      strategy,
+      { ...provider, name: strategy, logo_url: null },
+    ]),
+  );
+  settings.enterprise_sso = { ...settings.enterprise_sso, self_serve_sso: false };
+  settings.sign_in.second_factor.enabled = false;
+  settings.sign_up = { ...settings.sign_up, allowlist_only: false, legal_consent_enabled: false };
+  settings.username_settings = { min_length: 4, max_length: 64 };
+  environment.organization_settings.actions = { admin_delete: false };
+  environment.organization_settings.domains.default_role = null;
+  return environment;
+}
 const verification = {
   status: 'unverified',
   strategy: 'oauth_google',
@@ -107,7 +124,7 @@ export function tokenFixture() {
 }
 
 export const fixtures = {
-  environment: createBaseEnvironmentJSON(),
+  environment: createNativeEnvironmentJSON(),
   client: { ...createBaseClientJSON(), sessions: [], captcha_bypass: true },
   signIn,
   signUp,

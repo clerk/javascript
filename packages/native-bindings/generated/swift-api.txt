@@ -1,3 +1,5 @@
+Actions.create_organization: Bool
+Actions.delete_self: Bool
 ActiveSession.abandonAt: Date
 ActiveSession.actor: [String: JSONValue]?
 ActiveSession.agent: [String: JSONValue]?
@@ -31,11 +33,41 @@ AddMemberParams.role: String
 AddMemberParams.userId: String
 AddPaymentMethodParams.gateway: String
 AddPaymentMethodParams.paymentToken: String
+AttackProtectionData.enumeration_protection: AttackProtectionDataEnumeration_protection
+AttackProtectionDataEnumeration_protection.enabled: Bool
 AttemptAffiliationVerificationParams.code: String
 AttemptEmailAddressVerificationParams.code: String
 AttemptPhoneNumberVerificationParams.code: String
 AttemptWeb3WalletVerificationParams.signature: String
-AttemptWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy? = nil
+AttemptWeb3WalletVerificationParams.strategy: MobileUserSettingsWeb3FirstFactorsElement? = nil
+Attribute cases: password, email_address, phone_number, username, first_name, last_name, web3_wallet, authenticator_app, backup_code, passkey, unrecognized(String)
+AttributeData.channels: [PhoneCodeChannel]? = nil
+AttributeData.enabled: Bool
+AttributeData.first_factors: [VerificationStrategy]
+AttributeData.immutable: Bool? = nil
+AttributeData.name: Attribute
+AttributeData.required: Bool
+AttributeData.second_factors: [VerificationStrategy]
+AttributeData.used_for_first_factor: Bool
+AttributeData.used_for_second_factor: Bool
+AttributeData.verifications: [VerificationStrategy]
+AttributeData.verify_at_sign_up: Bool
+Attributes.authenticator_app: AttributeData
+Attributes.backup_code: AttributeData
+Attributes.email_address: AttributeData
+Attributes.first_name: AttributeData
+Attributes.last_name: AttributeData
+Attributes.passkey: AttributeData
+Attributes.password: AttributeData
+Attributes.phone_number: AttributeData
+Attributes.username: AttributeData
+Attributes.web3_wallet: AttributeData
+AuthConfig.claimedAt: Date?
+AuthConfig.id: String? = nil
+AuthConfig.preferredChannels: [String: PhoneCodeChannel]?
+AuthConfig.reverification: Bool
+AuthConfig.sessionMinter: Bool
+AuthConfig.singleSessionMode: Bool
 AuthenticatorAssertionResponse.authenticatorData: Data
 AuthenticatorAssertionResponse.clientDataJSON: Data
 AuthenticatorAssertionResponse.signature: Data
@@ -43,7 +75,6 @@ AuthenticatorAssertionResponse.userHandle: Data?
 BackupCode.codes: [String]
 BackupCode.createdAt: Date?
 BackupCode.id: String
-BackupCode.reload(p: ClerkResourceReloadParams? = nil): BackupCode [return]
 BackupCode.updatedAt: Date?
 BackupCodeAttempt.code: String
 BackupCodeAttempt.strategy: String
@@ -72,6 +103,7 @@ BillingPaymentMethodRemoveParams.orgId: String? = nil
 BillingPaymentMethodStatus cases: expired, active, disconnected, unrecognized(String)
 CheckAuthorizationParams variants: SessionCheckAuthorizationIsAuthorizedParamsCase1 | SessionCheckAuthorizationIsAuthorizedParamsCase2 | SessionCheckAuthorizationIsAuthorizedParamsCase3 | SessionCheckAuthorizationIsAuthorizedParamsCase4 | SessionCheckAuthorizationIsAuthorizedParamsCase5
 Clerk.createOrganization(params: CreateOrganizationParams): Organization [return]
+Clerk.environment: MobileEnvironment
 Clerk.getOrganization(organizationId: String): Organization [return]
 Clerk.loaded: Bool
 Clerk.organization: Organization?
@@ -122,6 +154,7 @@ ClerkPaginatedResponseUserOrganizationInvitation.data: [UserOrganizationInvitati
 ClerkPaginatedResponseUserOrganizationInvitation.total_count: Double
 ClerkResourceReloadParams.rotatingTokenNonce: String? = nil
 ClerkStatus cases: degraded, error, loading, ready, unrecognized(String)
+Color variants: String | HslaColor | RgbaColor
 CreateEmailAddressParams.email: String
 CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.cancelEmailLinkFlow(): Void [return]
 CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.startEmailLinkFlow(params: StartEmailLinkFlowParams): EmailAddress [return]
@@ -147,6 +180,59 @@ DeletedObject.deleted: Bool
 DeletedObject.id: String? = nil
 DeletedObject.object: String
 DeletedObject.slug: String? = nil
+DisplayConfig.afterCreateOrganizationUrl: String
+DisplayConfig.afterJoinWaitlistUrl: String
+DisplayConfig.afterLeaveOrganizationUrl: String
+DisplayConfig.afterSignInUrl: String
+DisplayConfig.afterSignOutAllUrl: String
+DisplayConfig.afterSignOutOneUrl: String
+DisplayConfig.afterSignUpUrl: String
+DisplayConfig.afterSwitchSessionUrl: String
+DisplayConfig.applicationName: String
+DisplayConfig.backendHost: String
+DisplayConfig.branded: Bool
+DisplayConfig.captchaHeartbeat: Bool
+DisplayConfig.captchaHeartbeatIntervalMs: Double? = nil
+DisplayConfig.captchaOauthBypass: [OAuthStrategy]
+DisplayConfig.captchaProvider: String
+DisplayConfig.captchaPublicKey: String?
+DisplayConfig.captchaPublicKeyInvisible: String?
+DisplayConfig.captchaWidgetType: DisplayConfigCaptchaWidgetType?
+DisplayConfig.clerkJSVersion: String? = nil
+DisplayConfig.createOrganizationUrl: String
+DisplayConfig.faviconImageUrl: String
+DisplayConfig.googleOneTapClientId: String? = nil
+DisplayConfig.homeUrl: String
+DisplayConfig.id: String
+DisplayConfig.instanceEnvironmentType: String
+DisplayConfig.logoImageUrl: String
+DisplayConfig.organizationProfileUrl: String
+DisplayConfig.preferredSignInStrategy: PreferredSignInStrategy
+DisplayConfig.privacyPolicyUrl: String
+DisplayConfig.showDevModeWarning: Bool
+DisplayConfig.signInUrl: String
+DisplayConfig.signUpUrl: String
+DisplayConfig.supportEmail: String
+DisplayConfig.termsUrl: String
+DisplayConfig.theme: DisplayThemeJSON
+DisplayConfig.userProfileUrl: String
+DisplayConfig.waitlistUrl: String
+DisplayConfigCaptchaWidgetType cases: smart, invisible, unrecognized(String)
+DisplayThemeJSON.accounts: DisplayThemeJSONAccounts
+DisplayThemeJSON.buttons: DisplayThemeJSONButtons
+DisplayThemeJSON.general: DisplayThemeJSONGeneral
+DisplayThemeJSONAccounts.background_color: Color
+DisplayThemeJSONButtons.font_color: String
+DisplayThemeJSONButtons.font_family: String
+DisplayThemeJSONButtons.font_weight: String
+DisplayThemeJSONGeneral.background_color: Color
+DisplayThemeJSONGeneral.border_radius: String
+DisplayThemeJSONGeneral.box_shadow: String
+DisplayThemeJSONGeneral.color: String
+DisplayThemeJSONGeneral.font_color: String
+DisplayThemeJSONGeneral.font_family: String
+DisplayThemeJSONGeneral.label_font_weight: String
+DisplayThemeJSONGeneral.padding: String
 EmailAddress.attemptVerification(params: AttemptEmailAddressVerificationParams): EmailAddress [return]
 EmailAddress.create(): EmailAddress [return]
 EmailAddress.createEmailLinkFlow(): CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress [return]
@@ -264,6 +350,8 @@ EnterpriseProvider cases: saml_custom, saml_okta, saml_google, saml_microsoft, o
 EnterpriseSSOFactor.enterpriseConnectionId: String? = nil
 EnterpriseSSOFactor.enterpriseConnectionName: String? = nil
 EnterpriseSSOFactor.strategy: String
+EnterpriseSSOSettings.enabled: Bool
+EnterpriseSSOSettings.self_serve_sso: Bool
 EnterpriseSamlConnectionNested.acsUrl: String
 EnterpriseSamlConnectionNested.active: Bool
 EnterpriseSamlConnectionNested.allowIdpInitiated: Bool
@@ -336,6 +424,10 @@ GetUserOrganizationSuggestionsParams.initialPage: Double? = nil
 GetUserOrganizationSuggestionsParams.pageSize: Double? = nil
 GetUserOrganizationSuggestionsParams.status: GetUserOrganizationSuggestionsParamsStatus? = nil
 GetUserOrganizationSuggestionsParamsStatus variants: String | String | [OrganizationSuggestionStatus]
+HslaColor.a: Double? = nil
+HslaColor.h: Double
+HslaColor.l: Double
+HslaColor.s: Double
 IdentificationLink.id: String
 IdentificationLink.reload(p: ClerkResourceReloadParams? = nil): IdentificationLink [return]
 IdentificationLink.type: String
@@ -348,12 +440,41 @@ InviteMemberParams.emailAddress: String
 InviteMemberParams.role: String
 InviteMembersParams.emailAddresses: [String]
 InviteMembersParams.role: String
+MobileEnvironment.authConfig: AuthConfig
+MobileEnvironment.displayConfig: DisplayConfig
+MobileEnvironment.maintenanceMode: Bool
+MobileEnvironment.organizationSettings: OrganizationSettings
+MobileEnvironment.userSettings: MobileUserSettings
 MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = .omitted
 MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = .omitted
 MobileSetActiveParamsOrganization variants: String | Organization
 MobileSetActiveParamsSession variants: String | ActiveSession | PendingSession
 MobileSignOutOptions.sessionId: String? = nil
+MobileUserSettings.actions: Actions
+MobileUserSettings.alternativePhoneCodeChannels: [PhoneCodeChannel]
+MobileUserSettings.attackProtection: AttackProtectionData
+MobileUserSettings.attributes: Attributes
+MobileUserSettings.authenticatableSocialStrategies: [OAuthStrategy]
+MobileUserSettings.enabledFirstFactorIdentifiers: [Attribute]
+MobileUserSettings.enterpriseSSO: EnterpriseSSOSettings
+MobileUserSettings.hasValidAuthFactor: Bool
+MobileUserSettings.instanceIsPasswordBased: Bool
+MobileUserSettings.passkeySettings: PasskeySettingsData
+MobileUserSettings.passwordSettings: PasswordSettingsData
+MobileUserSettings.signIn: SignInData
+MobileUserSettings.signUp: SignUpData
+MobileUserSettings.social: PartialOAuthProviders
+MobileUserSettings.socialProviderStrategies: [OAuthStrategy]
+MobileUserSettings.usernameSettings: UsernameSettingsData
+MobileUserSettings.web3FirstFactors: [MobileUserSettingsWeb3FirstFactorsElement]
+MobileUserSettingsWeb3FirstFactorsElement cases: web3_metamask_signature, web3_base_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_solana_signature, unrecognized(String)
 OAuthProvider cases: facebook, google, hubspot, github, tiktok, gitlab, discord, twitter, twitch, linkedin, linkedin_oidc, dropbox, atlassian, bitbucket, microsoft, notion, apple, line, instagram, coinbase, spotify, xero, box, slack, linear, x, enstall, huggingface, vercel, unrecognized(String)
+OAuthProviderSettings.authenticatable: Bool
+OAuthProviderSettings.enabled: Bool
+OAuthProviderSettings.logo_url: String?
+OAuthProviderSettings.name: String
+OAuthProviderSettings.required: Bool
+OAuthProviderSettings.strategy: OAuthStrategy
 OAuthStrategy cases: oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
 OauthFactor.strategy: OAuthStrategy
 OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.emailAddressId: String? = nil
@@ -501,6 +622,20 @@ OrganizationMembershipRequest.reject(): OrganizationMembershipRequest [return]
 OrganizationMembershipRequest.reload(p: ClerkResourceReloadParams? = nil): OrganizationMembershipRequest [return]
 OrganizationMembershipRequest.status: OrganizationInvitationStatus
 OrganizationMembershipRequest.updatedAt: Date
+OrganizationSettings.actions: OrganizationSettingsActions
+OrganizationSettings.domains: OrganizationSettingsDomains
+OrganizationSettings.enabled: Bool
+OrganizationSettings.forceOrganizationSelection: Bool
+OrganizationSettings.id: String? = nil
+OrganizationSettings.maxAllowedMemberships: Double
+OrganizationSettings.organizationCreationDefaults: OrganizationSettingsOrganizationCreationDefaults
+OrganizationSettings.slug: OrganizationSettingsSlug
+OrganizationSettingsActions.adminDelete: Bool
+OrganizationSettingsDomains.defaultRole: String?
+OrganizationSettingsDomains.enabled: Bool
+OrganizationSettingsDomains.enrollmentModes: [OrganizationEnrollmentMode]
+OrganizationSettingsOrganizationCreationDefaults.enabled: Bool
+OrganizationSettingsSlug.disabled: Bool
 OrganizationSuggestion.accept(): OrganizationSuggestion [return]
 OrganizationSuggestion.createdAt: Date
 OrganizationSuggestion.id: String
@@ -514,6 +649,35 @@ OrganizationSuggestionPublicOrganizationData.imageUrl: String
 OrganizationSuggestionPublicOrganizationData.name: String
 OrganizationSuggestionPublicOrganizationData.slug: String?
 OrganizationSuggestionStatus cases: pending, accepted, unrecognized(String)
+PartialOAuthProviders.oauth_apple: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_atlassian: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_bitbucket: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_box: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_coinbase: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_discord: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_dropbox: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_enstall: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_facebook: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_github: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_gitlab: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_google: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_hubspot: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_huggingface: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_instagram: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_line: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_linear: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_linkedin: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_linkedin_oidc: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_microsoft: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_notion: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_slack: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_spotify: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_tiktok: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_twitch: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_twitter: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_vercel: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_x: OAuthProviderSettings? = nil
+PartialOAuthProviders.oauth_xero: OAuthProviderSettings? = nil
 Partialtype.name: Field<String> = .omitted
 Passkey.createdAt: Date
 Passkey.delete(): DeletedObject [return]
@@ -527,6 +691,8 @@ Passkey.verification: PasskeyVerification?
 PasskeyAttempt.publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse
 PasskeyAttempt.strategy: String
 PasskeyFactor.strategy: String
+PasskeySettingsData.allow_autofill: Bool
+PasskeySettingsData.show_sign_in_button: Bool
 PasskeyVerification.attempts: Double?
 PasskeyVerification.channel: PhoneCodeChannel? = nil
 PasskeyVerification.error: ClerkAPIError?
@@ -540,6 +706,16 @@ PasskeyVerification.verifiedFromTheSameClient(): Bool [return]
 PasswordAttempt.password: String
 PasswordAttempt.strategy: String
 PasswordFactor.strategy: String
+PasswordSettingsData.allowed_special_characters: String
+PasswordSettingsData.disable_hibp: Bool
+PasswordSettingsData.max_length: Double
+PasswordSettingsData.min_length: Double
+PasswordSettingsData.min_zxcvbn_strength: Double
+PasswordSettingsData.require_lowercase: Bool
+PasswordSettingsData.require_numbers: Bool
+PasswordSettingsData.require_special_char: Bool
+PasswordSettingsData.require_uppercase: Bool
+PasswordSettingsData.show_zxcvbn: Bool
 PendingSession.abandonAt: Date
 PendingSession.actor: [String: JSONValue]?
 PendingSession.agent: [String: JSONValue]?
@@ -609,10 +785,11 @@ PhoneNumber.setReservedForSecondFactor(params: SetReservedForSecondFactorParams)
 PhoneNumber.stringValue(): String [return]
 PhoneNumber.verification: Verification
 PickCreateOrganizationDomainParamsAndenrollmentMode.enrollmentMode: OrganizationEnrollmentMode? = nil
+PreferredSignInStrategy cases: password, otp, unrecognized(String)
 PrepareAffiliationVerificationParams.affiliationEmailAddress: String
 PrepareEmailAddressVerificationParams variants: EmailAddressPrepareVerificationParamsCase1 | EmailAddressPrepareVerificationParamsCase2
-PrepareWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy
-PrepareWeb3WalletVerificationParamsStrategy cases: web3_metamask_signature, web3_base_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_solana_signature, unrecognized(String)
+PrepareEmailAddressVerificationParams.strategy: String [shared union field]
+PrepareWeb3WalletVerificationParams.strategy: MobileUserSettingsWeb3FirstFactorsElement
 ProtectCheck.expiresAt: Double? = nil
 ProtectCheck.sdkUrl: String
 ProtectCheck.status: String
@@ -645,6 +822,10 @@ ResetPasswordPhoneCodeFactor.primary: Bool? = nil
 ResetPasswordPhoneCodeFactor.safeIdentifier: String
 ResetPasswordPhoneCodeFactor.strategy: String
 ReverificationConfig variants: String | String | String | String | SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5
+RgbaColor.a: Double? = nil
+RgbaColor.b: Double
+RgbaColor.g: Double
+RgbaColor.r: Double
 Role.createdAt: Date
 Role.description: String
 Role.id: String
@@ -716,13 +897,19 @@ SessionVerification.status: SessionVerificationStatus
 SessionVerification.supportedFirstFactors: [SessionVerificationFirstFactor]?
 SessionVerification.supportedSecondFactors: [SessionVerificationSecondFactor]?
 SessionVerificationFirstFactor variants: EmailCodeFactor | PhoneCodeFactor | PasswordFactor | PasskeyFactor | EnterpriseSSOFactor
+SessionVerificationFirstFactor.strategy: String [shared union field]
 SessionVerificationLevel cases: first_factor, second_factor, multi_factor, unrecognized(String)
 SessionVerificationSecondFactor variants: PhoneCodeFactor | TOTPFactor | BackupCodeFactor
+SessionVerificationSecondFactor.strategy: String [shared union field]
 SessionVerificationStatus cases: needs_first_factor, needs_second_factor, complete, unrecognized(String)
 SessionVerifyAttemptFirstFactorParams variants: EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | PasskeyAttempt
+SessionVerifyAttemptFirstFactorParams.strategy: String [shared union field]
 SessionVerifyAttemptSecondFactorParams variants: PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt
+SessionVerifyAttemptSecondFactorParams.code: String [shared union field]
+SessionVerifyAttemptSecondFactorParams.strategy: String [shared union field]
 SessionVerifyCreateParams.level: SessionVerificationLevel
 SessionVerifyPrepareFirstFactorParams variants: PasskeyFactor | EmailCodeConfig | PhoneCodeConfig | OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl
+SessionVerifyPrepareFirstFactorParams.strategy: String [shared union field]
 SessionWithActivities.abandonAt: Date
 SessionWithActivities.actor: [String: JSONValue]?
 SessionWithActivities.expireAt: Date
@@ -773,6 +960,9 @@ SignInCreateParams.strategy: SignInCreateParamsStrategy? = nil
 SignInCreateParams.ticket: String? = nil
 SignInCreateParams.transfer: Bool? = nil
 SignInCreateParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, passkey, ticket, unrecognized(String)
+SignInData.second_factor: SignInDataSecond_factor
+SignInDataSecond_factor.enabled: Bool
+SignInDataSecond_factor.required: Bool
 SignInEmailCode.sendCode(params: SignInEmailCodeSendParams? = nil): Void [error-envelope]
 SignInEmailCode.verifyCode(params: SignInEmailCodeVerifyParams): Void [error-envelope]
 SignInEmailCodeSendCodeParamsCase1.emailAddress: String? = nil
@@ -787,12 +977,14 @@ SignInEmailLinkSendLinkParamsCase1.verificationUrl: String
 SignInEmailLinkSendLinkParamsCase2.emailAddressId: String? = nil
 SignInEmailLinkSendLinkParamsCase2.verificationUrl: String
 SignInEmailLinkSendParams variants: SignInEmailLinkSendLinkParamsCase1 | SignInEmailLinkSendLinkParamsCase2
+SignInEmailLinkSendParams.verificationUrl: String [shared union field]
 SignInEmailLinkVerification.createdSessionId: String
 SignInEmailLinkVerification.status: SignInEmailLinkVerificationStatus
 SignInEmailLinkVerification.verifiedFromTheSameClient: Bool
 SignInEmailLinkVerificationStatus cases: expired, verified, failed, client_mismatch, unrecognized(String)
 SignInExistingSession.sessionId: String
 SignInFirstFactor variants: EmailCodeFactor | PhoneCodeFactor | PasswordFactor | PasskeyFactor | EnterpriseSSOFactor | EmailLinkFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor | Web3SignatureFactor | OauthFactor
+SignInFirstFactor.strategy: String [shared union field]
 SignInMFAEmailCodeVerifyParams.code: String
 SignInMFAPhoneCodeVerifyParams.code: String
 SignInMfa.sendEmailCode(): Void [error-envelope]
@@ -804,6 +996,7 @@ SignInMfa.verifyTOTP(params: SignInTOTPVerifyParams): Void [error-envelope]
 SignInPasskeyParams.flow: SignInPasskeyParamsFlow? = nil
 SignInPasskeyParamsFlow cases: autofill, discoverable, unrecognized(String)
 SignInPasswordParams variants: SignInPasswordParamsCase1 | SignInPasswordParamsCase2 | SignInPasswordParamsCase3 | SignInPasswordParamsCase4
+SignInPasswordParams.password: String [shared union field]
 SignInPasswordParamsCase1.identifier: String
 SignInPasswordParamsCase1.password: String
 SignInPasswordParamsCase2.emailAddress: String
@@ -835,6 +1028,7 @@ SignInSSOParams.oidcPrompt: String? = nil
 SignInSSOParams.strategy: SignInSSOParamsStrategy
 SignInSSOParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
 SignInSecondFactor variants: EmailCodeFactor | PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailLinkFactor
+SignInSecondFactor.strategy: String [shared union field]
 SignInStatus cases: needs_first_factor, needs_second_factor, complete, needs_identifier, needs_client_trust, needs_new_password, needs_protect_check, unrecognized(String)
 SignInSubmitProtectCheckParams.proofToken: String
 SignInTOTPVerifyParams.code: String
@@ -885,12 +1079,21 @@ SignUpCreateParams.unsafeMetadata: [String: JSONValue]? = nil
 SignUpCreateParams.username: String? = nil
 SignUpCreateParams.web3Wallet: String? = nil
 SignUpCreateParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, phone_code, ticket, google_one_tap, oauth_token_apple, unrecognized(String)
+SignUpData.allowlist_only: Bool
+SignUpData.captcha_enabled: Bool
+SignUpData.legal_consent_enabled: Bool
+SignUpData.mfa: SignUpDataMfa? = nil
+SignUpData.mode: SignUpModes
+SignUpData.progressive: Bool
+SignUpDataMfa.required: Bool
 SignUpEmailCodeVerifyParams.code: String
 SignUpEmailLinkSendParams.verificationUrl: String
 SignUpExistingSession.sessionId: String
-SignUpField cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, username, first_name, last_name, password, legal_accepted, email_address, phone_number, email_address_or_phone_number, web3_wallet, protect_check, unrecognized(String)
-SignUpIdentificationField cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, username, email_address, phone_number, email_address_or_phone_number, web3_wallet, unrecognized(String)
+SignUpField cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, password, email_address, phone_number, username, first_name, last_name, web3_wallet, legal_accepted, email_address_or_phone_number, protect_check, unrecognized(String)
+SignUpIdentificationField cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, email_address, phone_number, username, web3_wallet, email_address_or_phone_number, unrecognized(String)
+SignUpModes cases: public, restricted, waitlist, unrecognized(String)
 SignUpPasswordParams variants: SignUpPasswordParamsCase1 | SignUpPasswordParamsCase2 | SignUpPasswordParamsCase3 | SignUpPasswordParamsCase4
+SignUpPasswordParams.password: String [shared union field]
 SignUpPasswordParamsCase1.emailAddress: String
 SignUpPasswordParamsCase1.firstName: String? = nil
 SignUpPasswordParamsCase1.lastName: String? = nil
@@ -985,7 +1188,6 @@ StartEnterpriseSSOLinkFlowParams.redirectUrl: String
 TOTP.backupCodes: [String]? = nil
 TOTP.createdAt: Date?
 TOTP.id: String
-TOTP.reload(p: ClerkResourceReloadParams? = nil): TOTP [return]
 TOTP.secret: String? = nil
 TOTP.updatedAt: Date?
 TOTP.uri: String? = nil
@@ -1091,6 +1293,7 @@ UserData.hasImage: Bool? = nil
 UserData.imageUrl: String? = nil
 UserData.lastName: String? = nil
 UserIsPrimaryIdentificationIdent variants: EmailAddress | PhoneNumber | Web3Wallet
+UserIsPrimaryIdentificationIdent.id: String [shared union field]
 UserOrganizationInvitation.accept(): UserOrganizationInvitation [return]
 UserOrganizationInvitation.createdAt: Date
 UserOrganizationInvitation.emailAddress: String
@@ -1106,6 +1309,8 @@ UserOrganizationInvitationPublicOrganizationData.id: String
 UserOrganizationInvitationPublicOrganizationData.imageUrl: String
 UserOrganizationInvitationPublicOrganizationData.name: String
 UserOrganizationInvitationPublicOrganizationData.slug: String?
+UsernameSettingsData.max_length: Double
+UsernameSettingsData.min_length: Double
 Verification.attempts: Double?
 Verification.channel: PhoneCodeChannel? = nil
 Verification.error: ClerkAPIError?
@@ -1117,9 +1322,10 @@ Verification.strategy: String?
 Verification.verifiedAtClient: String?
 Verification.verifiedFromTheSameClient(): Bool [return]
 VerificationStatus cases: expired, unverified, verified, failed, transferable, unrecognized(String)
+VerificationStrategy cases: email_code, backup_code, email_link, phone_code, totp, unrecognized(String)
 VerifyTOTPParams.code: String
 Web3SignatureFactor.primary: Bool? = nil
-Web3SignatureFactor.strategy: PrepareWeb3WalletVerificationParamsStrategy
+Web3SignatureFactor.strategy: MobileUserSettingsWeb3FirstFactorsElement
 Web3SignatureFactor.walletName: String? = nil
 Web3SignatureFactor.web3WalletId: String
 Web3Wallet.attemptVerification(params: AttemptWeb3WalletVerificationParams): Web3Wallet [return]
@@ -1131,13 +1337,16 @@ Web3Wallet.reload(p: ClerkResourceReloadParams? = nil): Web3Wallet [return]
 Web3Wallet.stringValue(): String [return]
 Web3Wallet.verification: Verification
 Web3Wallet.web3Wallet: String
+enum Attribute
 enum BillingPaymentMethodStatus
 enum ClerkStatus
+enum DisplayConfigCaptchaWidgetType
 enum EmailAddressPrepareVerificationParamsCase2Strategy
 enum EnterpriseConnectionTestRunConnectionType
 enum EnterpriseConnectionTestRunStatus
 enum EnterpriseProtocol
 enum EnterpriseProvider
+enum MobileUserSettingsWeb3FirstFactorsElement
 enum OAuthProvider
 enum OAuthStrategy
 enum OrganizationDomainOwnershipVerificationStatus
@@ -1149,7 +1358,7 @@ enum OrganizationInvitationStatus
 enum OrganizationSuggestionStatus
 enum PermissionType
 enum PhoneCodeChannel
-enum PrepareWeb3WalletVerificationParamsStrategy
+enum PreferredSignInStrategy
 enum SessionStatus
 enum SessionTaskKey
 enum SessionTouchIntent
@@ -1163,15 +1372,24 @@ enum SignInStatus
 enum SignUpCreateParamsStrategy
 enum SignUpField
 enum SignUpIdentificationField
+enum SignUpModes
 enum SignUpStatus
 enum VerificationStatus
+enum VerificationStrategy
+object Actions
 object AddMemberParams
 object AddPaymentMethodParams
+object AttackProtectionData
+object AttackProtectionDataEnumeration_protection
 object AttemptAffiliationVerificationParams
 object AttemptEmailAddressVerificationParams
 object AttemptPhoneNumberVerificationParams
 object AttemptWeb3WalletVerificationParams
+object AttributeData
+object Attributes
+object AuthConfig
 object AuthenticatorAssertionResponse
+object BackupCode
 object BackupCodeAttempt
 object BackupCodeFactor
 object BillingPaymentMethodRemoveParams
@@ -1196,6 +1414,11 @@ object CreateOrganizationParams
 object CreatePhoneNumberParams
 object CreateWeb3WalletParams
 object DeletedObject
+object DisplayConfig
+object DisplayThemeJSON
+object DisplayThemeJSONAccounts
+object DisplayThemeJSONButtons
+object DisplayThemeJSONGeneral
 object EmailAddressPrepareVerificationParamsCase1
 object EmailAddressPrepareVerificationParamsCase2
 object EmailCodeAttempt
@@ -1209,6 +1432,7 @@ object EnterpriseConnectionTestRunParsedUserInfo
 object EnterpriseConnectionTestRunSamlPayload
 object EnterpriseOAuthConfig
 object EnterpriseSSOFactor
+object EnterpriseSSOSettings
 object EnterpriseSamlConnectionNested
 object GetDomainsParams
 object GetEnterpriseConnectionTestRunsParams
@@ -1223,11 +1447,15 @@ object GetTokenOptions
 object GetUserOrganizationInvitationsParams
 object GetUserOrganizationMembershipParams
 object GetUserOrganizationSuggestionsParams
+object HslaColor
 object InitializePaymentMethodParams
 object InviteMemberParams
 object InviteMembersParams
+object MobileEnvironment
 object MobileSetActiveParams
 object MobileSignOutOptions
+object MobileUserSettings
+object OAuthProviderSettings
 object OauthFactor
 object OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl
 object OrganizationCreationDefaultsAdvisory
@@ -1239,12 +1467,20 @@ object OrganizationDomainsBulkOwnershipVerification
 object OrganizationEnterpriseConnectionOidcInput
 object OrganizationEnterpriseConnectionSamlInput
 object OrganizationGetDomain__0
+object OrganizationSettings
+object OrganizationSettingsActions
+object OrganizationSettingsDomains
+object OrganizationSettingsOrganizationCreationDefaults
+object OrganizationSettingsSlug
 object OrganizationSuggestionPublicOrganizationData
+object PartialOAuthProviders
 object Partialtype
 object PasskeyAttempt
 object PasskeyFactor
+object PasskeySettingsData
 object PasswordAttempt
 object PasswordFactor
+object PasswordSettingsData
 object PhoneCodeAttempt
 object PhoneCodeConfig
 object PhoneCodeFactor
@@ -1259,6 +1495,7 @@ object ReauthorizeExternalAccountParams
 object RemoveUserPasswordParams
 object ResetPasswordEmailCodeFactor
 object ResetPasswordPhoneCodeFactor
+object RgbaColor
 object SessionActivity
 object SessionCheckAuthorizationIsAuthorizedParamsCase1
 object SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5
@@ -1274,6 +1511,8 @@ object SetProfileImageParams
 object SetReservedForSecondFactorParams
 object SignInBackupCodeVerifyParams
 object SignInCreateParams
+object SignInData
+object SignInDataSecond_factor
 object SignInEmailCodeSendCodeParamsCase1
 object SignInEmailCodeSendCodeParamsCase2
 object SignInEmailCodeVerifyParams
@@ -1299,6 +1538,8 @@ object SignInSubmitProtectCheckParams
 object SignInTOTPVerifyParams
 object SignInTicketParams
 object SignUpCreateParams
+object SignUpData
+object SignUpDataMfa
 object SignUpEmailCodeVerifyParams
 object SignUpEmailLinkSendParams
 object SignUpExistingSession
@@ -1315,6 +1556,7 @@ object SignUpUpdateParams
 object SignUpVerificationsEmailLinkVerification
 object StartEmailLinkFlowParams
 object StartEnterpriseSSOLinkFlowParams
+object TOTP
 object TOTPAttempt
 object TOTPFactor
 object UpdateEnrollmentModeParams
@@ -1327,10 +1569,10 @@ object UpdateUserParams
 object UpdateUserPasswordParams
 object UserData
 object UserOrganizationInvitationPublicOrganizationData
+object UsernameSettingsData
 object VerifyTOTPParams
 object Web3SignatureFactor
 resource ActiveSession
-resource BackupCode
 resource BillingInitializedPaymentMethod
 resource BillingPaymentMethod
 resource Clerk
@@ -1370,7 +1612,6 @@ resource SignInResetPasswordPhoneCode
 resource SignUp
 resource SignUpVerification
 resource SignUpVerifications
-resource TOTP
 resource User
 resource UserOrganizationInvitation
 resource Verification
@@ -1379,6 +1620,7 @@ tuple ActiveSessionFactorVerificationAgeValue
 tuple PendingSessionFactorVerificationAgeValue
 tuple SessionFactorVerificationAgeValue
 union CheckAuthorizationParams
+union Color
 union GetUserOrganizationSuggestionsParamsStatus
 union MobileSetActiveParamsOrganization
 union MobileSetActiveParamsSession

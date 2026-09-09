@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.*
 
-public data class ClerkState(public val `status`: ClerkStatus, public val `loaded`: Boolean, public val `session`: Session?, public val `user`: User?, public val `organization`: Organization?, public val `signIn`: SignIn, public val `signUp`: SignUp) {
+public data class ClerkState(public val `status`: ClerkStatus, public val `loaded`: Boolean, public val `environment`: MobileEnvironment, public val `session`: Session?, public val `user`: User?, public val `organization`: Organization?, public val `signIn`: SignIn, public val `signUp`: SignUp) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("status", this@ClerkState.`status`.toJson())
     putPresent("loaded", JsonPrimitive(this@ClerkState.`loaded`))
+    putPresent("environment", this@ClerkState.`environment`.toJson())
     putPresent("session", this@ClerkState.`session`?.let { value -> value.toJson() } ?: JsonNull)
     putPresent("user", this@ClerkState.`user`?.let { value -> value.toJson() } ?: JsonNull)
     putPresent("organization", this@ClerkState.`organization`?.let { value -> value.toJson() } ?: JsonNull)
@@ -24,7 +25,7 @@ public data class ClerkState(public val `status`: ClerkStatus, public val `loade
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): ClerkState {
       val values = value.jsonObject
 
-      return ClerkState(`status` = ClerkStatus.fromJson((values["status"] ?: Undefined), runtime), `loaded` = (values["loaded"] ?: Undefined).requireBoolean(), `session` = (values["session"] ?: Undefined).decodeOptional { value -> Session.fromJson(value, runtime) }, `user` = (values["user"] ?: Undefined).decodeOptional { value -> User.fromJson(value, runtime) }, `organization` = (values["organization"] ?: Undefined).decodeOptional { value -> Organization.fromJson(value, runtime) }, `signIn` = SignIn.fromJson((values["signIn"] ?: Undefined), runtime), `signUp` = SignUp.fromJson((values["signUp"] ?: Undefined), runtime))
+      return ClerkState(`status` = ClerkStatus.fromJson((values["status"] ?: Undefined), runtime), `loaded` = (values["loaded"] ?: Undefined).requireBoolean(), `environment` = MobileEnvironment.fromJson((values["environment"] ?: Undefined), runtime), `session` = (values["session"] ?: Undefined).decodeOptional { value -> Session.fromJson(value, runtime) }, `user` = (values["user"] ?: Undefined).decodeOptional { value -> User.fromJson(value, runtime) }, `organization` = (values["organization"] ?: Undefined).decodeOptional { value -> Organization.fromJson(value, runtime) }, `signIn` = SignIn.fromJson((values["signIn"] ?: Undefined), runtime), `signUp` = SignUp.fromJson((values["signUp"] ?: Undefined), runtime))
     }
   }
 }
@@ -35,6 +36,7 @@ public class Clerk(override val handle: ResourceHandle, runtime: CoreRuntime) : 
   override val isInvalidated: Boolean get() = context.isInvalidated(handle)
   public val `status`: ClerkStatus get() = state.`status`
   public val `loaded`: Boolean get() = state.`loaded`
+  public val `environment`: MobileEnvironment get() = state.`environment`
   public val `session`: Session? get() = state.`session`
   public val `user`: User? get() = state.`user`
   public val `organization`: Organization? get() = state.`organization`
@@ -1973,6 +1975,783 @@ public data class ClerkPaginatedResponseBillingPaymentMethod(public val `data`: 
   }
 }
 
+public data class MobileEnvironment(public val `organizationSettings`: OrganizationSettings, public val `authConfig`: AuthConfig, public val `displayConfig`: DisplayConfig, public val `maintenanceMode`: Boolean, public val `userSettings`: MobileUserSettings) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("organizationSettings", this@MobileEnvironment.`organizationSettings`.toJson())
+    putPresent("authConfig", this@MobileEnvironment.`authConfig`.toJson())
+    putPresent("displayConfig", this@MobileEnvironment.`displayConfig`.toJson())
+    putPresent("maintenanceMode", JsonPrimitive(this@MobileEnvironment.`maintenanceMode`))
+    putPresent("userSettings", this@MobileEnvironment.`userSettings`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileEnvironment {
+      val values = value.jsonObject
+
+      return MobileEnvironment(`organizationSettings` = OrganizationSettings.fromJson((values["organizationSettings"] ?: Undefined), runtime), `authConfig` = AuthConfig.fromJson((values["authConfig"] ?: Undefined), runtime), `displayConfig` = DisplayConfig.fromJson((values["displayConfig"] ?: Undefined), runtime), `maintenanceMode` = (values["maintenanceMode"] ?: Undefined).requireBoolean(), `userSettings` = MobileUserSettings.fromJson((values["userSettings"] ?: Undefined), runtime))
+    }
+  }
+}
+
+/**
+ * The `OrganizationSettings` object holds the Organization-related settings configured for the instance.
+ */
+public data class OrganizationSettings(public val `enabled`: Boolean, public val `maxAllowedMemberships`: Double, public val `forceOrganizationSelection`: Boolean, public val `actions`: OrganizationSettingsActions, public val `domains`: OrganizationSettingsDomains, public val `slug`: OrganizationSettingsSlug, public val `organizationCreationDefaults`: OrganizationSettingsOrganizationCreationDefaults, public val `id`: String? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enabled", JsonPrimitive(this@OrganizationSettings.`enabled`))
+    putPresent("maxAllowedMemberships", JsonPrimitive(this@OrganizationSettings.`maxAllowedMemberships`))
+    putPresent("forceOrganizationSelection", JsonPrimitive(this@OrganizationSettings.`forceOrganizationSelection`))
+    putPresent("actions", this@OrganizationSettings.`actions`.toJson())
+    putPresent("domains", this@OrganizationSettings.`domains`.toJson())
+    putPresent("slug", this@OrganizationSettings.`slug`.toJson())
+    putPresent("organizationCreationDefaults", this@OrganizationSettings.`organizationCreationDefaults`.toJson())
+    putPresent("id", this@OrganizationSettings.`id`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OrganizationSettings {
+      val values = value.jsonObject
+
+      return OrganizationSettings(`enabled` = (values["enabled"] ?: Undefined).requireBoolean(), `maxAllowedMemberships` = (values["maxAllowedMemberships"] ?: Undefined).requireDouble(), `forceOrganizationSelection` = (values["forceOrganizationSelection"] ?: Undefined).requireBoolean(), `actions` = OrganizationSettingsActions.fromJson((values["actions"] ?: Undefined), runtime), `domains` = OrganizationSettingsDomains.fromJson((values["domains"] ?: Undefined), runtime), `slug` = OrganizationSettingsSlug.fromJson((values["slug"] ?: Undefined), runtime), `organizationCreationDefaults` = OrganizationSettingsOrganizationCreationDefaults.fromJson((values["organizationCreationDefaults"] ?: Undefined), runtime), `id` = (values["id"] ?: Undefined).decodeOptional { value -> value.requireString() })
+    }
+  }
+}
+
+public data class OrganizationSettingsActions(public val `adminDelete`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("adminDelete", JsonPrimitive(this@OrganizationSettingsActions.`adminDelete`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OrganizationSettingsActions {
+      val values = value.jsonObject
+
+      return OrganizationSettingsActions(`adminDelete` = (values["adminDelete"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public data class OrganizationSettingsDomains(public val `enabled`: Boolean, public val `enrollmentModes`: List<OrganizationEnrollmentMode>, public val `defaultRole`: String?) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enabled", JsonPrimitive(this@OrganizationSettingsDomains.`enabled`))
+    putPresent("enrollmentModes", JsonArray(this@OrganizationSettingsDomains.`enrollmentModes`.map { value -> value.toJson() }))
+    putPresent("defaultRole", this@OrganizationSettingsDomains.`defaultRole`?.let { value -> JsonPrimitive(value) } ?: JsonNull)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OrganizationSettingsDomains {
+      val values = value.jsonObject
+
+      return OrganizationSettingsDomains(`enabled` = (values["enabled"] ?: Undefined).requireBoolean(), `enrollmentModes` = (values["enrollmentModes"] ?: Undefined).jsonArray.map { value -> OrganizationEnrollmentMode.fromJson(value, runtime) }, `defaultRole` = (values["defaultRole"] ?: Undefined).decodeOptional { value -> value.requireString() })
+    }
+  }
+}
+
+public data class OrganizationSettingsSlug(public val `disabled`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("disabled", JsonPrimitive(this@OrganizationSettingsSlug.`disabled`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OrganizationSettingsSlug {
+      val values = value.jsonObject
+
+      return OrganizationSettingsSlug(`disabled` = (values["disabled"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public data class OrganizationSettingsOrganizationCreationDefaults(public val `enabled`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enabled", JsonPrimitive(this@OrganizationSettingsOrganizationCreationDefaults.`enabled`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OrganizationSettingsOrganizationCreationDefaults {
+      val values = value.jsonObject
+
+      return OrganizationSettingsOrganizationCreationDefaults(`enabled` = (values["enabled"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public data class AuthConfig(public val `singleSessionMode`: Boolean, public val `claimedAt`: Instant?, public val `reverification`: Boolean, public val `preferredChannels`: Map<String, PhoneCodeChannel>?, public val `sessionMinter`: Boolean, public val `id`: String? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("singleSessionMode", JsonPrimitive(this@AuthConfig.`singleSessionMode`))
+    putPresent("claimedAt", this@AuthConfig.`claimedAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
+    putPresent("reverification", JsonPrimitive(this@AuthConfig.`reverification`))
+    putPresent("preferredChannels", this@AuthConfig.`preferredChannels`?.let { value -> JsonObject(value.mapValues { (_, value) -> value.toJson() }) } ?: JsonNull)
+    putPresent("sessionMinter", JsonPrimitive(this@AuthConfig.`sessionMinter`))
+    putPresent("id", this@AuthConfig.`id`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): AuthConfig {
+      val values = value.jsonObject
+
+      return AuthConfig(`singleSessionMode` = (values["singleSessionMode"] ?: Undefined).requireBoolean(), `claimedAt` = (values["claimedAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) }, `reverification` = (values["reverification"] ?: Undefined).requireBoolean(), `preferredChannels` = (values["preferredChannels"] ?: Undefined).decodeOptional { value -> value.jsonObject.mapValues { (_, value) -> PhoneCodeChannel.fromJson(value, runtime) } }, `sessionMinter` = (values["sessionMinter"] ?: Undefined).requireBoolean(), `id` = (values["id"] ?: Undefined).decodeOptional { value -> value.requireString() })
+    }
+  }
+}
+
+public sealed class PhoneCodeChannel(public val rawValue: String) {
+  public data object Sms : PhoneCodeChannel("sms")
+  public data object Whatsapp : PhoneCodeChannel("whatsapp")
+  public data class Unrecognized(val value: String) : PhoneCodeChannel(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): PhoneCodeChannel = when (val raw = value.requireString()) {
+      "sms" -> Sms
+      "whatsapp" -> Whatsapp
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public data class DisplayConfig(public val `id`: String, public val `afterSignInUrl`: String, public val `afterSignOutAllUrl`: String, public val `afterSignOutOneUrl`: String, public val `afterSignUpUrl`: String, public val `afterSwitchSessionUrl`: String, public val `applicationName`: String, public val `backendHost`: String, public val `branded`: Boolean, public val `captchaPublicKey`: String?, public val `captchaWidgetType`: DisplayConfigCaptchaWidgetType?, public val `captchaPublicKeyInvisible`: String?, public val `captchaOauthBypass`: List<OAuthStrategy>, public val `captchaHeartbeat`: Boolean, public val `captchaHeartbeatIntervalMs`: Double? = null, public val `homeUrl`: String, public val `instanceEnvironmentType`: String, public val `logoImageUrl`: String, public val `faviconImageUrl`: String, public val `preferredSignInStrategy`: PreferredSignInStrategy, public val `signInUrl`: String, public val `signUpUrl`: String, public val `supportEmail`: String, public val `theme`: DisplayThemeJSON, public val `userProfileUrl`: String, public val `clerkJSVersion`: String? = null, public val `organizationProfileUrl`: String, public val `createOrganizationUrl`: String, public val `afterLeaveOrganizationUrl`: String, public val `afterCreateOrganizationUrl`: String, public val `googleOneTapClientId`: String? = null, public val `showDevModeWarning`: Boolean, public val `termsUrl`: String, public val `privacyPolicyUrl`: String, public val `waitlistUrl`: String, public val `afterJoinWaitlistUrl`: String) {
+  public val `captchaProvider`: String get() = "turnstile"
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("id", JsonPrimitive(this@DisplayConfig.`id`))
+    putPresent("afterSignInUrl", JsonPrimitive(this@DisplayConfig.`afterSignInUrl`))
+    putPresent("afterSignOutAllUrl", JsonPrimitive(this@DisplayConfig.`afterSignOutAllUrl`))
+    putPresent("afterSignOutOneUrl", JsonPrimitive(this@DisplayConfig.`afterSignOutOneUrl`))
+    putPresent("afterSignUpUrl", JsonPrimitive(this@DisplayConfig.`afterSignUpUrl`))
+    putPresent("afterSwitchSessionUrl", JsonPrimitive(this@DisplayConfig.`afterSwitchSessionUrl`))
+    putPresent("applicationName", JsonPrimitive(this@DisplayConfig.`applicationName`))
+    putPresent("backendHost", JsonPrimitive(this@DisplayConfig.`backendHost`))
+    putPresent("branded", JsonPrimitive(this@DisplayConfig.`branded`))
+    putPresent("captchaPublicKey", this@DisplayConfig.`captchaPublicKey`?.let { value -> JsonPrimitive(value) } ?: JsonNull)
+    putPresent("captchaWidgetType", this@DisplayConfig.`captchaWidgetType`?.let { value -> value.toJson() } ?: JsonNull)
+    putPresent("captchaProvider", JsonPrimitive("turnstile"))
+    putPresent("captchaPublicKeyInvisible", this@DisplayConfig.`captchaPublicKeyInvisible`?.let { value -> JsonPrimitive(value) } ?: JsonNull)
+    putPresent("captchaOauthBypass", JsonArray(this@DisplayConfig.`captchaOauthBypass`.map { value -> value.toJson() }))
+    putPresent("captchaHeartbeat", JsonPrimitive(this@DisplayConfig.`captchaHeartbeat`))
+    putPresent("captchaHeartbeatIntervalMs", this@DisplayConfig.`captchaHeartbeatIntervalMs`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("homeUrl", JsonPrimitive(this@DisplayConfig.`homeUrl`))
+    putPresent("instanceEnvironmentType", JsonPrimitive(this@DisplayConfig.`instanceEnvironmentType`))
+    putPresent("logoImageUrl", JsonPrimitive(this@DisplayConfig.`logoImageUrl`))
+    putPresent("faviconImageUrl", JsonPrimitive(this@DisplayConfig.`faviconImageUrl`))
+    putPresent("preferredSignInStrategy", this@DisplayConfig.`preferredSignInStrategy`.toJson())
+    putPresent("signInUrl", JsonPrimitive(this@DisplayConfig.`signInUrl`))
+    putPresent("signUpUrl", JsonPrimitive(this@DisplayConfig.`signUpUrl`))
+    putPresent("supportEmail", JsonPrimitive(this@DisplayConfig.`supportEmail`))
+    putPresent("theme", this@DisplayConfig.`theme`.toJson())
+    putPresent("userProfileUrl", JsonPrimitive(this@DisplayConfig.`userProfileUrl`))
+    putPresent("clerkJSVersion", this@DisplayConfig.`clerkJSVersion`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("organizationProfileUrl", JsonPrimitive(this@DisplayConfig.`organizationProfileUrl`))
+    putPresent("createOrganizationUrl", JsonPrimitive(this@DisplayConfig.`createOrganizationUrl`))
+    putPresent("afterLeaveOrganizationUrl", JsonPrimitive(this@DisplayConfig.`afterLeaveOrganizationUrl`))
+    putPresent("afterCreateOrganizationUrl", JsonPrimitive(this@DisplayConfig.`afterCreateOrganizationUrl`))
+    putPresent("googleOneTapClientId", this@DisplayConfig.`googleOneTapClientId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("showDevModeWarning", JsonPrimitive(this@DisplayConfig.`showDevModeWarning`))
+    putPresent("termsUrl", JsonPrimitive(this@DisplayConfig.`termsUrl`))
+    putPresent("privacyPolicyUrl", JsonPrimitive(this@DisplayConfig.`privacyPolicyUrl`))
+    putPresent("waitlistUrl", JsonPrimitive(this@DisplayConfig.`waitlistUrl`))
+    putPresent("afterJoinWaitlistUrl", JsonPrimitive(this@DisplayConfig.`afterJoinWaitlistUrl`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): DisplayConfig {
+      val values = value.jsonObject
+      require(values["captchaProvider"] == JsonPrimitive("turnstile"))
+      return DisplayConfig(`id` = (values["id"] ?: Undefined).requireString(), `afterSignInUrl` = (values["afterSignInUrl"] ?: Undefined).requireString(), `afterSignOutAllUrl` = (values["afterSignOutAllUrl"] ?: Undefined).requireString(), `afterSignOutOneUrl` = (values["afterSignOutOneUrl"] ?: Undefined).requireString(), `afterSignUpUrl` = (values["afterSignUpUrl"] ?: Undefined).requireString(), `afterSwitchSessionUrl` = (values["afterSwitchSessionUrl"] ?: Undefined).requireString(), `applicationName` = (values["applicationName"] ?: Undefined).requireString(), `backendHost` = (values["backendHost"] ?: Undefined).requireString(), `branded` = (values["branded"] ?: Undefined).requireBoolean(), `captchaPublicKey` = (values["captchaPublicKey"] ?: Undefined).decodeOptional { value -> value.requireString() }, `captchaWidgetType` = (values["captchaWidgetType"] ?: Undefined).decodeOptional { value -> DisplayConfigCaptchaWidgetType.fromJson(value, runtime) }, `captchaPublicKeyInvisible` = (values["captchaPublicKeyInvisible"] ?: Undefined).decodeOptional { value -> value.requireString() }, `captchaOauthBypass` = (values["captchaOauthBypass"] ?: Undefined).jsonArray.map { value -> OAuthStrategy.fromJson(value, runtime) }, `captchaHeartbeat` = (values["captchaHeartbeat"] ?: Undefined).requireBoolean(), `captchaHeartbeatIntervalMs` = (values["captchaHeartbeatIntervalMs"] ?: Undefined).decodeOptional { value -> value.requireDouble() }, `homeUrl` = (values["homeUrl"] ?: Undefined).requireString(), `instanceEnvironmentType` = (values["instanceEnvironmentType"] ?: Undefined).requireString(), `logoImageUrl` = (values["logoImageUrl"] ?: Undefined).requireString(), `faviconImageUrl` = (values["faviconImageUrl"] ?: Undefined).requireString(), `preferredSignInStrategy` = PreferredSignInStrategy.fromJson((values["preferredSignInStrategy"] ?: Undefined), runtime), `signInUrl` = (values["signInUrl"] ?: Undefined).requireString(), `signUpUrl` = (values["signUpUrl"] ?: Undefined).requireString(), `supportEmail` = (values["supportEmail"] ?: Undefined).requireString(), `theme` = DisplayThemeJSON.fromJson((values["theme"] ?: Undefined), runtime), `userProfileUrl` = (values["userProfileUrl"] ?: Undefined).requireString(), `clerkJSVersion` = (values["clerkJSVersion"] ?: Undefined).decodeOptional { value -> value.requireString() }, `organizationProfileUrl` = (values["organizationProfileUrl"] ?: Undefined).requireString(), `createOrganizationUrl` = (values["createOrganizationUrl"] ?: Undefined).requireString(), `afterLeaveOrganizationUrl` = (values["afterLeaveOrganizationUrl"] ?: Undefined).requireString(), `afterCreateOrganizationUrl` = (values["afterCreateOrganizationUrl"] ?: Undefined).requireString(), `googleOneTapClientId` = (values["googleOneTapClientId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `showDevModeWarning` = (values["showDevModeWarning"] ?: Undefined).requireBoolean(), `termsUrl` = (values["termsUrl"] ?: Undefined).requireString(), `privacyPolicyUrl` = (values["privacyPolicyUrl"] ?: Undefined).requireString(), `waitlistUrl` = (values["waitlistUrl"] ?: Undefined).requireString(), `afterJoinWaitlistUrl` = (values["afterJoinWaitlistUrl"] ?: Undefined).requireString())
+    }
+  }
+}
+
+public sealed class DisplayConfigCaptchaWidgetType(public val rawValue: String) {
+  public data object Smart : DisplayConfigCaptchaWidgetType("smart")
+  public data object Invisible : DisplayConfigCaptchaWidgetType("invisible")
+  public data class Unrecognized(val value: String) : DisplayConfigCaptchaWidgetType(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): DisplayConfigCaptchaWidgetType = when (val raw = value.requireString()) {
+      "smart" -> Smart
+      "invisible" -> Invisible
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+/**
+ * OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).
+ */
+public sealed class OAuthStrategy(public val rawValue: String) {
+  public data object OauthFacebook : OAuthStrategy("oauth_facebook")
+  public data object OauthGoogle : OAuthStrategy("oauth_google")
+  public data object OauthHubspot : OAuthStrategy("oauth_hubspot")
+  public data object OauthGithub : OAuthStrategy("oauth_github")
+  public data object OauthTiktok : OAuthStrategy("oauth_tiktok")
+  public data object OauthGitlab : OAuthStrategy("oauth_gitlab")
+  public data object OauthDiscord : OAuthStrategy("oauth_discord")
+  public data object OauthTwitter : OAuthStrategy("oauth_twitter")
+  public data object OauthTwitch : OAuthStrategy("oauth_twitch")
+  public data object OauthLinkedin : OAuthStrategy("oauth_linkedin")
+  public data object OauthLinkedinOidc : OAuthStrategy("oauth_linkedin_oidc")
+  public data object OauthDropbox : OAuthStrategy("oauth_dropbox")
+  public data object OauthAtlassian : OAuthStrategy("oauth_atlassian")
+  public data object OauthBitbucket : OAuthStrategy("oauth_bitbucket")
+  public data object OauthMicrosoft : OAuthStrategy("oauth_microsoft")
+  public data object OauthNotion : OAuthStrategy("oauth_notion")
+  public data object OauthApple : OAuthStrategy("oauth_apple")
+  public data object OauthLine : OAuthStrategy("oauth_line")
+  public data object OauthInstagram : OAuthStrategy("oauth_instagram")
+  public data object OauthCoinbase : OAuthStrategy("oauth_coinbase")
+  public data object OauthSpotify : OAuthStrategy("oauth_spotify")
+  public data object OauthXero : OAuthStrategy("oauth_xero")
+  public data object OauthBox : OAuthStrategy("oauth_box")
+  public data object OauthSlack : OAuthStrategy("oauth_slack")
+  public data object OauthLinear : OAuthStrategy("oauth_linear")
+  public data object OauthX : OAuthStrategy("oauth_x")
+  public data object OauthEnstall : OAuthStrategy("oauth_enstall")
+  public data object OauthHuggingface : OAuthStrategy("oauth_huggingface")
+  public data object OauthVercel : OAuthStrategy("oauth_vercel")
+  public data class Unrecognized(val value: String) : OAuthStrategy(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OAuthStrategy = when (val raw = value.requireString()) {
+      "oauth_facebook" -> OauthFacebook
+      "oauth_google" -> OauthGoogle
+      "oauth_hubspot" -> OauthHubspot
+      "oauth_github" -> OauthGithub
+      "oauth_tiktok" -> OauthTiktok
+      "oauth_gitlab" -> OauthGitlab
+      "oauth_discord" -> OauthDiscord
+      "oauth_twitter" -> OauthTwitter
+      "oauth_twitch" -> OauthTwitch
+      "oauth_linkedin" -> OauthLinkedin
+      "oauth_linkedin_oidc" -> OauthLinkedinOidc
+      "oauth_dropbox" -> OauthDropbox
+      "oauth_atlassian" -> OauthAtlassian
+      "oauth_bitbucket" -> OauthBitbucket
+      "oauth_microsoft" -> OauthMicrosoft
+      "oauth_notion" -> OauthNotion
+      "oauth_apple" -> OauthApple
+      "oauth_line" -> OauthLine
+      "oauth_instagram" -> OauthInstagram
+      "oauth_coinbase" -> OauthCoinbase
+      "oauth_spotify" -> OauthSpotify
+      "oauth_xero" -> OauthXero
+      "oauth_box" -> OauthBox
+      "oauth_slack" -> OauthSlack
+      "oauth_linear" -> OauthLinear
+      "oauth_x" -> OauthX
+      "oauth_enstall" -> OauthEnstall
+      "oauth_huggingface" -> OauthHuggingface
+      "oauth_vercel" -> OauthVercel
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public sealed class PreferredSignInStrategy(public val rawValue: String) {
+  public data object Password : PreferredSignInStrategy("password")
+  public data object Otp : PreferredSignInStrategy("otp")
+  public data class Unrecognized(val value: String) : PreferredSignInStrategy(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): PreferredSignInStrategy = when (val raw = value.requireString()) {
+      "password" -> Password
+      "otp" -> Otp
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public data class DisplayThemeJSON(public val `general`: DisplayThemeJSONGeneral, public val `buttons`: DisplayThemeJSONButtons, public val `accounts`: DisplayThemeJSONAccounts) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("general", this@DisplayThemeJSON.`general`.toJson())
+    putPresent("buttons", this@DisplayThemeJSON.`buttons`.toJson())
+    putPresent("accounts", this@DisplayThemeJSON.`accounts`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): DisplayThemeJSON {
+      val values = value.jsonObject
+
+      return DisplayThemeJSON(`general` = DisplayThemeJSONGeneral.fromJson((values["general"] ?: Undefined), runtime), `buttons` = DisplayThemeJSONButtons.fromJson((values["buttons"] ?: Undefined), runtime), `accounts` = DisplayThemeJSONAccounts.fromJson((values["accounts"] ?: Undefined), runtime))
+    }
+  }
+}
+
+public data class DisplayThemeJSONGeneral(public val `color`: String, public val `backgroundColor`: Color, public val `fontFamily`: String, public val `fontColor`: String, public val `labelFontWeight`: String, public val `padding`: String, public val `borderRadius`: String, public val `boxShadow`: String) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("color", JsonPrimitive(this@DisplayThemeJSONGeneral.`color`))
+    putPresent("background_color", this@DisplayThemeJSONGeneral.`backgroundColor`.toJson())
+    putPresent("font_family", JsonPrimitive(this@DisplayThemeJSONGeneral.`fontFamily`))
+    putPresent("font_color", JsonPrimitive(this@DisplayThemeJSONGeneral.`fontColor`))
+    putPresent("label_font_weight", JsonPrimitive(this@DisplayThemeJSONGeneral.`labelFontWeight`))
+    putPresent("padding", JsonPrimitive(this@DisplayThemeJSONGeneral.`padding`))
+    putPresent("border_radius", JsonPrimitive(this@DisplayThemeJSONGeneral.`borderRadius`))
+    putPresent("box_shadow", JsonPrimitive(this@DisplayThemeJSONGeneral.`boxShadow`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): DisplayThemeJSONGeneral {
+      val values = value.jsonObject
+
+      return DisplayThemeJSONGeneral(`color` = (values["color"] ?: Undefined).requireString(), `backgroundColor` = Color.fromJson((values["background_color"] ?: Undefined), runtime), `fontFamily` = (values["font_family"] ?: Undefined).requireString(), `fontColor` = (values["font_color"] ?: Undefined).requireString(), `labelFontWeight` = (values["label_font_weight"] ?: Undefined).requireString(), `padding` = (values["padding"] ?: Undefined).requireString(), `borderRadius` = (values["border_radius"] ?: Undefined).requireString(), `boxShadow` = (values["box_shadow"] ?: Undefined).requireString())
+    }
+  }
+}
+
+public sealed interface Color {
+  public data class Case1(val value: String) : Color
+  public data class Case2(val value: HslaColor) : Color
+  public data class Case3(val value: RgbaColor) : Color
+  public fun toJson(): JsonElement = when (this) {
+    is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to JsonPrimitive(value)))
+    is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
+    is Case3 -> JsonObject(mapOf("\$case" to JsonPrimitive(2), "value" to value.toJson()))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): Color {
+      val values = value.jsonObject
+      val payload = values["value"] ?: Undefined
+      return when (values.getValue("\$case").jsonPrimitive.int) {
+        0 -> Case1(payload.requireString())
+        1 -> Case2(HslaColor.fromJson(payload, runtime))
+        2 -> Case3(RgbaColor.fromJson(payload, runtime))
+        else -> throw CoreException("invalid_value")
+      }
+    }
+  }
+}
+
+public data class HslaColor(public val `h`: Double, public val `s`: Double, public val `l`: Double, public val `a`: Double? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("h", JsonPrimitive(this@HslaColor.`h`))
+    putPresent("s", JsonPrimitive(this@HslaColor.`s`))
+    putPresent("l", JsonPrimitive(this@HslaColor.`l`))
+    putPresent("a", this@HslaColor.`a`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): HslaColor {
+      val values = value.jsonObject
+
+      return HslaColor(`h` = (values["h"] ?: Undefined).requireDouble(), `s` = (values["s"] ?: Undefined).requireDouble(), `l` = (values["l"] ?: Undefined).requireDouble(), `a` = (values["a"] ?: Undefined).decodeOptional { value -> value.requireDouble() })
+    }
+  }
+}
+
+public data class RgbaColor(public val `r`: Double, public val `g`: Double, public val `b`: Double, public val `a`: Double? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("r", JsonPrimitive(this@RgbaColor.`r`))
+    putPresent("g", JsonPrimitive(this@RgbaColor.`g`))
+    putPresent("b", JsonPrimitive(this@RgbaColor.`b`))
+    putPresent("a", this@RgbaColor.`a`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): RgbaColor {
+      val values = value.jsonObject
+
+      return RgbaColor(`r` = (values["r"] ?: Undefined).requireDouble(), `g` = (values["g"] ?: Undefined).requireDouble(), `b` = (values["b"] ?: Undefined).requireDouble(), `a` = (values["a"] ?: Undefined).decodeOptional { value -> value.requireDouble() })
+    }
+  }
+}
+
+public data class DisplayThemeJSONButtons(public val `fontColor`: String, public val `fontFamily`: String, public val `fontWeight`: String) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("font_color", JsonPrimitive(this@DisplayThemeJSONButtons.`fontColor`))
+    putPresent("font_family", JsonPrimitive(this@DisplayThemeJSONButtons.`fontFamily`))
+    putPresent("font_weight", JsonPrimitive(this@DisplayThemeJSONButtons.`fontWeight`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): DisplayThemeJSONButtons {
+      val values = value.jsonObject
+
+      return DisplayThemeJSONButtons(`fontColor` = (values["font_color"] ?: Undefined).requireString(), `fontFamily` = (values["font_family"] ?: Undefined).requireString(), `fontWeight` = (values["font_weight"] ?: Undefined).requireString())
+    }
+  }
+}
+
+public data class DisplayThemeJSONAccounts(public val `backgroundColor`: Color) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("background_color", this@DisplayThemeJSONAccounts.`backgroundColor`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): DisplayThemeJSONAccounts {
+      val values = value.jsonObject
+
+      return DisplayThemeJSONAccounts(`backgroundColor` = Color.fromJson((values["background_color"] ?: Undefined), runtime))
+    }
+  }
+}
+
+public data class MobileUserSettings(public val `enterpriseSSO`: EnterpriseSSOSettings, public val `attributes`: Attributes, public val `actions`: Actions, public val `signIn`: SignInData, public val `signUp`: SignUpData, public val `passwordSettings`: PasswordSettingsData, public val `usernameSettings`: UsernameSettingsData, public val `attackProtection`: AttackProtectionData, public val `passkeySettings`: PasskeySettingsData, public val `socialProviderStrategies`: List<OAuthStrategy>, public val `authenticatableSocialStrategies`: List<OAuthStrategy>, public val `web3FirstFactors`: List<MobileUserSettingsWeb3FirstFactorsElement>, public val `alternativePhoneCodeChannels`: List<PhoneCodeChannel>, public val `enabledFirstFactorIdentifiers`: List<Attribute>, public val `instanceIsPasswordBased`: Boolean, public val `hasValidAuthFactor`: Boolean, public val `social`: PartialOAuthProviders) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enterpriseSSO", this@MobileUserSettings.`enterpriseSSO`.toJson())
+    putPresent("attributes", this@MobileUserSettings.`attributes`.toJson())
+    putPresent("actions", this@MobileUserSettings.`actions`.toJson())
+    putPresent("signIn", this@MobileUserSettings.`signIn`.toJson())
+    putPresent("signUp", this@MobileUserSettings.`signUp`.toJson())
+    putPresent("passwordSettings", this@MobileUserSettings.`passwordSettings`.toJson())
+    putPresent("usernameSettings", this@MobileUserSettings.`usernameSettings`.toJson())
+    putPresent("attackProtection", this@MobileUserSettings.`attackProtection`.toJson())
+    putPresent("passkeySettings", this@MobileUserSettings.`passkeySettings`.toJson())
+    putPresent("socialProviderStrategies", JsonArray(this@MobileUserSettings.`socialProviderStrategies`.map { value -> value.toJson() }))
+    putPresent("authenticatableSocialStrategies", JsonArray(this@MobileUserSettings.`authenticatableSocialStrategies`.map { value -> value.toJson() }))
+    putPresent("web3FirstFactors", JsonArray(this@MobileUserSettings.`web3FirstFactors`.map { value -> value.toJson() }))
+    putPresent("alternativePhoneCodeChannels", JsonArray(this@MobileUserSettings.`alternativePhoneCodeChannels`.map { value -> value.toJson() }))
+    putPresent("enabledFirstFactorIdentifiers", JsonArray(this@MobileUserSettings.`enabledFirstFactorIdentifiers`.map { value -> value.toJson() }))
+    putPresent("instanceIsPasswordBased", JsonPrimitive(this@MobileUserSettings.`instanceIsPasswordBased`))
+    putPresent("hasValidAuthFactor", JsonPrimitive(this@MobileUserSettings.`hasValidAuthFactor`))
+    putPresent("social", this@MobileUserSettings.`social`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileUserSettings {
+      val values = value.jsonObject
+
+      return MobileUserSettings(`enterpriseSSO` = EnterpriseSSOSettings.fromJson((values["enterpriseSSO"] ?: Undefined), runtime), `attributes` = Attributes.fromJson((values["attributes"] ?: Undefined), runtime), `actions` = Actions.fromJson((values["actions"] ?: Undefined), runtime), `signIn` = SignInData.fromJson((values["signIn"] ?: Undefined), runtime), `signUp` = SignUpData.fromJson((values["signUp"] ?: Undefined), runtime), `passwordSettings` = PasswordSettingsData.fromJson((values["passwordSettings"] ?: Undefined), runtime), `usernameSettings` = UsernameSettingsData.fromJson((values["usernameSettings"] ?: Undefined), runtime), `attackProtection` = AttackProtectionData.fromJson((values["attackProtection"] ?: Undefined), runtime), `passkeySettings` = PasskeySettingsData.fromJson((values["passkeySettings"] ?: Undefined), runtime), `socialProviderStrategies` = (values["socialProviderStrategies"] ?: Undefined).jsonArray.map { value -> OAuthStrategy.fromJson(value, runtime) }, `authenticatableSocialStrategies` = (values["authenticatableSocialStrategies"] ?: Undefined).jsonArray.map { value -> OAuthStrategy.fromJson(value, runtime) }, `web3FirstFactors` = (values["web3FirstFactors"] ?: Undefined).jsonArray.map { value -> MobileUserSettingsWeb3FirstFactorsElement.fromJson(value, runtime) }, `alternativePhoneCodeChannels` = (values["alternativePhoneCodeChannels"] ?: Undefined).jsonArray.map { value -> PhoneCodeChannel.fromJson(value, runtime) }, `enabledFirstFactorIdentifiers` = (values["enabledFirstFactorIdentifiers"] ?: Undefined).jsonArray.map { value -> Attribute.fromJson(value, runtime) }, `instanceIsPasswordBased` = (values["instanceIsPasswordBased"] ?: Undefined).requireBoolean(), `hasValidAuthFactor` = (values["hasValidAuthFactor"] ?: Undefined).requireBoolean(), `social` = PartialOAuthProviders.fromJson((values["social"] ?: Undefined), runtime))
+    }
+  }
+}
+
+public data class EnterpriseSSOSettings(public val `enabled`: Boolean, public val `selfServeSso`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enabled", JsonPrimitive(this@EnterpriseSSOSettings.`enabled`))
+    putPresent("self_serve_sso", JsonPrimitive(this@EnterpriseSSOSettings.`selfServeSso`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): EnterpriseSSOSettings {
+      val values = value.jsonObject
+
+      return EnterpriseSSOSettings(`enabled` = (values["enabled"] ?: Undefined).requireBoolean(), `selfServeSso` = (values["self_serve_sso"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public data class Attributes(public val `password`: AttributeData, public val `emailAddress`: AttributeData, public val `phoneNumber`: AttributeData, public val `username`: AttributeData, public val `firstName`: AttributeData, public val `lastName`: AttributeData, public val `web3Wallet`: AttributeData, public val `authenticatorApp`: AttributeData, public val `backupCode`: AttributeData, public val `passkey`: AttributeData) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("password", this@Attributes.`password`.toJson())
+    putPresent("email_address", this@Attributes.`emailAddress`.toJson())
+    putPresent("phone_number", this@Attributes.`phoneNumber`.toJson())
+    putPresent("username", this@Attributes.`username`.toJson())
+    putPresent("first_name", this@Attributes.`firstName`.toJson())
+    putPresent("last_name", this@Attributes.`lastName`.toJson())
+    putPresent("web3_wallet", this@Attributes.`web3Wallet`.toJson())
+    putPresent("authenticator_app", this@Attributes.`authenticatorApp`.toJson())
+    putPresent("backup_code", this@Attributes.`backupCode`.toJson())
+    putPresent("passkey", this@Attributes.`passkey`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): Attributes {
+      val values = value.jsonObject
+
+      return Attributes(`password` = AttributeData.fromJson((values["password"] ?: Undefined), runtime), `emailAddress` = AttributeData.fromJson((values["email_address"] ?: Undefined), runtime), `phoneNumber` = AttributeData.fromJson((values["phone_number"] ?: Undefined), runtime), `username` = AttributeData.fromJson((values["username"] ?: Undefined), runtime), `firstName` = AttributeData.fromJson((values["first_name"] ?: Undefined), runtime), `lastName` = AttributeData.fromJson((values["last_name"] ?: Undefined), runtime), `web3Wallet` = AttributeData.fromJson((values["web3_wallet"] ?: Undefined), runtime), `authenticatorApp` = AttributeData.fromJson((values["authenticator_app"] ?: Undefined), runtime), `backupCode` = AttributeData.fromJson((values["backup_code"] ?: Undefined), runtime), `passkey` = AttributeData.fromJson((values["passkey"] ?: Undefined), runtime))
+    }
+  }
+}
+
+public data class AttributeData(public val `enabled`: Boolean, public val `required`: Boolean, public val `immutable`: Boolean? = null, public val `verifications`: List<VerificationStrategy>, public val `usedForFirstFactor`: Boolean, public val `firstFactors`: List<VerificationStrategy>, public val `usedForSecondFactor`: Boolean, public val `secondFactors`: List<VerificationStrategy>, public val `verifyAtSignUp`: Boolean, public val `channels`: List<PhoneCodeChannel>? = null, public val `name`: Attribute) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enabled", JsonPrimitive(this@AttributeData.`enabled`))
+    putPresent("required", JsonPrimitive(this@AttributeData.`required`))
+    putPresent("immutable", this@AttributeData.`immutable`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("verifications", JsonArray(this@AttributeData.`verifications`.map { value -> value.toJson() }))
+    putPresent("used_for_first_factor", JsonPrimitive(this@AttributeData.`usedForFirstFactor`))
+    putPresent("first_factors", JsonArray(this@AttributeData.`firstFactors`.map { value -> value.toJson() }))
+    putPresent("used_for_second_factor", JsonPrimitive(this@AttributeData.`usedForSecondFactor`))
+    putPresent("second_factors", JsonArray(this@AttributeData.`secondFactors`.map { value -> value.toJson() }))
+    putPresent("verify_at_sign_up", JsonPrimitive(this@AttributeData.`verifyAtSignUp`))
+    putPresent("channels", this@AttributeData.`channels`?.let { value -> JsonArray(value.map { value -> value.toJson() }) } ?: Undefined)
+    putPresent("name", this@AttributeData.`name`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): AttributeData {
+      val values = value.jsonObject
+
+      return AttributeData(`enabled` = (values["enabled"] ?: Undefined).requireBoolean(), `required` = (values["required"] ?: Undefined).requireBoolean(), `immutable` = (values["immutable"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `verifications` = (values["verifications"] ?: Undefined).jsonArray.map { value -> VerificationStrategy.fromJson(value, runtime) }, `usedForFirstFactor` = (values["used_for_first_factor"] ?: Undefined).requireBoolean(), `firstFactors` = (values["first_factors"] ?: Undefined).jsonArray.map { value -> VerificationStrategy.fromJson(value, runtime) }, `usedForSecondFactor` = (values["used_for_second_factor"] ?: Undefined).requireBoolean(), `secondFactors` = (values["second_factors"] ?: Undefined).jsonArray.map { value -> VerificationStrategy.fromJson(value, runtime) }, `verifyAtSignUp` = (values["verify_at_sign_up"] ?: Undefined).requireBoolean(), `channels` = (values["channels"] ?: Undefined).decodeOptional { value -> value.jsonArray.map { value -> PhoneCodeChannel.fromJson(value, runtime) } }, `name` = Attribute.fromJson((values["name"] ?: Undefined), runtime))
+    }
+  }
+}
+
+public sealed class VerificationStrategy(public val rawValue: String) {
+  public data object EmailCode : VerificationStrategy("email_code")
+  public data object BackupCode : VerificationStrategy("backup_code")
+  public data object EmailLink : VerificationStrategy("email_link")
+  public data object PhoneCode : VerificationStrategy("phone_code")
+  public data object Totp : VerificationStrategy("totp")
+  public data class Unrecognized(val value: String) : VerificationStrategy(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): VerificationStrategy = when (val raw = value.requireString()) {
+      "email_code" -> EmailCode
+      "backup_code" -> BackupCode
+      "email_link" -> EmailLink
+      "phone_code" -> PhoneCode
+      "totp" -> Totp
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public sealed class Attribute(public val rawValue: String) {
+  public data object Password : Attribute("password")
+  public data object EmailAddress : Attribute("email_address")
+  public data object PhoneNumber : Attribute("phone_number")
+  public data object Username : Attribute("username")
+  public data object FirstName : Attribute("first_name")
+  public data object LastName : Attribute("last_name")
+  public data object Web3Wallet : Attribute("web3_wallet")
+  public data object AuthenticatorApp : Attribute("authenticator_app")
+  public data object BackupCode : Attribute("backup_code")
+  public data object Passkey : Attribute("passkey")
+  public data class Unrecognized(val value: String) : Attribute(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): Attribute = when (val raw = value.requireString()) {
+      "password" -> Password
+      "email_address" -> EmailAddress
+      "phone_number" -> PhoneNumber
+      "username" -> Username
+      "first_name" -> FirstName
+      "last_name" -> LastName
+      "web3_wallet" -> Web3Wallet
+      "authenticator_app" -> AuthenticatorApp
+      "backup_code" -> BackupCode
+      "passkey" -> Passkey
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public data class Actions(public val `deleteSelf`: Boolean, public val `createOrganization`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("delete_self", JsonPrimitive(this@Actions.`deleteSelf`))
+    putPresent("create_organization", JsonPrimitive(this@Actions.`createOrganization`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): Actions {
+      val values = value.jsonObject
+
+      return Actions(`deleteSelf` = (values["delete_self"] ?: Undefined).requireBoolean(), `createOrganization` = (values["create_organization"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public data class SignInData(public val `secondFactor`: SignInDataSecond_factor) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("second_factor", this@SignInData.`secondFactor`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInData {
+      val values = value.jsonObject
+
+      return SignInData(`secondFactor` = SignInDataSecond_factor.fromJson((values["second_factor"] ?: Undefined), runtime))
+    }
+  }
+}
+
+public data class SignInDataSecond_factor(public val `required`: Boolean, public val `enabled`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("required", JsonPrimitive(this@SignInDataSecond_factor.`required`))
+    putPresent("enabled", JsonPrimitive(this@SignInDataSecond_factor.`enabled`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInDataSecond_factor {
+      val values = value.jsonObject
+
+      return SignInDataSecond_factor(`required` = (values["required"] ?: Undefined).requireBoolean(), `enabled` = (values["enabled"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public data class SignUpData(public val `allowlistOnly`: Boolean, public val `progressive`: Boolean, public val `captchaEnabled`: Boolean, public val `mode`: SignUpModes, public val `legalConsentEnabled`: Boolean, public val `mfa`: SignUpDataMfa? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("allowlist_only", JsonPrimitive(this@SignUpData.`allowlistOnly`))
+    putPresent("progressive", JsonPrimitive(this@SignUpData.`progressive`))
+    putPresent("captcha_enabled", JsonPrimitive(this@SignUpData.`captchaEnabled`))
+    putPresent("mode", this@SignUpData.`mode`.toJson())
+    putPresent("legal_consent_enabled", JsonPrimitive(this@SignUpData.`legalConsentEnabled`))
+    putPresent("mfa", this@SignUpData.`mfa`?.let { value -> value.toJson() } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignUpData {
+      val values = value.jsonObject
+
+      return SignUpData(`allowlistOnly` = (values["allowlist_only"] ?: Undefined).requireBoolean(), `progressive` = (values["progressive"] ?: Undefined).requireBoolean(), `captchaEnabled` = (values["captcha_enabled"] ?: Undefined).requireBoolean(), `mode` = SignUpModes.fromJson((values["mode"] ?: Undefined), runtime), `legalConsentEnabled` = (values["legal_consent_enabled"] ?: Undefined).requireBoolean(), `mfa` = (values["mfa"] ?: Undefined).decodeOptional { value -> SignUpDataMfa.fromJson(value, runtime) })
+    }
+  }
+}
+
+public sealed class SignUpModes(public val rawValue: String) {
+  public data object Public : SignUpModes("public")
+  public data object Restricted : SignUpModes("restricted")
+  public data object Waitlist : SignUpModes("waitlist")
+  public data class Unrecognized(val value: String) : SignUpModes(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignUpModes = when (val raw = value.requireString()) {
+      "public" -> Public
+      "restricted" -> Restricted
+      "waitlist" -> Waitlist
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public data class SignUpDataMfa(public val `required`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("required", JsonPrimitive(this@SignUpDataMfa.`required`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignUpDataMfa {
+      val values = value.jsonObject
+
+      return SignUpDataMfa(`required` = (values["required"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public data class PasswordSettingsData(public val `allowedSpecialCharacters`: String, public val `disableHibp`: Boolean, public val `minLength`: Double, public val `maxLength`: Double, public val `requireSpecialChar`: Boolean, public val `requireNumbers`: Boolean, public val `requireUppercase`: Boolean, public val `requireLowercase`: Boolean, public val `showZxcvbn`: Boolean, public val `minZxcvbnStrength`: Double) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("allowed_special_characters", JsonPrimitive(this@PasswordSettingsData.`allowedSpecialCharacters`))
+    putPresent("disable_hibp", JsonPrimitive(this@PasswordSettingsData.`disableHibp`))
+    putPresent("min_length", JsonPrimitive(this@PasswordSettingsData.`minLength`))
+    putPresent("max_length", JsonPrimitive(this@PasswordSettingsData.`maxLength`))
+    putPresent("require_special_char", JsonPrimitive(this@PasswordSettingsData.`requireSpecialChar`))
+    putPresent("require_numbers", JsonPrimitive(this@PasswordSettingsData.`requireNumbers`))
+    putPresent("require_uppercase", JsonPrimitive(this@PasswordSettingsData.`requireUppercase`))
+    putPresent("require_lowercase", JsonPrimitive(this@PasswordSettingsData.`requireLowercase`))
+    putPresent("show_zxcvbn", JsonPrimitive(this@PasswordSettingsData.`showZxcvbn`))
+    putPresent("min_zxcvbn_strength", JsonPrimitive(this@PasswordSettingsData.`minZxcvbnStrength`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): PasswordSettingsData {
+      val values = value.jsonObject
+
+      return PasswordSettingsData(`allowedSpecialCharacters` = (values["allowed_special_characters"] ?: Undefined).requireString(), `disableHibp` = (values["disable_hibp"] ?: Undefined).requireBoolean(), `minLength` = (values["min_length"] ?: Undefined).requireDouble(), `maxLength` = (values["max_length"] ?: Undefined).requireDouble(), `requireSpecialChar` = (values["require_special_char"] ?: Undefined).requireBoolean(), `requireNumbers` = (values["require_numbers"] ?: Undefined).requireBoolean(), `requireUppercase` = (values["require_uppercase"] ?: Undefined).requireBoolean(), `requireLowercase` = (values["require_lowercase"] ?: Undefined).requireBoolean(), `showZxcvbn` = (values["show_zxcvbn"] ?: Undefined).requireBoolean(), `minZxcvbnStrength` = (values["min_zxcvbn_strength"] ?: Undefined).requireDouble())
+    }
+  }
+}
+
+public data class UsernameSettingsData(public val `minLength`: Double, public val `maxLength`: Double) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("min_length", JsonPrimitive(this@UsernameSettingsData.`minLength`))
+    putPresent("max_length", JsonPrimitive(this@UsernameSettingsData.`maxLength`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): UsernameSettingsData {
+      val values = value.jsonObject
+
+      return UsernameSettingsData(`minLength` = (values["min_length"] ?: Undefined).requireDouble(), `maxLength` = (values["max_length"] ?: Undefined).requireDouble())
+    }
+  }
+}
+
+public data class AttackProtectionData(public val `enumerationProtection`: AttackProtectionDataEnumeration_protection) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enumeration_protection", this@AttackProtectionData.`enumerationProtection`.toJson())
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): AttackProtectionData {
+      val values = value.jsonObject
+
+      return AttackProtectionData(`enumerationProtection` = AttackProtectionDataEnumeration_protection.fromJson((values["enumeration_protection"] ?: Undefined), runtime))
+    }
+  }
+}
+
+public data class AttackProtectionDataEnumeration_protection(public val `enabled`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enabled", JsonPrimitive(this@AttackProtectionDataEnumeration_protection.`enabled`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): AttackProtectionDataEnumeration_protection {
+      val values = value.jsonObject
+
+      return AttackProtectionDataEnumeration_protection(`enabled` = (values["enabled"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public data class PasskeySettingsData(public val `allowAutofill`: Boolean, public val `showSignInButton`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("allow_autofill", JsonPrimitive(this@PasskeySettingsData.`allowAutofill`))
+    putPresent("show_sign_in_button", JsonPrimitive(this@PasskeySettingsData.`showSignInButton`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): PasskeySettingsData {
+      val values = value.jsonObject
+
+      return PasskeySettingsData(`allowAutofill` = (values["allow_autofill"] ?: Undefined).requireBoolean(), `showSignInButton` = (values["show_sign_in_button"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+
+public sealed class MobileUserSettingsWeb3FirstFactorsElement(public val rawValue: String) {
+  public data object Web3MetamaskSignature : MobileUserSettingsWeb3FirstFactorsElement("web3_metamask_signature")
+  public data object Web3BaseSignature : MobileUserSettingsWeb3FirstFactorsElement("web3_base_signature")
+  public data object Web3CoinbaseWalletSignature : MobileUserSettingsWeb3FirstFactorsElement("web3_coinbase_wallet_signature")
+  public data object Web3OkxWalletSignature : MobileUserSettingsWeb3FirstFactorsElement("web3_okx_wallet_signature")
+  public data object Web3SolanaSignature : MobileUserSettingsWeb3FirstFactorsElement("web3_solana_signature")
+  public data class Unrecognized(val value: String) : MobileUserSettingsWeb3FirstFactorsElement(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): MobileUserSettingsWeb3FirstFactorsElement = when (val raw = value.requireString()) {
+      "web3_metamask_signature" -> Web3MetamaskSignature
+      "web3_base_signature" -> Web3BaseSignature
+      "web3_coinbase_wallet_signature" -> Web3CoinbaseWalletSignature
+      "web3_okx_wallet_signature" -> Web3OkxWalletSignature
+      "web3_solana_signature" -> Web3SolanaSignature
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+/**
+ * Make all properties in T optional
+ */
+public data class PartialOAuthProviders(public val `oauthFacebook`: OAuthProviderSettings? = null, public val `oauthGoogle`: OAuthProviderSettings? = null, public val `oauthHubspot`: OAuthProviderSettings? = null, public val `oauthGithub`: OAuthProviderSettings? = null, public val `oauthTiktok`: OAuthProviderSettings? = null, public val `oauthGitlab`: OAuthProviderSettings? = null, public val `oauthDiscord`: OAuthProviderSettings? = null, public val `oauthTwitter`: OAuthProviderSettings? = null, public val `oauthTwitch`: OAuthProviderSettings? = null, public val `oauthLinkedin`: OAuthProviderSettings? = null, public val `oauthLinkedinOidc`: OAuthProviderSettings? = null, public val `oauthDropbox`: OAuthProviderSettings? = null, public val `oauthAtlassian`: OAuthProviderSettings? = null, public val `oauthBitbucket`: OAuthProviderSettings? = null, public val `oauthMicrosoft`: OAuthProviderSettings? = null, public val `oauthNotion`: OAuthProviderSettings? = null, public val `oauthApple`: OAuthProviderSettings? = null, public val `oauthLine`: OAuthProviderSettings? = null, public val `oauthInstagram`: OAuthProviderSettings? = null, public val `oauthCoinbase`: OAuthProviderSettings? = null, public val `oauthSpotify`: OAuthProviderSettings? = null, public val `oauthXero`: OAuthProviderSettings? = null, public val `oauthBox`: OAuthProviderSettings? = null, public val `oauthSlack`: OAuthProviderSettings? = null, public val `oauthLinear`: OAuthProviderSettings? = null, public val `oauthX`: OAuthProviderSettings? = null, public val `oauthEnstall`: OAuthProviderSettings? = null, public val `oauthHuggingface`: OAuthProviderSettings? = null, public val `oauthVercel`: OAuthProviderSettings? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("oauth_facebook", this@PartialOAuthProviders.`oauthFacebook`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_google", this@PartialOAuthProviders.`oauthGoogle`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_hubspot", this@PartialOAuthProviders.`oauthHubspot`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_github", this@PartialOAuthProviders.`oauthGithub`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_tiktok", this@PartialOAuthProviders.`oauthTiktok`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_gitlab", this@PartialOAuthProviders.`oauthGitlab`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_discord", this@PartialOAuthProviders.`oauthDiscord`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_twitter", this@PartialOAuthProviders.`oauthTwitter`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_twitch", this@PartialOAuthProviders.`oauthTwitch`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_linkedin", this@PartialOAuthProviders.`oauthLinkedin`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_linkedin_oidc", this@PartialOAuthProviders.`oauthLinkedinOidc`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_dropbox", this@PartialOAuthProviders.`oauthDropbox`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_atlassian", this@PartialOAuthProviders.`oauthAtlassian`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_bitbucket", this@PartialOAuthProviders.`oauthBitbucket`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_microsoft", this@PartialOAuthProviders.`oauthMicrosoft`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_notion", this@PartialOAuthProviders.`oauthNotion`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_apple", this@PartialOAuthProviders.`oauthApple`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_line", this@PartialOAuthProviders.`oauthLine`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_instagram", this@PartialOAuthProviders.`oauthInstagram`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_coinbase", this@PartialOAuthProviders.`oauthCoinbase`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_spotify", this@PartialOAuthProviders.`oauthSpotify`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_xero", this@PartialOAuthProviders.`oauthXero`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_box", this@PartialOAuthProviders.`oauthBox`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_slack", this@PartialOAuthProviders.`oauthSlack`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_linear", this@PartialOAuthProviders.`oauthLinear`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_x", this@PartialOAuthProviders.`oauthX`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_enstall", this@PartialOAuthProviders.`oauthEnstall`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_huggingface", this@PartialOAuthProviders.`oauthHuggingface`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("oauth_vercel", this@PartialOAuthProviders.`oauthVercel`?.let { value -> value.toJson() } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): PartialOAuthProviders {
+      val values = value.jsonObject
+
+      return PartialOAuthProviders(`oauthFacebook` = (values["oauth_facebook"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthGoogle` = (values["oauth_google"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthHubspot` = (values["oauth_hubspot"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthGithub` = (values["oauth_github"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthTiktok` = (values["oauth_tiktok"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthGitlab` = (values["oauth_gitlab"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthDiscord` = (values["oauth_discord"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthTwitter` = (values["oauth_twitter"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthTwitch` = (values["oauth_twitch"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthLinkedin` = (values["oauth_linkedin"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthLinkedinOidc` = (values["oauth_linkedin_oidc"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthDropbox` = (values["oauth_dropbox"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthAtlassian` = (values["oauth_atlassian"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthBitbucket` = (values["oauth_bitbucket"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthMicrosoft` = (values["oauth_microsoft"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthNotion` = (values["oauth_notion"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthApple` = (values["oauth_apple"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthLine` = (values["oauth_line"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthInstagram` = (values["oauth_instagram"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthCoinbase` = (values["oauth_coinbase"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthSpotify` = (values["oauth_spotify"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthXero` = (values["oauth_xero"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthBox` = (values["oauth_box"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthSlack` = (values["oauth_slack"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthLinear` = (values["oauth_linear"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthX` = (values["oauth_x"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthEnstall` = (values["oauth_enstall"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthHuggingface` = (values["oauth_huggingface"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) }, `oauthVercel` = (values["oauth_vercel"] ?: Undefined).decodeOptional { value -> OAuthProviderSettings.fromJson(value, runtime) })
+    }
+  }
+}
+
+public data class OAuthProviderSettings(public val `enabled`: Boolean, public val `required`: Boolean, public val `authenticatable`: Boolean, public val `strategy`: OAuthStrategy, public val `name`: String, public val `logoUrl`: String?) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("enabled", JsonPrimitive(this@OAuthProviderSettings.`enabled`))
+    putPresent("required", JsonPrimitive(this@OAuthProviderSettings.`required`))
+    putPresent("authenticatable", JsonPrimitive(this@OAuthProviderSettings.`authenticatable`))
+    putPresent("strategy", this@OAuthProviderSettings.`strategy`.toJson())
+    putPresent("name", JsonPrimitive(this@OAuthProviderSettings.`name`))
+    putPresent("logo_url", this@OAuthProviderSettings.`logoUrl`?.let { value -> JsonPrimitive(value) } ?: JsonNull)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OAuthProviderSettings {
+      val values = value.jsonObject
+
+      return OAuthProviderSettings(`enabled` = (values["enabled"] ?: Undefined).requireBoolean(), `required` = (values["required"] ?: Undefined).requireBoolean(), `authenticatable` = (values["authenticatable"] ?: Undefined).requireBoolean(), `strategy` = OAuthStrategy.fromJson((values["strategy"] ?: Undefined), runtime), `name` = (values["name"] ?: Undefined).requireString(), `logoUrl` = (values["logo_url"] ?: Undefined).decodeOptional { value -> value.requireString() })
+    }
+  }
+}
+
 /**
  * The `Session` object is an abstraction over an HTTP session. It models the period of information exchange between a user and the server.
  * 
@@ -2775,20 +3554,6 @@ public sealed class VerificationStatus(public val rawValue: String) {
   }
 }
 
-public sealed class PhoneCodeChannel(public val rawValue: String) {
-  public data object Sms : PhoneCodeChannel("sms")
-  public data object Whatsapp : PhoneCodeChannel("whatsapp")
-  public data class Unrecognized(val value: String) : PhoneCodeChannel(value)
-  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
-  public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): PhoneCodeChannel = when (val raw = value.requireString()) {
-      "sms" -> Sms
-      "whatsapp" -> Whatsapp
-      else -> Unrecognized(raw)
-    }
-  }
-}
-
 public data class IdentificationLinkState(public val `id`: String, public val `type`: String) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("id", JsonPrimitive(this@IdentificationLinkState.`id`))
@@ -2827,6 +3592,10 @@ public class IdentificationLink(override val handle: ResourceHandle, runtime: Co
 public sealed interface PrepareEmailAddressVerificationParams {
   public data class Case1(val value: EmailAddressPrepareVerificationParamsCase1) : PrepareEmailAddressVerificationParams
   public data class Case2(val value: EmailAddressPrepareVerificationParamsCase2) : PrepareEmailAddressVerificationParams
+  public val `strategy`: String get() = when (this) {
+    is Case1 -> value.`strategy`
+    is Case2 -> value.`strategy`.rawValue
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -3163,7 +3932,7 @@ public class Web3Wallet(override val handle: ResourceHandle, runtime: CoreRuntim
   }
 }
 
-public data class PrepareWeb3WalletVerificationParams(public val `strategy`: PrepareWeb3WalletVerificationParamsStrategy) {
+public data class PrepareWeb3WalletVerificationParams(public val `strategy`: MobileUserSettingsWeb3FirstFactorsElement) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("strategy", this@PrepareWeb3WalletVerificationParams.`strategy`.toJson())
   }
@@ -3171,32 +3940,12 @@ public data class PrepareWeb3WalletVerificationParams(public val `strategy`: Pre
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): PrepareWeb3WalletVerificationParams {
       val values = value.jsonObject
 
-      return PrepareWeb3WalletVerificationParams(`strategy` = PrepareWeb3WalletVerificationParamsStrategy.fromJson((values["strategy"] ?: Undefined), runtime))
+      return PrepareWeb3WalletVerificationParams(`strategy` = MobileUserSettingsWeb3FirstFactorsElement.fromJson((values["strategy"] ?: Undefined), runtime))
     }
   }
 }
 
-public sealed class PrepareWeb3WalletVerificationParamsStrategy(public val rawValue: String) {
-  public data object Web3MetamaskSignature : PrepareWeb3WalletVerificationParamsStrategy("web3_metamask_signature")
-  public data object Web3BaseSignature : PrepareWeb3WalletVerificationParamsStrategy("web3_base_signature")
-  public data object Web3CoinbaseWalletSignature : PrepareWeb3WalletVerificationParamsStrategy("web3_coinbase_wallet_signature")
-  public data object Web3OkxWalletSignature : PrepareWeb3WalletVerificationParamsStrategy("web3_okx_wallet_signature")
-  public data object Web3SolanaSignature : PrepareWeb3WalletVerificationParamsStrategy("web3_solana_signature")
-  public data class Unrecognized(val value: String) : PrepareWeb3WalletVerificationParamsStrategy(value)
-  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
-  public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): PrepareWeb3WalletVerificationParamsStrategy = when (val raw = value.requireString()) {
-      "web3_metamask_signature" -> Web3MetamaskSignature
-      "web3_base_signature" -> Web3BaseSignature
-      "web3_coinbase_wallet_signature" -> Web3CoinbaseWalletSignature
-      "web3_okx_wallet_signature" -> Web3OkxWalletSignature
-      "web3_solana_signature" -> Web3SolanaSignature
-      else -> Unrecognized(raw)
-    }
-  }
-}
-
-public data class AttemptWeb3WalletVerificationParams(public val `signature`: String, public val `strategy`: PrepareWeb3WalletVerificationParamsStrategy? = null) {
+public data class AttemptWeb3WalletVerificationParams(public val `signature`: String, public val `strategy`: MobileUserSettingsWeb3FirstFactorsElement? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("signature", JsonPrimitive(this@AttemptWeb3WalletVerificationParams.`signature`))
     putPresent("strategy", this@AttemptWeb3WalletVerificationParams.`strategy`?.let { value -> value.toJson() } ?: Undefined)
@@ -3205,7 +3954,7 @@ public data class AttemptWeb3WalletVerificationParams(public val `signature`: St
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): AttemptWeb3WalletVerificationParams {
       val values = value.jsonObject
 
-      return AttemptWeb3WalletVerificationParams(`signature` = (values["signature"] ?: Undefined).requireString(), `strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> PrepareWeb3WalletVerificationParamsStrategy.fromJson(value, runtime) })
+      return AttemptWeb3WalletVerificationParams(`signature` = (values["signature"] ?: Undefined).requireString(), `strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> MobileUserSettingsWeb3FirstFactorsElement.fromJson(value, runtime) })
     }
   }
 }
@@ -3812,6 +4561,11 @@ public sealed interface UserIsPrimaryIdentificationIdent {
   public data class Case1(val value: EmailAddress) : UserIsPrimaryIdentificationIdent
   public data class Case2(val value: PhoneNumber) : UserIsPrimaryIdentificationIdent
   public data class Case3(val value: Web3Wallet) : UserIsPrimaryIdentificationIdent
+  public val `id`: String get() = when (this) {
+    is Case1 -> value.`id`
+    is Case2 -> value.`id`
+    is Case3 -> value.`id`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -3968,77 +4722,6 @@ public data class CreateExternalAccountParams(public val `strategy`: OAuthStrate
       val values = value.jsonObject
 
       return CreateExternalAccountParams(`strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> OAuthStrategy.fromJson(value, runtime) }, `enterpriseConnectionId` = (values["enterpriseConnectionId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `redirectUrl` = (values["redirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `additionalScopes` = (values["additionalScopes"] ?: Undefined).decodeOptional { value -> value.jsonArray.map { value -> value.requireString() } }, `oidcPrompt` = (values["oidcPrompt"] ?: Undefined).decodeOptional { value -> value.requireString() }, `oidcLoginHint` = (values["oidcLoginHint"] ?: Undefined).decodeOptional { value -> value.requireString() })
-    }
-  }
-}
-
-/**
- * OAuth-related authentication strategies (`oauth_<provider>` and custom OAuth).
- */
-public sealed class OAuthStrategy(public val rawValue: String) {
-  public data object OauthFacebook : OAuthStrategy("oauth_facebook")
-  public data object OauthGoogle : OAuthStrategy("oauth_google")
-  public data object OauthHubspot : OAuthStrategy("oauth_hubspot")
-  public data object OauthGithub : OAuthStrategy("oauth_github")
-  public data object OauthTiktok : OAuthStrategy("oauth_tiktok")
-  public data object OauthGitlab : OAuthStrategy("oauth_gitlab")
-  public data object OauthDiscord : OAuthStrategy("oauth_discord")
-  public data object OauthTwitter : OAuthStrategy("oauth_twitter")
-  public data object OauthTwitch : OAuthStrategy("oauth_twitch")
-  public data object OauthLinkedin : OAuthStrategy("oauth_linkedin")
-  public data object OauthLinkedinOidc : OAuthStrategy("oauth_linkedin_oidc")
-  public data object OauthDropbox : OAuthStrategy("oauth_dropbox")
-  public data object OauthAtlassian : OAuthStrategy("oauth_atlassian")
-  public data object OauthBitbucket : OAuthStrategy("oauth_bitbucket")
-  public data object OauthMicrosoft : OAuthStrategy("oauth_microsoft")
-  public data object OauthNotion : OAuthStrategy("oauth_notion")
-  public data object OauthApple : OAuthStrategy("oauth_apple")
-  public data object OauthLine : OAuthStrategy("oauth_line")
-  public data object OauthInstagram : OAuthStrategy("oauth_instagram")
-  public data object OauthCoinbase : OAuthStrategy("oauth_coinbase")
-  public data object OauthSpotify : OAuthStrategy("oauth_spotify")
-  public data object OauthXero : OAuthStrategy("oauth_xero")
-  public data object OauthBox : OAuthStrategy("oauth_box")
-  public data object OauthSlack : OAuthStrategy("oauth_slack")
-  public data object OauthLinear : OAuthStrategy("oauth_linear")
-  public data object OauthX : OAuthStrategy("oauth_x")
-  public data object OauthEnstall : OAuthStrategy("oauth_enstall")
-  public data object OauthHuggingface : OAuthStrategy("oauth_huggingface")
-  public data object OauthVercel : OAuthStrategy("oauth_vercel")
-  public data class Unrecognized(val value: String) : OAuthStrategy(value)
-  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
-  public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): OAuthStrategy = when (val raw = value.requireString()) {
-      "oauth_facebook" -> OauthFacebook
-      "oauth_google" -> OauthGoogle
-      "oauth_hubspot" -> OauthHubspot
-      "oauth_github" -> OauthGithub
-      "oauth_tiktok" -> OauthTiktok
-      "oauth_gitlab" -> OauthGitlab
-      "oauth_discord" -> OauthDiscord
-      "oauth_twitter" -> OauthTwitter
-      "oauth_twitch" -> OauthTwitch
-      "oauth_linkedin" -> OauthLinkedin
-      "oauth_linkedin_oidc" -> OauthLinkedinOidc
-      "oauth_dropbox" -> OauthDropbox
-      "oauth_atlassian" -> OauthAtlassian
-      "oauth_bitbucket" -> OauthBitbucket
-      "oauth_microsoft" -> OauthMicrosoft
-      "oauth_notion" -> OauthNotion
-      "oauth_apple" -> OauthApple
-      "oauth_line" -> OauthLine
-      "oauth_instagram" -> OauthInstagram
-      "oauth_coinbase" -> OauthCoinbase
-      "oauth_spotify" -> OauthSpotify
-      "oauth_xero" -> OauthXero
-      "oauth_box" -> OauthBox
-      "oauth_slack" -> OauthSlack
-      "oauth_linear" -> OauthLinear
-      "oauth_x" -> OauthX
-      "oauth_enstall" -> OauthEnstall
-      "oauth_huggingface" -> OauthHuggingface
-      "oauth_vercel" -> OauthVercel
-      else -> Unrecognized(raw)
     }
   }
 }
@@ -4379,48 +5062,22 @@ public data class OrganizationCreationDefaultsForm(public val `name`: String, pu
   }
 }
 
-public data class TOTPState(public val `id`: String, public val `secret`: String? = null, public val `uri`: String? = null, public val `verified`: Boolean, public val `backupCodes`: List<String>? = null, public val `createdAt`: Instant?, public val `updatedAt`: Instant?) {
+public data class TOTP(public val `id`: String, public val `secret`: String? = null, public val `uri`: String? = null, public val `verified`: Boolean, public val `backupCodes`: List<String>? = null, public val `createdAt`: Instant?, public val `updatedAt`: Instant?) {
   public fun toJson(): JsonElement = buildJsonObject {
-    putPresent("id", JsonPrimitive(this@TOTPState.`id`))
-    putPresent("secret", this@TOTPState.`secret`?.let { value -> JsonPrimitive(value) } ?: Undefined)
-    putPresent("uri", this@TOTPState.`uri`?.let { value -> JsonPrimitive(value) } ?: Undefined)
-    putPresent("verified", JsonPrimitive(this@TOTPState.`verified`))
-    putPresent("backupCodes", this@TOTPState.`backupCodes`?.let { value -> JsonArray(value.map { value -> JsonPrimitive(value) }) } ?: Undefined)
-    putPresent("createdAt", this@TOTPState.`createdAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
-    putPresent("updatedAt", this@TOTPState.`updatedAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
+    putPresent("id", JsonPrimitive(this@TOTP.`id`))
+    putPresent("secret", this@TOTP.`secret`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("uri", this@TOTP.`uri`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("verified", JsonPrimitive(this@TOTP.`verified`))
+    putPresent("backupCodes", this@TOTP.`backupCodes`?.let { value -> JsonArray(value.map { value -> JsonPrimitive(value) }) } ?: Undefined)
+    putPresent("createdAt", this@TOTP.`createdAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
+    putPresent("updatedAt", this@TOTP.`updatedAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
   }
   public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TOTPState {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TOTP {
       val values = value.jsonObject
 
-      return TOTPState(`id` = (values["id"] ?: Undefined).requireString(), `secret` = (values["secret"] ?: Undefined).decodeOptional { value -> value.requireString() }, `uri` = (values["uri"] ?: Undefined).decodeOptional { value -> value.requireString() }, `verified` = (values["verified"] ?: Undefined).requireBoolean(), `backupCodes` = (values["backupCodes"] ?: Undefined).decodeOptional { value -> value.jsonArray.map { value -> value.requireString() } }, `createdAt` = (values["createdAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) }, `updatedAt` = (values["updatedAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) })
+      return TOTP(`id` = (values["id"] ?: Undefined).requireString(), `secret` = (values["secret"] ?: Undefined).decodeOptional { value -> value.requireString() }, `uri` = (values["uri"] ?: Undefined).decodeOptional { value -> value.requireString() }, `verified` = (values["verified"] ?: Undefined).requireBoolean(), `backupCodes` = (values["backupCodes"] ?: Undefined).decodeOptional { value -> value.jsonArray.map { value -> value.requireString() } }, `createdAt` = (values["createdAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) }, `updatedAt` = (values["updatedAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) })
     }
-  }
-}
-public class TOTP(override val handle: ResourceHandle, runtime: CoreRuntime) : CoreResource {
-  override val context: ResourceContext = ResourceContext(runtime, handle, false)
-  public val state: TOTPState get() = context.state(handle)
-  public val changes: Flow<TOTPState> = runtime.changes.map { state }
-  override val isInvalidated: Boolean get() = context.isInvalidated(handle)
-  public val `id`: String get() = state.`id`
-  public val `secret`: String? get() = state.`secret`
-  public val `uri`: String? get() = state.`uri`
-  public val `verified`: Boolean get() = state.`verified`
-  public val `backupCodes`: List<String>? get() = state.`backupCodes`
-  public val `createdAt`: Instant? get() = state.`createdAt`
-  public val `updatedAt`: Instant? get() = state.`updatedAt`
-  override fun prepare(value: JsonElement): Any = TOTPState.fromJson(value, context.requireRuntime())
-  public fun toJson(): JsonElement = buildJsonObject { put("\$ref", handle.toJson()) }
-  public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): TOTP = runtime.resource(ResourceHandle.fromReference(value)) as TOTP
-  }
-  /**
-   * Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).
-   */
-  public suspend fun `reload`(`p`: ClerkResourceReloadParams? = null): TOTP {
-    val runtime = context.requireRuntime()
-    val result = runtime.invoke(this, handle, "TOTP.reload", listOf(`p`?.let { value -> value.toJson() } ?: Undefined))
-    return TOTP.fromJson(result, runtime)
   }
 }
 
@@ -4437,42 +5094,19 @@ public data class VerifyTOTPParams(public val `code`: String) {
   }
 }
 
-public data class BackupCodeState(public val `id`: String, public val `codes`: List<String>, public val `createdAt`: Instant?, public val `updatedAt`: Instant?) {
+public data class BackupCode(public val `id`: String, public val `codes`: List<String>, public val `createdAt`: Instant?, public val `updatedAt`: Instant?) {
   public fun toJson(): JsonElement = buildJsonObject {
-    putPresent("id", JsonPrimitive(this@BackupCodeState.`id`))
-    putPresent("codes", JsonArray(this@BackupCodeState.`codes`.map { value -> JsonPrimitive(value) }))
-    putPresent("createdAt", this@BackupCodeState.`createdAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
-    putPresent("updatedAt", this@BackupCodeState.`updatedAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
+    putPresent("id", JsonPrimitive(this@BackupCode.`id`))
+    putPresent("codes", JsonArray(this@BackupCode.`codes`.map { value -> JsonPrimitive(value) }))
+    putPresent("createdAt", this@BackupCode.`createdAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
+    putPresent("updatedAt", this@BackupCode.`updatedAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
   }
   public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BackupCodeState {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BackupCode {
       val values = value.jsonObject
 
-      return BackupCodeState(`id` = (values["id"] ?: Undefined).requireString(), `codes` = (values["codes"] ?: Undefined).jsonArray.map { value -> value.requireString() }, `createdAt` = (values["createdAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) }, `updatedAt` = (values["updatedAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) })
+      return BackupCode(`id` = (values["id"] ?: Undefined).requireString(), `codes` = (values["codes"] ?: Undefined).jsonArray.map { value -> value.requireString() }, `createdAt` = (values["createdAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) }, `updatedAt` = (values["updatedAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) })
     }
-  }
-}
-public class BackupCode(override val handle: ResourceHandle, runtime: CoreRuntime) : CoreResource {
-  override val context: ResourceContext = ResourceContext(runtime, handle, false)
-  public val state: BackupCodeState get() = context.state(handle)
-  public val changes: Flow<BackupCodeState> = runtime.changes.map { state }
-  override val isInvalidated: Boolean get() = context.isInvalidated(handle)
-  public val `id`: String get() = state.`id`
-  public val `codes`: List<String> get() = state.`codes`
-  public val `createdAt`: Instant? get() = state.`createdAt`
-  public val `updatedAt`: Instant? get() = state.`updatedAt`
-  override fun prepare(value: JsonElement): Any = BackupCodeState.fromJson(value, context.requireRuntime())
-  public fun toJson(): JsonElement = buildJsonObject { put("\$ref", handle.toJson()) }
-  public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BackupCode = runtime.resource(ResourceHandle.fromReference(value)) as BackupCode
-  }
-  /**
-   * Reloads the resource, which is useful when you want to access the latest user data after performing a mutation. To make the updated data immediately available, this method forces a session token refresh instead of waiting for the automatic refresh cycle that could temporarily retain stale information. Learn more about [forcing a token refresh](https://clerk.com/docs/guides/sessions/force-token-refresh).
-   */
-  public suspend fun `reload`(`p`: ClerkResourceReloadParams? = null): BackupCode {
-    val runtime = context.requireRuntime()
-    val result = runtime.invoke(this, handle, "BackupCode.reload", listOf(`p`?.let { value -> value.toJson() } ?: Undefined))
-    return BackupCode.fromJson(result, runtime)
   }
 }
 
@@ -4762,6 +5396,13 @@ public sealed interface SessionVerificationFirstFactor {
   public data class Case3(val value: PasswordFactor) : SessionVerificationFirstFactor
   public data class Case4(val value: PasskeyFactor) : SessionVerificationFirstFactor
   public data class Case5(val value: EnterpriseSSOFactor) : SessionVerificationFirstFactor
+  public val `strategy`: String get() = when (this) {
+    is Case1 -> value.`strategy`
+    is Case2 -> value.`strategy`
+    is Case3 -> value.`strategy`
+    is Case4 -> value.`strategy`
+    is Case5 -> value.`strategy`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -4869,6 +5510,11 @@ public sealed interface SessionVerificationSecondFactor {
   public data class Case1(val value: PhoneCodeFactor) : SessionVerificationSecondFactor
   public data class Case2(val value: TOTPFactor) : SessionVerificationSecondFactor
   public data class Case3(val value: BackupCodeFactor) : SessionVerificationSecondFactor
+  public val `strategy`: String get() = when (this) {
+    is Case1 -> value.`strategy`
+    is Case2 -> value.`strategy`
+    is Case3 -> value.`strategy`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -4921,6 +5567,12 @@ public sealed interface SessionVerifyPrepareFirstFactorParams {
   public data class Case2(val value: EmailCodeConfig) : SessionVerifyPrepareFirstFactorParams
   public data class Case3(val value: PhoneCodeConfig) : SessionVerifyPrepareFirstFactorParams
   public data class Case4(val value: OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl) : SessionVerifyPrepareFirstFactorParams
+  public val `strategy`: String get() = when (this) {
+    is Case1 -> value.`strategy`
+    is Case2 -> value.`strategy`
+    is Case3 -> value.`strategy`
+    is Case4 -> value.`strategy`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -5003,6 +5655,12 @@ public sealed interface SessionVerifyAttemptFirstFactorParams {
   public data class Case2(val value: PhoneCodeAttempt) : SessionVerifyAttemptFirstFactorParams
   public data class Case3(val value: PasswordAttempt) : SessionVerifyAttemptFirstFactorParams
   public data class Case4(val value: PasskeyAttempt) : SessionVerifyAttemptFirstFactorParams
+  public val `strategy`: String get() = when (this) {
+    is Case1 -> value.`strategy`
+    is Case2 -> value.`strategy`
+    is Case3 -> value.`strategy`
+    is Case4 -> value.`strategy`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -5142,6 +5800,16 @@ public sealed interface SessionVerifyAttemptSecondFactorParams {
   public data class Case1(val value: PhoneCodeAttempt) : SessionVerifyAttemptSecondFactorParams
   public data class Case2(val value: TOTPAttempt) : SessionVerifyAttemptSecondFactorParams
   public data class Case3(val value: BackupCodeAttempt) : SessionVerifyAttemptSecondFactorParams
+  public val `strategy`: String get() = when (this) {
+    is Case1 -> value.`strategy`
+    is Case2 -> value.`strategy`
+    is Case3 -> value.`strategy`
+  }
+  public val `code`: String get() = when (this) {
+    is Case1 -> value.`code`
+    is Case2 -> value.`code`
+    is Case3 -> value.`code`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -5339,6 +6007,18 @@ public sealed interface SignInFirstFactor {
   public data class Case8(val value: ResetPasswordEmailCodeFactor) : SignInFirstFactor
   public data class Case9(val value: Web3SignatureFactor) : SignInFirstFactor
   public data class Case10(val value: OauthFactor) : SignInFirstFactor
+  public val `strategy`: String get() = when (this) {
+    is Case1 -> value.`strategy`
+    is Case2 -> value.`strategy`
+    is Case3 -> value.`strategy`
+    is Case4 -> value.`strategy`
+    is Case5 -> value.`strategy`
+    is Case6 -> value.`strategy`
+    is Case7 -> value.`strategy`
+    is Case8 -> value.`strategy`
+    is Case9 -> value.`strategy`.rawValue
+    is Case10 -> value.`strategy`.rawValue
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -5423,7 +6103,7 @@ public data class ResetPasswordEmailCodeFactor(public val `emailAddressId`: Stri
   }
 }
 
-public data class Web3SignatureFactor(public val `strategy`: PrepareWeb3WalletVerificationParamsStrategy, public val `web3WalletId`: String, public val `primary`: Boolean? = null, public val `walletName`: String? = null) {
+public data class Web3SignatureFactor(public val `strategy`: MobileUserSettingsWeb3FirstFactorsElement, public val `web3WalletId`: String, public val `primary`: Boolean? = null, public val `walletName`: String? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("strategy", this@Web3SignatureFactor.`strategy`.toJson())
     putPresent("web3WalletId", JsonPrimitive(this@Web3SignatureFactor.`web3WalletId`))
@@ -5434,7 +6114,7 @@ public data class Web3SignatureFactor(public val `strategy`: PrepareWeb3WalletVe
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): Web3SignatureFactor {
       val values = value.jsonObject
 
-      return Web3SignatureFactor(`strategy` = PrepareWeb3WalletVerificationParamsStrategy.fromJson((values["strategy"] ?: Undefined), runtime), `web3WalletId` = (values["web3WalletId"] ?: Undefined).requireString(), `primary` = (values["primary"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `walletName` = (values["walletName"] ?: Undefined).decodeOptional { value -> value.requireString() })
+      return Web3SignatureFactor(`strategy` = MobileUserSettingsWeb3FirstFactorsElement.fromJson((values["strategy"] ?: Undefined), runtime), `web3WalletId` = (values["web3WalletId"] ?: Undefined).requireString(), `primary` = (values["primary"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `walletName` = (values["walletName"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
@@ -5458,6 +6138,13 @@ public sealed interface SignInSecondFactor {
   public data class Case3(val value: TOTPFactor) : SignInSecondFactor
   public data class Case4(val value: BackupCodeFactor) : SignInSecondFactor
   public data class Case5(val value: EmailLinkFactor) : SignInSecondFactor
+  public val `strategy`: String get() = when (this) {
+    is Case1 -> value.`strategy`
+    is Case2 -> value.`strategy`
+    is Case3 -> value.`strategy`
+    is Case4 -> value.`strategy`
+    is Case5 -> value.`strategy`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -5658,6 +6345,12 @@ public sealed interface SignInPasswordParams {
   public data class Case2(val value: SignInPasswordParamsCase2) : SignInPasswordParams
   public data class Case3(val value: SignInPasswordParamsCase3) : SignInPasswordParams
   public data class Case4(val value: SignInPasswordParamsCase4) : SignInPasswordParams
+  public val `password`: String get() = when (this) {
+    is Case1 -> value.`password`
+    is Case2 -> value.`password`
+    is Case3 -> value.`password`
+    is Case4 -> value.`password`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -5884,6 +6577,10 @@ public class SignInEmailLink(override val handle: ResourceHandle, runtime: CoreR
 public sealed interface SignInEmailLinkSendParams {
   public data class Case1(val value: SignInEmailLinkSendLinkParamsCase1) : SignInEmailLinkSendParams
   public data class Case2(val value: SignInEmailLinkSendLinkParamsCase2) : SignInEmailLinkSendParams
+  public val `verificationUrl`: String get() = when (this) {
+    is Case1 -> value.`verificationUrl`
+    is Case2 -> value.`verificationUrl`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -6660,15 +7357,15 @@ public sealed class SignUpField(public val rawValue: String) {
   public data object OauthEnstall : SignUpField("oauth_enstall")
   public data object OauthHuggingface : SignUpField("oauth_huggingface")
   public data object OauthVercel : SignUpField("oauth_vercel")
+  public data object Password : SignUpField("password")
+  public data object EmailAddress : SignUpField("email_address")
+  public data object PhoneNumber : SignUpField("phone_number")
   public data object Username : SignUpField("username")
   public data object FirstName : SignUpField("first_name")
   public data object LastName : SignUpField("last_name")
-  public data object Password : SignUpField("password")
-  public data object LegalAccepted : SignUpField("legal_accepted")
-  public data object EmailAddress : SignUpField("email_address")
-  public data object PhoneNumber : SignUpField("phone_number")
-  public data object EmailAddressOrPhoneNumber : SignUpField("email_address_or_phone_number")
   public data object Web3Wallet : SignUpField("web3_wallet")
+  public data object LegalAccepted : SignUpField("legal_accepted")
+  public data object EmailAddressOrPhoneNumber : SignUpField("email_address_or_phone_number")
   public data object ProtectCheck : SignUpField("protect_check")
   public data class Unrecognized(val value: String) : SignUpField(value)
   public fun toJson(): JsonElement = JsonPrimitive(rawValue)
@@ -6704,15 +7401,15 @@ public sealed class SignUpField(public val rawValue: String) {
       "oauth_enstall" -> OauthEnstall
       "oauth_huggingface" -> OauthHuggingface
       "oauth_vercel" -> OauthVercel
+      "password" -> Password
+      "email_address" -> EmailAddress
+      "phone_number" -> PhoneNumber
       "username" -> Username
       "first_name" -> FirstName
       "last_name" -> LastName
-      "password" -> Password
-      "legal_accepted" -> LegalAccepted
-      "email_address" -> EmailAddress
-      "phone_number" -> PhoneNumber
-      "email_address_or_phone_number" -> EmailAddressOrPhoneNumber
       "web3_wallet" -> Web3Wallet
+      "legal_accepted" -> LegalAccepted
+      "email_address_or_phone_number" -> EmailAddressOrPhoneNumber
       "protect_check" -> ProtectCheck
       else -> Unrecognized(raw)
     }
@@ -6750,11 +7447,11 @@ public sealed class SignUpIdentificationField(public val rawValue: String) {
   public data object OauthEnstall : SignUpIdentificationField("oauth_enstall")
   public data object OauthHuggingface : SignUpIdentificationField("oauth_huggingface")
   public data object OauthVercel : SignUpIdentificationField("oauth_vercel")
-  public data object Username : SignUpIdentificationField("username")
   public data object EmailAddress : SignUpIdentificationField("email_address")
   public data object PhoneNumber : SignUpIdentificationField("phone_number")
-  public data object EmailAddressOrPhoneNumber : SignUpIdentificationField("email_address_or_phone_number")
+  public data object Username : SignUpIdentificationField("username")
   public data object Web3Wallet : SignUpIdentificationField("web3_wallet")
+  public data object EmailAddressOrPhoneNumber : SignUpIdentificationField("email_address_or_phone_number")
   public data class Unrecognized(val value: String) : SignUpIdentificationField(value)
   public fun toJson(): JsonElement = JsonPrimitive(rawValue)
   public companion object {
@@ -6789,11 +7486,11 @@ public sealed class SignUpIdentificationField(public val rawValue: String) {
       "oauth_enstall" -> OauthEnstall
       "oauth_huggingface" -> OauthHuggingface
       "oauth_vercel" -> OauthVercel
-      "username" -> Username
       "email_address" -> EmailAddress
       "phone_number" -> PhoneNumber
-      "email_address_or_phone_number" -> EmailAddressOrPhoneNumber
+      "username" -> Username
       "web3_wallet" -> Web3Wallet
+      "email_address_or_phone_number" -> EmailAddressOrPhoneNumber
       else -> Unrecognized(raw)
     }
   }
@@ -7147,6 +7844,12 @@ public sealed interface SignUpPasswordParams {
   public data class Case2(val value: SignUpPasswordParamsCase2) : SignUpPasswordParams
   public data class Case3(val value: SignUpPasswordParamsCase3) : SignUpPasswordParams
   public data class Case4(val value: SignUpPasswordParamsCase4) : SignUpPasswordParams
+  public val `password`: String get() = when (this) {
+    is Case1 -> value.`password`
+    is Case2 -> value.`password`
+    is Case3 -> value.`password`
+    is Case4 -> value.`password`
+  }
   public fun toJson(): JsonElement = when (this) {
     is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to value.toJson()))
     is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to value.toJson()))
@@ -7737,7 +8440,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "0a52bc1140be0af0d047410ae267d11c38ed7c2244a335deb211c30131b85616"
+  public const val contractHash: String = "433f633d39fae8991468af0323aba52d7956b097f3fe695cdccce0ae62146450"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)
@@ -7771,8 +8474,6 @@ public object GeneratedBindings {
     "UserOrganizationInvitation" -> UserOrganizationInvitation(handle, runtime)
     "OrganizationSuggestion" -> OrganizationSuggestion(handle, runtime)
     "OrganizationCreationDefaults" -> OrganizationCreationDefaults(handle, runtime)
-    "TOTP" -> TOTP(handle, runtime)
-    "BackupCode" -> BackupCode(handle, runtime)
     "SessionVerification" -> SessionVerification(handle, runtime)
     "SignIn" -> SignIn(handle, runtime)
     "SignInEmailCode" -> SignInEmailCode(handle, runtime)

@@ -27,6 +27,11 @@ export const profile = {
     organization: ['organization.ts', 'OrganizationResource'],
   },
   excluded: {
+    'TOTPResource.reload': 'Enrollment secrets are explicit method return values, not shared observable resources.',
+    'BackupCodeResource.reload': 'Recovery codes are explicit method return values, not shared observable resources.',
+    'DisplayConfigResource.reload': 'Instance configuration is refreshed by the owning core lifecycle.',
+    'AuthConfigResource.reload': 'Instance configuration is refreshed by the owning core lifecycle.',
+    'OrganizationSettingsResource.reload': 'Instance configuration is refreshed by the owning core lifecycle.',
     'SignInFutureSSOParams.redirectUrl':
       'Native SSO uses the configured browser callback and has no navigation destination.',
     'SignInFutureSSOParams.redirectCallbackUrl': 'Native SSO uses the configured browser callback.',
@@ -50,6 +55,8 @@ export const profile = {
     'SessionResource.lastActiveToken': 'Session JWTs are only returned by getToken, never broadcast as state.',
   },
   adapted: {
+    'MobileClerk.environment': 'Read instance settings from the existing initialized core.',
+    'MobileUserSettings.social': 'Configured providers form a partial map; retain each declared provider shape.',
     'EmailAddressResource.toString': 'Generate stringValue to avoid an asynchronous Kotlin Any.toString override.',
     'PhoneNumberResource.toString': 'Generate stringValue to avoid an asynchronous Kotlin Any.toString override.',
     'Web3WalletResource.toString': 'Generate stringValue to avoid an asynchronous Kotlin Any.toString override.',

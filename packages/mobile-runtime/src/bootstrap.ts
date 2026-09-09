@@ -5,7 +5,8 @@ import type {
 import { setNativeNetworkEnvironment } from '@clerk/shared/network';
 import { installMobileCredentialTransport } from '@clerk/shared/mobile';
 import { eventBus, events } from '../../clerk-js/src/core/events';
-import { Clerk, authenticationRoots, publicCore } from './core.ts';
+import { Clerk } from '../../clerk-js/src/core/clerk';
+import { authenticationRoots, publicCore } from './core.ts';
 import { cancelCapabilities, disposeHost, emit, hostReply, hostRequest } from './host.ts';
 import { bridgeError, failure, type Invocation } from './protocol.ts';
 import { ResourceRuntime } from './runtime.ts';

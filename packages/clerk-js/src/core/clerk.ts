@@ -1,3 +1,4 @@
+import type { MobileAuthenticationResources } from '@clerk/shared/mobile';
 import { inBrowser as inClientSide } from '@clerk/shared/browser';
 import { isValidNetworkEnvironment } from '@clerk/shared/network';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
@@ -3189,6 +3190,15 @@ export class Clerk implements ClerkInterface {
     if (!options?.__internal_dangerouslySkipEmit) {
       this.#emit();
     }
+  };
+
+  __internal_getMobileResources = (): MobileAuthenticationResources => {
+    if (!this.client || !this.environment) throw new Error('Clerk must be loaded before attaching native resources.');
+    return {
+      signIn: this.client.signIn.__internal_future,
+      signUp: this.client.signUp.__internal_future,
+      environment: this.environment,
+    };
   };
 
   get __internal_environment(): EnvironmentResource | null | undefined {

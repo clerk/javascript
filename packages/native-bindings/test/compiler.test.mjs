@@ -113,3 +113,17 @@ test('only an explicit field policy permits arbitrary JSON metadata', () => {
   assert.deepEqual(model.failures, []);
   assert.equal(model.definitions.SignIn.properties.find(p => p.name === 'attributes').type.value.kind, 'json');
 });
+
+test('discriminated unions expose common string fields without duplicating variant policy', () => {
+  const model = compile(
+    source.replace(
+      'id: string;',
+      "id: string; factor: { strategy: 'email_code'; address: string } | { strategy: 'phone_code'; number: string };",
+    ),
+  );
+  assert.deepEqual(model.failures, []);
+  const native = generateNative(model, { protocolVersion: 1, contractHash: 'fixture' });
+  assert.match(native['GeneratedAPI.swift'], /public var `strategy`: String/);
+  assert.match(native['GeneratedAPI.kt'], /public val `strategy`: String/);
+  assert.match(native['swift-api.txt'], /strategy: String \[shared union field\]/);
+});

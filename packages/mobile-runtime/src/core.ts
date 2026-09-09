@@ -1,20 +1,36 @@
-import { Clerk } from '../../clerk-js/src/core/clerk';
-import { Client } from '../../clerk-js/src/core/resources/Client';
-import { SignIn } from '../../clerk-js/src/core/resources/SignIn';
-import { SignUp } from '../../clerk-js/src/core/resources/SignUp';
-import type { SignInFutureResource, SignUpFutureResource } from '@clerk/shared/types';
+import type { Clerk as ClerkType, SignInFutureResource, SignUpFutureResource } from '@clerk/shared/types';
 import type { MobileClerk } from '@clerk/shared/mobile';
 
-export function authenticationRoots(clerk: Clerk): { signIn: SignInFutureResource; signUp: SignUpFutureResource } {
-  const client = clerk.client;
-  if (!(client instanceof Client) || !(client.signIn instanceof SignIn) || !(client.signUp instanceof SignUp)) {
-    throw new Error('The embedded core has no initialized authentication resources.');
-  }
-  return { signIn: client.signIn.__internal_future, signUp: client.signUp.__internal_future };
+export type CoreOwner = Pick<
+  ClerkType,
+  | 'status'
+  | 'loaded'
+  | 'session'
+  | 'user'
+  | 'organization'
+  | 'setActive'
+  | 'signOut'
+  | 'createOrganization'
+  | 'getOrganization'
+  | '__internal_getMobileResources'
+>;
+
+function mobileResources(clerk: CoreOwner) {
+  if (!clerk.__internal_getMobileResources)
+    throw new Error('This Clerk core does not support generated native resources.');
+  return clerk.__internal_getMobileResources();
 }
 
-export function publicCore(clerk: Clerk, beforeSignOut: () => Promise<void>): MobileClerk {
+export function authenticationRoots(clerk: CoreOwner): { signIn: SignInFutureResource; signUp: SignUpFutureResource } {
+  const { signIn, signUp } = mobileResources(clerk);
+  return { signIn, signUp };
+}
+
+export function publicCore(clerk: CoreOwner, beforeSignOut: () => Promise<void>): MobileClerk {
   return {
+    get environment() {
+      return mobileResources(clerk).environment;
+    },
     get status() {
       return clerk.status;
     },
@@ -45,5 +61,3 @@ export function publicCore(clerk: Clerk, beforeSignOut: () => Promise<void>): Mo
     getOrganization: id => clerk.getOrganization(id),
   };
 }
-
-export { Clerk };

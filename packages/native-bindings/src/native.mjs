@@ -250,6 +250,32 @@ export function generateNative(model, manifest) {
           .map(line => `${indent} * ${line}`)
           .join('\n')}\n${indent} */\n`;
   };
+  function commonStringFields(definition) {
+    if (definition.kind !== 'union') return [];
+    const variants = definition.variants.map(shape => (shape.kind === 'ref' ? definitions[shape.name] : shape));
+    if (variants.some(variant => !['object', 'resource'].includes(variant.kind))) return [];
+    return (variants[0].properties || [])
+      .filter(property =>
+        variants.every(variant => {
+          const candidate = variant.properties.find(p => p.name === property.name && !p.optional);
+          if (!candidate) return false;
+          const shape = candidate.type.kind === 'ref' ? definitions[candidate.type.name] : candidate.type;
+          return (
+            shape.kind === 'string' ||
+            shape.kind === 'enum' ||
+            (shape.kind === 'literal' && typeof shape.value === 'string')
+          );
+        }),
+      )
+      .map(property => ({
+        name: property.name,
+        variants: variants.map(variant => variant.properties.find(p => p.name === property.name).type),
+      }));
+  }
+  function commonAccess(property, index) {
+    const shape = property.variants[index];
+    return `value.${quoted(property.name)}${shape.kind === 'ref' && definitions[shape.name].kind === 'enum' ? '.rawValue' : ''}`;
+  }
   for (const definition of Object.values(definitions)) {
     const { name, kind } = definition;
     swift += docs(definition, 'swift');
@@ -265,6 +291,8 @@ export function generateNative(model, manifest) {
         surface.push(
           `${name}.${method.nativeName || method.name}(${method.parameters.map(p => `${p.name}: ${type(p.type, language)}${defaults(p, language)}`).join(', ')}): ${type(method.result, language)} [${method.errorResult ? 'error-envelope' : 'return'}]`,
         );
+      for (const property of commonStringFields(definition))
+        surface.push(`${name}.${property.name}: String [shared union field]`);
       if (definition.values) surface.push(`${name} cases: ${definition.values.join(', ')}, unrecognized(String)`);
       if (definition.variants)
         surface.push(`${name} variants: ${definition.variants.map(v => type(v, language)).join(' | ')}`);
@@ -283,8 +311,21 @@ export function generateNative(model, manifest) {
       kotlin += `public sealed class ${name}(public val rawValue: String) {\n${cases.map(([value, c]) => `  public data object ${upper(c)} : ${name}(${JSON.stringify(value)})`).join('\n')}\n  public data class Unrecognized(val value: String) : ${name}(value)\n  public fun toJson(): JsonElement = JsonPrimitive(rawValue)\n  public companion object {\n    public fun fromJson(value: JsonElement, runtime: CoreRuntime): ${name} = when (val raw = value.requireString()) {\n${cases.map(([value, c]) => `      ${JSON.stringify(value)} -> ${upper(c)}`).join('\n')}\n      else -> Unrecognized(raw)\n    }\n  }\n}\n\n`;
     } else if (kind === 'union') {
       const variants = definition.variants;
-      swift += `public indirect enum ${name}: Sendable {\n${variants.map((v, i) => `  case case${i + 1}(${type(v, 'swift')})`).join('\n')}\n  @MainActor public func encode() throws -> JSONValue {\n    switch self {\n${variants.map((v, i) => `    case .case${i + 1}(let value): return .object(["$case": .number(${i}), "value": ${encode(v, 'value', 'swift')}])`).join('\n')}\n    }\n  }\n  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ${name} {\n    let values = try value.object()\n    let payload = values["value"] ?? .undefined\n    switch try (values["$case"] ?? .undefined).number() {\n${variants.map((v, i) => `    case ${i}: return .case${i + 1}(${decode(v, 'payload', 'swift')})`).join('\n')}\n    default: throw CoreError.invalidValue\n    }\n  }\n}\n\n`;
-      kotlin += `public sealed interface ${name} {\n${variants.map((v, i) => `  public data class Case${i + 1}(val value: ${type(v, 'kotlin')}) : ${name}`).join('\n')}\n  public fun toJson(): JsonElement = when (this) {\n${variants.map((v, i) => `    is Case${i + 1} -> JsonObject(mapOf("\\$case" to JsonPrimitive(${i}), "value" to ${encode(v, 'value', 'kotlin')}))`).join('\n')}\n  }\n  public companion object {\n    public fun fromJson(value: JsonElement, runtime: CoreRuntime): ${name} {\n      val values = value.jsonObject\n      val payload = values["value"] ?: Undefined\n      return when (values.getValue("\\$case").jsonPrimitive.int) {\n${variants.map((v, i) => `        ${i} -> Case${i + 1}(${decode(v, 'payload', 'kotlin')})`).join('\n')}\n        else -> throw CoreException("invalid_value")\n      }\n    }\n  }\n}\n\n`;
+      const common = commonStringFields(definition);
+      const swiftCommon = common
+        .map(
+          property =>
+            `  @MainActor public var ${quoted(property.name)}: String {\n    switch self {\n${variants.map((variant, index) => `    case .case${index + 1}(let value): return ${commonAccess(property, index)}`).join('\n')}\n    }\n  }\n`,
+        )
+        .join('');
+      const kotlinCommon = common
+        .map(
+          property =>
+            `  public val ${quoted(property.name)}: String get() = when (this) {\n${variants.map((variant, index) => `    is Case${index + 1} -> ${commonAccess(property, index)}`).join('\n')}\n  }\n`,
+        )
+        .join('');
+      swift += `public indirect enum ${name}: Sendable {\n${variants.map((v, i) => `  case case${i + 1}(${type(v, 'swift')})`).join('\n')}\n${swiftCommon}  @MainActor public func encode() throws -> JSONValue {\n    switch self {\n${variants.map((v, i) => `    case .case${i + 1}(let value): return .object(["$case": .number(${i}), "value": ${encode(v, 'value', 'swift')}])`).join('\n')}\n    }\n  }\n  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ${name} {\n    let values = try value.object()\n    let payload = values["value"] ?? .undefined\n    switch try (values["$case"] ?? .undefined).number() {\n${variants.map((v, i) => `    case ${i}: return .case${i + 1}(${decode(v, 'payload', 'swift')})`).join('\n')}\n    default: throw CoreError.invalidValue\n    }\n  }\n}\n\n`;
+      kotlin += `public sealed interface ${name} {\n${variants.map((v, i) => `  public data class Case${i + 1}(val value: ${type(v, 'kotlin')}) : ${name}`).join('\n')}\n${kotlinCommon}  public fun toJson(): JsonElement = when (this) {\n${variants.map((v, i) => `    is Case${i + 1} -> JsonObject(mapOf("\\$case" to JsonPrimitive(${i}), "value" to ${encode(v, 'value', 'kotlin')}))`).join('\n')}\n  }\n  public companion object {\n    public fun fromJson(value: JsonElement, runtime: CoreRuntime): ${name} {\n      val values = value.jsonObject\n      val payload = values["value"] ?: Undefined\n      return when (values.getValue("\\$case").jsonPrimitive.int) {\n${variants.map((v, i) => `        ${i} -> Case${i + 1}(${decode(v, 'payload', 'kotlin')})`).join('\n')}\n        else -> throw CoreException("invalid_value")\n      }\n    }\n  }\n}\n\n`;
     } else if (kind === 'tuple') {
       const tuple = { name, properties: definition.elements.map((s, i) => ({ name: `item${i}`, type: s })) };
       swift += `public struct ${name}: Sendable {\n${tuple.properties.map(p => `  public let ${p.name}: ${type(p.type, 'swift')}`).join('\n')}\n  public init(${tuple.properties.map(p => `${p.name}: ${type(p.type, 'swift')}`).join(', ')}) { ${tuple.properties.map(p => `self.${p.name} = ${p.name}`).join('; ')} }\n  @MainActor public func encode() throws -> JSONValue { .array([${tuple.properties.map(p => encode(p.type, p.name, 'swift')).join(', ')}]) }\n  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ${name} {\n    let values = try value.array()\n    guard values.count == ${tuple.properties.length} else { throw CoreError.invalidValue }\n    return ${name}(${tuple.properties.map((p, i) => `${p.name}: ${decode(p.type, `values[${i}]`, 'swift')}`).join(', ')})\n  }\n}\n\n`;

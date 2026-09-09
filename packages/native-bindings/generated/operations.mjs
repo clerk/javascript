@@ -859,18 +859,6 @@ export const operations = {
     result: {"kind":"ref","name":"OrganizationCreationDefaults"},
     invoke: (target, args) => target["reload"](...args),
   },
-  "TOTP.reload": {
-    type: "TOTP",
-    parameters: [{"name":"p","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"ClerkResourceReloadParams"}}}],
-    result: {"kind":"ref","name":"TOTP"},
-    invoke: (target, args) => target["reload"](...args),
-  },
-  "BackupCode.reload": {
-    type: "BackupCode",
-    parameters: [{"name":"p","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"ClerkResourceReloadParams"}}}],
-    result: {"kind":"ref","name":"BackupCode"},
-    invoke: (target, args) => target["reload"](...args),
-  },
   "SessionVerification.reload": {
     type: "SessionVerification",
     parameters: [{"name":"p","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"ClerkResourceReloadParams"}}}],
