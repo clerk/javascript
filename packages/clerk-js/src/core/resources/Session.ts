@@ -142,6 +142,25 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   /**
+   * Declines an optional session task so the session can move on to the next one.
+   *
+   * Only optional tasks can be skipped. A required task is rejected by the Frontend API with a
+   * `session_task_not_skippable` error, which is thrown to the caller rather than swallowed.
+   *
+   * The response piggybacks the client, so the client resource is refreshed as part of the
+   * request and `currentTask` ends up pointing at the next pending task (or nothing at all).
+   */
+  skipTask = async (taskKey: SessionTask['key']): Promise<SessionResource> => {
+    // `path()` percent-encodes its argument, so the nested segments are joined by hand.
+    const json = await BaseResource._fetch<SessionJSON>({
+      method: 'POST',
+      path: `${this.path('tasks')}/${encodeURIComponent(taskKey)}/skip`,
+    });
+
+    return this.fromJSON((json?.response || json) as SessionJSON);
+  };
+
+  /**
    * Internal method to touch the session without updating the client or explicitly emitting the TokenUpdate event.
    *
    * Returns the piggybacked client resource if it exists, otherwise undefined.

@@ -1092,6 +1092,82 @@ describe('Session', () => {
     });
   });
 
+  describe('skipTask()', () => {
+    const mockSessionData = {
+      status: 'pending',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      tasks: [{ key: 'setup-passkey' }, { key: 'choose-organization' }],
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as unknown as SessionJSON;
+
+    beforeEach(() => {
+      BaseResource.clerk = clerkMock();
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it('posts to the task skip endpoint without a body', async () => {
+      const session = new Session(mockSessionData);
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({ payload: { response: mockSessionData }, status: 200 });
+
+      await session.skipTask('setup-passkey');
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/tasks/setup-passkey/skip',
+        }),
+        expect.anything(),
+      );
+      expect(requestSpy.mock.calls[0][0].body).toBeUndefined();
+    });
+
+    it('advances currentTask from the response', async () => {
+      const session = new Session(mockSessionData);
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({
+        payload: { response: { ...mockSessionData, tasks: [{ key: 'choose-organization' }] } },
+        status: 200,
+      });
+
+      expect(session.currentTask).toEqual({ key: 'setup-passkey' });
+
+      await session.skipTask('setup-passkey');
+
+      expect(session.currentTask).toEqual({ key: 'choose-organization' });
+    });
+
+    // A required task cannot be skipped, and the rejection must reach the caller so the UI can
+    // surface it instead of silently pretending the task is gone.
+    it('propagates the API error for a task that cannot be skipped', async () => {
+      const session = new Session(mockSessionData);
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({
+        payload: {
+          errors: [
+            {
+              code: 'session_task_not_skippable',
+              message: 'Task is not skippable',
+              long_message: 'This session task cannot be skipped.',
+            },
+          ],
+        },
+        status: 400,
+      });
+
+      await expect(session.skipTask('setup-mfa')).rejects.toThrow(ClerkAPIResponseError);
+      expect(session.currentTask).toEqual({ key: 'setup-passkey' });
+    });
+  });
+
   describe('isAuthorized()', () => {
     it('user with permission to delete the organization should be able to delete the  organization', async () => {
       const session = new Session({

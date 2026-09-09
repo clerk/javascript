@@ -280,6 +280,14 @@ export interface SessionResource extends ClerkResource {
    */
   touch: (params?: SessionTouchParams) => Promise<SessionResource>;
   /**
+   * Declines an optional [session task](https://clerk.com/docs/guides/configure/session-tasks) so the session can move on to the next one.
+   *
+   * Only optional tasks can be skipped. A required task (for example `reset-password`, `setup-mfa` or `choose-organization`) is rejected with a `session_task_not_skippable` API error, which is thrown rather than swallowed.
+   * @param taskKey - The key of the task to decline, as found on `Session.currentTask`.
+   * @returns The updated [`Session`](https://clerk.com/docs/reference/objects/session), whose `currentTask` is now the next pending task, if any.
+   */
+  skipTask: (taskKey: SessionTask['key']) => Promise<SessionResource>;
+  /**
    * Gets the current user's [session token](https://clerk.com/docs/guides/sessions/session-tokens) or a [custom JWT template](https://clerk.com/docs/guides/sessions/jwt-templates).
    *
    * This method uses a cache so a network request will only be made if the token in memory has expired. The TTL for a Clerk token is one minute. It retries on transient failures (e.g., network errors); when the browser is offline and retries are exhausted, it throws `ClerkOfflineError`.
@@ -494,7 +502,7 @@ export interface SessionTask {
   /**
    * A unique identifier for the task
    */
-  key: 'choose-organization' | 'reset-password' | 'setup-mfa';
+  key: 'choose-organization' | 'reset-password' | 'setup-mfa' | 'setup-passkey';
 }
 
 /** @generateWithEmptyComment */

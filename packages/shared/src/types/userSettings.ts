@@ -88,9 +88,22 @@ export type AttackProtectionData = {
   };
 };
 
+/**
+ * Whether a user is prompted to enroll a passkey after signing up, and whether that prompt can be declined.
+ *
+ * `off` creates no prompt at all, `optional` creates a `setup-passkey` session task the user may skip, and
+ * `required` creates one that must be resolved by enrolling a passkey.
+ */
+export type PasskeyPromptAtSignUp = 'off' | 'optional' | 'required';
+
 export type PasskeySettingsData = {
   allow_autofill: boolean;
   show_sign_in_button: boolean;
+  /**
+   * Optional, and possibly empty, because settings cached before this field existed do not carry it.
+   * Both an absent and an empty value mean `off`.
+   */
+  prompt_at_sign_up?: PasskeyPromptAtSignUp | '';
 };
 
 export type OAuthProviders = {
