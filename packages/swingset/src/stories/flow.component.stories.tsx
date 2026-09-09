@@ -9,6 +9,7 @@ export { default as __source } from './flow.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Flow',
   source: 'packages/ui/src/mosaic/components/flow/flow.tsx',
 };

@@ -8,6 +8,7 @@ export { default as __source } from './user-profile-payment-methods-section.stor
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfilePaymentMethodsSection',
   label: 'Payment methods',
   navigation: { category: 'Sections' },
