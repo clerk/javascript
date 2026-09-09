@@ -9,7 +9,7 @@ export { default as __source } from './field.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Field',
   source: 'packages/ui/src/mosaic/components/field/field.tsx',
 };

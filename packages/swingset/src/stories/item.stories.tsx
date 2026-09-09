@@ -14,7 +14,7 @@ export { default as __source } from './item.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Item',
   source: 'packages/ui/src/mosaic/components/item/item.tsx',
 };

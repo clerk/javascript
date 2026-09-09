@@ -11,7 +11,7 @@ export { default as __source } from './button.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Button',
   source: 'packages/ui/src/mosaic/components/button/button.tsx',
   styles: {

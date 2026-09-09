@@ -10,7 +10,7 @@ export { default as __source } from './otp.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'OTP',
   source: 'packages/ui/src/mosaic/components/otp/otp.tsx',
   styles: {

@@ -27,7 +27,7 @@ function ProviderMedia({ provider }: { provider: string }) {
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Section',
   source: 'packages/ui/src/mosaic/components/section/section.tsx',
 };

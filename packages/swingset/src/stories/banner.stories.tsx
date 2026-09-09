@@ -11,7 +11,7 @@ export { default as __source } from './banner.stories?raw';
 // here to drive the playground + prop table. Keys mirror `BannerRootProps`.
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Banner',
   source: 'packages/ui/src/mosaic/components/banner/banner.tsx',
   styles: {

@@ -20,7 +20,7 @@ function ProviderLogo({ provider }: { provider: string }) {
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'IconFrame',
   source: 'packages/ui/src/mosaic/components/icon/icon-frame.tsx',
   styles: {
