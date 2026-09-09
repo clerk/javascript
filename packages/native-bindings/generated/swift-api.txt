@@ -1314,12 +1314,16 @@ SignInExistingSession: Hashable
 SignInFirstFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | Web3SignatureFactor | PasswordFactor | PasskeyFactor | OauthFactor | EnterpriseSSOFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor
 SignInFirstFactor.strategy: String [shared union field]
 SignInFirstFactor: Hashable
+SignInMFAEmailCodeSendParams.emailAddressId: String? = nil
+SignInMFAEmailCodeSendParams: Hashable
 SignInMFAEmailCodeVerifyParams.code: String
 SignInMFAEmailCodeVerifyParams: Hashable
+SignInMFAPhoneCodeSendParams.phoneNumberId: String? = nil
+SignInMFAPhoneCodeSendParams: Hashable
 SignInMFAPhoneCodeVerifyParams.code: String
 SignInMFAPhoneCodeVerifyParams: Hashable
-SignInMfa.sendEmailCode(): Void [error-envelope]
-SignInMfa.sendPhoneCode(): Void [error-envelope]
+SignInMfa.sendEmailCode(params: SignInMFAEmailCodeSendParams? = nil): Void [error-envelope]
+SignInMfa.sendPhoneCode(params: SignInMFAPhoneCodeSendParams? = nil): Void [error-envelope]
 SignInMfa.verifyBackupCode(params: SignInBackupCodeVerifyParams): Void [error-envelope]
 SignInMfa.verifyEmailCode(params: SignInMFAEmailCodeVerifyParams): Void [error-envelope]
 SignInMfa.verifyPhoneCode(params: SignInMFAPhoneCodeVerifyParams): Void [error-envelope]
@@ -1357,15 +1361,18 @@ SignInPhoneCodeSendParams variants: SignInPhoneCodeSendCodeParamsCase1 | SignInP
 SignInPhoneCodeSendParams: Hashable
 SignInPhoneCodeVerifyParams.code: String
 SignInPhoneCodeVerifyParams: Hashable
-SignInResetPasswordEmailCode.sendCode(): Void [error-envelope]
+SignInResetPasswordEmailCode.sendCode(params: SignInResetPasswordEmailCodeSendParams? = nil): Void [error-envelope]
 SignInResetPasswordEmailCode.submitPassword(params: SignInResetPasswordSubmitParams): Void [error-envelope]
 SignInResetPasswordEmailCode.verifyCode(params: SignInEmailCodeVerifyParams): Void [error-envelope]
 SignInResetPasswordEmailCode: Hashable
+SignInResetPasswordEmailCodeSendParams.emailAddressId: String? = nil
+SignInResetPasswordEmailCodeSendParams: Hashable
 SignInResetPasswordPhoneCode.sendCode(params: SignInResetPasswordPhoneCodeSendParams? = nil): Void [error-envelope]
 SignInResetPasswordPhoneCode.submitPassword(params: SignInResetPasswordSubmitParams): Void [error-envelope]
 SignInResetPasswordPhoneCode.verifyCode(params: SignInResetPasswordPhoneCodeVerifyParams): Void [error-envelope]
 SignInResetPasswordPhoneCode: Hashable
 SignInResetPasswordPhoneCodeSendParams.phoneNumber: String? = nil
+SignInResetPasswordPhoneCodeSendParams.phoneNumberId: String? = nil
 SignInResetPasswordPhoneCodeSendParams: Hashable
 SignInResetPasswordPhoneCodeVerifyParams.code: String
 SignInResetPasswordPhoneCodeVerifyParams: Hashable
@@ -1993,7 +2000,9 @@ object SignInEmailLinkSendLinkParamsCase1
 object SignInEmailLinkSendLinkParamsCase2
 object SignInEmailLinkVerification
 object SignInExistingSession
+object SignInMFAEmailCodeSendParams
 object SignInMFAEmailCodeVerifyParams
+object SignInMFAPhoneCodeSendParams
 object SignInMFAPhoneCodeVerifyParams
 object SignInPasskeyParams
 object SignInPasswordParamsCase1
@@ -2003,6 +2012,7 @@ object SignInPasswordParamsCase4
 object SignInPhoneCodeSendCodeParamsCase1
 object SignInPhoneCodeSendCodeParamsCase2
 object SignInPhoneCodeVerifyParams
+object SignInResetPasswordEmailCodeSendParams
 object SignInResetPasswordPhoneCodeSendParams
 object SignInResetPasswordPhoneCodeVerifyParams
 object SignInResetPasswordSubmitParams

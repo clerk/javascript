@@ -7804,11 +7804,11 @@ public class SignInResetPasswordEmailCode(override val handle: ResourceHandle, r
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInResetPasswordEmailCode = runtime.resource(ResourceHandle.fromReference(value)) as SignInResetPasswordEmailCode
   }
   /**
-   * Sends a password reset code to the first email address on the account.
+   * Sends a password reset code to the selected email address, or the first supported email factor.
    */
-  public suspend fun `sendCode`(): Unit {
+  public suspend fun `sendCode`(`params`: SignInResetPasswordEmailCodeSendParams? = null): Unit {
     val runtime = context.requireRuntime()
-    return runtime.invoke(this, handle, "SignInResetPasswordEmailCode.sendCode", listOf()) { result ->
+    return runtime.invoke(this, handle, "SignInResetPasswordEmailCode.sendCode", listOf(`params`?.let { value -> value.toJson() } ?: Undefined)) { result ->
       runtime.checkErrorResult(result)
     }
   }
@@ -7828,6 +7828,19 @@ public class SignInResetPasswordEmailCode(override val handle: ResourceHandle, r
     val runtime = context.requireRuntime()
     return runtime.invoke(this, handle, "SignInResetPasswordEmailCode.submitPassword", listOf(`params`.toJson())) { result ->
       runtime.checkErrorResult(result)
+    }
+  }
+}
+
+public data class SignInResetPasswordEmailCodeSendParams(public val `emailAddressId`: String? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("emailAddressId", this@SignInResetPasswordEmailCodeSendParams.`emailAddressId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInResetPasswordEmailCodeSendParams {
+      val values = value.jsonObject
+
+      return SignInResetPasswordEmailCodeSendParams(`emailAddressId` = (values["emailAddressId"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
@@ -7870,7 +7883,7 @@ public class SignInResetPasswordPhoneCode(override val handle: ResourceHandle, r
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInResetPasswordPhoneCode = runtime.resource(ResourceHandle.fromReference(value)) as SignInResetPasswordPhoneCode
   }
   /**
-   * Sends a password reset code to the first phone number on the account.
+   * Sends a password reset code to the selected phone number, or the first supported phone factor.
    */
   public suspend fun `sendCode`(`params`: SignInResetPasswordPhoneCodeSendParams? = null): Unit {
     val runtime = context.requireRuntime()
@@ -7898,15 +7911,16 @@ public class SignInResetPasswordPhoneCode(override val handle: ResourceHandle, r
   }
 }
 
-public data class SignInResetPasswordPhoneCodeSendParams(public val `phoneNumber`: String? = null) {
+public data class SignInResetPasswordPhoneCodeSendParams(public val `phoneNumberId`: String? = null, public val `phoneNumber`: String? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("phoneNumberId", this@SignInResetPasswordPhoneCodeSendParams.`phoneNumberId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("phoneNumber", this@SignInResetPasswordPhoneCodeSendParams.`phoneNumber`?.let { value -> JsonPrimitive(value) } ?: Undefined)
   }
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInResetPasswordPhoneCodeSendParams {
       val values = value.jsonObject
 
-      return SignInResetPasswordPhoneCodeSendParams(`phoneNumber` = (values["phoneNumber"] ?: Undefined).decodeOptional { value -> value.requireString() })
+      return SignInResetPasswordPhoneCodeSendParams(`phoneNumberId` = (values["phoneNumberId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `phoneNumber` = (values["phoneNumber"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
@@ -8054,9 +8068,9 @@ public class SignInMfa(override val handle: ResourceHandle, runtime: CoreRuntime
   /**
    * Sends a phone code to sign in with as a second factor.
    */
-  public suspend fun `sendPhoneCode`(): Unit {
+  public suspend fun `sendPhoneCode`(`params`: SignInMFAPhoneCodeSendParams? = null): Unit {
     val runtime = context.requireRuntime()
-    return runtime.invoke(this, handle, "SignInMfa.sendPhoneCode", listOf()) { result ->
+    return runtime.invoke(this, handle, "SignInMfa.sendPhoneCode", listOf(`params`?.let { value -> value.toJson() } ?: Undefined)) { result ->
       runtime.checkErrorResult(result)
     }
   }
@@ -8072,9 +8086,9 @@ public class SignInMfa(override val handle: ResourceHandle, runtime: CoreRuntime
   /**
    * Sends an email code to sign in with as a second factor.
    */
-  public suspend fun `sendEmailCode`(): Unit {
+  public suspend fun `sendEmailCode`(`params`: SignInMFAEmailCodeSendParams? = null): Unit {
     val runtime = context.requireRuntime()
-    return runtime.invoke(this, handle, "SignInMfa.sendEmailCode", listOf()) { result ->
+    return runtime.invoke(this, handle, "SignInMfa.sendEmailCode", listOf(`params`?.let { value -> value.toJson() } ?: Undefined)) { result ->
       runtime.checkErrorResult(result)
     }
   }
@@ -8107,6 +8121,19 @@ public class SignInMfa(override val handle: ResourceHandle, runtime: CoreRuntime
   }
 }
 
+public data class SignInMFAPhoneCodeSendParams(public val `phoneNumberId`: String? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("phoneNumberId", this@SignInMFAPhoneCodeSendParams.`phoneNumberId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInMFAPhoneCodeSendParams {
+      val values = value.jsonObject
+
+      return SignInMFAPhoneCodeSendParams(`phoneNumberId` = (values["phoneNumberId"] ?: Undefined).decodeOptional { value -> value.requireString() })
+    }
+  }
+}
+
 public data class SignInMFAPhoneCodeVerifyParams(public val `code`: String) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("code", JsonPrimitive(this@SignInMFAPhoneCodeVerifyParams.`code`))
@@ -8116,6 +8143,19 @@ public data class SignInMFAPhoneCodeVerifyParams(public val `code`: String) {
       val values = value.jsonObject
 
       return SignInMFAPhoneCodeVerifyParams(`code` = (values["code"] ?: Undefined).requireString())
+    }
+  }
+}
+
+public data class SignInMFAEmailCodeSendParams(public val `emailAddressId`: String? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("emailAddressId", this@SignInMFAEmailCodeSendParams.`emailAddressId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInMFAEmailCodeSendParams {
+      val values = value.jsonObject
+
+      return SignInMFAEmailCodeSendParams(`emailAddressId` = (values["emailAddressId"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
@@ -9641,7 +9681,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "1e4efdbbf7882dd957b0ca1bc502cd28ee090f8c2e22fd752eb14743b7981d6a"
+  public const val contractHash: String = "6ddbd6b9ae47c552373f1959973d24eeb1e24d979342c240962cf85a68d023bd"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

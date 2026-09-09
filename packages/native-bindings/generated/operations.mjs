@@ -1071,7 +1071,7 @@ export const operations = {
   },
   "SignInResetPasswordEmailCode.sendCode": {
     type: "SignInResetPasswordEmailCode",
-    parameters: [],
+    parameters: [{"name":"params","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"SignInResetPasswordEmailCodeSendParams"}}}],
     result: {"kind":"errorResult"},
     invoke: (target, args) => target["sendCode"](...args),
   },
@@ -1107,7 +1107,7 @@ export const operations = {
   },
   "SignInMfa.sendPhoneCode": {
     type: "SignInMfa",
-    parameters: [],
+    parameters: [{"name":"params","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"SignInMFAPhoneCodeSendParams"}}}],
     result: {"kind":"errorResult"},
     invoke: (target, args) => target["sendPhoneCode"](...args),
   },
@@ -1119,7 +1119,7 @@ export const operations = {
   },
   "SignInMfa.sendEmailCode": {
     type: "SignInMfa",
-    parameters: [],
+    parameters: [{"name":"params","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"SignInMFAEmailCodeSendParams"}}}],
     result: {"kind":"errorResult"},
     invoke: (target, args) => target["sendEmailCode"](...args),
   },

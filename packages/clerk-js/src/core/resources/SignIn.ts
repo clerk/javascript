@@ -44,6 +44,9 @@ import type {
   SignInFutureEmailCodeVerifyParams,
   SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
+  SignInFutureMFAEmailCodeSendParams,
+  SignInFutureMFAPhoneCodeSendParams,
+  SignInFutureResetPasswordEmailCodeSendParams,
   SignInFutureMFAEmailCodeVerifyParams,
   SignInFutureMFAPhoneCodeVerifyParams,
   SignInFuturePasskeyParams,
@@ -882,13 +885,17 @@ class SignInFuture implements SignInFutureResource {
     return this.#canBeDiscarded;
   }
 
-  async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
+  async sendResetPasswordEmailCode(
+    params: SignInFutureResetPasswordEmailCodeSendParams = {},
+  ): Promise<{ error: ClerkError | null }> {
     if (!this.#resource.id) {
       throw new Error('Cannot reset password without a sign in.');
     }
     return runAsyncResourceTask(this.#resource, async () => {
       const resetPasswordEmailCodeFactor = this.#resource.supportedFirstFactors?.find(
-        f => f.strategy === 'reset_password_email_code',
+        (f): f is Extract<SignInFirstFactor, { strategy: 'reset_password_email_code' }> =>
+          f.strategy === 'reset_password_email_code' &&
+          (params.emailAddressId === undefined || f.emailAddressId === params.emailAddressId),
       );
 
       if (!resetPasswordEmailCodeFactor) {
@@ -932,7 +939,9 @@ class SignInFuture implements SignInFutureResource {
       }
 
       const resetPasswordPhoneCodeFactor = this.#resource.supportedFirstFactors?.find(
-        f => f.strategy === 'reset_password_phone_code',
+        (f): f is Extract<SignInFirstFactor, { strategy: 'reset_password_phone_code' }> =>
+          f.strategy === 'reset_password_phone_code' &&
+          (params.phoneNumberId === undefined || f.phoneNumberId === params.phoneNumberId),
       );
 
       if (!resetPasswordPhoneCodeFactor) {
@@ -1528,9 +1537,13 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendMFAPhoneCode(): Promise<{ error: ClerkError | null }> {
+  async sendMFAPhoneCode(params: SignInFutureMFAPhoneCodeSendParams = {}): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
-      const phoneCodeFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'phone_code');
+      const phoneCodeFactor = this.#resource.supportedSecondFactors?.find(
+        (f): f is Extract<SignInSecondFactor, { strategy: 'phone_code' }> =>
+          f.strategy === 'phone_code' &&
+          (params.phoneNumberId === undefined || f.phoneNumberId === params.phoneNumberId),
+      );
 
       if (!phoneCodeFactor) {
         throw new ClerkRuntimeError('Phone code factor not found', { code: 'factor_not_found' });
@@ -1555,9 +1568,13 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendMFAEmailCode(): Promise<{ error: ClerkError | null }> {
+  async sendMFAEmailCode(params: SignInFutureMFAEmailCodeSendParams = {}): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
-      const emailCodeFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'email_code');
+      const emailCodeFactor = this.#resource.supportedSecondFactors?.find(
+        (f): f is Extract<SignInSecondFactor, { strategy: 'email_code' }> =>
+          f.strategy === 'email_code' &&
+          (params.emailAddressId === undefined || f.emailAddressId === params.emailAddressId),
+      );
 
       if (!emailCodeFactor) {
         throw new ClerkRuntimeError('Email code factor not found', { code: 'factor_not_found' });

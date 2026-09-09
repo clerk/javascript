@@ -163,7 +163,27 @@ export interface SignInFutureResetPasswordSubmitParams {
 }
 
 /** @generateWithEmptyComment */
+export interface SignInFutureResetPasswordEmailCodeSendParams {
+  /** The supported email factor to use. Defaults to the first supported factor. */
+  emailAddressId?: string;
+}
+
+/** @generateWithEmptyComment */
+export interface SignInFutureMFAPhoneCodeSendParams {
+  /** The supported phone factor to use. Defaults to the first supported factor. */
+  phoneNumberId?: string;
+}
+
+/** @generateWithEmptyComment */
+export interface SignInFutureMFAEmailCodeSendParams {
+  /** The supported email factor to use. Defaults to the first supported factor. */
+  emailAddressId?: string;
+}
+
+/** @generateWithEmptyComment */
 export interface SignInFutureResetPasswordPhoneCodeSendParams {
+  /** The supported phone factor to use. Defaults to the first supported factor. */
+  phoneNumberId?: string;
   /**
    * The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if
    * [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled.
@@ -503,9 +523,9 @@ export interface SignInFutureResource {
   /** @extractMethods */
   resetPasswordEmailCode: {
     /**
-     * Sends a password reset code to the first email address on the account.
+     * Sends a password reset code to the selected email address, or the first supported email factor.
      */
-    sendCode: () => Promise<{ error: ClerkError | null }>;
+    sendCode: (params?: SignInFutureResetPasswordEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Verifies a password reset code sent with the [`resetPasswordEmailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-submit-password) method to complete the password reset flow.
@@ -521,7 +541,7 @@ export interface SignInFutureResource {
   /** @extractMethods */
   resetPasswordPhoneCode: {
     /**
-     * Sends a password reset code to the first phone number on the account.
+     * Sends a password reset code to the selected phone number, or the first supported phone factor.
      */
     sendCode: (params?: SignInFutureResetPasswordPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
@@ -549,7 +569,7 @@ export interface SignInFutureResource {
     /**
      * Sends a phone code to sign in with as a second factor.
      */
-    sendPhoneCode: () => Promise<{ error: ClerkError | null }>;
+    sendPhoneCode: (params?: SignInFutureMFAPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Verifies a phone code sent with the [`mfa.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-phone-code) method.
@@ -559,7 +579,7 @@ export interface SignInFutureResource {
     /**
      * Sends an email code to sign in with as a second factor.
      */
-    sendEmailCode: () => Promise<{ error: ClerkError | null }>;
+    sendEmailCode: (params?: SignInFutureMFAEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Verifies an email code sent with the [`mfa.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-email-code) method.

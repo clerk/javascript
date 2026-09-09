@@ -1056,10 +1056,12 @@ SignInEmailLinkVerificationStatus cases: verified, failed, expired, client_misma
 SignInExistingSession.sessionId: String
 SignInFirstFactor variants: EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | Web3SignatureFactor | PasswordFactor | PasskeyFactor | OauthFactor | EnterpriseSSOFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor
 SignInFirstFactor.strategy: String [shared union field]
+SignInMFAEmailCodeSendParams.emailAddressId: String? = null
 SignInMFAEmailCodeVerifyParams.code: String
+SignInMFAPhoneCodeSendParams.phoneNumberId: String? = null
 SignInMFAPhoneCodeVerifyParams.code: String
-SignInMfa.sendEmailCode(): Unit [error-envelope]
-SignInMfa.sendPhoneCode(): Unit [error-envelope]
+SignInMfa.sendEmailCode(params: SignInMFAEmailCodeSendParams? = null): Unit [error-envelope]
+SignInMfa.sendPhoneCode(params: SignInMFAPhoneCodeSendParams? = null): Unit [error-envelope]
 SignInMfa.verifyBackupCode(params: SignInBackupCodeVerifyParams): Unit [error-envelope]
 SignInMfa.verifyEmailCode(params: SignInMFAEmailCodeVerifyParams): Unit [error-envelope]
 SignInMfa.verifyPhoneCode(params: SignInMFAPhoneCodeVerifyParams): Unit [error-envelope]
@@ -1084,13 +1086,15 @@ SignInPhoneCodeSendCodeParamsCase2.channel: PhoneCodeChannel? = null
 SignInPhoneCodeSendCodeParamsCase2.phoneNumberId: String
 SignInPhoneCodeSendParams variants: SignInPhoneCodeSendCodeParamsCase1 | SignInPhoneCodeSendCodeParamsCase2
 SignInPhoneCodeVerifyParams.code: String
-SignInResetPasswordEmailCode.sendCode(): Unit [error-envelope]
+SignInResetPasswordEmailCode.sendCode(params: SignInResetPasswordEmailCodeSendParams? = null): Unit [error-envelope]
 SignInResetPasswordEmailCode.submitPassword(params: SignInResetPasswordSubmitParams): Unit [error-envelope]
 SignInResetPasswordEmailCode.verifyCode(params: SignInEmailCodeVerifyParams): Unit [error-envelope]
+SignInResetPasswordEmailCodeSendParams.emailAddressId: String? = null
 SignInResetPasswordPhoneCode.sendCode(params: SignInResetPasswordPhoneCodeSendParams? = null): Unit [error-envelope]
 SignInResetPasswordPhoneCode.submitPassword(params: SignInResetPasswordSubmitParams): Unit [error-envelope]
 SignInResetPasswordPhoneCode.verifyCode(params: SignInResetPasswordPhoneCodeVerifyParams): Unit [error-envelope]
 SignInResetPasswordPhoneCodeSendParams.phoneNumber: String? = null
+SignInResetPasswordPhoneCodeSendParams.phoneNumberId: String? = null
 SignInResetPasswordPhoneCodeVerifyParams.code: String
 SignInResetPasswordSubmitParams.password: String
 SignInResetPasswordSubmitParams.signOutOfOtherSessions: Boolean? = null
@@ -1652,7 +1656,9 @@ object SignInEmailLinkSendLinkParamsCase1
 object SignInEmailLinkSendLinkParamsCase2
 object SignInEmailLinkVerification
 object SignInExistingSession
+object SignInMFAEmailCodeSendParams
 object SignInMFAEmailCodeVerifyParams
+object SignInMFAPhoneCodeSendParams
 object SignInMFAPhoneCodeVerifyParams
 object SignInPasskeyParams
 object SignInPasswordParamsCase1
@@ -1662,6 +1668,7 @@ object SignInPasswordParamsCase4
 object SignInPhoneCodeSendCodeParamsCase1
 object SignInPhoneCodeSendCodeParamsCase2
 object SignInPhoneCodeVerifyParams
+object SignInResetPasswordEmailCodeSendParams
 object SignInResetPasswordPhoneCodeSendParams
 object SignInResetPasswordPhoneCodeVerifyParams
 object SignInResetPasswordSubmitParams

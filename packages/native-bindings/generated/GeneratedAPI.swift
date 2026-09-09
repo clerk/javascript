@@ -10494,10 +10494,10 @@ public struct SignInResetPasswordEmailCodeState: Hashable, Sendable {
   public func prepare(_ value: JSONValue) throws -> any Sendable { try SignInResetPasswordEmailCodeState.decode(value, in: context.requireRuntime()) }
   public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
   public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInResetPasswordEmailCode { try runtime.resource(ResourceHandle.decodeReference(value), as: SignInResetPasswordEmailCode.self) }
-  /// Sends a password reset code to the first email address on the account.
-  public func `sendCode`() async throws {
+  /// Sends a password reset code to the selected email address, or the first supported email factor.
+  public func `sendCode`(_ `params`: SignInResetPasswordEmailCodeSendParams? = nil) async throws {
     let runtime = try context.requireRuntime()
-    return try await runtime.invoke(owner: self, target: handle, operation: "SignInResetPasswordEmailCode.sendCode", arguments: []) { result in
+    return try await runtime.invoke(owner: self, target: handle, operation: "SignInResetPasswordEmailCode.sendCode", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
       try runtime.checkErrorResult(result)
     }
   }
@@ -10514,6 +10514,24 @@ public struct SignInResetPasswordEmailCodeState: Hashable, Sendable {
     return try await runtime.invoke(owner: self, target: handle, operation: "SignInResetPasswordEmailCode.submitPassword", arguments: [try `params`.encode()]) { result in
       try runtime.checkErrorResult(result)
     }
+  }
+}
+
+public struct SignInResetPasswordEmailCodeSendParams: Hashable, Sendable {
+  public let `emailAddressId`: String?
+  public init(`emailAddressId`: String? = nil) {
+    self.`emailAddressId` = `emailAddressId`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "emailAddressId": try self.`emailAddressId`.map { value in .string(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInResetPasswordEmailCodeSendParams {
+    let values = try value.object()
+
+    return try SignInResetPasswordEmailCodeSendParams(`emailAddressId`: try (values["emailAddressId"] ?? .undefined).optional { value in try value.string() })
   }
 }
 
@@ -10564,7 +10582,7 @@ public struct SignInResetPasswordPhoneCodeState: Hashable, Sendable {
   public func prepare(_ value: JSONValue) throws -> any Sendable { try SignInResetPasswordPhoneCodeState.decode(value, in: context.requireRuntime()) }
   public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
   public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInResetPasswordPhoneCode { try runtime.resource(ResourceHandle.decodeReference(value), as: SignInResetPasswordPhoneCode.self) }
-  /// Sends a password reset code to the first phone number on the account.
+  /// Sends a password reset code to the selected phone number, or the first supported phone factor.
   public func `sendCode`(_ `params`: SignInResetPasswordPhoneCodeSendParams? = nil) async throws {
     let runtime = try context.requireRuntime()
     return try await runtime.invoke(owner: self, target: handle, operation: "SignInResetPasswordPhoneCode.sendCode", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
@@ -10588,12 +10606,15 @@ public struct SignInResetPasswordPhoneCodeState: Hashable, Sendable {
 }
 
 public struct SignInResetPasswordPhoneCodeSendParams: Hashable, Sendable {
+  public let `phoneNumberId`: String?
   public let `phoneNumber`: String?
-  public init(`phoneNumber`: String? = nil) {
+  public init(`phoneNumberId`: String? = nil, `phoneNumber`: String? = nil) {
+    self.`phoneNumberId` = `phoneNumberId`
     self.`phoneNumber` = `phoneNumber`
   }
   @MainActor public func encode() throws -> JSONValue {
     let values: [String: JSONValue] = [
+      "phoneNumberId": try self.`phoneNumberId`.map { value in .string(value) } ?? .undefined,
       "phoneNumber": try self.`phoneNumber`.map { value in .string(value) } ?? .undefined
     ]
     return .object(values.filter { !$0.value.isUndefined })
@@ -10601,7 +10622,7 @@ public struct SignInResetPasswordPhoneCodeSendParams: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInResetPasswordPhoneCodeSendParams {
     let values = try value.object()
 
-    return try SignInResetPasswordPhoneCodeSendParams(`phoneNumber`: try (values["phoneNumber"] ?? .undefined).optional { value in try value.string() })
+    return try SignInResetPasswordPhoneCodeSendParams(`phoneNumberId`: try (values["phoneNumberId"] ?? .undefined).optional { value in try value.string() }, `phoneNumber`: try (values["phoneNumber"] ?? .undefined).optional { value in try value.string() })
   }
 }
 
@@ -10813,9 +10834,9 @@ public struct SignInMfaState: Hashable, Sendable {
   public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
   public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInMfa { try runtime.resource(ResourceHandle.decodeReference(value), as: SignInMfa.self) }
   /// Sends a phone code to sign in with as a second factor.
-  public func `sendPhoneCode`() async throws {
+  public func `sendPhoneCode`(_ `params`: SignInMFAPhoneCodeSendParams? = nil) async throws {
     let runtime = try context.requireRuntime()
-    return try await runtime.invoke(owner: self, target: handle, operation: "SignInMfa.sendPhoneCode", arguments: []) { result in
+    return try await runtime.invoke(owner: self, target: handle, operation: "SignInMfa.sendPhoneCode", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
       try runtime.checkErrorResult(result)
     }
   }
@@ -10827,9 +10848,9 @@ public struct SignInMfaState: Hashable, Sendable {
     }
   }
   /// Sends an email code to sign in with as a second factor.
-  public func `sendEmailCode`() async throws {
+  public func `sendEmailCode`(_ `params`: SignInMFAEmailCodeSendParams? = nil) async throws {
     let runtime = try context.requireRuntime()
-    return try await runtime.invoke(owner: self, target: handle, operation: "SignInMfa.sendEmailCode", arguments: []) { result in
+    return try await runtime.invoke(owner: self, target: handle, operation: "SignInMfa.sendEmailCode", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
       try runtime.checkErrorResult(result)
     }
   }
@@ -10856,6 +10877,24 @@ public struct SignInMfaState: Hashable, Sendable {
   }
 }
 
+public struct SignInMFAPhoneCodeSendParams: Hashable, Sendable {
+  public let `phoneNumberId`: String?
+  public init(`phoneNumberId`: String? = nil) {
+    self.`phoneNumberId` = `phoneNumberId`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "phoneNumberId": try self.`phoneNumberId`.map { value in .string(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInMFAPhoneCodeSendParams {
+    let values = try value.object()
+
+    return try SignInMFAPhoneCodeSendParams(`phoneNumberId`: try (values["phoneNumberId"] ?? .undefined).optional { value in try value.string() })
+  }
+}
+
 public struct SignInMFAPhoneCodeVerifyParams: Hashable, Sendable {
   public let `code`: String
   public init(`code`: String) {
@@ -10871,6 +10910,24 @@ public struct SignInMFAPhoneCodeVerifyParams: Hashable, Sendable {
     let values = try value.object()
 
     return try SignInMFAPhoneCodeVerifyParams(`code`: try (values["code"] ?? .undefined).string())
+  }
+}
+
+public struct SignInMFAEmailCodeSendParams: Hashable, Sendable {
+  public let `emailAddressId`: String?
+  public init(`emailAddressId`: String? = nil) {
+    self.`emailAddressId` = `emailAddressId`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "emailAddressId": try self.`emailAddressId`.map { value in .string(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInMFAEmailCodeSendParams {
+    let values = try value.object()
+
+    return try SignInMFAEmailCodeSendParams(`emailAddressId`: try (values["emailAddressId"] ?? .undefined).optional { value in try value.string() })
   }
 }
 
@@ -12918,7 +12975,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "1e4efdbbf7882dd957b0ca1bc502cd28ee090f8c2e22fd752eb14743b7981d6a"
+  public static let contractHash = "6ddbd6b9ae47c552373f1959973d24eeb1e24d979342c240962cf85a68d023bd"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

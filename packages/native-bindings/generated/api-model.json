@@ -20721,7 +20721,7 @@
       "name": "SignIn",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 338,
+        "line": 358,
         "symbol": "SignInFutureResource"
       },
       "documentation": "The `SignInFuture` class holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.",
@@ -20740,7 +20740,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 342,
+            "line": 362,
             "symbol": "id"
           },
           "documentation": "The unique identifier for the current sign-in attempt."
@@ -20757,7 +20757,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 347,
+            "line": 367,
             "symbol": "supportedFirstFactors"
           },
           "documentation": "Array of the first factors that are supported in the current sign-in. Each factor contains information about the verification strategy that can be used."
@@ -20774,7 +20774,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 352,
+            "line": 372,
             "symbol": "supportedSecondFactors"
           },
           "documentation": "Array of the second factors that are supported in the current sign-in. Each factor contains information about the verification strategy that can be used. This property is populated only when the first factor is verified."
@@ -20788,7 +20788,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 366,
+            "line": 386,
             "symbol": "status"
           },
           "documentation": "The current status of the sign-in.\n<ul>\n<li>`'complete'` - The sign-in process has been completed successfully.</li>\n<li>`'needs_client_trust'` - The user is signing in from a new device and must complete a [second factor verification](!second-factor-verification) to establish [Device Trust](https://clerk.com/docs/guides/secure/device-trust). See the [Device Trust custom flow guide](https://clerk.com/docs/guides/development/custom-flows/authentication/device-trust) for more information.</li>\n<li>`'needs_identifier'` - The user's identifier (e.g., email address, phone number, username) hasn't been provided.</li>\n<li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy), or `'enterprise_sso'`.</li>\n<li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.</li>\n<li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](/docs/guides/development/custom-flows/authentication/forgot-password) guide for more information.</li>\n<li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. Run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. The pre-built components handle this automatically.</li>\n</ul>"
@@ -20801,7 +20801,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 371,
+            "line": 391,
             "symbol": "isTransferable"
           },
           "documentation": "Indicates that there is not a matching user for the first-factor verification used, and that the sign-in can be transferred to a sign-up."
@@ -20820,7 +20820,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 376,
+            "line": 396,
             "symbol": "existingSession"
           },
           "documentation": "Indicates that the sign-in was not able to create a new session because the identifier already exists in an existing session."
@@ -20834,7 +20834,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 386,
+            "line": 406,
             "symbol": "firstFactorVerification"
           },
           "documentation": "The state of the verification process for the selected first factor. Initially, this property contains an empty verification object, since there is no first factor selected."
@@ -20848,7 +20848,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 391,
+            "line": 411,
             "symbol": "secondFactorVerification"
           },
           "documentation": "The state of the verification process for the selected second factor. Initially, this property contains an empty verification object, since there is no second factor selected."
@@ -20866,7 +20866,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 396,
+            "line": 416,
             "symbol": "identifier"
           },
           "documentation": "The authentication identifier value for the current sign-in. `null` if the `strategy` is `'oauth_<provider>'` or `'enterprise_sso'`."
@@ -20884,7 +20884,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 401,
+            "line": 421,
             "symbol": "createdSessionId"
           },
           "documentation": "The ID of the session that was created upon completion of the current sign-in. The value of this property is `null` if the sign-in status is not `'complete'`."
@@ -20898,7 +20898,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 412,
+            "line": 432,
             "symbol": "userData"
           },
           "documentation": "An object containing information about the user of the current sign-in. This property is populated only once an identifier is given to the `SignIn` object through `signIn.create()` or another method that populates the `identifier` property.\n<ul>\n <li>`'firstName'`: The user's first name.</li>\n <li>`'lastName'`: The user's last name.</li>\n <li>`'imageUrl'`: The user's profile image URL.</li>\n <li>`'hasImage'`: Whether the user has a profile image.</li>\n</ul>"
@@ -20917,7 +20917,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 418,
+            "line": 438,
             "symbol": "protectCheck"
           },
           "documentation": "The current protect check challenge, if one is pending. Only populated when Protect mid-flow\nchallenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it."
@@ -20930,7 +20930,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 425,
+            "line": 445,
             "symbol": "canBeDiscarded"
           },
           "documentation": "Indicates that the sign-in can be discarded (has been finalized or explicitly reset)."
@@ -20944,7 +20944,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 445,
+            "line": 465,
             "symbol": "emailCode"
           }
         },
@@ -20957,7 +20957,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 458,
+            "line": 478,
             "symbol": "emailLink"
           }
         },
@@ -20970,7 +20970,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 491,
+            "line": 511,
             "symbol": "phoneCode"
           }
         },
@@ -20983,7 +20983,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 504,
+            "line": 524,
             "symbol": "resetPasswordEmailCode"
           }
         },
@@ -20996,7 +20996,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 522,
+            "line": 542,
             "symbol": "resetPasswordPhoneCode"
           }
         },
@@ -21009,7 +21009,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 548,
+            "line": 568,
             "symbol": "mfa"
           }
         }
@@ -21020,7 +21020,7 @@
           "nativeName": "create",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 437,
+            "line": 457,
             "symbol": "create"
           },
           "documentation": "Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in lifecycle state through its `status` property, which updates as the authentication flow progresses. Once the sign-in process is complete, call the `signIn.finalize()` method to set the newly created session as the active session.\n\nWhat you must pass to `params` depends on which [sign-in options](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options) you have enabled in your app's settings in the Clerk Dashboard.\n\nYou can complete the sign-in process in one step if you supply the required fields to `create()`. Otherwise, Clerk's sign-in process provides great flexibility and allows users to easily create multi-step sign-in flows.\n\n> [!IMPORTANT]\n> The `signIn.create()` method is intended for advanced use cases. For most use cases, prefer the use of the factor-specific methods such as `signIn.password()`, `signIn.emailCode.sendCode()`, etc.",
@@ -21045,7 +21045,7 @@
           "nativeName": "password",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 442,
+            "line": 462,
             "symbol": "password"
           },
           "documentation": "Submits a password to sign-in.",
@@ -21070,7 +21070,7 @@
           "nativeName": "biometricCredential",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 543,
+            "line": 563,
             "symbol": "biometricCredential"
           },
           "documentation": "Authenticate with a locally enrolled, device-held biometric key.",
@@ -21100,7 +21100,7 @@
           "nativeName": "sso",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 545,
+            "line": 565,
             "symbol": "sso"
           },
           "parameters": [
@@ -21124,7 +21124,7 @@
           "nativeName": "ticket",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 583,
+            "line": 603,
             "symbol": "ticket"
           },
           "documentation": "Performs a ticket-based sign-in.",
@@ -21154,7 +21154,7 @@
           "nativeName": "passkey",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 593,
+            "line": 613,
             "symbol": "passkey"
           },
           "documentation": "Initiates a passkey-based authentication flow, enabling users to authenticate using a previously registered passkey. When called without parameters, this method requires a prior call to `SignIn.create({ strategy: 'passkey' })` to initialize the sign-in context. This pattern is particularly useful in scenarios where the authentication strategy needs to be determined dynamically at runtime.",
@@ -21184,7 +21184,7 @@
           "nativeName": "submitProtectCheck",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 598,
+            "line": 618,
             "symbol": "submitProtectCheck"
           },
           "documentation": "Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.",
@@ -21209,7 +21209,7 @@
           "nativeName": "finalize",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 603,
+            "line": 623,
             "symbol": "finalize"
           },
           "documentation": "Converts a sign-in with `status === 'complete'` into an active session. Will cause anything observing the session state (such as the [`useUser()`](https://clerk.com/docs/reference/hooks/use-user) hook) to update automatically.",
@@ -21225,7 +21225,7 @@
           "nativeName": "reset",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 610,
+            "line": 630,
             "symbol": "reset"
           },
           "documentation": "Resets the current sign-in attempt by clearing all local state back to null. This is useful when you want to allow users to go back to the beginning of the sign-in flow (e.g., to change their identifier during verification).\n\nUnlike other methods, `reset()` does not trigger the `fetchStatus` to change to `'fetching'` and does not make any API calls - it only clears local state.",
@@ -21664,7 +21664,7 @@
       "name": "SignInExistingSession",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 376,
+        "line": 396,
         "symbol": "__type"
       },
       "kind": "object",
@@ -21677,7 +21677,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 380,
+            "line": 400,
             "symbol": "sessionId"
           },
           "documentation": "The ID of the existing session."
@@ -22350,7 +22350,7 @@
       "name": "SignInEmailCode",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 445,
+        "line": 465,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -22361,7 +22361,7 @@
           "nativeName": "sendCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 449,
+            "line": 469,
             "symbol": "sendCode"
           },
           "documentation": "Sends an email code to sign-in.",
@@ -22391,7 +22391,7 @@
           "nativeName": "verifyCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 454,
+            "line": 474,
             "symbol": "verifyCode"
           },
           "documentation": "Verifies a code sent with the [`emailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#email-code-send-code) method.",
@@ -22548,7 +22548,7 @@
       "name": "SignInEmailLink",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 458,
+        "line": 478,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -22567,7 +22567,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 472,
+            "line": 492,
             "symbol": "verification"
           },
           "documentation": "The verification status of the email link. This property is populated by reading query parameters from the URL after the user visits the email link. Returns `null` if no verification status is available."
@@ -22579,7 +22579,7 @@
           "nativeName": "sendLink",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 462,
+            "line": 482,
             "symbol": "sendLink"
           },
           "documentation": "Sends an email link to sign in with.",
@@ -22604,7 +22604,7 @@
           "nativeName": "waitForVerification",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 467,
+            "line": 487,
             "symbol": "waitForVerification"
           },
           "documentation": "Waits for email link verification to complete or expire.",
@@ -22717,7 +22717,7 @@
       "name": "SignInEmailLinkVerification",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 472,
+        "line": 492,
         "symbol": "__type"
       },
       "kind": "object",
@@ -22731,7 +22731,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 476,
+            "line": 496,
             "symbol": "status"
           },
           "documentation": "The verification status."
@@ -22744,7 +22744,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 481,
+            "line": 501,
             "symbol": "createdSessionId"
           },
           "documentation": "The ID of the session that was created upon completion of the current sign-in."
@@ -22757,7 +22757,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 486,
+            "line": 506,
             "symbol": "verifiedFromTheSameClient"
           },
           "documentation": "Whether the verification was from the same client."
@@ -22783,7 +22783,7 @@
       "name": "SignInPhoneCode",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 491,
+        "line": 511,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -22794,7 +22794,7 @@
           "nativeName": "sendCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 495,
+            "line": 515,
             "symbol": "sendCode"
           },
           "documentation": "Sends a phone code to sign in with.",
@@ -22824,7 +22824,7 @@
           "nativeName": "verifyCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 500,
+            "line": 520,
             "symbol": "verifyCode"
           },
           "documentation": "Verifies a code sent with the [`phoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phone-code-send-code) method.",
@@ -22850,7 +22850,7 @@
       "name": "SignInPhoneCodeSendParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 175,
+        "line": 195,
         "symbol": "SignInFuturePhoneCodeSendParams"
       },
       "kind": "union",
@@ -22885,7 +22885,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 179,
+            "line": 199,
             "symbol": "channel"
           },
           "documentation": "The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`."
@@ -22903,7 +22903,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 185,
+            "line": 205,
             "symbol": "phoneNumber"
           },
           "documentation": "The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Provide either `phoneNumber` or `phoneNumberId`, not both. Omit both when a sign-in already exists."
@@ -22916,7 +22916,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 186,
+            "line": 206,
             "symbol": "phoneNumberId"
           }
         }
@@ -22941,7 +22941,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 179,
+            "line": 199,
             "symbol": "channel"
           },
           "documentation": "The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`."
@@ -22954,7 +22954,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 192,
+            "line": 212,
             "symbol": "phoneNumberId"
           },
           "documentation": "The ID for the user's phone number that will receive a message with the one-time authentication code. Provide either `phoneNumber` or `phoneNumberId`, not both. Omit both when a sign-in already exists."
@@ -22967,7 +22967,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 193,
+            "line": 213,
             "symbol": "phoneNumber"
           }
         }
@@ -22978,7 +22978,7 @@
       "name": "SignInPhoneCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 198,
+        "line": 218,
         "symbol": "SignInFuturePhoneCodeVerifyParams"
       },
       "kind": "object",
@@ -22991,7 +22991,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 202,
+            "line": 222,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
@@ -23003,7 +23003,7 @@
       "name": "SignInResetPasswordEmailCode",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 504,
+        "line": 524,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -23014,11 +23014,25 @@
           "nativeName": "sendCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 508,
+            "line": 528,
             "symbol": "sendCode"
           },
-          "documentation": "Sends a password reset code to the first email address on the account.",
-          "parameters": [],
+          "documentation": "Sends a password reset code to the selected email address, or the first supported email factor.",
+          "parameters": [
+            {
+              "name": "params",
+              "optional": true,
+              "type": {
+                "kind": "optional",
+                "nullable": false,
+                "omittable": true,
+                "value": {
+                  "kind": "ref",
+                  "name": "SignInResetPasswordEmailCodeSendParams"
+                }
+              }
+            }
+          ],
           "result": {
             "kind": "errorResult"
           },
@@ -23030,7 +23044,7 @@
           "nativeName": "verifyCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 513,
+            "line": 533,
             "symbol": "verifyCode"
           },
           "documentation": "Verifies a password reset code sent with the [`resetPasswordEmailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-submit-password) method to complete the password reset flow.",
@@ -23055,7 +23069,7 @@
           "nativeName": "submitPassword",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 518,
+            "line": 538,
             "symbol": "submitPassword"
           },
           "documentation": "Submits a new password and moves the sign-in status to `'complete'`.",
@@ -23076,6 +23090,36 @@
           "asynchronous": true
         }
       ]
+    },
+    "SignInResetPasswordEmailCodeSendParams": {
+      "name": "SignInResetPasswordEmailCodeSendParams",
+      "source": {
+        "file": "packages/shared/src/types/signInFuture.ts",
+        "line": 166,
+        "symbol": "SignInFutureResetPasswordEmailCodeSendParams"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "emailAddressId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 168,
+            "symbol": "emailAddressId"
+          },
+          "documentation": "The supported email factor to use. Defaults to the first supported factor."
+        }
+      ],
+      "methods": []
     },
     "SignInResetPasswordSubmitParams": {
       "name": "SignInResetPasswordSubmitParams",
@@ -23124,7 +23168,7 @@
       "name": "SignInResetPasswordPhoneCode",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 522,
+        "line": 542,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -23135,10 +23179,10 @@
           "nativeName": "sendCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 526,
+            "line": 546,
             "symbol": "sendCode"
           },
-          "documentation": "Sends a password reset code to the first phone number on the account.",
+          "documentation": "Sends a password reset code to the selected phone number, or the first supported phone factor.",
           "parameters": [
             {
               "name": "params",
@@ -23165,7 +23209,7 @@
           "nativeName": "verifyCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 531,
+            "line": 551,
             "symbol": "verifyCode"
           },
           "documentation": "Verifies a password reset code sent with the [`resetPasswordPhoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-submit-password) method to complete the password reset flow.",
@@ -23190,7 +23234,7 @@
           "nativeName": "submitPassword",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 536,
+            "line": 556,
             "symbol": "submitPassword"
           },
           "documentation": "Submits a new password and moves the sign-in status to `'complete'`.",
@@ -23216,11 +23260,29 @@
       "name": "SignInResetPasswordPhoneCodeSendParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 166,
+        "line": 184,
         "symbol": "SignInFutureResetPasswordPhoneCodeSendParams"
       },
       "kind": "object",
       "properties": [
+        {
+          "name": "phoneNumberId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 186,
+            "symbol": "phoneNumberId"
+          },
+          "documentation": "The supported phone factor to use. Defaults to the first supported factor."
+        },
         {
           "name": "phoneNumber",
           "optional": true,
@@ -23234,7 +23296,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 171,
+            "line": 191,
             "symbol": "phoneNumber"
           },
           "documentation": "The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if\n[phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled."
@@ -23246,7 +23308,7 @@
       "name": "SignInResetPasswordPhoneCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 206,
+        "line": 226,
         "symbol": "SignInFutureResetPasswordPhoneCodeVerifyParams"
       },
       "kind": "object",
@@ -23259,7 +23321,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 210,
+            "line": 230,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
@@ -23351,7 +23413,7 @@
       "name": "SignInSSOParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 214,
+        "line": 234,
         "symbol": "SignInFutureSSOParams"
       },
       "kind": "object",
@@ -23365,7 +23427,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 218,
+            "line": 238,
             "symbol": "strategy"
           },
           "documentation": "The strategy to use for authentication."
@@ -23383,7 +23445,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 244,
+            "line": 264,
             "symbol": "oidcPrompt"
           },
           "documentation": "The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL."
@@ -23401,7 +23463,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 249,
+            "line": 269,
             "symbol": "enterpriseConnectionId"
           },
           "documentation": "The identifier of the enterprise connection to target when using the `enterprise_sso` strategy."
@@ -23419,7 +23481,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 253,
+            "line": 273,
             "symbol": "identifier"
           },
           "documentation": "The unique identifier of the user. Only supported with the `enterprise_sso` strategy."
@@ -23474,7 +23536,7 @@
       "name": "SignInMfa",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 548,
+        "line": 568,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -23485,11 +23547,25 @@
           "nativeName": "sendPhoneCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 552,
+            "line": 572,
             "symbol": "sendPhoneCode"
           },
           "documentation": "Sends a phone code to sign in with as a second factor.",
-          "parameters": [],
+          "parameters": [
+            {
+              "name": "params",
+              "optional": true,
+              "type": {
+                "kind": "optional",
+                "nullable": false,
+                "omittable": true,
+                "value": {
+                  "kind": "ref",
+                  "name": "SignInMFAPhoneCodeSendParams"
+                }
+              }
+            }
+          ],
           "result": {
             "kind": "errorResult"
           },
@@ -23501,7 +23577,7 @@
           "nativeName": "verifyPhoneCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 557,
+            "line": 577,
             "symbol": "verifyPhoneCode"
           },
           "documentation": "Verifies a phone code sent with the [`mfa.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-phone-code) method.",
@@ -23526,11 +23602,25 @@
           "nativeName": "sendEmailCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 562,
+            "line": 582,
             "symbol": "sendEmailCode"
           },
           "documentation": "Sends an email code to sign in with as a second factor.",
-          "parameters": [],
+          "parameters": [
+            {
+              "name": "params",
+              "optional": true,
+              "type": {
+                "kind": "optional",
+                "nullable": false,
+                "omittable": true,
+                "value": {
+                  "kind": "ref",
+                  "name": "SignInMFAEmailCodeSendParams"
+                }
+              }
+            }
+          ],
           "result": {
             "kind": "errorResult"
           },
@@ -23542,7 +23632,7 @@
           "nativeName": "verifyEmailCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 567,
+            "line": 587,
             "symbol": "verifyEmailCode"
           },
           "documentation": "Verifies an email code sent with the [`mfa.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-email-code) method.",
@@ -23567,7 +23657,7 @@
           "nativeName": "verifyTOTP",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 572,
+            "line": 592,
             "symbol": "verifyTOTP"
           },
           "documentation": "Verifies an authenticator app (TOTP) code to sign in with as a second factor.",
@@ -23592,7 +23682,7 @@
           "nativeName": "verifyBackupCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 577,
+            "line": 597,
             "symbol": "verifyBackupCode"
           },
           "documentation": "Verifies a backup code to sign in with as a second factor.",
@@ -23614,11 +23704,41 @@
         }
       ]
     },
+    "SignInMFAPhoneCodeSendParams": {
+      "name": "SignInMFAPhoneCodeSendParams",
+      "source": {
+        "file": "packages/shared/src/types/signInFuture.ts",
+        "line": 172,
+        "symbol": "SignInFutureMFAPhoneCodeSendParams"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "phoneNumberId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 174,
+            "symbol": "phoneNumberId"
+          },
+          "documentation": "The supported phone factor to use. Defaults to the first supported factor."
+        }
+      ],
+      "methods": []
+    },
     "SignInMFAPhoneCodeVerifyParams": {
       "name": "SignInMFAPhoneCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 257,
+        "line": 277,
         "symbol": "SignInFutureMFAPhoneCodeVerifyParams"
       },
       "kind": "object",
@@ -23631,10 +23751,40 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 261,
+            "line": 281,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
+        }
+      ],
+      "methods": []
+    },
+    "SignInMFAEmailCodeSendParams": {
+      "name": "SignInMFAEmailCodeSendParams",
+      "source": {
+        "file": "packages/shared/src/types/signInFuture.ts",
+        "line": 178,
+        "symbol": "SignInFutureMFAEmailCodeSendParams"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "emailAddressId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 180,
+            "symbol": "emailAddressId"
+          },
+          "documentation": "The supported email factor to use. Defaults to the first supported factor."
         }
       ],
       "methods": []
@@ -23643,7 +23793,7 @@
       "name": "SignInMFAEmailCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 265,
+        "line": 285,
         "symbol": "SignInFutureMFAEmailCodeVerifyParams"
       },
       "kind": "object",
@@ -23656,7 +23806,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 269,
+            "line": 289,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
@@ -23668,7 +23818,7 @@
       "name": "SignInTOTPVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 273,
+        "line": 293,
         "symbol": "SignInFutureTOTPVerifyParams"
       },
       "kind": "object",
@@ -23681,7 +23831,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 277,
+            "line": 297,
             "symbol": "code"
           },
           "documentation": "The TOTP generated by the user's authenticator app."
@@ -23693,7 +23843,7 @@
       "name": "SignInBackupCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 281,
+        "line": 301,
         "symbol": "SignInFutureBackupCodeVerifyParams"
       },
       "kind": "object",
@@ -23706,7 +23856,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 285,
+            "line": 305,
             "symbol": "code"
           },
           "documentation": "The backup code that was provided to the user when they set up backup codes."
@@ -23718,7 +23868,7 @@
       "name": "SignInTicketParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 289,
+        "line": 309,
         "symbol": "SignInFutureTicketParams"
       },
       "kind": "object",
@@ -23731,7 +23881,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 293,
+            "line": 313,
             "symbol": "ticket"
           },
           "documentation": "The [ticket _or token_](https://clerk.com/docs/guides/development/custom-flows/authentication/application-invitations) generated from the Backend API."
@@ -23743,7 +23893,7 @@
       "name": "SignInPasskeyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 313,
+        "line": 333,
         "symbol": "SignInFuturePasskeyParams"
       },
       "kind": "object",
@@ -23762,7 +23912,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 322,
+            "line": 342,
             "symbol": "flow"
           },
           "documentation": "The flow to use for the passkey sign-in.\n\n<ul>\n <li>`'autofill'`: The client prompts your users to select a passkey before they interact with your app.</li>\n <li>`'discoverable'`: The client requires the user to interact with the client.</li>\n</ul>"
@@ -23780,7 +23930,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 324,
+            "line": 344,
             "symbol": "preferImmediatelyAvailableCredentials"
           },
           "documentation": "Ask native credential presentation to avoid a cross-device prompt when no local credential is available."
@@ -26678,7 +26828,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 218,
+            "line": 238,
             "symbol": "strategy"
           },
           "documentation": "The strategy to use for authentication."
@@ -26696,7 +26846,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 253,
+            "line": 273,
             "symbol": "identifier"
           },
           "documentation": "The unique identifier of the user. Only supported with the `enterprise_sso` strategy."
@@ -26714,7 +26864,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 249,
+            "line": 269,
             "symbol": "enterpriseConnectionId"
           },
           "documentation": "The identifier of the enterprise connection to target when using the `enterprise_sso` strategy."
@@ -26732,7 +26882,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 244,
+            "line": 264,
             "symbol": "oidcPrompt"
           },
           "documentation": "The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL."
@@ -33385,6 +33535,10 @@
       "disposition": "generated"
     },
     {
+      "path": "SignInFutureResetPasswordEmailCodeSendParams.emailAddressId",
+      "disposition": "generated"
+    },
+    {
       "path": "SignInResetPasswordEmailCode.verifyCode",
       "disposition": "generated"
     },
@@ -33406,6 +33560,10 @@
     },
     {
       "path": "SignInResetPasswordPhoneCode.sendCode",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInFutureResetPasswordPhoneCodeSendParams.phoneNumberId",
       "disposition": "generated"
     },
     {
@@ -33488,6 +33646,10 @@
       "disposition": "generated"
     },
     {
+      "path": "SignInFutureMFAPhoneCodeSendParams.phoneNumberId",
+      "disposition": "generated"
+    },
+    {
       "path": "SignInMfa.verifyPhoneCode",
       "disposition": "generated"
     },
@@ -33497,6 +33659,10 @@
     },
     {
       "path": "SignInMfa.sendEmailCode",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInFutureMFAEmailCodeSendParams.emailAddressId",
       "disposition": "generated"
     },
     {
