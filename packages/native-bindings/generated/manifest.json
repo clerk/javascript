@@ -1,7 +1,7 @@
 {
   "protocolVersion": 1,
   "hostCapabilityVersion": 1,
-  "contractHash": "de318d17179d3c133b56f634c981ac2f7f090c3bb6a53051a195ca7a446f4268",
+  "contractHash": "db0edcf151926939c7031f50b51514339c6787c28e4518d71b4c6b331b074a5a",
   "roots": {
     "clerk": {
       "kind": "ref",

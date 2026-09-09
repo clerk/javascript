@@ -28,6 +28,12 @@ export function authenticationRoots(clerk: CoreOwner): { signIn: SignInFutureRes
 
 export function publicCore(clerk: CoreOwner, beforeSignOut: () => Promise<void>): MobileClerk {
   return {
+    get clientId() {
+      return mobileResources(clerk).clientId;
+    },
+    get biometricCredentials() {
+      return mobileResources(clerk).biometricCredentials;
+    },
     get authCallback() {
       return mobileResources(clerk).authCallback;
     },

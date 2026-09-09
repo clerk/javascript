@@ -86,3 +86,5 @@ export type * from './verification';
 export type * from './waitlist';
 export type * from './web3';
 export type * from './web3Wallet';
+
+export * from './biometricCredential';

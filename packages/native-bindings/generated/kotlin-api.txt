@@ -95,10 +95,52 @@ BillingPaymentMethod.updatedAt: Field<Instant> = Field.Omitted
 BillingPaymentMethod.walletType: Field<String> = Field.Omitted
 BillingPaymentMethodRemoveParams.orgId: String? = null
 BillingPaymentMethodStatus cases: expired, active, disconnected, unrecognized(String)
+BiometricCredential.algorithm: BiometricCredentialAlgorithm
+BiometricCredential.appIdentifier: String
+BiometricCredential.createdAt: Instant
+BiometricCredential.id: String
+BiometricCredential.lastUsedAt: Instant?
+BiometricCredential.name: String?
+BiometricCredential.object: String
+BiometricCredential.platform: BiometricCredentialPlatform
+BiometricCredential.revokedAt: Instant?
+BiometricCredential.status: BiometricCredentialStatus
+BiometricCredential.updatedAt: Instant
+BiometricCredentialAlgorithm variants: String | String
+BiometricCredentialAvailability.isAvailable: Boolean
+BiometricCredentialAvailability.unavailableReason: BiometricCredentialUnavailableReason?
+BiometricCredentialEnrollmentParams.identifierHint: String? = null
+BiometricCredentialEnrollmentParams.name: String? = null
+BiometricCredentialEnrollmentParams.policy: BiometricCredentialPolicy? = null
+BiometricCredentialEnrollmentParams.promptSubtitle: String? = null
+BiometricCredentialEnrollmentParams.reason: String? = null
+BiometricCredentialPlatform variants: String | String | String
+BiometricCredentialPolicy cases: biometry_current_set, biometry_any, biometry_or_device_passcode, unrecognized(String)
+BiometricCredentialSelectionParams.currentUser: Boolean? = null
+BiometricCredentialSelectionParams.id: String? = null
+BiometricCredentialSelectionParams.identifierHint: String? = null
+BiometricCredentialStatus variants: String | String | String
+BiometricCredentialUnavailableReason cases: environmentUnavailable, nativeAPIDisabled, featureDisabled, unsupportedPlatform, biometricAuthenticationUnavailable, noLocalCredential, localKeyMissing, serverCredentialMissing, serverCredentialRevoked, unrecognized(String)
+BiometricCredentialValidationResult.reason: BiometricCredentialUnavailableReason?
+BiometricCredentialValidationResult.status: BiometricCredentialValidationResultStatus
+BiometricCredentialValidationResultStatus cases: valid, invalid, inconclusive, unrecognized(String)
+BiometricCredentials.availability(params: BiometricCredentialSelectionParams? = null): BiometricCredentialAvailability [return]
+BiometricCredentials.canEnroll: Boolean
+BiometricCredentials.enroll(params: BiometricCredentialEnrollmentParams? = null): BiometricCredential [return]
+BiometricCredentials.forgetLocalCredentials(params: BiometricCredentialsForgetLocalCredentialsParams): Double [return]
+BiometricCredentials.list(): List<BiometricCredential> [return]
+BiometricCredentials.localAvailability(params: BiometricCredentialSelectionParams? = null): BiometricCredentialAvailability [return]
+BiometricCredentials.revoke(params: BiometricCredentialsRevokeParams): BiometricCredential [return]
+BiometricCredentials.revokeCurrentDeviceCredential(): BiometricCredential? [return]
+BiometricCredentials.validateLocalCredential(params: BiometricCredentialSelectionParams? = null): BiometricCredentialValidationResult [return]
+BiometricCredentialsForgetLocalCredentialsParams.userId: String
+BiometricCredentialsRevokeParams.id: String
 CheckAuthorizationParams variants: SessionCheckAuthorizationIsAuthorizedParamsCase1 | SessionCheckAuthorizationIsAuthorizedParamsCase2 | SessionCheckAuthorizationIsAuthorizedParamsCase3 | SessionCheckAuthorizationIsAuthorizedParamsCase4 | SessionCheckAuthorizationIsAuthorizedParamsCase5
 Clerk.authCallback: MobileAuthCallback?
 Clerk.authenticateWithSSO(params: MobileSSOParams): MobileAuthenticationResult [return]
+Clerk.biometricCredentials: BiometricCredentials
 Clerk.clearAuthCallback(id: Double): Unit [return]
+Clerk.clientId: String?
 Clerk.createOrganization(params: CreateOrganizationParams): Organization [return]
 Clerk.environment: EnvironmentResource
 Clerk.getOrganization(organizationId: String): Organization [return]
@@ -940,6 +982,7 @@ SetOrganizationLogoParams.file: SetOrganizationLogoParamsFile?
 SetOrganizationLogoParamsFile variants: String | UploadFile | UploadFile
 SetProfileImageParams.file: SetOrganizationLogoParamsFile?
 SetReservedForSecondFactorParams.reserved: Boolean
+SignIn.biometricCredential(params: SignInBiometricCredentialParams? = null): Unit [error-envelope]
 SignIn.canBeDiscarded: Boolean
 SignIn.create(params: SignInCreateParams): Unit [error-envelope]
 SignIn.createdSessionId: String?
@@ -968,6 +1011,10 @@ SignIn.supportedSecondFactors: List<SignInSecondFactor>
 SignIn.ticket(params: SignInTicketParams? = null): Unit [error-envelope]
 SignIn.userData: UserData
 SignInBackupCodeVerifyParams.code: String
+SignInBiometricCredentialParams.id: String? = null
+SignInBiometricCredentialParams.identifierHint: String? = null
+SignInBiometricCredentialParams.promptSubtitle: String? = null
+SignInBiometricCredentialParams.reason: String? = null
 SignInCreateParams.actionCompleteRedirectUrl: String? = null
 SignInCreateParams.identifier: String? = null
 SignInCreateParams.password: String? = null
@@ -977,7 +1024,8 @@ SignInCreateParams.strategy: SignInCreateParamsStrategy? = null
 SignInCreateParams.ticket: String? = null
 SignInCreateParams.token: String? = null
 SignInCreateParams.transfer: Boolean? = null
-SignInCreateParamsStrategy cases: oauth_token_apple, passkey, ticket, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInCreateParams.trustedDeviceId: String? = null
+SignInCreateParamsStrategy cases: oauth_token_apple, passkey, ticket, enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, trusted_device, unrecognized(String)
 SignInData.second_factor: SignInDataSecond_factor
 SignInDataSecond_factor.enabled: Boolean
 SignInDataSecond_factor.required: Boolean
@@ -1388,6 +1436,9 @@ Web3Wallet.verification: Verification
 Web3Wallet.web3Wallet: String
 enum Attribute
 enum BillingPaymentMethodStatus
+enum BiometricCredentialPolicy
+enum BiometricCredentialUnavailableReason
+enum BiometricCredentialValidationResultStatus
 enum ClerkStatus
 enum CreateExternalAccountParamsStrategy
 enum DisplayConfigCaptchaWidgetType
@@ -1447,6 +1498,13 @@ object BackupCode
 object BackupCodeAttempt
 object BackupCodeFactor
 object BillingPaymentMethodRemoveParams
+object BiometricCredential
+object BiometricCredentialAvailability
+object BiometricCredentialEnrollmentParams
+object BiometricCredentialSelectionParams
+object BiometricCredentialValidationResult
+object BiometricCredentialsForgetLocalCredentialsParams
+object BiometricCredentialsRevokeParams
 object ClerkAPIError
 object ClerkAPIErrorMeta
 object ClerkAPIErrorMetaPlan
@@ -1572,6 +1630,7 @@ object SetOrganizationLogoParams
 object SetProfileImageParams
 object SetReservedForSecondFactorParams
 object SignInBackupCodeVerifyParams
+object SignInBiometricCredentialParams
 object SignInCreateParams
 object SignInData
 object SignInDataSecond_factor
@@ -1640,6 +1699,7 @@ object Web3SignatureFactor
 resource ActiveSession
 resource BillingInitializedPaymentMethod
 resource BillingPaymentMethod
+resource BiometricCredentials
 resource Clerk
 resource CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress
 resource CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress
@@ -1686,6 +1746,9 @@ resource Web3Wallet
 tuple ActiveSessionFactorVerificationAgeValue
 tuple PendingSessionFactorVerificationAgeValue
 tuple SessionFactorVerificationAgeValue
+union BiometricCredentialAlgorithm
+union BiometricCredentialPlatform
+union BiometricCredentialStatus
 union CheckAuthorizationParams
 union DisplayThemeColor
 union GetUserOrganizationSuggestionsParamsStatus

@@ -369,7 +369,18 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   session_minter?: boolean;
 }
 
+export interface BiometricCredentialChallengeJSON {
+  object: string;
+  challenge: string;
+  challenge_id: string;
+  trusted_device_id?: string;
+  client_data: string;
+  expires_at: number;
+  algorithm: string;
+}
+
 export interface VerificationJSON extends ClerkResourceJSON {
+  trusted_device_challenge?: BiometricCredentialChallengeJSON;
   status: VerificationStatus;
   verified_at_client: string;
   strategy: string;

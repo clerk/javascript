@@ -1,6 +1,7 @@
 import { ClerkAPIError, errorToJSON } from '@clerk/shared/error';
 import { convertJSONToPublicKeyCreateOptions } from '@clerk/shared/internal/clerk-js/passkeys';
 import type {
+  BiometricCredentialChallengeJSON,
   PasskeyVerificationResource,
   PhoneCodeChannel,
   PublicKeyCredentialCreationOptionsJSON,
@@ -22,6 +23,7 @@ import { BaseResource } from './internal';
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';
+  __internal_trustedDeviceChallenge: BiometricCredentialChallengeJSON | null = null;
 
   status: VerificationStatus | null = null;
   strategy: string | null = null;
@@ -45,6 +47,8 @@ export class Verification extends BaseResource implements VerificationResource {
 
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     if (data) {
+      this.__internal_trustedDeviceChallenge =
+        'trusted_device_challenge' in data ? (data.trusted_device_challenge ?? null) : null;
       this.status = data.status;
       this.verifiedAtClient = data.verified_at_client;
       this.strategy = data.strategy;

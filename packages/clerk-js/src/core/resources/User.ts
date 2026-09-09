@@ -308,11 +308,13 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
-  delete = (): Promise<void> => {
-    return this._baseDelete({ path: '/me' }).then(res => {
-      eventBus.emit(events.UserSignOut, null);
-      return res;
-    });
+  delete = async (): Promise<void> => {
+    const userId = this.id;
+    await this._baseDelete({ path: '/me' });
+    eventBus.emit(events.UserSignOut, null);
+    if (userId) {
+      await User.clerk.__internal_nativeBiometrics?.forgetLocalCredentials({ userId }).catch(() => undefined);
+    }
   };
 
   getSessions = async (): Promise<SessionWithActivities[]> => {
@@ -376,7 +378,7 @@ export class User extends BaseResource implements UserResource {
             }
           : {}),
       })
-    )?.response as unknown as EnterpriseConnectionJSON[];
+    )?.response as EnterpriseConnectionJSON[];
 
     return (json || []).map(connection => new EnterpriseConnection(connection));
   };

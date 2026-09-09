@@ -1,3 +1,4 @@
+import { NativeBiometricCredentials } from '../utils/NativeBiometricCredentials';
 import type { NativeMagicLink } from '../utils/NativeMagicLink';
 import { authenticateWithMobileSSO } from '../utils/authenticateWithMobileSSO';
 import type { MobileAuthenticationResources } from '@clerk/shared/mobile';
@@ -363,6 +364,7 @@ export class Clerk implements ClerkInterface {
     | undefined;
 
   public __internal_nativeMagicLink: NativeMagicLink | undefined;
+  public __internal_nativeBiometrics = new NativeBiometricCredentials(this);
 
   public __internal_getAppleIdentity:
     | ((options: { fullName: boolean }) => Promise<{ token: string; firstName?: string; lastName?: string }>)
@@ -3205,6 +3207,8 @@ export class Clerk implements ClerkInterface {
   __internal_getMobileResources = (): MobileAuthenticationResources => {
     if (!this.client || !this.environment) throw new Error('Clerk must be loaded before attaching native resources.');
     return {
+      clientId: this.client.id ?? null,
+      biometricCredentials: this.__internal_nativeBiometrics,
       authCallback: this.__internal_nativeMagicLink?.authCallback ?? null,
       handleAuthCallback: async url => {
         if (!this.__internal_nativeMagicLink)

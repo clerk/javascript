@@ -31,7 +31,7 @@
       "name": "Clerk",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 24,
+        "line": 27,
         "symbol": "MobileClerk"
       },
       "kind": "resource",
@@ -127,7 +127,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 26,
+            "line": 29,
             "symbol": "environment"
           }
         },
@@ -145,7 +145,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 27,
+            "line": 30,
             "symbol": "session"
           }
         },
@@ -163,7 +163,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 28,
+            "line": 31,
             "symbol": "user"
           }
         },
@@ -181,8 +181,38 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 29,
+            "line": 32,
             "symbol": "organization"
+          }
+        },
+        {
+          "name": "clientId",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 33,
+            "symbol": "clientId"
+          }
+        },
+        {
+          "name": "biometricCredentials",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "BiometricCredentials"
+          },
+          "source": {
+            "file": "packages/shared/src/types/mobile.ts",
+            "line": 34,
+            "symbol": "biometricCredentials"
           }
         },
         {
@@ -199,7 +229,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 30,
+            "line": 35,
             "symbol": "authCallback"
           }
         },
@@ -212,7 +242,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 34,
+            "line": 39,
             "symbol": "signIn"
           }
         },
@@ -225,7 +255,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 35,
+            "line": 40,
             "symbol": "signUp"
           }
         }
@@ -287,7 +317,7 @@
           "nativeName": "handleAuthCallback",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 31,
+            "line": 36,
             "symbol": "handleAuthCallback"
           },
           "parameters": [
@@ -316,7 +346,7 @@
           "nativeName": "clearAuthCallback",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 32,
+            "line": 37,
             "symbol": "clearAuthCallback"
           },
           "parameters": [
@@ -339,7 +369,7 @@
           "nativeName": "authenticateWithSSO",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 33,
+            "line": 38,
             "symbol": "authenticateWithSSO"
           },
           "parameters": [
@@ -364,7 +394,7 @@
           "nativeName": "setActive",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 36,
+            "line": 41,
             "symbol": "setActive"
           },
           "parameters": [
@@ -388,7 +418,7 @@
           "nativeName": "signOut",
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 37,
+            "line": 42,
             "symbol": "signOut"
           },
           "parameters": [
@@ -19767,11 +19797,810 @@
         }
       ]
     },
+    "BiometricCredentials": {
+      "name": "BiometricCredentials",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 54,
+        "symbol": "BiometricCredentialsResource"
+      },
+      "documentation": "Native biometric credentials, backed by device-held keys and the Clerk core.",
+      "kind": "resource",
+      "properties": [
+        {
+          "name": "canEnroll",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 55,
+            "symbol": "canEnroll"
+          }
+        }
+      ],
+      "methods": [
+        {
+          "name": "list",
+          "nativeName": "list",
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 56,
+            "symbol": "list"
+          },
+          "parameters": [],
+          "result": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "name": "BiometricCredential"
+            }
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
+          "name": "availability",
+          "nativeName": "availability",
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 57,
+            "symbol": "availability"
+          },
+          "parameters": [
+            {
+              "name": "params",
+              "optional": true,
+              "type": {
+                "kind": "optional",
+                "nullable": false,
+                "omittable": true,
+                "value": {
+                  "kind": "ref",
+                  "name": "BiometricCredentialSelectionParams"
+                }
+              }
+            }
+          ],
+          "result": {
+            "kind": "ref",
+            "name": "BiometricCredentialAvailability"
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
+          "name": "localAvailability",
+          "nativeName": "localAvailability",
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 58,
+            "symbol": "localAvailability"
+          },
+          "parameters": [
+            {
+              "name": "params",
+              "optional": true,
+              "type": {
+                "kind": "optional",
+                "nullable": false,
+                "omittable": true,
+                "value": {
+                  "kind": "ref",
+                  "name": "BiometricCredentialSelectionParams"
+                }
+              }
+            }
+          ],
+          "result": {
+            "kind": "ref",
+            "name": "BiometricCredentialAvailability"
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
+          "name": "validateLocalCredential",
+          "nativeName": "validateLocalCredential",
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 59,
+            "symbol": "validateLocalCredential"
+          },
+          "parameters": [
+            {
+              "name": "params",
+              "optional": true,
+              "type": {
+                "kind": "optional",
+                "nullable": false,
+                "omittable": true,
+                "value": {
+                  "kind": "ref",
+                  "name": "BiometricCredentialSelectionParams"
+                }
+              }
+            }
+          ],
+          "result": {
+            "kind": "ref",
+            "name": "BiometricCredentialValidationResult"
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
+          "name": "enroll",
+          "nativeName": "enroll",
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 62,
+            "symbol": "enroll"
+          },
+          "parameters": [
+            {
+              "name": "params",
+              "optional": true,
+              "type": {
+                "kind": "optional",
+                "nullable": false,
+                "omittable": true,
+                "value": {
+                  "kind": "ref",
+                  "name": "BiometricCredentialEnrollmentParams"
+                }
+              }
+            }
+          ],
+          "result": {
+            "kind": "ref",
+            "name": "BiometricCredential"
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
+          "name": "revoke",
+          "nativeName": "revoke",
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 63,
+            "symbol": "revoke"
+          },
+          "parameters": [
+            {
+              "name": "params",
+              "optional": false,
+              "type": {
+                "kind": "ref",
+                "name": "BiometricCredentialsRevokeParams"
+              }
+            }
+          ],
+          "result": {
+            "kind": "ref",
+            "name": "BiometricCredential"
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
+          "name": "revokeCurrentDeviceCredential",
+          "nativeName": "revokeCurrentDeviceCredential",
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 64,
+            "symbol": "revokeCurrentDeviceCredential"
+          },
+          "parameters": [],
+          "result": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "ref",
+              "name": "BiometricCredential"
+            }
+          },
+          "errorResult": false,
+          "asynchronous": true
+        },
+        {
+          "name": "forgetLocalCredentials",
+          "nativeName": "forgetLocalCredentials",
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 65,
+            "symbol": "forgetLocalCredentials"
+          },
+          "parameters": [
+            {
+              "name": "params",
+              "optional": false,
+              "type": {
+                "kind": "ref",
+                "name": "BiometricCredentialsForgetLocalCredentialsParams"
+              }
+            }
+          ],
+          "result": {
+            "kind": "number"
+          },
+          "errorResult": false,
+          "asynchronous": true
+        }
+      ]
+    },
+    "BiometricCredential": {
+      "name": "BiometricCredential",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 35,
+        "symbol": "BiometricCredential"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "id",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 36,
+            "symbol": "id"
+          }
+        },
+        {
+          "name": "object",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 37,
+            "symbol": "object"
+          }
+        },
+        {
+          "name": "platform",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "BiometricCredentialPlatform"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 38,
+            "symbol": "platform"
+          }
+        },
+        {
+          "name": "appIdentifier",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 39,
+            "symbol": "appIdentifier"
+          }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 40,
+            "symbol": "name"
+          }
+        },
+        {
+          "name": "algorithm",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "BiometricCredentialAlgorithm"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 41,
+            "symbol": "algorithm"
+          }
+        },
+        {
+          "name": "status",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "BiometricCredentialStatus"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 42,
+            "symbol": "status"
+          }
+        },
+        {
+          "name": "createdAt",
+          "optional": false,
+          "type": {
+            "kind": "date"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 43,
+            "symbol": "createdAt"
+          }
+        },
+        {
+          "name": "updatedAt",
+          "optional": false,
+          "type": {
+            "kind": "date"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 44,
+            "symbol": "updatedAt"
+          }
+        },
+        {
+          "name": "lastUsedAt",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "date"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 45,
+            "symbol": "lastUsedAt"
+          }
+        },
+        {
+          "name": "revokedAt",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "date"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 46,
+            "symbol": "revokedAt"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "BiometricCredentialPlatform": {
+      "name": "BiometricCredentialPlatform",
+      "kind": "union",
+      "properties": [],
+      "methods": [],
+      "variants": [
+        {
+          "kind": "literal",
+          "value": "ios"
+        },
+        {
+          "kind": "literal",
+          "value": "android"
+        },
+        {
+          "kind": "string"
+        }
+      ]
+    },
+    "BiometricCredentialAlgorithm": {
+      "name": "BiometricCredentialAlgorithm",
+      "kind": "union",
+      "properties": [],
+      "methods": [],
+      "variants": [
+        {
+          "kind": "string"
+        },
+        {
+          "kind": "literal",
+          "value": "ES256"
+        }
+      ]
+    },
+    "BiometricCredentialStatus": {
+      "name": "BiometricCredentialStatus",
+      "kind": "union",
+      "properties": [],
+      "methods": [],
+      "variants": [
+        {
+          "kind": "literal",
+          "value": "active"
+        },
+        {
+          "kind": "literal",
+          "value": "revoked"
+        },
+        {
+          "kind": "string"
+        }
+      ]
+    },
+    "BiometricCredentialSelectionParams": {
+      "name": "BiometricCredentialSelectionParams",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 17,
+        "symbol": "BiometricCredentialSelectionParams"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "id",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 18,
+            "symbol": "id"
+          }
+        },
+        {
+          "name": "identifierHint",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 19,
+            "symbol": "identifierHint"
+          }
+        },
+        {
+          "name": "currentUser",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "boolean"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 20,
+            "symbol": "currentUser"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "BiometricCredentialAvailability": {
+      "name": "BiometricCredentialAvailability",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 13,
+        "symbol": "BiometricCredentialAvailability"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "isAvailable",
+          "optional": false,
+          "type": {
+            "kind": "boolean"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 14,
+            "symbol": "isAvailable"
+          }
+        },
+        {
+          "name": "unavailableReason",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "ref",
+              "name": "BiometricCredentialUnavailableReason"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 15,
+            "symbol": "unavailableReason"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "BiometricCredentialUnavailableReason": {
+      "name": "BiometricCredentialUnavailableReason",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 2,
+        "symbol": "BiometricCredentialUnavailableReason"
+      },
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "environmentUnavailable",
+        "nativeAPIDisabled",
+        "featureDisabled",
+        "unsupportedPlatform",
+        "biometricAuthenticationUnavailable",
+        "noLocalCredential",
+        "localKeyMissing",
+        "serverCredentialMissing",
+        "serverCredentialRevoked"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "BiometricCredentialValidationResult": {
+      "name": "BiometricCredentialValidationResult",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 48,
+        "symbol": "BiometricCredentialValidationResult"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "status",
+          "optional": false,
+          "type": {
+            "kind": "ref",
+            "name": "BiometricCredentialValidationResultStatus"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 49,
+            "symbol": "status"
+          }
+        },
+        {
+          "name": "reason",
+          "optional": false,
+          "type": {
+            "kind": "optional",
+            "nullable": true,
+            "omittable": false,
+            "value": {
+              "kind": "ref",
+              "name": "BiometricCredentialUnavailableReason"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 50,
+            "symbol": "reason"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "BiometricCredentialValidationResultStatus": {
+      "name": "BiometricCredentialValidationResultStatus",
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "valid",
+        "invalid",
+        "inconclusive"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "BiometricCredentialEnrollmentParams": {
+      "name": "BiometricCredentialEnrollmentParams",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 22,
+        "symbol": "BiometricCredentialEnrollmentParams"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "name",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 23,
+            "symbol": "name"
+          }
+        },
+        {
+          "name": "identifierHint",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 24,
+            "symbol": "identifierHint"
+          }
+        },
+        {
+          "name": "reason",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 25,
+            "symbol": "reason"
+          }
+        },
+        {
+          "name": "promptSubtitle",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 26,
+            "symbol": "promptSubtitle"
+          }
+        },
+        {
+          "name": "policy",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "ref",
+              "name": "BiometricCredentialPolicy"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 27,
+            "symbol": "policy"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "BiometricCredentialPolicy": {
+      "name": "BiometricCredentialPolicy",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 1,
+        "symbol": "BiometricCredentialPolicy"
+      },
+      "kind": "enum",
+      "properties": [],
+      "methods": [],
+      "values": [
+        "biometry_current_set",
+        "biometry_any",
+        "biometry_or_device_passcode"
+      ],
+      "open": false,
+      "patterns": []
+    },
+    "BiometricCredentialsRevokeParams": {
+      "name": "BiometricCredentialsRevokeParams",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 63,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "id",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 63,
+            "symbol": "id"
+          }
+        }
+      ],
+      "methods": []
+    },
+    "BiometricCredentialsForgetLocalCredentialsParams": {
+      "name": "BiometricCredentialsForgetLocalCredentialsParams",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 65,
+        "symbol": "__type"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "userId",
+          "optional": false,
+          "type": {
+            "kind": "string"
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 65,
+            "symbol": "userId"
+          }
+        }
+      ],
+      "methods": []
+    },
     "MobileAuthCallback": {
       "name": "MobileAuthCallback",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 50,
+        "line": 55,
         "symbol": "MobileAuthCallback"
       },
       "kind": "object",
@@ -19784,7 +20613,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 50,
+            "line": 55,
             "symbol": "id"
           }
         },
@@ -19797,7 +20626,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 50,
+            "line": 55,
             "symbol": "result"
           }
         }
@@ -19808,7 +20637,7 @@
       "name": "MobileAuthenticationResult",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 46,
+        "line": 51,
         "symbol": "MobileAuthenticationResult"
       },
       "kind": "union",
@@ -19829,7 +20658,7 @@
       "name": "MobileAuthCallbackResultCase1",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 47,
+        "line": 52,
         "symbol": "__type"
       },
       "kind": "object",
@@ -19843,7 +20672,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 47,
+            "line": 52,
             "symbol": "kind"
           }
         },
@@ -19856,7 +20685,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 47,
+            "line": 52,
             "symbol": "signIn"
           }
         }
@@ -19867,7 +20696,7 @@
       "name": "SignIn",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 329,
+        "line": 338,
         "symbol": "SignInFutureResource"
       },
       "documentation": "The `SignInFuture` class holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.",
@@ -19886,7 +20715,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 333,
+            "line": 342,
             "symbol": "id"
           },
           "documentation": "The unique identifier for the current sign-in attempt."
@@ -19903,7 +20732,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 338,
+            "line": 347,
             "symbol": "supportedFirstFactors"
           },
           "documentation": "Array of the first factors that are supported in the current sign-in. Each factor contains information about the verification strategy that can be used."
@@ -19920,7 +20749,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 343,
+            "line": 352,
             "symbol": "supportedSecondFactors"
           },
           "documentation": "Array of the second factors that are supported in the current sign-in. Each factor contains information about the verification strategy that can be used. This property is populated only when the first factor is verified."
@@ -19934,7 +20763,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 357,
+            "line": 366,
             "symbol": "status"
           },
           "documentation": "The current status of the sign-in.\n<ul>\n<li>`'complete'` - The sign-in process has been completed successfully.</li>\n<li>`'needs_client_trust'` - The user is signing in from a new device and must complete a [second factor verification](!second-factor-verification) to establish [Device Trust](https://clerk.com/docs/guides/secure/device-trust). See the [Device Trust custom flow guide](https://clerk.com/docs/guides/development/custom-flows/authentication/device-trust) for more information.</li>\n<li>`'needs_identifier'` - The user's identifier (e.g., email address, phone number, username) hasn't been provided.</li>\n<li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy), or `'enterprise_sso'`.</li>\n<li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.</li>\n<li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](/docs/guides/development/custom-flows/authentication/forgot-password) guide for more information.</li>\n<li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. Run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. The pre-built components handle this automatically.</li>\n</ul>"
@@ -19947,7 +20776,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 362,
+            "line": 371,
             "symbol": "isTransferable"
           },
           "documentation": "Indicates that there is not a matching user for the first-factor verification used, and that the sign-in can be transferred to a sign-up."
@@ -19966,7 +20795,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 367,
+            "line": 376,
             "symbol": "existingSession"
           },
           "documentation": "Indicates that the sign-in was not able to create a new session because the identifier already exists in an existing session."
@@ -19980,7 +20809,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 377,
+            "line": 386,
             "symbol": "firstFactorVerification"
           },
           "documentation": "The state of the verification process for the selected first factor. Initially, this property contains an empty verification object, since there is no first factor selected."
@@ -19994,7 +20823,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 382,
+            "line": 391,
             "symbol": "secondFactorVerification"
           },
           "documentation": "The state of the verification process for the selected second factor. Initially, this property contains an empty verification object, since there is no second factor selected."
@@ -20012,7 +20841,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 387,
+            "line": 396,
             "symbol": "identifier"
           },
           "documentation": "The authentication identifier value for the current sign-in. `null` if the `strategy` is `'oauth_<provider>'` or `'enterprise_sso'`."
@@ -20030,7 +20859,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 392,
+            "line": 401,
             "symbol": "createdSessionId"
           },
           "documentation": "The ID of the session that was created upon completion of the current sign-in. The value of this property is `null` if the sign-in status is not `'complete'`."
@@ -20044,7 +20873,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 403,
+            "line": 412,
             "symbol": "userData"
           },
           "documentation": "An object containing information about the user of the current sign-in. This property is populated only once an identifier is given to the `SignIn` object through `signIn.create()` or another method that populates the `identifier` property.\n<ul>\n <li>`'firstName'`: The user's first name.</li>\n <li>`'lastName'`: The user's last name.</li>\n <li>`'imageUrl'`: The user's profile image URL.</li>\n <li>`'hasImage'`: Whether the user has a profile image.</li>\n</ul>"
@@ -20063,7 +20892,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 409,
+            "line": 418,
             "symbol": "protectCheck"
           },
           "documentation": "The current protect check challenge, if one is pending. Only populated when Protect mid-flow\nchallenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it."
@@ -20076,7 +20905,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 416,
+            "line": 425,
             "symbol": "canBeDiscarded"
           },
           "documentation": "Indicates that the sign-in can be discarded (has been finalized or explicitly reset)."
@@ -20090,7 +20919,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 436,
+            "line": 445,
             "symbol": "emailCode"
           }
         },
@@ -20103,7 +20932,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 449,
+            "line": 458,
             "symbol": "emailLink"
           }
         },
@@ -20116,7 +20945,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 482,
+            "line": 491,
             "symbol": "phoneCode"
           }
         },
@@ -20129,7 +20958,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 495,
+            "line": 504,
             "symbol": "resetPasswordEmailCode"
           }
         },
@@ -20142,7 +20971,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 513,
+            "line": 522,
             "symbol": "resetPasswordPhoneCode"
           }
         },
@@ -20155,7 +20984,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 536,
+            "line": 548,
             "symbol": "mfa"
           }
         }
@@ -20166,7 +20995,7 @@
           "nativeName": "create",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 428,
+            "line": 437,
             "symbol": "create"
           },
           "documentation": "Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in lifecycle state through its `status` property, which updates as the authentication flow progresses. Once the sign-in process is complete, call the `signIn.finalize()` method to set the newly created session as the active session.\n\nWhat you must pass to `params` depends on which [sign-in options](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options) you have enabled in your app's settings in the Clerk Dashboard.\n\nYou can complete the sign-in process in one step if you supply the required fields to `create()`. Otherwise, Clerk's sign-in process provides great flexibility and allows users to easily create multi-step sign-in flows.\n\n> [!IMPORTANT]\n> The `signIn.create()` method is intended for advanced use cases. For most use cases, prefer the use of the factor-specific methods such as `signIn.password()`, `signIn.emailCode.sendCode()`, etc.",
@@ -20191,7 +21020,7 @@
           "nativeName": "password",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 433,
+            "line": 442,
             "symbol": "password"
           },
           "documentation": "Submits a password to sign-in.",
@@ -20212,14 +21041,43 @@
           "asynchronous": true
         },
         {
+          "name": "biometricCredential",
+          "nativeName": "biometricCredential",
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 543,
+            "symbol": "biometricCredential"
+          },
+          "documentation": "Authenticate with a locally enrolled, device-held biometric key.",
+          "parameters": [
+            {
+              "name": "params",
+              "optional": true,
+              "type": {
+                "kind": "optional",
+                "nullable": false,
+                "omittable": true,
+                "value": {
+                  "kind": "ref",
+                  "name": "SignInBiometricCredentialParams"
+                }
+              }
+            }
+          ],
+          "result": {
+            "kind": "errorResult"
+          },
+          "errorResult": true,
+          "asynchronous": true
+        },
+        {
           "name": "sso",
           "nativeName": "sso",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 533,
+            "line": 545,
             "symbol": "sso"
           },
-          "documentation": "Performs an SSO-based sign-in (Social/OAuth or Enterprise).",
           "parameters": [
             {
               "name": "params",
@@ -20241,7 +21099,7 @@
           "nativeName": "ticket",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 571,
+            "line": 583,
             "symbol": "ticket"
           },
           "documentation": "Performs a ticket-based sign-in.",
@@ -20271,7 +21129,7 @@
           "nativeName": "passkey",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 581,
+            "line": 593,
             "symbol": "passkey"
           },
           "documentation": "Initiates a passkey-based authentication flow, enabling users to authenticate using a previously registered passkey. When called without parameters, this method requires a prior call to `SignIn.create({ strategy: 'passkey' })` to initialize the sign-in context. This pattern is particularly useful in scenarios where the authentication strategy needs to be determined dynamically at runtime.",
@@ -20301,7 +21159,7 @@
           "nativeName": "submitProtectCheck",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 586,
+            "line": 598,
             "symbol": "submitProtectCheck"
           },
           "documentation": "Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.",
@@ -20326,7 +21184,7 @@
           "nativeName": "finalize",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 591,
+            "line": 603,
             "symbol": "finalize"
           },
           "documentation": "Converts a sign-in with `status === 'complete'` into an active session. Will cause anything observing the session state (such as the [`useUser()`](https://clerk.com/docs/reference/hooks/use-user) hook) to update automatically.",
@@ -20342,7 +21200,7 @@
           "nativeName": "reset",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 598,
+            "line": 610,
             "symbol": "reset"
           },
           "documentation": "Resets the current sign-in attempt by clearing all local state back to null. This is useful when you want to allow users to go back to the beginning of the sign-in flow (e.g., to change their identifier during verification).\n\nUnlike other methods, `reset()` does not trigger the `fetchStatus` to change to `'fetching'` and does not make any API calls - it only clears local state.",
@@ -20781,7 +21639,7 @@
       "name": "SignInExistingSession",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 367,
+        "line": 376,
         "symbol": "__type"
       },
       "kind": "object",
@@ -20794,7 +21652,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 371,
+            "line": 380,
             "symbol": "sessionId"
           },
           "documentation": "The ID of the existing session."
@@ -20971,7 +21829,7 @@
       "name": "SignInCreateParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 11,
+        "line": 12,
         "symbol": "SignInFutureCreateParams"
       },
       "kind": "object",
@@ -20989,7 +21847,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 15,
+            "line": 16,
             "symbol": "identifier"
           },
           "documentation": "The authentication identifier for the sign-in. This can be the value of the user's email address, phone number, username, or Web3 wallet address."
@@ -21007,7 +21865,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 19,
+            "line": 20,
             "symbol": "password"
           },
           "documentation": "The user's password. Only supported if [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled."
@@ -21026,10 +21884,28 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 23,
+            "line": 24,
             "symbol": "strategy"
           },
           "documentation": "The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each authentication identifier supports different verification strategies."
+        },
+        {
+          "name": "trustedDeviceId",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/signInFuture.ts",
+            "line": 32,
+            "symbol": "trustedDeviceId"
+          },
+          "documentation": "Device-bound credential identifier for the trusted-device strategy."
         },
         {
           "name": "token",
@@ -21044,7 +21920,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 25,
+            "line": 34,
             "symbol": "token"
           },
           "documentation": "Provider identity token for token-based strategies."
@@ -21062,7 +21938,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 29,
+            "line": 38,
             "symbol": "redirectUrl"
           },
           "documentation": "The full URL or path that the OAuth provider should redirect to after successful authorization on their part."
@@ -21080,7 +21956,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 33,
+            "line": 42,
             "symbol": "actionCompleteRedirectUrl"
           },
           "documentation": "The URL that the user will be redirected to, after successful authorization from the OAuth provider and Clerk sign-in."
@@ -21098,7 +21974,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 37,
+            "line": 46,
             "symbol": "transfer"
           },
           "documentation": "When set to `true`, the `SignIn` will attempt to retrieve information from the active `SignUp` instance and use it to complete the sign-in process. This is useful when you want to seamlessly transition a user from a sign-up attempt to a sign-in attempt."
@@ -21116,7 +21992,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 41,
+            "line": 50,
             "symbol": "ticket"
           },
           "documentation": "**Required** if `strategy` is set to `'ticket'`. The [ticket _or token_](https://clerk.com/docs/guides/development/custom-flows/authentication/application-invitations) generated from the Backend API."
@@ -21134,7 +22010,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 45,
+            "line": 54,
             "symbol": "signUpIfMissing"
           },
           "documentation": "When set to `true`, if a user does not exist, the sign-up will prepare a transfer to sign up a new account. If bot sign-up protection is enabled, captcha will also be required on sign in."
@@ -21180,7 +22056,8 @@
         "oauth_x",
         "oauth_enstall",
         "oauth_huggingface",
-        "oauth_vercel"
+        "oauth_vercel",
+        "trusted_device"
       ],
       "open": false,
       "patterns": [
@@ -21191,7 +22068,7 @@
       "name": "SignInPasswordParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 49,
+        "line": 58,
         "symbol": "SignInFuturePasswordParams"
       },
       "documentation": "Parameters for submitting a password to sign-in.",
@@ -21229,7 +22106,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 54,
+            "line": 63,
             "symbol": "password"
           },
           "documentation": "The user's password. Only supported if\n[password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled."
@@ -21242,7 +22119,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 60,
+            "line": 69,
             "symbol": "identifier"
           },
           "documentation": "The authentication identifier for the sign-in (email address, phone number, username, or Web3 wallet address). Provide exactly one of `identifier`, `emailAddress`, or `phoneNumber`. Omit all when a sign-in already exists to use the current identifier."
@@ -21255,7 +22132,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 61,
+            "line": 70,
             "symbol": "emailAddress"
           }
         },
@@ -21267,7 +22144,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 62,
+            "line": 71,
             "symbol": "phoneNumber"
           }
         }
@@ -21286,7 +22163,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 54,
+            "line": 63,
             "symbol": "password"
           },
           "documentation": "The user's password. Only supported if\n[password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled."
@@ -21299,7 +22176,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 68,
+            "line": 77,
             "symbol": "emailAddress"
           },
           "documentation": "The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Provide exactly one of `identifier`, `emailAddress`, or `phoneNumber`."
@@ -21312,7 +22189,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 69,
+            "line": 78,
             "symbol": "identifier"
           }
         },
@@ -21324,7 +22201,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 70,
+            "line": 79,
             "symbol": "phoneNumber"
           }
         }
@@ -21343,7 +22220,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 54,
+            "line": 63,
             "symbol": "password"
           },
           "documentation": "The user's password. Only supported if\n[password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled."
@@ -21356,7 +22233,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 76,
+            "line": 85,
             "symbol": "phoneNumber"
           },
           "documentation": "The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Provide exactly one of `identifier`, `emailAddress`, or `phoneNumber`."
@@ -21369,7 +22246,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 77,
+            "line": 86,
             "symbol": "identifier"
           }
         },
@@ -21381,7 +22258,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 78,
+            "line": 87,
             "symbol": "emailAddress"
           }
         }
@@ -21400,7 +22277,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 54,
+            "line": 63,
             "symbol": "password"
           },
           "documentation": "The user's password. Only supported if\n[password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled."
@@ -21413,7 +22290,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 81,
+            "line": 90,
             "symbol": "phoneNumber"
           }
         },
@@ -21425,7 +22302,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 82,
+            "line": 91,
             "symbol": "identifier"
           }
         },
@@ -21437,7 +22314,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 83,
+            "line": 92,
             "symbol": "emailAddress"
           }
         }
@@ -21448,7 +22325,7 @@
       "name": "SignInEmailCode",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 436,
+        "line": 445,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -21459,7 +22336,7 @@
           "nativeName": "sendCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 440,
+            "line": 449,
             "symbol": "sendCode"
           },
           "documentation": "Sends an email code to sign-in.",
@@ -21489,7 +22366,7 @@
           "nativeName": "verifyCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 445,
+            "line": 454,
             "symbol": "verifyCode"
           },
           "documentation": "Verifies a code sent with the [`emailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#email-code-send-code) method.",
@@ -21515,7 +22392,7 @@
       "name": "SignInEmailCodeSendParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 88,
+        "line": 97,
         "symbol": "SignInFutureEmailCodeSendParams"
       },
       "documentation": "Parameters for sending a sign-in email verification code.",
@@ -21537,7 +22414,7 @@
       "name": "SignInEmailCodeSendCodeParamsCase1",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 89,
+        "line": 98,
         "symbol": "__type"
       },
       "kind": "object",
@@ -21555,7 +22432,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 94,
+            "line": 103,
             "symbol": "emailAddress"
           },
           "documentation": "The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email)\nis enabled. Provide either `emailAddress` or `emailAddressId`, not both. Omit both when a sign-in already exists."
@@ -21568,7 +22445,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 95,
+            "line": 104,
             "symbol": "emailAddressId"
           }
         }
@@ -21579,7 +22456,7 @@
       "name": "SignInEmailCodeSendCodeParamsCase2",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 97,
+        "line": 106,
         "symbol": "__type"
       },
       "kind": "object",
@@ -21597,7 +22474,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 101,
+            "line": 110,
             "symbol": "emailAddressId"
           },
           "documentation": "The ID for the user's email address that will receive an email with the one-time authentication code. Provide either `emailAddress` or `emailAddressId`, not both. Omit both when a sign-in already exists."
@@ -21610,7 +22487,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 102,
+            "line": 111,
             "symbol": "emailAddress"
           }
         }
@@ -21621,7 +22498,7 @@
       "name": "SignInEmailCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 129,
+        "line": 138,
         "symbol": "SignInFutureEmailCodeVerifyParams"
       },
       "kind": "object",
@@ -21634,7 +22511,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 133,
+            "line": 142,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
@@ -21646,7 +22523,7 @@
       "name": "SignInEmailLink",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 449,
+        "line": 458,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -21665,7 +22542,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 463,
+            "line": 472,
             "symbol": "verification"
           },
           "documentation": "The verification status of the email link. This property is populated by reading query parameters from the URL after the user visits the email link. Returns `null` if no verification status is available."
@@ -21677,7 +22554,7 @@
           "nativeName": "sendLink",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 453,
+            "line": 462,
             "symbol": "sendLink"
           },
           "documentation": "Sends an email link to sign in with.",
@@ -21702,7 +22579,7 @@
           "nativeName": "waitForVerification",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 458,
+            "line": 467,
             "symbol": "waitForVerification"
           },
           "documentation": "Waits for email link verification to complete or expire.",
@@ -21719,7 +22596,7 @@
       "name": "SignInEmailLinkSendParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 106,
+        "line": 115,
         "symbol": "SignInFutureEmailLinkSendParams"
       },
       "documentation": "Parameters for sending a sign-in email link.",
@@ -21754,7 +22631,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 116,
+            "line": 125,
             "symbol": "emailAddress"
           },
           "documentation": "The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled. Provide either `emailAddress` or `emailAddressId`, not both. Omit both when a sign-in already exists."
@@ -21767,7 +22644,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 117,
+            "line": 126,
             "symbol": "emailAddressId"
           }
         }
@@ -21791,7 +22668,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 123,
+            "line": 132,
             "symbol": "emailAddressId"
           },
           "documentation": "The ID for the user's email address that will receive an email with the email link. Provide either `emailAddress` or `emailAddressId`, not both. Omit both when a sign-in already exists."
@@ -21804,7 +22681,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 124,
+            "line": 133,
             "symbol": "emailAddress"
           }
         }
@@ -21815,7 +22692,7 @@
       "name": "SignInEmailLinkVerification",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 463,
+        "line": 472,
         "symbol": "__type"
       },
       "kind": "object",
@@ -21829,7 +22706,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 467,
+            "line": 476,
             "symbol": "status"
           },
           "documentation": "The verification status."
@@ -21842,7 +22719,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 472,
+            "line": 481,
             "symbol": "createdSessionId"
           },
           "documentation": "The ID of the session that was created upon completion of the current sign-in."
@@ -21855,7 +22732,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 477,
+            "line": 486,
             "symbol": "verifiedFromTheSameClient"
           },
           "documentation": "Whether the verification was from the same client."
@@ -21881,7 +22758,7 @@
       "name": "SignInPhoneCode",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 482,
+        "line": 491,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -21892,7 +22769,7 @@
           "nativeName": "sendCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 486,
+            "line": 495,
             "symbol": "sendCode"
           },
           "documentation": "Sends a phone code to sign in with.",
@@ -21922,7 +22799,7 @@
           "nativeName": "verifyCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 491,
+            "line": 500,
             "symbol": "verifyCode"
           },
           "documentation": "Verifies a code sent with the [`phoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phone-code-send-code) method.",
@@ -21948,7 +22825,7 @@
       "name": "SignInPhoneCodeSendParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 166,
+        "line": 175,
         "symbol": "SignInFuturePhoneCodeSendParams"
       },
       "kind": "union",
@@ -21983,7 +22860,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 170,
+            "line": 179,
             "symbol": "channel"
           },
           "documentation": "The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`."
@@ -22001,7 +22878,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 176,
+            "line": 185,
             "symbol": "phoneNumber"
           },
           "documentation": "The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if [phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled. Provide either `phoneNumber` or `phoneNumberId`, not both. Omit both when a sign-in already exists."
@@ -22014,7 +22891,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 177,
+            "line": 186,
             "symbol": "phoneNumberId"
           }
         }
@@ -22039,7 +22916,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 170,
+            "line": 179,
             "symbol": "channel"
           },
           "documentation": "The mechanism to use to send the code to the provided phone number. Defaults to `'sms'`."
@@ -22052,7 +22929,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 183,
+            "line": 192,
             "symbol": "phoneNumberId"
           },
           "documentation": "The ID for the user's phone number that will receive a message with the one-time authentication code. Provide either `phoneNumber` or `phoneNumberId`, not both. Omit both when a sign-in already exists."
@@ -22065,7 +22942,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 184,
+            "line": 193,
             "symbol": "phoneNumber"
           }
         }
@@ -22076,7 +22953,7 @@
       "name": "SignInPhoneCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 189,
+        "line": 198,
         "symbol": "SignInFuturePhoneCodeVerifyParams"
       },
       "kind": "object",
@@ -22089,7 +22966,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 193,
+            "line": 202,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
@@ -22101,7 +22978,7 @@
       "name": "SignInResetPasswordEmailCode",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 495,
+        "line": 504,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -22112,7 +22989,7 @@
           "nativeName": "sendCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 499,
+            "line": 508,
             "symbol": "sendCode"
           },
           "documentation": "Sends a password reset code to the first email address on the account.",
@@ -22128,7 +23005,7 @@
           "nativeName": "verifyCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 504,
+            "line": 513,
             "symbol": "verifyCode"
           },
           "documentation": "Verifies a password reset code sent with the [`resetPasswordEmailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-submit-password) method to complete the password reset flow.",
@@ -22153,7 +23030,7 @@
           "nativeName": "submitPassword",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 509,
+            "line": 518,
             "symbol": "submitPassword"
           },
           "documentation": "Submits a new password and moves the sign-in status to `'complete'`.",
@@ -22179,7 +23056,7 @@
       "name": "SignInResetPasswordSubmitParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 145,
+        "line": 154,
         "symbol": "SignInFutureResetPasswordSubmitParams"
       },
       "kind": "object",
@@ -22192,7 +23069,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 149,
+            "line": 158,
             "symbol": "password"
           },
           "documentation": "The new password for the user."
@@ -22210,7 +23087,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 153,
+            "line": 162,
             "symbol": "signOutOfOtherSessions"
           },
           "documentation": "If `true`, signs the user out of all other authenticated sessions."
@@ -22222,7 +23099,7 @@
       "name": "SignInResetPasswordPhoneCode",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 513,
+        "line": 522,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -22233,7 +23110,7 @@
           "nativeName": "sendCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 517,
+            "line": 526,
             "symbol": "sendCode"
           },
           "documentation": "Sends a password reset code to the first phone number on the account.",
@@ -22263,7 +23140,7 @@
           "nativeName": "verifyCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 522,
+            "line": 531,
             "symbol": "verifyCode"
           },
           "documentation": "Verifies a password reset code sent with the [`resetPasswordPhoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-submit-password) method to complete the password reset flow.",
@@ -22288,7 +23165,7 @@
           "nativeName": "submitPassword",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 527,
+            "line": 536,
             "symbol": "submitPassword"
           },
           "documentation": "Submits a new password and moves the sign-in status to `'complete'`.",
@@ -22314,7 +23191,7 @@
       "name": "SignInResetPasswordPhoneCodeSendParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 157,
+        "line": 166,
         "symbol": "SignInFutureResetPasswordPhoneCodeSendParams"
       },
       "kind": "object",
@@ -22332,7 +23209,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 162,
+            "line": 171,
             "symbol": "phoneNumber"
           },
           "documentation": "The user's phone number in [E.164 format](https://en.wikipedia.org/wiki/E.164). Only supported if\n[phone number](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#phone) is enabled."
@@ -22344,7 +23221,7 @@
       "name": "SignInResetPasswordPhoneCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 197,
+        "line": 206,
         "symbol": "SignInFutureResetPasswordPhoneCodeVerifyParams"
       },
       "kind": "object",
@@ -22357,10 +23234,90 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 201,
+            "line": 210,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
+        }
+      ],
+      "methods": []
+    },
+    "SignInBiometricCredentialParams": {
+      "name": "SignInBiometricCredentialParams",
+      "source": {
+        "file": "packages/shared/src/types/biometricCredential.ts",
+        "line": 29,
+        "symbol": "SignInFutureBiometricCredentialParams"
+      },
+      "kind": "object",
+      "properties": [
+        {
+          "name": "id",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 30,
+            "symbol": "id"
+          }
+        },
+        {
+          "name": "identifierHint",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 31,
+            "symbol": "identifierHint"
+          }
+        },
+        {
+          "name": "reason",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 32,
+            "symbol": "reason"
+          }
+        },
+        {
+          "name": "promptSubtitle",
+          "optional": true,
+          "type": {
+            "kind": "optional",
+            "nullable": false,
+            "omittable": true,
+            "value": {
+              "kind": "string"
+            }
+          },
+          "source": {
+            "file": "packages/shared/src/types/biometricCredential.ts",
+            "line": 33,
+            "symbol": "promptSubtitle"
+          }
         }
       ],
       "methods": []
@@ -22369,7 +23326,7 @@
       "name": "SignInSSOParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 205,
+        "line": 214,
         "symbol": "SignInFutureSSOParams"
       },
       "kind": "object",
@@ -22383,7 +23340,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 209,
+            "line": 218,
             "symbol": "strategy"
           },
           "documentation": "The strategy to use for authentication."
@@ -22401,7 +23358,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 235,
+            "line": 244,
             "symbol": "oidcPrompt"
           },
           "documentation": "The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL."
@@ -22419,7 +23376,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 240,
+            "line": 249,
             "symbol": "enterpriseConnectionId"
           },
           "documentation": "The identifier of the enterprise connection to target when using the `enterprise_sso` strategy."
@@ -22437,7 +23394,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 244,
+            "line": 253,
             "symbol": "identifier"
           },
           "documentation": "The unique identifier of the user. Only supported with the `enterprise_sso` strategy."
@@ -22492,7 +23449,7 @@
       "name": "SignInMfa",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 536,
+        "line": 548,
         "symbol": "__type"
       },
       "kind": "resource",
@@ -22503,7 +23460,7 @@
           "nativeName": "sendPhoneCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 540,
+            "line": 552,
             "symbol": "sendPhoneCode"
           },
           "documentation": "Sends a phone code to sign in with as a second factor.",
@@ -22519,7 +23476,7 @@
           "nativeName": "verifyPhoneCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 545,
+            "line": 557,
             "symbol": "verifyPhoneCode"
           },
           "documentation": "Verifies a phone code sent with the [`mfa.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-phone-code) method.",
@@ -22544,7 +23501,7 @@
           "nativeName": "sendEmailCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 550,
+            "line": 562,
             "symbol": "sendEmailCode"
           },
           "documentation": "Sends an email code to sign in with as a second factor.",
@@ -22560,7 +23517,7 @@
           "nativeName": "verifyEmailCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 555,
+            "line": 567,
             "symbol": "verifyEmailCode"
           },
           "documentation": "Verifies an email code sent with the [`mfa.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-email-code) method.",
@@ -22585,7 +23542,7 @@
           "nativeName": "verifyTOTP",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 560,
+            "line": 572,
             "symbol": "verifyTOTP"
           },
           "documentation": "Verifies an authenticator app (TOTP) code to sign in with as a second factor.",
@@ -22610,7 +23567,7 @@
           "nativeName": "verifyBackupCode",
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 565,
+            "line": 577,
             "symbol": "verifyBackupCode"
           },
           "documentation": "Verifies a backup code to sign in with as a second factor.",
@@ -22636,7 +23593,7 @@
       "name": "SignInMFAPhoneCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 248,
+        "line": 257,
         "symbol": "SignInFutureMFAPhoneCodeVerifyParams"
       },
       "kind": "object",
@@ -22649,7 +23606,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 252,
+            "line": 261,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
@@ -22661,7 +23618,7 @@
       "name": "SignInMFAEmailCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 256,
+        "line": 265,
         "symbol": "SignInFutureMFAEmailCodeVerifyParams"
       },
       "kind": "object",
@@ -22674,7 +23631,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 260,
+            "line": 269,
             "symbol": "code"
           },
           "documentation": "The one-time code that was sent to the user."
@@ -22686,7 +23643,7 @@
       "name": "SignInTOTPVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 264,
+        "line": 273,
         "symbol": "SignInFutureTOTPVerifyParams"
       },
       "kind": "object",
@@ -22699,7 +23656,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 268,
+            "line": 277,
             "symbol": "code"
           },
           "documentation": "The TOTP generated by the user's authenticator app."
@@ -22711,7 +23668,7 @@
       "name": "SignInBackupCodeVerifyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 272,
+        "line": 281,
         "symbol": "SignInFutureBackupCodeVerifyParams"
       },
       "kind": "object",
@@ -22724,7 +23681,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 276,
+            "line": 285,
             "symbol": "code"
           },
           "documentation": "The backup code that was provided to the user when they set up backup codes."
@@ -22736,7 +23693,7 @@
       "name": "SignInTicketParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 280,
+        "line": 289,
         "symbol": "SignInFutureTicketParams"
       },
       "kind": "object",
@@ -22749,7 +23706,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 284,
+            "line": 293,
             "symbol": "ticket"
           },
           "documentation": "The [ticket _or token_](https://clerk.com/docs/guides/development/custom-flows/authentication/application-invitations) generated from the Backend API."
@@ -22761,7 +23718,7 @@
       "name": "SignInPasskeyParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 304,
+        "line": 313,
         "symbol": "SignInFuturePasskeyParams"
       },
       "kind": "object",
@@ -22780,7 +23737,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 313,
+            "line": 322,
             "symbol": "flow"
           },
           "documentation": "The flow to use for the passkey sign-in.\n\n<ul>\n <li>`'autofill'`: The client prompts your users to select a passkey before they interact with your app.</li>\n <li>`'discoverable'`: The client requires the user to interact with the client.</li>\n</ul>"
@@ -22798,7 +23755,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 315,
+            "line": 324,
             "symbol": "preferImmediatelyAvailableCredentials"
           },
           "documentation": "Ask native credential presentation to avoid a cross-device prompt when no local credential is available."
@@ -22822,7 +23779,7 @@
       "name": "SignInSubmitProtectCheckParams",
       "source": {
         "file": "packages/shared/src/types/signInFuture.ts",
-        "line": 137,
+        "line": 146,
         "symbol": "SignInFutureSubmitProtectCheckParams"
       },
       "kind": "object",
@@ -22835,7 +23792,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 141,
+            "line": 150,
             "symbol": "proofToken"
           },
           "documentation": "The proof token produced by the Protect challenge SDK."
@@ -22847,7 +23804,7 @@
       "name": "MobileAuthCallbackResultCase2",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 48,
+        "line": 53,
         "symbol": "__type"
       },
       "kind": "object",
@@ -22861,7 +23818,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 48,
+            "line": 53,
             "symbol": "kind"
           }
         },
@@ -22874,7 +23831,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 48,
+            "line": 53,
             "symbol": "signUp"
           }
         }
@@ -25682,7 +26639,7 @@
       "name": "MobileSSOParams",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 40,
+        "line": 45,
         "symbol": "MobileSSOParams"
       },
       "kind": "object",
@@ -25696,7 +26653,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 209,
+            "line": 218,
             "symbol": "strategy"
           },
           "documentation": "The strategy to use for authentication."
@@ -25714,7 +26671,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 244,
+            "line": 253,
             "symbol": "identifier"
           },
           "documentation": "The unique identifier of the user. Only supported with the `enterprise_sso` strategy."
@@ -25732,7 +26689,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 240,
+            "line": 249,
             "symbol": "enterpriseConnectionId"
           },
           "documentation": "The identifier of the enterprise connection to target when using the `enterprise_sso` strategy."
@@ -25750,7 +26707,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/signInFuture.ts",
-            "line": 235,
+            "line": 244,
             "symbol": "oidcPrompt"
           },
           "documentation": "The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL."
@@ -25854,7 +26811,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 42,
+            "line": 47,
             "symbol": "start"
           }
         },
@@ -25866,7 +26823,7 @@
           },
           "source": {
             "file": "packages/shared/src/types/mobile.ts",
-            "line": 43,
+            "line": 48,
             "symbol": "transferable"
           }
         }
@@ -25890,7 +26847,7 @@
       "name": "MobileSetActiveParams",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 10,
+        "line": 11,
         "symbol": "MobileSetActiveParams"
       },
       "kind": "object",
@@ -27117,7 +28074,7 @@
       "name": "MobileSignOutOptions",
       "source": {
         "file": "packages/shared/src/types/mobile.ts",
-        "line": 11,
+        "line": 12,
         "symbol": "MobileSignOutOptions"
       },
       "kind": "object",
@@ -31720,6 +32677,150 @@
       "reason": "Normalize unloaded undefined to null."
     },
     {
+      "path": "MobileClerk.clientId",
+      "disposition": "generated"
+    },
+    {
+      "path": "MobileClerk.biometricCredentials",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.canEnroll",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.list",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.object",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.platform",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.appIdentifier",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.name",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.algorithm",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.status",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.createdAt",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.updatedAt",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.lastUsedAt",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredential.revokedAt",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.availability",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialSelectionParams.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialSelectionParams.identifierHint",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialSelectionParams.currentUser",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialAvailability.isAvailable",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialAvailability.unavailableReason",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.localAvailability",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.validateLocalCredential",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialValidationResult.status",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialValidationResult.reason",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.enroll",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialEnrollmentParams.name",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialEnrollmentParams.identifierHint",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialEnrollmentParams.reason",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialEnrollmentParams.promptSubtitle",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialEnrollmentParams.policy",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.revoke",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsRevokeParams.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.revokeCurrentDeviceCredential",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsResource.forgetLocalCredentials",
+      "disposition": "generated"
+    },
+    {
+      "path": "BiometricCredentialsForgetLocalCredentialsParams.userId",
+      "disposition": "generated"
+    },
+    {
       "path": "MobileClerk.authCallback",
       "disposition": "generated"
     },
@@ -31914,6 +33015,10 @@
     },
     {
       "path": "SignInFutureCreateParams.strategy",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInFutureCreateParams.trustedDeviceId",
       "disposition": "generated"
     },
     {
@@ -32180,6 +33285,26 @@
     },
     {
       "path": "SignInResetPasswordPhoneCode.submitPassword",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInFutureResource.biometricCredential",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInFutureBiometricCredentialParams.id",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInFutureBiometricCredentialParams.identifierHint",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInFutureBiometricCredentialParams.reason",
+      "disposition": "generated"
+    },
+    {
+      "path": "SignInFutureBiometricCredentialParams.promptSubtitle",
       "disposition": "generated"
     },
     {

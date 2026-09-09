@@ -38,6 +38,7 @@ import type {
   SignInCreateParams,
   SignInFirstFactor,
   SignInFutureBackupCodeVerifyParams,
+  SignInFutureBiometricCredentialParams,
   SignInFutureCreateParams,
   SignInFutureEmailCodeSendParams,
   SignInFutureEmailCodeVerifyParams,
@@ -1051,6 +1052,25 @@ class SignInFuture implements SignInFutureResource {
   async create(params: SignInFutureCreateParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       await this._create(params);
+    });
+  }
+
+  async biometricCredential(params: SignInFutureBiometricCredentialParams = {}): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      await SignIn.clerk.__internal_nativeBiometrics.authenticate(
+        params,
+        async id => {
+          await this._create({ strategy: 'trusted_device', trustedDeviceId: id });
+          const verification = this.#resource.firstFactorVerification;
+          return verification instanceof Verification ? verification.__internal_trustedDeviceChallenge : null;
+        },
+        async (id, signature) => {
+          await this.#resource.__internal_basePost({
+            action: 'attempt_first_factor',
+            body: { strategy: 'trusted_device', trustedDeviceId: id, ...signature },
+          });
+        },
+      );
     });
   }
 

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.*
 
-public data class ClerkState(public val `status`: ClerkStatus, public val `telemetry`: TelemetryCollector? = null, public val `loaded`: Boolean, public val `sessions`: List<Session>, public val `lastAuthenticationStrategy`: LastAuthenticationStrategy?, public val `environment`: EnvironmentResource, public val `session`: Session?, public val `user`: User?, public val `organization`: Organization?, public val `authCallback`: MobileAuthCallback?, public val `signIn`: SignIn, public val `signUp`: SignUp) {
+public data class ClerkState(public val `status`: ClerkStatus, public val `telemetry`: TelemetryCollector? = null, public val `loaded`: Boolean, public val `sessions`: List<Session>, public val `lastAuthenticationStrategy`: LastAuthenticationStrategy?, public val `environment`: EnvironmentResource, public val `session`: Session?, public val `user`: User?, public val `organization`: Organization?, public val `clientId`: String?, public val `biometricCredentials`: BiometricCredentials, public val `authCallback`: MobileAuthCallback?, public val `signIn`: SignIn, public val `signUp`: SignUp) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("status", this@ClerkState.`status`.toJson())
     putPresent("telemetry", this@ClerkState.`telemetry`?.let { value -> value.toJson() } ?: Undefined)
@@ -21,6 +21,8 @@ public data class ClerkState(public val `status`: ClerkStatus, public val `telem
     putPresent("session", this@ClerkState.`session`?.let { value -> value.toJson() } ?: JsonNull)
     putPresent("user", this@ClerkState.`user`?.let { value -> value.toJson() } ?: JsonNull)
     putPresent("organization", this@ClerkState.`organization`?.let { value -> value.toJson() } ?: JsonNull)
+    putPresent("clientId", this@ClerkState.`clientId`?.let { value -> JsonPrimitive(value) } ?: JsonNull)
+    putPresent("biometricCredentials", this@ClerkState.`biometricCredentials`.toJson())
     putPresent("authCallback", this@ClerkState.`authCallback`?.let { value -> value.toJson() } ?: JsonNull)
     putPresent("signIn", this@ClerkState.`signIn`.toJson())
     putPresent("signUp", this@ClerkState.`signUp`.toJson())
@@ -29,7 +31,7 @@ public data class ClerkState(public val `status`: ClerkStatus, public val `telem
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): ClerkState {
       val values = value.jsonObject
 
-      return ClerkState(`status` = ClerkStatus.fromJson((values["status"] ?: Undefined), runtime), `telemetry` = (values["telemetry"] ?: Undefined).decodeOptional { value -> TelemetryCollector.fromJson(value, runtime) }, `loaded` = (values["loaded"] ?: Undefined).requireBoolean(), `sessions` = (values["sessions"] ?: Undefined).jsonArray.map { value -> Session.fromJson(value, runtime) }, `lastAuthenticationStrategy` = (values["lastAuthenticationStrategy"] ?: Undefined).decodeOptional { value -> LastAuthenticationStrategy.fromJson(value, runtime) }, `environment` = EnvironmentResource.fromJson((values["environment"] ?: Undefined), runtime), `session` = (values["session"] ?: Undefined).decodeOptional { value -> Session.fromJson(value, runtime) }, `user` = (values["user"] ?: Undefined).decodeOptional { value -> User.fromJson(value, runtime) }, `organization` = (values["organization"] ?: Undefined).decodeOptional { value -> Organization.fromJson(value, runtime) }, `authCallback` = (values["authCallback"] ?: Undefined).decodeOptional { value -> MobileAuthCallback.fromJson(value, runtime) }, `signIn` = SignIn.fromJson((values["signIn"] ?: Undefined), runtime), `signUp` = SignUp.fromJson((values["signUp"] ?: Undefined), runtime))
+      return ClerkState(`status` = ClerkStatus.fromJson((values["status"] ?: Undefined), runtime), `telemetry` = (values["telemetry"] ?: Undefined).decodeOptional { value -> TelemetryCollector.fromJson(value, runtime) }, `loaded` = (values["loaded"] ?: Undefined).requireBoolean(), `sessions` = (values["sessions"] ?: Undefined).jsonArray.map { value -> Session.fromJson(value, runtime) }, `lastAuthenticationStrategy` = (values["lastAuthenticationStrategy"] ?: Undefined).decodeOptional { value -> LastAuthenticationStrategy.fromJson(value, runtime) }, `environment` = EnvironmentResource.fromJson((values["environment"] ?: Undefined), runtime), `session` = (values["session"] ?: Undefined).decodeOptional { value -> Session.fromJson(value, runtime) }, `user` = (values["user"] ?: Undefined).decodeOptional { value -> User.fromJson(value, runtime) }, `organization` = (values["organization"] ?: Undefined).decodeOptional { value -> Organization.fromJson(value, runtime) }, `clientId` = (values["clientId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `biometricCredentials` = BiometricCredentials.fromJson((values["biometricCredentials"] ?: Undefined), runtime), `authCallback` = (values["authCallback"] ?: Undefined).decodeOptional { value -> MobileAuthCallback.fromJson(value, runtime) }, `signIn` = SignIn.fromJson((values["signIn"] ?: Undefined), runtime), `signUp` = SignUp.fromJson((values["signUp"] ?: Undefined), runtime))
     }
   }
 }
@@ -47,6 +49,8 @@ public class Clerk(override val handle: ResourceHandle, runtime: CoreRuntime) : 
   public val `session`: Session? get() = state.`session`
   public val `user`: User? get() = state.`user`
   public val `organization`: Organization? get() = state.`organization`
+  public val `clientId`: String? get() = state.`clientId`
+  public val `biometricCredentials`: BiometricCredentials get() = state.`biometricCredentials`
   public val `authCallback`: MobileAuthCallback? get() = state.`authCallback`
   public val `signIn`: SignIn get() = state.`signIn`
   public val `signUp`: SignUp get() = state.`signUp`
@@ -6480,6 +6484,317 @@ public sealed interface ProtectLoaderAttributesValue {
   }
 }
 
+/**
+ * Native biometric credentials, backed by device-held keys and the Clerk core.
+ */
+public data class BiometricCredentialsState(public val `canEnroll`: Boolean) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("canEnroll", JsonPrimitive(this@BiometricCredentialsState.`canEnroll`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialsState {
+      val values = value.jsonObject
+
+      return BiometricCredentialsState(`canEnroll` = (values["canEnroll"] ?: Undefined).requireBoolean())
+    }
+  }
+}
+public class BiometricCredentials(override val handle: ResourceHandle, runtime: CoreRuntime) : CoreResource {
+  override val context: ResourceContext = ResourceContext(runtime, handle, false)
+  public val state: BiometricCredentialsState get() = context.state(handle)
+  public val changes: Flow<BiometricCredentialsState> = runtime.changes.map { state }
+  override val isInvalidated: Boolean get() = context.isInvalidated(handle)
+  public val `canEnroll`: Boolean get() = state.`canEnroll`
+  override fun prepare(value: JsonElement): Any = BiometricCredentialsState.fromJson(value, context.requireRuntime())
+  public fun toJson(): JsonElement = buildJsonObject { put("\$ref", handle.toJson()) }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentials = runtime.resource(ResourceHandle.fromReference(value)) as BiometricCredentials
+  }
+  public suspend fun `list`(): List<BiometricCredential> {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "BiometricCredentials.list", listOf()) { result ->
+      result.jsonArray.map { value -> BiometricCredential.fromJson(value, runtime) }
+    }
+  }
+  public suspend fun `availability`(`params`: BiometricCredentialSelectionParams? = null): BiometricCredentialAvailability {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "BiometricCredentials.availability", listOf(`params`?.let { value -> value.toJson() } ?: Undefined)) { result ->
+      BiometricCredentialAvailability.fromJson(result, runtime)
+    }
+  }
+  public suspend fun `localAvailability`(`params`: BiometricCredentialSelectionParams? = null): BiometricCredentialAvailability {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "BiometricCredentials.localAvailability", listOf(`params`?.let { value -> value.toJson() } ?: Undefined)) { result ->
+      BiometricCredentialAvailability.fromJson(result, runtime)
+    }
+  }
+  public suspend fun `validateLocalCredential`(`params`: BiometricCredentialSelectionParams? = null): BiometricCredentialValidationResult {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "BiometricCredentials.validateLocalCredential", listOf(`params`?.let { value -> value.toJson() } ?: Undefined)) { result ->
+      BiometricCredentialValidationResult.fromJson(result, runtime)
+    }
+  }
+  public suspend fun `enroll`(`params`: BiometricCredentialEnrollmentParams? = null): BiometricCredential {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "BiometricCredentials.enroll", listOf(`params`?.let { value -> value.toJson() } ?: Undefined)) { result ->
+      BiometricCredential.fromJson(result, runtime)
+    }
+  }
+  public suspend fun `revoke`(`params`: BiometricCredentialsRevokeParams): BiometricCredential {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "BiometricCredentials.revoke", listOf(`params`.toJson())) { result ->
+      BiometricCredential.fromJson(result, runtime)
+    }
+  }
+  public suspend fun `revokeCurrentDeviceCredential`(): BiometricCredential? {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "BiometricCredentials.revokeCurrentDeviceCredential", listOf()) { result ->
+      result.decodeOptional { value -> BiometricCredential.fromJson(value, runtime) }
+    }
+  }
+  public suspend fun `forgetLocalCredentials`(`params`: BiometricCredentialsForgetLocalCredentialsParams): Double {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "BiometricCredentials.forgetLocalCredentials", listOf(`params`.toJson())) { result ->
+      result.requireDouble()
+    }
+  }
+}
+
+public data class BiometricCredential(public val `id`: String, public val `object`: String, public val `platform`: BiometricCredentialPlatform, public val `appIdentifier`: String, public val `name`: String?, public val `algorithm`: BiometricCredentialAlgorithm, public val `status`: BiometricCredentialStatus, public val `createdAt`: Instant, public val `updatedAt`: Instant, public val `lastUsedAt`: Instant?, public val `revokedAt`: Instant?) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("id", JsonPrimitive(this@BiometricCredential.`id`))
+    putPresent("object", JsonPrimitive(this@BiometricCredential.`object`))
+    putPresent("platform", this@BiometricCredential.`platform`.toJson())
+    putPresent("appIdentifier", JsonPrimitive(this@BiometricCredential.`appIdentifier`))
+    putPresent("name", this@BiometricCredential.`name`?.let { value -> JsonPrimitive(value) } ?: JsonNull)
+    putPresent("algorithm", this@BiometricCredential.`algorithm`.toJson())
+    putPresent("status", this@BiometricCredential.`status`.toJson())
+    putPresent("createdAt", JsonPrimitive(this@BiometricCredential.`createdAt`.toString()))
+    putPresent("updatedAt", JsonPrimitive(this@BiometricCredential.`updatedAt`.toString()))
+    putPresent("lastUsedAt", this@BiometricCredential.`lastUsedAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
+    putPresent("revokedAt", this@BiometricCredential.`revokedAt`?.let { value -> JsonPrimitive(value.toString()) } ?: JsonNull)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredential {
+      val values = value.jsonObject
+
+      return BiometricCredential(`id` = (values["id"] ?: Undefined).requireString(), `object` = (values["object"] ?: Undefined).requireString(), `platform` = BiometricCredentialPlatform.fromJson((values["platform"] ?: Undefined), runtime), `appIdentifier` = (values["appIdentifier"] ?: Undefined).requireString(), `name` = (values["name"] ?: Undefined).decodeOptional { value -> value.requireString() }, `algorithm` = BiometricCredentialAlgorithm.fromJson((values["algorithm"] ?: Undefined), runtime), `status` = BiometricCredentialStatus.fromJson((values["status"] ?: Undefined), runtime), `createdAt` = Instant.parse((values["createdAt"] ?: Undefined).requireString()), `updatedAt` = Instant.parse((values["updatedAt"] ?: Undefined).requireString()), `lastUsedAt` = (values["lastUsedAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) }, `revokedAt` = (values["revokedAt"] ?: Undefined).decodeOptional { value -> Instant.parse(value.requireString()) })
+    }
+  }
+}
+
+public sealed interface BiometricCredentialPlatform {
+  public data class Case1(val value: String) : BiometricCredentialPlatform
+  public data class Case2(val value: String) : BiometricCredentialPlatform
+  public data class Case3(val value: String) : BiometricCredentialPlatform
+  public fun toJson(): JsonElement = when (this) {
+    is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to JsonPrimitive("ios")))
+    is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to JsonPrimitive("android")))
+    is Case3 -> JsonObject(mapOf("\$case" to JsonPrimitive(2), "value" to JsonPrimitive(value)))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialPlatform {
+      val values = value.jsonObject
+      val payload = values["value"] ?: Undefined
+      return when (values.getValue("\$case").jsonPrimitive.int) {
+        0 -> Case1(payload.requireLiteral(JsonPrimitive("ios")).requireString())
+        1 -> Case2(payload.requireLiteral(JsonPrimitive("android")).requireString())
+        2 -> Case3(payload.requireString())
+        else -> throw CoreException("invalid_value")
+      }
+    }
+  }
+}
+
+public sealed interface BiometricCredentialAlgorithm {
+  public data class Case1(val value: String) : BiometricCredentialAlgorithm
+  public data class Case2(val value: String) : BiometricCredentialAlgorithm
+  public fun toJson(): JsonElement = when (this) {
+    is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to JsonPrimitive(value)))
+    is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to JsonPrimitive("ES256")))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialAlgorithm {
+      val values = value.jsonObject
+      val payload = values["value"] ?: Undefined
+      return when (values.getValue("\$case").jsonPrimitive.int) {
+        0 -> Case1(payload.requireString())
+        1 -> Case2(payload.requireLiteral(JsonPrimitive("ES256")).requireString())
+        else -> throw CoreException("invalid_value")
+      }
+    }
+  }
+}
+
+public sealed interface BiometricCredentialStatus {
+  public data class Case1(val value: String) : BiometricCredentialStatus
+  public data class Case2(val value: String) : BiometricCredentialStatus
+  public data class Case3(val value: String) : BiometricCredentialStatus
+  public fun toJson(): JsonElement = when (this) {
+    is Case1 -> JsonObject(mapOf("\$case" to JsonPrimitive(0), "value" to JsonPrimitive("active")))
+    is Case2 -> JsonObject(mapOf("\$case" to JsonPrimitive(1), "value" to JsonPrimitive("revoked")))
+    is Case3 -> JsonObject(mapOf("\$case" to JsonPrimitive(2), "value" to JsonPrimitive(value)))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialStatus {
+      val values = value.jsonObject
+      val payload = values["value"] ?: Undefined
+      return when (values.getValue("\$case").jsonPrimitive.int) {
+        0 -> Case1(payload.requireLiteral(JsonPrimitive("active")).requireString())
+        1 -> Case2(payload.requireLiteral(JsonPrimitive("revoked")).requireString())
+        2 -> Case3(payload.requireString())
+        else -> throw CoreException("invalid_value")
+      }
+    }
+  }
+}
+
+public data class BiometricCredentialSelectionParams(public val `id`: String? = null, public val `identifierHint`: String? = null, public val `currentUser`: Boolean? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("id", this@BiometricCredentialSelectionParams.`id`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("identifierHint", this@BiometricCredentialSelectionParams.`identifierHint`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("currentUser", this@BiometricCredentialSelectionParams.`currentUser`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialSelectionParams {
+      val values = value.jsonObject
+
+      return BiometricCredentialSelectionParams(`id` = (values["id"] ?: Undefined).decodeOptional { value -> value.requireString() }, `identifierHint` = (values["identifierHint"] ?: Undefined).decodeOptional { value -> value.requireString() }, `currentUser` = (values["currentUser"] ?: Undefined).decodeOptional { value -> value.requireBoolean() })
+    }
+  }
+}
+
+public data class BiometricCredentialAvailability(public val `isAvailable`: Boolean, public val `unavailableReason`: BiometricCredentialUnavailableReason?) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("isAvailable", JsonPrimitive(this@BiometricCredentialAvailability.`isAvailable`))
+    putPresent("unavailableReason", this@BiometricCredentialAvailability.`unavailableReason`?.let { value -> value.toJson() } ?: JsonNull)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialAvailability {
+      val values = value.jsonObject
+
+      return BiometricCredentialAvailability(`isAvailable` = (values["isAvailable"] ?: Undefined).requireBoolean(), `unavailableReason` = (values["unavailableReason"] ?: Undefined).decodeOptional { value -> BiometricCredentialUnavailableReason.fromJson(value, runtime) })
+    }
+  }
+}
+
+public sealed class BiometricCredentialUnavailableReason(public val rawValue: String) {
+  public data object EnvironmentUnavailable : BiometricCredentialUnavailableReason("environmentUnavailable")
+  public data object NativeAPIDisabled : BiometricCredentialUnavailableReason("nativeAPIDisabled")
+  public data object FeatureDisabled : BiometricCredentialUnavailableReason("featureDisabled")
+  public data object UnsupportedPlatform : BiometricCredentialUnavailableReason("unsupportedPlatform")
+  public data object BiometricAuthenticationUnavailable : BiometricCredentialUnavailableReason("biometricAuthenticationUnavailable")
+  public data object NoLocalCredential : BiometricCredentialUnavailableReason("noLocalCredential")
+  public data object LocalKeyMissing : BiometricCredentialUnavailableReason("localKeyMissing")
+  public data object ServerCredentialMissing : BiometricCredentialUnavailableReason("serverCredentialMissing")
+  public data object ServerCredentialRevoked : BiometricCredentialUnavailableReason("serverCredentialRevoked")
+  public data class Unrecognized(val value: String) : BiometricCredentialUnavailableReason(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialUnavailableReason = when (val raw = value.requireString()) {
+      "environmentUnavailable" -> EnvironmentUnavailable
+      "nativeAPIDisabled" -> NativeAPIDisabled
+      "featureDisabled" -> FeatureDisabled
+      "unsupportedPlatform" -> UnsupportedPlatform
+      "biometricAuthenticationUnavailable" -> BiometricAuthenticationUnavailable
+      "noLocalCredential" -> NoLocalCredential
+      "localKeyMissing" -> LocalKeyMissing
+      "serverCredentialMissing" -> ServerCredentialMissing
+      "serverCredentialRevoked" -> ServerCredentialRevoked
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public data class BiometricCredentialValidationResult(public val `status`: BiometricCredentialValidationResultStatus, public val `reason`: BiometricCredentialUnavailableReason?) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("status", this@BiometricCredentialValidationResult.`status`.toJson())
+    putPresent("reason", this@BiometricCredentialValidationResult.`reason`?.let { value -> value.toJson() } ?: JsonNull)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialValidationResult {
+      val values = value.jsonObject
+
+      return BiometricCredentialValidationResult(`status` = BiometricCredentialValidationResultStatus.fromJson((values["status"] ?: Undefined), runtime), `reason` = (values["reason"] ?: Undefined).decodeOptional { value -> BiometricCredentialUnavailableReason.fromJson(value, runtime) })
+    }
+  }
+}
+
+public sealed class BiometricCredentialValidationResultStatus(public val rawValue: String) {
+  public data object Valid : BiometricCredentialValidationResultStatus("valid")
+  public data object Invalid : BiometricCredentialValidationResultStatus("invalid")
+  public data object Inconclusive : BiometricCredentialValidationResultStatus("inconclusive")
+  public data class Unrecognized(val value: String) : BiometricCredentialValidationResultStatus(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialValidationResultStatus = when (val raw = value.requireString()) {
+      "valid" -> Valid
+      "invalid" -> Invalid
+      "inconclusive" -> Inconclusive
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public data class BiometricCredentialEnrollmentParams(public val `name`: String? = null, public val `identifierHint`: String? = null, public val `reason`: String? = null, public val `promptSubtitle`: String? = null, public val `policy`: BiometricCredentialPolicy? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("name", this@BiometricCredentialEnrollmentParams.`name`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("identifierHint", this@BiometricCredentialEnrollmentParams.`identifierHint`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("reason", this@BiometricCredentialEnrollmentParams.`reason`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("promptSubtitle", this@BiometricCredentialEnrollmentParams.`promptSubtitle`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("policy", this@BiometricCredentialEnrollmentParams.`policy`?.let { value -> value.toJson() } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialEnrollmentParams {
+      val values = value.jsonObject
+
+      return BiometricCredentialEnrollmentParams(`name` = (values["name"] ?: Undefined).decodeOptional { value -> value.requireString() }, `identifierHint` = (values["identifierHint"] ?: Undefined).decodeOptional { value -> value.requireString() }, `reason` = (values["reason"] ?: Undefined).decodeOptional { value -> value.requireString() }, `promptSubtitle` = (values["promptSubtitle"] ?: Undefined).decodeOptional { value -> value.requireString() }, `policy` = (values["policy"] ?: Undefined).decodeOptional { value -> BiometricCredentialPolicy.fromJson(value, runtime) })
+    }
+  }
+}
+
+public sealed class BiometricCredentialPolicy(public val rawValue: String) {
+  public data object BiometryCurrentSet : BiometricCredentialPolicy("biometry_current_set")
+  public data object BiometryAny : BiometricCredentialPolicy("biometry_any")
+  public data object BiometryOrDevicePasscode : BiometricCredentialPolicy("biometry_or_device_passcode")
+  public data class Unrecognized(val value: String) : BiometricCredentialPolicy(value)
+  public fun toJson(): JsonElement = JsonPrimitive(rawValue)
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialPolicy = when (val raw = value.requireString()) {
+      "biometry_current_set" -> BiometryCurrentSet
+      "biometry_any" -> BiometryAny
+      "biometry_or_device_passcode" -> BiometryOrDevicePasscode
+      else -> Unrecognized(raw)
+    }
+  }
+}
+
+public data class BiometricCredentialsRevokeParams(public val `id`: String) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("id", JsonPrimitive(this@BiometricCredentialsRevokeParams.`id`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialsRevokeParams {
+      val values = value.jsonObject
+
+      return BiometricCredentialsRevokeParams(`id` = (values["id"] ?: Undefined).requireString())
+    }
+  }
+}
+
+public data class BiometricCredentialsForgetLocalCredentialsParams(public val `userId`: String) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("userId", JsonPrimitive(this@BiometricCredentialsForgetLocalCredentialsParams.`userId`))
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): BiometricCredentialsForgetLocalCredentialsParams {
+      val values = value.jsonObject
+
+      return BiometricCredentialsForgetLocalCredentialsParams(`userId` = (values["userId"] ?: Undefined).requireString())
+    }
+  }
+}
+
 public data class MobileAuthCallback(public val `id`: Double, public val `result`: MobileAuthenticationResult) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("id", JsonPrimitive(this@MobileAuthCallback.`id`))
@@ -6621,8 +6936,14 @@ public class SignIn(override val handle: ResourceHandle, runtime: CoreRuntime) :
     }
   }
   /**
-   * Performs an SSO-based sign-in (Social/OAuth or Enterprise).
+   * Authenticate with a locally enrolled, device-held biometric key.
    */
+  public suspend fun `biometricCredential`(`params`: SignInBiometricCredentialParams? = null): Unit {
+    val runtime = context.requireRuntime()
+    return runtime.invoke(this, handle, "SignIn.biometricCredential", listOf(`params`?.let { value -> value.toJson() } ?: Undefined)) { result ->
+      runtime.checkErrorResult(result)
+    }
+  }
   public suspend fun `sso`(`params`: SignInSSOParams): Unit {
     val runtime = context.requireRuntime()
     return runtime.invoke(this, handle, "SignIn.sso", listOf(`params`.toJson())) { result ->
@@ -6929,11 +7250,12 @@ public data class ProtectCheck(public val `sdkUrl`: String, public val `expiresA
   }
 }
 
-public data class SignInCreateParams(public val `identifier`: String? = null, public val `password`: String? = null, public val `strategy`: SignInCreateParamsStrategy? = null, public val `token`: String? = null, public val `redirectUrl`: String? = null, public val `actionCompleteRedirectUrl`: String? = null, public val `transfer`: Boolean? = null, public val `ticket`: String? = null, public val `signUpIfMissing`: Boolean? = null) {
+public data class SignInCreateParams(public val `identifier`: String? = null, public val `password`: String? = null, public val `strategy`: SignInCreateParamsStrategy? = null, public val `trustedDeviceId`: String? = null, public val `token`: String? = null, public val `redirectUrl`: String? = null, public val `actionCompleteRedirectUrl`: String? = null, public val `transfer`: Boolean? = null, public val `ticket`: String? = null, public val `signUpIfMissing`: Boolean? = null) {
   public fun toJson(): JsonElement = buildJsonObject {
     putPresent("identifier", this@SignInCreateParams.`identifier`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("password", this@SignInCreateParams.`password`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("strategy", this@SignInCreateParams.`strategy`?.let { value -> value.toJson() } ?: Undefined)
+    putPresent("trustedDeviceId", this@SignInCreateParams.`trustedDeviceId`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("token", this@SignInCreateParams.`token`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("redirectUrl", this@SignInCreateParams.`redirectUrl`?.let { value -> JsonPrimitive(value) } ?: Undefined)
     putPresent("actionCompleteRedirectUrl", this@SignInCreateParams.`actionCompleteRedirectUrl`?.let { value -> JsonPrimitive(value) } ?: Undefined)
@@ -6945,7 +7267,7 @@ public data class SignInCreateParams(public val `identifier`: String? = null, pu
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInCreateParams {
       val values = value.jsonObject
 
-      return SignInCreateParams(`identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() }, `password` = (values["password"] ?: Undefined).decodeOptional { value -> value.requireString() }, `strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> SignInCreateParamsStrategy.fromJson(value, runtime) }, `token` = (values["token"] ?: Undefined).decodeOptional { value -> value.requireString() }, `redirectUrl` = (values["redirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `actionCompleteRedirectUrl` = (values["actionCompleteRedirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `transfer` = (values["transfer"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `ticket` = (values["ticket"] ?: Undefined).decodeOptional { value -> value.requireString() }, `signUpIfMissing` = (values["signUpIfMissing"] ?: Undefined).decodeOptional { value -> value.requireBoolean() })
+      return SignInCreateParams(`identifier` = (values["identifier"] ?: Undefined).decodeOptional { value -> value.requireString() }, `password` = (values["password"] ?: Undefined).decodeOptional { value -> value.requireString() }, `strategy` = (values["strategy"] ?: Undefined).decodeOptional { value -> SignInCreateParamsStrategy.fromJson(value, runtime) }, `trustedDeviceId` = (values["trustedDeviceId"] ?: Undefined).decodeOptional { value -> value.requireString() }, `token` = (values["token"] ?: Undefined).decodeOptional { value -> value.requireString() }, `redirectUrl` = (values["redirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `actionCompleteRedirectUrl` = (values["actionCompleteRedirectUrl"] ?: Undefined).decodeOptional { value -> value.requireString() }, `transfer` = (values["transfer"] ?: Undefined).decodeOptional { value -> value.requireBoolean() }, `ticket` = (values["ticket"] ?: Undefined).decodeOptional { value -> value.requireString() }, `signUpIfMissing` = (values["signUpIfMissing"] ?: Undefined).decodeOptional { value -> value.requireBoolean() })
     }
   }
 }
@@ -6984,6 +7306,7 @@ public sealed class SignInCreateParamsStrategy(public val rawValue: String) {
   public data object OauthEnstall : SignInCreateParamsStrategy("oauth_enstall")
   public data object OauthHuggingface : SignInCreateParamsStrategy("oauth_huggingface")
   public data object OauthVercel : SignInCreateParamsStrategy("oauth_vercel")
+  public data object TrustedDevice : SignInCreateParamsStrategy("trusted_device")
   public data class Unrecognized(val value: String) : SignInCreateParamsStrategy(value)
   public fun toJson(): JsonElement = JsonPrimitive(rawValue)
   public companion object {
@@ -7021,6 +7344,7 @@ public sealed class SignInCreateParamsStrategy(public val rawValue: String) {
       "oauth_enstall" -> OauthEnstall
       "oauth_huggingface" -> OauthHuggingface
       "oauth_vercel" -> OauthVercel
+      "trusted_device" -> TrustedDevice
       else -> Unrecognized(raw)
     }
   }
@@ -7590,6 +7914,22 @@ public data class SignInResetPasswordPhoneCodeVerifyParams(public val `code`: St
       val values = value.jsonObject
 
       return SignInResetPasswordPhoneCodeVerifyParams(`code` = (values["code"] ?: Undefined).requireString())
+    }
+  }
+}
+
+public data class SignInBiometricCredentialParams(public val `id`: String? = null, public val `identifierHint`: String? = null, public val `reason`: String? = null, public val `promptSubtitle`: String? = null) {
+  public fun toJson(): JsonElement = buildJsonObject {
+    putPresent("id", this@SignInBiometricCredentialParams.`id`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("identifierHint", this@SignInBiometricCredentialParams.`identifierHint`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("reason", this@SignInBiometricCredentialParams.`reason`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+    putPresent("promptSubtitle", this@SignInBiometricCredentialParams.`promptSubtitle`?.let { value -> JsonPrimitive(value) } ?: Undefined)
+  }
+  public companion object {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): SignInBiometricCredentialParams {
+      val values = value.jsonObject
+
+      return SignInBiometricCredentialParams(`id` = (values["id"] ?: Undefined).decodeOptional { value -> value.requireString() }, `identifierHint` = (values["identifierHint"] ?: Undefined).decodeOptional { value -> value.requireString() }, `reason` = (values["reason"] ?: Undefined).decodeOptional { value -> value.requireString() }, `promptSubtitle` = (values["promptSubtitle"] ?: Undefined).decodeOptional { value -> value.requireString() })
     }
   }
 }
@@ -9243,7 +9583,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "de318d17179d3c133b56f634c981ac2f7f090c3bb6a53051a195ca7a446f4268"
+  public const val contractHash: String = "db0edcf151926939c7031f50b51514339c6787c28e4518d71b4c6b331b074a5a"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)
@@ -9280,6 +9620,7 @@ public object GeneratedBindings {
     "OrganizationCreationDefaults" -> OrganizationCreationDefaults(handle, runtime)
     "SessionVerification" -> SessionVerification(handle, runtime)
     "EnvironmentResource" -> EnvironmentResource(handle, runtime)
+    "BiometricCredentials" -> BiometricCredentials(handle, runtime)
     "SignIn" -> SignIn(handle, runtime)
     "SignInEmailCode" -> SignInEmailCode(handle, runtime)
     "SignInEmailLink" -> SignInEmailLink(handle, runtime)

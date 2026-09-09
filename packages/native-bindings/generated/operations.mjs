@@ -925,6 +925,54 @@ export const operations = {
     result: {"kind":"ref","name":"EnvironmentResource"},
     invoke: (target, args) => target["reload"](...args),
   },
+  "BiometricCredentials.list": {
+    type: "BiometricCredentials",
+    parameters: [],
+    result: {"kind":"array","element":{"kind":"ref","name":"BiometricCredential"}},
+    invoke: (target, args) => target["list"](...args),
+  },
+  "BiometricCredentials.availability": {
+    type: "BiometricCredentials",
+    parameters: [{"name":"params","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"BiometricCredentialSelectionParams"}}}],
+    result: {"kind":"ref","name":"BiometricCredentialAvailability"},
+    invoke: (target, args) => target["availability"](...args),
+  },
+  "BiometricCredentials.localAvailability": {
+    type: "BiometricCredentials",
+    parameters: [{"name":"params","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"BiometricCredentialSelectionParams"}}}],
+    result: {"kind":"ref","name":"BiometricCredentialAvailability"},
+    invoke: (target, args) => target["localAvailability"](...args),
+  },
+  "BiometricCredentials.validateLocalCredential": {
+    type: "BiometricCredentials",
+    parameters: [{"name":"params","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"BiometricCredentialSelectionParams"}}}],
+    result: {"kind":"ref","name":"BiometricCredentialValidationResult"},
+    invoke: (target, args) => target["validateLocalCredential"](...args),
+  },
+  "BiometricCredentials.enroll": {
+    type: "BiometricCredentials",
+    parameters: [{"name":"params","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"BiometricCredentialEnrollmentParams"}}}],
+    result: {"kind":"ref","name":"BiometricCredential"},
+    invoke: (target, args) => target["enroll"](...args),
+  },
+  "BiometricCredentials.revoke": {
+    type: "BiometricCredentials",
+    parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"BiometricCredentialsRevokeParams"}}],
+    result: {"kind":"ref","name":"BiometricCredential"},
+    invoke: (target, args) => target["revoke"](...args),
+  },
+  "BiometricCredentials.revokeCurrentDeviceCredential": {
+    type: "BiometricCredentials",
+    parameters: [],
+    result: {"kind":"optional","nullable":true,"omittable":false,"value":{"kind":"ref","name":"BiometricCredential"}},
+    invoke: (target, args) => target["revokeCurrentDeviceCredential"](...args),
+  },
+  "BiometricCredentials.forgetLocalCredentials": {
+    type: "BiometricCredentials",
+    parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"BiometricCredentialsForgetLocalCredentialsParams"}}],
+    result: {"kind":"number"},
+    invoke: (target, args) => target["forgetLocalCredentials"](...args),
+  },
   "SignIn.create": {
     type: "SignIn",
     parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"SignInCreateParams"}}],
@@ -936,6 +984,12 @@ export const operations = {
     parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"SignInPasswordParams"}}],
     result: {"kind":"errorResult"},
     invoke: (target, args) => target["password"](...args),
+  },
+  "SignIn.biometricCredential": {
+    type: "SignIn",
+    parameters: [{"name":"params","optional":true,"type":{"kind":"optional","nullable":false,"omittable":true,"value":{"kind":"ref","name":"SignInBiometricCredentialParams"}}}],
+    result: {"kind":"errorResult"},
+    invoke: (target, args) => target["biometricCredential"](...args),
   },
   "SignIn.sso": {
     type: "SignIn",

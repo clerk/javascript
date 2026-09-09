@@ -1,3 +1,7 @@
+import {
+  NativeBiometricCredentials,
+  type NativeBiometricHost,
+} from '../../clerk-js/src/utils/NativeBiometricCredentials';
 import { NativeMagicLink } from '../../clerk-js/src/utils/NativeMagicLink';
 import type {
   PublicKeyCredentialCreationOptionsWithoutExtensions,
@@ -87,6 +91,24 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
       ? () => hostRequest('magicLink.attestation', {})
       : undefined,
   );
+  const biometricStorage = (key: string) => ({
+    read: (): Promise<string | null> => hostRequest('biometrics.storage.read', { scope, key }),
+    write: (value: string): Promise<void> => hostRequest('biometrics.storage.write', { scope, key, value }),
+  });
+  const biometricHost: NativeBiometricHost | undefined = configuration.capabilities.includes('biometrics')
+    ? {
+        platform: configuration.platform,
+        appIdentifier: () => hostRequest('biometrics.appIdentifier', {}),
+        storage: biometricStorage('credentials'),
+        cleanupStorage: biometricStorage('cleanup'),
+        supports: policy => hostRequest('biometrics.supports', { policy }),
+        hasKey: localKeyId => hostRequest('biometrics.hasKey', { localKeyId }),
+        createKey: policy => hostRequest('biometrics.createKey', { policy }),
+        sign: params => hostRequest('biometrics.sign', params),
+        deleteKey: localKeyId => hostRequest('biometrics.deleteKey', { localKeyId }),
+      }
+    : undefined;
+  clerk.__internal_nativeBiometrics = new NativeBiometricCredentials(clerk, biometricHost);
   clerk.__internal_isWebAuthnSupported = () => configuration.capabilities.includes('passkeys');
   clerk.__internal_isWebAuthnAutofillSupported = async () => configuration.capabilities.includes('passkeys.autofill');
   clerk.__internal_isWebAuthnPlatformAuthenticatorSupported = async () =>
@@ -120,8 +142,10 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     },
   });
   if (disposed) return;
+  await clerk.__internal_nativeBiometrics.retryPendingCleanup().catch(() => undefined);
   const facade = publicCore(clerk, async () => {
-    cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity']);
+    cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity', 'biometrics.sign']);
+    clerk.__internal_nativeBiometrics.invalidate();
     runtime?.invalidate('Clerk.signOut');
     await mobile?.invalidate();
     await clerk.__internal_nativeMagicLink?.reset();
@@ -137,7 +161,8 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     emit,
     beforeInvoke: async operation => {
       if (operation === 'SignIn.reset' || operation === 'SignUp.reset') {
-        cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity']);
+        cancelCapabilities(['browser', 'passkeys.get', 'passkeys.create', 'appleIdentity', 'biometrics.sign']);
+        clerk.__internal_nativeBiometrics.invalidate();
         await mobile?.invalidate();
         await clerk.__internal_nativeMagicLink?.reset();
       }

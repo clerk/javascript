@@ -1,3 +1,4 @@
+import type { BiometricCredentialsResource } from './biometricCredential';
 import type { ClientResource } from './client';
 import type { EnvironmentResource } from './environment';
 import type { Clerk, SetActiveParams, SignOutOptions } from './clerk';
@@ -12,6 +13,8 @@ export type MobileSignOutOptions = Omit<SignOutOptions, 'redirectUrl'>;
 
 export type MobileAuthenticationResources = Pick<ClientResource, 'sessions' | 'lastAuthenticationStrategy'> &
   Pick<Clerk, 'telemetry'> & {
+    readonly clientId: string | null;
+    readonly biometricCredentials: BiometricCredentialsResource;
     readonly authCallback: MobileAuthCallback | null;
     handleAuthCallback: (url: URL) => Promise<MobileAuthenticationResult | null>;
     clearAuthCallback: (id: number) => Promise<void>;
@@ -27,6 +30,8 @@ export type MobileClerk = Pick<Clerk, 'status' | 'loaded' | 'createOrganization'
     readonly session: SessionResource | null;
     readonly user: UserResource | null;
     readonly organization: OrganizationResource | null;
+    readonly clientId: string | null;
+    readonly biometricCredentials: BiometricCredentialsResource;
     readonly authCallback: MobileAuthCallback | null;
     handleAuthCallback: (url: URL) => Promise<MobileAuthenticationResult | null>;
     clearAuthCallback: (id: number) => Promise<void>;

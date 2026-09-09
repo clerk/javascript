@@ -12,10 +12,12 @@ public struct ClerkState: Hashable, Sendable {
   public let `session`: Session?
   public let `user`: User?
   public let `organization`: Organization?
+  public let `clientId`: String?
+  public let `biometricCredentials`: BiometricCredentials
   public let `authCallback`: MobileAuthCallback?
   public let `signIn`: SignIn
   public let `signUp`: SignUp
-  public init(`status`: ClerkStatus, `telemetry`: TelemetryCollector? = nil, `loaded`: Bool, `sessions`: [Session], `lastAuthenticationStrategy`: LastAuthenticationStrategy?, `environment`: EnvironmentResource, `session`: Session?, `user`: User?, `organization`: Organization?, `authCallback`: MobileAuthCallback?, `signIn`: SignIn, `signUp`: SignUp) {
+  public init(`status`: ClerkStatus, `telemetry`: TelemetryCollector? = nil, `loaded`: Bool, `sessions`: [Session], `lastAuthenticationStrategy`: LastAuthenticationStrategy?, `environment`: EnvironmentResource, `session`: Session?, `user`: User?, `organization`: Organization?, `clientId`: String?, `biometricCredentials`: BiometricCredentials, `authCallback`: MobileAuthCallback?, `signIn`: SignIn, `signUp`: SignUp) {
     self.`status` = `status`
     self.`telemetry` = `telemetry`
     self.`loaded` = `loaded`
@@ -25,6 +27,8 @@ public struct ClerkState: Hashable, Sendable {
     self.`session` = `session`
     self.`user` = `user`
     self.`organization` = `organization`
+    self.`clientId` = `clientId`
+    self.`biometricCredentials` = `biometricCredentials`
     self.`authCallback` = `authCallback`
     self.`signIn` = `signIn`
     self.`signUp` = `signUp`
@@ -40,6 +44,8 @@ public struct ClerkState: Hashable, Sendable {
       "session": try self.`session`.map { value in try value.encode() } ?? .null,
       "user": try self.`user`.map { value in try value.encode() } ?? .null,
       "organization": try self.`organization`.map { value in try value.encode() } ?? .null,
+      "clientId": try self.`clientId`.map { value in .string(value) } ?? .null,
+      "biometricCredentials": try self.`biometricCredentials`.encode(),
       "authCallback": try self.`authCallback`.map { value in try value.encode() } ?? .null,
       "signIn": try self.`signIn`.encode(),
       "signUp": try self.`signUp`.encode()
@@ -49,7 +55,7 @@ public struct ClerkState: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> ClerkState {
     let values = try value.object()
 
-    return try ClerkState(`status`: try ClerkStatus.decode((values["status"] ?? .undefined), in: runtime), `telemetry`: try (values["telemetry"] ?? .undefined).optional { value in try TelemetryCollector.decode(value, in: runtime) }, `loaded`: try (values["loaded"] ?? .undefined).bool(), `sessions`: try (values["sessions"] ?? .undefined).array().map { value in try Session.decode(value, in: runtime) }, `lastAuthenticationStrategy`: try (values["lastAuthenticationStrategy"] ?? .undefined).optional { value in try LastAuthenticationStrategy.decode(value, in: runtime) }, `environment`: try EnvironmentResource.decode((values["environment"] ?? .undefined), in: runtime), `session`: try (values["session"] ?? .undefined).optional { value in try Session.decode(value, in: runtime) }, `user`: try (values["user"] ?? .undefined).optional { value in try User.decode(value, in: runtime) }, `organization`: try (values["organization"] ?? .undefined).optional { value in try Organization.decode(value, in: runtime) }, `authCallback`: try (values["authCallback"] ?? .undefined).optional { value in try MobileAuthCallback.decode(value, in: runtime) }, `signIn`: try SignIn.decode((values["signIn"] ?? .undefined), in: runtime), `signUp`: try SignUp.decode((values["signUp"] ?? .undefined), in: runtime))
+    return try ClerkState(`status`: try ClerkStatus.decode((values["status"] ?? .undefined), in: runtime), `telemetry`: try (values["telemetry"] ?? .undefined).optional { value in try TelemetryCollector.decode(value, in: runtime) }, `loaded`: try (values["loaded"] ?? .undefined).bool(), `sessions`: try (values["sessions"] ?? .undefined).array().map { value in try Session.decode(value, in: runtime) }, `lastAuthenticationStrategy`: try (values["lastAuthenticationStrategy"] ?? .undefined).optional { value in try LastAuthenticationStrategy.decode(value, in: runtime) }, `environment`: try EnvironmentResource.decode((values["environment"] ?? .undefined), in: runtime), `session`: try (values["session"] ?? .undefined).optional { value in try Session.decode(value, in: runtime) }, `user`: try (values["user"] ?? .undefined).optional { value in try User.decode(value, in: runtime) }, `organization`: try (values["organization"] ?? .undefined).optional { value in try Organization.decode(value, in: runtime) }, `clientId`: try (values["clientId"] ?? .undefined).optional { value in try value.string() }, `biometricCredentials`: try BiometricCredentials.decode((values["biometricCredentials"] ?? .undefined), in: runtime), `authCallback`: try (values["authCallback"] ?? .undefined).optional { value in try MobileAuthCallback.decode(value, in: runtime) }, `signIn`: try SignIn.decode((values["signIn"] ?? .undefined), in: runtime), `signUp`: try SignUp.decode((values["signUp"] ?? .undefined), in: runtime))
   }
 }
 @MainActor @Observable public final class Clerk: CoreResource {
@@ -67,6 +73,8 @@ public struct ClerkState: Hashable, Sendable {
   public var `session`: Session? { state.`session` }
   public var `user`: User? { state.`user` }
   public var `organization`: Organization? { state.`organization` }
+  public var `clientId`: String? { state.`clientId` }
+  public var `biometricCredentials`: BiometricCredentials { state.`biometricCredentials` }
   public var `authCallback`: MobileAuthCallback? { state.`authCallback` }
   public var `signIn`: SignIn { state.`signIn` }
   public var `signUp`: SignUp { state.`signUp` }
@@ -8793,6 +8801,423 @@ public indirect enum ProtectLoaderAttributesValue: Hashable, Sendable {
   }
 }
 
+/// Native biometric credentials, backed by device-held keys and the Clerk core.
+public struct BiometricCredentialsState: Hashable, Sendable {
+  public let `canEnroll`: Bool
+  public init(`canEnroll`: Bool) {
+    self.`canEnroll` = `canEnroll`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "canEnroll": .bool(self.`canEnroll`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialsState {
+    let values = try value.object()
+
+    return try BiometricCredentialsState(`canEnroll`: try (values["canEnroll"] ?? .undefined).bool())
+  }
+}
+@MainActor @Observable public final class BiometricCredentials: CoreResource {
+  public let handle: ResourceHandle
+  public let context: ResourceContext
+  public var isInvalidated: Bool { context.isInvalidated(handle) }
+  public var state: BiometricCredentialsState { context.state(handle, as: BiometricCredentialsState.self) }
+  public init(handle: ResourceHandle, runtime: CoreRuntime) { self.handle = handle; self.context = ResourceContext(runtime: runtime, handle: handle, ownsRuntime: false) }
+  public var `canEnroll`: Bool { state.`canEnroll` }
+  public func prepare(_ value: JSONValue) throws -> any Sendable { try BiometricCredentialsState.decode(value, in: context.requireRuntime()) }
+  public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
+  public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentials { try runtime.resource(ResourceHandle.decodeReference(value), as: BiometricCredentials.self) }
+  public func `list`() async throws -> [BiometricCredential] {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "BiometricCredentials.list", arguments: []) { result in
+      return try result.array().map { value in try BiometricCredential.decode(value, in: runtime) }
+    }
+  }
+  public func `availability`(_ `params`: BiometricCredentialSelectionParams? = nil) async throws -> BiometricCredentialAvailability {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "BiometricCredentials.availability", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
+      return try BiometricCredentialAvailability.decode(result, in: runtime)
+    }
+  }
+  public func `localAvailability`(_ `params`: BiometricCredentialSelectionParams? = nil) async throws -> BiometricCredentialAvailability {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "BiometricCredentials.localAvailability", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
+      return try BiometricCredentialAvailability.decode(result, in: runtime)
+    }
+  }
+  public func `validateLocalCredential`(_ `params`: BiometricCredentialSelectionParams? = nil) async throws -> BiometricCredentialValidationResult {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "BiometricCredentials.validateLocalCredential", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
+      return try BiometricCredentialValidationResult.decode(result, in: runtime)
+    }
+  }
+  public func `enroll`(_ `params`: BiometricCredentialEnrollmentParams? = nil) async throws -> BiometricCredential {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "BiometricCredentials.enroll", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
+      return try BiometricCredential.decode(result, in: runtime)
+    }
+  }
+  public func `revoke`(_ `params`: BiometricCredentialsRevokeParams) async throws -> BiometricCredential {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "BiometricCredentials.revoke", arguments: [try `params`.encode()]) { result in
+      return try BiometricCredential.decode(result, in: runtime)
+    }
+  }
+  public func `revokeCurrentDeviceCredential`() async throws -> BiometricCredential? {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "BiometricCredentials.revokeCurrentDeviceCredential", arguments: []) { result in
+      return try result.optional { value in try BiometricCredential.decode(value, in: runtime) }
+    }
+  }
+  public func `forgetLocalCredentials`(_ `params`: BiometricCredentialsForgetLocalCredentialsParams) async throws -> Double {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "BiometricCredentials.forgetLocalCredentials", arguments: [try `params`.encode()]) { result in
+      return try result.number()
+    }
+  }
+}
+
+public struct BiometricCredential: Hashable, Sendable {
+  public let `id`: String
+  public let `object`: String
+  public let `platform`: BiometricCredentialPlatform
+  public let `appIdentifier`: String
+  public let `name`: String?
+  public let `algorithm`: BiometricCredentialAlgorithm
+  public let `status`: BiometricCredentialStatus
+  public let `createdAt`: Date
+  public let `updatedAt`: Date
+  public let `lastUsedAt`: Date?
+  public let `revokedAt`: Date?
+  public init(`id`: String, `object`: String, `platform`: BiometricCredentialPlatform, `appIdentifier`: String, `name`: String?, `algorithm`: BiometricCredentialAlgorithm, `status`: BiometricCredentialStatus, `createdAt`: Date, `updatedAt`: Date, `lastUsedAt`: Date?, `revokedAt`: Date?) {
+    self.`id` = `id`
+    self.`object` = `object`
+    self.`platform` = `platform`
+    self.`appIdentifier` = `appIdentifier`
+    self.`name` = `name`
+    self.`algorithm` = `algorithm`
+    self.`status` = `status`
+    self.`createdAt` = `createdAt`
+    self.`updatedAt` = `updatedAt`
+    self.`lastUsedAt` = `lastUsedAt`
+    self.`revokedAt` = `revokedAt`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "id": .string(self.`id`),
+      "object": .string(self.`object`),
+      "platform": try self.`platform`.encode(),
+      "appIdentifier": .string(self.`appIdentifier`),
+      "name": try self.`name`.map { value in .string(value) } ?? .null,
+      "algorithm": try self.`algorithm`.encode(),
+      "status": try self.`status`.encode(),
+      "createdAt": .string(self.`createdAt`.ISO8601Format(.init(includingFractionalSeconds: true))),
+      "updatedAt": .string(self.`updatedAt`.ISO8601Format(.init(includingFractionalSeconds: true))),
+      "lastUsedAt": try self.`lastUsedAt`.map { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) } ?? .null,
+      "revokedAt": try self.`revokedAt`.map { value in .string(value.ISO8601Format(.init(includingFractionalSeconds: true))) } ?? .null
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredential {
+    let values = try value.object()
+
+    return try BiometricCredential(`id`: try (values["id"] ?? .undefined).string(), `object`: try (values["object"] ?? .undefined).string(), `platform`: try BiometricCredentialPlatform.decode((values["platform"] ?? .undefined), in: runtime), `appIdentifier`: try (values["appIdentifier"] ?? .undefined).string(), `name`: try (values["name"] ?? .undefined).optional { value in try value.string() }, `algorithm`: try BiometricCredentialAlgorithm.decode((values["algorithm"] ?? .undefined), in: runtime), `status`: try BiometricCredentialStatus.decode((values["status"] ?? .undefined), in: runtime), `createdAt`: try (values["createdAt"] ?? .undefined).date(), `updatedAt`: try (values["updatedAt"] ?? .undefined).date(), `lastUsedAt`: try (values["lastUsedAt"] ?? .undefined).optional { value in try value.date() }, `revokedAt`: try (values["revokedAt"] ?? .undefined).optional { value in try value.date() })
+  }
+}
+
+public indirect enum BiometricCredentialPlatform: Hashable, Sendable {
+  case case1(String)
+  case case2(String)
+  case case3(String)
+  @MainActor public func encode() throws -> JSONValue {
+    switch self {
+    case .case1(let value): return .object(["$case": .number(0), "value": .string("ios")])
+    case .case2(let value): return .object(["$case": .number(1), "value": .string("android")])
+    case .case3(let value): return .object(["$case": .number(2), "value": .string(value)])
+    }
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialPlatform {
+    let values = try value.object()
+    let payload = values["value"] ?? .undefined
+    switch try (values["$case"] ?? .undefined).number() {
+    case 0: return .case1(try payload.literal(.string("ios")).string())
+    case 1: return .case2(try payload.literal(.string("android")).string())
+    case 2: return .case3(try payload.string())
+    default: throw CoreError.invalidValue
+    }
+  }
+}
+
+public indirect enum BiometricCredentialAlgorithm: Hashable, Sendable {
+  case case1(String)
+  case case2(String)
+  @MainActor public func encode() throws -> JSONValue {
+    switch self {
+    case .case1(let value): return .object(["$case": .number(0), "value": .string(value)])
+    case .case2(let value): return .object(["$case": .number(1), "value": .string("ES256")])
+    }
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialAlgorithm {
+    let values = try value.object()
+    let payload = values["value"] ?? .undefined
+    switch try (values["$case"] ?? .undefined).number() {
+    case 0: return .case1(try payload.string())
+    case 1: return .case2(try payload.literal(.string("ES256")).string())
+    default: throw CoreError.invalidValue
+    }
+  }
+}
+
+public indirect enum BiometricCredentialStatus: Hashable, Sendable {
+  case case1(String)
+  case case2(String)
+  case case3(String)
+  @MainActor public func encode() throws -> JSONValue {
+    switch self {
+    case .case1(let value): return .object(["$case": .number(0), "value": .string("active")])
+    case .case2(let value): return .object(["$case": .number(1), "value": .string("revoked")])
+    case .case3(let value): return .object(["$case": .number(2), "value": .string(value)])
+    }
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialStatus {
+    let values = try value.object()
+    let payload = values["value"] ?? .undefined
+    switch try (values["$case"] ?? .undefined).number() {
+    case 0: return .case1(try payload.literal(.string("active")).string())
+    case 1: return .case2(try payload.literal(.string("revoked")).string())
+    case 2: return .case3(try payload.string())
+    default: throw CoreError.invalidValue
+    }
+  }
+}
+
+public struct BiometricCredentialSelectionParams: Hashable, Sendable {
+  public let `id`: String?
+  public let `identifierHint`: String?
+  public let `currentUser`: Bool?
+  public init(`id`: String? = nil, `identifierHint`: String? = nil, `currentUser`: Bool? = nil) {
+    self.`id` = `id`
+    self.`identifierHint` = `identifierHint`
+    self.`currentUser` = `currentUser`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "id": try self.`id`.map { value in .string(value) } ?? .undefined,
+      "identifierHint": try self.`identifierHint`.map { value in .string(value) } ?? .undefined,
+      "currentUser": try self.`currentUser`.map { value in .bool(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialSelectionParams {
+    let values = try value.object()
+
+    return try BiometricCredentialSelectionParams(`id`: try (values["id"] ?? .undefined).optional { value in try value.string() }, `identifierHint`: try (values["identifierHint"] ?? .undefined).optional { value in try value.string() }, `currentUser`: try (values["currentUser"] ?? .undefined).optional { value in try value.bool() })
+  }
+}
+
+public struct BiometricCredentialAvailability: Hashable, Sendable {
+  public let `isAvailable`: Bool
+  public let `unavailableReason`: BiometricCredentialUnavailableReason?
+  public init(`isAvailable`: Bool, `unavailableReason`: BiometricCredentialUnavailableReason?) {
+    self.`isAvailable` = `isAvailable`
+    self.`unavailableReason` = `unavailableReason`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "isAvailable": .bool(self.`isAvailable`),
+      "unavailableReason": try self.`unavailableReason`.map { value in try value.encode() } ?? .null
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialAvailability {
+    let values = try value.object()
+
+    return try BiometricCredentialAvailability(`isAvailable`: try (values["isAvailable"] ?? .undefined).bool(), `unavailableReason`: try (values["unavailableReason"] ?? .undefined).optional { value in try BiometricCredentialUnavailableReason.decode(value, in: runtime) })
+  }
+}
+
+public enum BiometricCredentialUnavailableReason: Hashable, Sendable {
+  case `environmentUnavailable`
+  case `nativeAPIDisabled`
+  case `featureDisabled`
+  case `unsupportedPlatform`
+  case `biometricAuthenticationUnavailable`
+  case `noLocalCredential`
+  case `localKeyMissing`
+  case `serverCredentialMissing`
+  case `serverCredentialRevoked`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`environmentUnavailable`: return "environmentUnavailable"
+    case .`nativeAPIDisabled`: return "nativeAPIDisabled"
+    case .`featureDisabled`: return "featureDisabled"
+    case .`unsupportedPlatform`: return "unsupportedPlatform"
+    case .`biometricAuthenticationUnavailable`: return "biometricAuthenticationUnavailable"
+    case .`noLocalCredential`: return "noLocalCredential"
+    case .`localKeyMissing`: return "localKeyMissing"
+    case .`serverCredentialMissing`: return "serverCredentialMissing"
+    case .`serverCredentialRevoked`: return "serverCredentialRevoked"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "environmentUnavailable": self = .`environmentUnavailable`
+    case "nativeAPIDisabled": self = .`nativeAPIDisabled`
+    case "featureDisabled": self = .`featureDisabled`
+    case "unsupportedPlatform": self = .`unsupportedPlatform`
+    case "biometricAuthenticationUnavailable": self = .`biometricAuthenticationUnavailable`
+    case "noLocalCredential": self = .`noLocalCredential`
+    case "localKeyMissing": self = .`localKeyMissing`
+    case "serverCredentialMissing": self = .`serverCredentialMissing`
+    case "serverCredentialRevoked": self = .`serverCredentialRevoked`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialUnavailableReason { .init(rawValue: try value.string()) }
+}
+
+public struct BiometricCredentialValidationResult: Hashable, Sendable {
+  public let `status`: BiometricCredentialValidationResultStatus
+  public let `reason`: BiometricCredentialUnavailableReason?
+  public init(`status`: BiometricCredentialValidationResultStatus, `reason`: BiometricCredentialUnavailableReason?) {
+    self.`status` = `status`
+    self.`reason` = `reason`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "status": try self.`status`.encode(),
+      "reason": try self.`reason`.map { value in try value.encode() } ?? .null
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialValidationResult {
+    let values = try value.object()
+
+    return try BiometricCredentialValidationResult(`status`: try BiometricCredentialValidationResultStatus.decode((values["status"] ?? .undefined), in: runtime), `reason`: try (values["reason"] ?? .undefined).optional { value in try BiometricCredentialUnavailableReason.decode(value, in: runtime) })
+  }
+}
+
+public enum BiometricCredentialValidationResultStatus: Hashable, Sendable {
+  case `valid`
+  case `invalid`
+  case `inconclusive`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`valid`: return "valid"
+    case .`invalid`: return "invalid"
+    case .`inconclusive`: return "inconclusive"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "valid": self = .`valid`
+    case "invalid": self = .`invalid`
+    case "inconclusive": self = .`inconclusive`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialValidationResultStatus { .init(rawValue: try value.string()) }
+}
+
+public struct BiometricCredentialEnrollmentParams: Hashable, Sendable {
+  public let `name`: String?
+  public let `identifierHint`: String?
+  public let `reason`: String?
+  public let `promptSubtitle`: String?
+  public let `policy`: BiometricCredentialPolicy?
+  public init(`name`: String? = nil, `identifierHint`: String? = nil, `reason`: String? = nil, `promptSubtitle`: String? = nil, `policy`: BiometricCredentialPolicy? = nil) {
+    self.`name` = `name`
+    self.`identifierHint` = `identifierHint`
+    self.`reason` = `reason`
+    self.`promptSubtitle` = `promptSubtitle`
+    self.`policy` = `policy`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "name": try self.`name`.map { value in .string(value) } ?? .undefined,
+      "identifierHint": try self.`identifierHint`.map { value in .string(value) } ?? .undefined,
+      "reason": try self.`reason`.map { value in .string(value) } ?? .undefined,
+      "promptSubtitle": try self.`promptSubtitle`.map { value in .string(value) } ?? .undefined,
+      "policy": try self.`policy`.map { value in try value.encode() } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialEnrollmentParams {
+    let values = try value.object()
+
+    return try BiometricCredentialEnrollmentParams(`name`: try (values["name"] ?? .undefined).optional { value in try value.string() }, `identifierHint`: try (values["identifierHint"] ?? .undefined).optional { value in try value.string() }, `reason`: try (values["reason"] ?? .undefined).optional { value in try value.string() }, `promptSubtitle`: try (values["promptSubtitle"] ?? .undefined).optional { value in try value.string() }, `policy`: try (values["policy"] ?? .undefined).optional { value in try BiometricCredentialPolicy.decode(value, in: runtime) })
+  }
+}
+
+public enum BiometricCredentialPolicy: Hashable, Sendable {
+  case `biometryCurrentSet`
+  case `biometryAny`
+  case `biometryOrDevicePasscode`
+  case unrecognized(String)
+  public var rawValue: String {
+    switch self {
+    case .`biometryCurrentSet`: return "biometry_current_set"
+    case .`biometryAny`: return "biometry_any"
+    case .`biometryOrDevicePasscode`: return "biometry_or_device_passcode"
+    case .unrecognized(let value): return value
+    }
+  }
+  public init(rawValue: String) {
+    switch rawValue {
+    case "biometry_current_set": self = .`biometryCurrentSet`
+    case "biometry_any": self = .`biometryAny`
+    case "biometry_or_device_passcode": self = .`biometryOrDevicePasscode`
+    default: self = .unrecognized(rawValue)
+    }
+  }
+  public func encode() throws -> JSONValue { .string(rawValue) }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialPolicy { .init(rawValue: try value.string()) }
+}
+
+public struct BiometricCredentialsRevokeParams: Hashable, Sendable {
+  public let `id`: String
+  public init(`id`: String) {
+    self.`id` = `id`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "id": .string(self.`id`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialsRevokeParams {
+    let values = try value.object()
+
+    return try BiometricCredentialsRevokeParams(`id`: try (values["id"] ?? .undefined).string())
+  }
+}
+
+public struct BiometricCredentialsForgetLocalCredentialsParams: Hashable, Sendable {
+  public let `userId`: String
+  public init(`userId`: String) {
+    self.`userId` = `userId`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "userId": .string(self.`userId`)
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> BiometricCredentialsForgetLocalCredentialsParams {
+    let values = try value.object()
+
+    return try BiometricCredentialsForgetLocalCredentialsParams(`userId`: try (values["userId"] ?? .undefined).string())
+  }
+}
+
 public struct MobileAuthCallback: Hashable, Sendable {
   public let `id`: Double
   public let `result`: MobileAuthenticationResult
@@ -8981,7 +9406,13 @@ public struct SignInState: Hashable, Sendable {
       try runtime.checkErrorResult(result)
     }
   }
-  /// Performs an SSO-based sign-in (Social/OAuth or Enterprise).
+  /// Authenticate with a locally enrolled, device-held biometric key.
+  public func `biometricCredential`(_ `params`: SignInBiometricCredentialParams? = nil) async throws {
+    let runtime = try context.requireRuntime()
+    return try await runtime.invoke(owner: self, target: handle, operation: "SignIn.biometricCredential", arguments: [try `params`.map { value in try value.encode() } ?? .undefined]) { result in
+      try runtime.checkErrorResult(result)
+    }
+  }
   public func `sso`(_ `params`: SignInSSOParams) async throws {
     let runtime = try context.requireRuntime()
     return try await runtime.invoke(owner: self, target: handle, operation: "SignIn.sso", arguments: [try `params`.encode()]) { result in
@@ -9365,16 +9796,18 @@ public struct SignInCreateParams: Hashable, Sendable {
   public let `identifier`: String?
   public let `password`: String?
   public let `strategy`: SignInCreateParamsStrategy?
+  public let `trustedDeviceId`: String?
   public let `token`: String?
   public let `redirectUrl`: String?
   public let `actionCompleteRedirectUrl`: String?
   public let `transfer`: Bool?
   public let `ticket`: String?
   public let `signUpIfMissing`: Bool?
-  public init(`identifier`: String? = nil, `password`: String? = nil, `strategy`: SignInCreateParamsStrategy? = nil, `token`: String? = nil, `redirectUrl`: String? = nil, `actionCompleteRedirectUrl`: String? = nil, `transfer`: Bool? = nil, `ticket`: String? = nil, `signUpIfMissing`: Bool? = nil) {
+  public init(`identifier`: String? = nil, `password`: String? = nil, `strategy`: SignInCreateParamsStrategy? = nil, `trustedDeviceId`: String? = nil, `token`: String? = nil, `redirectUrl`: String? = nil, `actionCompleteRedirectUrl`: String? = nil, `transfer`: Bool? = nil, `ticket`: String? = nil, `signUpIfMissing`: Bool? = nil) {
     self.`identifier` = `identifier`
     self.`password` = `password`
     self.`strategy` = `strategy`
+    self.`trustedDeviceId` = `trustedDeviceId`
     self.`token` = `token`
     self.`redirectUrl` = `redirectUrl`
     self.`actionCompleteRedirectUrl` = `actionCompleteRedirectUrl`
@@ -9387,6 +9820,7 @@ public struct SignInCreateParams: Hashable, Sendable {
       "identifier": try self.`identifier`.map { value in .string(value) } ?? .undefined,
       "password": try self.`password`.map { value in .string(value) } ?? .undefined,
       "strategy": try self.`strategy`.map { value in try value.encode() } ?? .undefined,
+      "trustedDeviceId": try self.`trustedDeviceId`.map { value in .string(value) } ?? .undefined,
       "token": try self.`token`.map { value in .string(value) } ?? .undefined,
       "redirectUrl": try self.`redirectUrl`.map { value in .string(value) } ?? .undefined,
       "actionCompleteRedirectUrl": try self.`actionCompleteRedirectUrl`.map { value in .string(value) } ?? .undefined,
@@ -9399,7 +9833,7 @@ public struct SignInCreateParams: Hashable, Sendable {
   @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInCreateParams {
     let values = try value.object()
 
-    return try SignInCreateParams(`identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() }, `password`: try (values["password"] ?? .undefined).optional { value in try value.string() }, `strategy`: try (values["strategy"] ?? .undefined).optional { value in try SignInCreateParamsStrategy.decode(value, in: runtime) }, `token`: try (values["token"] ?? .undefined).optional { value in try value.string() }, `redirectUrl`: try (values["redirectUrl"] ?? .undefined).optional { value in try value.string() }, `actionCompleteRedirectUrl`: try (values["actionCompleteRedirectUrl"] ?? .undefined).optional { value in try value.string() }, `transfer`: try (values["transfer"] ?? .undefined).optional { value in try value.bool() }, `ticket`: try (values["ticket"] ?? .undefined).optional { value in try value.string() }, `signUpIfMissing`: try (values["signUpIfMissing"] ?? .undefined).optional { value in try value.bool() })
+    return try SignInCreateParams(`identifier`: try (values["identifier"] ?? .undefined).optional { value in try value.string() }, `password`: try (values["password"] ?? .undefined).optional { value in try value.string() }, `strategy`: try (values["strategy"] ?? .undefined).optional { value in try SignInCreateParamsStrategy.decode(value, in: runtime) }, `trustedDeviceId`: try (values["trustedDeviceId"] ?? .undefined).optional { value in try value.string() }, `token`: try (values["token"] ?? .undefined).optional { value in try value.string() }, `redirectUrl`: try (values["redirectUrl"] ?? .undefined).optional { value in try value.string() }, `actionCompleteRedirectUrl`: try (values["actionCompleteRedirectUrl"] ?? .undefined).optional { value in try value.string() }, `transfer`: try (values["transfer"] ?? .undefined).optional { value in try value.bool() }, `ticket`: try (values["ticket"] ?? .undefined).optional { value in try value.string() }, `signUpIfMissing`: try (values["signUpIfMissing"] ?? .undefined).optional { value in try value.bool() })
   }
 }
 
@@ -9437,6 +9871,7 @@ public enum SignInCreateParamsStrategy: Hashable, Sendable {
   case `oauthEnstall`
   case `oauthHuggingface`
   case `oauthVercel`
+  case `trustedDevice`
   case unrecognized(String)
   public var rawValue: String {
     switch self {
@@ -9473,6 +9908,7 @@ public enum SignInCreateParamsStrategy: Hashable, Sendable {
     case .`oauthEnstall`: return "oauth_enstall"
     case .`oauthHuggingface`: return "oauth_huggingface"
     case .`oauthVercel`: return "oauth_vercel"
+    case .`trustedDevice`: return "trusted_device"
     case .unrecognized(let value): return value
     }
   }
@@ -9511,6 +9947,7 @@ public enum SignInCreateParamsStrategy: Hashable, Sendable {
     case "oauth_enstall": self = .`oauthEnstall`
     case "oauth_huggingface": self = .`oauthHuggingface`
     case "oauth_vercel": self = .`oauthVercel`
+    case "trusted_device": self = .`trustedDevice`
     default: self = .unrecognized(rawValue)
     }
   }
@@ -10177,6 +10614,33 @@ public struct SignInResetPasswordPhoneCodeVerifyParams: Hashable, Sendable {
     let values = try value.object()
 
     return try SignInResetPasswordPhoneCodeVerifyParams(`code`: try (values["code"] ?? .undefined).string())
+  }
+}
+
+public struct SignInBiometricCredentialParams: Hashable, Sendable {
+  public let `id`: String?
+  public let `identifierHint`: String?
+  public let `reason`: String?
+  public let `promptSubtitle`: String?
+  public init(`id`: String? = nil, `identifierHint`: String? = nil, `reason`: String? = nil, `promptSubtitle`: String? = nil) {
+    self.`id` = `id`
+    self.`identifierHint` = `identifierHint`
+    self.`reason` = `reason`
+    self.`promptSubtitle` = `promptSubtitle`
+  }
+  @MainActor public func encode() throws -> JSONValue {
+    let values: [String: JSONValue] = [
+      "id": try self.`id`.map { value in .string(value) } ?? .undefined,
+      "identifierHint": try self.`identifierHint`.map { value in .string(value) } ?? .undefined,
+      "reason": try self.`reason`.map { value in .string(value) } ?? .undefined,
+      "promptSubtitle": try self.`promptSubtitle`.map { value in .string(value) } ?? .undefined
+    ]
+    return .object(values.filter { !$0.value.isUndefined })
+  }
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> SignInBiometricCredentialParams {
+    let values = try value.object()
+
+    return try SignInBiometricCredentialParams(`id`: try (values["id"] ?? .undefined).optional { value in try value.string() }, `identifierHint`: try (values["identifierHint"] ?? .undefined).optional { value in try value.string() }, `reason`: try (values["reason"] ?? .undefined).optional { value in try value.string() }, `promptSubtitle`: try (values["promptSubtitle"] ?? .undefined).optional { value in try value.string() })
   }
 }
 
@@ -12367,7 +12831,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "de318d17179d3c133b56f634c981ac2f7f090c3bb6a53051a195ca7a446f4268"
+  public static let contractHash = "db0edcf151926939c7031f50b51514339c6787c28e4518d71b4c6b331b074a5a"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {
@@ -12405,6 +12869,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
     case "OrganizationCreationDefaults": return OrganizationCreationDefaults(handle: handle, runtime: runtime)
     case "SessionVerification": return SessionVerification(handle: handle, runtime: runtime)
     case "EnvironmentResource": return EnvironmentResource(handle: handle, runtime: runtime)
+    case "BiometricCredentials": return BiometricCredentials(handle: handle, runtime: runtime)
     case "SignIn": return SignIn(handle: handle, runtime: runtime)
     case "SignInEmailCode": return SignInEmailCode(handle: handle, runtime: runtime)
     case "SignInEmailLink": return SignInEmailLink(handle: handle, runtime: runtime)
