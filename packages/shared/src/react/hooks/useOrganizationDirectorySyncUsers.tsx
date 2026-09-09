@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 import type {
   DirectorySyncResource,
@@ -23,7 +23,14 @@ export type UseOrganizationDirectorySyncUsersParams = {
    */
   params?: GetDirectorySyncUsersParams;
   /**
-   * Polling interval (ms) used while polling is active.
+   * Poll the list for changes while `true`. Tie this to the view that needs the
+   * live feed so polling stops when that view goes away.
+   *
+   * @default false
+   */
+  poll?: boolean;
+  /**
+   * Polling interval (ms) used while `poll` is `true`.
    *
    * @default 2000
    */
@@ -47,14 +54,6 @@ export type UseOrganizationDirectorySyncUsersReturn = {
   /** `true` while the hook is polling. */
   isPolling: boolean;
   /**
-   * Start polling for changes to the list. Polling continues until `stopPolling`
-   * is called or the hook unmounts, so colocate the hook with the view that
-   * needs the feed and call this from an effect on mount.
-   */
-  startPolling: () => void;
-  /** Stop polling. */
-  stopPolling: () => void;
-  /**
    * Force a refetch.
    */
   revalidate: () => Promise<void>;
@@ -62,8 +61,8 @@ export type UseOrganizationDirectorySyncUsersReturn = {
 
 /**
  * The users provisioned into an enterprise connection's Directory Sync
- * directory, most recently touched first. Polling is opt-in via `startPolling`,
- * which lets the setup flow use the list as a live activity feed.
+ * directory, most recently touched first. Polling is opt-in via `poll`, which
+ * lets the setup flow use the list as a live activity feed.
  *
  * @internal
  */
@@ -73,6 +72,7 @@ function useOrganizationDirectorySyncUsers(
   const {
     directory,
     params: fetchParams = { initialPage: 1, pageSize: 10 },
+    poll = false,
     pollIntervalMs = DEFAULT_POLL_INTERVAL_MS,
     enabled = true,
     keepPreviousData = true,
@@ -99,17 +99,6 @@ function useOrganizationDirectorySyncUsers(
 
   const queryEnabled = enabled && clerk.loaded && Boolean(organization) && Boolean(directory);
 
-  // Polling is requested for a specific directory, so a directory change stops it. This is
-  // derived rather than reset in an effect because a child component may call `startPolling`
-  // in the same commit the directory arrives, and an unconditional reset would cancel that.
-  const [pollingDirectoryId, setPollingDirectoryId] = useState<string | null>(null);
-  const shouldPoll = pollingDirectoryId !== null && pollingDirectoryId === directoryId;
-
-  useEffect(() => {
-    // Drop a request left over from a previous directory so it cannot resume if that directory returns.
-    setPollingDirectoryId(current => (current !== null && current !== directoryId ? null : current));
-  }, [directoryId]);
-
   const currentTracked = queryKey[2];
   const query = useClerkQuery({
     queryKey,
@@ -119,7 +108,7 @@ function useOrganizationDirectorySyncUsers(
       }
       return directory.getUsers(fetchParams);
     },
-    refetchInterval: () => (shouldPoll ? pollIntervalMs : false),
+    refetchInterval: () => (poll ? pollIntervalMs : false),
     enabled: queryEnabled,
     refetchIntervalInBackground: false,
     // Carry previous data only across pagination within the same organization
@@ -138,19 +127,11 @@ function useOrganizationDirectorySyncUsers(
       : undefined,
   });
 
-  const startPolling = useCallback(() => {
-    setPollingDirectoryId(directoryId);
-  }, [directoryId]);
-
-  const stopPolling = useCallback(() => {
-    setPollingDirectoryId(null);
-  }, []);
-
   const revalidate = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: invalidationKey });
   }, [queryClient, invalidationKey]);
 
-  const isPolling = queryEnabled && shouldPoll;
+  const isPolling = queryEnabled && poll;
 
   return {
     // A disabled query still exposes rows cached under its key; report none until it can run.
@@ -160,8 +141,6 @@ function useOrganizationDirectorySyncUsers(
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     isPolling,
-    startPolling,
-    stopPolling,
     revalidate,
   };
 }

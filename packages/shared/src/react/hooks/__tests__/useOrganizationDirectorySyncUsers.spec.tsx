@@ -1,10 +1,8 @@
-import { act, render, renderHook, waitFor } from '@testing-library/react';
-import React, { useEffect } from 'react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { DirectorySyncResource } from '@/types/directorySync';
 
-import type { UseOrganizationDirectorySyncUsersReturn } from '../useOrganizationDirectorySyncUsers';
 import { __internal_useOrganizationDirectorySyncUsers } from '../useOrganizationDirectorySyncUsers';
 import { createMockClerk, createMockQueryClient } from './mocks/clerk';
 import { wrapper } from './wrapper';
@@ -34,11 +32,13 @@ vi.mock('../../contexts', () => ({
   useInitialStateContext: () => undefined,
 }));
 
-const renderUsers = (initialDirectory: DirectorySyncResource | null) =>
+type RenderProps = { directory: DirectorySyncResource | null; poll?: boolean };
+
+const renderUsers = (initialProps: RenderProps) =>
   renderHook(
-    ({ directory }: { directory: DirectorySyncResource | null }) =>
-      __internal_useOrganizationDirectorySyncUsers({ directory, pollIntervalMs: POLL_INTERVAL_MS }),
-    { wrapper, initialProps: { directory: initialDirectory } },
+    ({ directory, poll }: RenderProps) =>
+      __internal_useOrganizationDirectorySyncUsers({ directory, poll, pollIntervalMs: POLL_INTERVAL_MS }),
+    { wrapper, initialProps },
   );
 
 describe('useOrganizationDirectorySyncUsers', () => {
@@ -49,23 +49,30 @@ describe('useOrganizationDirectorySyncUsers', () => {
   });
 
   it('stays dormant without a directory', () => {
-    const { result } = renderUsers(null);
+    const { result } = renderUsers({ directory: null, poll: true });
 
     expect(getUsersSpy).not.toHaveBeenCalled();
     expect(result.current.data).toBeUndefined();
     expect(result.current.isPolling).toBe(false);
   });
 
-  it('polls while armed and stops on stopPolling', async () => {
-    const { result } = renderUsers(createDirectory('dir_1'));
+  it('does not poll by default', async () => {
+    const { result } = renderUsers({ directory: createDirectory('dir_1') });
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.isPolling).toBe(false);
 
-    act(() => result.current.startPolling());
+    const callsAfterLoad = getUsersSpy.mock.calls.length;
+    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS * 3));
+    expect(getUsersSpy.mock.calls.length).toBe(callsAfterLoad);
+  });
+
+  it('polls while `poll` is true and stops when it turns false', async () => {
+    const directory = createDirectory('dir_1');
+    const { result, rerender } = renderUsers({ directory, poll: true });
     expect(result.current.isPolling).toBe(true);
     await waitFor(() => expect(getUsersSpy.mock.calls.length).toBeGreaterThanOrEqual(3));
 
-    act(() => result.current.stopPolling());
+    rerender({ directory, poll: false });
     expect(result.current.isPolling).toBe(false);
 
     const callsAfterStop = getUsersSpy.mock.calls.length;
@@ -73,70 +80,15 @@ describe('useOrganizationDirectorySyncUsers', () => {
     expect(getUsersSpy.mock.calls.length).toBe(callsAfterStop);
   });
 
-  it('disarms polling when the directory identity changes', async () => {
-    const { result, rerender } = renderUsers(createDirectory('dir_1'));
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-    act(() => result.current.startPolling());
-    expect(result.current.isPolling).toBe(true);
-
-    rerender({ directory: createDirectory('dir_2') });
-    expect(result.current.isPolling).toBe(false);
-  });
-
-  it('does not resume polling when the original directory returns', async () => {
-    const { result, rerender } = renderUsers(createDirectory('dir_1'));
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-    act(() => result.current.startPolling());
-    expect(result.current.isPolling).toBe(true);
-
-    rerender({ directory: createDirectory('dir_2') });
-    rerender({ directory: createDirectory('dir_1') });
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.isPolling).toBe(false);
-
-    const callsAfterReturn = getUsersSpy.mock.calls.length;
-    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS * 3));
-    expect(getUsersSpy.mock.calls.length).toBe(callsAfterReturn);
-  });
-
-  it('keeps polling armed by a child effect in the same commit the directory arrives', async () => {
-    let latest: UseOrganizationDirectorySyncUsersReturn | undefined;
-
-    // Child effects run before parent effects, so this is the ordering a
-    // reset-in-effect implementation would silently cancel.
-    const Child = ({
-      directory,
-      startPolling,
-    }: {
-      directory: DirectorySyncResource | null;
-      startPolling: () => void;
-    }) => {
-      useEffect(() => {
-        if (directory) {
-          startPolling();
-        }
-      }, [directory, startPolling]);
-      return null;
-    };
-
-    const Parent = ({ directory }: { directory: DirectorySyncResource | null }) => {
-      latest = __internal_useOrganizationDirectorySyncUsers({ directory, pollIntervalMs: POLL_INTERVAL_MS });
-      return (
-        <Child
-          directory={directory}
-          startPolling={latest.startPolling}
-        />
-      );
-    };
-
-    const { rerender } = render(<Parent directory={null} />);
-    expect(latest?.isPolling).toBe(false);
-
-    rerender(<Parent directory={createDirectory('dir_1')} />);
-
-    await waitFor(() => expect(latest?.isPolling).toBe(true));
+  it('stops polling on unmount', async () => {
+    const { result, unmount } = renderUsers({ directory: createDirectory('dir_1'), poll: true });
     await waitFor(() => expect(getUsersSpy.mock.calls.length).toBeGreaterThanOrEqual(3));
+    expect(result.current.isPolling).toBe(true);
+
+    unmount();
+
+    const callsAfterUnmount = getUsersSpy.mock.calls.length;
+    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS * 3));
+    expect(getUsersSpy.mock.calls.length).toBe(callsAfterUnmount);
   });
 });
