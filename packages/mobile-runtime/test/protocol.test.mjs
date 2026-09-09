@@ -1,0 +1,178 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import { fixture, response, deferred, sessionFixture, tokenFixture } from './protocol-fixture.mjs';
+import { fixtures } from './native-fixtures.mjs';
+
+test('production handshake rejects mismatched bindings before HTTP or storage', async () => {
+  const f = await fixture({ configuration: { contractHash: 'wrong' }, allowFailure: true });
+  assert.equal(f.ready.failure.code, 'incompatible_bindings');
+  assert.equal(f.requests.length, 0);
+  f.dispose();
+});
+
+test('generated email verification preserves MFA requirements and returned domain errors', async t => {
+  let reject = false;
+  const f = await fixture({
+    client: { ...fixtures.client, sign_in: fixtures.signIn },
+    http: request => {
+      if (!request.url.includes('/attempt_first_factor')) return;
+      assert.equal(new URLSearchParams(request.body).get('strategy'), 'email_code');
+      if (reject)
+        return response(null, {
+          status: 422,
+          body: JSON.stringify({
+            errors: [
+              {
+                code: 'form_code_incorrect',
+                message: 'Incorrect code',
+                long_message: 'Try again',
+                meta: { param_name: 'code', password: 'must-not-cross' },
+              },
+            ],
+          }),
+        });
+      return response({ ...fixtures.signIn, status: 'needs_second_factor' });
+    },
+  });
+  t.after(f.dispose);
+  const group = f.group('signIn', 'emailCode');
+  const success = await f.invoke(group, `${group.type}.verifyCode`, [{ code: '123456' }]);
+  assert.deepEqual(success.result, { error: null });
+  assert.equal(f.resource(f.state.roots.signIn).status, 'needs_second_factor');
+  assert.equal(f.state.roots.session, null);
+  reject = true;
+  const failure = await f.invoke(group, `${group.type}.verifyCode`, [{ code: 'wrong' }]);
+  assert.equal(failure.result.error.kind, 'clerk');
+  assert.equal(failure.result.error.errors[0].code, 'form_code_incorrect');
+  assert.equal(JSON.stringify(failure).includes('must-not-cross'), false);
+  assert.equal(failure.state.revision, f.state.revision);
+});
+
+test('local reset replaces the attempt, invalidates held groups, and makes no HTTP request', async t => {
+  const f = await fixture({ client: { ...fixtures.client, sign_in: fixtures.signIn } });
+  t.after(f.dispose);
+  const old = f.state.roots.signIn;
+  const group = f.group('signIn', 'emailCode');
+  const count = f.requests.length;
+  const reset = await f.invoke(old, 'SignIn.reset');
+  assert.deepEqual(reset.result, { error: null });
+  assert.equal(f.requests.length, count);
+  assert.notDeepEqual(f.state.roots.signIn, old);
+  assert.equal(f.resource(f.state.roots.signIn).status, 'needs_identifier');
+  const stale = await f.invoke(group, `${group.type}.verifyCode`, [{ code: '123456' }]);
+  assert.equal(stale.failure.code, 'stale_resource');
+  assert.equal(f.requests.length, count);
+});
+
+test('reset cancels an outstanding browser effect and ignores its late callback', async t => {
+  const browser = deferred(),
+    opened = deferred();
+  const f = await fixture({
+    browser: () => {
+      opened.resolve();
+      return browser.promise;
+    },
+    http: request => {
+      if (request.url.includes('/sign_ins')) return response(fixtures.signIn);
+    },
+  });
+  t.after(f.dispose);
+  const sso = f.invoke(f.state.roots.signIn, 'SignIn.sso', [{ strategy: 'oauth_google' }]);
+  await opened.promise;
+  await f.invoke(f.state.roots.signIn, 'SignIn.reset');
+  const result = await sso;
+  assert.equal(result.result.error.code, 'stale_authentication_attempt');
+  browser.resolve({ callbackUrl: 'clerk-test://sso-callback?rotating_token_nonce=late' });
+  await new Promise(r => setImmediate(r));
+  assert.equal(f.requests.filter(r => r.method === 'GET' && r.url.includes('sign_ins')).length, 0);
+  assert.equal(f.resource(f.state.roots.signIn).status, 'needs_identifier');
+  assert.ok(f.messages.some(m => m.kind === 'hostCancel'));
+});
+
+for (const status of ['active', 'pending']) {
+  test(`explicit finalize adopts the ${status} session before completion without navigation`, async t => {
+    const session = sessionFixture(status);
+    const token = tokenFixture();
+    const complete = { ...fixtures.signIn, status: 'complete', created_session_id: session.id };
+    const client = {
+      ...fixtures.client,
+      id: 'client_native',
+      sign_in: complete,
+      sessions: [session],
+      last_active_session_id: null,
+    };
+    let clientReads = 0;
+    const f = await fixture({
+      client: { ...client, sessions: [] },
+      http: request => {
+        if (new URL(request.url).pathname.endsWith('/client') && ++clientReads > 1) return response(client);
+        if (request.url.includes('/touch'))
+          return response(session, {
+            body: JSON.stringify({ response: session, client: { ...client, last_active_session_id: session.id } }),
+          });
+        if (request.url.includes('/tokens')) return response(token, { body: JSON.stringify(token) });
+      },
+    });
+    t.after(f.dispose);
+    assert.equal(f.state.roots.session, null);
+    const result = await f.invoke(f.state.roots.signIn, 'SignIn.finalize');
+    assert.deepEqual(result.result, { error: null }, JSON.stringify(result.failure || result.result));
+    assert.equal(f.resource(f.state.roots.session).status, status);
+    assert.equal(f.resource(f.state.roots.user).id, 'user_native');
+    assert.equal(JSON.stringify(result.state).includes('fixture_signature'), false);
+    assert.equal(
+      f.messages.some(m => m.capability === 'browser'),
+      false,
+    );
+    if (status === 'pending') assert.equal(f.resource(f.state.roots.session).currentTask.key, 'choose-organization');
+    else {
+      const jwt = await f.invoke(f.state.roots.session, 'Session.getToken');
+      assert.equal(jwt.result, token.jwt);
+    }
+  });
+}
+
+test('sign-out fences a finalization response and its credential before it can restore a session', async t => {
+  const session = sessionFixture();
+  const client = {
+    ...fixtures.client,
+    id: 'client_native',
+    sign_in: { ...fixtures.signIn, status: 'complete', created_session_id: session.id },
+    sessions: [session],
+  };
+  const touch = deferred(),
+    touched = deferred();
+  let reads = 0;
+  const f = await fixture({
+    client: { ...client, sessions: [] },
+    http: async request => {
+      const path = new URL(request.url).pathname;
+      if (path.endsWith('/client') && ++reads > 1) return response(client);
+      if (path.endsWith('/touch')) {
+        touched.resolve();
+        return touch.promise;
+      }
+      if (path.endsWith('/sessions')) return response({ ...fixtures.client, id: client.id, sessions: [] });
+    },
+  });
+  t.after(f.dispose);
+  const finalized = f.invoke(f.state.roots.signIn, 'SignIn.finalize');
+  await touched.promise;
+  const signedOut = await f.invoke(f.state.roots.clerk, 'Clerk.signOut');
+  assert.equal(signedOut.failure, undefined);
+  assert.equal(f.state.roots.session, null);
+  touch.resolve(
+    response(session, {
+      headers: { authorization: 'stale_credential' },
+      body: JSON.stringify({ response: session, client: { ...client, last_active_session_id: session.id } }),
+    }),
+  );
+  const stale = await finalized;
+  assert.equal(stale.failure.code, 'stale_operation');
+  assert.equal(f.state.roots.session, null);
+  assert.notEqual(f.credential, 'stale_credential');
+  assert.equal(
+    f.requests.some(r => r.url.includes('/tokens')),
+    false,
+  );
+});

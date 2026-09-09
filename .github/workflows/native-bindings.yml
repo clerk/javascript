@@ -1,0 +1,48 @@
+name: Native binding contracts
+on:
+  pull_request:
+    paths:
+      - 'packages/clerk-js/**'
+      - 'packages/shared/**'
+      - 'packages/native-bindings/**'
+      - 'packages/mobile-runtime/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/native-bindings.yml'
+  workflow_dispatch:
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm --filter @clerk/shared build
+      - run: pnpm --filter @clerk/native-bindings check
+      - run: pnpm --filter @clerk/native-bindings test
+      - run: pnpm --filter @clerk/mobile-runtime build
+      - run: pnpm --filter @clerk/mobile-runtime test
+      - run: pnpm --dir packages/mobile-runtime exec tsc --noEmit
+      - name: Record native public API changes
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REVISION: ${{ github.event.pull_request.base.sha }}
+        run: |
+          mkdir -p /tmp/native-api-before
+          for language in swift kotlin; do
+            git show "$BASE_REVISION:packages/native-bindings/generated/$language-api.txt" > "/tmp/native-api-before/$language-api.txt" || :
+          done
+          node packages/native-bindings/src/api-diff.mjs /tmp/native-api-before packages/native-bindings/generated > native-api-diff.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-contracts
+          path: |
+            packages/native-bindings/generated/
+            packages/mobile-runtime/dist/clerk-core.js
+            native-api-diff.json

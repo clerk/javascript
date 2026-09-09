@@ -1,0 +1,23 @@
+{
+  "extends": "../clerk-js/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "allowImportingTsExtensions": true,
+    "checkJs": false,
+    "rootDir": "../..",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "paths": {
+      "@/*": ["../clerk-js/src/*"]
+    },
+    "types": ["node"],
+    "skipLibCheck": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": false
+  },
+  "include": ["src", "../clerk-js/src/global.d.ts"],
+  "files": [
+    "../clerk-js/node_modules/@rspack/core/module.d.ts",
+    "../clerk-js/node_modules/@types/cloudflare-turnstile/index.d.ts"
+  ]
+}

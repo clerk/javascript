@@ -1,0 +1,14 @@
+{
+  "name": "@clerk/native-bindings",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node src/generate.mjs --check",
+    "generate": "node src/generate.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "catalog:repo"
+  }
+}

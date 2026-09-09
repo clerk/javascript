@@ -1,0 +1,226 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import { randomBytes } from 'node:crypto';
+import { fixtures } from './native-fixtures.mjs';
+
+const bundle = fs.readFileSync(new URL('../dist/clerk-core.js', import.meta.url), 'utf8');
+const manifest = JSON.parse(fs.readFileSync(new URL('../../native-bindings/generated/manifest.json', import.meta.url)));
+export const publishableKey = `pk_test_${Buffer.from('native-core.clerk.accounts.dev$').toString('base64')}`;
+export const callbackUrl = 'clerk-test://sso-callback';
+export const deferred = () => {
+  let resolve;
+  const promise = new Promise(r => {
+    resolve = r;
+  });
+  return { promise, resolve };
+};
+
+export async function fixture(options = {}) {
+  const messages = [],
+    requests = [],
+    waits = new Map(),
+    jobs = new Map();
+  let credential = options.credential ?? null,
+    state,
+    sequence = 0;
+  let client = structuredClone(options.client ?? fixtures.client);
+  const context = vm.createContext({
+    __clerkNativeRandom: length => randomBytes(length).toString('base64'),
+    __clerkNativeEmit: encoded => {
+      const message = JSON.parse(encoded);
+      messages.push(message);
+      if (message.state) state = message.state;
+      if (message.kind === 'hostCancel') {
+        clearTimeout(jobs.get(message.id));
+        jobs.delete(message.id);
+        return;
+      }
+      if (message.kind !== 'hostRequest') {
+        if (message.kind === 'runtimeError') {
+          for (const pending of waits.values()) pending.resolve(message);
+          waits.clear();
+        }
+        const waiter = waits.get(message.id);
+        if (waiter) {
+          waits.delete(message.id);
+          waiter.resolve(message);
+        }
+        return;
+      }
+      if (message.capability === 'timer') {
+        jobs.set(
+          message.id,
+          setTimeout(() => {
+            jobs.delete(message.id);
+            receive({ kind: 'hostReply', id: message.id, result: null });
+          }, message.args.milliseconds),
+        );
+        return;
+      }
+      void (async () => {
+        try {
+          let result;
+          if (message.capability === 'storage.read') result = credential;
+          else if (message.capability === 'storage.write') {
+            credential = message.args.value;
+            result = null;
+          } else if (message.capability === 'storage.remove') {
+            credential = null;
+            result = null;
+          } else if (message.capability === 'browser')
+            result = (await options.browser?.(message.args)) ?? {
+              callbackUrl: `${callbackUrl}?rotating_token_nonce=fixture_nonce`,
+            };
+          else if (message.capability === 'http') {
+            const request = message.args;
+            requests.push(request);
+            const custom = await options.http?.(request, {
+              get client() {
+                return client;
+              },
+              set client(value) {
+                client = value;
+              },
+            });
+            if (custom) result = custom;
+            else {
+              const pathname = new URL(request.url).pathname;
+              let payload;
+              if (pathname.endsWith('/environment')) payload = fixtures.environment;
+              else if (pathname.endsWith('/client')) payload = client;
+              else
+                throw Object.assign(new Error(`Unexpected request: ${request.method} ${pathname}`), {
+                  code: 'unexpected_fixture_request',
+                });
+              result = response(payload);
+            }
+          } else if (message.capability.startsWith('passkeys.')) result = await options.passkeys?.(message);
+          else throw Object.assign(new Error('Unsupported fixture capability'), { code: 'capability_unavailable' });
+          receive({ kind: 'hostReply', id: message.id, result });
+        } catch (error) {
+          receive({ kind: 'hostReply', id: message.id, error: { code: error.code || 'fixture_error' } });
+        }
+      })();
+    },
+  });
+  const receive = message => context.ClerkCore.receive(JSON.stringify(message));
+  const send = message => {
+    const id = message.id || `t${++sequence}`;
+    const waiter = deferred();
+    waits.set(id, waiter);
+    receive({ ...message, id });
+    return waiter.promise;
+  };
+  vm.runInContext(bundle, context, { timeout: 10000 });
+  const ready = await send({
+    kind: 'init',
+    configuration: {
+      publishableKey,
+      callbackUrl,
+      ...manifest,
+      platform: 'ios',
+      capabilities: ['http', 'storage', 'random', 'timer', 'browser', ...(options.capabilities || [])],
+      ...options.configuration,
+    },
+  });
+  const dispose = () => {
+    receive({ kind: 'dispose' });
+    for (const job of jobs.values()) clearTimeout(job);
+  };
+  if (!options.allowFailure) assert.equal(ready.kind, 'ready', JSON.stringify(ready));
+  return {
+    ready,
+    messages,
+    requests,
+    receive,
+    send,
+    dispose,
+    get state() {
+      return state;
+    },
+    get credential() {
+      return credential;
+    },
+    resource(handle) {
+      return state.resources.find(r => r.handle.id === handle.id)?.state;
+    },
+    invoke(target, operation, args = [], id) {
+      return send({ kind: 'invoke', target, operation, args, id });
+    },
+    group(root, name) {
+      const reference = state.resources.find(r => r.handle.id === state.roots[root].id).state[name];
+      return reference.$ref;
+    },
+  };
+}
+
+export function response(payload, extra = {}) {
+  return {
+    status: 200,
+    headers: { authorization: 'fixture_client_credential' },
+    body: JSON.stringify({ response: payload }),
+    ...extra,
+  };
+}
+
+export function sessionFixture(status = 'active') {
+  const now = Date.now();
+  return {
+    object: 'session',
+    id: 'sess_native',
+    status,
+    expire_at: now + 86400000,
+    abandon_at: now + 86400000,
+    created_at: now,
+    updated_at: now,
+    last_active_at: now,
+    last_active_organization_id: null,
+    actor: null,
+    factor_verification_age: [0, 0],
+    tasks: status === 'pending' ? [{ key: 'choose-organization' }] : [],
+    public_user_data: {
+      first_name: 'Test',
+      last_name: 'User',
+      image_url: '',
+      identifier: 'test@example.com',
+      user_id: 'user_native',
+    },
+    user: {
+      object: 'user',
+      id: 'user_native',
+      first_name: 'Test',
+      last_name: 'User',
+      image_url: '',
+      username: null,
+      primary_email_address_id: null,
+      primary_phone_number_id: null,
+      primary_web3_wallet_id: null,
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+      enterprise_accounts: [],
+      organization_memberships: [],
+      passkeys: [],
+      password_enabled: true,
+      totp_enabled: false,
+      backup_code_enabled: false,
+      two_factor_enabled: false,
+      public_metadata: {},
+      unsafe_metadata: {},
+      created_at: now,
+      updated_at: now,
+      last_sign_in_at: now,
+    },
+  };
+}
+
+export function tokenFixture() {
+  const now = Math.floor(Date.now() / 1000);
+  const base64 = object => Buffer.from(JSON.stringify(object)).toString('base64url');
+  return {
+    object: 'token',
+    jwt: `${base64({ alg: 'RS256', typ: 'JWT' })}.${base64({ sub: 'user_native', sid: 'sess_native', iat: now, exp: now + 60, iss: 'https://native-core.clerk.accounts.dev' })}.fixture_signature`,
+  };
+}

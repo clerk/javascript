@@ -27,3 +27,6 @@ renovate.json5
 # Frozen snapshots of TypeDoc-generated MDX; must match raw `extract-methods.mjs` output.
 .typedoc/__tests__/__snapshots__/
 CLAUDE.md
+
+# Deterministic native binding compiler outputs.
+packages/native-bindings/generated/

@@ -1,0 +1,1400 @@
+ActiveSession.abandonAt: Date
+ActiveSession.actor: [String: JSONValue]?
+ActiveSession.agent: [String: JSONValue]?
+ActiveSession.attemptFirstFactorVerification(attemptFactor: SessionVerifyAttemptFirstFactorParams): SessionVerification [return]
+ActiveSession.attemptSecondFactorVerification(params: SessionVerifyAttemptSecondFactorParams): SessionVerification [return]
+ActiveSession.checkAuthorization(isAuthorizedParams: CheckAuthorizationParams): Bool [return]
+ActiveSession.clearCache(): Void [return]
+ActiveSession.createdAt: Date
+ActiveSession.currentTask: SessionTask? = nil
+ActiveSession.end(): Session [return]
+ActiveSession.expireAt: Date
+ActiveSession.factorVerificationAge: ActiveSessionFactorVerificationAgeValue?
+ActiveSession.getToken(options: GetTokenOptions? = nil): String? [return]
+ActiveSession.id: String
+ActiveSession.lastActiveAt: Date
+ActiveSession.lastActiveOrganizationId: String?
+ActiveSession.prepareFirstFactorVerification(factor: SessionVerifyPrepareFirstFactorParams): SessionVerification [return]
+ActiveSession.prepareSecondFactorVerification(params: PhoneCodeSecondFactorConfig): SessionVerification [return]
+ActiveSession.publicUserData: PublicUserData
+ActiveSession.reload(p: ClerkResourceReloadParams? = nil): ActiveSession [return]
+ActiveSession.remove(): Session [return]
+ActiveSession.startVerification(params: SessionVerifyCreateParams): SessionVerification [return]
+ActiveSession.status: String
+ActiveSession.tasks: [SessionTask]?
+ActiveSession.touch(params: SessionTouchParams? = nil): Session [return]
+ActiveSession.updatedAt: Date
+ActiveSession.user: User
+ActiveSession.verifyWithPasskey(): SessionVerification [return]
+ActiveSessionFactorVerificationAgeValue tuple: Double, Double
+AddMemberParams.role: String
+AddMemberParams.userId: String
+AddPaymentMethodParams.gateway: String
+AddPaymentMethodParams.paymentToken: String
+AttemptAffiliationVerificationParams.code: String
+AttemptEmailAddressVerificationParams.code: String
+AttemptPhoneNumberVerificationParams.code: String
+AttemptWeb3WalletVerificationParams.signature: String
+AttemptWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy? = nil
+AuthenticatorAssertionResponse.authenticatorData: Data
+AuthenticatorAssertionResponse.clientDataJSON: Data
+AuthenticatorAssertionResponse.signature: Data
+AuthenticatorAssertionResponse.userHandle: Data?
+BackupCode.codes: [String]
+BackupCode.createdAt: Date?
+BackupCode.id: String
+BackupCode.reload(p: ClerkResourceReloadParams? = nil): BackupCode [return]
+BackupCode.updatedAt: Date?
+BackupCodeAttempt.code: String
+BackupCodeAttempt.strategy: String
+BackupCodeFactor.strategy: String
+BillingInitializedPaymentMethod.externalClientSecret: String
+BillingInitializedPaymentMethod.externalGatewayId: String
+BillingInitializedPaymentMethod.id: String? = nil
+BillingInitializedPaymentMethod.paymentMethodOrder: [String]
+BillingInitializedPaymentMethod.reload(p: ClerkResourceReloadParams? = nil): BillingInitializedPaymentMethod [return]
+BillingPaymentMethod.cardType: String?
+BillingPaymentMethod.createdAt: Field<Date> = .omitted
+BillingPaymentMethod.expiryMonth: Field<Double> = .omitted
+BillingPaymentMethod.expiryYear: Field<Double> = .omitted
+BillingPaymentMethod.id: String
+BillingPaymentMethod.isDefault: Bool? = nil
+BillingPaymentMethod.isRemovable: Bool? = nil
+BillingPaymentMethod.last4: String?
+BillingPaymentMethod.makeDefault(params: BillingPaymentMethodRemoveParams? = nil): JSONValue [return]
+BillingPaymentMethod.paymentType: String? = nil
+BillingPaymentMethod.reload(p: ClerkResourceReloadParams? = nil): BillingPaymentMethod [return]
+BillingPaymentMethod.remove(params: BillingPaymentMethodRemoveParams? = nil): DeletedObject [return]
+BillingPaymentMethod.status: BillingPaymentMethodStatus
+BillingPaymentMethod.updatedAt: Field<Date> = .omitted
+BillingPaymentMethod.walletType: Field<String> = .omitted
+BillingPaymentMethodRemoveParams.orgId: String? = nil
+BillingPaymentMethodStatus cases: expired, active, disconnected, unrecognized(String)
+CheckAuthorizationParams variants: SessionCheckAuthorizationIsAuthorizedParamsCase1 | SessionCheckAuthorizationIsAuthorizedParamsCase2 | SessionCheckAuthorizationIsAuthorizedParamsCase3 | SessionCheckAuthorizationIsAuthorizedParamsCase4 | SessionCheckAuthorizationIsAuthorizedParamsCase5
+Clerk.createOrganization(params: CreateOrganizationParams): Organization [return]
+Clerk.getOrganization(organizationId: String): Organization [return]
+Clerk.loaded: Bool
+Clerk.organization: Organization?
+Clerk.session: Session?
+Clerk.setActive(params: MobileSetActiveParams): Void [return]
+Clerk.signIn: SignIn
+Clerk.signOut(options: MobileSignOutOptions? = nil): Void [return]
+Clerk.signUp: SignUp
+Clerk.status: ClerkStatus
+Clerk.user: User?
+ClerkAPIError.code: String
+ClerkAPIError.longMessage: String? = nil
+ClerkAPIError.message: String
+ClerkAPIError.meta: ClerkAPIErrorMeta? = nil
+ClerkAPIErrorMeta.emailAddresses: [String]? = nil
+ClerkAPIErrorMeta.identifiers: [String]? = nil
+ClerkAPIErrorMeta.isPlanUpgradePossible: Bool? = nil
+ClerkAPIErrorMeta.paramName: String? = nil
+ClerkAPIErrorMeta.permissions: [String]? = nil
+ClerkAPIErrorMeta.plan: ClerkAPIErrorMetaPlan? = nil
+ClerkAPIErrorMeta.seatsQuantity: Double? = nil
+ClerkAPIErrorMeta.seatsQuantityToAdd: Double? = nil
+ClerkAPIErrorMeta.sessionId: String? = nil
+ClerkAPIErrorMeta.zxcvbn: ClerkAPIErrorMetaZxcvbn? = nil
+ClerkAPIErrorMetaPlan.amount_formatted: String
+ClerkAPIErrorMetaPlan.annual_monthly_amount_formatted: String
+ClerkAPIErrorMetaPlan.currency_symbol: String
+ClerkAPIErrorMetaPlan.id: String
+ClerkAPIErrorMetaPlan.name: String
+ClerkAPIErrorMetaZxcvbn.suggestions: [ClerkAPIErrorMetaZxcvbnSuggestionsElement]
+ClerkAPIErrorMetaZxcvbnSuggestionsElement.code: String
+ClerkAPIErrorMetaZxcvbnSuggestionsElement.message: String
+ClerkPaginatedResponseBillingPaymentMethod.data: [BillingPaymentMethod]
+ClerkPaginatedResponseBillingPaymentMethod.total_count: Double
+ClerkPaginatedResponseEnterpriseConnectionTestRun.data: [EnterpriseConnectionTestRun]
+ClerkPaginatedResponseEnterpriseConnectionTestRun.total_count: Double
+ClerkPaginatedResponseOrganizationDomain.data: [OrganizationDomain]
+ClerkPaginatedResponseOrganizationDomain.total_count: Double
+ClerkPaginatedResponseOrganizationInvitation.data: [OrganizationInvitation]
+ClerkPaginatedResponseOrganizationInvitation.total_count: Double
+ClerkPaginatedResponseOrganizationMembership.data: [OrganizationMembership]
+ClerkPaginatedResponseOrganizationMembership.total_count: Double
+ClerkPaginatedResponseOrganizationMembershipRequest.data: [OrganizationMembershipRequest]
+ClerkPaginatedResponseOrganizationMembershipRequest.total_count: Double
+ClerkPaginatedResponseOrganizationSuggestion.data: [OrganizationSuggestion]
+ClerkPaginatedResponseOrganizationSuggestion.total_count: Double
+ClerkPaginatedResponseUserOrganizationInvitation.data: [UserOrganizationInvitation]
+ClerkPaginatedResponseUserOrganizationInvitation.total_count: Double
+ClerkResourceReloadParams.rotatingTokenNonce: String? = nil
+ClerkStatus cases: degraded, error, loading, ready, unrecognized(String)
+CreateEmailAddressParams.email: String
+CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.cancelEmailLinkFlow(): Void [return]
+CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.startEmailLinkFlow(params: StartEmailLinkFlowParams): EmailAddress [return]
+CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress.cancelEnterpriseSSOLinkFlow(): Void [return]
+CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress.startEnterpriseSSOLinkFlow(params: StartEnterpriseSSOLinkFlowParams): EmailAddress [return]
+CreateExternalAccountParams.additionalScopes: [String]? = nil
+CreateExternalAccountParams.enterpriseConnectionId: String? = nil
+CreateExternalAccountParams.oidcLoginHint: String? = nil
+CreateExternalAccountParams.oidcPrompt: String? = nil
+CreateExternalAccountParams.redirectUrl: String? = nil
+CreateExternalAccountParams.strategy: OAuthStrategy? = nil
+CreateOrganizationEnterpriseConnectionParams.domains: [String]? = nil
+CreateOrganizationEnterpriseConnectionParams.name: String? = nil
+CreateOrganizationEnterpriseConnectionParams.oidc: Field<OrganizationEnterpriseConnectionOidcInput> = .omitted
+CreateOrganizationEnterpriseConnectionParams.organizationId: Field<String> = .omitted
+CreateOrganizationEnterpriseConnectionParams.provider: OrganizationEnterpriseConnectionProvider
+CreateOrganizationEnterpriseConnectionParams.saml: Field<OrganizationEnterpriseConnectionSamlInput> = .omitted
+CreateOrganizationParams.name: String
+CreateOrganizationParams.slug: String? = nil
+CreatePhoneNumberParams.phoneNumber: String
+CreateWeb3WalletParams.web3Wallet: String
+DeletedObject.deleted: Bool
+DeletedObject.id: String? = nil
+DeletedObject.object: String
+DeletedObject.slug: String? = nil
+EmailAddress.attemptVerification(params: AttemptEmailAddressVerificationParams): EmailAddress [return]
+EmailAddress.create(): EmailAddress [return]
+EmailAddress.createEmailLinkFlow(): CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress [return]
+EmailAddress.createEnterpriseSSOLinkFlow(): CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress [return]
+EmailAddress.destroy(): Void [return]
+EmailAddress.emailAddress: String
+EmailAddress.id: String
+EmailAddress.linkedTo: [IdentificationLink]
+EmailAddress.matchesSsoConnection: Bool
+EmailAddress.prepareVerification(params: PrepareEmailAddressVerificationParams): EmailAddress [return]
+EmailAddress.reload(p: ClerkResourceReloadParams? = nil): EmailAddress [return]
+EmailAddress.stringValue(): String [return]
+EmailAddress.verification: Verification
+EmailAddressPrepareVerificationParamsCase1.strategy: String
+EmailAddressPrepareVerificationParamsCase2.redirectUrl: String
+EmailAddressPrepareVerificationParamsCase2.strategy: EmailAddressPrepareVerificationParamsCase2Strategy
+EmailAddressPrepareVerificationParamsCase2Strategy cases: enterprise_sso, email_link, unrecognized(String)
+EmailCodeAttempt.code: String
+EmailCodeAttempt.strategy: String
+EmailCodeConfig.emailAddressId: String
+EmailCodeConfig.primary: Bool? = nil
+EmailCodeConfig.strategy: String
+EmailCodeFactor.emailAddressId: String
+EmailCodeFactor.primary: Bool? = nil
+EmailCodeFactor.safeIdentifier: String
+EmailCodeFactor.strategy: String
+EmailLinkFactor.emailAddressId: String
+EmailLinkFactor.primary: Bool? = nil
+EmailLinkFactor.safeIdentifier: String
+EmailLinkFactor.strategy: String
+EnterpriseAccount.active: Bool
+EnterpriseAccount.destroy(): Void [return]
+EnterpriseAccount.emailAddress: String
+EnterpriseAccount.enterpriseConnection: EnterpriseAccountConnection?
+EnterpriseAccount.enterpriseConnectionId: String?
+EnterpriseAccount.firstName: String?
+EnterpriseAccount.id: String? = nil
+EnterpriseAccount.lastAuthenticatedAt: Date?
+EnterpriseAccount.lastName: String?
+EnterpriseAccount.protocol: EnterpriseProtocol
+EnterpriseAccount.provider: EnterpriseProvider
+EnterpriseAccount.providerUserId: String?
+EnterpriseAccount.publicMetadata: [String: JSONValue]?
+EnterpriseAccount.reload(p: ClerkResourceReloadParams? = nil): EnterpriseAccount [return]
+EnterpriseAccount.verification: Verification?
+EnterpriseAccountConnection.active: Bool
+EnterpriseAccountConnection.allowIdpInitiated: Bool
+EnterpriseAccountConnection.allowOrganizationAccountLinking: Bool
+EnterpriseAccountConnection.allowSubdomains: Bool
+EnterpriseAccountConnection.disableAdditionalIdentifications: Bool
+EnterpriseAccountConnection.domain: String
+EnterpriseAccountConnection.enterpriseConnectionId: String?
+EnterpriseAccountConnection.id: String? = nil
+EnterpriseAccountConnection.logoPublicUrl: String?
+EnterpriseAccountConnection.name: String
+EnterpriseAccountConnection.protocol: EnterpriseProtocol
+EnterpriseAccountConnection.provider: EnterpriseProvider
+EnterpriseAccountConnection.reload(p: ClerkResourceReloadParams? = nil): EnterpriseAccountConnection [return]
+EnterpriseAccountConnection.syncUserAttributes: Bool
+EnterpriseConnection.active: Bool
+EnterpriseConnection.allowOrganizationAccountLinking: Bool
+EnterpriseConnection.createdAt: Date?
+EnterpriseConnection.customAttributes: [JSONValue]
+EnterpriseConnection.disableAdditionalIdentifications: Bool
+EnterpriseConnection.domains: [String]
+EnterpriseConnection.id: String
+EnterpriseConnection.logoPublicUrl: String?
+EnterpriseConnection.name: String
+EnterpriseConnection.oauthConfig: EnterpriseOAuthConfig?
+EnterpriseConnection.organizationId: String?
+EnterpriseConnection.provider: String
+EnterpriseConnection.reload(p: ClerkResourceReloadParams? = nil): EnterpriseConnection [return]
+EnterpriseConnection.samlConnection: EnterpriseSamlConnectionNested?
+EnterpriseConnection.syncUserAttributes: Bool
+EnterpriseConnection.updatedAt: Date?
+EnterpriseConnectionTestRun.connectionType: EnterpriseConnectionTestRunConnectionType
+EnterpriseConnectionTestRun.createdAt: Date?
+EnterpriseConnectionTestRun.id: String
+EnterpriseConnectionTestRun.logs: [EnterpriseConnectionTestRunLog]
+EnterpriseConnectionTestRun.oauth: EnterpriseConnectionTestRunOauthPayload?
+EnterpriseConnectionTestRun.parsedUserInfo: EnterpriseConnectionTestRunParsedUserInfo?
+EnterpriseConnectionTestRun.reload(p: ClerkResourceReloadParams? = nil): EnterpriseConnectionTestRun [return]
+EnterpriseConnectionTestRun.saml: EnterpriseConnectionTestRunSamlPayload?
+EnterpriseConnectionTestRun.status: String
+EnterpriseConnectionTestRunConnectionType cases: saml, oauth, unrecognized(String)
+EnterpriseConnectionTestRunInit.url: String
+EnterpriseConnectionTestRunLog.code: String? = nil
+EnterpriseConnectionTestRunLog.level: String? = nil
+EnterpriseConnectionTestRunLog.message: String? = nil
+EnterpriseConnectionTestRunLog.shortMessage: String? = nil
+EnterpriseConnectionTestRunOauthPayload.userInfo: String? = nil
+EnterpriseConnectionTestRunParsedUserInfo.emailAddress: String? = nil
+EnterpriseConnectionTestRunParsedUserInfo.firstName: String? = nil
+EnterpriseConnectionTestRunParsedUserInfo.lastName: String? = nil
+EnterpriseConnectionTestRunParsedUserInfo.userId: String? = nil
+EnterpriseConnectionTestRunSamlPayload.relayState: String? = nil
+EnterpriseConnectionTestRunSamlPayload.samlRequest: String? = nil
+EnterpriseConnectionTestRunSamlPayload.samlResponse: String? = nil
+EnterpriseConnectionTestRunStatus cases: pending, failed, success, unrecognized(String)
+EnterpriseOAuthConfig.authUrl: String? = nil
+EnterpriseOAuthConfig.clientId: String
+EnterpriseOAuthConfig.createdAt: Date?
+EnterpriseOAuthConfig.discoveryUrl: String? = nil
+EnterpriseOAuthConfig.id: String
+EnterpriseOAuthConfig.logoPublicUrl: Field<String> = .omitted
+EnterpriseOAuthConfig.name: String
+EnterpriseOAuthConfig.providerKey: String? = nil
+EnterpriseOAuthConfig.redirectUri: String? = nil
+EnterpriseOAuthConfig.requiresPkce: Bool? = nil
+EnterpriseOAuthConfig.tokenUrl: String? = nil
+EnterpriseOAuthConfig.updatedAt: Date?
+EnterpriseOAuthConfig.userInfoUrl: String? = nil
+EnterpriseProtocol cases: saml, oauth, unrecognized(String)
+EnterpriseProvider cases: saml_custom, saml_okta, saml_google, saml_microsoft, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+EnterpriseSSOFactor.enterpriseConnectionId: String? = nil
+EnterpriseSSOFactor.enterpriseConnectionName: String? = nil
+EnterpriseSSOFactor.strategy: String
+EnterpriseSamlConnectionNested.acsUrl: String
+EnterpriseSamlConnectionNested.active: Bool
+EnterpriseSamlConnectionNested.allowIdpInitiated: Bool
+EnterpriseSamlConnectionNested.allowSubdomains: Bool
+EnterpriseSamlConnectionNested.forceAuthn: Bool
+EnterpriseSamlConnectionNested.id: String
+EnterpriseSamlConnectionNested.idpCertificate: String
+EnterpriseSamlConnectionNested.idpCertificateExpiresAt: Double
+EnterpriseSamlConnectionNested.idpCertificateIssuedAt: Double
+EnterpriseSamlConnectionNested.idpEntityId: String
+EnterpriseSamlConnectionNested.idpMetadata: String
+EnterpriseSamlConnectionNested.idpMetadataUrl: String
+EnterpriseSamlConnectionNested.idpSsoUrl: String
+EnterpriseSamlConnectionNested.name: String
+EnterpriseSamlConnectionNested.spEntityId: String
+EnterpriseSamlConnectionNested.spMetadataUrl: String
+ExternalAccount.accountIdentifier(): String [return]
+ExternalAccount.approvedScopes: String
+ExternalAccount.destroy(): Void [return]
+ExternalAccount.emailAddress: String
+ExternalAccount.firstName: String
+ExternalAccount.id: String
+ExternalAccount.identificationId: String
+ExternalAccount.imageUrl: String
+ExternalAccount.label: String? = nil
+ExternalAccount.lastName: String
+ExternalAccount.phoneNumber: String? = nil
+ExternalAccount.provider: OAuthProvider
+ExternalAccount.providerSlug(): OAuthProvider [return]
+ExternalAccount.providerTitle(): String [return]
+ExternalAccount.providerUserId: String
+ExternalAccount.publicMetadata: [String: JSONValue]
+ExternalAccount.reauthorize(params: ReauthorizeExternalAccountParams): ExternalAccount [return]
+ExternalAccount.reload(p: ClerkResourceReloadParams? = nil): ExternalAccount [return]
+ExternalAccount.username: String? = nil
+ExternalAccount.verification: Verification?
+GetDomainsParams.enrollmentMode: OrganizationEnrollmentMode? = nil
+GetDomainsParams.initialPage: Double? = nil
+GetDomainsParams.pageSize: Double? = nil
+GetEnterpriseConnectionTestRunsParams.initialPage: Double? = nil
+GetEnterpriseConnectionTestRunsParams.pageSize: Double? = nil
+GetEnterpriseConnectionTestRunsParams.status: [EnterpriseConnectionTestRunStatus]? = nil
+GetEnterpriseConnectionsParams.withOrganizationAccountLinking: Bool? = nil
+GetInvitationsParams.initialPage: Double? = nil
+GetInvitationsParams.pageSize: Double? = nil
+GetInvitationsParams.status: [OrganizationInvitationStatus]? = nil
+GetMembersParams.initialPage: Double? = nil
+GetMembersParams.pageSize: Double? = nil
+GetMembersParams.query: String? = nil
+GetMembersParams.role: [String]? = nil
+GetMembershipRequestParams.initialPage: Double? = nil
+GetMembershipRequestParams.pageSize: Double? = nil
+GetMembershipRequestParams.status: OrganizationInvitationStatus? = nil
+GetPaymentMethodsParams.initialPage: Double? = nil
+GetPaymentMethodsParams.pageSize: Double? = nil
+GetRolesParams.initialPage: Double? = nil
+GetRolesParams.pageSize: Double? = nil
+GetRolesResponse.data: [Role]
+GetRolesResponse.has_role_set_migration: Bool? = nil
+GetRolesResponse.total_count: Double
+GetTokenOptions.organizationId: String? = nil
+GetTokenOptions.skipCache: Bool? = nil
+GetTokenOptions.template: String? = nil
+GetUserOrganizationInvitationsParams.initialPage: Double? = nil
+GetUserOrganizationInvitationsParams.pageSize: Double? = nil
+GetUserOrganizationInvitationsParams.status: OrganizationInvitationStatus? = nil
+GetUserOrganizationMembershipParams.initialPage: Double? = nil
+GetUserOrganizationMembershipParams.pageSize: Double? = nil
+GetUserOrganizationSuggestionsParams.initialPage: Double? = nil
+GetUserOrganizationSuggestionsParams.pageSize: Double? = nil
+GetUserOrganizationSuggestionsParams.status: GetUserOrganizationSuggestionsParamsStatus? = nil
+GetUserOrganizationSuggestionsParamsStatus variants: String | String | [OrganizationSuggestionStatus]
+IdentificationLink.id: String
+IdentificationLink.reload(p: ClerkResourceReloadParams? = nil): IdentificationLink [return]
+IdentificationLink.type: String
+Image.id: String? = nil
+Image.name: String?
+Image.publicUrl: String?
+Image.reload(p: ClerkResourceReloadParams? = nil): Image [return]
+InitializePaymentMethodParams.gateway: String
+InviteMemberParams.emailAddress: String
+InviteMemberParams.role: String
+InviteMembersParams.emailAddresses: [String]
+InviteMembersParams.role: String
+MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = .omitted
+MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = .omitted
+MobileSetActiveParamsOrganization variants: String | Organization
+MobileSetActiveParamsSession variants: String | ActiveSession | PendingSession
+MobileSignOutOptions.sessionId: String? = nil
+OAuthProvider cases: facebook, google, hubspot, github, tiktok, gitlab, discord, twitter, twitch, linkedin, linkedin_oidc, dropbox, atlassian, bitbucket, microsoft, notion, apple, line, instagram, coinbase, spotify, xero, box, slack, linear, x, enstall, huggingface, vercel, unrecognized(String)
+OAuthStrategy cases: oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+OauthFactor.strategy: OAuthStrategy
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.emailAddressId: String? = nil
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.enterpriseConnectionId: String? = nil
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.enterpriseConnectionName: String? = nil
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.oidcPrompt: String? = nil
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.redirectUrl: String
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.strategy: String
+Organization.addMember(params: AddMemberParams): OrganizationMembership [return]
+Organization.addPaymentMethod(params: AddPaymentMethodParams): BillingPaymentMethod [return]
+Organization.adminDeleteEnabled: Bool
+Organization.attemptOwnershipVerification(domainIds: [String]): OrganizationDomainsBulkOwnershipVerification [return]
+Organization.createDomain(domainName: String, params: PickCreateOrganizationDomainParamsAndenrollmentMode? = nil): OrganizationDomain [return]
+Organization.createEnterpriseConnection(params: CreateOrganizationEnterpriseConnectionParams): EnterpriseConnection [return]
+Organization.createEnterpriseConnectionTestRun(enterpriseConnectionId: String): EnterpriseConnectionTestRunInit [return]
+Organization.createdAt: Date
+Organization.deleteEnterpriseConnection(enterpriseConnectionId: String): DeletedObject [return]
+Organization.destroy(): Void [return]
+Organization.exclusiveMembership: Bool
+Organization.getDomain(__0: OrganizationGetDomain__0): OrganizationDomain [return]
+Organization.getDomains(params: GetDomainsParams? = nil): ClerkPaginatedResponseOrganizationDomain [return]
+Organization.getEnterpriseConnectionTestRuns(enterpriseConnectionId: String, params: GetEnterpriseConnectionTestRunsParams? = nil): ClerkPaginatedResponseEnterpriseConnectionTestRun [return]
+Organization.getEnterpriseConnections(params: GetEnterpriseConnectionsParams? = nil): [EnterpriseConnection] [return]
+Organization.getInvitations(params: GetInvitationsParams? = nil): ClerkPaginatedResponseOrganizationInvitation [return]
+Organization.getMembershipRequests(params: GetMembershipRequestParams? = nil): ClerkPaginatedResponseOrganizationMembershipRequest [return]
+Organization.getMemberships(params: GetMembersParams? = nil): ClerkPaginatedResponseOrganizationMembership [return]
+Organization.getPaymentMethods(params: GetPaymentMethodsParams? = nil): ClerkPaginatedResponseBillingPaymentMethod [return]
+Organization.getRoles(params: GetRolesParams? = nil): GetRolesResponse [return]
+Organization.hasImage: Bool
+Organization.id: String
+Organization.imageUrl: String
+Organization.initializePaymentMethod(params: InitializePaymentMethodParams): BillingInitializedPaymentMethod [return]
+Organization.inviteMember(params: InviteMemberParams): OrganizationInvitation [return]
+Organization.inviteMembers(params: InviteMembersParams): [OrganizationInvitation] [return]
+Organization.maxAllowedMemberships: Double
+Organization.membersCount: Double
+Organization.name: String
+Organization.pendingInvitationsCount: Double
+Organization.prepareOwnershipVerification(domainIds: [String]): OrganizationDomainsBulkOwnershipVerification [return]
+Organization.publicMetadata: [String: JSONValue]
+Organization.reload(p: ClerkResourceReloadParams? = nil): Organization [return]
+Organization.removeMember(userId: String): OrganizationMembership [return]
+Organization.selfServeSSOEnabled: Bool
+Organization.setLogo(params: SetOrganizationLogoParams): Organization [return]
+Organization.slug: String?
+Organization.update(params: UpdateOrganizationParams): Organization [return]
+Organization.updateEnterpriseConnection(enterpriseConnectionId: String, params: UpdateOrganizationEnterpriseConnectionParams): EnterpriseConnection [return]
+Organization.updateMember(params: UpdateMembershipParams): OrganizationMembership [return]
+Organization.updatedAt: Date
+OrganizationCreationDefaults.advisory: OrganizationCreationDefaultsAdvisory?
+OrganizationCreationDefaults.form: OrganizationCreationDefaultsForm
+OrganizationCreationDefaults.id: String? = nil
+OrganizationCreationDefaults.reload(p: ClerkResourceReloadParams? = nil): OrganizationCreationDefaults [return]
+OrganizationCreationDefaultsAdvisory.code: String
+OrganizationCreationDefaultsAdvisory.meta: [String: String]
+OrganizationCreationDefaultsAdvisory.severity: String
+OrganizationCreationDefaultsForm.blurHash: String?
+OrganizationCreationDefaultsForm.logo: String?
+OrganizationCreationDefaultsForm.name: String
+OrganizationCreationDefaultsForm.slug: String
+OrganizationDomain.affiliationEmailAddress: String?
+OrganizationDomain.affiliationVerification: OrganizationDomainVerification?
+OrganizationDomain.attemptAffiliationVerification(params: AttemptAffiliationVerificationParams): OrganizationDomain [return]
+OrganizationDomain.createdAt: Date
+OrganizationDomain.delete(): Void [return]
+OrganizationDomain.enrollmentMode: OrganizationEnrollmentMode
+OrganizationDomain.id: String
+OrganizationDomain.name: String
+OrganizationDomain.organizationId: String
+OrganizationDomain.ownershipVerification: OrganizationDomainOwnershipVerification?
+OrganizationDomain.prepareAffiliationVerification(params: PrepareAffiliationVerificationParams): OrganizationDomain [return]
+OrganizationDomain.reload(p: ClerkResourceReloadParams? = nil): OrganizationDomain [return]
+OrganizationDomain.totalPendingInvitations: Double
+OrganizationDomain.totalPendingSuggestions: Double
+OrganizationDomain.updateEnrollmentMode(params: UpdateEnrollmentModeParams): OrganizationDomain [return]
+OrganizationDomain.updatedAt: Date
+OrganizationDomain.verification: OrganizationDomainVerification?
+OrganizationDomainBulkOwnershipVerificationError.code: String
+OrganizationDomainBulkOwnershipVerificationError.id: String
+OrganizationDomainOwnershipVerification.attempts: Double?
+OrganizationDomainOwnershipVerification.expiresAt: Date?
+OrganizationDomainOwnershipVerification.status: OrganizationDomainOwnershipVerificationStatus
+OrganizationDomainOwnershipVerification.strategy: OrganizationDomainOwnershipVerificationStrategy
+OrganizationDomainOwnershipVerification.txtRecordName: String?
+OrganizationDomainOwnershipVerification.txtRecordValue: String?
+OrganizationDomainOwnershipVerification.verifiedAt: Date?
+OrganizationDomainOwnershipVerificationStatus cases: expired, unverified, verified, unrecognized(String)
+OrganizationDomainOwnershipVerificationStrategy cases: txt, legacy, manual_override, parent_domain, unrecognized(String)
+OrganizationDomainVerification.attempts: Double
+OrganizationDomainVerification.expiresAt: Date
+OrganizationDomainVerification.status: OrganizationDomainVerificationStatus
+OrganizationDomainVerification.strategy: String
+OrganizationDomainVerificationStatus cases: expired, unverified, verified, failed, unrecognized(String)
+OrganizationDomainsBulkOwnershipVerification.data: [OrganizationDomain]
+OrganizationDomainsBulkOwnershipVerification.errors: [OrganizationDomainBulkOwnershipVerificationError]
+OrganizationEnrollmentMode cases: manual_invitation, automatic_invitation, automatic_suggestion, enterprise_sso, unrecognized(String)
+OrganizationEnterpriseConnectionOidcInput.authUrl: Field<String> = .omitted
+OrganizationEnterpriseConnectionOidcInput.clientId: Field<String> = .omitted
+OrganizationEnterpriseConnectionOidcInput.clientSecret: Field<String> = .omitted
+OrganizationEnterpriseConnectionOidcInput.discoveryUrl: Field<String> = .omitted
+OrganizationEnterpriseConnectionOidcInput.requiresPkce: Field<Bool> = .omitted
+OrganizationEnterpriseConnectionOidcInput.tokenUrl: Field<String> = .omitted
+OrganizationEnterpriseConnectionOidcInput.userInfoUrl: Field<String> = .omitted
+OrganizationEnterpriseConnectionProvider cases: saml_custom, saml_okta, saml_google, saml_microsoft, oidc_custom, oidc_github_enterprise, oidc_gitlab, unrecognized(String)
+OrganizationEnterpriseConnectionSamlInput.allowIdpInitiated: Field<Bool> = .omitted
+OrganizationEnterpriseConnectionSamlInput.allowSubdomains: Field<Bool> = .omitted
+OrganizationEnterpriseConnectionSamlInput.attributeMapping: Field<[String: JSONValue]> = .omitted
+OrganizationEnterpriseConnectionSamlInput.forceAuthn: Field<Bool> = .omitted
+OrganizationEnterpriseConnectionSamlInput.idpCertificate: Field<String> = .omitted
+OrganizationEnterpriseConnectionSamlInput.idpEntityId: Field<String> = .omitted
+OrganizationEnterpriseConnectionSamlInput.idpMetadata: Field<String> = .omitted
+OrganizationEnterpriseConnectionSamlInput.idpMetadataUrl: Field<String> = .omitted
+OrganizationEnterpriseConnectionSamlInput.idpSsoUrl: Field<String> = .omitted
+OrganizationGetDomain__0.domainId: String
+OrganizationInvitation.createdAt: Date
+OrganizationInvitation.emailAddress: String
+OrganizationInvitation.id: String
+OrganizationInvitation.organizationId: String
+OrganizationInvitation.publicMetadata: [String: JSONValue]
+OrganizationInvitation.reload(p: ClerkResourceReloadParams? = nil): OrganizationInvitation [return]
+OrganizationInvitation.revoke(): OrganizationInvitation [return]
+OrganizationInvitation.role: String
+OrganizationInvitation.roleName: String
+OrganizationInvitation.status: OrganizationInvitationStatus
+OrganizationInvitation.updatedAt: Date
+OrganizationInvitationStatus cases: pending, accepted, revoked, expired, unrecognized(String)
+OrganizationMembership.createdAt: Date
+OrganizationMembership.destroy(): OrganizationMembership [return]
+OrganizationMembership.id: String
+OrganizationMembership.organization: Organization
+OrganizationMembership.permissions: [String]
+OrganizationMembership.publicMetadata: [String: JSONValue]
+OrganizationMembership.publicUserData: PublicUserData? = nil
+OrganizationMembership.reload(p: ClerkResourceReloadParams? = nil): OrganizationMembership [return]
+OrganizationMembership.role: String
+OrganizationMembership.roleName: String
+OrganizationMembership.update(updateParams: UpdateOrganizationMembershipParams): OrganizationMembership [return]
+OrganizationMembership.updatedAt: Date
+OrganizationMembershipRequest.accept(): OrganizationMembershipRequest [return]
+OrganizationMembershipRequest.createdAt: Date
+OrganizationMembershipRequest.id: String
+OrganizationMembershipRequest.organizationId: String
+OrganizationMembershipRequest.publicUserData: PublicUserData
+OrganizationMembershipRequest.reject(): OrganizationMembershipRequest [return]
+OrganizationMembershipRequest.reload(p: ClerkResourceReloadParams? = nil): OrganizationMembershipRequest [return]
+OrganizationMembershipRequest.status: OrganizationInvitationStatus
+OrganizationMembershipRequest.updatedAt: Date
+OrganizationSuggestion.accept(): OrganizationSuggestion [return]
+OrganizationSuggestion.createdAt: Date
+OrganizationSuggestion.id: String
+OrganizationSuggestion.publicOrganizationData: OrganizationSuggestionPublicOrganizationData
+OrganizationSuggestion.reload(p: ClerkResourceReloadParams? = nil): OrganizationSuggestion [return]
+OrganizationSuggestion.status: OrganizationSuggestionStatus
+OrganizationSuggestion.updatedAt: Date
+OrganizationSuggestionPublicOrganizationData.hasImage: Bool
+OrganizationSuggestionPublicOrganizationData.id: String
+OrganizationSuggestionPublicOrganizationData.imageUrl: String
+OrganizationSuggestionPublicOrganizationData.name: String
+OrganizationSuggestionPublicOrganizationData.slug: String?
+OrganizationSuggestionStatus cases: pending, accepted, unrecognized(String)
+Partialtype.name: Field<String> = .omitted
+Passkey.createdAt: Date
+Passkey.delete(): DeletedObject [return]
+Passkey.id: String
+Passkey.lastUsedAt: Date?
+Passkey.name: String?
+Passkey.reload(p: ClerkResourceReloadParams? = nil): Passkey [return]
+Passkey.update(params: Partialtype): Passkey [return]
+Passkey.updatedAt: Date
+Passkey.verification: PasskeyVerification?
+PasskeyAttempt.publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse
+PasskeyAttempt.strategy: String
+PasskeyFactor.strategy: String
+PasskeyVerification.attempts: Double?
+PasskeyVerification.channel: PhoneCodeChannel? = nil
+PasskeyVerification.error: ClerkAPIError?
+PasskeyVerification.expireAt: Date?
+PasskeyVerification.id: String? = nil
+PasskeyVerification.reload(p: ClerkResourceReloadParams? = nil): PasskeyVerification [return]
+PasskeyVerification.status: VerificationStatus?
+PasskeyVerification.strategy: String?
+PasskeyVerification.verifiedAtClient: String?
+PasskeyVerification.verifiedFromTheSameClient(): Bool [return]
+PasswordAttempt.password: String
+PasswordAttempt.strategy: String
+PasswordFactor.strategy: String
+PendingSession.abandonAt: Date
+PendingSession.actor: [String: JSONValue]?
+PendingSession.agent: [String: JSONValue]?
+PendingSession.attemptFirstFactorVerification(attemptFactor: SessionVerifyAttemptFirstFactorParams): SessionVerification [return]
+PendingSession.attemptSecondFactorVerification(params: SessionVerifyAttemptSecondFactorParams): SessionVerification [return]
+PendingSession.checkAuthorization(isAuthorizedParams: CheckAuthorizationParams): Bool [return]
+PendingSession.clearCache(): Void [return]
+PendingSession.createdAt: Date
+PendingSession.currentTask: SessionTask
+PendingSession.end(): Session [return]
+PendingSession.expireAt: Date
+PendingSession.factorVerificationAge: PendingSessionFactorVerificationAgeValue?
+PendingSession.getToken(options: GetTokenOptions? = nil): String? [return]
+PendingSession.id: String
+PendingSession.lastActiveAt: Date
+PendingSession.lastActiveOrganizationId: String?
+PendingSession.prepareFirstFactorVerification(factor: SessionVerifyPrepareFirstFactorParams): SessionVerification [return]
+PendingSession.prepareSecondFactorVerification(params: PhoneCodeSecondFactorConfig): SessionVerification [return]
+PendingSession.publicUserData: PublicUserData
+PendingSession.reload(p: ClerkResourceReloadParams? = nil): PendingSession [return]
+PendingSession.remove(): Session [return]
+PendingSession.startVerification(params: SessionVerifyCreateParams): SessionVerification [return]
+PendingSession.status: String
+PendingSession.tasks: [SessionTask]?
+PendingSession.touch(params: SessionTouchParams? = nil): Session [return]
+PendingSession.updatedAt: Date
+PendingSession.user: User
+PendingSession.verifyWithPasskey(): SessionVerification [return]
+PendingSessionFactorVerificationAgeValue tuple: Double, Double
+Permission.createdAt: Date
+Permission.description: String
+Permission.id: String
+Permission.key: String
+Permission.name: String
+Permission.reload(p: ClerkResourceReloadParams? = nil): Permission [return]
+Permission.type: PermissionType
+Permission.updatedAt: Date
+PermissionType cases: system, user, unrecognized(String)
+PhoneCodeAttempt.code: String
+PhoneCodeAttempt.strategy: String
+PhoneCodeChannel cases: sms, whatsapp, unrecognized(String)
+PhoneCodeConfig.channel: PhoneCodeChannel? = nil
+PhoneCodeConfig.default: Bool? = nil
+PhoneCodeConfig.phoneNumberId: String
+PhoneCodeConfig.primary: Bool? = nil
+PhoneCodeConfig.strategy: String
+PhoneCodeFactor.channel: PhoneCodeChannel? = nil
+PhoneCodeFactor.default: Bool? = nil
+PhoneCodeFactor.phoneNumberId: String
+PhoneCodeFactor.primary: Bool? = nil
+PhoneCodeFactor.safeIdentifier: String
+PhoneCodeFactor.strategy: String
+PhoneCodeSecondFactorConfig.phoneNumberId: String? = nil
+PhoneCodeSecondFactorConfig.strategy: String
+PhoneNumber.attemptVerification(params: AttemptPhoneNumberVerificationParams): PhoneNumber [return]
+PhoneNumber.create(): PhoneNumber [return]
+PhoneNumber.defaultSecondFactor: Bool
+PhoneNumber.destroy(): Void [return]
+PhoneNumber.id: String
+PhoneNumber.linkedTo: [IdentificationLink]
+PhoneNumber.makeDefaultSecondFactor(): PhoneNumber [return]
+PhoneNumber.phoneNumber: String
+PhoneNumber.prepareVerification(): PhoneNumber [return]
+PhoneNumber.reload(p: ClerkResourceReloadParams? = nil): PhoneNumber [return]
+PhoneNumber.reservedForSecondFactor: Bool
+PhoneNumber.setReservedForSecondFactor(params: SetReservedForSecondFactorParams): PhoneNumber [return]
+PhoneNumber.stringValue(): String [return]
+PhoneNumber.verification: Verification
+PickCreateOrganizationDomainParamsAndenrollmentMode.enrollmentMode: OrganizationEnrollmentMode? = nil
+PrepareAffiliationVerificationParams.affiliationEmailAddress: String
+PrepareEmailAddressVerificationParams variants: EmailAddressPrepareVerificationParamsCase1 | EmailAddressPrepareVerificationParamsCase2
+PrepareWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy
+PrepareWeb3WalletVerificationParamsStrategy cases: web3_metamask_signature, web3_base_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_solana_signature, unrecognized(String)
+ProtectCheck.expiresAt: Double? = nil
+ProtectCheck.sdkUrl: String
+ProtectCheck.status: String
+ProtectCheck.uiHints: [String: String]? = nil
+PublicKeyCredentialWithAuthenticatorAssertionResponse.authenticatorAttachment: String?
+PublicKeyCredentialWithAuthenticatorAssertionResponse.id: String
+PublicKeyCredentialWithAuthenticatorAssertionResponse.rawId: Data
+PublicKeyCredentialWithAuthenticatorAssertionResponse.response: AuthenticatorAssertionResponse
+PublicKeyCredentialWithAuthenticatorAssertionResponse.type: String
+PublicUserData.banned: Bool? = nil
+PublicUserData.deprovisioned: Bool? = nil
+PublicUserData.firstName: String?
+PublicUserData.hasImage: Bool
+PublicUserData.identifier: String
+PublicUserData.imageUrl: String
+PublicUserData.lastName: String?
+PublicUserData.userId: String? = nil
+PublicUserData.username: String? = nil
+ReauthorizeExternalAccountParams.additionalScopes: [String]? = nil
+ReauthorizeExternalAccountParams.oidcLoginHint: String? = nil
+ReauthorizeExternalAccountParams.oidcPrompt: String? = nil
+ReauthorizeExternalAccountParams.redirectUrl: String? = nil
+RemoveUserPasswordParams.currentPassword: String? = nil
+ResetPasswordEmailCodeFactor.emailAddressId: String
+ResetPasswordEmailCodeFactor.primary: Bool? = nil
+ResetPasswordEmailCodeFactor.safeIdentifier: String
+ResetPasswordEmailCodeFactor.strategy: String
+ResetPasswordPhoneCodeFactor.phoneNumberId: String
+ResetPasswordPhoneCodeFactor.primary: Bool? = nil
+ResetPasswordPhoneCodeFactor.safeIdentifier: String
+ResetPasswordPhoneCodeFactor.strategy: String
+ReverificationConfig variants: String | String | String | String | SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5
+Role.createdAt: Date
+Role.description: String
+Role.id: String
+Role.key: String
+Role.name: String
+Role.permissions: [Permission]
+Role.reload(p: ClerkResourceReloadParams? = nil): Role [return]
+Role.updatedAt: Date
+Session.abandonAt: Date
+Session.actor: [String: JSONValue]?
+Session.agent: [String: JSONValue]?
+Session.attemptFirstFactorVerification(attemptFactor: SessionVerifyAttemptFirstFactorParams): SessionVerification [return]
+Session.attemptSecondFactorVerification(params: SessionVerifyAttemptSecondFactorParams): SessionVerification [return]
+Session.checkAuthorization(isAuthorizedParams: CheckAuthorizationParams): Bool [return]
+Session.clearCache(): Void [return]
+Session.createdAt: Date
+Session.currentTask: SessionTask? = nil
+Session.end(): Session [return]
+Session.expireAt: Date
+Session.factorVerificationAge: SessionFactorVerificationAgeValue?
+Session.getToken(options: GetTokenOptions? = nil): String? [return]
+Session.id: String
+Session.lastActiveAt: Date
+Session.lastActiveOrganizationId: String?
+Session.prepareFirstFactorVerification(factor: SessionVerifyPrepareFirstFactorParams): SessionVerification [return]
+Session.prepareSecondFactorVerification(params: PhoneCodeSecondFactorConfig): SessionVerification [return]
+Session.publicUserData: PublicUserData
+Session.reload(p: ClerkResourceReloadParams? = nil): Session [return]
+Session.remove(): Session [return]
+Session.startVerification(params: SessionVerifyCreateParams): SessionVerification [return]
+Session.status: SessionStatus
+Session.tasks: [SessionTask]?
+Session.touch(params: SessionTouchParams? = nil): Session [return]
+Session.updatedAt: Date
+Session.user: User?
+Session.verifyWithPasskey(): SessionVerification [return]
+SessionActivity.browserName: String? = nil
+SessionActivity.browserVersion: String? = nil
+SessionActivity.city: String? = nil
+SessionActivity.country: String? = nil
+SessionActivity.deviceType: String? = nil
+SessionActivity.id: String
+SessionActivity.ipAddress: String? = nil
+SessionActivity.isMobile: Bool? = nil
+SessionCheckAuthorizationIsAuthorizedParamsCase1.reverification: ReverificationConfig? = nil
+SessionCheckAuthorizationIsAuthorizedParamsCase1.role: String
+SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5.afterMinutes: Double
+SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5.level: SessionVerificationLevel
+SessionCheckAuthorizationIsAuthorizedParamsCase2.permission: String
+SessionCheckAuthorizationIsAuthorizedParamsCase2.reverification: ReverificationConfig? = nil
+SessionCheckAuthorizationIsAuthorizedParamsCase3.feature: String
+SessionCheckAuthorizationIsAuthorizedParamsCase3.reverification: ReverificationConfig? = nil
+SessionCheckAuthorizationIsAuthorizedParamsCase4.plan: String
+SessionCheckAuthorizationIsAuthorizedParamsCase4.reverification: ReverificationConfig? = nil
+SessionCheckAuthorizationIsAuthorizedParamsCase5.reverification: ReverificationConfig? = nil
+SessionFactorVerificationAgeValue tuple: Double, Double
+SessionStatus cases: pending, revoked, expired, active, abandoned, ended, removed, replaced, unrecognized(String)
+SessionTask.key: SessionTaskKey
+SessionTaskKey cases: choose-organization, reset-password, setup-mfa, unrecognized(String)
+SessionTouchIntent cases: focus, select_session, select_org, unrecognized(String)
+SessionTouchParams.intent: SessionTouchIntent? = nil
+SessionVerification.firstFactorVerification: Verification
+SessionVerification.id: String? = nil
+SessionVerification.level: SessionVerificationLevel
+SessionVerification.reload(p: ClerkResourceReloadParams? = nil): SessionVerification [return]
+SessionVerification.secondFactorVerification: Verification
+SessionVerification.session: Session
+SessionVerification.status: SessionVerificationStatus
+SessionVerification.supportedFirstFactors: [SessionVerificationFirstFactor]?
+SessionVerification.supportedSecondFactors: [SessionVerificationSecondFactor]?
+SessionVerificationFirstFactor variants: EmailCodeFactor | PhoneCodeFactor | PasswordFactor | PasskeyFactor | EnterpriseSSOFactor
+SessionVerificationLevel cases: first_factor, second_factor, multi_factor, unrecognized(String)
+SessionVerificationSecondFactor variants: PhoneCodeFactor | TOTPFactor | BackupCodeFactor
+SessionVerificationStatus cases: needs_first_factor, needs_second_factor, complete, unrecognized(String)
+SessionVerifyAttemptFirstFactorParams variants: EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | PasskeyAttempt
+SessionVerifyAttemptSecondFactorParams variants: PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt
+SessionVerifyCreateParams.level: SessionVerificationLevel
+SessionVerifyPrepareFirstFactorParams variants: PasskeyFactor | EmailCodeConfig | PhoneCodeConfig | OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl
+SessionWithActivities.abandonAt: Date
+SessionWithActivities.actor: [String: JSONValue]?
+SessionWithActivities.expireAt: Date
+SessionWithActivities.id: String
+SessionWithActivities.lastActiveAt: Date
+SessionWithActivities.latestActivity: SessionActivity
+SessionWithActivities.reload(p: ClerkResourceReloadParams? = nil): SessionWithActivities [return]
+SessionWithActivities.revoke(): SessionWithActivities [return]
+SessionWithActivities.status: String
+SetOrganizationLogoParams.file: SetOrganizationLogoParamsFile?
+SetOrganizationLogoParamsFile variants: String | UploadFile | UploadFile
+SetProfileImageParams.file: SetOrganizationLogoParamsFile?
+SetReservedForSecondFactorParams.reserved: Bool
+SignIn.canBeDiscarded: Bool
+SignIn.create(params: SignInCreateParams): Void [error-envelope]
+SignIn.createdSessionId: String?
+SignIn.emailCode: SignInEmailCode
+SignIn.emailLink: SignInEmailLink
+SignIn.existingSession: SignInExistingSession? = nil
+SignIn.finalize(): Void [error-envelope]
+SignIn.firstFactorVerification: Verification
+SignIn.id: String? = nil
+SignIn.identifier: String?
+SignIn.isTransferable: Bool
+SignIn.mfa: SignInMfa
+SignIn.passkey(params: SignInPasskeyParams? = nil): Void [error-envelope]
+SignIn.password(params: SignInPasswordParams): Void [error-envelope]
+SignIn.phoneCode: SignInPhoneCode
+SignIn.protectCheck: ProtectCheck?
+SignIn.reset(): Void [error-envelope]
+SignIn.resetPasswordEmailCode: SignInResetPasswordEmailCode
+SignIn.resetPasswordPhoneCode: SignInResetPasswordPhoneCode
+SignIn.secondFactorVerification: Verification
+SignIn.sso(params: SignInSSOParams): Void [error-envelope]
+SignIn.status: SignInStatus
+SignIn.submitProtectCheck(params: SignInSubmitProtectCheckParams): Void [error-envelope]
+SignIn.supportedFirstFactors: [SignInFirstFactor]
+SignIn.supportedSecondFactors: [SignInSecondFactor]
+SignIn.ticket(params: SignInTicketParams? = nil): Void [error-envelope]
+SignIn.userData: UserData
+SignInBackupCodeVerifyParams.code: String
+SignInCreateParams.actionCompleteRedirectUrl: String? = nil
+SignInCreateParams.identifier: String? = nil
+SignInCreateParams.password: String? = nil
+SignInCreateParams.redirectUrl: String? = nil
+SignInCreateParams.signUpIfMissing: Bool? = nil
+SignInCreateParams.strategy: SignInCreateParamsStrategy? = nil
+SignInCreateParams.ticket: String? = nil
+SignInCreateParams.transfer: Bool? = nil
+SignInCreateParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, passkey, ticket, unrecognized(String)
+SignInEmailCode.sendCode(params: SignInEmailCodeSendParams? = nil): Void [error-envelope]
+SignInEmailCode.verifyCode(params: SignInEmailCodeVerifyParams): Void [error-envelope]
+SignInEmailCodeSendCodeParamsCase1.emailAddress: String? = nil
+SignInEmailCodeSendCodeParamsCase2.emailAddressId: String? = nil
+SignInEmailCodeSendParams variants: SignInEmailCodeSendCodeParamsCase1 | SignInEmailCodeSendCodeParamsCase2
+SignInEmailCodeVerifyParams.code: String
+SignInEmailLink.sendLink(params: SignInEmailLinkSendParams): Void [error-envelope]
+SignInEmailLink.verification: SignInEmailLinkVerification?
+SignInEmailLink.waitForVerification(): Void [error-envelope]
+SignInEmailLinkSendLinkParamsCase1.emailAddress: String? = nil
+SignInEmailLinkSendLinkParamsCase1.verificationUrl: String
+SignInEmailLinkSendLinkParamsCase2.emailAddressId: String? = nil
+SignInEmailLinkSendLinkParamsCase2.verificationUrl: String
+SignInEmailLinkSendParams variants: SignInEmailLinkSendLinkParamsCase1 | SignInEmailLinkSendLinkParamsCase2
+SignInEmailLinkVerification.createdSessionId: String
+SignInEmailLinkVerification.status: SignInEmailLinkVerificationStatus
+SignInEmailLinkVerification.verifiedFromTheSameClient: Bool
+SignInEmailLinkVerificationStatus cases: expired, verified, failed, client_mismatch, unrecognized(String)
+SignInExistingSession.sessionId: String
+SignInFirstFactor variants: EmailCodeFactor | PhoneCodeFactor | PasswordFactor | PasskeyFactor | EnterpriseSSOFactor | EmailLinkFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor | Web3SignatureFactor | OauthFactor
+SignInMFAEmailCodeVerifyParams.code: String
+SignInMFAPhoneCodeVerifyParams.code: String
+SignInMfa.sendEmailCode(): Void [error-envelope]
+SignInMfa.sendPhoneCode(): Void [error-envelope]
+SignInMfa.verifyBackupCode(params: SignInBackupCodeVerifyParams): Void [error-envelope]
+SignInMfa.verifyEmailCode(params: SignInMFAEmailCodeVerifyParams): Void [error-envelope]
+SignInMfa.verifyPhoneCode(params: SignInMFAPhoneCodeVerifyParams): Void [error-envelope]
+SignInMfa.verifyTOTP(params: SignInTOTPVerifyParams): Void [error-envelope]
+SignInPasskeyParams.flow: SignInPasskeyParamsFlow? = nil
+SignInPasskeyParamsFlow cases: autofill, discoverable, unrecognized(String)
+SignInPasswordParams variants: SignInPasswordParamsCase1 | SignInPasswordParamsCase2 | SignInPasswordParamsCase3 | SignInPasswordParamsCase4
+SignInPasswordParamsCase1.identifier: String
+SignInPasswordParamsCase1.password: String
+SignInPasswordParamsCase2.emailAddress: String
+SignInPasswordParamsCase2.password: String
+SignInPasswordParamsCase3.password: String
+SignInPasswordParamsCase3.phoneNumber: String
+SignInPasswordParamsCase4.password: String
+SignInPhoneCode.sendCode(params: SignInPhoneCodeSendParams? = nil): Void [error-envelope]
+SignInPhoneCode.verifyCode(params: SignInPhoneCodeVerifyParams): Void [error-envelope]
+SignInPhoneCodeSendCodeParamsCase1.channel: PhoneCodeChannel? = nil
+SignInPhoneCodeSendCodeParamsCase1.phoneNumber: String? = nil
+SignInPhoneCodeSendCodeParamsCase2.channel: PhoneCodeChannel? = nil
+SignInPhoneCodeSendCodeParamsCase2.phoneNumberId: String
+SignInPhoneCodeSendParams variants: SignInPhoneCodeSendCodeParamsCase1 | SignInPhoneCodeSendCodeParamsCase2
+SignInPhoneCodeVerifyParams.code: String
+SignInResetPasswordEmailCode.sendCode(): Void [error-envelope]
+SignInResetPasswordEmailCode.submitPassword(params: SignInResetPasswordSubmitParams): Void [error-envelope]
+SignInResetPasswordEmailCode.verifyCode(params: SignInEmailCodeVerifyParams): Void [error-envelope]
+SignInResetPasswordPhoneCode.sendCode(params: SignInResetPasswordPhoneCodeSendParams? = nil): Void [error-envelope]
+SignInResetPasswordPhoneCode.submitPassword(params: SignInResetPasswordSubmitParams): Void [error-envelope]
+SignInResetPasswordPhoneCode.verifyCode(params: SignInResetPasswordPhoneCodeVerifyParams): Void [error-envelope]
+SignInResetPasswordPhoneCodeSendParams.phoneNumber: String? = nil
+SignInResetPasswordPhoneCodeVerifyParams.code: String
+SignInResetPasswordSubmitParams.password: String
+SignInResetPasswordSubmitParams.signOutOfOtherSessions: Bool? = nil
+SignInSSOParams.enterpriseConnectionId: String? = nil
+SignInSSOParams.identifier: String? = nil
+SignInSSOParams.oidcPrompt: String? = nil
+SignInSSOParams.strategy: SignInSSOParamsStrategy
+SignInSSOParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInSecondFactor variants: EmailCodeFactor | PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailLinkFactor
+SignInStatus cases: needs_first_factor, needs_second_factor, complete, needs_identifier, needs_client_trust, needs_new_password, needs_protect_check, unrecognized(String)
+SignInSubmitProtectCheckParams.proofToken: String
+SignInTOTPVerifyParams.code: String
+SignInTicketParams.ticket: String
+SignUp.abandonAt: Double?
+SignUp.canBeDiscarded: Bool
+SignUp.create(params: SignUpCreateParams): Void [error-envelope]
+SignUp.createdSessionId: String?
+SignUp.createdUserId: String?
+SignUp.emailAddress: String?
+SignUp.existingSession: SignUpExistingSession? = nil
+SignUp.finalize(): Void [error-envelope]
+SignUp.firstName: String?
+SignUp.hasPassword: Bool
+SignUp.id: String? = nil
+SignUp.isTransferable: Bool
+SignUp.lastName: String?
+SignUp.legalAcceptedAt: Double?
+SignUp.locale: String?
+SignUp.missingFields: [SignUpField]
+SignUp.optionalFields: [SignUpField]
+SignUp.password(params: SignUpPasswordParams): Void [error-envelope]
+SignUp.phoneNumber: String?
+SignUp.protectCheck: ProtectCheck?
+SignUp.requiredFields: [SignUpField]
+SignUp.reset(): Void [error-envelope]
+SignUp.sso(params: SignUpSSOParams): Void [error-envelope]
+SignUp.status: SignUpStatus
+SignUp.submitProtectCheck(params: SignUpSubmitProtectCheckParams): Void [error-envelope]
+SignUp.ticket(params: SignUpTicketParams? = nil): Void [error-envelope]
+SignUp.unsafeMetadata: [String: JSONValue]
+SignUp.unverifiedFields: [SignUpIdentificationField]
+SignUp.update(params: SignUpUpdateParams): Void [error-envelope]
+SignUp.username: String?
+SignUp.verifications: SignUpVerifications
+SignUp.web3Wallet: String?
+SignUpCreateParams.emailAddress: String? = nil
+SignUpCreateParams.firstName: String? = nil
+SignUpCreateParams.lastName: String? = nil
+SignUpCreateParams.legalAccepted: Bool? = nil
+SignUpCreateParams.locale: String? = nil
+SignUpCreateParams.password: String? = nil
+SignUpCreateParams.phoneNumber: String? = nil
+SignUpCreateParams.strategy: SignUpCreateParamsStrategy? = nil
+SignUpCreateParams.ticket: String? = nil
+SignUpCreateParams.transfer: Bool? = nil
+SignUpCreateParams.unsafeMetadata: [String: JSONValue]? = nil
+SignUpCreateParams.username: String? = nil
+SignUpCreateParams.web3Wallet: String? = nil
+SignUpCreateParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, phone_code, ticket, google_one_tap, oauth_token_apple, unrecognized(String)
+SignUpEmailCodeVerifyParams.code: String
+SignUpEmailLinkSendParams.verificationUrl: String
+SignUpExistingSession.sessionId: String
+SignUpField cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, username, first_name, last_name, password, legal_accepted, email_address, phone_number, email_address_or_phone_number, web3_wallet, protect_check, unrecognized(String)
+SignUpIdentificationField cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, username, email_address, phone_number, email_address_or_phone_number, web3_wallet, unrecognized(String)
+SignUpPasswordParams variants: SignUpPasswordParamsCase1 | SignUpPasswordParamsCase2 | SignUpPasswordParamsCase3 | SignUpPasswordParamsCase4
+SignUpPasswordParamsCase1.emailAddress: String
+SignUpPasswordParamsCase1.firstName: String? = nil
+SignUpPasswordParamsCase1.lastName: String? = nil
+SignUpPasswordParamsCase1.legalAccepted: Bool? = nil
+SignUpPasswordParamsCase1.locale: String? = nil
+SignUpPasswordParamsCase1.password: String
+SignUpPasswordParamsCase1.phoneNumber: String? = nil
+SignUpPasswordParamsCase1.unsafeMetadata: [String: JSONValue]? = nil
+SignUpPasswordParamsCase1.username: String? = nil
+SignUpPasswordParamsCase2.emailAddress: String? = nil
+SignUpPasswordParamsCase2.firstName: String? = nil
+SignUpPasswordParamsCase2.lastName: String? = nil
+SignUpPasswordParamsCase2.legalAccepted: Bool? = nil
+SignUpPasswordParamsCase2.locale: String? = nil
+SignUpPasswordParamsCase2.password: String
+SignUpPasswordParamsCase2.phoneNumber: String
+SignUpPasswordParamsCase2.unsafeMetadata: [String: JSONValue]? = nil
+SignUpPasswordParamsCase2.username: String? = nil
+SignUpPasswordParamsCase3.emailAddress: String? = nil
+SignUpPasswordParamsCase3.firstName: String? = nil
+SignUpPasswordParamsCase3.lastName: String? = nil
+SignUpPasswordParamsCase3.legalAccepted: Bool? = nil
+SignUpPasswordParamsCase3.locale: String? = nil
+SignUpPasswordParamsCase3.password: String
+SignUpPasswordParamsCase3.phoneNumber: String? = nil
+SignUpPasswordParamsCase3.unsafeMetadata: [String: JSONValue]? = nil
+SignUpPasswordParamsCase3.username: String
+SignUpPasswordParamsCase4.emailAddress: String? = nil
+SignUpPasswordParamsCase4.firstName: String? = nil
+SignUpPasswordParamsCase4.lastName: String? = nil
+SignUpPasswordParamsCase4.legalAccepted: Bool? = nil
+SignUpPasswordParamsCase4.locale: String? = nil
+SignUpPasswordParamsCase4.password: String
+SignUpPasswordParamsCase4.phoneNumber: String? = nil
+SignUpPasswordParamsCase4.unsafeMetadata: [String: JSONValue]? = nil
+SignUpPasswordParamsCase4.username: String? = nil
+SignUpPhoneCodeSendParams.channel: PhoneCodeChannel? = nil
+SignUpPhoneCodeVerifyParams.code: String
+SignUpSSOParams.emailAddress: String? = nil
+SignUpSSOParams.enterpriseConnectionId: String? = nil
+SignUpSSOParams.firstName: String? = nil
+SignUpSSOParams.lastName: String? = nil
+SignUpSSOParams.legalAccepted: Bool? = nil
+SignUpSSOParams.locale: String? = nil
+SignUpSSOParams.oidcPrompt: String? = nil
+SignUpSSOParams.strategy: String
+SignUpSSOParams.unsafeMetadata: [String: JSONValue]? = nil
+SignUpStatus cases: abandoned, complete, missing_requirements, unrecognized(String)
+SignUpSubmitProtectCheckParams.proofToken: String
+SignUpTicketParams.firstName: String? = nil
+SignUpTicketParams.lastName: String? = nil
+SignUpTicketParams.legalAccepted: Bool? = nil
+SignUpTicketParams.locale: String? = nil
+SignUpTicketParams.ticket: String
+SignUpTicketParams.unsafeMetadata: [String: JSONValue]? = nil
+SignUpUpdateParams.emailAddress: String? = nil
+SignUpUpdateParams.firstName: String? = nil
+SignUpUpdateParams.lastName: String? = nil
+SignUpUpdateParams.legalAccepted: Bool? = nil
+SignUpUpdateParams.locale: String? = nil
+SignUpUpdateParams.phoneNumber: String? = nil
+SignUpUpdateParams.unsafeMetadata: [String: JSONValue]? = nil
+SignUpUpdateParams.username: String? = nil
+SignUpVerification.attempts: Double?
+SignUpVerification.channel: PhoneCodeChannel? = nil
+SignUpVerification.error: ClerkAPIError?
+SignUpVerification.expireAt: Date?
+SignUpVerification.id: String? = nil
+SignUpVerification.nextAction: String
+SignUpVerification.reload(p: ClerkResourceReloadParams? = nil): SignUpVerification [return]
+SignUpVerification.status: VerificationStatus?
+SignUpVerification.strategy: String?
+SignUpVerification.supportedStrategies: [String]
+SignUpVerification.verifiedAtClient: String?
+SignUpVerification.verifiedFromTheSameClient(): Bool [return]
+SignUpVerifications.emailAddress: SignUpVerification
+SignUpVerifications.emailLinkVerification: SignUpVerificationsEmailLinkVerification?
+SignUpVerifications.externalAccount: Verification
+SignUpVerifications.phoneNumber: SignUpVerification
+SignUpVerifications.sendEmailCode(): Void [error-envelope]
+SignUpVerifications.sendEmailLink(params: SignUpEmailLinkSendParams): Void [error-envelope]
+SignUpVerifications.sendPhoneCode(params: SignUpPhoneCodeSendParams? = nil): Void [error-envelope]
+SignUpVerifications.verifyEmailCode(params: SignUpEmailCodeVerifyParams): Void [error-envelope]
+SignUpVerifications.verifyPhoneCode(params: SignUpPhoneCodeVerifyParams): Void [error-envelope]
+SignUpVerifications.waitForEmailLinkVerification(): Void [error-envelope]
+SignUpVerifications.web3Wallet: Verification
+SignUpVerificationsEmailLinkVerification.createdSessionId: String
+SignUpVerificationsEmailLinkVerification.status: SignInEmailLinkVerificationStatus
+SignUpVerificationsEmailLinkVerification.verifiedFromTheSameClient: Bool
+StartEmailLinkFlowParams.redirectUrl: String
+StartEnterpriseSSOLinkFlowParams.redirectUrl: String
+TOTP.backupCodes: [String]? = nil
+TOTP.createdAt: Date?
+TOTP.id: String
+TOTP.reload(p: ClerkResourceReloadParams? = nil): TOTP [return]
+TOTP.secret: String? = nil
+TOTP.updatedAt: Date?
+TOTP.uri: String? = nil
+TOTP.verified: Bool
+TOTPAttempt.code: String
+TOTPAttempt.strategy: String
+TOTPFactor.strategy: String
+UpdateEnrollmentModeParams.deletePending: Bool? = nil
+UpdateEnrollmentModeParams.enrollmentMode: OrganizationEnrollmentMode
+UpdateMembershipParams.role: String
+UpdateMembershipParams.userId: String
+UpdateOrganizationEnterpriseConnectionParams.active: Field<Bool> = .omitted
+UpdateOrganizationEnterpriseConnectionParams.customAttributes: Field<[String: JSONValue]> = .omitted
+UpdateOrganizationEnterpriseConnectionParams.disableAdditionalIdentifications: Field<Bool> = .omitted
+UpdateOrganizationEnterpriseConnectionParams.domains: [String]? = nil
+UpdateOrganizationEnterpriseConnectionParams.name: Field<String> = .omitted
+UpdateOrganizationEnterpriseConnectionParams.oidc: Field<OrganizationEnterpriseConnectionOidcInput> = .omitted
+UpdateOrganizationEnterpriseConnectionParams.organizationId: Field<String> = .omitted
+UpdateOrganizationEnterpriseConnectionParams.saml: Field<OrganizationEnterpriseConnectionSamlInput> = .omitted
+UpdateOrganizationEnterpriseConnectionParams.syncUserAttributes: Field<Bool> = .omitted
+UpdateOrganizationMembershipParams.role: String
+UpdateOrganizationParams.name: String
+UpdateOrganizationParams.slug: String? = nil
+UpdateUserMetadataParams.unsafeMetadata: [String: JSONValue]
+UpdateUserParams.firstName: Field<String> = .omitted
+UpdateUserParams.lastName: Field<String> = .omitted
+UpdateUserParams.primaryEmailAddressId: Field<String> = .omitted
+UpdateUserParams.primaryPhoneNumberId: Field<String> = .omitted
+UpdateUserParams.primaryWeb3WalletId: Field<String> = .omitted
+UpdateUserParams.unsafeMetadata: [String: JSONValue]? = nil
+UpdateUserParams.username: Field<String> = .omitted
+UpdateUserPasswordParams.currentPassword: String? = nil
+UpdateUserPasswordParams.newPassword: String
+UpdateUserPasswordParams.signOutOfOtherSessions: Bool? = nil
+User.addPaymentMethod(params: AddPaymentMethodParams): BillingPaymentMethod [return]
+User.backupCodeEnabled: Bool
+User.createBackupCode(): BackupCode [return]
+User.createEmailAddress(params: CreateEmailAddressParams): EmailAddress [return]
+User.createExternalAccount(params: CreateExternalAccountParams): ExternalAccount [return]
+User.createOrganizationEnabled: Bool
+User.createOrganizationsLimit: Double?
+User.createPasskey(): Passkey [return]
+User.createPhoneNumber(params: CreatePhoneNumberParams): PhoneNumber [return]
+User.createTOTP(): TOTP [return]
+User.createWeb3Wallet(params: CreateWeb3WalletParams): Web3Wallet [return]
+User.createdAt: Date?
+User.delete(): Void [return]
+User.deleteSelfEnabled: Bool
+User.disableTOTP(): DeletedObject [return]
+User.emailAddresses: [EmailAddress]
+User.enterpriseAccounts: [EnterpriseAccount]
+User.externalAccounts: [ExternalAccount]
+User.externalId: String?
+User.firstName: String?
+User.fullName: String?
+User.getEnterpriseConnections(params: GetEnterpriseConnectionsParams? = nil): [EnterpriseConnection] [return]
+User.getOrganizationCreationDefaults(): OrganizationCreationDefaults [return]
+User.getOrganizationInvitations(params: GetUserOrganizationInvitationsParams? = nil): ClerkPaginatedResponseUserOrganizationInvitation [return]
+User.getOrganizationMemberships(params: GetUserOrganizationMembershipParams? = nil): ClerkPaginatedResponseOrganizationMembership [return]
+User.getOrganizationSuggestions(params: GetUserOrganizationSuggestionsParams? = nil): ClerkPaginatedResponseOrganizationSuggestion [return]
+User.getPaymentMethods(params: GetPaymentMethodsParams? = nil): ClerkPaginatedResponseBillingPaymentMethod [return]
+User.getSessions(): [SessionWithActivities] [return]
+User.hasImage: Bool
+User.hasVerifiedEmailAddress: Bool
+User.hasVerifiedPhoneNumber: Bool
+User.id: String
+User.imageUrl: String
+User.initializePaymentMethod(params: InitializePaymentMethodParams): BillingInitializedPaymentMethod [return]
+User.isPrimaryIdentification(ident: UserIsPrimaryIdentificationIdent): Bool [return]
+User.lastName: String?
+User.lastSignInAt: Date?
+User.leaveOrganization(organizationId: String): DeletedObject [return]
+User.legalAcceptedAt: Date?
+User.organizationMemberships: [OrganizationMembership]
+User.passkeys: [Passkey]
+User.passwordEnabled: Bool
+User.phoneNumbers: [PhoneNumber]
+User.primaryEmailAddress: EmailAddress?
+User.primaryEmailAddressId: String?
+User.primaryPhoneNumber: PhoneNumber?
+User.primaryPhoneNumberId: String?
+User.primaryWeb3Wallet: Web3Wallet?
+User.primaryWeb3WalletId: String?
+User.publicMetadata: [String: JSONValue]
+User.reload(p: ClerkResourceReloadParams? = nil): User [return]
+User.removePassword(params: RemoveUserPasswordParams): User [return]
+User.setProfileImage(params: SetProfileImageParams): Image [return]
+User.totpEnabled: Bool
+User.twoFactorEnabled: Bool
+User.unsafeMetadata: [String: JSONValue]
+User.unverifiedExternalAccounts: [ExternalAccount]
+User.update(params: UpdateUserParams): User [return]
+User.updateMetadata(params: UpdateUserMetadataParams): User [return]
+User.updatePassword(params: UpdateUserPasswordParams): User [return]
+User.updatedAt: Date?
+User.username: String?
+User.verifiedExternalAccounts: [ExternalAccount]
+User.verifiedWeb3Wallets: [Web3Wallet]
+User.verifyTOTP(params: VerifyTOTPParams): TOTP [return]
+User.web3Wallets: [Web3Wallet]
+UserData.firstName: String? = nil
+UserData.hasImage: Bool? = nil
+UserData.imageUrl: String? = nil
+UserData.lastName: String? = nil
+UserIsPrimaryIdentificationIdent variants: EmailAddress | PhoneNumber | Web3Wallet
+UserOrganizationInvitation.accept(): UserOrganizationInvitation [return]
+UserOrganizationInvitation.createdAt: Date
+UserOrganizationInvitation.emailAddress: String
+UserOrganizationInvitation.id: String
+UserOrganizationInvitation.publicMetadata: [String: JSONValue]
+UserOrganizationInvitation.publicOrganizationData: UserOrganizationInvitationPublicOrganizationData
+UserOrganizationInvitation.reload(p: ClerkResourceReloadParams? = nil): UserOrganizationInvitation [return]
+UserOrganizationInvitation.role: String
+UserOrganizationInvitation.status: OrganizationInvitationStatus
+UserOrganizationInvitation.updatedAt: Date
+UserOrganizationInvitationPublicOrganizationData.hasImage: Bool
+UserOrganizationInvitationPublicOrganizationData.id: String
+UserOrganizationInvitationPublicOrganizationData.imageUrl: String
+UserOrganizationInvitationPublicOrganizationData.name: String
+UserOrganizationInvitationPublicOrganizationData.slug: String?
+Verification.attempts: Double?
+Verification.channel: PhoneCodeChannel? = nil
+Verification.error: ClerkAPIError?
+Verification.expireAt: Date?
+Verification.id: String? = nil
+Verification.reload(p: ClerkResourceReloadParams? = nil): Verification [return]
+Verification.status: VerificationStatus?
+Verification.strategy: String?
+Verification.verifiedAtClient: String?
+Verification.verifiedFromTheSameClient(): Bool [return]
+VerificationStatus cases: expired, unverified, verified, failed, transferable, unrecognized(String)
+VerifyTOTPParams.code: String
+Web3SignatureFactor.primary: Bool? = nil
+Web3SignatureFactor.strategy: PrepareWeb3WalletVerificationParamsStrategy
+Web3SignatureFactor.walletName: String? = nil
+Web3SignatureFactor.web3WalletId: String
+Web3Wallet.attemptVerification(params: AttemptWeb3WalletVerificationParams): Web3Wallet [return]
+Web3Wallet.create(): Web3Wallet [return]
+Web3Wallet.destroy(): Void [return]
+Web3Wallet.id: String
+Web3Wallet.prepareVerification(params: PrepareWeb3WalletVerificationParams): Web3Wallet [return]
+Web3Wallet.reload(p: ClerkResourceReloadParams? = nil): Web3Wallet [return]
+Web3Wallet.stringValue(): String [return]
+Web3Wallet.verification: Verification
+Web3Wallet.web3Wallet: String
+enum BillingPaymentMethodStatus
+enum ClerkStatus
+enum EmailAddressPrepareVerificationParamsCase2Strategy
+enum EnterpriseConnectionTestRunConnectionType
+enum EnterpriseConnectionTestRunStatus
+enum EnterpriseProtocol
+enum EnterpriseProvider
+enum OAuthProvider
+enum OAuthStrategy
+enum OrganizationDomainOwnershipVerificationStatus
+enum OrganizationDomainOwnershipVerificationStrategy
+enum OrganizationDomainVerificationStatus
+enum OrganizationEnrollmentMode
+enum OrganizationEnterpriseConnectionProvider
+enum OrganizationInvitationStatus
+enum OrganizationSuggestionStatus
+enum PermissionType
+enum PhoneCodeChannel
+enum PrepareWeb3WalletVerificationParamsStrategy
+enum SessionStatus
+enum SessionTaskKey
+enum SessionTouchIntent
+enum SessionVerificationLevel
+enum SessionVerificationStatus
+enum SignInCreateParamsStrategy
+enum SignInEmailLinkVerificationStatus
+enum SignInPasskeyParamsFlow
+enum SignInSSOParamsStrategy
+enum SignInStatus
+enum SignUpCreateParamsStrategy
+enum SignUpField
+enum SignUpIdentificationField
+enum SignUpStatus
+enum VerificationStatus
+object AddMemberParams
+object AddPaymentMethodParams
+object AttemptAffiliationVerificationParams
+object AttemptEmailAddressVerificationParams
+object AttemptPhoneNumberVerificationParams
+object AttemptWeb3WalletVerificationParams
+object AuthenticatorAssertionResponse
+object BackupCodeAttempt
+object BackupCodeFactor
+object BillingPaymentMethodRemoveParams
+object ClerkAPIError
+object ClerkAPIErrorMeta
+object ClerkAPIErrorMetaPlan
+object ClerkAPIErrorMetaZxcvbn
+object ClerkAPIErrorMetaZxcvbnSuggestionsElement
+object ClerkPaginatedResponseBillingPaymentMethod
+object ClerkPaginatedResponseEnterpriseConnectionTestRun
+object ClerkPaginatedResponseOrganizationDomain
+object ClerkPaginatedResponseOrganizationInvitation
+object ClerkPaginatedResponseOrganizationMembership
+object ClerkPaginatedResponseOrganizationMembershipRequest
+object ClerkPaginatedResponseOrganizationSuggestion
+object ClerkPaginatedResponseUserOrganizationInvitation
+object ClerkResourceReloadParams
+object CreateEmailAddressParams
+object CreateExternalAccountParams
+object CreateOrganizationEnterpriseConnectionParams
+object CreateOrganizationParams
+object CreatePhoneNumberParams
+object CreateWeb3WalletParams
+object DeletedObject
+object EmailAddressPrepareVerificationParamsCase1
+object EmailAddressPrepareVerificationParamsCase2
+object EmailCodeAttempt
+object EmailCodeConfig
+object EmailCodeFactor
+object EmailLinkFactor
+object EnterpriseConnectionTestRunInit
+object EnterpriseConnectionTestRunLog
+object EnterpriseConnectionTestRunOauthPayload
+object EnterpriseConnectionTestRunParsedUserInfo
+object EnterpriseConnectionTestRunSamlPayload
+object EnterpriseOAuthConfig
+object EnterpriseSSOFactor
+object EnterpriseSamlConnectionNested
+object GetDomainsParams
+object GetEnterpriseConnectionTestRunsParams
+object GetEnterpriseConnectionsParams
+object GetInvitationsParams
+object GetMembersParams
+object GetMembershipRequestParams
+object GetPaymentMethodsParams
+object GetRolesParams
+object GetRolesResponse
+object GetTokenOptions
+object GetUserOrganizationInvitationsParams
+object GetUserOrganizationMembershipParams
+object GetUserOrganizationSuggestionsParams
+object InitializePaymentMethodParams
+object InviteMemberParams
+object InviteMembersParams
+object MobileSetActiveParams
+object MobileSignOutOptions
+object OauthFactor
+object OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl
+object OrganizationCreationDefaultsAdvisory
+object OrganizationCreationDefaultsForm
+object OrganizationDomainBulkOwnershipVerificationError
+object OrganizationDomainOwnershipVerification
+object OrganizationDomainVerification
+object OrganizationDomainsBulkOwnershipVerification
+object OrganizationEnterpriseConnectionOidcInput
+object OrganizationEnterpriseConnectionSamlInput
+object OrganizationGetDomain__0
+object OrganizationSuggestionPublicOrganizationData
+object Partialtype
+object PasskeyAttempt
+object PasskeyFactor
+object PasswordAttempt
+object PasswordFactor
+object PhoneCodeAttempt
+object PhoneCodeConfig
+object PhoneCodeFactor
+object PhoneCodeSecondFactorConfig
+object PickCreateOrganizationDomainParamsAndenrollmentMode
+object PrepareAffiliationVerificationParams
+object PrepareWeb3WalletVerificationParams
+object ProtectCheck
+object PublicKeyCredentialWithAuthenticatorAssertionResponse
+object PublicUserData
+object ReauthorizeExternalAccountParams
+object RemoveUserPasswordParams
+object ResetPasswordEmailCodeFactor
+object ResetPasswordPhoneCodeFactor
+object SessionActivity
+object SessionCheckAuthorizationIsAuthorizedParamsCase1
+object SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5
+object SessionCheckAuthorizationIsAuthorizedParamsCase2
+object SessionCheckAuthorizationIsAuthorizedParamsCase3
+object SessionCheckAuthorizationIsAuthorizedParamsCase4
+object SessionCheckAuthorizationIsAuthorizedParamsCase5
+object SessionTask
+object SessionTouchParams
+object SessionVerifyCreateParams
+object SetOrganizationLogoParams
+object SetProfileImageParams
+object SetReservedForSecondFactorParams
+object SignInBackupCodeVerifyParams
+object SignInCreateParams
+object SignInEmailCodeSendCodeParamsCase1
+object SignInEmailCodeSendCodeParamsCase2
+object SignInEmailCodeVerifyParams
+object SignInEmailLinkSendLinkParamsCase1
+object SignInEmailLinkSendLinkParamsCase2
+object SignInEmailLinkVerification
+object SignInExistingSession
+object SignInMFAEmailCodeVerifyParams
+object SignInMFAPhoneCodeVerifyParams
+object SignInPasskeyParams
+object SignInPasswordParamsCase1
+object SignInPasswordParamsCase2
+object SignInPasswordParamsCase3
+object SignInPasswordParamsCase4
+object SignInPhoneCodeSendCodeParamsCase1
+object SignInPhoneCodeSendCodeParamsCase2
+object SignInPhoneCodeVerifyParams
+object SignInResetPasswordPhoneCodeSendParams
+object SignInResetPasswordPhoneCodeVerifyParams
+object SignInResetPasswordSubmitParams
+object SignInSSOParams
+object SignInSubmitProtectCheckParams
+object SignInTOTPVerifyParams
+object SignInTicketParams
+object SignUpCreateParams
+object SignUpEmailCodeVerifyParams
+object SignUpEmailLinkSendParams
+object SignUpExistingSession
+object SignUpPasswordParamsCase1
+object SignUpPasswordParamsCase2
+object SignUpPasswordParamsCase3
+object SignUpPasswordParamsCase4
+object SignUpPhoneCodeSendParams
+object SignUpPhoneCodeVerifyParams
+object SignUpSSOParams
+object SignUpSubmitProtectCheckParams
+object SignUpTicketParams
+object SignUpUpdateParams
+object SignUpVerificationsEmailLinkVerification
+object StartEmailLinkFlowParams
+object StartEnterpriseSSOLinkFlowParams
+object TOTPAttempt
+object TOTPFactor
+object UpdateEnrollmentModeParams
+object UpdateMembershipParams
+object UpdateOrganizationEnterpriseConnectionParams
+object UpdateOrganizationMembershipParams
+object UpdateOrganizationParams
+object UpdateUserMetadataParams
+object UpdateUserParams
+object UpdateUserPasswordParams
+object UserData
+object UserOrganizationInvitationPublicOrganizationData
+object VerifyTOTPParams
+object Web3SignatureFactor
+resource ActiveSession
+resource BackupCode
+resource BillingInitializedPaymentMethod
+resource BillingPaymentMethod
+resource Clerk
+resource CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress
+resource CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress
+resource EmailAddress
+resource EnterpriseAccount
+resource EnterpriseAccountConnection
+resource EnterpriseConnection
+resource EnterpriseConnectionTestRun
+resource ExternalAccount
+resource IdentificationLink
+resource Image
+resource Organization
+resource OrganizationCreationDefaults
+resource OrganizationDomain
+resource OrganizationInvitation
+resource OrganizationMembership
+resource OrganizationMembershipRequest
+resource OrganizationSuggestion
+resource Passkey
+resource PasskeyVerification
+resource PendingSession
+resource Permission
+resource PhoneNumber
+resource Role
+resource Session
+resource SessionVerification
+resource SessionWithActivities
+resource SignIn
+resource SignInEmailCode
+resource SignInEmailLink
+resource SignInMfa
+resource SignInPhoneCode
+resource SignInResetPasswordEmailCode
+resource SignInResetPasswordPhoneCode
+resource SignUp
+resource SignUpVerification
+resource SignUpVerifications
+resource TOTP
+resource User
+resource UserOrganizationInvitation
+resource Verification
+resource Web3Wallet
+tuple ActiveSessionFactorVerificationAgeValue
+tuple PendingSessionFactorVerificationAgeValue
+tuple SessionFactorVerificationAgeValue
+union CheckAuthorizationParams
+union GetUserOrganizationSuggestionsParamsStatus
+union MobileSetActiveParamsOrganization
+union MobileSetActiveParamsSession
+union PrepareEmailAddressVerificationParams
+union ReverificationConfig
+union SessionVerificationFirstFactor
+union SessionVerificationSecondFactor
+union SessionVerifyAttemptFirstFactorParams
+union SessionVerifyAttemptSecondFactorParams
+union SessionVerifyPrepareFirstFactorParams
+union SetOrganizationLogoParamsFile
+union SignInEmailCodeSendParams
+union SignInEmailLinkSendParams
+union SignInFirstFactor
+union SignInPasswordParams
+union SignInPhoneCodeSendParams
+union SignInSecondFactor
+union SignUpPasswordParams
+union UserIsPrimaryIdentificationIdent

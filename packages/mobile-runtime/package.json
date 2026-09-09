@@ -1,0 +1,17 @@
+{
+  "name": "@clerk/mobile-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@clerk/shared": "workspace:^",
+    "core-js": "catalog:repo"
+  },
+  "devDependencies": {
+    "rolldown": "catalog:repo"
+  }
+}

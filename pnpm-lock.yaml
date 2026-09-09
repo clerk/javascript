@@ -844,6 +844,19 @@ importers:
         specifier: workspace:^
         version: link:../shared
 
+  packages/mobile-runtime:
+    dependencies:
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
+      core-js:
+        specifier: catalog:repo
+        version: 3.47.0
+    devDependencies:
+      rolldown:
+        specifier: 1.1.0
+        version: 1.1.0
+
   packages/msw:
     dependencies:
       '@clerk/shared':
@@ -858,6 +871,12 @@ importers:
       react:
         specifier: 18.3.1
         version: 18.3.1
+
+  packages/native-bindings:
+    devDependencies:
+      typescript:
+        specifier: catalog:repo
+        version: 6.0.3
 
   packages/nextjs:
     dependencies:

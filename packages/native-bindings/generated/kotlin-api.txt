@@ -1,0 +1,1400 @@
+ActiveSession.abandonAt: Instant
+ActiveSession.actor: JsonObject?
+ActiveSession.agent: JsonObject?
+ActiveSession.attemptFirstFactorVerification(attemptFactor: SessionVerifyAttemptFirstFactorParams): SessionVerification [return]
+ActiveSession.attemptSecondFactorVerification(params: SessionVerifyAttemptSecondFactorParams): SessionVerification [return]
+ActiveSession.checkAuthorization(isAuthorizedParams: CheckAuthorizationParams): Boolean [return]
+ActiveSession.clearCache(): Unit [return]
+ActiveSession.createdAt: Instant
+ActiveSession.currentTask: SessionTask? = null
+ActiveSession.end(): Session [return]
+ActiveSession.expireAt: Instant
+ActiveSession.factorVerificationAge: ActiveSessionFactorVerificationAgeValue?
+ActiveSession.getToken(options: GetTokenOptions? = null): String? [return]
+ActiveSession.id: String
+ActiveSession.lastActiveAt: Instant
+ActiveSession.lastActiveOrganizationId: String?
+ActiveSession.prepareFirstFactorVerification(factor: SessionVerifyPrepareFirstFactorParams): SessionVerification [return]
+ActiveSession.prepareSecondFactorVerification(params: PhoneCodeSecondFactorConfig): SessionVerification [return]
+ActiveSession.publicUserData: PublicUserData
+ActiveSession.reload(p: ClerkResourceReloadParams? = null): ActiveSession [return]
+ActiveSession.remove(): Session [return]
+ActiveSession.startVerification(params: SessionVerifyCreateParams): SessionVerification [return]
+ActiveSession.status: String
+ActiveSession.tasks: List<SessionTask>?
+ActiveSession.touch(params: SessionTouchParams? = null): Session [return]
+ActiveSession.updatedAt: Instant
+ActiveSession.user: User
+ActiveSession.verifyWithPasskey(): SessionVerification [return]
+ActiveSessionFactorVerificationAgeValue tuple: Double, Double
+AddMemberParams.role: String
+AddMemberParams.userId: String
+AddPaymentMethodParams.gateway: String
+AddPaymentMethodParams.paymentToken: String
+AttemptAffiliationVerificationParams.code: String
+AttemptEmailAddressVerificationParams.code: String
+AttemptPhoneNumberVerificationParams.code: String
+AttemptWeb3WalletVerificationParams.signature: String
+AttemptWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy? = null
+AuthenticatorAssertionResponse.authenticatorData: ByteArray
+AuthenticatorAssertionResponse.clientDataJSON: ByteArray
+AuthenticatorAssertionResponse.signature: ByteArray
+AuthenticatorAssertionResponse.userHandle: ByteArray?
+BackupCode.codes: List<String>
+BackupCode.createdAt: Instant?
+BackupCode.id: String
+BackupCode.reload(p: ClerkResourceReloadParams? = null): BackupCode [return]
+BackupCode.updatedAt: Instant?
+BackupCodeAttempt.code: String
+BackupCodeAttempt.strategy: String
+BackupCodeFactor.strategy: String
+BillingInitializedPaymentMethod.externalClientSecret: String
+BillingInitializedPaymentMethod.externalGatewayId: String
+BillingInitializedPaymentMethod.id: String? = null
+BillingInitializedPaymentMethod.paymentMethodOrder: List<String>
+BillingInitializedPaymentMethod.reload(p: ClerkResourceReloadParams? = null): BillingInitializedPaymentMethod [return]
+BillingPaymentMethod.cardType: String?
+BillingPaymentMethod.createdAt: Field<Instant> = Field.Omitted
+BillingPaymentMethod.expiryMonth: Field<Double> = Field.Omitted
+BillingPaymentMethod.expiryYear: Field<Double> = Field.Omitted
+BillingPaymentMethod.id: String
+BillingPaymentMethod.isDefault: Boolean? = null
+BillingPaymentMethod.isRemovable: Boolean? = null
+BillingPaymentMethod.last4: String?
+BillingPaymentMethod.makeDefault(params: BillingPaymentMethodRemoveParams? = null): JsonElement [return]
+BillingPaymentMethod.paymentType: String? = null
+BillingPaymentMethod.reload(p: ClerkResourceReloadParams? = null): BillingPaymentMethod [return]
+BillingPaymentMethod.remove(params: BillingPaymentMethodRemoveParams? = null): DeletedObject [return]
+BillingPaymentMethod.status: BillingPaymentMethodStatus
+BillingPaymentMethod.updatedAt: Field<Instant> = Field.Omitted
+BillingPaymentMethod.walletType: Field<String> = Field.Omitted
+BillingPaymentMethodRemoveParams.orgId: String? = null
+BillingPaymentMethodStatus cases: expired, active, disconnected, unrecognized(String)
+CheckAuthorizationParams variants: SessionCheckAuthorizationIsAuthorizedParamsCase1 | SessionCheckAuthorizationIsAuthorizedParamsCase2 | SessionCheckAuthorizationIsAuthorizedParamsCase3 | SessionCheckAuthorizationIsAuthorizedParamsCase4 | SessionCheckAuthorizationIsAuthorizedParamsCase5
+Clerk.createOrganization(params: CreateOrganizationParams): Organization [return]
+Clerk.getOrganization(organizationId: String): Organization [return]
+Clerk.loaded: Boolean
+Clerk.organization: Organization?
+Clerk.session: Session?
+Clerk.setActive(params: MobileSetActiveParams): Unit [return]
+Clerk.signIn: SignIn
+Clerk.signOut(options: MobileSignOutOptions? = null): Unit [return]
+Clerk.signUp: SignUp
+Clerk.status: ClerkStatus
+Clerk.user: User?
+ClerkAPIError.code: String
+ClerkAPIError.longMessage: String? = null
+ClerkAPIError.message: String
+ClerkAPIError.meta: ClerkAPIErrorMeta? = null
+ClerkAPIErrorMeta.emailAddresses: List<String>? = null
+ClerkAPIErrorMeta.identifiers: List<String>? = null
+ClerkAPIErrorMeta.isPlanUpgradePossible: Boolean? = null
+ClerkAPIErrorMeta.paramName: String? = null
+ClerkAPIErrorMeta.permissions: List<String>? = null
+ClerkAPIErrorMeta.plan: ClerkAPIErrorMetaPlan? = null
+ClerkAPIErrorMeta.seatsQuantity: Double? = null
+ClerkAPIErrorMeta.seatsQuantityToAdd: Double? = null
+ClerkAPIErrorMeta.sessionId: String? = null
+ClerkAPIErrorMeta.zxcvbn: ClerkAPIErrorMetaZxcvbn? = null
+ClerkAPIErrorMetaPlan.amount_formatted: String
+ClerkAPIErrorMetaPlan.annual_monthly_amount_formatted: String
+ClerkAPIErrorMetaPlan.currency_symbol: String
+ClerkAPIErrorMetaPlan.id: String
+ClerkAPIErrorMetaPlan.name: String
+ClerkAPIErrorMetaZxcvbn.suggestions: List<ClerkAPIErrorMetaZxcvbnSuggestionsElement>
+ClerkAPIErrorMetaZxcvbnSuggestionsElement.code: String
+ClerkAPIErrorMetaZxcvbnSuggestionsElement.message: String
+ClerkPaginatedResponseBillingPaymentMethod.data: List<BillingPaymentMethod>
+ClerkPaginatedResponseBillingPaymentMethod.total_count: Double
+ClerkPaginatedResponseEnterpriseConnectionTestRun.data: List<EnterpriseConnectionTestRun>
+ClerkPaginatedResponseEnterpriseConnectionTestRun.total_count: Double
+ClerkPaginatedResponseOrganizationDomain.data: List<OrganizationDomain>
+ClerkPaginatedResponseOrganizationDomain.total_count: Double
+ClerkPaginatedResponseOrganizationInvitation.data: List<OrganizationInvitation>
+ClerkPaginatedResponseOrganizationInvitation.total_count: Double
+ClerkPaginatedResponseOrganizationMembership.data: List<OrganizationMembership>
+ClerkPaginatedResponseOrganizationMembership.total_count: Double
+ClerkPaginatedResponseOrganizationMembershipRequest.data: List<OrganizationMembershipRequest>
+ClerkPaginatedResponseOrganizationMembershipRequest.total_count: Double
+ClerkPaginatedResponseOrganizationSuggestion.data: List<OrganizationSuggestion>
+ClerkPaginatedResponseOrganizationSuggestion.total_count: Double
+ClerkPaginatedResponseUserOrganizationInvitation.data: List<UserOrganizationInvitation>
+ClerkPaginatedResponseUserOrganizationInvitation.total_count: Double
+ClerkResourceReloadParams.rotatingTokenNonce: String? = null
+ClerkStatus cases: degraded, error, loading, ready, unrecognized(String)
+CreateEmailAddressParams.email: String
+CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.cancelEmailLinkFlow(): Unit [return]
+CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress.startEmailLinkFlow(params: StartEmailLinkFlowParams): EmailAddress [return]
+CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress.cancelEnterpriseSSOLinkFlow(): Unit [return]
+CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress.startEnterpriseSSOLinkFlow(params: StartEnterpriseSSOLinkFlowParams): EmailAddress [return]
+CreateExternalAccountParams.additionalScopes: List<String>? = null
+CreateExternalAccountParams.enterpriseConnectionId: String? = null
+CreateExternalAccountParams.oidcLoginHint: String? = null
+CreateExternalAccountParams.oidcPrompt: String? = null
+CreateExternalAccountParams.redirectUrl: String? = null
+CreateExternalAccountParams.strategy: OAuthStrategy? = null
+CreateOrganizationEnterpriseConnectionParams.domains: List<String>? = null
+CreateOrganizationEnterpriseConnectionParams.name: String? = null
+CreateOrganizationEnterpriseConnectionParams.oidc: Field<OrganizationEnterpriseConnectionOidcInput> = Field.Omitted
+CreateOrganizationEnterpriseConnectionParams.organizationId: Field<String> = Field.Omitted
+CreateOrganizationEnterpriseConnectionParams.provider: OrganizationEnterpriseConnectionProvider
+CreateOrganizationEnterpriseConnectionParams.saml: Field<OrganizationEnterpriseConnectionSamlInput> = Field.Omitted
+CreateOrganizationParams.name: String
+CreateOrganizationParams.slug: String? = null
+CreatePhoneNumberParams.phoneNumber: String
+CreateWeb3WalletParams.web3Wallet: String
+DeletedObject.deleted: Boolean
+DeletedObject.id: String? = null
+DeletedObject.object: String
+DeletedObject.slug: String? = null
+EmailAddress.attemptVerification(params: AttemptEmailAddressVerificationParams): EmailAddress [return]
+EmailAddress.create(): EmailAddress [return]
+EmailAddress.createEmailLinkFlow(): CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress [return]
+EmailAddress.createEnterpriseSSOLinkFlow(): CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress [return]
+EmailAddress.destroy(): Unit [return]
+EmailAddress.emailAddress: String
+EmailAddress.id: String
+EmailAddress.linkedTo: List<IdentificationLink>
+EmailAddress.matchesSsoConnection: Boolean
+EmailAddress.prepareVerification(params: PrepareEmailAddressVerificationParams): EmailAddress [return]
+EmailAddress.reload(p: ClerkResourceReloadParams? = null): EmailAddress [return]
+EmailAddress.stringValue(): String [return]
+EmailAddress.verification: Verification
+EmailAddressPrepareVerificationParamsCase1.strategy: String
+EmailAddressPrepareVerificationParamsCase2.redirectUrl: String
+EmailAddressPrepareVerificationParamsCase2.strategy: EmailAddressPrepareVerificationParamsCase2Strategy
+EmailAddressPrepareVerificationParamsCase2Strategy cases: enterprise_sso, email_link, unrecognized(String)
+EmailCodeAttempt.code: String
+EmailCodeAttempt.strategy: String
+EmailCodeConfig.emailAddressId: String
+EmailCodeConfig.primary: Boolean? = null
+EmailCodeConfig.strategy: String
+EmailCodeFactor.emailAddressId: String
+EmailCodeFactor.primary: Boolean? = null
+EmailCodeFactor.safeIdentifier: String
+EmailCodeFactor.strategy: String
+EmailLinkFactor.emailAddressId: String
+EmailLinkFactor.primary: Boolean? = null
+EmailLinkFactor.safeIdentifier: String
+EmailLinkFactor.strategy: String
+EnterpriseAccount.active: Boolean
+EnterpriseAccount.destroy(): Unit [return]
+EnterpriseAccount.emailAddress: String
+EnterpriseAccount.enterpriseConnection: EnterpriseAccountConnection?
+EnterpriseAccount.enterpriseConnectionId: String?
+EnterpriseAccount.firstName: String?
+EnterpriseAccount.id: String? = null
+EnterpriseAccount.lastAuthenticatedAt: Instant?
+EnterpriseAccount.lastName: String?
+EnterpriseAccount.protocol: EnterpriseProtocol
+EnterpriseAccount.provider: EnterpriseProvider
+EnterpriseAccount.providerUserId: String?
+EnterpriseAccount.publicMetadata: Map<String, JsonElement>?
+EnterpriseAccount.reload(p: ClerkResourceReloadParams? = null): EnterpriseAccount [return]
+EnterpriseAccount.verification: Verification?
+EnterpriseAccountConnection.active: Boolean
+EnterpriseAccountConnection.allowIdpInitiated: Boolean
+EnterpriseAccountConnection.allowOrganizationAccountLinking: Boolean
+EnterpriseAccountConnection.allowSubdomains: Boolean
+EnterpriseAccountConnection.disableAdditionalIdentifications: Boolean
+EnterpriseAccountConnection.domain: String
+EnterpriseAccountConnection.enterpriseConnectionId: String?
+EnterpriseAccountConnection.id: String? = null
+EnterpriseAccountConnection.logoPublicUrl: String?
+EnterpriseAccountConnection.name: String
+EnterpriseAccountConnection.protocol: EnterpriseProtocol
+EnterpriseAccountConnection.provider: EnterpriseProvider
+EnterpriseAccountConnection.reload(p: ClerkResourceReloadParams? = null): EnterpriseAccountConnection [return]
+EnterpriseAccountConnection.syncUserAttributes: Boolean
+EnterpriseConnection.active: Boolean
+EnterpriseConnection.allowOrganizationAccountLinking: Boolean
+EnterpriseConnection.createdAt: Instant?
+EnterpriseConnection.customAttributes: List<JsonElement>
+EnterpriseConnection.disableAdditionalIdentifications: Boolean
+EnterpriseConnection.domains: List<String>
+EnterpriseConnection.id: String
+EnterpriseConnection.logoPublicUrl: String?
+EnterpriseConnection.name: String
+EnterpriseConnection.oauthConfig: EnterpriseOAuthConfig?
+EnterpriseConnection.organizationId: String?
+EnterpriseConnection.provider: String
+EnterpriseConnection.reload(p: ClerkResourceReloadParams? = null): EnterpriseConnection [return]
+EnterpriseConnection.samlConnection: EnterpriseSamlConnectionNested?
+EnterpriseConnection.syncUserAttributes: Boolean
+EnterpriseConnection.updatedAt: Instant?
+EnterpriseConnectionTestRun.connectionType: EnterpriseConnectionTestRunConnectionType
+EnterpriseConnectionTestRun.createdAt: Instant?
+EnterpriseConnectionTestRun.id: String
+EnterpriseConnectionTestRun.logs: List<EnterpriseConnectionTestRunLog>
+EnterpriseConnectionTestRun.oauth: EnterpriseConnectionTestRunOauthPayload?
+EnterpriseConnectionTestRun.parsedUserInfo: EnterpriseConnectionTestRunParsedUserInfo?
+EnterpriseConnectionTestRun.reload(p: ClerkResourceReloadParams? = null): EnterpriseConnectionTestRun [return]
+EnterpriseConnectionTestRun.saml: EnterpriseConnectionTestRunSamlPayload?
+EnterpriseConnectionTestRun.status: String
+EnterpriseConnectionTestRunConnectionType cases: saml, oauth, unrecognized(String)
+EnterpriseConnectionTestRunInit.url: String
+EnterpriseConnectionTestRunLog.code: String? = null
+EnterpriseConnectionTestRunLog.level: String? = null
+EnterpriseConnectionTestRunLog.message: String? = null
+EnterpriseConnectionTestRunLog.shortMessage: String? = null
+EnterpriseConnectionTestRunOauthPayload.userInfo: String? = null
+EnterpriseConnectionTestRunParsedUserInfo.emailAddress: String? = null
+EnterpriseConnectionTestRunParsedUserInfo.firstName: String? = null
+EnterpriseConnectionTestRunParsedUserInfo.lastName: String? = null
+EnterpriseConnectionTestRunParsedUserInfo.userId: String? = null
+EnterpriseConnectionTestRunSamlPayload.relayState: String? = null
+EnterpriseConnectionTestRunSamlPayload.samlRequest: String? = null
+EnterpriseConnectionTestRunSamlPayload.samlResponse: String? = null
+EnterpriseConnectionTestRunStatus cases: pending, failed, success, unrecognized(String)
+EnterpriseOAuthConfig.authUrl: String? = null
+EnterpriseOAuthConfig.clientId: String
+EnterpriseOAuthConfig.createdAt: Instant?
+EnterpriseOAuthConfig.discoveryUrl: String? = null
+EnterpriseOAuthConfig.id: String
+EnterpriseOAuthConfig.logoPublicUrl: Field<String> = Field.Omitted
+EnterpriseOAuthConfig.name: String
+EnterpriseOAuthConfig.providerKey: String? = null
+EnterpriseOAuthConfig.redirectUri: String? = null
+EnterpriseOAuthConfig.requiresPkce: Boolean? = null
+EnterpriseOAuthConfig.tokenUrl: String? = null
+EnterpriseOAuthConfig.updatedAt: Instant?
+EnterpriseOAuthConfig.userInfoUrl: String? = null
+EnterpriseProtocol cases: saml, oauth, unrecognized(String)
+EnterpriseProvider cases: saml_custom, saml_okta, saml_google, saml_microsoft, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+EnterpriseSSOFactor.enterpriseConnectionId: String? = null
+EnterpriseSSOFactor.enterpriseConnectionName: String? = null
+EnterpriseSSOFactor.strategy: String
+EnterpriseSamlConnectionNested.acsUrl: String
+EnterpriseSamlConnectionNested.active: Boolean
+EnterpriseSamlConnectionNested.allowIdpInitiated: Boolean
+EnterpriseSamlConnectionNested.allowSubdomains: Boolean
+EnterpriseSamlConnectionNested.forceAuthn: Boolean
+EnterpriseSamlConnectionNested.id: String
+EnterpriseSamlConnectionNested.idpCertificate: String
+EnterpriseSamlConnectionNested.idpCertificateExpiresAt: Double
+EnterpriseSamlConnectionNested.idpCertificateIssuedAt: Double
+EnterpriseSamlConnectionNested.idpEntityId: String
+EnterpriseSamlConnectionNested.idpMetadata: String
+EnterpriseSamlConnectionNested.idpMetadataUrl: String
+EnterpriseSamlConnectionNested.idpSsoUrl: String
+EnterpriseSamlConnectionNested.name: String
+EnterpriseSamlConnectionNested.spEntityId: String
+EnterpriseSamlConnectionNested.spMetadataUrl: String
+ExternalAccount.accountIdentifier(): String [return]
+ExternalAccount.approvedScopes: String
+ExternalAccount.destroy(): Unit [return]
+ExternalAccount.emailAddress: String
+ExternalAccount.firstName: String
+ExternalAccount.id: String
+ExternalAccount.identificationId: String
+ExternalAccount.imageUrl: String
+ExternalAccount.label: String? = null
+ExternalAccount.lastName: String
+ExternalAccount.phoneNumber: String? = null
+ExternalAccount.provider: OAuthProvider
+ExternalAccount.providerSlug(): OAuthProvider [return]
+ExternalAccount.providerTitle(): String [return]
+ExternalAccount.providerUserId: String
+ExternalAccount.publicMetadata: Map<String, JsonElement>
+ExternalAccount.reauthorize(params: ReauthorizeExternalAccountParams): ExternalAccount [return]
+ExternalAccount.reload(p: ClerkResourceReloadParams? = null): ExternalAccount [return]
+ExternalAccount.username: String? = null
+ExternalAccount.verification: Verification?
+GetDomainsParams.enrollmentMode: OrganizationEnrollmentMode? = null
+GetDomainsParams.initialPage: Double? = null
+GetDomainsParams.pageSize: Double? = null
+GetEnterpriseConnectionTestRunsParams.initialPage: Double? = null
+GetEnterpriseConnectionTestRunsParams.pageSize: Double? = null
+GetEnterpriseConnectionTestRunsParams.status: List<EnterpriseConnectionTestRunStatus>? = null
+GetEnterpriseConnectionsParams.withOrganizationAccountLinking: Boolean? = null
+GetInvitationsParams.initialPage: Double? = null
+GetInvitationsParams.pageSize: Double? = null
+GetInvitationsParams.status: List<OrganizationInvitationStatus>? = null
+GetMembersParams.initialPage: Double? = null
+GetMembersParams.pageSize: Double? = null
+GetMembersParams.query: String? = null
+GetMembersParams.role: List<String>? = null
+GetMembershipRequestParams.initialPage: Double? = null
+GetMembershipRequestParams.pageSize: Double? = null
+GetMembershipRequestParams.status: OrganizationInvitationStatus? = null
+GetPaymentMethodsParams.initialPage: Double? = null
+GetPaymentMethodsParams.pageSize: Double? = null
+GetRolesParams.initialPage: Double? = null
+GetRolesParams.pageSize: Double? = null
+GetRolesResponse.data: List<Role>
+GetRolesResponse.has_role_set_migration: Boolean? = null
+GetRolesResponse.total_count: Double
+GetTokenOptions.organizationId: String? = null
+GetTokenOptions.skipCache: Boolean? = null
+GetTokenOptions.template: String? = null
+GetUserOrganizationInvitationsParams.initialPage: Double? = null
+GetUserOrganizationInvitationsParams.pageSize: Double? = null
+GetUserOrganizationInvitationsParams.status: OrganizationInvitationStatus? = null
+GetUserOrganizationMembershipParams.initialPage: Double? = null
+GetUserOrganizationMembershipParams.pageSize: Double? = null
+GetUserOrganizationSuggestionsParams.initialPage: Double? = null
+GetUserOrganizationSuggestionsParams.pageSize: Double? = null
+GetUserOrganizationSuggestionsParams.status: GetUserOrganizationSuggestionsParamsStatus? = null
+GetUserOrganizationSuggestionsParamsStatus variants: String | String | List<OrganizationSuggestionStatus>
+IdentificationLink.id: String
+IdentificationLink.reload(p: ClerkResourceReloadParams? = null): IdentificationLink [return]
+IdentificationLink.type: String
+Image.id: String? = null
+Image.name: String?
+Image.publicUrl: String?
+Image.reload(p: ClerkResourceReloadParams? = null): Image [return]
+InitializePaymentMethodParams.gateway: String
+InviteMemberParams.emailAddress: String
+InviteMemberParams.role: String
+InviteMembersParams.emailAddresses: List<String>
+InviteMembersParams.role: String
+MobileSetActiveParams.organization: Field<MobileSetActiveParamsOrganization> = Field.Omitted
+MobileSetActiveParams.session: Field<MobileSetActiveParamsSession> = Field.Omitted
+MobileSetActiveParamsOrganization variants: String | Organization
+MobileSetActiveParamsSession variants: String | ActiveSession | PendingSession
+MobileSignOutOptions.sessionId: String? = null
+OAuthProvider cases: facebook, google, hubspot, github, tiktok, gitlab, discord, twitter, twitch, linkedin, linkedin_oidc, dropbox, atlassian, bitbucket, microsoft, notion, apple, line, instagram, coinbase, spotify, xero, box, slack, linear, x, enstall, huggingface, vercel, unrecognized(String)
+OAuthStrategy cases: oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+OauthFactor.strategy: OAuthStrategy
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.emailAddressId: String? = null
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.enterpriseConnectionId: String? = null
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.enterpriseConnectionName: String? = null
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.oidcPrompt: String? = null
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.redirectUrl: String
+OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl.strategy: String
+Organization.addMember(params: AddMemberParams): OrganizationMembership [return]
+Organization.addPaymentMethod(params: AddPaymentMethodParams): BillingPaymentMethod [return]
+Organization.adminDeleteEnabled: Boolean
+Organization.attemptOwnershipVerification(domainIds: List<String>): OrganizationDomainsBulkOwnershipVerification [return]
+Organization.createDomain(domainName: String, params: PickCreateOrganizationDomainParamsAndenrollmentMode? = null): OrganizationDomain [return]
+Organization.createEnterpriseConnection(params: CreateOrganizationEnterpriseConnectionParams): EnterpriseConnection [return]
+Organization.createEnterpriseConnectionTestRun(enterpriseConnectionId: String): EnterpriseConnectionTestRunInit [return]
+Organization.createdAt: Instant
+Organization.deleteEnterpriseConnection(enterpriseConnectionId: String): DeletedObject [return]
+Organization.destroy(): Unit [return]
+Organization.exclusiveMembership: Boolean
+Organization.getDomain(__0: OrganizationGetDomain__0): OrganizationDomain [return]
+Organization.getDomains(params: GetDomainsParams? = null): ClerkPaginatedResponseOrganizationDomain [return]
+Organization.getEnterpriseConnectionTestRuns(enterpriseConnectionId: String, params: GetEnterpriseConnectionTestRunsParams? = null): ClerkPaginatedResponseEnterpriseConnectionTestRun [return]
+Organization.getEnterpriseConnections(params: GetEnterpriseConnectionsParams? = null): List<EnterpriseConnection> [return]
+Organization.getInvitations(params: GetInvitationsParams? = null): ClerkPaginatedResponseOrganizationInvitation [return]
+Organization.getMembershipRequests(params: GetMembershipRequestParams? = null): ClerkPaginatedResponseOrganizationMembershipRequest [return]
+Organization.getMemberships(params: GetMembersParams? = null): ClerkPaginatedResponseOrganizationMembership [return]
+Organization.getPaymentMethods(params: GetPaymentMethodsParams? = null): ClerkPaginatedResponseBillingPaymentMethod [return]
+Organization.getRoles(params: GetRolesParams? = null): GetRolesResponse [return]
+Organization.hasImage: Boolean
+Organization.id: String
+Organization.imageUrl: String
+Organization.initializePaymentMethod(params: InitializePaymentMethodParams): BillingInitializedPaymentMethod [return]
+Organization.inviteMember(params: InviteMemberParams): OrganizationInvitation [return]
+Organization.inviteMembers(params: InviteMembersParams): List<OrganizationInvitation> [return]
+Organization.maxAllowedMemberships: Double
+Organization.membersCount: Double
+Organization.name: String
+Organization.pendingInvitationsCount: Double
+Organization.prepareOwnershipVerification(domainIds: List<String>): OrganizationDomainsBulkOwnershipVerification [return]
+Organization.publicMetadata: JsonObject
+Organization.reload(p: ClerkResourceReloadParams? = null): Organization [return]
+Organization.removeMember(userId: String): OrganizationMembership [return]
+Organization.selfServeSSOEnabled: Boolean
+Organization.setLogo(params: SetOrganizationLogoParams): Organization [return]
+Organization.slug: String?
+Organization.update(params: UpdateOrganizationParams): Organization [return]
+Organization.updateEnterpriseConnection(enterpriseConnectionId: String, params: UpdateOrganizationEnterpriseConnectionParams): EnterpriseConnection [return]
+Organization.updateMember(params: UpdateMembershipParams): OrganizationMembership [return]
+Organization.updatedAt: Instant
+OrganizationCreationDefaults.advisory: OrganizationCreationDefaultsAdvisory?
+OrganizationCreationDefaults.form: OrganizationCreationDefaultsForm
+OrganizationCreationDefaults.id: String? = null
+OrganizationCreationDefaults.reload(p: ClerkResourceReloadParams? = null): OrganizationCreationDefaults [return]
+OrganizationCreationDefaultsAdvisory.code: String
+OrganizationCreationDefaultsAdvisory.meta: Map<String, String>
+OrganizationCreationDefaultsAdvisory.severity: String
+OrganizationCreationDefaultsForm.blurHash: String?
+OrganizationCreationDefaultsForm.logo: String?
+OrganizationCreationDefaultsForm.name: String
+OrganizationCreationDefaultsForm.slug: String
+OrganizationDomain.affiliationEmailAddress: String?
+OrganizationDomain.affiliationVerification: OrganizationDomainVerification?
+OrganizationDomain.attemptAffiliationVerification(params: AttemptAffiliationVerificationParams): OrganizationDomain [return]
+OrganizationDomain.createdAt: Instant
+OrganizationDomain.delete(): Unit [return]
+OrganizationDomain.enrollmentMode: OrganizationEnrollmentMode
+OrganizationDomain.id: String
+OrganizationDomain.name: String
+OrganizationDomain.organizationId: String
+OrganizationDomain.ownershipVerification: OrganizationDomainOwnershipVerification?
+OrganizationDomain.prepareAffiliationVerification(params: PrepareAffiliationVerificationParams): OrganizationDomain [return]
+OrganizationDomain.reload(p: ClerkResourceReloadParams? = null): OrganizationDomain [return]
+OrganizationDomain.totalPendingInvitations: Double
+OrganizationDomain.totalPendingSuggestions: Double
+OrganizationDomain.updateEnrollmentMode(params: UpdateEnrollmentModeParams): OrganizationDomain [return]
+OrganizationDomain.updatedAt: Instant
+OrganizationDomain.verification: OrganizationDomainVerification?
+OrganizationDomainBulkOwnershipVerificationError.code: String
+OrganizationDomainBulkOwnershipVerificationError.id: String
+OrganizationDomainOwnershipVerification.attempts: Double?
+OrganizationDomainOwnershipVerification.expiresAt: Instant?
+OrganizationDomainOwnershipVerification.status: OrganizationDomainOwnershipVerificationStatus
+OrganizationDomainOwnershipVerification.strategy: OrganizationDomainOwnershipVerificationStrategy
+OrganizationDomainOwnershipVerification.txtRecordName: String?
+OrganizationDomainOwnershipVerification.txtRecordValue: String?
+OrganizationDomainOwnershipVerification.verifiedAt: Instant?
+OrganizationDomainOwnershipVerificationStatus cases: expired, unverified, verified, unrecognized(String)
+OrganizationDomainOwnershipVerificationStrategy cases: txt, legacy, manual_override, parent_domain, unrecognized(String)
+OrganizationDomainVerification.attempts: Double
+OrganizationDomainVerification.expiresAt: Instant
+OrganizationDomainVerification.status: OrganizationDomainVerificationStatus
+OrganizationDomainVerification.strategy: String
+OrganizationDomainVerificationStatus cases: expired, unverified, verified, failed, unrecognized(String)
+OrganizationDomainsBulkOwnershipVerification.data: List<OrganizationDomain>
+OrganizationDomainsBulkOwnershipVerification.errors: List<OrganizationDomainBulkOwnershipVerificationError>
+OrganizationEnrollmentMode cases: manual_invitation, automatic_invitation, automatic_suggestion, enterprise_sso, unrecognized(String)
+OrganizationEnterpriseConnectionOidcInput.authUrl: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionOidcInput.clientId: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionOidcInput.clientSecret: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionOidcInput.discoveryUrl: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionOidcInput.requiresPkce: Field<Boolean> = Field.Omitted
+OrganizationEnterpriseConnectionOidcInput.tokenUrl: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionOidcInput.userInfoUrl: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionProvider cases: saml_custom, saml_okta, saml_google, saml_microsoft, oidc_custom, oidc_github_enterprise, oidc_gitlab, unrecognized(String)
+OrganizationEnterpriseConnectionSamlInput.allowIdpInitiated: Field<Boolean> = Field.Omitted
+OrganizationEnterpriseConnectionSamlInput.allowSubdomains: Field<Boolean> = Field.Omitted
+OrganizationEnterpriseConnectionSamlInput.attributeMapping: Field<Map<String, JsonElement>> = Field.Omitted
+OrganizationEnterpriseConnectionSamlInput.forceAuthn: Field<Boolean> = Field.Omitted
+OrganizationEnterpriseConnectionSamlInput.idpCertificate: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionSamlInput.idpEntityId: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionSamlInput.idpMetadata: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionSamlInput.idpMetadataUrl: Field<String> = Field.Omitted
+OrganizationEnterpriseConnectionSamlInput.idpSsoUrl: Field<String> = Field.Omitted
+OrganizationGetDomain__0.domainId: String
+OrganizationInvitation.createdAt: Instant
+OrganizationInvitation.emailAddress: String
+OrganizationInvitation.id: String
+OrganizationInvitation.organizationId: String
+OrganizationInvitation.publicMetadata: JsonObject
+OrganizationInvitation.reload(p: ClerkResourceReloadParams? = null): OrganizationInvitation [return]
+OrganizationInvitation.revoke(): OrganizationInvitation [return]
+OrganizationInvitation.role: String
+OrganizationInvitation.roleName: String
+OrganizationInvitation.status: OrganizationInvitationStatus
+OrganizationInvitation.updatedAt: Instant
+OrganizationInvitationStatus cases: pending, accepted, revoked, expired, unrecognized(String)
+OrganizationMembership.createdAt: Instant
+OrganizationMembership.destroy(): OrganizationMembership [return]
+OrganizationMembership.id: String
+OrganizationMembership.organization: Organization
+OrganizationMembership.permissions: List<String>
+OrganizationMembership.publicMetadata: JsonObject
+OrganizationMembership.publicUserData: PublicUserData? = null
+OrganizationMembership.reload(p: ClerkResourceReloadParams? = null): OrganizationMembership [return]
+OrganizationMembership.role: String
+OrganizationMembership.roleName: String
+OrganizationMembership.update(updateParams: UpdateOrganizationMembershipParams): OrganizationMembership [return]
+OrganizationMembership.updatedAt: Instant
+OrganizationMembershipRequest.accept(): OrganizationMembershipRequest [return]
+OrganizationMembershipRequest.createdAt: Instant
+OrganizationMembershipRequest.id: String
+OrganizationMembershipRequest.organizationId: String
+OrganizationMembershipRequest.publicUserData: PublicUserData
+OrganizationMembershipRequest.reject(): OrganizationMembershipRequest [return]
+OrganizationMembershipRequest.reload(p: ClerkResourceReloadParams? = null): OrganizationMembershipRequest [return]
+OrganizationMembershipRequest.status: OrganizationInvitationStatus
+OrganizationMembershipRequest.updatedAt: Instant
+OrganizationSuggestion.accept(): OrganizationSuggestion [return]
+OrganizationSuggestion.createdAt: Instant
+OrganizationSuggestion.id: String
+OrganizationSuggestion.publicOrganizationData: OrganizationSuggestionPublicOrganizationData
+OrganizationSuggestion.reload(p: ClerkResourceReloadParams? = null): OrganizationSuggestion [return]
+OrganizationSuggestion.status: OrganizationSuggestionStatus
+OrganizationSuggestion.updatedAt: Instant
+OrganizationSuggestionPublicOrganizationData.hasImage: Boolean
+OrganizationSuggestionPublicOrganizationData.id: String
+OrganizationSuggestionPublicOrganizationData.imageUrl: String
+OrganizationSuggestionPublicOrganizationData.name: String
+OrganizationSuggestionPublicOrganizationData.slug: String?
+OrganizationSuggestionStatus cases: pending, accepted, unrecognized(String)
+Partialtype.name: Field<String> = Field.Omitted
+Passkey.createdAt: Instant
+Passkey.delete(): DeletedObject [return]
+Passkey.id: String
+Passkey.lastUsedAt: Instant?
+Passkey.name: String?
+Passkey.reload(p: ClerkResourceReloadParams? = null): Passkey [return]
+Passkey.update(params: Partialtype): Passkey [return]
+Passkey.updatedAt: Instant
+Passkey.verification: PasskeyVerification?
+PasskeyAttempt.publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse
+PasskeyAttempt.strategy: String
+PasskeyFactor.strategy: String
+PasskeyVerification.attempts: Double?
+PasskeyVerification.channel: PhoneCodeChannel? = null
+PasskeyVerification.error: ClerkAPIError?
+PasskeyVerification.expireAt: Instant?
+PasskeyVerification.id: String? = null
+PasskeyVerification.reload(p: ClerkResourceReloadParams? = null): PasskeyVerification [return]
+PasskeyVerification.status: VerificationStatus?
+PasskeyVerification.strategy: String?
+PasskeyVerification.verifiedAtClient: String?
+PasskeyVerification.verifiedFromTheSameClient(): Boolean [return]
+PasswordAttempt.password: String
+PasswordAttempt.strategy: String
+PasswordFactor.strategy: String
+PendingSession.abandonAt: Instant
+PendingSession.actor: JsonObject?
+PendingSession.agent: JsonObject?
+PendingSession.attemptFirstFactorVerification(attemptFactor: SessionVerifyAttemptFirstFactorParams): SessionVerification [return]
+PendingSession.attemptSecondFactorVerification(params: SessionVerifyAttemptSecondFactorParams): SessionVerification [return]
+PendingSession.checkAuthorization(isAuthorizedParams: CheckAuthorizationParams): Boolean [return]
+PendingSession.clearCache(): Unit [return]
+PendingSession.createdAt: Instant
+PendingSession.currentTask: SessionTask
+PendingSession.end(): Session [return]
+PendingSession.expireAt: Instant
+PendingSession.factorVerificationAge: PendingSessionFactorVerificationAgeValue?
+PendingSession.getToken(options: GetTokenOptions? = null): String? [return]
+PendingSession.id: String
+PendingSession.lastActiveAt: Instant
+PendingSession.lastActiveOrganizationId: String?
+PendingSession.prepareFirstFactorVerification(factor: SessionVerifyPrepareFirstFactorParams): SessionVerification [return]
+PendingSession.prepareSecondFactorVerification(params: PhoneCodeSecondFactorConfig): SessionVerification [return]
+PendingSession.publicUserData: PublicUserData
+PendingSession.reload(p: ClerkResourceReloadParams? = null): PendingSession [return]
+PendingSession.remove(): Session [return]
+PendingSession.startVerification(params: SessionVerifyCreateParams): SessionVerification [return]
+PendingSession.status: String
+PendingSession.tasks: List<SessionTask>?
+PendingSession.touch(params: SessionTouchParams? = null): Session [return]
+PendingSession.updatedAt: Instant
+PendingSession.user: User
+PendingSession.verifyWithPasskey(): SessionVerification [return]
+PendingSessionFactorVerificationAgeValue tuple: Double, Double
+Permission.createdAt: Instant
+Permission.description: String
+Permission.id: String
+Permission.key: String
+Permission.name: String
+Permission.reload(p: ClerkResourceReloadParams? = null): Permission [return]
+Permission.type: PermissionType
+Permission.updatedAt: Instant
+PermissionType cases: system, user, unrecognized(String)
+PhoneCodeAttempt.code: String
+PhoneCodeAttempt.strategy: String
+PhoneCodeChannel cases: sms, whatsapp, unrecognized(String)
+PhoneCodeConfig.channel: PhoneCodeChannel? = null
+PhoneCodeConfig.default: Boolean? = null
+PhoneCodeConfig.phoneNumberId: String
+PhoneCodeConfig.primary: Boolean? = null
+PhoneCodeConfig.strategy: String
+PhoneCodeFactor.channel: PhoneCodeChannel? = null
+PhoneCodeFactor.default: Boolean? = null
+PhoneCodeFactor.phoneNumberId: String
+PhoneCodeFactor.primary: Boolean? = null
+PhoneCodeFactor.safeIdentifier: String
+PhoneCodeFactor.strategy: String
+PhoneCodeSecondFactorConfig.phoneNumberId: String? = null
+PhoneCodeSecondFactorConfig.strategy: String
+PhoneNumber.attemptVerification(params: AttemptPhoneNumberVerificationParams): PhoneNumber [return]
+PhoneNumber.create(): PhoneNumber [return]
+PhoneNumber.defaultSecondFactor: Boolean
+PhoneNumber.destroy(): Unit [return]
+PhoneNumber.id: String
+PhoneNumber.linkedTo: List<IdentificationLink>
+PhoneNumber.makeDefaultSecondFactor(): PhoneNumber [return]
+PhoneNumber.phoneNumber: String
+PhoneNumber.prepareVerification(): PhoneNumber [return]
+PhoneNumber.reload(p: ClerkResourceReloadParams? = null): PhoneNumber [return]
+PhoneNumber.reservedForSecondFactor: Boolean
+PhoneNumber.setReservedForSecondFactor(params: SetReservedForSecondFactorParams): PhoneNumber [return]
+PhoneNumber.stringValue(): String [return]
+PhoneNumber.verification: Verification
+PickCreateOrganizationDomainParamsAndenrollmentMode.enrollmentMode: OrganizationEnrollmentMode? = null
+PrepareAffiliationVerificationParams.affiliationEmailAddress: String
+PrepareEmailAddressVerificationParams variants: EmailAddressPrepareVerificationParamsCase1 | EmailAddressPrepareVerificationParamsCase2
+PrepareWeb3WalletVerificationParams.strategy: PrepareWeb3WalletVerificationParamsStrategy
+PrepareWeb3WalletVerificationParamsStrategy cases: web3_metamask_signature, web3_base_signature, web3_coinbase_wallet_signature, web3_okx_wallet_signature, web3_solana_signature, unrecognized(String)
+ProtectCheck.expiresAt: Double? = null
+ProtectCheck.sdkUrl: String
+ProtectCheck.status: String
+ProtectCheck.uiHints: Map<String, String>? = null
+PublicKeyCredentialWithAuthenticatorAssertionResponse.authenticatorAttachment: String?
+PublicKeyCredentialWithAuthenticatorAssertionResponse.id: String
+PublicKeyCredentialWithAuthenticatorAssertionResponse.rawId: ByteArray
+PublicKeyCredentialWithAuthenticatorAssertionResponse.response: AuthenticatorAssertionResponse
+PublicKeyCredentialWithAuthenticatorAssertionResponse.type: String
+PublicUserData.banned: Boolean? = null
+PublicUserData.deprovisioned: Boolean? = null
+PublicUserData.firstName: String?
+PublicUserData.hasImage: Boolean
+PublicUserData.identifier: String
+PublicUserData.imageUrl: String
+PublicUserData.lastName: String?
+PublicUserData.userId: String? = null
+PublicUserData.username: String? = null
+ReauthorizeExternalAccountParams.additionalScopes: List<String>? = null
+ReauthorizeExternalAccountParams.oidcLoginHint: String? = null
+ReauthorizeExternalAccountParams.oidcPrompt: String? = null
+ReauthorizeExternalAccountParams.redirectUrl: String? = null
+RemoveUserPasswordParams.currentPassword: String? = null
+ResetPasswordEmailCodeFactor.emailAddressId: String
+ResetPasswordEmailCodeFactor.primary: Boolean? = null
+ResetPasswordEmailCodeFactor.safeIdentifier: String
+ResetPasswordEmailCodeFactor.strategy: String
+ResetPasswordPhoneCodeFactor.phoneNumberId: String
+ResetPasswordPhoneCodeFactor.primary: Boolean? = null
+ResetPasswordPhoneCodeFactor.safeIdentifier: String
+ResetPasswordPhoneCodeFactor.strategy: String
+ReverificationConfig variants: String | String | String | String | SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5
+Role.createdAt: Instant
+Role.description: String
+Role.id: String
+Role.key: String
+Role.name: String
+Role.permissions: List<Permission>
+Role.reload(p: ClerkResourceReloadParams? = null): Role [return]
+Role.updatedAt: Instant
+Session.abandonAt: Instant
+Session.actor: JsonObject?
+Session.agent: JsonObject?
+Session.attemptFirstFactorVerification(attemptFactor: SessionVerifyAttemptFirstFactorParams): SessionVerification [return]
+Session.attemptSecondFactorVerification(params: SessionVerifyAttemptSecondFactorParams): SessionVerification [return]
+Session.checkAuthorization(isAuthorizedParams: CheckAuthorizationParams): Boolean [return]
+Session.clearCache(): Unit [return]
+Session.createdAt: Instant
+Session.currentTask: SessionTask? = null
+Session.end(): Session [return]
+Session.expireAt: Instant
+Session.factorVerificationAge: SessionFactorVerificationAgeValue?
+Session.getToken(options: GetTokenOptions? = null): String? [return]
+Session.id: String
+Session.lastActiveAt: Instant
+Session.lastActiveOrganizationId: String?
+Session.prepareFirstFactorVerification(factor: SessionVerifyPrepareFirstFactorParams): SessionVerification [return]
+Session.prepareSecondFactorVerification(params: PhoneCodeSecondFactorConfig): SessionVerification [return]
+Session.publicUserData: PublicUserData
+Session.reload(p: ClerkResourceReloadParams? = null): Session [return]
+Session.remove(): Session [return]
+Session.startVerification(params: SessionVerifyCreateParams): SessionVerification [return]
+Session.status: SessionStatus
+Session.tasks: List<SessionTask>?
+Session.touch(params: SessionTouchParams? = null): Session [return]
+Session.updatedAt: Instant
+Session.user: User?
+Session.verifyWithPasskey(): SessionVerification [return]
+SessionActivity.browserName: String? = null
+SessionActivity.browserVersion: String? = null
+SessionActivity.city: String? = null
+SessionActivity.country: String? = null
+SessionActivity.deviceType: String? = null
+SessionActivity.id: String
+SessionActivity.ipAddress: String? = null
+SessionActivity.isMobile: Boolean? = null
+SessionCheckAuthorizationIsAuthorizedParamsCase1.reverification: ReverificationConfig? = null
+SessionCheckAuthorizationIsAuthorizedParamsCase1.role: String
+SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5.afterMinutes: Double
+SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5.level: SessionVerificationLevel
+SessionCheckAuthorizationIsAuthorizedParamsCase2.permission: String
+SessionCheckAuthorizationIsAuthorizedParamsCase2.reverification: ReverificationConfig? = null
+SessionCheckAuthorizationIsAuthorizedParamsCase3.feature: String
+SessionCheckAuthorizationIsAuthorizedParamsCase3.reverification: ReverificationConfig? = null
+SessionCheckAuthorizationIsAuthorizedParamsCase4.plan: String
+SessionCheckAuthorizationIsAuthorizedParamsCase4.reverification: ReverificationConfig? = null
+SessionCheckAuthorizationIsAuthorizedParamsCase5.reverification: ReverificationConfig? = null
+SessionFactorVerificationAgeValue tuple: Double, Double
+SessionStatus cases: pending, revoked, expired, active, abandoned, ended, removed, replaced, unrecognized(String)
+SessionTask.key: SessionTaskKey
+SessionTaskKey cases: choose-organization, reset-password, setup-mfa, unrecognized(String)
+SessionTouchIntent cases: focus, select_session, select_org, unrecognized(String)
+SessionTouchParams.intent: SessionTouchIntent? = null
+SessionVerification.firstFactorVerification: Verification
+SessionVerification.id: String? = null
+SessionVerification.level: SessionVerificationLevel
+SessionVerification.reload(p: ClerkResourceReloadParams? = null): SessionVerification [return]
+SessionVerification.secondFactorVerification: Verification
+SessionVerification.session: Session
+SessionVerification.status: SessionVerificationStatus
+SessionVerification.supportedFirstFactors: List<SessionVerificationFirstFactor>?
+SessionVerification.supportedSecondFactors: List<SessionVerificationSecondFactor>?
+SessionVerificationFirstFactor variants: EmailCodeFactor | PhoneCodeFactor | PasswordFactor | PasskeyFactor | EnterpriseSSOFactor
+SessionVerificationLevel cases: first_factor, second_factor, multi_factor, unrecognized(String)
+SessionVerificationSecondFactor variants: PhoneCodeFactor | TOTPFactor | BackupCodeFactor
+SessionVerificationStatus cases: needs_first_factor, needs_second_factor, complete, unrecognized(String)
+SessionVerifyAttemptFirstFactorParams variants: EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | PasskeyAttempt
+SessionVerifyAttemptSecondFactorParams variants: PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt
+SessionVerifyCreateParams.level: SessionVerificationLevel
+SessionVerifyPrepareFirstFactorParams variants: PasskeyFactor | EmailCodeConfig | PhoneCodeConfig | OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl
+SessionWithActivities.abandonAt: Instant
+SessionWithActivities.actor: JsonObject?
+SessionWithActivities.expireAt: Instant
+SessionWithActivities.id: String
+SessionWithActivities.lastActiveAt: Instant
+SessionWithActivities.latestActivity: SessionActivity
+SessionWithActivities.reload(p: ClerkResourceReloadParams? = null): SessionWithActivities [return]
+SessionWithActivities.revoke(): SessionWithActivities [return]
+SessionWithActivities.status: String
+SetOrganizationLogoParams.file: SetOrganizationLogoParamsFile?
+SetOrganizationLogoParamsFile variants: String | UploadFile | UploadFile
+SetProfileImageParams.file: SetOrganizationLogoParamsFile?
+SetReservedForSecondFactorParams.reserved: Boolean
+SignIn.canBeDiscarded: Boolean
+SignIn.create(params: SignInCreateParams): Unit [error-envelope]
+SignIn.createdSessionId: String?
+SignIn.emailCode: SignInEmailCode
+SignIn.emailLink: SignInEmailLink
+SignIn.existingSession: SignInExistingSession? = null
+SignIn.finalize(): Unit [error-envelope]
+SignIn.firstFactorVerification: Verification
+SignIn.id: String? = null
+SignIn.identifier: String?
+SignIn.isTransferable: Boolean
+SignIn.mfa: SignInMfa
+SignIn.passkey(params: SignInPasskeyParams? = null): Unit [error-envelope]
+SignIn.password(params: SignInPasswordParams): Unit [error-envelope]
+SignIn.phoneCode: SignInPhoneCode
+SignIn.protectCheck: ProtectCheck?
+SignIn.reset(): Unit [error-envelope]
+SignIn.resetPasswordEmailCode: SignInResetPasswordEmailCode
+SignIn.resetPasswordPhoneCode: SignInResetPasswordPhoneCode
+SignIn.secondFactorVerification: Verification
+SignIn.sso(params: SignInSSOParams): Unit [error-envelope]
+SignIn.status: SignInStatus
+SignIn.submitProtectCheck(params: SignInSubmitProtectCheckParams): Unit [error-envelope]
+SignIn.supportedFirstFactors: List<SignInFirstFactor>
+SignIn.supportedSecondFactors: List<SignInSecondFactor>
+SignIn.ticket(params: SignInTicketParams? = null): Unit [error-envelope]
+SignIn.userData: UserData
+SignInBackupCodeVerifyParams.code: String
+SignInCreateParams.actionCompleteRedirectUrl: String? = null
+SignInCreateParams.identifier: String? = null
+SignInCreateParams.password: String? = null
+SignInCreateParams.redirectUrl: String? = null
+SignInCreateParams.signUpIfMissing: Boolean? = null
+SignInCreateParams.strategy: SignInCreateParamsStrategy? = null
+SignInCreateParams.ticket: String? = null
+SignInCreateParams.transfer: Boolean? = null
+SignInCreateParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, passkey, ticket, unrecognized(String)
+SignInEmailCode.sendCode(params: SignInEmailCodeSendParams? = null): Unit [error-envelope]
+SignInEmailCode.verifyCode(params: SignInEmailCodeVerifyParams): Unit [error-envelope]
+SignInEmailCodeSendCodeParamsCase1.emailAddress: String? = null
+SignInEmailCodeSendCodeParamsCase2.emailAddressId: String? = null
+SignInEmailCodeSendParams variants: SignInEmailCodeSendCodeParamsCase1 | SignInEmailCodeSendCodeParamsCase2
+SignInEmailCodeVerifyParams.code: String
+SignInEmailLink.sendLink(params: SignInEmailLinkSendParams): Unit [error-envelope]
+SignInEmailLink.verification: SignInEmailLinkVerification?
+SignInEmailLink.waitForVerification(): Unit [error-envelope]
+SignInEmailLinkSendLinkParamsCase1.emailAddress: String? = null
+SignInEmailLinkSendLinkParamsCase1.verificationUrl: String
+SignInEmailLinkSendLinkParamsCase2.emailAddressId: String? = null
+SignInEmailLinkSendLinkParamsCase2.verificationUrl: String
+SignInEmailLinkSendParams variants: SignInEmailLinkSendLinkParamsCase1 | SignInEmailLinkSendLinkParamsCase2
+SignInEmailLinkVerification.createdSessionId: String
+SignInEmailLinkVerification.status: SignInEmailLinkVerificationStatus
+SignInEmailLinkVerification.verifiedFromTheSameClient: Boolean
+SignInEmailLinkVerificationStatus cases: expired, verified, failed, client_mismatch, unrecognized(String)
+SignInExistingSession.sessionId: String
+SignInFirstFactor variants: EmailCodeFactor | PhoneCodeFactor | PasswordFactor | PasskeyFactor | EnterpriseSSOFactor | EmailLinkFactor | ResetPasswordPhoneCodeFactor | ResetPasswordEmailCodeFactor | Web3SignatureFactor | OauthFactor
+SignInMFAEmailCodeVerifyParams.code: String
+SignInMFAPhoneCodeVerifyParams.code: String
+SignInMfa.sendEmailCode(): Unit [error-envelope]
+SignInMfa.sendPhoneCode(): Unit [error-envelope]
+SignInMfa.verifyBackupCode(params: SignInBackupCodeVerifyParams): Unit [error-envelope]
+SignInMfa.verifyEmailCode(params: SignInMFAEmailCodeVerifyParams): Unit [error-envelope]
+SignInMfa.verifyPhoneCode(params: SignInMFAPhoneCodeVerifyParams): Unit [error-envelope]
+SignInMfa.verifyTOTP(params: SignInTOTPVerifyParams): Unit [error-envelope]
+SignInPasskeyParams.flow: SignInPasskeyParamsFlow? = null
+SignInPasskeyParamsFlow cases: autofill, discoverable, unrecognized(String)
+SignInPasswordParams variants: SignInPasswordParamsCase1 | SignInPasswordParamsCase2 | SignInPasswordParamsCase3 | SignInPasswordParamsCase4
+SignInPasswordParamsCase1.identifier: String
+SignInPasswordParamsCase1.password: String
+SignInPasswordParamsCase2.emailAddress: String
+SignInPasswordParamsCase2.password: String
+SignInPasswordParamsCase3.password: String
+SignInPasswordParamsCase3.phoneNumber: String
+SignInPasswordParamsCase4.password: String
+SignInPhoneCode.sendCode(params: SignInPhoneCodeSendParams? = null): Unit [error-envelope]
+SignInPhoneCode.verifyCode(params: SignInPhoneCodeVerifyParams): Unit [error-envelope]
+SignInPhoneCodeSendCodeParamsCase1.channel: PhoneCodeChannel? = null
+SignInPhoneCodeSendCodeParamsCase1.phoneNumber: String? = null
+SignInPhoneCodeSendCodeParamsCase2.channel: PhoneCodeChannel? = null
+SignInPhoneCodeSendCodeParamsCase2.phoneNumberId: String
+SignInPhoneCodeSendParams variants: SignInPhoneCodeSendCodeParamsCase1 | SignInPhoneCodeSendCodeParamsCase2
+SignInPhoneCodeVerifyParams.code: String
+SignInResetPasswordEmailCode.sendCode(): Unit [error-envelope]
+SignInResetPasswordEmailCode.submitPassword(params: SignInResetPasswordSubmitParams): Unit [error-envelope]
+SignInResetPasswordEmailCode.verifyCode(params: SignInEmailCodeVerifyParams): Unit [error-envelope]
+SignInResetPasswordPhoneCode.sendCode(params: SignInResetPasswordPhoneCodeSendParams? = null): Unit [error-envelope]
+SignInResetPasswordPhoneCode.submitPassword(params: SignInResetPasswordSubmitParams): Unit [error-envelope]
+SignInResetPasswordPhoneCode.verifyCode(params: SignInResetPasswordPhoneCodeVerifyParams): Unit [error-envelope]
+SignInResetPasswordPhoneCodeSendParams.phoneNumber: String? = null
+SignInResetPasswordPhoneCodeVerifyParams.code: String
+SignInResetPasswordSubmitParams.password: String
+SignInResetPasswordSubmitParams.signOutOfOtherSessions: Boolean? = null
+SignInSSOParams.enterpriseConnectionId: String? = null
+SignInSSOParams.identifier: String? = null
+SignInSSOParams.oidcPrompt: String? = null
+SignInSSOParams.strategy: SignInSSOParamsStrategy
+SignInSSOParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, unrecognized(String)
+SignInSecondFactor variants: EmailCodeFactor | PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailLinkFactor
+SignInStatus cases: needs_first_factor, needs_second_factor, complete, needs_identifier, needs_client_trust, needs_new_password, needs_protect_check, unrecognized(String)
+SignInSubmitProtectCheckParams.proofToken: String
+SignInTOTPVerifyParams.code: String
+SignInTicketParams.ticket: String
+SignUp.abandonAt: Double?
+SignUp.canBeDiscarded: Boolean
+SignUp.create(params: SignUpCreateParams): Unit [error-envelope]
+SignUp.createdSessionId: String?
+SignUp.createdUserId: String?
+SignUp.emailAddress: String?
+SignUp.existingSession: SignUpExistingSession? = null
+SignUp.finalize(): Unit [error-envelope]
+SignUp.firstName: String?
+SignUp.hasPassword: Boolean
+SignUp.id: String? = null
+SignUp.isTransferable: Boolean
+SignUp.lastName: String?
+SignUp.legalAcceptedAt: Double?
+SignUp.locale: String?
+SignUp.missingFields: List<SignUpField>
+SignUp.optionalFields: List<SignUpField>
+SignUp.password(params: SignUpPasswordParams): Unit [error-envelope]
+SignUp.phoneNumber: String?
+SignUp.protectCheck: ProtectCheck?
+SignUp.requiredFields: List<SignUpField>
+SignUp.reset(): Unit [error-envelope]
+SignUp.sso(params: SignUpSSOParams): Unit [error-envelope]
+SignUp.status: SignUpStatus
+SignUp.submitProtectCheck(params: SignUpSubmitProtectCheckParams): Unit [error-envelope]
+SignUp.ticket(params: SignUpTicketParams? = null): Unit [error-envelope]
+SignUp.unsafeMetadata: JsonObject
+SignUp.unverifiedFields: List<SignUpIdentificationField>
+SignUp.update(params: SignUpUpdateParams): Unit [error-envelope]
+SignUp.username: String?
+SignUp.verifications: SignUpVerifications
+SignUp.web3Wallet: String?
+SignUpCreateParams.emailAddress: String? = null
+SignUpCreateParams.firstName: String? = null
+SignUpCreateParams.lastName: String? = null
+SignUpCreateParams.legalAccepted: Boolean? = null
+SignUpCreateParams.locale: String? = null
+SignUpCreateParams.password: String? = null
+SignUpCreateParams.phoneNumber: String? = null
+SignUpCreateParams.strategy: SignUpCreateParamsStrategy? = null
+SignUpCreateParams.ticket: String? = null
+SignUpCreateParams.transfer: Boolean? = null
+SignUpCreateParams.unsafeMetadata: JsonObject? = null
+SignUpCreateParams.username: String? = null
+SignUpCreateParams.web3Wallet: String? = null
+SignUpCreateParamsStrategy cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, phone_code, ticket, google_one_tap, oauth_token_apple, unrecognized(String)
+SignUpEmailCodeVerifyParams.code: String
+SignUpEmailLinkSendParams.verificationUrl: String
+SignUpExistingSession.sessionId: String
+SignUpField cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, username, first_name, last_name, password, legal_accepted, email_address, phone_number, email_address_or_phone_number, web3_wallet, protect_check, unrecognized(String)
+SignUpIdentificationField cases: enterprise_sso, oauth_facebook, oauth_google, oauth_hubspot, oauth_github, oauth_tiktok, oauth_gitlab, oauth_discord, oauth_twitter, oauth_twitch, oauth_linkedin, oauth_linkedin_oidc, oauth_dropbox, oauth_atlassian, oauth_bitbucket, oauth_microsoft, oauth_notion, oauth_apple, oauth_line, oauth_instagram, oauth_coinbase, oauth_spotify, oauth_xero, oauth_box, oauth_slack, oauth_linear, oauth_x, oauth_enstall, oauth_huggingface, oauth_vercel, username, email_address, phone_number, email_address_or_phone_number, web3_wallet, unrecognized(String)
+SignUpPasswordParams variants: SignUpPasswordParamsCase1 | SignUpPasswordParamsCase2 | SignUpPasswordParamsCase3 | SignUpPasswordParamsCase4
+SignUpPasswordParamsCase1.emailAddress: String
+SignUpPasswordParamsCase1.firstName: String? = null
+SignUpPasswordParamsCase1.lastName: String? = null
+SignUpPasswordParamsCase1.legalAccepted: Boolean? = null
+SignUpPasswordParamsCase1.locale: String? = null
+SignUpPasswordParamsCase1.password: String
+SignUpPasswordParamsCase1.phoneNumber: String? = null
+SignUpPasswordParamsCase1.unsafeMetadata: JsonObject? = null
+SignUpPasswordParamsCase1.username: String? = null
+SignUpPasswordParamsCase2.emailAddress: String? = null
+SignUpPasswordParamsCase2.firstName: String? = null
+SignUpPasswordParamsCase2.lastName: String? = null
+SignUpPasswordParamsCase2.legalAccepted: Boolean? = null
+SignUpPasswordParamsCase2.locale: String? = null
+SignUpPasswordParamsCase2.password: String
+SignUpPasswordParamsCase2.phoneNumber: String
+SignUpPasswordParamsCase2.unsafeMetadata: JsonObject? = null
+SignUpPasswordParamsCase2.username: String? = null
+SignUpPasswordParamsCase3.emailAddress: String? = null
+SignUpPasswordParamsCase3.firstName: String? = null
+SignUpPasswordParamsCase3.lastName: String? = null
+SignUpPasswordParamsCase3.legalAccepted: Boolean? = null
+SignUpPasswordParamsCase3.locale: String? = null
+SignUpPasswordParamsCase3.password: String
+SignUpPasswordParamsCase3.phoneNumber: String? = null
+SignUpPasswordParamsCase3.unsafeMetadata: JsonObject? = null
+SignUpPasswordParamsCase3.username: String
+SignUpPasswordParamsCase4.emailAddress: String? = null
+SignUpPasswordParamsCase4.firstName: String? = null
+SignUpPasswordParamsCase4.lastName: String? = null
+SignUpPasswordParamsCase4.legalAccepted: Boolean? = null
+SignUpPasswordParamsCase4.locale: String? = null
+SignUpPasswordParamsCase4.password: String
+SignUpPasswordParamsCase4.phoneNumber: String? = null
+SignUpPasswordParamsCase4.unsafeMetadata: JsonObject? = null
+SignUpPasswordParamsCase4.username: String? = null
+SignUpPhoneCodeSendParams.channel: PhoneCodeChannel? = null
+SignUpPhoneCodeVerifyParams.code: String
+SignUpSSOParams.emailAddress: String? = null
+SignUpSSOParams.enterpriseConnectionId: String? = null
+SignUpSSOParams.firstName: String? = null
+SignUpSSOParams.lastName: String? = null
+SignUpSSOParams.legalAccepted: Boolean? = null
+SignUpSSOParams.locale: String? = null
+SignUpSSOParams.oidcPrompt: String? = null
+SignUpSSOParams.strategy: String
+SignUpSSOParams.unsafeMetadata: JsonObject? = null
+SignUpStatus cases: abandoned, complete, missing_requirements, unrecognized(String)
+SignUpSubmitProtectCheckParams.proofToken: String
+SignUpTicketParams.firstName: String? = null
+SignUpTicketParams.lastName: String? = null
+SignUpTicketParams.legalAccepted: Boolean? = null
+SignUpTicketParams.locale: String? = null
+SignUpTicketParams.ticket: String
+SignUpTicketParams.unsafeMetadata: JsonObject? = null
+SignUpUpdateParams.emailAddress: String? = null
+SignUpUpdateParams.firstName: String? = null
+SignUpUpdateParams.lastName: String? = null
+SignUpUpdateParams.legalAccepted: Boolean? = null
+SignUpUpdateParams.locale: String? = null
+SignUpUpdateParams.phoneNumber: String? = null
+SignUpUpdateParams.unsafeMetadata: JsonObject? = null
+SignUpUpdateParams.username: String? = null
+SignUpVerification.attempts: Double?
+SignUpVerification.channel: PhoneCodeChannel? = null
+SignUpVerification.error: ClerkAPIError?
+SignUpVerification.expireAt: Instant?
+SignUpVerification.id: String? = null
+SignUpVerification.nextAction: String
+SignUpVerification.reload(p: ClerkResourceReloadParams? = null): SignUpVerification [return]
+SignUpVerification.status: VerificationStatus?
+SignUpVerification.strategy: String?
+SignUpVerification.supportedStrategies: List<String>
+SignUpVerification.verifiedAtClient: String?
+SignUpVerification.verifiedFromTheSameClient(): Boolean [return]
+SignUpVerifications.emailAddress: SignUpVerification
+SignUpVerifications.emailLinkVerification: SignUpVerificationsEmailLinkVerification?
+SignUpVerifications.externalAccount: Verification
+SignUpVerifications.phoneNumber: SignUpVerification
+SignUpVerifications.sendEmailCode(): Unit [error-envelope]
+SignUpVerifications.sendEmailLink(params: SignUpEmailLinkSendParams): Unit [error-envelope]
+SignUpVerifications.sendPhoneCode(params: SignUpPhoneCodeSendParams? = null): Unit [error-envelope]
+SignUpVerifications.verifyEmailCode(params: SignUpEmailCodeVerifyParams): Unit [error-envelope]
+SignUpVerifications.verifyPhoneCode(params: SignUpPhoneCodeVerifyParams): Unit [error-envelope]
+SignUpVerifications.waitForEmailLinkVerification(): Unit [error-envelope]
+SignUpVerifications.web3Wallet: Verification
+SignUpVerificationsEmailLinkVerification.createdSessionId: String
+SignUpVerificationsEmailLinkVerification.status: SignInEmailLinkVerificationStatus
+SignUpVerificationsEmailLinkVerification.verifiedFromTheSameClient: Boolean
+StartEmailLinkFlowParams.redirectUrl: String
+StartEnterpriseSSOLinkFlowParams.redirectUrl: String
+TOTP.backupCodes: List<String>? = null
+TOTP.createdAt: Instant?
+TOTP.id: String
+TOTP.reload(p: ClerkResourceReloadParams? = null): TOTP [return]
+TOTP.secret: String? = null
+TOTP.updatedAt: Instant?
+TOTP.uri: String? = null
+TOTP.verified: Boolean
+TOTPAttempt.code: String
+TOTPAttempt.strategy: String
+TOTPFactor.strategy: String
+UpdateEnrollmentModeParams.deletePending: Boolean? = null
+UpdateEnrollmentModeParams.enrollmentMode: OrganizationEnrollmentMode
+UpdateMembershipParams.role: String
+UpdateMembershipParams.userId: String
+UpdateOrganizationEnterpriseConnectionParams.active: Field<Boolean> = Field.Omitted
+UpdateOrganizationEnterpriseConnectionParams.customAttributes: Field<Map<String, JsonElement>> = Field.Omitted
+UpdateOrganizationEnterpriseConnectionParams.disableAdditionalIdentifications: Field<Boolean> = Field.Omitted
+UpdateOrganizationEnterpriseConnectionParams.domains: List<String>? = null
+UpdateOrganizationEnterpriseConnectionParams.name: Field<String> = Field.Omitted
+UpdateOrganizationEnterpriseConnectionParams.oidc: Field<OrganizationEnterpriseConnectionOidcInput> = Field.Omitted
+UpdateOrganizationEnterpriseConnectionParams.organizationId: Field<String> = Field.Omitted
+UpdateOrganizationEnterpriseConnectionParams.saml: Field<OrganizationEnterpriseConnectionSamlInput> = Field.Omitted
+UpdateOrganizationEnterpriseConnectionParams.syncUserAttributes: Field<Boolean> = Field.Omitted
+UpdateOrganizationMembershipParams.role: String
+UpdateOrganizationParams.name: String
+UpdateOrganizationParams.slug: String? = null
+UpdateUserMetadataParams.unsafeMetadata: JsonObject
+UpdateUserParams.firstName: Field<String> = Field.Omitted
+UpdateUserParams.lastName: Field<String> = Field.Omitted
+UpdateUserParams.primaryEmailAddressId: Field<String> = Field.Omitted
+UpdateUserParams.primaryPhoneNumberId: Field<String> = Field.Omitted
+UpdateUserParams.primaryWeb3WalletId: Field<String> = Field.Omitted
+UpdateUserParams.unsafeMetadata: JsonObject? = null
+UpdateUserParams.username: Field<String> = Field.Omitted
+UpdateUserPasswordParams.currentPassword: String? = null
+UpdateUserPasswordParams.newPassword: String
+UpdateUserPasswordParams.signOutOfOtherSessions: Boolean? = null
+User.addPaymentMethod(params: AddPaymentMethodParams): BillingPaymentMethod [return]
+User.backupCodeEnabled: Boolean
+User.createBackupCode(): BackupCode [return]
+User.createEmailAddress(params: CreateEmailAddressParams): EmailAddress [return]
+User.createExternalAccount(params: CreateExternalAccountParams): ExternalAccount [return]
+User.createOrganizationEnabled: Boolean
+User.createOrganizationsLimit: Double?
+User.createPasskey(): Passkey [return]
+User.createPhoneNumber(params: CreatePhoneNumberParams): PhoneNumber [return]
+User.createTOTP(): TOTP [return]
+User.createWeb3Wallet(params: CreateWeb3WalletParams): Web3Wallet [return]
+User.createdAt: Instant?
+User.delete(): Unit [return]
+User.deleteSelfEnabled: Boolean
+User.disableTOTP(): DeletedObject [return]
+User.emailAddresses: List<EmailAddress>
+User.enterpriseAccounts: List<EnterpriseAccount>
+User.externalAccounts: List<ExternalAccount>
+User.externalId: String?
+User.firstName: String?
+User.fullName: String?
+User.getEnterpriseConnections(params: GetEnterpriseConnectionsParams? = null): List<EnterpriseConnection> [return]
+User.getOrganizationCreationDefaults(): OrganizationCreationDefaults [return]
+User.getOrganizationInvitations(params: GetUserOrganizationInvitationsParams? = null): ClerkPaginatedResponseUserOrganizationInvitation [return]
+User.getOrganizationMemberships(params: GetUserOrganizationMembershipParams? = null): ClerkPaginatedResponseOrganizationMembership [return]
+User.getOrganizationSuggestions(params: GetUserOrganizationSuggestionsParams? = null): ClerkPaginatedResponseOrganizationSuggestion [return]
+User.getPaymentMethods(params: GetPaymentMethodsParams? = null): ClerkPaginatedResponseBillingPaymentMethod [return]
+User.getSessions(): List<SessionWithActivities> [return]
+User.hasImage: Boolean
+User.hasVerifiedEmailAddress: Boolean
+User.hasVerifiedPhoneNumber: Boolean
+User.id: String
+User.imageUrl: String
+User.initializePaymentMethod(params: InitializePaymentMethodParams): BillingInitializedPaymentMethod [return]
+User.isPrimaryIdentification(ident: UserIsPrimaryIdentificationIdent): Boolean [return]
+User.lastName: String?
+User.lastSignInAt: Instant?
+User.leaveOrganization(organizationId: String): DeletedObject [return]
+User.legalAcceptedAt: Instant?
+User.organizationMemberships: List<OrganizationMembership>
+User.passkeys: List<Passkey>
+User.passwordEnabled: Boolean
+User.phoneNumbers: List<PhoneNumber>
+User.primaryEmailAddress: EmailAddress?
+User.primaryEmailAddressId: String?
+User.primaryPhoneNumber: PhoneNumber?
+User.primaryPhoneNumberId: String?
+User.primaryWeb3Wallet: Web3Wallet?
+User.primaryWeb3WalletId: String?
+User.publicMetadata: JsonObject
+User.reload(p: ClerkResourceReloadParams? = null): User [return]
+User.removePassword(params: RemoveUserPasswordParams): User [return]
+User.setProfileImage(params: SetProfileImageParams): Image [return]
+User.totpEnabled: Boolean
+User.twoFactorEnabled: Boolean
+User.unsafeMetadata: JsonObject
+User.unverifiedExternalAccounts: List<ExternalAccount>
+User.update(params: UpdateUserParams): User [return]
+User.updateMetadata(params: UpdateUserMetadataParams): User [return]
+User.updatePassword(params: UpdateUserPasswordParams): User [return]
+User.updatedAt: Instant?
+User.username: String?
+User.verifiedExternalAccounts: List<ExternalAccount>
+User.verifiedWeb3Wallets: List<Web3Wallet>
+User.verifyTOTP(params: VerifyTOTPParams): TOTP [return]
+User.web3Wallets: List<Web3Wallet>
+UserData.firstName: String? = null
+UserData.hasImage: Boolean? = null
+UserData.imageUrl: String? = null
+UserData.lastName: String? = null
+UserIsPrimaryIdentificationIdent variants: EmailAddress | PhoneNumber | Web3Wallet
+UserOrganizationInvitation.accept(): UserOrganizationInvitation [return]
+UserOrganizationInvitation.createdAt: Instant
+UserOrganizationInvitation.emailAddress: String
+UserOrganizationInvitation.id: String
+UserOrganizationInvitation.publicMetadata: JsonObject
+UserOrganizationInvitation.publicOrganizationData: UserOrganizationInvitationPublicOrganizationData
+UserOrganizationInvitation.reload(p: ClerkResourceReloadParams? = null): UserOrganizationInvitation [return]
+UserOrganizationInvitation.role: String
+UserOrganizationInvitation.status: OrganizationInvitationStatus
+UserOrganizationInvitation.updatedAt: Instant
+UserOrganizationInvitationPublicOrganizationData.hasImage: Boolean
+UserOrganizationInvitationPublicOrganizationData.id: String
+UserOrganizationInvitationPublicOrganizationData.imageUrl: String
+UserOrganizationInvitationPublicOrganizationData.name: String
+UserOrganizationInvitationPublicOrganizationData.slug: String?
+Verification.attempts: Double?
+Verification.channel: PhoneCodeChannel? = null
+Verification.error: ClerkAPIError?
+Verification.expireAt: Instant?
+Verification.id: String? = null
+Verification.reload(p: ClerkResourceReloadParams? = null): Verification [return]
+Verification.status: VerificationStatus?
+Verification.strategy: String?
+Verification.verifiedAtClient: String?
+Verification.verifiedFromTheSameClient(): Boolean [return]
+VerificationStatus cases: expired, unverified, verified, failed, transferable, unrecognized(String)
+VerifyTOTPParams.code: String
+Web3SignatureFactor.primary: Boolean? = null
+Web3SignatureFactor.strategy: PrepareWeb3WalletVerificationParamsStrategy
+Web3SignatureFactor.walletName: String? = null
+Web3SignatureFactor.web3WalletId: String
+Web3Wallet.attemptVerification(params: AttemptWeb3WalletVerificationParams): Web3Wallet [return]
+Web3Wallet.create(): Web3Wallet [return]
+Web3Wallet.destroy(): Unit [return]
+Web3Wallet.id: String
+Web3Wallet.prepareVerification(params: PrepareWeb3WalletVerificationParams): Web3Wallet [return]
+Web3Wallet.reload(p: ClerkResourceReloadParams? = null): Web3Wallet [return]
+Web3Wallet.stringValue(): String [return]
+Web3Wallet.verification: Verification
+Web3Wallet.web3Wallet: String
+enum BillingPaymentMethodStatus
+enum ClerkStatus
+enum EmailAddressPrepareVerificationParamsCase2Strategy
+enum EnterpriseConnectionTestRunConnectionType
+enum EnterpriseConnectionTestRunStatus
+enum EnterpriseProtocol
+enum EnterpriseProvider
+enum OAuthProvider
+enum OAuthStrategy
+enum OrganizationDomainOwnershipVerificationStatus
+enum OrganizationDomainOwnershipVerificationStrategy
+enum OrganizationDomainVerificationStatus
+enum OrganizationEnrollmentMode
+enum OrganizationEnterpriseConnectionProvider
+enum OrganizationInvitationStatus
+enum OrganizationSuggestionStatus
+enum PermissionType
+enum PhoneCodeChannel
+enum PrepareWeb3WalletVerificationParamsStrategy
+enum SessionStatus
+enum SessionTaskKey
+enum SessionTouchIntent
+enum SessionVerificationLevel
+enum SessionVerificationStatus
+enum SignInCreateParamsStrategy
+enum SignInEmailLinkVerificationStatus
+enum SignInPasskeyParamsFlow
+enum SignInSSOParamsStrategy
+enum SignInStatus
+enum SignUpCreateParamsStrategy
+enum SignUpField
+enum SignUpIdentificationField
+enum SignUpStatus
+enum VerificationStatus
+object AddMemberParams
+object AddPaymentMethodParams
+object AttemptAffiliationVerificationParams
+object AttemptEmailAddressVerificationParams
+object AttemptPhoneNumberVerificationParams
+object AttemptWeb3WalletVerificationParams
+object AuthenticatorAssertionResponse
+object BackupCodeAttempt
+object BackupCodeFactor
+object BillingPaymentMethodRemoveParams
+object ClerkAPIError
+object ClerkAPIErrorMeta
+object ClerkAPIErrorMetaPlan
+object ClerkAPIErrorMetaZxcvbn
+object ClerkAPIErrorMetaZxcvbnSuggestionsElement
+object ClerkPaginatedResponseBillingPaymentMethod
+object ClerkPaginatedResponseEnterpriseConnectionTestRun
+object ClerkPaginatedResponseOrganizationDomain
+object ClerkPaginatedResponseOrganizationInvitation
+object ClerkPaginatedResponseOrganizationMembership
+object ClerkPaginatedResponseOrganizationMembershipRequest
+object ClerkPaginatedResponseOrganizationSuggestion
+object ClerkPaginatedResponseUserOrganizationInvitation
+object ClerkResourceReloadParams
+object CreateEmailAddressParams
+object CreateExternalAccountParams
+object CreateOrganizationEnterpriseConnectionParams
+object CreateOrganizationParams
+object CreatePhoneNumberParams
+object CreateWeb3WalletParams
+object DeletedObject
+object EmailAddressPrepareVerificationParamsCase1
+object EmailAddressPrepareVerificationParamsCase2
+object EmailCodeAttempt
+object EmailCodeConfig
+object EmailCodeFactor
+object EmailLinkFactor
+object EnterpriseConnectionTestRunInit
+object EnterpriseConnectionTestRunLog
+object EnterpriseConnectionTestRunOauthPayload
+object EnterpriseConnectionTestRunParsedUserInfo
+object EnterpriseConnectionTestRunSamlPayload
+object EnterpriseOAuthConfig
+object EnterpriseSSOFactor
+object EnterpriseSamlConnectionNested
+object GetDomainsParams
+object GetEnterpriseConnectionTestRunsParams
+object GetEnterpriseConnectionsParams
+object GetInvitationsParams
+object GetMembersParams
+object GetMembershipRequestParams
+object GetPaymentMethodsParams
+object GetRolesParams
+object GetRolesResponse
+object GetTokenOptions
+object GetUserOrganizationInvitationsParams
+object GetUserOrganizationMembershipParams
+object GetUserOrganizationSuggestionsParams
+object InitializePaymentMethodParams
+object InviteMemberParams
+object InviteMembersParams
+object MobileSetActiveParams
+object MobileSignOutOptions
+object OauthFactor
+object OmitEnterpriseSSOConfigAndactionCompleteRedirectUrl
+object OrganizationCreationDefaultsAdvisory
+object OrganizationCreationDefaultsForm
+object OrganizationDomainBulkOwnershipVerificationError
+object OrganizationDomainOwnershipVerification
+object OrganizationDomainVerification
+object OrganizationDomainsBulkOwnershipVerification
+object OrganizationEnterpriseConnectionOidcInput
+object OrganizationEnterpriseConnectionSamlInput
+object OrganizationGetDomain__0
+object OrganizationSuggestionPublicOrganizationData
+object Partialtype
+object PasskeyAttempt
+object PasskeyFactor
+object PasswordAttempt
+object PasswordFactor
+object PhoneCodeAttempt
+object PhoneCodeConfig
+object PhoneCodeFactor
+object PhoneCodeSecondFactorConfig
+object PickCreateOrganizationDomainParamsAndenrollmentMode
+object PrepareAffiliationVerificationParams
+object PrepareWeb3WalletVerificationParams
+object ProtectCheck
+object PublicKeyCredentialWithAuthenticatorAssertionResponse
+object PublicUserData
+object ReauthorizeExternalAccountParams
+object RemoveUserPasswordParams
+object ResetPasswordEmailCodeFactor
+object ResetPasswordPhoneCodeFactor
+object SessionActivity
+object SessionCheckAuthorizationIsAuthorizedParamsCase1
+object SessionCheckAuthorizationIsAuthorizedParamsCase1ReverificationCase5
+object SessionCheckAuthorizationIsAuthorizedParamsCase2
+object SessionCheckAuthorizationIsAuthorizedParamsCase3
+object SessionCheckAuthorizationIsAuthorizedParamsCase4
+object SessionCheckAuthorizationIsAuthorizedParamsCase5
+object SessionTask
+object SessionTouchParams
+object SessionVerifyCreateParams
+object SetOrganizationLogoParams
+object SetProfileImageParams
+object SetReservedForSecondFactorParams
+object SignInBackupCodeVerifyParams
+object SignInCreateParams
+object SignInEmailCodeSendCodeParamsCase1
+object SignInEmailCodeSendCodeParamsCase2
+object SignInEmailCodeVerifyParams
+object SignInEmailLinkSendLinkParamsCase1
+object SignInEmailLinkSendLinkParamsCase2
+object SignInEmailLinkVerification
+object SignInExistingSession
+object SignInMFAEmailCodeVerifyParams
+object SignInMFAPhoneCodeVerifyParams
+object SignInPasskeyParams
+object SignInPasswordParamsCase1
+object SignInPasswordParamsCase2
+object SignInPasswordParamsCase3
+object SignInPasswordParamsCase4
+object SignInPhoneCodeSendCodeParamsCase1
+object SignInPhoneCodeSendCodeParamsCase2
+object SignInPhoneCodeVerifyParams
+object SignInResetPasswordPhoneCodeSendParams
+object SignInResetPasswordPhoneCodeVerifyParams
+object SignInResetPasswordSubmitParams
+object SignInSSOParams
+object SignInSubmitProtectCheckParams
+object SignInTOTPVerifyParams
+object SignInTicketParams
+object SignUpCreateParams
+object SignUpEmailCodeVerifyParams
+object SignUpEmailLinkSendParams
+object SignUpExistingSession
+object SignUpPasswordParamsCase1
+object SignUpPasswordParamsCase2
+object SignUpPasswordParamsCase3
+object SignUpPasswordParamsCase4
+object SignUpPhoneCodeSendParams
+object SignUpPhoneCodeVerifyParams
+object SignUpSSOParams
+object SignUpSubmitProtectCheckParams
+object SignUpTicketParams
+object SignUpUpdateParams
+object SignUpVerificationsEmailLinkVerification
+object StartEmailLinkFlowParams
+object StartEnterpriseSSOLinkFlowParams
+object TOTPAttempt
+object TOTPFactor
+object UpdateEnrollmentModeParams
+object UpdateMembershipParams
+object UpdateOrganizationEnterpriseConnectionParams
+object UpdateOrganizationMembershipParams
+object UpdateOrganizationParams
+object UpdateUserMetadataParams
+object UpdateUserParams
+object UpdateUserPasswordParams
+object UserData
+object UserOrganizationInvitationPublicOrganizationData
+object VerifyTOTPParams
+object Web3SignatureFactor
+resource ActiveSession
+resource BackupCode
+resource BillingInitializedPaymentMethod
+resource BillingPaymentMethod
+resource Clerk
+resource CreateEmailLinkFlowReturnStartEmailLinkFlowParamsAndEmailAddress
+resource CreateEnterpriseSSOLinkFlowReturnStartEnterpriseSSOLinkFlowParamsAndEmailAddress
+resource EmailAddress
+resource EnterpriseAccount
+resource EnterpriseAccountConnection
+resource EnterpriseConnection
+resource EnterpriseConnectionTestRun
+resource ExternalAccount
+resource IdentificationLink
+resource Image
+resource Organization
+resource OrganizationCreationDefaults
+resource OrganizationDomain
+resource OrganizationInvitation
+resource OrganizationMembership
+resource OrganizationMembershipRequest
+resource OrganizationSuggestion
+resource Passkey
+resource PasskeyVerification
+resource PendingSession
+resource Permission
+resource PhoneNumber
+resource Role
+resource Session
+resource SessionVerification
+resource SessionWithActivities
+resource SignIn
+resource SignInEmailCode
+resource SignInEmailLink
+resource SignInMfa
+resource SignInPhoneCode
+resource SignInResetPasswordEmailCode
+resource SignInResetPasswordPhoneCode
+resource SignUp
+resource SignUpVerification
+resource SignUpVerifications
+resource TOTP
+resource User
+resource UserOrganizationInvitation
+resource Verification
+resource Web3Wallet
+tuple ActiveSessionFactorVerificationAgeValue
+tuple PendingSessionFactorVerificationAgeValue
+tuple SessionFactorVerificationAgeValue
+union CheckAuthorizationParams
+union GetUserOrganizationSuggestionsParamsStatus
+union MobileSetActiveParamsOrganization
+union MobileSetActiveParamsSession
+union PrepareEmailAddressVerificationParams
+union ReverificationConfig
+union SessionVerificationFirstFactor
+union SessionVerificationSecondFactor
+union SessionVerifyAttemptFirstFactorParams
+union SessionVerifyAttemptSecondFactorParams
+union SessionVerifyPrepareFirstFactorParams
+union SetOrganizationLogoParamsFile
+union SignInEmailCodeSendParams
+union SignInEmailLinkSendParams
+union SignInFirstFactor
+union SignInPasswordParams
+union SignInPhoneCodeSendParams
+union SignInSecondFactor
+union SignUpPasswordParams
+union UserIsPrimaryIdentificationIdent
