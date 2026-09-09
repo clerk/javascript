@@ -6,7 +6,6 @@ export type InputGroupSize = 'sm' | 'md' | 'lg';
 
 interface InputGroupContextValue {
   disabled: boolean;
-  focusInput: () => void;
   invalid: boolean;
   inputRef: (node: HTMLInputElement | null) => void;
   size: InputGroupSize;

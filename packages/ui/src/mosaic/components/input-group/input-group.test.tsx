@@ -1,14 +1,101 @@
-import { render, screen } from '@testing-library/react';
+import * as stylex from '@stylexjs/stylex';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { colorVars } from '../../tokens.stylex';
 import { Button } from '../button';
 import { Field } from '../field';
 import { Input } from '../input';
 import { InputGroup } from './input-group';
 
+const expectedTextStyles = stylex.create({
+  text: { color: colorVars['--cl-color-input-placeholder'], pointerEvents: 'none' },
+});
+
 describe('Mosaic InputGroup', () => {
+  it('focuses the input when clicking the group or non-interactive slot content', () => {
+    render(
+      <InputGroup.Root data-testid='group'>
+        <Input aria-label='Value' />
+        <InputGroup.End>
+          <span>Decoration</span>
+        </InputGroup.End>
+      </InputGroup.Root>,
+    );
+    const input = screen.getByRole('textbox');
+    fireEvent.click(screen.getByTestId('group'));
+    expect(input).toHaveFocus();
+    input.blur();
+    fireEvent.click(screen.getByText('Decoration'));
+    expect(input).toHaveFocus();
+  });
+
+  it('does not focus the input when the group click is canceled or disabled', () => {
+    const { rerender } = render(
+      <InputGroup.Root
+        data-testid='group'
+        onClick={event => event.preventDefault()}
+      >
+        <Input aria-label='Value' />
+      </InputGroup.Root>,
+    );
+    fireEvent.click(screen.getByTestId('group'));
+    expect(screen.getByRole('textbox')).not.toHaveFocus();
+    rerender(
+      <InputGroup.Root
+        data-testid='group'
+        disabled
+      >
+        <Input aria-label='Value' />
+      </InputGroup.Root>,
+    );
+    fireEvent.click(screen.getByTestId('group'));
+    expect(screen.getByRole('textbox')).not.toHaveFocus();
+  });
+
+  it('preserves interactive child clicks and direct input clicks', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <InputGroup.Root>
+        <Input aria-label='Value' />
+        <InputGroup.End>
+          <Button onClick={onClick}>
+            <span>Action</span>
+          </Button>
+          <a href='#value'>Link</a>
+          <span
+            role='button'
+            tabIndex={0}
+          >
+            Custom control
+          </span>
+        </InputGroup.End>
+      </InputGroup.Root>,
+    );
+    for (const name of ['Action', 'Link', 'Custom control']) {
+      await user.click(screen.getByText(name));
+      expect(screen.getByRole('textbox')).not.toHaveFocus();
+    }
+    expect(onClick).toHaveBeenCalledTimes(1);
+    const input = screen.getByRole('textbox');
+    const focus = vi.spyOn(input, 'focus');
+    fireEvent.click(input);
+    expect(focus).not.toHaveBeenCalled();
+    focus.mockRestore();
+  });
+
+  it('uses placeholder-colored, pointer-transparent text', () => {
+    render(
+      <InputGroup.Root>
+        <InputGroup.Text>Suffix</InputGroup.Text>
+      </InputGroup.Root>,
+    );
+    const classes = stylex.props(expectedTextStyles.text).className ?? '';
+    expect(screen.getByText('Suffix')).toHaveClass(...classes.split(' ').filter(name => name.startsWith('x')));
+  });
   it.each([
     ['sm', 'xs'],
     ['md', 'sm'],

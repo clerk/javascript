@@ -22,21 +22,17 @@ export interface InputGroupRootProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function MosaicInputGroupRoot(
-  { render, className, style, disabled: disabledProp, invalid: invalidProp, size = 'md', ...otherProps },
+  { render, className, style, onClick, disabled: disabledProp, invalid: invalidProp, size = 'md', ...otherProps },
   ref,
 ) {
   const field = useOptionalFieldContext();
   const disabled = disabledProp ?? field?.disabled ?? false;
   const invalid = invalidProp ?? field?.invalid ?? false;
   const inputElementRef = React.useRef<HTMLInputElement | null>(null);
-  const focusInput = React.useCallback(() => inputElementRef.current?.focus(), []);
   const inputRef = React.useCallback((node: HTMLInputElement | null) => {
     inputElementRef.current = node;
   }, []);
-  const context = React.useMemo(
-    () => ({ disabled, focusInput, invalid, inputRef, size }),
-    [disabled, focusInput, invalid, inputRef, size],
-  );
+  const context = React.useMemo(() => ({ disabled, invalid, inputRef, size }), [disabled, invalid, inputRef, size]);
   const element = useRender({
     defaultTagName: 'div',
     render,
@@ -49,6 +45,22 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
         style,
       ),
       ...otherProps,
+      onClick: (event: React.MouseEvent<HTMLDivElement>) => {
+        onClick?.(event);
+        if (event.defaultPrevented || disabled || !(event.target instanceof Element)) {
+          return;
+        }
+        const interactive = event.target.closest(
+          'button, input, select, textarea, a[href], label, summary, [tabindex], [role], [contenteditable]:not([contenteditable="false"])',
+        );
+        if (
+          !event.currentTarget.contains(event.target) ||
+          (interactive && interactive !== event.currentTarget && event.currentTarget.contains(interactive))
+        ) {
+          return;
+        }
+        inputElementRef.current?.focus();
+      },
     },
   });
 
@@ -58,7 +70,7 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
 export type InputGroupTextProps = MosaicComponentProps<'span'>;
 
 const Text = React.forwardRef<HTMLSpanElement, InputGroupTextProps>(function MosaicInputGroupText(
-  { render, className, style, onPointerDown, ...otherProps },
+  { render, className, style, ...otherProps },
   ref,
 ) {
   const group = useInputGroupContext();
@@ -74,13 +86,6 @@ const Text = React.forwardRef<HTMLSpanElement, InputGroupTextProps>(function Mos
         className,
         style,
       ),
-      onPointerDown: (event: React.PointerEvent<HTMLSpanElement>) => {
-        onPointerDown?.(event);
-        if (!event.defaultPrevented) {
-          event.preventDefault();
-          group.focusInput();
-        }
-      },
       ...otherProps,
     },
   });

@@ -21,7 +21,7 @@ export const styles = stylex.create({
   },
   text: {
     alignItems: 'center',
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-input-placeholder'],
     display: 'flex',
     flexShrink: 0,
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
@@ -33,6 +33,7 @@ export const styles = stylex.create({
       default: 0,
       ':first-child': space['3'],
     },
+    pointerEvents: 'none',
   },
 });
 
