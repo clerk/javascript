@@ -507,7 +507,7 @@ struct ClerkNativeErrorDescriptor {
     authFlowEmitter = emitter
   }
 
-  static func biometricCredentialErrorDescriptor(_ error: Error, fallbackCode: String)
+  static func nativeErrorDescriptor(_ error: Error, fallbackCode: String)
     -> ClerkNativeErrorDescriptor
   {
     .init(code: (error as? CoreError)?.code ?? fallbackCode, message: error.localizedDescription)

@@ -3,7 +3,8 @@ import Foundation
 
 // MARK: - Module
 
-public class ClerkExpoModule: Module {
+// Expo owns the module lifetime; all mutable native state is confined to MainActor.
+public final class ClerkExpoModule: Module, @unchecked Sendable {
   private static let nativeAuthFlowChangedEvent = "clerkNativeAuthFlowChanged"
   private static let coreMessageEvent = "clerkCoreMessage"
 
@@ -37,8 +38,12 @@ public class ClerkExpoModule: Module {
             try ClerkNativeBridge.shared.prepare(publishableKey: publishableKey) { id, message in
               Self.sharedInstance?.sendEvent(
                 Self.coreMessageEvent, ["connectionId": id, "message": message])
-            })
-        } catch { promise.reject("E_CORE_PREPARE", error.localizedDescription) }
+            } as Any?)
+        } catch {
+          let descriptor = ClerkNativeBridge.nativeErrorDescriptor(
+            error, fallbackCode: "E_CORE_PREPARE")
+          promise.reject(descriptor.code, descriptor.message)
+        }
       }
     }
     AsyncFunction("startCore") { (id: String, promise: Promise) in
@@ -46,7 +51,11 @@ public class ClerkExpoModule: Module {
         do {
           try await ClerkNativeBridge.shared.start(id)
           promise.resolve()
-        } catch { promise.reject("E_CORE_START", error.localizedDescription) }
+        } catch {
+          let descriptor = ClerkNativeBridge.nativeErrorDescriptor(
+            error, fallbackCode: "E_CORE_START")
+          promise.reject(descriptor.code, descriptor.message)
+        }
       }
     }
     Function("receiveCoreMessage") { (id: String, message: String) in
@@ -67,7 +76,7 @@ public class ClerkExpoModule: Module {
             try await ClerkNativeBridge.shared.requireConnection(id).perform(
               id: requestId, capability: capability, arguments: arguments))
         } catch {
-          let descriptor = ClerkNativeBridge.biometricCredentialErrorDescriptor(
+          let descriptor = ClerkNativeBridge.nativeErrorDescriptor(
             error, fallbackCode: "native_capability_failed")
           promise.reject(descriptor.code, descriptor.message)
         }
@@ -87,7 +96,7 @@ public class ClerkExpoModule: Module {
   private func getAuthFlowState(promise: Promise) {
     Task { @MainActor in
       let state = ClerkNativeBridge.shared.getAuthFlowState()
-      promise.resolve(state)
+      promise.resolve(state as Any?)
     }
   }
 

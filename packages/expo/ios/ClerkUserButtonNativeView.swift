@@ -27,8 +27,8 @@ public class ClerkUserButtonViewModule: Module {
 
       AsyncFunction("navigateCustomPage") {
         (view: ClerkUserButtonNativeView, action: String, routeKey: String?) in
-        view.navigateCustomPage(action: action, routeKey: routeKey)
-      }
+        MainActor.assumeIsolated { view.navigateCustomPage(action: action, routeKey: routeKey) }
+      }.runOnQueue(.main)
     }
   }
 }

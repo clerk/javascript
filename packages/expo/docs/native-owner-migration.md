@@ -6,7 +6,7 @@ Native views attach a generated resource projection to the loaded Expo Clerk ins
 
 The native dependencies are `ClerkKit`/`ClerkKitUI` 2.0.0-alpha.0 and `clerk-android-api`/`clerk-android-ui` 2.0.0-alpha.0. These are prerelease coordinates for the sibling implementation branches; they must be published together before a consumer can resolve them. Local source verification does not prove registry installation.
 
-The iOS bridge uses Swift 6 and iOS 17 or newer. The Android source has been compiled with the sibling SDK's Kotlin 2.4.10 toolchain. Configure the application's Kotlin/Compose compiler consistently; the plugin no longer suppresses incompatible Kotlin metadata checks. Client credentials remain in the Expo token cache. Native secure storage is used only for magic-link and biometric platform state.
+The iOS bridge uses Swift 6 and iOS 17 or newer. The Android config plugin defaults to Kotlin 2.3.20 when the app has no explicit Kotlin version. Expo SDK 57's native module compiles with that compiler against the SDK built with Kotlin 2.4.10. Configure custom Kotlin/Compose versions consistently; Expo's optional compiler plugins may not support newer compilers immediately. The plugin no longer suppresses incompatible Kotlin metadata checks. Client credentials remain in the Expo token cache. Native secure storage is used only for magic-link and biometric platform state.
 
 On iOS the config plugin registers `clerk://<bundle-id>.native-callback`. On Android the 2.x SDK manifest registers `<application-id>.clerk://oauth/callback`. Existing hosted-auth routes remain separate. Regenerate the development build when moving to this transport.
 

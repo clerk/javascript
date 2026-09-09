@@ -14,6 +14,8 @@ const {
   withDangerousMod,
   withInfoPlist,
   withAppBuildGradle,
+  withGradleProperties,
+  withProjectBuildGradle,
   withAndroidManifest,
   withEntitlementsPlist,
 } = require('@expo/config-plugins');
@@ -134,6 +136,20 @@ const withClerkIOS = config => {
  */
 const withClerkAndroid = config => {
   console.log('✅ Clerk Android plugin loaded');
+
+  config = withGradleProperties(config, modConfig => {
+    if (!modConfig.modResults.some(item => item.type === 'property' && item.key === 'android.kotlinVersion')) {
+      modConfig.modResults.push({ type: 'property', key: 'android.kotlinVersion', value: '2.3.20' });
+    }
+    return modConfig;
+  });
+  config = withProjectBuildGradle(config, modConfig => {
+    modConfig.modResults.contents = modConfig.modResults.contents.replace(
+      /classpath\(['"]org.jetbrains.kotlin:kotlin-gradle-plugin['"]\)/g,
+      "classpath(\"org.jetbrains.kotlin:kotlin-gradle-plugin:${findProperty('android.kotlinVersion') ?: '2.3.20'}\")",
+    );
+    return modConfig;
+  });
 
   config = withAndroidManifest(config, modConfig => {
     const packageName = config.android?.package;

@@ -4,7 +4,7 @@ import UIKit
 public class ClerkNativeViewHost: ExpoView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var hasInitialized: Bool = false
-  private var configuredObserver: NSObjectProtocol?
+  private var configuredObserver: ClerkNotificationToken?
 
   public required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -13,10 +13,6 @@ public class ClerkNativeViewHost: ExpoView {
   @available(*, unavailable)
   public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
-  }
-
-  deinit {
-    removeConfiguredObserver()
   }
 
   override public func didMoveToWindow() {
@@ -61,20 +57,18 @@ public class ClerkNativeViewHost: ExpoView {
   private func addConfiguredObserver() {
     guard configuredObserver == nil else { return }
 
-    configuredObserver = NotificationCenter.default.addObserver(
-      forName: .clerkNativeSDKDidConfigure,
-      object: nil,
-      queue: .main
-    ) { [weak self] _ in
-      guard let self else { return }
-      setNeedsHostedViewUpdate()
-    }
+    configuredObserver = ClerkNotificationToken(
+      NotificationCenter.default.addObserver(
+        forName: .clerkNativeSDKDidConfigure,
+        object: nil,
+        queue: .main
+      ) { [weak self] _ in
+        MainActor.assumeIsolated { self?.setNeedsHostedViewUpdate() }
+      })
   }
 
   private func removeConfiguredObserver() {
-    guard let configuredObserver else { return }
-    NotificationCenter.default.removeObserver(configuredObserver)
-    self.configuredObserver = nil
+    configuredObserver = nil
   }
 
   private func updateHostedView() {
@@ -84,6 +78,12 @@ public class ClerkNativeViewHost: ExpoView {
     }
     hostingCoordinator.attach(controller)
   }
+}
+
+private final class ClerkNotificationToken {
+  private let token: NSObjectProtocol
+  init(_ token: NSObjectProtocol) { self.token = token }
+  deinit { NotificationCenter.default.removeObserver(token) }
 }
 
 public class ClerkUserProfileCustomPageHost: ClerkNativeViewHost {
@@ -145,7 +145,7 @@ public class ClerkUserProfileCustomPageHost: ClerkNativeViewHost {
   #endif
 }
 
-private final class ClerkNativeHostingCoordinator {
+@MainActor private final class ClerkNativeHostingCoordinator {
   private weak var containerView: UIView?
   private var hostingController: UIViewController?
 

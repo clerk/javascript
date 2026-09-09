@@ -46,7 +46,8 @@ public class ClerkUserProfileNativeView: ClerkUserProfileCustomPageHost {
   }
 
   override func makeHostedController() -> UIViewController? {
-    let hostBackAction: (() -> Void)? = currentHostBackButton
+    let hostBackAction: (() -> Void)? =
+      currentHostBackButton
       ? { [weak self] in self?.onHostBack([:]) }
       : nil
 
@@ -85,8 +86,8 @@ public class ClerkUserProfileViewModule: Module {
 
       AsyncFunction("navigateCustomPage") {
         (view: ClerkUserProfileNativeView, action: String, routeKey: String?) in
-        view.navigateCustomPage(action: action, routeKey: routeKey)
-      }
+        MainActor.assumeIsolated { view.navigateCustomPage(action: action, routeKey: routeKey) }
+      }.runOnQueue(.main)
     }
   }
 }

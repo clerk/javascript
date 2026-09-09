@@ -1,10 +1,16 @@
 import groovy.json.JsonSlurper
 
+buildscript {
+  def kotlinCompilerVersion = rootProject.findProperty('android.kotlinVersion') ?: (rootProject.ext.has('kotlinVersion') ? rootProject.ext.kotlinVersion : '2.3.20')
+  repositories { google(); mavenCentral() }
+  dependencies { classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:$kotlinCompilerVersion" }
+}
+
 plugins {
   id 'com.android.library'
   id 'expo-module-gradle-plugin'
-  id 'org.jetbrains.kotlin.plugin.compose'
 }
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
 group = 'com.clerk.expo'
 version = '1.0.0'
@@ -15,6 +21,8 @@ android {
   namespace 'expo.modules.clerk'
   compileSdk 36
   defaultConfig {
+    versionCode 1
+    versionName clerkExpoPackageJson.version
     minSdk 24
     targetSdk 36
     buildConfigField 'String', 'CLERK_EXPO_VERSION', "\"${clerkExpoPackageJson.version}\""
