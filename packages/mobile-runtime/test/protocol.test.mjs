@@ -413,3 +413,16 @@ test('native auth settings refresh through the canonical environment and default
     trustedDeviceEnrollmentPromptAfterSignUpEnabled: false,
   });
 });
+
+test('instance environment strings preserve known and future server values', async t => {
+  for (const mode of ['production', 'development', 'unknown', 'future_mode']) {
+    const environment = structuredClone(fixtures.environment);
+    environment.display_config.instance_environment_type = mode;
+    const f = await fixture({
+      http: request => (new URL(request.url).pathname.endsWith('/environment') ? response(environment) : undefined),
+    });
+    t.after(f.dispose);
+    const env = f.resource(f.resource(f.state.roots.clerk).environment.$ref);
+    assert.equal(env.displayConfig.instanceEnvironmentType, mode);
+  }
+});
