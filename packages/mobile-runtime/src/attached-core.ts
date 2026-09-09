@@ -86,6 +86,8 @@ export function attachResourceCore(
       } else if (message.kind === 'lifecycle' && ['foreground', 'background'].includes(message.state)) {
         // The existing Expo owner controls foreground recovery and token scheduling.
         runtime.publish();
+      } else if (message.kind === 'connectivity' && typeof message.online === 'boolean') {
+        // Connectivity and recovery remain owned by Expo's existing JavaScript runtime.
       } else {
         throw bridgeError('unknown_message');
       }

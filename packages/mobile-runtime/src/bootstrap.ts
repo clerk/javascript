@@ -24,6 +24,9 @@ let initializing = false;
 let unsubscribe: (() => void) | undefined;
 let disposed = false;
 let active = true;
+let online = true;
+let recovery: Promise<void> | undefined;
+let recoveryRequested = false;
 let removeNativeHost: (() => void) | undefined;
 let removeNetworkEnvironment: (() => void) | undefined;
 
@@ -45,7 +48,7 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
   )
     throw bridgeError('invalid_callback_url');
   initializing = true;
-  removeNetworkEnvironment = setNativeNetworkEnvironment({ isOnline: () => true, isActive: () => active });
+  removeNetworkEnvironment = setNativeNetworkEnvironment({ isOnline: () => online, isActive: () => active });
   const clerk = new Clerk(configuration.publishableKey);
   core = clerk;
   const scope = configuration.publishableKey;
@@ -118,6 +121,32 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
   emit({ kind: 'ready', id, manifest, state: runtime.snapshot() });
 }
 
+// Recovery policy belongs to this owner; native hosts only report OS state.
+function recoverResources(): void {
+  if (!active || !online || disposed || !core) return;
+  if (recovery) {
+    recoveryRequested = true;
+    return;
+  }
+  recoveryRequested = false;
+  let failed = false;
+  recovery = core
+    .__internal_reloadInitialResources()
+    .then(
+      () => {
+        if (!disposed) runtime?.publish();
+      },
+      error => {
+        failed = true;
+        if (!disposed) emit({ kind: 'lifecycleError', failure: failure(error) });
+      },
+    )
+    .finally(() => {
+      recovery = undefined;
+      if (failed && recoveryRequested) recoverResources();
+    });
+}
+
 export function receive(encoded: string): void {
   let message: any;
   try {
@@ -155,11 +184,12 @@ export function receive(encoded: string): void {
       if (!['foreground', 'background'].includes(message.state)) throw bridgeError('invalid_lifecycle_state');
       const wasActive = active;
       active = message.state === 'foreground';
-      if (active && !wasActive)
-        void core?.__internal_reloadInitialResources().then(
-          () => runtime?.publish(),
-          error => emit({ kind: 'lifecycleError', failure: failure(error) }),
-        );
+      if (active && !wasActive) recoverResources();
+    } else if (message.kind === 'connectivity') {
+      if (typeof message.online !== 'boolean') throw bridgeError('invalid_connectivity_state');
+      const wasOnline = online;
+      online = message.online;
+      if (online && !wasOnline) recoverResources();
     } else throw bridgeError('unknown_message');
   } catch (error) {
     emit({ kind: 'runtimeError', failure: failure(error, 'bridge') });
