@@ -43,8 +43,7 @@ type ReverificationEvent =
   | { type: 'SHOW_HELP' }
   | { type: 'SELECT_METHOD'; id: string }
   | { type: 'BACK' }
-  | { type: 'RESEND' }
-  | { type: 'ABORT' };
+  | { type: 'RESEND' };
 
 const { createMachine, assign, fromPromise } = setup<ReverificationContext, ReverificationEvent>();
 
@@ -117,13 +116,6 @@ const afterResult = [
   { target: 'verifying' as const, actions: applyResult },
 ];
 
-const abortNow = {
-  target: 'done' as const,
-  actions: (ctx: ReverificationContext) => {
-    ctx.deps.cancel();
-  },
-};
-
 const abortAfterInvoke = {
   target: 'done' as const,
   guard: (ctx: ReverificationContext) => ctx.abortRequested,
@@ -170,7 +162,7 @@ export const reverificationMachine = createMachine({
     },
 
     preparing: {
-      on: { RESET: 'inactive', ABORT: abortNow },
+      on: { RESET: 'inactive' },
       invoke: fromPromise(prepareActive, {
         onDone: 'verifying',
         onError: {
@@ -181,6 +173,7 @@ export const reverificationMachine = createMachine({
     },
 
     verifying: {
+      always: [{ guard: ctx => ctx.activeMethod === null, target: 'unavailable' }],
       after: {
         30_000: { guard: ctx => !ctx.canResend, actions: assign(() => ({ canResend: true })) },
       },
@@ -202,14 +195,12 @@ export const reverificationMachine = createMachine({
           target: 'help',
           actions: assign(() => ({ direction: 1 as const, overlayFrom: 'factor' as const })),
         },
-        ABORT: abortNow,
         RESET: 'inactive',
       },
     },
 
     submitting: {
       on: {
-        ABORT: { actions: assign(() => ({ abortRequested: true })) },
         RESET: { actions: assign(() => ({ abortRequested: true })) },
       },
       invoke: fromPromise(submit, {
@@ -256,7 +247,6 @@ export const reverificationMachine = createMachine({
           actions: assign(() => ({ direction: 1 as const, overlayFrom: 'method-picker' as const })),
         },
         BACK: { target: 'verifying', actions: assign(() => ({ direction: -1 as const })) },
-        ABORT: abortNow,
         RESET: 'inactive',
       },
     },
@@ -271,13 +261,15 @@ export const reverificationMachine = createMachine({
           },
           { target: 'verifying', actions: assign(() => ({ direction: -1 as const })) },
         ],
-        ABORT: abortNow,
         RESET: 'inactive',
       },
     },
 
     unavailable: {
-      on: { ABORT: abortNow, RESET: 'inactive' },
+      entry: (ctx: ReverificationContext) => {
+        ctx.deps.cancel();
+      },
+      on: { RESET: 'inactive' },
     },
 
     completing: {
