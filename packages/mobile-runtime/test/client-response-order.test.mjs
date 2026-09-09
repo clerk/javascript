@@ -7,6 +7,79 @@ const earlier = 'Wed, 09 Sep 2026 16:00:00 GMT';
 const later = 'Wed, 09 Sep 2026 16:00:01 GMT';
 const after = 'Wed, 09 Sep 2026 16:00:02 GMT';
 
+test('session changes become visible only after the client credential is persisted', async t => {
+  const active = sessionFixture();
+  const pending = { ...active, status: 'pending', tasks: [{ key: 'choose-organization' }] };
+  const client = { ...fixtures.client, sessions: [active], last_active_session_id: active.id };
+  const started = deferred(),
+    finish = deferred();
+  const f = await fixture({
+    client,
+    credentialWrite: async value => {
+      if (value !== 'pending-client-credential') return;
+      started.resolve();
+      await finish.promise;
+    },
+    http: request => {
+      if (!new URL(request.url).pathname.endsWith(`/sessions/${active.id}`)) return;
+      return response(pending, {
+        headers: { date: later, authorization: 'pending-client-credential' },
+        body: JSON.stringify({ response: pending, client: { ...client, sessions: [pending] } }),
+      });
+    },
+  });
+  t.after(f.dispose);
+  const previousCredential = f.credential;
+  let completed = false;
+  const reload = f.invoke(f.state.roots.session, 'Session.reload').then(value => {
+    completed = true;
+    return value;
+  });
+  await started.promise;
+  assert.equal(completed, false);
+  assert.equal(f.resource(f.state.roots.session).status, 'active');
+  assert.equal(f.credential, previousCredential);
+  finish.resolve();
+  const result = await reload;
+  assert.equal(result.failure, undefined, JSON.stringify(result));
+  assert.equal(f.resource(f.state.roots.session).currentTask.key, 'choose-organization');
+  assert.equal(f.credential, 'pending-client-credential');
+});
+
+test('failed credential persistence preserves the visible session and permits retry', async t => {
+  const active = sessionFixture();
+  const pending = { ...active, status: 'pending', tasks: [{ key: 'choose-organization' }] };
+  const client = { ...fixtures.client, sessions: [active], last_active_session_id: active.id };
+  let failWrite = false;
+  const f = await fixture({
+    client,
+    credentialWrite: async () => {
+      if (failWrite) throw Object.assign(new Error('Storage unavailable'), { code: 'secure_storage_locked' });
+    },
+    http: request => {
+      if (!new URL(request.url).pathname.endsWith(`/sessions/${active.id}`)) return;
+      return response(pending, {
+        headers: { date: later, authorization: 'pending-client-credential' },
+        body: JSON.stringify({ response: pending, client: { ...client, sessions: [pending] } }),
+      });
+    },
+  });
+  t.after(f.dispose);
+  const handle = f.state.roots.session;
+  const previousCredential = f.credential;
+  failWrite = true;
+  const failed = await f.invoke(handle, 'Session.reload');
+  assert.equal(failed.failure?.code, 'secure_storage_locked');
+  assert.equal(f.resource(f.state.roots.session).status, 'active');
+  assert.equal(f.credential, previousCredential);
+  failWrite = false;
+  const retried = await f.invoke(handle, 'Session.reload');
+  assert.equal(retried.failure, undefined, JSON.stringify(retried));
+  assert.equal(f.resource(f.state.roots.session).status, 'pending');
+  assert.equal(f.resource(f.state.roots.session).currentTask.key, 'choose-organization');
+  assert.equal(f.credential, 'pending-client-credential');
+});
+
 for (const [name, oldDate, newDate, newerVersion, accepted, envelope = 'client'] of [
   ['older server date', earlier, later, false, false],
   ['equal date and older client version', later, later, false, false],

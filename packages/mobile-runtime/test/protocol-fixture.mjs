@@ -68,6 +68,7 @@ export async function fixture(options = {}) {
           let result;
           if (message.capability === 'storage.read') result = credential;
           else if (message.capability === 'storage.write') {
+            await options.credentialWrite?.(message.args.value);
             credential = message.args.value;
             result = null;
           } else if (message.capability === 'storage.remove') {
