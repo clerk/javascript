@@ -5,7 +5,6 @@ import { Combobox } from '@clerk/ui/mosaic/components/combobox';
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
-import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -19,15 +18,10 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const [query, setQuery] = useState('');
   const options = ['Apple', 'Apricot', 'Banana', 'Blackberry', 'Cherry', 'Fig', 'Grape', 'Pear', 'Plum'];
-  const filtered = options.filter(option => option.toLowerCase().includes(query.toLowerCase()));
 
   return (
-    <Combobox.Root
-      inputValue={query}
-      onInputValueChange={setQuery}
-    >
+    <Combobox.Root>
       <Field.Root style={{ width: 320 }}>
         <Field.Label>Fruit</Field.Label>
         <InputGroup.Root>
@@ -50,34 +44,32 @@ export function Default() {
         </InputGroup.Root>
       </Field.Root>
       <Combobox.Popup>
-        {filtered.length > 0 ? (
-          filtered.map(option => (
+        <Combobox.Collection
+          items={options}
+          itemToStringLabel={option => option}
+          empty={<Combobox.Empty>No fruit found</Combobox.Empty>}
+        >
+          {option => (
             <Combobox.Option
               key={option}
               value={option.toLowerCase()}
               label={option}
             >
               {option}
+              <Combobox.OptionIndicator />
             </Combobox.Option>
-          ))
-        ) : (
-          <Combobox.Empty>No fruit found</Combobox.Empty>
-        )}
+          )}
+        </Combobox.Collection>
       </Combobox.Popup>
     </Combobox.Root>
   );
 }
 
 export function Scrolling() {
-  const [query, setQuery] = useState('');
   const options = Array.from({ length: 40 }, (_, index) => `Fruit ${index + 1}`);
-  const filtered = options.filter(option => option.toLowerCase().includes(query.toLowerCase()));
 
   return (
-    <Combobox.Root
-      inputValue={query}
-      onInputValueChange={setQuery}
-    >
+    <Combobox.Root>
       <Field.Root style={{ width: 320 }}>
         <Field.Label>Fruit</Field.Label>
         <InputGroup.Root>
@@ -100,19 +92,22 @@ export function Scrolling() {
         </InputGroup.Root>
       </Field.Root>
       <Combobox.Popup>
-        {filtered.length > 0 ? (
-          filtered.map(option => (
+        <Combobox.Collection
+          items={options}
+          itemToStringLabel={option => option}
+          empty={<Combobox.Empty>No fruit found</Combobox.Empty>}
+        >
+          {option => (
             <Combobox.Option
               key={option}
               value={option.toLowerCase()}
               label={option}
             >
               {option}
+              <Combobox.OptionIndicator />
             </Combobox.Option>
-          ))
-        ) : (
-          <Combobox.Empty>No fruit found</Combobox.Empty>
-        )}
+          )}
+        </Combobox.Collection>
       </Combobox.Popup>
     </Combobox.Root>
   );
