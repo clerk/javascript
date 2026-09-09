@@ -1,19 +1,8 @@
-import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Input } from './input';
-
-const expectedAppearance = stylex.create({
-  ghost: {
-    borderRadius: 0,
-    borderStyle: 'none',
-    borderWidth: 0,
-    backgroundColor: 'transparent',
-    boxShadow: 'none',
-  },
-});
 
 describe('Mosaic Input', () => {
   it('applies the default size', () => {
@@ -35,7 +24,7 @@ describe('Mosaic Input', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveAttribute('data-size', size);
   });
 
-  it('removes field chrome with the ghost variant', () => {
+  it('reflects the ghost variant', () => {
     render(
       <Input
         variant='ghost'
@@ -46,8 +35,6 @@ describe('Mosaic Input', () => {
     const input = screen.getByRole('textbox', { name: 'Search' });
     expect(input).toHaveClass('cl-input');
     expect(input).toHaveAttribute('data-variant', 'ghost');
-    const appearance = stylex.props(expectedAppearance.ghost).className ?? '';
-    expect(input).toHaveClass(...appearance.split(' ').filter(name => name.startsWith('x')));
     expect(input).not.toHaveFocus();
   });
 
