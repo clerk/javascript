@@ -174,6 +174,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     name: 'Vercel',
     docsUrl: 'https://clerk.com/docs/authentication/social-connections/vercel',
   },
+  {
+    provider: 'agentid',
+    strategy: 'oauth_agentid',
+    name: 'AgentID',
+    docsUrl: 'https://www.agentid.com/docs/clerk',
+  },
 ];
 
 interface getOAuthProviderDataProps {
