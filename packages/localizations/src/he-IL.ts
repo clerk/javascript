@@ -944,8 +944,8 @@ export const heIL: LocalizationResource = {
       title: 'כתובת להפניה',
     },
     scopeList: {
-      title: 'פעולה זו תאפשר ל-{{applicationName}} גישה אל:',
       privateMetadata: undefined,
+      title: 'פעולה זו תאפשר ל-{{applicationName}} גישה אל:',
     },
     subtitle: 'מבקש גישה ל-{{applicationName}} בשם {{identifier}}',
     viewFullUrl: 'הצג כתובת מלאה',
