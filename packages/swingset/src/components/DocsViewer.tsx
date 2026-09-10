@@ -69,6 +69,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     // Headless primitives — alphabetical.
     accordion: dynamic(() => import('../stories/accordion.mdx')),
     autocomplete: dynamic(() => import('../stories/autocomplete.mdx')),
+    combobox: dynamic(() => import('../stories/combobox.primitive.mdx')),
     collapsible: dynamic(() => import('../stories/collapsible.mdx')),
     dialog: dynamic(() => import('../stories/dialog.mdx')),
     drawer: dynamic(() => import('../stories/drawer.mdx')),
