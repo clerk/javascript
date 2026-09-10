@@ -46,6 +46,46 @@ const handle = (f, flow = 'sia_native', token = 'fixture_approval') =>
   f.invoke(f.state.roots.clerk, 'Clerk.handleAuthCallback', [`${callbackUrl}?flow_id=${flow}&approval_token=${token}`]);
 
 for (const kind of ['signIn', 'signUp']) {
+  for (const failure of ['storage', 'prepare']) {
+    test(`${kind} email-link ${failure} failure preserves the persistence-before-request boundary`, async t => {
+      let saved;
+      let prepares = 0;
+      const f = await magicFixture({
+        authWrite: value => {
+          if (failure === 'storage')
+            throw Object.assign(new Error('Storage unavailable'), { code: 'secure_storage_locked' });
+          saved = JSON.parse(value);
+        },
+        http: request => {
+          if (!/prepare_first_factor|prepare_verification/.test(request.url)) return;
+          prepares++;
+          assert.equal(saved.kind, kind);
+          assert.equal(saved.flowId, kind === 'signIn' ? 'sia_native' : 'sua_native');
+          assert.match(saved.codeVerifier, /^[A-Za-z0-9_-]{43}$/);
+          return response(null, {
+            status: 422,
+            body: JSON.stringify({ errors: [{ code: 'prepare_rejected', message: 'Preparation rejected' }] }),
+          });
+        },
+      });
+      t.after(f.dispose);
+      const result = await sendLink(f, kind);
+      assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+      if (failure === 'storage') {
+        assert.equal(result.result.error.code, 'secure_storage_locked');
+        assert.equal(prepares, 0);
+        assert.equal(f.authRecord, null);
+      } else {
+        assert.equal(result.result.error.errors[0].code, 'prepare_rejected');
+        assert.equal(prepares, 1);
+        assert.deepEqual(JSON.parse(f.authRecord), saved);
+      }
+      assert.equal(f.state.roots.session, null);
+    });
+  }
+}
+
+for (const kind of ['signIn', 'signUp']) {
   test(`native ${kind} email link stores PKCE and returns the canonical resource without activation`, async t => {
     const f = await magicFixture();
     t.after(f.dispose);
