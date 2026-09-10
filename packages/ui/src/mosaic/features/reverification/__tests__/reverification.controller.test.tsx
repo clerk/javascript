@@ -389,6 +389,40 @@ describe('useReverificationController', () => {
     });
   });
 
+  it('resets once while an attempt is in flight', async () => {
+    const attempt = deferred<ReverificationResult>();
+    const finish = vi.fn(() => Promise.resolve());
+    const cancel = vi.fn();
+    const activeModel = readyModel({ attempt: () => attempt.promise, finish, cancel });
+    const { result, rerender } = renderHook(
+      ({ model }: { model: ReverificationModel }) => useReverificationController(model),
+      { initialProps: { model: activeModel } },
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onValueChange('secret');
+        result.current.onSubmit();
+      }
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.isPending).toBe(true);
+      }
+    });
+
+    rerender({ model: { ...activeModel, isActive: false } });
+    expect(result.current.status).toBe('idle');
+
+    act(() => {
+      attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+    });
+    await waitFor(() => expect(cancel).toHaveBeenCalledOnce());
+    expect(finish).not.toHaveBeenCalled();
+  });
+
   it('stays on the current step pending while finish runs', async () => {
     const finish = deferred<void>();
     const { result } = renderHook(() =>

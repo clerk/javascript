@@ -273,7 +273,10 @@ export const reverificationMachine = createMachine({
 
     submitting: {
       on: {
-        RESET: { actions: assign(() => ({ abortRequested: true })) },
+        RESET: {
+          guard: ctx => !ctx.abortRequested,
+          actions: assign(() => ({ abortRequested: true })),
+        },
       },
       invoke: fromPromise(submit, {
         onDone: [abortAfterInvoke, ...afterResult],
@@ -413,13 +416,15 @@ export function useReverificationController(model: ReverificationModel): Reverif
     return () => window.clearInterval(id);
   }, [countingDown, resendAvailableAt]);
 
+  const needsStart = model.isActive && Boolean(ready) && snapshot.value === 'inactive';
+  const needsReset = !model.isActive && snapshot.value !== 'inactive';
   useEffect(() => {
-    if (model.isActive && ready && snapshot.value === 'inactive') {
+    if (needsStart) {
       send({ type: 'START' });
-    } else if (!model.isActive && snapshot.value !== 'inactive') {
+    } else if (needsReset) {
       send({ type: 'RESET' });
     }
-  });
+  }, [needsStart, needsReset, send]);
 
   if (!model.isActive) {
     return { status: 'idle' };
