@@ -257,7 +257,11 @@ const prodConfig = ({ mode, env, analysis }) => {
           entry: { sandbox: './sandbox/app.ts' },
           plugins: [
             new rspack.CopyRspackPlugin({
-              patterns: [{ from: path.resolve(__dirname, '../ui/dist/*.js'), to: '[name][ext]' }],
+              patterns: [
+                { from: path.resolve(__dirname, '../ui/dist/*.js'), to: '[name][ext]' },
+                // Scenario mocking registers /mockServiceWorker.js from here; the dev server serves it as static.
+                { from: path.resolve(__dirname, 'sandbox/public'), to: '.' },
+              ],
             }),
             new rspack.HtmlRspackPlugin({
               minify: false,
