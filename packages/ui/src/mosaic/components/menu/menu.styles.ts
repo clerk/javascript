@@ -81,9 +81,9 @@ export const item = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': neutralAlpha['4'],
+      ':is([data-active])': neutralAlpha['6'],
       '@media (hover: hover)': {
-        ':hover': neutralAlpha['4'],
+        ':hover': neutralAlpha['6'],
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },

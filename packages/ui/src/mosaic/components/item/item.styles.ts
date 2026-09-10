@@ -49,7 +49,7 @@ export const item = stylex.create({
       default: null,
       ':active:not(:disabled, [aria-disabled="true"])': neutralAlpha['8'],
       '@media (hover: hover)': {
-        ':hover:not(:disabled, [aria-disabled="true"])': neutralAlpha['4'],
+        ':hover:not(:disabled, [aria-disabled="true"])': neutralAlpha['6'],
       },
     },
     color: {
