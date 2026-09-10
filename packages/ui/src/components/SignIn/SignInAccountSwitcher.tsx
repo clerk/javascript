@@ -1,3 +1,5 @@
+import { CLERK_ADD_ACCOUNT } from '@clerk/shared/internal/clerk-js/constants';
+
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -9,23 +11,31 @@ import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Add, ArrowRight } from '../../icons';
+import { useRouter } from '../../router';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
-const SignInAccountSwitcherInternal = () => {
+type SignInAccountSwitcherProps = {
+  // Route of the sign-in start screen relative to where the switcher is mounted.
+  addAccountPath?: string;
+};
+
+const SignInAccountSwitcherInternal = ({ addAccountPath = '..' }: SignInAccountSwitcherProps) => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
-  const { afterSignInUrl, path: signInPath, signInUrl, taskUrl } = useSignInContext();
+  const { afterSignInUrl, signInUrl, taskUrl } = useSignInContext();
   const { navigateAfterSignOut } = useSignOutContext();
-  const { handleSignOutAllClicked, handleSessionClicked, signedInSessions, handleAddAccountClicked } =
-    useMultisessionActions({
-      taskUrl,
-      navigateAfterSignOut,
-      afterSwitchSessionUrl: afterSignInUrl,
-      userProfileUrl,
-      signInUrl: signInPath ?? signInUrl,
-      user: undefined,
-    });
+  const { navigate } = useRouter();
+  const { handleSignOutAllClicked, handleSessionClicked, signedInSessions } = useMultisessionActions({
+    taskUrl,
+    navigateAfterSignOut,
+    afterSwitchSessionUrl: afterSignInUrl,
+    userProfileUrl,
+    signInUrl,
+    user: undefined,
+  });
+  const handleAddAccountClicked = () =>
+    navigate(addAccountPath, { searchParams: new URLSearchParams({ [CLERK_ADD_ACCOUNT]: 'true' }) });
 
   return (
     <Flow.Part part='accountSwitcher'>

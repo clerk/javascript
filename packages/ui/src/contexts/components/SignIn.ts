@@ -1,4 +1,8 @@
-import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
+import {
+  CLERK_ADD_ACCOUNT,
+  SIGN_IN_INITIAL_VALUE_KEYS,
+  SIGN_UP_MODES,
+} from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
@@ -101,7 +105,12 @@ export const useSignInContext = (): SignInContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
-  const authQueryString = redirectUrls.toSearchParams().toString();
+  const authSearchParams = redirectUrls.toSearchParams();
+  if (queryParams[CLERK_ADD_ACCOUNT]) {
+    // Survives the OAuth / email-link round trip so a failed add-account attempt lands back on the form.
+    authSearchParams.set(CLERK_ADD_ACCOUNT, queryParams[CLERK_ADD_ACCOUNT]);
+  }
+  const authQueryString = authSearchParams.toString();
 
   // Callback routes owned by the SignIn tree are always SignIn-rooted — including the combined-flow
   // branches mounted at `create/sso-callback` and `create/verify` under the SignIn component

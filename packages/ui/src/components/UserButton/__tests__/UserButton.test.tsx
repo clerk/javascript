@@ -1,11 +1,14 @@
 import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
+import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import { UserButton } from '../';
+
+vi.mock('@/ui/utils/windowNavigate', () => ({ clerkWindowNavigate: vi.fn() }));
 
 const { createFixtures } = bindCreateFixtures('UserButton');
 
@@ -87,8 +90,6 @@ describe('UserButton', () => {
     expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
   });
 
-  it.todo('navigates to sign in url when "Add account" is clicked');
-
   describe('UserButton with PortalProvider', () => {
     it('passes getContainer to openUserProfile when wrapped in PortalProvider', async () => {
       const container = document.createElement('div');
@@ -155,6 +156,17 @@ describe('UserButton', () => {
       expect(getByText('First1 Last1')).toBeDefined();
       expect(getByText('First2 Last2')).toBeDefined();
       expect(getByText('First3 Last3')).toBeDefined();
+    });
+
+    it('navigates to the sign-in URL with the add-account param when "Add account" is clicked', async () => {
+      const { wrapper } = await createFixtures(initConfig);
+      const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+      await userEvent.click(getByText('Add account'));
+      expect(clerkWindowNavigate).toHaveBeenLastCalledWith(
+        expect.anything(),
+        expect.stringContaining('__clerk_add_account=true'),
+      );
     });
 
     it('changes the active session when clicking another session', async () => {

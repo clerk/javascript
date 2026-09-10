@@ -1902,6 +1902,14 @@ export type SignInProps = RoutingOptions & {
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+  /**
+   * On multi-session instances, where a signed-in visitor lands when opening the sign-in component.
+   * `'form'` renders the identifier form. `'switcher'` renders the account switcher listing the signed-in accounts,
+   * with "Add account" and "Sign out of all accounts". Ignored in single-session mode.
+   *
+   * @default 'form'
+   */
+  multiSessionStart?: 'form' | 'switcher';
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
