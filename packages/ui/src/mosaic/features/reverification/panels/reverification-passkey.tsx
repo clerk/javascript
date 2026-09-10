@@ -14,7 +14,7 @@ export interface ReverificationPasskeyProps {
   messages: ReverificationPasskeyMessages;
   errorMessage?: string;
   isPending?: boolean;
-  onVerify: () => void;
+  onSubmit: () => void;
   onCancel?: () => void;
 }
 
@@ -22,7 +22,7 @@ export function ReverificationPasskey({
   messages,
   errorMessage,
   isPending = false,
-  onVerify,
+  onSubmit,
   onCancel,
 }: ReverificationPasskeyProps) {
   return (
@@ -59,7 +59,7 @@ export function ReverificationPasskey({
           fullWidth
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
-          onClick={onVerify}
+          onClick={onSubmit}
         >
           {messages.primaryActionLabel}
         </SubmitButton>

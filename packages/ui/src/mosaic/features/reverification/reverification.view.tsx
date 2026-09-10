@@ -62,7 +62,6 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
     errorMessage,
     isPending,
     onSubmit,
-    onVerifyPasskey,
     onShowMethods,
     onShowHelp,
     onBack,
@@ -124,7 +123,7 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
                 }}
                 errorMessage={errorMessage}
                 isPending={isPending}
-                onVerify={onVerifyPasskey}
+                onSubmit={onSubmit}
                 onCancel={hasAlternatives ? onShowMethods : undefined}
               />
             </Flow.Step>

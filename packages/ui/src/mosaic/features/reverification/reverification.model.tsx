@@ -25,7 +25,6 @@ export type ReverificationReadyModel = {
   start: () => Promise<ReverificationResult>;
   prepare: (method: ReverificationMethod) => Promise<void>;
   attempt: (method: ReverificationMethod, value: string) => Promise<ReverificationResult>;
-  verifyPasskey: () => Promise<ReverificationResult>;
   finish: () => Promise<void>;
   cancel: () => void;
 };
@@ -138,13 +137,6 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
     start: async () => {
       try {
         return handleResponse(await session.startVerification({ level: level ?? 'first_factor' }));
-      } catch (error) {
-        throw toError(error);
-      }
-    },
-    verifyPasskey: async () => {
-      try {
-        return handleResponse(await session.verifyWithPasskey());
       } catch (error) {
         throw toError(error);
       }

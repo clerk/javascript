@@ -13,7 +13,6 @@ const model: ReverificationModel = {
   start: vi.fn(),
   prepare: vi.fn(),
   attempt: vi.fn(),
-  verifyPasskey: vi.fn(),
   finish: vi.fn(),
   cancel: vi.fn(),
 };
@@ -47,7 +46,6 @@ function ready(overrides: Partial<ReverificationViewProps> = {}): Reverification
     onValueChange: vi.fn(),
     isPending: false,
     onSubmit: vi.fn(),
-    onVerifyPasskey: vi.fn(),
     onShowMethods: vi.fn(),
     onShowHelp: vi.fn(),
     onEmailSupport: vi.fn(),

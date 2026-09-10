@@ -18,7 +18,7 @@ type OverlayFrom = 'factor' | 'method-picker';
 
 export type ReverificationDeps = Pick<
   ReverificationReadyModel,
-  'start' | 'prepare' | 'attempt' | 'verifyPasskey' | 'finish' | 'cancel'
+  'start' | 'prepare' | 'attempt' | 'finish' | 'cancel'
 >;
 
 interface ReverificationContext {
@@ -58,7 +58,6 @@ const unseatedDeps: ReverificationDeps = {
   start: notSeated,
   prepare: notSeated,
   attempt: notSeated,
-  verifyPasskey: notSeated,
   finish: notSeated,
   cancel: () => {},
 };
@@ -96,7 +95,7 @@ function submit(ctx: ReverificationContext): Promise<ReverificationResult> {
   if (!method) {
     return Promise.reject(new Error('No active method'));
   }
-  return method.strategy === 'passkey' ? ctx.deps.verifyPasskey() : ctx.deps.attempt(method, ctx.inputValue);
+  return ctx.deps.attempt(method, ctx.inputValue);
 }
 
 const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => ({
@@ -482,7 +481,6 @@ export function useReverificationController(model: ReverificationModel): Reverif
     errorMessage: context.errorMessage,
     isPending: pendingStates.has(snapshot.value),
     onSubmit: () => send({ type: 'SUBMIT' }),
-    onVerifyPasskey: () => send({ type: 'SUBMIT' }),
     onShowMethods: () => send({ type: 'SHOW_METHODS' }),
     onShowHelp: () => send({ type: 'SHOW_HELP' }),
     onBack: step === 'method-picker' || step === 'help' ? () => send({ type: 'BACK' }) : undefined,
@@ -495,7 +493,6 @@ export function useReverificationController(model: ReverificationModel): Reverif
     pendingMethodId,
     onSelectMethod: id => send({ type: 'SELECT_METHOD', id }),
     otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
-    identifier: activeMethod && 'identifier' in activeMethod ? activeMethod.identifier : undefined,
     onResend: () => send({ type: 'RESEND' }),
     canResend: context.canResend,
     resendRemainingSeconds:
