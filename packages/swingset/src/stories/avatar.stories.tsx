@@ -12,6 +12,7 @@ export { default as __source } from './avatar.stories?raw';
 // here to drive the playground + prop table. Keys mirror `AvatarProps`.
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Avatar',
   source: 'packages/ui/src/mosaic/components/avatar/avatar.tsx',
   styles: {

@@ -40,6 +40,7 @@ const FILES_WITHOUT_HEADINGS = [
   'use-organization-creation-defaults-params.mdx',
   'use-o-auth-consent-params.mdx',
   'use-o-auth-consent-return.mdx',
+  'use-o-auth-device-verification-return.mdx',
   'create-organization-domain-params.mdx',
 ];
 
@@ -75,6 +76,11 @@ const LINK_REPLACEMENTS = [
   ['o-auth-application-namespace', '/docs/reference/types/oauth-application'],
   ['o-auth-consent-info', '/docs/reference/types/oauth-consent-info'],
   ['o-auth-consent-scope', '/docs/reference/types/oauth-consent-scope'],
+  ['lookup-o-auth-device-verification-params', '/docs/reference/types/lookup-oauth-device-verification-params'],
+  ['o-auth-device-verification-info', '/docs/reference/types/oauth-device-verification-info'],
+  ['o-auth-device-verification-result', '/docs/reference/types/oauth-device-verification-result'],
+  ['submit-o-auth-device-verification-params', '/docs/reference/types/submit-oauth-device-verification-params'],
+  ['use-o-auth-device-verification-return', '/docs/reference/hooks/use-oauth-device-verification#returns'],
   ['o-auth-strategy', '/docs/reference/types/sso#oauthstrategy'],
   ['o-auth-provider', '/docs/reference/types/sso#oauthprovider'],
   ['session', '/docs/reference/backend/types/backend-session'],

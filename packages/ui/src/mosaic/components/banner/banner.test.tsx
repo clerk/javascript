@@ -49,6 +49,7 @@ describe('Mosaic Banner', () => {
     );
     const icon = container.querySelector('.cl-banner-root > .cl-icon');
     expect(icon).toBeInTheDocument();
+    expect(icon).toHaveClass('cl-banner-icon');
     expect(icon).toHaveAttribute('aria-hidden', 'true');
 
     rerender(

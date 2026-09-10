@@ -73,6 +73,10 @@ export type AuthFn = GetAuthFnNoRequest<SessionAuthWithRedirect, true> & {
  * - Only available for App Router.
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/reference/nextjs/clerk-middleware) to be configured.
+ *
+ * To set up Clerk in your project, run `npx -y clerk@latest init` from your project's root directory.
+ * The Clerk CLI can provision temporary development keys without a Clerk account and write them to `.env.local`. See
+ * the [Clerk CLI docs](https://clerk.com/docs/cli).
  */
 export const auth: AuthFn = (async (options?: AuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports

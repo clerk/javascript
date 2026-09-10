@@ -11,6 +11,7 @@ export { default as __source } from './badge.stories?raw';
 // here to drive the playground + prop table. Keys mirror `BadgeProps`.
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Badge',
   source: 'packages/ui/src/mosaic/components/badge/badge.tsx',
   styles: {

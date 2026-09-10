@@ -70,8 +70,11 @@ function useHandleAuthenticateWithPasskey(
         if (err.code === 'passkey_operation_aborted') {
           return;
         }
-        // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
-        if (flow === 'autofill' && err.code === 'passkey_retrieval_cancelled') {
+        // Autofill runs in the background, so browser rejections must not surface as form errors.
+        if (
+          flow === 'autofill' &&
+          (err.code === 'passkey_retrieval_cancelled' || err.code === 'passkey_invalid_rpID_or_domain')
+        ) {
           return;
         }
       }

@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { getModule } from '@/lib/registry';
 
 import { PlaygroundProvider } from './PlaygroundContext';
-import { ViewSource } from './ViewSource';
 
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
@@ -57,6 +56,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     otp: dynamic(() => import('../stories/otp.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    table: dynamic(() => import('../stories/table.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
@@ -110,13 +110,8 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose relative mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
-        {meta?.source ? (
-          <div className='absolute right-3 top-3 sm:right-8 sm:top-8'>
-            <ViewSource source={meta.source} />
-          </div>
-        ) : null}
         <DocContent />
       </article>
     </PlaygroundProvider>

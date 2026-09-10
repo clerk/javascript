@@ -15,6 +15,7 @@ export { default as __source } from './scroll-area.stories?raw';
 export const meta: StoryMeta = {
   group: 'Styles',
   title: 'Scroll Area',
+  status: 'stable',
   source: 'packages/ui/src/mosaic/components/scroll-area/scroll-area.styles.ts',
 };
 

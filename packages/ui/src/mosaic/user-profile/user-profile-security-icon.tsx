@@ -27,7 +27,7 @@ export function UserProfileSecurityIcon({ name }: { name: UserProfileSecurityIco
         aria-hidden
         name={icons[name]}
         size='lg'
-        {...stylex.props(styles.icon)}
+        xstyle={styles.icon}
       />
     </Section.Media>
   );

@@ -11,6 +11,7 @@ export { default as __source } from './user-profile-account-section.stories?raw'
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileAccountSection',
   label: 'Account',
   navigation: { category: 'Sections' },
