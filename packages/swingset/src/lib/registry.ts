@@ -32,6 +32,11 @@ import {
 } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import {
+  Default as DrawerComponentDefault,
+  InsideProfile as DrawerComponentInsideProfile,
+  meta as drawerComponentMeta,
+} from '../stories/drawer.component.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
 import {
   Default as FieldDefault,
@@ -65,10 +70,18 @@ import {
 import {
   Default,
   Disabled as InputDisabled,
+  Ghost as InputGhost,
   Invalid,
   meta as inputMeta,
   Sizes as InputSizes,
 } from '../stories/input.stories';
+import {
+  Default as InputGroupDefault,
+  Disabled as InputGroupDisabled,
+  Invalid as InputGroupInvalid,
+  meta as inputGroupMeta,
+  Sizes as InputGroupSizes,
+} from '../stories/input-group.stories';
 import {
   Default as ItemDefault,
   Group as ItemGroup,
@@ -93,6 +106,12 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import {
+  Customized as ProfileCustomized,
+  Default as ProfileDefault,
+  meta as profileComponentMeta,
+  Transitions as ProfileTransitions,
+} from '../stories/profile.component.stories';
 import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
@@ -148,7 +167,11 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
-import { Default as UserPageDefault, meta as userPageMeta } from '../stories/user-page.stories';
+import {
+  Default as UserProfileDefault,
+  meta as userProfileMeta,
+  Overlay as UserProfileOverlay,
+} from '../stories/user-profile.stories';
 import {
   Default as UserProfileAccountSectionDefault,
   meta as userProfileAccountSectionMeta,
@@ -233,6 +256,11 @@ const sectionModule: StoryModule = {
   Destructive: SectionDestructive,
 };
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+const drawerComponentModule: StoryModule = {
+  meta: drawerComponentMeta,
+  Default: DrawerComponentDefault,
+  InsideProfile: DrawerComponentInsideProfile,
+};
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
 
@@ -262,13 +290,34 @@ const bannerModule: StoryModule = {
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
-const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
+const inputModule: StoryModule = {
+  meta: inputMeta,
+  Default,
+  Sizes: InputSizes,
+  Disabled: InputDisabled,
+  Invalid,
+  Ghost: InputGhost,
+};
+
+const inputGroupModule: StoryModule = {
+  meta: inputGroupMeta,
+  Default: InputGroupDefault,
+  Sizes: InputGroupSizes,
+  Disabled: InputGroupDisabled,
+  Invalid: InputGroupInvalid,
+};
 
 const popoverComponentModule: StoryModule = {
   meta: popoverComponentMeta,
   Default: PopoverComponentDefault,
   Placement: PopoverComponentPlacement,
   Alignment: PopoverComponentAlignment,
+};
+const profileComponentModule: StoryModule = {
+  meta: profileComponentMeta,
+  Default: ProfileDefault,
+  Customized: ProfileCustomized,
+  Transitions: ProfileTransitions,
 };
 
 const itemModule: StoryModule = {
@@ -376,9 +425,10 @@ const userProfileApiKeysPanelModule: StoryModule = {
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
-const userPageModule: StoryModule = {
-  meta: userPageMeta,
-  Default: UserPageDefault,
+const userProfileModule: StoryModule = {
+  meta: userProfileMeta,
+  Default: UserProfileDefault,
+  Overlay: UserProfileOverlay,
 };
 
 const userProfileAccountSectionModule: StoryModule = {
@@ -475,7 +525,7 @@ export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
   // User Profile
-  userPageModule,
+  userProfileModule,
   // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
@@ -504,14 +554,17 @@ export const registry: StoryModule[] = [
   cardComponentModule,
   flowComponentModule,
   inputModule,
+  inputGroupModule,
   itemModule,
   dialogComponentModule,
+  drawerComponentModule,
   headingModule,
   iconModule,
   iconFrameModule,
   menuComponentModule,
   otpComponentModule,
   popoverComponentModule,
+  profileComponentModule,
   sectionModule,
   tableModule,
   textModule,

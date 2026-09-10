@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { applyOrder } from '../user-button.utils';
+import { applyOrder } from './apply-order';
 
 describe('applyOrder', () => {
   const id = (value: string) => value;

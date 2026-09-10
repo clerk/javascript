@@ -83,7 +83,7 @@ export const styles = stylex.create({
       ':not([data-disabled]):hover': durationVars['--cl-duration-instant'],
     },
     borderColor: 'transparent',
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: `var(--_cl-button-radius, ${radiusVars['--cl-radius-md']})`,
     borderStyle: 'solid',
     borderWidth: '1px',
     alignItems: 'center',
@@ -125,7 +125,7 @@ export const styles = stylex.create({
   // shape — icon buttons zero their inline padding; width tracks the height. Longhands because
   // StyleX ranks a longhand above a shorthand, so `paddingInline` would lose to what `sizes` sets.
   shapeSquare: {
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: `var(--_cl-button-radius, ${radiusVars['--cl-radius-md']})`,
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
   },
@@ -431,12 +431,25 @@ export const variants = stylex.create({
 });
 
 // size — height-driven; padding sets only the inline axis. An icon's side tightens to the inset
-// it already has above and below, `(height - icon) / 2`, so it sits in a square cell: 8px at md
-// and lg exactly, and at sm too, where the ideal 7px is off the 4px scale.
+// it already has above and below, `(height - icon) / 2`, so it sits in a square cell.
 //
 /* eslint-disable @stylexjs/no-lookahead-selectors -- every browser this package builds for
    supports `:has()` (`tsdown.mosaic.config.mts`); an older one keeps the untightened padding. */
 export const sizes = stylex.create({
+  xs: {
+    gap: space['1'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    paddingInlineEnd: {
+      default: space['2'],
+      [stylex.when.descendant("[data-icon='inline-end']", iconScope)]: space['1.5'],
+    },
+    paddingInlineStart: {
+      default: space['2'],
+      [stylex.when.descendant("[data-icon='inline-start']", iconScope)]: space['1.5'],
+    },
+    height: space['6'],
+  },
   sm: {
     // sm runs a step tighter than md on every inline measure, gap included
     gap: space['1.5'],
@@ -484,6 +497,7 @@ export const sizes = stylex.create({
 /* eslint-enable @stylexjs/no-lookahead-selectors */
 
 export const iconSizes = stylex.create({
+  xs: { width: space['6'] },
   sm: { width: space['7'] },
   md: { width: space['8'] },
   lg: { width: space['9'] },
