@@ -4,6 +4,7 @@ import type { UserProfileFormError } from './user-profile-account-section.types'
 import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.view';
 
 export interface UserProfileEditNameContext {
+  /** Saves the name. Injected from the caller's `onSave` prop, and stands in for the model's action. */
   saveName: (value: UserProfileEditNameValue) => Promise<void>;
   /** The saved name, injected on every render. What the fields are seeded from each time the dialog opens. */
   savedFirstName: string;
@@ -11,6 +12,7 @@ export interface UserProfileEditNameContext {
   /** What is currently typed. Owned here rather than by the view, so re-seeding is a transition. */
   firstName: string;
   lastName: string;
+  /** Why the last attempt failed. */
   error: UserProfileFormError<UserProfileEditNameField> | undefined;
 }
 
