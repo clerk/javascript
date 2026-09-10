@@ -10,10 +10,7 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
-const positiveFocusShadow = `0 0 0 3px light-dark(
-  color-mix(in oklab, ${colorVars['--cl-color-positive']} 12%, transparent),
-  color-mix(in oklab, ${colorVars['--cl-color-positive']} 15%, transparent)
-)`;
+const positiveFocusShadow = `0 0 0 3px ${colorVars['--cl-color-positive-alpha-300']}`;
 
 export const styles = stylex.create({
   root: {

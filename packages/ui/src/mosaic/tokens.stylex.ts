@@ -45,6 +45,9 @@ export const gray = stylex.defineVars({
 
 const colorDefaults = {
   '--cl-color-neutral': `light-dark(${gray['1000']}, ${gray['0']})`,
+  '--cl-color-neutral-alpha-100': 'color-mix(in oklab, var(--cl-color-neutral) 6%, transparent)',
+  '--cl-color-neutral-alpha-200': 'color-mix(in oklab, var(--cl-color-neutral) 8%, transparent)',
+  '--cl-color-neutral-alpha-300': 'color-mix(in oklab, var(--cl-color-neutral) 12%, transparent)',
 
   '--cl-color-foreground': `light-dark(${gray['900']}, ${gray['50']})`,
   '--cl-color-foreground-secondary': `light-dark(${gray['600']}, ${gray['400']})`,
@@ -65,16 +68,25 @@ const colorDefaults = {
   '--cl-color-negative-foreground': gray['0'],
   '--cl-color-negative-subtle': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
   '--cl-color-negative-border': 'light-dark(oklch(0.8155 0.0983 19.41), oklch(0.3958 0.1331 25.72))',
+  '--cl-color-negative-alpha-100': 'color-mix(in oklab, var(--cl-color-negative) 6%, transparent)',
+  '--cl-color-negative-alpha-200': 'color-mix(in oklab, var(--cl-color-negative) 8%, transparent)',
+  '--cl-color-negative-alpha-300': 'color-mix(in oklab, var(--cl-color-negative) 12%, transparent)',
 
   '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
   '--cl-color-positive-foreground': gray['0'],
   '--cl-color-positive-subtle': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
   '--cl-color-positive-border': 'light-dark(oklch(0.7922 0.1959 148.18), oklch(0.4479 0.1083 151.33))',
+  '--cl-color-positive-alpha-100': 'color-mix(in oklab, var(--cl-color-positive) 6%, transparent)',
+  '--cl-color-positive-alpha-200': 'color-mix(in oklab, var(--cl-color-positive) 8%, transparent)',
+  '--cl-color-positive-alpha-300': 'color-mix(in oklab, var(--cl-color-positive) 12%, transparent)',
 
   '--cl-color-warning': 'light-dark(oklch(0.7099 0.1888 44.94), oklch(0.7576 0.159 55.93))',
   '--cl-color-warning-foreground': gray['0'],
   '--cl-color-warning-subtle': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
   '--cl-color-warning-border': 'light-dark(oklch(0.8672 0.0902 63.47), oklch(0.4084 0.1165 38.17))',
+  '--cl-color-warning-alpha-100': 'color-mix(in oklab, var(--cl-color-warning) 6%, transparent)',
+  '--cl-color-warning-alpha-200': 'color-mix(in oklab, var(--cl-color-warning) 8%, transparent)',
+  '--cl-color-warning-alpha-300': 'color-mix(in oklab, var(--cl-color-warning) 12%, transparent)',
 
   '--cl-color-input': `light-dark(${gray['0']}, ${gray['850']})`,
   '--cl-color-input-placeholder': gray['400'],
@@ -83,18 +95,6 @@ const colorDefaults = {
 } as const;
 
 export const colorVars = stylex.defineVars(colorDefaults);
-
-// =============================================================================
-// Neutral Alpha Scale
-// =============================================================================
-
-export const neutralAlpha = stylex.defineVars({
-  '4': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
-  '6': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 6%, transparent)`,
-  '8': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
-  '12': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 12%, transparent)`,
-  '18': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 18%, transparent)`,
-});
 
 // =============================================================================
 // Radius Tokens

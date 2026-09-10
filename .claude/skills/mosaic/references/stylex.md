@@ -98,12 +98,13 @@ export const colorVars = stylex.defineVars(colorDefaults);
   would let a consumer override one and not the other, and the ring's appearance
   would then depend on which they picked.
 - **DO** build a fill that sits _on top of_ an unknown backdrop — a hover or pressed
-  wash on a transparent `outline`/`ghost` control — from the internal `neutralAlpha`
-  scale: an opacity of black-on-light / white-on-dark over `transparent`, keyed by
-  that opacity, not a percentage of a gray token.
+  wash on a transparent `outline`/`ghost` control — from the `--cl-color-neutral-alpha-*`
+  tokens: `--cl-color-neutral` (black on light, white on dark) at a fixed opacity over
+  `transparent`, not a percentage of a gray token. Status colors have the same three
+  steps (`--cl-color-negative-alpha-100` …).
 
   ```ts
-  backgroundColor: neutralAlpha['12'],
+  backgroundColor: colorVars['--cl-color-neutral-alpha-300'],
   ```
 
   A gray token like `--cl-color-foreground` is a 900, not black, so the same percentage of
@@ -316,11 +317,11 @@ device, while touch devices look correct.
   ```ts
   backgroundColor: {
     default: 'transparent',
-    ':enabled:active': neutralAlpha['12'],
-    ':enabled[data-open]': neutralAlpha['12'],
+    ':enabled:active': colorVars['--cl-color-neutral-alpha-200'],
+    ':enabled[data-open]': colorVars['--cl-color-neutral-alpha-200'],
     '@media (hover: hover)': {
       default: null,
-      ':enabled:hover:not(:active):not([data-open])': neutralAlpha['6'],
+      ':enabled:hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
     },
   },
   ```

@@ -1,14 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import {
-  colorVars,
-  fontFamilyVars,
-  fontWeightVars,
-  neutralAlpha,
-  radiusVars,
-  space,
-  typeScaleVars,
-} from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
@@ -45,7 +37,7 @@ export const styles = stylex.create({
 export const rootColors = stylex.create({
   neutral: {
     borderColor: colorVars['--cl-color-border'],
-    backgroundColor: neutralAlpha['4'],
+    backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
     color: colorVars['--cl-color-foreground'],
   },
   warning: {

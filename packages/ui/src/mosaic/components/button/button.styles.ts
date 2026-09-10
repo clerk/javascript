@@ -5,7 +5,6 @@ import {
   durationVars,
   fontFamilyVars,
   fontWeightVars,
-  neutralAlpha,
   radiusVars,
   space,
   targetVars,
@@ -13,10 +12,10 @@ import {
 } from '../../tokens.stylex';
 import { iconScope } from '../icon/icon.markers.stylex';
 
-// Neutral fills are three steps up the `neutralAlpha` scale, shared across variants:
-//   6  — `filled-neutral` rest, `outline-*`/`ghost-*` hover
-//   12 — `filled-neutral` hover, `outline-*`/`ghost-*` pressed
-//   18 — `filled-neutral` pressed
+// Neutral fills are the three neutral alpha steps, shared across variants:
+//   100 — `filled-neutral` rest, `outline-*`/`ghost-*` hover
+//   200 — `filled-neutral` hover, `outline-*`/`ghost-*` pressed
+//   300 — `filled-neutral` pressed
 
 // Opaque fills blend toward their own on-fill at the same 12%/18%. Neutral has no fill
 // to blend from, so it rides the opacity ramp above.
@@ -198,12 +197,12 @@ export const variants = stylex.create({
       },
     },
     backgroundColor: {
-      default: neutralAlpha['6'],
-      ':not([data-disabled]):not([data-pending]):active': neutralAlpha['18'],
-      ':not([data-disabled])[data-open]': neutralAlpha['18'],
+      default: colorVars['--cl-color-neutral-alpha-100'],
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-300'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-300'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralAlpha['12'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-200'],
       },
     },
     color: colorVars['--cl-color-foreground'],
@@ -244,11 +243,11 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralAlpha['12'],
-      ':not([data-disabled])[data-open]': neutralAlpha['12'],
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralAlpha['6'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: colorVars['--cl-color-brand'],
@@ -265,11 +264,11 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralAlpha['12'],
-      ':not([data-disabled])[data-open]': neutralAlpha['12'],
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralAlpha['6'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: colorVars['--cl-color-foreground'],
@@ -286,11 +285,11 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralAlpha['12'],
-      ':not([data-disabled])[data-open]': neutralAlpha['12'],
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralAlpha['6'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -307,11 +306,11 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralAlpha['12'],
-      ':not([data-disabled])[data-open]': neutralAlpha['12'],
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralAlpha['6'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: colorVars['--cl-color-brand'],
@@ -327,11 +326,11 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralAlpha['12'],
-      ':not([data-disabled])[data-open]': neutralAlpha['12'],
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralAlpha['6'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: colorVars['--cl-color-foreground'],

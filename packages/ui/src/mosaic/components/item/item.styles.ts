@@ -1,14 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import {
-  colorVars,
-  fontFamilyVars,
-  fontWeightVars,
-  neutralAlpha,
-  radiusVars,
-  space,
-  typeScaleVars,
-} from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const item = stylex.create({
   base: {
@@ -47,9 +39,9 @@ export const item = stylex.create({
     },
     backgroundColor: {
       default: null,
-      ':active:not(:disabled, [aria-disabled="true"])': neutralAlpha['8'],
+      ':active:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
-        ':hover:not(:disabled, [aria-disabled="true"])': neutralAlpha['6'],
+        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {

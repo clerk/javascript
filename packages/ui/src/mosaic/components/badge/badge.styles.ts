@@ -1,14 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import {
-  colorVars,
-  fontFamilyVars,
-  fontWeightVars,
-  neutralAlpha,
-  radiusVars,
-  space,
-  typeScaleVars,
-} from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 // warning/negative/positive fill with the subtle surface and use the saturated token as text;
 // primary fills with the solid token and uses its `-foreground` for text.
@@ -39,7 +31,7 @@ export const colors = stylex.create({
     color: colorVars['--cl-color-brand-foreground'],
   },
   neutral: {
-    backgroundColor: neutralAlpha['6'],
+    backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
     color: colorVars['--cl-color-foreground'],
   },
   warning: {
