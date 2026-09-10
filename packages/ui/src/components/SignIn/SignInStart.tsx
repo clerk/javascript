@@ -42,9 +42,12 @@ import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
   hasMultipleEnterpriseConnections,
+  SIGN_IN_PROMPT_PARAM,
+  SIGN_IN_PROMPT_SELECT_ACCOUNT,
   SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
   useHandleAuthenticateWithPasskey,
 } from './shared';
+import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -797,6 +800,23 @@ const InstantPasswordRow = ({
   );
 };
 
-export const SignInStart = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
-);
+const SignInStartCard = withRedirectToSignInTask(withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)));
+
+export const SignInStart = () => {
+  const clerk = useClerk();
+  const { authConfig } = useEnvironment();
+  const { navigate, queryParams } = useRouter();
+  // Snapshot on mount: the sign-in POST adds a session before setActive navigates; keep the form until then.
+  const [hadSignedInSessions] = useState(() => clerk.client.signedInSessions.length > 0);
+
+  const showAccountSwitcher =
+    queryParams[SIGN_IN_PROMPT_PARAM] === SIGN_IN_PROMPT_SELECT_ACCOUNT &&
+    !authConfig.singleSessionMode &&
+    hadSignedInSessions;
+
+  if (showAccountSwitcher) {
+    // Navigating to the index drops `prompt` (not a preserved param), so the form renders.
+    return <SignInAccountSwitcher onAddAccount={() => navigate('.')} />;
+  }
+  return <SignInStartCard />;
+};
