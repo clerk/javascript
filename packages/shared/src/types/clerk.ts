@@ -2427,10 +2427,10 @@ export type OrganizationListProps = {
   /**
    * By default, users can switch between Organization and their personal account.
    * This option controls whether OrganizationList will include the user's personal account
-   * in the Organization list. Setting this to `false` will hide the personal account entry,
+   * in the Organization list. Setting this to `true` will hide the personal account entry,
    * and users will only be able to switch between Organizations.
    *
-   * @default true
+   * @default false
    */
   hidePersonal?: boolean;
   /**
