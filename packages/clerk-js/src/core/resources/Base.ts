@@ -147,11 +147,14 @@ export abstract class BaseResource {
       // Handle 401 errors based on the specific error code:
       // - dev_browser_unauthenticated: reset the dev browser token
       // - requires_captcha: ignored here, handled by the captcha challenge flow
-      // - all other 401s: refresh client/session via handleUnauthenticated
+      // - other 401s: refresh client/session unless this is the refresh itself
       if (status === 401 && code === 'dev_browser_unauthenticated') {
         await BaseResource.clerk.__internal_handleUnauthenticatedDevBrowser();
       } else if (status === 401 && code !== 'requires_captcha') {
-        await BaseResource.clerk.handleUnauthenticated();
+        // A rejected recovery request must not recursively start the same recovery.
+        if (requestInit.method !== 'GET' || requestInit.path !== '/client') {
+          await BaseResource.clerk.handleUnauthenticated();
+        }
       }
 
       assertProductionKeysOnDev(status, errors);
