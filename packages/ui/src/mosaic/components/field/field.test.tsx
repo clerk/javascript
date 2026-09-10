@@ -396,6 +396,22 @@ describe('Mosaic Field', () => {
     consoleWarn.mockRestore();
   });
 
+  it('keeps a native label for a select when htmlFor is explicit', () => {
+    render(
+      <Field.Root>
+        <Field.Label htmlFor='elsewhere'>Role</Field.Label>
+        <Select.Root items={[{ value: 'admin', label: 'Admin' }]}>
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>
+      </Field.Root>,
+    );
+
+    const label = screen.getByText('Role');
+    expect(label.tagName).toBe('LABEL');
+    expect(label).toHaveAttribute('for', 'elsewhere');
+  });
+
   it('warns when Field.Label does not render a native label', () => {
     const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 

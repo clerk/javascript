@@ -75,7 +75,7 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
   const id = idProp ?? (context ? `cl-field-${generatedId}-label` : undefined);
   // A `<label>` activates the control it names, which would open a select; those get a span
   // that only focuses it, and are named through `aria-labelledby` instead.
-  const nativeLabel = context?.labelElementType !== 'span';
+  const nativeLabel = htmlForProp !== undefined || context?.labelElementType !== 'span';
   const controlId = context?.controlId;
   const htmlFor = htmlForProp ?? (nativeLabel ? controlId : undefined);
   const [label, setLabel] = React.useState<HTMLLabelElement | null>(null);
