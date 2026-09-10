@@ -12,7 +12,7 @@ From the JavaScript repository, run:
 node packages/expo/proofs/shared-owner/prepare.mjs /absolute/path/to/disposable-expo-app
 ```
 
-This replaces the destination's index.js and the three named proof files. Set its package.json main to index.js. Build/install the native app against the current local SDK, start Metro, then launch the development app with that Metro endpoint. On iOS this fixture was run with the launch arguments `-RCT_jsLocation localhost:8088` because it does not include expo-dev-client.
+This replaces the destination's index.js and the three named proof files. Set its package.json main to index.js. Build/install the native app against the current local SDK, start Metro, then launch the development app with that Metro endpoint. Building both Android SDK modules requires JDK 21. Apply the current Clerk config plugin before building the Expo Android app so the app uses its compatible D8/R8 configuration. On iOS this fixture was run with the launch arguments `-RCT_jsLocation localhost:8088` because it does not include expo-dev-client.
 
 ## Exercise
 

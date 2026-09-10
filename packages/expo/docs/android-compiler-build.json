@@ -1,0 +1,58 @@
+{
+  "date": "2026-09-09",
+  "scope": "Build and packaging only; Android UI journey remains unverified",
+  "javascriptBaseRevision": "a7de52a79ac07a93b892ab140a881774464752ac",
+  "androidRevision": "baa3da6721469faf9b656ac2224b4f31362df1fe",
+  "pluginSourceSHA256": "a8070bb44380a9eef6fd802333b69eed793171d0baf2b745d8ff48f957f5e02e",
+  "generatedSettingsSHA256": "9fd859c10896317bf318ce784eb61aa608a26cbc33dab74232a2f878c4cc8693",
+  "coreRevision": "3260b879799448630c20d459f207c3d0f78fc3ae",
+  "contractHash": "d0e44f4d5307614738d237be8326540031290579f49e2b098be85596ced06d98",
+  "nativeBundleSHA256": "3d5cb56dc9efa48e30b5280656f430dbf524bea874914a53826b2022627c07e0",
+  "versions": {
+    "expo": "57.0.21",
+    "reactNative": "0.86.0",
+    "nativeSDKKotlin": "2.4.10",
+    "expoKotlin": "2.3.20",
+    "AGP": "8.12.0",
+    "Gradle": "9.3.1",
+    "JDK": "21.0.8",
+    "originalR8": "8.12.14",
+    "configuredR8": "9.1.43"
+  },
+  "abi": "arm64-v8a",
+  "artifacts": {
+    "debug": {
+      "bytes": 63706825,
+      "sha256": "7c433913eb06ac11117c3ce5d5f6b18d7da6d8e033ab941edaaa21a285480a82",
+      "minified": false,
+      "embeddedJavaScriptBytecode": false
+    },
+    "release": {
+      "bytes": 28928388,
+      "sha256": "31072e25e396a382fa97ab6955ffc5d5b43bdebb4718997e4f958f041eb7f619",
+      "minified": true,
+      "embeddedJavaScriptBytecode": true
+    }
+  },
+  "nativeAARSHA256": {
+    "clerk-android-api": "a769ddd92ceb1418eed7384ea8c22887e4e302d8bf7d30aa0ec7b5abfc45a0fd",
+    "clerk-android-ui": "6c7d821d9c9a0ffbc05ed54274ba35002cba730eb2c96f99550c88ec3111dabc"
+  },
+  "metadataRewriteErrors": {
+    "original": 6364,
+    "configuredDebug": 0,
+    "pluginGeneratedDebugAndRelease": 0
+  },
+  "configPluginTests": 35,
+  "remainingWarnings": [
+    "AGP class file provider does not support R8 asynchronous parsing; release build succeeds.",
+    "Gradle daemon reports 512 MiB metaspace pressure and will expire after the successful build.",
+    "SDK XML schema, manifest merge and upstream deprecated API warnings remain."
+  ],
+  "limitations": [
+    "No Android launch, profile-edit, sign-out, or physical-device proof is claimed.",
+    "Debug app installation is preparation for a separate UI journey.",
+    "APK byte sizes are whole fixture app artifacts, not incremental SDK download or installed-size measurements.",
+    "The Kotlin source compiler and D8/R8 metadata reader have separate compatibility requirements."
+  ]
+}

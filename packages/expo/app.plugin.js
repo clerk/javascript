@@ -16,6 +16,7 @@ const {
   withAppBuildGradle,
   withGradleProperties,
   withProjectBuildGradle,
+  withSettingsGradle,
   withAndroidManifest,
   withEntitlementsPlist,
 } = require('@expo/config-plugins');
@@ -24,6 +25,7 @@ const fs = require('fs');
 const packageJson = require('./package.json');
 
 const CLERK_MIN_IOS_VERSION = '17.0';
+const CLERK_ANDROID_R8_VERSION = '9.1.43';
 
 const addHostedAuthIntentFilter = (mainActivity, packageName) => {
   const callbackHost = `${packageName}.hosted-callback`;
@@ -134,8 +136,42 @@ const withClerkIOS = config => {
  * Add packaging exclusions to Android app build.gradle to resolve
  * duplicate META-INF file conflicts from clerk-android dependencies.
  */
-const withClerkAndroid = config => {
+const withClerkAndroid = (config, props = {}) => {
   console.log('✅ Clerk Android plugin loaded');
+
+  const r8Version = props.androidR8Version ?? CLERK_ANDROID_R8_VERSION;
+  if (r8Version !== false) {
+    if (typeof r8Version !== 'string' || !/^\d+\.\d+\.\d+(?:[-.][A-Za-z0-9]+)*$/.test(r8Version)) {
+      throw new Error('Clerk androidR8Version must be a compiler version string or false.');
+    }
+    config = withSettingsGradle(config, modConfig => {
+      const marker =
+        /[ \t]*\/\/ Clerk Kotlin metadata compiler begin[\s\S]*?\/\/ Clerk Kotlin metadata compiler end\n?/g;
+      let contents = modConfig.modResults.contents.replace(marker, '');
+      if (!/pluginManagement\s*\{/.test(contents)) {
+        throw new Error('Clerk requires a pluginManagement block in Android settings.gradle to configure R8.');
+      }
+      const compiler = `
+  // Clerk Kotlin metadata compiler begin
+  buildscript {
+    repositories { google(); mavenCentral() }
+    dependencies { classpath("com.android.tools:r8:${r8Version}") }
+  }
+  // Clerk Kotlin metadata compiler end
+`;
+      contents = contents.replace(/pluginManagement\s*\{\n?/, `pluginManagement {${compiler}`);
+      modConfig.modResults.contents = contents;
+      return modConfig;
+    });
+  } else {
+    config = withSettingsGradle(config, modConfig => {
+      modConfig.modResults.contents = modConfig.modResults.contents.replace(
+        /[ \t]*\/\/ Clerk Kotlin metadata compiler begin[\s\S]*?\/\/ Clerk Kotlin metadata compiler end\n?/g,
+        '',
+      );
+      return modConfig;
+    });
+  }
 
   config = withGradleProperties(config, modConfig => {
     if (!modConfig.modResults.some(item => item.type === 'property' && item.key === 'android.kotlinVersion')) {
@@ -382,7 +418,7 @@ const withClerkExpo = (config, props = {}) => {
   if (appleSignIn !== false) {
     config = withClerkAppleSignIn(config);
   }
-  config = withClerkAndroid(config);
+  config = withClerkAndroid(config, props);
   config = withClerkKeychainService(config, props);
   config = withClerkFaceIDPermission(config, props);
   config = withClerkTheme(config, props);
