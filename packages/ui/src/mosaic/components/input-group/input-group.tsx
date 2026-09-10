@@ -97,7 +97,10 @@ function useAddon(
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps(`input-group-${side}`, { size: group.size, disabled: group.disabled }),
+        themeProps(side === 'start' ? 'input-group-start' : 'input-group-end', {
+          size: group.size,
+          disabled: group.disabled,
+        }),
         stylex.props(reset.base, styles.addon, textSizes[group.size], styles[side]),
         className,
         style,
