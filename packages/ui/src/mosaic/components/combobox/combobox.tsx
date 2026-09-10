@@ -57,10 +57,11 @@ export interface ComboboxInputProps extends Omit<MosaicComponentProps<'input'>, 
 }
 
 export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputProps>(function MosaicComboboxInput(
-  { size: sizeProp, variant = 'default', render, className, style, ...rest },
+  { size: sizeProp, variant: variantProp, render, className, style, ...rest },
   ref,
 ) {
   const inputGroup = useOptionalInputGroupContext();
+  const variant = variantProp ?? (inputGroup ? 'ghost' : 'default');
   const setAnchor = React.useContext(ComboboxAnchorContext)?.setAnchor;
   const groupElement = inputGroup?.element;
   React.useLayoutEffect(() => {

@@ -14,7 +14,6 @@ function FloatingCombobox(props?: { onValueChange?: (value: string | null) => vo
     <Combobox.Root onValueChange={props?.onValueChange}>
       <InputGroup.Root data-testid='fruit-group'>
         <Combobox.Input
-          variant='ghost'
           aria-label='Fruit'
           placeholder='Search fruit'
         />
@@ -52,6 +51,32 @@ function FloatingCombobox(props?: { onValueChange?: (value: string | null) => vo
 }
 
 describe('Mosaic Combobox', () => {
+  it.each([undefined, 'ghost', 'default'] as const)('supports the %s variant outside a group', variant => {
+    render(
+      <Combobox.Root>
+        <Combobox.Input
+          aria-label='Fruit'
+          variant={variant}
+        />
+      </Combobox.Root>,
+    );
+    expect(screen.getByRole('combobox')).toHaveAttribute('data-variant', variant ?? 'default');
+  });
+
+  it('respects an explicit default variant inside a group', () => {
+    render(
+      <Combobox.Root>
+        <InputGroup.Root>
+          <Combobox.Input
+            aria-label='Fruit'
+            variant='default'
+          />
+        </InputGroup.Root>
+      </Combobox.Root>,
+    );
+    expect(screen.getByRole('combobox')).toHaveAttribute('data-variant', 'default');
+  });
+
   it('removes the check and selection when the input is cleared', async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();
@@ -290,7 +315,7 @@ describe('Mosaic Combobox', () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
-  it('uses the ghost Input variant inside an input group', () => {
+  it('defaults to the ghost Input variant inside an input group', () => {
     render(
       <Combobox.Root open>
         <InputGroup.Root size='lg'>
@@ -301,7 +326,6 @@ describe('Mosaic Combobox', () => {
             />
           </InputGroup.Start>
           <Combobox.Input
-            variant='ghost'
             aria-label='Search countries'
             placeholder='Search country or code'
           />

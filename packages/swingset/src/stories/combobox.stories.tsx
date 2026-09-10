@@ -25,10 +25,7 @@ export function Default() {
       <Field.Root style={{ width: 320 }}>
         <Field.Label>Fruit</Field.Label>
         <InputGroup.Root>
-          <Combobox.Input
-            variant='ghost'
-            placeholder='Search fruit…'
-          />
+          <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Trigger
               aria-label='Toggle fruit options'
@@ -73,10 +70,7 @@ export function Scrolling() {
       <Field.Root style={{ width: 320 }}>
         <Field.Label>Fruit</Field.Label>
         <InputGroup.Root>
-          <Combobox.Input
-            variant='ghost'
-            placeholder='Search fruit…'
-          />
+          <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Trigger
               aria-label='Toggle fruit options'
