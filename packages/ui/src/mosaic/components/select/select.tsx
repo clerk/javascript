@@ -14,6 +14,7 @@ import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { truncationStyles } from '../../utils/typography.styles';
 import { Button } from '../button';
+import { mergeIds, useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { selectOptionScope } from './select.markers.stylex';
@@ -72,12 +73,42 @@ export type SelectTriggerProps = MosaicComponentProps<'button'> & {
 
 /**
  * Opens the listbox and shows the selected option's label. Renders a neutral `md` `Button` by
- * default; pass `render` to supply your own element.
+ * default; pass `render` to supply your own element. Inside a `Field` it takes the field's id,
+ * disabled, required, invalid, label, and message relationships.
  */
 export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(function MosaicSelectTrigger(
-  { variant = 'outline', placeholder, render, className, style, children, ...rest },
+  {
+    variant = 'outline',
+    placeholder,
+    render,
+    className,
+    style,
+    children,
+    id: idProp,
+    disabled: disabledProp,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    'aria-invalid': ariaInvalid,
+    'aria-required': ariaRequired,
+    ...rest
+  },
   ref,
 ) {
+  const generatedId = React.useId();
+  const valueId = `${generatedId}-value`;
+  const fieldProps = useOptionalFieldControlProps({
+    id: idProp,
+    disabled: disabledProp,
+    ariaInvalid,
+    ariaLabelledBy,
+    ariaDescribedBy,
+    labelElementType: 'span',
+  });
+  const id = fieldProps?.id ?? idProp ?? generatedId;
+  // A combobox takes no name from its content, so the value is named explicitly, after any label.
+  // An `aria-label` is kept by naming the trigger itself.
+  const labelledBy = fieldProps?.['aria-labelledby'] ?? ariaLabelledBy ?? (ariaLabel ? id : undefined);
   const trigger: SelectTriggerProps['render'] =
     render ??
     (props => (
@@ -93,11 +124,19 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
     <Primitive.Trigger
       ref={ref}
       render={trigger}
+      id={id}
+      disabled={fieldProps?.disabled ?? disabledProp}
+      aria-label={ariaLabel}
+      aria-labelledby={mergeIds(labelledBy, valueId)}
+      aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
+      aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
+      aria-required={ariaRequired ?? (fieldProps?.required ? true : undefined)}
       {...mergeStyleProps(themeProps('select-trigger', { variant }), className, style)}
       {...rest}
     >
       {children ?? (
         <Primitive.Value
+          id={valueId}
           placeholder={placeholder}
           {...mergeStyleProps(
             themeProps('select-value'),

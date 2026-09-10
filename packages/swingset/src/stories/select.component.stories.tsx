@@ -113,6 +113,31 @@ export function Placeholder() {
   );
 }
 
+/**
+ * Inside a `Field` the trigger takes the field's id, state, and label and message relationships.
+ * The label renders as a span that focuses the trigger, since a `<label>` would open it.
+ */
+export function WithField() {
+  return (
+    <Field.Root
+      required
+      invalid
+      style={{ display: 'grid', gap: 8, maxWidth: 384 }}
+    >
+      <Field.Label>Role</Field.Label>
+      <Select.Root
+        items={roleFilters}
+        defaultValue='member'
+      >
+        <Select.Trigger />
+        <Select.Popup />
+      </Select.Root>
+      <Field.Description>Applies to new members of the organization.</Field.Description>
+      <Field.Error>Choose a role.</Field.Error>
+    </Field.Root>
+  );
+}
+
 export function Controlled() {
   const [value, setValue] = useState('member');
 
