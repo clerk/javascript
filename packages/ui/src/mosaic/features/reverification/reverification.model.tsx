@@ -137,7 +137,7 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
     supportEmail,
     start: async () => {
       try {
-        return handleResponse(await session.startVerification({ level: level ?? 'first_factor' }));
+        return handleResponse(await session.startVerification({ level: level ?? 'second_factor' }));
       } catch (error) {
         throw toError(error);
       }
