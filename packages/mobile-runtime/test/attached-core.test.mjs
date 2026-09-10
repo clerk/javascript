@@ -75,7 +75,11 @@ async function fixture(options = {}) {
     },
     invalidateCredentials: () => mobile.invalidate(),
   });
-  await core.load({ standardBrowser: false, telemetry: false, experimental: { runtimeEnvironment: 'headless' } });
+  await core.load({
+    standardBrowser: false,
+    telemetry: false,
+    experimental: { runtimeEnvironment: 'headless', persistClient: options.persistClient },
+  });
   if (options.reactNativeWindow) context.window = context;
   const attachments = [];
   function attach(configuration = {}) {
@@ -121,6 +125,53 @@ async function fixture(options = {}) {
     for (const job of jobs.values()) clearTimeout(job);
   }
   return { core, attach, requests, dispose, credential: () => credential, resets: () => resets };
+}
+
+for (const marker of ['Bearer', 'Bearer ']) {
+  test(`the attached owner's client deletion clears its credential for ${JSON.stringify(marker)}`, async t => {
+    let deletion;
+    let creating;
+    const f = await fixture({
+      persistClient: false,
+      http: request => {
+        const url = new URL(request.url);
+        if (url.pathname === '/v1/client') {
+          if (url.searchParams.get('_method') !== 'DELETE') return response(fixtures.authenticatedClient);
+          deletion = request;
+          return response(fixtures.client, { headers: { authorization: marker } });
+        }
+        if (url.pathname === '/v1/client/sign_ins') {
+          creating = request;
+          return response(fixtures.signIn, {
+            headers: { authorization: 'new-client-credential' },
+            body: JSON.stringify({
+              response: fixtures.signIn,
+              client: { ...fixtures.client, id: 'new-client', sign_in: fixtures.signIn },
+            }),
+          });
+        }
+      },
+    });
+    t.after(f.dispose);
+    const projection = f.attach();
+    await projection.ready;
+    const result = await projection.invoke(projection.state.roots.clerk, 'Clerk.signOut');
+    assert.equal(result.failure, undefined, JSON.stringify(result));
+    assert.deepEqual(result.result, { $undefined: true });
+    assert.ok(deletion);
+    assert.equal(deletion.method, 'POST');
+    assert.equal(f.credential(), null);
+    assert.equal(f.core.client.id, '');
+    assert.equal(projection.state.roots.session, null);
+    assert.equal(projection.state.roots.user, null);
+    const created = await projection.invoke(projection.state.roots.signIn, 'SignIn.create', [
+      { identifier: 'test@example.com' },
+    ]);
+    assert.equal(created.result.error, null, JSON.stringify(created));
+    assert.equal(creating.headers.authorization, '');
+    assert.equal(f.credential(), 'new-client-credential');
+    assert.equal(f.core.client.id, 'new-client');
+  });
 }
 
 test('attached handshake validates the existing owner and bindings without another initialization request', async t => {

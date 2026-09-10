@@ -9,7 +9,11 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-function fixture(initialCredential: string | null = 'original', options: { native?: boolean } = {}) {
+function fixture(
+  initialCredential: string | null = 'original',
+  options: { native?: boolean } = {},
+  beforeRemove?: () => Promise<void>,
+) {
   let before: any;
   let after: any;
   let credential = initialCredential;
@@ -28,6 +32,7 @@ function fixture(initialCredential: string | null = 'original', options: { nativ
         credential = value;
       },
       remove: async () => {
+        await beforeRemove?.();
         credential = null;
       },
     },
@@ -118,6 +123,83 @@ describe('mobile credential transport', () => {
     await expect(
       f.after(request, new Response('{}', { headers: { authorization: 'late-client' } })),
     ).rejects.toMatchObject({ code: 'stale_client_request' });
+    expect(f.read()).toBeNull();
+  });
+
+  it.each(['Bearer', 'Bearer ', 'bEaReR\t'])(
+    'clears a native credential for %j and fences older replies',
+    async marker => {
+      const f = fixture();
+      const stale = { url: new URL('https://clerk.example/client') };
+      const removing = { url: new URL('https://clerk.example/client'), method: 'DELETE' };
+      await f.before(stale);
+      await f.before(removing);
+      await f.after(removing, new Response('{}', { headers: { authorization: marker } }));
+      expect(f.read()).toBeNull();
+      await expect(
+        f.after(stale, new Response('{}', { headers: { authorization: 'obsolete' } })),
+      ).rejects.toMatchObject({
+        code: 'stale_client_request',
+      });
+      expect(f.read()).toBeNull();
+      const next = { url: new URL('https://clerk.example/client'), headers: new Headers() };
+      await f.before(next);
+      expect(next.headers.get('authorization')).toBe('');
+      await f.after(next, new Response('{}', { headers: { authorization: 'replacement' } }));
+      expect(f.read()).toBe('replacement');
+    },
+  );
+
+  it('does not interpret the native clear marker in non-native mode', async () => {
+    const f = fixture('original', { native: false });
+    const request = { url: new URL('https://clerk.example/client') };
+    await f.before(request);
+    await f.after(request, new Response('{}', { headers: { authorization: 'Bearer ' } }));
+    expect(f.read()).toBe('Bearer');
+  });
+
+  it('reports a failed clear and permits another request to retry clearing', async () => {
+    let fail = true;
+    const f = fixture('original', {}, async () => {
+      if (fail) throw new Error('storage_failure');
+    });
+    const first = { url: new URL('https://clerk.example/client') };
+    await f.before(first);
+    await expect(f.after(first, new Response('{}', { headers: { authorization: 'Bearer' } }))).rejects.toThrow(
+      'storage_failure',
+    );
+    expect(f.read()).toBe('original');
+    fail = false;
+    const second = { url: new URL('https://clerk.example/client') };
+    await f.before(second);
+    await f.after(second, new Response('{}', { headers: { authorization: 'Bearer' } }));
+    expect(f.read()).toBeNull();
+    await expect(f.after(first, new Response('{}', { headers: { authorization: 'obsolete' } }))).rejects.toMatchObject({
+      code: 'stale_client_request',
+    });
+  });
+
+  it('waits for a queued clear before preparing the next request', async () => {
+    const started = deferred<void>();
+    const release = deferred<void>();
+    const f = fixture('original', {}, async () => {
+      started.resolve();
+      await release.promise;
+    });
+    const first = { url: new URL('https://clerk.example/client') };
+    await f.before(first);
+    const clearing = f.after(first, new Response('{}', { headers: { authorization: 'Bearer' } }));
+    await started.promise;
+    const second = { url: new URL('https://clerk.example/client'), headers: new Headers() };
+    let prepared = false;
+    const preparing = f.before(second).then(() => {
+      prepared = true;
+    });
+    await Promise.resolve();
+    expect(prepared).toBe(false);
+    release.resolve();
+    await Promise.all([clearing, preparing]);
+    expect(second.headers.get('authorization')).toBe('');
     expect(f.read()).toBeNull();
   });
 

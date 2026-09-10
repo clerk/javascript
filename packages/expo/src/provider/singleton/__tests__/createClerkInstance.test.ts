@@ -382,6 +382,40 @@ describe('createClerkInstance', () => {
     expect(requestInit.headers.get('authorization')).toBe('cached-token');
   });
 
+  test.each(['response', 'configuration'])('clears a read/write-only token cache after %s', async cause => {
+    class ReadWriteCache implements TokenCache {
+      tokens = new Map([
+        [CLERK_CLIENT_JWT_KEY, 'previous-client'],
+        ['unrelated', 'keep'],
+      ]);
+      async getToken(key: string) {
+        return this.tokens.get(key) ?? null;
+      }
+      async saveToken(key: string, value: string) {
+        this.tokens.set(key, value);
+      }
+    }
+    const cache = new ReadWriteCache();
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    let clerk = getClerkInstance({ publishableKey: 'pk_test_123', tokenCache: cache }) as unknown as MockClerk;
+    if (cause === 'response') {
+      const request = { headers: new Headers(), url: new URL('https://clerk.example.com/v1/client') };
+      await clerk.__internal_onBeforeRequest.mock.calls[0][0](request);
+      await clerk.__internal_onAfterResponse.mock.calls[0][0](request, {
+        headers: new Headers({ authorization: 'Bearer ' }),
+        payload: null,
+      });
+    } else {
+      clerk = getClerkInstance({ publishableKey: 'pk_test_456' }) as unknown as MockClerk;
+    }
+    const next = { headers: new Headers(), url: new URL('https://clerk.example.com/v1/client') };
+    await clerk.__internal_onBeforeRequest.mock.calls[0][0](next);
+    expect(next.headers.get('authorization')).toBe('');
+    await expect(cache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('');
+    await expect(cache.getToken('unrelated')).resolves.toBe('keep');
+  });
+
   test('preserves the latest tokenCache when the singleton is reused without one', async () => {
     const initialTokenCache: TokenCache = {
       getToken: vi.fn(() => Promise.resolve(null)),

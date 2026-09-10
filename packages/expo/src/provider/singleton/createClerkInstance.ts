@@ -64,6 +64,11 @@ export function invalidateMobileCredentials(clerk: object): Promise<void> {
 
 let __internal_mobileTransport: ReturnType<typeof installMobileCredentialTransport> | undefined;
 
+async function clearClientCredential(cache: TokenCache): Promise<void> {
+  if (cache.clearToken) await cache.clearToken(CLERK_CLIENT_JWT_KEY);
+  else await cache.saveToken(CLERK_CLIENT_JWT_KEY, '');
+}
+
 /**
  * Resolves the next native singleton config while preserving existing values for omitted options.
  * A publishable key change starts from a clean proxy/domain config unless those values are
@@ -126,7 +131,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       previousTransport?.dispose();
       const resetCache = __internal_tokenCache;
       const credentialReady = hasConfigChanged
-        ? Promise.resolve(invalidation).then(() => resetCache.clearToken?.(CLERK_CLIENT_JWT_KEY))
+        ? Promise.resolve(invalidation).then(() => clearClientCredential(resetCache))
         : Promise.resolve(invalidation);
 
       const getToken = (key: string) => __internal_tokenCache.getToken(key);
@@ -268,9 +273,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             return (await getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
           },
           write: token => saveToken(CLERK_CLIENT_JWT_KEY, token),
-          remove: async () => {
-            await __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
-          },
+          remove: () => clearClientCredential(__internal_tokenCache),
         },
         isNative() ? { 'x-expo-sdk-version': packageJson.version } : {},
         { native: isNative() },

@@ -98,6 +98,8 @@ export function installMobileCredentialTransport(
     if (issued === undefined) throw new Error('Missing mobile request generation.');
     assertCurrent(issued.generation);
     const credential = response.headers.get('authorization');
+    // Native FAPI uses a blank Bearer value because intermediaries strip empty headers.
+    const clearCredential = options.native !== false && credential?.trim().toLowerCase() === 'bearer';
     const client = responseClientVersion(response.payload);
     if (!credential && !client) return;
     const parsedDate = Date.parse(response.headers.get('date') || '');
@@ -127,9 +129,10 @@ export function installMobileCredentialTransport(
             code: 'stale_client_response',
           });
       }
-      if (credential) await storage.write(credential);
+      if (clearCredential) await storage.remove();
+      else if (credential) await storage.write(credential);
       assertCurrent(issued.generation);
-      if (credential && credential !== issued.credential) ++credentialRevision;
+      if (clearCredential || (credential && credential !== issued.credential)) ++credentialRevision;
       if (client) {
         acceptedClient = {
           sequence: Math.max(acceptedClient?.sequence ?? issued.sequence, issued.sequence),
