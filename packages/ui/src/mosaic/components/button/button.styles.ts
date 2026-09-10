@@ -12,28 +12,15 @@ import {
 } from '../../tokens.stylex';
 import { iconScope } from '../icon/icon.markers.stylex';
 
-// Neutral fills are three steps up one gray ramp, shared across variants:
-//   step 0 — `filled-neutral` rest, `outline-*`/`ghost-*` hover
-//   step 1 — `filled-neutral` hover, `outline-*`/`ghost-*` pressed
-//   step 2 — `filled-neutral` pressed
-//
-// Scrim opacities over `transparent`, so they composite against any backdrop. Not
-// `--cl-color-neutral`: it's a 900, so a percentage of it lands lighter than the same
-// percentage of black by an amount that shifts with the backdrop.
-//
-// TODO: codify this %-mix scale as shared tokens once more components adopt these
-// shades — `item` and `avatar` still mix from `--cl-color-neutral`, and unifying them
-// is a palette-wide change.
-//
-// Must be local bindings — StyleX inlines them; an imported one fails to compile.
-const neutralStep0 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 6%, transparent)`;
-const neutralStep1 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 12%, transparent)`;
-const neutralStep2 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 18%, transparent)`;
+// Neutral fills are the three neutral alpha steps, shared across variants:
+//   100 — `filled-neutral` rest, `outline-*`/`ghost-*` hover
+//   200 — `filled-neutral` hover, `outline-*`/`ghost-*` pressed
+//   300 — `filled-neutral` pressed
 
 // Opaque fills blend toward their own on-fill at the same 12%/18%. Neutral has no fill
 // to blend from, so it rides the opacity ramp above.
-const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`;
-const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 18%)`;
+const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 12%)`;
+const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 18%)`;
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`;
 const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 18%)`;
 
@@ -44,9 +31,9 @@ const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']},
 // The achromatic foregrounds (`primary`, `neutral-foreground`) share the house faded gray. The two
 // that carry hue fade toward the tint that belongs to them, and the light-on-fill pairs fade toward
 // their own fill, which is the only backdrop they can ever sit on.
-const iconFadedNeutral = colorVars['--cl-color-neutral-faded'];
-const iconFadedNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-faded']} 50%)`;
-const iconFadedOnPrimary = `color-mix(in oklab, ${colorVars['--cl-color-primary-foreground']}, ${colorVars['--cl-color-primary']} 40%)`;
+const iconFadedNeutral = colorVars['--cl-color-foreground-secondary'];
+const iconFadedNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-subtle']} 50%)`;
+const iconFadedOnPrimary = `color-mix(in oklab, ${colorVars['--cl-color-brand-foreground']}, ${colorVars['--cl-color-brand']} 40%)`;
 const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative-foreground']}, ${colorVars['--cl-color-negative']} 40%)`;
 
 // Interactive states are gated on `:not([data-disabled])`: the button stays hit-testable while
@@ -183,14 +170,14 @@ export const variants = stylex.create({
   'filled-primary': {
     '--_cl-icon-color': {
       default: iconFadedOnPrimary,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-primary-foreground'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-brand-foreground'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-primary-foreground'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-brand-foreground'],
       },
     },
     backgroundColor: {
-      default: colorVars['--cl-color-primary'],
+      default: colorVars['--cl-color-brand'],
       ':not([data-disabled]):not([data-pending]):active': primaryActive,
       ':not([data-disabled])[data-open]': primaryActive,
       '@media (hover: hover)': {
@@ -198,27 +185,27 @@ export const variants = stylex.create({
         ':not([data-disabled]):hover:not(:active):not([data-open])': primaryHover,
       },
     },
-    color: colorVars['--cl-color-primary-foreground'],
+    color: colorVars['--cl-color-brand-foreground'],
   },
   'filled-neutral': {
     '--_cl-icon-color': {
       default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-foreground'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-foreground'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-neutral-foreground'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
       },
     },
     backgroundColor: {
-      default: neutralStep0,
-      ':not([data-disabled]):not([data-pending]):active': neutralStep2,
-      ':not([data-disabled])[data-open]': neutralStep2,
+      default: colorVars['--cl-color-neutral-alpha-100'],
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-300'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-300'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralStep1,
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-200'],
       },
     },
-    color: colorVars['--cl-color-neutral-foreground'],
+    color: colorVars['--cl-color-foreground'],
   },
   'filled-negative': {
     '--_cl-icon-color': {
@@ -247,44 +234,44 @@ export const variants = stylex.create({
   'outline-primary': {
     '--_cl-icon-color': {
       default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-primary'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-brand'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-primary'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-brand'],
       },
     },
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralStep1,
-      ':not([data-disabled])[data-open]': neutralStep1,
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralStep0,
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
-    color: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-brand'],
   },
   'outline-neutral': {
     '--_cl-icon-color': {
       default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-foreground'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-foreground'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-neutral-foreground'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
       },
     },
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralStep1,
-      ':not([data-disabled])[data-open]': neutralStep1,
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralStep0,
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
-    color: colorVars['--cl-color-neutral-foreground'],
+    color: colorVars['--cl-color-foreground'],
   },
   'outline-negative': {
     '--_cl-icon-color': {
@@ -298,11 +285,11 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralStep1,
-      ':not([data-disabled])[data-open]': neutralStep1,
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralStep0,
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -311,42 +298,42 @@ export const variants = stylex.create({
   'ghost-primary': {
     '--_cl-icon-color': {
       default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-primary'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-brand'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-primary'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-brand'],
       },
     },
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralStep1,
-      ':not([data-disabled])[data-open]': neutralStep1,
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralStep0,
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
-    color: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-brand'],
   },
   'ghost-neutral': {
     '--_cl-icon-color': {
       default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-foreground'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-foreground'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-neutral-foreground'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
       },
     },
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': neutralStep1,
-      ':not([data-disabled])[data-open]': neutralStep1,
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralStep0,
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
-    color: colorVars['--cl-color-neutral-foreground'],
+    color: colorVars['--cl-color-foreground'],
   },
   // The one ghost that tints instead of graying, so its pressed step walks its own faded
   // fill toward the negative it carries rather than joining the gray ramp.
@@ -361,11 +348,11 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
-      ':not([data-disabled])[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':not([data-disabled]):not([data-pending]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':not([data-disabled])[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-faded'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-subtle'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -382,11 +369,11 @@ export const variants = stylex.create({
       default: iconFadedNeutral,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-primary'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-brand'],
       },
     },
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-brand'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
     textDecorationColor: { default: 'transparent', ':not([data-disabled]):hover': 'currentColor' },
@@ -399,11 +386,11 @@ export const variants = stylex.create({
       default: iconFadedNeutral,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-neutral-foreground'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
       },
     },
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-neutral-foreground'],
+    color: colorVars['--cl-color-foreground'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
     textDecorationColor: { default: 'transparent', ':not([data-disabled]):hover': 'currentColor' },

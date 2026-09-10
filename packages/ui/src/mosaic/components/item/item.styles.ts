@@ -9,11 +9,11 @@ export const item = stylex.create({
     // rule, so the value crosses the element boundary as a custom property. It is restated in
     // `interactive` rather than gaining a hover branch here: StyleX resolves a property to the
     // last style that declares it, so the two can't merge.
-    '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
+    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
     borderRadius: radiusVars['--cl-radius-lg'],
     paddingInline: space['1.5'],
     alignItems: 'center',
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     display: 'flex',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
@@ -31,24 +31,24 @@ export const item = stylex.create({
   // instead of the native attribute.
   interactive: {
     '--_cl-icon-color': {
-      default: colorVars['--cl-color-neutral-faded'],
+      default: colorVars['--cl-color-foreground-secondary'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral'],
+        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
       },
     },
     backgroundColor: {
       default: null,
-      ':active:not(:disabled, [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+      ':active:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
-        ':hover:not(:disabled, [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {
-      default: colorVars['--cl-color-neutral-faded'],
+      default: colorVars['--cl-color-foreground-secondary'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral'],
+        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
       },
     },
     cursor: {
@@ -110,7 +110,7 @@ export const label = stylex.create({
   },
 
   default: {
-    color: colorVars['--cl-color-neutral'],
+    color: colorVars['--cl-color-foreground'],
   },
   // Declares no color, so `reset`'s `inherit` stands and the row's own color reaches it. That is
   // what carries it through the hover promotion on an interactive row, which a fixed color would
@@ -121,7 +121,7 @@ export const label = stylex.create({
 
 export const description = stylex.create({
   base: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
@@ -158,7 +158,7 @@ export const group = stylex.create({
 export const separator = stylex.create({
   base: {
     borderStyle: 'none',
-    backgroundColor: colorVars['--cl-color-border-faded'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     flexShrink: 0,
     height: '1px',
     width: '100%',

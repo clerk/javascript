@@ -209,7 +209,7 @@ export const styles = stylex.create({
     // Cleared because `FloatingFocusManager` focuses the popup itself when it holds no
     // tabbable content, which would otherwise draw a ring around the whole surface.
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-background'],
     // Matches `Menu`. The two schemes are different treatments, not one at two strengths: light
     // gets the two drop layers and a dark hairline, dark drops them to `transparent` and separates
     // with a light hairline instead — a shadow reads as depth against a light page and as nothing
@@ -224,7 +224,7 @@ export const styles = stylex.create({
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
                 0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
                 0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     display: 'flex',
     flexDirection: 'column',
     // A dialog holds prose it did not author — an email address, an org slug, an API key — and a
@@ -238,7 +238,7 @@ export const styles = stylex.create({
       inset: 0,
       // Follows the popup's own radius.
       borderRadius: 'inherit',
-      backgroundColor: colorVars['--cl-color-card'],
+      backgroundColor: colorVars['--cl-color-background'],
       content: '""',
       opacity: 'var(--_cl-stack-veil, 0)',
       pointerEvents: 'none',

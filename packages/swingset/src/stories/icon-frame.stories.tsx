@@ -113,8 +113,8 @@ export function CustomSurface() {
   return (
     <IconFrame
       style={{
-        backgroundColor: colorVars['--cl-color-primary'],
-        color: colorVars['--cl-color-primary-foreground'],
+        backgroundColor: colorVars['--cl-color-brand'],
+        color: colorVars['--cl-color-brand-foreground'],
       }}
     >
       <Icon

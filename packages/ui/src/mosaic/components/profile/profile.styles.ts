@@ -114,7 +114,7 @@ export const styles = stylex.create({
     // `clip` rather than `hidden`: the surface must never become a scroll container itself, or
     // focusing something in the content column would scroll the whole surface instead of the column.
     overflow: 'clip',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-background'],
     blockSize: {
       [compact]: '100dvh',
       default: '45rem',
@@ -122,7 +122,7 @@ export const styles = stylex.create({
     // In a page — standalone or inline — the frame is its border alone, the way a card sits flat in
     // content. The card's elevation belongs to the overlay; see `layoutInDialog`.
     boxShadow: 'none',
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     display: 'grid',
     gridTemplateColumns: {
       [compact]: 'minmax(0, 1fr)',
@@ -214,16 +214,16 @@ export const styles = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':where([data-selected])': colorVars['--cl-color-border-faded'],
-      ':active': colorVars['--cl-color-border-faded'],
+      ':where([data-selected])': colorVars['--cl-color-border-subtle'],
+      ':active': colorVars['--cl-color-border-subtle'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-border-faded'],
+        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-border-subtle'],
       },
     },
     color: {
-      default: colorVars['--cl-color-neutral-faded'],
-      ':where([data-selected])': colorVars['--cl-color-card-foreground'],
+      default: colorVars['--cl-color-foreground-secondary'],
+      ':where([data-selected])': colorVars['--cl-color-foreground'],
     },
     cursor: 'pointer',
     display: 'flex',
@@ -342,7 +342,7 @@ export const styles = stylex.create({
    * own variable rather than `color`, which the icon sets itself.
    */
   caret: {
-    '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
+    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
     fontSize: '0.6em',
     marginInlineStart: '0.25em',
     verticalAlign: 'middle',

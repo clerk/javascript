@@ -520,7 +520,7 @@ describe('popup surface', () => {
   // an atom from its property and value, so a probe with the popup's own values yields the very
   // atoms `styles.popup` declares.
   const probe = stylex.create({
-    background: { backgroundColor: colorVars['--cl-color-card'] },
+    background: { backgroundColor: colorVars['--cl-color-background'] },
     radius: { borderRadius: radiusVars['--cl-radius-xl'] },
   });
 

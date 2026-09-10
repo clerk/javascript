@@ -4,7 +4,7 @@ import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScale
 
 export const styles = stylex.create({
   base: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     display: 'block',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     minWidth: 0,

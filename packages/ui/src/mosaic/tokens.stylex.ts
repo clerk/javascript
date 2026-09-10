@@ -7,9 +7,9 @@ import * as stylex from '@stylexjs/stylex';
 // these become real, stable custom properties a consumer can override in plain
 // CSS without touching StyleX:
 //
-//   :root { --cl-color-primary: rebeccapurple; }
+//   :root { --cl-color-brand: rebeccapurple; }
 //
-// StyleX still emits `:root { --cl-color-primary: … }` as the default. Following
+// StyleX still emits `:root { --cl-color-brand: … }` as the default. Following
 // astryx's structure: each group is a plain `*Defaults` object wrapped by
 // `defineVars`. The `*VarName` unions are derived from the exported `*Vars` in
 // `styles/index.ts` — the `@stylexjs/enforce-extension` rule requires a
@@ -20,40 +20,76 @@ import * as stylex from '@stylexjs/stylex';
 // the vars so they never collide with a host app's own custom properties.
 
 // =============================================================================
+// Gray Scale
+// =============================================================================
+
+export const gray = stylex.defineVars({
+  '0': 'oklch(1 0 0)',
+  '50': 'oklch(0.9851 0 0)',
+  '100': 'oklch(0.9702 0 0)',
+  '200': 'oklch(0.9461 0 0)',
+  '300': 'oklch(0.8699 0 0)',
+  '400': 'oklch(0.7155 0 0)',
+  '500': 'oklch(0.5555 0 0)',
+  '600': 'oklch(0.4386 0 0)',
+  '700': 'oklch(0.3715 0 0)',
+  '800': 'oklch(0.2686 0 0)',
+  '850': 'oklch(0.2393 0 0)',
+  '900': 'oklch(0.2046 0 0)',
+  '1000': 'oklch(0 0 0)',
+});
+
+// =============================================================================
 // Color Tokens
 // =============================================================================
 
 const colorDefaults = {
-  '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
-  '--cl-color-primary-foreground': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
-  '--cl-color-primary-faded': 'light-dark(oklch(0.9583 0.0214 291.74), oklch(0.3097 0.1008 285.05))',
+  '--cl-color-neutral': `light-dark(${gray['1000']}, ${gray['0']})`,
+  '--cl-color-neutral-alpha-100': 'color-mix(in oklab, var(--cl-color-neutral) 6%, transparent)',
+  '--cl-color-neutral-alpha-200': 'color-mix(in oklab, var(--cl-color-neutral) 8%, transparent)',
+  '--cl-color-neutral-alpha-300': 'color-mix(in oklab, var(--cl-color-neutral) 12%, transparent)',
 
-  '--cl-color-neutral': 'light-dark(oklch(0.2928 0.0163 285.35), oklch(0.9854 0.0013 286.38))',
-  '--cl-color-neutral-foreground': 'light-dark(oklch(0.24 0 0), oklch(0.96 0 0))',
-  '--cl-color-neutral-faded': 'light-dark(oklch(0.5697 0.0246 279.94), oklch(0.6953 0.0261 285.7))',
+  '--cl-color-foreground': `light-dark(${gray['900']}, ${gray['50']})`,
+  '--cl-color-foreground-secondary': `light-dark(${gray['600']}, ${gray['400']})`,
+  '--cl-color-foreground-disabled': `light-dark(${gray['400']}, ${gray['500']})`,
 
-  '--cl-color-negative': 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
-  '--cl-color-negative-foreground': 'oklch(0.985 0 0)',
-  '--cl-color-negative-faded': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
+  '--cl-color-background': `light-dark(${gray['0']}, ${gray['900']})`,
+  '--cl-color-background-subtle': `light-dark(${gray['100']}, ${gray['850']})`,
 
-  '--cl-color-positive': 'light-dark(oklch(0.548 0.153 152.535), oklch(0.696 0.17 162.48))',
-  '--cl-color-positive-foreground': 'oklch(0.985 0 0)',
-  '--cl-color-positive-faded': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
+  '--cl-color-border': `light-dark(${gray['200']}, ${gray['800']})`,
+  '--cl-color-border-subtle': `light-dark(${gray['100']}, ${gray['850']})`,
 
-  '--cl-color-warning': 'light-dark(oklch(0.646 0.222 41.116), oklch(0.75 0.183 55.934))',
-  '--cl-color-warning-foreground': 'oklch(0.985 0 0)',
-  '--cl-color-warning-faded': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
+  '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
+  '--cl-color-brand-secondary': 'light-dark(oklch(0.5555 0 0), oklch(0.7155 0 0))',
+  '--cl-color-brand-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
 
-  '--cl-color-background': 'light-dark(oklch(0.985 0 0), oklch(0.2686 0 0))',
+  '--cl-color-negative': 'light-dark(oklch(0.5903 0.213 26.78), oklch(0.7106 0.1661 22.22))',
+  '--cl-color-negative-foreground': gray['0'],
+  '--cl-color-negative-subtle': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
+  '--cl-color-negative-border': 'light-dark(oklch(0.8155 0.0983 19.41), oklch(0.3958 0.1331 25.72))',
+  '--cl-color-negative-alpha-100': 'color-mix(in oklab, var(--cl-color-negative) 6%, transparent)',
+  '--cl-color-negative-alpha-200': 'color-mix(in oklab, var(--cl-color-negative) 8%, transparent)',
+  '--cl-color-negative-alpha-300': 'color-mix(in oklab, var(--cl-color-negative) 12%, transparent)',
 
-  '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
-  '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
+  '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
+  '--cl-color-positive-foreground': gray['0'],
+  '--cl-color-positive-subtle': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
+  '--cl-color-positive-border': 'light-dark(oklch(0.7922 0.1959 148.18), oklch(0.4479 0.1083 151.33))',
+  '--cl-color-positive-alpha-100': 'color-mix(in oklab, var(--cl-color-positive) 6%, transparent)',
+  '--cl-color-positive-alpha-200': 'color-mix(in oklab, var(--cl-color-positive) 8%, transparent)',
+  '--cl-color-positive-alpha-300': 'color-mix(in oklab, var(--cl-color-positive) 12%, transparent)',
 
-  '--cl-color-input': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
-  '--cl-color-input-placeholder': '#a3a3a3',
+  '--cl-color-warning': 'light-dark(oklch(0.7099 0.1888 44.94), oklch(0.7576 0.159 55.93))',
+  '--cl-color-warning-foreground': gray['0'],
+  '--cl-color-warning-subtle': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
+  '--cl-color-warning-border': 'light-dark(oklch(0.8672 0.0902 63.47), oklch(0.4084 0.1165 38.17))',
+  '--cl-color-warning-alpha-100': 'color-mix(in oklab, var(--cl-color-warning) 6%, transparent)',
+  '--cl-color-warning-alpha-200': 'color-mix(in oklab, var(--cl-color-warning) 8%, transparent)',
+  '--cl-color-warning-alpha-300': 'color-mix(in oklab, var(--cl-color-warning) 12%, transparent)',
 
-  '--cl-color-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
-  '--cl-color-border-faded': 'light-dark(oklch(0.9702 0 0), oklch(0.296 0.0126 285.61))',
+  '--cl-color-input': `light-dark(${gray['0']}, ${gray['850']})`,
+  '--cl-color-input-placeholder': gray['400'],
 
   '--cl-color-ring': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
 } as const;
@@ -63,8 +99,6 @@ export const colorVars = stylex.defineVars(colorDefaults);
 // =============================================================================
 // Radius Tokens
 // =============================================================================
-// `md` is 6px rather than a 4/8/12 step: it is the control radius (button, avatar
-// square), and neither neighbour sits right on a control.
 
 const radiusDefaults = {
   '--cl-radius-none': '0rem',
@@ -123,9 +157,9 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
 // thumb's own two. Each derives from `--cl-scrollbar-thumb` rather than baking its value in, so
 // they resolve at use time — overriding the base re-derives all three, while any one stays
-// individually overridable. The base is itself mixed most of the way toward `--cl-color-card`,
+// individually overridable. The base is itself mixed most of the way toward `--cl-color-background`,
 // which keeps a 4px bar reading as a hairline rather than a hard rule; `idle` carries on in that
-// direction, and the other two step back toward `--cl-color-card-foreground`, deepening in light
+// direction, and the other two step back toward `--cl-color-foreground`, deepening in light
 // mode and lightening in dark, since that token already carries both.
 //
 // Only the idle → base step can animate. It is set on the scroller, which owns the transition;
@@ -146,10 +180,10 @@ const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
 const scrollbarDefaults = {
   '--cl-scrollbar-width': '8px',
   '--cl-scrollbar-thumb-inset': '2px',
-  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-neutral-faded']}, ${colorVars['--cl-color-card']} 55%)`,
-  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card']} 45%)`,
-  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 15%)`,
-  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 30%)`,
+  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-foreground-secondary']}, ${colorVars['--cl-color-background']} 55%)`,
+  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-background']} 45%)`,
+  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 15%)`,
+  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 30%)`,
 } as const;
 
 export const scrollbarVars = stylex.defineVars(scrollbarDefaults);
@@ -179,8 +213,6 @@ export const scrollFadeVars = stylex.defineVars(scrollFadeDefaults);
 // =============================================================================
 // Spacing Tokens
 // =============================================================================
-// `--cl-spacing` is the ONLY exposed custom property (the base unit, Tailwind's
-// model). Overriding it rescales every gap, pad, and control height at once.
 
 const spacingDefaults = {
   '--cl-spacing': '0.25rem',
@@ -188,12 +220,6 @@ const spacingDefaults = {
 
 export const spacingVars = stylex.defineVars(spacingDefaults);
 
-// The scale is `defineVars` (like astryx's `spacingVars`): each step is a StyleX
-// var whose default is `calc(var(--cl-spacing) * n)`, so overriding `--cl-spacing`
-// still rescales the whole scale. `defineConsts` was tried here but emits no CSS
-// across module boundaries — consumers got dangling `var(--hash)` refs. StyleX
-// hashes these var names (they aren't `--cl-*`), so only `--cl-spacing` stays a
-// stable, targetable custom property. `space['2']` reads like Tailwind's `space-2`.
 const step = (multiple: number): string => `calc(var(--cl-spacing) * ${multiple})`;
 
 export const space = stylex.defineVars({
@@ -283,8 +309,6 @@ export const space = stylex.defineVars({
 // =============================================================================
 // Typography Tokens — type scale
 // =============================================================================
-// One named step scale every text-bearing component sizes against. `defineVars`
-// values are single CSS values, so size and leading are each their own var.
 
 const typeScaleDefaults = {
   '--cl-text-xs-size': '0.75rem',
@@ -316,7 +340,6 @@ export const fontFamilyVars = stylex.defineVars(fontFamilyDefaults);
 // =============================================================================
 // Typography Tokens — font weight
 // =============================================================================
-// Kept separate from the step scale: weight and size vary independently.
 
 const fontWeightDefaults = {
   '--cl-font-normal': '400',
@@ -398,13 +421,6 @@ export const easingVars = stylex.defineVars(easingDefaults);
 // =============================================================================
 // Focus Tokens
 // =============================================================================
-// The keyboard focus ring, as one definition for the whole system. Components read
-// these through `utils/focus-outline.styles.ts`; the `:focus-visible` condition stays
-// there, so a theme can restyle the ring but cannot show it to pointer users.
-//
-// The colour is NOT restated here: it is `--cl-color-ring`, which lives with the other
-// colours. A `--cl-focus-outline-color` alias would be a second public name for the same
-// value, and the two would drift the moment a consumer overrode one of them.
 
 const focusDefaults = {
   '--cl-focus-outline-width': '2px',
@@ -419,9 +435,9 @@ export const focusVars = stylex.defineVars(focusDefaults);
 // dark. Branched per colour via `light-dark()` since a shadow's geometry cannot branch — see the
 // note on `Dialog`'s popup for why `@media (prefers-color-scheme)` is not the escape hatch.
 const shadowDefaults = {
-  '--cl-shadow-card': `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-    0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-    0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+  '--cl-shadow-card': `0 12px 12px -7px light-dark(color-mix(in oklab, ${gray['900']} 12%, transparent), transparent),
+    0 24px 24px -10px light-dark(color-mix(in oklab, ${gray['900']} 4%, transparent), transparent),
+    0 0 0 1px light-dark(color-mix(in oklab, ${gray['900']} 4%, transparent), color-mix(in oklab, ${gray['0']} 10%, transparent))`,
 };
 
 export const shadowVars = stylex.defineVars(shadowDefaults);

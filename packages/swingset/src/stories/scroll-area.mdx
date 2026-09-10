@@ -153,13 +153,13 @@ can drive itself from them.
 }
 .cl-item-group::before {
   top: 0;
-  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
   opacity: var(--cl-scroll-area-progress-start);
   transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
 }
 .cl-item-group::after {
   bottom: 0;
-  background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+  background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
   opacity: var(--cl-scroll-area-progress-end);
   transform: translateY(calc((1 - var(--cl-scroll-area-progress-end)) * var(--cl-scroll-fade-size)));
 }
@@ -169,7 +169,7 @@ The vars are registered as `<number>`, so they drive position as readily as opac
 slides out from behind its own edge as it fades in. Clip the root — `overflow: hidden` — so the half
 that is still offscreen stays there.
 
-Mix the scrim from a theme colour rather than hardcoding black: `--cl-color-card-foreground` inverts
+Mix the scrim from a theme colour rather than hardcoding black: `--cl-color-foreground` inverts
 with the theme, so one declaration reads as a shadow on light and a soft glow on dark, where black
 would vanish.
 

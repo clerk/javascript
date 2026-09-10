@@ -4,7 +4,7 @@ import { colorVars, fontWeightVars, space, typeScaleVars } from '../tokens.style
 
 export const styles = stylex.create({
   amount: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-base-size'],
     fontWeight: fontWeightVars['--cl-font-semibold'],
     lineHeight: typeScaleVars['--cl-text-base-leading'],
