@@ -40,7 +40,7 @@ const colorDefaults = {
   '--cl-color-background-subtle': neutralMix(3, 4),
 
   '--cl-color-foreground': neutralMix(80, 98),
-  '--cl-color-foreground-secondary': neutralMix(56, 64),
+  '--cl-color-foreground-secondary': neutralMix(43, 64),
   '--cl-color-foreground-disabled': neutralMix(28, 44),
 
   '--cl-color-border': neutralMix(5, 8),
