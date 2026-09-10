@@ -1,6 +1,6 @@
 'use client';
 
-import type { ClerkAppearanceTheme, OAuthProvider, OAuthScope, UserProfileProps } from '@clerk/shared/types';
+import type { OrganizationProfileProps, UserProfileProps } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
 import type { CustomProfileItem, UserProfilePageId } from '../user-profile/user-profile.types';
@@ -13,36 +13,46 @@ import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.typ
 import type { UserButtonTriggerProps } from './user-button.view';
 import { UserButtonView } from './user-button.view';
 
-/** Configures a profile this button opens. */
-export interface UserButtonProfileProps<PageId extends string> {
-  /** Your own pages and links, added to the profile's navigation. */
+/** What a profile opened by `<UserButton />` takes beyond the profile component's own props. */
+export interface UserButtonProfilePages<PageId extends string> {
+  /**
+   * Provide custom pages and links to be rendered inside the profile.
+   */
   customPages?: CustomProfileItem[];
   /**
-   * The order of the profile's navigation, by id: a built-in page's id or a custom item's `path`.
-   * Pages left out follow the ones named. The profile opens on the first entry, so it cannot be a link.
+   * Controls the order of the profile's navigation. Accepts the ids of built-in pages and the
+   * `path` of custom pages. Pages not listed are placed after the listed ones. The first entry is
+   * the page the profile opens on, so it cannot be a link.
+   *
+   * @default undefined
    */
   pageOrder?: (PageId | (string & {}))[];
-  /** Theme for the profile modal, layered over your app-wide `appearance`. */
-  appearance?: ClerkAppearanceTheme;
 }
 
-/** Configures the UserProfile this button opens. */
-export interface UserButtonUserProfileProps extends UserButtonProfileProps<UserProfilePageId> {
-  /** Extra OAuth scopes to request, per provider, when the user reconnects an account. */
-  additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
-  /** Options for the profile's API keys page. Set `hide` to leave the page out. */
-  apiKeysProps?: UserProfileProps['apiKeysProps'];
-}
+/** Options for the underlying `<UserProfile />` component. */
+export interface UserButtonUserProfileProps
+  extends
+    UserButtonProfilePages<UserProfilePageId>,
+    Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'> {}
 
-/** Configures the OrganizationProfile this button opens. */
-export type UserButtonOrganizationProfileProps = UserButtonProfileProps<OrganizationProfilePageId>;
+/** Options for the underlying `<OrganizationProfile />` component. */
+export interface UserButtonOrganizationProfileProps
+  extends UserButtonProfilePages<OrganizationProfilePageId>, Pick<OrganizationProfileProps, 'appearance'> {}
 
 /** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profiles it opens. */
 export type UserButtonProps = UserButtonModelOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
   UserButtonModeProps & {
+    /**
+     * Specify options for the underlying <UserProfile /> component.
+     * e.g., <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
+     */
     userProfileProps?: UserButtonUserProfileProps;
+    /**
+     * Specify options for the underlying <OrganizationProfile /> component.
+     * e.g., <UserButton organizationProfileProps={{appearance: {...}}} />
+     */
     organizationProfileProps?: UserButtonOrganizationProfileProps;
     /**
      * Fallback while loading.
