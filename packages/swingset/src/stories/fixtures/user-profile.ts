@@ -1,5 +1,4 @@
-import type { UserPageViewProps } from '@clerk/ui/mosaic/user-profile/user-page.view';
-import { UserPageView } from '@clerk/ui/mosaic/user-profile/user-page.view';
+import type { UserProfileViewProps } from '@clerk/ui/mosaic/user-profile/user-profile.view';
 import type { UserProfileAPIKey } from '@clerk/ui/mosaic/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
@@ -11,23 +10,14 @@ import type {
   UserProfileMfaMethod,
   UserProfilePasskey,
 } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
-import type { UserProfilePanelId } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
 import { useMemo, useState } from 'react';
 
-import type { StoryMeta } from '@/lib/types';
+import { usePreviewImage } from './use-preview-image';
 
-import { usePreviewImage } from './fixtures/use-preview-image';
-
-export { default as __source } from './user-page.stories?raw';
-
-export const meta: StoryMeta = {
-  group: 'User Profile',
-  status: 'wip',
-  title: 'UserPage',
-  label: 'User page',
-  layout: 'wide',
-  source: 'packages/ui/src/mosaic/user-profile/user-page.view.tsx',
-};
+export interface UserProfileFixtureOptions {
+  /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
+  onAddEmail?: () => void;
+}
 
 const initialAPIKeys: UserProfileAPIKey[] = [
   {
@@ -47,11 +37,15 @@ const initialAPIKeys: UserProfileAPIKey[] = [
   },
 ];
 
-export function Default() {
-  const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
+/**
+ * Every page of the user profile, backed by local state so the actions on them do something. For
+ * stories that need a realistic profile surface without being about it.
+ */
+export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
+  const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
-    { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
-    { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
+    { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
+    { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
   ]);
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
@@ -59,7 +53,7 @@ export function Default() {
   const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
     {
       id: 'passkey',
-      name: 'Passkey',
+      name: 'MacBook Pro',
       createdAtLabel: 'Created today at 10:12 PM',
       lastUsedAtLabel: 'Last used 1h ago',
     },
@@ -82,7 +76,14 @@ export function Default() {
       description: 'Last seen 2 weeks ago · Orem, UT, United States',
       type: 'mobile',
     },
+    {
+      id: 'desktop',
+      name: 'Clerk App on macOS',
+      description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
+      type: 'desktop',
+    },
   ]);
+
   const [subscription, setSubscription] = useState<UserProfileSubscription>({
     planName: 'Basic Plan',
     priceLabel: '$12 / Month',
@@ -96,14 +97,17 @@ export function Default() {
   const [apiKeys, setAPIKeys] = useState(initialAPIKeys);
   const [apiKeysPageSize, setAPIKeysPageSize] = useState(10);
   const [searchValue, setSearchValue] = useState('');
-  const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const visibleAPIKeys = useMemo(
     () => apiKeys.filter(apiKey => apiKey.name.toLowerCase().includes(searchValue.toLowerCase())),
     [apiKeys, searchValue],
   );
 
-  const panels: UserPageViewProps['panels'] = {
+  const addEmail = (value: string) =>
+    setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
+
+  const pages: UserProfileViewProps['pages'] = {
     account: {
       allowMultipleAccounts: true,
       hasImage: Boolean(imageUrl),
@@ -112,11 +116,7 @@ export function Default() {
       username: 'prestonxyz',
       emails,
       phones,
-      onAddEmail: () =>
-        setEmails(current => [
-          ...current,
-          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
-        ]),
+      onAddEmail: onAddEmail ?? (() => addEmail(`preston+${emails.length}@clerk.dev`)),
       onAddPhone: () =>
         setPhones(current => [
           ...current,
@@ -127,12 +127,12 @@ export function Default() {
           },
         ]),
       onDeleteAccount: () => Promise.resolve(),
-      onProfilePictureChange: showFile,
-      onRemoveProfilePicture: clearImage,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onNameChange: () => undefined,
+      onProfilePictureChange: showFile,
       onRemoveEmail: id => setEmails(current => current.filter(email => email.id !== id)),
+      onRemoveProfilePicture: clearImage,
       onRemovePhone: id => setPhones(current => current.filter(phone => phone.id !== id)),
       onSetPrimaryEmail: id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id }))),
       onSetPrimaryPhone: id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id }))),
@@ -148,20 +148,10 @@ export function Default() {
       mfaMethods,
       devices,
       onAddMfaMethod: type =>
-        setMfaMethods(current => {
-          const timestamp = Date.now();
-          return [
-            ...current,
-            {
-              id: `${type}-${timestamp}`,
-              type,
-              description: type === 'sms' ? '+1 801-555-0100' : undefined,
-            },
-            ...(current.some(method => method.type === 'backup-codes')
-              ? []
-              : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
-          ];
-        }),
+        setMfaMethods(current => [
+          ...current,
+          { id: `${type}-${Date.now()}`, type, description: type === 'sms' ? '+1 801-555-0100' : undefined },
+        ]),
       onAddPasskey: () =>
         setPasskeys(current => [
           ...current,
@@ -171,10 +161,7 @@ export function Default() {
       onDeleteAccount: () => Promise.resolve(),
       onManageDevice: () => undefined,
       onManagePasskey: () => undefined,
-      onRegenerateBackupCodes: () =>
-        setMfaMethods(current =>
-          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
-        ),
+      onRegenerateBackupCodes: () => undefined,
       onRemoveMfaMethod: id => setMfaMethods(current => current.filter(method => method.id !== id)),
       onRemovePasskey: id => setPasskeys(current => current.filter(passkey => passkey.id !== id)),
       onSignOutAllOtherDevices: () => setDevices(current => current.filter(device => device.isCurrent)),
@@ -247,11 +234,5 @@ export function Default() {
     },
   };
 
-  return (
-    <UserPageView
-      activePanel={activePanel}
-      panels={panels}
-      onPanelChange={setActivePanel}
-    />
-  );
+  return { activePage, setActivePage, pages, addEmail, devices };
 }
