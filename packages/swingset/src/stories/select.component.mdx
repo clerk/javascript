@@ -115,6 +115,33 @@ same `value`, `label`, `description`, and `disabled`.
 </Select.Popup>
 ```
 
+### Field
+
+Inside a `Field.Root` the trigger takes the field's id, `disabled`, `required` (as `aria-required`),
+`invalid`, and the label and message relationships. A combobox is not named by its content, so the
+trigger's `aria-labelledby` always points at its value, after any field label or `aria-label`: the
+accessible name reads "Role, Member". `Field.Label` renders as a span for a select, because a native
+`<label>` would open the listbox on click; clicking it focuses the trigger instead.
+
+```tsx
+<Field.Root>
+  <Field.Label>Role</Field.Label>
+  <Select.Root
+    items={roles}
+    defaultValue='member'
+  >
+    <Select.Trigger />
+    <Select.Popup />
+  </Select.Root>
+  <Field.Description>Applies to new members.</Field.Description>
+</Field.Root>
+```
+
+<Story
+  name='WithField'
+  storyModule={SelectStories}
+/>
+
 ### Controlled
 
 ```tsx
