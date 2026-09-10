@@ -6,26 +6,22 @@ import type { UserButtonController } from '../user-button.controller';
 
 let controller: UserButtonController;
 
-vi.mock('../user-button.model', () => ({
-  useUserButtonModel: () => ({ status: 'loading' }),
+const { useUserButtonModel, useCustomPages } = vi.hoisted(() => ({
+  useUserButtonModel: vi.fn(() => ({ status: 'loading' })),
+  useCustomPages: vi.fn(),
 }));
+
+vi.mock('../user-button.model', () => ({ useUserButtonModel }));
 
 vi.mock('../user-button.controller', () => ({
   useUserButtonController: () => controller,
 }));
 
-// The custom pages outlive the popup, so the wrapper renders their portals in every state.
+// The two bridges are told apart by the built-in page list each was given.
 vi.mock('../user-button.pages', () => ({
-  useUserProfilePages: () => [],
-  useCustomPages: () => ({
-    customPages: undefined,
-    portals: [
-      <output
-        key='p'
-        data-testid='portal'
-      />,
-    ],
-  }),
+  useUserProfilePages: () => ['account'],
+  useOrganizationProfilePages: () => ['general'],
+  useCustomPages,
 }));
 
 // The wrapper's own job is which of the three controller states renders what, so the surface is
@@ -53,6 +49,16 @@ function ready(): UserButtonController {
 describe('UserButton', () => {
   beforeEach(() => {
     controller = { status: 'loading' };
+    useUserButtonModel.mockClear();
+    useCustomPages.mockImplementation(({ builtInPages }: { builtInPages: readonly string[] }) => ({
+      customPages: [{ label: `${builtInPages[0]}-page` }],
+      portals: [
+        <output
+          key={builtInPages[0]}
+          data-testid={`${builtInPages[0]}-portal`}
+        />,
+      ],
+    }));
   });
 
   it('stands the fallback in while Clerk is still answering', () => {
@@ -83,17 +89,61 @@ describe('UserButton', () => {
     expect(screen.queryByTestId('view')).not.toBeInTheDocument();
   });
 
-  // The profile can be open in clerk-js's own root while the button itself has nothing to render.
-  it('keeps the custom page portals mounted in every state', () => {
+  it('keeps the custom page portals of both profiles mounted in every state', () => {
     const { rerender } = render(<UserButton />);
-    expect(screen.getByTestId('portal')).toBeInTheDocument();
+    expect(screen.getByTestId('account-portal')).toBeInTheDocument();
+    expect(screen.getByTestId('general-portal')).toBeInTheDocument();
 
     controller = { status: 'hidden' };
     rerender(<UserButton />);
-    expect(screen.getByTestId('portal')).toBeInTheDocument();
+    expect(screen.getByTestId('account-portal')).toBeInTheDocument();
+    expect(screen.getByTestId('general-portal')).toBeInTheDocument();
 
     controller = ready();
     rerender(<UserButton />);
-    expect(screen.getByTestId('portal')).toBeInTheDocument();
+    expect(screen.getByTestId('account-portal')).toBeInTheDocument();
+    expect(screen.getByTestId('general-portal')).toBeInTheDocument();
+  });
+
+  it('hands the model each profile modal its props, and keeps the routing options apart', () => {
+    const appearance = { variables: { colorPrimary: 'red' } };
+    const additionalOAuthScopes = { google: ['https://www.googleapis.com/auth/calendar'] };
+    const apiKeysProps = { showDescription: true };
+    render(
+      <UserButton
+        afterLeaveOrganizationUrl='/left'
+        userProfileProps={{ additionalOAuthScopes, apiKeysProps, appearance }}
+        organizationProfileProps={{ appearance }}
+      />,
+    );
+
+    expect(useUserButtonModel).toHaveBeenCalledWith(
+      { afterLeaveOrganizationUrl: '/left' },
+      {
+        userProfile: { customPages: [{ label: 'account-page' }], additionalOAuthScopes, apiKeysProps, appearance },
+        organizationProfile: { customPages: [{ label: 'general-page' }], appearance },
+      },
+    );
+  });
+
+  it('bridges each profile its own custom pages, ordered against its own built-in pages', () => {
+    const page = { label: 'Usage', path: 'usage', content: <p>Usage</p> };
+    render(
+      <UserButton
+        userProfileProps={{ customPages: [page], pageOrder: ['usage', 'account'] }}
+        organizationProfileProps={{ customPages: [page], pageOrder: ['members', 'usage'] }}
+      />,
+    );
+
+    expect(useCustomPages).toHaveBeenCalledWith({
+      items: [page],
+      order: ['usage', 'account'],
+      builtInPages: ['account'],
+    });
+    expect(useCustomPages).toHaveBeenCalledWith({
+      items: [page],
+      order: ['members', 'usage'],
+      builtInPages: ['general'],
+    });
   });
 });

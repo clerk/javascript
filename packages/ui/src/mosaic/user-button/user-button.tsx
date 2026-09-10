@@ -1,36 +1,49 @@
 'use client';
 
+import type { ClerkAppearanceTheme, OAuthProvider, OAuthScope, UserProfileProps } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
 import type { CustomProfileItem, UserProfilePageId } from '../user-profile/user-profile.types';
 import { useUserButtonController } from './user-button.controller';
 import type { UserButtonModelOptions } from './user-button.model';
 import { useUserButtonModel } from './user-button.model';
-import { useCustomPages, useUserProfilePages } from './user-button.pages';
+import type { OrganizationProfilePageId } from './user-button.pages';
+import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './user-button.pages';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonTriggerProps } from './user-button.view';
 import { UserButtonView } from './user-button.view';
 
-/** Configures the UserProfile this button opens. */
-export interface UserButtonUserProfileProps {
-  /** Pages and links of your own, added to the profile's navigation. */
+/** Configures a profile this button opens. */
+export interface UserButtonProfileProps<PageId extends string> {
+  /** Your own pages and links, added to the profile's navigation. */
   customPages?: CustomProfileItem[];
   /**
-   * The order the profile's navigation runs in, by id: a built-in page's id, or a custom entry's
-   * `path`. Anything left out follows the pages named here. The first page is the one the profile
-   * opens on, so it cannot be a link.
+   * The order of the profile's navigation, by id: a built-in page's id or a custom item's `path`.
+   * Pages left out follow the ones named. The profile opens on the first entry, so it cannot be a link.
    */
-  pageOrder?: (UserProfilePageId | (string & {}))[];
+  pageOrder?: (PageId | (string & {}))[];
+  /** Theme for the profile modal, layered over your app-wide `appearance`. */
+  appearance?: ClerkAppearanceTheme;
 }
 
-/** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profile it opens. */
-// TODO: Possibly missing, verify these before GA:
-// defaultOpen, signInUrl, userProfileProps.additionalOAuthScopes, userProfileProps.apiKeysProps, userProfileProps.appearance, customMenuItems open/startPath, afterCreateOrganizationUrl, skipInvitationScreen, afterLeaveOrganizationUrl, organizationProfileProps
+/** Configures the UserProfile this button opens. */
+export interface UserButtonUserProfileProps extends UserButtonProfileProps<UserProfilePageId> {
+  /** Extra OAuth scopes to request, per provider, when the user reconnects an account. */
+  additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
+  /** Options for the profile's API keys page. Set `hide` to leave the page out. */
+  apiKeysProps?: UserProfileProps['apiKeysProps'];
+}
+
+/** Configures the OrganizationProfile this button opens. */
+export type UserButtonOrganizationProfileProps = UserButtonProfileProps<OrganizationProfilePageId>;
+
+/** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profiles it opens. */
 export type UserButtonProps = UserButtonModelOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
   UserButtonModeProps & {
     userProfileProps?: UserButtonUserProfileProps;
+    organizationProfileProps?: UserButtonOrganizationProfileProps;
     /**
      * Fallback while loading.
      *
@@ -85,13 +98,17 @@ export type UserButtonProps = UserButtonModelOptions &
  * ```
  *
  * @example
- * `customPages` adds your own pages to the profile this button opens; `customMenuItems` adds your
+ * `customPages` adds your own pages to either profile this button opens; `customMenuItems` adds your
  * own rows to the foot of the menu, each one either an `onClick` action or an `href` link.
  * ```tsx
  * <UserButton
  *   userProfileProps={{
  *     customPages: [{ path: 'usage', label: 'Usage', icon: <ChartIcon />, content: <UsagePage /> }],
  *     pageOrder: ['account', 'usage', 'security'],
+ *   }}
+ *   organizationProfileProps={{
+ *     customPages: [{ path: 'audit', label: 'Audit log', icon: <ListIcon />, content: <AuditPage /> }],
+ *     pageOrder: ['general', 'members', 'audit'],
  *   }}
  *   customMenuItems={[
  *     { id: 'docs', label: 'Documentation', icon: <BookIcon />, href: 'https://example.com/docs' },
@@ -108,21 +125,41 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     mode,
     modePriority,
     userProfileProps,
+    organizationProfileProps,
     customMenuItems,
     menuItemOrder,
     fallback,
     ...options
   } = props;
-  // The profile opens in clerk-js's own React root, so its custom pages reach it as portals rendered
-  // from here. They have to outlive the popover that opened it, and the button's own data with it,
-  // which is why they hang off the wrapper rather than anything the popover renders.
-  const builtInPages = useUserProfilePages();
-  const { customPages, portals } = useCustomPages({
+  // The portals must outlive the popover, so custom pages are bridged here rather than inside it.
+  const userProfile = useCustomPages({
     items: userProfileProps?.customPages,
     order: userProfileProps?.pageOrder,
-    builtInPages,
+    builtInPages: useUserProfilePages(),
   });
-  const model = useUserButtonModel(options, customPages);
+  const organizationProfile = useCustomPages({
+    items: organizationProfileProps?.customPages,
+    order: organizationProfileProps?.pageOrder,
+    builtInPages: useOrganizationProfilePages(),
+  });
+  const portals = (
+    <>
+      {userProfile.portals}
+      {organizationProfile.portals}
+    </>
+  );
+  const model = useUserButtonModel(options, {
+    userProfile: {
+      customPages: userProfile.customPages,
+      additionalOAuthScopes: userProfileProps?.additionalOAuthScopes,
+      apiKeysProps: userProfileProps?.apiKeysProps,
+      appearance: userProfileProps?.appearance,
+    },
+    organizationProfile: {
+      customPages: organizationProfile.customPages,
+      appearance: organizationProfileProps?.appearance,
+    },
+  });
   const controller = useUserButtonController(model, { mode, modePriority, customMenuItems, menuItemOrder });
 
   if (controller.status === 'loading') {
