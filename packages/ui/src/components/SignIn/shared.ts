@@ -110,9 +110,6 @@ function hasMultipleEnterpriseConnections(
 
 /**
  * Returns the email code factor a sign-in may fall back to, or `null`.
- *
- * The API populates the list only for allowlisted users, so a factor here means this user is
- * eligible and anything rendered from it discloses that to whoever supplied the identifier.
  * @experimental
  */
 function getSSOFallbackFactor(signIn: SignInResource): EmailCodeFactor | null {
