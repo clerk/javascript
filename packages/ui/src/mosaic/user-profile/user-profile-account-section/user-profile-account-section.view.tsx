@@ -47,12 +47,8 @@ export interface UserProfileAccountSectionViewProps {
   hasImage?: boolean;
   name: string;
   username: string;
-  /**
-   * The saved first name, seeding the edit-name dialog. The display `name` cannot be split back
-   * into its two halves, so both are passed.
-   */
+  /** Passed alongside `name`, which cannot be split back into its two halves. */
   firstName?: string;
-  /** The saved last name, seeding the edit-name dialog. */
   lastName?: string;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
@@ -64,10 +60,7 @@ export interface UserProfileAccountSectionViewProps {
    */
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
   onRemoveProfilePicture?: () => void;
-  /**
-   * Saves the edited name. Resolve and the dialog closes; reject with an `Error` and it stays open
-   * with that message in its banner. Omit it and the row renders without its action.
-   */
+  /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. Omit to hide the action. */
   onSaveName?: (value: UserProfileEditNameValue) => Promise<void>;
   onUsernameChange?: (value: string) => void;
   onAddEmail?: () => void;
@@ -301,10 +294,7 @@ function ProfilePictureActions({
   return null;
 }
 
-/**
- * The name row's action. Split out so the section body stays a render, and so the controller is
- * mounted only where the action exists — the same shape as `UserProfileDeleteSectionView`.
- */
+/** Split out so the controller is mounted only where the action exists. */
 function EditName({
   firstName,
   lastName,

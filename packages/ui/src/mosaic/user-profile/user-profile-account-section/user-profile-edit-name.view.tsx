@@ -11,7 +11,6 @@ import { Input } from '../../components/input';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileFormError } from './user-profile-account-section.types';
 
-/** The two controls the dialog owns, and the keys `error.fields` is addressed by. */
 export type UserProfileEditNameField = 'firstName' | 'lastName';
 
 export interface UserProfileEditNameValue {
@@ -20,34 +19,22 @@ export interface UserProfileEditNameValue {
 }
 
 export interface UserProfileEditNameViewProps {
-  /** Whether the dialog is open. */
   open: boolean;
-  /** Asked to open or close. The caller owns the answer, including while a save is running. */
   onOpenChange: (open: boolean) => void;
-  /** Element that opens the dialog. Rendering it here is what returns focus to it on close. */
+  /** Rendering the opener here is what returns focus to it on close. */
   trigger?: DialogTriggerProps['render'];
-  /** What is currently typed in each field. */
   firstName: string;
   lastName: string;
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
-  /** Whether the save is in flight. The fields go inert and the action announces itself busy. */
   isSaving?: boolean;
-  /** Why the last save failed. */
   error?: UserProfileFormError<UserProfileEditNameField>;
-  /** Submits, by the action or by Enter in either field. */
   onSave: () => void;
 }
 
 /**
- * Edits the user's first and last name.
- *
- * Holds nothing. Open state, the typed values, the pending flag and the error all come from the
- * caller — which is what lets the controller re-seed the fields on close and keep them through a
- * failed save without the view knowing either rule.
- *
- * Nothing is validated here. The name the API will take is the API's to decide, so the action stays
- * live and a rejection comes back as `error`.
+ * Edits the user's first and last name. Holds nothing, and validates nothing: the name the API will
+ * take is the API's to decide, so the action stays live and a rejection comes back as `error`.
  */
 export function UserProfileEditNameView({
   open,
@@ -64,9 +51,7 @@ export function UserProfileEditNameView({
   const formId = useId();
   const firstNameRef = useRef<HTMLInputElement>(null);
 
-  // The action sits in the footer, outside the form, so `form={formId}` associates the two.
-  // `isSaving` is re-checked here because it only cancels the press on the action, and does not
-  // stop a native submit.
+  // `isSaving` only cancels the press on the action; it does not stop a native submit.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isSaving) {
@@ -83,8 +68,7 @@ export function UserProfileEditNameView({
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
         size='card'
-        // Past the corner dismiss that `Card.Header` renders first: a form dialog opens on the
-        // field it exists to edit.
+        // Past the corner dismiss `Card.Header` renders first.
         initialFocus={firstNameRef}
       >
         <Card.Root
@@ -94,9 +78,8 @@ export function UserProfileEditNameView({
           <Card.Header>
             <Card.Title>{m.name.dialogTitle}</Card.Title>
           </Card.Header>
-          {/* The body IS the form, so `Card.Content`'s own column spaces the fields and nothing
-              here needs a stylesheet. Safe on `Content` where it would not be on `Root`: the
-              header's dismiss is a sibling, so it cannot become the form's default submit. */}
+          {/* Not `Root`: the header's dismiss would become the form's default submit, since
+              `Button` sets no `type`. */}
           <Card.Content
             render={
               <form
@@ -134,9 +117,8 @@ export function UserProfileEditNameView({
               />
               {error?.fields?.lastName ? <Field.Error>{error.fields.lastName}</Field.Error> : null}
             </Field.Root>
-            {/* A form with two fields and no submit button inside it gets no implicit submission at
-                all, so Enter in either field would do nothing. The footer's action cannot play that
-                part from outside the form. A one-field dialog needs none of this; see `Destructive`. */}
+            {/* Two fields and no in-form submit button means no implicit submission, so Enter would
+                do nothing. Unnecessary at one field; see `Destructive`. */}
             <button
               hidden
               type='submit'

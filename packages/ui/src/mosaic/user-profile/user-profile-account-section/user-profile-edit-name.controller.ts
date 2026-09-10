@@ -5,10 +5,9 @@ import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-
 
 export interface UserProfileEditNameContext {
   saveName: (value: UserProfileEditNameValue) => Promise<void>;
-  /** The saved name, injected on every render. What the fields are seeded from each time the dialog opens. */
+  /** Injected every render. What `OPEN` seeds the fields from. */
   savedFirstName: string;
   savedLastName: string;
-  /** What is currently typed. Owned here rather than by the view, so re-seeding is a transition. */
   firstName: string;
   lastName: string;
   error: UserProfileFormError<UserProfileEditNameField> | undefined;
@@ -26,11 +25,6 @@ function notSeated(): Promise<never> {
   return Promise.reject(new Error('edit-name deps are not seated'));
 }
 
-/**
- * Reads a rejection as something the dialog can render. A plain `Error` is the whole failure and
- * belongs in the banner; a rejection already shaped as a form error keeps its field copy, which is
- * how an empty or over-long name lands under the control that caused it.
- */
 type FieldCopy = UserProfileFormError<UserProfileEditNameField>['fields'];
 
 function toFormError(cause: unknown): UserProfileFormError<UserProfileEditNameField> {
@@ -40,13 +34,7 @@ function toFormError(cause: unknown): UserProfileFormError<UserProfileEditNameFi
   return { message: 'Something went wrong. Please try again.' };
 }
 
-/**
- * The edit-name flow. `saving` decides the dialog's fate: a resolved save closes it and returns to
- * `idle`, where the next open re-seeds from whatever the model now reports; a rejection drops back
- * to `editing`, keeping what was typed so the user can correct it rather than retype it.
- *
- * Unlike the delete flow this has no terminal state — a name can be edited again straight away.
- */
+/** No terminal state, unlike the delete flow: a name can be edited again straight away. */
 export const userProfileEditNameMachine = createMachine({
   id: 'editName',
   initial: 'idle',
@@ -91,14 +79,9 @@ export const userProfileEditNameMachine = createMachine({
 });
 
 export interface UserProfileEditNameControllerOptions {
-  /** The saved first name. */
   firstName?: string;
-  /** The saved last name. */
   lastName?: string;
-  /**
-   * Saves the name. Resolve and the dialog closes; reject with an `Error` and it stays open with
-   * that message in its banner, or with `fields` set to put copy under a specific control.
-   */
+  /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. */
   onSave: (value: UserProfileEditNameValue) => Promise<void>;
 }
 
@@ -114,11 +97,7 @@ export interface UserProfileEditNameController {
   error: UserProfileFormError<UserProfileEditNameField> | undefined;
 }
 
-/**
- * Drives the edit-name dialog and hands the view plain props. A machine backs it because the flow
- * has an async step, an error path back to the step before it, and a success that closes a surface
- * the user did not close.
- */
+/** A machine rather than `useState`: an async step, an error path back, and a success that closes the dialog. */
 export function useUserProfileEditNameController({
   firstName = '',
   lastName = '',

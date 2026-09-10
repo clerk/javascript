@@ -4,7 +4,6 @@ import type {
 } from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
 import { useState } from 'react';
 
-/** A rejection the dialog can render field by field, standing in for what the model will map. */
 class FormError extends Error {
   constructor(
     message: string,
@@ -18,17 +17,12 @@ class FormError extends Error {
 export interface UserProfileEditNameFixtureOptions {
   firstName?: string;
   lastName?: string;
-  /** How long a save takes, in ms. Long enough by default that the pending affordance is visible. */
   latency?: number;
-  /** Rejects every save with this instead of committing it, to exercise the failure surface. */
+  /** Rejects every save instead of committing it. */
   failWith?: UserProfileFormError;
 }
 
-/**
- * Stands in for the model: it holds the saved name and answers a save after a delay, with the
- * committed value or with the injected failure. Everything else the dialog needs — open state, the
- * typed values, pending, the error — belongs to the controller, so this is the whole seam.
- */
+/** Stands in for the model. Everything else the dialog needs belongs to the controller. */
 export function useUserProfileEditNameFixture({
   firstName: initialFirstName = 'Preston',
   lastName: initialLastName = 'Booth',
