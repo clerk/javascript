@@ -111,6 +111,7 @@ function ComboboxInner(props: ComboboxProps) {
       labelsByValueRef.current.set(value, label);
       if (value === selectedValue) {
         setSelectedIndex(index);
+        return () => setSelectedIndex(current => (current === index ? null : current));
       }
     },
     [selectedValue],

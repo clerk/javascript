@@ -10,4 +10,5 @@ export type {
   ComboboxPortalProps,
   ComboboxPositionerProps,
   ComboboxProps,
+  ComboboxTriggerProps,
 } from './parts';

@@ -1,9 +1,9 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { createRef, StrictMode, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { Combobox } from './index';
+import { Combobox, type ComboboxTriggerProps } from './index';
 
 afterEach(() => cleanup());
 
@@ -15,6 +15,136 @@ const fruits = [
 ];
 
 describe('Combobox', () => {
+  it('keeps selection aligned through repeated reordering, removal, and remounting in Strict Mode', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    function Fixture({ items, value }: { items: typeof fruits; value: string }) {
+      return (
+        <StrictMode>
+          <Combobox.Root
+            value={value}
+            onValueChange={onValueChange}
+          >
+            <Combobox.Input aria-label='Fruit' />
+            <Combobox.Trigger aria-label='Toggle' />
+            <Combobox.List>
+              {items.map(item => (
+                <Combobox.Option
+                  key={item.value}
+                  value={item.value}
+                  label={item.label}
+                >
+                  {item.label}
+                </Combobox.Option>
+              ))}
+            </Combobox.List>
+          </Combobox.Root>
+        </StrictMode>
+      );
+    }
+    const { rerender } = render(
+      <Fixture
+        items={fruits}
+        value='banana'
+      />,
+    );
+    for (let cycle = 0; cycle < 5; cycle++) {
+      for (const items of [fruits, [...fruits].reverse(), fruits.filter(item => item.value !== 'banana'), fruits]) {
+        rerender(
+          <Fixture
+            items={items}
+            value='banana'
+          />,
+        );
+        await user.click(screen.getByRole('button', { name: 'Toggle' }));
+        const banana = screen.queryByRole('option', { name: 'Banana' });
+        if (banana) {
+          expect(banana).toHaveAttribute('data-active');
+          expect(banana).toHaveAttribute('aria-selected', 'true');
+        } else {
+          expect(screen.getAllByRole('option').every(option => option.getAttribute('aria-selected') === 'false')).toBe(
+            true,
+          );
+        }
+        await user.click(screen.getByRole('button', { name: 'Toggle' }));
+      }
+      rerender(
+        <Fixture
+          items={fruits.filter(item => item.value !== 'banana')}
+          value='cherry'
+        />,
+      );
+      await user.click(screen.getByRole('button', { name: 'Toggle' }));
+      expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
+      await user.click(screen.getByRole('button', { name: 'Toggle' }));
+    }
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('forwards the arrow ref without requiring a floating context prop', async () => {
+    const ref = createRef<SVGSVGElement>();
+    const { unmount } = render(
+      <Combobox.Root defaultOpen>
+        <Combobox.Input aria-label='Fruit' />
+        <Combobox.Positioner>
+          <Combobox.Popup>
+            <Combobox.Arrow
+              ref={ref}
+              data-testid='arrow'
+            />
+          </Combobox.Popup>
+        </Combobox.Positioner>
+      </Combobox.Root>,
+    );
+    await waitFor(() => expect(ref.current).toBe(screen.getByTestId('arrow')));
+    expect(ref.current).toHaveAttribute('data-side', 'bottom');
+    unmount();
+    expect(ref.current).toBeNull();
+  });
+
+  it.each(['banana', 'cherry'])('handles option removal with %s selected', async selected => {
+    const user = userEvent.setup();
+    function Fixture({ showBanana, value = 'banana' }: { showBanana: boolean; value?: string }) {
+      return (
+        <Combobox.Root value={value}>
+          <Combobox.Input aria-label='Fruit' />
+          <Combobox.Trigger aria-label='Open' />
+          <Combobox.List>
+            <Combobox.Option value='apple'>Apple</Combobox.Option>
+            {showBanana && <Combobox.Option value='banana'>Banana</Combobox.Option>}
+            <Combobox.Option value='cherry'>Cherry</Combobox.Option>
+          </Combobox.List>
+        </Combobox.Root>
+      );
+    }
+    const { rerender } = render(<Fixture showBanana />);
+    rerender(
+      <Fixture
+        showBanana={false}
+        value={selected}
+      />,
+    );
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    const cherry = screen.getByRole('option', { name: 'Cherry' });
+    if (selected === 'cherry') {
+      expect(cherry).toHaveAttribute('data-active');
+      expect(cherry).toHaveAttribute('aria-selected', 'true');
+    } else {
+      expect(cherry).not.toHaveAttribute('data-active');
+    }
+  });
+
+  it('requires an option around the selection indicator', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      expect(() => render(<Combobox.OptionIndicator />)).toThrow(
+        'Combobox.OptionIndicator must be used within Combobox.Option',
+      );
+    } finally {
+      error.mockRestore();
+    }
+  });
+
   it('measures a custom popup anchor while keeping keyboard focus on the input', async () => {
     const user = userEvent.setup();
     const anchor = document.createElement('div');
@@ -52,11 +182,12 @@ describe('Combobox', () => {
 
   it('toggles from a popup button while keeping focus on the input', async () => {
     const user = userEvent.setup();
+    const triggerProps: ComboboxTriggerProps = { 'aria-label': 'Toggle fruit options' };
     const onOpenChange = vi.fn();
     render(
       <Combobox.Root onOpenChange={onOpenChange}>
         <Combobox.Input placeholder='Search fruits...' />
-        <Combobox.Trigger aria-label='Toggle fruit options' />
+        <Combobox.Trigger {...triggerProps} />
         <Combobox.Positioner>
           <Combobox.Popup>
             <Combobox.Option value='apple'>Apple</Combobox.Option>

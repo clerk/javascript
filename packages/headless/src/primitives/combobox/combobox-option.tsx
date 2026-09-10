@@ -31,9 +31,10 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
       if (!disabled) {
         map.set(index, value);
       }
-      registerSelectedIndex(index, value, displayLabel);
+      const unregisterSelectedIndex = registerSelectedIndex(index, value, displayLabel);
       return () => {
         map.delete(index);
+        unregisterSelectedIndex?.();
       };
     }, [index, value, displayLabel, disabled, valuesByIndexRef, registerSelectedIndex]);
 

@@ -1,22 +1,23 @@
 'use client';
 
-import { FloatingArrow } from '@floating-ui/react';
+import { FloatingArrow, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
 import { useComboboxContext } from './combobox-context';
 
-export type ComboboxArrowProps = React.ComponentPropsWithRef<typeof FloatingArrow>;
+export type ComboboxArrowProps = Omit<React.ComponentPropsWithoutRef<typeof FloatingArrow>, 'context'>;
 
-export function ComboboxArrow(props: ComboboxArrowProps) {
+export const ComboboxArrow = React.forwardRef<SVGSVGElement, ComboboxArrowProps>(function ComboboxArrow(props, ref) {
   const { floatingContext, arrowRef, placement } = useComboboxContext();
+  const mergedRef = useMergeRefs([arrowRef, ref]);
   const side = placement.split('-')[0];
 
   return (
     <FloatingArrow
       data-side={side}
       {...props}
-      ref={arrowRef}
+      ref={mergedRef}
       context={floatingContext}
     />
   );
-}
+});
