@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRightIcon } from 'lucide-react';
+import { ChevronRightIcon, FlaskConicalIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -257,18 +257,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter className='gap-0 p-0'>
         <SidebarSeparator className='data-horizontal:w-auto my-1' />
         <SidebarGroup className='py-1'>
-          <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
-            Live
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   className='h-auto py-1 text-xs'
-                  isActive={pathname.startsWith('/live/reverification')}
-                  render={<Link href='/live/reverification' />}
+                  isActive={pathname.startsWith('/live')}
+                  render={<Link href='/live' />}
                 >
-                  Reverification
+                  <FlaskConicalIcon className='size-3.5!' />
+                  Live Sandbox
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
