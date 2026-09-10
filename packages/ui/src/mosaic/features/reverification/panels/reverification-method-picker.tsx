@@ -80,6 +80,7 @@ export function ReverificationMethodPicker({
             type='button'
             variant='ghost'
             fullWidth
+            disabled={Boolean(pendingMethodId)}
             onClick={onBack}
             style={{
               marginBlockStart: space['2'],
@@ -101,7 +102,12 @@ export function ReverificationMethodPicker({
             type='button'
             size='sm'
             variant='link'
-            onClick={onHelp}
+            disabled={Boolean(pendingMethodId)}
+            onClick={() => {
+              if (!pendingMethodId) {
+                onHelp();
+              }
+            }}
           >
             {messages.helpButton}
           </Button>

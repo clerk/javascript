@@ -91,7 +91,7 @@ describe('reverificationMachine', () => {
     actor.send({ type: 'SHOW_METHODS' });
     expect(actor.getSnapshot().value).toBe('methodPicker');
     actor.send({ type: 'SELECT_METHOD', id: email.id });
-    expect(actor.getSnapshot().value).toBe('preparing');
+    expect(actor.getSnapshot().value).toBe('methodPickerPreparing');
     await tick();
     expect(prepare).toHaveBeenCalledOnce();
     expect(actor.getSnapshot().value).toBe('verifying');
@@ -202,6 +202,51 @@ describe('reverificationMachine', () => {
     expect(actor.getSnapshot().context.errorMessage).toBe('Session could not be activated.');
     expect(actor.getSnapshot().context.deps.cancel).not.toHaveBeenCalled();
   });
+
+  it('prepares the starting email method without leaving the factor', async () => {
+    const prepare = deferred<void>();
+    const actor = startActor(
+      seatedDeps({
+        start: vi.fn(async () => firstFactorResult({ methods: [email], startingMethod: email })),
+        prepare: () => prepare.promise,
+      }),
+    );
+    await tick();
+    expect(actor.getSnapshot().value).toBe('preparing');
+    expect(actor.getSnapshot().context.canResend).toBe(false);
+
+    actor.send({ type: 'TYPE', value: '123456' });
+    expect(actor.getSnapshot().context.inputValue).toBe('123456');
+
+    prepare.resolve();
+    await tick();
+    expect(actor.getSnapshot().value).toBe('verifying');
+    expect(actor.getSnapshot().context.canResend).toBe(true);
+  });
+
+  it('queues an attempt submitted while the starting prepare is in flight', async () => {
+    const prepare = deferred<void>();
+    const finish = deferred<void>();
+    const attempt = vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+    const actor = startActor(
+      seatedDeps({
+        start: vi.fn(async () => firstFactorResult({ methods: [email], startingMethod: email })),
+        prepare: () => prepare.promise,
+        attempt,
+        finish: () => finish.promise,
+      }),
+    );
+    await tick();
+    actor.send({ type: 'TYPE', value: '123456' });
+    actor.send({ type: 'SUBMIT' });
+    expect(actor.getSnapshot().value).toBe('preparing');
+    expect(attempt).not.toHaveBeenCalled();
+
+    prepare.resolve();
+    await tick();
+    expect(attempt).toHaveBeenCalledOnce();
+    expect(actor.getSnapshot().value).toBe('completing');
+  });
 });
 
 describe('useReverificationController', () => {
@@ -271,12 +316,16 @@ describe('useReverificationController', () => {
       ),
     );
 
-    await waitFor(() => expect(result.current.status).toBe('ready'));
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.canResend).toBe(true);
+      }
+    });
     if (result.current.status !== 'ready') {
       throw new Error('expected ready');
     }
     expect(result.current.onResend).toEqual(expect.any(Function));
-    expect(result.current.canResend).toBe(true);
 
     act(() => {
       result.current.onResend();
@@ -452,5 +501,154 @@ describe('useReverificationController', () => {
     rerender({ model: readyModel({ start, isActive: true }) });
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(start).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows the factor idle while the starting prepare is in flight', async () => {
+    const prepare = deferred<void>();
+    const { result } = renderHook(() =>
+      useReverificationController(
+        readyModel({
+          start: vi.fn(async () => firstFactorResult({ methods: [email, password], startingMethod: email })),
+          prepare: () => prepare.promise,
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    if (result.current.status !== 'ready') {
+      throw new Error('expected ready');
+    }
+    expect(result.current.step).toBe('otp');
+    expect(result.current.isPending).toBe(false);
+    expect(result.current.canResend).toBe(false);
+    expect(result.current.pendingMethodId).toBeUndefined();
+
+    const onValueChange = result.current.onValueChange;
+    act(() => {
+      onValueChange('123456');
+    });
+    expect(result.current.status).toBe('ready');
+    if (result.current.status === 'ready') {
+      expect(result.current.value).toBe('123456');
+    }
+
+    act(() => {
+      prepare.resolve();
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.canResend).toBe(true);
+        expect(result.current.isPending).toBe(false);
+      }
+    });
+  });
+
+  it('does not attempt until the starting prepare settles after submit', async () => {
+    const prepare = deferred<void>();
+    const attempt = vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+    const { result } = renderHook(() =>
+      useReverificationController(
+        readyModel({
+          start: vi.fn(async () => firstFactorResult({ methods: [email], startingMethod: email })),
+          prepare: () => prepare.promise,
+          attempt,
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onValueChange('123456');
+        result.current.onSubmit();
+      }
+    });
+    expect(attempt).not.toHaveBeenCalled();
+    if (result.current.status === 'ready') {
+      expect(result.current.isPending).toBe(false);
+    }
+
+    act(() => {
+      prepare.resolve();
+    });
+    await waitFor(() => expect(attempt).toHaveBeenCalledOnce());
+  });
+
+  it('keeps the picker on the sending row until prepare settles', async () => {
+    const prepare = deferred<void>();
+    const { result } = renderHook(() =>
+      useReverificationController(
+        readyModel({
+          prepare: () => prepare.promise,
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onShowMethods();
+      }
+    });
+    if (result.current.status !== 'ready') {
+      throw new Error('expected ready');
+    }
+    expect(result.current.step).toBe('method-picker');
+
+    const onSelectMethod = result.current.onSelectMethod;
+    act(() => {
+      onSelectMethod(email.id);
+    });
+    if (result.current.status !== 'ready') {
+      throw new Error('expected ready');
+    }
+    expect(result.current.step).toBe('method-picker');
+    expect(result.current.pendingMethodId).toBe(email.id);
+    expect(result.current.isPending).toBe(false);
+    expect(result.current.methods.some(method => method.id === email.id)).toBe(true);
+    expect(result.current.onBack).toEqual(expect.any(Function));
+
+    act(() => {
+      prepare.resolve();
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.step).toBe('otp');
+        expect(result.current.pendingMethodId).toBeUndefined();
+      }
+    });
+  });
+
+  it('shows the factor with the error when a picker prepare fails', async () => {
+    const prepare = deferred<void>();
+    const { result } = renderHook(() =>
+      useReverificationController(
+        readyModel({
+          prepare: () => prepare.promise,
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onShowMethods();
+        result.current.onSelectMethod(email.id);
+      }
+    });
+
+    act(() => {
+      prepare.reject(new Error('Could not send the code.'));
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.step).toBe('otp');
+        expect(result.current.errorMessage).toBe('Could not send the code.');
+        expect(result.current.pendingMethodId).toBeUndefined();
+      }
+    });
   });
 });

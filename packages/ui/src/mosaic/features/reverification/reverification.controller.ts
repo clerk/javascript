@@ -29,6 +29,8 @@ interface ReverificationContext {
   methods: readonly ReverificationMethod[];
   canResend: boolean;
   abortRequested: boolean;
+  submitRequested: boolean;
+  frozenActiveMethodId: string | undefined;
   overlayFrom: OverlayFrom;
   supportEmail: string;
   deps: ReverificationDeps;
@@ -70,6 +72,7 @@ function selectMethod(ctx: ReverificationContext, id: string): Partial<Reverific
     inputValue: '',
     errorMessage: undefined,
     direction: 1,
+    submitRequested: false,
   };
 }
 
@@ -111,7 +114,7 @@ const afterResult = [
       return Boolean(strategy && needsPrepare(strategy));
     },
     target: 'preparing' as const,
-    actions: applyResult,
+    actions: [applyResult, assign(() => ({ canResend: false }))],
   },
   { target: 'verifying' as const, actions: applyResult },
 ];
@@ -138,6 +141,8 @@ export const reverificationMachine = createMachine({
     methods: [],
     canResend: true,
     abortRequested: false,
+    submitRequested: false,
+    frozenActiveMethodId: undefined,
     overlayFrom: 'factor',
     supportEmail: '',
     deps: unseatedDeps,
@@ -148,6 +153,7 @@ export const reverificationMachine = createMachine({
         inputValue: '',
         errorMessage: undefined,
         abortRequested: false,
+        submitRequested: false,
         canResend: true,
       })),
       on: { START: 'starting' },
@@ -161,13 +167,69 @@ export const reverificationMachine = createMachine({
       }),
     },
 
+    /*
+      Preparing a factor behind the scenes (e.g. sending an OTP)
+
+      This shows the factor card with optimistic UI, so it needs to handle the same actions
+      as verifying, but if the user submits, we queue that up until after prepare resolves
+    */
     preparing: {
-      on: { RESET: 'inactive' },
+      on: {
+        TYPE: {
+          actions: assign((_, event) => ({ inputValue: event.value, errorMessage: undefined })),
+        },
+        SUBMIT: {
+          actions: assign(() => ({ submitRequested: true })),
+        },
+        SHOW_METHODS: {
+          target: 'methodPicker',
+          guard: ctx => ctx.methods.filter(method => method.id !== ctx.activeMethod?.id).length > 0,
+          actions: assign(ctx => ({
+            direction: 1 as const,
+            overlayFrom: 'factor' as const,
+            submitRequested: false,
+            frozenActiveMethodId: ctx.activeMethod?.id,
+          })),
+        },
+        SHOW_HELP: {
+          target: 'help',
+          actions: assign(() => ({ direction: 1 as const, overlayFrom: 'factor' as const, submitRequested: false })),
+        },
+        RESET: 'inactive',
+      },
       invoke: fromPromise(prepareActive, {
-        onDone: 'verifying',
+        onDone: [
+          {
+            guard: (ctx: ReverificationContext) => ctx.submitRequested,
+            target: 'submitting' as const,
+            actions: assign(() => ({ submitRequested: false, canResend: true })),
+          },
+          { target: 'verifying' as const, actions: assign(() => ({ canResend: true })) },
+        ],
         onError: {
           target: 'verifying',
-          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
+          actions: assign((_, event) => ({
+            errorMessage: errorMessage(event.error),
+            submitRequested: false,
+            canResend: true,
+          })),
+        },
+      }),
+    },
+
+    /*
+      When selecting a method from the picker, we prepare before going to the factor card
+
+      We don't use optimistic UI here simply because we're in a better position to show
+      some feedback that does not feel janky. The view handles disabling inputs while preparing.
+    */
+    methodPickerPreparing: {
+      on: { RESET: 'inactive' },
+      invoke: fromPromise(prepareActive, {
+        onDone: { target: 'verifying', actions: assign(() => ({ canResend: true })) },
+        onError: {
+          target: 'verifying',
+          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error), canResend: true })),
         },
       }),
     },
@@ -189,7 +251,11 @@ export const reverificationMachine = createMachine({
         SHOW_METHODS: {
           target: 'methodPicker',
           guard: ctx => ctx.methods.filter(method => method.id !== ctx.activeMethod?.id).length > 0,
-          actions: assign(() => ({ direction: 1 as const, overlayFrom: 'factor' as const })),
+          actions: assign(ctx => ({
+            direction: 1 as const,
+            overlayFrom: 'factor' as const,
+            frozenActiveMethodId: ctx.activeMethod?.id,
+          })),
         },
         SHOW_HELP: {
           target: 'help',
@@ -233,7 +299,7 @@ export const reverificationMachine = createMachine({
       on: {
         SELECT_METHOD: [
           {
-            target: 'preparing',
+            target: 'methodPickerPreparing',
             guard: (ctx, event) => {
               const method = ctx.methods.find(candidate => candidate.id === event.id);
               return Boolean(method && needsPrepare(method.strategy));
@@ -289,10 +355,10 @@ export const reverificationMachine = createMachine({
   },
 });
 
-const pendingStates = new Set(['starting', 'preparing', 'submitting', 'resending', 'completing']);
+const pendingStates = new Set(['submitting', 'resending', 'completing']);
 
 function viewStep(value: string, method: ReverificationMethod | null): ReverificationViewProps['step'] | undefined {
-  if (value === 'methodPicker') {
+  if (value === 'methodPicker' || value === 'methodPickerPreparing') {
     return 'method-picker';
   }
   if (value === 'help') {
@@ -375,7 +441,11 @@ export function useReverificationController(model: ReverificationModel): Reverif
   }
 
   const activeMethod = context.activeMethod;
-  const alternativeMethods = context.methods.filter(method => method.id !== activeMethod?.id);
+  // If we are currently on the alternative methods screen and preparing a factor, activeMethod will
+  // have transitioned to the factor we are now preparing, so the one we want to hide is the old one
+  const excludeId = snapshot.value === 'methodPickerPreparing' ? context.frozenActiveMethodId : activeMethod?.id;
+  const methods = context.methods.filter(method => method.id !== excludeId);
+  const pendingMethodId = snapshot.value === 'methodPickerPreparing' ? activeMethod?.id : undefined;
 
   return {
     status: 'ready',
@@ -395,7 +465,8 @@ export function useReverificationController(model: ReverificationModel): Reverif
         window.location.assign(`mailto:${context.supportEmail}`);
       }
     },
-    methods: alternativeMethods,
+    methods,
+    pendingMethodId,
     onSelectMethod: id => send({ type: 'SELECT_METHOD', id }),
     otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
     identifier: activeMethod && 'identifier' in activeMethod ? activeMethod.identifier : undefined,
