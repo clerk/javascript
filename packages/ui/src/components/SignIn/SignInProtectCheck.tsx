@@ -1,3 +1,4 @@
+import { removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type { SignInResource } from '@clerk/shared/types';
 import { useEffect, useRef, useState } from 'react';
@@ -72,6 +73,9 @@ function SignInProtectCheckInternal(): JSX.Element | null {
         return;
       }
       if (updatedSignIn.status === 'complete' && updatedSignIn.createdSessionId) {
+        // A ticket sign-in that would have completed on the start page is completing here
+        // instead, so the ticket has to be cleared here too — otherwise it stays in the URL.
+        removeClerkQueryParam('__clerk_ticket');
         await setActive({
           session: updatedSignIn.createdSessionId,
           navigate: async ({ session, decorateUrl }) => {
