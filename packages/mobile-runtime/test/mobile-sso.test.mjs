@@ -3,6 +3,107 @@ import { test } from 'node:test';
 import { fixture, response, deferred } from './protocol-fixture.mjs';
 import { fixtures } from './native-fixtures.mjs';
 
+for (const scenario of [
+  'waitlist-existing',
+  'waitlist-new',
+  'transfer-verification-error',
+  'transfer-request-error',
+  'unrelated-signup-error',
+  'signup-only-restricted',
+]) {
+  test(`prebuilt Apple SSO preserves terminal errors and restriction boundaries: ${scenario}`, async t => {
+    let prompts = 0;
+    const attempts = [];
+    const apiError = code =>
+      response(null, {
+        status: 403,
+        body: JSON.stringify({
+          errors: [{ code, message: 'Apple authentication rejected', meta: { param_name: 'token' } }],
+        }),
+      });
+    const f = await fixture({
+      capabilities: ['appleIdentity'],
+      appleIdentity: () => {
+        prompts++;
+        return { token: 'single_apple_error_token', firstName: 'First', lastName: 'Last' };
+      },
+      http: request => {
+        const pathname = new URL(request.url).pathname;
+        if (!/\/sign_(ins|ups)/.test(pathname)) return;
+        attempts.push({ pathname, body: new URLSearchParams(request.body) });
+        if (pathname.includes('/sign_ups')) {
+          if (scenario === 'unrelated-signup-error') return apiError('form_param_invalid');
+          if (scenario === 'signup-only-restricted') return apiError('sign_up_mode_restricted');
+          if (scenario.startsWith('waitlist')) return apiError('sign_up_restricted_waitlist');
+          return response(transferableSignUp);
+        }
+        if (scenario === 'transfer-request-error') return apiError('account_locked');
+        if (scenario === 'transfer-verification-error')
+          return response({
+            ...fixtures.signIn,
+            first_factor_verification: {
+              ...fixtures.signIn.first_factor_verification,
+              status: 'failed',
+              strategy: 'oauth_token_apple',
+              error: {
+                code: 'account_locked',
+                message: 'Account is locked',
+                long_message: 'Choose another sign-in method',
+                meta: { param_name: 'token', password: 'must-not-cross' },
+              },
+            },
+          });
+        return response(scenario === 'waitlist-new' ? transferableSignIn : completeSignIn);
+      },
+    });
+    t.after(f.dispose);
+    const result = await f.invoke(f.state.roots.clerk, 'Clerk.authenticateWithSSO', [
+      {
+        strategy: 'oauth_token_apple',
+        start: scenario === 'signup-only-restricted' ? 'signUp' : 'auto',
+        transferable: true,
+      },
+    ]);
+    assert.equal(prompts, 1);
+    assert.equal(f.state.roots.session, null);
+    assert.equal(attempts[0].body.get('token'), 'single_apple_error_token');
+    assert.equal(attempts.length, ['unrelated-signup-error', 'signup-only-restricted'].includes(scenario) ? 1 : 2);
+    if (scenario === 'waitlist-existing') {
+      assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+      assert.equal(result.result.value.kind, 'signIn');
+      assert.equal(f.resource(f.state.roots.signIn).status, 'complete');
+    } else {
+      const expected =
+        scenario === 'waitlist-new'
+          ? 'sign_up_restricted_waitlist'
+          : scenario === 'signup-only-restricted'
+            ? 'sign_up_mode_restricted'
+            : scenario === 'unrelated-signup-error'
+              ? 'form_param_invalid'
+              : 'account_locked';
+      assert.ok(result.failure?.errors, JSON.stringify(result.failure));
+      assert.equal(result.failure.errors[0].code, expected);
+      assert.equal(result.failure.errors[0].meta.paramName, 'token');
+      if (scenario === 'transfer-verification-error') {
+        assert.equal(result.failure.errors[0].message, 'Account is locked');
+        assert.equal(result.failure.errors[0].longMessage, 'Choose another sign-in method');
+        assert.equal(result.failure.status, undefined);
+        assert.equal(JSON.stringify(result.failure).includes('must-not-cross'), false);
+      }
+    }
+    if (scenario.startsWith('waitlist')) {
+      assert.equal(attempts[1].body.get('token'), 'single_apple_error_token');
+      assert.equal(attempts[1].body.has('transfer'), false);
+    }
+    if (scenario.startsWith('transfer')) assert.equal(attempts[1].body.get('transfer'), 'true');
+    assert.equal(
+      f.messages.some(m => m.kind === 'hostRequest' && m.capability === 'browser'),
+      false,
+    );
+    assert.equal(JSON.stringify(f.messages.filter(m => m.state)).includes('single_apple_error_token'), false);
+  });
+}
+
 const completeSignIn = { ...fixtures.signIn, status: 'complete', created_session_id: 'sess_native' };
 const completeSignUp = { ...fixtures.signUp, status: 'complete', created_session_id: 'sess_native' };
 const transferableSignIn = {

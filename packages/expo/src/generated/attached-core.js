@@ -69,6 +69,76 @@ function publicCore(clerk, beforeSignOut = async () => void 0) {
 	};
 }
 //#endregion
+//#region packages/shared/dist/_chunks/clerkRuntimeError-DlesLWqO.mjs
+function createErrorTypeGuard(ErrorClass) {
+	function typeGuard(error) {
+		const target = error ?? this;
+		if (!target) throw new TypeError(`${ErrorClass.kind || ErrorClass.name} type guard requires an error object`);
+		if (ErrorClass.kind && typeof target === "object" && target !== null && "constructor" in target) {
+			if (target.constructor?.kind === ErrorClass.kind) return true;
+		}
+		return target instanceof ErrorClass;
+	}
+	return typeGuard;
+}
+//#endregion
+//#region packages/shared/dist/_chunks/error-wrUdW78M.mjs
+var ClerkAPIError = class {
+	static kind = "ClerkAPIError";
+	code;
+	message;
+	longMessage;
+	meta;
+	constructor(json) {
+		const parsedError = {
+			code: json.code,
+			message: json.message,
+			longMessage: json.long_message,
+			meta: {
+				paramName: json.meta?.param_name,
+				sessionId: json.meta?.session_id,
+				emailAddresses: json.meta?.email_addresses,
+				identifiers: json.meta?.identifiers,
+				zxcvbn: json.meta?.zxcvbn,
+				plan: json.meta?.plan,
+				isPlanUpgradePossible: json.meta?.is_plan_upgrade_possible,
+				seatsQuantityToAdd: json.meta?.seats_quantity_to_add,
+				seatsQuantity: json.meta?.seats_quantity
+			}
+		};
+		this.code = parsedError.code;
+		this.message = parsedError.message;
+		this.longMessage = parsedError.longMessage;
+		this.meta = parsedError.meta;
+	}
+};
+const isClerkAPIError = createErrorTypeGuard(ClerkAPIError);
+Object.freeze({
+	InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
+	InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid (key={{key}}, expected format: pk_test_... or pk_live_...). To create a Clerk application with valid keys, in your terminal run:
+
+npx clerk@latest init
+
+\`npx clerk@latest init\` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.
+
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys (\`--instance prod\` for production keys). Or copy its Publishable key from https://dashboard.clerk.com/~/api-keys.`,
+	MissingPublishableKeyErrorMessage: `Missing publishableKey. To set up Clerk for this project, in your terminal run:
+
+npx clerk@latest init
+
+\`npx clerk@latest init\` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.
+
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys. Or copy them from https://dashboard.clerk.com/~/api-keys. Deploy a production instance by running \`npx clerk@latest deploy\`, or \`npx clerk@latest env pull --instance prod\` to use an existing one.`,
+	MissingSecretKeyErrorMessage: `Missing secretKey. To set up Clerk for this project, in your terminal run:
+
+npx clerk@latest init
+
+\`npx clerk@latest init\` creates a Clerk application and writes keys to your .env file. No Clerk account or login required and the command is non-interactive.
+
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys. Or copy them from https://dashboard.clerk.com/~/api-keys. Deploy a production instance by running \`npx clerk@latest deploy\`, or \`npx clerk@latest env pull --instance prod\` to use an existing one.`,
+	MissingClerkProvider: `{{source}} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`
+});
+//#endregion
 //#region packages/clerk-js/src/utils/passkeyFailureStage.ts
 const stages = new WeakMap();
 function getPasskeyFailureStage(error) {
@@ -87,7 +157,8 @@ function failure(error, kind = "rejection") {
 	const value = error && typeof error === "object" ? error : {};
 	if (kind === "rejection" && value.__clerkBridgeError === true) kind = "bridge";
 	const code = typeof value.code === "string" ? value.code : kind === "bridge" ? "bridge_failure" : "operation_failed";
-	const errors = Array.isArray(value.errors) ? value.errors.map((item) => {
+	const apiErrors = Array.isArray(value.errors) ? value.errors : isClerkAPIError(value) ? [value] : void 0;
+	const errors = apiErrors ? apiErrors.map((item) => {
 		const meta = item.meta && typeof item.meta === "object" ? Object.fromEntries(Object.entries(item.meta).filter(([key, val]) => safeMetadata.has(key) && [
 			"string",
 			"number",

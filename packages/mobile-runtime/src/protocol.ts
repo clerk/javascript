@@ -1,3 +1,5 @@
+import { isClerkAPIError } from '@clerk/shared/error';
+
 import { getPasskeyFailureStage, type PasskeyFailureStage } from '../../clerk-js/src/utils/passkeyFailureStage.ts';
 
 export type JSONValue = null | boolean | number | string | JSONValue[] | { [key: string]: JSONValue };
@@ -29,8 +31,10 @@ export function failure(error: unknown, kind: Failure['kind'] = 'rejection'): Fa
   const value = error && typeof error === 'object' ? (error as Record<string, unknown>) : {};
   if (kind === 'rejection' && value.__clerkBridgeError === true) kind = 'bridge';
   const code = typeof value.code === 'string' ? value.code : kind === 'bridge' ? 'bridge_failure' : 'operation_failed';
-  const errors = Array.isArray(value.errors)
-    ? value.errors.map(item => {
+  // Verification resources can reject with one API error instead of an HTTP response error.
+  const apiErrors = Array.isArray(value.errors) ? value.errors : isClerkAPIError(value) ? [value] : undefined;
+  const errors = apiErrors
+    ? apiErrors.map(item => {
         const meta =
           item.meta && typeof item.meta === 'object'
             ? Object.fromEntries(
