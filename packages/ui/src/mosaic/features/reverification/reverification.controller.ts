@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
 import { setup } from '../../machine/setup';
-import type { DoneInvokeEvent } from '../../machine/types';
+import type { DoneInvokeEvent, StateConfig } from '../../machine/types';
 import { useMachine } from '../../machine/useMachine';
 import type { ReverificationModel, ReverificationReadyModel } from './reverification.model';
 import type { ReverificationMethod, ReverificationResult, ReverificationViewProps } from './reverification.types';
@@ -24,7 +24,6 @@ interface ReverificationContext {
   direction: FlowDirection;
   activeMethod: ReverificationMethod | null;
   methods: readonly ReverificationMethod[];
-  canResend: boolean;
   resendAvailableAt: number | undefined;
   abortRequested: boolean;
   submitRequested: boolean;
@@ -61,12 +60,12 @@ const unseatedDeps: ReverificationDeps = {
 
 export const RESEND_COOLDOWN_MS = 30_000;
 
-function lockResend(): Pick<ReverificationContext, 'canResend' | 'resendAvailableAt'> {
-  return { canResend: false, resendAvailableAt: Date.now() + RESEND_COOLDOWN_MS };
+function lockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
+  return { resendAvailableAt: Date.now() + RESEND_COOLDOWN_MS };
 }
 
-function unlockResend(): Pick<ReverificationContext, 'canResend' | 'resendAvailableAt'> {
-  return { canResend: true, resendAvailableAt: undefined };
+function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
+  return { resendAvailableAt: undefined };
 }
 
 function errorMessage(error: unknown): string {
@@ -139,6 +138,31 @@ const abortAfterInvoke = {
   ],
 };
 
+const factorEvents = {
+  TYPE: {
+    actions: assign((_, event) => ({ inputValue: event.value, errorMessage: undefined })),
+  },
+  SHOW_METHODS: {
+    target: 'methodPicker',
+    guard: ctx => ctx.methods.filter(method => method.id !== ctx.activeMethod?.id).length > 0,
+    actions: assign(ctx => ({
+      direction: 1 as const,
+      overlayFrom: 'factor' as const,
+      submitRequested: false,
+      frozenActiveMethodId: ctx.activeMethod?.id,
+    })),
+  },
+  SHOW_HELP: {
+    target: 'help',
+    actions: assign(() => ({
+      direction: 1 as const,
+      overlayFrom: 'factor' as const,
+      submitRequested: false,
+    })),
+  },
+  RESET: 'inactive',
+} satisfies NonNullable<StateConfig<ReverificationContext, ReverificationEvent>['on']>;
+
 export const reverificationMachine = createMachine({
   id: 'reverification',
   initial: 'inactive',
@@ -148,7 +172,6 @@ export const reverificationMachine = createMachine({
     direction: 1,
     activeMethod: null,
     methods: [],
-    canResend: true,
     resendAvailableAt: undefined,
     abortRequested: false,
     submitRequested: false,
@@ -185,27 +208,10 @@ export const reverificationMachine = createMachine({
     */
     preparing: {
       on: {
-        TYPE: {
-          actions: assign((_, event) => ({ inputValue: event.value, errorMessage: undefined })),
-        },
+        ...factorEvents,
         SUBMIT: {
           actions: assign(() => ({ submitRequested: true })),
         },
-        SHOW_METHODS: {
-          target: 'methodPicker',
-          guard: ctx => ctx.methods.filter(method => method.id !== ctx.activeMethod?.id).length > 0,
-          actions: assign(ctx => ({
-            direction: 1 as const,
-            overlayFrom: 'factor' as const,
-            submitRequested: false,
-            frozenActiveMethodId: ctx.activeMethod?.id,
-          })),
-        },
-        SHOW_HELP: {
-          target: 'help',
-          actions: assign(() => ({ direction: 1 as const, overlayFrom: 'factor' as const, submitRequested: false })),
-        },
-        RESET: 'inactive',
       },
       invoke: fromPromise(prepareActive, {
         onDone: [
@@ -247,32 +253,21 @@ export const reverificationMachine = createMachine({
 
     verifying: {
       always: [{ guard: ctx => ctx.activeMethod === null, target: 'unavailable' }],
-      after: {
-        [RESEND_COOLDOWN_MS]: { guard: ctx => !ctx.canResend, actions: assign(() => unlockResend()) },
-      },
       on: {
-        TYPE: {
-          actions: assign((_, event) => ({ inputValue: event.value, errorMessage: undefined })),
-        },
+        ...factorEvents,
         SUBMIT: 'submitting',
         RESEND: {
-          target: 'resending',
-          guard: ctx => Boolean(ctx.activeMethod && needsPrepare(ctx.activeMethod) && ctx.canResend),
-        },
-        SHOW_METHODS: {
-          target: 'methodPicker',
-          guard: ctx => ctx.methods.filter(method => method.id !== ctx.activeMethod?.id).length > 0,
-          actions: assign(ctx => ({
-            direction: 1 as const,
-            overlayFrom: 'factor' as const,
-            frozenActiveMethodId: ctx.activeMethod?.id,
+          target: 'preparing',
+          guard: ctx =>
+            Boolean(ctx.activeMethod && needsPrepare(ctx.activeMethod)) &&
+            (ctx.resendAvailableAt === undefined || Date.now() >= ctx.resendAvailableAt),
+          actions: assign(() => ({
+            ...lockResend(),
+            inputValue: '',
+            errorMessage: undefined,
+            submitRequested: false,
           })),
         },
-        SHOW_HELP: {
-          target: 'help',
-          actions: assign(() => ({ direction: 1 as const, overlayFrom: 'factor' as const })),
-        },
-        RESET: 'inactive',
       },
     },
 
@@ -289,20 +284,6 @@ export const reverificationMachine = createMachine({
             actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
           },
         ],
-      }),
-    },
-
-    resending: {
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(prepareActive, {
-        onDone: {
-          target: 'verifying',
-          actions: assign(() => ({ ...lockResend(), inputValue: '', errorMessage: undefined })),
-        },
-        onError: {
-          target: 'verifying',
-          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
-        },
       }),
     },
 
@@ -366,7 +347,7 @@ export const reverificationMachine = createMachine({
   },
 });
 
-const pendingStates = new Set(['submitting', 'resending', 'completing']);
+const pendingStates = new Set(['submitting', 'completing']);
 
 function viewStep(value: string, method: ReverificationMethod | null): ReverificationViewProps['step'] | undefined {
   if (value === 'methodPicker' || value === 'methodPickerPreparing') {
@@ -375,13 +356,7 @@ function viewStep(value: string, method: ReverificationMethod | null): Reverific
   if (value === 'help') {
     return 'help';
   }
-  if (
-    value === 'verifying' ||
-    value === 'submitting' ||
-    value === 'preparing' ||
-    value === 'resending' ||
-    value === 'completing'
-  ) {
+  if (value === 'verifying' || value === 'submitting' || value === 'preparing' || value === 'completing') {
     if (!method) {
       return undefined;
     }
@@ -427,7 +402,8 @@ export function useReverificationController(model: ReverificationModel): Reverif
 
   const [now, setNow] = useState(() => Date.now());
   const resendAvailableAt = snapshot.context.resendAvailableAt;
-  const countingDown = Boolean(resendAvailableAt && !snapshot.context.canResend);
+  const canResend = resendAvailableAt === undefined || now >= resendAvailableAt;
+  const countingDown = !canResend;
 
   useEffect(() => {
     if (!countingDown) {
@@ -492,7 +468,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
     onSelectMethod: id => send({ type: 'SELECT_METHOD', id }),
     otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
     onResend: () => send({ type: 'RESEND' }),
-    canResend: context.canResend,
+    canResend,
     // We clamp this to 30s because the first render after locking resend
     // will have the old `now` state set, which would result in a value above
     // 30s. There are other solutions like reading Date.now() in render and

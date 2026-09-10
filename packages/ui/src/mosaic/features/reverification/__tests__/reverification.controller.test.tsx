@@ -94,7 +94,6 @@ describe('reverificationMachine', () => {
     expect(prepare).toHaveBeenCalledOnce();
     expect(actor.getSnapshot().value).toBe('verifying');
     expect(actor.getSnapshot().context.activeMethod?.strategy).toBe('email_code');
-    expect(actor.getSnapshot().context.canResend).toBe(false);
     expect(actor.getSnapshot().context.resendAvailableAt).toEqual(expect.any(Number));
 
     actor.send({ type: 'SHOW_METHODS' });
@@ -213,7 +212,7 @@ describe('reverificationMachine', () => {
     );
     await tick();
     expect(actor.getSnapshot().value).toBe('preparing');
-    expect(actor.getSnapshot().context.canResend).toBe(false);
+    expect(actor.getSnapshot().context.resendAvailableAt).toEqual(expect.any(Number));
 
     actor.send({ type: 'TYPE', value: '123456' });
     expect(actor.getSnapshot().context.inputValue).toBe('123456');
@@ -221,7 +220,6 @@ describe('reverificationMachine', () => {
     prepare.resolve();
     await tick();
     expect(actor.getSnapshot().value).toBe('verifying');
-    expect(actor.getSnapshot().context.canResend).toBe(false);
     expect(actor.getSnapshot().context.resendAvailableAt).toEqual(expect.any(Number));
   });
 
@@ -247,6 +245,46 @@ describe('reverificationMachine', () => {
     await tick();
     expect(attempt).toHaveBeenCalledOnce();
     expect(actor.getSnapshot().value).toBe('completing');
+  });
+
+  it('keeps the factor interactive and queues submit while resend prepares', async () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1_000);
+    const resend = deferred<void>();
+    let prepareCount = 0;
+    const prepare = vi.fn(() => {
+      prepareCount += 1;
+      return prepareCount === 1 ? Promise.resolve() : resend.promise;
+    });
+    const attempt = vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+
+    try {
+      const actor = startActor(
+        seatedDeps({
+          start: vi.fn(async () => firstFactorResult({ methods: [email], startingMethod: email })),
+          prepare,
+          attempt,
+        }),
+      );
+      await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('verifying'));
+
+      actor.send({ type: 'SHOW_HELP' });
+      actor.send({ type: 'BACK' });
+      now.mockReturnValue(31_000);
+      actor.send({ type: 'RESEND' });
+
+      expect(actor.getSnapshot().value).toBe('preparing');
+      expect(actor.getSnapshot().context.resendAvailableAt).toBe(61_000);
+
+      actor.send({ type: 'TYPE', value: '123456' });
+      actor.send({ type: 'SUBMIT' });
+      expect(actor.getSnapshot().context.inputValue).toBe('123456');
+      expect(attempt).not.toHaveBeenCalled();
+
+      resend.resolve();
+      await vi.waitFor(() => expect(attempt).toHaveBeenCalledWith(email, '123456'));
+    } finally {
+      now.mockRestore();
+    }
   });
 });
 
