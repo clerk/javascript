@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { usePreviewImage } from './fixtures/use-preview-image';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
@@ -21,7 +22,6 @@ export const meta: StoryMeta = {
 };
 
 export function Default(_args: Record<string, unknown>) {
-  const editName = useUserProfileEditNameFixture();
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
     { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
@@ -29,6 +29,8 @@ export function Default(_args: Record<string, unknown>) {
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
+  const { imageUrl, showFile, clearImage } = usePreviewImage(profileImageUrl);
+  const editName = useUserProfileEditNameFixture();
 
   return (
     <UserProfileProfilePanelView
@@ -61,7 +63,8 @@ export function Default(_args: Record<string, unknown>) {
           connected: false,
         },
       ]}
-      imageUrl={profileImageUrl}
+      hasImage={Boolean(imageUrl)}
+      imageUrl={imageUrl}
       phones={phones}
       username='prestonxyz'
       onAddEmail={() =>
@@ -82,10 +85,11 @@ export function Default(_args: Record<string, unknown>) {
       }
       onConnectAccount={() => undefined}
       onDeleteAccount={() => Promise.resolve()}
-      onEditProfilePicture={() => undefined}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
+      onProfilePictureChange={showFile}
       onRemoveConnectedAccount={() => undefined}
+      onRemoveProfilePicture={clearImage}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onConnectWeb3Wallet={() => undefined}

@@ -153,6 +153,9 @@ export class StateProxy implements State {
         get supportedFirstFactors() {
           return gateProperty(target, 'supportedFirstFactors', []);
         },
+        get ssoFallbackFirstFactors() {
+          return gateProperty(target, 'ssoFallbackFirstFactors', []);
+        },
         get supportedSecondFactors() {
           return gateProperty(target, 'supportedSecondFactors', []);
         },

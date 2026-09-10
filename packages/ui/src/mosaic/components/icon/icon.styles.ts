@@ -23,4 +23,6 @@ export const sizes = stylex.create({
   sm: { height: space['3.5'], width: space['3.5'] },
   md: { height: space['4'], width: space['4'] },
   lg: { height: space['5'], width: space['5'] },
+  // Sized by the font around it, for an icon that sits in running text or a heading.
+  inherit: { height: '1em', width: '1em' },
 });

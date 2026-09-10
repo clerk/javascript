@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { Heading } from '../components/heading';
+import { Profile } from '../components/profile';
 import { mergeStyleProps, themeProps } from '../props';
 import type {
   UserProfileAccountSectionViewProps,
@@ -36,6 +36,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
 export function UserProfileProfilePanelView({
   allowMultipleAccounts,
   imageUrl,
+  hasImage,
   name = '',
   username = '',
   firstName,
@@ -44,7 +45,9 @@ export function UserProfileProfilePanelView({
   phones = [],
   connectedAccounts = [],
   web3Wallets = [],
-  onEditProfilePicture,
+  onProfilePictureChange,
+  onProfilePictureReject,
+  onRemoveProfilePicture,
   onSaveName,
   onUsernameChange,
   onAddEmail,
@@ -68,17 +71,13 @@ export function UserProfileProfilePanelView({
 }: UserProfileProfilePanelViewProps): ReactElement {
   return (
     <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(styles.root))}>
-      <Heading
-        render={props => <h3 {...props} />}
-        size='2xl'
-      >
-        Account
-      </Heading>
+      <Profile.PageTitle>Account</Profile.PageTitle>
       <div {...stylex.props(styles.sections)}>
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
           firstName={firstName}
+          hasImage={hasImage}
           imageUrl={imageUrl}
           lastName={lastName}
           name={name}
@@ -86,11 +85,13 @@ export function UserProfileProfilePanelView({
           username={username}
           onAddEmail={onAddEmail}
           onAddPhone={onAddPhone}
-          onEditProfilePicture={onEditProfilePicture}
           onManageEmail={onManageEmail}
           onManagePhone={onManagePhone}
+          onProfilePictureChange={onProfilePictureChange}
+          onProfilePictureReject={onProfilePictureReject}
           onRemoveEmail={onRemoveEmail}
           onRemovePhone={onRemovePhone}
+          onRemoveProfilePicture={onRemoveProfilePicture}
           onSetPrimaryEmail={onSetPrimaryEmail}
           onSetPrimaryPhone={onSetPrimaryPhone}
           onVerifyEmail={onVerifyEmail}

@@ -92,7 +92,7 @@ export function UserProfileEditNameView({
           renderBranding={false}
         >
           <Card.Header>
-            <Card.Title>{m.editName.title}</Card.Title>
+            <Card.Title>{m.name.dialogTitle}</Card.Title>
           </Card.Header>
           {/* The body IS the form, so `Card.Content`'s own column spaces the fields and nothing
               here needs a stylesheet. Safe on `Content` where it would not be on `Root`: the
@@ -114,7 +114,7 @@ export function UserProfileEditNameView({
               </Banner.Root>
             ) : null}
             <Field.Root invalid={Boolean(error?.fields?.firstName)}>
-              <Field.Label>{m.editName.firstNameLabel}</Field.Label>
+              <Field.Label>{m.name.firstNameLabel}</Field.Label>
               <Input
                 ref={firstNameRef}
                 autoComplete='given-name'
@@ -125,7 +125,7 @@ export function UserProfileEditNameView({
               {error?.fields?.firstName ? <Field.Error>{error.fields.firstName}</Field.Error> : null}
             </Field.Root>
             <Field.Root invalid={Boolean(error?.fields?.lastName)}>
-              <Field.Label>{m.editName.lastNameLabel}</Field.Label>
+              <Field.Label>{m.name.lastNameLabel}</Field.Label>
               <Input
                 autoComplete='family-name'
                 disabled={isSaving}
@@ -152,7 +152,7 @@ export function UserProfileEditNameView({
                   color='neutral'
                   fullWidth
                 >
-                  {m.editName.cancelLabel}
+                  {m.name.cancel}
                 </Button>
               }
             />
@@ -161,7 +161,7 @@ export function UserProfileEditNameView({
               fullWidth
               isPending={isSaving}
             >
-              {m.editName.actionLabel}
+              {m.name.save}
             </SubmitButton>
           </Card.Footer>
         </Card.Root>

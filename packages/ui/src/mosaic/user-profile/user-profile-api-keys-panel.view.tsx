@@ -3,10 +3,10 @@ import type { ReactElement } from 'react';
 
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
-import { Heading } from '../components/heading';
 import { Icon } from '../components/icon';
 import { Input } from '../components/input';
 import { Menu } from '../components/menu';
+import { Profile } from '../components/profile';
 import { mergeStyleProps, themeProps } from '../props';
 import { styles } from './user-profile-api-keys-panel.styles';
 
@@ -65,12 +65,7 @@ export function UserProfileApiKeysPanelView({
 
   return (
     <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(styles.root))}>
-      <Heading
-        render={props => <h3 {...props} />}
-        size='2xl'
-      >
-        API Keys
-      </Heading>
+      <Profile.PageTitle>API Keys</Profile.PageTitle>
       <div {...stylex.props(styles.toolbar)}>
         <div {...stylex.props(styles.searchWrapper)}>
           <Icon

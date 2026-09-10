@@ -8,6 +8,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { usePreviewImage } from './fixtures/use-preview-image';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
@@ -40,13 +41,15 @@ function AccountSection({
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
+  const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
 
   return (
     <UserProfileAccountSectionView
       {...editName}
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
-      imageUrl='https://avatars.githubusercontent.com/u/51144033?v=4'
+      hasImage={Boolean(imageUrl)}
+      imageUrl={imageUrl}
       phones={phones}
       username='prestonxyz'
       onAddEmail={() =>
@@ -65,11 +68,12 @@ function AccountSection({
           },
         ])
       }
-      onEditProfilePicture={() => undefined}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
+      onProfilePictureChange={showFile}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
+      onRemoveProfilePicture={clearImage}
       onUsernameChange={() => undefined}
     />
   );

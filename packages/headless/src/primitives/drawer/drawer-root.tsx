@@ -132,8 +132,11 @@ function DrawerInner(props: DrawerProps) {
   // CSS-var writers. `setSwipe` is the single writer of the live swipe-y, keeping
   // the var and the `curSwipe` ref in lockstep so drag decisions can read the ref.
   const curSwipe = useRef(0);
+  // Written to the backdrop as well: it is the popup's sibling, so nothing it needs — the dismiss
+  // progress its fade follows — would otherwise reach it through inheritance.
   const setVar = useCallback((name: string, value: string) => {
     popupRef.current?.style.setProperty(name, value);
+    backdropRef.current?.style.setProperty(name, value);
   }, []);
   const setSwipe = useCallback(
     (px: number) => {

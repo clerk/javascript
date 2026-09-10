@@ -1452,6 +1452,9 @@ export const daDK: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Nulstil adgangskode',
       resendButton: 'Modtog du ikke en kode? Send igen',
@@ -1516,6 +1519,15 @@ export const daDK: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Vi skal bekræfte din identitet, før du nulstiller din adgangskode.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Tilmeld dig',

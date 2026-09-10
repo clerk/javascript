@@ -153,4 +153,36 @@ describe('Section', () => {
     expect(screen.getByText('Name')).toHaveStyle({ color: 'rgb(255, 0, 0)' });
     expect(actionsRef.current).toHaveClass('cl-section-actions');
   });
+
+  it('renders a row-level error as a sibling of the item, with the alert glyph', () => {
+    render(
+      <Section.Root>
+        <Section.Group>
+          <Section.Row data-testid='row'>
+            <Section.Item data-testid='item'>
+              <Section.Content>
+                <Section.Label>Profile picture</Section.Label>
+              </Section.Content>
+            </Section.Item>
+            <Section.Error data-testid='error'>File type not supported.</Section.Error>
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const error = screen.getByTestId('error');
+    expect(error).toHaveClass('cl-section-error');
+    expect(error.tagName).toBe('P');
+    // A row-level message announces itself; there is no field to describe it.
+    expect(error).toHaveAttribute('role', 'alert');
+    expect(error).toHaveTextContent('File type not supported.');
+    // Outside the item, so the item's media and actions keep their centre line.
+    expect(screen.getByTestId('item')).not.toContainElement(error);
+    expect(screen.getByTestId('row')).toContainElement(error);
+
+    const icon = error.querySelector('.cl-icon');
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
+    expect(icon).toHaveAttribute('data-size', 'sm');
+  });
 });

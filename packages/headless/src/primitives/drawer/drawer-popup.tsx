@@ -3,12 +3,19 @@
 import { FloatingFocusManager } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
+import { type FocusTarget, useFinalFocus } from '../../hooks/use-focus-target';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { DrawerAttrs, DrawerCssVars } from './css-vars';
 import { useDrawerContext } from './drawer-context';
 
 /** Props for {@link DrawerPopup}. */
-export type DrawerPopupProps = ComponentProps<'div'>;
+export interface DrawerPopupProps extends ComponentProps<'div'> {
+  /**
+   * Where focus returns when the drawer closes. Default: the trigger, via `useReturnFocus`. The
+   * function form is called with the close's interaction type and may return an element.
+   */
+  finalFocus?: FocusTarget;
+}
 
 /**
  * The drawer sheet (`role="dialog"`). Hosts the drag gesture, focus trapping
@@ -17,7 +24,7 @@ export type DrawerPopupProps = ComponentProps<'div'>;
  * opening on touch does not summon the keyboard.
  */
 export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function DrawerPopup(props, ref) {
-  const { render, ...otherProps } = props;
+  const { render, finalFocus, ...otherProps } = props;
   const {
     popupRef,
     refs,
@@ -98,6 +105,8 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     props: mergeProps<'div'>(defaultProps, otherProps),
   });
 
+  const resolvedReturnFocus = useFinalFocus(finalFocus, returnFocusRef, floatingContext);
+
   if (!element) {
     return null;
   }
@@ -108,7 +117,7 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
       modal={modal}
       outsideElementsInert={modal}
       initialFocus={autoFocus ? undefined : popupRef}
-      returnFocus={returnFocusRef}
+      returnFocus={resolvedReturnFocus}
     >
       {element}
     </FloatingFocusManager>

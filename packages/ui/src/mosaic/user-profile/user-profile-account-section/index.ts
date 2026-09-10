@@ -1,4 +1,4 @@
-export { userProfileAccountSectionBase } from './user-profile-account-section.messages';
+export { fill, userProfileAccountSectionBase } from './user-profile-account-section.messages';
 export type { UserProfileFormError } from './user-profile-account-section.types';
 export type {
   UserProfileAccountSectionViewProps,
