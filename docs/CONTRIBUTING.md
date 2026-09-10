@@ -306,6 +306,26 @@ If you are a paying Clerk customer looking for support, please reach out directl
 
 ## Localizations
 
+All Clerk-authored UI text must come from the localization system. Do not hardcode English in components or in data that supplies their text. This includes headings, buttons, status messages, instructions, errors, placeholders, and accessibility labels. The requirement also applies to conditional expressions, template strings, and configuration objects outside JSX.
+
+Use `localizationKeys(...)` with the `localizationKey` prop for components that support it:
+
+```tsx
+<Text localizationKey={localizationKeys('formFieldLabel__role')} />
+```
+
+Use `t` from `useLocalizations()` when a prop or function requires a string:
+
+```tsx
+const { t } = useLocalizations();
+
+<button aria-label={t(localizationKeys('backButton'))} />;
+```
+
+Passing English directly to `localizationKey` or `t(...)` does not translate it. For conditional text, select a localization key for each message. For text that includes a variable, put the complete message in the localization resource and pass the variable as a localization parameter. Do not build sentences by joining translated fragments or adding English text.
+
+Store localization keys in configuration objects that supply UI text, such as arrays of provider setup instructions and translate them when rendering.
+
 If you want to add or edit localizations (e.g. how a button text is translated to your language), you can check out the [`localizations` README](../packages/localizations/README.md).
 
 ## Publishing packages

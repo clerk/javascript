@@ -11,6 +11,7 @@ Clerk's JavaScript SDK and library monorepo.
 - Commits must be conventional: `type(scope):` (commitlint enforces, on the PR title). `scope` is the package name without `@clerk/`, or `repo` / `release` / `e2e` / `ci` / `*`. `clerk-js` uses scope `js` (`clerk-js` is also accepted). Scope is mandatory; `docs` is a type, not a scope.
 - PR descriptions follow `.github/PULL_REQUEST_TEMPLATE.md` and add no sections of their own. Never add a "Testing" (or "Test plan" / "How to test") section summarizing the tests written or the checks run; the Checklist covers that and reviewers read the diff. Describe the change, not the work done on it.
 - Keep code comments minimal. Do not add a comment unless it is critical to explain WHY a non-obvious change was made; never restate what the code does. When one is warranted, keep it to a single terse line, not a verbose multi-line block.
+- All Clerk-authored UI text must come from the localization system. Do not hardcode English in JSX, text props (including accessibility labels), conditional expressions, template strings, or configuration objects used to render text. Use `localizationKeys(...)` with `localizationKey`, or `t(localizationKeys(...))` where a string is required. Plain strings passed to `localizationKey` or `t(...)` are not translated. User data and technical identifiers do not need translation. See `docs/CONTRIBUTING.md#localizations` for examples.
 
 ## References
 
