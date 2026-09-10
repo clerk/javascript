@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -18,7 +18,7 @@ const fruits = [
 
 function FilteredAutocomplete(
   props: {
-    onValueChange?: (value: string | undefined) => void;
+    onValueChange?: (value: string) => void;
     onInputValueChange?: (value: string) => void;
     defaultInputValue?: string;
   } = {},
@@ -77,76 +77,7 @@ function StaticAutocomplete(props: Partial<React.ComponentProps<typeof Autocompl
 }
 
 describe('Autocomplete', () => {
-  it('measures a custom popup anchor while keeping keyboard focus on the input', async () => {
-    const user = userEvent.setup();
-    const anchor = document.createElement('div');
-    document.body.append(anchor);
-    const measureAnchor = vi.spyOn(anchor, 'getBoundingClientRect');
-
-    function AnchoredAutocomplete({ anchor }: { anchor?: HTMLElement }) {
-      return (
-        <Autocomplete.Root>
-          <Autocomplete.Input aria-label='Fruit' />
-          <Autocomplete.Positioner anchor={anchor}>
-            <Autocomplete.Popup>
-              <Autocomplete.Option value='apple'>Apple</Autocomplete.Option>
-            </Autocomplete.Popup>
-          </Autocomplete.Positioner>
-        </Autocomplete.Root>
-      );
-    }
-
-    const { rerender } = render(<AnchoredAutocomplete anchor={anchor} />);
-    const input = screen.getByRole('combobox', { name: 'Fruit' });
-    await user.type(input, 'a');
-
-    await waitFor(() => expect(measureAnchor).toHaveBeenCalled());
-    await user.keyboard('{ArrowDown}');
-    expect(input).toHaveFocus();
-    expect(input).toHaveAttribute('aria-controls', screen.getByRole('listbox').id);
-
-    const measureInput = vi.spyOn(input, 'getBoundingClientRect');
-    rerender(<AnchoredAutocomplete />);
-    await waitFor(() => expect(measureInput).toHaveBeenCalled());
-    expect(input).toHaveFocus();
-    anchor.remove();
-  });
-
   describe('open/close', () => {
-    it('toggles from a popup button while keeping focus on the input', async () => {
-      const user = userEvent.setup();
-      const onOpenChange = vi.fn();
-      render(
-        <Autocomplete.Root onOpenChange={onOpenChange}>
-          <Autocomplete.Input placeholder='Search fruits...' />
-          <Autocomplete.Trigger aria-label='Toggle fruit options' />
-          <Autocomplete.Positioner>
-            <Autocomplete.Popup>
-              <Autocomplete.Option value='apple'>Apple</Autocomplete.Option>
-            </Autocomplete.Popup>
-          </Autocomplete.Positioner>
-        </Autocomplete.Root>,
-      );
-
-      const input = screen.getByRole('combobox');
-      const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
-      expect(trigger).toHaveAttribute('tabindex', '-1');
-      expect(trigger).toHaveAttribute('aria-expanded', 'false');
-
-      await user.click(trigger);
-
-      const listbox = screen.getByRole('listbox');
-      expect(trigger).toHaveAttribute('aria-expanded', 'true');
-      expect(trigger).toHaveAttribute('aria-controls', listbox.id);
-      expect(input).toHaveFocus();
-
-      await user.click(trigger);
-
-      expect(onOpenChange).toHaveBeenLastCalledWith(false);
-      expect(trigger).toHaveAttribute('aria-expanded', 'false');
-      expect(input).toHaveFocus();
-    });
-
     it('opens when user types', async () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
@@ -372,54 +303,6 @@ describe('Autocomplete', () => {
   });
 
   describe('animation lifecycle', () => {
-    it('holds options during exit and shows updated options when reopened', () => {
-      function Fixture({ open, label }: { open: boolean; label: string }) {
-        return (
-          <Autocomplete.Root open={open}>
-            <Autocomplete.Input aria-label='Fruit' />
-            <Autocomplete.Positioner>
-              <Autocomplete.Popup data-testid='autocomplete-popup'>
-                <Autocomplete.Option value={label}>{label}</Autocomplete.Option>
-              </Autocomplete.Popup>
-            </Autocomplete.Positioner>
-          </Autocomplete.Root>
-        );
-      }
-
-      const { rerender } = render(
-        <Fixture
-          open
-          label='Apple'
-        />,
-      );
-      const popup = screen.getByTestId('autocomplete-popup');
-      Object.defineProperty(popup, 'getAnimations', {
-        value: () => [{ finished: new Promise<void>(() => {}) }],
-      });
-
-      rerender(
-        <Fixture
-          open={false}
-          label='Banana'
-        />,
-      );
-
-      expect(popup).toHaveAttribute('data-closed', '');
-      expect(popup).toHaveTextContent('Apple');
-      expect(popup).not.toHaveTextContent('Banana');
-
-      rerender(
-        <Fixture
-          open
-          label='Banana'
-        />,
-      );
-
-      expect(popup).toHaveAttribute('data-open', '');
-      expect(screen.getByRole('option', { name: 'Banana' })).toBeInTheDocument();
-      expect(popup).not.toHaveTextContent('Apple');
-    });
-
     it('positioner is not rendered when closed', () => {
       render(<StaticAutocomplete />);
       expect(document.querySelector('[data-testid="autocomplete-positioner"]')).not.toBeInTheDocument();
@@ -553,9 +436,7 @@ describe('Autocomplete', () => {
   });
 
   describe('Autocomplete.List (inline mode)', () => {
-    function InlineAutocomplete(
-      props: { value?: string | undefined; onValueChange?: (value: string | undefined) => void } = {},
-    ) {
+    function InlineAutocomplete(props: { value?: string; onValueChange?: (value: string) => void } = {}) {
       const [inputValue, setInputValue] = useState('');
       const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
 
@@ -715,7 +596,7 @@ describe('Autocomplete', () => {
     it('shows selected state after selecting then remounting', async () => {
       function TestHarness() {
         const [mounted, setMounted] = useState(true);
-        const [value, setValue] = useState<string | undefined>(undefined);
+        const [value, setValue] = useState<string | undefined>();
 
         return (
           <>
@@ -755,7 +636,7 @@ describe('Autocomplete', () => {
   describe('Autocomplete.List inside Popover', () => {
     function AutocompleteInPopover() {
       const [popoverOpen, setPopoverOpen] = useState(false);
-      const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
+      const [selectedValue, setSelectedValue] = useState<string | undefined>();
       const [inputValue, setInputValue] = useState('');
       const selectedLabel = fruits.find(f => f.value === selectedValue)?.label;
       const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
@@ -994,7 +875,7 @@ describe('Autocomplete', () => {
   describe('Autocomplete.List inside Popover — edge cases', () => {
     function AutocompleteInPopoverFull() {
       const [popoverOpen, setPopoverOpen] = useState(false);
-      const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
+      const [selectedValue, setSelectedValue] = useState<string | undefined>();
       const [inputValue, setInputValue] = useState('');
       const selectedLabel = fruits.find(f => f.value === selectedValue)?.label;
       const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));

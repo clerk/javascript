@@ -15,6 +15,122 @@ const fruits = [
 ];
 
 describe('Combobox', () => {
+  it('measures a custom popup anchor while keeping keyboard focus on the input', async () => {
+    const user = userEvent.setup();
+    const anchor = document.createElement('div');
+    document.body.append(anchor);
+    const measureAnchor = vi.spyOn(anchor, 'getBoundingClientRect');
+
+    function AnchoredCombobox({ anchor }: { anchor?: HTMLElement }) {
+      return (
+        <Combobox.Root>
+          <Combobox.Input aria-label='Fruit' />
+          <Combobox.Positioner anchor={anchor}>
+            <Combobox.Popup>
+              <Combobox.Option value='apple'>Apple</Combobox.Option>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Root>
+      );
+    }
+
+    const { rerender } = render(<AnchoredCombobox anchor={anchor} />);
+    const input = screen.getByRole('combobox', { name: 'Fruit' });
+    await user.type(input, 'a');
+
+    await waitFor(() => expect(measureAnchor).toHaveBeenCalled());
+    await user.keyboard('{ArrowDown}');
+    expect(input).toHaveFocus();
+    expect(input).toHaveAttribute('aria-controls', screen.getByRole('listbox').id);
+
+    const measureInput = vi.spyOn(input, 'getBoundingClientRect');
+    rerender(<AnchoredCombobox />);
+    await waitFor(() => expect(measureInput).toHaveBeenCalled());
+    expect(input).toHaveFocus();
+    anchor.remove();
+  });
+
+  it('toggles from a popup button while keeping focus on the input', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <Combobox.Root onOpenChange={onOpenChange}>
+        <Combobox.Input placeholder='Search fruits...' />
+        <Combobox.Trigger aria-label='Toggle fruit options' />
+        <Combobox.Positioner>
+          <Combobox.Popup>
+            <Combobox.Option value='apple'>Apple</Combobox.Option>
+          </Combobox.Popup>
+        </Combobox.Positioner>
+      </Combobox.Root>,
+    );
+
+    const input = screen.getByRole('combobox');
+    const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
+    expect(trigger).toHaveAttribute('tabindex', '-1');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(trigger);
+
+    const listbox = screen.getByRole('listbox');
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(trigger).toHaveAttribute('aria-controls', listbox.id);
+    expect(input).toHaveFocus();
+
+    await user.click(trigger);
+
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(input).toHaveFocus();
+  });
+
+  it('holds options during exit and shows updated options when reopened', () => {
+    function Fixture({ open, label }: { open: boolean; label: string }) {
+      return (
+        <Combobox.Root open={open}>
+          <Combobox.Input aria-label='Fruit' />
+          <Combobox.Positioner>
+            <Combobox.Popup data-testid='combobox-popup'>
+              <Combobox.Option value={label}>{label}</Combobox.Option>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Root>
+      );
+    }
+
+    const { rerender } = render(
+      <Fixture
+        open
+        label='Apple'
+      />,
+    );
+    const popup = screen.getByTestId('combobox-popup');
+    Object.defineProperty(popup, 'getAnimations', {
+      value: () => [{ finished: new Promise<void>(() => {}) }],
+    });
+
+    rerender(
+      <Fixture
+        open={false}
+        label='Banana'
+      />,
+    );
+
+    expect(popup).toHaveAttribute('data-closed', '');
+    expect(popup).toHaveTextContent('Apple');
+    expect(popup).not.toHaveTextContent('Banana');
+
+    rerender(
+      <Fixture
+        open
+        label='Banana'
+      />,
+    );
+
+    expect(popup).toHaveAttribute('data-open', '');
+    expect(screen.getByRole('option', { name: 'Banana' })).toBeInTheDocument();
+    expect(popup).not.toHaveTextContent('Apple');
+  });
   describe('selection-only input', () => {
     it('keeps the selected option when hover and keyboard highlight move', async () => {
       const user = userEvent.setup();

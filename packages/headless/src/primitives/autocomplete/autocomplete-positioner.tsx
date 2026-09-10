@@ -6,24 +6,13 @@ import React from 'react';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useAutocompleteContext } from './autocomplete-context';
 
-export interface AutocompletePositionerProps extends ComponentProps<'div'> {
-  /** Element used for popup positioning. Defaults to the input. */
-  anchor?: HTMLElement | null;
-}
+export type AutocompletePositionerProps = ComponentProps<'div'>;
 
 export const AutocompletePositioner = React.forwardRef<HTMLDivElement, AutocompletePositionerProps>(
   function AutocompletePositioner(props, ref) {
-    const { anchor, render, ...otherProps } = props;
+    const { render, ...otherProps } = props;
     const { mounted, floatingContext, refs, floatingStyles, placement, getFloatingProps, elementsRef, labelsRef } =
       useAutocompleteContext();
-
-    React.useLayoutEffect(() => {
-      if (!anchor) {
-        return;
-      }
-      refs.setPositionReference(anchor);
-      return () => refs.setPositionReference(refs.domReference.current);
-    }, [anchor, refs]);
 
     const side = placement.split('-')[0];
 
