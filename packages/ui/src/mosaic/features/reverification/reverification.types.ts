@@ -30,6 +30,7 @@ export type ReverificationViewProps = {
   onBack?: () => void;
   onEmailSupport: () => void;
   methods: readonly ReverificationMethod[];
+  pendingMethodId?: string;
   onSelectMethod: (id: string) => void;
   otpChannel?: ReverificationOtpChannel;
   identifier?: string;

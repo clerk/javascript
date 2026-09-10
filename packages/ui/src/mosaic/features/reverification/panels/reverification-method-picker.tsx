@@ -80,6 +80,7 @@ export function ReverificationMethodPicker({
             type='button'
             variant='ghost'
             fullWidth
+            disabled={Boolean(pendingMethodId)}
             onClick={onBack}
           >
             {messages.backButton}
@@ -97,7 +98,12 @@ export function ReverificationMethodPicker({
             type='button'
             size='sm'
             variant='link'
-            onClick={onHelp}
+            disabled={Boolean(pendingMethodId)}
+            onClick={() => {
+              if (!pendingMethodId) {
+                onHelp();
+              }
+            }}
           >
             {messages.helpButton}
           </Button>

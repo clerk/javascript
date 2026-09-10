@@ -68,6 +68,7 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
     onBack,
     onEmailSupport,
     methods,
+    pendingMethodId,
     onSelectMethod,
     otpChannel,
     onResend,
@@ -179,6 +180,7 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
                   label: methodLabel(method),
                   icon: methodIcon[method.strategy],
                 }))}
+                pendingMethodId={pendingMethodId}
                 onSelect={onSelectMethod}
                 onHelp={onShowHelp}
                 onBack={onBack}
