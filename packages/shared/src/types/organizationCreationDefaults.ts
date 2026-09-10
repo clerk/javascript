@@ -18,7 +18,7 @@ export type OrganizationCreationAdvisorySeverity = 'warning';
 export interface OrganizationCreationDefaultsJSON extends ClerkResourceJSON {
   advisory: {
     code: OrganizationCreationAdvisoryType;
-    severity: OrganizationCreationAdvisorySeverity;
+    severity?: OrganizationCreationAdvisorySeverity;
     meta: Record<string, string>;
   } | null;
   form: {

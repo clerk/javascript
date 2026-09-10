@@ -37,7 +37,7 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
     }
 
     if (data.advisory) {
-      this.advisory = this.withDefault(data.advisory, this.advisory ?? null);
+      this.advisory = { ...data.advisory, severity: data.advisory.severity ?? 'warning' };
     }
 
     if (data.form) {
