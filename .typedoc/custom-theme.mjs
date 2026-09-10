@@ -479,6 +479,17 @@ function getPickPropertyNames(t) {
 }
 
 /**
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {boolean}
+ */
+function isPickReferenceType(t) {
+  if (!isReferenceTypeDoc(t)) {
+    return false;
+  }
+  return t.name === 'Pick' && t.package === 'typescript' && t.typeArguments?.length === 2;
+}
+
+/**
  * Object shape for a parameter: inline `{ … }`, optional-wrapped, reference to a type alias / interface, or `Pick<T, K>` with literal keys.
  *
  * @param {import('typedoc').Type | undefined} t
@@ -503,8 +514,10 @@ function getParameterObjectShapeDeclaration(t) {
   }
   if (o.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
-    if (ref.name === 'Pick' && ref.package === 'typescript' && ref.typeArguments?.length === 2) {
-      const [sourceType, keysType] = ref.typeArguments;
+    if (isPickReferenceType(ref)) {
+      const [sourceType, keysType] = /** @type {[import('typedoc').Type, import('typedoc').Type]} */ (
+        ref.typeArguments
+      );
       const propertyNames = getPickPropertyNames(keysType);
       if (!propertyNames?.length) {
         return undefined;
@@ -513,7 +526,9 @@ function getParameterObjectShapeDeclaration(t) {
       const sourceRef = sourceType.type === 'reference' ? sourceType.reflection : undefined;
       const sourceWithChildren =
         sourceDecl ??
-        (sourceRef && 'children' in sourceRef
+        (sourceRef &&
+        (sourceRef.kind === ReflectionKind.TypeAlias || sourceRef.kind === ReflectionKind.Interface) &&
+        'children' in sourceRef
           ? /** @type {import('typedoc').DeclarationReflection} */ (sourceRef)
           : undefined);
       if (!sourceWithChildren?.children?.length) {
@@ -572,11 +587,7 @@ function shouldFlattenInlineObjectParameter(decl) {
  */
 function isFlattenedPickParameter(t) {
   const unwrapped = unwrapOptional(t);
-  if (!unwrapped || unwrapped.type !== 'reference') {
-    return false;
-  }
-  const ref = /** @type {import('typedoc').ReferenceType} */ (unwrapped);
-  if (ref.name !== 'Pick' || ref.package !== 'typescript' || ref.typeArguments?.length !== 2) {
+  if (!isPickReferenceType(unwrapped)) {
     return false;
   }
   return shouldFlattenInlineObjectParameter(getParameterObjectShapeDeclaration(t));
@@ -2040,4 +2051,4 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
   return false;
 }
 
-export { isCallableInterfaceProperty };
+export { getParameterObjectShapeDeclaration, isCallableInterfaceProperty };
