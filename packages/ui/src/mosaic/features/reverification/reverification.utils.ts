@@ -1,6 +1,11 @@
 import type { PreferredSignInStrategy } from '@clerk/shared/types';
 
-import type { ReverificationMethod, ReverificationOtpChannel, ReverificationStrategy } from './reverification.types';
+import type {
+  ReverificationMethod,
+  ReverificationOtpChannel,
+  ReverificationPreparableMethod,
+  ReverificationStrategy,
+} from './reverification.types';
 
 export function otpChannelFor(strategy: ReverificationStrategy): ReverificationOtpChannel | undefined {
   if (strategy === 'email_code') {
@@ -15,8 +20,8 @@ export function otpChannelFor(strategy: ReverificationStrategy): ReverificationO
   return undefined;
 }
 
-export function needsPrepare(strategy: ReverificationStrategy): boolean {
-  return strategy === 'email_code' || strategy === 'phone_code';
+export function needsPrepare(method: ReverificationMethod): method is ReverificationPreparableMethod {
+  return method.strategy === 'email_code' || method.strategy === 'phone_code';
 }
 
 function pickStartingFirstFactor(

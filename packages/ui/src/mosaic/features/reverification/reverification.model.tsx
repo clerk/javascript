@@ -12,6 +12,7 @@ import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
 import { useMosaicSupportEmail } from '../../hooks/useMosaicSupportEmail';
 import type {
   ReverificationMethod,
+  ReverificationPreparableMethod,
   ReverificationProps,
   ReverificationResult,
   ReverificationStage,
@@ -23,7 +24,7 @@ export type ReverificationReadyModel = {
   isActive: boolean;
   supportEmail: string;
   start: () => Promise<ReverificationResult>;
-  prepare: (method: ReverificationMethod) => Promise<void>;
+  prepare: (method: ReverificationPreparableMethod) => Promise<void>;
   attempt: (method: ReverificationMethod, value: string) => Promise<ReverificationResult>;
   finish: () => Promise<void>;
   cancel: () => void;
@@ -165,8 +166,6 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
               strategy: 'phone_code',
               phoneNumberId: method.phoneNumberId,
             });
-            return;
-          default:
             return;
         }
       } catch (error) {

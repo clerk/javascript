@@ -16,6 +16,8 @@ export type ReverificationMethod =
   | { id: string; stage: 'first' | 'second'; strategy: 'phone_code'; phoneNumberId: string; identifier: string }
   | { id: string; stage: 'second'; strategy: 'totp' | 'backup_code' };
 
+export type ReverificationPreparableMethod = Extract<ReverificationMethod, { strategy: 'email_code' | 'phone_code' }>;
+
 export type ReverificationViewProps = {
   step: ReverificationStep;
   direction?: FlowDirection;
