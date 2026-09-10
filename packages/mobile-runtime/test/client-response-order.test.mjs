@@ -7,6 +7,60 @@ const earlier = 'Wed, 09 Sep 2026 16:00:00 GMT';
 const later = 'Wed, 09 Sep 2026 16:00:01 GMT';
 const after = 'Wed, 09 Sep 2026 16:00:02 GMT';
 
+for (const newerSessionResponse of [false, true]) {
+  test(`empty foreground client response preserves accepted identity: newer session=${newerSessionResponse}`, async t => {
+    const client = structuredClone(fixtures.authenticatedClient);
+    const active = client.sessions[0];
+    const pending = { ...active, status: 'pending', tasks: [{ key: 'choose-organization' }] };
+    const started = deferred();
+    const reply = deferred();
+    let clientReads = 0;
+    const f = await fixture({
+      client,
+      http: request => {
+        const path = new URL(request.url).pathname;
+        if (path.endsWith('/client') && ++clientReads > 1) {
+          assert.equal(request.method, 'GET');
+          started.resolve();
+          return reply.promise;
+        }
+        if (path.endsWith(`/sessions/${active.id}`))
+          return response(pending, {
+            body: JSON.stringify({ response: pending, client: { ...client, sessions: [pending] } }),
+          });
+      },
+    });
+    t.after(f.dispose);
+    const session = f.state.roots.session;
+    const credential = f.credential;
+    assert.equal(f.resource(f.state.roots.clerk).clientId, client.id);
+    f.receive({ kind: 'lifecycle', state: 'background' });
+    f.receive({ kind: 'lifecycle', state: 'foreground' });
+    await started.promise;
+    if (newerSessionResponse) assert.equal((await f.invoke(session, 'Session.reload')).failure, undefined);
+    await new Promise(resolve => setImmediate(resolve));
+    const messagesBefore = f.messages.length;
+    reply.resolve(response(null));
+    const deadline = Date.now() + 1000;
+    while (
+      !f.messages.slice(messagesBefore).some(message => ['state', 'lifecycleError'].includes(message.kind)) &&
+      Date.now() < deadline
+    )
+      await new Promise(resolve => setTimeout(resolve, 1));
+    assert.ok(f.messages.slice(messagesBefore).some(message => message.kind === 'state'));
+    assert.equal(
+      f.messages.some(message => message.kind === 'lifecycleError'),
+      false,
+    );
+    assert.equal(f.resource(f.state.roots.clerk).clientId, client.id);
+    assert.deepEqual(f.state.roots.session, session);
+    assert.equal(f.resource(session).status, newerSessionResponse ? 'pending' : 'active');
+    if (newerSessionResponse) assert.equal(f.resource(session).currentTask.key, 'choose-organization');
+    assert.equal(f.credential, credential);
+    assert.equal(clientReads, 2);
+  });
+}
+
 test('session changes become visible only after the client credential is persisted', async t => {
   const active = sessionFixture();
   const pending = { ...active, status: 'pending', tasks: [{ key: 'choose-organization' }] };

@@ -224,7 +224,7 @@ export abstract class BaseResource {
       opts,
     );
 
-    return this.fromJSON((json?.response || json) as J);
+    return this.fromJSON((json && 'response' in json ? json.response : json) as J);
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {

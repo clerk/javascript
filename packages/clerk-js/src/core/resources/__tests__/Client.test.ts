@@ -18,6 +18,42 @@ afterAll(() => {
 });
 
 describe('Client Singleton', () => {
+  it.each(['null payload', 'null response', 'wrapped client', 'unwrapped client'])(
+    'fetch preserves null semantics and accepts resource payloads: %s',
+    async shape => {
+      const user = createUser({ id: 'user_refresh' });
+      const session = createSession({ id: 'sess_refresh' }, user);
+      const initial = {
+        ...createBaseClientJSON(),
+        id: 'client_refresh',
+        sessions: [session],
+        last_active_session_id: session.id,
+      };
+      const next = { ...initial, id: 'client_replacement', sessions: [], last_active_session_id: null };
+      const payload =
+        shape === 'null payload'
+          ? null
+          : shape === 'null response'
+            ? { response: null }
+            : shape === 'wrapped client'
+              ? { response: next }
+              : next;
+      Client.clearInstance();
+      const client = Client.getOrCreateInstance(initial);
+      const fetch = vi.spyOn(BaseResource, '_fetch').mockResolvedValue(payload);
+      try {
+        expect(await client.fetch()).toBe(client);
+        const preserved = shape.startsWith('null');
+        expect(client.id).toBe(preserved ? initial.id : next.id);
+        expect(client.sessions.map(value => value.id)).toEqual(preserved ? [session.id] : []);
+        expect(client.lastActiveSessionId).toBe(preserved ? session.id : null);
+      } finally {
+        fetch.mockRestore();
+        Client.clearInstance();
+      }
+    },
+  );
+
   it('removeSessions returns the updated client resource promised by its type', async () => {
     const user = createUser({ id: 'user_removal' });
     const session = createSession({ id: 'sess_removal' }, user);
