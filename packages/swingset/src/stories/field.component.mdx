@@ -11,7 +11,7 @@ import * as FieldStories from './field.component.stories';
 
 ## Usage
 
-Compose one Mosaic control inside each `Field.Root` to generate its ID, the label's `htmlFor`, and the message relationships. Rendering multiple controls logs a development warning. The caller owns validation and decides when to render an error. Use a separate `Field.Root` for each control; grouped controls should use native `<fieldset>` and `<legend>` semantics until dedicated Mosaic `Fieldset` and `Field.Item` components are available.
+Compose one Mosaic control inside each `Field.Root` to generate its ID, the label relationship, and the message relationships. Rendering multiple controls logs a development warning. The caller owns validation and decides when to render an error. Use a separate `Field.Root` for each control; grouped controls should use native `<fieldset>` and `<legend>` semantics until dedicated Mosaic `Fieldset` and `Field.Item` components are available.
 
 ```tsx
 import { Field } from '@clerk/ui/mosaic/components/field';
@@ -41,6 +41,20 @@ Field does not validate controls or render errors automatically. Its parts may a
 />
 
 Pass `visuallyHidden` to `Field.Label` when the surrounding UI already makes the label redundant. The label is still rendered and still associated with the control, so the control keeps its accessible name — unlike dropping the label and relying on a `placeholder`, which is not an accessible name. It applies the same style as the [VisuallyHidden](/components/visually-hidden) component.
+
+### Controls without a native label
+
+<Story
+  name='WithSelect'
+  storyModule={FieldStories}
+/>
+
+A native `<label>` activates the control it names, which for a `Select` trigger would open the
+listbox on every label click. A control that cannot be natively labelled registers as such, and
+`Field.Label` then renders a `span` instead: clicking it focuses the control, and the control is named
+through `aria-labelledby` rather than `htmlFor`. Description and error relationships are unchanged.
+Explicit `htmlFor` still renders a native `label`. `Select.Trigger` opts in; `Input` and `OTP` keep
+the native label.
 
 ## Parts
 
