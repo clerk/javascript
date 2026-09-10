@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, neutralAlpha, radiusVars, space } from '../../tokens.stylex';
 
 // Timed to match `skeleton.tsx`'s pulse, so the two generations of placeholder read as one thing.
 const pulse = stylex.keyframes({
@@ -50,7 +50,7 @@ export const styles = stylex.create({
   fallback: {
     borderRadius: 'inherit',
     alignItems: 'center',
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-foreground']} 8%, transparent)`,
+    backgroundColor: neutralAlpha['8'],
     color: colorVars['--cl-color-foreground'],
     display: 'flex',
     justifyContent: 'center',

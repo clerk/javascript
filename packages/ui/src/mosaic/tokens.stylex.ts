@@ -22,10 +22,6 @@ import * as stylex from '@stylexjs/stylex';
 // =============================================================================
 // Gray Scale
 // =============================================================================
-// Figma's `base/gray/*`, internal only. The keys carry no `--cl-` prefix on purpose:
-// StyleX hashes them, so there is no `--cl-gray-*` for a consumer to override and the
-// semantic `--cl-color-*` tokens below stay the whole public colour surface. Pure grays,
-// so chroma and hue are 0 and only lightness varies.
 
 export const gray = stylex.defineVars({
   '50': 'oklch(0.9851 0 0)',
@@ -44,10 +40,10 @@ export const gray = stylex.defineVars({
 // =============================================================================
 // Color Tokens
 // =============================================================================
-// Tokens Figma maps to `base/gray/*` read from the scale above. Brand and status
-// colours are literal values there too, so they stay literal here.
 
 const colorDefaults = {
+  '--cl-color-neutral': 'light-dark(oklch(0 0 0), oklch(1 0 0))',
+
   '--cl-color-foreground': `light-dark(${gray['900']}, ${gray['50']})`,
   '--cl-color-foreground-secondary': `light-dark(${gray['600']}, ${gray['400']})`,
   '--cl-color-foreground-disabled': `light-dark(${gray['400']}, ${gray['500']})`,
@@ -87,10 +83,20 @@ const colorDefaults = {
 export const colorVars = stylex.defineVars(colorDefaults);
 
 // =============================================================================
+// Neutral Alpha Scale
+// =============================================================================
+
+export const neutralAlpha = stylex.defineVars({
+  '4': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+  '6': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 6%, transparent)`,
+  '8': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+  '12': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 12%, transparent)`,
+  '18': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 18%, transparent)`,
+});
+
+// =============================================================================
 // Radius Tokens
 // =============================================================================
-// `md` is 6px rather than a 4/8/12 step: it is the control radius (button, avatar
-// square), and neither neighbour sits right on a control.
 
 const radiusDefaults = {
   '--cl-radius-none': '0rem',
@@ -205,8 +211,6 @@ export const scrollFadeVars = stylex.defineVars(scrollFadeDefaults);
 // =============================================================================
 // Spacing Tokens
 // =============================================================================
-// `--cl-spacing` is the ONLY exposed custom property (the base unit, Tailwind's
-// model). Overriding it rescales every gap, pad, and control height at once.
 
 const spacingDefaults = {
   '--cl-spacing': '0.25rem',
@@ -214,12 +218,6 @@ const spacingDefaults = {
 
 export const spacingVars = stylex.defineVars(spacingDefaults);
 
-// The scale is `defineVars` (like astryx's `spacingVars`): each step is a StyleX
-// var whose default is `calc(var(--cl-spacing) * n)`, so overriding `--cl-spacing`
-// still rescales the whole scale. `defineConsts` was tried here but emits no CSS
-// across module boundaries — consumers got dangling `var(--hash)` refs. StyleX
-// hashes these var names (they aren't `--cl-*`), so only `--cl-spacing` stays a
-// stable, targetable custom property. `space['2']` reads like Tailwind's `space-2`.
 const step = (multiple: number): string => `calc(var(--cl-spacing) * ${multiple})`;
 
 export const space = stylex.defineVars({
@@ -309,8 +307,6 @@ export const space = stylex.defineVars({
 // =============================================================================
 // Typography Tokens — type scale
 // =============================================================================
-// One named step scale every text-bearing component sizes against. `defineVars`
-// values are single CSS values, so size and leading are each their own var.
 
 const typeScaleDefaults = {
   '--cl-text-xs-size': '0.75rem',
@@ -342,7 +338,6 @@ export const fontFamilyVars = stylex.defineVars(fontFamilyDefaults);
 // =============================================================================
 // Typography Tokens — font weight
 // =============================================================================
-// Kept separate from the step scale: weight and size vary independently.
 
 const fontWeightDefaults = {
   '--cl-font-normal': '400',
@@ -424,13 +419,6 @@ export const easingVars = stylex.defineVars(easingDefaults);
 // =============================================================================
 // Focus Tokens
 // =============================================================================
-// The keyboard focus ring, as one definition for the whole system. Components read
-// these through `utils/focus-outline.styles.ts`; the `:focus-visible` condition stays
-// there, so a theme can restyle the ring but cannot show it to pointer users.
-//
-// The colour is NOT restated here: it is `--cl-color-ring`, which lives with the other
-// colours. A `--cl-focus-outline-color` alias would be a second public name for the same
-// value, and the two would drift the moment a consumer overrode one of them.
 
 const focusDefaults = {
   '--cl-focus-outline-width': '2px',

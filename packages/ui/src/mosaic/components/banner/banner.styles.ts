@@ -1,8 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
-
-const neutralFill = `color-mix(in oklab, ${colorVars['--cl-color-foreground']} 4%, transparent)`;
+import {
+  colorVars,
+  fontFamilyVars,
+  fontWeightVars,
+  neutralAlpha,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
@@ -39,7 +45,7 @@ export const styles = stylex.create({
 export const rootColors = stylex.create({
   neutral: {
     borderColor: colorVars['--cl-color-border'],
-    backgroundColor: neutralFill,
+    backgroundColor: neutralAlpha['4'],
     color: colorVars['--cl-color-foreground'],
   },
   warning: {

@@ -98,11 +98,12 @@ export const colorVars = stylex.defineVars(colorDefaults);
   would let a consumer override one and not the other, and the ring's appearance
   would then depend on which they picked.
 - **DO** build a fill that sits _on top of_ an unknown backdrop — a hover or pressed
-  wash on a transparent `outline`/`ghost` control — as a **scrim**: an opacity of
-  black-on-light / white-on-dark over `transparent`, not a percentage of a gray token.
+  wash on a transparent `outline`/`ghost` control — from the internal `neutralAlpha`
+  scale: an opacity of black-on-light / white-on-dark over `transparent`, keyed by
+  that opacity, not a percentage of a gray token.
 
   ```ts
-  const step = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 12%, transparent)`;
+  backgroundColor: neutralAlpha['12'],
   ```
 
   A gray token like `--cl-color-foreground` is a 900, not black, so the same percentage of
@@ -315,11 +316,11 @@ device, while touch devices look correct.
   ```ts
   backgroundColor: {
     default: 'transparent',
-    ':enabled:active': neutralStep1,
-    ':enabled[data-open]': neutralStep1,
+    ':enabled:active': neutralAlpha['12'],
+    ':enabled[data-open]': neutralAlpha['12'],
     '@media (hover: hover)': {
       default: null,
-      ':enabled:hover:not(:active):not([data-open])': neutralStep0,
+      ':enabled:hover:not(:active):not([data-open])': neutralAlpha['6'],
     },
   },
   ```

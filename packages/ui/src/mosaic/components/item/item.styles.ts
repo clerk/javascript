@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  fontFamilyVars,
+  fontWeightVars,
+  neutralAlpha,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 export const item = stylex.create({
   base: {
@@ -39,9 +47,9 @@ export const item = stylex.create({
     },
     backgroundColor: {
       default: null,
-      ':active:not(:disabled, [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-foreground']} 8%, transparent)`,
+      ':active:not(:disabled, [aria-disabled="true"])': neutralAlpha['8'],
       '@media (hover: hover)': {
-        ':hover:not(:disabled, [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-foreground']} 4%, transparent)`,
+        ':hover:not(:disabled, [aria-disabled="true"])': neutralAlpha['4'],
       },
     },
     color: {

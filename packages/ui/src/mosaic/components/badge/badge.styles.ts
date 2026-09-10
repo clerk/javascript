@@ -1,15 +1,21 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  fontFamilyVars,
+  fontWeightVars,
+  neutralAlpha,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 // warning/negative/positive fill with the subtle surface and use the saturated token as text;
 // primary fills with the solid token and uses its `-foreground` for text.
 //
 // Neutral has no subtle surface to fill — `--cl-color-foreground-secondary` is a text gray, and its
 // `-foreground` is a text color rather than an on-fill one, so it is unreadable against the solid
-// 900. It rides the same black/white scrim the button's neutral fill does, which composites against
-// any backdrop. Must be a local binding — StyleX inlines it; an imported one fails to compile.
-const neutralScrim = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 6%, transparent)`;
+// 900. It rides the same neutral scrim the button's neutral fill does.
 export const styles = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-full'],
@@ -33,7 +39,7 @@ export const colors = stylex.create({
     color: colorVars['--cl-color-brand-foreground'],
   },
   neutral: {
-    backgroundColor: neutralScrim,
+    backgroundColor: neutralAlpha['6'],
     color: colorVars['--cl-color-foreground'],
   },
   warning: {

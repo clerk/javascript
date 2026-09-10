@@ -25,7 +25,7 @@ export const colorVars = stylex.defineVars({
 
 Groups: `colorVars`, `radiusVars`, `targetVars`, `scrollbarVars`, `scrollFadeVars`, `spacingVars`, `space`, `typeScaleVars`, `fontFamilyVars`, `fontWeightVars`, `durationVars`, `easingVars`, `focusVars`.
 
-`gray` is the one group that is not public: its keys carry no `--cl-` prefix, so StyleX hashes the names and there is no `--cl-gray-*` to override. The gray-backed `--cl-color-*` tokens read from it; consumers retheme those, not the scale.
+`gray` and `neutralAlpha` are the two groups that are not public: their keys carry no `--cl-` prefix, so StyleX hashes the names and there is nothing to override. The gray-backed `--cl-color-*` tokens read from `gray`, and hover, pressed, and resting washes over an unknown backdrop read from `neutralAlpha` (`--cl-color-neutral`, black on light and white on dark, at a fixed opacity over `transparent`); consumers retheme the `--cl-color-*` tokens, not the scales.
 
 Light and dark come from CSS `light-dark()` on the default values, so there is no theme object and no re-render on theme change — the browser resolves it.
 
