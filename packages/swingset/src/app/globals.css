@@ -9,6 +9,12 @@
    (token :root defaults + atoms). See postcss.config.mjs. */
 @stylex;
 
+/* "Warm neutral" header toggle: overrides Mosaic's neutral root so the derived gray ramp
+   (foreground, border, subtle surfaces, alpha washes, shadow) can be previewed warm. */
+html.warm-neutral {
+  --cl-color-neutral: light-dark(oklch(0.2 0.06 50), oklch(0.95 0.06 85));
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
