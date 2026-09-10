@@ -25,6 +25,7 @@ import {
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
 import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
@@ -394,6 +395,7 @@ const iconFrameModule: StoryModule = {
 // `<Preview>` embeds in the MDX, which import the stories module directly.
 const accordionModule: StoryModule = { meta: accordionMeta };
 const autocompleteModule: StoryModule = { meta: autocompleteMeta };
+const comboboxPrimitiveModule: StoryModule = { meta: comboboxPrimitiveMeta };
 const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
@@ -576,6 +578,7 @@ export const registry: StoryModule[] = [
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
+  comboboxPrimitiveModule,
   collapsibleModule,
   dialogModule,
   drawerModule,
