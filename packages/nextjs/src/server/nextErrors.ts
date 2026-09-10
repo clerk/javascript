@@ -147,6 +147,14 @@ function isRedirectToSignInError(error: unknown): error is RedirectError<{ retur
   return false;
 }
 
+function isRedirectToUrlError(error: unknown): error is RedirectError<{ redirectUrl: string | URL }> {
+  if (isNextjsRedirectError(error) && 'clerk_digest' in error) {
+    return error.clerk_digest === CONTROL_FLOW_ERROR.REDIRECT_TO_URL;
+  }
+
+  return false;
+}
+
 function isRedirectToSignUpError(error: unknown): error is RedirectError<{ returnBackUrl: string | URL }> {
   if (isNextjsRedirectError(error) && 'clerk_digest' in error) {
     return error.clerk_digest === CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_UP;
@@ -178,6 +186,7 @@ export {
   isNextjsRedirectError,
   isRedirectToSignInError,
   isRedirectToSignUpError,
+  isRedirectToUrlError,
   isNextjsUnauthorizedError,
   unauthorized,
 };

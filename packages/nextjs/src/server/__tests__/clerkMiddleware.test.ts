@@ -1,6 +1,6 @@
 // There is no need to execute the complete authenticateRequest to test clerkMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
-import { AuthStatus, constants, TokenType } from '@clerk/backend/internal';
+import { AuthErrorReason, AuthStatus, constants, TokenType } from '@clerk/backend/internal';
 import { MalformedURLError } from '@clerk/shared/pathMatcher';
 // used to assert the mock
 import assert from 'assert';
@@ -990,6 +990,159 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.headers.get('location')).toContain('https://www.clerk.com/unauthorizedUrl');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+  });
+
+  describe('App Router RSC navigations with a recoverable signed-out session', () => {
+    const expiredReason = `${AuthErrorReason.SessionTokenExpired}-refresh-refresh-token-missing`;
+
+    const mockSignedOut = (reason: string) => {
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        reason,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
+      });
+    };
+
+    const rscRequest = (extraHeaders: Record<string, string> = {}) =>
+      mockRequest({
+        url: '/protected',
+        headers: new Headers({
+          'next-url': '/protected',
+          [constants.Headers.Accept]: '*/*',
+          [constants.Headers.SecFetchDest]: 'empty',
+          ...extraHeaders,
+        }),
+        appendDevBrowserCookie: true,
+      });
+
+    it('returns 401 instead of redirecting to sign-in when protect is called', async () => {
+      mockSignedOut(expiredReason);
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
+      })(rscRequest(), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get(constants.Headers.CacheControl)).toEqual('no-store');
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('returns 401 instead of redirecting when redirectToSignIn is called directly', async () => {
+      mockSignedOut(expiredReason);
+
+      const resp = await clerkMiddleware(async auth => {
+        (await auth()).redirectToSignIn();
+      })(rscRequest(), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get(constants.Headers.CacheControl)).toEqual('no-store');
+      expect(resp?.headers.get('location')).toBeFalsy();
+    });
+
+    it('returns 401 instead of redirecting to the unauthenticatedUrl passed to protect', async () => {
+      mockSignedOut(expiredReason);
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ unauthenticatedUrl: 'https://www.clerk.com/unauthenticatedUrl' });
+      })(rscRequest(), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get(constants.Headers.CacheControl)).toEqual('no-store');
+      expect(resp?.headers.get('location')).toBeFalsy();
+    });
+
+    it.each([
+      AuthErrorReason.ClientUATWithoutSessionToken,
+      AuthErrorReason.SessionTokenIATBeforeClientUAT,
+      AuthErrorReason.SessionTokenWithoutClientUAT,
+      AuthErrorReason.DevBrowserMissing,
+      AuthErrorReason.DevBrowserSync,
+      AuthErrorReason.SessionTokenNBF,
+      AuthErrorReason.SessionTokenIatInTheFuture,
+    ])('returns 401 for the recoverable reason %s', async reason => {
+      mockSignedOut(reason);
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
+      })(rscRequest(), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+    });
+
+    it('still redirects when the request is a document request', async () => {
+      mockSignedOut(expiredReason);
+
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-in');
+    });
+
+    it('still redirects when the signed-out reason is not recoverable', async () => {
+      mockSignedOut(AuthErrorReason.SessionTokenAndUATMissing);
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
+      })(rscRequest(), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-in');
+    });
+
+    it('still redirects when the Accept header is not the RSC fetch signature', async () => {
+      mockSignedOut(expiredReason);
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
+      })(rscRequest({ [constants.Headers.Accept]: 'application/json' }), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-in');
+    });
+
+    it('still redirects for Pages Router internal navigations', async () => {
+      mockSignedOut(expiredReason);
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
+      })(rscRequest({ 'x-nextjs-data': '1' }), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-in');
+    });
+
+    it('still redirects for non-GET requests', async () => {
+      mockSignedOut(expiredReason);
+
+      const req = mockRequest({
+        url: '/protected',
+        method: 'POST',
+        headers: new Headers({
+          'next-url': '/protected',
+          [constants.Headers.Accept]: '*/*',
+          [constants.Headers.SecFetchDest]: 'empty',
+        }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        (await auth()).redirectToSignIn();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-in');
     });
   });
 
