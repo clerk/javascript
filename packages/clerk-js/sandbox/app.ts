@@ -72,7 +72,10 @@ const OTHER_DEFAULTS = {
 };
 
 function getScenario(): (() => MockScenario) | null {
-  const scenarioName = localStorage.getItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`);
+  // The URL wins so a shared link boots straight into its scenario, matching getComponentProps.
+  const scenarioName =
+    new URL(window.location.href).searchParams.get('scenario') ??
+    localStorage.getItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`);
   if (scenarioName && AVAILABLE_SCENARIOS.includes(scenarioName as AvailableScenario)) {
     return scenarios[scenarioName as AvailableScenario];
   }
