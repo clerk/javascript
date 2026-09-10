@@ -588,7 +588,9 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      expect(await screen.findByText('Google Workspace connections are not supported here')).toBeInTheDocument();
+      expect(
+        await screen.findByText('Google Workspace connections are not configurable via self-serve'),
+      ).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
       expect(screen.queryByText('SSO Required')).not.toBeInTheDocument();
     });
