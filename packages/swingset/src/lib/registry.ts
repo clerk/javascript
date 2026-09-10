@@ -1,7 +1,6 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
-import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
 import {
   Fallback as AvatarFallbackStory,
   Interactive as AvatarInteractive,
@@ -26,6 +25,7 @@ import {
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
 import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
