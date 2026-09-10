@@ -37,7 +37,12 @@ const attempt = (second = false) => ({
 const apiError = () =>
   response(null, {
     status: 400,
-    body: JSON.stringify({ errors: [{ code: 'passkey_verification_failed', message: 'Credential rejected' }] }),
+    body: JSON.stringify({
+      clerk_trace_id: 'passkey-signin-trace',
+      errors: [
+        { code: 'passkey_verification_failed', message: 'Credential rejected', long_message: 'Try another passkey.' },
+      ],
+    }),
   });
 
 for (const flow of ['autofill', 'discoverable']) {
@@ -126,7 +131,11 @@ for (const failedStage of ['preparingFirstFactor', 'requestingAuthorization', 'a
     const result = await f.invoke(f.state.roots.signIn, 'SignIn.passkey', [{ flow: 'discoverable' }]);
     assert.equal(result.result.error.passkeyStage, failedStage);
     if (failedStage === 'requestingAuthorization') assert.equal(result.result.error.code, 'user_cancelled');
-    else assert.equal(result.result.error.errors[0].code, 'passkey_verification_failed');
+    else {
+      assert.equal(result.result.error.errors[0].code, 'passkey_verification_failed');
+      assert.equal(result.result.error.clerkTraceId, 'passkey-signin-trace');
+      assert.equal(result.result.error.errors[0].longMessage, 'Try another passkey.');
+    }
     assert.equal(f.state.roots.session, null);
   });
 }
@@ -153,8 +162,31 @@ for (const failedStage of ['preparingSecondFactor', 'attemptingSecondFactor']) {
     const result = await f.invoke(handle, 'SignIn.passkey');
     assert.equal(result.result.error.passkeyStage, failedStage);
     assert.equal(result.result.error.errors[0].code, 'passkey_verification_failed');
+    assert.equal(result.result.error.clerkTraceId, 'passkey-signin-trace');
+    assert.equal(result.result.error.errors[0].longMessage, 'Try another passkey.');
     assert.deepEqual(f.state.roots.signIn, handle);
     assert.equal(f.resource(handle).status, 'needs_second_factor');
     assert.equal(f.state.roots.session, null);
   });
 }
+
+test('unknown passkey provider failure retains the attempt without submitting a credential', async t => {
+  const f = await fixture({
+    capabilities: ['passkeys'],
+    passkeys: () => {
+      throw Object.assign(new Error('private provider detail'), { code: 'host_failure' });
+    },
+    http: request => (request.url.includes('/sign_ins') ? response(attempt()) : undefined),
+  });
+  t.after(f.dispose);
+  const result = await f.invoke(f.state.roots.signIn, 'SignIn.passkey', [{ flow: 'discoverable' }]);
+  assert.equal(result.result.error.code, 'host_failure');
+  assert.equal(result.result.error.passkeyStage, 'requestingAuthorization');
+  assert.equal(
+    f.requests.some(request => request.url.includes('/attempt_first_factor')),
+    false,
+  );
+  assert.equal(f.resource(f.state.roots.signIn).status, 'needs_first_factor');
+  assert.equal(f.state.roots.session, null);
+  assert.equal(JSON.stringify(result).includes('private provider detail'), false);
+});
