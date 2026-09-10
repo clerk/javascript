@@ -9,7 +9,6 @@ import { handleError } from '@/ui/utils/errorHandler';
 
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Button, Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { maskEmailAddress } from '../../utils/formatSafeIdentifier';
 import { hasMultipleEnterpriseConnections } from './shared';
 import { SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
@@ -33,12 +32,6 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
   const signIn = useCoreSignIn();
   const [step, setStep] = React.useState<Step>('sso');
   const [isRedirecting, setIsRedirecting] = React.useState(false);
-
-  // `safe_identifier` is the address the user typed, unmasked; the design shows it obfuscated.
-  const maskedFallbackFactor = React.useMemo(
-    () => ({ ...fallbackFactor, safeIdentifier: maskEmailAddress(fallbackFactor.safeIdentifier) as string }),
-    [fallbackFactor],
-  );
 
   const goToStep = (next: Step) => {
     card.setError(undefined);
@@ -78,7 +71,7 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
     return (
       <Flow.Part part='ssoFallback'>
         <SignInFactorOneCodeForm
-          factor={maskedFallbackFactor}
+          factor={fallbackFactor}
           factorAlreadyPrepared={false}
           onFactorPrepare={() => {}}
           cardTitle={localizationKeys('signIn.ssoFallback.code.title')}

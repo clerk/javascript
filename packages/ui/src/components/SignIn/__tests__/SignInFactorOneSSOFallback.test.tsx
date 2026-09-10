@@ -12,7 +12,6 @@ describe('SignInFactorOne SSO fallback', () => {
   it('offers the fallback next to the SSO action for a single connection', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
-      f.withEnterpriseSso();
       f.startSignInWithEnterpriseSSO({ supportSSOFallback: true });
     });
 
@@ -25,7 +24,6 @@ describe('SignInFactorOne SSO fallback', () => {
   it('does not render the fallback when the user is not allowlisted for one', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
-      f.withEnterpriseSso();
       f.startSignInWithEnterpriseSSO();
     });
 
@@ -37,7 +35,6 @@ describe('SignInFactorOne SSO fallback', () => {
   it('offers a single fallback action alongside multiple connections', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
-      f.withEnterpriseSso();
       f.startSignInWithEnterpriseSSO({
         supportSSOFallback: true,
         enterpriseConnections: [
@@ -57,7 +54,6 @@ describe('SignInFactorOne SSO fallback', () => {
   it('redirects to the identity provider when the SSO action is used', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
-      f.withEnterpriseSso();
       f.startSignInWithEnterpriseSSO({ supportSSOFallback: true });
     });
 
@@ -73,7 +69,6 @@ describe('SignInFactorOne SSO fallback', () => {
   it('prepares the email code with the handle and warns on the code screen', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
-      f.withEnterpriseSso();
       f.startSignInWithEnterpriseSSO({ supportSSOFallback: true });
     });
     fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
@@ -89,26 +84,9 @@ describe('SignInFactorOne SSO fallback', () => {
     );
   });
 
-  it('masks the email address on the code screen', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withEmailAddress();
-      f.withEnterpriseSso();
-      f.startSignInWithEnterpriseSSO({ identifier: 'hello@clerk.com', supportSSOFallback: true });
-    });
-    fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-
-    const { userEvent } = render(<SignInFactorOne />, { wrapper });
-
-    await userEvent.click(await screen.findByText("Can't use SSO?"));
-
-    await screen.findByText('h***@clerk.com');
-    expect(screen.queryByText('hello@clerk.com')).not.toBeInTheDocument();
-  });
-
   it('returns to the SSO screen from the code screen', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
-      f.withEnterpriseSso();
       f.startSignInWithEnterpriseSSO({ supportSSOFallback: true });
     });
     fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));

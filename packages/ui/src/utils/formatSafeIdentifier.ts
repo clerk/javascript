@@ -13,18 +13,3 @@ export const formatSafeIdentifier = (str: string | undefined | null) => {
   }
   return stringToFormattedPhoneString(str);
 };
-
-/**
- * Masks the local part of an email address, e.g. `user@corp.com` -> `u***@corp.com`.
- * Needed where the server hands back the address the user typed rather than an obfuscated one.
- */
-export const maskEmailAddress = (str: string | undefined | null) => {
-  if (!str || isMaskedIdentifier(str)) {
-    return str;
-  }
-  const at = str.lastIndexOf('@');
-  if (at <= 0) {
-    return str;
-  }
-  return `${str.slice(0, 1)}***${str.slice(at)}`;
-};
