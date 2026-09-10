@@ -2051,4 +2051,4 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
   return false;
 }
 
-export { getParameterObjectShapeDeclaration, isCallableInterfaceProperty };
+export { getParameterObjectShapeDeclaration, getPickPropertyNames, isCallableInterfaceProperty };
