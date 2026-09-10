@@ -10,7 +10,7 @@ export type SelectTriggerProps = ComponentProps<'button'>;
 export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
   function SelectTrigger(props, ref) {
     const { render, ...otherProps } = props;
-    const { open, refs, getReferenceProps } = useSelectContext();
+    const { open, refs, getReferenceProps, openMethodRef } = useSelectContext();
 
     const state = { open };
 
@@ -18,7 +18,17 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       type: 'button',
     } satisfies DefaultProps<'button'>;
 
-    const defaultProps = { ...ownProps, ...getReferenceProps() };
+    const defaultProps = {
+      ...ownProps,
+      ...getReferenceProps({
+        onPointerDown(event: React.PointerEvent<HTMLButtonElement>) {
+          openMethodRef.current = event.pointerType;
+        },
+        onKeyDown() {
+          openMethodRef.current = 'keyboard';
+        },
+      }),
+    };
 
     return useRender({
       defaultTagName: 'button',
