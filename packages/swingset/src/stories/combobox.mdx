@@ -2,7 +2,7 @@ import * as ComboboxStories from './combobox.stories';
 
 # Combobox
 
-`Combobox` adds Mosaic styling to the headless `Autocomplete` behavior: text entry, listbox ARIA,
+`Combobox` adds Mosaic styling to the headless `Combobox` behavior: text entry, listbox ARIA,
 keyboard navigation, selection, positioning, and the shared scrolling treatment.
 
 `value` is the selected option; `inputValue` is the search text. Typing does not change the selection.
@@ -65,13 +65,13 @@ Long lists receive the shared ScrollArea fade and scrollbar automatically.
 
 ## Parts
 
-| Part                  | Description                                                                       |
-| --------------------- | --------------------------------------------------------------------------------- |
-| `Combobox.Root`       | Owns input, selection, open state, and keyboard navigation.                       |
-| `Combobox.Input`      | Autocomplete input; renders Mosaic `Input` unless composed through another input. |
-| `Combobox.Trigger`    | Opens and closes the option list while keeping focus on the input.                |
-| `Combobox.Popup`      | Portals, positions, surfaces, and scrolls a floating option list.                 |
-| `Combobox.List`       | Scrollable inline listbox.                                                        |
-| `Combobox.Collection` | Filters items and renders each option, with an optional empty state.              |
-| `Combobox.Option`     | Selectable option with active, selected, and disabled states.                     |
-| `Combobox.Empty`      | Empty result message.                                                             |
+| Part                  | Description                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| `Combobox.Root`       | Owns input, selection, open state, and keyboard navigation.                 |
+| `Combobox.Input`      | Search input; renders Mosaic `Input` unless composed through another input. |
+| `Combobox.Trigger`    | Opens and closes the option list while keeping focus on the input.          |
+| `Combobox.Popup`      | Portals, positions, surfaces, and scrolls a floating option list.           |
+| `Combobox.List`       | Scrollable inline listbox.                                                  |
+| `Combobox.Collection` | Filters items and renders each option, with an optional empty state.        |
+| `Combobox.Option`     | Selectable option with active, selected, and disabled states.               |
+| `Combobox.Empty`      | Empty result message.                                                       |
