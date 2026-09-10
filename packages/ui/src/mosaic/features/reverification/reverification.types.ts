@@ -36,6 +36,7 @@ export type ReverificationViewProps = {
   identifier?: string;
   onResend: () => void;
   canResend: boolean;
+  resendRemainingSeconds?: number;
 };
 
 export type ReverificationProps =

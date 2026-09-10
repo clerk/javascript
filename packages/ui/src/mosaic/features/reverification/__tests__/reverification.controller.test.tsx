@@ -97,6 +97,7 @@ describe('reverificationMachine', () => {
     expect(actor.getSnapshot().value).toBe('verifying');
     expect(actor.getSnapshot().context.activeMethod?.strategy).toBe('email_code');
     expect(actor.getSnapshot().context.canResend).toBe(false);
+    expect(actor.getSnapshot().context.resendAvailableAt).toEqual(expect.any(Number));
 
     actor.send({ type: 'SHOW_METHODS' });
     actor.send({ type: 'BACK' });
@@ -223,6 +224,7 @@ describe('reverificationMachine', () => {
     await tick();
     expect(actor.getSnapshot().value).toBe('verifying');
     expect(actor.getSnapshot().context.canResend).toBe(false);
+    expect(actor.getSnapshot().context.resendAvailableAt).toEqual(expect.any(Number));
   });
 
   it('queues an attempt submitted while the starting prepare is in flight', async () => {
@@ -323,6 +325,8 @@ describe('useReverificationController', () => {
     }
     expect(result.current.canResend).toBe(false);
     expect(result.current.onResend).toEqual(expect.any(Function));
+    expect(result.current.resendRemainingSeconds).toBeGreaterThan(0);
+    expect(result.current.resendRemainingSeconds).toBeLessThanOrEqual(30);
   });
 
   it('marks the current step pending while an attempt is in flight', async () => {
