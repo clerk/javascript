@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -7,18 +7,30 @@ import { Field } from '../field';
 import { PhoneInput } from './phone-input';
 
 describe('Mosaic PhoneInput', () => {
-  it.each([
-    ['sm', 'xs'],
-    ['md', 'sm'],
-    ['lg', 'md'],
-  ] as const)('sizes the country trigger for a %s input', (size, triggerSize) => {
+  it('positions the country popup against the full phone field', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+    const group = screen.getByRole('textbox', { name: 'Phone number' }).closest('.cl-phone-input');
+    if (!group) {
+      throw new Error('Phone input group missing');
+    }
+    const measureGroup = vi.spyOn(group, 'getBoundingClientRect');
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+
+    await waitFor(() => expect(measureGroup).toHaveBeenCalled());
+    expect(document.querySelector('.cl-phone-input-popup')).toHaveAttribute('data-size', 'anchor');
+  });
+
+  it.each(['sm', 'md', 'lg'] as const)('uses an xs country trigger for a %s input', size => {
     render(
       <PhoneInput
         size={size}
         aria-label='Phone number'
       />,
     );
-    expect(screen.getByRole('button', { name: 'Country, United States' })).toHaveAttribute('data-size', triggerSize);
+    expect(screen.getByRole('button', { name: 'Country, United States' })).toHaveAttribute('data-size', 'xs');
+    expect(screen.getByRole('button', { name: 'Country, United States' })).toHaveAttribute('data-shape', 'default');
   });
   it('renders one grouped telephone control with the default country', () => {
     render(<PhoneInput aria-label='Phone number' />);
@@ -31,7 +43,7 @@ describe('Mosaic PhoneInput', () => {
     const countryTrigger = screen.getByRole('button', { name: 'Country, United States' });
     expect(countryTrigger).toHaveClass('cl-button', 'cl-phone-input-country-trigger');
     expect(countryTrigger.closest('.cl-input-group-start')).not.toBeNull();
-    expect(countryTrigger).toHaveAttribute('data-size', 'sm');
+    expect(countryTrigger).toHaveAttribute('data-size', 'xs');
     expect(countryTrigger).toHaveAttribute('data-variant', 'ghost');
     expect(screen.queryByText('us')).not.toBeInTheDocument();
     expect(document.querySelector('.cl-phone-input-divider')).toHaveAttribute('aria-hidden', 'true');

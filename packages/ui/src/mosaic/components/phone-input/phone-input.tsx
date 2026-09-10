@@ -13,6 +13,7 @@ import {
 } from '../../../utils/phoneUtils';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { colorVars, space } from '../../tokens.stylex';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Combobox } from '../combobox';
@@ -114,6 +115,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   const nationalNumber = getNationalNumber(value, country);
   const formattedNumber = formatPhoneNumber(nationalNumber, country.pattern, country.code);
   const [open, setOpen] = React.useState(false);
+  const [anchor, setAnchor] = React.useState<HTMLDivElement | null>(null);
   const [query, setQuery] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const setInputRef = React.useCallback(
@@ -191,6 +193,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   return (
     <>
       <InputGroup.Root
+        ref={setAnchor}
         size={size}
         disabled={disabled}
         invalid={invalid}
@@ -200,11 +203,16 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           open={open}
           onOpenChange={setOpen}
           placement='bottom-start'
+          sideOffset={8}
         >
           <InputGroup.Start>
             <Popover.Trigger
               render={
-                <Button {...mergeStyleProps(themeProps('phone-input-country-trigger'), stylex.props(styles.trigger))} />
+                <Button
+                  size='xs'
+                  shape='default'
+                  {...themeProps('phone-input-country-trigger')}
+                />
               }
               type='button'
               disabled={disabled}
@@ -213,21 +221,25 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               <span {...stylex.props(reset.base, styles.triggerContent)}>
                 <span
                   aria-hidden='true'
-                  {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
+                  {...mergeStyleProps(
+                    themeProps('phone-input-flag'),
+                    stylex.props(reset.base, styles.flag, styles.triggerFlag),
+                  )}
                 >
                   {getFlagEmojiFromCountryIso(country.iso)}
                 </span>
                 <Icon
                   name='chevron-down'
-                  size='sm'
+                  size='md'
                   aria-hidden='true'
                 />
               </span>
             </Popover.Trigger>
           </InputGroup.Start>
           <Popover.Popup
+            anchor={anchor}
             aria-label='Choose a country'
-            size='sm'
+            size='anchor'
             {...mergeStyleProps(themeProps('phone-input-popup'), stylex.props(reset.base, styles.popup))}
           >
             <Combobox.Root
@@ -242,10 +254,10 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 }
               }}
             >
-              <Field.Root>
+              <Field.Root {...stylex.props(styles.countrySearchContainer)}>
                 <InputGroup.Root
                   size='md'
-                  {...mergeStyleProps(themeProps('phone-input-country-search'), stylex.props(styles.countrySearch))}
+                  {...themeProps('phone-input-country-search')}
                 >
                   <InputGroup.Start>
                     <Icon
@@ -298,6 +310,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
         <InputGroup.Start
           aria-hidden='true'
           {...mergeStyleProps(themeProps('phone-input-prefix'), stylex.props(styles.prefix))}
+          style={{ color: colorVars['--cl-color-primary'], paddingInlineStart: space['2'], paddingInlineEnd: 0 }}
         >
           <span
             aria-hidden='true'

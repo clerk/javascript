@@ -3,11 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  trigger: {
-    paddingInlineEnd: space['2'],
-    paddingInlineStart: space['2'],
-    width: 'auto',
-  },
   triggerContent: {
     gap: space['0.5'],
     alignItems: 'center',
@@ -16,6 +11,15 @@ export const styles = stylex.create({
   flag: {
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: 1,
+  },
+  triggerFlag: {
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+    fontSize: space['4'],
+    justifyContent: 'center',
+    height: space['4'],
+    width: space['4'],
   },
   divider: {
     backgroundColor: colorVars['--cl-color-border'],
@@ -26,8 +30,6 @@ export const styles = stylex.create({
   prefix: {
     gap: space['2'],
     fontVariantNumeric: 'tabular-nums',
-    paddingInlineEnd: 0,
-    paddingInlineStart: space['2'],
   },
   control: {
     fontVariantNumeric: 'tabular-nums',
@@ -41,13 +43,12 @@ export const styles = stylex.create({
                 0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
                 0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
     color: colorVars['--cl-color-card-foreground'],
-    width: '100%',
   },
-  countrySearch: {
-    marginInline: space['2'],
+  countrySearchContainer: {
+    paddingInline: space['2'],
     flexShrink: 0,
-    marginBlockEnd: space['1'],
-    marginBlockStart: space['2'],
+    paddingBlockEnd: space['1'],
+    paddingBlockStart: space['2'],
   },
   optionName: {
     overflow: 'hidden',
