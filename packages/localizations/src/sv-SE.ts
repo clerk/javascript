@@ -1455,6 +1455,9 @@ export const svSE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Återställ lösenordskod',
       resendButton: 'Fick du inte en kod? Skicka igen',
@@ -1520,6 +1523,15 @@ export const svSE: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Vi behöver verifiera din identitet innan vi återställer ditt lösenord.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Skapa konto',

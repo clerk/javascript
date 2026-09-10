@@ -1455,6 +1455,9 @@ export const nlNL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Wachtwoord resetcode',
       resendButton: 'Niet ontvangen? Verstuur opnieuw',
@@ -1519,6 +1522,15 @@ export const nlNL: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Voor veiligheidsredenen is het vereist om je wachtwoord te resetten.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registreren',

@@ -1465,6 +1465,9 @@ export const isIS: LocalizationResource = {
       subtitle: 'Veldu fyrirtækjareikninginn sem þú vilt halda áfram með.',
       title: 'Veldu fyrirtækjareikning',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Endurstilla lykilorð kóða',
       resendButton: 'Fékkstu ekki kóða? Senda aftur',
@@ -1530,6 +1533,15 @@ export const isIS: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Við þurfum að staðfesta auðkenni þitt áður en við endurstillum lykilorðið þitt.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Skrá sig',

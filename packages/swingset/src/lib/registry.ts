@@ -25,6 +25,7 @@ import {
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
 import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
@@ -159,6 +160,7 @@ import {
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
+import { meta as toastMeta } from '../stories/toast.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import {
@@ -393,6 +395,7 @@ const iconFrameModule: StoryModule = {
 // `<Preview>` embeds in the MDX, which import the stories module directly.
 const accordionModule: StoryModule = { meta: accordionMeta };
 const autocompleteModule: StoryModule = { meta: autocompleteMeta };
+const comboboxPrimitiveModule: StoryModule = { meta: comboboxPrimitiveMeta };
 const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
@@ -419,6 +422,7 @@ const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
 const tableModule: StoryModule = { meta: tableMeta };
+const toastModule: StoryModule = { meta: toastMeta };
 
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
@@ -568,11 +572,13 @@ export const registry: StoryModule[] = [
   sectionModule,
   tableModule,
   textModule,
+  toastModule,
   fieldModule,
   visuallyHiddenModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
+  comboboxPrimitiveModule,
   collapsibleModule,
   dialogModule,
   drawerModule,

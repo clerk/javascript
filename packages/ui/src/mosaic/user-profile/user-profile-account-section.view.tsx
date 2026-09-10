@@ -1,13 +1,21 @@
+import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
+import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
+import { useState } from 'react';
 
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
+import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { styles } from './user-profile-profile-panel.styles';
+
+const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
+/** Matches the limit the row's own description advertises. */
+const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
 
 export interface UserProfileEmail {
   id: string;
@@ -28,11 +36,24 @@ export interface UserProfilePhone {
 export interface UserProfileAccountSectionViewProps {
   allowMultipleAccounts?: boolean;
   imageUrl?: string;
+  /**
+   * Whether `imageUrl` is a picture the user uploaded. Clerk's image service always returns a URL —
+   * a generated initials avatar when none was uploaded — so the row cannot tell the two apart from
+   * `imageUrl` alone. Supplied from `user.hasImage`.
+   */
+  hasImage?: boolean;
   name: string;
   username: string;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
-  onEditProfilePicture?: () => void;
+  onProfilePictureChange?: (file: File) => void;
+  /**
+   * Called with the files the picker turned away for type or size. The row already tells the user
+   * why, so this is for whatever else a consumer wants to do with them — logging, or a toast once
+   * there is one.
+   */
+  onProfilePictureReject?: (rejections: FileRejection[]) => void;
+  onRemoveProfilePicture?: () => void;
   onNameChange?: (value: string) => void;
   onUsernameChange?: (value: string) => void;
   onAddEmail?: () => void;
@@ -50,11 +71,14 @@ export interface UserProfileAccountSectionViewProps {
 export function UserProfileAccountSectionView({
   allowMultipleAccounts = false,
   imageUrl,
+  hasImage = false,
   name,
   username,
   emails,
   phones,
-  onEditProfilePicture,
+  onProfilePictureChange,
+  onProfilePictureReject,
+  onRemoveProfilePicture,
   onNameChange,
   onUsernameChange,
   onAddEmail,
@@ -74,13 +98,29 @@ export function UserProfileAccountSectionView({
     .join('')
     .slice(0, 2)
     .toUpperCase();
+  const [rejection, setRejection] = useState<FileRejectionReason | null>(null);
   const updateName = onNameChange ? () => onNameChange(name) : undefined;
   const updateUsername = onUsernameChange ? () => onUsernameChange(username) : undefined;
 
   return (
-    <div {...stylex.props(styles.sections)}>
-      <Section.Root aria-label='Account'>
-        <Section.Title>Profile</Section.Title>
+    <FileUpload.Root
+      accept={PROFILE_PICTURE_MIME_TYPES}
+      maxSize={PROFILE_PICTURE_MAX_BYTES}
+      render={<div {...stylex.props(styles.sections)} />}
+      onReject={rejections => {
+        setRejection(rejections[0]?.reason ?? null);
+        onProfilePictureReject?.(rejections);
+      }}
+      onValueChange={files => {
+        const file = files[0];
+        if (file) {
+          setRejection(null);
+          onProfilePictureChange?.(file);
+        }
+      }}
+    >
+      <Section.Root aria-label={m.sectionLabel}>
+        <Section.Title>{m.sectionTitle}</Section.Title>
         <Section.Group>
           <Section.Row>
             <Section.Item>
@@ -94,27 +134,21 @@ export function UserProfileAccountSectionView({
                 </Avatar.Root>
               </Section.Media>
               <Section.Content>
-                <Section.Label>Profile picture</Section.Label>
-                <Section.Description>Recommend size 1:1, up to 10MB.</Section.Description>
+                <Section.Label>{m.picture.label}</Section.Label>
+                <Section.Description>{m.picture.description}</Section.Description>
               </Section.Content>
-              {onEditProfilePicture ? (
-                <Section.Actions>
-                  <Button
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    onClick={onEditProfilePicture}
-                  >
-                    Upload
-                  </Button>
-                </Section.Actions>
-              ) : null}
+              <ProfilePictureActions
+                canChange={Boolean(onProfilePictureChange)}
+                hasImage={hasImage}
+                onRemove={onRemoveProfilePicture}
+              />
             </Section.Item>
+            {rejection ? <Section.Error>{m.picture.errors[rejection]}</Section.Error> : null}
           </Section.Row>
           <Section.Row>
             <Section.Item>
               <Section.Content>
-                <Section.Label>Name</Section.Label>
+                <Section.Label>{m.name.label}</Section.Label>
                 <Section.Description>{name}</Section.Description>
               </Section.Content>
               {updateName ? (
@@ -125,7 +159,7 @@ export function UserProfileAccountSectionView({
                     variant='outline'
                     onClick={updateName}
                   >
-                    Edit name
+                    {m.name.edit}
                   </Button>
                 </Section.Actions>
               ) : null}
@@ -134,7 +168,7 @@ export function UserProfileAccountSectionView({
           <Section.Row>
             <Section.Item>
               <Section.Content>
-                <Section.Label>Username</Section.Label>
+                <Section.Label>{m.username.label}</Section.Label>
                 <Section.Description>{username}</Section.Description>
               </Section.Content>
               {updateUsername ? (
@@ -145,7 +179,7 @@ export function UserProfileAccountSectionView({
                     variant='outline'
                     onClick={updateUsername}
                   >
-                    Edit username
+                    {m.username.edit}
                   </Button>
                 </Section.Actions>
               ) : null}
@@ -155,7 +189,7 @@ export function UserProfileAccountSectionView({
             <SingleContactRow
               items={emails}
               kind='email'
-              label='Email'
+              label={m.email.label}
               onAdd={onAddEmail}
               onManage={onManageEmail}
             />
@@ -164,7 +198,7 @@ export function UserProfileAccountSectionView({
             <SingleContactRow
               items={phones}
               kind='phone'
-              label='Phone'
+              label={m.phone.label}
               onAdd={onAddPhone}
               onManage={onManagePhone}
             />
@@ -175,7 +209,7 @@ export function UserProfileAccountSectionView({
         <ContactSection
           items={emails}
           kind='email'
-          label='Email'
+          label={m.email.label}
           onAdd={onAddEmail}
           onManage={onManageEmail}
           onRemove={onRemoveEmail}
@@ -187,7 +221,7 @@ export function UserProfileAccountSectionView({
         <ContactSection
           items={phones}
           kind='phone'
-          label='Phone'
+          label={m.phone.label}
           onAdd={onAddPhone}
           onManage={onManagePhone}
           onRemove={onRemovePhone}
@@ -195,8 +229,64 @@ export function UserProfileAccountSectionView({
           onVerify={onVerifyPhone}
         />
       ) : null}
-    </div>
+    </FileUpload.Root>
   );
+}
+
+/**
+ * Sits inside `FileUpload.Root` so it can open the picker from a menu item, which is a plain
+ * callback rather than a `FileUpload.Trigger` button.
+ */
+function ProfilePictureActions({
+  hasImage,
+  canChange,
+  onRemove,
+}: {
+  hasImage: boolean;
+  canChange: boolean;
+  onRemove?: () => void;
+}) {
+  const { openFilePicker } = FileUpload.useFileUpload();
+  const actions: UserProfileMenuAction[] = [];
+
+  if (hasImage && canChange) {
+    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
+  }
+
+  if (hasImage && onRemove) {
+    actions.push({ label: m.picture.remove, icon: 'close', onClick: onRemove });
+  }
+
+  if (actions.length > 0) {
+    return (
+      <Section.Actions>
+        <UserProfileActionMenu
+          actions={actions}
+          label={m.picture.manage}
+        />
+      </Section.Actions>
+    );
+  }
+
+  if (!hasImage && canChange) {
+    return (
+      <Section.Actions>
+        <FileUpload.Trigger
+          render={
+            <Button
+              color='neutral'
+              size='sm'
+              variant='outline'
+            />
+          }
+        >
+          {m.picture.upload}
+        </FileUpload.Trigger>
+      </Section.Actions>
+    );
+  }
+
+  return null;
 }
 
 interface ContactSectionProps {
@@ -223,14 +313,8 @@ function ContactSection(props: ContactSectionProps) {
 function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectionProps) {
   const item = items[0];
   const onClick = item ? (onManage ? () => onManage(item.id) : undefined) : onAdd;
-  const emptyDescription = kind === 'email' ? 'No email addresses added' : 'No phone numbers added';
-  const actionLabel = item
-    ? kind === 'email'
-      ? 'Update email'
-      : 'Update phone number'
-    : kind === 'email'
-      ? 'Add email'
-      : 'Add phone number';
+  const emptyDescription = m[kind].empty;
+  const actionLabel = item ? m[kind].update : m[kind].add;
 
   return (
     <Section.Row>
@@ -240,7 +324,7 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
           {item ? (
             <Section.Description {...stylex.props(styles.contactValue)}>
               <span>{item.value}</span>
-              {item.isDefault ? <Badge color='neutral'>Primary</Badge> : null}
+              {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
             </Section.Description>
           ) : (
             <Section.Description>{emptyDescription}</Section.Description>
@@ -264,7 +348,7 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
 }
 
 function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimary, onRemove }: ContactSectionProps) {
-  const emptyDescription = kind === 'email' ? 'No email addresses added' : 'No phone numbers added';
+  const emptyDescription = m[kind].empty;
 
   return (
     <Section.Row>
@@ -275,7 +359,7 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
         {onAdd ? (
           <Section.Actions>
             <Button
-              aria-label={kind === 'email' ? 'Add email' : 'Add phone number'}
+              aria-label={m[kind].add}
               color='neutral'
               size='sm'
               variant='outline'
@@ -286,7 +370,7 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
                 placement='inline-start'
                 size='sm'
               />
-              Add
+              {m.add}
             </Button>
           </Section.Actions>
         ) : null}
@@ -305,23 +389,23 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
 
             if (item.isVerified === false && onVerify) {
               actions.push({
-                label: item.isDefault ? 'Complete verification' : kind === 'email' ? 'Verify' : 'Verify phone number',
+                label: item.isDefault ? m.completeVerification : m[kind].verify,
                 onClick: () => onVerify(item.id),
               });
             } else if (!item.isDefault && item.isVerified === true && onSetPrimary) {
-              actions.push({ label: 'Set as primary', onClick: () => onSetPrimary(item.id) });
+              actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
             }
 
             if (onRemove && item.canRemove !== false) {
               actions.push({
-                label: kind === 'email' ? 'Remove email' : 'Remove phone number',
+                label: m[kind].remove,
                 color: 'negative',
                 onClick: () => onRemove(item.id),
               });
             }
 
             if (!hasExplicitActions && onManage) {
-              actions.push({ label: 'Manage', onClick: () => onManage(item.id) });
+              actions.push({ label: m.manage, onClick: () => onManage(item.id) });
             }
 
             return (
@@ -329,14 +413,14 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
                 <Section.Content>
                   <Section.Description {...stylex.props(styles.contactValue)}>
                     <span>{item.value}</span>
-                    {item.isDefault ? <Badge color='neutral'>Primary</Badge> : null}
+                    {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
                   </Section.Description>
                 </Section.Content>
                 {actions.length > 0 ? (
                   <Section.Actions>
                     <UserProfileActionMenu
                       actions={actions}
-                      label={`Manage ${item.value}`}
+                      label={fill(m.manageValue, { value: item.value })}
                     />
                   </Section.Actions>
                 ) : null}

@@ -1442,6 +1442,9 @@ export const zhCN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: '重置密码代码',
       resendButton: '重新发送代码',
@@ -1505,6 +1508,15 @@ export const zhCN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: '我们需要验证您的身份才能重置您的密码。',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: '注册',

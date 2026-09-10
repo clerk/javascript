@@ -1464,6 +1464,9 @@ export const ptBR: LocalizationResource = {
       subtitle: 'Selecione a conta corporativa com a qual deseja continuar.',
       title: 'Escolha sua conta corporativa',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de redefinição de senha',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -1529,6 +1532,15 @@ export const ptBR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Precisamos verificar sua identidade antes de redefinir sua senha.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registre-se',
