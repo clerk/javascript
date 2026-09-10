@@ -262,17 +262,6 @@ describe('useReverificationModel', () => {
     expect(session?.attemptSecondFactorVerification).toHaveBeenCalledWith({ strategy: 'totp', code: '123456' });
   });
 
-  it('no-ops prepare for methods that have no prepare step', async () => {
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    await ready(result.current).prepare({ id: 'password', stage: 'first', strategy: 'password' });
-    await ready(result.current).prepare({ id: 'passkey', stage: 'first', strategy: 'passkey' });
-    await ready(result.current).prepare({ id: 'totp', stage: 'second', strategy: 'totp' });
-    await ready(result.current).prepare({ id: 'backup_code', stage: 'second', strategy: 'backup_code' });
-
-    expect(session?.prepareFirstFactorVerification).not.toHaveBeenCalled();
-    expect(session?.prepareSecondFactorVerification).not.toHaveBeenCalled();
-  });
-
   it('verifies a passkey', async () => {
     session?.verifyWithPasskey.mockResolvedValue(resource({ status: 'complete' }));
     const { result } = renderHook(() => useReverificationModel(activeProps()));

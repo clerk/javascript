@@ -87,7 +87,8 @@ function selectMethod(ctx: ReverificationContext, id: string): Partial<Reverific
 }
 
 function prepareActive(ctx: ReverificationContext) {
-  return ctx.activeMethod ? ctx.deps.prepare(ctx.activeMethod) : Promise.resolve();
+  const method = ctx.activeMethod;
+  return method && needsPrepare(method) ? ctx.deps.prepare(method) : Promise.resolve();
 }
 
 function submit(ctx: ReverificationContext): Promise<ReverificationResult> {
@@ -121,8 +122,8 @@ const afterResult = [
   },
   {
     guard: (_: ReverificationContext, event: DoneInvokeEvent<ReverificationResult>) => {
-      const strategy = event.output.startingMethod?.strategy;
-      return Boolean(strategy && needsPrepare(strategy));
+      const method = event.output.startingMethod;
+      return Boolean(method && needsPrepare(method));
     },
     target: 'preparing' as const,
     actions: [applyResult, assign(() => lockResend())],
@@ -259,7 +260,7 @@ export const reverificationMachine = createMachine({
         SUBMIT: 'submitting',
         RESEND: {
           target: 'resending',
-          guard: ctx => Boolean(ctx.activeMethod && needsPrepare(ctx.activeMethod.strategy) && ctx.canResend),
+          guard: ctx => Boolean(ctx.activeMethod && needsPrepare(ctx.activeMethod) && ctx.canResend),
         },
         SHOW_METHODS: {
           target: 'methodPicker',
@@ -315,7 +316,7 @@ export const reverificationMachine = createMachine({
             target: 'methodPickerPreparing',
             guard: (ctx, event) => {
               const method = ctx.methods.find(candidate => candidate.id === event.id);
-              return Boolean(method && needsPrepare(method.strategy));
+              return Boolean(method && needsPrepare(method));
             },
             actions: assign((ctx, event) => selectMethod(ctx, event.id)),
           },
