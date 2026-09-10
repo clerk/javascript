@@ -1,0 +1,185 @@
+import * as SelectStories from './select.component.stories';
+
+# Select
+
+## Example
+
+Click the trigger, then use the arrow keys or type to move between options. The selected option
+opens directly over the trigger, the way a native `<select>` does.
+
+<Story
+  name='Default'
+  storyModule={SelectStories}
+/>
+
+## Usage
+
+```tsx
+import { Select } from '@clerk/ui/mosaic/components/select';
+
+const roles = [
+  { value: 'all', label: 'All roles' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'member', label: 'Member' },
+];
+
+<Select.Root
+  items={roles}
+  defaultValue='all'
+>
+  <Select.Trigger />
+  <Select.Popup />
+</Select.Root>;
+```
+
+`items` is required. The options only exist while the listbox is open, so the items are what let
+the closed trigger show the selected label. `Select.Popup` renders one `Select.Option` per item
+when it is given no children, and it renders the portal and the floating positioner itself, so in
+the common case there is nothing else to write.
+
+### Trigger
+
+`Select.Trigger` renders a neutral `md` `Button` that shows the selected label and a chevron. The
+`outline` variant (the default) is the bordered form control; `ghost` drops the border for a select
+that sits inside a dense surface such as a table row. Pass `placeholder` for the text shown until
+something is chosen, or `render` to supply your own element — it receives the computed props (ARIA
+attributes, click and keyboard handlers) to spread.
+
+```tsx
+<Select.Trigger variant='ghost' />
+
+<Select.Trigger placeholder='Choose a role' />
+```
+
+<Story
+  name='Ghost'
+  storyModule={SelectStories}
+/>
+
+<Story
+  name='Placeholder'
+  storyModule={SelectStories}
+/>
+
+### Alignment
+
+By default the popup opens with the selected option sitting exactly over the trigger. The option
+row is built to the trigger's measurements — the same height, the same text inset, the same type —
+so the label does not appear to move when the list opens.
+
+That only holds while every row is the height of the trigger. An item with a `description` renders
+a second line, so a list with descriptions hangs below the trigger instead: pass
+`alignItemWithTrigger={false}`.
+
+The overlay also gives way on its own where it would not work: a touch opening, or a trigger within
+20px of the top or bottom of the viewport, places the list below the trigger like a menu.
+
+```tsx
+const roles = [
+  { value: 'member', label: 'Member', description: 'Role with non-privileged permissions.' },
+  { value: 'admin', label: 'Admin', description: 'Role with elevated permissions.' },
+];
+
+<Select.Root
+  items={roles}
+  defaultValue='member'
+  alignItemWithTrigger={false}
+>
+  <Select.Trigger />
+  <Select.Popup />
+</Select.Root>;
+```
+
+<Story
+  name='Descriptions'
+  storyModule={SelectStories}
+/>
+
+### Options
+
+Every row reserves space for the check, so the labels stay put when the selection moves. A
+`disabled` item can still be reached with the keyboard but cannot be selected. The description is
+read to assistive technology as the option's description, not as part of its name.
+
+To compose the rows yourself, give `Select.Popup` children: one `Select.Option` per item, taking the
+same `value`, `label`, `description`, and `disabled`.
+
+```tsx
+<Select.Popup>
+  {roles.map(role => (
+    <Select.Option
+      key={role.value}
+      {...role}
+    />
+  ))}
+</Select.Popup>
+```
+
+### Controlled
+
+```tsx
+const [value, setValue] = useState('member');
+
+<Select.Root
+  items={roles}
+  value={value}
+  onValueChange={setValue}
+>
+  <Select.Trigger />
+  <Select.Popup />
+</Select.Root>;
+```
+
+<Story
+  name='Controlled'
+  storyModule={SelectStories}
+/>
+
+### Scrolling
+
+A list with more options than fit is cut at the viewport edge and scrolled so the selected row still
+lands on the trigger. Scrolling toward the hidden rows first grows the popup into whatever space is
+free on the other side, then scrolls the list in place. The page is scroll-locked underneath. The rows scroll
+with the shared ScrollArea treatment. Nothing to opt into — `Select.Popup` composes it.
+
+<Story
+  name='Overflowing'
+  storyModule={SelectStories}
+/>
+
+## Parts
+
+| Part             | Slot                                 | Description                                                                         |
+| ---------------- | ------------------------------------ | ----------------------------------------------------------------------------------- |
+| `Select.Root`    | —                                    | State provider; owns the value, the items, open/close, and keyboard nav.            |
+| `Select.Trigger` | `select-trigger`                     | Opens the listbox. Defaults to a neutral `md` `Button`; `variant` picks the chrome. |
+| ↳ value          | `select-value`                       | The selected label, or the placeholder.                                             |
+| ↳ icon           | `select-trigger-icon`                | The trailing chevron.                                                               |
+| `Select.Popup`   | `select-positioner` / `select-popup` | Portals, positions, and renders the listbox surface.                                |
+| ↳ viewport       | `select-viewport`                    | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.      |
+| `Select.Option`  | `select-option`                      | A single choice. `data-selected`, `data-active`, `data-disabled`, `data-described`. |
+| ↳ content        | `select-option-content`              | Stacks the label over the description.                                              |
+| ↳ label          | `select-option-label`                | The option's text. Truncates to one line.                                           |
+| ↳ description    | `select-option-description`          | The optional second line.                                                           |
+| ↳ indicator      | `select-option-indicator`            | The check. Present on every row, visible on the selected one.                       |
+
+## Styling
+
+The Mosaic select is themed with **StyleX**. Each styled part carries a stable `.cl-<slot>` class
+(the slots above) alongside the StyleX atoms. Consumers never target the hashed atomic classes —
+override by targeting the `.cl-*` slot from a CSS layer that wins over `@clerk/ui/styles.css`:
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+@layer overrides {
+  .cl-select-popup {
+    border-radius: 20px;
+  }
+}
+```
+
+The popup's enter/exit transition is driven off its own `data-starting-style` /`data-ending-style`
+attributes and is disabled under `prefers-reduced-motion: reduce`. Option hover state is gated
+behind `@media (hover: hover)`, and the keyboard-active option is styled off `data-active`, so
+pointer and keyboard highlighting stay in sync.

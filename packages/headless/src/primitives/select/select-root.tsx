@@ -6,7 +6,6 @@ import {
   flip,
   FloatingNode,
   FloatingTree,
-  type Middleware,
   offset,
   type Placement,
   shift,
@@ -21,12 +20,13 @@ import {
   useRole,
   useTypeahead,
 } from '@floating-ui/react';
-import { type ReactNode, type RefObject, useCallback, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { cssVars } from '../../utils/css-vars';
+import { alignSelectedItem } from './align-selected-item';
 import { SelectContext, type SelectContextValue, type SelectItem } from './select-context';
 
 export type { SelectItem } from './select-context';
@@ -42,39 +42,14 @@ export interface SelectProps {
   onOpenChange?: (open: boolean) => void;
   /**
    * When true, the popup is positioned so the selected item overlays the
-   * trigger — like a native `<select>`. Defaults to `true`.
+   * trigger — like a native `<select>`. Defaults to `true`. Falls back to
+   * menu-like placement below the trigger when opened by touch, or when the
+   * trigger sits too close to a viewport edge for the overlay to be usable.
    */
   alignItemWithTrigger?: boolean;
   placement?: Placement;
   sideOffset?: number;
   children: ReactNode;
-}
-
-function alignSelectedItem(selectedItemRef: RefObject<HTMLElement | null>): Middleware {
-  return {
-    name: 'alignSelectedItem',
-    fn({ elements }) {
-      const selectedEl = selectedItemRef.current;
-      if (!selectedEl) {
-        return {};
-      }
-
-      const floatingRect = elements.floating.getBoundingClientRect();
-      const selectedRect = selectedEl.getBoundingClientRect();
-      const referenceRect = (elements.reference as HTMLElement).getBoundingClientRect();
-
-      const itemOffsetInPopup = selectedRect.top - floatingRect.top;
-      const desiredTop = referenceRect.top - itemOffsetInPopup;
-
-      const viewportHeight = window.innerHeight;
-      const clampedTop = Math.max(8, Math.min(desiredTop, viewportHeight - floatingRect.height - 8));
-
-      return {
-        x: referenceRect.left,
-        y: clampedTop,
-      };
-    },
-  };
 }
 
 function SelectInner(props: SelectProps) {
@@ -106,33 +81,66 @@ function SelectInner(props: SelectProps) {
   const popupRef = useRef<HTMLDivElement | null>(null);
   const valueToLabelRef = useRef<Map<string, string>>(new Map());
   const selectedItemRef = useRef<HTMLElement | null>(null);
+  const openRef = useRef(open);
+  openRef.current = open;
+  const openMethodRef = useRef<string | null>(null);
+  const updateRef = useRef<() => void>(() => {});
+  const [touchOpen, setTouchOpen] = useState(false);
+  const [fallback, setFallback] = useState(false);
+  const alignActive = alignProp && !touchOpen && !fallback;
+  // Memoized so its held position survives re-renders during the exit transition.
+  const align = useMemo(
+    () =>
+      alignSelectedItem({
+        selectedItemRef,
+        openRef,
+        onFallback: () => setFallback(true),
+        requestUpdate: () => updateRef.current(),
+      }),
+    [],
+  );
+
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (next) {
+        setTouchOpen(openMethodRef.current === 'touch');
+      }
+      setOpen(next);
+    },
+    [setOpen],
+  );
 
   const {
     refs,
     floatingStyles,
     context: floatingContext,
     placement,
+    update,
   } = useFloating({
     nodeId,
     open,
-    onOpenChange: setOpen,
+    onOpenChange: handleOpenChange,
     placement: placementProp,
-    middleware: [
-      offset(alignProp ? 0 : sideOffset),
-      ...(!alignProp ? [flip(), shift({ padding: 5 })] : []),
-      size({
-        apply({ availableHeight, elements }) {
-          Object.assign(elements.floating.style, {
-            maxHeight: `${availableHeight}px`,
-          });
-        },
-      }),
-      ...(!alignProp ? [arrow({ element: arrowRef })] : []),
-      ...(alignProp ? [alignSelectedItem(selectedItemRef)] : []),
-      cssVars({ sideOffset }),
-    ],
+    middleware: alignActive
+      ? [offset(0), align, cssVars({ sideOffset })]
+      : [
+          offset(sideOffset),
+          flip(),
+          shift({ padding: 5 }),
+          size({
+            apply({ availableHeight, elements }) {
+              Object.assign(elements.floating.style, {
+                maxHeight: `${availableHeight}px`,
+              });
+            },
+          }),
+          arrow({ element: arrowRef }),
+          cssVars({ sideOffset }),
+        ],
     whileElementsMounted: autoUpdate,
   });
+
+  updateRef.current = update;
 
   const returnFocusRef = useReturnFocus(floatingContext);
 
@@ -140,6 +148,13 @@ function SelectInner(props: SelectProps) {
     open,
     ref: popupRef,
   });
+
+  // Reset only once the popup is gone, or the exit transition would reposition.
+  useEffect(() => {
+    if (!mounted) {
+      setFallback(false);
+    }
+  }, [mounted]);
 
   const isControlled = props.value !== undefined;
 
@@ -154,9 +169,9 @@ function SelectInner(props: SelectProps) {
       if (!isControlled) {
         setSelectedLabel(valueToLabelRef.current.get(value) ?? value);
       }
-      setOpen(false);
+      handleOpenChange(false);
     },
-    [isControlled, setSelectedValue, setOpen],
+    [isControlled, setSelectedValue, handleOpenChange],
   );
 
   const handleTypeaheadMatch = useCallback(
@@ -219,7 +234,8 @@ function SelectInner(props: SelectProps) {
       returnFocusRef,
       valueToLabelRef,
       selectedItemRef,
-      alignItemWithTrigger: alignProp,
+      openMethodRef,
+      alignItemWithTrigger: alignActive,
       handleSelect,
       mounted,
       transitionProps,
@@ -241,7 +257,7 @@ function SelectInner(props: SelectProps) {
       selectedValue,
       selectedLabel,
       returnFocusRef,
-      alignProp,
+      alignActive,
       handleSelect,
       mounted,
       transitionProps,

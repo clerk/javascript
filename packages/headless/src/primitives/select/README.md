@@ -141,13 +141,13 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 
 ## Data Attributes
 
-| Attribute                   | Applies To | Description                     |
-| --------------------------- | ---------- | ------------------------------- |
-| `data-open` / `data-closed` | Trigger    | Popup open state                |
-| `data-selected`             | Option     | The currently selected option   |
-| `data-active`               | Option     | The keyboard-highlighted option |
-| `data-disabled`             | Option     | Disabled option                 |
-| `data-side`                 | Positioner | Resolved placement side         |
+| Attribute                   | Applies To | Description                                                                       |
+| --------------------------- | ---------- | --------------------------------------------------------------------------------- |
+| `data-open` / `data-closed` | Trigger    | Popup open state                                                                  |
+| `data-selected`             | Option     | The currently selected option                                                     |
+| `data-active`               | Option     | The keyboard-highlighted option                                                   |
+| `data-disabled`             | Option     | Disabled option                                                                   |
+| `data-side`                 | Positioner | Resolved placement side, or `none` while the selected option overlays the trigger |
 
 ## Important Notes
 

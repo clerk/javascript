@@ -164,6 +164,15 @@ import {
   meta as sectionMeta,
   MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
+import {
+  Controlled as SelectComponentControlled,
+  Default as SelectComponentDefault,
+  Descriptions as SelectComponentDescriptions,
+  Ghost as SelectComponentGhost,
+  meta as selectComponentMeta,
+  Overflowing as SelectComponentOverflowing,
+  Placeholder as SelectComponentPlaceholder,
+} from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { meta as tableMeta } from '../stories/table.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
@@ -373,6 +382,16 @@ const headingModule: StoryModule = {
 };
 
 const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
+
+const selectComponentModule: StoryModule = {
+  meta: selectComponentMeta,
+  Default: SelectComponentDefault,
+  Descriptions: SelectComponentDescriptions,
+  Ghost: SelectComponentGhost,
+  Placeholder: SelectComponentPlaceholder,
+  Controlled: SelectComponentControlled,
+  Overflowing: SelectComponentOverflowing,
+};
 
 const otpComponentModule: StoryModule = {
   meta: otpComponentMeta,
@@ -600,6 +619,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   sectionModule,
+  selectComponentModule,
   tableModule,
   textModule,
   toastModule,
