@@ -94,6 +94,7 @@ const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => 
   inputValue: '',
   errorMessage: undefined,
   canResend: true,
+  direction: 1,
 }));
 const afterResult = [
   {
@@ -226,7 +227,7 @@ export const reverificationMachine = createMachine({
     methodPickerPreparing: {
       on: { RESET: 'inactive' },
       invoke: fromPromise(prepareActive, {
-        onDone: { target: 'verifying', actions: assign(() => ({ canResend: true })) },
+        onDone: { target: 'verifying', actions: assign(() => ({ canResend: false })) },
         onError: {
           target: 'verifying',
           actions: assign((_, event) => ({ errorMessage: errorMessage(event.error), canResend: true })),
