@@ -16013,7 +16013,7 @@ var ResourceRuntime = class {
 		let entry = this.#identity.get(value)?.get(type);
 		if (entry?.active) return entry.handle;
 		const serverID = value.id;
-		entry = Array.from(this.#entries.values()).find((candidate) => candidate.active && candidate.handle.type === type && (serverID && candidate.value.id === serverID || !serverID && !candidate.value.id && this.#projectionParent && this.#projectionEdge && candidate.parent === this.#projectionParent && candidate.edge === this.#projectionEdge));
+		entry = Array.from(this.#entries.values()).find((candidate) => candidate.active && !Array.from(this.#rootEntries.values()).includes(candidate) && candidate.handle.type === type && (serverID && candidate.value.id === serverID || !serverID && !candidate.value.id && this.#projectionParent && this.#projectionEdge && candidate.parent === this.#projectionParent && candidate.edge === this.#projectionEdge));
 		if (entry) this.#bind(entry, value);
 		else {
 			entry = {

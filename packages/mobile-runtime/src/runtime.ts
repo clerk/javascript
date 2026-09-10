@@ -64,6 +64,8 @@ export class ResourceRuntime implements ResourceCodec {
     entry = Array.from(this.#entries.values()).find(
       candidate =>
         candidate.active &&
+        // Distinct returned instances must not overwrite a live root with the same server ID.
+        !Array.from(this.#rootEntries.values()).includes(candidate) &&
         candidate.handle.type === type &&
         ((serverID && candidate.value.id === serverID) ||
           (!serverID &&

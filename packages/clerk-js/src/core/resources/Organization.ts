@@ -412,10 +412,15 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   setLogo = async ({ file }: SetOrganizationLogoParams): Promise<OrganizationResource> => {
     if (file === null) {
-      return await BaseResource._fetch({
+      const res = await BaseResource._fetch<OrganizationJSON | DeletedObjectJSON>({
         path: `/organizations/${this.id}/logo`,
         method: 'DELETE',
-      }).then(res => new Organization(res?.response as OrganizationJSON));
+      });
+      const json = res?.response;
+      if (json && 'deleted' in json && json.deleted === true && json.object === 'image') {
+        return this.reload();
+      }
+      return new Organization(json as OrganizationJSON);
     }
 
     let body;

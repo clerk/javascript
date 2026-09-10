@@ -7,7 +7,11 @@ export function convertPageToOffsetSearchParams<T>(pageParams: ClerkPaginationPa
   const _initialPage = initialPage ?? 1;
 
   const obj = {
-    ...getNonUndefinedValues(restParams),
+    ...Object.fromEntries(
+      Object.entries(getNonUndefinedValues(restParams)).filter(
+        ([, value]) => !Array.isArray(value) || value.length > 0,
+      ),
+    ),
     limit: _pageSize + '',
     offset: (_initialPage - 1) * _pageSize + '',
   };
