@@ -4,6 +4,8 @@ import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@
 import type {
   OrganizationProfileModalProps,
   OrganizationResource,
+  OrganizationSwitcherProps,
+  UserButtonProps as ClerkUserButtonProps,
   UserProfileModalProps,
   UserResource,
 } from '@clerk/shared/types';
@@ -44,9 +46,6 @@ export type UserButtonModel =
         organizationsEnabled: boolean;
       });
 
-// Mirrors `<OrganizationSwitcher>`: a URL, a `:token` template resolved against the entity, or a builder.
-type AfterUrl<T> = ((entity: T) => string) | string;
-
 /** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
 type UserProfileMode =
   | { userProfileUrl: string; userProfileMode?: 'navigation' }
@@ -62,32 +61,17 @@ type CreateOrganizationMode =
 
 export type UserButtonModelOptions = UserProfileMode &
   OrganizationProfileMode &
-  CreateOrganizationMode & {
-    afterSelectOrganizationUrl?: AfterUrl<OrganizationResource>;
-    /** Where selecting the personal workspace lands. Resolved against the user, not an organization. */
-    afterSelectPersonalUrl?: AfterUrl<UserResource>;
-    /** Where creating an organization lands. Resolved against the new organization. */
-    afterCreateOrganizationUrl?: AfterUrl<OrganizationResource>;
-    /** Where leaving the active organization lands. The instance URL is used when this is omitted. */
-    afterLeaveOrganizationUrl?: string;
-    /** Where switching account lands. The instance URL is used when this is omitted. */
-    afterSwitchSessionUrl?: string;
-    /**
-     * Your app's sign-in page. Adding an account goes here, and a pending task on the account being
-     * switched to opens under it. The instance URL is used when this is omitted.
-     */
-    signInUrl?: string;
-    /**
-     * Skips the invite-members step after creating an organization. Left unset, the step is skipped
-     * only when the organization allows a single member.
-     */
-    skipInvitationScreen?: boolean;
-    /**
-     * Leaves the personal workspace out. An instance that forces organization selection withholds it
-     * either way, so this cannot opt back in.
-     */
-    hidePersonal?: boolean;
-  };
+  CreateOrganizationMode &
+  Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'> &
+  Pick<
+    OrganizationSwitcherProps,
+    | 'afterSelectOrganizationUrl'
+    | 'afterSelectPersonalUrl'
+    | 'afterCreateOrganizationUrl'
+    | 'afterLeaveOrganizationUrl'
+    | 'skipInvitationScreen'
+    | 'hidePersonal'
+  >;
 
 /** Props forwarded to the profile modals this button opens. */
 export interface UserButtonModalProps {
@@ -95,7 +79,10 @@ export interface UserButtonModalProps {
   organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
 }
 
-function resolveAfterUrl<T extends object>(config: AfterUrl<T> | undefined, entity: T): string | undefined {
+function resolveAfterUrl<T extends object>(
+  config: ((entity: T) => string) | string | undefined,
+  entity: T,
+): string | undefined {
   if (typeof config === 'function') {
     return config(entity);
   }
