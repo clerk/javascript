@@ -32,6 +32,11 @@ import {
 } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import {
+  Default as DrawerComponentDefault,
+  InsideProfile as DrawerComponentInsideProfile,
+  meta as drawerComponentMeta,
+} from '../stories/drawer.component.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
 import {
   Default as FieldDefault,
@@ -102,6 +107,12 @@ import {
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import {
+  Customized as ProfileCustomized,
+  Default as ProfileDefault,
+  meta as profileComponentMeta,
+  Transitions as ProfileTransitions,
+} from '../stories/profile.component.stories';
+import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
   BackupCodeError as ReverificationBackupCodeError,
@@ -156,7 +167,11 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
-import { Default as UserPageDefault, meta as userPageMeta } from '../stories/user-page.stories';
+import {
+  Default as UserProfileDefault,
+  meta as userProfileMeta,
+  Overlay as UserProfileOverlay,
+} from '../stories/user-profile.stories';
 import {
   Default as UserProfileAccountSectionDefault,
   meta as userProfileAccountSectionMeta,
@@ -241,6 +256,11 @@ const sectionModule: StoryModule = {
   Destructive: SectionDestructive,
 };
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+const drawerComponentModule: StoryModule = {
+  meta: drawerComponentMeta,
+  Default: DrawerComponentDefault,
+  InsideProfile: DrawerComponentInsideProfile,
+};
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
 
@@ -292,6 +312,12 @@ const popoverComponentModule: StoryModule = {
   Default: PopoverComponentDefault,
   Placement: PopoverComponentPlacement,
   Alignment: PopoverComponentAlignment,
+};
+const profileComponentModule: StoryModule = {
+  meta: profileComponentMeta,
+  Default: ProfileDefault,
+  Customized: ProfileCustomized,
+  Transitions: ProfileTransitions,
 };
 
 const itemModule: StoryModule = {
@@ -399,9 +425,10 @@ const userProfileApiKeysPanelModule: StoryModule = {
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
-const userPageModule: StoryModule = {
-  meta: userPageMeta,
-  Default: UserPageDefault,
+const userProfileModule: StoryModule = {
+  meta: userProfileMeta,
+  Default: UserProfileDefault,
+  Overlay: UserProfileOverlay,
 };
 
 const userProfileAccountSectionModule: StoryModule = {
@@ -498,7 +525,7 @@ export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
   // User Profile
-  userPageModule,
+  userProfileModule,
   // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
@@ -530,12 +557,14 @@ export const registry: StoryModule[] = [
   inputGroupModule,
   itemModule,
   dialogComponentModule,
+  drawerComponentModule,
   headingModule,
   iconModule,
   iconFrameModule,
   menuComponentModule,
   otpComponentModule,
   popoverComponentModule,
+  profileComponentModule,
   sectionModule,
   tableModule,
   textModule,

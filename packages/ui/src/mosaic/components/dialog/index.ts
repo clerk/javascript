@@ -1,4 +1,4 @@
-export { Dialog, DialogContext } from './dialog';
+export { Dialog, DialogContext, isOverlayDialog } from './dialog';
 export { createConfirmHandle } from './confirm-handle';
 export { useConfirmedClose } from './use-confirmed-close';
 export type { ConfirmHandle, ConfirmOptions } from './confirm-handle';

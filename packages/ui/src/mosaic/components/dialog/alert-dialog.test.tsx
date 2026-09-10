@@ -75,7 +75,7 @@ describe('role="alertdialog"', () => {
         defaultOpen
         role='alertdialog'
       >
-        <Dialog.Popup size='panel'>
+        <Dialog.Popup size='profile'>
           <Dialog.Title>Discard changes?</Dialog.Title>
           <Dialog.Description>This address has not been saved.</Dialog.Description>
         </Dialog.Popup>
@@ -83,7 +83,7 @@ describe('role="alertdialog"', () => {
     );
 
     expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'prompt');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="panel"'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="profile"'));
     warn.mockRestore();
   });
 
