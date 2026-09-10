@@ -493,7 +493,15 @@ export function useReverificationController(model: ReverificationModel): Reverif
     otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
     onResend: () => send({ type: 'RESEND' }),
     canResend: context.canResend,
+    // We clamp this to 30s because the first render after locking resend
+    // will have the old `now` state set, which would result in a value above
+    // 30s. There are other solutions like reading Date.now() in render and
+    // letting the interval only retrigger render, but that makes the render
+    // impure which is something the React compiler would warn about.
+    // useSyncExternalStore feels unnecessarily complex here
     resendRemainingSeconds:
-      countingDown && resendAvailableAt ? Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)) : undefined,
+      countingDown && resendAvailableAt
+        ? Math.min(RESEND_COOLDOWN_MS / 1000, Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)))
+        : undefined,
   };
 }
