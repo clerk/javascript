@@ -203,9 +203,9 @@ export const reverificationMachine = createMachine({
           {
             guard: (ctx: ReverificationContext) => ctx.submitRequested,
             target: 'submitting' as const,
-            actions: assign(() => ({ submitRequested: false, canResend: true })),
+            actions: assign(() => ({ submitRequested: false })),
           },
-          { target: 'verifying' as const, actions: assign(() => ({ canResend: true })) },
+          { target: 'verifying' as const },
         ],
         onError: {
           target: 'verifying',
@@ -225,9 +225,10 @@ export const reverificationMachine = createMachine({
       some feedback that does not feel janky. The view handles disabling inputs while preparing.
     */
     methodPickerPreparing: {
+      entry: assign(() => ({ canResend: false })),
       on: { RESET: 'inactive' },
       invoke: fromPromise(prepareActive, {
-        onDone: { target: 'verifying', actions: assign(() => ({ canResend: false })) },
+        onDone: 'verifying',
         onError: {
           target: 'verifying',
           actions: assign((_, event) => ({ errorMessage: errorMessage(event.error), canResend: true })),
