@@ -11,6 +11,7 @@ type Configuration = {
   publishableKey: string;
   locale?: string;
   sdkVersion?: string;
+  isMobile?: boolean;
   callbackUrl: string;
   platform: 'ios' | 'android';
   protocolVersion: number;
@@ -53,6 +54,8 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
     (typeof configuration.sdkVersion !== 'string' || !/^[0-9A-Za-z.+-]+$/.test(configuration.sdkVersion))
   )
     throw bridgeError('invalid_sdk_version');
+  if (configuration.isMobile !== undefined && typeof configuration.isMobile !== 'boolean')
+    throw bridgeError('invalid_mobile_device');
   initializing = true;
   removeNetworkEnvironment = setNativeNetworkEnvironment({ isOnline: () => online, isActive: () => active });
   const clerk = new Clerk(configuration.publishableKey);
@@ -65,7 +68,10 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
       write: value => hostRequest('storage.write', { scope, key: 'client', value }),
       remove: () => hostRequest('storage.remove', { scope, key: 'client' }),
     },
-    configuration.sdkVersion ? { [`x-${configuration.platform}-sdk-version`]: configuration.sdkVersion } : {},
+    {
+      'x-mobile': configuration.isMobile === false ? '0' : '1',
+      ...(configuration.sdkVersion ? { [`x-${configuration.platform}-sdk-version`]: configuration.sdkVersion } : {}),
+    },
   );
   removeNativeHost = await clerk.__internal_configureNativeHost({
     platform: configuration.platform,
