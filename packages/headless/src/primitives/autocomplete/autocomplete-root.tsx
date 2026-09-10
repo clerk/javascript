@@ -41,20 +41,12 @@ export interface AutocompleteProps {
   children: ReactNode;
 }
 
-export interface ComboboxRootInternalProps extends Omit<AutocompleteProps, 'value' | 'defaultValue' | 'onValueChange'> {
-  allowsCustomValue?: boolean;
-  /** Separate search input inside another surface. Bind open to that surface. */
-  inline?: boolean;
-  value?: string | null;
-  defaultValue?: string | null;
-  onValueChange?: (value: string | null) => void;
-}
-function AutocompleteInner(props: ComboboxRootInternalProps) {
-  const { placement: placementProp = 'bottom-start', sideOffset = 4, allowsCustomValue = true, children } = props;
+function AutocompleteInner(props: AutocompleteProps) {
+  const { placement: placementProp = 'bottom-start', sideOffset = 4, children } = props;
 
   const nodeId = useFloatingNodeId();
 
-  const [open, setOpenState] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
+  const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
   const [inputValue, setInputValue] = useControllableState(
     props.inputValue,
@@ -62,49 +54,19 @@ function AutocompleteInner(props: ComboboxRootInternalProps) {
     props.onInputValueChange,
   );
 
-  const [selectedValue, setSelectedValue] = useControllableState<string | null>(
+  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>(
     props.value,
-    props.defaultValue ?? null,
-    props.onValueChange,
+    props.defaultValue,
+    value => {
+      if (value !== undefined) {
+        props.onValueChange?.(value);
+      }
+    },
   );
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [inlineMode, setInlineMode] = useState(false);
-  const [queryChanged, setQueryChanged] = useState(false);
-  const initialValue = props.value ?? props.defaultValue;
-  const labelsByValueRef = useRef(
-    new Map<string, string>(
-      initialValue != null && props.defaultInputValue !== undefined ? [[initialValue, props.defaultInputValue]] : [],
-    ),
-  );
-
-  const setOpen = useCallback(
-    (nextOpen: boolean) => {
-      if (!nextOpen) {
-        setQueryChanged(false);
-      }
-      setOpenState(nextOpen);
-    },
-    [setOpenState],
-  );
-
-  useEffect(() => {
-    if (!open) {
-      setQueryChanged(false);
-    }
-    if (allowsCustomValue || open) {
-      return;
-    }
-    const label =
-      props.inline || selectedValue === null ? '' : (labelsByValueRef.current.get(selectedValue) ?? selectedValue);
-    if (inputValue !== label) {
-      setInputValue(label);
-    }
-  }, [allowsCustomValue, open, props.inline, selectedValue, selectedIndex, inputValue, setInputValue]);
-
-  const selectedLabel = selectedValue === null ? '' : (labelsByValueRef.current.get(selectedValue) ?? selectedValue);
-  const filterQuery = !allowsCustomValue && !queryChanged && inputValue === selectedLabel ? '' : inputValue;
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
@@ -113,8 +75,7 @@ function AutocompleteInner(props: ComboboxRootInternalProps) {
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
   const registerSelectedIndex = useCallback(
-    (index: number, value: string, label: string) => {
-      labelsByValueRef.current.set(value, label);
+    (index: number, value: string) => {
       if (value === selectedValue) {
         setSelectedIndex(index);
       }
@@ -205,41 +166,33 @@ function AutocompleteInner(props: ComboboxRootInternalProps) {
 
   const handleSelect = useCallback(
     (value: string, index: number, label: string) => {
-      labelsByValueRef.current.set(value, label);
       setSelectedValue(value);
       setSelectedIndex(index);
-      setInputValue(props.inline ? '' : label);
+      setInputValue(label);
       setActiveIndex(null);
       setOpen(false);
     },
-    [props.inline, setSelectedValue, setInputValue, setOpen],
+    [setSelectedValue, setInputValue, setOpen],
   );
 
   const handleInputChange = useCallback(
     (value: string) => {
-      setQueryChanged(true);
       setInputValue(value);
-      if (value === '' && !allowsCustomValue && !props.inline) {
-        setSelectedValue(null);
-        setSelectedIndex(null);
-      }
-      if (value || !allowsCustomValue) {
-        setOpenState(true);
+      if (value) {
+        setOpen(true);
         setActiveIndex(0);
       } else {
-        setOpenState(false);
+        setOpen(false);
         setActiveIndex(null);
       }
     },
-    [allowsCustomValue, props.inline, setInputValue, setOpenState, setSelectedValue],
+    [setInputValue, setOpen],
   );
 
   const contextValue = useMemo<AutocompleteContextValue>(
     () => ({
-      allowsCustomValue,
       open,
       inputValue,
-      filterQuery,
       selectedValue,
       floatingContext,
       refs,
@@ -267,10 +220,8 @@ function AutocompleteInner(props: ComboboxRootInternalProps) {
       transitionProps,
     }),
     [
-      allowsCustomValue,
       open,
       inputValue,
-      filterQuery,
       selectedValue,
       floatingContext,
       refs,
@@ -299,7 +250,7 @@ function AutocompleteInner(props: ComboboxRootInternalProps) {
   );
 }
 
-export function ComboboxRootInternal(props: ComboboxRootInternalProps) {
+export function AutocompleteRoot(props: AutocompleteProps) {
   const parentId = useFloatingParentNodeId();
 
   if (parentId === null) {
@@ -311,17 +262,4 @@ export function ComboboxRootInternal(props: ComboboxRootInternalProps) {
   }
 
   return <AutocompleteInner {...props} />;
-}
-
-export function AutocompleteRoot({ onValueChange, ...props }: AutocompleteProps) {
-  return (
-    <ComboboxRootInternal
-      {...props}
-      onValueChange={value => {
-        if (value !== null) {
-          onValueChange?.(value);
-        }
-      }}
-    />
-  );
 }
