@@ -96,6 +96,7 @@ describe('reverificationMachine', () => {
     expect(prepare).toHaveBeenCalledOnce();
     expect(actor.getSnapshot().value).toBe('verifying');
     expect(actor.getSnapshot().context.activeMethod?.strategy).toBe('email_code');
+    expect(actor.getSnapshot().context.canResend).toBe(false);
 
     actor.send({ type: 'SHOW_METHODS' });
     actor.send({ type: 'BACK' });
@@ -617,6 +618,7 @@ describe('useReverificationController', () => {
       if (result.current.status === 'ready') {
         expect(result.current.step).toBe('otp');
         expect(result.current.pendingMethodId).toBeUndefined();
+        expect(result.current.canResend).toBe(false);
       }
     });
   });
@@ -648,6 +650,7 @@ describe('useReverificationController', () => {
         expect(result.current.step).toBe('otp');
         expect(result.current.errorMessage).toBe('Could not send the code.');
         expect(result.current.pendingMethodId).toBeUndefined();
+        expect(result.current.canResend).toBe(true);
       }
     });
   });
