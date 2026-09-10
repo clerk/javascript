@@ -25,23 +25,36 @@ export function useReverificationWithState<F extends Fetcher>(
   const { session } = useSession();
   const [reverificationState, setReverificationState] = useState<ReverificationProps>({ isActive: false });
   const openedSessionId = useRef<string | null>(null);
-  const cancelOnUnmountRef = useRef<(() => void) | undefined>(undefined);
+  const activeCancelRef = useRef<(() => void) | undefined>(undefined);
 
   const wrapped = useReverification(fetcher, {
     ...options,
     onNeedsReverification: ({ complete, cancel, level }) => {
+      // If another Reverification is already in progress for this specific
+      // wrapped action, cancel this new one immediately and keep the old one.
+      // This is an extra safeguard for something that likely never happens.
+      if (activeCancelRef.current) {
+        cancel();
+        return;
+      }
+
       openedSessionId.current = session?.id ?? null;
+      activeCancelRef.current = cancel;
+
+      const settle = (callback: () => void) => {
+        if (activeCancelRef.current !== cancel) {
+          return;
+        }
+        activeCancelRef.current = undefined;
+        setReverificationState({ isActive: false });
+        callback();
+      };
+
       setReverificationState({
         isActive: true,
         level,
-        complete: () => {
-          setReverificationState({ isActive: false });
-          complete();
-        },
-        cancel: () => {
-          setReverificationState({ isActive: false });
-          cancel();
-        },
+        complete: () => settle(complete),
+        cancel: () => settle(cancel),
       });
     },
   });
@@ -49,8 +62,6 @@ export function useReverificationWithState<F extends Fetcher>(
   // Cancel if the session changes mid-flight
   const { isActive, cancel } = reverificationState;
   useEffect(() => {
-    cancelOnUnmountRef.current = isActive ? cancel : undefined;
-
     if (!isActive) {
       openedSessionId.current = null;
       return;
@@ -74,7 +85,9 @@ export function useReverificationWithState<F extends Fetcher>(
 
   useEffect(() => {
     return () => {
-      cancelOnUnmountRef.current?.();
+      const cancel = activeCancelRef.current;
+      activeCancelRef.current = undefined;
+      cancel?.();
     };
   }, []);
 
