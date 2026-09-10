@@ -141,6 +141,25 @@ test('native Apple account linking uses an identity token and refreshes the cano
   assert.equal(JSON.stringify(f.messages.filter(m => m.state)).includes('apple_link_token'), false);
 });
 
+test('native Apple account linking preserves a supplied token without requesting another identity', async t => {
+  const f = await connectedFixture({ apple: true });
+  t.after(f.dispose);
+  const token = 'provided_apple_token';
+  const result = await f.invoke(f.state.roots.user, 'User.createExternalAccount', [
+    { strategy: 'oauth_token_apple', token },
+  ]);
+  assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+  assert.equal(f.resource(result.result.$ref).provider, 'apple');
+  assert.deepEqual(f.resource(f.state.roots.user).externalAccounts[0], result.result);
+  const request = f.requests.find(r => r.url.includes('/external_accounts'));
+  assert.equal(new URLSearchParams(request.body).get('token'), token);
+  assert.equal(
+    f.messages.some(m => m.kind === 'hostRequest' && ['appleIdentity', 'browser'].includes(m.capability)),
+    false,
+  );
+  assert.equal(JSON.stringify(f.messages.filter(m => m.state)).includes(token), false);
+});
+
 for (const outcome of ['cancel', 'mismatch']) {
   test(`external account ${outcome} does not reconcile an unverified callback`, async t => {
     const f = await connectedFixture({ [outcome]: true });
