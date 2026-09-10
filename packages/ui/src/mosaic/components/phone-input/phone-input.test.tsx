@@ -7,6 +7,48 @@ import { Field } from '../field';
 import { PhoneInput } from './phone-input';
 
 describe('Mosaic PhoneInput', () => {
+  it('forwards object refs and clears them on unmount', () => {
+    const ref = React.createRef<HTMLInputElement>();
+    const { unmount } = render(
+      <PhoneInput
+        ref={ref}
+        aria-label='Phone number'
+      />,
+    );
+    expect(ref.current).toBe(screen.getByRole('textbox'));
+    unmount();
+    expect(ref.current).toBeNull();
+  });
+
+  it('forwards callback refs and clears them on unmount', () => {
+    const ref = vi.fn();
+    const { unmount } = render(
+      <PhoneInput
+        ref={ref}
+        aria-label='Phone number'
+      />,
+    );
+    expect(ref).toHaveBeenLastCalledWith(screen.getByRole('textbox'));
+    unmount();
+    expect(ref).toHaveBeenLastCalledWith(null);
+  });
+
+  it('keeps the country indicator on the selection while hovering another country', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+    const us = screen.getByRole('option', { name: /United States/ });
+    const uk = screen.getByRole('option', { name: /United Kingdom/ });
+    await user.hover(uk);
+    expect(us.querySelector('.cl-combobox-option-indicator')).toBeVisible();
+    expect(uk.querySelector('.cl-combobox-option-indicator')).not.toBeInTheDocument();
+    await user.click(uk);
+    await user.click(screen.getByRole('button', { name: 'Country, United Kingdom' }));
+    expect(
+      screen.getByRole('option', { name: /United Kingdom/ }).querySelector('.cl-combobox-option-indicator'),
+    ).toBeVisible();
+  });
+
   it('positions the country popup against the full phone field', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);

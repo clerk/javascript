@@ -61,7 +61,9 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-neutral-faded'],
     fontVariantNumeric: 'tabular-nums',
   },
-  checkHidden: {
-    visibility: 'hidden',
+  indicatorSlot: {
+    display: 'flex',
+    flexShrink: 0,
+    width: space['3'],
   },
 });

@@ -1,5 +1,6 @@
 'use client';
 
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -118,17 +119,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   const [anchor, setAnchor] = React.useState<HTMLDivElement | null>(null);
   const [query, setQuery] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const setInputRef = React.useCallback(
-    (node: HTMLInputElement | null) => {
-      inputRef.current = node;
-      if (typeof forwardedRef === 'function') {
-        forwardedRef(node);
-      } else if (forwardedRef) {
-        forwardedRef.current = node;
-      }
-    },
-    [forwardedRef],
-  );
+  const mergedInputRef = useMergeRefs([inputRef, forwardedRef]);
 
   React.useEffect(() => {
     if (countryProp === undefined && valueProp) {
@@ -267,7 +258,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                     />
                   </InputGroup.Start>
                   <Combobox.Input
-                    variant='ghost'
                     aria-label='Search countries'
                     placeholder={countrySearchPlaceholder}
                     spellCheck={false}
@@ -291,12 +281,9 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                       </span>
                       <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
                       <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
-                      <Icon
-                        name='check'
-                        size='sm'
-                        aria-hidden='true'
-                        {...(option.iso === country.iso ? {} : stylex.props(styles.checkHidden))}
-                      />
+                      <span {...stylex.props(styles.indicatorSlot)}>
+                        <Combobox.OptionIndicator />
+                      </span>
                     </Combobox.Option>
                   ))
                 ) : (
@@ -319,8 +306,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           +{country.code}
         </InputGroup.Start>
         <InputGroup.Input
-          ref={setInputRef}
-          variant='ghost'
+          ref={mergedInputRef}
           {...mergeStyleProps(themeProps('phone-input-control'), stylex.props(styles.control))}
           {...inputProps}
           id={id}
