@@ -29,6 +29,7 @@ let active = true;
 let online = true;
 let recovery: Promise<void> | undefined;
 let recoveryRequested = false;
+let activeInvocations = 0;
 let removeNativeHost: (() => void) | undefined;
 let removeNetworkEnvironment: (() => void) | undefined;
 
@@ -136,7 +137,8 @@ async function initialize(id: string, configuration: Configuration): Promise<voi
 // Recovery policy belongs to this owner; native hosts only report OS state.
 function recoverResources(): void {
   if (!active || !online || disposed || !core) return;
-  if (recovery) {
+  // OS recovery must not rotate credentials underneath a caller's ongoing operation.
+  if (recovery || activeInvocations > 0) {
     recoveryRequested = true;
     return;
   }
@@ -187,9 +189,14 @@ export function receive(encoded: string): void {
     }
     if (!runtime) throw bridgeError('runtime_not_ready');
     if (message.kind === 'invoke') {
+      activeInvocations++;
       void runtime
         .invoke(message as Invocation)
-        .catch(error => emit({ kind: 'runtimeError', failure: failure(error, 'bridge') }));
+        .catch(error => emit({ kind: 'runtimeError', failure: failure(error, 'bridge') }))
+        .finally(() => {
+          activeInvocations--;
+          if (recoveryRequested) recoverResources();
+        });
     } else if (message.kind === 'cancel') runtime.cancel(message.id);
     else if (message.kind === 'release') runtime.release(message.target);
     else if (message.kind === 'lifecycle') {
