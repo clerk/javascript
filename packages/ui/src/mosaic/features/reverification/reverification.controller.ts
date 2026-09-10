@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
 import { setup } from '../../machine/setup';
@@ -28,6 +28,7 @@ interface ReverificationContext {
   activeMethod: ReverificationMethod | null;
   methods: readonly ReverificationMethod[];
   canResend: boolean;
+  resendAvailableAt: number | undefined;
   abortRequested: boolean;
   submitRequested: boolean;
   frozenActiveMethodId: string | undefined;
@@ -62,6 +63,16 @@ const unseatedDeps: ReverificationDeps = {
   cancel: () => {},
 };
 
+export const RESEND_COOLDOWN_MS = 30_000;
+
+function lockResend(): Pick<ReverificationContext, 'canResend' | 'resendAvailableAt'> {
+  return { canResend: false, resendAvailableAt: Date.now() + RESEND_COOLDOWN_MS };
+}
+
+function unlockResend(): Pick<ReverificationContext, 'canResend' | 'resendAvailableAt'> {
+  return { canResend: true, resendAvailableAt: undefined };
+}
+
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
 }
@@ -93,7 +104,7 @@ const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => 
   activeMethod: event.output.startingMethod,
   inputValue: '',
   errorMessage: undefined,
-  canResend: true,
+  ...unlockResend(),
   direction: 1,
 }));
 const afterResult = [
@@ -115,7 +126,7 @@ const afterResult = [
       return Boolean(strategy && needsPrepare(strategy));
     },
     target: 'preparing' as const,
-    actions: [applyResult, assign(() => ({ canResend: false }))],
+    actions: [applyResult, assign(() => lockResend())],
   },
   { target: 'verifying' as const, actions: applyResult },
 ];
@@ -141,6 +152,7 @@ export const reverificationMachine = createMachine({
     activeMethod: null,
     methods: [],
     canResend: true,
+    resendAvailableAt: undefined,
     abortRequested: false,
     submitRequested: false,
     frozenActiveMethodId: undefined,
@@ -155,7 +167,7 @@ export const reverificationMachine = createMachine({
         errorMessage: undefined,
         abortRequested: false,
         submitRequested: false,
-        canResend: true,
+        ...unlockResend(),
       })),
       on: { START: 'starting' },
     },
@@ -212,7 +224,7 @@ export const reverificationMachine = createMachine({
           actions: assign((_, event) => ({
             errorMessage: errorMessage(event.error),
             submitRequested: false,
-            canResend: true,
+            ...unlockResend(),
           })),
         },
       }),
@@ -225,13 +237,13 @@ export const reverificationMachine = createMachine({
       some feedback that does not feel janky. The view handles disabling inputs while preparing.
     */
     methodPickerPreparing: {
-      entry: assign(() => ({ canResend: false })),
+      entry: assign(() => lockResend()),
       on: { RESET: 'inactive' },
       invoke: fromPromise(prepareActive, {
         onDone: 'verifying',
         onError: {
           target: 'verifying',
-          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error), canResend: true })),
+          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error), ...unlockResend() })),
         },
       }),
     },
@@ -239,7 +251,7 @@ export const reverificationMachine = createMachine({
     verifying: {
       always: [{ guard: ctx => ctx.activeMethod === null, target: 'unavailable' }],
       after: {
-        30_000: { guard: ctx => !ctx.canResend, actions: assign(() => ({ canResend: true })) },
+        [RESEND_COOLDOWN_MS]: { guard: ctx => !ctx.canResend, actions: assign(() => unlockResend()) },
       },
       on: {
         TYPE: {
@@ -288,7 +300,7 @@ export const reverificationMachine = createMachine({
       invoke: fromPromise(prepareActive, {
         onDone: {
           target: 'verifying',
-          actions: assign(() => ({ canResend: false, inputValue: '', errorMessage: undefined })),
+          actions: assign(() => ({ ...lockResend(), inputValue: '', errorMessage: undefined })),
         },
         onError: {
           target: 'verifying',
@@ -416,6 +428,18 @@ export function useReverificationController(model: ReverificationModel): Reverif
       : undefined,
   );
 
+  const [now, setNow] = useState(() => Date.now());
+  const resendAvailableAt = snapshot.context.resendAvailableAt;
+  const countingDown = Boolean(resendAvailableAt && !snapshot.context.canResend);
+
+  useEffect(() => {
+    if (!countingDown) {
+      return;
+    }
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [countingDown, resendAvailableAt]);
+
   useEffect(() => {
     if (model.isActive && ready && snapshot.value === 'inactive') {
       send({ type: 'START' });
@@ -474,5 +498,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
     identifier: activeMethod && 'identifier' in activeMethod ? activeMethod.identifier : undefined,
     onResend: () => send({ type: 'RESEND' }),
     canResend: context.canResend,
+    resendRemainingSeconds:
+      countingDown && resendAvailableAt ? Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)) : undefined,
   };
 }

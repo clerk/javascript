@@ -73,9 +73,10 @@ describe('ReverificationView', () => {
       step: 'otp',
       otpChannel: 'email',
       canResend: false,
+      resendRemainingSeconds: 23,
     });
 
-    expect(screen.getByRole('button', { name: 'Didn’t receive a code? Resend' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Didn’t receive a code? Resend (23)' })).toBeDisabled();
   });
 
   it('does not render Card branding', () => {

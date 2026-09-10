@@ -73,14 +73,16 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
     otpChannel,
     onResend,
     canResend,
+    resendRemainingSeconds,
   } = props;
 
   const otp = otpCopy(otpChannel);
   const hasAlternatives = methods.length > 0;
+  const resendLabel = otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton;
   const resend =
     otpChannel === 'email' || otpChannel === 'phone'
       ? {
-          label: otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton,
+          label: resendRemainingSeconds ? `${resendLabel} (${resendRemainingSeconds})` : resendLabel,
           disabled: !canResend || isPending,
           onClick: onResend,
         }
