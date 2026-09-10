@@ -935,23 +935,21 @@ export const heIL: LocalizationResource = {
   membershipRole__basicMember: 'חבר',
   membershipRole__guestMember: 'אורח',
   oauthConsent: {
-    action__allow: "אישור",
-    action__deny: "דחייה",
-    offlineAccessNotice: "תישאר מחובר עד שתתנתק או תבטל את הגישה.",
-    redirectNotice: "אם תאשר גישה, האפליקציה תעביר אותך אל {{domainAction}}.",
+    action__allow: 'אישור',
+    action__deny: 'דחייה',
+    offlineAccessNotice: 'תישאר מחובר עד שתתנתק או תבטל את הגישה.',
+    redirectNotice: 'אם תאשר גישה, האפליקציה תעביר אותך אל {{domainAction}}.',
     redirectUriModal: {
-      subtitle:
-        "ודא שאתה סומך על {{applicationName}} ושכתובת URL זו שייכת ל-{{applicationName}}.",
-      title: "כתובת להפניה",
+      subtitle: 'ודא שאתה סומך על {{applicationName}} ושכתובת URL זו שייכת ל-{{applicationName}}.',
+      title: 'כתובת להפניה',
     },
     scopeList: {
-      title: "פעולה זו תאפשר ל-{{applicationName}} גישה אל:",
+      title: 'פעולה זו תאפשר ל-{{applicationName}} גישה אל:',
       privateMetadata: undefined,
     },
-    subtitle: "מבקש גישה ל-{{applicationName}} בשם {{identifier}}",
-    viewFullUrl: "הצג כתובת מלאה",
-    warning:
-      "ודא שאתה סומך על {{applicationName}} ({{domainAction}}). ייתכן שתשתף מידע רגיש עם אתר או אפליקציה זו.",
+    subtitle: 'מבקש גישה ל-{{applicationName}} בשם {{identifier}}',
+    viewFullUrl: 'הצג כתובת מלאה',
+    warning: 'ודא שאתה סומך על {{applicationName}} ({{domainAction}}). ייתכן שתשתף מידע רגיש עם אתר או אפליקציה זו.',
   },
   oauthDeviceVerification: {
     action__tryAnotherCode: undefined,
