@@ -9,7 +9,7 @@ import { __internal_useOrganizationDirectorySync } from '../useOrganizationDirec
 import { createMockClerk, createMockQueryClient } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
-const updateSpy = vi.fn(() => Promise.resolve({ ...directory, name: 'Renamed' }));
+const updateSpy = vi.fn(() => Promise.resolve({ ...directory, enabled: false }));
 const rotateTokenSpy = vi.fn(() => Promise.resolve({ ...directory, token: 'tok_new' }));
 const deleteSpy = vi.fn(() => Promise.resolve({ object: 'directory', id: 'dir_1', deleted: true }));
 const directory = {
@@ -129,7 +129,7 @@ describe('useOrganizationDirectorySync', () => {
       [
         'updateDirectorySync',
         updateSpy,
-        (r: ReturnType<typeof renderDirectorySync>['result']) => r.current.updateDirectorySync({ name: 'Renamed' }),
+        (r: ReturnType<typeof renderDirectorySync>['result']) => r.current.updateDirectorySync({ enabled: false }),
       ],
       [
         'rotateDirectorySyncToken',
@@ -161,10 +161,10 @@ describe('useOrganizationDirectorySync', () => {
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
       await act(async () => {
-        await result.current.updateDirectorySync({ name: 'Renamed' });
+        await result.current.updateDirectorySync({ enabled: false });
       });
 
-      expect(updateSpy).toHaveBeenCalledWith({ name: 'Renamed' });
+      expect(updateSpy).toHaveBeenCalledWith({ enabled: false });
     });
 
     it('directory-scoped mutations resolve undefined before the directory has loaded', async () => {
@@ -173,7 +173,7 @@ describe('useOrganizationDirectorySync', () => {
       await waitFor(() => expect(result.current.isLoading).toBe(false));
       expect(result.current.data).toBeNull();
 
-      await expect(result.current.updateDirectorySync({ name: 'Renamed' })).resolves.toBeUndefined();
+      await expect(result.current.updateDirectorySync({ enabled: false })).resolves.toBeUndefined();
       await expect(result.current.rotateDirectorySyncToken()).resolves.toBeUndefined();
       await expect(result.current.deleteDirectorySync()).resolves.toBeUndefined();
       expect(updateSpy).not.toHaveBeenCalled();
