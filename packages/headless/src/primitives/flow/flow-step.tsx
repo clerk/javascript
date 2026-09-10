@@ -4,7 +4,7 @@ import { inertProps } from '@clerk/shared/inert';
 import React, { useLayoutEffect, useRef } from 'react';
 
 import { useTransition } from '../../hooks/use-transition';
-import { type ComponentProps, mergeProps, useRender } from '../../utils';
+import { type ComponentProps, Freeze, mergeProps, useRender } from '../../utils';
 import { useFlowContext } from './flow-context';
 
 export interface FlowStepProps extends ComponentProps<'div'> {
@@ -16,12 +16,9 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
   const { value, direction, registerActiveStep, unregisterActiveStep } = useFlowContext();
   const open = ids.includes(value);
   const stepRef = useRef<HTMLDivElement | null>(null);
-  const activeChildrenRef = useRef(children);
   const hasBeenClosed = useRef(false);
 
-  if (open) {
-    activeChildrenRef.current = children;
-  } else {
+  if (!open) {
     hasBeenClosed.current = true;
   }
 
@@ -49,7 +46,9 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
       ...effectiveTransitionProps.style,
       ['--cl-flow-transition-direction' as string]: String(direction),
     },
-    children: open ? children : activeChildrenRef.current,
+    // An outgoing step keeps showing what it showed while active, not what its controller has
+    // since moved on to.
+    children: <Freeze frozen={!open}>{children}</Freeze>,
   };
 
   return useRender({

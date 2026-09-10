@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
@@ -74,14 +74,6 @@ export function Destructive({
   const formId = useId();
   const [typedValue, setTypedValue] = useState('');
 
-  // The caller may close the dialog without going through the trigger or Cancel, so the
-  // field is cleared on close rather than in a handler.
-  useEffect(() => {
-    if (!open) {
-      setTypedValue('');
-    }
-  }, [open]);
-
   const isConfirmed = typedValue === confirmationValue;
 
   // The action sits in the footer, outside the form, so `form={formId}` associates the two.
@@ -100,6 +92,14 @@ export function Destructive({
       closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
+      // The caller may close the dialog without going through the trigger or Cancel, so the
+      // field is cleared on close rather than in a handler — and after the exit animation, so the
+      // phrase does not empty out under the fade.
+      onOpenChangeComplete={nextOpen => {
+        if (!nextOpen) {
+          setTypedValue('');
+        }
+      }}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup size='card'>

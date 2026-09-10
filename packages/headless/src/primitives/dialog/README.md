@@ -148,17 +148,18 @@ the close was pointer-driven, where focus is left where the pointer put it (see 
 
 ### `Dialog.Root`
 
-| Prop           | Type                                                        | Default    | Description                                                           |
-| -------------- | ----------------------------------------------------------- | ---------- | --------------------------------------------------------------------- |
-| `open`         | `boolean`                                                   | —          | Controlled open state                                                 |
-| `defaultOpen`  | `boolean`                                                   | `false`    | Initial open state (uncontrolled)                                     |
-| `onOpenChange` | `(open: boolean, details: DialogOpenChangeDetails) => void` | —          | Called when open state changes; `details` names the trigger behind it |
-| `modal`        | `boolean`                                                   | `true`     | Traps focus and blocks page interaction                               |
-| `role`         | `'dialog' \| 'alertdialog'`                                 | `'dialog'` | The popup's ARIA role                                                 |
-| `closedBy`     | `'any' \| 'closerequest' \| 'none'`                         | `'any'`    | Which gestures dismiss the dialog                                     |
-| `handle`       | `DialogHandle`                                              | —          | Connects detached triggers (see `Dialog.createHandle()`)              |
-| `triggerId`    | `string \| null`                                            | —          | Controls which trigger the open is attributed to                      |
-| `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —          | Content, or a render function of the active `payload`                 |
+| Prop                   | Type                                                        | Default    | Description                                                                             |
+| ---------------------- | ----------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------- |
+| `open`                 | `boolean`                                                   | —          | Controlled open state                                                                   |
+| `defaultOpen`          | `boolean`                                                   | `false`    | Initial open state (uncontrolled)                                                       |
+| `onOpenChange`         | `(open: boolean, details: DialogOpenChangeDetails) => void` | —          | Called when open state changes; `details` names the trigger behind it                   |
+| `onOpenChangeComplete` | `(open: boolean) => void`                                   | —          | Called once the open or close animation has finished; reset what the dialog showed here |
+| `modal`                | `boolean`                                                   | `true`     | Traps focus and blocks page interaction                                                 |
+| `role`                 | `'dialog' \| 'alertdialog'`                                 | `'dialog'` | The popup's ARIA role                                                                   |
+| `closedBy`             | `'any' \| 'closerequest' \| 'none'`                         | `'any'`    | Which gestures dismiss the dialog                                                       |
+| `handle`               | `DialogHandle`                                              | —          | Connects detached triggers (see `Dialog.createHandle()`)                                |
+| `triggerId`            | `string \| null`                                            | —          | Controls which trigger the open is attributed to                                        |
+| `children`             | `ReactNode \| ({ payload }) => ReactNode`                   | —          | Content, or a render function of the active `payload`                                   |
 
 #### `closedBy`
 
@@ -218,9 +219,12 @@ root, and `initialFocus={false}` on the popup so mounting does not steal focus.
 
 `DialogFocusTarget` is `boolean | RefObject | (interactionType) => boolean | void | HTMLElement | null`.
 
-The popup's children are held at their last committed frame while it exits (`Freeze`), so state
-that resets on close — a machine returning to its initial state — does not flash through the
-fade. The popup element itself stays live for `data-closed` / `data-ending-style`.
+The popup's children are held while it exits (`Freeze` from `@clerk/headless/utils`): the popup
+keeps rendering the element it was handed on the last open render, so state a parent bakes into
+that JSX — a machine returning to its initial state, a form clearing — does not flash through the
+fade. Components inside keep rendering, so a value they read through a hook (context, a store)
+still moves; wrap that read in `useFrozenValue`, or reset it in `onOpenChangeComplete`, which
+fires after the exit. The popup element itself stays live for `data-closed` / `data-ending-style`.
 
 ### `Dialog.Backdrop`, `Dialog.Title`, `Dialog.Description`, `Dialog.Close`
 

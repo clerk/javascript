@@ -1,6 +1,6 @@
 'use client';
 
-import { type CSSProperties, type RefObject, useEffect, useMemo } from 'react';
+import { type CSSProperties, type RefObject, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { useAnimationsFinished } from './use-animations-finished';
 import { type TransitionStatus, useTransitionStatus } from './use-transition-status';
@@ -8,6 +8,12 @@ import { type TransitionStatus, useTransitionStatus } from './use-transition-sta
 export interface UseTransitionOptions {
   open: boolean;
   ref: RefObject<HTMLElement | null>;
+  /**
+   * Fires once the enter or exit animation has finished — on exit, right after the element
+   * unmounts. State that should reset when the element closes belongs here rather than in
+   * `onOpenChange`, so the reset cannot show through the exit animation.
+   */
+  onOpenChangeComplete?: (open: boolean) => void;
 }
 
 export interface TransitionProps {
@@ -38,21 +44,31 @@ export interface UseTransitionReturn {
  * transitions (via `[data-starting-style]` / `[data-ending-style]`) and
  * CSS keyframe animations (via `[data-open]` / `[data-closed]`).
  */
-export function useTransition({ open, ref }: UseTransitionOptions): UseTransitionReturn {
+export function useTransition({ open, ref, onOpenChangeComplete }: UseTransitionOptions): UseTransitionReturn {
   const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
   const runOnAnimationsFinished = useAnimationsFinished(ref, open);
 
+  const onOpenChangeCompleteRef = useRef(onOpenChangeComplete);
+  useLayoutEffect(() => {
+    onOpenChangeCompleteRef.current = onOpenChangeComplete;
+  });
+
   useEffect(() => {
-    if (transitionStatus !== 'ending') {
-      return;
+    // `ending` outlives a reopen by one frame (the status clears on the next rAF), and the
+    // element must not be scheduled to unmount in that window.
+    if (!open && transitionStatus === 'ending') {
+      // Cancelling on cleanup is what makes an exit interruptible: reopening
+      // mid-exit must abandon the pending unmount, not unmount once the
+      // retargeted transition settles.
+      return runOnAnimationsFinished(() => {
+        setMounted(false);
+        onOpenChangeCompleteRef.current?.(false);
+      });
     }
-    // Cancelling on cleanup is what makes an exit interruptible: reopening
-    // mid-exit must abandon the pending unmount, not unmount once the
-    // retargeted transition settles.
-    return runOnAnimationsFinished(() => {
-      setMounted(false);
-    });
-  }, [transitionStatus, runOnAnimationsFinished, setMounted]);
+    if (open && transitionStatus === undefined) {
+      return runOnAnimationsFinished(() => onOpenChangeCompleteRef.current?.(true));
+    }
+  }, [open, transitionStatus, runOnAnimationsFinished, setMounted]);
 
   const transitionProps = useMemo<TransitionProps>(() => {
     const props: TransitionProps = {};

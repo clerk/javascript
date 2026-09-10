@@ -1,5 +1,5 @@
 export { cssVars } from './css-vars';
-export { Freeze, type FreezeProps } from './freeze';
+export { Freeze, type FreezeProps, useFrozenValue, useIsFrozen } from './freeze';
 export { isKeyboardEvent, isKeyboardOpen } from './interaction-modality';
 export { resetLayoutStyles } from './reset-layout-styles';
 export { resolveSideOffset, type SideOffset } from './side-offset';

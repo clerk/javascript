@@ -23,6 +23,7 @@ trapping, scroll lock and ARIA wiring come from the primitive.
     { name: 'open', type: 'boolean' },
     { name: 'defaultOpen', type: 'boolean', default: 'false' },
     { name: 'onOpenChange', type: '(open: boolean, details: DialogOpenChangeDetails) => void' },
+    { name: 'onOpenChangeComplete', type: '(open: boolean) => void' },
     { name: 'modal', type: 'boolean', default: 'true' },
     { name: 'closedBy', type: "'any' | 'closerequest' | 'none'", default: "'any'" },
   ]}
@@ -247,8 +248,24 @@ action as its submit — that is how Enter reaches it:
 
 ### Exit animations
 
-The popup's contents hold their last frame while it fades out, so state that resets on close (a
-machine returning to idle) does not flash through the exit.
+The popup keeps rendering what it was handed on the last open render while it fades out, so state
+that resets on close (a machine returning to idle, a form clearing) does not flash through the
+exit. Two things follow:
+
+- Reset state in `onOpenChangeComplete`, which fires once the exit has finished, rather than in
+  `onOpenChange`. A reset there is what the hold protects against, so doing it later is cheaper
+  than doing it and hiding it.
+- The hold covers the JSX you pass. A component inside the popup that reads what it shows through
+  a hook (a store, a context) keeps updating; wrap that read in `useFrozenValue` from
+  `@clerk/headless/utils` to hold it too.
+
+The hold is plain state, so a close issued inside `startTransition` (or a React 19 form action)
+commits like any other.
+
+<Story
+  name='ExitHold'
+  storyModule={DialogStories}
+/>
 
 ## Parts
 
