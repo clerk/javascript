@@ -87,6 +87,7 @@ catalogs:
       version: 2.0.1
 
 overrides:
+  '@astrojs/compiler': 2.13.0
   '@babel/plugin-transform-modules-systemjs@<=7.29.3': 7.29.8
   axios@<0.33.0: 0.33.0
   chokidar@<5.0.0: 5.0.0
