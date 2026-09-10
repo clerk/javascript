@@ -484,7 +484,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
     onSubmit: () => send({ type: 'SUBMIT' }),
     onShowMethods: () => send({ type: 'SHOW_METHODS' }),
     onShowHelp: () => send({ type: 'SHOW_HELP' }),
-    onBack: step === 'method-picker' || step === 'help' ? () => send({ type: 'BACK' }) : undefined,
+    onBack: () => send({ type: 'BACK' }),
     onEmailSupport: () => {
       if (context.supportEmail) {
         window.location.assign(`mailto:${context.supportEmail}`);

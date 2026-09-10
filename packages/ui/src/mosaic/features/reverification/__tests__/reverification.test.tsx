@@ -48,6 +48,7 @@ function ready(overrides: Partial<ReverificationViewProps> = {}): Reverification
     onSubmit: vi.fn(),
     onShowMethods: vi.fn(),
     onShowHelp: vi.fn(),
+    onBack: vi.fn(),
     onEmailSupport: vi.fn(),
     onResend: vi.fn(),
     canResend: true,
