@@ -12,7 +12,6 @@ function viewProps(overrides: Partial<ReverificationViewProps> = {}): Reverifica
     onValueChange: vi.fn(),
     isPending: false,
     onSubmit: vi.fn(),
-    onVerifyPasskey: vi.fn(),
     onShowMethods: vi.fn(),
     onShowHelp: vi.fn(),
     onEmailSupport: vi.fn(),

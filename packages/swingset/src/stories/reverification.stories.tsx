@@ -192,6 +192,10 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
       void submitOtp(valueRef.current);
       return;
     }
+    if (step === 'passkey') {
+      void submitPasskey();
+      return;
+    }
     void submitPassword();
   };
 
@@ -205,7 +209,6 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
         errorMessage={errorMessage}
         isPending={isPending}
         onSubmit={onSubmit}
-        onVerifyPasskey={() => void submitPasskey()}
         onShowMethods={() => navigate('method-picker', 1)}
         onResend={onResend}
         canResend={canResend}
@@ -320,7 +323,7 @@ function PasskeyPanel({
         }}
         errorMessage={errorMessage}
         isPending={isPending}
-        onVerify={() => undefined}
+        onSubmit={() => undefined}
         onCancel={() => undefined}
       />
     </Card.Root>

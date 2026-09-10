@@ -277,7 +277,7 @@ describe('useReverificationModel', () => {
     session?.verifyWithPasskey.mockResolvedValue(resource({ status: 'complete' }));
     const { result } = renderHook(() => useReverificationModel(activeProps()));
 
-    await ready(result.current).verifyPasskey();
+    await ready(result.current).attempt({ id: 'passkey', stage: 'first', strategy: 'passkey' }, '');
     expect(session?.verifyWithPasskey).toHaveBeenCalledOnce();
   });
 
