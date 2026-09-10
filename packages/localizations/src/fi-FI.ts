@@ -1464,6 +1464,9 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Valitse yritystili, jolla haluat jatkaa.',
       title: 'Valitse yritystilisi',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Nollaa salasana',
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
@@ -1529,6 +1532,15 @@ export const fiFI: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Ennen salasanan nollaamista on varmistettava henkilöllisyytesi.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Rekisteröidy',

@@ -30,7 +30,7 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 
 describe('UserProfileProfilePanelView', () => {
   it('composes the profile content without profile navigation', () => {
-    renderView({ onEditProfilePicture: vi.fn(), onNameChange: vi.fn(), onUsernameChange: vi.fn() });
+    renderView({ onProfilePictureChange: vi.fn(), onNameChange: vi.fn(), onUsernameChange: vi.fn() });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Account' })).toContainElement(
@@ -59,14 +59,78 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('heading', { name: 'User Profile' })).toBeNull();
   });
 
-  it('edits the profile picture when Upload is clicked', async () => {
-    const onEditProfilePicture = vi.fn();
+  it('uploads the picked file when no profile picture is set', async () => {
+    const onProfilePictureChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ onEditProfilePicture });
+    const { container } = renderView({ onProfilePictureChange, onRemoveProfilePicture: vi.fn() });
 
-    await user.click(screen.getByRole('button', { name: 'Upload' }));
+    expect(screen.queryByRole('button', { name: 'Manage profile picture' })).toBeNull();
 
-    expect(onEditProfilePicture).toHaveBeenCalledOnce();
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]');
+    expect(input).not.toBeNull();
+    const file = new File(['avatar'], 'avatar.png', { type: 'image/png' });
+    await user.upload(input as HTMLInputElement, file);
+
+    expect(onProfilePictureChange).toHaveBeenCalledWith(file);
+  });
+
+  it('turns away a file past the size the row advertises', async () => {
+    const onProfilePictureChange = vi.fn();
+    const onProfilePictureReject = vi.fn();
+    const user = userEvent.setup();
+    const { container } = renderView({ onProfilePictureChange, onProfilePictureReject });
+
+    const oversized = new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'big.png', { type: 'image/png' });
+    await user.upload(container.querySelector<HTMLInputElement>('input[type="file"]') as HTMLInputElement, oversized);
+
+    expect(onProfilePictureChange).not.toHaveBeenCalled();
+    expect(onProfilePictureReject).toHaveBeenCalledWith([{ file: oversized, reason: 'size' }]);
+    expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
+    expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toBeInTheDocument();
+  });
+
+  it('clears the rejection once an acceptable file is picked', async () => {
+    const user = userEvent.setup();
+    const { container } = renderView({ onProfilePictureChange: vi.fn() });
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]') as HTMLInputElement;
+
+    await user.upload(input, new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'big.png', { type: 'image/png' }));
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+
+    await user.upload(input, new File(['small'], 'small.png', { type: 'image/png' }));
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('offers Upload while the avatar is only a generated default', () => {
+    renderView({
+      hasImage: false,
+      imageUrl: 'https://img.clerk.com/generated-default.png',
+      onProfilePictureChange: vi.fn(),
+      onRemoveProfilePicture: vi.fn(),
+    });
+
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Manage profile picture' })).toBeNull();
+  });
+
+  it('offers change and remove in a menu once a profile picture is set', async () => {
+    const onProfilePictureChange = vi.fn();
+    const onRemoveProfilePicture = vi.fn();
+    const user = userEvent.setup();
+    renderView({
+      hasImage: true,
+      imageUrl: 'https://example.com/avatar.png',
+      onProfilePictureChange,
+      onRemoveProfilePicture,
+    });
+
+    expect(screen.queryByRole('button', { name: 'Upload' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));
+
+    expect(screen.getByRole('menuitem', { name: 'Change avatar' })).toBeInTheDocument();
+    await user.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
+
+    expect(onRemoveProfilePicture).toHaveBeenCalledOnce();
   });
 
   it('breaks out both contact types when multiple accounts are allowed', () => {

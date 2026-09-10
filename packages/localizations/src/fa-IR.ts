@@ -1463,6 +1463,9 @@ export const faIR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'کد رمز عبور را بازنشانی کنید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
@@ -1528,6 +1531,15 @@ export const faIR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'قبل از تنظیم مجدد رمز عبور، باید هویت شما را تأیید کنیم.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'ثبت نام',

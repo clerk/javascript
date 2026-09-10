@@ -1454,6 +1454,9 @@ export const bgBG: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код за нулиране на парола',
       resendButton: 'Не сте получили код? Изпрати отново',
@@ -1518,6 +1521,15 @@ export const bgBG: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Трябва да потвърдим вашата самоличност, преди да нулираме паролата ви.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Регистрирайте се',

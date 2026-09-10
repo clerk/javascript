@@ -6,8 +6,10 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
+import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import type { HeadingProps } from '../heading';
 import { Heading } from '../heading';
+import { Icon } from '../icon';
 import { sectionItemsMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
@@ -23,6 +25,7 @@ export type SectionContentProps = MosaicComponentProps<'div'>;
 export type SectionLabelProps = MosaicComponentProps<'div'>;
 export type SectionDescriptionProps = MosaicComponentProps<'div'>;
 export type SectionActionsProps = MosaicComponentProps<'div'>;
+export type SectionErrorProps = MosaicComponentProps<'p'>;
 
 const mediaSizes = {
   sm: styles.mediaSm,
@@ -251,7 +254,58 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
 });
 
 /**
+ * A row-level message, mirroring `Field.Error` for a row that holds no form control. Place it as a
+ * sibling of `Section.Item` inside `Section.Row`, not inside `Section.Content`: the item stays a
+ * single centred line, so the media and actions hold their position whether or not it is showing.
+ * Carries `role='alert'` for the announcement a `Field.Root` would otherwise wire up.
+ */
+const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(function SectionError(
+  { render, className, style, children, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'p',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('section-error'),
+        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.error),
+        className,
+        style,
+      ),
+      role: 'alert',
+      ...rest,
+      children: (
+        <>
+          <Icon
+            name='alert-circle'
+            size='sm'
+            aria-hidden='true'
+            xstyle={styles.errorIcon}
+          />
+          <span>{children}</span>
+        </>
+      ),
+    },
+  });
+});
+
+/**
  * A compound component that fixes section semantics, surface treatment, row grouping,
  * and item layout while leaving each item's content composable.
  */
-export const Section = { Root, Title, Group, Row, Items, Item, Media, Content, Label, Description, Actions };
+export const Section = {
+  Root,
+  Title,
+  Group,
+  Row,
+  Items,
+  Item,
+  Media,
+  Content,
+  Label,
+  Description,
+  Actions,
+  Error: SectionError,
+};

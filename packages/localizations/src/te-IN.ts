@@ -1465,6 +1465,9 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీరు కొనసాగించాలనుకుంటున్న ఎంటర్‌ప్రైజ్ ఖాతాను ఎంచుకోండి.',
       title: 'మీ ఎంటర్‌ప్రైజ్ ఖాతాను ఎంచుకోండి',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'పాస్‌వర్డ్ రీసెట్ కోడ్',
       resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
@@ -1531,6 +1534,15 @@ export const teIN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'మీ పాస్‌వర్డ్‌ను రీసెట్ చేయడానికి ముందు మీ గుర్తింపును మేము ధృవీకరించాలి.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'సైన్ అప్ చేయండి',
