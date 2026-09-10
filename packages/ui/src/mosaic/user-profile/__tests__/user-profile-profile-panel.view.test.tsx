@@ -29,6 +29,19 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
+  it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
+    renderView({
+      allowMultipleAccounts,
+      phones: [{ id: 'phone_added', value: '+18015558181' }],
+      onManagePhone: vi.fn(),
+    });
+
+    expect(screen.getByText('+1 (801) 555-8181')).toBeInTheDocument();
+    if (allowMultipleAccounts) {
+      expect(screen.getByRole('button', { name: 'Manage +1 (801) 555-8181' })).toBeInTheDocument();
+    }
+  });
+
   it('composes the profile content without profile navigation', () => {
     renderView({ onProfilePictureChange: vi.fn(), onNameChange: vi.fn(), onUsernameChange: vi.fn() });
 
@@ -45,7 +58,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev')).toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev').closest('.cl-section-item')).toHaveTextContent('Primary');
-    expect(screen.getByText('+1 801-888-8181')).toBeInTheDocument();
+    expect(screen.getByText('+1 (801) 888-8181')).toBeInTheDocument();
     expect(screen.getByText('Profile picture')).toHaveClass('cl-section-label');
     expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toHaveClass('cl-section-description');
     expect(screen.getByText('Email')).toHaveClass('cl-section-label');
@@ -147,7 +160,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(accountSection).not.toContainElement(emailSection);
     expect(accountSection).not.toContainElement(phoneSection);
     expect(emailSection).toHaveTextContent('item1@clerk.dev');
-    expect(phoneSection).toHaveTextContent('+1 801-888-8181');
+    expect(phoneSection).toHaveTextContent('+1 (801) 888-8181');
     expect(within(emailSection).getByRole('button', { name: 'Add email' })).toHaveTextContent('Add');
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toHaveTextContent('Add');
   });
@@ -163,7 +176,7 @@ describe('UserProfileProfilePanelView', () => {
     const accountSection = screen.getByRole('region', { name: 'Account' });
 
     expect(accountSection).toHaveTextContent('item1@clerk.dev');
-    expect(accountSection).toHaveTextContent('+1 801-888-8181');
+    expect(accountSection).toHaveTextContent('+1 (801) 888-8181');
     expect(within(accountSection).getByRole('button', { name: 'Update email' })).toBeInTheDocument();
     expect(within(accountSection).getByRole('button', { name: 'Update phone number' })).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Email' })).not.toBeInTheDocument();
@@ -398,15 +411,15 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
     expect(onVerifyEmail).toHaveBeenCalledWith('email_unverified');
 
-    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0100' }));
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Verify phone number' }));
     expect(onVerifyPhone).toHaveBeenCalledWith('phone_unverified');
 
-    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0100' }));
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
     expect(onRemovePhone).toHaveBeenCalledWith('phone_unverified');
 
-    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0101' }));
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0101' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledWith('phone_secondary');
 

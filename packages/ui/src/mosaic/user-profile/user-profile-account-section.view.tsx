@@ -3,6 +3,7 @@ import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
+import { stringToFormattedPhoneString } from '../../utils/phoneUtils';
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
@@ -92,6 +93,10 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const formattedPhones = phones.map(phone => ({
+    ...phone,
+    value: stringToFormattedPhoneString(phone.value),
+  }));
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -196,7 +201,7 @@ export function UserProfileAccountSectionView({
           ) : null}
           {!allowMultipleAccounts ? (
             <SingleContactRow
-              items={phones}
+              items={formattedPhones}
               kind='phone'
               label={m.phone.label}
               onAdd={onAddPhone}
@@ -219,7 +224,7 @@ export function UserProfileAccountSectionView({
       ) : null}
       {allowMultipleAccounts ? (
         <ContactSection
-          items={phones}
+          items={formattedPhones}
           kind='phone'
           label={m.phone.label}
           onAdd={onAddPhone}
