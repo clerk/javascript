@@ -167,11 +167,6 @@ function SignInFactorOneInternal(): JSX.Element {
     }));
   };
 
-  /**
-   * An enterprise-routed sign-in on an instance that allows a fallback owns its own screens,
-   * including the enterprise connection choice, so that the fallback stays reachable from them.
-   * @experimental
-   */
   if (ssoFallbackFactor) {
     return <SignInFactorOneSSOFallback fallbackFactor={ssoFallbackFactor} />;
   }
