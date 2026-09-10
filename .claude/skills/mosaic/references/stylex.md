@@ -78,9 +78,9 @@ export const colorVars = stylex.defineVars(colorDefaults);
 - **DO** put light + dark in one token value via `light-dark()`. Never ship a
   second `@media (prefers-color-scheme: dark)` copy of a color.
 - **DO** reserve `--cl-*`-prefixed keys for the public, overridable contract.
-- **DO** point a gray-backed colour token at the internal `gray` scale
-  (`light-dark(${gray['900']}, ${gray['50']})`) rather than restating the oklch value.
-  Its keys are unprefixed on purpose, so the names hash and stay un-overridable.
+- **DO** derive a gray-backed colour token from `--cl-color-neutral` mixed into
+  `--cl-color-background` (`neutralMix(80, 98)` in `tokens.stylex.ts`) rather than
+  restating an oklch value. There is no gray scale: retinting neutral retints the ramp.
 - **DO** name internal, non-contract vars with a `--_cl-*` prefix (e.g. a value a
   parent writes for a child to read). They still emit verbatim but the `_` marks
   them "not a contract, don't override."
