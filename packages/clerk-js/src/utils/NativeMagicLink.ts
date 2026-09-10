@@ -218,9 +218,16 @@ export class NativeMagicLink {
     }
     try {
       const value = JSON.parse(raw);
+      // Older iOS records may omit kind; Android records require a recognized state.
+      const legacyKind =
+        value.state === undefined || value.state === 'SIGN_IN'
+          ? 'signIn'
+          : value.state === 'SIGN_UP'
+            ? 'signUp'
+            : undefined;
       const flow = {
         schemaVersion: 1 as const,
-        kind: value.kind ?? (value.state === 'SIGN_UP' ? 'signUp' : 'signIn'),
+        kind: value.kind ?? legacyKind,
         flowId: value.flowId ?? value.flow_id,
         codeVerifier: value.codeVerifier ?? value.code_verifier,
         createdAt: value.createdAt ?? value.created_at ?? value.createdAtEpochMs,

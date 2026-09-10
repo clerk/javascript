@@ -326,3 +326,180 @@ test('email-link query values take precedence over fragment values', async t => 
   assert.equal(f.requests.length, count);
   assert.ok(f.authRecord);
 });
+
+for (const state of ['UNSUPPORTED', '', null, 7]) {
+  test(`invalid Android email-link state is discarded before redemption: ${JSON.stringify(state)}`, async t => {
+    const now = Date.now();
+    const f = await magicFixture({
+      authRecord: JSON.stringify({
+        state,
+        flowId: 'sia_native',
+        codeVerifier: 'v'.repeat(43),
+        createdAtEpochMs: now,
+        expiresAtEpochMs: now + 600000,
+      }),
+    });
+    t.after(f.dispose);
+    const before = f.requests.length;
+    const result = await handle(f);
+    assert.equal(result.failure?.code, 'no_pending_email_link', JSON.stringify(result.failure));
+    assert.equal(f.requests.length, before);
+    assert.equal(f.authRecord, null);
+    assert.equal(f.state.roots.session, null);
+  });
+}
+
+for (const kind of [undefined, null]) {
+  test(`legacy iOS absent email-link kind remains a sign-in record: ${kind}`, async t => {
+    const now = Date.now();
+    const f = await magicFixture({
+      authRecord: JSON.stringify({
+        kind,
+        flow_id: 'sia_native',
+        code_verifier: 'v'.repeat(43),
+        created_at: now,
+        expires_at: now + 600000,
+      }),
+    });
+    t.after(f.dispose);
+    const result = await handle(f);
+    assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+    assert.equal(result.result.value.kind, 'signIn');
+    assert.equal(f.authRecord, null);
+  });
+}
+
+for (const kind of ['signIn', 'signUp']) {
+  test(`incomplete ${kind} email-link completion publishes remaining requirements without activation`, async t => {
+    const f = await magicFixture({
+      http: request => {
+        const path = new URL(request.url).pathname;
+        if (kind === 'signIn' && path.endsWith('/sign_ins'))
+          return response({ ...fixtures.signIn, status: 'needs_second_factor', created_session_id: null });
+        if (kind === 'signUp' && path.endsWith('/magic_links/complete'))
+          return response({
+            ...fixtures.signUp,
+            status: 'missing_requirements',
+            created_session_id: null,
+            missing_fields: ['first_name'],
+          });
+      },
+    });
+    t.after(f.dispose);
+    await sendLink(f, kind);
+    const result = await handle(f, kind === 'signIn' ? 'sia_native' : 'sua_native');
+    assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+    assert.deepEqual(result.result.value[kind].$ref, f.state.roots[kind]);
+    assert.equal(
+      f.resource(f.state.roots[kind]).status,
+      kind === 'signIn' ? 'needs_second_factor' : 'missing_requirements',
+    );
+    assert.equal(f.resource(f.state.roots[kind]).createdSessionId, null);
+    const callback = f.resource(f.state.roots.clerk).authCallback;
+    assert.deepEqual(callback.result.value[kind].$ref, f.state.roots[kind]);
+    assert.equal(f.authRecord, null);
+    assert.equal(f.state.roots.session, null);
+    if (kind === 'signUp') {
+      assert.deepEqual(f.resource(f.state.roots.signUp).missingFields, ['first_name']);
+      assert.equal(
+        f.requests.some(r => new URL(r.url).pathname.endsWith('/sign_ups')),
+        false,
+      );
+    }
+  });
+}
+
+for (const invalid of ['ticket', 'wrong-signup', 'null']) {
+  test(`sign-up email-link rejects ${invalid} completion and consumes its verifier`, async t => {
+    const f = await magicFixture({
+      http: request =>
+        request.url.includes('/magic_links/complete')
+          ? response(
+              invalid === 'ticket'
+                ? { ticket: 'unexpected_ticket' }
+                : invalid === 'wrong-signup'
+                  ? { ...fixtures.signUp, id: 'sua_wrong' }
+                  : null,
+            )
+          : undefined,
+    });
+    t.after(f.dispose);
+    await sendLink(f, 'signUp');
+    const result = await handle(f, 'sua_native');
+    assert.equal(result.failure?.code, 'invalid_email_link_response');
+    assert.equal(f.authRecord, null);
+    assert.equal(f.state.roots.session, null);
+    assert.equal(f.resource(f.state.roots.clerk).authCallback, null);
+    assert.equal(
+      f.requests.some(r => /\/sign_(ins|ups)$/.test(new URL(r.url).pathname)),
+      false,
+    );
+  });
+}
+
+test('starting a newer email link fences an old completion and preserves the new verifier', async t => {
+  const started = deferred(),
+    finish = deferred();
+  const f = await magicFixture({
+    http: async request => {
+      if (!request.url.includes('/magic_links/complete')) return;
+      started.resolve();
+      await finish.promise;
+      return response({ ticket: 'obsolete_ticket' });
+    },
+  });
+  t.after(f.dispose);
+  await sendLink(f);
+  const completing = handle(f);
+  await started.promise;
+  const sent = await sendLink(f, 'signUp');
+  assert.equal(sent.result.error, null);
+  const newer = f.authRecord;
+  finish.resolve();
+  const result = await completing;
+  assert.equal(result.failure?.code, 'stale_authentication_attempt');
+  assert.equal(f.authRecord, newer);
+  assert.equal(JSON.parse(newer).kind, 'signUp');
+  assert.equal(f.state.roots.session, null);
+  assert.equal(f.resource(f.state.roots.clerk).authCallback, null);
+  assert.equal(
+    f.requests.some(r => new URL(r.url).pathname.endsWith('/sign_ins')),
+    false,
+  );
+});
+
+for (const [code, status, param, clear] of [
+  ['approval_token_consumed', 422, undefined, true],
+  ['approval_token_invalid', 422, undefined, true],
+  ['pkce_verification_failed', 422, undefined, true],
+  ['flow_not_approved', 422, undefined, true],
+  ['form_param_value_invalid', 422, 'flow_id', true],
+  ['form_param_value_invalid', 422, 'identifier', false],
+  ['server_error', 500, undefined, false],
+  ['too_many_requests', 429, undefined, false],
+]) {
+  test(`email-link error ${code}/${param ?? status} preserves the canonical cleanup policy`, async t => {
+    const f = await magicFixture({
+      http: request =>
+        request.url.includes('/magic_links/complete')
+          ? response(null, {
+              status,
+              body: JSON.stringify({ errors: [{ code, message: 'Completion rejected', meta: { param_name: param } }] }),
+            })
+          : undefined,
+    });
+    t.after(f.dispose);
+    await sendLink(f);
+    const saved = f.authRecord;
+    const result = await handle(f);
+    assert.equal(result.failure.errors[0].code, code);
+    assert.equal(result.failure.status, status);
+    assert.equal(f.authRecord, clear ? null : saved);
+    assert.equal(
+      f.requests.some(r => new URL(r.url).pathname.endsWith('/sign_ins')),
+      false,
+    );
+    assert.equal(f.resource(f.state.roots.clerk).authCallback, null);
+    assert.equal(f.state.roots.session, null);
+  });
+}

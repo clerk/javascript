@@ -82,3 +82,41 @@ test('reset fences a pending Apple identity result before an authentication requ
   assert.equal(f.requests.length, before);
   assert.equal(f.state.roots.session, null);
 });
+
+for (const enabled of [
+  [false, false],
+  [true, false],
+  [false, true],
+  [true, true],
+]) {
+  test(`native Apple identity respects enabled profile attributes: ${JSON.stringify(enabled)}`, async t => {
+    let options;
+    const f = await fixture({
+      capabilities: ['appleIdentity'],
+      appleIdentity: value => {
+        options = value;
+        return { token: 'apple_attribute_token', firstName: 'Jane', lastName: 'Doe' };
+      },
+      http: request => {
+        const path = new URL(request.url).pathname;
+        if (path.endsWith('/environment')) {
+          const environment = structuredClone(fixtures.environment);
+          environment.user_settings.attributes.first_name.enabled = enabled[0];
+          environment.user_settings.attributes.last_name.enabled = enabled[1];
+          return response(environment);
+        }
+        if (path.includes('/sign_ups'))
+          return response({ ...fixtures.signUp, status: 'complete', created_session_id: 'sess_native' });
+      },
+    });
+    t.after(f.dispose);
+    const result = await f.invoke(f.state.roots.signUp, 'SignUp.sso', [{ strategy: 'oauth_token_apple' }]);
+    assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+    assert.equal(result.result.error, null);
+    assert.equal(options.fullName, enabled.some(Boolean));
+    const body = new URLSearchParams(f.requests.find(r => r.url.includes('/sign_ups')).body);
+    assert.equal(body.get('first_name'), enabled[0] === false ? null : 'Jane');
+    assert.equal(body.get('last_name'), enabled[1] === false ? null : 'Doe');
+    assert.equal(f.state.roots.session, null);
+  });
+}
