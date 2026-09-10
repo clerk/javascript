@@ -2,37 +2,19 @@ import * as ComboboxStories from './combobox.stories';
 
 # Combobox
 
-`Combobox` adds Mosaic styling to the headless `Combobox` behavior: text entry, listbox ARIA,
-keyboard navigation, selection, positioning, and the shared scrolling treatment.
-
-`value` is the selected option; `inputValue` is the search text. Typing does not change the selection.
-Closing without choosing restores the selected label, or clears the input when nothing is selected.
-Deleting all text clears the selection and calls `onValueChange(null)`.
-Opening with the trigger or arrow keys keeps the selected label visible and shows all options until you edit it.
-
 ## Example
-
-Use the trigger to show every option, or type to open and filter the list. Use the arrow keys and
-Enter to select an option.
-
-`OptionIndicator` shows a check beside the selected option, independently of the hover or keyboard highlight.
 
 <Story
   name='Default'
   storyModule={ComboboxStories}
 />
 
-`Combobox.Collection` filters its items using the search query, without treating the selected label as a filter.
-`Combobox.Popup` owns its portal, positioner, surface, and scrolling viewport.
-The popup automatically aligns with the surrounding input group, or the input when used alone.
-Use `Popup`'s `anchor` prop to override this. `Root`'s `sideOffset` defaults to `8`.
+`value` is the selected option; `inputValue` is the search text. Clearing the input clears the selection.
 
 ## Inline lists
 
-Use `List` when the searchable list already lives in another floating surface, such as a country
-picker inside a popover. Use the ghost input variant when it needs an icon or adjacent text.
-This avoids both a second input implementation and a nested popup.
-Set `inline` on the root and bind its open state to the outer surface. Closing resets the search, not the selection.
+Use `List` inside an existing popover. Set `inline` and bind the root's open state to that popover
+so closing resets the search, not the selection.
 
 ```tsx
 <Combobox.Root inline open={open} onOpenChange={setOpen} value={country} onValueChange={setCountry}>
@@ -40,23 +22,21 @@ Set `inline` on the root and bind its open state to the outer surface. Closing r
     <InputGroup.Start>
       <Icon name='search' aria-hidden='true' />
     </InputGroup.Start>
-    <Combobox.Input variant='ghost' aria-label='Search countries' />
+    <Combobox.Input aria-label='Search countries' />
   </InputGroup.Root>
   <Combobox.List>
     <Combobox.Collection items={countries} itemToStringLabel={country => country.name}>
-    {country => (
-      <Combobox.Option key={country.iso} value={country.iso} label={country.name}>
-        {country.name}
-      </Combobox.Option>
-    )}
+      {country => (
+        <Combobox.Option key={country.iso} value={country.iso} label={country.name}>
+          {country.name}
+        </Combobox.Option>
+      )}
     </Combobox.Collection>
   </Combobox.List>
 </Combobox.Root>
 ```
 
 ## Scrolling
-
-Long lists receive the shared ScrollArea fade and scrollbar automatically.
 
 <Story
   name='Scrolling'
