@@ -1,4 +1,3 @@
-import * as stylex from '@stylexjs/stylex';
 import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
@@ -11,7 +10,6 @@ import { Field } from '../../components/field';
 import { Input } from '../../components/input';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileFormError } from './user-profile-account-section.types';
-import { styles } from './user-profile-edit-name.styles';
 
 /** The two controls the dialog owns, and the keys `error.fields` is addressed by. */
 export type UserProfileEditNameField = 'firstName' | 'lastName';
@@ -96,7 +94,17 @@ export function UserProfileEditNameView({
           <Card.Header>
             <Card.Title>{m.editName.title}</Card.Title>
           </Card.Header>
-          <Card.Content {...stylex.props(styles.content)}>
+          {/* The body IS the form, so `Card.Content`'s own column spaces the fields and nothing
+              here needs a stylesheet. Safe on `Content` where it would not be on `Root`: the
+              header's dismiss is a sibling, so it cannot become the form's default submit. */}
+          <Card.Content
+            render={
+              <form
+                id={formId}
+                onSubmit={handleSubmit}
+              />
+            }
+          >
             {error?.message ? (
               <Banner.Root
                 role='alert'
@@ -105,44 +113,36 @@ export function UserProfileEditNameView({
                 <Banner.Label>{error.message}</Banner.Label>
               </Banner.Root>
             ) : null}
-            <form
-              id={formId}
-              onSubmit={handleSubmit}
-              {...stylex.props(styles.form)}
-            >
-              <Field.Root invalid={Boolean(error?.fields?.firstName)}>
-                <Field.Label>{m.editName.firstNameLabel}</Field.Label>
-                <Input
-                  ref={firstNameRef}
-                  autoComplete='given-name'
-                  disabled={isSaving}
-                  value={firstName}
-                  onChange={event => onFirstNameChange(event.target.value)}
-                />
-                {error?.fields?.firstName ? <Field.Error>{error.fields.firstName}</Field.Error> : null}
-              </Field.Root>
-              <Field.Root invalid={Boolean(error?.fields?.lastName)}>
-                <Field.Label>{m.editName.lastNameLabel}</Field.Label>
-                <Input
-                  autoComplete='family-name'
-                  disabled={isSaving}
-                  value={lastName}
-                  onChange={event => onLastNameChange(event.target.value)}
-                />
-                {error?.fields?.lastName ? <Field.Error>{error.fields.lastName}</Field.Error> : null}
-              </Field.Root>
-              {/* A form with two fields and no submit button inside it gets no implicit submission
-                  at all, so Enter in either field would do nothing. The footer's action cannot play
-                  that part from outside the form, and the card's own buttons must stay out of it —
-                  `Button` sets no `type`, so an in-form dismiss would become the default submit.
-                  A one-field dialog needs none of this; see `Destructive`. */}
-              <button
-                hidden
-                type='submit'
-                tabIndex={-1}
-                aria-hidden='true'
+            <Field.Root invalid={Boolean(error?.fields?.firstName)}>
+              <Field.Label>{m.editName.firstNameLabel}</Field.Label>
+              <Input
+                ref={firstNameRef}
+                autoComplete='given-name'
+                disabled={isSaving}
+                value={firstName}
+                onChange={event => onFirstNameChange(event.target.value)}
               />
-            </form>
+              {error?.fields?.firstName ? <Field.Error>{error.fields.firstName}</Field.Error> : null}
+            </Field.Root>
+            <Field.Root invalid={Boolean(error?.fields?.lastName)}>
+              <Field.Label>{m.editName.lastNameLabel}</Field.Label>
+              <Input
+                autoComplete='family-name'
+                disabled={isSaving}
+                value={lastName}
+                onChange={event => onLastNameChange(event.target.value)}
+              />
+              {error?.fields?.lastName ? <Field.Error>{error.fields.lastName}</Field.Error> : null}
+            </Field.Root>
+            {/* A form with two fields and no submit button inside it gets no implicit submission at
+                all, so Enter in either field would do nothing. The footer's action cannot play that
+                part from outside the form. A one-field dialog needs none of this; see `Destructive`. */}
+            <button
+              hidden
+              type='submit'
+              tabIndex={-1}
+              aria-hidden='true'
+            />
           </Card.Content>
           <Card.Footer>
             <Dialog.Close

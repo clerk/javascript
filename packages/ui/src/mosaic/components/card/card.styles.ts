@@ -71,10 +71,15 @@ export const header = stylex.create({
 });
 
 export const content = stylex.create({
+  // A column rather than a plain box, so a card whose body is more than one thing — a banner over
+  // a form, two fields — spaces itself. A single child is unaffected: a gap needs two.
   base: {
+    gap: space['4'],
     paddingBlock: space['4'],
     paddingInline: space['5'],
+    display: 'flex',
     flexBasis: 'auto',
+    flexDirection: 'column',
     flexGrow: '1',
     flexShrink: '1',
   },
