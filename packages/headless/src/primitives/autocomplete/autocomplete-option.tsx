@@ -5,6 +5,7 @@ import React, { useEffect, useId } from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useAutocompleteContext } from './autocomplete-context';
+import { AutocompleteOptionContext } from './autocomplete-option-context';
 
 export interface AutocompleteOptionProps extends ComponentProps<'div'> {
   value: string;
@@ -15,8 +16,16 @@ export interface AutocompleteOptionProps extends ComponentProps<'div'> {
 export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteOptionProps>(
   function AutocompleteOption(props, ref) {
     const { render, value, label, disabled, ...otherProps } = props;
-    const { activeIndex, selectedValue, getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, refs } =
-      useAutocompleteContext();
+    const {
+      allowsCustomValue,
+      activeIndex,
+      selectedValue,
+      getItemProps,
+      handleSelect,
+      valuesByIndexRef,
+      registerSelectedIndex,
+      refs,
+    } = useAutocompleteContext();
 
     const id = useId();
     const displayLabel = label ?? value;
@@ -30,11 +39,11 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
       if (!disabled) {
         map.set(index, value);
       }
-      registerSelectedIndex(index, value);
+      registerSelectedIndex(index, value, displayLabel);
       return () => {
         map.delete(index);
       };
-    }, [index, value, disabled, valuesByIndexRef, registerSelectedIndex]);
+    }, [index, value, displayLabel, disabled, valuesByIndexRef, registerSelectedIndex]);
 
     const state = {
       selected: isSelected,
@@ -45,7 +54,7 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
     const ownProps = {
       id,
       role: 'option',
-      'aria-selected': isActive,
+      'aria-selected': allowsCustomValue ? isActive : isSelected,
       'aria-disabled': disabled || undefined,
     } satisfies DefaultProps<'div'>;
 
@@ -66,7 +75,7 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
     // aria-activedescendant linkage: a consumer-supplied id must not override it.
     merged.id = id;
 
-    return useRender({
+    const element = useRender({
       defaultTagName: 'div',
       render,
       ref: [itemRef, ref],
@@ -78,5 +87,6 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
       },
       props: merged,
     });
+    return <AutocompleteOptionContext.Provider value={isSelected}>{element}</AutocompleteOptionContext.Provider>;
   },
 );

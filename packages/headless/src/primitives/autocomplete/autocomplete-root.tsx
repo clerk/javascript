@@ -41,12 +41,20 @@ export interface AutocompleteProps {
   children: ReactNode;
 }
 
-function AutocompleteInner(props: AutocompleteProps) {
-  const { placement: placementProp = 'bottom-start', sideOffset = 4, children } = props;
+export interface ComboboxRootInternalProps extends Omit<AutocompleteProps, 'value' | 'defaultValue' | 'onValueChange'> {
+  allowsCustomValue?: boolean;
+  /** Separate search input inside another surface. Bind open to that surface. */
+  inline?: boolean;
+  value?: string | null;
+  defaultValue?: string | null;
+  onValueChange?: (value: string | null) => void;
+}
+function AutocompleteInner(props: ComboboxRootInternalProps) {
+  const { placement: placementProp = 'bottom-start', sideOffset = 4, allowsCustomValue = true, children } = props;
 
   const nodeId = useFloatingNodeId();
 
-  const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
+  const [open, setOpenState] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
   const [inputValue, setInputValue] = useControllableState(
     props.inputValue,
@@ -54,23 +62,59 @@ function AutocompleteInner(props: AutocompleteProps) {
     props.onInputValueChange,
   );
 
-  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>(
+  const [selectedValue, setSelectedValue] = useControllableState<string | null>(
     props.value,
-    props.defaultValue,
-    props.onValueChange as ((value: string | undefined) => void) | undefined,
+    props.defaultValue ?? null,
+    props.onValueChange,
   );
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [inlineMode, setInlineMode] = useState(false);
+  const [queryChanged, setQueryChanged] = useState(false);
+  const initialValue = props.value ?? props.defaultValue;
+  const labelsByValueRef = useRef(
+    new Map<string, string>(
+      initialValue != null && props.defaultInputValue !== undefined ? [[initialValue, props.defaultInputValue]] : [],
+    ),
+  );
+
+  const setOpen = useCallback(
+    (nextOpen: boolean) => {
+      if (!nextOpen) {
+        setQueryChanged(false);
+      }
+      setOpenState(nextOpen);
+    },
+    [setOpenState],
+  );
+
+  useEffect(() => {
+    if (!open) {
+      setQueryChanged(false);
+    }
+    if (allowsCustomValue || open) {
+      return;
+    }
+    const label =
+      props.inline || selectedValue === null ? '' : (labelsByValueRef.current.get(selectedValue) ?? selectedValue);
+    if (inputValue !== label) {
+      setInputValue(label);
+    }
+  }, [allowsCustomValue, open, props.inline, selectedValue, selectedIndex, inputValue, setInputValue]);
+
+  const selectedLabel = selectedValue === null ? '' : (labelsByValueRef.current.get(selectedValue) ?? selectedValue);
+  const filterQuery = !allowsCustomValue && !queryChanged && inputValue === selectedLabel ? '' : inputValue;
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
   const registerSelectedIndex = useCallback(
-    (index: number, value: string) => {
+    (index: number, value: string, label: string) => {
+      labelsByValueRef.current.set(value, label);
       if (value === selectedValue) {
         setSelectedIndex(index);
       }
@@ -125,7 +169,13 @@ function AutocompleteInner(props: AutocompleteProps) {
 
   const dismiss = useDismiss(floatingContext, {
     escapeKey: !inlineMode,
-    outsidePress: !inlineMode,
+    outsidePress(event) {
+      if (inlineMode) {
+        return false;
+      }
+      const target = event.target;
+      return !(target instanceof Node && triggerRef.current?.contains(target));
+    },
     bubbles: {
       escapeKey: inlineMode,
       outsidePress: inlineMode,
@@ -143,36 +193,53 @@ function AutocompleteInner(props: AutocompleteProps) {
   });
 
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav]);
+  const referenceProps = getReferenceProps();
+  const popupId = typeof referenceProps['aria-controls'] === 'string' ? referenceProps['aria-controls'] : undefined;
+
+  const focusInput = useCallback(() => {
+    const input = refs.domReference.current;
+    if (input instanceof HTMLElement) {
+      input.focus();
+    }
+  }, [refs.domReference]);
 
   const handleSelect = useCallback(
     (value: string, index: number, label: string) => {
+      labelsByValueRef.current.set(value, label);
       setSelectedValue(value);
       setSelectedIndex(index);
-      setInputValue(label);
+      setInputValue(props.inline ? '' : label);
       setActiveIndex(null);
       setOpen(false);
     },
-    [setSelectedValue, setInputValue, setOpen],
+    [props.inline, setSelectedValue, setInputValue, setOpen],
   );
 
   const handleInputChange = useCallback(
     (value: string) => {
+      setQueryChanged(true);
       setInputValue(value);
-      if (value) {
-        setOpen(true);
+      if (value === '' && !allowsCustomValue && !props.inline) {
+        setSelectedValue(null);
+        setSelectedIndex(null);
+      }
+      if (value || !allowsCustomValue) {
+        setOpenState(true);
         setActiveIndex(0);
       } else {
-        setOpen(false);
+        setOpenState(false);
         setActiveIndex(null);
       }
     },
-    [setInputValue, setOpen],
+    [allowsCustomValue, props.inline, setInputValue, setOpenState, setSelectedValue],
   );
 
   const contextValue = useMemo<AutocompleteContextValue>(
     () => ({
+      allowsCustomValue,
       open,
       inputValue,
+      filterQuery,
       selectedValue,
       floatingContext,
       refs,
@@ -186,18 +253,24 @@ function AutocompleteInner(props: AutocompleteProps) {
       elementsRef,
       labelsRef,
       popupRef,
+      triggerRef,
       arrowRef,
       valuesByIndexRef,
       setInlineMode,
       handleSelect,
       handleInputChange,
+      setOpen,
+      focusInput,
+      popupId,
       registerSelectedIndex,
       mounted,
       transitionProps,
     }),
     [
+      allowsCustomValue,
       open,
       inputValue,
+      filterQuery,
       selectedValue,
       floatingContext,
       refs,
@@ -210,6 +283,9 @@ function AutocompleteInner(props: AutocompleteProps) {
       selectedIndex,
       handleSelect,
       handleInputChange,
+      setOpen,
+      focusInput,
+      popupId,
       registerSelectedIndex,
       mounted,
       transitionProps,
@@ -223,7 +299,7 @@ function AutocompleteInner(props: AutocompleteProps) {
   );
 }
 
-export function AutocompleteRoot(props: AutocompleteProps) {
+export function ComboboxRootInternal(props: ComboboxRootInternalProps) {
   const parentId = useFloatingParentNodeId();
 
   if (parentId === null) {
@@ -235,4 +311,17 @@ export function AutocompleteRoot(props: AutocompleteProps) {
   }
 
   return <AutocompleteInner {...props} />;
+}
+
+export function AutocompleteRoot({ onValueChange, ...props }: AutocompleteProps) {
+  return (
+    <ComboboxRootInternal
+      {...props}
+      onValueChange={value => {
+        if (value !== null) {
+          onValueChange?.(value);
+        }
+      }}
+    />
+  );
 }
