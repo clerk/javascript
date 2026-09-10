@@ -1,10 +1,12 @@
 import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Input } from '../input';
+import { Select } from '../select';
 import { Field } from './field';
 
 describe('Mosaic Field', () => {
@@ -360,6 +362,38 @@ describe('Mosaic Field', () => {
     expect(error).not.toHaveAttribute('role');
     expect(error).not.toHaveAttribute('aria-live');
     expect(error?.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('renders a span label that focuses a control which cannot be natively labelled', async () => {
+    const user = userEvent.setup();
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    render(
+      <Field.Root>
+        <Field.Label>Role</Field.Label>
+        <Select.Root
+          items={[{ value: 'admin', label: 'Admin' }]}
+          defaultValue='admin'
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>
+      </Field.Root>,
+    );
+
+    const label = screen.getByText('Role');
+    const trigger = screen.getByRole('combobox');
+    expect(label.tagName).toBe('SPAN');
+    expect(label).toHaveClass('cl-field-label');
+    expect(label).not.toHaveAttribute('for');
+    expect(label.id).not.toBe('');
+    expect(trigger.id).not.toBe('');
+    expect(trigger.getAttribute('aria-labelledby')).toContain(label.id);
+
+    await user.click(label);
+    expect(trigger).toHaveFocus();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(consoleWarn).not.toHaveBeenCalled();
+    consoleWarn.mockRestore();
   });
 
   it('warns when Field.Label does not render a native label', () => {

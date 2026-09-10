@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Field } from '../field';
 import { Select } from './select';
 
 const roles = [
@@ -244,5 +245,80 @@ describe('Mosaic Select', () => {
       </Select.Root>,
     );
     expect(ref.current).toBe(screen.getByRole('combobox'));
+  });
+
+  it('connects the trigger to a surrounding Field', async () => {
+    const user = userEvent.setup();
+    render(
+      <Field.Root
+        required
+        invalid
+      >
+        <Field.Label>Role</Field.Label>
+        <Select.Root
+          items={roles}
+          defaultValue='admin'
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>
+        <Field.Description>Who can manage members.</Field.Description>
+        <Field.Error>Pick a role.</Field.Error>
+      </Field.Root>,
+    );
+
+    const trigger = screen.getByRole('combobox');
+    const label = screen.getByText('Role');
+    const value = trigger.querySelector('.cl-select-value');
+    const description = screen.getByText('Who can manage members.');
+    const error = screen.getByText('Pick a role.').closest('p');
+    expect(value?.id).not.toBe('');
+    expect(trigger).toHaveAttribute('aria-labelledby', `${label.id} ${value?.id}`);
+    expect(trigger).toHaveAttribute('aria-describedby', `${description.id} ${error?.id}`);
+    expect(trigger).toHaveAttribute('aria-invalid', 'true');
+    expect(trigger).toHaveAttribute('aria-required', 'true');
+    expect(trigger).not.toHaveAttribute('required');
+    expect(trigger).toHaveAccessibleName('Role Admin');
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('option', { name: 'Member' }));
+    expect(trigger).toHaveAccessibleName('Role Member');
+  });
+
+  it('disables the trigger from a disabled Field', () => {
+    render(
+      <Field.Root disabled>
+        <Field.Label>Role</Field.Label>
+        <Select.Root
+          items={roles}
+          defaultValue='admin'
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>
+      </Field.Root>,
+    );
+    expect(screen.getByRole('combobox')).toBeDisabled();
+  });
+
+  it('names the trigger by its value outside a Field', () => {
+    renderSelect();
+    const trigger = screen.getByRole('combobox');
+    const value = trigger.querySelector('.cl-select-value');
+    expect(trigger).toHaveAttribute('aria-labelledby', value?.id);
+    expect(trigger).toHaveAccessibleName('All roles');
+  });
+
+  it('keeps a consumer aria-label ahead of the value', () => {
+    render(
+      <Select.Root
+        items={roles}
+        defaultValue='all'
+      >
+        <Select.Trigger aria-label='Filter by role' />
+        <Select.Popup />
+      </Select.Root>,
+    );
+    expect(screen.getByRole('combobox')).toHaveAccessibleName('Filter by role All roles');
   });
 });
