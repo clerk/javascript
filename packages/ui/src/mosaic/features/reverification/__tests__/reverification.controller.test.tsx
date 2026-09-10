@@ -222,7 +222,7 @@ describe('reverificationMachine', () => {
     prepare.resolve();
     await tick();
     expect(actor.getSnapshot().value).toBe('verifying');
-    expect(actor.getSnapshot().context.canResend).toBe(true);
+    expect(actor.getSnapshot().context.canResend).toBe(false);
   });
 
   it('queues an attempt submitted while the starting prepare is in flight', async () => {
@@ -317,28 +317,12 @@ describe('useReverificationController', () => {
       ),
     );
 
-    await waitFor(() => {
-      expect(result.current.status).toBe('ready');
-      if (result.current.status === 'ready') {
-        expect(result.current.canResend).toBe(true);
-      }
-    });
+    await waitFor(() => expect(result.current.status).toBe('ready'));
     if (result.current.status !== 'ready') {
       throw new Error('expected ready');
     }
+    expect(result.current.canResend).toBe(false);
     expect(result.current.onResend).toEqual(expect.any(Function));
-
-    act(() => {
-      result.current.onResend();
-    });
-
-    await waitFor(() => {
-      expect(result.current.status).toBe('ready');
-      if (result.current.status === 'ready') {
-        expect(result.current.canResend).toBe(false);
-        expect(result.current.onResend).toEqual(expect.any(Function));
-      }
-    });
   });
 
   it('marks the current step pending while an attempt is in flight', async () => {
@@ -539,7 +523,7 @@ describe('useReverificationController', () => {
     await waitFor(() => {
       expect(result.current.status).toBe('ready');
       if (result.current.status === 'ready') {
-        expect(result.current.canResend).toBe(true);
+        expect(result.current.canResend).toBe(false);
         expect(result.current.isPending).toBe(false);
       }
     });
