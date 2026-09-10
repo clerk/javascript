@@ -46,7 +46,7 @@ describe('extract-methods snapshots', () => {
     await expect(content).toMatchFileSnapshot('./__snapshots__/clerk-methods-handle-email-link-verification.mdx');
   });
 
-  it('Pick parameter includes only selected properties: organization.createDomain()', async () => {
+  it('Pick parameter includes only selected properties without linking the full type: organization.createDomain()', async () => {
     const content = await readGenerated('shared/organization-resource/methods/create-domain.mdx');
     await expect(content).toMatchFileSnapshot('./__snapshots__/organization-resource-methods-create-domain.mdx');
   });

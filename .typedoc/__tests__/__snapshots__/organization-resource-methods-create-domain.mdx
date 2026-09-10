@@ -17,5 +17,5 @@ function createDomain(domainName: string, params?: Pick<CreateOrganizationDomain
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `domainName` | `string` | The name of the domain to create. |
-| `params?` | `Pick`\<[`CreateOrganizationDomainParams`](#create-organization-domain-params), `"enrollmentMode"`\> | Optional parameters, including the `enrollmentMode` to assign to the new domain. |
+| `params?` | `Pick`\<`CreateOrganizationDomainParams`, `"enrollmentMode"`\> | Optional parameters, including the `enrollmentMode` to assign to the new domain. |
 | `params?.enrollmentMode?` | <code>"manual_invitation" \| "automatic_invitation" \| "automatic_suggestion" \| "enterprise_sso"</code> | The enrollment mode that determines how matching users are added to the Organization. Defaults to `manual_invitation`. |

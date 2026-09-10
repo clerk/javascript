@@ -565,6 +565,31 @@ function shouldFlattenInlineObjectParameter(decl) {
 }
 
 /**
+ * Whether a parameter is a built-in `Pick<T, K>` that will be flattened into nested rows. Its source type should not
+ * link to the full unpicked declaration, which documents properties the parameter does not accept.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ */
+function isFlattenedPickParameter(t) {
+  const unwrapped = unwrapOptional(t);
+  if (!unwrapped || unwrapped.type !== 'reference') {
+    return false;
+  }
+  const ref = /** @type {import('typedoc').ReferenceType} */ (unwrapped);
+  if (ref.name !== 'Pick' || ref.package !== 'typescript' || ref.typeArguments?.length !== 2) {
+    return false;
+  }
+  return shouldFlattenInlineObjectParameter(getParameterObjectShapeDeclaration(t));
+}
+
+/**
+ * @param {string} value
+ */
+function stripMarkdownLinks(value) {
+  return value.replace(/\[([^\[\]]*)\]\((.*?)\)/gm, '$1');
+}
+
+/**
  * Same as typedoc-plugin-markdown `member.parametersTable`, with `shouldFlattenInlineObjectParameter` and `getParameterObjectShapeDeclaration`.
  *
  * @this {import('typedoc-plugin-markdown').MarkdownThemeContext}
@@ -641,12 +666,13 @@ function clerkParametersTable(model) {
     const optional = isOptional ? '?' : '';
     row.push(`${rest}${backTicks(`${parameter.name}${optional}`)}`);
     if (parameter.type) {
-      const displayType =
+      const renderedType =
         parameter.type instanceof ReflectionType
           ? this.partials.reflectionType(parameter.type, {
               forceCollapse: true,
             })
           : this.partials.someType(parameter.type);
+      const displayType = isFlattenedPickParameter(parameter.type) ? stripMarkdownLinks(renderedType) : renderedType;
       row.push(removeLineBreaks(displayType));
     }
     if (showDefaults) {
