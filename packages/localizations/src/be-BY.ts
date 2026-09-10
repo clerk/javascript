@@ -1479,6 +1479,9 @@ export const beBY: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код аднаўлення пароля',
       resendButton: 'Адправіць код яшчэ раз',
@@ -1543,6 +1546,15 @@ export const beBY: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Неабходна верыфікаваць вашу асобу перад аднаўленнем пароля',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Зарэгістравацца',

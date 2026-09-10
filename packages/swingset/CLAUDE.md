@@ -84,6 +84,7 @@ export const meta: StoryMeta = {
   group: 'Components', // exact group string from the table
   title: 'Button', // drives slug + the page <h1>
   label: 'Delete Org', // optional friendlier sidebar text
+  status: 'stable', // maturity dot in sidebar + page badge; omit to show no status
   source: 'packages/ui/src/mosaic/components/button/button.tsx', // repo-root path → "View source"
   styles: {
     // Hand-written variant surface — archetype A · simple only
@@ -94,6 +95,8 @@ export const meta: StoryMeta = {
 ```
 
 - `title` is the component's export name; it produces the slug and is what readers match against code. Set `label` only when the sidebar should read differently (the slug and page heading still come from `title`).
+- `status` marks the entry's maturity — `'stable'`, `'wip'`, or `'todo'` (planned, not yet implemented; e.g. `Table`) — rendered as a colored dot (green / amber / gray) to the left of the entry in the sidebar, and as a dot-plus-label badge to the right of the page's `# Title` h1. It is explicit: omitting it displays no status anywhere (not every entry carries one, e.g. `Scroll Area`). A todo entry is `meta` alone plus a one-paragraph MDX page; it skips its archetype's required sections (and `source`) until the component exists.
+- `substatus` optionally says *why* a wip entry is wip — one of `'needs wire-up'` (view runs on mock data, not yet connected to its model/controller), `'needs design'`, `'needs a11y'`, `'needs docs'`, `'needs polish'`. It renders in the page badge (`wip: needs wire-up`) and the sidebar dot's tooltip. Most wip entries won't need one; it is ignored on stable entries.
 - `source` is always a path **relative to the monorepo root**, pointing at the file that exports the documented component. Always set it — it powers the "View source" link.
 - `styles` declares the component's variant props and is **required for archetype A's simple (knob-driven) form** (it generates the knobs and the `<PropTable>`). Keep it in sync with the component's real prop union by hand — StyleX compiles its styles away, so nothing derives it for you. Omit it for compound A components, and for B and C.
 

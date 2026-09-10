@@ -1478,6 +1478,9 @@ export const idID: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kode reset kata sandi',
       resendButton: 'Tidak menerima kode? Kirim ulang',
@@ -1543,6 +1546,15 @@ export const idID: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Kami perlu memverifikasi identitas Anda sebelum mereset kata sandi.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Daftar',

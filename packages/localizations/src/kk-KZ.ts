@@ -1466,6 +1466,9 @@ export const kkKZ: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Құпия сөзді қалпына келтіру коды',
       resendButton: 'Код алмадыңыз ба? Қайта жіберу',
@@ -1531,6 +1534,15 @@ export const kkKZ: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Құпия сөзді өзгерту үшін тұлғаңызды растау қажет.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Тіркелу',

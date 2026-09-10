@@ -1475,6 +1475,9 @@ export const enGB: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
@@ -1539,6 +1542,15 @@ export const enGB: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Sign up',

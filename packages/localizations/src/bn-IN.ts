@@ -1483,6 +1483,9 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনি যে এন্টারপ্রাইজ অ্যাকাউন্ট দিয়ে চালিয়ে যেতে চান তা নির্বাচন করুন।',
       title: 'আপনার এন্টারপ্রাইজ অ্যাকাউন্ট বেছে নিন',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'পাসওয়ার্ড রিসেট কোড',
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
@@ -1549,6 +1552,15 @@ export const bnIN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'আপনার পাসওয়ার্ড রিসেট করার আগে আমাদের আপনার পরিচয় যাচাই করতে হবে।',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'সাইন আপ করুন',

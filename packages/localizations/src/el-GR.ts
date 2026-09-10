@@ -1483,6 +1483,9 @@ export const elGR: LocalizationResource = {
       subtitle: 'Συνδεθείτε με SSO επιχείρησης',
       title: 'Σύνδεση επιχείρησης',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Επαναφορά κωδικού πρόσβασης',
       resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
@@ -1549,6 +1552,15 @@ export const elGR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Πρέπει να επαληθεύσουμε την ταυτότητά σας πριν επαναφέρουμε τον κωδικό πρόσβασής σας.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Εγγραφή',

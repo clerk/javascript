@@ -619,6 +619,18 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    enterpriseSSO: {
+      formButtonPrimary: LocalizationValue;
+    };
+    ssoFallback: {
+      actionLink: LocalizationValue;
+      notice: LocalizationValue;
+      code: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        resendButton: LocalizationValue;
+      };
+    };
     web3Solana: {
       title: LocalizationValue;
       subtitle: LocalizationValue;

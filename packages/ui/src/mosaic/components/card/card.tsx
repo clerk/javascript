@@ -4,11 +4,10 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
+import { Branding } from '../branding';
 import { Button } from '../button';
-import { ClerkLogo } from '../clerk-logo';
-import { Dialog, DialogContext } from '../dialog';
+import { Dialog, DialogContext, isOverlayDialog } from '../dialog';
 import { Icon } from '../icon';
 import { cardContentMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
@@ -19,20 +18,10 @@ const DEFAULT_ELEVATION: CardElevation = 'card';
 
 const CardElevationContext = React.createContext<CardElevation>(DEFAULT_ELEVATION);
 
-function Branding() {
+function CardBranding() {
   return (
     <div {...stylex.props(reset.base, slots.branding.base)}>
-      <span {...stylex.props(reset.base, slots.branding.text)}>
-        Secured by{' '}
-        <a
-          href='https://go.clerk.com/components'
-          target='_blank'
-          rel='noopener noreferrer'
-          {...stylex.props(reset.base, slots.branding.link, focusOutline.visible)}
-        >
-          <ClerkLogo height={14} />
-        </a>
-      </span>
+      <Branding />
     </div>
   );
 }
@@ -68,7 +57,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
       children: (
         <>
           {children}
-          {renderBranding ? <Branding /> : null}
+          {renderBranding ? <CardBranding /> : null}
         </>
       ),
     },
@@ -117,7 +106,7 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
               Not for an inline dialog, which nothing closes. */}
-          {dialog && !dialog.inline ? <HeaderCloseButton /> : null}
+          {isOverlayDialog(dialog) ? <HeaderCloseButton /> : null}
           <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
             {children}
           </div>

@@ -13,6 +13,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'FileUpload',
   label: 'File Upload',
   source: 'packages/headless/src/primitives/file-upload/index.ts',

@@ -527,6 +527,18 @@ describe('Tabs', () => {
     });
   });
 
+  // React writes changed attributes in key order, and Chrome flushes style when `tabindex` changes on
+  // the focused element. A state marker that lands after that write is absent from the flush, which
+  // is how a CSS anchor on `[data-selected]` loses its transition. So the marker leads the tab's props.
+  describe('attribute order', () => {
+    it('emits data-selected ahead of the roving tabindex', () => {
+      renderTabs();
+      const names = Array.from(screen.getByRole('tab', { name: 'Account' }).attributes).map(a => a.name);
+      expect(names.indexOf('data-selected')).toBeGreaterThanOrEqual(0);
+      expect(names.indexOf('data-selected')).toBeLessThan(names.indexOf('tabindex'));
+    });
+  });
+
   describe('accessibility (axe)', () => {
     it('has no violations', async () => {
       const { container } = renderTabs();

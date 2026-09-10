@@ -1479,6 +1479,9 @@ export const esUY: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código para restablecer la contraseña',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -1544,6 +1547,15 @@ export const esUY: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Necesitamos verificar tu identidad antes de restablecer tu contraseña.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrate',

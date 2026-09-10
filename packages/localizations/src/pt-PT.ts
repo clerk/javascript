@@ -1486,6 +1486,9 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Selecione a conta empresarial com a qual pretende continuar.',
       title: 'Escolha a sua conta empresarial',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de redefinição de palavra-passe',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -1550,6 +1553,15 @@ export const ptPT: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Precisamos verificar a sua identidade antes de redefinir a palavra-passe.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registar-se',

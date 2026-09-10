@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { Heading } from '../components/heading';
+import { Profile } from '../components/profile';
 import { mergeStyleProps, themeProps } from '../props';
 import type {
   UserProfileActiveDevicesSectionViewProps,
@@ -55,12 +55,7 @@ export function UserProfileSecurityPanelView({
 
   return (
     <div {...mergeStyleProps(themeProps('user-profile-security-panel'), stylex.props(styles.root))}>
-      <Heading
-        render={props => <h3 {...props} />}
-        size='2xl'
-      >
-        Security
-      </Heading>
+      <Profile.PageTitle>Security</Profile.PageTitle>
       <div {...stylex.props(styles.sections)}>
         {hasAuthentication ? (
           <div {...stylex.props(styles.sectionCards)}>

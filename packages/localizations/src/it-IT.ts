@@ -1483,6 +1483,9 @@ export const itIT: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Codice di reset della password',
       resendButton: 'Non hai ricevuto un codice? Reinvia',
@@ -1547,6 +1550,15 @@ export const itIT: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Dobbiamo verificare la tua identità prima di resettare la tua password.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrati',

@@ -1476,6 +1476,9 @@ export const mnMN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Нууц үг шинэчлэх код',
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
@@ -1541,6 +1544,15 @@ export const mnMN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Нууц үгээ шинэчлэхээс өмнө бид таны хувийн мэдээллийг баталгаажуулах шаардлагатай.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Бүртгүүлэх',

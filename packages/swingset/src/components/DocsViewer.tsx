@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { getModule } from '@/lib/registry';
 
 import { PlaygroundProvider } from './PlaygroundContext';
-import { ViewSource } from './ViewSource';
 
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
@@ -14,7 +13,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
   'user-profile': {
-    'user-page': dynamic(() => import('../stories/user-page.mdx')),
+    'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
@@ -48,15 +47,20 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
+    'input-group': dynamic(() => import('../stories/input-group.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
+    drawer: dynamic(() => import('../stories/drawer.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
     otp: dynamic(() => import('../stories/otp.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
+    profile: dynamic(() => import('../stories/profile.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    table: dynamic(() => import('../stories/table.mdx')),
+    toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
@@ -110,13 +114,8 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose relative mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
-        {meta?.source ? (
-          <div className='absolute right-3 top-3 sm:right-8 sm:top-8'>
-            <ViewSource source={meta.source} />
-          </div>
-        ) : null}
         <DocContent />
       </article>
     </PlaygroundProvider>

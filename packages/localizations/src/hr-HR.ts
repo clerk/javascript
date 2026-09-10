@@ -1485,6 +1485,9 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Odaberite poslovni račun s kojim želite nastaviti.',
       title: 'Odaberite svoj poslovni račun',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod za resetiranje lozinke',
       resendButton: 'Niste primili kod? Pošalji ponovno',
@@ -1550,6 +1553,15 @@ export const hrHR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Moramo potvrditi vaš identitet prije resetiranja lozinke.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrirajte se',

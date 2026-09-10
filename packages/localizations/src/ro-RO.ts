@@ -1487,6 +1487,9 @@ export const roRO: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Cod pentru resetarea parolei',
       resendButton: 'Nu ai primit un cod? Retrimite',
@@ -1552,6 +1555,15 @@ export const roRO: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Trebuie să îți verificăm identitatea înainte de a reseta parola.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Înregistrează-te',

@@ -26,6 +26,14 @@ export interface SignInFutureCreateParams {
    */
   redirectUrl?: string;
   /**
+   * The value to pass to the [OIDC `prompt` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
+  /**
+   * The value to pass to the [OIDC `login_hint` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=login_hint,in%20\(if%20necessary\).) in the generated OAuth redirect URL.
+   */
+  oidcLoginHint?: string;
+  /**
    * The URL that the user will be redirected to, after successful authorization from the OAuth provider and Clerk sign-in.
    */
   actionCompleteRedirectUrl?: string;
@@ -337,6 +345,11 @@ export interface SignInFutureResource {
    * Array of the second factors that are supported in the current sign-in. Each factor contains information about the verification strategy that can be used. This property is populated only when the first factor is verified.
    */
   readonly supportedSecondFactors: SignInSecondFactor[];
+
+  /**
+   * Factors an enterprise SSO user can fall back to when they cannot reach their identity provider. Empty unless the instance has allowlisted this user for a fallback.
+   */
+  readonly ssoFallbackFirstFactors: SignInFirstFactor[];
 
   /**
    * The current status of the sign-in.

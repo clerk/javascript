@@ -1487,6 +1487,9 @@ export const huHU: LocalizationResource = {
       subtitle: 'Válaszd ki a vállalati fiókot, amellyel folytatni szeretnéd.',
       title: 'Válaszd ki a vállalati fiókodat',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Jelszó visszaállító kód',
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
@@ -1552,6 +1555,15 @@ export const huHU: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Vissza kell igazolnod az identitásod, mielőtt visszaállítod a jelszavad',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Regisztráció',

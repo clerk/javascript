@@ -1486,6 +1486,9 @@ export const nbNO: LocalizationResource = {
       subtitle: 'Velg bedriftskontoen du ønsker å fortsette med.',
       title: 'Velg bedriftskonto',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Tilbakestill passord-kode',
       resendButton: 'Send kode på nytt',
@@ -1552,6 +1555,15 @@ export const nbNO: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Vi må bekrefte identiteten din før vi tilbakestiller passordet ditt.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Opprett konto',

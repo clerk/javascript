@@ -1484,6 +1484,9 @@ export const jaJP: LocalizationResource = {
       subtitle: '続行するエンタープライズアカウントを選択してください。',
       title: 'エンタープライズアカウントを選択',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'パスワードリセットコード',
       resendButton: 'コードを再送信',
@@ -1549,6 +1552,15 @@ export const jaJP: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'パスワードをリセットする前に、身元を確認する必要があります。',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'サインアップ',

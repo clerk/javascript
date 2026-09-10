@@ -11,6 +11,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Tooltip',
   source: 'packages/headless/src/primitives/tooltip/index.ts',
 };
