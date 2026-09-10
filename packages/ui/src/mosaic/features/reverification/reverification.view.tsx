@@ -197,7 +197,7 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
                   supportButton: m.alternativeMethods.getHelp.blockButton__emailSupport,
                 }}
                 onEmailSupport={onEmailSupport}
-                onBack={onBack ?? (() => {})}
+                onBack={onBack}
               />
             </Flow.Step>
           </>

@@ -213,13 +213,15 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
         onResend={onResend}
         canResend={canResend}
         onShowHelp={() => navigate('help', 1)}
-        onBack={
-          step === 'help'
-            ? () => navigate('method-picker', -1)
-            : step === 'method-picker'
-              ? () => navigate(stepFor(methodId), -1)
-              : undefined
-        }
+        onBack={() => {
+          if (step === 'help') {
+            navigate('method-picker', -1);
+            return;
+          }
+          if (step === 'method-picker') {
+            navigate(stepFor(methodId), -1);
+          }
+        }}
         onEmailSupport={() => setSupportRequested(true)}
         methods={allMethods.filter(method => method.id !== methodId)}
         onSelectMethod={id => void selectMethod(id)}

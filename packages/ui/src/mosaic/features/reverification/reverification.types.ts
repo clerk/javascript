@@ -28,7 +28,7 @@ export type ReverificationViewProps = {
   onSubmit: () => void;
   onShowMethods: () => void;
   onShowHelp: () => void;
-  onBack?: () => void;
+  onBack: () => void;
   onEmailSupport: () => void;
   methods: readonly ReverificationMethod[];
   pendingMethodId?: string;
