@@ -424,9 +424,7 @@ export class User extends BaseResource implements UserResource {
     this.externalId = data.external_id || null;
     this.firstName = data.first_name || null;
     this.lastName = data.last_name || null;
-    if (this.firstName || this.lastName) {
-      this.fullName = getFullName({ firstName: this.firstName, lastName: this.lastName });
-    }
+    this.fullName = getFullName({ firstName: this.firstName, lastName: this.lastName }) || null;
 
     this.imageUrl = data.image_url || '';
     this.hasImage = data.has_image || false;

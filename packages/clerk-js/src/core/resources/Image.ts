@@ -53,8 +53,8 @@ export class Image extends BaseResource implements ImageResource {
       return this;
     }
     this.id = data.id;
-    this.name = data.name;
-    this.publicUrl = data.public_url;
+    this.name = this.withDefault(data.name, null);
+    this.publicUrl = this.withDefault(data.public_url, null);
     return this;
   }
 }
