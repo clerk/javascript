@@ -1986,7 +1986,7 @@ export class Clerk implements ClerkInterface {
               this.updateClient(updatedClient, { __internal_dangerouslySkipEmit: true });
             }
           } catch (e) {
-            if (isUnauthenticatedError(e)) {
+            if (isUnauthenticatedError(e) && !shouldSwitchOrganization) {
               void this.handleUnauthenticated();
             } else {
               throw e;
@@ -3719,7 +3719,7 @@ export class Clerk implements ClerkInterface {
     await session
       .touch({ intent, ...(organizationId !== undefined ? { __internal_organizationId: organizationId } : {}) })
       .catch(e => {
-        if (isUnauthenticatedError(e)) {
+        if (isUnauthenticatedError(e) && organizationId === undefined) {
           void this.handleUnauthenticated();
         } else {
           throw e;

@@ -25,29 +25,112 @@ const membership = id => ({
   },
 });
 
-test('rejected organization activation preserves session organization', async t => {
+for (const [status, code] of [
+  [401, 'unauthorized_organization'],
+  [403, 'not_a_member_in_organization'],
+]) {
+  test(
+    `rejected organization activation preserves session organization and cached token: ${status}`,
+    { timeout: 5000 },
+    async t => {
+      const session = sessionFixture();
+      session.last_active_organization_id = 'org_previous';
+      session.user.organization_memberships = [membership('org_previous'), membership('org_rejected')];
+      let minted = 0;
+      const token = tokenFixture();
+      const f = await fixture({
+        client: { ...fixtures.client, sessions: [session], last_active_session_id: session.id },
+        http: request => {
+          if (new URL(request.url).pathname.endsWith('/tokens'))
+            return response(token, { body: JSON.stringify(token) });
+          if (new URL(request.url).pathname.endsWith('/tokens/firebase')) {
+            minted++;
+            return response(token, { body: JSON.stringify(token) });
+          }
+          if (new URL(request.url).pathname.endsWith('/touch'))
+            return response(null, {
+              status,
+              body: JSON.stringify({ errors: [{ code, message: 'Unable to switch' }] }),
+            });
+        },
+      });
+      t.after(f.dispose);
+      const handle = f.state.roots.session;
+      const getToken = () => f.invoke(handle, 'Session.getToken', [{ template: 'firebase' }]);
+      assert.equal((await getToken()).result, token.jwt);
+      const result = await f.invoke(f.state.roots.clerk, 'Clerk.setActive', [
+        { organization: { $case: 0, value: 'org_rejected' } },
+      ]);
+      assert.equal(result.failure?.status, status);
+      assert.equal(result.failure?.errors[0].code, code);
+      assert.equal(f.resource(handle).lastActiveOrganizationId, 'org_previous');
+      assert.equal(f.resource(f.state.roots.organization).id, 'org_previous');
+      assert.equal((await getToken()).result, token.jwt);
+      assert.equal(minted, 1);
+    },
+  );
+}
+
+test('forced organization selection rejects personal selection without a request', async t => {
   const session = sessionFixture();
   session.last_active_organization_id = 'org_previous';
-  session.user.organization_memberships = [membership('org_previous'), membership('org_rejected')];
+  session.user.organization_memberships = [membership('org_previous')];
   const f = await fixture({
     client: { ...fixtures.client, sessions: [session], last_active_session_id: session.id },
     http: request => {
-      if (new URL(request.url).pathname.endsWith('/touch'))
-        return response(null, {
-          status: 403,
-          body: JSON.stringify({ errors: [{ code: 'not_a_member_in_organization', message: 'Unable to switch' }] }),
+      if (new URL(request.url).pathname.endsWith('/environment'))
+        return response({
+          ...fixtures.environment,
+          organization_settings: { ...fixtures.environment.organization_settings, force_organization_selection: true },
         });
     },
   });
   t.after(f.dispose);
-  const handle = f.state.roots.session;
-  const result = await f.invoke(f.state.roots.clerk, 'Clerk.setActive', [
-    { organization: { $case: 0, value: 'org_rejected' } },
-  ]);
-  assert.equal(result.failure?.status, 403);
-  assert.equal(result.failure?.errors[0].code, 'not_a_member_in_organization');
-  assert.equal(f.resource(handle).lastActiveOrganizationId, 'org_previous');
+  const count = f.requests.length;
+  const result = await f.invoke(f.state.roots.clerk, 'Clerk.setActive', [{ organization: null }]);
+  assert.equal(result.failure, undefined);
+  assert.equal(f.requests.length, count);
+  assert.equal(f.resource(f.state.roots.session).lastActiveOrganizationId, 'org_previous');
   assert.equal(f.resource(f.state.roots.organization).id, 'org_previous');
+});
+
+test('a retained session reads a fresh template token after accepted organization activation', async t => {
+  const session = sessionFixture();
+  session.last_active_organization_id = 'org_previous';
+  session.user.organization_memberships = [membership('org_previous'), membership('org_next')];
+  const client = { ...fixtures.client, sessions: [session], last_active_session_id: session.id };
+  const initial = tokenFixture();
+  const next = { ...tokenFixture(), jwt: tokenFixture().jwt + '_next' };
+  let minted = 0;
+  const f = await fixture({
+    client,
+    http: request => {
+      const path = new URL(request.url).pathname;
+      if (path.endsWith('/tokens/firebase')) {
+        const value = ++minted === 1 ? initial : next;
+        return response(value, { body: JSON.stringify(value) });
+      }
+      if (path.endsWith('/tokens')) return response(null, { body: JSON.stringify(tokenFixture()) });
+      if (!path.endsWith('/touch')) return;
+      const updated = { ...session, last_active_organization_id: 'org_next' };
+      return response(updated, {
+        body: JSON.stringify({ response: updated, client: { ...client, sessions: [updated] } }),
+      });
+    },
+  });
+  t.after(f.dispose);
+  const handle = f.state.roots.session;
+  const getToken = () => f.invoke(handle, 'Session.getToken', [{ template: 'firebase' }]);
+  assert.equal((await getToken()).result, initial.jwt);
+  const result = await f.invoke(f.state.roots.clerk, 'Clerk.setActive', [
+    { organization: { $case: 0, value: 'org_next' } },
+  ]);
+  assert.equal(result.failure, undefined, JSON.stringify(result.failure));
+  assert.deepEqual(f.state.roots.session, handle);
+  assert.equal(f.resource(handle).lastActiveOrganizationId, 'org_next');
+  assert.equal((await getToken()).result, next.jwt);
+  assert.equal((await getToken()).result, next.jwt);
+  assert.equal(minted, 2);
 });
 
 for (const selection of ['org_next', null, undefined]) {

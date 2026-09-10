@@ -253,6 +253,24 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
+      it.each([false, true])('propagates rejected organization selection with navigation=%s', async navigate => {
+        const error = Object.assign(new Error('Organization selection denied'), { status: 401 });
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        mockSession.touch.mockRejectedValueOnce(error);
+        mockSession.__internal_touch.mockRejectedValueOnce(error);
+        const onNavigate = vi.fn();
+        await expect(
+          sut.setActive({
+            session: mockSession as any as ActiveSessionResource,
+            organization: 'org_denied',
+            ...(navigate ? { navigate: onNavigate } : {}),
+          }),
+        ).rejects.toBe(error);
+        expect(onNavigate).not.toHaveBeenCalled();
+      });
+
       describe('with `touchSession` set to false', () => {
         it('calls session.touch by default outside of focus window event', async () => {
           mockSession.touch.mockReturnValue(Promise.resolve());
