@@ -33,6 +33,10 @@
       "types": "./dist/primitives/menu/index.d.ts",
       "import": "./dist/primitives/menu/index.js"
     },
+    "./combobox": {
+      "types": "./dist/primitives/combobox/index.d.ts",
+      "import": "./dist/primitives/combobox/index.js"
+    },
     "./autocomplete": {
       "types": "./dist/primitives/autocomplete/index.d.ts",
       "import": "./dist/primitives/autocomplete/index.js"
