@@ -124,6 +124,15 @@ describe('useReverificationModel', () => {
     expect(result.current.isActive).toBe(false);
   });
 
+  it('defaults to second-factor verification when no level is provided', async () => {
+    session?.startVerification.mockResolvedValue(resource());
+    const { result } = renderHook(() => useReverificationModel({ ...activeProps(), level: undefined }));
+
+    await ready(result.current).start();
+
+    expect(session?.startVerification).toHaveBeenCalledWith({ level: 'second_factor' });
+  });
+
   it('maps first-factor strategies and drops enterprise_sso and passkey without WebAuthn', async () => {
     webAuthnSupported = false;
     session?.startVerification.mockResolvedValue(
