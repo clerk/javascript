@@ -31,7 +31,8 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     }
 
     const measure = () => {
-      setActiveStepHeight(activeStep.getBoundingClientRect().height);
+      // An enclosing dialog can be scaled while opening; measure the unscaled layout.
+      setActiveStepHeight(activeStep.offsetHeight);
     };
 
     measure();
