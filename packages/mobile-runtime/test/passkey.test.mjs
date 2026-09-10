@@ -190,3 +190,84 @@ test('unknown passkey provider failure retains the attempt without submitting a 
   assert.equal(f.state.roots.session, null);
   assert.equal(JSON.stringify(result).includes('private provider detail'), false);
 });
+
+for (const code of ['user_cancelled', 'host_failure', 'presentation_unavailable', 'invalid_credential_response']) {
+  test(`email sign-in can follow an automatic passkey failure: ${code}`, async t => {
+    let presentations = 0;
+    const paths = [];
+    const f = await fixture({
+      capabilities: ['passkeys'],
+      passkeys: () => {
+        presentations++;
+        throw Object.assign(new Error('private provider detail'), { code });
+      },
+      http: request => {
+        const path = new URL(request.url).pathname;
+        if (!path.includes('/sign_ins')) return;
+        paths.push(path);
+        const body = new URLSearchParams(request.body);
+        if (body.get('strategy') === 'passkey') {
+          assert.equal(path, '/v1/client/sign_ins');
+          return response({ ...attempt(), id: 'si_passkey_prompt' });
+        }
+        if (path.endsWith('/prepare_first_factor')) {
+          assert.equal(path, '/v1/client/sign_ins/si_after_passkey/prepare_first_factor');
+          assert.equal(body.get('strategy'), 'email_code');
+          assert.equal(body.get('email_address_id'), 'idn_email');
+          assert.equal(body.has('public_key_credential'), false);
+        } else {
+          assert.equal(path, '/v1/client/sign_ins');
+          assert.equal(body.get('identifier'), 'person@example.com');
+          assert.equal(body.has('strategy'), false);
+        }
+        return response({
+          ...fixtures.signIn,
+          id: 'si_after_passkey',
+          identifier: 'person@example.com',
+          status: 'needs_first_factor',
+          supported_first_factors: [
+            { strategy: 'email_code', email_address_id: 'idn_email', safe_identifier: 'person@example.com' },
+          ],
+          first_factor_verification: {
+            ...fixtures.signIn.first_factor_verification,
+            strategy: 'email_code',
+            nonce: null,
+          },
+        });
+      },
+    });
+    t.after(f.dispose);
+    const failed = await f.invoke(f.state.roots.signIn, 'SignIn.passkey', [
+      { flow: 'discoverable', preferImmediatelyAvailableCredentials: true },
+    ]);
+    assert.equal(failed.result.error.code, code);
+    assert.equal(failed.result.error.passkeyStage, 'requestingAuthorization');
+    assert.equal(f.resource(f.state.roots.signIn).id, 'si_passkey_prompt');
+    assert.equal(f.state.roots.session, null);
+    const started = await f.invoke(f.state.roots.clerk, 'Clerk.startAuthentication', [
+      {
+        mode: 'signIn',
+        identifier: 'person@example.com',
+        identifierType: 'emailAddress',
+      },
+    ]);
+    assert.equal(started.failure, undefined, JSON.stringify(started.failure));
+    assert.equal(started.result.value.kind, 'signIn');
+    const signIn = f.resource(f.state.roots.signIn);
+    assert.equal(signIn.id, 'si_after_passkey');
+    const group = f.group('signIn', 'emailCode');
+    const sent = await f.invoke(group, `${group.type}.sendCode`, [
+      { $case: 1, value: { emailAddressId: 'idn_email' } },
+    ]);
+    assert.equal(sent.failure, undefined, JSON.stringify(sent.failure));
+    assert.equal(sent.result.error, null);
+    assert.deepEqual(paths, [
+      '/v1/client/sign_ins',
+      '/v1/client/sign_ins',
+      '/v1/client/sign_ins/si_after_passkey/prepare_first_factor',
+    ]);
+    assert.equal(presentations, 1);
+    assert.equal(f.state.roots.session, null);
+    assert.equal(f.state.roots.user, null);
+  });
+}
