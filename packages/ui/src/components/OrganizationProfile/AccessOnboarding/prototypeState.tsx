@@ -1,3 +1,4 @@
+import type { FieldId } from '@clerk/shared/types';
 import React, { createContext, useContext, useReducer } from 'react';
 
 import type { LocalizationKey } from '../../../customizables';
@@ -41,6 +42,10 @@ export type ProtoDomain = {
    * application's tenancy model) — surfaces here as a read-only fact.
    */
   membershipRequired?: boolean;
+  /** Pre-approved from the dashboard: the C1 vouches, so proofs are waived. */
+  createdBy?: 'application';
+  /** True until the C2 configures the rule — the row reads Awaiting setup. */
+  awaitingSetup?: boolean;
 };
 
 /*
@@ -66,6 +71,55 @@ export const NON_DIRECTORY_FALLBACK_LABELS: Record<ProtoNonDirectoryFallback, { 
 /** The recommendation tracks who is vouching, same as the dashboard wizard. */
 export const recommendedEnrollmentFor = (signInMode: 'default' | 'sso'): ProtoEnrollment =>
   signInMode === 'sso' ? 'join_automatically' : 'request_access';
+
+export type EnrollmentChoices = {
+  options: { value: string; label: string; description?: string }[];
+  locked: { label: string; reason: string }[];
+};
+
+/*
+ * Ordering tracks the sign-in answer (dashboard parity) and the proof
+ * matrix decides availability: affiliation unlocks the low-risk modes,
+ * ownership unlocks joining automatically, and directory sync needs the
+ * domain's single sign-on to be active. Locked modes are listed beneath
+ * the radio group with their reasons rather than rendered as dead rows.
+ */
+export const enrollmentChoicesFor = (domain: ProtoDomain, signInMode: 'default' | 'sso'): EnrollmentChoices => {
+  const ssoActive = domain.authentication.mode === 'sso' && domain.authentication.status === 'active';
+  const order: ProtoEnrollment[] =
+    signInMode === 'sso'
+      ? ['join_automatically', 'directory_synced', 'request_access', 'invitation_only']
+      : ['join_automatically', 'request_access', 'invitation_only', 'directory_synced'];
+
+  const reasonFor = (mode: ProtoEnrollment): string | null => {
+    if (mode === 'join_automatically' && !hasOwnership(domain)) {
+      return 'verify domain ownership to enable';
+    }
+    if ((mode === 'request_access' || mode === 'invitation_only') && !domain.affiliationVerified) {
+      return 'verify the domain to enable';
+    }
+    if (mode === 'directory_synced' && !ssoActive) {
+      return signInMode === 'sso' ? 'available once single sign-on is active' : 'needs single sign-on';
+    }
+    return null;
+  };
+
+  const options: EnrollmentChoices['options'] = [];
+  const locked: EnrollmentChoices['locked'] = [];
+  for (const mode of order) {
+    const reason = reasonFor(mode);
+    if (reason) {
+      locked.push({ label: ENROLLMENT_LABELS[mode].label, reason });
+    } else {
+      options.push({
+        value: mode,
+        label: ENROLLMENT_LABELS[mode].label,
+        description: ENROLLMENT_LABELS[mode].description,
+      });
+    }
+  }
+  return { options, locked };
+};
 
 export const ENROLLMENT_LABELS: Record<ProtoEnrollment, { label: string; description: string }> = {
   join_automatically: {
@@ -100,30 +154,26 @@ const txtRecordFor = (name: string) => ({
 
 const SEED_DOMAINS: ProtoDomain[] = [
   {
+    /*
+     * The receiving end of the dashboard's pre-approve flow: the C1 created
+     * this rule, so proofs are vouched (ownership waived, nothing locked)
+     * and the row waits for the C2 to self-serve through SSO and, later,
+     * SCIM. Ownership can still be proven, it just is not required.
+     */
     id: 'proto_dom_acme',
     name: 'acme.com',
-    enrollment: 'join_automatically',
-    authentication: { mode: 'sso', provider: 'saml_okta', status: 'active' },
-    affiliationVerified: true,
-    ownership: 'verified',
-    twoStepRequired: false,
-    sessionLifetimeHours: APP_SESSION_LIFETIME_HOURS,
-    nonDirectoryFallback: 'block',
-    // Seeded so the read-only membership fact has something to show.
-    membershipRequired: true,
-    ...txtRecordFor('acme.com'),
-  },
-  {
-    id: 'proto_dom_contractors',
-    name: 'contractors.acme.com',
     enrollment: 'request_access',
     authentication: { mode: 'default' },
     affiliationVerified: true,
-    ownership: 'unverified',
+    ownership: 'waived',
     twoStepRequired: false,
     sessionLifetimeHours: APP_SESSION_LIFETIME_HOURS,
     nonDirectoryFallback: 'block',
-    ...txtRecordFor('contractors.acme.com'),
+    // Set by the C1 alongside the pre-approval, shown as a read-only fact.
+    membershipRequired: true,
+    createdBy: 'application',
+    awaitingSetup: true,
+    ...txtRecordFor('acme.com'),
   },
 ];
 
@@ -177,6 +227,7 @@ const reducer = (domains: ProtoDomain[], action: ProtoAction): ProtoDomain[] => 
       return patch(domains, action.id, { enrollment: action.enrollment });
     case 'configureRule':
       return patch(domains, action.id, {
+        awaitingSetup: false,
         enrollment: action.enrollment,
         twoStepRequired: action.twoStepRequired,
         sessionLifetimeHours: action.sessionLifetimeHours,
@@ -187,6 +238,7 @@ const reducer = (domains: ProtoDomain[], action: ProtoAction): ProtoDomain[] => 
       });
     case 'setSsoProvider':
       return patch(domains, action.id, {
+        awaitingSetup: false,
         authentication: { mode: 'sso', provider: action.provider, status: 'setting_up' },
       });
     case 'completeSsoSetup':
@@ -235,3 +287,6 @@ export const simulateRequest = () => new Promise<void>(resolve => setTimeout(res
 
 // Prototype-only: raw strings render fine at runtime (makeLocalizable's string branch).
 export const protoKey = (value: string) => value as unknown as LocalizationKey;
+
+// Prototype-only: readable runtime field names; FieldId only scopes descriptors.
+export const protoFieldId = (value: string) => value as unknown as FieldId;

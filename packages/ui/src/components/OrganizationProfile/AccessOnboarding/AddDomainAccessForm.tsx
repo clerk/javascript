@@ -1,4 +1,3 @@
-import { iconImageUrl } from '@clerk/shared/constants';
 import React, { useRef, useState } from 'react';
 
 import { useFieldOTP } from '@/ui/elements/CodeControl';
@@ -10,14 +9,15 @@ import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useWizard, Wizard } from '../../../common';
-import { Box, Button, CheckboxInput, Col, descriptors, Flex, RadioInput, Span, Text } from '../../../customizables';
-import { common } from '../../../styledSystem';
+import { Button, Col, descriptors, Flex, Span, Text } from '../../../customizables';
 import { EnrollmentOptions } from './EnrollmentOptions';
-import type { ProtoEnrollment, ProtoNonDirectoryFallback, ProtoProvider } from './prototypeState';
+import type { ProtoEnrollment, ProtoProvider } from './prototypeState';
 import {
   APP_SESSION_LIFETIME_HOURS,
   ENROLLMENT_LABELS,
+  enrollmentChoicesFor,
   formatSessionLifetime,
+  protoFieldId,
   protoKey,
   PROVIDER_LABELS,
   recommendedEnrollmentFor,
@@ -33,24 +33,18 @@ type AddDomainAccessFormProps = {
 };
 
 /*
- * The self-serve add-domain flow, restructured to the dashboard wizard's
- * question shape (Aug 24 direction): domain → sign-in (with two-step as a
- * checkbox under default sign-in and re-verification as the step's second
- * question) → enrollment → review. The C2-specific difference is proof:
- * affiliation (email round-trip) is folded into the domain step, and
- * choosing SSO leaves the rule "Setting up" — ownership verification and
- * the IdP handshake continue from the row afterwards.
+ * The self-serve add-domain flow in the dashboard wizard's question shape,
+ * built from the house form controls (VerifiedDomainForm's patterns):
+ * domain → affiliation proof → sign-in (two-step as a checkbox under
+ * default, re-verification as the step's second question) → enrollment →
+ * review. The wizard captures decisions only — ownership verification,
+ * the IdP handshake, and SCIM live on the saved row's setup checklist.
  */
 export const AddDomainAccessForm = withCardStateProvider(({ onClose }: AddDomainAccessFormProps) => {
   const { domains, dispatch } = useAccessOnboarding();
   const wizard = useWizard();
   const [domainName, setDomainName] = useState('');
-  const [signInMode, setSignInMode] = useState<'default' | 'sso'>('default');
-  const [provider, setProvider] = useState<ProtoProvider>('saml_okta');
-  const [twoStepRequired, setTwoStepRequired] = useState(false);
   const [sessionLifetimeHours, setSessionLifetimeHours] = useState(APP_SESSION_LIFETIME_HOURS);
-  const [enrollment, setEnrollment] = useState<ProtoEnrollment>('request_access');
-  const [nonDirectoryFallback] = useState<ProtoNonDirectoryFallback>('block');
   const [isSaving, setIsSaving] = useState(false);
   const emailRef = useRef('');
   const lifetimeButtonRef = useRef<HTMLButtonElement>(null);
@@ -70,7 +64,42 @@ export const AddDomainAccessForm = withCardStateProvider(({ onClose }: AddDomain
     isRequired: true,
   });
 
+  const signInField = useFormControl(protoFieldId('signInMode'), 'default', {
+    type: 'radio',
+    radioOptions: [
+      {
+        value: 'default',
+        label: 'Default sign-in',
+        description: 'Whatever this application already offers: email, password, social providers.',
+      },
+      {
+        value: 'sso',
+        label: 'Single sign-on',
+        description: 'An identity provider signs people in. You will verify ownership and connect it after saving.',
+      },
+    ],
+  });
+
+  const twoStepField = useFormControl(protoFieldId('twoStepRequired'), '', {
+    type: 'checkbox',
+    label: protoKey('Require two-step verification'),
+  });
+
+  const providerField = useFormControl(protoFieldId('ssoProvider'), 'saml_okta', {
+    type: 'radio',
+    radioOptions: (Object.keys(PROVIDER_LABELS) as ProtoProvider[]).map(key => ({
+      value: key,
+      label: PROVIDER_LABELS[key].label,
+    })),
+  });
+
+  const enrollmentField = useFormControl(protoFieldId('enrollment'), 'request_access', {
+    type: 'radio',
+    radioOptions: [],
+  });
+
   const domain = domains.find(d => d.name === domainName);
+  const signInMode = signInField.value === 'sso' ? ('sso' as const) : ('default' as const);
 
   const otp = useFieldOTP({
     onCodeEntryFinished: (_code, resolve) => {
@@ -108,33 +137,16 @@ export const AddDomainAccessForm = withCardStateProvider(({ onClose }: AddDomain
     return simulateRequest().then(wizard.nextStep);
   };
 
-  const onPickSignIn = (mode: 'default' | 'sso') => {
-    setSignInMode(mode);
-    if (mode === 'sso') {
-      setTwoStepRequired(false);
-    }
-    /*
-      The recommendation tracks who is vouching (dashboard parity): a value
-      equal to the old recommendation is a default, not a decision, so it
-      follows the flip.
-    */
-    if (mode === 'sso' && enrollment === 'request_access') {
-      setEnrollment('join_automatically');
-    }
-    if (mode === 'default' && (enrollment === 'join_automatically' || enrollment === 'directory_synced')) {
-      setEnrollment('request_access');
-    }
-  };
+  const verifiedDomain = domain ? { ...domain, affiliationVerified: true } : undefined;
 
   const onSubmitSignIn = () => {
-    /*
-      The recommended enrollment may still be proof-locked (join
-      automatically needs ownership, which a just-added domain lacks) —
-      the enrollment step shows it locked with the reason and preselects
-      the best unlocked option.
-    */
-    if (domain && recommendedEnrollmentFor(signInMode) === 'join_automatically' && domain.ownership === 'unverified') {
-      setEnrollment('request_access');
+    if (verifiedDomain) {
+      const { options } = enrollmentChoicesFor(verifiedDomain, signInMode);
+      const recommended = recommendedEnrollmentFor(signInMode);
+      const preferred = options.some(option => option.value === recommended) ? recommended : 'request_access';
+      if (!options.some(option => option.value === enrollmentField.value)) {
+        enrollmentField.setValue(preferred);
+      }
     }
     wizard.nextStep();
   };
@@ -148,23 +160,21 @@ export const AddDomainAccessForm = withCardStateProvider(({ onClose }: AddDomain
       dispatch({
         type: 'configureRule',
         id: domain.id,
-        enrollment,
-        twoStepRequired,
+        enrollment: enrollmentField.value as ProtoEnrollment,
+        twoStepRequired: Boolean(twoStepField.checked),
         sessionLifetimeHours,
-        nonDirectoryFallback,
-        ssoProvider: signInMode === 'sso' ? provider : null,
+        nonDirectoryFallback: 'block',
+        ssoProvider: signInMode === 'sso' ? (providerField.value as ProtoProvider) : null,
       });
       setIsSaving(false);
       onClose();
     });
   };
 
-  const verifiedDomain = domain ? { ...domain, affiliationVerified: true } : undefined;
-
   const signInAnswer =
     signInMode === 'sso'
-      ? PROVIDER_LABELS[provider].label
-      : twoStepRequired
+      ? PROVIDER_LABELS[providerField.value as ProtoProvider].label
+      : twoStepField.checked
         ? 'Default sign-in with two-step verification'
         : 'Default sign-in';
 
@@ -243,121 +253,52 @@ export const AddDomainAccessForm = withCardStateProvider(({ onClose }: AddDomain
         headerTitle={protoKey('How do people sign in?')}
         headerSubtitle={protoKey(`How people with an @${domainName} email sign in, and how often they re-verify.`)}
       >
-        <Col sx={t => ({ gap: t.space.$2 })}>
-          <SignInOptionCard
-            label='Default sign-in'
-            description='Whatever this application already offers: email, password, social providers.'
-            isChecked={signInMode === 'default'}
-            onSelect={() => onPickSignIn('default')}
-          >
-            {signInMode === 'default' ? (
-              <Box
-                as='label'
-                sx={t => ({
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: t.space.$2,
-                  marginTop: t.space.$2,
-                  cursor: 'pointer',
-                })}
-              >
-                <CheckboxInput
-                  checked={twoStepRequired}
-                  onChange={() => setTwoStepRequired(current => !current)}
-                  sx={t => ({ marginTop: t.space.$0x5 })}
-                />
-                <Col sx={t => ({ gap: t.space.$0x5 })}>
-                  <Text
-                    as='span'
-                    variant='subtitle'
-                  >
-                    Require two-step verification
-                  </Text>
-                  <Text
-                    as='span'
-                    colorScheme='secondary'
-                    sx={t => ({ fontSize: t.fontSizes.$sm })}
-                  >
-                    Everyone must also verify with a second factor.
-                  </Text>
-                </Col>
-              </Box>
-            ) : null}
-          </SignInOptionCard>
-
-          <SignInOptionCard
-            label='Single sign-on'
-            description='An identity provider signs people in. You will verify domain ownership and finish the connection after this rule is saved.'
-            isChecked={signInMode === 'sso'}
-            onSelect={() => onPickSignIn('sso')}
-          >
-            {signInMode === 'sso' ? (
-              <Col sx={t => ({ gap: t.space.$1, marginTop: t.space.$2 })}>
-                {(Object.keys(PROVIDER_LABELS) as ProtoProvider[]).map(key => (
-                  <Box
-                    key={key}
-                    as='label'
-                    sx={t => ({
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: t.space.$2,
-                      cursor: 'pointer',
-                    })}
-                  >
-                    <RadioInput
-                      name='protoSsoProvider'
-                      value={key}
-                      checked={provider === key}
-                      onChange={() => setProvider(key)}
-                    />
-                    <img
-                      alt={PROVIDER_LABELS[key].label}
-                      src={iconImageUrl(PROVIDER_LABELS[key].iconId)}
-                      width={16}
-                      height={16}
-                    />
-                    <Text as='span'>{PROVIDER_LABELS[key].label}</Text>
-                  </Box>
-                ))}
-              </Col>
-            ) : null}
-          </SignInOptionCard>
-        </Col>
-
-        <Col sx={t => ({ gap: t.space.$1, marginTop: t.space.$3 })}>
-          <Text
-            as='span'
-            variant='subtitle'
-          >
-            Re-verification
-          </Text>
-          <Text
-            as='span'
-            colorScheme='secondary'
-            sx={t => ({ fontSize: t.fontSizes.$sm })}
-          >
-            How often people must verify again to keep their session.
-          </Text>
-          <Select
-            options={SESSION_LIFETIME_OPTIONS.map(hours => ({
-              value: String(hours),
-              label:
-                hours === APP_SESSION_LIFETIME_HOURS
-                  ? `Every ${formatSessionLifetime(hours)} (application setting)`
-                  : `Every ${formatSessionLifetime(hours)}`,
-            }))}
-            value={String(sessionLifetimeHours)}
-            onChange={option => setSessionLifetimeHours(Number(option.value))}
-            referenceElement={lifetimeButtonRef}
-          >
-            <SelectButton
-              ref={lifetimeButtonRef}
-              sx={t => ({ justifyContent: 'space-between', backgroundColor: t.colors.$colorBackground })}
+        <Col sx={t => ({ gap: t.space.$3 })}>
+          <Form.RadioGroup {...signInField.props} />
+          {signInMode === 'default' ? (
+            <Form.Checkbox
+              {...twoStepField.props}
+              description={protoKey('Everyone must also verify with a second factor.')}
             />
-            <SelectOptionList />
-          </Select>
+          ) : (
+            <Col sx={t => ({ gap: t.space.$1 })}>
+              <Text
+                colorScheme='secondary'
+                sx={t => ({ fontSize: t.fontSizes.$sm })}
+              >
+                Which identity provider signs people in.
+              </Text>
+              <Form.RadioGroup {...providerField.props} />
+            </Col>
+          )}
+          <Col sx={t => ({ gap: t.space.$1 })}>
+            <Text variant='subtitle'>Re-verification</Text>
+            <Text
+              colorScheme='secondary'
+              sx={t => ({ fontSize: t.fontSizes.$sm })}
+            >
+              How often people must verify again to keep their session.
+            </Text>
+            <Select
+              options={SESSION_LIFETIME_OPTIONS.map(hours => ({
+                value: String(hours),
+                label:
+                  hours === APP_SESSION_LIFETIME_HOURS
+                    ? `Every ${formatSessionLifetime(hours)} (application setting)`
+                    : `Every ${formatSessionLifetime(hours)}`,
+              }))}
+              value={String(sessionLifetimeHours)}
+              onChange={option => setSessionLifetimeHours(Number(option.value))}
+              referenceElement={lifetimeButtonRef}
+            >
+              <SelectButton
+                ref={lifetimeButtonRef}
+                sx={t => ({ justifyContent: 'space-between', backgroundColor: t.colors.$colorBackground })}
+              />
+              <SelectOptionList />
+            </Select>
+          </Col>
         </Col>
-
         <FormButtonContainer>
           <Button
             block={false}
@@ -381,9 +322,8 @@ export const AddDomainAccessForm = withCardStateProvider(({ onClose }: AddDomain
         {verifiedDomain ? (
           <EnrollmentOptions
             domain={verifiedDomain}
-            value={enrollment}
-            onChange={setEnrollment}
             signInMode={signInMode}
+            field={enrollmentField}
           />
         ) : null}
         <FormButtonContainer>
@@ -429,7 +369,7 @@ export const AddDomainAccessForm = withCardStateProvider(({ onClose }: AddDomain
           />
           <ReviewRow
             label='Enrollment'
-            value={ENROLLMENT_LABELS[enrollment].label}
+            value={ENROLLMENT_LABELS[enrollmentField.value as ProtoEnrollment].label}
           />
         </Col>
         <Text
@@ -457,65 +397,6 @@ export const AddDomainAccessForm = withCardStateProvider(({ onClose }: AddDomain
     </Wizard>
   );
 });
-
-const SignInOptionCard = ({
-  label,
-  description,
-  isChecked,
-  onSelect,
-  children,
-}: {
-  label: string;
-  description: string;
-  isChecked: boolean;
-  onSelect: () => void;
-  children?: React.ReactNode;
-}) => (
-  <Box
-    isActive={isChecked}
-    sx={t => ({
-      padding: t.space.$3,
-      ...common.borderVariants(t).normal,
-      '&:has(input:checked)': {
-        backgroundColor: t.colors.$neutralAlpha50,
-      },
-    })}
-  >
-    <Box
-      as='label'
-      sx={t => ({
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: t.space.$3,
-        cursor: 'pointer',
-      })}
-    >
-      <RadioInput
-        name='protoSignIn'
-        value={label}
-        checked={isChecked}
-        onChange={onSelect}
-        sx={t => ({ marginTop: t.space.$0x5 })}
-      />
-      <Col sx={t => ({ gap: t.space.$0x5, minWidth: 0 })}>
-        <Text
-          as='span'
-          variant='subtitle'
-        >
-          {label}
-        </Text>
-        <Text
-          as='span'
-          colorScheme='secondary'
-          sx={t => ({ fontSize: t.fontSizes.$sm })}
-        >
-          {description}
-        </Text>
-      </Col>
-    </Box>
-    {children ? <Box sx={t => ({ paddingInlineStart: t.space.$7 })}>{children}</Box> : null}
-  </Box>
-);
 
 const ReviewRow = ({ label, value, hint }: { label: string; value: string; hint?: string }) => (
   <Flex

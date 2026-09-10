@@ -61,7 +61,10 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     Boolean(statements.data.length > 0);
 
   const shouldShowSelfServeSSO =
-    environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
+    (environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled) ||
+    // Prototype: the access-onboarding checklist links to the SSO page, so
+    // the route must exist even on instances without the feature enabled.
+    Boolean(ctx.__internal_accessOnboarding);
 
   const shouldShowAccessOnboarding = Boolean(ctx.__internal_accessOnboarding);
 

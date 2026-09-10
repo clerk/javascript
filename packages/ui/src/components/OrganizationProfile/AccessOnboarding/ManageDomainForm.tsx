@@ -1,16 +1,24 @@
 import { useState } from 'react';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { CalloutWithAction } from '../../../common';
 import { useEnvironment } from '../../../contexts';
-import { Button, Col, Flex, RadioInput, Text } from '../../../customizables';
+import { Button, Col, Text } from '../../../customizables';
 import { InformationCircle } from '../../../icons';
 import { EnrollmentOptions } from './EnrollmentOptions';
 import type { ProtoDomain, ProtoEnrollment, ProtoNonDirectoryFallback } from './prototypeState';
-import { NON_DIRECTORY_FALLBACK_LABELS, protoKey, simulateRequest, useAccessOnboarding } from './prototypeState';
+import {
+  NON_DIRECTORY_FALLBACK_LABELS,
+  protoFieldId,
+  protoKey,
+  simulateRequest,
+  useAccessOnboarding,
+} from './prototypeState';
 
 type ManageDomainFormProps = {
   domain: ProtoDomain;
@@ -20,11 +28,21 @@ type ManageDomainFormProps = {
 export const ManageDomainForm = withCardStateProvider(({ domain, onClose }: ManageDomainFormProps) => {
   const { dispatch } = useAccessOnboarding();
   const { displayConfig } = useEnvironment();
-  const [enrollment, setEnrollment] = useState<ProtoEnrollment>(domain.enrollment);
-  const [nonDirectoryFallback, setNonDirectoryFallback] = useState<ProtoNonDirectoryFallback>(
-    domain.nonDirectoryFallback,
-  );
   const [isSaving, setIsSaving] = useState(false);
+
+  const enrollmentField = useFormControl(protoFieldId('enrollment'), domain.enrollment, {
+    type: 'radio',
+    radioOptions: [],
+  });
+
+  const fallbackField = useFormControl(protoFieldId('nonDirectoryFallback'), domain.nonDirectoryFallback, {
+    type: 'radio',
+    radioOptions: (Object.keys(NON_DIRECTORY_FALLBACK_LABELS) as ProtoNonDirectoryFallback[]).map(value => ({
+      value,
+      label: NON_DIRECTORY_FALLBACK_LABELS[value].label,
+      description: NON_DIRECTORY_FALLBACK_LABELS[value].description,
+    })),
+  });
 
   const onSave = () => {
     setIsSaving(true);
@@ -32,10 +50,10 @@ export const ManageDomainForm = withCardStateProvider(({ domain, onClose }: Mana
       dispatch({
         type: 'configureRule',
         id: domain.id,
-        enrollment,
+        enrollment: enrollmentField.value as ProtoEnrollment,
         twoStepRequired: domain.twoStepRequired,
         sessionLifetimeHours: domain.sessionLifetimeHours,
-        nonDirectoryFallback,
+        nonDirectoryFallback: fallbackField.value as ProtoNonDirectoryFallback,
         ssoProvider: domain.authentication.mode === 'sso' ? domain.authentication.provider : null,
       });
       setIsSaving(false);
@@ -57,59 +75,21 @@ export const ManageDomainForm = withCardStateProvider(({ domain, onClose }: Mana
       ) : null}
       <EnrollmentOptions
         domain={domain}
-        value={enrollment}
-        onChange={setEnrollment}
         signInMode={domain.authentication.mode}
+        field={enrollmentField}
       />
-      {enrollment === 'directory_synced' ? (
-        <Col
-          sx={t => ({
-            gap: t.space.$2,
-            paddingInlineStart: t.space.$4,
-            borderInlineStart: `1px solid ${t.colors.$borderAlpha150}`,
-          })}
-        >
+      {enrollmentField.value === 'directory_synced' ? (
+        <Col sx={t => ({ gap: t.space.$1x5 })}>
           <Col sx={t => ({ gap: t.space.$0x5 })}>
+            <Text variant='subtitle'>Outside the directory</Text>
             <Text
-              as='span'
-              variant='subtitle'
-            >
-              Outside the directory
-            </Text>
-            <Text
-              as='span'
               colorScheme='secondary'
               sx={t => ({ fontSize: t.fontSizes.$sm })}
             >
               {`Someone with an @${domain.name} email who is not in the directory.`}
             </Text>
           </Col>
-          {(Object.keys(NON_DIRECTORY_FALLBACK_LABELS) as ProtoNonDirectoryFallback[]).map(fallback => (
-            <Flex
-              key={fallback}
-              as='label'
-              align='start'
-              sx={t => ({ gap: t.space.$2, cursor: 'pointer' })}
-            >
-              <RadioInput
-                name='protoNonDirectoryFallback'
-                value={fallback}
-                checked={nonDirectoryFallback === fallback}
-                onChange={() => setNonDirectoryFallback(fallback)}
-                sx={t => ({ marginTop: t.space.$0x5 })}
-              />
-              <Col sx={t => ({ gap: t.space.$0x5 })}>
-                <Text as='span'>{NON_DIRECTORY_FALLBACK_LABELS[fallback].label}</Text>
-                <Text
-                  as='span'
-                  colorScheme='secondary'
-                  sx={t => ({ fontSize: t.fontSizes.$sm })}
-                >
-                  {NON_DIRECTORY_FALLBACK_LABELS[fallback].description}
-                </Text>
-              </Col>
-            </Flex>
-          ))}
+          <Form.RadioGroup {...fallbackField.props} />
           <Text
             colorScheme='secondary'
             sx={t => ({ fontSize: t.fontSizes.$sm })}
@@ -130,7 +110,9 @@ export const ManageDomainForm = withCardStateProvider(({ domain, onClose }: Mana
         <Button
           block={false}
           isLoading={isSaving}
-          isDisabled={enrollment === domain.enrollment && nonDirectoryFallback === domain.nonDirectoryFallback}
+          isDisabled={
+            enrollmentField.value === domain.enrollment && fallbackField.value === domain.nonDirectoryFallback
+          }
           onClick={onSave}
           localizationKey={protoKey('Save')}
         />

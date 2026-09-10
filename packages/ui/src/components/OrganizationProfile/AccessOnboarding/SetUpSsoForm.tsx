@@ -11,7 +11,7 @@ import { Badge, Box, Button, Col, Flex, Icon, RadioInput, Span, Text } from '../
 import { Checkmark, Clipboard, RotateLeftRight } from '../../../icons';
 import { common } from '../../../styledSystem';
 import type { ProtoDomain, ProtoProvider } from './prototypeState';
-import { hasOwnership, protoKey, PROVIDER_LABELS, simulateRequest, useAccessOnboarding } from './prototypeState';
+import { protoKey, PROVIDER_LABELS, simulateRequest, useAccessOnboarding } from './prototypeState';
 
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta', 'saml']);
 
@@ -29,7 +29,9 @@ type SetUpSsoFormProps = {
  */
 export const SetUpSsoForm = withCardStateProvider(({ domain, onClose }: SetUpSsoFormProps) => {
   const { dispatch } = useAccessOnboarding();
-  const wizard = useWizard({ defaultStep: hasOwnership(domain) ? 1 : 0 });
+  // Only proven ownership skips the DNS step; a waived (pre-approved)
+  // domain still sees it, marked optional, with a skip.
+  const wizard = useWizard({ defaultStep: domain.ownership === 'verified' ? 1 : 0 });
   const [provider, setProvider] = useState<ProtoProvider>(
     domain.authentication.mode === 'sso' ? domain.authentication.provider : 'saml_okta',
   );
@@ -69,7 +71,9 @@ export const SetUpSsoForm = withCardStateProvider(({ domain, onClose }: SetUpSso
       <FormContainer
         headerTitle={protoKey('Verify you own this domain')}
         headerSubtitle={protoKey(
-          `Single sign-on changes how everyone at ${domain.name} signs in, so you first need to prove you control the domain.`,
+          domain.ownership === 'waived'
+            ? `${domain.name} was pre-approved, so this step is optional. You can still add the record to prove you control the domain.`
+            : `Single sign-on changes how everyone at ${domain.name} signs in, so you first need to prove you control the domain.`,
         )}
       >
         <Col
@@ -145,6 +149,13 @@ export const SetUpSsoForm = withCardStateProvider(({ domain, onClose }: SetUpSso
           </Flex>
         </Col>
         <FormButtonContainer>
+          {domain.ownership === 'waived' ? (
+            <Button
+              block={false}
+              onClick={() => wizard.nextStep()}
+              localizationKey={protoKey('Skip for now')}
+            />
+          ) : null}
           <Button
             block={false}
             variant='ghost'

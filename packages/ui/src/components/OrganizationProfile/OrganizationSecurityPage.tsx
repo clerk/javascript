@@ -6,6 +6,7 @@ import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
 import { ChevronLeft } from '../../icons';
+import { useRouter } from '../../router';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { SecuritySsoSection } from './SecuritySsoSection';
@@ -39,6 +40,18 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
 
   const [view, setView] = useState<'overview' | 'wizard'>('overview');
   const [forceFirstStep, setForceFirstStep] = useState(false);
+
+  /*
+   * ?configure=1 (the access-onboarding checklist's deep link) opens the
+   * wizard as soon as the overview's data has settled — same ordering as a
+   * click on Start configuration, minus the click.
+   */
+  const { queryParams } = useRouter();
+  const [autoOpened, setAutoOpened] = useState(false);
+  if (queryParams.configure === '1' && !autoOpened && !isLoading && view === 'overview') {
+    setAutoOpened(true);
+    setView('wizard');
+  }
 
   const exitWizard = () => setView('overview');
 
