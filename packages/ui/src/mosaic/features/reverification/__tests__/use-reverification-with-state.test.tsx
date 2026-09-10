@@ -95,6 +95,56 @@ describe('useReverificationWithState', () => {
     expect(result.current[1].isActive).toBe(false);
   });
 
+  it('cancels an overlapping challenge and preserves the active challenge', () => {
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+    const firstComplete = vi.fn();
+    const firstCancel = vi.fn();
+    const secondComplete = vi.fn();
+    const secondCancel = vi.fn();
+
+    act(() => {
+      capturedOnNeeds?.({ complete: firstComplete, cancel: firstCancel, level: 'first_factor' });
+      capturedOnNeeds?.({ complete: secondComplete, cancel: secondCancel, level: 'multi_factor' });
+    });
+
+    expect(secondCancel).toHaveBeenCalledOnce();
+    expect(result.current[1]).toMatchObject({ isActive: true, level: 'first_factor' });
+
+    act(() => {
+      const [, state] = result.current;
+      if (state.isActive) {
+        state.complete();
+      }
+    });
+
+    expect(firstComplete).toHaveBeenCalledOnce();
+    expect(firstCancel).not.toHaveBeenCalled();
+    expect(secondComplete).not.toHaveBeenCalled();
+  });
+
+  it('allows another challenge after the active challenge settles', () => {
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+    const firstComplete = vi.fn();
+    const secondCancel = vi.fn();
+
+    act(() => {
+      capturedOnNeeds?.({ complete: firstComplete, cancel: vi.fn(), level: 'first_factor' });
+    });
+    act(() => {
+      const [, state] = result.current;
+      if (state.isActive) {
+        state.complete();
+      }
+    });
+    act(() => {
+      capturedOnNeeds?.({ complete: vi.fn(), cancel: secondCancel, level: 'multi_factor' });
+    });
+
+    expect(firstComplete).toHaveBeenCalledOnce();
+    expect(secondCancel).not.toHaveBeenCalled();
+    expect(result.current[1]).toMatchObject({ isActive: true, level: 'multi_factor' });
+  });
+
   it('cancels when the session changes after reverification opens', async () => {
     const { result, rerender } = renderHook(() => useReverificationWithState(fetcher));
     const cancel = vi.fn();
