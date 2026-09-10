@@ -133,6 +133,26 @@ describe('ProviderIcon', () => {
       expect(icon).toBeInTheDocument();
     });
 
+    it('applies mask-image styles for supported providers (agentid)', async () => {
+      const { wrapper } = await createFixtures();
+
+      render(
+        <ProviderIcon
+          id='agentid'
+          iconUrl='https://example.com/agentid-icon.svg'
+          name='AgentID'
+        />,
+        { wrapper },
+      );
+
+      const icon = screen.getByLabelText('AgentID icon');
+      expect(icon).toBeInTheDocument();
+
+      const styles = window.getComputedStyle(icon);
+      expect(styles.maskImage).toContain('https://example.com/agentid-icon.svg');
+      expect(styles.backgroundImage).not.toContain('https://example.com/agentid-icon.svg');
+    });
+
     it('applies background-image styles for non-mask-image providers', async () => {
       const { wrapper } = await createFixtures();
 
