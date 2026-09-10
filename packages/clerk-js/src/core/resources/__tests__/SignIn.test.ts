@@ -311,6 +311,104 @@ describe('SignIn', () => {
     });
   });
 
+  describe('authenticateWithRedirect with a pending challenge', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+      SignIn.clerk = {} as any;
+    });
+
+    const gatedResponse = {
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        first_factor_verification: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token-abc',
+          sdk_url: 'https://sdk.example.com/challenge.js',
+        },
+      },
+    };
+
+    const setupClerk = () => {
+      const windowNavigate = vi.fn();
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_windowNavigate: windowNavigate,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+      return windowNavigate;
+    };
+
+    it('stops after create instead of preparing a hand-off it cannot follow', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+        }),
+      ).resolves.toBeUndefined();
+
+      // Only the create call — the prepare is not attempted while the challenge is pending.
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(windowNavigate).not.toHaveBeenCalled();
+      expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('stops when preparing the enterprise SSO hand-off returns a challenge', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      ).resolves.toBeUndefined();
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+      expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('follows the hand-off once no challenge is pending', async () => {
+      const windowNavigate = setupClerk();
+      BaseResource._fetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://idp.example/auth',
+          },
+        },
+      });
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        continueSignIn: true,
+      });
+
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/auth'));
+    });
+  });
+
   describe('signIn.create', () => {
     afterEach(() => {
       vi.clearAllMocks();
