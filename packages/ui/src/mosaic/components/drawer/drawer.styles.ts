@@ -77,14 +77,14 @@ export const styles = stylex.create({
     borderWidth: { default: null, '@media (forced-colors: active)': '1px' },
     outline: 'none',
     overscrollBehavior: 'contain',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-background'],
     borderStartEndRadius: radiusVars['--cl-radius-2xl'],
     borderStartStartRadius: radiusVars['--cl-radius-2xl'],
     // No drop shadow — the sheet sits on the screen edge, so there is nothing for it to float over.
     // The hairline ring stays: a faint dark edge in light, and the light edge that separates a dark
     // sheet from a dark page.
     boxShadow: `0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     display: 'flex',
     flexDirection: 'column',
     marginBlockEnd: `calc(-1 * ${BLEED})`,
@@ -135,7 +135,7 @@ export const styles = stylex.create({
     // is not a press on the handle, and leaves it alone.
     '--_cl-grip-color': {
       default: colorVars['--cl-color-border'],
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-border']}, ${colorVars['--cl-color-neutral-faded']} 35%)`,
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-border']}, ${colorVars['--cl-color-foreground-secondary']} 35%)`,
     },
     placeItems: 'center',
     display: 'grid',
