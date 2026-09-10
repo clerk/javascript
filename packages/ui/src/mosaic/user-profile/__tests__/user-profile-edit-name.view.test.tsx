@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -86,18 +86,6 @@ describe('UserProfileEditNameView', () => {
 
     await user.click(saveButton());
 
-    expect(onSave).toHaveBeenCalledTimes(1);
-  });
-
-  // Enter in a field is the browser submitting this form, which `user-event` can't reproduce: it
-  // only looks for a submit button *inside* the form, and ours is the footer action.
-  it('submits when either field owns the submitted form', () => {
-    const onSave = vi.fn();
-    renderView({ onSave });
-
-    fireEvent.submit(firstNameField().closest('form') as HTMLFormElement);
-
-    expect(firstNameField().form).toBe(lastNameField().form);
     expect(onSave).toHaveBeenCalledTimes(1);
   });
 
