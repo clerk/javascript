@@ -110,7 +110,7 @@ function SignInFactorOneInternal(): JSX.Element {
     supportedFirstFactors,
   });
 
-  // Frozen on mount: a later response may drop the field, which would otherwise unmount the
+  // Frozen on mount: client-piggybacking may drop the field, which would otherwise unmount the
   // fallback screens mid-flow.
   const ssoFallbackFactor = React.useRef(getSSOFallbackFactor(signIn)).current;
 
