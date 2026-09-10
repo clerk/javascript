@@ -24,6 +24,7 @@ import * as stylex from '@stylexjs/stylex';
 // =============================================================================
 
 export const gray = stylex.defineVars({
+  '0': 'oklch(1 0 0)',
   '50': 'oklch(0.9851 0 0)',
   '100': 'oklch(0.9702 0 0)',
   '200': 'oklch(0.9461 0 0)',
@@ -35,6 +36,7 @@ export const gray = stylex.defineVars({
   '800': 'oklch(0.2686 0 0)',
   '850': 'oklch(0.2393 0 0)',
   '900': 'oklch(0.2046 0 0)',
+  '1000': 'oklch(0 0 0)',
 });
 
 // =============================================================================
@@ -42,13 +44,13 @@ export const gray = stylex.defineVars({
 // =============================================================================
 
 const colorDefaults = {
-  '--cl-color-neutral': 'light-dark(oklch(0 0 0), oklch(1 0 0))',
+  '--cl-color-neutral': `light-dark(${gray['1000']}, ${gray['0']})`,
 
   '--cl-color-foreground': `light-dark(${gray['900']}, ${gray['50']})`,
   '--cl-color-foreground-secondary': `light-dark(${gray['600']}, ${gray['400']})`,
   '--cl-color-foreground-disabled': `light-dark(${gray['400']}, ${gray['500']})`,
 
-  '--cl-color-background': `light-dark(oklch(1 0 0), ${gray['900']})`,
+  '--cl-color-background': `light-dark(${gray['0']}, ${gray['900']})`,
   '--cl-color-background-subtle': `light-dark(${gray['100']}, ${gray['850']})`,
 
   '--cl-color-border': `light-dark(${gray['200']}, ${gray['800']})`,
@@ -60,21 +62,21 @@ const colorDefaults = {
   '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
 
   '--cl-color-negative': 'light-dark(oklch(0.5903 0.213 26.78), oklch(0.7106 0.1661 22.22))',
-  '--cl-color-negative-foreground': 'oklch(1 0 0)',
+  '--cl-color-negative-foreground': gray['0'],
   '--cl-color-negative-subtle': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
   '--cl-color-negative-border': 'light-dark(oklch(0.8155 0.0983 19.41), oklch(0.3958 0.1331 25.72))',
 
   '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
-  '--cl-color-positive-foreground': 'oklch(1 0 0)',
+  '--cl-color-positive-foreground': gray['0'],
   '--cl-color-positive-subtle': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
   '--cl-color-positive-border': 'light-dark(oklch(0.7922 0.1959 148.18), oklch(0.4479 0.1083 151.33))',
 
   '--cl-color-warning': 'light-dark(oklch(0.7099 0.1888 44.94), oklch(0.7576 0.159 55.93))',
-  '--cl-color-warning-foreground': 'oklch(1 0 0)',
+  '--cl-color-warning-foreground': gray['0'],
   '--cl-color-warning-subtle': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
   '--cl-color-warning-border': 'light-dark(oklch(0.8672 0.0902 63.47), oklch(0.4084 0.1165 38.17))',
 
-  '--cl-color-input': `light-dark(oklch(1 0 0), ${gray['850']})`,
+  '--cl-color-input': `light-dark(${gray['0']}, ${gray['850']})`,
   '--cl-color-input-placeholder': gray['400'],
 
   '--cl-color-ring': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
@@ -433,9 +435,9 @@ export const focusVars = stylex.defineVars(focusDefaults);
 // dark. Branched per colour via `light-dark()` since a shadow's geometry cannot branch — see the
 // note on `Dialog`'s popup for why `@media (prefers-color-scheme)` is not the escape hatch.
 const shadowDefaults = {
-  '--cl-shadow-card': `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-    0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-    0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+  '--cl-shadow-card': `0 12px 12px -7px light-dark(color-mix(in oklab, ${gray['900']} 12%, transparent), transparent),
+    0 24px 24px -10px light-dark(color-mix(in oklab, ${gray['900']} 4%, transparent), transparent),
+    0 0 0 1px light-dark(color-mix(in oklab, ${gray['900']} 4%, transparent), color-mix(in oklab, ${gray['0']} 10%, transparent))`,
 };
 
 export const shadowVars = stylex.defineVars(shadowDefaults);
