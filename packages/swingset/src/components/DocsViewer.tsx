@@ -60,6 +60,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     profile: dynamic(() => import('../stories/profile.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
+    toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),

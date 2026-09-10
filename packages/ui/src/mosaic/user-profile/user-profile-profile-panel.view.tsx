@@ -35,13 +35,16 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
 export function UserProfileProfilePanelView({
   allowMultipleAccounts,
   imageUrl,
+  hasImage,
   name = '',
   username = '',
   emails = [],
   phones = [],
   connectedAccounts = [],
   web3Wallets = [],
-  onEditProfilePicture,
+  onProfilePictureChange,
+  onProfilePictureReject,
+  onRemoveProfilePicture,
   onNameChange,
   onUsernameChange,
   onAddEmail,
@@ -70,17 +73,20 @@ export function UserProfileProfilePanelView({
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
+          hasImage={hasImage}
           imageUrl={imageUrl}
           name={name}
           phones={phones}
           username={username}
           onAddEmail={onAddEmail}
           onAddPhone={onAddPhone}
-          onEditProfilePicture={onEditProfilePicture}
           onManageEmail={onManageEmail}
           onManagePhone={onManagePhone}
+          onProfilePictureChange={onProfilePictureChange}
+          onProfilePictureReject={onProfilePictureReject}
           onRemoveEmail={onRemoveEmail}
           onRemovePhone={onRemovePhone}
+          onRemoveProfilePicture={onRemoveProfilePicture}
           onSetPrimaryEmail={onSetPrimaryEmail}
           onSetPrimaryPhone={onSetPrimaryPhone}
           onVerifyEmail={onVerifyEmail}

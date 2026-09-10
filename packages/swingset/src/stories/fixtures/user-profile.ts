@@ -12,6 +12,8 @@ import type {
 } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { useMemo, useState } from 'react';
 
+import { usePreviewImage } from './use-preview-image';
+
 export interface UserProfileFixtureOptions {
   /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
   onAddEmail?: () => void;
@@ -96,6 +98,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const [apiKeysPageSize, setAPIKeysPageSize] = useState(10);
   const [searchValue, setSearchValue] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const visibleAPIKeys = useMemo(
     () => apiKeys.filter(apiKey => apiKey.name.toLowerCase().includes(searchValue.toLowerCase())),
     [apiKeys, searchValue],
@@ -107,7 +110,8 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const pages: UserProfileViewProps['pages'] = {
     account: {
       allowMultipleAccounts: true,
-      imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
+      hasImage: Boolean(imageUrl),
+      imageUrl,
       name: 'Preston Booth',
       username: 'prestonxyz',
       emails,
@@ -123,11 +127,12 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
           },
         ]),
       onDeleteAccount: () => Promise.resolve(),
-      onEditProfilePicture: () => undefined,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onNameChange: () => undefined,
+      onProfilePictureChange: showFile,
       onRemoveEmail: id => setEmails(current => current.filter(email => email.id !== id)),
+      onRemoveProfilePicture: clearImage,
       onRemovePhone: id => setPhones(current => current.filter(phone => phone.id !== id)),
       onSetPrimaryEmail: id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id }))),
       onSetPrimaryPhone: id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id }))),

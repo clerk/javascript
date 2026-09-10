@@ -1,8 +1,11 @@
+import { Icon } from '../components/icon';
 import { Menu } from '../components/menu';
+import type { IconName } from '../icons/registry';
 
 export interface UserProfileMenuAction {
   label: string;
   color?: 'neutral' | 'negative';
+  icon?: IconName;
   onClick: () => void;
 }
 
@@ -22,6 +25,11 @@ export function UserProfileActionMenu({ label, actions }: { label: string; actio
             label={action.label}
             onClick={action.onClick}
           >
+            {action.icon ? (
+              <Menu.Media>
+                <Icon name={action.icon} />
+              </Menu.Media>
+            ) : null}
             <Menu.Label>{action.label}</Menu.Label>
           </Menu.Item>
         ))}
