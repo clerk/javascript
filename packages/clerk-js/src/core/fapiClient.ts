@@ -20,6 +20,7 @@ export type FapiRequestInit = RequestInit & {
   rotatingTokenNonce?: string;
   pathPrefix?: string;
   url?: URL;
+  __internal_requestGuard?: () => void;
 };
 
 type FapiQueryStringParameters = {
@@ -294,26 +295,34 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isNetworkOnline() ? 4 : 11);
         // TODO @userland-errors:
-        response = await retry(() => fetch(url, fetchOpts), {
-          // This retry handles only network errors, not 4xx or 5xx responses,
-          // so we want to try once immediately to handle simple network blips.
-          // Since fapiClient is responsible for the network layer only,
-          // callers need to use their own retry logic where needed.
-          retryImmediately: true,
-          // And then exponentially back off with a max delay of 5 seconds.
-          initialDelay: 700,
-          maxDelayBetweenRetries: 5000,
-          shouldRetry: (_: unknown, iterations: number) => {
-            // We want to retry only GET requests, as other methods are not idempotent,
-            // and stop as soon as the caller aborted the request.
-            return overwrittenRequestMethod === 'GET' && iterations < maxTries && !fetchOpts.signal?.aborted;
+        response = await retry(
+          () => {
+            // A retry must not transmit an identity that became obsolete during backoff.
+            requestInit.__internal_requestGuard?.();
+            return fetch(url, fetchOpts);
           },
-          onBeforeRetry: (iteration: number): void => {
-            // Add the retry attempt to the query string params.
-            // We use params to keep the request simple for CORS.
-            url.searchParams.set('_clerk_retry_attempt', iteration.toString());
+          {
+            // This retry handles only network errors, not 4xx or 5xx responses,
+            // so we want to try once immediately to handle simple network blips.
+            // Since fapiClient is responsible for the network layer only,
+            // callers need to use their own retry logic where needed.
+            retryImmediately: true,
+            // And then exponentially back off with a max delay of 5 seconds.
+            initialDelay: 700,
+            maxDelayBetweenRetries: 5000,
+            shouldRetry: (_: unknown, iterations: number) => {
+              requestInit.__internal_requestGuard?.();
+              // We want to retry only GET requests, as other methods are not idempotent,
+              // and stop as soon as the caller aborted the request.
+              return overwrittenRequestMethod === 'GET' && iterations < maxTries && !fetchOpts.signal?.aborted;
+            },
+            onBeforeRetry: (iteration: number): void => {
+              // Add the retry attempt to the query string params.
+              // We use params to keep the request simple for CORS.
+              url.searchParams.set('_clerk_retry_attempt', iteration.toString());
+            },
           },
-        });
+        );
       } else {
         response = new Response('{}', requestInit); // Mock an empty json response
       }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { fixture, response } from './protocol-fixture.mjs';
+import { deferred, fixture, response } from './protocol-fixture.mjs';
 import { fixtures } from './native-fixtures.mjs';
 
 test('a generated GET recovers from a transient network failure', async t => {
@@ -140,3 +140,46 @@ test('concurrent unauthorized operations finish after their independent recovery
   assert.equal(clientReads, 3);
   assert.equal(f.resource(f.state.roots.session).status, 'active');
 });
+
+for (const transition of ['sign-out', 'credential-rotation']) {
+  test(`a generated GET does not retry after ${transition}`, { timeout: 5000 }, async t => {
+    const session = fixtures.authenticatedClient.sessions[0];
+    const entered = deferred();
+    const release = deferred();
+    const attempts = [];
+    const f = await fixture({
+      client: fixtures.authenticatedClient,
+      timerMilliseconds: () => 0,
+      http: async request => {
+        const url = new URL(request.url);
+        if (url.pathname.endsWith(`/sessions/${session.id}`)) {
+          attempts.push(request);
+          if (attempts.length === 1) {
+            entered.resolve();
+            await release.promise;
+            throw new Error('Network connection lost');
+          }
+          return response(session);
+        }
+        if (url.pathname.endsWith('/client/sessions'))
+          return response({ ...fixtures.client, sessions: [], last_active_session_id: null });
+        if (url.pathname.endsWith('/me'))
+          return response(session.user, { headers: { authorization: 'rotated-client-credential' } });
+      },
+    });
+    t.after(f.dispose);
+    const request = f.invoke(f.state.roots.session, 'Session.reload');
+    await entered.promise;
+    const changed =
+      transition === 'sign-out'
+        ? await f.invoke(f.state.roots.clerk, 'Clerk.signOut')
+        : await f.invoke(f.state.roots.user, 'User.reload');
+    assert.equal(changed.failure, undefined, JSON.stringify(changed.failure));
+    release.resolve();
+    const result = await request;
+    assert.ok(result.failure, JSON.stringify(result));
+    assert.equal(attempts.length, 1);
+    if (transition === 'sign-out') assert.equal(f.state.roots.session, null);
+    else assert.equal(f.credential, 'rotated-client-credential');
+  });
+}

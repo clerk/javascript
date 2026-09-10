@@ -16,7 +16,7 @@ export interface MobileCredentialStorage {
   remove(): Promise<void>;
 }
 
-type MobileRequest = RequestInit & { url?: URL };
+type MobileRequest = RequestInit & { url?: URL; __internal_requestGuard?: () => void };
 type MobileResponse = Response & { payload?: unknown };
 type MobileCore = {
   __internal_onBeforeRequest(callback: (request: MobileRequest) => Promise<void>): void;
@@ -83,6 +83,10 @@ export function installMobileCredentialTransport(
       assertCurrent(current);
     } while (pendingWrites !== writes || revision !== credentialRevision);
     requests.set(request, { generation: current, sequence: ++sequence, credentialRevision: revision, credential });
+    request.__internal_requestGuard = () => {
+      assertCurrent(current);
+      assertCredentialCurrent(revision);
+    };
     request.credentials = 'omit';
     request.url?.searchParams.set('_is_native', '1');
     const requestHeaders = request.headers instanceof Headers ? request.headers : new Headers(request.headers);

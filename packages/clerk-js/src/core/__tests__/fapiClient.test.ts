@@ -530,6 +530,31 @@ describe('request', () => {
   });
 
   describe('retry logic', () => {
+    it('rejects an obsolete request before its next transmission after backoff', async () => {
+      vi.useFakeTimers();
+      const previousFetch = (fetch as Mock).getMockImplementation();
+      try {
+        let active = true;
+        (fetch as Mock).mockRejectedValue(new Error('Network unavailable'));
+        const pending = fapiClient.request({
+          path: '/foo',
+          __internal_requestGuard: () => {
+            if (!active) throw new Error('Obsolete identity');
+          },
+        });
+        const rejected = expect(pending).rejects.toThrow();
+        await vi.advanceTimersByTimeAsync(0);
+        expect(fetch).toHaveBeenCalledTimes(1);
+        active = false;
+        await vi.advanceTimersByTimeAsync(5000);
+        await rejected;
+        expect(fetch).toHaveBeenCalledTimes(1);
+      } finally {
+        (fetch as Mock).mockImplementation(previousFetch!);
+        vi.useRealTimers();
+      }
+    });
+
     it('does not send retry query parameter on initial request', async () => {
       await fapiClient.request({
         path: '/foo',
