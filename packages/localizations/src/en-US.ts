@@ -269,8 +269,8 @@ export const enUS: LocalizationResource = {
       subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
       title: 'Configure',
       warning__googleUnsupported: {
+        title: 'Google Workspace connections are not configurable via self-serve',
         subtitle: 'Google Workspace provisions through a credential-based integration instead of SCIM push.',
-        title: 'Google Workspace connections are not supported here',
       },
       warning__ssoInactive:
         'Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.',

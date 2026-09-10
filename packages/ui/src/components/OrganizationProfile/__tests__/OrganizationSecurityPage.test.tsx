@@ -576,6 +576,23 @@ describe('OrganizationSecurityPage', () => {
       expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
     });
 
+    it('replaces setup with an unsupported notice when the SSO connection is Google Workspace', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        configuredConnection({ active: true, provider: 'saml_google' }),
+      ]);
+      fixtures.clerk.organization?.getDirectorySync.mockRejectedValue(
+        new ClerkAPIResponseError('Not found', { status: 404, data: [{ code: 'resource_not_found', message: '' }] }),
+      );
+
+      renderPage(wrapper);
+
+      expect(await screen.findByText('Google Workspace connections are not supported here')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
+      expect(screen.queryByText('SSO Required')).not.toBeInTheDocument();
+    });
+
     it('lists Edit and Deactivate for an active directory', async () => {
       const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
       withActiveConnection(fixtures);

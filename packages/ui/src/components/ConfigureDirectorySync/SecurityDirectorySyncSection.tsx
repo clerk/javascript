@@ -14,6 +14,7 @@ import { handleError } from '@/utils/errorHandler';
 import type { LocalizationKey } from '../../customizables';
 import { Badge, Button, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import { ResetConnectionDialog } from '../ConfigureSSO/ResetConnectionDialog';
+import { directorySyncProviderForConnection } from './providerMeta';
 
 type SecurityDirectorySyncSectionProps = {
   organizationName: string;
@@ -57,6 +58,7 @@ export const SecurityDirectorySyncSection = ({
   } = __internal_useOrganizationEnterpriseConnections();
   const connection = connections?.[0];
   const hasSsoConnection = Boolean(connection);
+  const isGoogle = connection ? directorySyncProviderForConnection(connection.provider) === 'google' : false;
   const {
     data: directory,
     isLoading: isLoadingDirectory,
@@ -113,29 +115,37 @@ export const SecurityDirectorySyncSection = ({
           gap={4}
         >
           <Description />
-          <Flex
-            align='center'
-            gap={2}
-          >
-            <Button
-              variant='bordered'
-              colorScheme='secondary'
-              size='sm'
-              isDisabled={!hasSsoConnection}
-              onClick={onConfigure}
-              localizationKey={localizationKeys(
-                'organizationProfile.securityPage.directorySyncSection.primaryButton__startConfiguration',
-              )}
+          {isGoogle ? (
+            <Alert
+              variant='warning'
+              title={localizationKeys('configureDirectorySync.configureStep.warning__googleUnsupported.title')}
+              subtitle={localizationKeys('configureDirectorySync.configureStep.warning__googleUnsupported.subtitle')}
             />
-            {!hasSsoConnection && (
-              <Badge
-                colorScheme='primary'
+          ) : (
+            <Flex
+              align='center'
+              gap={2}
+            >
+              <Button
+                variant='bordered'
+                colorScheme='secondary'
+                size='sm'
+                isDisabled={!hasSsoConnection}
+                onClick={onConfigure}
                 localizationKey={localizationKeys(
-                  'organizationProfile.securityPage.directorySyncSection.badge__ssoRequired',
+                  'organizationProfile.securityPage.directorySyncSection.primaryButton__startConfiguration',
                 )}
               />
-            )}
-          </Flex>
+              {!hasSsoConnection && (
+                <Badge
+                  colorScheme='primary'
+                  localizationKey={localizationKeys(
+                    'organizationProfile.securityPage.directorySyncSection.badge__ssoRequired',
+                  )}
+                />
+              )}
+            </Flex>
+          )}
         </Col>
       ) : (
         <CardStateProvider>
