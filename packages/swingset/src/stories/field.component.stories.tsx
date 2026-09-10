@@ -1,6 +1,7 @@
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Input } from '@clerk/ui/mosaic/components/input';
+import { Select } from '@clerk/ui/mosaic/components/select';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -133,5 +134,26 @@ export function WithFeedback() {
         Clear
       </Button>
     </div>
+  );
+}
+
+const roles = [
+  { value: 'member', label: 'Member' },
+  { value: 'admin', label: 'Admin' },
+];
+
+export function WithSelect() {
+  return (
+    <Field.Root xstyle={styles.stack}>
+      <Field.Label>Role</Field.Label>
+      <Select.Root
+        items={roles}
+        defaultValue='member'
+      >
+        <Select.Trigger />
+        <Select.Popup />
+      </Select.Root>
+      <Field.Description>Applies to new members of the organization.</Field.Description>
+    </Field.Root>
   );
 }
