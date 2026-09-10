@@ -32,12 +32,12 @@ let session:
   | undefined;
 let environmentHydrated: boolean;
 let preferredSignInStrategy: PreferredSignInStrategy;
-let supportEmail: string;
+let supportEmail: string | undefined;
 let webAuthnSupported: boolean;
 let setActive: ReturnType<typeof vi.fn>;
 
 function environment() {
-  return environmentHydrated ? { displayConfig: { preferredSignInStrategy, supportEmail } } : undefined;
+  return environmentHydrated ? { displayConfig: { preferredSignInStrategy } } : undefined;
 }
 
 vi.mock('@clerk/shared/react', async importOriginal => {
@@ -51,6 +51,10 @@ vi.mock('@clerk/shared/react', async importOriginal => {
 
 vi.mock('../../../hooks/useMosaicEnvironment', () => ({
   useMosaicEnvironment: () => environment(),
+}));
+
+vi.mock('../../../hooks/useMosaicSupportEmail', () => ({
+  useMosaicSupportEmail: () => supportEmail,
 }));
 
 vi.mock('@clerk/shared/webauthn', () => ({
@@ -102,9 +106,17 @@ describe('useReverificationModel', () => {
     expect(result.current.isActive).toBe(true);
   });
 
+  it('is loading until supportEmail is resolved', () => {
+    supportEmail = undefined;
+    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    expect(result.current.status).toBe('loading');
+    expect(result.current.isActive).toBe(true);
+  });
+
   it('is active when props are active', () => {
     const { result } = renderHook(() => useReverificationModel(activeProps()));
     expect(result.current.isActive).toBe(true);
+    expect(ready(result.current).supportEmail).toBe('support@example.com');
   });
 
   it('is inactive when props are idle', () => {

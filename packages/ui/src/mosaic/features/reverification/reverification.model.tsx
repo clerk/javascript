@@ -9,6 +9,7 @@ import type {
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
 import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
+import { useMosaicSupportEmail } from '../../hooks/useMosaicSupportEmail';
 import type {
   ReverificationMethod,
   ReverificationProps,
@@ -117,9 +118,10 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
   const { session } = useSession();
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
+  const supportEmail = useMosaicSupportEmail();
   const { isActive, cancel, complete, level } = props;
 
-  if (!session || !environment) {
+  if (!session || !environment || supportEmail === undefined) {
     return { status: 'loading', isActive };
   }
 
@@ -132,7 +134,7 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
   return {
     status: 'ready',
     isActive,
-    supportEmail: environment.displayConfig.supportEmail ?? '',
+    supportEmail,
     start: async () => {
       try {
         return handleResponse(await session.startVerification({ level: level ?? 'first_factor' }));
