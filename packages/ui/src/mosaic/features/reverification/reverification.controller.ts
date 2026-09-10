@@ -16,10 +16,7 @@ export type ReverificationController =
 
 type OverlayFrom = 'factor' | 'method-picker';
 
-export type ReverificationDeps = Pick<
-  ReverificationReadyModel,
-  'start' | 'prepare' | 'attempt' | 'finish' | 'cancel'
->;
+export type ReverificationDeps = Pick<ReverificationReadyModel, 'start' | 'prepare' | 'attempt' | 'finish' | 'cancel'>;
 
 interface ReverificationContext {
   inputValue: string;
