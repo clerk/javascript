@@ -7,8 +7,8 @@ import type {
   UserProfileAccountSectionViewProps,
   UserProfileEmail,
   UserProfilePhone,
-} from './user-profile-account-section.view';
-import { UserProfileAccountSectionView } from './user-profile-account-section.view';
+} from './user-profile-account-section';
+import { UserProfileAccountSectionView } from './user-profile-account-section';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
@@ -17,6 +17,7 @@ import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
+export type { UserProfileEditNameValue, UserProfileFormError } from './user-profile-account-section';
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
@@ -37,12 +38,14 @@ export function UserProfileProfilePanelView({
   imageUrl,
   name = '',
   username = '',
+  firstName,
+  lastName,
   emails = [],
   phones = [],
   connectedAccounts = [],
   web3Wallets = [],
   onEditProfilePicture,
-  onNameChange,
+  onSaveName,
   onUsernameChange,
   onAddEmail,
   onManageEmail,
@@ -75,7 +78,9 @@ export function UserProfileProfilePanelView({
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
+          firstName={firstName}
           imageUrl={imageUrl}
+          lastName={lastName}
           name={name}
           phones={phones}
           username={username}
@@ -90,7 +95,7 @@ export function UserProfileProfilePanelView({
           onSetPrimaryPhone={onSetPrimaryPhone}
           onVerifyEmail={onVerifyEmail}
           onVerifyPhone={onVerifyPhone}
-          onNameChange={onNameChange}
+          onSaveName={onSaveName}
           onUsernameChange={onUsernameChange}
         />
         {connectedAccounts.length > 0 ? (

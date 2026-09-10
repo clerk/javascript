@@ -8,6 +8,8 @@ import type {
 import type { UserProfilePanelId } from '@clerk/ui/mosaic/user-profile/user-profile-sidebar';
 import { useState } from 'react';
 
+import { useUserProfileEditNameFixture } from './user-profile-edit-name';
+
 export interface UserPageFixtureOptions {
   /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
   onAddEmail?: () => void;
@@ -18,6 +20,7 @@ export interface UserPageFixtureOptions {
  * do something. For stories that need a realistic profile surface without being about it.
  */
 export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) {
+  const editName = useUserProfileEditNameFixture();
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
@@ -65,9 +68,9 @@ export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) 
 
   const panels: UserPageViewProps['panels'] = {
     account: {
+      ...editName,
       allowMultipleAccounts: true,
       imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
-      name: 'Preston Booth',
       username: 'prestonxyz',
       emails,
       phones,
@@ -85,7 +88,6 @@ export function useUserPageFixture({ onAddEmail }: UserPageFixtureOptions = {}) 
       onEditProfilePicture: () => undefined,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
-      onNameChange: () => undefined,
       onRemoveEmail: id => setEmails(current => current.filter(email => email.id !== id)),
       onRemovePhone: id => setPhones(current => current.filter(phone => phone.id !== id)),
       onSetPrimaryEmail: id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id }))),

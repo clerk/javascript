@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
+
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 const profileImageUrl = 'https://avatars.githubusercontent.com/u/51144033?v=4';
 
@@ -19,6 +21,7 @@ export const meta: StoryMeta = {
 };
 
 export function Default(_args: Record<string, unknown>) {
+  const editName = useUserProfileEditNameFixture();
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
     { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
@@ -29,6 +32,7 @@ export function Default(_args: Record<string, unknown>) {
 
   return (
     <UserProfileProfilePanelView
+      {...editName}
       allowMultipleAccounts
       emails={emails}
       connectedAccounts={[
@@ -58,7 +62,6 @@ export function Default(_args: Record<string, unknown>) {
         },
       ]}
       imageUrl={profileImageUrl}
-      name='Preston Booth'
       phones={phones}
       username='prestonxyz'
       onAddEmail={() =>
@@ -92,7 +95,6 @@ export function Default(_args: Record<string, unknown>) {
       onSetPrimaryPhone={() => undefined}
       onVerifyEmail={() => undefined}
       onVerifyPhone={() => undefined}
-      onNameChange={() => undefined}
       onUsernameChange={() => undefined}
     />
   );

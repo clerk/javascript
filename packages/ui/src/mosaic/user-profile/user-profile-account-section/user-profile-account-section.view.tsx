@@ -1,13 +1,17 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Avatar } from '../components/avatar';
-import { Badge } from '../components/badge';
-import { Button } from '../components/button';
-import { Icon } from '../components/icon';
-import { Section } from '../components/section';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { styles } from './user-profile-profile-panel.styles';
+import { Avatar } from '../../components/avatar';
+import { Badge } from '../../components/badge';
+import { Button } from '../../components/button';
+import { Icon } from '../../components/icon';
+import { Section } from '../../components/section';
+import type { UserProfileMenuAction } from '../user-profile-action-menu';
+import { UserProfileActionMenu } from '../user-profile-action-menu';
+import { styles } from '../user-profile-profile-panel.styles';
+import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
+import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
+import { UserProfileEditNameView } from './user-profile-edit-name.view';
 
 export interface UserProfileEmail {
   id: string;
@@ -30,10 +34,18 @@ export interface UserProfileAccountSectionViewProps {
   imageUrl?: string;
   name: string;
   username: string;
+  /** The saved first name, seeding the edit-name dialog. The display `name` cannot be split back into its two halves, so both are passed. */
+  firstName?: string;
+  /** The saved last name, seeding the edit-name dialog. */
+  lastName?: string;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
   onEditProfilePicture?: () => void;
-  onNameChange?: (value: string) => void;
+  /**
+   * Saves the edited name. Resolve and the dialog closes; reject with an `Error` and it stays open
+   * with that message in its banner. Omit it and the row renders without its action.
+   */
+  onSaveName?: (value: UserProfileEditNameValue) => Promise<void>;
   onUsernameChange?: (value: string) => void;
   onAddEmail?: () => void;
   onManageEmail?: (id: string) => void;
@@ -52,10 +64,12 @@ export function UserProfileAccountSectionView({
   imageUrl,
   name,
   username,
+  firstName,
+  lastName,
   emails,
   phones,
   onEditProfilePicture,
-  onNameChange,
+  onSaveName,
   onUsernameChange,
   onAddEmail,
   onManageEmail,
@@ -74,7 +88,6 @@ export function UserProfileAccountSectionView({
     .join('')
     .slice(0, 2)
     .toUpperCase();
-  const updateName = onNameChange ? () => onNameChange(name) : undefined;
   const updateUsername = onUsernameChange ? () => onUsernameChange(username) : undefined;
 
   return (
@@ -117,16 +130,13 @@ export function UserProfileAccountSectionView({
                 <Section.Label>Name</Section.Label>
                 <Section.Description>{name}</Section.Description>
               </Section.Content>
-              {updateName ? (
+              {onSaveName ? (
                 <Section.Actions>
-                  <Button
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    onClick={updateName}
-                  >
-                    Edit name
-                  </Button>
+                  <EditName
+                    firstName={firstName}
+                    lastName={lastName}
+                    onSave={onSaveName}
+                  />
                 </Section.Actions>
               ) : null}
             </Section.Item>
@@ -196,6 +206,38 @@ export function UserProfileAccountSectionView({
         />
       ) : null}
     </div>
+  );
+}
+
+/**
+ * The name row's action. Split out so the section body stays a render, and so the controller is
+ * mounted only where the action exists — the same shape as `UserProfileDeleteSectionView`.
+ */
+function EditName({
+  firstName,
+  lastName,
+  onSave,
+}: {
+  firstName?: string;
+  lastName?: string;
+  onSave: (value: UserProfileEditNameValue) => Promise<void>;
+}) {
+  const controller = useUserProfileEditNameController({ firstName, lastName, onSave });
+
+  return (
+    <UserProfileEditNameView
+      {...controller}
+      open={controller.isOpen}
+      trigger={
+        <Button
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {m.editName.trigger}
+        </Button>
+      }
+    />
   );
 }
 

@@ -16,6 +16,8 @@ import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
+
 export { default as __source } from './user-page.stories?raw';
 
 export const meta: StoryMeta = {
@@ -46,6 +48,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
 ];
 
 export function Default() {
+  const editName = useUserProfileEditNameFixture();
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
@@ -102,9 +105,9 @@ export function Default() {
 
   const panels: UserPageViewProps['panels'] = {
     account: {
+      ...editName,
       allowMultipleAccounts: true,
       imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
-      name: 'Preston Booth',
       username: 'prestonxyz',
       emails,
       phones,
@@ -126,7 +129,6 @@ export function Default() {
       onEditProfilePicture: () => undefined,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
-      onNameChange: () => undefined,
       onRemoveEmail: id => setEmails(current => current.filter(email => email.id !== id)),
       onRemovePhone: id => setPhones(current => current.filter(phone => phone.id !== id)),
       onSetPrimaryEmail: id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id }))),

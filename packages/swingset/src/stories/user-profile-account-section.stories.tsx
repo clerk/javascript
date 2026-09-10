@@ -1,11 +1,14 @@
 import type {
   UserProfileEmail,
+  UserProfileFormError,
   UserProfilePhone,
-} from '@clerk/ui/mosaic/user-profile/user-profile-account-section.view';
-import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section.view';
+} from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
+import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -15,10 +18,17 @@ export const meta: StoryMeta = {
   title: 'UserProfileAccountSection',
   label: 'Account',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-account-section.view.tsx',
+  source: 'packages/ui/src/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
 };
 
-function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: boolean }) {
+function AccountSection({
+  allowMultipleAccounts,
+  failWith,
+}: {
+  allowMultipleAccounts: boolean;
+  failWith?: UserProfileFormError;
+}) {
+  const editName = useUserProfileEditNameFixture({ failWith });
   const [emails, setEmails] = useState<UserProfileEmail[]>(
     allowMultipleAccounts
       ? [
@@ -33,10 +43,10 @@ function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: bool
 
   return (
     <UserProfileAccountSectionView
+      {...editName}
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
       imageUrl='https://avatars.githubusercontent.com/u/51144033?v=4'
-      name='Preston Booth'
       phones={phones}
       username='prestonxyz'
       onAddEmail={() =>
@@ -60,7 +70,6 @@ function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: bool
       onManagePhone={() => undefined}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
-      onNameChange={() => undefined}
       onUsernameChange={() => undefined}
     />
   );
@@ -72,4 +81,17 @@ export function Default() {
 
 export function MultipleAccounts() {
   return <AccountSection allowMultipleAccounts />;
+}
+
+/** Every save is rejected, so the dialog shows both halves of a failure at once. */
+export function EditNameFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts={false}
+      failWith={{
+        message: 'Your name could not be updated.',
+        fields: { lastName: 'Last name must be 64 characters or fewer.' },
+      }}
+    />
+  );
 }
