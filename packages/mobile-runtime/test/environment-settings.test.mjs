@@ -23,6 +23,7 @@ async function environmentFixture(t, section, value) {
 for (const [name, value] of [
   ['missing', undefined],
   ['empty', {}],
+  ['null children', { domains: null, actions: null, slug: null, organization_creation_defaults: null }],
   ['partial', { enabled: true, max_allowed_memberships: 5 }],
   [
     'partial nested settings',
@@ -58,6 +59,65 @@ for (const [name, value] of [
     });
   });
 }
+
+for (const supportEmail of [undefined, null, 'help@example.com']) {
+  test(`display support email preserves ${supportEmail === undefined ? 'missing' : supportEmail}`, async t => {
+    const display = structuredClone(fixtures.environment.display_config);
+    if (supportEmail === undefined) delete display.support_email;
+    else display.support_email = supportEmail;
+    const { get } = await environmentFixture(t, 'display_config', display);
+    assert.equal(get().displayConfig.supportEmail, supportEmail ?? '');
+  });
+}
+
+for (const immutable of [undefined, false, true]) {
+  test(`user attribute preserves ${immutable ?? 'missing'} immutable and factor settings`, async t => {
+    const settings = structuredClone(fixtures.environment.user_settings);
+    const attribute = {
+      enabled: true,
+      required: true,
+      used_for_first_factor: true,
+      first_factors: ['email_code'],
+      used_for_second_factor: false,
+      second_factors: [],
+      verifications: ['email_code'],
+      verify_at_sign_up: true,
+    };
+    if (immutable !== undefined) attribute.immutable = immutable;
+    settings.attributes.email_address = attribute;
+    const { get } = await environmentFixture(t, 'user_settings', settings);
+    assert.deepEqual(get().userSettings.attributes.email_address, { ...attribute, name: 'email_address' });
+  });
+}
+
+for (const [name, enabled, firstFactor] of [
+  ['first factor', true, true],
+  ['registration only', true, false],
+  ['disabled', false, true],
+]) {
+  test(`passkey attributes preserve ${name} configuration`, async t => {
+    const settings = structuredClone(fixtures.environment.user_settings);
+    Object.assign(settings.attributes.passkey, { enabled, used_for_first_factor: firstFactor });
+    const { get } = await environmentFixture(t, 'user_settings', settings);
+    const actual = get().userSettings.attributes.passkey;
+    assert.equal(actual.enabled, enabled);
+    assert.equal(actual.used_for_first_factor, firstFactor);
+  });
+}
+
+test('missing required passkey attribute fails the generated contract', async t => {
+  const environment = structuredClone(fixtures.environment);
+  delete environment.user_settings.attributes.passkey;
+  const f = await fixture({
+    allowFailure: true,
+    http: request => {
+      if (new URL(request.url).pathname.endsWith('/environment')) return response(environment);
+    },
+  });
+  t.after(f.dispose);
+  assert.equal(f.ready.kind, 'initializationFailed');
+  assert.equal(f.ready.failure.code, 'invalid_projection:EnvironmentResource.userSettings');
+});
 
 for (const warning of [undefined, false, true]) {
   test(`development warning preserves ${warning ?? 'missing/default false'}`, async t => {
