@@ -3920,7 +3920,7 @@ public class Passkey(override val handle: ResourceHandle, runtime: CoreRuntime) 
   public companion object {
     public fun fromJson(value: JsonElement, runtime: CoreRuntime): Passkey = runtime.resource(ResourceHandle.fromReference(value)) as Passkey
   }
-  public suspend fun `update`(`params`: Partialtype): Passkey {
+  public suspend fun `update`(`params`: UpdatePasskeyParams): Passkey {
     val runtime = context.requireRuntime()
     return runtime.invoke(this, handle, "Passkey.update", listOf(`params`.toJson())) { result ->
       Passkey.fromJson(result, runtime)
@@ -3997,18 +3997,15 @@ public class PasskeyVerification(override val handle: ResourceHandle, runtime: C
   }
 }
 
-/**
- * Make all properties in T optional
- */
-public data class Partialtype(public val `name`: Field<String> = Field.Omitted) {
+public data class UpdatePasskeyParams(public val `name`: Field<String> = Field.Omitted) {
   public fun toJson(): JsonElement = buildJsonObject {
-    putPresent("name", this@Partialtype.`name`.toJson { value -> JsonPrimitive(value) })
+    putPresent("name", this@UpdatePasskeyParams.`name`.toJson { value -> JsonPrimitive(value) })
   }
   public companion object {
-    public fun fromJson(value: JsonElement, runtime: CoreRuntime): Partialtype {
+    public fun fromJson(value: JsonElement, runtime: CoreRuntime): UpdatePasskeyParams {
       val values = value.jsonObject
 
-      return Partialtype(`name` = Field.fromJson((values["name"] ?: Undefined)) { value -> value.requireString() })
+      return UpdatePasskeyParams(`name` = Field.fromJson((values["name"] ?: Undefined)) { value -> value.requireString() })
     }
   }
 }
@@ -9695,7 +9692,7 @@ public data class PendingSessionFactorVerificationAgeValue(public val item0: Dou
 }
 
 public object GeneratedBindings {
-  public const val contractHash: String = "d0e44f4d5307614738d237be8326540031290579f49e2b098be85596ced06d98"
+  public const val contractHash: String = "0f8387f260072ba6f894442b73d50afa6bda5f1205ed3c9209f5d6b1cfba16ce"
   public const val protocolVersion: Int = 1
   public fun makeResource(handle: ResourceHandle, runtime: CoreRuntime): CoreResource = when (handle.type) {
     "Clerk" -> Clerk(handle, runtime)

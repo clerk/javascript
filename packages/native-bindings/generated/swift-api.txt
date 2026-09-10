@@ -900,15 +900,13 @@ OrganizationSuggestionPublicOrganizationData.slug: String?
 OrganizationSuggestionPublicOrganizationData: Hashable
 OrganizationSuggestionStatus cases: accepted, pending, unrecognized(String)
 OrganizationSuggestionStatus: Hashable
-Partialtype.name: Field<String> = .omitted
-Partialtype: Hashable
 Passkey.createdAt: Date
 Passkey.delete(): DeletedObject [return]
 Passkey.id: String
 Passkey.lastUsedAt: Date?
 Passkey.name: String?
 Passkey.reload(p: ClerkResourceReloadParams? = nil): Passkey [return]
-Passkey.update(params: Partialtype): Passkey [return]
+Passkey.update(params: UpdatePasskeyParams): Passkey [return]
 Passkey.updatedAt: Date
 Passkey.verification: PasskeyVerification?
 Passkey: Hashable
@@ -1634,6 +1632,8 @@ UpdateOrganizationMembershipParams: Hashable
 UpdateOrganizationParams.name: String
 UpdateOrganizationParams.slug: String? = nil
 UpdateOrganizationParams: Hashable
+UpdatePasskeyParams.name: Field<String> = .omitted
+UpdatePasskeyParams: Hashable
 UpdateUserMetadataParams.unsafeMetadata: [String: JSONValue]
 UpdateUserMetadataParams: Hashable
 UpdateUserParams.firstName: Field<String> = .omitted
@@ -1954,7 +1954,6 @@ object OrganizationSettingsDomains
 object OrganizationSettingsOrganizationCreationDefaults
 object OrganizationSettingsSlug
 object OrganizationSuggestionPublicOrganizationData
-object Partialtype
 object PasskeyAttempt
 object PasskeyFactor
 object PasskeySettingsData
@@ -2053,6 +2052,7 @@ object UpdateMembershipParams
 object UpdateOrganizationEnterpriseConnectionParams
 object UpdateOrganizationMembershipParams
 object UpdateOrganizationParams
+object UpdatePasskeyParams
 object UpdateUserMetadataParams
 object UpdateUserParams
 object UpdateUserPasswordParams

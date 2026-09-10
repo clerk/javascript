@@ -825,7 +825,7 @@ export const operations = {
   },
   "Passkey.update": {
     type: "Passkey",
-    parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"Partialtype"}}],
+    parameters: [{"name":"params","optional":false,"type":{"kind":"ref","name":"UpdatePasskeyParams"}}],
     result: {"kind":"ref","name":"Passkey"},
     invoke: (target, args) => target["update"](...args),
   },

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { compileProfile } from '../src/compiler.mjs';
 import { generateNative } from '../src/native.mjs';
 
-function compile(source, changes = {}) {
+function compile(source, changes = {}, files = {}) {
   const repository = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-bindings-'));
   const shared = path.join(repository, 'packages/shared');
   fs.mkdirSync(path.join(shared, 'src/types'), { recursive: true });
@@ -23,6 +23,9 @@ function compile(source, changes = {}) {
     path.join(shared, 'src/types/fixture.ts'),
     `import type { ClerkError } from '../errors/clerkError';\n${source}`,
   );
+  for (const [name, contents] of Object.entries(files)) {
+    fs.writeFileSync(path.join(shared, 'src/types', name), contents);
+  }
   try {
     return compileProfile(repository, {
       version: 1,
@@ -177,6 +180,20 @@ test('utility-type parameters keep their exported contract alias', () => {
   const model = compile(
     source.replace('params: VerifyParams', 'params: UpdatePasskeyParams') +
       'export type UpdatePasskeyParams = Partial<{ name: string | null }>;',
+  );
+  assert.deepEqual(model.failures, []);
+  const native = generateNative(model, { protocolVersion: 1, contractHash: 'fixture' });
+  assert.match(native['GeneratedAPI.swift'], /struct UpdatePasskeyParams/);
+  assert.match(native['GeneratedAPI.kt'], /class UpdatePasskeyParams/);
+  assert.doesNotMatch(native['GeneratedAPI.swift'], /Partialtype/);
+});
+
+test('utility aliases keep their names when exported through multiple barrels', () => {
+  const model = compile(
+    source.replace('params: VerifyParams', 'params: UpdatePasskeyParams') +
+      'export type UpdatePasskeyParams = Partial<{ name: string | null }>;',
+    {},
+    { 'index.ts': "export * from './fixture';", 'public.ts': "export * from './index';" },
   );
   assert.deepEqual(model.failures, []);
   const native = generateNative(model, { protocolVersion: 1, contractHash: 'fixture' });

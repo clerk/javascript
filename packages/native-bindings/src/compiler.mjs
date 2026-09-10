@@ -37,7 +37,7 @@ export function compileProfile(repository, policy = profile) {
       if (!declaration || declaration.typeParameters?.length) continue;
       const type = checker.getDeclaredTypeOfSymbol(symbol);
       const aliases = exportedAliases.get(type.id) || [];
-      aliases.push(symbol);
+      if (!aliases.includes(symbol)) aliases.push(symbol);
       exportedAliases.set(type.id, aliases);
     }
   }

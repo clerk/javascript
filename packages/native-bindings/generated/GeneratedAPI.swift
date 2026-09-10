@@ -5083,7 +5083,7 @@ public struct PasskeyState: Hashable, Sendable {
   public func prepare(_ value: JSONValue) throws -> any Sendable { try PasskeyState.decode(value, in: context.requireRuntime()) }
   public func encode() throws -> JSONValue { .object(["$ref": handle.json]) }
   public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> Passkey { try runtime.resource(ResourceHandle.decodeReference(value), as: Passkey.self) }
-  public func `update`(_ `params`: Partialtype) async throws -> Passkey {
+  public func `update`(_ `params`: UpdatePasskeyParams) async throws -> Passkey {
     let runtime = try context.requireRuntime()
     return try await runtime.invoke(owner: self, target: handle, operation: "Passkey.update", arguments: [try `params`.encode()]) { result in
       return try Passkey.decode(result, in: runtime)
@@ -5174,8 +5174,7 @@ public struct PasskeyVerificationState: Hashable, Sendable {
   }
 }
 
-/// Make all properties in T optional
-public struct Partialtype: Hashable, Sendable {
+public struct UpdatePasskeyParams: Hashable, Sendable {
   public let `name`: Field<String>
   public init(`name`: Field<String> = .omitted) {
     self.`name` = `name`
@@ -5186,10 +5185,10 @@ public struct Partialtype: Hashable, Sendable {
     ]
     return .object(values.filter { !$0.value.isUndefined })
   }
-  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> Partialtype {
+  @MainActor public static func decode(_ value: JSONValue, in runtime: CoreRuntime) throws -> UpdatePasskeyParams {
     let values = try value.object()
 
-    return try Partialtype(`name`: try Field.decode((values["name"] ?? .undefined)) { value in try value.string() })
+    return try UpdatePasskeyParams(`name`: try Field.decode((values["name"] ?? .undefined)) { value in try value.string() })
   }
 }
 
@@ -12996,7 +12995,7 @@ public struct PendingSessionFactorVerificationAgeValue: Hashable, Sendable {
 }
 
 @MainActor public enum GeneratedBindings {
-  public static let contractHash = "d0e44f4d5307614738d237be8326540031290579f49e2b098be85596ced06d98"
+  public static let contractHash = "0f8387f260072ba6f894442b73d50afa6bda5f1205ed3c9209f5d6b1cfba16ce"
   public static let protocolVersion = 1
   public static func makeResource(_ handle: ResourceHandle, runtime: CoreRuntime) throws -> any CoreResource {
     switch handle.type {

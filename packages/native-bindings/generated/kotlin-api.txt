@@ -729,14 +729,13 @@ OrganizationSuggestionPublicOrganizationData.imageUrl: String
 OrganizationSuggestionPublicOrganizationData.name: String
 OrganizationSuggestionPublicOrganizationData.slug: String?
 OrganizationSuggestionStatus cases: accepted, pending, unrecognized(String)
-Partialtype.name: Field<String> = Field.Omitted
 Passkey.createdAt: Instant
 Passkey.delete(): DeletedObject [return]
 Passkey.id: String
 Passkey.lastUsedAt: Instant?
 Passkey.name: String?
 Passkey.reload(p: ClerkResourceReloadParams? = null): Passkey [return]
-Passkey.update(params: Partialtype): Passkey [return]
+Passkey.update(params: UpdatePasskeyParams): Passkey [return]
 Passkey.updatedAt: Instant
 Passkey.verification: PasskeyVerification?
 PasskeyAttempt.publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse
@@ -1305,6 +1304,7 @@ UpdateOrganizationEnterpriseConnectionParams.syncUserAttributes: Field<Boolean> 
 UpdateOrganizationMembershipParams.role: String
 UpdateOrganizationParams.name: String
 UpdateOrganizationParams.slug: String? = null
+UpdatePasskeyParams.name: Field<String> = Field.Omitted
 UpdateUserMetadataParams.unsafeMetadata: JsonObject
 UpdateUserParams.firstName: Field<String> = Field.Omitted
 UpdateUserParams.lastName: Field<String> = Field.Omitted
@@ -1609,7 +1609,6 @@ object OrganizationSettingsDomains
 object OrganizationSettingsOrganizationCreationDefaults
 object OrganizationSettingsSlug
 object OrganizationSuggestionPublicOrganizationData
-object Partialtype
 object PasskeyAttempt
 object PasskeyFactor
 object PasskeySettingsData
@@ -1708,6 +1707,7 @@ object UpdateMembershipParams
 object UpdateOrganizationEnterpriseConnectionParams
 object UpdateOrganizationMembershipParams
 object UpdateOrganizationParams
+object UpdatePasskeyParams
 object UpdateUserMetadataParams
 object UpdateUserParams
 object UpdateUserPasswordParams

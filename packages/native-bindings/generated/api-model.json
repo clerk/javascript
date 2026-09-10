@@ -12059,7 +12059,7 @@
               "optional": false,
               "type": {
                 "kind": "ref",
-                "name": "Partialtype"
+                "name": "UpdatePasskeyParams"
               }
             }
           ],
@@ -12318,14 +12318,13 @@
         }
       ]
     },
-    "Partialtype": {
-      "name": "Partialtype",
+    "UpdatePasskeyParams": {
+      "name": "UpdatePasskeyParams",
       "source": {
-        "file": "node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/lib/lib.es5.d.ts",
-        "line": 1583,
-        "symbol": "Partial"
+        "file": "packages/shared/src/types/passkey.ts",
+        "line": 10,
+        "symbol": "UpdatePasskeyParams"
       },
-      "documentation": "Make all properties in T optional",
       "kind": "object",
       "properties": [
         {
@@ -30764,7 +30763,7 @@
       "disposition": "generated"
     },
     {
-      "path": "Partial.name",
+      "path": "UpdatePasskeyParams.name",
       "disposition": "generated"
     },
     {
