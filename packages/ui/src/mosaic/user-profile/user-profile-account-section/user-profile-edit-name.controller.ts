@@ -34,7 +34,6 @@ function toFormError(cause: unknown): UserProfileFormError<UserProfileEditNameFi
   return { message: 'Something went wrong. Please try again.' };
 }
 
-/** No terminal state, unlike the delete flow: a name can be edited again straight away. */
 export const userProfileEditNameMachine = createMachine({
   id: 'editName',
   initial: 'idle',
@@ -97,7 +96,6 @@ export interface UserProfileEditNameController {
   error: UserProfileFormError<UserProfileEditNameField> | undefined;
 }
 
-/** A machine rather than `useState`: an async step, an error path back, and a success that closes the dialog. */
 export function useUserProfileEditNameController({
   firstName = '',
   lastName = '',

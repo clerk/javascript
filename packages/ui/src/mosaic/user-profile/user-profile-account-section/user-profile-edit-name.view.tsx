@@ -68,7 +68,6 @@ export function UserProfileEditNameView({
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
         size='card'
-        // Past the corner dismiss `Card.Header` renders first.
         initialFocus={firstNameRef}
       >
         <Card.Root
@@ -78,8 +77,6 @@ export function UserProfileEditNameView({
           <Card.Header>
             <Card.Title>{m.name.dialogTitle}</Card.Title>
           </Card.Header>
-          {/* Not `Root`: the header's dismiss would become the form's default submit, since
-              `Button` sets no `type`. */}
           <Card.Content
             render={
               <form
@@ -117,14 +114,6 @@ export function UserProfileEditNameView({
               />
               {error?.fields?.lastName ? <Field.Error>{error.fields.lastName}</Field.Error> : null}
             </Field.Root>
-            {/* Two fields and no in-form submit button means no implicit submission, so Enter would
-                do nothing. Unnecessary at one field; see `Destructive`. */}
-            <button
-              hidden
-              type='submit'
-              tabIndex={-1}
-              aria-hidden='true'
-            />
           </Card.Content>
           <Card.Footer>
             <Dialog.Close

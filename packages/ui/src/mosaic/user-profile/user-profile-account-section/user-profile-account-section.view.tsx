@@ -294,7 +294,6 @@ function ProfilePictureActions({
   return null;
 }
 
-/** Split out so the controller is mounted only where the action exists. */
 function EditName({
   firstName,
   lastName,
