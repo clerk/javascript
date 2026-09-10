@@ -35,4 +35,4 @@ Dismissal restores the selected label. Reopening shows all options until typing 
 
 For search inside another popup, use `inline` with `List` and bind `open` to the outer popup. Closing clears search without clearing selection. Supply `defaultInputValue` when an initial selection's label differs from its value.
 
-Combobox reuses Autocomplete's rendering and keyboard internals. Autocomplete's existing public props and free-text behavior remain unchanged. Mosaic adds styling separately.
+Combobox owns its selection state and rendering parts independently of Autocomplete. Both use general headless utilities for rendering, controllable state, and transitions. Mosaic adds styling separately.

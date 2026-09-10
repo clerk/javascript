@@ -1,2 +1,13 @@
 export * as Combobox from './parts';
-export type { ComboboxProps } from './combobox-root';
+export type {
+  ComboboxCollectionProps,
+  ComboboxArrowProps,
+  ComboboxInputProps,
+  ComboboxListProps,
+  ComboboxOptionProps,
+  ComboboxOptionIndicatorProps,
+  ComboboxPopupProps,
+  ComboboxPortalProps,
+  ComboboxPositionerProps,
+  ComboboxProps,
+} from './parts';
