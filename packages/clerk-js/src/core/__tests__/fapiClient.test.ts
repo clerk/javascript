@@ -180,6 +180,23 @@ describe('buildUrl(options)', () => {
 });
 
 describe('request', () => {
+  it.each(['sess_other', undefined])(
+    'preserves an explicit initiating session when the selected session is %s',
+    async selected => {
+      const client = createFapiClient({ ...baseFapiClientOptions, getSessionId: () => selected });
+      await client.request({
+        path: '/me/biometric_credentials/td_created',
+        method: 'DELETE',
+        sessionId: 'sess_original',
+      });
+      const pinned = new URL((fetch as Mock).mock.calls[0][0].toString());
+      expect(pinned.searchParams.get('_clerk_session_id')).toBe('sess_original');
+      await client.request({ path: '/me/biometric_credentials' });
+      const current = new URL((fetch as Mock).mock.calls[1][0].toString());
+      expect(current.searchParams.get('_clerk_session_id')).toBe(selected ?? null);
+    },
+  );
+
   it('invokes global.fetch', async () => {
     await fapiClient.request({
       path: '/foo',

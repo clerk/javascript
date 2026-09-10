@@ -185,9 +185,10 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
     const host = this.requireHost();
     const generation = this.#generation;
     const userId = session.user.id;
+    const sessionId = session.id;
     const assertEnrollmentCurrent = () => {
       this.assertCurrent(generation);
-      if (this.clerk.session?.id !== session.id || this.clerk.session?.user?.id !== userId) {
+      if (this.clerk.session?.id !== sessionId || this.clerk.session?.user?.id !== userId) {
         throw fail('stale_authentication_attempt');
       }
     };
@@ -197,8 +198,12 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
     }
     const policy =
       params.policy ?? (host.platform === 'android' ? 'biometry_or_device_passcode' : 'biometry_current_set');
+    await this.records();
     assertEnrollmentCurrent();
     const key = await host.createKey(policy);
+    let enrolled: BiometricCredential | undefined;
+    let persisted: LocalRecord | undefined;
+    let replaced: LocalRecord[] = [];
     try {
       assertEnrollmentCurrent();
       const body = {
@@ -212,7 +217,7 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
         '/me/biometric_credentials/prepare',
         'POST',
         body,
-        session.id,
+        sessionId,
       );
       assertEnrollmentCurrent();
       this.validateChallenge(challenge);
@@ -230,9 +235,10 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
           '/me/biometric_credentials/attempt',
           'POST',
           { ...body, ...signature },
-          session.id,
+          sessionId,
         ),
       );
+      enrolled = result;
       assertEnrollmentCurrent();
       if (result.appIdentifier !== appIdentifier || result.platform !== host.platform) {
         throw fail('invalid_biometric_response');
@@ -247,31 +253,43 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
         createdAt: result.createdAt.getTime(),
         updatedAt: result.updatedAt.getTime(),
       };
-      try {
-        await this.serialized(async () => {
-          assertEnrollmentCurrent();
-          const records = await this.records();
-          assertEnrollmentCurrent();
-          await host.storage.write(JSON.stringify([...records.filter(value => value.id !== record.id), record]));
+      replaced = await this.serialized(async () => {
+        assertEnrollmentCurrent();
+        const records = await this.rawRecords();
+        assertEnrollmentCurrent();
+        const previous: LocalRecord[] = [];
+        const retained = records.filter(value => {
+          const existing = this.localRecord(value);
+          if (existing?.id !== record.id || existing.appIdentifier !== appIdentifier) return true;
+          previous.push(existing);
+          return false;
         });
-      } catch (error) {
-        await this.request(
-          '/me/biometric_credentials/' + encodeURIComponent(result.id),
-          'DELETE',
-          undefined,
-          session.id,
-        ).catch(() => undefined);
-        throw error;
-      }
+        await host.storage.write(JSON.stringify([...retained, record]));
+        return previous;
+      });
+      persisted = record;
       assertEnrollmentCurrent();
-      for (const old of await this.records()) {
-        if (old.appIdentifier === appIdentifier && old.id !== record.id) {
+      const remaining = await this.records().catch(() => []);
+      for (const old of [...replaced, ...remaining]) {
+        if (old.appIdentifier === appIdentifier && old.localKeyId !== record.localKeyId) {
           await this.deleteLocal(old).catch(() => undefined);
         }
       }
       return result;
     } catch (error) {
-      await host.deleteKey(key.localKeyId).catch(() => undefined);
+      if (enrolled) {
+        await this.request(
+          '/me/biometric_credentials/' + encodeURIComponent(enrolled.id),
+          'DELETE',
+          undefined,
+          sessionId,
+        ).catch(() => undefined);
+      }
+      if (persisted) {
+        for (const record of [...replaced, persisted]) await this.deleteLocal(record).catch(() => undefined);
+      } else {
+        await host.deleteKey(key.localKeyId).catch(() => undefined);
+      }
       throw error;
     }
   }
@@ -286,9 +304,11 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
       ),
     );
     if (this.host) {
-      const record = (await this.records()).find(record => record.id === id);
-      if (record) {
-        await this.deleteLocal(record).catch(() => undefined);
+      try {
+        const record = (await this.records()).find(record => record.id === id);
+        if (record) await this.deleteLocal(record);
+      } catch {
+        // Local cleanup cannot undo a successful server revocation.
       }
     }
     return result;
@@ -464,14 +484,7 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
         if (!(await installation.isCurrent())) {
           const appIdentifier = await host.appIdentifier();
           if (!appIdentifier) throw fail('missing_app_identifier');
-          const raw = await host.storage.read();
-          let records: unknown;
-          try {
-            records = raw ? JSON.parse(raw) : [];
-          } catch {
-            throw fail('invalid_biometric_metadata');
-          }
-          if (!Array.isArray(records)) throw fail('invalid_biometric_metadata');
+          const records = this.parseRecords(await host.storage.read());
           const belongsToApp = (record: unknown): record is Record<string, unknown> =>
             !!record &&
             typeof record === 'object' &&
@@ -495,8 +508,15 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
   }
 
   private async records(): Promise<LocalRecord[]> {
+    return (await this.rawRecords()).map(value => this.localRecord(value)).filter(value => value !== null);
+  }
+
+  private async rawRecords(): Promise<unknown[]> {
     await this.ensureInstallation();
-    const raw = await this.requireHost().storage.read();
+    return this.parseRecords(await this.requireHost().storage.read());
+  }
+
+  private parseRecords(raw: string | null): unknown[] {
     if (!raw) {
       return [];
     }
@@ -504,57 +524,58 @@ export class NativeBiometricCredentials implements BiometricCredentialsResource 
     try {
       values = JSON.parse(raw);
     } catch {
-      return [];
+      throw fail('invalid_biometric_metadata');
     }
     if (!Array.isArray(values)) {
-      return [];
+      throw fail('invalid_biometric_metadata');
     }
-    return values
-      .map(record => {
-        // The previous Android SDK serialized local metadata through ClerkApi.json
-        // (SnakeCase, encodeDefaults=false). Apple and current records use camelCase.
-        if (
-          this.host?.platform !== 'android' ||
-          !record ||
-          typeof record !== 'object' ||
-          'localKeyId' in record ||
-          !('local_key_id' in record)
-        ) {
-          return record;
-        }
-        return {
-          id: record.id,
-          localKeyId: record.local_key_id,
-          userId: record.user_id,
-          appIdentifier: record.app_identifier,
-          identifierHint: record.identifier_hint,
-          policy: record.policy === undefined ? 'biometry_or_device_passcode' : record.policy,
-          createdAt: record.created_at,
-          updatedAt: record.updated_at,
-        };
-      })
-      .filter(
-        (record): record is LocalRecord =>
-          record !== null &&
-          typeof record === 'object' &&
-          ['id', 'localKeyId', 'userId', 'appIdentifier'].every(
-            key => typeof record[key] === 'string' && record[key],
-          ) &&
-          (record.identifierHint == null || typeof record.identifierHint === 'string') &&
-          policies.includes(record.policy) &&
-          Number.isFinite(record.createdAt) &&
-          Number.isFinite(record.updatedAt),
-      )
-      .map(record => ({ ...record, identifierHint: normalizeHint(record.identifierHint) }));
+    return values;
+  }
+
+  private localRecord(value: unknown): LocalRecord | null {
+    if (!value || typeof value !== 'object') return null;
+    let record = value as Record<string, unknown>;
+    // Decode old Android records for selection without rewriting unrelated raw entries.
+    if (this.host?.platform === 'android' && !('localKeyId' in record) && 'local_key_id' in record) {
+      record = {
+        id: record.id,
+        localKeyId: record.local_key_id,
+        userId: record.user_id,
+        appIdentifier: record.app_identifier,
+        identifierHint: record.identifier_hint,
+        policy: record.policy === undefined ? 'biometry_or_device_passcode' : record.policy,
+        createdAt: record.created_at,
+        updatedAt: record.updated_at,
+      };
+    }
+    if (
+      !['id', 'localKeyId', 'userId', 'appIdentifier'].every(key => typeof record[key] === 'string' && record[key]) ||
+      !(record.identifierHint == null || typeof record.identifierHint === 'string') ||
+      !policies.includes(record.policy as BiometricCredentialPolicy) ||
+      !Number.isFinite(record.createdAt) ||
+      !Number.isFinite(record.updatedAt)
+    )
+      return null;
+    const decoded = record as LocalRecord;
+    return { ...decoded, identifierHint: normalizeHint(decoded.identifierHint) };
   }
 
   private async deleteLocal(record: LocalRecord): Promise<void> {
     const host = this.requireHost();
     await host.deleteKey(record.localKeyId);
     await this.serialized(async () => {
-      const records = await this.records();
+      const records = await this.rawRecords();
       await host.storage.write(
-        JSON.stringify(records.filter(value => value.id !== record.id || value.localKeyId !== record.localKeyId)),
+        JSON.stringify(
+          records.filter(value => {
+            const existing = this.localRecord(value);
+            return (
+              existing?.id !== record.id ||
+              existing.localKeyId !== record.localKeyId ||
+              existing.appIdentifier !== record.appIdentifier
+            );
+          }),
+        ),
       );
     });
   }
