@@ -1446,6 +1446,9 @@ export const heIL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'אפס קוד הסיסמה',
       resendButton: 'שלח קוד שוב',
@@ -1509,6 +1512,15 @@ export const heIL: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'אנחנו צריכים לאמת את זהותך לפני שנאפס את הסיסמה שלך.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'הרשמה',

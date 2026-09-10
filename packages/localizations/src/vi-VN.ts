@@ -1462,6 +1462,9 @@ export const viVN: LocalizationResource = {
       subtitle: 'Chọn tài khoản doanh nghiệp bạn muốn dùng để tiếp tục.',
       title: 'Chọn tài khoản doanh nghiệp của bạn',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Mã xác minh mật khẩu',
       resendButton: 'Không nhận được mã? Gửi lại',
@@ -1527,6 +1530,15 @@ export const viVN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Chúng tôi cần xác minh danh tính của bạn trước khi đặt lại mật khẩu.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Đăng ký',

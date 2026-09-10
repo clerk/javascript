@@ -1454,6 +1454,9 @@ export const trTR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Şifre sıfırlama kodu',
       resendButton: 'Tekrar gönder',
@@ -1519,6 +1522,15 @@ export const trTR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Şifrenizi sıfırlamadan önce kimliğinizi doğrulamamız gerekiyor.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Kayıt ol',

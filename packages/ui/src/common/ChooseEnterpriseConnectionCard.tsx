@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
 
 import type { LocalizationKey } from '@/ui/customizables';
@@ -22,7 +23,8 @@ export const ChooseEnterpriseConnectionCard = ({
   subtitle,
   onClick,
   enterpriseConnections,
-}: ChooseEnterpriseConnectionCardProps) => {
+  children,
+}: PropsWithChildren<ChooseEnterpriseConnectionCardProps>) => {
   const card = useCardState();
 
   return (
@@ -47,6 +49,8 @@ export const ChooseEnterpriseConnectionCard = ({
             />
           ))}
         </Grid>
+
+        {children}
       </Card.Content>
 
       <Card.Footer />

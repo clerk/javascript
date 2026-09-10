@@ -1462,6 +1462,9 @@ export const caES: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Codi de restabliment de contrasenya',
       resendButton: 'No has rebut el codi? Reenvia',
@@ -1527,6 +1530,15 @@ export const caES: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Necessitem verificar la teva identitat abans de restablir la teva contrasenya.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: "Registra't",
