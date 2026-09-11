@@ -13,6 +13,7 @@ import {
   connectionBackingEmail,
   isEnterpriseConnectionConfigured,
   organizationEnterpriseConnection,
+  sortEnterpriseConnections,
 } from '../organizationEnterpriseConnection';
 
 const makeSamlConnection = (overrides: Partial<SamlAccountConnectionResource> = {}): SamlAccountConnectionResource =>
@@ -423,5 +424,45 @@ describe('connectionBackingEmail', () => {
   it('returns undefined for a null or undefined user', () => {
     expect(connectionBackingEmail(null)).toBeUndefined();
     expect(connectionBackingEmail(undefined)).toBeUndefined();
+  });
+});
+
+describe('sortEnterpriseConnections', () => {
+  const at = (id: string, createdAt: Date | null) => makeConnection({ id, createdAt });
+
+  it('orders by createdAt ascending regardless of the input order', () => {
+    const older = at('enc_b', new Date('2024-01-01T00:00:00Z'));
+    const newer = at('enc_a', new Date('2024-06-01T00:00:00Z'));
+
+    expect(sortEnterpriseConnections([newer, older]).map(c => c.id)).toEqual(['enc_b', 'enc_a']);
+  });
+
+  it('puts connections without a createdAt last', () => {
+    const dated = at('enc_b', new Date('2024-01-01T00:00:00Z'));
+    const undated = at('enc_a', null);
+
+    expect(sortEnterpriseConnections([undated, dated]).map(c => c.id)).toEqual(['enc_b', 'enc_a']);
+  });
+
+  it('breaks createdAt ties by id', () => {
+    const sameInstant = new Date('2024-01-01T00:00:00Z');
+    const connections = [at('enc_c', sameInstant), at('enc_a', sameInstant), at('enc_b', sameInstant)];
+
+    expect(sortEnterpriseConnections(connections).map(c => c.id)).toEqual(['enc_a', 'enc_b', 'enc_c']);
+  });
+
+  it('breaks ties by id among connections without a createdAt', () => {
+    expect(sortEnterpriseConnections([at('enc_z', null), at('enc_a', null)]).map(c => c.id)).toEqual([
+      'enc_a',
+      'enc_z',
+    ]);
+  });
+
+  it('does not mutate the input array', () => {
+    const connections = [at('enc_b', new Date('2024-06-01T00:00:00Z')), at('enc_a', new Date('2024-01-01T00:00:00Z'))];
+
+    sortEnterpriseConnections(connections);
+
+    expect(connections.map(c => c.id)).toEqual(['enc_b', 'enc_a']);
   });
 });
