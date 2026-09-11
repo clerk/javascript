@@ -47,9 +47,7 @@ describe('ProviderIcon', () => {
       expect(SUPPORTS_MASK_IMAGE).toEqual(['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x']);
     });
 
-    // The mask-image path tints the icon with the foreground color so it stays
-    // visible in dark mode, instead of painting the raw (black) SVG as a background.
-    it.each(SUPPORTS_MASK_IMAGE)('applies mask-image styles for supported provider %s', async id => {
+    it.each(SUPPORTS_MASK_IMAGE)('tints supported provider %s with the foreground color via mask-image', async id => {
       const { wrapper } = await createFixtures();
       const iconUrl = `https://example.com/${id}-icon.svg`;
 
