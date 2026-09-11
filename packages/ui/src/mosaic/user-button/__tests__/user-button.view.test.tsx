@@ -877,7 +877,20 @@ describe('UserButtonTrigger', () => {
     expect(caret({ mode: 'organization', renderTriggerLabel: false })).toBeNull();
   });
 
-  it('takes its corner from the workspace it names, labelled or not', () => {
+  it('shrinks the avatar beside a label, and fills the trigger with it alone', () => {
+    const avatarSize = (props: Partial<UserButtonProps>) => {
+      const { unmount } = renderTrigger(props);
+      const avatar = screen.getByRole('button', { name: /Open account menu/ }).querySelector('.cl-avatar');
+      const size = avatar?.getAttribute('data-size');
+      unmount();
+      return size;
+    };
+
+    expect(avatarSize({ mode: 'organization' })).toBe('xs');
+    expect(avatarSize({ mode: 'organization', renderTriggerLabel: false })).toBe('sm');
+  });
+
+  it('keeps the same corner for a user and an organization', () => {
     const corner = (props: Partial<UserButtonProps>) => {
       const { unmount } = renderTrigger(props);
       const className = screen.getByRole('button', { name: /Open account menu/ }).className;
@@ -885,10 +898,7 @@ describe('UserButtonTrigger', () => {
       return className;
     };
 
-    expect(corner({ mode: 'organization' })).not.toEqual(corner({ mode: 'user' }));
-    expect(corner({ mode: 'organization', renderTriggerLabel: false })).not.toEqual(
-      corner({ mode: 'user', renderTriggerLabel: false }),
-    );
+    expect(corner({ mode: 'organization' })).toEqual(corner({ mode: 'user' }));
   });
 
   it('names the active organization before its membership list has loaded', () => {
