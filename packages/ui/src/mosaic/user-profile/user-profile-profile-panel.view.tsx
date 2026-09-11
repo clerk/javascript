@@ -62,6 +62,7 @@ export function UserProfileProfilePanelView({
   onSetPrimaryEmail,
   onRemoveEmail,
   onAddPhone,
+  addPhone,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
@@ -93,6 +94,7 @@ export function UserProfileProfilePanelView({
           username={username}
           onAddEmail={onAddEmail}
           onAddPhone={onAddPhone}
+          addPhone={addPhone}
           onManageEmail={onManageEmail}
           onManagePhone={onManagePhone}
           onProfilePictureChange={onProfilePictureChange}

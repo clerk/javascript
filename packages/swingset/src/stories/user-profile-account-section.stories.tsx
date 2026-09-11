@@ -5,13 +5,12 @@ import type {
 } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileAddPhoneViewProps } from '@clerk/ui/mosaic/user-profile/user-profile-add-phone.view';
-import { UserProfileAddPhoneView } from '@clerk/ui/mosaic/user-profile/user-profile-add-phone.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
-import { useUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
+import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
@@ -48,39 +47,36 @@ function AccountSection({
     ...(allowMultipleAccounts ? [{ id: 'phone_2', value: '+18015550100', isVerified: true }] : []),
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
-  const addPhone = useUserProfileAddPhoneFixture({
+  const addPhone = createUserProfileAddPhoneFixture({
     failAt,
     onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
   });
 
   return (
-    <>
-      <UserProfileAccountSectionView
-        {...editName}
-        allowMultipleAccounts={allowMultipleAccounts}
-        emails={emails}
-        hasImage={Boolean(imageUrl)}
-        imageUrl={imageUrl}
-        phones={phones}
-        username='prestonxyz'
-        onAddEmail={() =>
-          setEmails(current => [
-            ...current,
-            { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
-          ])
-        }
-        onAddPhone={() => addPhone.onOpenChange(true)}
-        onProfilePictureChange={showFile}
-        onRemoveProfilePicture={clearImage}
-        onManageEmail={() => undefined}
-        onManagePhone={() => undefined}
-        onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
-        onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
-        onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
-        onUsernameChange={() => undefined}
-      />
-      <UserProfileAddPhoneView {...addPhone} />
-    </>
+    <UserProfileAccountSectionView
+      {...editName}
+      allowMultipleAccounts={allowMultipleAccounts}
+      emails={emails}
+      hasImage={Boolean(imageUrl)}
+      imageUrl={imageUrl}
+      phones={phones}
+      username='prestonxyz'
+      onAddEmail={() =>
+        setEmails(current => [
+          ...current,
+          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
+        ])
+      }
+      addPhone={addPhone}
+      onProfilePictureChange={showFile}
+      onRemoveProfilePicture={clearImage}
+      onManageEmail={() => undefined}
+      onManagePhone={() => undefined}
+      onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
+      onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
+      onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
+      onUsernameChange={() => undefined}
+    />
   );
 }
 

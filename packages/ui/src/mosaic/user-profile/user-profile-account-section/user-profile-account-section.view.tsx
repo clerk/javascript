@@ -1,6 +1,7 @@
 import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
 import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
+import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
 import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
@@ -13,6 +14,9 @@ import { Section } from '../../components/section';
 import { Text } from '../../components/text';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
+import type { UserProfileAddPhoneControllerOptions } from '../user-profile-add-phone.controller';
+import { useUserProfileAddPhoneController } from '../user-profile-add-phone.controller';
+import { UserProfileAddPhoneView } from '../user-profile-add-phone.view';
 import { styles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
@@ -76,6 +80,7 @@ export interface UserProfileAccountSectionViewProps {
   onSetPrimaryEmail?: (id: string) => void;
   onRemoveEmail?: (id: string) => void;
   onAddPhone?: () => void;
+  addPhone?: UserProfileAddPhoneControllerOptions;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
   onSetPrimaryPhone?: (id: string) => void | Promise<void>;
@@ -105,11 +110,18 @@ export function UserProfileAccountSectionView({
   onSetPrimaryEmail,
   onRemoveEmail,
   onAddPhone,
+  addPhone,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const addPhoneAction = addPhone ? (
+    <AddPhone
+      options={addPhone}
+      compact={allowMultipleAccounts}
+    />
+  ) : undefined;
   const sectionRef = useRef<HTMLDivElement>(null);
   const removeConfirm = useMemo(() => createConfirmHandle(), []);
   const [phoneToRemove, setPhoneToRemove] = useState<UserProfilePhone>();
@@ -280,6 +292,7 @@ export function UserProfileAccountSectionView({
               items={formattedPhones}
               kind='phone'
               label={m.phone.label}
+              addAction={addPhoneAction}
               onAdd={onAddPhone}
               onManage={onManagePhone}
             />
@@ -303,6 +316,7 @@ export function UserProfileAccountSectionView({
           items={formattedPhones}
           kind='phone'
           label={m.phone.label}
+          addAction={addPhoneAction}
           onAdd={onAddPhone}
           onManage={isSettingPrimary ? undefined : onManagePhone}
           onRemove={onRemovePhone ? id => void removePhone(id) : undefined}
@@ -433,7 +447,34 @@ function EditName({
   );
 }
 
+function AddPhone({ options, compact }: { options: UserProfileAddPhoneControllerOptions; compact: boolean }) {
+  const controller = useUserProfileAddPhoneController(options);
+  return (
+    <UserProfileAddPhoneView
+      {...controller}
+      trigger={
+        <Button
+          aria-label={m.phone.add}
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {compact ? (
+            <Icon
+              name='plus'
+              placement='inline-start'
+              size='sm'
+            />
+          ) : null}
+          {compact ? m.add : m.phone.add}
+        </Button>
+      }
+    />
+  );
+}
+
 interface ContactSectionProps {
+  addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
   items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
@@ -454,7 +495,7 @@ function ContactSection(props: ContactSectionProps) {
   );
 }
 
-function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectionProps) {
+function SingleContactRow({ kind, label, items, onAdd, onManage, addAction }: ContactSectionProps) {
   const item = items[0];
   const onClick = item ? (onManage ? () => onManage(item.id) : undefined) : onAdd;
   const emptyDescription = m[kind].empty;
@@ -474,7 +515,9 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
             <Section.Description>{emptyDescription}</Section.Description>
           )}
         </Section.Content>
-        {onClick ? (
+        {!item && addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onClick ? (
           <Section.Actions>
             <Button
               color='neutral'
@@ -491,7 +534,17 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
   );
 }
 
-function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimary, onRemove }: ContactSectionProps) {
+function ContactRow({
+  kind,
+  label,
+  items,
+  onAdd,
+  onManage,
+  onVerify,
+  onSetPrimary,
+  onRemove,
+  addAction,
+}: ContactSectionProps) {
   const emptyDescription = m[kind].empty;
 
   return (
@@ -500,7 +553,9 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
         <Section.Content>
           <Section.Label>{label}</Section.Label>
         </Section.Content>
-        {onAdd ? (
+        {addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onAdd ? (
           <Section.Actions>
             <Button
               aria-label={m[kind].add}

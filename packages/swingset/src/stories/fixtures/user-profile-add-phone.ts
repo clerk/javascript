@@ -1,4 +1,4 @@
-import { useUserProfileAddPhoneController } from '@clerk/ui/mosaic/user-profile/user-profile-add-phone.controller';
+import type { UserProfileAddPhoneControllerOptions } from '@clerk/ui/mosaic/user-profile/user-profile-add-phone.controller';
 import type { UserProfileAddPhoneViewProps } from '@clerk/ui/mosaic/user-profile/user-profile-add-phone.view';
 
 interface FixtureOptions {
@@ -6,8 +6,11 @@ interface FixtureOptions {
   onVerified?: (phoneNumber: string) => void;
 }
 
-export function useUserProfileAddPhoneFixture({ failAt, onVerified }: FixtureOptions = {}) {
-  return useUserProfileAddPhoneController({
+export function createUserProfileAddPhoneFixture({
+  failAt,
+  onVerified,
+}: FixtureOptions = {}): UserProfileAddPhoneControllerOptions {
+  return {
     initialPhoneNumber: '+18015558181',
     onSend: async () => {
       await new Promise(resolve => setTimeout(resolve, 700));
@@ -22,5 +25,5 @@ export function useUserProfileAddPhoneFixture({ failAt, onVerified }: FixtureOpt
       }
       onVerified?.(phoneNumber);
     },
-  });
+  };
 }
