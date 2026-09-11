@@ -18,6 +18,7 @@ export * from './DeletedObject';
 export * from './DisplayConfig';
 export * from './EmailAddress';
 export * from './EnterpriseAccount';
+export * from './DirectorySync';
 export * from './EnterpriseConnection';
 export * from './EnterpriseConnectionTestRun';
 export * from './Environment';
