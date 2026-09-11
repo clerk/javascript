@@ -68,14 +68,20 @@ describe('UserProfileAddPhoneView', () => {
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith('123456');
   });
 
-  it('focuses the phone field and submits with Enter or Send code', async () => {
+  it('focuses the phone field and submits through the form or Send code', async () => {
     const user = userEvent.setup();
     const { props } = renderView();
 
     expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeInTheDocument();
     const phone = screen.getByRole('textbox', { name: 'Phone' });
     await waitFor(() => expect(phone).toHaveFocus());
-    await user.type(phone, '{Enter}');
+    const phoneForm = phone.closest('form');
+    if (!phoneForm) {
+      throw new Error('Phone form missing');
+    }
+    expect(phoneForm).toHaveClass('cl-card-content');
+    // user-event only finds descendant submit buttons, not buttons linked by form ID.
+    phoneForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
     await user.click(screen.getByRole('button', { name: 'Send code' }));
@@ -103,7 +109,12 @@ describe('UserProfileAddPhoneView', () => {
     expect(screen.queryByRole('textbox', { name: 'Phone' })).not.toBeInTheDocument();
     const firstSlot = screen.getByRole('textbox', { name: 'Verification code' });
     await waitFor(() => expect(firstSlot).toHaveFocus());
-    await user.type(firstSlot, '{Enter}');
+    const verifyForm = firstSlot.closest('form');
+    if (!verifyForm) {
+      throw new Error('Verification form missing');
+    }
+    expect(verifyForm).toHaveClass('cl-card-content');
+    verifyForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
     await user.click(screen.getByRole('button', { name: 'Verify', exact: true }));

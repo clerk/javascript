@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
 import { stringToFormattedPhoneString } from '../../utils/phoneUtils';
 import { Button, SubmitButton } from '../components/button';
@@ -30,6 +30,8 @@ export interface UserProfileAddPhoneViewProps {
 }
 
 export function UserProfileAddPhoneView(props: UserProfileAddPhoneViewProps) {
+  const phoneFormId = useId();
+  const verifyFormId = useId();
   const phoneRef = useRef<HTMLInputElement>(null);
   const verifyRef = useRef<HTMLDivElement>(null);
 
@@ -74,33 +76,39 @@ export function UserProfileAddPhoneView(props: UserProfileAddPhoneViewProps) {
                     <Card.Title>{m.phone.title}</Card.Title>
                     <Card.Description>{m.phone.description}</Card.Description>
                   </Card.Header>
-                  <form onSubmit={handleSubmit}>
-                    <Card.Content>
-                      <Field.Root
-                        required
-                        disabled={current.isPending}
-                        invalid={Boolean(current.errorMessage)}
-                      >
-                        <Field.Label>{m.phone.label}</Field.Label>
-                        <PhoneInput
-                          ref={phoneRef}
-                          name='phoneNumber'
-                          value={current.phoneNumber}
-                          onValueChange={current.onPhoneNumberChange}
-                        />
-                        {current.errorMessage ? <Field.Error>{current.errorMessage}</Field.Error> : null}
-                      </Field.Root>
-                    </Card.Content>
-                    <Card.Footer>
-                      <SubmitButton
-                        fullWidth
-                        isPending={current.isPending}
-                        pendingLabel={m.phone.pending}
-                      >
-                        {m.phone.submit}
-                      </SubmitButton>
-                    </Card.Footer>
-                  </form>
+                  <Card.Content
+                    render={
+                      <form
+                        id={phoneFormId}
+                        onSubmit={handleSubmit}
+                      />
+                    }
+                  >
+                    <Field.Root
+                      required
+                      disabled={current.isPending}
+                      invalid={Boolean(current.errorMessage)}
+                    >
+                      <Field.Label>{m.phone.label}</Field.Label>
+                      <PhoneInput
+                        ref={phoneRef}
+                        name='phoneNumber'
+                        value={current.phoneNumber}
+                        onValueChange={current.onPhoneNumberChange}
+                      />
+                      {current.errorMessage ? <Field.Error>{current.errorMessage}</Field.Error> : null}
+                    </Field.Root>
+                  </Card.Content>
+                  <Card.Footer>
+                    <SubmitButton
+                      form={phoneFormId}
+                      fullWidth
+                      isPending={current.isPending}
+                      pendingLabel={m.phone.pending}
+                    >
+                      {m.phone.submit}
+                    </SubmitButton>
+                  </Card.Footer>
                 </Flow.Step>
                 <Flow.Step
                   ids={['verify']}
@@ -112,63 +120,69 @@ export function UserProfileAddPhoneView(props: UserProfileAddPhoneViewProps) {
                       {m.verify.description(stringToFormattedPhoneString(current.phoneNumber))}
                     </Card.Description>
                   </Card.Header>
-                  <form onSubmit={handleSubmit}>
-                    <Card.Content>
-                      <Field.Root
-                        required
-                        disabled={current.isPending}
-                        invalid={Boolean(current.errorMessage)}
+                  <Card.Content
+                    render={
+                      <form
+                        id={verifyFormId}
+                        onSubmit={handleSubmit}
+                      />
+                    }
+                  >
+                    <Field.Root
+                      required
+                      disabled={current.isPending}
+                      invalid={Boolean(current.errorMessage)}
+                    >
+                      <Field.Label visuallyHidden>{m.verify.label}</Field.Label>
+                      <Otp
+                        name='code'
+                        value={current.code}
+                        onValueChange={current.onCodeChange}
+                        onComplete={code => {
+                          if (!current.isPending && !current.isResending) {
+                            current.onSubmit(code);
+                          }
+                        }}
+                      />
+                      {current.errorMessage ? <Field.Error>{current.errorMessage}</Field.Error> : null}
+                      <Button
+                        type='button'
+                        size='sm'
+                        variant='link'
+                        color='neutral'
+                        disabled={current.isPending || current.isResending || (current.resendSeconds ?? 0) > 0}
+                        onClick={current.onResend}
                       >
-                        <Field.Label visuallyHidden>{m.verify.label}</Field.Label>
-                        <Otp
-                          name='code'
-                          value={current.code}
-                          onValueChange={current.onCodeChange}
-                          onComplete={code => {
-                            if (!current.isPending && !current.isResending) {
-                              current.onSubmit(code);
-                            }
-                          }}
-                        />
-                        {current.errorMessage ? <Field.Error>{current.errorMessage}</Field.Error> : null}
+                        {current.isResending
+                          ? m.verify.resending
+                          : (current.resendSeconds ?? 0) > 0
+                            ? m.verify.resendCountdown(current.resendSeconds ?? 0)
+                            : m.verify.resend}
+                      </Button>
+                    </Field.Root>
+                  </Card.Content>
+                  <Card.Footer>
+                    <Dialog.Close
+                      render={
                         <Button
-                          type='button'
-                          size='sm'
-                          variant='link'
+                          variant='outline'
                           color='neutral'
-                          disabled={current.isPending || current.isResending || (current.resendSeconds ?? 0) > 0}
-                          onClick={current.onResend}
-                        >
-                          {current.isResending
-                            ? m.verify.resending
-                            : (current.resendSeconds ?? 0) > 0
-                              ? m.verify.resendCountdown(current.resendSeconds ?? 0)
-                              : m.verify.resend}
-                        </Button>
-                      </Field.Root>
-                    </Card.Content>
-                    <Card.Footer>
-                      <Dialog.Close
-                        render={
-                          <Button
-                            variant='outline'
-                            color='neutral'
-                            fullWidth
-                          />
-                        }
-                      >
-                        {m.verify.cancel}
-                      </Dialog.Close>
-                      <SubmitButton
-                        fullWidth
-                        isPending={current.isPending}
-                        disabled={current.isResending}
-                        pendingLabel={m.verify.pending}
-                      >
-                        {m.verify.submit}
-                      </SubmitButton>
-                    </Card.Footer>
-                  </form>
+                          fullWidth
+                        />
+                      }
+                    >
+                      {m.verify.cancel}
+                    </Dialog.Close>
+                    <SubmitButton
+                      form={verifyFormId}
+                      fullWidth
+                      isPending={current.isPending}
+                      disabled={current.isResending}
+                      pendingLabel={m.verify.pending}
+                    >
+                      {m.verify.submit}
+                    </SubmitButton>
+                  </Card.Footer>
                 </Flow.Step>
               </>
             )}
