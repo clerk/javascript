@@ -663,6 +663,18 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/swingset',
+    files: ['packages/swingset/src/**/*'],
+    rules: {
+      'turbo/no-undeclared-env-vars': [
+        'error',
+        {
+          allowList: ['SWINGSET_DASHBOARD_URL'],
+        },
+      ],
+    },
+  },
+  {
     name: 'packages/upgrade',
     files: ['packages/upgrade/src/**/*'],
     rules: {
