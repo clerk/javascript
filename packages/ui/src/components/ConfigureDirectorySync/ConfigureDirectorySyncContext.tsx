@@ -5,6 +5,7 @@ import {
 import type { DirectorySyncProvider, DirectorySyncResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
+import { sortEnterpriseConnections } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import type { DirectorySyncProviderMeta } from './providerMeta';
 import { DIRECTORY_SYNC_PROVIDERS, directorySyncProviderForConnection } from './providerMeta';
 
@@ -49,9 +50,9 @@ export const ConfigureDirectorySyncProvider = ({
   children,
 }: ConfigureDirectorySyncProviderProps): JSX.Element => {
   const { data: connections, isLoading: isLoadingConnections } = __internal_useOrganizationEnterpriseConnections();
-  // The self-serve SSO flow enforces a single connection per organization; the
-  // directory hangs off that same connection.
-  const connection = connections?.[0];
+  // Per-connection Directory Sync is not modelled yet, so the directory hangs
+  // off the organization's first connection in deterministic order.
+  const connection = sortEnterpriseConnections(connections ?? [])[0];
   const enterpriseConnectionId = connection?.id ?? null;
 
   const {
