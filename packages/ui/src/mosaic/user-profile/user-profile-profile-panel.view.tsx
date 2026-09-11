@@ -17,7 +17,10 @@ import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
-export type { UserProfileFormError } from './user-profile-account-section/user-profile-account-section.types';
+export type {
+  UserProfileFormError,
+  UserProfileNameAttribute,
+} from './user-profile-account-section/user-profile-account-section.types';
 export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.view';
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
@@ -42,6 +45,8 @@ export function UserProfileProfilePanelView({
   username = '',
   firstName,
   lastName,
+  firstNameAttribute,
+  lastNameAttribute,
   emails = [],
   phones = [],
   connectedAccounts = [],
@@ -78,9 +83,11 @@ export function UserProfileProfilePanelView({
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
           firstName={firstName}
+          firstNameAttribute={firstNameAttribute}
           hasImage={hasImage}
           imageUrl={imageUrl}
           lastName={lastName}
+          lastNameAttribute={lastNameAttribute}
           name={name}
           phones={phones}
           username={username}

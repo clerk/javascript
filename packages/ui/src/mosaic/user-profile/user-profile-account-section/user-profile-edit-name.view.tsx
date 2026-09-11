@@ -9,7 +9,7 @@ import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
-import type { UserProfileFormError } from './user-profile-account-section.types';
+import type { UserProfileFormError, UserProfileNameAttribute } from './user-profile-account-section.types';
 
 export type UserProfileEditNameField = 'firstName' | 'lastName';
 
@@ -25,6 +25,9 @@ export interface UserProfileEditNameViewProps {
   trigger?: DialogTriggerProps['render'];
   firstName: string;
   lastName: string;
+  /** A disabled attribute drops its field; a required one blocks the submit while empty. */
+  firstNameAttribute?: UserProfileNameAttribute;
+  lastNameAttribute?: UserProfileNameAttribute;
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
   isSaving?: boolean;
@@ -33,8 +36,9 @@ export interface UserProfileEditNameViewProps {
 }
 
 /**
- * Edits the user's first and last name. Holds nothing, and validates nothing: the name the API will
- * take is the API's to decide, so the action stays live and a rejection comes back as `error`.
+ * Edits the user's first and last name. Holds nothing, and validates nothing beyond the native
+ * `required` the instance asks for: the name the API will take is the API's to decide, so the action
+ * stays live and a rejection comes back as `error`.
  */
 export function UserProfileEditNameView({
   open,
@@ -42,6 +46,8 @@ export function UserProfileEditNameView({
   trigger,
   firstName,
   lastName,
+  firstNameAttribute = {},
+  lastNameAttribute = {},
   onFirstNameChange,
   onLastNameChange,
   isSaving = false,
@@ -49,7 +55,9 @@ export function UserProfileEditNameView({
   onSave,
 }: UserProfileEditNameViewProps) {
   const formId = useId();
-  const firstNameRef = useRef<HTMLInputElement>(null);
+  const initialFocusRef = useRef<HTMLInputElement>(null);
+  const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;
+  const { enabled: showLastName = true, required: lastNameRequired = false } = lastNameAttribute;
 
   // `isSaving` only cancels the press on the action; it does not stop a native submit.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -68,7 +76,7 @@ export function UserProfileEditNameView({
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
         size='card'
-        initialFocus={firstNameRef}
+        initialFocus={initialFocusRef}
       >
         <Card.Root
           elevation='overlay'
@@ -93,27 +101,38 @@ export function UserProfileEditNameView({
                 <Banner.Label>{error.message}</Banner.Label>
               </Banner.Root>
             ) : null}
-            <Field.Root invalid={Boolean(error?.fields?.firstName)}>
-              <Field.Label>{m.name.firstNameLabel}</Field.Label>
-              <Input
-                ref={firstNameRef}
-                autoComplete='given-name'
-                disabled={isSaving}
-                value={firstName}
-                onChange={event => onFirstNameChange(event.target.value)}
-              />
-              {error?.fields?.firstName ? <Field.Error>{error.fields.firstName}</Field.Error> : null}
-            </Field.Root>
-            <Field.Root invalid={Boolean(error?.fields?.lastName)}>
-              <Field.Label>{m.name.lastNameLabel}</Field.Label>
-              <Input
-                autoComplete='family-name'
-                disabled={isSaving}
-                value={lastName}
-                onChange={event => onLastNameChange(event.target.value)}
-              />
-              {error?.fields?.lastName ? <Field.Error>{error.fields.lastName}</Field.Error> : null}
-            </Field.Root>
+            {showFirstName ? (
+              <Field.Root
+                invalid={Boolean(error?.fields?.firstName)}
+                required={firstNameRequired}
+              >
+                <Field.Label>{m.name.firstNameLabel}</Field.Label>
+                <Input
+                  ref={initialFocusRef}
+                  autoComplete='given-name'
+                  disabled={isSaving}
+                  value={firstName}
+                  onChange={event => onFirstNameChange(event.target.value)}
+                />
+                {error?.fields?.firstName ? <Field.Error>{error.fields.firstName}</Field.Error> : null}
+              </Field.Root>
+            ) : null}
+            {showLastName ? (
+              <Field.Root
+                invalid={Boolean(error?.fields?.lastName)}
+                required={lastNameRequired}
+              >
+                <Field.Label>{m.name.lastNameLabel}</Field.Label>
+                <Input
+                  ref={showFirstName ? undefined : initialFocusRef}
+                  autoComplete='family-name'
+                  disabled={isSaving}
+                  value={lastName}
+                  onChange={event => onLastNameChange(event.target.value)}
+                />
+                {error?.fields?.lastName ? <Field.Error>{error.fields.lastName}</Field.Error> : null}
+              </Field.Root>
+            ) : null}
           </Card.Content>
           <Card.Footer>
             <Dialog.Close

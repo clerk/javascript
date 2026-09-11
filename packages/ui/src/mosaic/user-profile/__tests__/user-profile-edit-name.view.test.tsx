@@ -89,6 +89,37 @@ describe('UserProfileEditNameView', () => {
     expect(onSave).toHaveBeenCalledTimes(1);
   });
 
+  it('renders both fields optional and enabled unless told otherwise', () => {
+    renderView();
+
+    expect(firstNameField()).not.toBeRequired();
+    expect(lastNameField()).not.toBeRequired();
+  });
+
+  it('marks a field required from its attribute', () => {
+    renderView({ firstNameAttribute: { required: true } });
+
+    expect(firstNameField()).toBeRequired();
+    expect(lastNameField()).not.toBeRequired();
+  });
+
+  it('holds the submit while a required field is empty', async () => {
+    const onSave = vi.fn();
+    const user = userEvent.setup();
+    renderView({ firstName: '', firstNameAttribute: { required: true }, onSave });
+
+    await user.click(saveButton());
+
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it('drops a field the instance has disabled, and opens on the one that remains', async () => {
+    renderView({ firstNameAttribute: { enabled: false } });
+
+    expect(screen.queryByLabelText('First name')).not.toBeInTheDocument();
+    await waitFor(() => expect(lastNameField()).toHaveFocus());
+  });
+
   it('asks to close from cancel', async () => {
     const onOpenChange = vi.fn();
     const user = userEvent.setup();

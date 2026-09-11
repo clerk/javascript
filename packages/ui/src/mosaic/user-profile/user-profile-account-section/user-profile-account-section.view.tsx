@@ -12,6 +12,7 @@ import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
 import { styles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
 import { UserProfileEditNameView } from './user-profile-edit-name.view';
@@ -50,6 +51,9 @@ export interface UserProfileAccountSectionViewProps {
   /** Passed alongside `name`, which cannot be split back into its two halves. */
   firstName?: string;
   lastName?: string;
+  /** How the instance configures each half of the name; both enabled and optional by default. */
+  firstNameAttribute?: UserProfileNameAttribute;
+  lastNameAttribute?: UserProfileNameAttribute;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
   onProfilePictureChange?: (file: File) => void;
@@ -83,6 +87,8 @@ export function UserProfileAccountSectionView({
   username,
   firstName,
   lastName,
+  firstNameAttribute,
+  lastNameAttribute,
   emails,
   phones,
   onProfilePictureChange,
@@ -164,6 +170,8 @@ export function UserProfileAccountSectionView({
                   <EditName
                     firstName={firstName}
                     lastName={lastName}
+                    firstNameAttribute={firstNameAttribute}
+                    lastNameAttribute={lastNameAttribute}
                     onSave={onSaveName}
                   />
                 </Section.Actions>
@@ -297,10 +305,14 @@ function ProfilePictureActions({
 function EditName({
   firstName,
   lastName,
+  firstNameAttribute,
+  lastNameAttribute,
   onSave,
 }: {
   firstName?: string;
   lastName?: string;
+  firstNameAttribute?: UserProfileNameAttribute;
+  lastNameAttribute?: UserProfileNameAttribute;
   onSave: (value: UserProfileEditNameValue) => Promise<void>;
 }) {
   const controller = useUserProfileEditNameController({ firstName, lastName, onSave });
@@ -308,6 +320,8 @@ function EditName({
   return (
     <UserProfileEditNameView
       {...controller}
+      firstNameAttribute={firstNameAttribute}
+      lastNameAttribute={lastNameAttribute}
       open={controller.isOpen}
       trigger={
         <Button
