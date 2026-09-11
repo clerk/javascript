@@ -1468,6 +1468,9 @@ export const taIN: LocalizationResource = {
       subtitle: 'நீங்கள் தொடர விரும்பும் நிறுவன கணக்கைத் தேர்ந்தெடுக்கவும்.',
       title: 'உங்கள் நிறுவன கணக்கைத் தேர்வு செய்யவும்',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'கடவுச்சொல் மீட்டமைப்பு குறியீடு',
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
@@ -1533,6 +1536,15 @@ export const taIN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'உங்கள் கடவுச்சொல்லை மீட்டமைப்பதற்கு முன் உங்கள் அடையாளத்தை சரிபார்க்க வேண்டும்.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'பதிவு செய்',

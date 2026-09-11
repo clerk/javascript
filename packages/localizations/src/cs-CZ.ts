@@ -1461,6 +1461,9 @@ export const csCZ: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kód pro resetování hesla',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -1526,6 +1529,15 @@ export const csCZ: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Před resetováním hesla musíme ověřit vaši identitu.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrovat se',

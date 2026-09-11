@@ -1,0 +1,57 @@
+import * as ComboboxStories from './combobox.stories';
+
+# Combobox
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={ComboboxStories}
+/>
+
+`value` is the selected option; `inputValue` is the search text. Clearing the input clears the selection.
+
+## Inline lists
+
+Use `List` inside an existing popover. Set `inline` and bind the root's open state to that popover
+so closing resets the search, not the selection.
+
+```tsx
+<Combobox.Root inline open={open} onOpenChange={setOpen} value={country} onValueChange={setCountry}>
+  <InputGroup.Root>
+    <InputGroup.Start>
+      <Icon name='search' aria-hidden='true' />
+    </InputGroup.Start>
+    <Combobox.Input aria-label='Search countries' />
+  </InputGroup.Root>
+  <Combobox.List>
+    <Combobox.Collection items={countries} itemToStringLabel={country => country.name}>
+      {country => (
+        <Combobox.Option key={country.iso} value={country.iso} label={country.name}>
+          {country.name}
+        </Combobox.Option>
+      )}
+    </Combobox.Collection>
+  </Combobox.List>
+</Combobox.Root>
+```
+
+## Scrolling
+
+<Story
+  name='Scrolling'
+  storyModule={ComboboxStories}
+/>
+
+## Parts
+
+| Part                  | Description                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| `Combobox.Root`       | Owns input, selection, open state, and keyboard navigation.                 |
+| `Combobox.Input`      | Search input; renders Mosaic `Input` unless composed through another input. |
+| `Combobox.Trigger`    | Opens and closes the option list while keeping focus on the input.          |
+| `Combobox.Popup`      | Portals, positions, surfaces, and scrolls a floating option list.           |
+| `Combobox.List`       | Scrollable inline listbox.                                                  |
+| `Combobox.Collection` | Filters items and renders each option, with an optional empty state.        |
+| `Combobox.Option`     | Selectable option with active, selected, and disabled states.               |
+| `Combobox.Empty`      | Empty result message.                                                       |

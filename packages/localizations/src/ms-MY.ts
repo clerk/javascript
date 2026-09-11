@@ -1467,6 +1467,9 @@ export const msMY: LocalizationResource = {
       subtitle: 'Pilih akaun perusahaan yang anda ingin teruskan.',
       title: 'Pilih akaun perusahaan anda',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod tetapan semula kata laluan',
       resendButton: 'Tidak menerima kod? Hantar semula',
@@ -1532,6 +1535,15 @@ export const msMY: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Kami perlu mengesahkan identiti anda sebelum menetapkan semula kata laluan anda.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Daftar',

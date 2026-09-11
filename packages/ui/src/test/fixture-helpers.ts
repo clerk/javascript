@@ -116,6 +116,12 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportResetPassword?: boolean;
   };
 
+  type SignInWithEnterpriseSSOParams = {
+    identifier?: string;
+    enterpriseConnections?: Array<{ id: string; name: string }>;
+    supportSSOFallback?: boolean;
+  };
+
   type SignInFactorTwoParams = {
     identifier?: string;
     supportPhoneCode?: boolean;
@@ -154,6 +160,28 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
             ]
           : []),
       ],
+      user_data: { ...(createUserFixture() as any) },
+    } as SignInJSON;
+  };
+
+  const startSignInWithEnterpriseSSO = (params?: SignInWithEnterpriseSSOParams) => {
+    const { identifier = 'hello@clerk.com', enterpriseConnections, supportSSOFallback } = params || {};
+    baseClient.sign_in = {
+      status: 'needs_first_factor',
+      identifier,
+      supported_identifiers: ['email_address'],
+      supported_first_factors: enterpriseConnections?.length
+        ? enterpriseConnections.map(({ id, name }) => ({
+            strategy: 'enterprise_sso',
+            enterprise_connection_id: id,
+            enterprise_connection_name: name,
+          }))
+        : [{ strategy: 'enterprise_sso' }],
+      ...(supportSSOFallback && {
+        sso_fallback_first_factors: [
+          { strategy: 'email_code', safe_identifier: identifier, email_address_id: 'idn_hmac' },
+        ],
+      }),
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
@@ -287,6 +315,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
 
   return {
     startSignInWithEmailAddress,
+    startSignInWithEnterpriseSSO,
     startSignInWithPhoneNumber,
     startSignInFactorTwo,
     startSignInClientTrust,

@@ -118,6 +118,7 @@ export class SignIn extends BaseResource implements SignInResource {
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
+  ssoFallbackFirstFactors: SignInFirstFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
@@ -639,6 +640,9 @@ export class SignIn extends BaseResource implements SignInResource {
       this.identifier = data.identifier;
       this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
+      this.ssoFallbackFirstFactors = deepSnakeToCamel(data.sso_fallback_first_factors ?? null) as
+        | SignInFirstFactor[]
+        | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
@@ -708,6 +712,7 @@ export class SignIn extends BaseResource implements SignInResource {
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
       supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      sso_fallback_first_factors: deepCamelToSnake(this.ssoFallbackFirstFactors) ?? undefined,
       first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
       second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
       identifier: this.identifier,
@@ -825,6 +830,10 @@ class SignInFuture implements SignInFutureResource {
 
   get supportedSecondFactors() {
     return this.#resource.supportedSecondFactors ?? [];
+  }
+
+  get ssoFallbackFirstFactors() {
+    return this.#resource.ssoFallbackFirstFactors ?? [];
   }
 
   get isTransferable() {

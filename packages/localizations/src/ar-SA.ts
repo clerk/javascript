@@ -1450,6 +1450,9 @@ export const arSA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'رمز تحقق لإعادة تعيين كلمة المرور',
       resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
@@ -1515,6 +1518,15 @@ export const arSA: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'نريد التحقق من هويتك قبل أعادة تعيين كلمة المرور',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'إنشاء حساب جديد',

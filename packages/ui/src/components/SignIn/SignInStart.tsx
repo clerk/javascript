@@ -41,6 +41,7 @@ import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
+  getSSOFallbackFactor,
   hasMultipleEnterpriseConnections,
   SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
   useHandleAuthenticateWithPasskey,
@@ -241,7 +242,7 @@ function SignInStartInternal(): JSX.Element {
         }
         switch (res.status) {
           case 'needs_first_factor': {
-            if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            if (!canRedirectToEnterpriseSSO(res)) {
               return navigate('factor-one');
             }
 
@@ -418,7 +419,7 @@ function SignInStartInternal(): JSX.Element {
           }
           break;
         case 'needs_first_factor': {
-          if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+          if (!canRedirectToEnterpriseSSO(res)) {
             if (options?.resetPasswordIntent) {
               return navigate('factor-one', {
                 searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
@@ -726,6 +727,17 @@ const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
 
   return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
 };
+
+/**
+ * Whether the sign-in can go straight to the identity provider without showing a card first.
+ *
+ * A connection choice and an SSO fallback are both only reachable from one, so either sends the
+ * user to `factor-one` instead.
+ */
+const canRedirectToEnterpriseSSO = (signIn: SignInResource): boolean =>
+  hasOnlyEnterpriseSSOFirstFactors(signIn) &&
+  !hasMultipleEnterpriseConnections(signIn.supportedFirstFactors) &&
+  !getSSOFallbackFactor(signIn);
 
 const InstantPasswordRow = ({
   field,

@@ -1462,6 +1462,9 @@ export const hiIN: LocalizationResource = {
       subtitle: 'वह एंटरप्राइज़ खाता चुनें जिसके साथ आप जारी रखना चाहते हैं।',
       title: 'अपना एंटरप्राइज़ खाता चुनें',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'पासवर्ड रीसेट कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
@@ -1528,6 +1531,15 @@ export const hiIN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'आपका पासवर्ड रीसेट करने से पहले हमें आपकी पहचान सत्यापित करनी होगी।',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'साइन अप करें',

@@ -1462,6 +1462,9 @@ export const ruRU: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код восстановления пароля',
       resendButton: 'Отправить код еще раз',
@@ -1527,6 +1530,15 @@ export const ruRU: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Необходимо верифицировать вашу личность перед восстановлением пароля',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Зарегистрироваться',

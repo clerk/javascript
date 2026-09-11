@@ -476,6 +476,26 @@ describe('SignInStart', () => {
         continueSignIn: true,
       });
     });
+
+    it('stops short of the redirect when the instance offers an SSO fallback', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+          ssoFallbackFirstFactors: [
+            { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
+          ],
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one');
+    });
   });
 
   describe('Identifier switching', () => {
@@ -1008,6 +1028,38 @@ describe('SignInStart', () => {
         '',
         expect.not.stringContaining('__clerk_ticket'),
       );
+    });
+
+    it('stops short of the redirect when the instance offers an SSO fallback', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        ssoFallbackFirstFactors: [
+          { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
+        ],
+      } as unknown as SignInResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-in?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: vi.fn() },
+      });
+
+      render(
+        <CardStateProvider>
+          <SignInStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one'));
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
     });
   });
 
