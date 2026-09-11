@@ -3,11 +3,19 @@ import type { DirectorySyncProvider } from '@clerk/shared/types';
 import type { LocalizationKey } from '@/customizables';
 import { localizationKeys } from '@/customizables';
 
+/**
+ * How the directory exchanges data with the identity provider.
+ *
+ * `push` providers hold a bearer token and push SCIM to Clerk's endpoint.
+ * `pull` providers hand Clerk a stored credential and Clerk reads from them on
+ * a schedule, so their setup collects a credential rather than handing one out.
+ */
+export type DirectorySyncMode = 'push' | 'pull';
+
 export interface DirectorySyncProviderMeta {
   name: LocalizationKey;
-  /** Whether the IdP can push SCIM to Clerk's endpoint (self-serve supported). */
-  supportsScim: boolean;
-  /** Where the admin pastes the endpoint + token, as numbered instructions. */
+  mode: DirectorySyncMode;
+  /** Setup instructions for the admin, as numbered steps. */
   instructions: LocalizationKey[];
 }
 
@@ -18,25 +26,33 @@ const instructionKeys = (provider: 'okta' | 'entra' | 'custom'): LocalizationKey
   localizationKeys(`configureDirectorySync.configureStep.instructions.${provider}.step4`),
 ];
 
+const googleInstructionKeys = (): LocalizationKey[] => [
+  localizationKeys('configureDirectorySync.configureStep.instructions.google.step1'),
+  localizationKeys('configureDirectorySync.configureStep.instructions.google.step2'),
+  localizationKeys('configureDirectorySync.configureStep.instructions.google.step3'),
+  localizationKeys('configureDirectorySync.configureStep.instructions.google.step4'),
+  localizationKeys('configureDirectorySync.configureStep.instructions.google.step5'),
+];
+
 export const DIRECTORY_SYNC_PROVIDERS: Record<DirectorySyncProvider, DirectorySyncProviderMeta> = {
   okta: {
     name: localizationKeys('configureDirectorySync.providers.okta'),
-    supportsScim: true,
+    mode: 'push',
     instructions: instructionKeys('okta'),
   },
   entra: {
     name: localizationKeys('configureDirectorySync.providers.entra'),
-    supportsScim: true,
+    mode: 'push',
     instructions: instructionKeys('entra'),
   },
   google: {
     name: localizationKeys('configureDirectorySync.providers.google'),
-    supportsScim: false,
-    instructions: [],
+    mode: 'pull',
+    instructions: googleInstructionKeys(),
   },
   custom: {
     name: localizationKeys('configureDirectorySync.providers.custom'),
-    supportsScim: true,
+    mode: 'push',
     instructions: instructionKeys('custom'),
   },
 };

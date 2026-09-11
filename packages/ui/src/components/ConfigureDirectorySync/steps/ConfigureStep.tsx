@@ -24,6 +24,7 @@ import { handleError } from '@/utils/errorHandler';
 import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
 import { useConfigureDirectorySync } from '../ConfigureDirectorySyncContext';
+import { GoogleCredentialsForm } from '../GoogleCredentialsForm';
 
 const FieldLabel = ({ id, localizationKey }: { id: string; localizationKey: LocalizationKey }): JSX.Element => (
   <Text
@@ -37,14 +38,16 @@ const FieldLabel = ({ id, localizationKey }: { id: string; localizationKey: Loca
 
 export const ConfigureStep = (): JSX.Element => {
   const { goNext } = useWizard();
-  const { connection, provider, providerMeta, directory, createDirectory, revealedToken, rotateToken } =
+  const { connection, providerMeta, directory, createDirectory, revealedToken, rotateToken } =
     useConfigureDirectorySync();
   const { t } = useLocalizations();
   const card = useCardState();
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
 
-  const isGoogle = provider === 'google';
-  const canProvision = Boolean(connection) && !isGoogle;
+  // Pull providers hand Clerk a credential instead of receiving a token, so the
+  // directory still has to exist first — it is what the credential attaches to.
+  const isPull = providerMeta?.mode === 'pull';
+  const canProvision = Boolean(connection);
   const domains = connection?.domains ?? [];
   const instructions = providerMeta?.instructions ?? [];
 
@@ -205,17 +208,7 @@ export const ConfigureStep = (): JSX.Element => {
                 )}
               </Col>
 
-              {isGoogle && (
-                <Alert
-                  variant='warning'
-                  title={localizationKeys('configureDirectorySync.configureStep.warning__googleUnsupported.title')}
-                  subtitle={localizationKeys(
-                    'configureDirectorySync.configureStep.warning__googleUnsupported.subtitle',
-                  )}
-                />
-              )}
-
-              {!connection.active && !isGoogle && (
+              {!connection.active && (
                 <Alert
                   variant='warning'
                   title={localizationKeys('configureDirectorySync.configureStep.warning__ssoInactive')}
@@ -223,85 +216,89 @@ export const ConfigureStep = (): JSX.Element => {
               )}
 
               {directory ? (
-                <>
-                  <Col sx={t => ({ gap: t.space.$1x5 })}>
-                    <FieldLabel
-                      id='endpointUrl'
-                      localizationKey={localizationKeys(
-                        'configureDirectorySync.configureStep.formFieldLabel__endpointUrl',
-                      )}
-                    />
-                    <ClipboardInput
-                      elementDescriptor={descriptors.configureDirectorySyncEndpointUrlInput}
-                      value={directory.endpointUrl}
-                      readOnly
-                      copyIcon={Clipboard}
-                      copiedIcon={Checkmark}
-                    />
-                  </Col>
+                isPull ? (
+                  <GoogleCredentialsForm />
+                ) : (
+                  <>
+                    <Col sx={t => ({ gap: t.space.$1x5 })}>
+                      <FieldLabel
+                        id='endpointUrl'
+                        localizationKey={localizationKeys(
+                          'configureDirectorySync.configureStep.formFieldLabel__endpointUrl',
+                        )}
+                      />
+                      <ClipboardInput
+                        elementDescriptor={descriptors.configureDirectorySyncEndpointUrlInput}
+                        value={directory.endpointUrl}
+                        readOnly
+                        copyIcon={Clipboard}
+                        copiedIcon={Checkmark}
+                      />
+                    </Col>
 
-                  <Col sx={t => ({ gap: t.space.$1x5 })}>
-                    <FieldLabel
-                      id='token'
-                      localizationKey={localizationKeys('configureDirectorySync.configureStep.formFieldLabel__token')}
-                    />
-                    <Flex
-                      align='center'
-                      sx={t => ({ gap: t.space.$2 })}
-                    >
-                      {revealedToken ? (
-                        <ClipboardInput
-                          elementDescriptor={descriptors.configureDirectorySyncTokenInput}
-                          value={revealedToken}
-                          readOnly
-                          copyIcon={Clipboard}
-                          copiedIcon={Checkmark}
-                          sx={{ flex: 1 }}
-                        />
-                      ) : (
-                        <Input
-                          elementDescriptor={descriptors.configureDirectorySyncTokenInput}
-                          value=''
-                          readOnly
-                          placeholder={t(
-                            localizationKeys('configureDirectorySync.configureStep.formFieldInputPlaceholder__token'),
+                    <Col sx={t => ({ gap: t.space.$1x5 })}>
+                      <FieldLabel
+                        id='token'
+                        localizationKey={localizationKeys('configureDirectorySync.configureStep.formFieldLabel__token')}
+                      />
+                      <Flex
+                        align='center'
+                        sx={t => ({ gap: t.space.$2 })}
+                      >
+                        {revealedToken ? (
+                          <ClipboardInput
+                            elementDescriptor={descriptors.configureDirectorySyncTokenInput}
+                            value={revealedToken}
+                            readOnly
+                            copyIcon={Clipboard}
+                            copiedIcon={Checkmark}
+                            sx={{ flex: 1 }}
+                          />
+                        ) : (
+                          <Input
+                            elementDescriptor={descriptors.configureDirectorySyncTokenInput}
+                            value=''
+                            readOnly
+                            placeholder={t(
+                              localizationKeys('configureDirectorySync.configureStep.formFieldInputPlaceholder__token'),
+                            )}
+                            sx={{ flex: 1 }}
+                          />
+                        )}
+                        <Button
+                          elementDescriptor={descriptors.configureDirectorySyncGenerateTokenButton}
+                          variant='outline'
+                          size='sm'
+                          isLoading={card.isLoading}
+                          onClick={() => void run(rotateToken)}
+                          localizationKey={localizationKeys(
+                            'configureDirectorySync.configureStep.actionLabel__generateToken',
                           )}
-                          sx={{ flex: 1 }}
+                          sx={{ flexShrink: 0 }}
                         />
-                      )}
-                      <Button
-                        elementDescriptor={descriptors.configureDirectorySyncGenerateTokenButton}
-                        variant='outline'
-                        size='sm'
-                        isLoading={card.isLoading}
-                        onClick={() => void run(rotateToken)}
-                        localizationKey={localizationKeys(
-                          'configureDirectorySync.configureStep.actionLabel__generateToken',
-                        )}
-                        sx={{ flexShrink: 0 }}
-                      />
-                    </Flex>
-                    <Flex
-                      elementDescriptor={descriptors.configureDirectorySyncTokenNotice}
-                      align='center'
-                      sx={t => ({ gap: t.space.$1x5 })}
-                    >
-                      <Icon
-                        icon={ExclamationTriangle}
-                        size='sm'
-                        colorScheme='neutral'
-                      />
-                      <Text
-                        as='span'
-                        colorScheme='secondary'
-                        localizationKey={localizationKeys(
-                          'configureDirectorySync.configureStep.notice__tokenShownOnce',
-                        )}
-                        sx={t => ({ fontSize: t.fontSizes.$sm })}
-                      />
-                    </Flex>
-                  </Col>
-                </>
+                      </Flex>
+                      <Flex
+                        elementDescriptor={descriptors.configureDirectorySyncTokenNotice}
+                        align='center'
+                        sx={t => ({ gap: t.space.$1x5 })}
+                      >
+                        <Icon
+                          icon={ExclamationTriangle}
+                          size='sm'
+                          colorScheme='neutral'
+                        />
+                        <Text
+                          as='span'
+                          colorScheme='secondary'
+                          localizationKey={localizationKeys(
+                            'configureDirectorySync.configureStep.notice__tokenShownOnce',
+                          )}
+                          sx={t => ({ fontSize: t.fontSizes.$sm })}
+                        />
+                      </Flex>
+                    </Col>
+                  </>
+                )
               ) : (
                 canProvision &&
                 !card.error && (
