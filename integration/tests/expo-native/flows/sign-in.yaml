@@ -1,13 +1,22 @@
 # Native AuthView email+password sign-in, asserting the native->JS session
-# sync, then JS-side sign-out asserting the reverse direction.
+# sync; then a restart WITHOUT clearing state, asserting the session is
+# restored from secure-store with no re-auth (bridge + token cache
+# persistence); then JS-side sign-out asserting the reverse direction.
 appId: com.clerk.exponativebuildfixture
-name: Native AuthView sign-in syncs to JS
+name: Native AuthView sign-in syncs to JS and survives a restart
 ---
 - runFlow: subflows/open-app.yaml
 - tapOn:
     id: 'open-auth-view-button'
 - runFlow: subflows/sign-in-email-password.yaml
 - runFlow: subflows/assert-signed-in.yaml
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: 'signed in'
+    timeout: 45000
+- assertVisible:
+    id: 'user-id'
 - tapOn:
     id: 'sign-out-button'
 - runFlow: subflows/assert-signed-out.yaml
