@@ -2,7 +2,7 @@ import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { fireEvent, render, screen, waitFor } from '@/test/utils';
 
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySyncWizard';
 
@@ -47,6 +47,18 @@ const directory = (overrides: Record<string, unknown> = {}) =>
     getUsers: vi.fn().mockResolvedValue({ data: [], total_count: 0 }),
     ...overrides,
   }) as any;
+
+const googleConnection = { ...oktaConnection, provider: 'saml_google' } as any;
+
+const googleDirectory = (overrides: Record<string, unknown> = {}) =>
+  directory({
+    provider: 'google',
+    credentialsConfigured: false,
+    setCredentials: vi.fn(),
+    sync: vi.fn(),
+    getSyncStatus: vi.fn().mockResolvedValue({ lastSyncedAt: null, lastSyncStatus: null, lastSyncError: null }),
+    ...overrides,
+  });
 
 const notFound = () =>
   new ClerkAPIResponseError('Not found', { status: 404, data: [{ code: 'resource_not_found', message: '' }] });
@@ -96,6 +108,59 @@ describe('ConfigureDirectorySyncWizard configure step', () => {
 
     expect(existing.rotateToken).toHaveBeenCalledTimes(1);
     expect(await screen.findByDisplayValue('tok_rotated')).toBeInTheDocument();
+  });
+
+  it('collects a credential for a Google Workspace connection instead of dead-ending', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const created = googleDirectory();
+    fixtures.clerk.organization?.getDirectorySync.mockRejectedValueOnce(notFound()).mockResolvedValue(created);
+    fixtures.clerk.organization?.createDirectorySync.mockResolvedValue(created);
+
+    render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    // Google used to render a "configure it in the Clerk Dashboard" notice here,
+    // which the organization admin has no account for.
+    expect(await screen.findByRole('button', { name: 'Upload JSON key' })).toBeInTheDocument();
+    expect(
+      screen.queryByText('Google Workspace connections are not configurable via self-serve'),
+    ).not.toBeInTheDocument();
+    // A pull directory has no endpoint or bearer token to hand out.
+    expect(screen.queryByDisplayValue('https://api.example.com/scim/v2')).not.toBeInTheDocument();
+    expect(screen.getByText('Not configured')).toBeInTheDocument();
+  });
+
+  it('sends the uploaded key and admin email, and does not keep the key afterwards', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory();
+    existing.setCredentials.mockResolvedValue(googleDirectory({ credentialsConfigured: true, enabled: true }));
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    // The input is hidden behind a styled button, which userEvent.upload will
+    // not interact with, so the change is dispatched directly.
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const keyFile = new File(['{"type":"service_account"}'], 'key.json', { type: 'application/json' });
+    fireEvent.change(fileInput, { target: { files: [keyFile] } });
+
+    // Reading the file is async, so the submit stays disabled until it lands.
+    expect(await screen.findByText('key.json')).toBeInTheDocument();
+
+    await userEvent.type(screen.getByPlaceholderText('admin@yourcompany.com'), 'admin@clerk.com');
+    await userEvent.click(screen.getByRole('button', { name: 'Save and enable' }));
+
+    await waitFor(() =>
+      expect(existing.setCredentials).toHaveBeenCalledWith({
+        serviceAccountJson: '{"type":"service_account"}',
+        subjectEmail: 'admin@clerk.com',
+      }),
+    );
+
+    // The key is dropped once accepted; the form must not still be holding it.
+    await waitFor(() => expect(screen.queryByText('key.json')).not.toBeInTheDocument());
   });
 
   it('blocks the step without an SSO connection', async () => {

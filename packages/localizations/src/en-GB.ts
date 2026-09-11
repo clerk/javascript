@@ -275,10 +275,6 @@ export const enGB: LocalizationResource = {
       notice__tokenShownOnce: undefined,
       subtitle: undefined,
       title: undefined,
-      warning__googleUnsupported: {
-        subtitle: undefined,
-        title: undefined,
-      },
       warning__ssoInactive: undefined,
     },
     navbar: {
