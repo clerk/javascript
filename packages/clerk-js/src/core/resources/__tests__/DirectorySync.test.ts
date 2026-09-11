@@ -69,6 +69,102 @@ describe('DirectorySync', () => {
     expect(result.apiKey).toBe('ak_new');
   });
 
+  it('stores pull credentials and reflects the activated directory', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: { ...directoryJSON, provider: 'google', enabled: true, credentials_configured: true },
+      }),
+    );
+
+    const result = await createDirectorySync().setCredentials({
+      serviceAccountJson: '{"type":"service_account"}',
+      subjectEmail: 'admin@example.com',
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: `${DIRECTORY_PATH}/credentials`,
+      body: {
+        service_account_json: '{"type":"service_account"}',
+        subject_email: 'admin@example.com',
+      },
+    });
+    expect(result.credentialsConfigured).toBe(true);
+    expect(result.enabled).toBe(true);
+  });
+
+  it('never retains the uploaded credential on the resource or its snapshot', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi
+      .fn()
+      .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, credentials_configured: true } }));
+
+    const directory = createDirectorySync();
+    const result = await directory.setCredentials({
+      serviceAccountJson: '{"private_key":"-----BEGIN PRIVATE KEY-----"}',
+      subjectEmail: 'admin@example.com',
+    });
+
+    // The key is an input only. Snapshots can be persisted, so a private key
+    // must never be reachable from one. Check the receiver as well as the
+    // returned resource: setCredentials returns a fresh instance, so a leak
+    // would sit on the object the method was called on.
+    for (const target of [directory, result]) {
+      expect(JSON.stringify(target)).not.toContain('PRIVATE KEY');
+      expect(JSON.stringify(target.__internal_toSnapshot())).not.toContain('PRIVATE KEY');
+    }
+  });
+
+  it('reports credentialsConfigured as null for push providers, which have no credential', () => {
+    const directory = createDirectorySync();
+
+    expect(directory.credentialsConfigured).toBeNull();
+  });
+
+  it('triggers a sync', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: null }));
+
+    await createDirectorySync().sync();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'POST', path: `${DIRECTORY_PATH}/sync` });
+  });
+
+  it('reads the last sync result', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: { last_synced_at: 1700000000000, last_sync_status: 'failed', last_sync_error: 'delegation denied' },
+      }),
+    );
+
+    const result = await createDirectorySync().getSyncStatus();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: `${DIRECTORY_PATH}/sync_status` });
+    expect(result.lastSyncedAt).toEqual(new Date(1700000000000));
+    expect(result.lastSyncStatus).toBe('failed');
+    expect(result.lastSyncError).toBe('delegation denied');
+  });
+
+  it('reads an unsynced directory as null rather than an epoch date', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi
+      .fn()
+      .mockReturnValue(
+        Promise.resolve({ response: { last_synced_at: null, last_sync_status: null, last_sync_error: null } }),
+      );
+
+    const result = await createDirectorySync().getSyncStatus();
+
+    expect(result.lastSyncedAt).toBeNull();
+    expect(result.lastSyncStatus).toBeNull();
+    expect(result.lastSyncError).toBeNull();
+  });
+
   it('deletes the directory', async () => {
     // @ts-ignore
     BaseResource._fetch = vi
