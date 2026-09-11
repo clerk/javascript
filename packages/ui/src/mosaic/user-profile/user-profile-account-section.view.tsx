@@ -351,15 +351,18 @@ function EmailContactSection(props: ContactSectionProps) {
     setContactToRemove(contact);
     setRemoveError(undefined);
     try {
+      const [beforeEmail, afterEmail] = messages.removeDialog.description.split('{emailAddress}');
       const confirmed = await removeConfirm.show({
-        title: messages.removeTitle,
+        title: messages.removeDialog.title,
         description: (
           <>
-            <strong {...stylex.props(styles.confirmationContactValue)}>{contact.value}</strong>{' '}
-            {messages.removeDescription}
+            {beforeEmail}
+            <strong {...stylex.props(styles.confirmationContactValue)}>{contact.value}</strong>
+            {afterEmail}
           </>
         ),
-        actionLabel: m.remove,
+        actionLabel: messages.removeDialog.confirm,
+        cancelLabel: messages.removeDialog.cancel,
         destructive: true,
       });
       if (confirmed) {
