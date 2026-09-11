@@ -65,7 +65,7 @@ A failed attempt leaves the dialog up. Pass the sentence the user should read as
 | `onOpenChange` | `(open: boolean) => void` | — (required) | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop. |
 | `trigger`      | `ReactNode`               | —            | The button that asks to open the dialog.                                       |
 | `title`        | `string`                  | — (required) | Names what is about to happen.                                                 |
-| `description`  | `string`                  | — (required) | Spells out what it means.                                                      |
+| `description`  | `ReactNode`               | — (required) | Spells out what it means. Takes markup, for a name to emphasise.               |
 | `actionLabel`  | `string`                  | — (required) | The destructive button's label.                                                |
 | `cancelLabel`  | `string`                  | `'Cancel'`   | The cancel button's label.                                                     |
 | `onConfirm`    | `() => void`              | — (required) | Asks the caller to run the action.                                             |

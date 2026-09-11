@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
@@ -13,8 +15,8 @@ export interface ConfirmationProps {
   trigger?: DialogTriggerProps['render'];
   /** Dialog heading */
   title: string;
-  /** What the action does and why it warrants a second look */
-  description: string;
+  /** What the action does and why it warrants a second look. Takes markup, for a name to emphasise */
+  description: ReactNode;
   /** Text of the confirming button */
   actionLabel: string;
   /** Text of the cancel button (default: "Cancel") */

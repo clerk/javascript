@@ -52,6 +52,21 @@ describe('Confirmation', () => {
     expect(onConfirm).toHaveBeenCalledOnce();
   });
 
+  it('renders markup in the description', () => {
+    renderBlock({
+      description: (
+        <>
+          <strong>preston@clerk.dev</strong> will be removed from this account.
+        </>
+      ),
+    });
+
+    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(
+      'preston@clerk.dev will be removed from this account.',
+    );
+    expect(screen.getByText('preston@clerk.dev').tagName).toBe('STRONG');
+  });
+
   it('asks to close from cancel', async () => {
     const onOpenChange = vi.fn();
     const user = userEvent.setup();
