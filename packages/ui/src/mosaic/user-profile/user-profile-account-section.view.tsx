@@ -1,13 +1,15 @@
 import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
 import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
+import { createConfirmHandle, Dialog } from '../components/dialog';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
+import { Text } from '../components/text';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
@@ -59,8 +61,8 @@ export interface UserProfileAccountSectionViewProps {
   onAddEmail?: () => void;
   onManageEmail?: (id: string) => void;
   onVerifyEmail?: (id: string) => void;
-  onSetPrimaryEmail?: (id: string) => void;
-  onRemoveEmail?: (id: string) => void;
+  onSetPrimaryEmail?: (id: string) => void | Promise<void>;
+  onRemoveEmail?: (id: string) => void | Promise<void>;
   onAddPhone?: () => void;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
@@ -206,7 +208,7 @@ export function UserProfileAccountSectionView({
         </Section.Group>
       </Section.Root>
       {allowMultipleAccounts ? (
-        <ContactSection
+        <EmailContactSection
           items={emails}
           kind='email'
           label={m.email.label}
@@ -296,8 +298,8 @@ interface ContactSectionProps {
   onAdd?: () => void;
   onManage?: (id: string) => void;
   onVerify?: (id: string) => void;
-  onSetPrimary?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onSetPrimary?: (id: string) => void | Promise<void>;
+  onRemove?: (id: string) => void | Promise<void>;
 }
 
 function ContactSection(props: ContactSectionProps) {
@@ -306,6 +308,112 @@ function ContactSection(props: ContactSectionProps) {
       <Section.Group>
         <ContactRow {...props} />
       </Section.Group>
+    </Section.Root>
+  );
+}
+
+function EmailContactSection(props: ContactSectionProps) {
+  const { items, onSetPrimary, onRemove } = props;
+  const messages = m.email;
+  const sectionRef = useRef<HTMLElement>(null);
+  const removeConfirm = useMemo(() => createConfirmHandle(), []);
+  const [contactToRemove, setContactToRemove] = useState<ContactSectionProps['items'][number]>();
+  const [removeError, setRemoveError] = useState<string>();
+  const removing = useRef(false);
+  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
+  const [primaryError, setPrimaryError] = useState<string>();
+  const settingPrimary = useRef(false);
+
+  const setPrimary = async (id: string) => {
+    const contact = items.find(item => item.id === id);
+    if (!onSetPrimary || !contact?.isVerified || contact.isDefault || settingPrimary.current) {
+      return;
+    }
+    settingPrimary.current = true;
+    setIsSettingPrimary(true);
+    setPrimaryError(undefined);
+    try {
+      await onSetPrimary(id);
+    } catch (error) {
+      setPrimaryError(error instanceof Error ? error.message : messages.primaryError);
+    } finally {
+      settingPrimary.current = false;
+      setIsSettingPrimary(false);
+    }
+  };
+
+  const removeContact = async (id: string) => {
+    const contact = items.find(item => item.id === id);
+    if (!contact || contact.canRemove === false || !onRemove || removing.current) {
+      return;
+    }
+    removing.current = true;
+    setContactToRemove(contact);
+    setRemoveError(undefined);
+    try {
+      const confirmed = await removeConfirm.show({
+        title: messages.removeTitle,
+        description: (
+          <>
+            <strong {...stylex.props(styles.confirmationContactValue)}>{contact.value}</strong>{' '}
+            {messages.removeDescription}
+          </>
+        ),
+        actionLabel: m.remove,
+        destructive: true,
+      });
+      if (confirmed) {
+        await onRemove(id);
+      }
+    } catch (error) {
+      setRemoveError(error instanceof Error ? error.message : messages.removeError);
+    } finally {
+      removing.current = false;
+    }
+  };
+
+  return (
+    <Section.Root
+      ref={sectionRef}
+      aria-label={props.label}
+    >
+      <Section.Group>
+        <ContactRow
+          {...props}
+          onManage={isSettingPrimary ? undefined : props.onManage}
+          onSetPrimary={onSetPrimary && !isSettingPrimary ? id => void setPrimary(id) : undefined}
+          onRemove={onRemove ? id => void removeContact(id) : undefined}
+        />
+      </Section.Group>
+      {primaryError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {primaryError}
+        </Text>
+      ) : null}
+      {removeError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {removeError}
+        </Text>
+      ) : null}
+      <Dialog.Confirm
+        handle={removeConfirm}
+        finalFocus={() => {
+          const buttons = Array.from(sectionRef.current?.querySelectorAll('button') ?? []);
+          const label = contactToRemove ? fill(m.manageValue, { value: contactToRemove.value }) : '';
+          return (
+            buttons.find(button => button.getAttribute('aria-label') === label) ??
+            buttons.find(button => button.getAttribute('aria-label') === messages.add) ??
+            buttons[0] ??
+            false
+          );
+        }}
+      />
     </Section.Root>
   );
 }
@@ -393,14 +501,14 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
                 onClick: () => onVerify(item.id),
               });
             } else if (!item.isDefault && item.isVerified === true && onSetPrimary) {
-              actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
+              actions.push({ label: m.setPrimary, onClick: () => void onSetPrimary(item.id) });
             }
 
             if (onRemove && item.canRemove !== false) {
               actions.push({
                 label: m[kind].remove,
                 color: 'negative',
-                onClick: () => onRemove(item.id),
+                onClick: () => void onRemove(item.id),
               });
             }
 

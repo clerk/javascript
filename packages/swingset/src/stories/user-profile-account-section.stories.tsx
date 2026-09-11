@@ -63,6 +63,7 @@ function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: bool
       onManagePhone={() => undefined}
       onProfilePictureChange={showFile}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
+      onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onRemoveProfilePicture={clearImage}
       onNameChange={() => undefined}

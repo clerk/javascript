@@ -37,6 +37,7 @@ export const userProfileAccountSectionBase = {
   },
   primary: 'Primary',
   add: 'Add',
+  remove: 'Remove',
   manage: 'Manage',
   setPrimary: 'Set as primary',
   completeVerification: 'Complete verification',
@@ -49,6 +50,10 @@ export const userProfileAccountSectionBase = {
     add: 'Add email',
     verify: 'Verify',
     remove: 'Remove email',
+    removeTitle: 'Remove email address?',
+    removeDescription: 'will be removed from your account. You won’t be able to use it to sign in.',
+    primaryError: 'Unable to set the primary email address. Try again.',
+    removeError: 'Unable to remove this email address. Try again.',
   },
   phone: {
     label: 'Phone',
