@@ -5,6 +5,7 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
@@ -31,10 +32,14 @@ export function Default(_args: Record<string, unknown>) {
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage(profileImageUrl);
   const editName = useUserProfileEditNameFixture();
+  const emailFlow = createUserProfileAddEmailFixture({
+    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+  });
 
   return (
     <UserProfileProfilePanelView
       {...editName}
+      {...emailFlow}
       allowMultipleAccounts
       emails={emails}
       connectedAccounts={[
@@ -67,12 +72,6 @@ export function Default(_args: Record<string, unknown>) {
       imageUrl={imageUrl}
       phones={phones}
       username='prestonxyz'
-      onAddEmail={() =>
-        setEmails(current => [
-          ...current,
-          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
-        ])
-      }
       onAddPhone={() =>
         setPhones(current => [
           ...current,
@@ -95,7 +94,7 @@ export function Default(_args: Record<string, unknown>) {
       onConnectWeb3Wallet={() => undefined}
       onRemoveWeb3Wallet={() => undefined}
       onSetPrimaryWeb3Wallet={() => undefined}
-      onSetPrimaryEmail={() => undefined}
+      onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
       onSetPrimaryPhone={() => undefined}
       onVerifyEmail={() => undefined}
       onVerifyPhone={() => undefined}

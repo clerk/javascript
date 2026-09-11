@@ -414,6 +414,12 @@ describe('UserProfileProfilePanelView', () => {
     const removeEmail = screen.getByRole('menuitem', { name: 'Remove email' });
     expect(removeEmail).toHaveAttribute('data-color', 'negative');
     await user.click(removeEmail);
+    expect(onRemoveEmail).not.toHaveBeenCalled();
+    await user.click(
+      within(screen.getByRole('alertdialog', { name: 'Remove email address?' })).getByRole('button', {
+        name: 'Remove',
+      }),
+    );
     expect(onRemoveEmail).toHaveBeenCalledWith('email_secondary');
 
     await user.click(screen.getByRole('button', { name: 'Manage unverified@clerk.dev' }));
