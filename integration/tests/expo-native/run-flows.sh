@@ -23,9 +23,11 @@ device_count=${#devices[@]}
 
 force_stop() {
   local device
-  for device in ${devices[@]+"${devices[@]}"}; do
+  for device in "${devices[@]:-booted}"; do
     if [ "$PLATFORM" = ios ]; then
       xcrun simctl terminate "$device" "$app_id" >/dev/null 2>&1 || true
+    elif [ "$device" = booted ]; then
+      adb shell am force-stop "$app_id" >/dev/null 2>&1 || true
     else
       adb -s "$device" shell am force-stop "$app_id" >/dev/null 2>&1 || true
     fi

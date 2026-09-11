@@ -371,6 +371,7 @@ jobs:
       # add-mask only covers step logs, not artifact contents. Must run whenever
       # the upload does, or a passing run uploads the password.
       - name: Scrub test credentials from Maestro debug output
+        id: scrub
         if: always() && steps.user.outputs.user_id != ''
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
@@ -383,7 +384,7 @@ jobs:
             -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
 
       - name: Upload Maestro artifacts
-        if: always() && steps.user.outputs.user_id != ''
+        if: always() && steps.scrub.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: maestro-${{ matrix.platform }}
