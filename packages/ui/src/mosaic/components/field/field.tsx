@@ -11,7 +11,7 @@ import { Icon } from '../icon';
 import { FieldProvider, useOptionalFieldContext, useRegisterFieldPartId } from './field.context';
 import { styles } from './field.styles';
 
-function useNativeLabelWarning(label: HTMLLabelElement | null) {
+function useNativeLabelWarning(label: HTMLElement | null) {
   React.useEffect(() => {
     if (process.env.NODE_ENV !== 'production' && label && label.tagName !== 'LABEL') {
       console.warn('[clerk] <Field.Label> must render a native `<label>` element.');
@@ -57,7 +57,8 @@ export interface FieldLabelProps extends MosaicComponentProps<'label'> {
   visuallyHidden?: boolean;
 }
 
-const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function MosaicFieldLabel(
+// Typed to `HTMLElement`: a select's label renders as a span.
+const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFieldLabel(
   {
     render,
     className,
@@ -78,7 +79,7 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
   const nativeLabel = htmlForProp !== undefined || context?.labelElementType !== 'span';
   const controlId = context?.controlId;
   const htmlFor = htmlForProp ?? (nativeLabel ? controlId : undefined);
-  const [label, setLabel] = React.useState<HTMLLabelElement | null>(null);
+  const [label, setLabel] = React.useState<HTMLElement | null>(null);
   useRegisterFieldPartId(htmlForProp === undefined ? id : undefined, context?.setLabelIds);
   useNativeLabelWarning(nativeLabel ? label : null);
   const handleClick = (event: React.MouseEvent<HTMLLabelElement>) => {
