@@ -68,9 +68,18 @@ describe('mergeStyleProps', () => {
     const rest = { className: 'cl-dialog-title', style: { color: 'red' }, id: 'title' };
     const merged = mergeStyleProps({ className: 'cl-heading' }, { className: 'x1', style: { margin: 0 } }, rest);
     expect(merged).toEqual({
-      className: 'cl-heading x1 cl-dialog-title',
+      className: 'cl-heading cl-dialog-title x1',
       style: { margin: 0, color: 'red' },
       id: 'title',
     });
+  });
+
+  it('groups the cl-* slot classes ahead of the hashed atoms, keeping each group in order', () => {
+    const merged = mergeStyleProps(
+      { className: 'cl-heading' },
+      { className: 'x1 x2' },
+      { className: 'cl-dialog-title x3' },
+    );
+    expect(merged.className).toBe('cl-heading cl-dialog-title x1 x2 x3');
   });
 });
