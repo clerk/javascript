@@ -109,9 +109,9 @@ function mergeTwoProps(base: PropsObject, overrides: PropsObject): PropsObject {
 
 /**
  * Fuse a part's `themeProps(...)`, its `stylex.props(...)` result, and the props it was
- * called with into one spreadable object, left to right: `className` concatenates,
- * `style` shallow-merges with the later bag winning, everything else is overwritten by
- * the later bag.
+ * called with into one spreadable object, left to right: `className` concatenates (the
+ * `cl-*` slot classes grouped first), `style` shallow-merges with the later bag winning,
+ * everything else is overwritten by the later bag.
  *
  *   mergeStyleProps(themeProps('button', { variant }), stylex.props(styles.base, xstyle), rest)
  *
@@ -136,5 +136,19 @@ export function mergeStyleProps(...bags: Array<PropsObject | undefined>): PropsO
       merged = mergeTwoProps(merged, bag);
     }
   }
+  if (merged.className) {
+    merged.className = groupSlotClasses(merged.className);
+  }
   return merged;
+}
+
+// Order carries no cascade meaning; the slot classes lead so `class="cl-heading cl-dialog-title x1…"`
+// reads in devtools without hunting for them between the hashed atoms.
+function groupSlotClasses(className: string): string {
+  const slots: string[] = [];
+  const atoms: string[] = [];
+  for (const token of className.split(' ')) {
+    (token.startsWith('cl-') ? slots : atoms).push(token);
+  }
+  return [...slots, ...atoms].join(' ');
 }
