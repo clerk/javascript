@@ -28,10 +28,7 @@ env:
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
   MAESTRO_VERSION: '2.8.0'
-  # Skips a blocking network call on every CLI start.
   MAESTRO_CLI_NO_ANALYTICS: '1'
-  # Devices per e2e job; the flows are split across them. A second driver
-  # took up to 130s to come up beside the first, past the default startup timeout.
   MAESTRO_SHARDS: '2'
   MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
 
