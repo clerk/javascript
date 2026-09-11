@@ -54,7 +54,7 @@ export function UserProfileProfilePanelView({
   onProfilePictureChange,
   onProfilePictureReject,
   onRemoveProfilePicture,
-  onSaveName,
+  onSubmitName,
   onUsernameChange,
   onAddEmail,
   onManageEmail,
@@ -104,7 +104,7 @@ export function UserProfileProfilePanelView({
           onSetPrimaryPhone={onSetPrimaryPhone}
           onVerifyEmail={onVerifyEmail}
           onVerifyPhone={onVerifyPhone}
-          onSaveName={onSaveName}
+          onSubmitName={onSubmitName}
           onUsernameChange={onUsernameChange}
         />
         {connectedAccounts.length > 0 ? (

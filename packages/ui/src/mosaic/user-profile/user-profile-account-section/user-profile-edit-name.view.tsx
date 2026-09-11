@@ -32,7 +32,7 @@ export interface UserProfileEditNameViewProps {
   onLastNameChange: (value: string) => void;
   isSaving?: boolean;
   error?: UserProfileFormError<UserProfileEditNameField>;
-  onSave: () => void;
+  onSubmit: () => void;
 }
 
 /**
@@ -52,7 +52,7 @@ export function UserProfileEditNameView({
   onLastNameChange,
   isSaving = false,
   error,
-  onSave,
+  onSubmit,
 }: UserProfileEditNameViewProps) {
   const formId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
@@ -63,7 +63,7 @@ export function UserProfileEditNameView({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isSaving) {
-      onSave();
+      onSubmit();
     }
   };
 

@@ -65,7 +65,7 @@ export interface UserProfileAccountSectionViewProps {
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
   onRemoveProfilePicture?: () => void;
   /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. Omit to hide the action. */
-  onSaveName?: (value: UserProfileEditNameValue) => Promise<void>;
+  onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
   onUsernameChange?: (value: string) => void;
   onAddEmail?: () => void;
   onManageEmail?: (id: string) => void;
@@ -94,7 +94,7 @@ export function UserProfileAccountSectionView({
   onProfilePictureChange,
   onProfilePictureReject,
   onRemoveProfilePicture,
-  onSaveName,
+  onSubmitName,
   onUsernameChange,
   onAddEmail,
   onManageEmail,
@@ -165,14 +165,14 @@ export function UserProfileAccountSectionView({
                 <Section.Label>{m.name.label}</Section.Label>
                 <Section.Description>{name}</Section.Description>
               </Section.Content>
-              {onSaveName ? (
+              {onSubmitName ? (
                 <Section.Actions>
                   <EditName
                     firstName={firstName}
                     lastName={lastName}
                     firstNameAttribute={firstNameAttribute}
                     lastNameAttribute={lastNameAttribute}
-                    onSave={onSaveName}
+                    onSubmit={onSubmitName}
                   />
                 </Section.Actions>
               ) : null}
@@ -307,15 +307,15 @@ function EditName({
   lastName,
   firstNameAttribute,
   lastNameAttribute,
-  onSave,
+  onSubmit,
 }: {
   firstName?: string;
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
-  onSave: (value: UserProfileEditNameValue) => Promise<void>;
+  onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
 }) {
-  const controller = useUserProfileEditNameController({ firstName, lastName, onSave });
+  const controller = useUserProfileEditNameController({ firstName, lastName, onSubmit });
 
   return (
     <UserProfileEditNameView

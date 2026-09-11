@@ -32,7 +32,7 @@ describe('UserProfileProfilePanelView', () => {
   it('composes the profile content without profile navigation', () => {
     renderView({
       onProfilePictureChange: vi.fn(),
-      onSaveName: () => Promise.resolve(),
+      onSubmitName: () => Promise.resolve(),
       onUsernameChange: vi.fn(),
     });
 
@@ -339,7 +339,7 @@ describe('UserProfileProfilePanelView', () => {
   it('forwards profile and contact actions', async () => {
     const onAddEmail = vi.fn();
     const onManageEmail = vi.fn();
-    renderView({ onSaveName: () => Promise.resolve(), onAddEmail, onManageEmail });
+    renderView({ onSubmitName: () => Promise.resolve(), onAddEmail, onManageEmail });
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
@@ -355,9 +355,9 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('drives the edit-name dialog from the section, seeded with the saved name', async () => {
-    const onSaveName = vi.fn(() => Promise.resolve());
+    const onSubmitName = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
-    renderView({ firstName: 'Preston', lastName: 'Booth', onSaveName });
+    renderView({ firstName: 'Preston', lastName: 'Booth', onSubmitName });
 
     await user.click(screen.getByRole('button', { name: 'Edit name' }));
     const dialog = screen.getByRole('dialog', { name: 'Edit name' });
@@ -368,7 +368,7 @@ describe('UserProfileProfilePanelView', () => {
     await user.type(within(dialog).getByLabelText('Last name'), 'Barton');
     await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
 
-    expect(onSaveName).toHaveBeenCalledWith({ firstName: 'Preston', lastName: 'Barton' });
+    expect(onSubmitName).toHaveBeenCalledWith({ firstName: 'Preston', lastName: 'Barton' });
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit name' })).not.toBeInTheDocument());
   });
 

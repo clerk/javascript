@@ -93,7 +93,7 @@ describe('userProfileEditNameMachine', () => {
 describe('useUserProfileEditNameController', () => {
   it('holds the dialog open across editing and saving, then closes on success', async () => {
     const { result } = renderHook(() =>
-      useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSave: () => Promise.resolve() }),
+      useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSubmit: () => Promise.resolve() }),
     );
     expect(result.current.isOpen).toBe(false);
 
@@ -105,7 +105,7 @@ describe('useUserProfileEditNameController', () => {
     act(() => result.current.onLastNameChange('Barton'));
     expect(result.current.lastName).toBe('Barton');
 
-    act(() => result.current.onSave());
+    act(() => result.current.onSubmit());
     expect(result.current.isOpen).toBe(true);
     expect(result.current.isSaving).toBe(true);
 
@@ -113,15 +113,15 @@ describe('useUserProfileEditNameController', () => {
   });
 
   it('saves the values it is currently holding', async () => {
-    const onSave = vi.fn(() => Promise.resolve());
+    const onSubmit = vi.fn(() => Promise.resolve());
     const { result } = renderHook(() =>
-      useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSave }),
+      useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSubmit }),
     );
 
     act(() => result.current.onOpenChange(true));
     act(() => result.current.onFirstNameChange('Ada'));
-    act(() => result.current.onSave());
+    act(() => result.current.onSubmit());
 
-    await waitFor(() => expect(onSave).toHaveBeenCalledWith({ firstName: 'Ada', lastName: 'Booth' }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ firstName: 'Ada', lastName: 'Booth' }));
   });
 });

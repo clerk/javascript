@@ -26,7 +26,7 @@ export function useUserProfileEditNameFixture({
   return {
     ...name,
     name: [name.firstName, name.lastName].filter(Boolean).join(' '),
-    onSaveName: async (value: UserProfileEditNameValue) => {
+    onSubmitName: async (value: UserProfileEditNameValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith) {
         throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);

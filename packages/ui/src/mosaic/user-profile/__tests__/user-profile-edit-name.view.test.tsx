@@ -15,7 +15,7 @@ function renderView(overrides: Partial<UserProfileEditNameViewProps> = {}) {
     lastName: 'Booth',
     onFirstNameChange: vi.fn(),
     onLastNameChange: vi.fn(),
-    onSave: vi.fn(),
+    onSubmit: vi.fn(),
     ...overrides,
   };
   return {
@@ -80,13 +80,13 @@ describe('UserProfileEditNameView', () => {
   });
 
   it('submits from the action, without validating', async () => {
-    const onSave = vi.fn();
+    const onSubmit = vi.fn();
     const user = userEvent.setup();
-    renderView({ firstName: '', onSave });
+    renderView({ firstName: '', onSubmit });
 
     await user.click(saveButton());
 
-    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
   it('renders both fields optional and enabled unless told otherwise', () => {
@@ -104,13 +104,13 @@ describe('UserProfileEditNameView', () => {
   });
 
   it('holds the submit while a required field is empty', async () => {
-    const onSave = vi.fn();
+    const onSubmit = vi.fn();
     const user = userEvent.setup();
-    renderView({ firstName: '', firstNameAttribute: { required: true }, onSave });
+    renderView({ firstName: '', firstNameAttribute: { required: true }, onSubmit });
 
     await user.click(saveButton());
 
-    expect(onSave).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it('drops a field the instance has disabled, and opens on the one that remains', async () => {
@@ -154,10 +154,10 @@ describe('UserProfileEditNameView', () => {
   });
 
   it('stays inert while the save runs', async () => {
-    const onSave = vi.fn();
+    const onSubmit = vi.fn();
     const onFirstNameChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ isSaving: true, onSave, onFirstNameChange });
+    renderView({ isSaving: true, onSubmit, onFirstNameChange });
 
     await user.type(firstNameField(), 'Ada');
 
@@ -166,6 +166,6 @@ describe('UserProfileEditNameView', () => {
     // Busy, not unavailable: the pending affordance is `isPending`, not a second disabled state.
     expect(saveButton()).toHaveAttribute('aria-busy', 'true');
     await user.click(saveButton());
-    expect(onSave).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

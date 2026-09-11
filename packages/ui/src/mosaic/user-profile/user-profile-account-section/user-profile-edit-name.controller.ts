@@ -83,7 +83,7 @@ export interface UserProfileEditNameControllerOptions {
   firstName?: string;
   lastName?: string;
   /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. */
-  onSave: (value: UserProfileEditNameValue) => Promise<void>;
+  onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
 }
 
 export interface UserProfileEditNameController {
@@ -93,7 +93,7 @@ export interface UserProfileEditNameController {
   lastName: string;
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
-  onSave: () => void;
+  onSubmit: () => void;
   isSaving: boolean;
   error: UserProfileFormError<UserProfileEditNameField> | undefined;
 }
@@ -101,10 +101,10 @@ export interface UserProfileEditNameController {
 export function useUserProfileEditNameController({
   firstName = '',
   lastName = '',
-  onSave,
+  onSubmit,
 }: UserProfileEditNameControllerOptions): UserProfileEditNameController {
   const [snapshot, send] = useMachine(userProfileEditNameMachine, {
-    context: { saveName: onSave, savedFirstName: firstName, savedLastName: lastName },
+    context: { saveName: onSubmit, savedFirstName: firstName, savedLastName: lastName },
   });
 
   return {
@@ -114,7 +114,7 @@ export function useUserProfileEditNameController({
     lastName: snapshot.context.lastName,
     onFirstNameChange: value => send({ type: 'TYPE', field: 'firstName', value }),
     onLastNameChange: value => send({ type: 'TYPE', field: 'lastName', value }),
-    onSave: () => send({ type: 'SAVE' }),
+    onSubmit: () => send({ type: 'SAVE' }),
     isSaving: snapshot.value === 'saving',
     error: snapshot.context.error,
   };
