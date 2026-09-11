@@ -306,7 +306,7 @@ describe('Electron ClerkProvider', () => {
     tokenCache.getToken.mockResolvedValue('client-jwt');
     renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_before_request'>App</ClerkProvider>);
 
-    const request = {
+    const request: { credentials?: RequestCredentials; headers: Headers; url: URL } = {
       headers: new Headers(),
       url: new URL('https://api.clerk.test/v1/client'),
     };
