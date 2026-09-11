@@ -18,7 +18,6 @@ import { Popover } from '../components/popover';
 import { scrollAreaViewport } from '../components/scroll-area';
 import { Spinner } from '../components/spinner';
 import type { IconName } from '../icons/registry';
-import { fontWeightVars } from '../tokens.stylex';
 import { applyOrder } from '../utils/apply-order';
 import { focusOutline } from '../utils/focus-outline.styles';
 import { truncationStyles } from '../utils/typography.styles';
@@ -504,13 +503,7 @@ function OrganizationsHeading() {
   return (
     <Item.Root size='xs'>
       <Item.Content>
-        <Item.Description
-          style={{
-            fontWeight: fontWeightVars['--cl-font-medium'],
-          }}
-        >
-          {identifier}
-        </Item.Description>
+        <Item.Description xstyle={styles.accountIdentifier}>{identifier}</Item.Description>
       </Item.Content>
       {busy ? (
         <Trailing>

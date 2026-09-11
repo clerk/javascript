@@ -21,17 +21,13 @@ export const TextContext = React.createContext<Partial<TextProps> | null>(null);
  * `size` and `color` variants. Pass `render` for inline copy (`<span>`).
  */
 export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function MosaicText(rawProps, ref) {
-  const { size = 'sm', color = 'primary', render, className, style, ...rest } = useContextProps(rawProps, TextContext);
+  const { size = 'sm', color = 'primary', render, xstyle, ...rest } = useContextProps(rawProps, TextContext);
 
-  const props = {
-    ...mergeStyleProps(
-      themeProps('text', { size, color }),
-      stylex.props(reset.base, styles.base, sizes[size], colors[color]),
-      className,
-      style,
-    ),
-    ...rest,
-  };
+  const props = mergeStyleProps(
+    themeProps('text', { size, color }),
+    stylex.props(reset.base, styles.base, sizes[size], colors[color], xstyle),
+    rest,
+  );
 
   // useRender only runs for `render` (function or element); Emotion processes `css`
   // inside the consumer's own JSX there. The no-render fallback must stay JSX —

@@ -572,6 +572,18 @@ export default tseslint.config([
           message:
             "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
         },
+        // A Mosaic part takes `xstyle`, not `className`/`style`; its prop types already reject the pair,
+        // this names the replacement. Native elements (lowercase) are unaffected.
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXAttribute[name.name=/^(className|style)$/]",
+          message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
+        },
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXAttribute[name.name=/^(className|style)$/]",
+          message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
+        },
       ],
     },
   },

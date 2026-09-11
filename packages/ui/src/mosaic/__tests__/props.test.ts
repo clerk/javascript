@@ -4,8 +4,8 @@ import { mergeStyleProps, themeProps } from '../props';
 
 // The public styling contract lives here, not in any one component: the stable
 // `.cl-<slot>` class, `data-<axis>` variant reflection, and the class/style merge
-// order that lets a consumer's `className`/`style` win. Components just wire their
-// props into these helpers, so this is where the contract is exhaustively pinned.
+// order that lets a later bag win. Components just wire their props into these
+// helpers, so this is where the contract is exhaustively pinned.
 
 describe('themeProps', () => {
   it('returns the stable slot class', () => {
@@ -43,32 +43,34 @@ describe('mergeStyleProps', () => {
     expect(merged.className).toBe('cl-button x1 x2');
   });
 
-  it('accepts a trailing string as an appended className', () => {
-    const merged = mergeStyleProps({ className: 'cl-button' }, { className: 'x1' }, 'consumer');
-    expect(merged.className).toBe('cl-button x1 consumer');
-  });
-
-  it('accepts a trailing object as a style and lets it win', () => {
-    const merged = mergeStyleProps({ style: { marginTop: '2px', color: 'red' } }, undefined, { marginTop: '8px' });
+  it('shallow-merges style with the later bag winning', () => {
+    const merged = mergeStyleProps({ style: { marginTop: '2px', color: 'red' } }, { style: { marginTop: '8px' } });
     expect(merged.style).toEqual({ marginTop: '8px', color: 'red' });
   });
 
-  it('disambiguates the trailing className and style pair by position', () => {
-    const merged = mergeStyleProps({ className: 'cl-button' }, undefined, 'consumer', { marginTop: '8px' });
-    expect(merged.className).toBe('cl-button consumer');
-    expect(merged.style).toEqual({ marginTop: '8px' });
-  });
-
-  it('treats a string second argument as a className', () => {
-    expect(mergeStyleProps({ className: 'cl-button' }, 'consumer').className).toBe('cl-button consumer');
+  it('skips undefined bags', () => {
+    const merged = mergeStyleProps({ className: 'cl-button' }, undefined, { className: 'x1' });
+    expect(merged.className).toBe('cl-button x1');
   });
 
   it('drops className entirely when nothing contributes one', () => {
     expect(mergeStyleProps({ 'data-color': 'primary' }, {})).not.toHaveProperty('className');
   });
 
-  it('preserves non-class/style props from both bags', () => {
-    const merged = mergeStyleProps({ 'data-color': 'primary' }, { role: 'button' });
-    expect(merged).toMatchObject({ 'data-color': 'primary', role: 'button' });
+  it('preserves non-class/style props from every bag, later bags winning', () => {
+    const merged = mergeStyleProps({ 'data-color': 'primary', role: 'note' }, { role: 'button' }, { id: 'x' });
+    expect(merged).toMatchObject({ 'data-color': 'primary', role: 'button', id: 'x' });
+  });
+
+  it("merges a render source's className/style out of the incoming prop bag", () => {
+    // `Dialog.Title render={<Heading />}` hands Heading the title's merged pair through its
+    // props; passing that bag last must merge them rather than clobber the part's own class.
+    const rest = { className: 'cl-dialog-title', style: { color: 'red' }, id: 'title' };
+    const merged = mergeStyleProps({ className: 'cl-heading' }, { className: 'x1', style: { margin: 0 } }, rest);
+    expect(merged).toEqual({
+      className: 'cl-heading x1 cl-dialog-title',
+      style: { margin: 0, color: 'red' },
+      id: 'title',
+    });
   });
 });

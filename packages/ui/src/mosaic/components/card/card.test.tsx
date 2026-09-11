@@ -9,6 +9,13 @@ import { Card } from './card';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
+const callerStyles = stylex.create({
+  root: { width: '20rem' },
+  header: { textAlign: 'right' },
+  content: { paddingInline: 0 },
+  footer: { paddingBlockEnd: 0 },
+});
+
 const responsiveLayout = stylex.create({
   root: {
     containerName: 'card',
@@ -80,39 +87,52 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
   });
 
-  it('lets consumer className and style win on every slot', () => {
+  it('composes caller xstyle onto every slot', () => {
     render(
       <Card.Root
-        className='my-card'
-        style={{ width: '20rem' }}
+        xstyle={callerStyles.root}
         data-testid='root'
       >
         <Card.Header
-          className='my-header'
-          style={{ textAlign: 'right' }}
+          xstyle={callerStyles.header}
           data-testid='header'
         />
         <Card.Content
-          className='my-content'
-          style={{ paddingInline: 0 }}
+          xstyle={callerStyles.content}
           data-testid='content'
         />
         <Card.Footer
-          className='my-footer'
-          style={{ paddingBlockEnd: 0 }}
+          xstyle={callerStyles.footer}
           data-testid='footer'
         />
       </Card.Root>,
     );
 
-    expect(screen.getByTestId('root')).toHaveClass('cl-card-root', 'my-card');
-    expect(screen.getByTestId('root')).toHaveStyle({ width: '20rem' });
-    expect(screen.getByTestId('header')).toHaveClass('cl-card-header', 'my-header');
-    expect(screen.getByTestId('header')).toHaveStyle({ textAlign: 'right' });
-    expect(screen.getByTestId('content')).toHaveClass('cl-card-content', 'my-content');
-    expect(screen.getByTestId('content')).toHaveStyle({ paddingInline: 0 });
-    expect(screen.getByTestId('footer')).toHaveClass('cl-card-footer', 'my-footer');
-    expect(screen.getByTestId('footer')).toHaveStyle({ paddingBlockEnd: 0 });
+    expect(screen.getByTestId('root')).toHaveClass('cl-card-root', stylex.props(callerStyles.root).className ?? '');
+    expect(screen.getByTestId('header')).toHaveClass(
+      'cl-card-header',
+      stylex.props(callerStyles.header).className ?? '',
+    );
+    expect(screen.getByTestId('content')).toHaveClass(
+      'cl-card-content',
+      stylex.props(callerStyles.content).className ?? '',
+    );
+    expect(screen.getByTestId('footer')).toHaveClass(
+      'cl-card-footer',
+      stylex.props(callerStyles.footer).className ?? '',
+    );
+  });
+
+  it('merges the className and style a render source hands a slot', () => {
+    render(
+      <Card.Root data-testid='root'>
+        <Card.Header render={<Card.Content data-testid='header' />} />
+      </Card.Root>,
+    );
+
+    // `Card.Header` clones its merged class onto the `Card.Content` it renders; the content
+    // keeps its own slot class rather than being overwritten by the incoming one.
+    expect(screen.getByTestId('header')).toHaveClass('cl-card-header', 'cl-card-content');
   });
 
   it('forwards refs and arbitrary props from compound slots', () => {

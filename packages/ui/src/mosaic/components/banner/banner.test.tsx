@@ -1,8 +1,18 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Banner } from './banner';
+
+const overrides = stylex.create({
+  root: { marginTop: '8px' },
+  label: { fontWeight: 700 },
+  description: { opacity: 0.8 },
+});
+
+const atoms = (style: stylex.StyleXStyles) =>
+  (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
 const COLORS = ['neutral', 'warning', 'negative'] as const;
 
@@ -60,21 +70,25 @@ describe('Mosaic Banner', () => {
     expect(container.querySelector('.cl-banner-root > .cl-icon')).toBeInTheDocument();
   });
 
-  it('lets the consumer className and style win on every part', () => {
+  it('applies xstyle on every part', () => {
     const { container } = render(
-      <Banner.Root
-        className='my-banner'
-        style={{ marginTop: '8px' }}
-      >
-        <Banner.Label className='my-label'>Label</Banner.Label>
-        <Banner.Description className='my-description'>Description</Banner.Description>
+      <Banner.Root xstyle={overrides.root}>
+        <Banner.Label xstyle={overrides.label}>Label</Banner.Label>
+        <Banner.Description xstyle={overrides.description}>Description</Banner.Description>
       </Banner.Root>,
     );
-    const root = container.querySelector('.cl-banner-root');
-    expect(root).toHaveClass('cl-banner-root', 'my-banner');
-    expect(root).toHaveStyle({ marginTop: '8px' });
-    expect(screen.getByText('Label')).toHaveClass('cl-banner-label', 'my-label');
-    expect(screen.getByText('Description')).toHaveClass('cl-banner-description', 'my-description');
+    expect(container.querySelector('.cl-banner-root')).toHaveClass('cl-banner-root', ...atoms(overrides.root));
+    expect(screen.getByText('Label')).toHaveClass('cl-banner-label', ...atoms(overrides.label));
+    expect(screen.getByText('Description')).toHaveClass('cl-banner-description', ...atoms(overrides.description));
+  });
+
+  it('merges a render-sourced className instead of clobbering its own', () => {
+    render(
+      <Banner.Root>
+        <Banner.Label render={<Banner.Description />}>Label</Banner.Label>
+      </Banner.Root>,
+    );
+    expect(screen.getByText('Label')).toHaveClass('cl-banner-label', 'cl-banner-description');
   });
 
   it('forwards arbitrary props and refs', () => {

@@ -3,7 +3,7 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { MosaicComponentProps } from '../../props';
+import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
@@ -32,7 +32,7 @@ export interface AvatarProps extends MosaicComponentProps<'span'> {
 }
 
 const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatarRoot(
-  { shape = 'circle', size = 'md', render, className, style, ...rest },
+  { shape = 'circle', size = 'md', render, xstyle, ...rest },
   ref,
 ) {
   const [status, setStatus] = React.useState<ImageLoadingStatus>('idle');
@@ -52,21 +52,20 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
           sizes[size],
           interactive && styles.interactive,
           interactive && focusOutline.visible,
+          xstyle,
         ),
-        className,
-        style,
+        rest,
       ),
-      ...rest,
     },
   });
 
   return <AvatarContext.Provider value={value}>{element}</AvatarContext.Provider>;
 });
 
-export type AvatarImageProps = React.ComponentPropsWithRef<'img'>;
+export type AvatarImageProps = MosaicElementProps<'img'>;
 
 const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(function MosaicAvatarImage(
-  { src, alt = '', className, style, ...rest },
+  { src, alt = '', xstyle, ...rest },
   ref,
 ) {
   const { status, onStatusChange } = useAvatarContext('Avatar.Image');
@@ -112,19 +111,18 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
       // An avatar is an identity mark, not content to pull out of the page — dragging one
       // only ever produces a stray ghost image mid-interaction.
       draggable={false}
-      {...mergeStyleProps(themeProps('avatar-image'), stylex.props(reset.base, styles.image), className, style)}
-      {...rest}
+      {...mergeStyleProps(themeProps('avatar-image'), stylex.props(reset.base, styles.image, xstyle), rest)}
     />
   );
 });
 
-export interface AvatarFallbackProps extends React.ComponentPropsWithRef<'span'> {
+export interface AvatarFallbackProps extends MosaicElementProps<'span'> {
   /** Wait this many ms before showing the fallback, to avoid a flash on fast connections. */
   delayMs?: number;
 }
 
 const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(function MosaicAvatarFallback(
-  { delayMs, className, style, children, ...rest },
+  { delayMs, xstyle, children, ...rest },
   ref,
 ) {
   const { status } = useAvatarContext('Avatar.Fallback');
@@ -149,11 +147,9 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
       ref={ref}
       {...mergeStyleProps(
         themeProps('avatar-fallback', { pending }),
-        stylex.props(reset.base, styles.fallback, pending && styles.fallbackPending),
-        className,
-        style,
+        stylex.props(reset.base, styles.fallback, pending && styles.fallbackPending, xstyle),
+        rest,
       )}
-      {...rest}
     >
       <span {...mergeStyleProps(themeProps('avatar-fallback-content'), stylex.props(styles.fallbackContent))}>
         {children}
@@ -162,10 +158,10 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
   );
 });
 
-export type AvatarIconProps = React.ComponentPropsWithRef<'span'>;
+export type AvatarIconProps = MosaicElementProps<'span'>;
 
 const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function MosaicAvatarIcon(
-  { className, style, ...rest },
+  { xstyle, ...rest },
   ref,
 ) {
   useAvatarContext('Avatar.Icon');
@@ -174,8 +170,7 @@ const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function M
     <span
       ref={ref}
       aria-hidden
-      {...mergeStyleProps(themeProps('avatar-icon'), stylex.props(reset.base, styles.icon), className, style)}
-      {...rest}
+      {...mergeStyleProps(themeProps('avatar-icon'), stylex.props(reset.base, styles.icon, xstyle), rest)}
     />
   );
 });

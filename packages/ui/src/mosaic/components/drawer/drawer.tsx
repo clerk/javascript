@@ -3,17 +3,21 @@ import { Drawer as Primitive, registerDrawerCssVars } from '@clerk/headless/draw
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { MosaicComponentProps } from '../../props';
+import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { DialogContext, isOverlayDialog } from '../dialog';
 import { styles } from './drawer.styles';
 
 export type DrawerRootProps = HeadlessDrawerProps;
-export type DrawerTriggerProps = React.ComponentPropsWithoutRef<typeof Primitive.Trigger>;
-export type DrawerCloseProps = React.ComponentPropsWithoutRef<typeof Primitive.Close>;
-export type DrawerTitleProps = React.ComponentPropsWithoutRef<typeof Primitive.Title>;
-export type DrawerDescriptionProps = React.ComponentPropsWithoutRef<typeof Primitive.Description>;
+// The headless parts pass through, minus `className`/`style` and plus `xstyle`, like every Mosaic part.
+type Passthrough<Part extends React.ElementType> = Omit<React.ComponentPropsWithoutRef<Part>, 'className' | 'style'> &
+  MosaicStyleProps;
+
+export type DrawerTriggerProps = Passthrough<typeof Primitive.Trigger>;
+export type DrawerCloseProps = Passthrough<typeof Primitive.Close>;
+export type DrawerTitleProps = Passthrough<typeof Primitive.Title>;
+export type DrawerDescriptionProps = Passthrough<typeof Primitive.Description>;
 
 export interface DrawerPopupProps extends MosaicComponentProps<'div'> {
   /** Where focus returns when the sheet closes. Default: the trigger. */
@@ -38,7 +42,7 @@ function Root(props: DrawerRootProps) {
  * `card` dialog it takes the nested scrim, the way a prompt does there.
  */
 const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function DrawerPopup(
-  { finalFocus, children, render, className, style, ...rest },
+  { finalFocus, children, render, xstyle, ...rest },
   ref,
 ) {
   const host = React.useContext(DialogContext);
@@ -58,8 +62,7 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
           ref={ref}
           render={render}
           finalFocus={finalFocus}
-          {...mergeStyleProps(themeProps('drawer-popup'), stylex.props(reset.base, styles.popup), className, style)}
-          {...rest}
+          {...mergeStyleProps(themeProps('drawer-popup'), stylex.props(reset.base, styles.popup, xstyle), rest)}
         >
           <Primitive.Handle {...mergeStyleProps(themeProps('drawer-handle'), stylex.props(reset.base, styles.handle))}>
             <span {...mergeStyleProps(themeProps('drawer-grip'), stylex.props(reset.base, styles.grip))} />
@@ -73,6 +76,48 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
   );
 });
 
+const Trigger = React.forwardRef<HTMLButtonElement, DrawerTriggerProps>(function DrawerTrigger(
+  { xstyle, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.Trigger
+      ref={ref}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
+    />
+  );
+});
+
+const Close = React.forwardRef<HTMLButtonElement, DrawerCloseProps>(function DrawerClose({ xstyle, ...rest }, ref) {
+  return (
+    <Primitive.Close
+      ref={ref}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
+    />
+  );
+});
+
+const Title = React.forwardRef<HTMLHeadingElement, DrawerTitleProps>(function DrawerTitle({ xstyle, ...rest }, ref) {
+  return (
+    <Primitive.Title
+      ref={ref}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
+    />
+  );
+});
+
+const Description = React.forwardRef<HTMLParagraphElement, DrawerDescriptionProps>(function DrawerDescription(
+  { xstyle, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.Description
+      ref={ref}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
+    />
+  );
+});
+
 /**
  * A bottom sheet: `Drawer.Root` holds the state, `Drawer.Trigger` opens it, and `Drawer.Popup`
  * renders the sheet with its scrim, portal and grip. `Drawer.Title` and `Drawer.Description` name
@@ -82,8 +127,8 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
 export const Drawer = {
   Root,
   Popup,
-  Trigger: Primitive.Trigger,
-  Title: Primitive.Title,
-  Description: Primitive.Description,
-  Close: Primitive.Close,
+  Trigger,
+  Title,
+  Description,
+  Close,
 };

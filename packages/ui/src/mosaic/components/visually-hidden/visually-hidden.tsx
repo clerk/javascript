@@ -20,7 +20,7 @@ export type VisuallyHiddenProps = MosaicComponentProps<'span'>;
  * <VisuallyHidden render={<div role='status' aria-live='polite' />}>{feedback}</VisuallyHidden>
  */
 export const VisuallyHidden = React.forwardRef<HTMLSpanElement, VisuallyHiddenProps>(function MosaicVisuallyHidden(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -28,13 +28,7 @@ export const VisuallyHidden = React.forwardRef<HTMLSpanElement, VisuallyHiddenPr
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('visually-hidden'),
-        stylex.props(reset.base, visuallyHidden.base),
-        className,
-        style,
-      ),
-      ...rest,
+      ...mergeStyleProps(themeProps('visually-hidden'), stylex.props(reset.base, visuallyHidden.base, xstyle), rest),
     },
   });
 });

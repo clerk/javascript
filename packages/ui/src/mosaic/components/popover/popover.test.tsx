@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -90,17 +91,30 @@ describe('Mosaic Popover', () => {
     expect(document.querySelector('.cl-popover-popup')).toBeInTheDocument();
   });
 
-  it('keeps a consumer className on the trigger alongside the slot class', () => {
+  it('composes consumer xstyle onto the trigger alongside the slot class', () => {
+    const caller = stylex.create({ trigger: { marginInlineStart: '4px' } });
     render(
       <Popover.Root>
-        <Popover.Trigger className='mine'>Open</Popover.Trigger>
+        <Popover.Trigger xstyle={caller.trigger}>Open</Popover.Trigger>
         <Popover.Popup>Body</Popover.Popup>
       </Popover.Root>,
     );
 
-    const trigger = screen.getByRole('button', { name: 'Open' });
-    expect(trigger).toHaveClass('cl-popover-trigger');
-    expect(trigger).toHaveClass('mine');
+    expect(screen.getByRole('button', { name: 'Open' })).toHaveClass(
+      'cl-popover-trigger',
+      stylex.props(caller.trigger).className ?? '',
+    );
+  });
+
+  it('merges the className a render source hands the trigger', () => {
+    render(
+      <Popover.Root>
+        <Popover.Trigger render={<button className='from-render' />}>Open</Popover.Trigger>
+        <Popover.Popup>Body</Popover.Popup>
+      </Popover.Root>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Open' })).toHaveClass('cl-popover-trigger', 'from-render');
   });
 
   it('defaults the popup to the md size and reflects it as data-size', () => {
@@ -125,22 +139,19 @@ describe('Mosaic Popover', () => {
     expect(document.querySelector('.cl-popover-popup')).toHaveAttribute('data-size', 'lg');
   });
 
-  it('merges consumer className and style onto the popup', () => {
+  it('composes consumer xstyle onto the popup', () => {
+    const caller = stylex.create({ popup: { marginTop: '8px' } });
     render(
       <Popover.Root defaultOpen>
         <Popover.Trigger>Open</Popover.Trigger>
-        <Popover.Popup
-          className='my-popup'
-          style={{ marginTop: '8px' }}
-        >
-          Body
-        </Popover.Popup>
+        <Popover.Popup xstyle={caller.popup}>Body</Popover.Popup>
       </Popover.Root>,
     );
 
-    const popup = document.querySelector('.cl-popover-popup');
-    expect(popup).toHaveClass('cl-popover-popup', 'my-popup');
-    expect(popup).toHaveStyle({ marginTop: '8px' });
+    expect(document.querySelector('.cl-popover-popup')).toHaveClass(
+      'cl-popover-popup',
+      stylex.props(caller.popup).className ?? '',
+    );
   });
 
   it('closes via Popover.Close', async () => {

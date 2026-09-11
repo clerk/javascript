@@ -1,8 +1,13 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { VisuallyHidden } from './visually-hidden';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 describe('Mosaic VisuallyHidden', () => {
   it('renders a span with its children', () => {
@@ -33,7 +38,7 @@ describe('Mosaic VisuallyHidden', () => {
         ref={ref}
         role='status'
         aria-live='polite'
-        className='my-hidden'
+        xstyle={atoms.spaced}
       >
         Saved
       </VisuallyHidden>,
@@ -41,6 +46,18 @@ describe('Mosaic VisuallyHidden', () => {
     const hidden = screen.getByRole('status');
     expect(ref.current).toBe(hidden);
     expect(hidden).toHaveAttribute('aria-live', 'polite');
-    expect(hidden).toHaveClass('cl-visually-hidden', 'my-hidden');
+    expect(hidden).toHaveClass('cl-visually-hidden', stylex.props(atoms.spaced).className ?? '');
+  });
+
+  it('merges a className carried by the render element instead of clobbering the slot class', () => {
+    render(
+      <VisuallyHidden
+        role='status'
+        render={<span className='from-source' />}
+      >
+        Saved
+      </VisuallyHidden>,
+    );
+    expect(screen.getByRole('status')).toHaveClass('cl-visually-hidden', 'from-source');
   });
 });

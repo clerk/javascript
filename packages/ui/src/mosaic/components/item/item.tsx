@@ -57,7 +57,7 @@ export type ItemProps = MosaicComponentProps<'div'> & {
  * </Item.Root>
  */
 const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
-  { size = DEFAULT_SIZE, variant: variantProp, render, className, style, ...rest },
+  { size = DEFAULT_SIZE, variant: variantProp, render, xstyle, ...rest },
   ref,
 ) {
   // A custom render (link/button row) opts into hover + cursor affordances.
@@ -80,11 +80,10 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
           slots.item[size],
           variant === 'outline' && slots.item.outline,
           interactive && slots.item.interactive,
+          xstyle,
         ),
-        className,
-        style,
+        rest,
       ),
-      ...rest,
     },
   });
 
@@ -97,7 +96,7 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
  * default when rendered on its own.
  */
 const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemMedia(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const size = React.useContext(ItemContext);
@@ -108,18 +107,16 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     props: {
       ...mergeStyleProps(
         themeProps('item-media', { size }),
-        stylex.props(reset.base, slots.media.base, slots.media[size]),
-        className,
-        style,
+        stylex.props(reset.base, slots.media.base, slots.media[size], xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
 
 /** Vertical stack (label + description) that grows to fill the row between media and actions. */
 const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemContent(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -127,8 +124,7 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-content'), stylex.props(reset.base, slots.content.base), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('item-content'), stylex.props(reset.base, slots.content.base, xstyle), rest),
     },
   });
 });
@@ -153,7 +149,7 @@ export type ItemLabelProps = MosaicComponentProps<'div'> & {
 
 /** The row's label. Truncates to a single line. */
 const Label = React.forwardRef<HTMLDivElement, ItemLabelProps>(function MosaicItemLabel(
-  { variant = DEFAULT_LABEL_VARIANT, render, className, style, ...rest },
+  { variant = DEFAULT_LABEL_VARIANT, render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -163,18 +159,16 @@ const Label = React.forwardRef<HTMLDivElement, ItemLabelProps>(function MosaicIt
     props: {
       ...mergeStyleProps(
         themeProps('item-label', { variant }),
-        stylex.props(reset.base, slots.label.base, slots.label[variant], truncationStyles.singleLine),
-        className,
-        style,
+        stylex.props(reset.base, slots.label.base, slots.label[variant], truncationStyles.singleLine, xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
 
 /** Secondary text beneath the label. Truncates to a single line. */
 const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemDescription(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -184,18 +178,16 @@ const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>
     props: {
       ...mergeStyleProps(
         themeProps('item-description'),
-        stylex.props(reset.base, slots.description.base, truncationStyles.singleLine),
-        className,
-        style,
+        stylex.props(reset.base, slots.description.base, truncationStyles.singleLine, xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
 
 /** Trailing controls (buttons, badges). */
 const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemActions(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -203,8 +195,7 @@ const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-actions'), stylex.props(reset.base, slots.actions.base), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('item-actions'), stylex.props(reset.base, slots.actions.base, xstyle), rest),
     },
   });
 });
@@ -227,7 +218,7 @@ export type ItemGroupProps = MosaicComponentProps<'div'> & {
  * semantics. Provides its `variant` to the rows nested within it.
  */
 const Group = React.forwardRef<HTMLDivElement, ItemGroupProps>(function MosaicItemGroup(
-  { variant = DEFAULT_VARIANT, render, className, style, ...rest },
+  { variant = DEFAULT_VARIANT, render, xstyle, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -237,11 +228,9 @@ const Group = React.forwardRef<HTMLDivElement, ItemGroupProps>(function MosaicIt
     props: {
       ...mergeStyleProps(
         themeProps('item-group', { variant }),
-        stylex.props(reset.base, slots.group.base, slots.group[variant]),
-        className,
-        style,
+        stylex.props(reset.base, slots.group.base, slots.group[variant], xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 
@@ -250,7 +239,7 @@ const Group = React.forwardRef<HTMLDivElement, ItemGroupProps>(function MosaicIt
 
 /** Thin divider (`<hr>`) between rows or groups. */
 const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(function MosaicItemSeparator(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -258,13 +247,7 @@ const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('item-separator'),
-        stylex.props(reset.base, slots.separator.base),
-        className,
-        style,
-      ),
-      ...rest,
+      ...mergeStyleProps(themeProps('item-separator'), stylex.props(reset.base, slots.separator.base, xstyle), rest),
     },
   });
 });

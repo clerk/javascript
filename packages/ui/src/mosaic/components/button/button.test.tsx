@@ -1,9 +1,14 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from './button';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 describe('Mosaic Button', () => {
   it('renders a button with its children', () => {
@@ -60,7 +65,7 @@ describe('Mosaic Button', () => {
     expect(screen.getByRole('button')).not.toHaveAttribute('touchtarget');
   });
 
-  it('wires variant props and consumer className/style through to the element', () => {
+  it('wires variant props and xstyle atoms through to the element', () => {
     render(
       <Button
         color='negative'
@@ -68,8 +73,7 @@ describe('Mosaic Button', () => {
         size='sm'
         shape='circle'
         fullWidth
-        className='my-button'
-        style={{ marginTop: '8px' }}
+        xstyle={atoms.spaced}
       >
         Hi
       </Button>,
@@ -80,8 +84,7 @@ describe('Mosaic Button', () => {
     expect(button).toHaveAttribute('data-size', 'sm');
     expect(button).toHaveAttribute('data-shape', 'circle');
     expect(button).toHaveAttribute('data-full-width', '');
-    expect(button).toHaveClass('cl-button', 'my-button');
-    expect(button).toHaveStyle({ marginTop: '8px' });
+    expect(button).toHaveClass('cl-button', stylex.props(atoms.spaced).className ?? '');
   });
 
   it.each(['primary', 'neutral', 'negative'] as const)('reflects the %s color', color => {

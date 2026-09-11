@@ -104,8 +104,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
     touchTarget = true,
     disabled: disabledProp,
     focusableWhenDisabled = false,
-    className,
-    style,
+    xstyle,
     children,
     ...rest
   },
@@ -144,11 +143,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
           fullWidth && styles.fullWidth,
           disabled && styles.disabled,
           defaults.styles,
+          xstyle,
         ),
-        className,
-        style,
+        rest,
       )}
-      {...rest}
     >
       {withTruncatableLabel(children)}
     </HeadlessButton>

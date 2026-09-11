@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { flushSync } from 'react-dom';
@@ -263,22 +264,33 @@ describe('Mosaic Avatar', () => {
     expect(screen.getByTestId('fallback')).not.toHaveAttribute('data-pending');
   });
 
-  it('wires consumer className/style/ref through to the root', () => {
+  it('wires consumer xstyle and ref through to the root', () => {
+    const caller = stylex.create({ root: { marginTop: '8px' } });
     const ref = React.createRef<HTMLSpanElement>();
     render(
       <Avatar.Root
         ref={ref}
         data-testid='avatar'
-        className='my-avatar'
-        style={{ marginTop: '8px' }}
+        xstyle={caller.root}
       >
         <Avatar.Fallback>CN</Avatar.Fallback>
       </Avatar.Root>,
     );
     const avatar = screen.getByTestId('avatar');
     expect(ref.current).toBe(avatar);
-    expect(avatar).toHaveClass('cl-avatar', 'my-avatar');
-    expect(avatar).toHaveStyle({ marginTop: '8px' });
+    expect(avatar).toHaveClass('cl-avatar', stylex.props(caller.root).className ?? '');
+  });
+
+  it('merges the className a render source hands the root', () => {
+    render(
+      <Avatar.Root
+        data-testid='avatar'
+        render={<span className='from-render' />}
+      >
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByTestId('avatar')).toHaveClass('cl-avatar', 'from-render');
   });
 
   it('composes its root onto another element and renders an icon affordance', () => {

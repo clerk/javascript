@@ -1,25 +1,44 @@
 import type { ComponentProps } from '@clerk/headless/utils';
+import type * as stylex from '@stylexjs/stylex';
 import type React from 'react';
 
 /**
- * The native props for a tag, minus the non-standard HTML `color` attribute. That
- * attribute is typed `string`, so leaving it in widens any component that exposes
- * `color` as a variant union. Use for a component that has no `render`.
+ * The one styling prop a Mosaic part takes from the code that renders it: StyleX atoms
+ * for the part's root element, composed last in its `stylex.props(...)` call so they win.
+ *
+ * `className` and `style` are deliberately absent. Inside `packages/ui` a flow author
+ * styles a part with `xstyle`; outside it, a theme targets the `.cl-<slot>` class,
+ * `data-<axis>` attrs, and `--cl-*` vars in CSS. Neither path needs raw CSS on the part.
+ */
+export interface MosaicStyleProps {
+  xstyle?: stylex.StyleXStyles;
+}
+
+/**
+ * The native props for a tag, minus the non-standard HTML `color` attribute and the
+ * `className`/`style` pair, plus `xstyle`. `color` is typed `string`, so leaving it in
+ * widens any component that exposes `color` as a variant union. Use for a component
+ * that has no `render`.
  */
 export type MosaicElementProps<Tag extends keyof React.JSX.IntrinsicElements> = Omit<
   React.ComponentPropsWithRef<Tag>,
-  'color'
->;
+  'color' | 'className' | 'style'
+> &
+  MosaicStyleProps;
 
 /**
  * The base props every Mosaic component accepts: the native props for its default
- * tag, plus the `render` escape hatch that swaps the rendered element.
+ * tag, the `render` escape hatch that swaps the rendered element, and `xstyle`.
  *
- * Mosaic's name for the headless part contract, which already drops `color` and
- * hands `render` callbacks tag-agnostic props. Aliased rather than rebuilt so the
- * two layers cannot drift, and so `@clerk/ui` consumers have a name to import.
+ * Derived from the headless part contract, which already drops `color` and hands
+ * `render` callbacks tag-agnostic props, so the two layers cannot drift. Mosaic
+ * additionally drops `className`/`style` in favour of `xstyle` (see `MosaicStyleProps`).
  */
-export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = ComponentProps<Tag>;
+export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = Omit<
+  ComponentProps<Tag>,
+  'className' | 'style'
+> &
+  MosaicStyleProps;
 
 // The public styling contract, emitted onto a component's root element:
 //   1. `--cl-*` vars      — from `tokens.stylex.ts` (`:root { --cl-color-primary: … }`)
@@ -89,38 +108,33 @@ function mergeTwoProps(base: PropsObject, overrides: PropsObject): PropsObject {
 }
 
 /**
- * Fuse `themeProps(...)`, `stylex.props(...)`, and the consumer's incoming
- * `className`/`style` into one spreadable object. Positional, mirroring astryx's
- * helper so the consumer's `className` and `style` can be passed raw:
+ * Fuse a part's `themeProps(...)`, its `stylex.props(...)` result, and the props it was
+ * called with into one spreadable object, left to right: `className` concatenates,
+ * `style` shallow-merges with the later bag winning, everything else is overwritten by
+ * the later bag.
  *
- *   mergeStyleProps(themeProps('button', { variant }), stylex.props(...), className, style)
+ *   mergeStyleProps(themeProps('button', { variant }), stylex.props(styles.base, xstyle), rest)
  *
- * The trailing pair disambiguates by type — a string is a `className`, an object
- * is a `style` — which is why `style` is accepted directly rather than wrapped.
- * Order is deliberate: stable class + data-attrs, then StyleX atoms, then the
- * consumer's `className`/`style` last so they win.
+ * A part's public props carry no `className`/`style` (flow authors pass `xstyle`), but a
+ * `render` source hands its own merged pair to the part it renders, so the incoming bag
+ * can still hold them at runtime. Passing the bag through here merges that pair; a
+ * trailing `{...rest}` spread would clobber the part's own class instead.
  *
- * Distinct from `@clerk/headless`'s `mergeProps`: this only fuses styling output
- * (className/style) and does not chain event handlers.
+ * The result keeps the last bag's prop types (minus the pair, which comes back merged), so a
+ * required prop the part forwards through `rest` is still checked by the element it lands on.
+ *
+ * Distinct from `@clerk/headless`'s `mergeProps`: this only fuses `className`/`style`
+ * and does not chain event handlers.
  */
-export function mergeStyleProps(
-  first: PropsObject,
-  second?: PropsObject | string,
-  classNameOrStyle?: string | React.CSSProperties,
-  style?: React.CSSProperties,
-): PropsObject {
-  const secondObject = typeof second === 'string' ? { className: second } : (second ?? {});
-  let merged = mergeTwoProps(first, secondObject);
-
-  if (typeof classNameOrStyle === 'string') {
-    merged = mergeTwoProps(merged, { className: classNameOrStyle });
-  } else if (classNameOrStyle != null) {
-    merged = mergeTwoProps(merged, { style: classNameOrStyle });
+export function mergeStyleProps<Rest extends PropsObject>(
+  ...bags: [...Array<PropsObject | undefined>, Rest]
+): Omit<Rest, 'className' | 'style'> & Pick<PropsObject, 'className' | 'style'>;
+export function mergeStyleProps(...bags: Array<PropsObject | undefined>): PropsObject {
+  let merged: PropsObject = {};
+  for (const bag of bags) {
+    if (bag) {
+      merged = mergeTwoProps(merged, bag);
+    }
   }
-
-  if (style != null) {
-    merged = mergeTwoProps(merged, { style });
-  }
-
   return merged;
 }

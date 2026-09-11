@@ -1,3 +1,5 @@
+import * as stylex from '@stylexjs/stylex';
+
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import type { IconProps } from '../../components/icon';
@@ -6,6 +8,16 @@ import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
 import { space } from '../../tokens.stylex';
+
+const styles = stylex.create({
+  backButton: {
+    marginBlockStart: space['2'],
+  },
+  helpText: {
+    marginBlockStart: space['1'],
+    textAlign: 'center',
+  },
+});
 
 export interface ReverificationMethod {
   id: string;
@@ -81,9 +93,7 @@ export function ReverificationMethodPicker({
             variant='ghost'
             fullWidth
             onClick={onBack}
-            style={{
-              marginBlockStart: space['2'],
-            }}
+            xstyle={styles.backButton}
           >
             {messages.backButton}
           </Button>
@@ -91,10 +101,7 @@ export function ReverificationMethodPicker({
         <Text
           size='xs'
           color='neutral'
-          style={{
-            textAlign: 'center',
-            marginBlockStart: space['1'],
-          }}
+          xstyle={styles.helpText}
         >
           {messages.helpText}{' '}
           <Button
