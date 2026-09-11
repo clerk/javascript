@@ -1,10 +1,27 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
+import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
+
+const channelOf = {
+  '/sign_ups': (body: any) => body.verifications.phone_number.channel,
+  '/sign_ins': (body: any) => body.first_factor_verification.channel,
+};
+
+function expectWhatsAppChannel(page: Page, path: keyof typeof channelOf) {
+  const response = page.waitForResponse(res => res.url().includes(path) && res.request().method() === 'POST');
+  return async () => {
+    const { response: body } = await (await response).json();
+    expect(
+      channelOf[path](body),
+      'FAPI downgraded the WhatsApp channel to SMS. The instance WhatsApp OTP quota is likely exhausted.',
+    ).toBe('whatsapp');
+  };
+}
 
 test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
   // The WhatsApp alternate phone-code channel is not provisioned on the staging
@@ -59,10 +76,12 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
 
         // Click on WhatsApp button
         await page.getByRole('button', { name: new RegExp(`WhatsApp`, 'gi') }).click();
+        const assertChannel = expectWhatsAppChannel(page, '/sign_ups');
         // Fill in sign up form with phone number
         await u.po.signUp.signUp({
           phoneNumber: fakeUser.phoneNumber,
         });
+        await assertChannel();
 
         // intercept the request to /prepare_verification
         await page.context().route('**/prepare_verification*', async route => {
@@ -98,9 +117,11 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
 
         // Click on WhatsApp button
         await page.getByRole('button', { name: new RegExp(`WhatsApp`, 'gi') }).click();
+        const assertChannel = expectWhatsAppChannel(page, '/sign_ins');
         // Fill in WhatsApp sign in form with phone number
         await u.po.signIn.getIdentifierInput().fill(fakeUser.phoneNumber);
         await u.po.signIn.continue();
+        await assertChannel();
 
         // intercept the request to /prepare_first_factor
         await page.context().route('**/prepare_first_factor*', async route => {
@@ -137,9 +158,11 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
           await route.continue();
         });
 
+        const assertChannel = expectWhatsAppChannel(page, '/sign_ins');
         // Fill in the sign in form with the test US phone number
         await u.po.signIn.getIdentifierInput().fill(fakeUser.phoneNumber);
         await u.po.signIn.continue();
+        await assertChannel();
 
         // intercept the request to /prepare_first_factor
         await page.context().route('**/prepare_first_factor*', async route => {
