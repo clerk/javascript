@@ -188,7 +188,10 @@ import {
   Overlay as UserProfileOverlay,
 } from '../stories/user-profile.stories';
 import {
+  AddEmailFails as UserProfileAccountSectionAddEmailFails,
   Default as UserProfileAccountSectionDefault,
+  EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
+  EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
 } from '../stories/user-profile-account-section.stories';
@@ -467,6 +470,9 @@ const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
+  AddEmailFails: UserProfileAccountSectionAddEmailFails,
+  EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,
+  EmailLinkResendFails: UserProfileAccountSectionEmailLinkResendFails,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,

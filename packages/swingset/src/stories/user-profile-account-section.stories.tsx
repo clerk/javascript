@@ -1,15 +1,19 @@
+import { Button } from '@clerk/ui/mosaic/components/button';
 import type { UserProfileFormError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
+import { UserProfileVerifyEmailLinkView } from '@clerk/ui/mosaic/user-profile/user-profile-verify-email-link.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
+import { useUserProfileVerifyEmailLinkFixture } from './fixtures/user-profile-verify-email-link';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -25,9 +29,11 @@ export const meta: StoryMeta = {
 function AccountSection({
   allowMultipleAccounts,
   failWith,
+  failEmailVerification = false,
 }: {
   allowMultipleAccounts: boolean;
   failWith?: UserProfileFormError;
+  failEmailVerification?: boolean;
 }) {
   const editName = useUserProfileEditNameFixture({ failWith });
   const [emails, setEmails] = useState<UserProfileEmail[]>(
@@ -42,22 +48,21 @@ function AccountSection({
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
+  const emailFlow = createUserProfileAddEmailFixture({
+    failAt: failEmailVerification ? 'verify' : undefined,
+    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+  });
 
   return (
     <UserProfileAccountSectionView
       {...editName}
+      {...emailFlow}
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
       hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}
       phones={phones}
       username='prestonxyz'
-      onAddEmail={() =>
-        setEmails(current => [
-          ...current,
-          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
-        ])
-      }
       onAddPhone={() =>
         setPhones(current => [
           ...current,
@@ -86,6 +91,49 @@ export function Default() {
 
 export function MultipleAccounts() {
   return <AccountSection allowMultipleAccounts />;
+}
+
+export function AddEmailFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      failEmailVerification
+    />
+  );
+}
+
+export function EmailLinkVerification() {
+  const fixture = useUserProfileVerifyEmailLinkFixture();
+  return (
+    <UserProfileVerifyEmailLinkView
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify email link
+        </Button>
+      }
+    />
+  );
+}
+
+export function EmailLinkResendFails() {
+  const fixture = useUserProfileVerifyEmailLinkFixture({ failResend: true });
+  return (
+    <UserProfileVerifyEmailLinkView
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify email link
+        </Button>
+      }
+    />
+  );
 }
 
 /** Every save is rejected, so the dialog shows both halves of a failure at once. */

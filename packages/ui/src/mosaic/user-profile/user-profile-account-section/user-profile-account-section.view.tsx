@@ -1,6 +1,7 @@
 import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
 import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
+import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
 import { Avatar } from '../../components/avatar';
@@ -12,6 +13,9 @@ import { Section } from '../../components/section';
 import { Text } from '../../components/text';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
+import type { UserProfileAddEmailControllerOptions } from '../user-profile-add-email.controller';
+import { useUserProfileAddEmailController } from '../user-profile-add-email.controller';
+import { UserProfileAddEmailView } from '../user-profile-add-email.view';
 import { styles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
@@ -70,6 +74,8 @@ export interface UserProfileAccountSectionViewProps {
   onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
   onUsernameChange?: (value: string) => void;
   onAddEmail?: () => void;
+  onSendEmailCode?: (emailAddress: string) => Promise<void>;
+  onVerifyEmailCode?: (emailAddress: string, code: string) => Promise<void>;
   onManageEmail?: (id: string) => void;
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void | Promise<void>;
@@ -99,6 +105,8 @@ export function UserProfileAccountSectionView({
   onSubmitName,
   onUsernameChange,
   onAddEmail,
+  onSendEmailCode,
+  onVerifyEmailCode,
   onManageEmail,
   onVerifyEmail,
   onSetPrimaryEmail,
@@ -109,6 +117,13 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const addEmailAction =
+    onSendEmailCode && onVerifyEmailCode ? (
+      <AddEmail
+        options={{ onSend: onSendEmailCode, onVerify: onVerifyEmailCode }}
+        compact={allowMultipleAccounts}
+      />
+    ) : undefined;
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -205,6 +220,7 @@ export function UserProfileAccountSectionView({
               items={emails}
               kind='email'
               label={m.email.label}
+              addAction={addEmailAction}
               onAdd={onAddEmail}
               onManage={onManageEmail}
             />
@@ -225,6 +241,7 @@ export function UserProfileAccountSectionView({
           items={emails}
           kind='email'
           label={m.email.label}
+          addAction={addEmailAction}
           onAdd={onAddEmail}
           onManage={onManageEmail}
           onRemove={onRemoveEmail}
@@ -338,7 +355,34 @@ function EditName({
   );
 }
 
+function AddEmail({ options, compact }: { options: UserProfileAddEmailControllerOptions; compact: boolean }) {
+  const controller = useUserProfileAddEmailController(options);
+  return (
+    <UserProfileAddEmailView
+      {...controller}
+      trigger={
+        <Button
+          aria-label={m.email.add}
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {compact ? (
+            <Icon
+              name='plus'
+              placement='inline-start'
+              size='sm'
+            />
+          ) : null}
+          {compact ? m.add : m.email.add}
+        </Button>
+      }
+    />
+  );
+}
+
 interface ContactSectionProps {
+  addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
   items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
@@ -468,7 +512,7 @@ function EmailContactSection(props: ContactSectionProps) {
   );
 }
 
-function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectionProps) {
+function SingleContactRow({ kind, label, items, onAdd, onManage, addAction }: ContactSectionProps) {
   const item = items[0];
   const onClick = item ? (onManage ? () => onManage(item.id) : undefined) : onAdd;
   const emptyDescription = m[kind].empty;
@@ -488,7 +532,9 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
             <Section.Description>{emptyDescription}</Section.Description>
           )}
         </Section.Content>
-        {onClick ? (
+        {!item && addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onClick ? (
           <Section.Actions>
             <Button
               color='neutral'
@@ -505,7 +551,17 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
   );
 }
 
-function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimary, onRemove }: ContactSectionProps) {
+function ContactRow({
+  kind,
+  label,
+  items,
+  onAdd,
+  onManage,
+  onVerify,
+  onSetPrimary,
+  onRemove,
+  addAction,
+}: ContactSectionProps) {
   const emptyDescription = m[kind].empty;
 
   return (
@@ -514,7 +570,9 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
         <Section.Content>
           <Section.Label>{label}</Section.Label>
         </Section.Content>
-        {onAdd ? (
+        {addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onAdd ? (
           <Section.Actions>
             <Button
               aria-label={m[kind].add}

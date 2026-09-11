@@ -18,6 +18,10 @@ Account details, profile image, email addresses, and phone numbers composed with
 
 ## Multiple accounts
 
+**Add email** opens email entry followed by a six-digit verification code. Resend is available after
+the countdown. In this preview, `000000` shows an incorrect-code error; another six-digit code adds
+the verified address.
+
 <Story
   name='MultipleAccounts'
   storyModule={Stories}
@@ -27,5 +31,37 @@ Account details, profile image, email addresses, and phone numbers composed with
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Badge', href: '/components/badge', layer: 'Components' },
     { name: 'Icon', href: '/components/icon', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Otp', href: '/components/otp', layer: 'Components' },
   ]}
 />
+
+## Email verification error
+
+This example rejects every verification attempt so the error remains visible and the user can retry.
+
+<Story name='AddEmailFails' storyModule={Stories} />
+
+## Email-link verification
+
+The profile uses OTP. This separate view displays an email-link verification in progress, with a
+resend countdown and Cancel. Its caller supplies the address, pending state, errors, and callbacks.
+
+<Story
+  name='EmailLinkVerification'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+### Resend error
+
+After the countdown, resend to see the supplied error message.
+
+<Story name='EmailLinkResendFails' storyModule={Stories} />
