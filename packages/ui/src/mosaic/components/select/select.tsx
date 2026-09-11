@@ -127,7 +127,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       id={id}
       disabled={fieldProps?.disabled ?? disabledProp}
       aria-label={ariaLabel}
-      aria-labelledby={mergeIds(labelledBy, valueId)}
+      aria-labelledby={mergeIds(labelledBy, children === undefined ? valueId : undefined)}
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
       aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
       aria-required={ariaRequired ?? (fieldProps?.required ? true : undefined)}
