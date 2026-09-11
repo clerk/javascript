@@ -1,0 +1,87 @@
+import * as Stories from './confirmation.stories';
+
+# Confirmation
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Banner', href: '/components/banner', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+A confirmation for a destructive action that is worth a second look but not worth making the user type for. Removing a connected account, revoking a session, signing out everywhere. For the actions that do warrant typing, use [Destructive](/components/destructive).
+
+The block holds nothing of its own. Everything that decides what the dialog does next belongs to the caller. `open` closes it, `isConfirming` marks it busy, `errorMessage` explains a failure.
+
+```tsx
+import { Confirmation } from '@clerk/ui/mosaic/blocks/confirmation';
+import { Button } from '@clerk/ui/mosaic/components/button';
+
+const [open, setOpen] = useState(false);
+const [isConfirming, setIsConfirming] = useState(false);
+
+const handleConfirm = async () => {
+  setIsConfirming(true);
+  await removeConnectedAccount();
+  setIsConfirming(false);
+  setOpen(false);
+};
+
+<Confirmation
+  open={open}
+  onOpenChange={setOpen}
+  trigger={<Button color='negative' variant='outline'>Remove</Button>}
+  title='Remove connected account'
+  description='Google will be removed from this account. You will no longer be able to use this connected account and any dependent features will no longer work.'
+  actionLabel='Remove'
+  onConfirm={() => void handleConfirm()}
+  isConfirming={isConfirming}
+/>;
+```
+
+## Failure
+
+A failed attempt leaves the dialog up. Pass the sentence the user should read as `errorMessage`, and clear it when the next attempt starts. The message renders as a banner between the description and the actions.
+
+<Story
+  name='WithError'
+  storyModule={Stories}
+/>
+
+## Props
+
+| Prop           | Type                      | Description                                                                    |
+| -------------- | ------------------------- | ------------------------------------------------------------------------------ |
+| `open`         | `boolean`                 | Whether the confirmation is showing. Controlled, the way any dialog is.        |
+| `onOpenChange` | `(open: boolean) => void` | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop. |
+| `trigger`      | `ReactNode`               | Optional. The button that asks to open the dialog.                             |
+| `title`        | `string`                  | Names what is about to happen.                                                 |
+| `description`  | `string`                  | Spells out what it means.                                                      |
+| `actionLabel`  | `string`                  | The destructive button's label.                                                |
+| `cancelLabel`  | `string`                  | Optional. Defaults to `Cancel`.                                                |
+| `onConfirm`    | `() => void`              | Asks the caller to run the action.                                             |
+| `isConfirming` | `boolean`                 | Optional. Renders the action pending and ignores further presses.              |
+| `errorMessage` | `string`                  | Optional. Renders as a negative banner above the actions.                      |
+
+## Driving it from a machine
+
+A section that wires the block to a state machine maps the machine's state onto the same props:
+
+```tsx
+<Confirmation
+  open={snapshot.value === 'confirming' || snapshot.value === 'removing'}
+  onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
+  onConfirm={() => send({ type: 'CONFIRM' })}
+  isConfirming={snapshot.value === 'removing'}
+  errorMessage={snapshot.context.errorMessage}
+  {...copy}
+/>
+```
