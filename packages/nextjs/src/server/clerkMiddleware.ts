@@ -37,7 +37,8 @@ import { clerkClient } from './clerkClient';
 import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
 import { errorThrower } from './errorThrower';
-import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
+import type { ClerkMiddlewareRequestDataStore } from './middleware-storage';
+import { clerkMiddlewareRequestDataStorage } from './middleware-storage';
 import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
@@ -145,63 +146,64 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
-  const middleware = clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
-    const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
-      // Handles the case where `options` is a callback function to dynamically access `NextRequest`
-      const resolvedParams = typeof params === 'function' ? await params(request) : params;
+  const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+    // Handles the case where `options` is a callback function to dynamically access `NextRequest`
+    const resolvedParams = typeof params === 'function' ? await params(request) : params;
 
-      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
-        errorThrower.throwMissingPublishableKeyError(),
-      );
+    const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
+      errorThrower.throwMissingPublishableKeyError(),
+    );
 
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
-        errorThrower.throwMissingSecretKeyError(),
-      );
+    const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
+      errorThrower.throwMissingSecretKeyError(),
+    );
 
-      // Handle Frontend API proxy requests early, before authentication
-      const requestUrl = new URL(request.nextUrl.href);
-      let frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+    // Handle Frontend API proxy requests early, before authentication
+    const requestUrl = new URL(request.nextUrl.href);
+    let frontendApiProxyConfig = resolvedParams.frontendApiProxy;
 
-      // Auto-detect when no explicit proxy or domain is configured
-      const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
-      if (
-        !frontendApiProxyConfig &&
-        !hasExplicitProxyOrDomain &&
-        !isAutoProxyDisabledFromEnvironment() &&
-        isProductionFromPublishableKey(publishableKey)
-      ) {
-        if (shouldAutoProxy(requestUrl.hostname)) {
-          frontendApiProxyConfig = { enabled: true };
-        }
+    // Auto-detect when no explicit proxy or domain is configured
+    const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
+    if (
+      !frontendApiProxyConfig &&
+      !hasExplicitProxyOrDomain &&
+      !isAutoProxyDisabledFromEnvironment() &&
+      isProductionFromPublishableKey(publishableKey)
+    ) {
+      if (shouldAutoProxy(requestUrl.hostname)) {
+        frontendApiProxyConfig = { enabled: true };
       }
-      if (frontendApiProxyConfig) {
-        const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxyConfig;
+    }
+    if (frontendApiProxyConfig) {
+      const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxyConfig;
 
-        // Resolve enabled - either boolean or function
-        const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
+      // Resolve enabled - either boolean or function
+      const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
 
-        if (isEnabled && matchProxyPath(request, { proxyPath })) {
-          return clerkFrontendApiProxy(request, {
-            proxyPath,
-            publishableKey,
-            secretKey,
-          });
-        }
+      if (isEnabled && matchProxyPath(request, { proxyPath })) {
+        return clerkFrontendApiProxy(request, {
+          proxyPath,
+          publishableKey,
+          secretKey,
+        });
       }
+    }
 
-      const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
-      const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
+    const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
+    const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
 
-      const options = {
-        publishableKey,
-        secretKey,
-        signInUrl,
-        signUpUrl,
-        ...resolvedParams,
-      };
+    const options = {
+      publishableKey,
+      secretKey,
+      signInUrl,
+      signUpUrl,
+      ...resolvedParams,
+    };
 
-      // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
-      clerkMiddlewareRequestDataStore.set('requestData', options);
+    // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
+    const requestDataStore: ClerkMiddlewareRequestDataStore = new Map([['requestData', options]]);
+
+    return clerkMiddlewareRequestDataStorage.run(requestDataStore, async () => {
       const resolvedClerkClient = await clerkClient();
 
       if (options.debug) {
@@ -239,19 +241,17 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         logger,
       });
     });
-
-    // If we have a request and event, we're being called as a middleware directly
-    // eg, export default clerkMiddleware;
-    if (request && event) {
-      return baseNextMiddleware(request, event);
-    }
-
-    // Otherwise, return a middleware that can be called with a request and event
-    // eg, export default clerkMiddleware(auth => { ... });
-    return baseNextMiddleware;
   });
 
-  return middleware;
+  // If we have a request and event, we're being called as a middleware directly
+  // eg, export default clerkMiddleware;
+  if (request && event) {
+    return baseNextMiddleware(request, event);
+  }
+
+  // Otherwise, return a middleware that can be called with a request and event
+  // eg, export default clerkMiddleware(auth => { ... });
+  return baseNextMiddleware;
 }) as ClerkMiddleware;
 
 const parseRequestAndEvent = (args: unknown[]) => {
@@ -338,9 +338,7 @@ async function runHandlerWithRequestState({
 
   let handlerResult: Response = NextResponse.next();
   try {
-    const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, async () =>
-      handler?.(authHandler, request, event),
-    );
+    const userHandlerResult = await handler?.(authHandler, request, event);
     handlerResult = userHandlerResult || handlerResult;
   } catch (e: any) {
     handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
