@@ -1,11 +1,11 @@
-import { Button } from '../../components/button';
-import { Card } from '../../components/card';
-import type { IconProps } from '../../components/icon';
-import { Icon, IconFrame } from '../../components/icon';
-import { Item } from '../../components/item';
-import { Spinner } from '../../components/spinner';
-import { Text } from '../../components/text';
-import { space } from '../../tokens.stylex';
+import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
+import type { IconProps } from '../../../components/icon';
+import { Icon, IconFrame } from '../../../components/icon';
+import { Item } from '../../../components/item';
+import { Spinner } from '../../../components/spinner';
+import { Text } from '../../../components/text';
+import { space } from '../../../tokens.stylex';
 
 export interface ReverificationMethod {
   id: string;
@@ -80,6 +80,7 @@ export function ReverificationMethodPicker({
             type='button'
             variant='ghost'
             fullWidth
+            disabled={Boolean(pendingMethodId)}
             onClick={onBack}
             style={{
               marginBlockStart: space['2'],
@@ -101,7 +102,12 @@ export function ReverificationMethodPicker({
             type='button'
             size='sm'
             variant='link'
-            onClick={onHelp}
+            disabled={Boolean(pendingMethodId)}
+            onClick={() => {
+              if (!pendingMethodId) {
+                onHelp();
+              }
+            }}
           >
             {messages.helpButton}
           </Button>
