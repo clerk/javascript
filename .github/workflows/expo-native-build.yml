@@ -69,10 +69,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Boot iOS simulators
-        if: matrix.platform == 'ios' && matrix.run-e2e == true
-        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$MAESTRO_SHARDS"
-
       - name: Compute native build cache key
         id: native-build-key
         env:
@@ -229,6 +225,10 @@ jobs:
         with:
           path: ${{ steps.native-build-key.outputs.artifact }}
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
+
+      - name: Boot iOS simulators
+        if: matrix.platform == 'ios' && matrix.run-e2e == true
+        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$MAESTRO_SHARDS"
 
       - name: Cache maestro CLI
         if: steps.keys.outputs.pk != ''
