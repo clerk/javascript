@@ -79,7 +79,6 @@ export interface UserProfileAccountSectionViewProps {
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void;
   onRemoveEmail?: (id: string) => void;
-  onAddPhone?: () => void;
   addPhone?: UserProfileAddPhoneControllerOptions;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
@@ -109,7 +108,6 @@ export function UserProfileAccountSectionView({
   onVerifyEmail,
   onSetPrimaryEmail,
   onRemoveEmail,
-  onAddPhone,
   addPhone,
   onManagePhone,
   onVerifyPhone,
@@ -293,7 +291,6 @@ export function UserProfileAccountSectionView({
               kind='phone'
               label={m.phone.label}
               addAction={addPhoneAction}
-              onAdd={onAddPhone}
               onManage={onManagePhone}
             />
           ) : null}
@@ -317,7 +314,6 @@ export function UserProfileAccountSectionView({
           kind='phone'
           label={m.phone.label}
           addAction={addPhoneAction}
-          onAdd={onAddPhone}
           onManage={isSettingPrimary ? undefined : onManagePhone}
           onRemove={onRemovePhone ? id => void removePhone(id) : undefined}
           onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}

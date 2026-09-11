@@ -154,7 +154,7 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
       onAddEmail: vi.fn(),
-      onAddPhone: vi.fn(),
+      addPhone: { onSend: () => Promise.resolve(), onVerify: () => Promise.resolve() },
     });
 
     const accountSection = screen.getByRole('region', { name: 'Account' });
@@ -207,7 +207,7 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('renders an actionable empty state when no phone number exists', () => {
-    renderView({ phones: [], onAddPhone: vi.fn() });
+    renderView({ phones: [], addPhone: { onSend: () => Promise.resolve(), onVerify: () => Promise.resolve() } });
 
     const phoneSection = screen.getByRole('region', { name: 'Phone' });
     const emptyState = within(phoneSection).getByText('No phone numbers added');
