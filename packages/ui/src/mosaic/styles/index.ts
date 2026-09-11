@@ -64,6 +64,8 @@ export { Input } from '../components/input';
 export type { InputProps, InputVariant } from '../components/input';
 export { InputGroup } from '../components/input-group';
 export type { InputGroupAddonProps, InputGroupRootProps } from '../components/input-group';
+export { Pagination } from '../components/pagination';
+export type { PaginationProps } from '../components/pagination';
 export { PhoneInput } from '../components/phone-input';
 export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
