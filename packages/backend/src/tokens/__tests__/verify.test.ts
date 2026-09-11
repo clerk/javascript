@@ -232,7 +232,8 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
   it.each([
     { aud: undefined },
-    { aud: 'https://my-resource.example.com' },
+    { aud: [] },
+    { aud: ['https://my-resource.example.com'] },
     { aud: ['https://my-resource.example.com', 'https://other-resource.example.com'] },
   ])('verifies opaque OAuth token with aud=$aud', async ({ aud }) => {
     const token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
