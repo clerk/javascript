@@ -576,7 +576,7 @@ describe('OrganizationSecurityPage', () => {
       expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
     });
 
-    it('replaces setup with an unsupported notice when the SSO connection is Google Workspace', async () => {
+    it('offers setup for a Google Workspace connection like any other provider', async () => {
       const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
       withActiveConnection(fixtures);
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
@@ -588,11 +588,12 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
+      // Google used to be sent to the Clerk Dashboard here, which is the Clerk
+      // customer's account rather than the admin's, so setup dead-ended.
+      expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeEnabled();
       expect(
-        await screen.findByText('Google Workspace connections are not configurable via self-serve'),
-      ).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
-      expect(screen.queryByText('SSO Required')).not.toBeInTheDocument();
+        screen.queryByText('Google Workspace connections are not configurable via self-serve'),
+      ).not.toBeInTheDocument();
     });
 
     it('lists Edit and Deactivate for an active directory', async () => {

@@ -1491,11 +1491,16 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };
-      warning__googleUnsupported: {
-        title: LocalizationValue;
-        subtitle: LocalizationValue;
-      };
       warning__ssoInactive: LocalizationValue;
+      formFieldLabel__serviceAccountKey: LocalizationValue;
+      formFieldLabel__subjectEmail: LocalizationValue;
+      formFieldInputPlaceholder__subjectEmail: LocalizationValue;
+      formFieldHint__subjectEmail: LocalizationValue;
+      actionLabel__uploadKey: LocalizationValue;
+      actionLabel__replaceKey: LocalizationValue;
+      badge__credentialsConfigured: LocalizationValue;
+      badge__credentialsMissing: LocalizationValue;
+      error__invalidKeyFile: LocalizationValue;
       domainsLabel: LocalizationValue;
       instructions: {
         actionLabel__toggle: LocalizationValue;
@@ -1517,6 +1522,13 @@ export type __internal_LocalizationResource = {
           step3: LocalizationValue;
           step4: LocalizationValue;
         };
+        google: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
+        };
       };
       formFieldLabel__endpointUrl: LocalizationValue;
       formFieldLabel__token: LocalizationValue;
@@ -1537,9 +1549,21 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue<'provider'>;
       description: LocalizationValue;
+      description__pull: LocalizationValue;
       noteLabel: LocalizationValue;
       note: LocalizationValue;
       empty__waitingForFirstUser: LocalizationValue;
+      empty__waitingForFirstSync: LocalizationValue;
+      actionLabel__syncNow: LocalizationValue;
+      error__lastSyncFailed: LocalizationValue;
+      syncStatus__running: LocalizationValue;
+      syncStatus__succeeded: LocalizationValue;
+      syncStatus__failed: LocalizationValue;
+      syncStatus__cancelled: LocalizationValue;
+      syncRow: {
+        title: LocalizationValue;
+        neverSynced: LocalizationValue;
+      };
       badge__active: LocalizationValue;
       badge__deprovisioned: LocalizationValue;
       error__loadUsers: LocalizationValue;
