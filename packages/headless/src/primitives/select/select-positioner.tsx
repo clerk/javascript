@@ -1,6 +1,6 @@
 'use client';
 
-import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingList, FloatingOverlay } from '@floating-ui/react';
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
@@ -22,9 +22,10 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       labelsRef,
       returnFocusRef,
       setActiveIndex,
+      alignItemWithTrigger,
     } = useSelectContext();
 
-    const side = placement.split('-')[0];
+    const side = alignItemWithTrigger ? 'none' : placement.split('-')[0];
 
     const floatingProps = getFloatingProps({
       onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
@@ -81,18 +82,22 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     }
 
     return (
-      <FloatingFocusManager
-        context={floatingContext}
-        modal={false}
-        returnFocus={returnFocusRef}
-      >
-        <FloatingList
-          elementsRef={elementsRef}
-          labelsRef={labelsRef}
+      <>
+        {/* An overlay on the trigger only works while the page holds still beneath it. */}
+        {alignItemWithTrigger && <FloatingOverlay lockScroll />}
+        <FloatingFocusManager
+          context={floatingContext}
+          modal={false}
+          returnFocus={returnFocusRef}
         >
-          {element}
-        </FloatingList>
-      </FloatingFocusManager>
+          <FloatingList
+            elementsRef={elementsRef}
+            labelsRef={labelsRef}
+          >
+            {element}
+          </FloatingList>
+        </FloatingFocusManager>
+      </>
     );
   },
 );

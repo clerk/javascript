@@ -38,6 +38,9 @@ export interface SelectContextValue {
   returnFocusRef: React.MutableRefObject<HTMLElement | null>;
   valueToLabelRef: React.MutableRefObject<Map<string, string>>;
   selectedItemRef: React.MutableRefObject<HTMLElement | null>;
+  /** The pointer type of the last press on the trigger, or `'keyboard'`; read when the popup opens. */
+  openMethodRef: React.MutableRefObject<string | null>;
+  /** Whether the popup is currently overlaying the selected option on the trigger. */
   alignItemWithTrigger: boolean;
   handleSelect: (value: string, index: number) => void;
   mounted: boolean;

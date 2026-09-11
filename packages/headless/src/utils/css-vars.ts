@@ -30,12 +30,15 @@ export function cssVars(opts?: { sideOffset?: SideOffset }): Middleware {
       const overflow = await detectOverflow(state, { padding: 5 });
       const side = placement.split('-')[0] as 'top' | 'bottom' | 'left' | 'right';
 
+      // A middleware that already capped the popup (select alignment) owns the height.
       const availableHeight =
-        side === 'top'
-          ? rects.floating.height - overflow.top
-          : side === 'bottom'
-            ? rects.floating.height - overflow.bottom
-            : rects.floating.height - Math.max(overflow.top, 0) - Math.max(overflow.bottom, 0);
+        typeof middlewareData.alignSelectedItem?.availableHeight === 'number'
+          ? middlewareData.alignSelectedItem.availableHeight
+          : side === 'top'
+            ? rects.floating.height - overflow.top
+            : side === 'bottom'
+              ? rects.floating.height - overflow.bottom
+              : rects.floating.height - Math.max(overflow.top, 0) - Math.max(overflow.bottom, 0);
 
       const availableWidth =
         side === 'left'
