@@ -25,11 +25,6 @@ export interface UserProfileEditUsernameViewProps {
   onSubmit: () => void;
 }
 
-/**
- * Edits the user's username. Holds nothing, and validates nothing: acceptability arrives as
- * `canSave`, and the username the API will actually take is the API's to decide, so a rejection
- * comes back as `error`.
- */
 export function UserProfileEditUsernameView({
   open,
   onOpenChange,
@@ -60,7 +55,6 @@ export function UserProfileEditUsernameView({
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
         size='card'
-        // Past the corner dismiss `Card.Header` renders first.
         initialFocus={usernameRef}
       >
         <Card.Root

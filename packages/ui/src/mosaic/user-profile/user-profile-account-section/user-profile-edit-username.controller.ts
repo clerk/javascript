@@ -6,7 +6,6 @@ import type { UserProfileEditUsernameField } from './user-profile-edit-username.
 
 export interface UserProfileEditUsernameContext {
   saveUsername: (username: string) => Promise<void>;
-  /** Injected every render. What `OPEN` seeds the field from. */
   savedUsername: string;
   username: string;
   error: UserProfileFormError<UserProfileEditUsernameField> | undefined;
@@ -24,7 +23,6 @@ function notSeated(): Promise<never> {
   return Promise.reject(new Error('edit-username deps are not seated'));
 }
 
-/** Clearing a username is not something the surface offers, so an empty value is never saveable. */
 function isSaveable(context: UserProfileEditUsernameContext): boolean {
   return context.username !== context.savedUsername && context.username !== '';
 }

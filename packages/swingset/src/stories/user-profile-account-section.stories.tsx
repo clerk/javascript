@@ -103,7 +103,6 @@ export function EditNameFails() {
   );
 }
 
-/** Every username save is rejected, so the dialog shows a failure without losing what was typed. */
 export function EditUsernameFails() {
   return (
     <AccountSection

@@ -53,22 +53,14 @@ export interface UserProfileAccountSectionViewProps {
   /** Passed alongside `name`, which cannot be split back into its two halves. */
   firstName?: string;
   lastName?: string;
-  /** How the instance configures each half of the name; both enabled and optional by default. */
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
   onProfilePictureChange?: (file: File) => void;
-  /**
-   * Called with the files the picker turned away for type or size. The row already tells the user
-   * why, so this is for whatever else a consumer wants to do with them — logging, or a toast once
-   * there is one.
-   */
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
   onRemoveProfilePicture?: () => void;
-  /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. Omit to hide the action. */
   onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
-  /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. Omit to hide the action. */
   onSubmitUsername?: (username: string) => Promise<void>;
   onAddEmail?: () => void;
   onManageEmail?: (id: string) => void;
@@ -244,10 +236,6 @@ export function UserProfileAccountSectionView({
   );
 }
 
-/**
- * Sits inside `FileUpload.Root` so it can open the picker from a menu item, which is a plain
- * callback rather than a `FileUpload.Trigger` button.
- */
 function ProfilePictureActions({
   hasImage,
   canChange,
@@ -334,7 +322,6 @@ function EditName({
   );
 }
 
-/** Split out so the controller is mounted only where the action exists. */
 function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
   const controller = useUserProfileEditUsernameController({ username, onSubmit });
 

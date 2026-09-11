@@ -5,11 +5,9 @@ import { useState } from 'react';
 export interface UserProfileEditUsernameFixtureOptions {
   username?: string;
   latency?: number;
-  /** Rejects every save instead of committing it. */
   failWith?: UserProfileFormError;
 }
 
-/** Stands in for the model. Everything else the dialog needs belongs to the controller. */
 export function useUserProfileEditUsernameFixture({
   username: initialUsername = 'prestonxyz',
   latency = 800,
