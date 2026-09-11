@@ -67,16 +67,17 @@ export const header = stylex.create({
 });
 
 export const content = stylex.create({
-  // A column so a body of more than one thing spaces itself; a single child is unaffected.
+  // A grid rather than a flex column: grid ignores a child's `flex`, so a `fullWidth` button
+  // keeps its height instead of collapsing to a zero basis on the block axis.
   base: {
     gap: space['4'],
     paddingBlock: space['4'],
     paddingInline: space['5'],
-    display: 'flex',
+    display: 'grid',
     flexBasis: 'auto',
-    flexDirection: 'column',
     flexGrow: '1',
     flexShrink: '1',
+    gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
   },
 });
 
