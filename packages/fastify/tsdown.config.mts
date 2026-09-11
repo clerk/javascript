@@ -17,7 +17,7 @@ export default defineConfig(overrideOptions => {
     clean: true,
     minify: false,
     sourcemap: true,
-    dts: true,
+    dts: { sourcemap: true },
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
     define: {
       PACKAGE_NAME: `"${pkgJson.name}"`,

@@ -5,7 +5,7 @@
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationMap": false,
+    "declarationMap": true,
     "sourceMap": false,
     "outDir": "./dist",
     "declarationDir": "./dist/types",

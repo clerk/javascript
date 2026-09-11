@@ -47,7 +47,9 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
     "build": "tsdown --onSuccess \"pnpm build:dts\"",
