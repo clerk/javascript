@@ -230,14 +230,18 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
   });
 
-  it('verifies provided OAuth token', async () => {
+  it.each([
+    { aud: undefined },
+    { aud: 'https://my-resource.example.com' },
+    { aud: ['https://my-resource.example.com', 'https://other-resource.example.com'] },
+  ])('verifies opaque OAuth token with aud=$aud', async ({ aud }) => {
     const token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
 
     server.use(
       http.post(
         'https://api.clerk.test/oauth_applications/access_tokens/verify',
         validateHeaders(() => {
-          return HttpResponse.json(mockVerificationResults.oauth_token);
+          return HttpResponse.json({ ...mockVerificationResults.oauth_token, ...(aud === undefined ? {} : { aud }) });
         }),
       ),
     );
@@ -255,6 +259,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:foo', 'write:bar']);
+    expect(data.aud).toEqual(aud);
   });
 
   describe('handles API errors for API keys', () => {
@@ -424,6 +429,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(data.type).toBe('oauth_token');
       expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(data.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(data.aud).toBeUndefined();
       // Timestamps are exposed in milliseconds, matching M2MToken and the API JSON shape
       expect(data.expiration).toBe(mockOAuthAccessTokenJwtPayload.exp * 1000);
       expect(data.createdAt).toBe(mockOAuthAccessTokenJwtPayload.iat * 1000);
@@ -570,7 +576,10 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       },
     );
 
-    it('verifies OAuth JWT with a matching RFC 8707 resource audience', async () => {
+    it.each([
+      { aud: 'https://my-resource.example.com' },
+      { aud: ['https://my-resource.example.com', 'https://other-resource.example.com'] },
+    ])('verifies OAuth JWT with a matching resource audience aud=$aud', async ({ aud }) => {
       server.use(
         http.get(
           'https://api.clerk.test/v1/jwks',
@@ -583,7 +592,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const audience = 'https://my-resource.example.com';
       const oauthJwt = await createSignedOAuthJwt({
         ...mockOAuthAccessTokenJwtPayload,
-        aud: audience,
+        aud,
       });
 
       const result = await verifyMachineAuthToken(oauthJwt, {
@@ -593,26 +602,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       });
 
       expect(result.tokenType).toBe('oauth_token');
-      expect(result.data).toMatchInlineSnapshot(`
-        IdPOAuthAccessToken {
-          "aud": "https://my-resource.example.com",
-          "clientId": "client_2VTWUzvGC5UhdJCNx6xG1D98edc",
-          "createdAt": 1666648250000,
-          "expiration": 1666648550000,
-          "expired": false,
-          "id": "oat_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE",
-          "revocationReason": null,
-          "revoked": false,
-          "scopes": [
-            "read:foo",
-            "write:bar",
-          ],
-          "subject": "user_2vYVtestTESTtestTESTtestTESTtest",
-          "type": "oauth_token",
-          "updatedAt": 1666648250000,
-        }
-      `);
-      expect((result.data as IdPOAuthAccessToken).aud).toBe(audience);
+      expect(result.data).toMatchObject({ aud, scopes: ['read:foo', 'write:bar'] });
       expect(result.errors).toBeUndefined();
     });
 
