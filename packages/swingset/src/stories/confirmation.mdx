@@ -24,6 +24,7 @@ The block holds nothing of its own. Everything that decides what the dialog does
 ```tsx
 import { Confirmation } from '@clerk/ui/mosaic/blocks/confirmation';
 import { Button } from '@clerk/ui/mosaic/components/button';
+import { useState } from 'react';
 
 const [open, setOpen] = useState(false);
 const [isConfirming, setIsConfirming] = useState(false);
@@ -58,18 +59,18 @@ A failed attempt leaves the dialog up. Pass the sentence the user should read as
 
 ## Props
 
-| Prop           | Type                      | Description                                                                    |
-| -------------- | ------------------------- | ------------------------------------------------------------------------------ |
-| `open`         | `boolean`                 | Whether the confirmation is showing. Controlled, the way any dialog is.        |
-| `onOpenChange` | `(open: boolean) => void` | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop. |
-| `trigger`      | `ReactNode`               | Optional. The button that asks to open the dialog.                             |
-| `title`        | `string`                  | Names what is about to happen.                                                 |
-| `description`  | `string`                  | Spells out what it means.                                                      |
-| `actionLabel`  | `string`                  | The destructive button's label.                                                |
-| `cancelLabel`  | `string`                  | Optional. Defaults to `Cancel`.                                                |
-| `onConfirm`    | `() => void`              | Asks the caller to run the action.                                             |
-| `isConfirming` | `boolean`                 | Optional. Renders the action pending and ignores further presses.              |
-| `errorMessage` | `string`                  | Optional. Renders as a negative banner above the actions.                      |
+| Prop           | Type                      | Default      | Description                                                                    |
+| -------------- | ------------------------- | ------------ | ------------------------------------------------------------------------------ |
+| `open`         | `boolean`                 | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.        |
+| `onOpenChange` | `(open: boolean) => void` | — (required) | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop. |
+| `trigger`      | `ReactNode`               | —            | The button that asks to open the dialog.                                       |
+| `title`        | `string`                  | — (required) | Names what is about to happen.                                                 |
+| `description`  | `string`                  | — (required) | Spells out what it means.                                                      |
+| `actionLabel`  | `string`                  | — (required) | The destructive button's label.                                                |
+| `cancelLabel`  | `string`                  | `'Cancel'`   | The cancel button's label.                                                     |
+| `onConfirm`    | `() => void`              | — (required) | Asks the caller to run the action.                                             |
+| `isConfirming` | `boolean`                 | `false`      | Renders the action pending and ignores further presses.                        |
+| `errorMessage` | `string`                  | —            | Renders as a negative banner above the actions.                                |
 
 ## Driving it from a machine
 
