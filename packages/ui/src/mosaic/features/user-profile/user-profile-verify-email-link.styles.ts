@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { fontWeightVars, space } from '../tokens.stylex';
+import { colorVars, fontWeightVars, space } from '../tokens.stylex';
 
 export const styles = stylex.create({
   content: {
@@ -19,5 +19,8 @@ export const styles = stylex.create({
   },
   emphasis: {
     fontWeight: fontWeightVars['--cl-font-medium'],
+  },
+  emailAddress: {
+    color: colorVars['--cl-color-primary'],
   },
 });
