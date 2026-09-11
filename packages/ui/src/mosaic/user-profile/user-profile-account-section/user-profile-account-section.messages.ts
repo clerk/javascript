@@ -20,7 +20,7 @@ export const userProfileAccountSectionBase = {
     manage: 'Manage profile picture',
     change: 'Change avatar',
     remove: 'Remove avatar',
-    /** Shown under the description when the picker turns a file away. Keyed by rejection reason. */
+
     errors: {
       accept: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
       size: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
@@ -30,7 +30,7 @@ export const userProfileAccountSectionBase = {
   name: {
     label: 'Name',
     edit: 'Edit name',
-    /** The dialog behind `edit`. */
+
     dialogTitle: 'Edit name',
     firstNameLabel: 'First name',
     lastNameLabel: 'Last name',
@@ -40,13 +40,18 @@ export const userProfileAccountSectionBase = {
   username: {
     label: 'Username',
     edit: 'Edit username',
+
+    dialogTitle: 'Edit username',
+    fieldLabel: 'Username',
+    cancel: 'Cancel',
+    save: 'Save changes',
   },
   primary: 'Primary',
   add: 'Add',
   manage: 'Manage',
   setPrimary: 'Set as primary',
   completeVerification: 'Complete verification',
-  /** Names the action menu on one contact row, read as e.g. "Manage item1@clerk.dev". */
+
   manageValue: 'Manage {value}',
   email: {
     label: 'Email',

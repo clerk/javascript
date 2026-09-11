@@ -33,7 +33,7 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       onProfilePictureChange: vi.fn(),
       onSubmitName: () => Promise.resolve(),
-      onUsernameChange: vi.fn(),
+      onSubmitUsername: () => Promise.resolve(),
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
@@ -370,6 +370,23 @@ describe('UserProfileProfilePanelView', () => {
 
     expect(onSubmitName).toHaveBeenCalledWith({ firstName: 'Preston', lastName: 'Barton' });
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit name' })).not.toBeInTheDocument());
+  });
+
+  it('drives the edit-username dialog from the section, seeded with the saved username', async () => {
+    const onSubmitUsername = vi.fn(() => Promise.resolve());
+    const user = userEvent.setup();
+    renderView({ username: 'prestonxyz', onSubmitUsername });
+
+    await user.click(screen.getByRole('button', { name: 'Edit username' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit username' });
+    expect(within(dialog).getByLabelText('Username')).toHaveValue('prestonxyz');
+
+    await user.clear(within(dialog).getByLabelText('Username'));
+    await user.type(within(dialog).getByLabelText('Username'), 'preston');
+    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmitUsername).toHaveBeenCalledWith('preston');
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit username' })).not.toBeInTheDocument());
   });
 
   it('matches the existing conditional contact and connected-account actions', async () => {
