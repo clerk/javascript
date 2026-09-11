@@ -38,7 +38,7 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
   // the nonce fetching (which calls headers()) from the rest of the page.
   // This allows the page to remain statically renderable / use PPR.
   const scriptsSlot = dynamic ? (
-    <Suspense>
+    <Suspense key='clerk-scripts'>
       <DynamicClerkScripts
         publishableKey={propsWithEnvs.publishableKey}
         __internal_clerkJSUrl={propsWithEnvs.__internal_clerkJSUrl}
