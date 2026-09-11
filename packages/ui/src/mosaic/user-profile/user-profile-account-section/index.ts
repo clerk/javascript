@@ -1,5 +1,6 @@
 export { fill, userProfileAccountSectionBase } from './user-profile-account-section.messages';
 export type { UserProfileFormError } from './user-profile-account-section.types';
+export { UserProfileSaveError } from './user-profile-account-section.types';
 export type {
   UserProfileAccountSectionViewProps,
   UserProfileEmail,

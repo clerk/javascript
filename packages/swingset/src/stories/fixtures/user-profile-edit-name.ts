@@ -2,17 +2,8 @@ import type {
   UserProfileEditNameValue,
   UserProfileFormError,
 } from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
+import { UserProfileSaveError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
 import { useState } from 'react';
-
-class FormError extends Error {
-  constructor(
-    message: string,
-    readonly fields?: UserProfileFormError['fields'],
-  ) {
-    super(message);
-    this.name = 'FormError';
-  }
-}
 
 export interface UserProfileEditNameFixtureOptions {
   firstName?: string;
@@ -40,7 +31,7 @@ export function useUserProfileEditNameFixture({
     onSaveName: async (value: UserProfileEditNameValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith) {
-        throw new FormError(failWith.message ?? 'Something went wrong.', failWith.fields);
+        throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);
       }
       setName(value);
     },

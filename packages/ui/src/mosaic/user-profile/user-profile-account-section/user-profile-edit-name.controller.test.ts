@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/createActor';
+import { UserProfileSaveError } from './user-profile-account-section.types';
 import { userProfileEditNameMachine, useUserProfileEditNameController } from './user-profile-edit-name.controller';
 
 function start(saveName: () => Promise<void>, saved = { savedFirstName: 'Preston', savedLastName: 'Booth' }) {
@@ -56,8 +57,8 @@ describe('userProfileEditNameMachine', () => {
   });
 
   it('carries field copy through when the rejection names a control', async () => {
-    const failure = Object.assign(new Error('Your name could not be updated.'), {
-      fields: { firstName: 'First name is required.' },
+    const failure = new UserProfileSaveError('Your name could not be updated.', {
+      firstName: 'First name is required.',
     });
     const actor = start(() => Promise.reject(failure));
     actor.send({ type: 'SAVE' });

@@ -1,6 +1,7 @@
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/useMachine';
 import type { UserProfileFormError } from './user-profile-account-section.types';
+import { UserProfileSaveError } from './user-profile-account-section.types';
 import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.view';
 
 export interface UserProfileEditNameContext {
@@ -25,11 +26,12 @@ function notSeated(): Promise<never> {
   return Promise.reject(new Error('edit-name deps are not seated'));
 }
 
-type FieldCopy = UserProfileFormError<UserProfileEditNameField>['fields'];
-
 function toFormError(cause: unknown): UserProfileFormError<UserProfileEditNameField> {
+  if (cause instanceof UserProfileSaveError) {
+    return { message: cause.message, fields: cause.fields };
+  }
   if (cause instanceof Error) {
-    return { message: cause.message, fields: (cause as Error & { fields?: FieldCopy }).fields };
+    return { message: cause.message };
   }
   return { message: 'Something went wrong. Please try again.' };
 }
