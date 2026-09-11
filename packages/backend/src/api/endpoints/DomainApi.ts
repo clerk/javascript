@@ -12,7 +12,7 @@ export type AddDomainParams = {
    * The new domain name. For development instances, can contain the port, e.g., `myhostname:3000`. For production instances, must be a valid FQDN, e.g., `mysite.com`. Cannot contain protocol scheme.
    */
   name: string;
-  /** Whether the new domain is a satellite domain. Only `true` is accepted at the moment. */
+  /** Whether the new domain is a satellite domain. Set to `false` to add the first custom primary domain to a production instance with an active provider domain. */
   is_satellite: boolean;
   /** The proxy URL for the domain. Applicable only to production instances. */
   proxy_url?: string | null;
@@ -40,7 +40,9 @@ export class DomainAPI extends AbstractAPI {
   }
 
   /**
-   * Adds a new domain to the instance. Useful in the case of multi-domain instances, allows adding [satellite domains](https://clerk.com/docs/guides/dashboard/dns-domains/satellite-domains) to an instance.
+   * Adds a [satellite domain](https://clerk.com/docs/guides/dashboard/dns-domains/satellite-domains) or the first custom primary domain to the instance.
+   *
+   * To migrate a production instance from an active provider domain to a custom primary domain, set `is_satellite` to `false`. The custom domain becomes active, and the provider domain remains attached. Additional custom primary domains are not supported.
    * @returns The created [`Domain`](https://clerk.com/docs/reference/backend/types/domain) object.
    */
   public async add(params: AddDomainParams) {
@@ -70,8 +72,8 @@ export class DomainAPI extends AbstractAPI {
   }
 
   /**
-   * Deletes a satellite domain for the instance. It is currently not possible to delete the instance's primary domain.
-   * @param satelliteDomainId - The ID of the satellite domain to delete.
+   * Deletes a domain for the instance. The active domain cannot be deleted.
+   * @param satelliteDomainId - The ID of the domain to delete.
    * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object).
    */
   public async delete(satelliteDomainId: string) {
@@ -79,8 +81,8 @@ export class DomainAPI extends AbstractAPI {
   }
 
   /**
-   * Deletes a satellite domain for the instance.
-   * @param satelliteDomainId - The ID of the satellite domain to delete.
+   * Deletes a domain for the instance. The active domain cannot be deleted.
+   * @param satelliteDomainId - The ID of the domain to delete.
    * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object).
    * @deprecated Use `delete()` instead.
    */
