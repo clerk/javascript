@@ -5,7 +5,7 @@ import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-li
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useOrganizationListInView } from '../../../hooks/useOrganizationListInView';
-import type { UserButtonModelOptions } from '../user-button.model';
+import type { UserButtonModalProps, UserButtonModelOptions } from '../user-button.model';
 import { useUserButtonModel } from '../user-button.model';
 
 interface FakeUser {
@@ -188,8 +188,8 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-function Harness({ customPages, ...options }: UserButtonModelOptions & { customPages?: CustomPage[] } = {}) {
-  const c = useUserButtonModel(options, customPages);
+function Harness({ modals, ...options }: UserButtonModelOptions & { modals?: UserButtonModalProps } = {}) {
+  const c = useUserButtonModel(options, modals);
   if (c.status !== 'ready') {
     return <output data-testid='status'>{c.status}</output>;
   }
@@ -640,6 +640,25 @@ describe('useUserButtonModel', () => {
     expect(decorateUrl).not.toHaveBeenCalled();
   });
 
+  it('prefers the signInUrl prop over the instance sign-in URL for add-account and task routing', async () => {
+    render(<Harness signInUrl='/join' />);
+
+    fireEvent.click(screen.getByText('add-account'));
+    expect(navigate).toHaveBeenCalledWith('/join');
+
+    fireEvent.click(screen.getByText('switch'));
+    const navigateOnSetActive = setActive.mock.calls[0][0].navigate;
+    await act(async () => {
+      await navigateOnSetActive({
+        session: { currentTask: { key: 'choose-organization' } },
+        decorateUrl: (url: string) => url,
+      });
+    });
+    expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/join'));
+    expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/tasks/choose-organization'));
+    expect(navigate).not.toHaveBeenCalledWith(expect.stringContaining('/sign-in'));
+  });
+
   it('prefers the afterSwitchSessionUrl prop over the instance URL', async () => {
     render(<Harness afterSwitchSessionUrl='/app-switch' />);
     fireEvent.click(screen.getByText('switch'));
@@ -723,11 +742,60 @@ describe('useUserButtonModel', () => {
         unmountIcon: vi.fn(),
       },
     ];
-    render(<Harness customPages={customPages} />);
+    render(<Harness modals={{ userProfile: { customPages } }} />);
 
     fireEvent.click(screen.getByText('manage-account'));
 
     expect(openUserProfile).toHaveBeenCalledWith({ getContainer, customPages });
+  });
+
+  it('hands the user profile modal its OAuth scopes, API keys options, and appearance', () => {
+    const additionalOAuthScopes = { google: ['https://www.googleapis.com/auth/calendar'] };
+    const apiKeysProps = { showDescription: true, hide: false };
+    const appearance = { variables: { colorPrimary: 'red' } };
+    render(<Harness modals={{ userProfile: { additionalOAuthScopes, apiKeysProps, appearance } }} />);
+
+    fireEvent.click(screen.getByText('manage-account'));
+
+    expect(openUserProfile).toHaveBeenCalledWith({ getContainer, additionalOAuthScopes, apiKeysProps, appearance });
+  });
+
+  it('hands the organization profile modal its custom pages, appearance, and where leaving lands', () => {
+    const customPages: CustomPage[] = [{ label: 'members' }];
+    const appearance = { variables: { colorPrimary: 'red' } };
+    render(
+      <Harness
+        afterLeaveOrganizationUrl='/left'
+        modals={{ organizationProfile: { customPages, appearance } }}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('manage-org'));
+
+    expect(openOrganizationProfile).toHaveBeenCalledWith({
+      getContainer,
+      customPages,
+      appearance,
+      afterLeaveOrganizationUrl: '/left',
+    });
+  });
+
+  // clerk-js fills the `:param` template itself once the organization exists.
+  it('hands the create-organization modal where creating lands and whether to skip inviting', () => {
+    render(
+      <Harness
+        afterCreateOrganizationUrl='/orgs/:slug'
+        skipInvitationScreen
+      />,
+    );
+
+    fireEvent.click(screen.getByText('create-org'));
+
+    expect(openCreateOrganization).toHaveBeenCalledWith({
+      getContainer,
+      afterCreateOrganizationUrl: '/orgs/:slug',
+      skipInvitationScreen: true,
+    });
   });
 
   // A URL is the whole opt-in: passing one means navigation, with no mode to remember to pass

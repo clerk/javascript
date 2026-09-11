@@ -1,4 +1,7 @@
 import {
+  disabledOrganizationAPIKeysFeature,
+  disabledOrganizationBillingFeature,
+  disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   disabledUserBillingFeature,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
@@ -12,6 +15,9 @@ import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { USER_PROFILE_PAGE_IDS } from '../user-profile/user-profile.layout';
 import type { CustomProfileItem, CustomProfileLink, UserProfilePageId } from '../user-profile/user-profile.types';
 import { applyOrder } from '../utils/apply-order';
+
+/** A built-in OrganizationProfile page, by the id its navigation uses. */
+export type OrganizationProfilePageId = 'general' | 'members' | 'billing' | 'apiKeys' | 'security';
 
 /**
  * The UserProfile's own pages, in the order it lists them, minus the ones this instance has turned
@@ -31,6 +37,24 @@ export function useUserProfilePages(): UserProfilePageId[] {
     apiKeys: disabledUserAPIKeysFeature(clerk, environment),
   };
   return USER_PROFILE_PAGE_IDS.filter(id => !disabled[id]);
+}
+
+/** The OrganizationProfile's built-in pages, mirrored from clerk-js for the same reason as `useUserProfilePages`. */
+export function useOrganizationProfilePages(): OrganizationProfilePageId[] {
+  const clerk = useClerk();
+  const environment = useMosaicEnvironment();
+
+  const pages: OrganizationProfilePageId[] = ['general', 'members'];
+  if (!disabledOrganizationBillingFeature(clerk, environment)) {
+    pages.push('billing');
+  }
+  if (!disabledOrganizationAPIKeysFeature(clerk, environment)) {
+    pages.push('apiKeys');
+  }
+  if (!disabledSelfServeSSOFeature(clerk, environment)) {
+    pages.push('security');
+  }
+  return pages;
 }
 
 export interface CustomPagesOptions {

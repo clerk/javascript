@@ -1,7 +1,14 @@
 import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
-import type { CustomPage, OrganizationResource, UserResource } from '@clerk/shared/types';
+import type {
+  OrganizationProfileModalProps,
+  OrganizationResource,
+  OrganizationSwitcherProps,
+  UserButtonProps as ClerkUserButtonProps,
+  UserProfileModalProps,
+  UserResource,
+} from '@clerk/shared/types';
 
 import { populateParamFromObject } from '../../contexts/utils';
 import { useOrganizationListInView } from '../../hooks/useOrganizationListInView';
@@ -39,9 +46,6 @@ export type UserButtonModel =
         organizationsEnabled: boolean;
       });
 
-// Mirrors `<OrganizationSwitcher>`: a URL, a `:token` template resolved against the entity, or a builder.
-type AfterSelectUrl<T> = ((entity: T) => string) | string;
-
 /** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
 type UserProfileMode =
   | { userProfileUrl: string; userProfileMode?: 'navigation' }
@@ -57,20 +61,28 @@ type CreateOrganizationMode =
 
 export type UserButtonModelOptions = UserProfileMode &
   OrganizationProfileMode &
-  CreateOrganizationMode & {
-    afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
-    /** Where selecting the personal workspace lands. Resolved against the user, not an organization. */
-    afterSelectPersonalUrl?: AfterSelectUrl<UserResource>;
-    /** Where switching account lands. The instance URL is used when this is omitted. */
-    afterSwitchSessionUrl?: string;
-    /**
-     * Leaves the personal workspace out. An instance that forces organization selection withholds it
-     * either way, so this cannot opt back in.
-     */
-    hidePersonal?: boolean;
-  };
+  CreateOrganizationMode &
+  Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'> &
+  Pick<
+    OrganizationSwitcherProps,
+    | 'afterSelectOrganizationUrl'
+    | 'afterSelectPersonalUrl'
+    | 'afterCreateOrganizationUrl'
+    | 'afterLeaveOrganizationUrl'
+    | 'skipInvitationScreen'
+    | 'hidePersonal'
+  >;
 
-function resolveAfterSelectUrl<T extends object>(config: AfterSelectUrl<T> | undefined, entity: T): string | undefined {
+/** Props forwarded to the profile modals this button opens. */
+export interface UserButtonModalProps {
+  userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
+  organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
+}
+
+function resolveAfterUrl<T extends object>(
+  config: ((entity: T) => string) | string | undefined,
+  entity: T,
+): string | undefined {
   if (typeof config === 'function') {
     return config(entity);
   }
@@ -124,14 +136,10 @@ function toSession(sessionId: string, user: UserResource): UserButtonSession {
 }
 
 /**
- * @param userProfileCustomPages - The consumer's custom pages, already bridged into clerk-js's
- *   DOM-callback form. The wrapper owns that conversion because it is the layer that can render
- *   the portals behind it, so they arrive here ready to forward and stay out of the public options.
+ * @param modals - Props forwarded to the profile modals. Custom pages arrive already bridged, since only
+ *   the wrapper can render the portals behind them.
  */
-export function useUserButtonModel(
-  options?: UserButtonModelOptions,
-  userProfileCustomPages?: CustomPage[],
-): UserButtonModel {
+export function useUserButtonModel(options?: UserButtonModelOptions, modals?: UserButtonModalProps): UserButtonModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   // The active org names the trigger. That is not a request to turn Organizations on.
@@ -143,6 +151,7 @@ export function useUserButtonModel(
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = usePortalRoot();
   const environment = useMosaicEnvironment();
+  const signInUrl = () => options?.signInUrl ?? clerk.buildSignInUrl();
   // Don't fetch orgsLists until we know orgs are enabled.
   // This wont delay rendering of the trigger, or even the popup shell, since the "ready" status
   // does not depend on this.
@@ -153,7 +162,7 @@ export function useUserButtonModel(
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => clerk.openUserProfile({ getContainer, customPages: userProfileCustomPages }),
+    openModal: () => clerk.openUserProfile({ getContainer, ...modals?.userProfile }),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -161,7 +170,12 @@ export function useUserButtonModel(
   const manageOrganization = openOrNavigate({
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
-    openModal: () => clerk.openOrganizationProfile({ getContainer }),
+    openModal: () =>
+      clerk.openOrganizationProfile({
+        getContainer,
+        ...modals?.organizationProfile,
+        afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
+      }),
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });
@@ -169,7 +183,12 @@ export function useUserButtonModel(
   const createOrganization = openOrNavigate({
     url: options?.createOrganizationUrl,
     mode: options?.createOrganizationMode,
-    openModal: () => clerk.openCreateOrganization({ getContainer }),
+    openModal: () =>
+      clerk.openCreateOrganization({
+        getContainer,
+        afterCreateOrganizationUrl: options?.afterCreateOrganizationUrl,
+        skipInvitationScreen: options?.skipInvitationScreen,
+      }),
     buildUrl: () => clerk.buildCreateOrganizationUrl(),
     navigate: router.navigate,
   });
@@ -231,10 +250,10 @@ export function useUserButtonModel(
 
   const afterSelectUrl = (organizationId: string | null): string | undefined => {
     if (!organizationId) {
-      return resolveAfterSelectUrl(options?.afterSelectPersonalUrl, user);
+      return resolveAfterUrl(options?.afterSelectPersonalUrl, user);
     }
     const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
-    return selected ? resolveAfterSelectUrl(options?.afterSelectOrganizationUrl, selected) : undefined;
+    return selected ? resolveAfterUrl(options?.afterSelectOrganizationUrl, selected) : undefined;
   };
 
   return {
@@ -266,7 +285,7 @@ export function useUserButtonModel(
         navigate: async ({ session, decorateUrl }) => {
           const task = session.currentTask;
           if (task) {
-            await router.navigate(buildTaskUrl(task, { base: clerk.buildSignInUrl() }));
+            await router.navigate(buildTaskUrl(task, { base: signInUrl() }));
             return;
           }
           const afterSwitchSessionUrl = options?.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
@@ -292,7 +311,7 @@ export function useUserButtonModel(
     onInviteMembers: canInviteMembers ? () => clerk.openInviteMembers({ getContainer }) : undefined,
     // Covers both restricted instances and users at their creation limit.
     onCreateOrganization: user.createOrganizationEnabled ? createOrganization : undefined,
-    onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
+    onAddAccount: singleSessionMode ? undefined : () => void router.navigate(signInUrl()),
     onAcceptSuggestion: async suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
       try {
