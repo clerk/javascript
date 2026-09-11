@@ -68,7 +68,7 @@ export function UserProfileVerifyEmailLinkView({
             <div {...stylex.props(styles.details)}>
               <Card.Description>
                 {beforeEmail}
-                <strong {...stylex.props(styles.emphasis)}>{emailAddress}</strong>
+                <strong {...stylex.props(styles.emphasis, styles.emailAddress)}>{emailAddress}</strong>
                 {afterEmail}
               </Card.Description>
               <Button
