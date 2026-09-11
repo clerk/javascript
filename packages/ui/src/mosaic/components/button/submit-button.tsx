@@ -32,9 +32,9 @@ export interface SubmitButtonProps extends ButtonProps {
   spinDelay?: SpinDelayOptions;
 }
 
-// The spinner scale stops at `md`, and a `lg` button's label is only one step up, so both take
-// the larger ring rather than `lg` asking for one the spinner cannot render.
-const spinnerSizes = { sm: 'sm', md: 'md', lg: 'md' } as const;
+// The spinner scale stops at `md`, so `xs` and `sm` share the small ring while `md` and `lg`
+// share the larger one.
+const spinnerSizes = { xs: 'sm', sm: 'sm', md: 'md', lg: 'md' } as const;
 
 // Long enough that a request served from cache or a local mutation never draws a spinner, short
 // enough that a press which is going to take a while doesn't sit there looking ignored. Set here

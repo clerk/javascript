@@ -1470,6 +1470,9 @@ export const frFR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Code de réinitialisation du mot de passe',
       resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
@@ -1535,6 +1538,15 @@ export const frFR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Nous devons vérifier votre identité avant de réinitialiser votre mot de passe.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: "S'inscrire",

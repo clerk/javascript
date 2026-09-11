@@ -2,7 +2,8 @@ import type { CustomPage } from '@clerk/shared/types';
 import { act, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import type { CustomPagesOptions, CustomProfileItem } from '../user-button.pages';
+import type { CustomProfileItem } from '../../user-profile/user-profile.types';
+import type { CustomPagesOptions } from '../user-button.pages';
 import { useCustomPages } from '../user-button.pages';
 
 // The bridge's other half lives in clerk-js: `ExternalElementMounter` renders a `div` and hands it to

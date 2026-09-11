@@ -24,6 +24,20 @@ describe('Mosaic Input', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveAttribute('data-size', size);
   });
 
+  it('reflects the ghost variant', () => {
+    render(
+      <Input
+        variant='ghost'
+        aria-label='Search'
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Search' });
+    expect(input).toHaveClass('cl-input');
+    expect(input).toHaveAttribute('data-variant', 'ghost');
+    expect(input).not.toHaveFocus();
+  });
+
   it('reflects and forwards the disabled state', () => {
     render(
       <Input

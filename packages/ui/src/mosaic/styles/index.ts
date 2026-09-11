@@ -5,25 +5,37 @@
 // as components migrate.
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
-export { ProfilePage } from '../profile-page';
-export type {
-  ProfilePageContentProps,
-  ProfilePageItem,
-  ProfilePagePanelProps,
-  ProfilePageRootProps,
-  ProfilePageSidebarProps,
-} from '../profile-page';
-
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
 export { Banner } from '../components/banner';
+export { Branding } from '../components/branding';
+export type { BrandingProps } from '../components/branding';
 export type { BannerDescriptionProps, BannerLabelProps, BannerRootProps } from '../components/banner';
 export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
+export { Drawer } from '../components/drawer';
+export type {
+  DrawerCloseProps,
+  DrawerDescriptionProps,
+  DrawerPopupProps,
+  DrawerRootProps,
+  DrawerTitleProps,
+  DrawerTriggerProps,
+} from '../components/drawer';
+export { Combobox } from '../components/combobox';
+export type {
+  ComboboxEmptyProps,
+  ComboboxInputProps,
+  ComboboxListProps,
+  ComboboxOptionProps,
+  ComboboxPopupProps,
+  ComboboxRootProps,
+  ComboboxSize,
+} from '../components/combobox';
 export { Dialog, createConfirmHandle, useConfirmedClose } from '../components/dialog';
 export type {
   ConfirmHandle,
@@ -49,7 +61,9 @@ export type { HeadingProps } from '../components/heading';
 export { Icon, IconFrame } from '../components/icon';
 export type { IconFrameProps, IconProps } from '../components/icon';
 export { Input } from '../components/input';
-export type { InputProps } from '../components/input';
+export type { InputProps, InputVariant } from '../components/input';
+export { InputGroup } from '../components/input-group';
+export type { InputGroupAddonProps, InputGroupRootProps } from '../components/input-group';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
@@ -98,6 +112,17 @@ export type {
   PopoverTitleProps,
   PopoverTriggerProps,
 } from '../components/popover';
+export { Profile } from '../components/profile';
+export type {
+  ProfileContentProps,
+  ProfileElevation,
+  ProfileNavItemProps,
+  ProfileNavProps,
+  ProfileContentPanelProps,
+  ProfilePageTitleProps,
+  ProfileRootProps,
+  ProfileTitleProps,
+} from '../components/profile';
 
 import {
   colorVars,
@@ -109,6 +134,7 @@ import {
   radiusVars,
   scrollbarVars,
   scrollFadeVars,
+  shadowVars,
   space,
   spacingVars,
   targetVars,
@@ -125,6 +151,7 @@ export {
   radiusVars,
   scrollbarVars,
   scrollFadeVars,
+  shadowVars,
   space,
   spacingVars,
   targetVars,
@@ -138,6 +165,7 @@ export type ColorVarName = keyof typeof colorVars;
 export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;
 export type FocusVarName = keyof typeof focusVars;
+export type ShadowVarName = keyof typeof shadowVars;
 export type FontFamilyVarName = keyof typeof fontFamilyVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;

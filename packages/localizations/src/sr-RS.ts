@@ -1452,6 +1452,9 @@ export const srRS: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod za resetovanje lozinke',
       resendButton: 'Nisi primio kod? Pošalji ponovo',
@@ -1517,6 +1520,15 @@ export const srRS: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Potrebno je da potvrdimo tvoj identitet pre resetovanja lozinke.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registruj se',

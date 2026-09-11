@@ -1454,6 +1454,9 @@ export const thTH: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'รหัสรีเซ็ตรหัสผ่าน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
@@ -1518,6 +1521,15 @@ export const thTH: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'เราต้องยืนยันตัวตนของคุณก่อนรีเซ็ตรหัสผ่าน',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'สมัครสมาชิก',
