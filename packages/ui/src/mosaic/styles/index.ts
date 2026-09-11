@@ -26,6 +26,16 @@ export type {
   DrawerTitleProps,
   DrawerTriggerProps,
 } from '../components/drawer';
+export { Combobox } from '../components/combobox';
+export type {
+  ComboboxEmptyProps,
+  ComboboxInputProps,
+  ComboboxListProps,
+  ComboboxOptionProps,
+  ComboboxPopupProps,
+  ComboboxRootProps,
+  ComboboxSize,
+} from '../components/combobox';
 export { Dialog, createConfirmHandle, useConfirmedClose } from '../components/dialog';
 export type {
   ConfirmHandle,
@@ -54,6 +64,8 @@ export { Input } from '../components/input';
 export type { InputProps, InputVariant } from '../components/input';
 export { InputGroup } from '../components/input-group';
 export type { InputGroupAddonProps, InputGroupRootProps } from '../components/input-group';
+export { PhoneInput } from '../components/phone-input';
+export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';

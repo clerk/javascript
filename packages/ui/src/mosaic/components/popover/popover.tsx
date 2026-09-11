@@ -9,7 +9,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { sizes, styles } from './popover.styles';
 
-export type PopoverSize = 'sm' | 'md' | 'lg';
+export type PopoverSize = 'sm' | 'md' | 'lg' | 'anchor';
 
 export type PopoverRootProps = HeadlessPopoverProps;
 
@@ -107,6 +107,8 @@ function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof
 }
 
 export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
+  /** Positions against this element instead of the trigger. */
+  anchor?: HTMLElement | null;
   /** Width of the floating box. */
   size?: PopoverSize;
   /**
@@ -123,7 +125,7 @@ export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
  * `Popover.Trigger`; supply the surface inside it, usually a `Card`.
  */
 const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function PopoverPopup(
-  { className, style, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
+  { anchor, className, style, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
   ref,
 ) {
   return (
@@ -136,6 +138,7 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
         it alone.
       */}
       <Positioner
+        anchor={anchor}
         {...(ariaLabel == null ? {} : { 'aria-label': ariaLabel })}
         {...(ariaLabelledby == null ? {} : { 'aria-labelledby': ariaLabelledby })}
       >

@@ -6,11 +6,14 @@ import React from 'react';
 import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../../utils';
 import { usePopoverContext } from './popover-context';
 
-export type PopoverPositionerProps = ComponentProps<'div'>;
+export interface PopoverPositionerProps extends ComponentProps<'div'> {
+  /** Positions against this element instead of the trigger. */
+  anchor?: HTMLElement | null;
+}
 
 export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositionerProps>(
   function PopoverPositioner(props, ref) {
-    const { render, ...otherProps } = props;
+    const { anchor, render, ...otherProps } = props;
     const {
       mounted,
       floatingContext,
@@ -26,6 +29,14 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       hasTitle,
       hasDescription,
     } = usePopoverContext();
+
+    React.useLayoutEffect(() => {
+      if (!anchor) {
+        return;
+      }
+      refs.setPositionReference(anchor);
+      return () => refs.setPositionReference(refs.domReference.current);
+    }, [anchor, refs]);
 
     const side = placement.split('-')[0];
 

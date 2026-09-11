@@ -4,8 +4,11 @@ import React, { useState } from 'react';
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
+import { useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
 import { ChevronLeft } from '../../icons';
+import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/ConfigureDirectorySyncWizard';
+import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { SecuritySsoSection } from './SecuritySsoSection';
@@ -37,7 +40,10 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
-  const [view, setView] = useState<'overview' | 'wizard'>('overview');
+  const { userSettings } = useEnvironment();
+  const showDirectorySync = userSettings.enterpriseSSO.self_serve_directory_sync;
+
+  const [view, setView] = useState<'overview' | 'wizard' | 'directorySync'>('overview');
   const [forceFirstStep, setForceFirstStep] = useState(false);
 
   const exitWizard = () => setView('overview');
@@ -92,6 +98,15 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     </SimpleButton>
   );
 
+  if (view === 'directorySync') {
+    return (
+      <ConfigureDirectorySyncWizard
+        title={backControl}
+        onExit={exitWizard}
+      />
+    );
+  }
+
   return view === 'overview' ? (
     <SecurityPageOverview>
       <SecuritySsoSection
@@ -103,6 +118,13 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         contentRef={contentRef}
         onConfigure={openWizard}
       />
+      {showDirectorySync && (
+        <SecurityDirectorySyncSection
+          organizationName={organization?.name ?? ''}
+          contentRef={contentRef}
+          onConfigure={() => setView('directorySync')}
+        />
+      )}
     </SecurityPageOverview>
   ) : (
     <ConfigureSSOWizard

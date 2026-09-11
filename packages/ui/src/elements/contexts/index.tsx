@@ -99,6 +99,7 @@ export type FlowMetadata = {
     | 'pricingTable'
     | 'apiKeys'
     | 'configureSSO'
+    | 'configureDirectorySync'
     | 'oauthConsent'
     | 'oauthDeviceVerification'
     | 'subscriptionDetails'

@@ -27,6 +27,11 @@ import { Default as CardDefault, meta as cardComponentMeta } from '../stories/ca
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
 import {
+  Default as ComboboxDefault,
+  meta as comboboxMeta,
+  Scrolling as ComboboxScrolling,
+} from '../stories/combobox.stories';
+import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
   WithError as DestructiveWithError,
@@ -100,6 +105,14 @@ import {
   Success as OtpComponentSuccess,
 } from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
+import {
+  Default as PhoneInputDefault,
+  Disabled as PhoneInputDisabled,
+  Invalid as PhoneInputInvalid,
+  meta as phoneInputMeta,
+  Prefilled as PhoneInputPrefilled,
+  Sizes as PhoneInputSizes,
+} from '../stories/phone-input.stories';
 import {
   Alignment as PopoverComponentAlignment,
   Default as PopoverComponentDefault,
@@ -266,6 +279,12 @@ const drawerComponentModule: StoryModule = {
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
 
+const comboboxModule: StoryModule = {
+  meta: comboboxMeta,
+  Default: ComboboxDefault,
+  Scrolling: ComboboxScrolling,
+};
+
 const avatarModule: StoryModule = {
   meta: avatarMeta,
   Primary: AvatarPrimary,
@@ -307,6 +326,15 @@ const inputGroupModule: StoryModule = {
   Sizes: InputGroupSizes,
   Disabled: InputGroupDisabled,
   Invalid: InputGroupInvalid,
+};
+
+const phoneInputModule: StoryModule = {
+  meta: phoneInputMeta,
+  Default: PhoneInputDefault,
+  Sizes: PhoneInputSizes,
+  Prefilled: PhoneInputPrefilled,
+  Disabled: PhoneInputDisabled,
+  Invalid: PhoneInputInvalid,
 };
 
 const popoverComponentModule: StoryModule = {
@@ -556,9 +584,11 @@ export const registry: StoryModule[] = [
   bannerModule,
   buttonModule,
   cardComponentModule,
+  comboboxModule,
   flowComponentModule,
   inputModule,
   inputGroupModule,
+  phoneInputModule,
   itemModule,
   dialogComponentModule,
   drawerComponentModule,
