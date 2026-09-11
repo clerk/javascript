@@ -154,6 +154,7 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 - **`label` on `Select.Option`** drives both display in `Select.Value` and typeahead matching. If omitted, `value` is used for both.
 - **`items` prop** is only for label resolution — it does not control which options render. You still render `Select.Option` children yourself.
 - **Disabled options** can still receive keyboard focus but cannot be selected.
+- **Popup contents freeze while closing.** The popup outlives `open` by its exit animation, so its children are wrapped in `Freeze` (`@clerk/headless/utils`) and hold their last frame: picking an option does not move `data-selected` to the new row under the animation. The popup element itself keeps updating, so `data-closed` / `data-ending-style` still land.
 
 ## ARIA
 
