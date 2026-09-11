@@ -1,6 +1,7 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.src.json",
   "compilerOptions": {
+    "composite": false,
     "jsxImportSource": "react",
     "paths": {
       // Resolve the private, unpublished `@clerk/headless` to its SOURCE for the Mosaic
@@ -10,7 +11,7 @@
       "@clerk/headless/utils": ["../headless/src/utils/index.ts"],
       "@clerk/headless/*": ["../headless/src/*"],
       // Preserve the base config's test-only aliases (extends replaces `paths` wholesale).
-      "@/core/*": ["../clerk-js/src/core/*"],
+      "@/core/*": ["./src/test/core-shims/*"],
       "@/*": ["./src/*"],
       "@/ui*": ["./src/*"]
     }

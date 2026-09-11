@@ -1,9 +1,19 @@
-import type { VerificationJSON } from '@clerk/shared/types';
+import type { EmailAddressResource, PhoneNumberResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { EmailAddress, PhoneNumber } from '@/core/resources';
-
 import { sortIdentificationBasedOnVerification } from '../utils';
+
+const email = (id: string, status: string, expireAtMs = 0) =>
+  ({
+    id,
+    verification: { status, expireAt: new Date(expireAtMs) },
+  }) as EmailAddressResource;
+
+const phone = (id: string, status: string, expireAtMs = 0) =>
+  ({
+    id,
+    verification: { status, expireAt: new Date(expireAtMs) },
+  }) as PhoneNumberResource;
 
 describe('UserProfile utils', () => {
   describe('sortIdentificationBasedOnVerification', () => {
@@ -22,71 +32,11 @@ describe('UserProfile utils', () => {
         `1) primary, 2) verified (sorted alphabetically by id), 3) unverified (sorted by expiresAt verification property)`,
       () => {
         const input = [
-          new EmailAddress(
-            {
-              id: '1',
-              email_address: 'test@clerk.com',
-              verification: {
-                strategy: 'email_code',
-                status: 'unverified',
-                attempts: 0,
-                expire_at: 200,
-              } as VerificationJSON,
-            },
-            '',
-          ),
-          new EmailAddress(
-            {
-              id: '2',
-              email_address: 'test@clerk.com',
-              verification: {
-                strategy: 'email_code',
-                status: 'verified',
-                attempts: 0,
-                expire_at: 0,
-              } as VerificationJSON,
-            },
-            '',
-          ),
-          new EmailAddress(
-            {
-              id: '3',
-              email_address: 'test@clerk.com',
-              verification: {
-                strategy: 'email_code',
-                status: 'verified',
-                attempts: 0,
-                expire_at: 0,
-              } as VerificationJSON,
-            },
-            '',
-          ),
-          new EmailAddress(
-            {
-              id: '4',
-              email_address: 'test@clerk.com',
-              verification: {
-                strategy: 'email_code',
-                status: 'verified',
-                attempts: 0,
-                expire_at: 0,
-              } as VerificationJSON,
-            },
-            '',
-          ),
-          new EmailAddress(
-            {
-              id: '5',
-              email_address: 'test@clerk.com',
-              verification: {
-                strategy: 'email_code',
-                status: 'unverified',
-                attempts: 0,
-                expire_at: 100,
-              } as VerificationJSON,
-            },
-            '',
-          ),
+          email('1', 'unverified', 200),
+          email('2', 'verified'),
+          email('3', 'verified'),
+          email('4', 'verified'),
+          email('5', 'unverified', 100),
         ];
         const result = sortIdentificationBasedOnVerification(input, '3');
         expect(result[0].id).toEqual('3');
@@ -102,71 +52,11 @@ describe('UserProfile utils', () => {
         `1) primary, 2) verified (sorted alphabetically by id), 3) unverified (sorted by expiresAt verification property)`,
       () => {
         const input = [
-          new PhoneNumber(
-            {
-              id: '1',
-              phone_number: '+1234567890',
-              verification: {
-                strategy: 'sms',
-                status: 'unverified',
-                attempts: 0,
-                expire_at: 200,
-              } as VerificationJSON,
-            },
-            '',
-          ),
-          new PhoneNumber(
-            {
-              id: '2',
-              phone_number: '+1234567890',
-              verification: {
-                strategy: 'sms',
-                status: 'verified',
-                attempts: 0,
-                expire_at: 0,
-              } as VerificationJSON,
-            },
-            '',
-          ),
-          new PhoneNumber(
-            {
-              id: '3',
-              phone_number: '+1234567890',
-              verification: {
-                strategy: 'sms',
-                status: 'verified',
-                attempts: 0,
-                expire_at: 0,
-              } as VerificationJSON,
-            },
-            '',
-          ),
-          new PhoneNumber(
-            {
-              id: '4',
-              phone_number: '+1234567890',
-              verification: {
-                strategy: 'sms',
-                status: 'verified',
-                attempts: 0,
-                expire_at: 0,
-              } as VerificationJSON,
-            },
-            '',
-          ),
-          new PhoneNumber(
-            {
-              id: '5',
-              phone_number: '+1234567890',
-              verification: {
-                strategy: 'sms',
-                status: 'unverified',
-                attempts: 0,
-                expire_at: 100,
-              } as VerificationJSON,
-            },
-            '',
-          ),
+          phone('1', 'unverified', 200),
+          phone('2', 'verified'),
+          phone('3', 'verified'),
+          phone('4', 'verified'),
+          phone('5', 'unverified', 100),
         ];
 
         const result = sortIdentificationBasedOnVerification(input, '3');
@@ -180,71 +70,11 @@ describe('UserProfile utils', () => {
 
     it('should return the correct order if the primaryId is not in the array', () => {
       const input = [
-        new PhoneNumber(
-          {
-            id: '1',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'unverified',
-              attempts: 0,
-              expire_at: 200,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '2',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'verified',
-              attempts: 0,
-              expire_at: 0,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '3',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'verified',
-              attempts: 0,
-              expire_at: 0,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '4',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'verified',
-              attempts: 0,
-              expire_at: 0,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '5',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'unverified',
-              attempts: 0,
-              expire_at: 100,
-            } as VerificationJSON,
-          },
-          '',
-        ),
+        phone('1', 'unverified', 200),
+        phone('2', 'verified'),
+        phone('3', 'verified'),
+        phone('4', 'verified'),
+        phone('5', 'unverified', 100),
       ];
 
       const result = sortIdentificationBasedOnVerification(input, '10');
@@ -257,84 +87,12 @@ describe('UserProfile utils', () => {
 
     it('should return last the item without verification status', () => {
       const input = [
-        new PhoneNumber(
-          {
-            id: '1',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'unverified',
-              attempts: 0,
-              expire_at: 200,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '2',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'verified',
-              attempts: 0,
-              expire_at: 0,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '3',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'verified',
-              attempts: 0,
-              expire_at: 0,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '4',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'verified',
-              attempts: 0,
-              expire_at: 0,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '5',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: 'sms',
-              status: 'unverified',
-              attempts: 0,
-              expire_at: 100,
-            } as VerificationJSON,
-          },
-          '',
-        ),
-        new PhoneNumber(
-          {
-            id: '6',
-            phone_number: '+1234567890',
-            verification: {
-              strategy: '',
-              status: '' as any,
-              attempts: 0,
-              expire_at: 0,
-            } as VerificationJSON,
-          },
-          '',
-        ),
+        phone('1', 'unverified', 200),
+        phone('2', 'verified'),
+        phone('3', 'verified'),
+        phone('4', 'verified'),
+        phone('5', 'unverified', 100),
+        phone('6', ''),
       ];
 
       const result = sortIdentificationBasedOnVerification(input, '3');
