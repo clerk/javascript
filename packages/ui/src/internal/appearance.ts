@@ -807,6 +807,16 @@ export type ElementsConfig = {
   configureDirectorySyncUserStatusBadge: WithOptions<string>;
   configureDirectorySyncUsersEmpty: WithOptions;
   configureDirectorySyncCompleteButton: WithOptions;
+  configureDirectorySyncCredentialsForm: WithOptions;
+  configureDirectorySyncCredentialsBadge: WithOptions;
+  configureDirectorySyncUploadKeyButton: WithOptions;
+  configureDirectorySyncUploadedFileName: WithOptions;
+  configureDirectorySyncSubjectEmailInput: WithOptions;
+  configureDirectorySyncSaveCredentialsButton: WithOptions;
+  configureDirectorySyncSyncRow: WithOptions;
+  configureDirectorySyncSyncNowButton: WithOptions;
+  configureDirectorySyncStatusBadge: WithOptions<string>;
+  configureDirectorySyncLastSyncedAt: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
