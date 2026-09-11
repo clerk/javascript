@@ -518,6 +518,9 @@ function getParameterObjectShapeDeclaration(t) {
       const [sourceType, keysType] = /** @type {[import('typedoc').Type, import('typedoc').Type]} */ (
         ref.typeArguments
       );
+      if (sourceType.type === 'reference' && sourceType.typeArguments?.length) {
+        return undefined;
+      }
       const propertyNames = getPickPropertyNames(keysType);
       if (!propertyNames?.length) {
         return undefined;

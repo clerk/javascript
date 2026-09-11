@@ -95,6 +95,16 @@ describe('getParameterObjectShapeDeclaration', () => {
     ).toBeUndefined();
   });
 
+  it('fails closed for generic source instantiations', () => {
+    const source = {
+      ...sourceInterface('value'),
+      name: 'Box',
+      typeArguments: [{ type: 'intrinsic', name: 'string' }],
+    };
+
+    expect(getParameterObjectShapeDeclaration(pick(source, literal('value')))).toBeUndefined();
+  });
+
   it('does not treat Omit as a flattenable builtin', () => {
     const omit = {
       type: 'reference',
