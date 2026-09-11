@@ -30,6 +30,10 @@ env:
   MAESTRO_VERSION: '2.8.0'
   # Skips a blocking network call on every CLI start.
   MAESTRO_CLI_NO_ANALYTICS: '1'
+  # Devices per e2e job; the flows are split across them. A second driver
+  # took up to 130s to come up beside the first, past the default startup timeout.
+  MAESTRO_SHARDS: '2'
+  MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
 
 jobs:
   native-build:
@@ -67,6 +71,10 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+
+      - name: Boot iOS simulators
+        if: matrix.platform == 'ios' && matrix.run-e2e == true
+        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$MAESTRO_SHARDS"
 
       - name: Compute native build cache key
         id: native-build-key
@@ -247,13 +255,6 @@ jobs:
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
           test "$("$HOME/.maestro/bin/maestro" --version)" = "$MAESTRO_VERSION"
 
-      - name: Boot iOS simulator
-        id: sim
-        if: matrix.platform == 'ios' && steps.keys.outputs.pk != ''
-        uses: futureware-tech/simulator-action@e89aa8f93d3aec35083ff49d2854d07f7186f7f5 # v5
-        with:
-          model: 'iPhone 17 Pro'
-
       # Provisioned as late as possible so live credentials exist for the
       # shortest window.
       - name: Provision test user via BAPI
@@ -290,35 +291,23 @@ jobs:
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-          SIM_UDID: ${{ steps.sim.outputs.udid }}
         run: |
-          echo "Using simulator $SIM_UDID"
-          # Kill animations + predictive keyboard: animations add latency to
-          # every tap; predictive text hijacks inputText targets.
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.UIKit UIAnimationDragCoefficient -float 0.01 || true
-          xcrun simctl spawn "$SIM_UDID" defaults write -g ApplePersistenceIgnoreState -bool YES || true
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.ContinuousPath -bool NO || true
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
-          # The one-time keyboard tutorial sheets carry their own Continue
-          # button, which can hijack taps on the AuthView's Continue.
-          for key in DidShowContinuousPathIntroduction DidShowGestureKeyboardIntroduction KeyboardDidShowProductivityTutorial UIKeyboardDidShowInternationalInfoIntroduction; do
-            xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.preferences "$key" -bool YES || true
-          done
-          xcrun simctl install "$SIM_UDID" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
-          # Stream the app's console output into the debug artifact so a hang has
-          # actionable evidence (keychain/network errors) instead of just screenshots.
+          "$GITHUB_WORKSPACE/$E2E_DIR/boot-ios-simulators.sh" wait
           mkdir -p "$RUNNER_TEMP/maestro-debug"
-          xcrun simctl spawn "$SIM_UDID" log stream --style compact \
-            --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
-            > "$RUNNER_TEMP/maestro-debug/sim-console.log" 2>&1 &
-          LOG_PID=$!
-          cd "$GITHUB_WORKSPACE/$E2E_DIR"
+          log_pids=()
+          for udid in ${MAESTRO_UDID//,/ }; do
+            xcrun simctl install "$udid" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
+            # Stream the app's console output into the debug artifact so a hang
+            # has actionable evidence (keychain/network errors), not just screenshots.
+            xcrun simctl spawn "$udid" log stream --style compact \
+              --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
+              > "$RUNNER_TEMP/maestro-debug/$udid-console.log" 2>&1 &
+            log_pids+=($!)
+          done
           rc=0
-          MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" MAESTRO_UDID="$SIM_UDID" ./run-flows.sh \
-            xcrun simctl terminate "$SIM_UDID" com.clerk.exponativebuildfixture || rc=$?
-          kill "$LOG_PID" 2>/dev/null || true
+          PLATFORM=ios MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" \
+            "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh" || rc=$?
+          kill "${log_pids[@]}" 2>/dev/null || true
           exit "$rc"
 
       - name: Enable KVM
@@ -362,7 +351,9 @@ jobs:
           target: google_apis
           arch: x86_64
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          # read-only so the extra shard emulators can share this AVD: a
+          # writable instance holds a lock the others wait on forever.
+          emulator-options: -read-only -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           # The action runs each script line in a separate sh -c; the folded
           # scalar (>-) plus && keeps everything in one shell invocation.
