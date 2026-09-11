@@ -1,15 +1,22 @@
 import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
 import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
-import { useState } from 'react';
+import type { ReactNode } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
+import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
 import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
+import { createConfirmHandle, Dialog } from '../../components/dialog';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { Text } from '../../components/text';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
+import type { UserProfileAddPhoneControllerOptions } from '../user-profile-add-phone.controller';
+import { useUserProfileAddPhoneController } from '../user-profile-add-phone.controller';
+import { UserProfileAddPhoneView } from '../user-profile-add-phone.view';
 import { styles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
@@ -72,11 +79,12 @@ export interface UserProfileAccountSectionViewProps {
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void;
   onRemoveEmail?: (id: string) => void;
-  onAddPhone?: () => void;
+  onSendPhoneCode?: (phoneNumber: string) => Promise<void>;
+  onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
-  onSetPrimaryPhone?: (id: string) => void;
-  onRemovePhone?: (id: string) => void;
+  onSetPrimaryPhone?: (id: string) => void | Promise<void>;
+  onRemovePhone?: (id: string) => void | Promise<void>;
 }
 
 export function UserProfileAccountSectionView({
@@ -101,12 +109,83 @@ export function UserProfileAccountSectionView({
   onVerifyEmail,
   onSetPrimaryEmail,
   onRemoveEmail,
-  onAddPhone,
+  onSendPhoneCode,
+  onVerifyPhoneCode,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const addPhoneAction =
+    onSendPhoneCode && onVerifyPhoneCode ? (
+      <AddPhone
+        options={{ onSend: onSendPhoneCode, onVerify: onVerifyPhoneCode }}
+        compact={allowMultipleAccounts}
+      />
+    ) : undefined;
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const removeConfirm = useMemo(() => createConfirmHandle(), []);
+  const [phoneToRemove, setPhoneToRemove] = useState<UserProfilePhone>();
+  const [removeError, setRemoveError] = useState<string>();
+  const removing = useRef(false);
+  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
+  const [primaryError, setPrimaryError] = useState<string>();
+  const settingPrimary = useRef(false);
+
+  const setPrimaryPhone = async (id: string) => {
+    const phone = phones.find(phone => phone.id === id);
+    if (!onSetPrimaryPhone || !phone?.isVerified || phone.isDefault || settingPrimary.current) {
+      return;
+    }
+    settingPrimary.current = true;
+    setIsSettingPrimary(true);
+    setPrimaryError(undefined);
+    try {
+      await onSetPrimaryPhone(id);
+    } catch (error) {
+      setPrimaryError(error instanceof Error ? error.message : m.phone.primaryError);
+    } finally {
+      settingPrimary.current = false;
+      setIsSettingPrimary(false);
+    }
+  };
+
+  const removePhone = async (id: string) => {
+    const phone = phones.find(phone => phone.id === id);
+    if (!phone || phone.canRemove === false || !onRemovePhone || removing.current) {
+      return;
+    }
+    removing.current = true;
+    setPhoneToRemove(phone);
+    setRemoveError(undefined);
+    try {
+      const [beforePhone, afterPhone] = m.phone.removeDialog.description.split('{phoneNumber}');
+      const confirmed = await removeConfirm.show({
+        title: m.phone.removeDialog.title,
+        description: (
+          <>
+            {beforePhone}
+            <strong {...stylex.props(styles.confirmPhoneNumber)}>{stringToFormattedPhoneString(phone.value)}</strong>
+            {afterPhone}
+          </>
+        ),
+        actionLabel: m.phone.removeDialog.confirm,
+        cancelLabel: m.phone.removeDialog.cancel,
+        destructive: true,
+      });
+      if (confirmed) {
+        await onRemovePhone(id);
+      }
+    } catch (error) {
+      setRemoveError(error instanceof Error ? error.message : m.phone.removeError);
+    } finally {
+      removing.current = false;
+    }
+  };
+  const formattedPhones = phones.map(phone => ({
+    ...phone,
+    value: stringToFormattedPhoneString(phone.value),
+  }));
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -120,7 +199,12 @@ export function UserProfileAccountSectionView({
     <FileUpload.Root
       accept={PROFILE_PICTURE_MIME_TYPES}
       maxSize={PROFILE_PICTURE_MAX_BYTES}
-      render={<div {...stylex.props(styles.sections)} />}
+      render={
+        <div
+          ref={sectionRef}
+          {...stylex.props(styles.sections)}
+        />
+      }
       onReject={rejections => {
         setRejection(rejections[0]?.reason ?? null);
         onProfilePictureReject?.(rejections);
@@ -209,10 +293,10 @@ export function UserProfileAccountSectionView({
           ) : null}
           {!allowMultipleAccounts ? (
             <SingleContactRow
-              items={phones}
+              items={formattedPhones}
               kind='phone'
               label={m.phone.label}
-              onAdd={onAddPhone}
+              addAction={addPhoneAction}
               onManage={onManagePhone}
             />
           ) : null}
@@ -232,16 +316,45 @@ export function UserProfileAccountSectionView({
       ) : null}
       {allowMultipleAccounts ? (
         <ContactSection
-          items={phones}
+          items={formattedPhones}
           kind='phone'
           label={m.phone.label}
-          onAdd={onAddPhone}
-          onManage={onManagePhone}
-          onRemove={onRemovePhone}
-          onSetPrimary={onSetPrimaryPhone}
+          addAction={addPhoneAction}
+          onManage={isSettingPrimary ? undefined : onManagePhone}
+          onRemove={onRemovePhone ? id => void removePhone(id) : undefined}
+          onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
           onVerify={onVerifyPhone}
         />
       ) : null}
+      {primaryError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {primaryError}
+        </Text>
+      ) : null}
+      {removeError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {removeError}
+        </Text>
+      ) : null}
+      <Dialog.Confirm
+        handle={removeConfirm}
+        finalFocus={() => {
+          const buttons = Array.from(sectionRef.current?.querySelectorAll('button') ?? []);
+          const label = phoneToRemove ? `Manage ${stringToFormattedPhoneString(phoneToRemove.value)}` : '';
+          return (
+            buttons.find(button => button.getAttribute('aria-label') === label) ??
+            buttons.find(button => button.getAttribute('aria-label') === 'Add phone number') ??
+            buttons[0] ??
+            false
+          );
+        }}
+      />
     </FileUpload.Root>
   );
 }
@@ -336,7 +449,34 @@ function EditName({
   );
 }
 
+function AddPhone({ options, compact }: { options: UserProfileAddPhoneControllerOptions; compact: boolean }) {
+  const controller = useUserProfileAddPhoneController(options);
+  return (
+    <UserProfileAddPhoneView
+      {...controller}
+      trigger={
+        <Button
+          aria-label={m.phone.add}
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {compact ? (
+            <Icon
+              name='plus'
+              placement='inline-start'
+              size='sm'
+            />
+          ) : null}
+          {compact ? m.add : m.phone.add}
+        </Button>
+      }
+    />
+  );
+}
+
 interface ContactSectionProps {
+  addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
   items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
@@ -357,7 +497,7 @@ function ContactSection(props: ContactSectionProps) {
   );
 }
 
-function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectionProps) {
+function SingleContactRow({ kind, label, items, onAdd, onManage, addAction }: ContactSectionProps) {
   const item = items[0];
   const onClick = item ? (onManage ? () => onManage(item.id) : undefined) : onAdd;
   const emptyDescription = m[kind].empty;
@@ -377,7 +517,9 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
             <Section.Description>{emptyDescription}</Section.Description>
           )}
         </Section.Content>
-        {onClick ? (
+        {!item && addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onClick ? (
           <Section.Actions>
             <Button
               color='neutral'
@@ -394,7 +536,17 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
   );
 }
 
-function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimary, onRemove }: ContactSectionProps) {
+function ContactRow({
+  kind,
+  label,
+  items,
+  onAdd,
+  onManage,
+  onVerify,
+  onSetPrimary,
+  onRemove,
+  addAction,
+}: ContactSectionProps) {
   const emptyDescription = m[kind].empty;
 
   return (
@@ -403,7 +555,9 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
         <Section.Content>
           <Section.Label>{label}</Section.Label>
         </Section.Content>
-        {onAdd ? (
+        {addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onAdd ? (
           <Section.Actions>
             <Button
               aria-label={m[kind].add}

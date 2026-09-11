@@ -13,6 +13,7 @@ import type {
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
+import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 
 export interface UserProfileFixtureOptions {
@@ -119,15 +120,9 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       emails,
       phones,
       onAddEmail: onAddEmail ?? (() => addEmail(`preston+${emails.length}@clerk.dev`)),
-      onAddPhone: () =>
-        setPhones(current => [
-          ...current,
-          {
-            id: `phone_${Date.now()}`,
-            value: `+1 801-555-${String(current.length + 1).padStart(4, '0')}`,
-            isVerified: true,
-          },
-        ]),
+      ...createUserProfileAddPhoneFixture({
+        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+      }),
       onDeleteAccount: () => Promise.resolve(),
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,

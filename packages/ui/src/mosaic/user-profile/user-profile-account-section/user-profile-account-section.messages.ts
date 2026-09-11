@@ -63,6 +63,14 @@ export const userProfileAccountSectionBase = {
     add: 'Add phone number',
     verify: 'Verify phone number',
     remove: 'Remove phone number',
+    primaryError: 'Unable to set the primary phone number. Try again.',
+    removeError: 'Unable to remove this phone number. Try again.',
+    removeDialog: {
+      title: 'Remove phone number?',
+      description: '{phoneNumber} will be removed from your account. You won’t be able to use it to sign in.',
+      confirm: 'Remove',
+      cancel: 'Cancel',
+    },
   },
 };
 
