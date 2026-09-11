@@ -321,4 +321,19 @@ describe('Mosaic Select', () => {
     );
     expect(screen.getByRole('combobox')).toHaveAccessibleName('Filter by role All roles');
   });
+
+  it('does not reference the value id when the trigger renders its own children', () => {
+    render(
+      <Select.Root
+        items={roles}
+        defaultValue='all'
+      >
+        <Select.Trigger aria-label='Filter by role'>Custom</Select.Trigger>
+        <Select.Popup />
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toHaveAttribute('aria-labelledby', trigger.id);
+    expect(trigger).toHaveAccessibleName('Filter by role');
+  });
 });
