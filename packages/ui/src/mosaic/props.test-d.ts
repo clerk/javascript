@@ -1,19 +1,28 @@
-import type * as stylex from '@stylexjs/stylex';
+import * as stylex from '@stylexjs/stylex';
 import type React from 'react';
 import { describe, expectTypeOf, test } from 'vitest';
 
-import type { MosaicComponentProps, MosaicElementProps } from './props';
+import { scrollAreaViewport } from './components/scroll-area/scroll-area.styles';
+import type { MosaicComponentProps, MosaicElementProps, XStyle } from './props';
 import { mergeStyleProps, themeProps } from './props';
 
 // A Mosaic part is styled from inside `packages/ui` through `xstyle`, and from outside through
 // the `.cl-<slot>` / `data-<axis>` / `--cl-*` CSS contract. Neither path is `className` or
 // `style`, so the canonical prop types drop both; every part inherits the omission from here.
 
+describe('XStyle', () => {
+  // StyleX's own `StyleXStyles` only admits property names it knows, which rejects real atoms such as
+  // the scroll area's `::-webkit-scrollbar` rules. `xstyle` is spread into `stylex.props`, so it takes
+  // exactly what that accepts.
+  test('accepts every atom stylex.props does', () => {
+    stylex.props(xstyle);
+    expectTypeOf(scrollAreaViewport()).toExtend<XStyle>();
+  });
+});
+
 describe('MosaicComponentProps', () => {
   test('accepts xstyle', () => {
-    expectTypeOf<MosaicComponentProps<'div'>>()
-      .toHaveProperty('xstyle')
-      .toEqualTypeOf<stylex.StyleXStyles | undefined>();
+    expectTypeOf<MosaicComponentProps<'div'>>().toHaveProperty('xstyle').toEqualTypeOf<XStyle | undefined>();
   });
 
   test('rejects className and style', () => {
@@ -30,9 +39,7 @@ describe('MosaicComponentProps', () => {
 
 describe('MosaicElementProps', () => {
   test('accepts xstyle', () => {
-    expectTypeOf<MosaicElementProps<'button'>>()
-      .toHaveProperty('xstyle')
-      .toEqualTypeOf<stylex.StyleXStyles | undefined>();
+    expectTypeOf<MosaicElementProps<'button'>>().toHaveProperty('xstyle').toEqualTypeOf<XStyle | undefined>();
   });
 
   test('rejects className and style', () => {
@@ -45,6 +52,7 @@ describe('MosaicElementProps', () => {
   });
 });
 
+declare const xstyle: XStyle;
 declare const optionRest: Omit<MosaicComponentProps<'div'>, 'xstyle'> & { value: string };
 
 describe('mergeStyleProps', () => {

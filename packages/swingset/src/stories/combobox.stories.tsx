@@ -5,8 +5,13 @@ import { Combobox } from '@clerk/ui/mosaic/components/combobox';
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
+import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
+
+const styles = stylex.create({
+  fieldWidth: { width: 320 },
+});
 
 export { default as __source } from './combobox.stories?raw';
 
@@ -22,7 +27,7 @@ export function Default() {
 
   return (
     <Combobox.Root>
-      <Field.Root style={{ width: 320 }}>
+      <Field.Root xstyle={styles.fieldWidth}>
         <Field.Label>Fruit</Field.Label>
         <InputGroup.Root>
           <Combobox.Input placeholder='Search fruit…' />
@@ -67,7 +72,7 @@ export function Scrolling() {
 
   return (
     <Combobox.Root>
-      <Field.Root style={{ width: 320 }}>
+      <Field.Root xstyle={styles.fieldWidth}>
         <Field.Label>Fruit</Field.Label>
         <InputGroup.Root>
           <Combobox.Input placeholder='Search fruit…' />

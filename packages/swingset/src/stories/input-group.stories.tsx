@@ -3,7 +3,8 @@ import { Field } from '@clerk/ui/mosaic/components/field';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import type { InputGroupRootProps } from '@clerk/ui/mosaic/components/input-group';
 import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
-import { colorVars } from '@clerk/ui/mosaic/styles';
+import { colorVars } from '@clerk/ui/mosaic/tokens.stylex';
+import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -25,6 +26,15 @@ export const meta: StoryMeta = {
   },
 };
 
+const styles = stylex.create({
+  fieldWidth: {
+    width: 320,
+  },
+  tintedAddon: {
+    backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+  },
+});
+
 function knobsAsProps(props: Record<string, unknown>) {
   return props as unknown as InputGroupRootProps;
 }
@@ -34,7 +44,7 @@ export function Default(props: Record<string, unknown>) {
   const groupProps = knobsAsProps(props);
 
   return (
-    <Field.Root style={{ width: 320 }}>
+    <Field.Root xstyle={styles.fieldWidth}>
       <Field.Label>Password</Field.Label>
       <InputGroup.Root {...groupProps}>
         <InputGroup.Input
@@ -78,20 +88,12 @@ export function Sizes(props: Record<string, unknown>) {
 
 export function TextAddons(props: Record<string, unknown>) {
   return (
-    <Field.Root style={{ width: 320 }}>
+    <Field.Root xstyle={styles.fieldWidth}>
       <Field.Label>Website</Field.Label>
       <InputGroup.Root {...knobsAsProps(props)}>
-        <InputGroup.Start
-          style={{ backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)` }}
-        >
-          https://
-        </InputGroup.Start>
+        <InputGroup.Start xstyle={styles.tintedAddon}>https://</InputGroup.Start>
         <InputGroup.Input placeholder='example' />
-        <InputGroup.End
-          style={{ backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)` }}
-        >
-          .com
-        </InputGroup.End>
+        <InputGroup.End xstyle={styles.tintedAddon}>.com</InputGroup.End>
       </InputGroup.Root>
     </Field.Root>
   );
@@ -101,7 +103,7 @@ export function Disabled(props: Record<string, unknown>) {
   return (
     <Field.Root
       disabled
-      style={{ width: 320 }}
+      xstyle={styles.fieldWidth}
     >
       <Field.Label>Email address</Field.Label>
       <InputGroup.Root {...knobsAsProps(props)}>
@@ -119,7 +121,7 @@ export function Invalid(props: Record<string, unknown>) {
   return (
     <Field.Root
       invalid
-      style={{ width: 320 }}
+      xstyle={styles.fieldWidth}
     >
       <Field.Label>Password</Field.Label>
       <InputGroup.Root {...groupProps}>

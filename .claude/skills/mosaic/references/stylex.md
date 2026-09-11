@@ -608,8 +608,8 @@ function Button({ intent, variant, xstyle, ...rest }: ButtonProps) {
 ### `xstyle`, not `className`/`style`
 
 A Mosaic part has no `className` or `style` prop. `MosaicComponentProps` and
-`MosaicElementProps` (`props.ts`) omit the pair and add `xstyle?: StyleXStyles`,
-so every part inherits the contract by typing its props off one of them. A lint
+`MosaicElementProps` (`props.ts`) omit the pair and add `xstyle?: XStyle`, so
+every part inherits the contract by typing its props off one of them. A lint
 rule in the `packages/ui/mosaic` eslint block names the replacement when either
 attribute shows up on a capitalized element.
 
@@ -634,9 +634,13 @@ render={<Heading />}` clones the title's merged `className`/`style` onto the
   `Heading`, which is why a part passes its `rest` bag through `mergeStyleProps`:
   the helper merges the incoming pair instead of letting it overwrite the part's
   own class. The public prop types stay closed; only the merge is tolerant.
-- `xstyle` is typed as the unconstrained `StyleXStyles`. Narrow it per part
-  (`StyleXStyles<{ marginBlockStart?: string }>`) only once a part needs to fence
-  what a caller may override.
+- `xstyle` is typed as `XStyle`: whatever `stylex.props(...)` accepts, since that
+  is where the part passes it on. StyleX's narrower `StyleXStyles` only admits
+  property names it knows and rejects real atoms (the scroll area's
+  `::-webkit-scrollbar` rules), so parts do not use it.
+- `{...stylex.props(atoms)}` on a part is the same pair by another route and the
+  lint rule flags it too. Pass the atoms as `xstyle`; only native elements spread
+  `stylex.props`.
 
 ### Type every part with `MosaicComponentProps`
 

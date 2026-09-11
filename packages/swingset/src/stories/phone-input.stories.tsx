@@ -3,6 +3,7 @@
 import { Field } from '@clerk/ui/mosaic/components/field';
 import type { PhoneInputProps } from '@clerk/ui/mosaic/components/phone-input';
 import { PhoneInput } from '@clerk/ui/mosaic/components/phone-input';
+import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -25,11 +26,13 @@ export const meta: StoryMeta = {
   },
 };
 
-const stackStyles = {
-  display: 'grid',
-  gap: 8,
-  width: 320,
-} as const;
+const styles = stylex.create({
+  stack: {
+    display: 'grid',
+    gap: 8,
+    width: 320,
+  },
+});
 
 function knobsAsProps(props: Record<string, unknown>) {
   return props as unknown as PhoneInputProps;
@@ -37,7 +40,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 
 export function Default(props: Record<string, unknown>) {
   return (
-    <Field.Root style={stackStyles}>
+    <Field.Root xstyle={styles.stack}>
       <Field.Label>Phone number</Field.Label>
       <PhoneInput
         {...knobsAsProps(props)}
@@ -73,7 +76,7 @@ export function Sizes() {
 
 export function Prefilled() {
   return (
-    <Field.Root style={stackStyles}>
+    <Field.Root xstyle={styles.stack}>
       <Field.Label>Phone number</Field.Label>
       <PhoneInput defaultValue='+306901234567' />
       <Field.Description>Paste an international number to update the detected country.</Field.Description>
@@ -85,7 +88,7 @@ export function Disabled() {
   return (
     <Field.Root
       disabled
-      style={stackStyles}
+      xstyle={styles.stack}
     >
       <Field.Label>Phone number</Field.Label>
       <PhoneInput defaultValue='+12025550123' />
@@ -97,7 +100,7 @@ export function Invalid() {
   return (
     <Field.Root
       invalid
-      style={stackStyles}
+      xstyle={styles.stack}
     >
       <Field.Label>Phone number</Field.Label>
       <PhoneInput defaultValue='+1202' />

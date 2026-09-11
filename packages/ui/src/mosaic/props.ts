@@ -3,6 +3,15 @@ import type * as stylex from '@stylexjs/stylex';
 import type React from 'react';
 
 /**
+ * What `xstyle` accepts: exactly what `stylex.props(...)` does, since that is where a part
+ * passes it on. StyleX's narrower `StyleXStyles` only admits property names it knows, which
+ * rejects real atoms such as the scroll area's `::-webkit-scrollbar` rules.
+ */
+export type XStyle = stylex.StyleXArray<
+  null | undefined | boolean | stylex.CompiledStyles | Readonly<[stylex.CompiledStyles, stylex.InlineStyles]>
+>;
+
+/**
  * The one styling prop a Mosaic part takes from the code that renders it: StyleX atoms
  * for the part's root element, composed last in its `stylex.props(...)` call so they win.
  *
@@ -11,7 +20,7 @@ import type React from 'react';
  * `data-<axis>` attrs, and `--cl-*` vars in CSS. Neither path needs raw CSS on the part.
  */
 export interface MosaicStyleProps {
-  xstyle?: stylex.StyleXStyles;
+  xstyle?: XStyle;
 }
 
 /**
