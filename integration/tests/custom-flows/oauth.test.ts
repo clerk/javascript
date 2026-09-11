@@ -6,6 +6,7 @@ import { appConfigs } from '../../presets';
 import { instanceKeys } from '../../presets/envs';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
+import { withRetry } from '../../testUtils/retryableClerkClient';
 import { createUserService } from '../../testUtils/usersService';
 
 test.describe('Custom Flows OAuth @custom', () => {
@@ -25,7 +26,7 @@ test.describe('Custom Flows OAuth @custom', () => {
       secretKey: instanceKeys.get('oauth-provider').sk,
       publishableKey: instanceKeys.get('oauth-provider').pk,
     });
-    const users = createUserService(client);
+    const users = createUserService(withRetry(client));
     fakeUser = users.createFakeUser(test, { withUsername: true });
     await users.createBapiUser(fakeUser);
   });
