@@ -54,3 +54,28 @@ export function useOrganizationDirectorySyncUsersCacheKeys(params: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizationId, enterpriseConnectionId, directoryId, JSON.stringify(args)]);
 }
+
+/**
+ * @internal
+ */
+export function useOrganizationDirectorySyncStatusCacheKeys(params: {
+  organizationId: string | null;
+  enterpriseConnectionId: string | null;
+  directoryId: string | null;
+}) {
+  const { organizationId, enterpriseConnectionId, directoryId } = params;
+  return useMemo(() => {
+    return createCacheKeys({
+      stablePrefix: INTERNAL_STABLE_KEYS.ORGANIZATION_DIRECTORY_SYNC_STATUS_KEY,
+      authenticated: Boolean(organizationId),
+      tracked: {
+        organizationId: organizationId ?? null,
+        enterpriseConnectionId: enterpriseConnectionId ?? null,
+        directoryId: directoryId ?? null,
+      },
+      untracked: {
+        args: {},
+      },
+    });
+  }, [organizationId, enterpriseConnectionId, directoryId]);
+}

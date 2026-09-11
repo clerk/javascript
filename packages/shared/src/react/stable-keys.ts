@@ -85,6 +85,7 @@ const ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'organizationEnterprise
 const ORGANIZATION_DOMAINS_KEY = 'organizationDomains';
 const ORGANIZATION_DIRECTORY_SYNC_KEY = 'organizationDirectorySync';
 const ORGANIZATION_DIRECTORY_SYNC_USERS_KEY = 'organizationDirectorySyncUsers';
+const ORGANIZATION_DIRECTORY_SYNC_STATUS_KEY = 'organizationDirectorySyncStatus';
 
 const CREDIT_HISTORY_KEY = 'billing-credit-history';
 
@@ -100,6 +101,7 @@ export const INTERNAL_STABLE_KEYS = {
   ORGANIZATION_DOMAINS_KEY,
   ORGANIZATION_DIRECTORY_SYNC_KEY,
   ORGANIZATION_DIRECTORY_SYNC_USERS_KEY,
+  ORGANIZATION_DIRECTORY_SYNC_STATUS_KEY,
 } as const;
 
 export type __internal_ResourceCacheStableKey = (typeof INTERNAL_STABLE_KEYS)[keyof typeof INTERNAL_STABLE_KEYS];
