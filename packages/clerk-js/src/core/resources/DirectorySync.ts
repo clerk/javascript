@@ -112,12 +112,14 @@ export class DirectorySync extends BaseResource implements DirectorySyncResource
   };
 
   getSyncStatus = async (): Promise<DirectorySyncStatusResource> => {
-    const json = (
-      await BaseResource._fetch<DirectorySyncStatusJSON>({
-        path: `${this.directoryPath}/sync_status`,
-        method: 'GET',
-      })
-    )?.response as unknown as DirectorySyncStatusJSON | undefined;
+    // Not a Clerk resource — it has no id or object — so it is fetched
+    // untyped and cast, the same way getUsers handles its paginated payload.
+    const res = await BaseResource._fetch({
+      path: `${this.directoryPath}/sync_status`,
+      method: 'GET',
+    });
+
+    const json = res?.response as unknown as DirectorySyncStatusJSON | undefined;
 
     return {
       lastSyncedAt: json?.last_synced_at ? unixEpochToDate(json.last_synced_at) : null,
