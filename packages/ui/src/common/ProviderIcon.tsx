@@ -7,7 +7,7 @@ import { ProviderInitialIcon } from './ProviderInitialIcon';
 
 type ProviderId = OAuthProvider | Web3Provider | PhoneCodeChannel;
 
-const SUPPORTS_MASK_IMAGE = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'] as const;
+export const SUPPORTS_MASK_IMAGE = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'] as const;
 
 const supportsMaskImage = (id: ProviderId): boolean => {
   return (SUPPORTS_MASK_IMAGE as readonly string[]).includes(id);

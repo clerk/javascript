@@ -3,4 +3,4 @@
 '@clerk/ui': patch
 ---
 
-Add `agentid` to `OAuthProvider` and `OAUTH_PROVIDERS` to support the "Continue with AgentID" OAuth flow. `<ProviderIcon />` now renders the AgentID mark with the foreground color so it stays visible in dark mode.
+Add `agentid` to `OAuthProvider` and `OAUTH_PROVIDERS` to support the "Continue with AgentID" OAuth flow. `<ProviderIcon />` renders the AgentID mark via mask-image so the social button icon follows the foreground color.
