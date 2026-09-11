@@ -37,6 +37,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
   },
   blocks: {
+    confirmation: dynamic(() => import('../stories/confirmation.mdx')),
     destructive: dynamic(() => import('../stories/destructive.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
