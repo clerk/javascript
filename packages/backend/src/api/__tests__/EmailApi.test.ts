@@ -156,6 +156,49 @@ describe('EmailApi', () => {
     expect(requests).toBe(0);
   });
 
+  it('accepts a batch of 100 messages in one request', async () => {
+    const messages = Array.from({ length: 100 }, (_, index) => ({
+      to: { address: `recipient${index}@acme.com` },
+      from: { address: 'notify@acme.com' },
+      subject: 'Update',
+      text: 'Done',
+    }));
+    let requests = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', async ({ request }) => {
+        requests++;
+        expect(await request.json()).toEqual({ messages });
+        return HttpResponse.json({
+          data: messages.map((message, index) => ({
+            index,
+            email: { ...mockEmail, id: `ema_${index}`, to_email_address: message.to.address },
+            status_code: 200,
+          })),
+        });
+      }),
+    );
+    const results = await apiClient.emails.createBatch(messages);
+    expect(requests).toBe(1);
+    expect(results).toHaveLength(100);
+    expect(results.map(result => result.email?.id)).toEqual(messages.map((_, index) => `ema_${index}`));
+  });
+
+  it('does not retry a batch POST after a network interruption', async () => {
+    let requests = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', () => {
+        requests++;
+        return HttpResponse.error();
+      }),
+    );
+    await expect(
+      apiClient.emails.createBatch([
+        { to: { address: 'admin@acme.com' }, from: { address: 'notify@acme.com' }, subject: 'Update', text: 'Done' },
+      ]),
+    ).rejects.toMatchObject({ errors: [expect.objectContaining({ code: 'unexpected_error' })] });
+    expect(requests).toBe(1);
+  });
+
   it('does not retry a batch POST automatically', async () => {
     let requests = 0;
     server.use(
