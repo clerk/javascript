@@ -49,7 +49,7 @@ export function UserProfileVerifyEmailLinkView({
           <Card.Header>
             <Card.Title>{m.title}</Card.Title>
           </Card.Header>
-          <Card.Content>
+          <Card.Content {...stylex.props(styles.content)}>
             {errorMessage ? (
               <Banner.Root
                 role='alert'
