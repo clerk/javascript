@@ -7,6 +7,7 @@ import type {
 import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 import { UserProfileVerifyEmailLinkView } from '@clerk/ui/mosaic/features/user-profile/user-profile-verify-email-link.view';
+import { UserProfileVerifyEmailSsoView } from '@clerk/ui/mosaic/features/user-profile/user-profile-verify-email-sso.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -17,6 +18,7 @@ import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
 import { useUserProfileVerifyEmailLinkFixture } from './fixtures/user-profile-verify-email-link';
+import { useUserProfileVerifyEmailSsoFixture } from './fixtures/user-profile-verify-email-sso';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -135,6 +137,40 @@ export function EmailLinkResendFails() {
           color='neutral'
         >
           Verify email link
+        </Button>
+      }
+    />
+  );
+}
+
+export function EmailSsoVerification() {
+  const fixture = useUserProfileVerifyEmailSsoFixture();
+  return (
+    <UserProfileVerifyEmailSsoView
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify with SSO
+        </Button>
+      }
+    />
+  );
+}
+
+export function EmailSsoConnectFails() {
+  const fixture = useUserProfileVerifyEmailSsoFixture({ failConnect: true });
+  return (
+    <UserProfileVerifyEmailSsoView
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify with SSO
         </Button>
       }
     />
