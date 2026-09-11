@@ -188,6 +188,7 @@ for (const outcome of ['receipt', 'resource', 'rejected']) {
         if (url.pathname.endsWith('/logo')) {
           assert.equal(url.pathname, `/v1/organizations/${organization.id}/logo`);
           assert.equal(url.searchParams.get('_method') ?? request.method, 'DELETE');
+          assert.equal(url.searchParams.get('_clerk_session_id'), 'sess_native');
           if (outcome === 'rejected')
             return response(null, {
               status: 403,
