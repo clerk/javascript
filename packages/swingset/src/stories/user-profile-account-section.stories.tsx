@@ -40,6 +40,7 @@ function AccountSection({
   );
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
+    ...(allowMultipleAccounts ? [{ id: 'phone_2', value: '+18015550100', isVerified: true }] : []),
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addPhone = useUserProfileAddPhoneFixture({
@@ -70,6 +71,7 @@ function AccountSection({
         onManagePhone={() => undefined}
         onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
         onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
+        onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
         onNameChange={() => undefined}
         onUsernameChange={() => undefined}
       />

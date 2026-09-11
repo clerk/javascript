@@ -1,7 +1,7 @@
 import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
 import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { stringToFormattedPhoneString } from '../../utils/phoneUtils';
 import { Avatar } from '../components/avatar';
@@ -9,6 +9,7 @@ import { Badge } from '../components/badge';
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
+import { Text } from '../components/text';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
@@ -65,7 +66,7 @@ export interface UserProfileAccountSectionViewProps {
   onAddPhone?: () => void;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
-  onSetPrimaryPhone?: (id: string) => void;
+  onSetPrimaryPhone?: (id: string) => void | Promise<void>;
   onRemovePhone?: (id: string) => void;
 }
 
@@ -93,6 +94,28 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
+  const [primaryError, setPrimaryError] = useState<string>();
+  const settingPrimary = useRef(false);
+
+  const setPrimaryPhone = async (id: string) => {
+    const phone = phones.find(phone => phone.id === id);
+    if (!onSetPrimaryPhone || !phone?.isVerified || phone.isDefault || settingPrimary.current) {
+      return;
+    }
+    settingPrimary.current = true;
+    setIsSettingPrimary(true);
+    setPrimaryError(undefined);
+    try {
+      await onSetPrimaryPhone(id);
+    } catch (error) {
+      setPrimaryError(error instanceof Error ? error.message : 'Unable to set the primary phone number. Try again.');
+    } finally {
+      settingPrimary.current = false;
+      setIsSettingPrimary(false);
+    }
+  };
+
   const formattedPhones = phones.map(phone => ({
     ...phone,
     value: stringToFormattedPhoneString(phone.value),
@@ -228,11 +251,19 @@ export function UserProfileAccountSectionView({
           kind='phone'
           label={m.phone.label}
           onAdd={onAddPhone}
-          onManage={onManagePhone}
+          onManage={isSettingPrimary ? undefined : onManagePhone}
           onRemove={onRemovePhone}
-          onSetPrimary={onSetPrimaryPhone}
+          onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
           onVerify={onVerifyPhone}
         />
+      ) : null}
+      {primaryError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {primaryError}
+        </Text>
       ) : null}
     </FileUpload.Root>
   );
