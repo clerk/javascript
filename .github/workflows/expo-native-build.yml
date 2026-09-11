@@ -294,8 +294,6 @@ jobs:
           log_pids=()
           for udid in ${MAESTRO_UDID//,/ }; do
             xcrun simctl install "$udid" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
-            # Stream the app's console output into the debug artifact so a hang
-            # has actionable evidence (keychain/network errors), not just screenshots.
             xcrun simctl spawn "$udid" log stream --style compact \
               --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
               > "$RUNNER_TEMP/maestro-debug/$udid-console.log" 2>&1 &
@@ -348,8 +346,7 @@ jobs:
           target: google_apis
           arch: x86_64
           force-avd-creation: false
-          # read-only so the extra shard emulators can share this AVD: a
-          # writable instance holds a lock the others wait on forever.
+          # read-only: a writable instance holds a lock the shard emulators wait on forever
           emulator-options: -read-only -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           # The action runs each script line in a separate sh -c; the folded

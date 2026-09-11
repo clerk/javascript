@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
-# Boots N simulators of one model on the newest installed iOS runtime and
-# configures each for Maestro. `boot` returns as soon as the boots are issued
-# so they overlap the native build; `wait` blocks until every one is usable.
-#
-# Usage: ./boot-ios-simulators.sh boot <count> [model]   # exports MAESTRO_UDID
-#        ./boot-ios-simulators.sh wait                    # reads MAESTRO_UDID
+# Usage: ./boot-ios-simulators.sh boot <count> [model] | wait
 set -euo pipefail
 
 boot() {
   local count=$1 model=${2:-iPhone 17 Pro}
   local runtime device_type udids=() i
-  # The runtime matching the SDK the app was built with, so a newer beta
-  # runtime installed on the runner does not change the OS under test.
+  # pinned to the SDK the app was built with; runners may also carry a newer beta runtime
   sdk=$(xcrun --sdk iphonesimulator --show-sdk-version)
   runtime=$(xcrun simctl list runtimes available -j | jq -r --arg v "$sdk" \
     '[.runtimes[] | select(.platform == "iOS")] | (map(select(.version == $v)) + .) | first | .identifier')
@@ -29,8 +23,6 @@ wait_ready() {
   local udid key
   IFS=, read -r -a udids <<< "${MAESTRO_UDID:?MAESTRO_UDID is required}"
   for udid in "${udids[@]}"; do
-    # bootstatus blocks with no deadline of its own; a simulator that never
-    # finishes booting would otherwise hold the job until its timeout.
     xcrun simctl bootstatus "$udid" -b &
     local pid=$! elapsed=0
     while kill -0 "$pid" 2>/dev/null; do
@@ -45,16 +37,13 @@ wait_ready() {
       elapsed=$((elapsed + 5))
     done
     wait "$pid"
-    # Kill animations + predictive keyboard: animations add latency to every
-    # tap; predictive text hijacks inputText targets.
     xcrun simctl spawn "$udid" defaults write com.apple.UIKit UIAnimationDragCoefficient -float 0.01 || true
     xcrun simctl spawn "$udid" defaults write -g ApplePersistenceIgnoreState -bool YES || true
     xcrun simctl spawn "$udid" defaults write com.apple.keyboard.ContinuousPath -bool NO || true
     xcrun simctl spawn "$udid" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
     xcrun simctl spawn "$udid" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
     xcrun simctl spawn "$udid" defaults write com.apple.keyboard.Prediction -bool NO || true
-    # The one-time keyboard tutorial sheets carry their own Continue button,
-    # which can hijack taps on the AuthView's Continue.
+    # the keyboard tutorial sheets have their own Continue button that steals taps
     for key in DidShowContinuousPathIntroduction DidShowGestureKeyboardIntroduction KeyboardDidShowProductivityTutorial UIKeyboardDidShowInternationalInfoIntroduction; do
       xcrun simctl spawn "$udid" defaults write com.apple.keyboard.preferences "$key" -bool YES || true
     done

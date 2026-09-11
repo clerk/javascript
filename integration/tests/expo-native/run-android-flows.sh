@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
-# Installs the APK on every emulator, starting extra instances of the booted
-# AVD when MAESTRO_SHARDS asks for more than one, then runs the flows across
-# them. Meant to run inside reactivecircus/android-emulator-runner.
-#
-# Usage: ./run-android-flows.sh <apk>
-# Optional env: MAESTRO_SHARDS (default 1), AVD_NAME (default test),
-#               MAESTRO_DEBUG_OUTPUT
+# Usage: ./run-android-flows.sh <apk>   (inside reactivecircus/android-emulator-runner)
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -21,8 +15,6 @@ sdk=$(dirname "$(dirname "$(command -v adb)")")
 debug=${MAESTRO_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-maestro-runner}
 mkdir -p "$debug"
 
-# The action boots one emulator on 5554; extra shards start the same AVD
-# read-only on the next even ports so they share its snapshot.
 for ((i = 1; i < shards; i++)); do
   port=$((5554 + i * 2))
   "$sdk/emulator/emulator" -avd "${AVD_NAME:-test}" -read-only -port "$port" \
@@ -31,8 +23,7 @@ for ((i = 1; i < shards; i++)); do
   devices+=("emulator-$port")
 done
 
-# Bounded, because adb wait-for-device on an emulator that died at startup
-# never returns and the job would sit until its timeout with no output.
+# adb wait-for-device never returns for an emulator that died at startup
 wait_for_boot() {
   local device=$1 elapsed=0
   until [ "$(adb -s "$device" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ]; do

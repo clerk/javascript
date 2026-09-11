@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
-# Runs every top-level Maestro flow (flows/*.yaml; flows/subflows/ are
-# runFlow-only pieces) once across the connected devices, then reruns only the
-# flows that failed. The rerun is diagnostic: it labels a failure flaky or
-# deterministic in the summary, and any first-attempt failure still fails the
-# run, so app instability is never absorbed.
-#
-# Usage: PLATFORM=<ios|android> ./run-flows.sh
-#
-# Required env: PLATFORM, CLERK_TEST_EMAIL, CLERK_TEST_PASSWORD
-# Optional env: MAESTRO_UDID (comma-separated device ids; the flows are split
-#               across them, one shard per device; unset lets maestro pick one),
-#               MAESTRO_DEBUG_OUTPUT (directory for CI debug artifacts)
+# Usage: PLATFORM=<ios|android> [MAESTRO_UDID=a,b] [MAESTRO_DEBUG_OUTPUT=dir] ./run-flows.sh
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -43,7 +32,6 @@ force_stop() {
   done
 }
 
-# $1: output name, $2: shard mode (all|split), $3: shard count, rest: flows.
 run_maestro() {
   local output_name=$1 mode=$2 shards=$3
   shift 3
@@ -60,7 +48,6 @@ run_maestro() {
     "$@"
 }
 
-# Prints one "<file>\t<status>\t<seconds>" line per testcase in a JUnit report.
 report_rows() {
   python3 - "$1" <<'PY'
 import sys, xml.etree.ElementTree as ET
