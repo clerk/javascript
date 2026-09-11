@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Runs every top-level Maestro flow (flows/*.yaml; flows/subflows/ are
 # runFlow-only pieces) once across the connected devices, then reruns only the
-# flows that failed. Whole-flow retry can mask app instability (the Maestro
-# docs discourage it), so it is capped at a single rerun purely to absorb
-# emulator/simulator flake.
+# flows that failed. The rerun is diagnostic: it labels a failure flaky or
+# deterministic in the summary, and any first-attempt failure still fails the
+# run, so app instability is never absorbed.
 #
 # Usage: PLATFORM=<ios|android> ./run-flows.sh
 #
@@ -100,7 +100,7 @@ while IFS=$'\t' read -r file status _; do
 done < "$output_root/attempt-1.tsv"
 
 if [ "${#failed[@]}" -gt 0 ]; then
-  echo "::warning::${#failed[@]} flow(s) failed, rerunning after 10s: ${failed[*]}"
+  echo "::warning::${#failed[@]} flow(s) failed, rerunning after 10s to tell flaky from deterministic: ${failed[*]}"
   force_stop
   sleep 10
   shards=$device_count
@@ -120,14 +120,19 @@ fi
 status=0
 while IFS=$'\t' read -r file result seconds; do
   attempts=1
-  if [ -f "$output_root/attempt-2.tsv" ]; then
-    rerun=$(awk -F'\t' -v f="$file" '$1 == f { print $2 "\t" $3 }' "$output_root/attempt-2.tsv")
+  if [ "$result" = SUCCESS ]; then
+    result=passed
+  else
+    status=1
+    result=failed
+    rerun=$(awk -F'\t' -v f="$file" '$1 == f { print $2 "\t" $3 }' "$output_root/attempt-2.tsv" 2>/dev/null || true)
     if [ -n "$rerun" ]; then
       attempts=2
-      IFS=$'\t' read -r result seconds <<< "$rerun"
+      IFS=$'\t' read -r rerun_result seconds <<< "$rerun"
+      [ "$rerun_result" = SUCCESS ] && result='flaky (failed, then passed on the rerun)'
     fi
+    echo "::error::Flow $file: $result"
   fi
-  if [ "$result" = SUCCESS ]; then result=passed; else result=failed; status=1; fi
   echo "Flow $file: $result after $attempts attempt(s) in ${seconds}s"
   if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     printf '| `%s` | %s | %s | %ss |\n' "$file" "$result" "$attempts" "$seconds" >> "$GITHUB_STEP_SUMMARY"
