@@ -1598,6 +1598,68 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
+    test.each(['oauth_token', 'any'] as const)(
+      'rejects an opaque OAuth audience mismatch when acceptsToken is %s',
+      async acceptsToken => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
+            return HttpResponse.json({
+              ...mockVerificationResults.oauth_token,
+              aud: 'https://other.example.com',
+            });
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message:
+            'Invalid JWT audience claim (aud) "https://other.example.com". Is not included in "["https://resource.example.com"]". (code=token-verification-failed, status=n/a)',
+        });
+        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+          tokenType: 'oauth_token',
+          isAuthenticated: false,
+        });
+      },
+    );
+
+    describe.each(['opaque', 'JWT'] as const)('%s OAuth token without aud', format => {
+      test.each(['oauth_token', 'any'] as const)(
+        'rejects a configured audience when acceptsToken is %s',
+        async acceptsToken => {
+          server.use(
+            http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
+              return HttpResponse.json(mockVerificationResults.oauth_token);
+            }),
+            http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)),
+          );
+          const token = format === 'opaque' ? mockTokens.oauth_token : mockSignedOAuthAccessTokenJwt;
+          const request = mockRequest({ authorization: `Bearer ${token}` });
+          const requestState = await authenticateRequest(
+            request,
+            mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),
+          );
+
+          expect(requestState).toBeMachineUnauthenticated({
+            tokenType: 'oauth_token',
+            reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message:
+              'Invalid OAuth audience claim (aud) undefined. Expected a non-empty string or a non-empty array of non-empty strings. (code=token-verification-failed, status=n/a)',
+          });
+          expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+            tokenType: 'oauth_token',
+            isAuthenticated: false,
+          });
+        },
+      );
+    });
+
     test('accepts machine secret when verifying machine-to-machine token', async () => {
       server.use(
         http.post(mockMachineAuthResponses.m2m_token.endpoint, ({ request }) => {
