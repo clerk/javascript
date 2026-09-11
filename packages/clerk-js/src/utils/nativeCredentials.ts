@@ -59,6 +59,10 @@ export async function nativeCredential(
   request: MobileNativeHost['request'],
 ) {
   try {
+    if (kind === 'get') {
+      const rpId = options && typeof options === 'object' && 'rpId' in options ? options.rpId : undefined;
+      if (typeof rpId !== 'string' || !rpId.trim()) throw bridgeError('invalid_credential_options');
+    }
     const result = await request<any>(`passkeys.${kind}`, options);
     if (!result || result.type !== 'public-key' || typeof result.id !== 'string' || !result.response)
       throw bridgeError('invalid_credential_result');
