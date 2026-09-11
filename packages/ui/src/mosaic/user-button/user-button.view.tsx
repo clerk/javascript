@@ -25,7 +25,7 @@ import { truncationStyles } from '../utils/typography.styles';
 import type { UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
 import { fill, plural, userButtonBase as m } from './user-button.messages';
-import { styles, triggerShapes } from './user-button.styles';
+import { styles } from './user-button.styles';
 import type {
   UserButtonBrandingProps,
   UserButtonBusyState,
@@ -1082,18 +1082,13 @@ export function UserButtonTrigger({
   return (
     <Popover.Trigger
       aria-label={fill(m.trigger.open, { name })}
-      {...stylex.props(
-        focusOutline.visible,
-        styles.trigger,
-        renderTriggerLabel ? styles.triggerLabelled : null,
-        triggerShapes[shape],
-      )}
+      {...stylex.props(focusOutline.visible, styles.trigger, renderTriggerLabel ? styles.triggerLabelled : null)}
     >
       <RowAvatar
         name={name}
         imageUrl={imageUrl}
         shape={shape}
-        size='sm'
+        size={renderTriggerLabel ? 'xs' : 'sm'}
       />
       {renderTriggerLabel ? (
         <>

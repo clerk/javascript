@@ -4,7 +4,8 @@ import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVa
 
 export const styles = stylex.create({
   trigger: {
-    padding: space['1'],
+    padding: 0,
+    borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'none',
     alignItems: 'center',
     backgroundColor: {
@@ -21,6 +22,7 @@ export const styles = stylex.create({
   },
 
   triggerLabelled: {
+    padding: space['1'],
     gap: space['1.5'],
   },
 
@@ -53,11 +55,4 @@ export const styles = stylex.create({
     justifyContent: 'center',
     width: space['7'],
   },
-});
-
-// The trigger takes the corner of the workspace mark it carries: round for a person, squared for
-// an organization. Rounding it fully would draw a circle around a square mark, labelled or not.
-export const triggerShapes = stylex.create({
-  circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: radiusVars['--cl-radius-md'] },
 });
