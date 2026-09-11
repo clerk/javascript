@@ -1,8 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { space } from '../tokens.stylex';
+import { fontWeightVars, space } from '../tokens.stylex';
 
 export const styles = stylex.create({
+  confirmPhoneNumber: {
+    fontWeight: fontWeightVars['--cl-font-medium'],
+  },
   contactValue: {
     gap: space['2'],
     alignItems: 'center',

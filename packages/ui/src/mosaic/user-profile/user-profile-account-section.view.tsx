@@ -1,12 +1,13 @@
 import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
 import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { stringToFormattedPhoneString } from '../../utils/phoneUtils';
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
+import { createConfirmHandle, Dialog } from '../components/dialog';
 import { Icon } from '../components/icon';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
@@ -67,7 +68,7 @@ export interface UserProfileAccountSectionViewProps {
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
   onSetPrimaryPhone?: (id: string) => void | Promise<void>;
-  onRemovePhone?: (id: string) => void;
+  onRemovePhone?: (id: string) => void | Promise<void>;
 }
 
 export function UserProfileAccountSectionView({
@@ -94,6 +95,11 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const removeConfirm = useMemo(() => createConfirmHandle(), []);
+  const [phoneToRemove, setPhoneToRemove] = useState<UserProfilePhone>();
+  const [removeError, setRemoveError] = useState<string>();
+  const removing = useRef(false);
   const [isSettingPrimary, setIsSettingPrimary] = useState(false);
   const [primaryError, setPrimaryError] = useState<string>();
   const settingPrimary = useRef(false);
@@ -116,6 +122,35 @@ export function UserProfileAccountSectionView({
     }
   };
 
+  const removePhone = async (id: string) => {
+    const phone = phones.find(phone => phone.id === id);
+    if (!phone || phone.canRemove === false || !onRemovePhone || removing.current) {
+      return;
+    }
+    removing.current = true;
+    setPhoneToRemove(phone);
+    setRemoveError(undefined);
+    try {
+      const confirmed = await removeConfirm.show({
+        title: 'Remove phone number?',
+        description: (
+          <>
+            <strong {...stylex.props(styles.confirmPhoneNumber)}>{stringToFormattedPhoneString(phone.value)}</strong>{' '}
+            will be removed from your account. You won’t be able to use it to sign in.
+          </>
+        ),
+        actionLabel: 'Remove',
+        destructive: true,
+      });
+      if (confirmed) {
+        await onRemovePhone(id);
+      }
+    } catch (error) {
+      setRemoveError(error instanceof Error ? error.message : 'Unable to remove this phone number. Try again.');
+    } finally {
+      removing.current = false;
+    }
+  };
   const formattedPhones = phones.map(phone => ({
     ...phone,
     value: stringToFormattedPhoneString(phone.value),
@@ -134,7 +169,12 @@ export function UserProfileAccountSectionView({
     <FileUpload.Root
       accept={PROFILE_PICTURE_MIME_TYPES}
       maxSize={PROFILE_PICTURE_MAX_BYTES}
-      render={<div {...stylex.props(styles.sections)} />}
+      render={
+        <div
+          ref={sectionRef}
+          {...stylex.props(styles.sections)}
+        />
+      }
       onReject={rejections => {
         setRejection(rejections[0]?.reason ?? null);
         onProfilePictureReject?.(rejections);
@@ -252,7 +292,7 @@ export function UserProfileAccountSectionView({
           label={m.phone.label}
           onAdd={onAddPhone}
           onManage={isSettingPrimary ? undefined : onManagePhone}
-          onRemove={onRemovePhone}
+          onRemove={onRemovePhone ? id => void removePhone(id) : undefined}
           onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
           onVerify={onVerifyPhone}
         />
@@ -265,6 +305,27 @@ export function UserProfileAccountSectionView({
           {primaryError}
         </Text>
       ) : null}
+      {removeError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {removeError}
+        </Text>
+      ) : null}
+      <Dialog.Confirm
+        handle={removeConfirm}
+        finalFocus={() => {
+          const buttons = Array.from(sectionRef.current?.querySelectorAll('button') ?? []);
+          const label = phoneToRemove ? `Manage ${stringToFormattedPhoneString(phoneToRemove.value)}` : '';
+          return (
+            buttons.find(button => button.getAttribute('aria-label') === label) ??
+            buttons.find(button => button.getAttribute('aria-label') === 'Add phone number') ??
+            buttons[0] ??
+            false
+          );
+        }}
+      />
     </FileUpload.Root>
   );
 }
