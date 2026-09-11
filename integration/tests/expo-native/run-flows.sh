@@ -11,7 +11,8 @@
 #   Local:      ./run-flows.sh
 #
 # Required env: CLERK_TEST_EMAIL, CLERK_TEST_PASSWORD
-# Optional env: MAESTRO_DEBUG_OUTPUT (directory for CI debug artifacts)
+# Optional env: MAESTRO_DEBUG_OUTPUT (directory for CI debug artifacts),
+#               MAESTRO_UDID (target one device when several are connected)
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -34,8 +35,11 @@ run_flow() {
   local output_root=${MAESTRO_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-maestro-runner}
 
   maestro test \
+    ${MAESTRO_UDID:+--udid "$MAESTRO_UDID"} \
     --debug-output "$output_root/$output_name" \
     --flatten-debug-output \
+    --format JUNIT \
+    --output "$output_root/$output_name/report.xml" \
     "$@"
 }
 
