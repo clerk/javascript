@@ -1,3 +1,4 @@
+import { Button } from '@clerk/ui/mosaic/components/button';
 import type { UserProfileFormError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
@@ -5,6 +6,7 @@ import type {
 } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
+import { UserProfileVerifyEmailLinkView } from '@clerk/ui/mosaic/features/user-profile/user-profile-verify-email-link.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -13,6 +15,8 @@ import { usePreviewImage } from './fixtures/use-preview-image';
 import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
+import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
+import { useUserProfileVerifyEmailLinkFixture } from './fixtures/user-profile-verify-email-link';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -31,11 +35,13 @@ function AccountSection({
   failAt,
   failWith,
   usernameFailWith,
+  failEmailVerification = false,
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
   failWith?: UserProfileFormError;
   usernameFailWith?: UserProfileFormError;
+  failEmailVerification?: boolean;
 }) {
   const editName = useUserProfileEditNameFixture({ failWith });
   const editUsername = useUserProfileEditUsernameFixture({ failWith: usernameFailWith });
@@ -56,22 +62,21 @@ function AccountSection({
     failAt,
     onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
   });
+  const emailFlow = createUserProfileAddEmailFixture({
+    failAt: failEmailVerification ? 'verify' : undefined,
+    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+  });
 
   return (
     <UserProfileAccountSectionView
       {...editName}
       {...editUsername}
+      {...emailFlow}
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
       hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}
       phones={phones}
-      onAddEmail={() =>
-        setEmails(current => [
-          ...current,
-          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
-        ])
-      }
       {...addPhone}
       onProfilePictureChange={showFile}
       onRemoveProfilePicture={clearImage}
@@ -91,6 +96,49 @@ export function Default() {
 
 export function MultipleAccounts() {
   return <AccountSection allowMultipleAccounts />;
+}
+
+export function AddEmailFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      failEmailVerification
+    />
+  );
+}
+
+export function EmailLinkVerification() {
+  const fixture = useUserProfileVerifyEmailLinkFixture();
+  return (
+    <UserProfileVerifyEmailLinkView
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify email link
+        </Button>
+      }
+    />
+  );
+}
+
+export function EmailLinkResendFails() {
+  const fixture = useUserProfileVerifyEmailLinkFixture({ failResend: true });
+  return (
+    <UserProfileVerifyEmailLinkView
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify email link
+        </Button>
+      }
+    />
+  );
 }
 
 /** Every save is rejected, so the dialog shows both halves of a failure at once. */

@@ -1,10 +1,16 @@
 import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
+import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
 import { createConfirmHandle, Dialog } from '../../../components/dialog';
 import { Text } from '../../../components/text';
 import { Section } from '../../../components/section';
+import { Button } from '../../../components/button';
+import { Icon } from '../../../components/icon';
+import type { UserProfileAddEmailControllerOptions } from '../user-profile-add-email.controller';
+import { useUserProfileAddEmailController } from '../user-profile-add-email.controller';
+import { UserProfileAddEmailView } from '../user-profile-add-email.view';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import { styles } from './user-profile-account-section.styles';
 import type { UserProfileNameAttribute, UserProfilePhone } from './user-profile-account-section.types';
@@ -50,6 +56,8 @@ export interface UserProfileAccountSectionViewProps {
   onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
   onSubmitUsername?: (username: string) => Promise<void>;
   onAddEmail?: () => void;
+  onSendEmailCode?: (emailAddress: string) => Promise<void>;
+  onVerifyEmailCode?: (emailAddress: string, code: string) => Promise<void>;
   onManageEmail?: (id: string) => void;
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void | Promise<void>;
@@ -80,6 +88,8 @@ export function UserProfileAccountSectionView({
   onSubmitName,
   onSubmitUsername,
   onAddEmail,
+  onSendEmailCode,
+  onVerifyEmailCode,
   onManageEmail,
   onVerifyEmail,
   onSetPrimaryEmail,
@@ -103,6 +113,13 @@ export function UserProfileAccountSectionView({
       onRemovePhone={onRemovePhone}
     />
   );
+  const addEmailAction =
+    onSendEmailCode && onVerifyEmailCode ? (
+      <AddEmail
+        options={{ onSend: onSendEmailCode, onVerify: onVerifyEmailCode }}
+        compact={allowMultipleAccounts}
+      />
+    ) : undefined;
 
   return (
     <div {...stylex.props(styles.sections)}>
@@ -134,6 +151,7 @@ export function UserProfileAccountSectionView({
               items={emails}
               kind='email'
               label={m.email.label}
+              addAction={addEmailAction}
               onAdd={onAddEmail}
               onManage={onManageEmail}
             />
@@ -143,14 +161,15 @@ export function UserProfileAccountSectionView({
       </Section.Root>
       {allowMultipleAccounts ? (
         <EmailContactSection
-              items={emails}
-              kind='email'
-              label={m.email.label}
-              onAdd={onAddEmail}
-              onRemove={onRemoveEmail}
-              onSetPrimary={onSetPrimaryEmail}
-              onVerify={onVerifyEmail}
-            />
+          items={emails}
+          kind='email'
+          label={m.email.label}
+          addAction={addEmailAction}
+          onAdd={onAddEmail}
+          onRemove={onRemoveEmail}
+          onSetPrimary={onSetPrimaryEmail}
+          onVerify={onVerifyEmail}
+        />
       ) : null}
       {allowMultipleAccounts ? (
         <Section.Root aria-label={m.phone.label}>
@@ -161,7 +180,34 @@ export function UserProfileAccountSectionView({
   );
 }
 
+function AddEmail({ options, compact }: { options: UserProfileAddEmailControllerOptions; compact: boolean }) {
+  const controller = useUserProfileAddEmailController(options);
+  return (
+    <UserProfileAddEmailView
+      {...controller}
+      trigger={
+        <Button
+          aria-label={m.email.add}
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {compact ? (
+            <Icon
+              name='plus'
+              placement='inline-start'
+              size='sm'
+            />
+          ) : null}
+          {compact ? m.add : m.email.add}
+        </Button>
+      }
+    />
+  );
+}
+
 interface ContactSectionProps {
+  addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
   items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
@@ -280,4 +326,3 @@ function EmailContactSection(props: ContactSectionProps) {
     </Section.Root>
   );
 }
-

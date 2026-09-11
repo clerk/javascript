@@ -194,7 +194,10 @@ import {
 } from '../stories/user-profile.stories';
 import {
   AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
+  AddEmailFails as UserProfileAccountSectionAddEmailFails,
   Default as UserProfileAccountSectionDefault,
+  EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
+  EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
 } from '../stories/user-profile-account-section.stories';
@@ -474,6 +477,9 @@ const userProfileAccountSectionModule: StoryModule = {
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
   AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
+  AddEmailFails: UserProfileAccountSectionAddEmailFails,
+  EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,
+  EmailLinkResendFails: UserProfileAccountSectionEmailLinkResendFails,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
