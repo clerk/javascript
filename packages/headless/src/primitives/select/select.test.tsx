@@ -555,6 +555,24 @@ describe('Select', () => {
       const positioner = document.querySelector('[data-testid="select-positioner"]');
       expect(positioner).toHaveAttribute('data-side');
     });
+
+    it('holds the options at their last frame while the popup exits', async () => {
+      const user = userEvent.setup();
+      renderSelect({ defaultValue: 'apple' });
+
+      await user.click(screen.getByRole('combobox'));
+      const popup = screen.getByTestId('select-popup');
+      Object.defineProperty(popup, 'getAnimations', {
+        value: () => [{ finished: new Promise<void>(() => {}) }],
+      });
+
+      await user.click(screen.getByRole('option', { name: 'Banana' }));
+
+      expect(popup).toHaveAttribute('data-closed', '');
+      expect(screen.getByTestId('select-value')).toHaveTextContent('Banana');
+      expect(screen.getByRole('option', { name: 'Apple', hidden: true })).toHaveAttribute('data-selected', '');
+      expect(screen.getByRole('option', { name: 'Banana', hidden: true })).not.toHaveAttribute('data-selected');
+    });
   });
 
   describe('controlled open', () => {
