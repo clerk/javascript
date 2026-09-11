@@ -10,6 +10,7 @@ import { Field } from '../components/field';
 import { Flow } from '../components/flow';
 import { Otp } from '../components/otp';
 import { PhoneInput } from '../components/phone-input';
+import { fill } from './user-profile-account-section/user-profile-account-section.messages';
 import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
 
 export interface UserProfileAddPhoneViewProps {
@@ -117,7 +118,7 @@ export function UserProfileAddPhoneView(props: UserProfileAddPhoneViewProps) {
                   <Card.Header>
                     <Card.Title>{m.verify.title}</Card.Title>
                     <Card.Description>
-                      {m.verify.description(stringToFormattedPhoneString(current.phoneNumber))}
+                      {fill(m.verify.description, { phoneNumber: stringToFormattedPhoneString(current.phoneNumber) })}
                     </Card.Description>
                   </Card.Header>
                   <Card.Content
@@ -156,7 +157,7 @@ export function UserProfileAddPhoneView(props: UserProfileAddPhoneViewProps) {
                         {current.isResending
                           ? m.verify.resending
                           : (current.resendSeconds ?? 0) > 0
-                            ? m.verify.resendCountdown(current.resendSeconds ?? 0)
+                            ? fill(m.verify.resendCountdown, { seconds: current.resendSeconds ?? 0 })
                             : m.verify.resend}
                       </Button>
                     </Field.Root>

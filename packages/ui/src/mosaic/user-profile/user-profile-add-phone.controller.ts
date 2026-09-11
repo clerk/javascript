@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { setup } from '../machine/setup';
 import { useMachine } from '../machine/useMachine';
+import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
 import type { UserProfileAddPhoneViewProps } from './user-profile-add-phone.view';
 
 export interface UserProfileAddPhoneControllerOptions {
@@ -33,7 +34,7 @@ function missingDependency(): Promise<never> {
 }
 
 function errorMessage(cause: unknown): string {
-  return cause instanceof Error ? cause.message : 'Something went wrong. Please try again.';
+  return cause instanceof Error ? cause.message : m.error;
 }
 
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };

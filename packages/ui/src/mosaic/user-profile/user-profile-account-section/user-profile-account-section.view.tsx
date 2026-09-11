@@ -143,7 +143,7 @@ export function UserProfileAccountSectionView({
     try {
       await onSetPrimaryPhone(id);
     } catch (error) {
-      setPrimaryError(error instanceof Error ? error.message : 'Unable to set the primary phone number. Try again.');
+      setPrimaryError(error instanceof Error ? error.message : m.phone.primaryError);
     } finally {
       settingPrimary.current = false;
       setIsSettingPrimary(false);
@@ -159,22 +159,25 @@ export function UserProfileAccountSectionView({
     setPhoneToRemove(phone);
     setRemoveError(undefined);
     try {
+      const [beforePhone, afterPhone] = m.phone.removeDialog.description.split('{phoneNumber}');
       const confirmed = await removeConfirm.show({
-        title: 'Remove phone number?',
+        title: m.phone.removeDialog.title,
         description: (
           <>
-            <strong {...stylex.props(styles.confirmPhoneNumber)}>{stringToFormattedPhoneString(phone.value)}</strong>{' '}
-            will be removed from your account. You won’t be able to use it to sign in.
+            {beforePhone}
+            <strong {...stylex.props(styles.confirmPhoneNumber)}>{stringToFormattedPhoneString(phone.value)}</strong>
+            {afterPhone}
           </>
         ),
-        actionLabel: 'Remove',
+        actionLabel: m.phone.removeDialog.confirm,
+        cancelLabel: m.phone.removeDialog.cancel,
         destructive: true,
       });
       if (confirmed) {
         await onRemovePhone(id);
       }
     } catch (error) {
-      setRemoveError(error instanceof Error ? error.message : 'Unable to remove this phone number. Try again.');
+      setRemoveError(error instanceof Error ? error.message : m.phone.removeError);
     } finally {
       removing.current = false;
     }
