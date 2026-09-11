@@ -12,7 +12,8 @@ const createMessageForDisabledOrganizations = (
     | 'OrganizationList'
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
-    | 'ConfigureSSO',
+    | 'ConfigureSSO'
+    | 'ConfigureDirectorySync',
 ) => {
   return formatWarning(
     `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
@@ -20,7 +21,7 @@ const createMessageForDisabledOrganizations = (
 };
 
 const createCannotRenderComponentWhenOrgDoesNotExist = (
-  componentName: 'OrganizationProfile' | 'InviteMembers' | 'ConfigureSSO',
+  componentName: 'OrganizationProfile' | 'InviteMembers' | 'ConfigureSSO' | 'ConfigureDirectorySync',
 ) => {
   return formatWarning(
     `<${componentName}/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
@@ -88,6 +89,8 @@ const warnings = {
     '<ConfigureSSO/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderConfigureSSOComponentWhenDisabled:
     'The <ConfigureSSO/> component cannot be rendered when self-serve SSO is disabled. Visit `https://dashboard.clerk.com` to enable the feature. Since self-serve SSO is disabled, this is no-op.',
+  cannotRenderConfigureDirectorySyncComponentWhenDisabled:
+    'The <ConfigureDirectorySync/> component cannot be rendered when self-serve Directory Sync is disabled. Since self-serve Directory Sync is disabled, this is no-op.',
   cannotRenderConfigureSSOComponentWhenEmailAddressDisabled:
     'The <ConfigureSSO/> component cannot be rendered when email addresses are disabled on the instance. Visit `https://dashboard.clerk.com` to enable email addresses. Since email addresses are disabled, this is no-op.',
 };

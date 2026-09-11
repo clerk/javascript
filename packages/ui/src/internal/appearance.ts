@@ -783,6 +783,31 @@ export type ElementsConfig = {
   configureSSORemoveDomainDialogCancelButton: WithOptions;
   configureSSORemoveDomainDialogSubmitButton: WithOptions;
 
+  configureDirectorySyncConnectionCard: WithOptions;
+  configureDirectorySyncConnectionCardName: WithOptions;
+  configureDirectorySyncConnectionCardDomains: WithOptions;
+  configureDirectorySyncConnectionCardDomainBadge: WithOptions;
+  configureDirectorySyncInstructionsToggle: WithOptions;
+  configureDirectorySyncInstructionsList: WithOptions;
+  configureDirectorySyncInstructionsListItem: WithOptions;
+  configureDirectorySyncFieldLabel: WithOptions<string>;
+  configureDirectorySyncEndpointUrlInput: WithOptions;
+  configureDirectorySyncTokenInput: WithOptions;
+  configureDirectorySyncGenerateTokenButton: WithOptions;
+  configureDirectorySyncTokenNotice: WithOptions;
+  configureDirectorySyncRetryButton: WithOptions;
+  configureDirectorySyncAttributeMappingTable: WithOptions;
+  configureDirectorySyncAttributeMappingHeader: WithOptions<string>;
+  configureDirectorySyncAttributeMappingValue: WithOptions<string>;
+  configureDirectorySyncUsersList: WithOptions;
+  configureDirectorySyncUsersRow: WithOptions;
+  configureDirectorySyncUserIdentifier: WithOptions;
+  configureDirectorySyncUserName: WithOptions;
+  configureDirectorySyncUserTimestamp: WithOptions;
+  configureDirectorySyncUserStatusBadge: WithOptions<string>;
+  configureDirectorySyncUsersEmpty: WithOptions;
+  configureDirectorySyncCompleteButton: WithOptions;
+
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
   web3SolanaWalletButtonsIconButton: WithOptions<string, LoadingState>;
@@ -1241,6 +1266,10 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<ConfigureSSO />` component
      */
     configureSSO?: T;
+    /**
+     * Theme overrides that only apply to the `<ConfigureDirectorySync />` component
+     */
+    configureDirectorySync?: T;
     /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
