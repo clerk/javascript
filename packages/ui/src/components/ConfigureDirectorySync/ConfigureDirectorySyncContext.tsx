@@ -2,7 +2,12 @@ import {
   __internal_useOrganizationDirectorySync,
   __internal_useOrganizationEnterpriseConnections,
 } from '@clerk/shared/react';
-import type { DirectorySyncProvider, DirectorySyncResource, EnterpriseConnectionResource } from '@clerk/shared/types';
+import type {
+  DirectorySyncProvider,
+  DirectorySyncResource,
+  EnterpriseConnectionResource,
+  SetDirectorySyncCredentialsParams,
+} from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
 import type { DirectorySyncProviderMeta } from './providerMeta';
@@ -29,6 +34,10 @@ export interface ConfigureDirectorySyncData {
   createDirectory: () => Promise<DirectorySyncResource | undefined>;
   rotateToken: () => Promise<DirectorySyncResource | undefined>;
   setDirectoryEnabled: (enabled: boolean) => Promise<DirectorySyncResource | undefined>;
+  /** Stores the credential a pull directory reads the identity provider with. */
+  setCredentials: (params: SetDirectorySyncCredentialsParams) => Promise<DirectorySyncResource | undefined>;
+  /** Starts a sync for a pull directory. */
+  syncDirectory: () => Promise<void>;
   onExit?: () => void;
 }
 
@@ -60,6 +69,8 @@ export const ConfigureDirectorySyncProvider = ({
     createDirectorySync,
     updateDirectorySync,
     rotateDirectorySyncToken,
+    setDirectorySyncCredentials,
+    syncDirectory,
   } = __internal_useOrganizationDirectorySync({ enterpriseConnectionId });
 
   // The token is stored with the connection it was issued for, so a response
@@ -103,6 +114,8 @@ export const ConfigureDirectorySyncProvider = ({
     createDirectory,
     rotateToken,
     setDirectoryEnabled,
+    setCredentials: setDirectorySyncCredentials,
+    syncDirectory,
     onExit,
   };
 

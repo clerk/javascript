@@ -258,6 +258,16 @@ export const enUS: LocalizationResource = {
           step3: 'Select Provisioning and set the provisioning mode to Automatic.',
           step4: 'Assign the users and groups to provision, then turn provisioning On.',
         },
+        google: {
+          step1:
+            'In the Google Cloud console, create a project and a service account, then create a JSON key for it and download the file.',
+          step2: 'Enable the Admin SDK API for that project.',
+          step3:
+            'In the Google Admin console, open Security, then API controls, then Domain-wide delegation, and add the service account using its client ID.',
+          step4:
+            'Grant it the read-only directory scopes: https://www.googleapis.com/auth/admin.directory.user.readonly and https://www.googleapis.com/auth/admin.directory.group.readonly.',
+          step5: 'Upload the JSON key below and enter the email of a Google Workspace admin to read the directory as.',
+        },
         okta: {
           step1: 'In the Okta Admin Console, open the application used for your SSO connection.',
           step2: 'Open the Provisioning tab and select the Integration setting.',
@@ -268,10 +278,17 @@ export const enUS: LocalizationResource = {
       notice__tokenShownOnce: 'This token is only shown once. Generate a new token if you lose it.',
       subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
       title: 'Configure',
-      warning__googleUnsupported: {
-        subtitle: 'Please contact support to set up your Google Workspace integration.',
-        title: 'Google Workspace connections are not configurable via self-serve',
-      },
+      actionLabel__replaceKey: 'Replace JSON key',
+      actionLabel__saveCredentials: 'Save and enable',
+      actionLabel__updateCredentials: 'Update credentials',
+      actionLabel__uploadKey: 'Upload JSON key',
+      badge__credentialsConfigured: 'Configured',
+      badge__credentialsMissing: 'Not configured',
+      error__invalidKeyFile: 'That file is not valid JSON. Upload the key file downloaded from Google.',
+      formFieldHint__subjectEmail: 'The admin whose directory Clerk reads. They must be an active Workspace admin.',
+      formFieldInputPlaceholder__subjectEmail: 'admin@yourcompany.com',
+      formFieldLabel__serviceAccountKey: 'Service account key',
+      formFieldLabel__subjectEmail: 'Google Workspace admin email',
       warning__ssoInactive:
         'Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.',
     },
@@ -291,11 +308,24 @@ export const enUS: LocalizationResource = {
     },
     testStep: {
       actionLabel__complete: 'Complete',
+      actionLabel__syncNow: 'Sync now',
       badge__active: 'Active',
       badge__deprovisioned: 'Deprovisioned',
       description: 'Users appear here as your identity provider provisions them, most recent activity first.',
+      description__pull:
+        'Clerk reads your directory on a schedule. Start a sync to pull users now, most recent activity first.',
+      empty__waitingForFirstSync: 'Waiting for the first sync to finish…',
       empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
+      error__lastSyncFailed: 'The last sync failed',
       error__loadUsers: 'Could not load provisioned users',
+      syncRow: {
+        neverSynced: 'Not synced yet',
+        title: 'Directory sync',
+      },
+      syncStatus__cancelled: 'Cancelled',
+      syncStatus__failed: 'Failed',
+      syncStatus__running: 'Running',
+      syncStatus__succeeded: 'Succeeded',
       note: 'only users with an email address from a configured domain will be processed.',
       noteLabel: 'Note:',
       subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',
