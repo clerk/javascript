@@ -19,6 +19,8 @@ describe('buildPublishableKey(frontendApi)', () => {
     ['foo-bar-13.clerk.accounts.dev', 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk'],
     ['clerk.boring.sawfly-91.lcl.dev', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2wuZGV2JA'],
     ['clerk.boring.sawfly-91.lclclerk.com', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2xjbGVyay5jb20k'],
+    ['clerk.prod.lclclerk.com', 'pk_live_Y2xlcmsucHJvZC5sY2xjbGVyay5jb20k'],
+    ['clerk.example.prod.lclclerk.com', 'pk_live_Y2xlcmsuZXhhbXBsZS5wcm9kLmxjbGNsZXJrLmNvbSQ'],
   ];
 
   test.each(cases)(
