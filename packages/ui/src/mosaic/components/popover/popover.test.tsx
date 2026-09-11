@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -14,6 +14,31 @@ const settle = () =>
   });
 
 describe('Mosaic Popover', () => {
+  it('uses a custom anchor and restores the trigger when it is removed', async () => {
+    const anchor = document.createElement('div');
+    const measureAnchor = vi.spyOn(anchor, 'getBoundingClientRect');
+    const example = (element: HTMLElement | null) => (
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup
+          anchor={element}
+          size='anchor'
+          aria-label='Panel'
+        >
+          Body
+        </Popover.Popup>
+      </Popover.Root>
+    );
+    const { rerender } = render(example(anchor));
+    await waitFor(() => expect(measureAnchor).toHaveBeenCalled());
+
+    const measureTrigger = vi.spyOn(screen.getByRole('button', { name: 'Open' }), 'getBoundingClientRect');
+    measureAnchor.mockClear();
+    rerender(example(null));
+    await waitFor(() => expect(measureTrigger).toHaveBeenCalled());
+    expect(measureAnchor).not.toHaveBeenCalled();
+  });
+
   it('renders the trigger and opens the popup on click', async () => {
     const user = userEvent.setup();
     render(

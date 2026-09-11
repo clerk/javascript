@@ -1,0 +1,71 @@
+import * as stylex from '@stylexjs/stylex';
+
+import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+
+export const styles = stylex.create({
+  triggerContent: {
+    gap: space['0.5'],
+    alignItems: 'center',
+    display: 'flex',
+  },
+  flag: {
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: 1,
+  },
+  triggerFlag: {
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+    fontSize: space['4'],
+    justifyContent: 'center',
+    height: space['4'],
+    width: space['4'],
+  },
+  divider: {
+    backgroundColor: colorVars['--cl-color-border'],
+    flexShrink: 0,
+    height: space['3.5'],
+    width: '1px',
+  },
+  prefix: {
+    gap: space['2'],
+    fontVariantNumeric: 'tabular-nums',
+  },
+  control: {
+    fontVariantNumeric: 'tabular-nums',
+    paddingInlineStart: space['2'],
+  },
+  popup: {
+    borderRadius: radiusVars['--cl-radius-lg'],
+    overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-card'],
+    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
+                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
+                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    color: colorVars['--cl-color-card-foreground'],
+  },
+  countrySearchContainer: {
+    paddingInline: space['2'],
+    flexShrink: 0,
+    paddingBlockEnd: space['1'],
+    paddingBlockStart: space['2'],
+  },
+  optionName: {
+    overflow: 'hidden',
+    flexGrow: 1,
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    minWidth: 0,
+  },
+  optionCode: {
+    color: colorVars['--cl-color-neutral-faded'],
+    flexShrink: 0,
+    fontVariantNumeric: 'tabular-nums',
+    whiteSpace: 'nowrap',
+  },
+  indicatorSlot: {
+    display: 'flex',
+    flexShrink: 0,
+    width: space['3'],
+  },
+});

@@ -92,6 +92,7 @@ export const styles = stylex.create({
 // `md` reproduces the width the legacy `PopoverCard` uses (`theme.sizes.$94`), so
 // popovers migrating onto Mosaic keep their current footprint.
 export const sizes = stylex.create({
+  anchor: { width: 'var(--cl-anchor-width)' },
   sm: { width: 'min(18rem, calc(100vw - 2rem))' },
   md: { width: 'min(23.5rem, calc(100vw - 2rem))' },
   lg: { width: 'min(26rem, calc(100vw - 2rem))' },
