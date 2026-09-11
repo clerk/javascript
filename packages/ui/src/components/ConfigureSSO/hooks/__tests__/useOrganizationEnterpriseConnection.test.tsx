@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // The umbrella hook composes several `@clerk/shared/react` hooks. We mock the
@@ -13,6 +13,7 @@ type MockConnection = {
   id: string;
   provider: string;
   active?: boolean;
+  createdAt?: Date;
   samlConnection?: { idpSsoUrl?: string; idpEntityId?: string } | null;
 };
 
@@ -224,5 +225,73 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     await result.current.enterpriseConnectionMutations.setConnectionActive('ent_1', true);
 
     expect(mutationSpies.update).toHaveBeenCalledWith('ent_1', { active: true });
+  });
+
+  it('changeProvider deletes the connection it is given, not the first one in the list', async () => {
+    connectionsState.data = [configuredConnection('ent_1'), configuredConnection('ent_2')];
+    const callOrder: string[] = [];
+    mutationSpies.delete.mockImplementation(() => {
+      callOrder.push('delete');
+      return Promise.resolve({});
+    });
+    mutationSpies.create.mockImplementation(() => {
+      callOrder.push('create');
+      return Promise.resolve({ id: 'ent_3' });
+    });
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    await act(async () => {
+      await result.current.enterpriseConnectionMutations.changeProvider('ent_2', 'saml_google');
+    });
+
+    expect(mutationSpies.delete).toHaveBeenCalledWith('ent_2');
+    expect(callOrder).toEqual(['delete', 'create']);
+    expect(result.current.connectionScope).toEqual({ kind: 'existing', id: 'ent_3' });
+  });
+
+  it('deleting the scoped connection resets the scope to new rather than falling back to another one', async () => {
+    connectionsState.data = [configuredConnection('ent_1'), configuredConnection('ent_2')];
+    mutationSpies.delete.mockResolvedValue({});
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    expect(result.current.connectionScope).toEqual({ kind: 'existing', id: 'ent_1' });
+
+    await act(async () => {
+      await result.current.enterpriseConnectionMutations.deleteConnection('ent_1');
+    });
+
+    expect(result.current.connectionScope).toEqual({ kind: 'new' });
+    expect(result.current.enterpriseConnection).toBeUndefined();
+  });
+});
+
+describe('useOrganizationEnterpriseConnection — connection scope', () => {
+  it('orders the connections by createdAt and scopes to the first one', () => {
+    connectionsState.data = [
+      { ...configuredConnection('ent_b'), createdAt: new Date('2024-02-01T00:00:00Z') },
+      { ...configuredConnection('ent_a'), createdAt: new Date('2024-01-01T00:00:00Z') },
+    ];
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    expect(result.current.enterpriseConnections.map(connection => connection.id)).toEqual(['ent_a', 'ent_b']);
+    expect(result.current.connectionScope).toEqual({ kind: 'existing', id: 'ent_a' });
+    expect(result.current.enterpriseConnection?.id).toBe('ent_a');
+  });
+
+  it('selectConnection pins the wizard to an explicit connection', () => {
+    connectionsState.data = [configuredConnection('ent_1'), configuredConnection('ent_2')];
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    act(() => result.current.selectConnection({ kind: 'existing', id: 'ent_2' }));
+
+    expect(result.current.enterpriseConnection?.id).toBe('ent_2');
+
+    act(() => result.current.selectConnection({ kind: 'new' }));
+
+    expect(result.current.enterpriseConnection).toBeUndefined();
   });
 });

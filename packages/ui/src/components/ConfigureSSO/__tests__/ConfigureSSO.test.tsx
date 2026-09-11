@@ -116,6 +116,75 @@ describe('ConfigureSSO', () => {
     });
   });
 
+  describe('connection scope banner', () => {
+    const samlConnection = {
+      idpSsoUrl: 'https://idp.example.com/sso',
+      idpEntityId: 'https://idp.example.com/entity',
+      idpCertificate: 'CERT',
+    };
+
+    const connection = (overrides: Record<string, unknown>) =>
+      ({
+        provider: 'saml_okta',
+        active: true,
+        organizationId: 'Org1',
+        domains: ['clerk.com'],
+        samlConnection,
+        ...overrides,
+      }) as any;
+
+    const withOrganizationFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
+      f.withEnterpriseSso({ selfServeSSO: true });
+      f.withEmailAddress();
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+      });
+    };
+
+    it('names the scoped connection when the organization has more than one', async () => {
+      const { wrapper, fixtures } = await createFixtures(withOrganizationFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        connection({ id: 'ent_2', name: 'second.com', createdAt: new Date('2024-06-01T00:00:00Z') }),
+        connection({ id: 'ent_1', name: 'first.com', createdAt: new Date('2024-01-01T00:00:00Z') }),
+      ]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+
+      const { findByText } = render(<ConfigureSSO />, { wrapper });
+
+      // The standalone host has no list UI, so it falls back to the oldest connection.
+      expect(await findByText('Editing "first.com"')).toBeInTheDocument();
+      expect(
+        await findByText('This organization has 2 SSO connections. Changes here apply only to this connection.'),
+      ).toBeInTheDocument();
+    });
+
+    it('stays silent for a single connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withOrganizationFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        connection({ id: 'ent_1', name: 'first.com', createdAt: new Date('2024-01-01T00:00:00Z') }),
+      ]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+
+      const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
+
+      await findByText(/sso connection is active/i);
+      expect(queryByText(/^Editing /)).not.toBeInTheDocument();
+      expect(queryByText('Adding a new SSO connection')).not.toBeInTheDocument();
+    });
+  });
+
   describe('state machine mounts on the right step', () => {
     it('mounts on select-provider when all organization domains are verified and there is no connection', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {

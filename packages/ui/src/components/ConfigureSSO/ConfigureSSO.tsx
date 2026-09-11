@@ -47,6 +47,8 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
   const {
     isLoading,
     enterpriseConnection,
+    enterpriseConnections,
+    connectionScope,
     organizationEnterpriseConnection,
     testRuns,
     enterpriseConnectionMutations,
@@ -64,6 +66,8 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
         organizationEnterpriseConnection={organizationEnterpriseConnection}
         testRuns={testRuns}
         enterpriseConnection={enterpriseConnection}
+        enterpriseConnections={enterpriseConnections}
+        connectionScope={connectionScope}
         contentRef={contentRef}
         enterpriseConnectionMutations={enterpriseConnectionMutations}
         organizationDomainMutations={organizationDomainMutations}

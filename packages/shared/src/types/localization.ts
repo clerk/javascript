@@ -1197,7 +1197,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       removeDialog: {
         title: LocalizationValue;
-        subtitle: LocalizationValue;
+        subtitle: LocalizationValue<'name'>;
         confirmButton: LocalizationValue;
       };
       ssoSection: {
@@ -1209,8 +1209,10 @@ export type __internal_LocalizationResource = {
         descriptionLine1: LocalizationValue;
         primaryButton__startConfiguration: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
+        primaryButton__addConnection: LocalizationValue;
         domainLabel: LocalizationValue;
         menuAction__edit: LocalizationValue;
+        menuAction__continue: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
         menuAction__remove: LocalizationValue;
@@ -1554,12 +1556,18 @@ export type __internal_LocalizationResource = {
     navbar: {
       title: LocalizationValue;
     };
+    connectionScopeBanner: {
+      title__editing: LocalizationValue<'name'>;
+      subtitle__editing: LocalizationValue<'count'>;
+      title__adding: LocalizationValue;
+      subtitle__adding: LocalizationValue<'count'>;
+    };
     resetConnectionDialog: {
       cancelButton: LocalizationValue;
       confirmationFieldLabel: LocalizationValue<'name'>;
       confirmationFieldPlaceholder: LocalizationValue<'name'>;
       resetButton: LocalizationValue;
-      subtitle: LocalizationValue;
+      subtitle: LocalizationValue<'name'>;
       title: LocalizationValue;
     };
     selectProviderStep: {
@@ -1580,7 +1588,7 @@ export type __internal_LocalizationResource = {
     };
     changeProviderDialog: {
       title: LocalizationValue<'provider'>;
-      subtitle: LocalizationValue<'provider' | 'currentProvider'>;
+      subtitle: LocalizationValue<'provider' | 'currentProvider' | 'name'>;
       cancelButton: LocalizationValue;
       confirmButton: LocalizationValue;
     };

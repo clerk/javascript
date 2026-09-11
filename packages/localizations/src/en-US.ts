@@ -316,8 +316,15 @@ export const enUS: LocalizationResource = {
     changeProviderDialog: {
       cancelButton: 'Cancel',
       confirmButton: 'Change provider',
-      subtitle: 'Switching to {{provider}} will remove your {{currentProvider}} connection and require a new setup.',
+      subtitle:
+        'Switching to {{provider}} will remove the {{currentProvider}} connection "{{name}}" and require a new setup.',
       title: 'Change provider to {{provider}}',
+    },
+    connectionScopeBanner: {
+      subtitle__adding: 'This organization already has {{count}} SSO connections.',
+      subtitle__editing: 'This organization has {{count}} SSO connections. Changes here apply only to this connection.',
+      title__adding: 'Adding a new SSO connection',
+      title__editing: 'Editing "{{name}}"',
     },
     configureStep: {
       activeConnectionWarning: {
@@ -862,7 +869,7 @@ export const enUS: LocalizationResource = {
       confirmationFieldPlaceholder: '{{name}}',
       resetButton: 'Reset connection',
       subtitle:
-        'Are you sure you want to reset the connection? This action is irreversible and you will have to configure all steps again',
+        'Are you sure you want to reset the connection "{{name}}"? This action is irreversible and you will have to configure all steps again',
       title: 'Reset connection',
     },
     selectProviderStep: {
@@ -1337,7 +1344,7 @@ export const enUS: LocalizationResource = {
       removeDialog: {
         confirmButton: 'Remove connection',
         subtitle:
-          'Are you sure you want to remove the connection? This action is irreversible and deletes the connection and all of its configuration.',
+          'Are you sure you want to remove the connection "{{name}}"? This action is irreversible and deletes the connection and all of its configuration.',
         title: 'Remove SSO connection',
       },
       ssoSection: {
@@ -1348,9 +1355,11 @@ export const enUS: LocalizationResource = {
         descriptionLine1: 'Require members with a matching email domain to sign in through your identity provider.',
         domainLabel: 'Domains:',
         menuAction__activate: 'Activate',
+        menuAction__continue: 'Continue configuration',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
+        primaryButton__addConnection: 'Add connection',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',

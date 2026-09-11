@@ -65,6 +65,9 @@ vi.mock('../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection', () => ({
       session: {},
       organization: { name: 'Org1' },
       enterpriseConnection: activeConnection,
+      enterpriseConnections: [activeConnection],
+      connectionScope: { kind: 'existing', id: activeConnection.id },
+      selectConnection: () => {},
       organizationEnterpriseConnection: buildOrganizationEnterpriseConnection({
         connection: activeConnection,
         hasSuccessfulTestRun: true,

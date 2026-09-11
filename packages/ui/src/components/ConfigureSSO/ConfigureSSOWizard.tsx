@@ -4,6 +4,7 @@ import { CardStateProvider } from '@/elements/contexts';
 
 import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
+import { ConnectionScopeBanner } from './ConnectionScopeBanner';
 import { areAllOrganizationDomainsVerified } from './domain/organizationEnterpriseConnection';
 import { Wizard, type WizardStepConfig } from './elements/Wizard';
 import { ActivateStep, ConfigureStep, OrganizationDomainsStep, TestConfigurationStep } from './steps';
@@ -52,6 +53,8 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
         initialStepId={initialStepId}
       >
         <ConfigureSSOHeader title={title} />
+
+        <ConnectionScopeBanner />
 
         <Wizard.Match id='verify-domain'>
           <CardStateProvider>

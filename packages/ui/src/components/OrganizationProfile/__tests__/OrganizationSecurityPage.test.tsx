@@ -82,15 +82,16 @@ describe('OrganizationSecurityPage', () => {
         total_count: 0,
       } as any);
 
-      renderPage(wrapper);
+      const { userEvent } = renderPage(wrapper);
 
       expect(await screen.findByText('In Progress')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
       expect(screen.queryByText(/you have started a configuration/i)).not.toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Continue configuration' })).toBeInTheDocument();
-
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
+
+      expect(screen.queryByRole('button', { name: 'Continue configuration' })).not.toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      expect(screen.getByRole('menuitem', { name: 'Continue configuration' })).toBeInTheDocument();
     });
 
     it('renders the active state as a condensed overview with the domains and actions menu', async () => {
@@ -109,9 +110,8 @@ describe('OrganizationSecurityPage', () => {
 
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 
-      // The condensed overview keeps the domains, dropping the bordered detail card.
-      expect(screen.getByText(/^Domains:?$/)).toBeInTheDocument();
-      expect(screen.getByText('clerk.com')).toBeInTheDocument();
+      expect(screen.queryByText(/^Domains:?$/)).not.toBeInTheDocument();
+      expect(screen.getAllByText('clerk.com').length).toBeGreaterThan(0);
 
       expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
@@ -136,7 +136,6 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
 
-      expect(screen.getByText(/^Domains:?$/)).toBeInTheDocument();
       for (const domain of ['github.com', 'gmail.com', 'maps.com', 'another.com']) {
         expect(screen.getByText(domain)).toBeInTheDocument();
       }
@@ -237,7 +236,8 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: 'Continue configuration' }));
+      await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Continue configuration' }));
 
       // Continue passes no forced step, so the wizard resumes at the furthest-
       // reachable step for this connection (configure, since a provider connection
@@ -353,7 +353,7 @@ describe('OrganizationSecurityPage', () => {
       // The shared dialog renders the Remove copy here, not the wizard's Reset copy.
       expect(await screen.findByRole('heading', { name: 'Remove SSO connection' })).toBeInTheDocument();
       expect(screen.queryByRole('heading', { name: 'Reset connection' })).not.toBeInTheDocument();
-      expect(screen.getByText(/Are you sure you want to remove the connection\?/i)).toBeInTheDocument();
+      expect(screen.getByText(/Are you sure you want to remove the connection "clerk.com"\?/i)).toBeInTheDocument();
 
       // Type-to-confirm uses the organization name.
       await userEvent.type(screen.getByLabelText(/below to continue/i), 'Org1');
@@ -481,6 +481,101 @@ describe('OrganizationSecurityPage', () => {
       // The badge reads from the (unchanged) entity — no optimistic flip to roll back.
       expect(screen.getByText('Active')).toBeInTheDocument();
       expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('multiple connections', () => {
+    // Returned newest-first, so a stable render order can only come from the sort.
+    const twoConnections = () => [
+      configuredConnection({
+        id: 'ent_2',
+        name: 'second.com',
+        domains: ['second.com'],
+        active: true,
+        createdAt: new Date('2024-06-01T00:00:00Z'),
+      }),
+      configuredConnection({
+        id: 'ent_1',
+        name: 'first.com',
+        domains: ['first.com'],
+        active: true,
+        createdAt: new Date('2024-01-01T00:00:00Z'),
+      }),
+    ];
+
+    const withTwoConnections = (fixtures: any) => {
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue(twoConnections());
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
+    };
+
+    it('renders one row per connection in createdAt order, with no section-level badge', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withTwoConnections(fixtures);
+
+      const { container } = renderPage(wrapper);
+
+      await waitFor(() => expect(container.querySelectorAll('.cl-profileSectionItem__sso')).toHaveLength(2));
+
+      const rows = container.querySelectorAll('.cl-profileSectionItem__sso');
+      expect(rows[0]).toHaveTextContent('first.com');
+      expect(rows[1]).toHaveTextContent('second.com');
+
+      expect(screen.getAllByText('Active')).toHaveLength(2);
+      expect(screen.queryByText('Unconfigured')).not.toBeInTheDocument();
+    });
+
+    it('opens the wizard scoped to the row whose Edit was selected', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withTwoConnections(fixtures);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
+
+      expect(await screen.findByText('Editing "second.com"')).toBeInTheDocument();
+      expect(screen.queryByText('Editing "first.com"')).not.toBeInTheDocument();
+    });
+
+    it('removes the connection of the row whose Remove was selected', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withTwoConnections(fixtures);
+      fixtures.clerk.organization?.deleteEnterpriseConnection.mockResolvedValue({} as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: /open menu/i })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: /open menu/i })[1]);
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Remove' }));
+
+      expect(
+        await screen.findByText(/Are you sure you want to remove the connection "second.com"/i),
+      ).toBeInTheDocument();
+
+      await userEvent.type(screen.getByLabelText(/below to continue/i), 'Org1');
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Remove connection' })).toBeEnabled());
+      await userEvent.click(screen.getByRole('button', { name: 'Remove connection' }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.organization?.deleteEnterpriseConnection).toHaveBeenCalledWith('ent_2');
+      });
+    });
+
+    it('opens the wizard on a new connection from Add connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withTwoConnections(fixtures);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await userEvent.click(await screen.findByRole('button', { name: /Add connection/i }));
+
+      expect(await screen.findByText('Adding a new SSO connection')).toBeInTheDocument();
+      expect(screen.queryByText(/^Editing /)).not.toBeInTheDocument();
     });
   });
 
