@@ -6,6 +6,9 @@ export const styles = stylex.create({
   confirmPhoneNumber: {
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
+  confirmationContactValue: {
+    fontWeight: fontWeightVars['--cl-font-medium'],
+  },
   contactValue: {
     gap: space['2'],
     alignItems: 'center',

@@ -1,8 +1,11 @@
 import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
+import { useMemo, useRef, useState } from 'react';
 
+import { createConfirmHandle, Dialog } from '../../../components/dialog';
+import { Text } from '../../../components/text';
 import { Section } from '../../../components/section';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import { styles } from './user-profile-account-section.styles';
 import type { UserProfileNameAttribute, UserProfilePhone } from './user-profile-account-section.types';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
@@ -49,8 +52,8 @@ export interface UserProfileAccountSectionViewProps {
   onAddEmail?: () => void;
   onManageEmail?: (id: string) => void;
   onVerifyEmail?: (id: string) => void;
-  onSetPrimaryEmail?: (id: string) => void;
-  onRemoveEmail?: (id: string) => void;
+  onSetPrimaryEmail?: (id: string) => void | Promise<void>;
+  onRemoveEmail?: (id: string) => void | Promise<void>;
   onSendPhoneCode?: (phoneNumber: string) => Promise<void>;
   onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
   onManagePhone?: (id: string) => void;
@@ -139,9 +142,7 @@ export function UserProfileAccountSectionView({
         </Section.Group>
       </Section.Root>
       {allowMultipleAccounts ? (
-        <Section.Root aria-label={m.email.label}>
-          <Section.Group>
-            <UserProfileContactListRowView
+        <EmailContactSection
               items={emails}
               kind='email'
               label={m.email.label}
@@ -150,8 +151,6 @@ export function UserProfileAccountSectionView({
               onSetPrimary={onSetPrimaryEmail}
               onVerify={onVerifyEmail}
             />
-          </Section.Group>
-        </Section.Root>
       ) : null}
       {allowMultipleAccounts ? (
         <Section.Root aria-label={m.phone.label}>
@@ -161,3 +160,121 @@ export function UserProfileAccountSectionView({
     </div>
   );
 }
+
+interface ContactSectionProps {
+  kind: 'email' | 'phone';
+  label: string;
+  items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
+  onAdd?: () => void;
+  onManage?: (id: string) => void;
+  onVerify?: (id: string) => void;
+  onSetPrimary?: (id: string) => void | Promise<void>;
+  onRemove?: (id: string) => void | Promise<void>;
+}
+
+function EmailContactSection(props: ContactSectionProps) {
+  const { items, onSetPrimary, onRemove } = props;
+  const messages = m.email;
+  const sectionRef = useRef<HTMLElement>(null);
+  const removeConfirm = useMemo(() => createConfirmHandle(), []);
+  const [contactToRemove, setContactToRemove] = useState<ContactSectionProps['items'][number]>();
+  const [removeError, setRemoveError] = useState<string>();
+  const removing = useRef(false);
+  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
+  const [primaryError, setPrimaryError] = useState<string>();
+  const settingPrimary = useRef(false);
+
+  const setPrimary = async (id: string) => {
+    const contact = items.find(item => item.id === id);
+    if (!onSetPrimary || !contact?.isVerified || contact.isDefault || settingPrimary.current) {
+      return;
+    }
+    settingPrimary.current = true;
+    setIsSettingPrimary(true);
+    setPrimaryError(undefined);
+    try {
+      await onSetPrimary(id);
+    } catch (error) {
+      setPrimaryError(error instanceof Error ? error.message : messages.primaryError);
+    } finally {
+      settingPrimary.current = false;
+      setIsSettingPrimary(false);
+    }
+  };
+
+  const removeContact = async (id: string) => {
+    const contact = items.find(item => item.id === id);
+    if (!contact || contact.canRemove === false || !onRemove || removing.current) {
+      return;
+    }
+    removing.current = true;
+    setContactToRemove(contact);
+    setRemoveError(undefined);
+    try {
+      const confirmed = await removeConfirm.show({
+        title: messages.removeTitle,
+        description: (
+          <>
+            <strong {...stylex.props(styles.confirmationContactValue)}>{contact.value}</strong>{' '}
+            {messages.removeDescription}
+          </>
+        ),
+        actionLabel: m.remove,
+        destructive: true,
+      });
+      if (confirmed) {
+        await onRemove(id);
+      }
+    } catch (error) {
+      setRemoveError(error instanceof Error ? error.message : messages.removeError);
+    } finally {
+      removing.current = false;
+    }
+  };
+
+  return (
+    <Section.Root
+      ref={sectionRef}
+      aria-label={props.label}
+    >
+      <Section.Group>
+        <UserProfileContactListRowView
+          {...props}
+          onManage={isSettingPrimary ? undefined : props.onManage}
+          onSetPrimary={onSetPrimary && !isSettingPrimary ? id => void setPrimary(id) : undefined}
+          onRemove={onRemove ? id => void removeContact(id) : undefined}
+        />
+      </Section.Group>
+      {primaryError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {primaryError}
+        </Text>
+      ) : null}
+      {removeError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {removeError}
+        </Text>
+      ) : null}
+      <Dialog.Confirm
+        handle={removeConfirm}
+        finalFocus={() => {
+          const buttons = Array.from(sectionRef.current?.querySelectorAll('button') ?? []);
+          const label = contactToRemove ? fill(m.manageValue, { value: contactToRemove.value }) : '';
+          return (
+            buttons.find(button => button.getAttribute('aria-label') === label) ??
+            buttons.find(button => button.getAttribute('aria-label') === messages.add) ??
+            buttons[0] ??
+            false
+          );
+        }}
+      />
+    </Section.Root>
+  );
+}
+

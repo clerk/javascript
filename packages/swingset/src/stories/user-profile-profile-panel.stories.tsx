@@ -94,7 +94,7 @@ export function Default(_args: Record<string, unknown>) {
       onConnectWeb3Wallet={() => undefined}
       onRemoveWeb3Wallet={() => undefined}
       onSetPrimaryWeb3Wallet={() => undefined}
-      onSetPrimaryEmail={() => undefined}
+      onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
       onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
       onVerifyEmail={() => undefined}
       onVerifyPhone={() => undefined}

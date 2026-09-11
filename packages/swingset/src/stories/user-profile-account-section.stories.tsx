@@ -78,6 +78,7 @@ function AccountSection({
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
+      onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
     />
