@@ -7,6 +7,15 @@ import { Field } from '../field';
 import { PhoneInput } from './phone-input';
 
 describe('Mosaic PhoneInput', () => {
+  it('focuses the country search when opened with a pointer', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+
+    await waitFor(() => expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveFocus());
+  });
+
   it('forwards object refs and clears them on unmount', () => {
     const ref = React.createRef<HTMLInputElement>();
     const { unmount } = render(

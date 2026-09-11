@@ -193,6 +193,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
         <Popover.Root
           open={open}
           onOpenChange={setOpen}
+          initialFocus='first'
           placement='bottom-start'
           sideOffset={8}
         >
