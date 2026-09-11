@@ -56,10 +56,10 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
       this.emailAddress = data.email_address;
       this.publicOrganizationData = {
         hasImage: data.public_organization_data.has_image,
-        imageUrl: data.public_organization_data.image_url,
+        imageUrl: data.public_organization_data.image_url ?? '',
         name: data.public_organization_data.name,
         id: data.public_organization_data.id,
-        slug: data.public_organization_data.slug,
+        slug: data.public_organization_data.slug ?? null,
       };
       this.publicMetadata = data.public_metadata;
       this.role = data.role;
