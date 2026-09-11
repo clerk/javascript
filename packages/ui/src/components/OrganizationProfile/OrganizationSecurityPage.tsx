@@ -10,6 +10,7 @@ import { ChevronLeft } from '../../icons';
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/ConfigureDirectorySyncWizard';
 import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
+import type { ConnectionScope } from '../ConfigureSSO/domain/connectionScope';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { SecuritySsoSection } from './SecuritySsoSection';
 
@@ -33,6 +34,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     organization,
     isLoading,
     enterpriseConnection,
+    enterpriseConnections,
+    connectionScope,
+    selectConnection,
     organizationEnterpriseConnection,
     testRuns,
     enterpriseConnectionMutations,
@@ -48,7 +52,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
 
   const exitWizard = () => setView('overview');
 
-  const openWizard = (forceInitialStep = false) => {
+  const openWizard = (scope: ConnectionScope, forceInitialStep = false) => {
+    selectConnection(scope);
     setForceFirstStep(forceInitialStep);
     setView('wizard');
   };
@@ -110,8 +115,7 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
   return view === 'overview' ? (
     <SecurityPageOverview>
       <SecuritySsoSection
-        connection={organizationEnterpriseConnection}
-        enterpriseConnection={enterpriseConnection}
+        enterpriseConnections={enterpriseConnections}
         setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
         deleteConnection={enterpriseConnectionMutations.deleteConnection}
         organizationName={organization?.name ?? ''}
@@ -131,6 +135,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
       organizationEnterpriseConnection={organizationEnterpriseConnection}
       testRuns={testRuns}
       enterpriseConnection={enterpriseConnection}
+      enterpriseConnections={enterpriseConnections}
+      connectionScope={connectionScope}
       contentRef={contentRef}
       enterpriseConnectionMutations={enterpriseConnectionMutations}
       organizationDomainMutations={organizationDomainMutations}

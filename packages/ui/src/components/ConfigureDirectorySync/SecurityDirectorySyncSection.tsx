@@ -13,6 +13,7 @@ import { handleError } from '@/utils/errorHandler';
 
 import type { LocalizationKey } from '../../customizables';
 import { Badge, Button, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
+import { sortEnterpriseConnections } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import { ResetConnectionDialog } from '../ConfigureSSO/ResetConnectionDialog';
 import { directorySyncProviderForConnection } from './providerMeta';
 
@@ -56,7 +57,7 @@ export const SecurityDirectorySyncSection = ({
     isLoading: isLoadingConnections,
     error: connectionsError,
   } = __internal_useOrganizationEnterpriseConnections();
-  const connection = connections?.[0];
+  const connection = sortEnterpriseConnections(connections ?? [])[0];
   const hasSsoConnection = Boolean(connection);
   const isGoogle = connection ? directorySyncProviderForConnection(connection.provider) === 'google' : false;
   const {

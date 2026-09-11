@@ -1,6 +1,7 @@
 import type { EnterpriseConnectionResource, OrganizationDomainResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
+import type { ConnectionScope } from './domain/connectionScope';
 import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
 import type {
   EnterpriseConnectionMutations,
@@ -18,6 +19,8 @@ export type { OrganizationDomainMutations };
  */
 export interface ConfigureSSOData {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
+  enterpriseConnections: EnterpriseConnectionResource[];
+  connectionScope: ConnectionScope;
   /** Ref to the wizard's scrollable content container. */
   contentRef: React.RefObject<HTMLDivElement>;
   enterpriseConnectionMutations: EnterpriseConnectionMutations;
@@ -30,6 +33,8 @@ export interface ConfigureSSOData {
 
 interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
+  enterpriseConnections: EnterpriseConnectionResource[];
+  connectionScope: ConnectionScope;
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
@@ -44,6 +49,8 @@ ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
 export const ConfigureSSOProvider = ({
   enterpriseConnection,
+  enterpriseConnections,
+  connectionScope,
   organizationEnterpriseConnection,
   testRuns,
   organizationDomains,
@@ -57,6 +64,8 @@ export const ConfigureSSOProvider = ({
     () => ({
       contentRef,
       enterpriseConnection,
+      enterpriseConnections,
+      connectionScope,
       organizationEnterpriseConnection,
       testRuns,
       organizationDomains,
@@ -72,6 +81,8 @@ export const ConfigureSSOProvider = ({
       testRuns,
       organizationDomains,
       enterpriseConnection,
+      enterpriseConnections,
+      connectionScope,
       onExit,
     ],
   );

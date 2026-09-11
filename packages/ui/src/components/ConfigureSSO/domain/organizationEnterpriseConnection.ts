@@ -24,12 +24,33 @@ export const isOidcProvider = (provider: string): provider is OidcProviderType =
 export const connectionBackingEmail = (user: UserResource | null | undefined): EmailAddressResource | undefined =>
   user?.primaryEmailAddress ?? user?.emailAddresses?.find(e => e.verification.status !== 'verified');
 
+/** FAPI returns the list unordered; every reader sorts through here so they agree on "the first one". */
+export const sortEnterpriseConnections = (
+  connections: EnterpriseConnectionResource[],
+): EnterpriseConnectionResource[] =>
+  [...connections].sort((a, b) => {
+    const aCreatedAt = a.createdAt?.getTime();
+    const bCreatedAt = b.createdAt?.getTime();
+
+    if (aCreatedAt !== bCreatedAt) {
+      if (aCreatedAt === undefined) {
+        return 1;
+      }
+      if (bCreatedAt === undefined) {
+        return -1;
+      }
+      return aCreatedAt - bCreatedAt;
+    }
+
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  });
+
 /**
  * The inputs {@link organizationEnterpriseConnection} composes. Every field is a
  * plain value — the entity is pure and knows nothing about React or the wizard.
  */
 export interface OrganizationEnterpriseConnectionInput {
-  /** FAPI currently supports a single connection per organization. */
+  /** The connection in scope, i.e. the one the wizard is editing. */
   connection: EnterpriseConnectionResource | null | undefined;
   /** Probed upstream — not a property of the connection resource itself. */
   hasSuccessfulTestRun: boolean;
