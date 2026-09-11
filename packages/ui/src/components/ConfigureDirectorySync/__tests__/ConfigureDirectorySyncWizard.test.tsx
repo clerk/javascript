@@ -150,7 +150,8 @@ describe('ConfigureDirectorySyncWizard configure step', () => {
     expect(await screen.findByText('key.json')).toBeInTheDocument();
 
     await userEvent.type(screen.getByPlaceholderText('admin@yourcompany.com'), 'admin@clerk.com');
-    await userEvent.click(screen.getByRole('button', { name: 'Save and enable' }));
+    // Continue is the submit; the form has no button of its own.
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
     await waitFor(() =>
       expect(existing.setCredentials).toHaveBeenCalledWith({
@@ -161,6 +162,28 @@ describe('ConfigureDirectorySyncWizard configure step', () => {
 
     // The key is dropped once accepted; the form must not still be holding it.
     await waitFor(() => expect(screen.queryByText('key.json')).not.toBeInTheDocument());
+  });
+
+  it('holds Continue until both the key and the admin email are given', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(googleDirectory());
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    // An email on its own is not enough to send.
+    await userEvent.type(screen.getByPlaceholderText('admin@yourcompany.com'), 'admin@clerk.com');
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['{"type":"service_account"}'], 'key.json', { type: 'application/json' })] },
+    });
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled());
   });
 
   it('blocks the step without an SSO connection', async () => {

@@ -24,7 +24,7 @@ import { handleError } from '@/utils/errorHandler';
 import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
 import { useConfigureDirectorySync } from '../ConfigureDirectorySyncContext';
-import { GoogleCredentialsForm } from '../GoogleCredentialsForm';
+import { GoogleCredentialsForm, useGoogleCredentialsState } from '../GoogleCredentialsForm';
 
 const FieldLabel = ({ id, localizationKey }: { id: string; localizationKey: LocalizationKey }): JSX.Element => (
   <Text
@@ -47,6 +47,7 @@ export const ConfigureStep = (): JSX.Element => {
   // Pull providers hand Clerk a credential instead of receiving a token, so the
   // directory still has to exist first — it is what the credential attaches to.
   const isPull = providerMeta?.mode === 'pull';
+  const credentials = useGoogleCredentialsState();
   const canProvision = Boolean(connection);
   const domains = connection?.domains ?? [];
   const instructions = providerMeta?.instructions ?? [];
@@ -217,7 +218,7 @@ export const ConfigureStep = (): JSX.Element => {
 
               {directory ? (
                 isPull ? (
-                  <GoogleCredentialsForm />
+                  <GoogleCredentialsForm state={credentials} />
                 ) : (
                   <>
                     <Col sx={t => ({ gap: t.space.$1x5 })}>
@@ -340,8 +341,11 @@ export const ConfigureStep = (): JSX.Element => {
 
       <Step.Footer>
         <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={!directory}
+          onClick={isPull ? () => run(async () => (await credentials.submit(), goNext())) : () => goNext()}
+          // For a pull directory this button is the submit, so it waits on the
+          // form being complete rather than just on the directory existing.
+          isDisabled={!directory || (isPull && !credentials.canContinue)}
+          isLoading={isPull && card.isLoading}
         />
       </Step.Footer>
     </>
