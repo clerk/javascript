@@ -80,7 +80,6 @@ describe('UserProfileAddPhoneView', () => {
       throw new Error('Phone form missing');
     }
     expect(phoneForm).toHaveClass('cl-card-content');
-    // user-event only finds descendant submit buttons, not buttons linked by form ID.
     phoneForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
