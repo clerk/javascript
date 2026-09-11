@@ -31,7 +31,7 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     }
 
     const measure = () => {
-      setActiveStepHeight(activeStep.getBoundingClientRect().height);
+      setActiveStepHeight(activeStep.offsetHeight);
     };
 
     measure();
