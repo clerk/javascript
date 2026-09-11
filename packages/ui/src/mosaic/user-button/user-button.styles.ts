@@ -36,6 +36,7 @@ export const styles = stylex.create({
 
   triggerCaret: {
     '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
+    marginInlineEnd: space['1'],
   },
 
   // The workspace list scrolls; the header and footer stay put. The scroll area carries the
