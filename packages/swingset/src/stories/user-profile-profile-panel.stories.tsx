@@ -74,7 +74,7 @@ export function Default(_args: Record<string, unknown>) {
           { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
         ])
       }
-      addPhone={createUserProfileAddPhoneFixture({
+      {...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       })}
       onConnectAccount={() => undefined}

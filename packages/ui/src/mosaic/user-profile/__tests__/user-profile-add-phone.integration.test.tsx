@@ -20,13 +20,15 @@ describe('profile add phone', () => {
             username='test'
             emails={[]}
             phones={[]}
-            addPhone={{ initialPhoneNumber: '+18015550100', onSend, onVerify }}
+            onSendPhoneCode={onSend}
+            onVerifyPhoneCode={onVerify}
           />
         </MosaicProvider>,
       );
       const trigger = screen.getByRole('button', { name: 'Add phone number' });
       await user.click(trigger);
       expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeInTheDocument();
+      await user.type(screen.getByRole('textbox', { name: 'Phone' }), '8015550100');
       await user.click(screen.getByRole('button', { name: 'Send code' }));
       await waitFor(() => expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus());
       await user.keyboard('123456');

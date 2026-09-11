@@ -67,7 +67,7 @@ function AccountSection({
           { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
         ])
       }
-      addPhone={addPhone}
+      {...addPhone}
       onProfilePictureChange={showFile}
       onRemoveProfilePicture={clearImage}
       onManageEmail={() => undefined}

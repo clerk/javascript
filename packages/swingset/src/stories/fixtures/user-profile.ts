@@ -120,7 +120,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       emails,
       phones,
       onAddEmail: onAddEmail ?? (() => addEmail(`preston+${emails.length}@clerk.dev`)),
-      addPhone: createUserProfileAddPhoneFixture({
+      ...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       }),
       onDeleteAccount: () => Promise.resolve(),

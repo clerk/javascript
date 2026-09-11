@@ -79,7 +79,8 @@ export interface UserProfileAccountSectionViewProps {
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void;
   onRemoveEmail?: (id: string) => void;
-  addPhone?: UserProfileAddPhoneControllerOptions;
+  onSendPhoneCode?: (phoneNumber: string) => Promise<void>;
+  onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
   onSetPrimaryPhone?: (id: string) => void | Promise<void>;
@@ -108,18 +109,20 @@ export function UserProfileAccountSectionView({
   onVerifyEmail,
   onSetPrimaryEmail,
   onRemoveEmail,
-  addPhone,
+  onSendPhoneCode,
+  onVerifyPhoneCode,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
-  const addPhoneAction = addPhone ? (
-    <AddPhone
-      options={addPhone}
-      compact={allowMultipleAccounts}
-    />
-  ) : undefined;
+  const addPhoneAction =
+    onSendPhoneCode && onVerifyPhoneCode ? (
+      <AddPhone
+        options={{ onSend: onSendPhoneCode, onVerify: onVerifyPhoneCode }}
+        compact={allowMultipleAccounts}
+      />
+    ) : undefined;
   const sectionRef = useRef<HTMLDivElement>(null);
   const removeConfirm = useMemo(() => createConfirmHandle(), []);
   const [phoneToRemove, setPhoneToRemove] = useState<UserProfilePhone>();
