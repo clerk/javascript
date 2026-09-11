@@ -79,6 +79,7 @@ describe('EmailApi', () => {
         text: 'Done',
       },
     ]);
+    expect(results.map(result => result.index)).toEqual([0, 1]);
     expect(results[0].email?.toEmailAddress).toBe('admin@acme.com');
     expect(results[0].email?.deliveredByClerk).toBe(true);
     expect(results[1].statusCode).toBe(429);
@@ -137,8 +138,22 @@ describe('EmailApi', () => {
     expect(requests).toBe(0);
   });
 
-  it('rejects an empty batch', async () => {
-    await expect(apiClient.emails.createBatch([])).rejects.toThrow('between 1 and 100');
+  it.each([0, 101])('rejects a batch of %i messages before sending a request', async count => {
+    let requests = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', () => {
+        requests++;
+        return HttpResponse.json({ data: [] });
+      }),
+    );
+    const messages = Array.from({ length: count }, () => ({
+      to: { address: 'admin@acme.com' },
+      from: { address: 'notify@acme.com' },
+      subject: 'Update',
+      text: 'Done',
+    }));
+    await expect(apiClient.emails.createBatch(messages)).rejects.toThrow('between 1 and 100');
+    expect(requests).toBe(0);
   });
 
   it('does not retry a batch POST automatically', async () => {

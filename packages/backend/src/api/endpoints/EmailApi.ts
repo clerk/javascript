@@ -122,8 +122,10 @@ export type CreateEmailOptions = {
   idempotencyKey?: string;
 };
 
+/** One independently processed email and its optional idempotency key. */
 export type CreateBatchEmailParams = CreateEmailParams & CreateEmailOptions;
 
+/** The email or errors for one batch item, identified by its zero-based input index. */
 export type BatchEmailResult =
   | { index: number; email: Email; errors?: never; statusCode: number; retryAfterSeconds?: never }
   | { index: number; email?: never; errors: ClerkAPIError[]; statusCode: number; retryAfterSeconds?: number };
@@ -198,7 +200,32 @@ export class EmailApi extends AbstractAPI {
    * @experimental Submit 1–100 emails, returning one result per input in order.
    * Each message commits independently. Use a stable `idempotencyKey` on each
    * item to safely retry an interrupted batch or retry through `emails.create`.
+   * Reuse a key only with identical message parameters. The SDK does not retry
+   * the batch automatically.
    * Item errors are returned alongside successes; request-level errors throw.
+   *
+   * @param messages - The emails to send, each with an optional idempotency key.
+   * @returns One success or error result per input, in input order.
+   * @throws If the batch size or an idempotency key is invalid, or the request fails.
+   * @example
+   * ```ts
+   * const results = await clerkClient.emails.createBatch([
+   *   {
+   *     to: { address: 'customer@example.com' },
+   *     from: { address: 'support@example.com' },
+   *     subject: 'Your receipt',
+   *     text: 'Thanks for your order.',
+   *     idempotencyKey: 'order_123_receipt',
+   *   },
+   * ]);
+   * for (const result of results) {
+   *   if (result.email) {
+   *     console.log(result.index, result.email.id);
+   *   } else {
+   *     console.error(result.index, result.statusCode, result.errors);
+   *   }
+   * }
+   * ```
    */
   public async createBatch(messages: CreateBatchEmailParams[]): Promise<BatchEmailResult[]> {
     if (messages.length < 1 || messages.length > 100) {
