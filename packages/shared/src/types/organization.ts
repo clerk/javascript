@@ -1,5 +1,6 @@
 import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
+import type { CreateDirectorySyncParams, DirectorySyncResource } from './directorySync';
 import type {
   CreateOrganizationEnterpriseConnectionParams,
   EnterpriseConnectionResource,
@@ -221,6 +222,18 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
     enterpriseConnectionId: string,
     params?: GetEnterpriseConnectionTestRunsParams,
   ) => Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>>;
+  /**
+   * Gets the Directory Sync directory bound to the given enterprise connection.
+   */
+  getDirectorySync: (enterpriseConnectionId: string) => Promise<DirectorySyncResource>;
+  /**
+   * Provisions Directory Sync for the given enterprise connection. The returned resource is the only place the SCIM
+   * bearer token (`apiKey`) is ever available; rotate it to obtain a new one.
+   */
+  createDirectorySync: (
+    enterpriseConnectionId: string,
+    params?: CreateDirectorySyncParams,
+  ) => Promise<DirectorySyncResource>;
   /**
    * Deletes the Organization. Only administrators can delete an Organization.
    *

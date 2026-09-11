@@ -344,4 +344,72 @@ describe('Organization', () => {
       expect(result.data[0].connectionType).toBe('saml');
     });
   });
+
+  describe('directory sync', () => {
+    const DIRECTORY_PATH = `/organizations/${ORG_ID}/enterprise_connections/ec_123/directory`;
+
+    const directoryJSON = {
+      object: 'directory' as const,
+      id: 'scimdir_1',
+      name: 'Acme Okta',
+      enterprise_connection_id: 'ec_123',
+      endpoint_url: 'https://api.example.com/scim/v2',
+      provider: 'okta' as const,
+      enabled: false,
+      group_role_mapping_enabled: false,
+      attribute_mapping: { 'name.givenName': 'first_name' },
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+
+    it('fetches the directory from the connection-scoped path', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: directoryJSON }));
+
+      const organization = createOrganization();
+      const result = await organization.getDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: DIRECTORY_PATH });
+      expect(result.id).toBe('scimdir_1');
+      expect(result.endpointUrl).toBe('https://api.example.com/scim/v2');
+      expect(result.provider).toBe('okta');
+      expect(result.attributeMapping).toEqual({ 'name.givenName': 'first_name' });
+      expect(result.apiKey).toBeNull();
+    });
+
+    it('creates the directory and exposes the show-once token', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, api_key: 'ak_secret' } }));
+
+      const organization = createOrganization();
+      const result = await organization.createDirectorySync('ec_123', { name: 'Acme Okta' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: DIRECTORY_PATH,
+        body: { name: 'Acme Okta' },
+      });
+      expect(result.apiKey).toBe('ak_secret');
+      expect(result.__internal_toSnapshot()).not.toHaveProperty('api_key');
+    });
+
+    it('creates the directory without a name, leaving it to the FAPI client to drop the undefined field', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: directoryJSON }));
+
+      const organization = createOrganization();
+      await organization.createDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: DIRECTORY_PATH,
+        body: { name: undefined },
+      });
+    });
+  });
 });
