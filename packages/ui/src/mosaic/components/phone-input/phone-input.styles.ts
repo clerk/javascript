@@ -29,7 +29,10 @@ export const styles = stylex.create({
   },
   prefix: {
     gap: space['2'],
+    color: colorVars['--cl-color-primary'],
     fontVariantNumeric: 'tabular-nums',
+    paddingInlineEnd: 0,
+    paddingInlineStart: space['2'],
   },
   control: {
     fontVariantNumeric: 'tabular-nums',

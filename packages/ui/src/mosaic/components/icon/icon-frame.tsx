@@ -14,7 +14,7 @@ export interface IconFrameProps extends MosaicComponentProps<'span'> {
 }
 
 export const IconFrame = React.forwardRef<HTMLSpanElement, IconFrameProps>(function MosaicIconFrame(
-  { bordered = true, filled = false, size = 'xl', render, className, style, ...rest },
+  { bordered = true, filled = false, size = 'xl', render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -24,11 +24,16 @@ export const IconFrame = React.forwardRef<HTMLSpanElement, IconFrameProps>(funct
     props: {
       ...mergeStyleProps(
         themeProps('icon-frame', { bordered, filled, size }),
-        stylex.props(reset.base, styles.base, sizes[size], bordered && styles.bordered, filled && styles.filled),
-        className,
-        style,
+        stylex.props(
+          reset.base,
+          styles.base,
+          sizes[size],
+          bordered && styles.bordered,
+          filled && styles.filled,
+          xstyle,
+        ),
+        rest,
       ),
-      ...rest,
     },
   });
 });

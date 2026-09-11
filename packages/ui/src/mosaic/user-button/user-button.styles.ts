@@ -3,6 +3,9 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
 
 export const styles = stylex.create({
+  accountIdentifier: {
+    fontWeight: fontWeightVars['--cl-font-medium'],
+  },
   // The avatar is the trigger, so the button paints nothing of its own.
   trigger: {
     padding: 0,

@@ -1,8 +1,13 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Heading, HeadingContext } from './heading';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 describe('Mosaic Heading', () => {
   it('renders an h2 with its children', () => {
@@ -18,13 +23,12 @@ describe('Mosaic Heading', () => {
     expect(heading).toHaveAttribute('data-color', 'primary');
   });
 
-  it('wires variant props and consumer className/style through to the element', () => {
+  it('wires variant props and xstyle atoms through to the element', () => {
     render(
       <Heading
         size='2xl'
         color='negative'
-        className='my-heading'
-        style={{ marginTop: '8px' }}
+        xstyle={atoms.spaced}
       >
         Title
       </Heading>,
@@ -32,8 +36,12 @@ describe('Mosaic Heading', () => {
     const heading = screen.getByRole('heading');
     expect(heading).toHaveAttribute('data-size', '2xl');
     expect(heading).toHaveAttribute('data-color', 'negative');
-    expect(heading).toHaveClass('cl-heading', 'my-heading');
-    expect(heading).toHaveStyle({ marginTop: '8px' });
+    expect(heading).toHaveClass('cl-heading', stylex.props(atoms.spaced).className ?? '');
+  });
+
+  it('merges a className carried by the render element instead of clobbering the slot class', () => {
+    render(<Heading render={<h3 className='from-source' />}>Title</Heading>);
+    expect(screen.getByRole('heading')).toHaveClass('cl-heading', 'from-source');
   });
 
   it('renders a different element through the render prop, keeping the slot props', () => {

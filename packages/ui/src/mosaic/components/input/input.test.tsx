@@ -1,8 +1,13 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Input } from './input';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 describe('Mosaic Input', () => {
   it('applies the default size', () => {
@@ -67,17 +72,25 @@ describe('Mosaic Input', () => {
     expect(screen.getByRole('textbox', { name: 'Browser invalid' })).not.toHaveAttribute('aria-invalid');
   });
 
-  it('merges consumer className and inline styles', () => {
+  it('merges xstyle atoms after the slot atoms', () => {
     render(
       <Input
-        className='my-input'
-        style={{ marginTop: '8px' }}
+        xstyle={atoms.spaced}
         aria-label='Name'
       />,
     );
     const input = screen.getByRole('textbox', { name: 'Name' });
-    expect(input).toHaveClass('cl-input', 'my-input');
-    expect(input).toHaveStyle({ marginTop: '8px' });
+    expect(input).toHaveClass('cl-input', stylex.props(atoms.spaced).className ?? '');
+  });
+
+  it('merges a className carried by the render element instead of clobbering the slot class', () => {
+    render(
+      <Input
+        aria-label='Name'
+        render={<input className='from-source' />}
+      />,
+    );
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('cl-input', 'from-source');
   });
 
   it('forwards native props and the ref', () => {

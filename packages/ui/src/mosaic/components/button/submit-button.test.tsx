@@ -1,9 +1,14 @@
+import * as stylex from '@stylexjs/stylex';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SubmitButton } from './submit-button';
+
+const consumerAtoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 /** The spinner is decorative, so it has no role or name to query — only its slot class. */
 const spinner = () => document.querySelector('.cl-spinner');
@@ -193,15 +198,14 @@ describe('Mosaic SubmitButton', () => {
     expect(spinner()).toHaveAttribute('data-size', expected);
   });
 
-  it('wires the button variant props and consumer className/style through', () => {
+  it('wires the button variant props and xstyle atoms through', () => {
     render(
       <SubmitButton
         color='negative'
         variant='outline'
         size='sm'
         fullWidth
-        className='my-button'
-        style={{ marginTop: '8px' }}
+        xstyle={consumerAtoms.spaced}
       >
         Save
       </SubmitButton>,
@@ -211,8 +215,7 @@ describe('Mosaic SubmitButton', () => {
     expect(button).toHaveAttribute('data-variant', 'outline');
     expect(button).toHaveAttribute('data-size', 'sm');
     expect(button).toHaveAttribute('data-full-width', '');
-    expect(button).toHaveClass('cl-button', 'my-button');
-    expect(button).toHaveStyle({ marginTop: '8px' });
+    expect(button).toHaveClass('cl-button', stylex.props(consumerAtoms.spaced).className ?? '');
   });
 
   it('keeps the isPending prop off the element', () => {

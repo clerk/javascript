@@ -4,17 +4,16 @@ import React from 'react';
 import { useMosaicIcons } from '../../icons/overrides';
 import type { IconName } from '../../icons/registry';
 import { iconRegistry } from '../../icons/registry';
+import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { iconScope } from './icon.markers.stylex';
 import { sizes, styles } from './icon.styles';
 
-export interface IconProps extends React.ComponentPropsWithRef<'svg'> {
+export interface IconProps extends MosaicElementProps<'svg'> {
   name: IconName;
   size?: 'sm' | 'md' | 'lg' | 'inherit';
   placement?: 'inline-start' | 'inline-end';
-  /** StyleX atoms from the container; merged last so they win over the icon's own size atoms. */
-  xstyle?: stylex.StyleXStyles;
 }
 
 /**
@@ -28,7 +27,7 @@ export interface IconProps extends React.ComponentPropsWithRef<'svg'> {
  * follow the writing mode rather than naming a physical edge.
  */
 export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIcon(
-  { name, size = 'md', placement, xstyle, className, style, ...rest },
+  { name, size = 'md', placement, xstyle, ...rest },
   ref,
 ) {
   const override = useMosaicIcons()[name];
@@ -37,8 +36,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
   const props = mergeStyleProps(
     themeProps('icon', { size, icon: placement }),
     stylex.props(reset.base, styles.base, sizes[size], iconScope, xstyle),
-    className,
-    style,
+    rest,
   );
 
   if (override) {
@@ -48,7 +46,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
     // SAFETY: React 18 types `ReactElement.props` as `any`; we only read an optional className.
     // cloneElement re-validates the merged props against the element's real type at render.
     const overrideClassName = (override.props as { className?: string }).className;
-    return React.cloneElement(override, { ...rest, ...mergeStyleProps(props, overrideClassName) });
+    return React.cloneElement(override, mergeStyleProps(props, { className: overrideClassName }));
   }
 
   const Glyph = iconRegistry[name];
@@ -56,7 +54,6 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
     <Glyph
       ref={ref}
       {...props}
-      {...rest}
     />
   );
 });

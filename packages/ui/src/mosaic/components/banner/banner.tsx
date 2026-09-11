@@ -28,7 +28,7 @@ export interface BannerRootProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, BannerRootProps>(function MosaicBannerRoot(
-  { color = DEFAULT_COLOR, render, className, style, children, ...rest },
+  { color = DEFAULT_COLOR, render, xstyle, children, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -38,11 +38,9 @@ const Root = React.forwardRef<HTMLDivElement, BannerRootProps>(function MosaicBa
     props: {
       ...mergeStyleProps(
         themeProps('banner-root', { color }),
-        stylex.props(reset.base, styles.root, rootColors[color]),
-        className,
-        style,
+        stylex.props(reset.base, styles.root, rootColors[color], xstyle),
+        rest,
       ),
-      ...rest,
       children: (
         <>
           <Icon
@@ -66,7 +64,7 @@ const Root = React.forwardRef<HTMLDivElement, BannerRootProps>(function MosaicBa
 export type BannerLabelProps = MosaicComponentProps<'p'>;
 
 const Label = React.forwardRef<HTMLSpanElement, BannerLabelProps>(function MosaicBannerLabel(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const color = React.useContext(BannerColorContext);
@@ -75,13 +73,7 @@ const Label = React.forwardRef<HTMLSpanElement, BannerLabelProps>(function Mosai
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('banner-label', { color }),
-        stylex.props(reset.base, styles.label),
-        className,
-        style,
-      ),
-      ...rest,
+      ...mergeStyleProps(themeProps('banner-label', { color }), stylex.props(reset.base, styles.label, xstyle), rest),
     },
   });
 });
@@ -90,7 +82,7 @@ const Label = React.forwardRef<HTMLSpanElement, BannerLabelProps>(function Mosai
 export type BannerDescriptionProps = MosaicComponentProps<'p'>;
 
 const Description = React.forwardRef<HTMLParagraphElement, BannerDescriptionProps>(function MosaicBannerDescription(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const color = React.useContext(BannerColorContext);
@@ -101,11 +93,9 @@ const Description = React.forwardRef<HTMLParagraphElement, BannerDescriptionProp
     props: {
       ...mergeStyleProps(
         themeProps('banner-description', { color }),
-        stylex.props(reset.base, styles.description, descriptionColors[color]),
-        className,
-        style,
+        stylex.props(reset.base, styles.description, descriptionColors[color], xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
