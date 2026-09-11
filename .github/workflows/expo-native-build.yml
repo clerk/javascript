@@ -28,6 +28,8 @@ env:
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
   MAESTRO_VERSION: '2.8.0'
+  # Skips a blocking network call on every CLI start.
+  MAESTRO_CLI_NO_ANALYTICS: '1'
 
 jobs:
   native-build:
@@ -233,22 +235,17 @@ jobs:
       - name: Install maestro CLI
         if: steps.keys.outputs.pk != ''
         run: |
-          set -o pipefail
           if [ -x "$HOME/.maestro/bin/maestro" ]; then
             echo "Using cached Maestro"
           else
-            installed=0
-            for i in 1 2 3; do
-              if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | MAESTRO_VERSION="$MAESTRO_VERSION" bash; then
-                if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
-              fi
-              echo "Maestro install attempt $i failed (or binary missing); retrying"
-              sleep 5
-            done
-            [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
+            archive="$RUNNER_TEMP/maestro.zip"
+            curl -fLs --retry 3 --retry-delay 5 -o "$archive" \
+              "https://github.com/mobile-dev-inc/Maestro/releases/download/cli-$MAESTRO_VERSION/maestro.zip"
+            unzip -q "$archive" -d "$RUNNER_TEMP/maestro-dist"
+            mv "$RUNNER_TEMP/maestro-dist/maestro" "$HOME/.maestro"
           fi
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-          "$HOME/.maestro/bin/maestro" --version
+          test "$("$HOME/.maestro/bin/maestro" --version)" = "$MAESTRO_VERSION"
 
       - name: Boot iOS simulator
         id: sim
@@ -319,7 +316,7 @@ jobs:
           LOG_PID=$!
           cd "$GITHUB_WORKSPACE/$E2E_DIR"
           rc=0
-          MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-flows.sh \
+          MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" MAESTRO_UDID="$SIM_UDID" ./run-flows.sh \
             xcrun simctl terminate "$SIM_UDID" com.clerk.exponativebuildfixture || rc=$?
           kill "$LOG_PID" 2>/dev/null || true
           exit "$rc"
@@ -386,9 +383,10 @@ jobs:
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
 
       # Test reports record flow env (and typed input) in plaintext;
-      # add-mask only covers step logs, not artifact contents.
+      # add-mask only covers step logs, not artifact contents. Must run whenever
+      # the upload does, or a passing run uploads the password.
       - name: Scrub test credentials from Maestro debug output
-        if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
+        if: always() && steps.user.outputs.user_id != ''
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         run: |
@@ -399,12 +397,13 @@ jobs:
             \( -name '*.html' -o -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' \) \
             -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
 
-      - name: Upload Maestro artifacts on e2e failure
-        if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
+      - name: Upload Maestro artifacts
+        if: always() && steps.user.outputs.user_id != ''
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: maestro-${{ matrix.platform }}
           path: ${{ runner.temp }}/maestro-debug
+          if-no-files-found: warn
           retention-days: 7
 
       - name: Report e2e outcome
