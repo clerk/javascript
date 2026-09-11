@@ -7,7 +7,7 @@ type M2MJwtPayload = {
   exp: number;
   iat: number;
   jti?: string;
-  aud?: string | string[];
+  aud?: string[];
   scopes?: string;
   [key: string]: unknown;
 };
@@ -82,19 +82,10 @@ export class M2MToken {
   }
 
   static fromJwtPayload(payload: M2MJwtPayload, clockSkewInMs = 5000): M2MToken {
-    let audience: string[] = [];
-    // If audience is an array, use it directly;
-    // If it's a string, wrap it in an array;
-    // If it's undefined, leave it as an empty array.
-    if (Array.isArray(payload.aud)) {
-      audience = payload.aud;
-    } else if (payload.aud) {
-      audience = [payload.aud];
-    }
     return new M2MToken(
       payload.jti ?? '', // jti should always be present in Clerk-issued M2M JWTs
       payload.sub,
-      payload.scopes?.split(' ') ?? audience,
+      payload.scopes?.split(' ') ?? payload.aud ?? [],
       extractCustomClaims(payload),
       false,
       null,

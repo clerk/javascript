@@ -3,6 +3,7 @@ import type { JwtPayload } from '@clerk/shared/types';
 import type { IdPOAuthAccessTokenJSON } from './JSON';
 
 type OAuthJwtPayload = JwtPayload & {
+  aud?: string | string[];
   jti?: string;
   client_id?: string;
   scope?: string;
@@ -62,10 +63,10 @@ export class IdPOAuthAccessToken {
       oauthPayload.scp ?? oauthPayload.scope?.split(' ') ?? [],
       false,
       null,
-      oauthPayload.exp * 1000 <= Date.now() - clockSkewInMs,
-      oauthPayload.exp * 1000, // milliseconds: expiration, converted from JWT exp claim
-      oauthPayload.iat * 1000, // milliseconds: createdAt, converted from JWT iat claim
-      oauthPayload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
+      payload.exp * 1000 <= Date.now() - clockSkewInMs,
+      payload.exp * 1000, // milliseconds: expiration, converted from JWT exp claim
+      payload.iat * 1000, // milliseconds: createdAt, converted from JWT iat claim
+      payload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
       oauthPayload.aud,
     );
   }
