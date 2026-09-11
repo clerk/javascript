@@ -833,7 +833,6 @@ export type ElementsConfig = {
   configureDirectorySyncUploadKeyButton: WithOptions;
   configureDirectorySyncUploadedFileName: WithOptions;
   configureDirectorySyncSubjectEmailInput: WithOptions;
-  configureDirectorySyncSaveCredentialsButton: WithOptions;
   configureDirectorySyncSyncRow: WithOptions;
   configureDirectorySyncSyncNowButton: WithOptions;
   configureDirectorySyncStatusBadge: WithOptions<string>;

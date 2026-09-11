@@ -697,7 +697,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureDirectorySyncUploadKeyButton',
   'configureDirectorySyncUploadedFileName',
   'configureDirectorySyncSubjectEmailInput',
-  'configureDirectorySyncSaveCredentialsButton',
   'configureDirectorySyncSyncRow',
   'configureDirectorySyncSyncNowButton',
   'configureDirectorySyncStatusBadge',

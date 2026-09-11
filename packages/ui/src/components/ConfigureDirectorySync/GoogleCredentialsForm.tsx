@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import {
   Badge,
@@ -11,9 +11,6 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
-import { useCardState } from '@/elements/contexts';
-import { Alert } from '@/ui/elements/Alert';
-import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureDirectorySync } from './ConfigureDirectorySyncContext';
 
@@ -27,18 +24,29 @@ const fileToText = (file: File): Promise<string> =>
     reader.onerror = error => reject(error);
   });
 
+export type GoogleCredentialsState = {
+  fileName: string | null;
+  subjectEmail: string;
+  fileError: string | null;
+  isConfigured: boolean;
+  /** Whether the step can be left: a credential is stored, or one is ready to send. */
+  canContinue: boolean;
+  setSubjectEmail: (value: string) => void;
+  selectFile: (file: File | undefined) => Promise<void>;
+  /** Sends the pending credential, if there is one. Rejects if the provider refuses it. */
+  submit: () => Promise<void>;
+};
+
 /**
- * Collects the credential a pull-based directory reads the identity provider
- * with: the service account key and the administrator it impersonates.
+ * Holds the credential a pull-based directory reads the identity provider with.
  *
- * The key never leaves this component except as the request body — it is not
- * held in wizard state, because wizard state outlives the request.
+ * State lives here rather than inside the form so the step footer can drive it:
+ * the wizard's Continue performs the submit, so the form has no button of its
+ * own and there is only one way forward.
  */
-export const GoogleCredentialsForm = (): JSX.Element => {
+export const useGoogleCredentialsState = (): GoogleCredentialsState => {
   const { directory, setCredentials } = useConfigureDirectorySync();
   const { t } = useLocalizations();
-  const card = useCardState();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [serviceAccountJson, setServiceAccountJson] = useState('');
   const [fileName, setFileName] = useState<string | null>(null);
@@ -46,46 +54,62 @@ export const GoogleCredentialsForm = (): JSX.Element => {
   const [fileError, setFileError] = useState<string | null>(null);
 
   const isConfigured = Boolean(directory?.credentialsConfigured);
-  const canSubmit = Boolean(serviceAccountJson) && Boolean(subjectEmail) && !card.isLoading;
+  const hasPendingCredential = Boolean(serviceAccountJson) && Boolean(subjectEmail);
 
-  const onFileSelected = async (file: File | undefined): Promise<void> => {
-    if (!file) {
-      return;
-    }
-    const contents = await fileToText(file);
-    try {
-      JSON.parse(contents);
-    } catch {
-      // Catch the obvious wrong-file case here; anything structurally valid is
-      // the identity provider's to judge, and its message is better than ours.
-      setServiceAccountJson('');
-      setFileName(null);
-      setFileError(t(localizationKeys('configureDirectorySync.configureStep.error__invalidKeyFile')));
-      return;
-    }
-    setFileError(null);
-    setServiceAccountJson(contents);
-    setFileName(file.name);
-  };
+  const selectFile = useCallback(
+    async (file: File | undefined): Promise<void> => {
+      if (!file) {
+        return;
+      }
+      const contents = await fileToText(file);
+      try {
+        JSON.parse(contents);
+      } catch {
+        // Catch the obvious wrong-file case here; anything structurally valid is
+        // the identity provider's to judge, and its message is better than ours.
+        setServiceAccountJson('');
+        setFileName(null);
+        setFileError(t(localizationKeys('configureDirectorySync.configureStep.error__invalidKeyFile')));
+        return;
+      }
+      setFileError(null);
+      setServiceAccountJson(contents);
+      setFileName(file.name);
+    },
+    [t],
+  );
 
-  const onSubmit = async (): Promise<void> => {
-    if (!canSubmit) {
+  const submit = useCallback(async (): Promise<void> => {
+    if (!hasPendingCredential) {
       return;
     }
-    card.setError(undefined);
-    card.setLoading();
-    try {
-      await setCredentials({ serviceAccountJson, subjectEmail });
-      // Drop the key as soon as it has been accepted. Nothing in this flow
-      // needs it again, and holding it only widens where it can leak from.
-      setServiceAccountJson('');
-      setFileName(null);
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
+    await setCredentials({ serviceAccountJson, subjectEmail });
+    // Drop the key as soon as it has been accepted. Nothing in this flow needs
+    // it again, and holding it only widens where it can leak from.
+    setServiceAccountJson('');
+    setFileName(null);
+  }, [hasPendingCredential, setCredentials, serviceAccountJson, subjectEmail]);
+
+  return {
+    fileName,
+    subjectEmail,
+    fileError,
+    isConfigured,
+    canContinue: isConfigured || hasPendingCredential,
+    setSubjectEmail,
+    selectFile,
+    submit,
   };
+};
+
+/**
+ * Collects the service account key and the administrator it impersonates. The
+ * key is never held in wizard state, which outlives the request.
+ */
+export const GoogleCredentialsForm = ({ state }: { state: GoogleCredentialsState }): JSX.Element => {
+  const { t } = useLocalizations();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { fileName, subjectEmail, fileError, isConfigured, setSubjectEmail, selectFile } = state;
 
   return (
     <Col
@@ -118,7 +142,7 @@ export const GoogleCredentialsForm = (): JSX.Element => {
           type='file'
           accept='application/json,.json'
           hidden
-          onChange={event => void onFileSelected(event.target.files?.[0])}
+          onChange={event => void selectFile(event.target.files?.[0])}
         />
         <Flex
           align='center'
@@ -179,29 +203,6 @@ export const GoogleCredentialsForm = (): JSX.Element => {
           sx={t => ({ fontSize: t.fontSizes.$sm })}
         />
       </Col>
-
-      {card.error && (
-        <Alert
-          variant='danger'
-          title={card.error}
-        />
-      )}
-
-      <Flex>
-        <Button
-          elementDescriptor={descriptors.configureDirectorySyncSaveCredentialsButton}
-          variant='solid'
-          size='sm'
-          isDisabled={!canSubmit}
-          isLoading={card.isLoading}
-          onClick={() => void onSubmit()}
-          localizationKey={localizationKeys(
-            isConfigured
-              ? 'configureDirectorySync.configureStep.actionLabel__updateCredentials'
-              : 'configureDirectorySync.configureStep.actionLabel__saveCredentials',
-          )}
-        />
-      </Flex>
     </Col>
   );
 };

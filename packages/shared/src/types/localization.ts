@@ -1610,8 +1610,6 @@ export type __internal_LocalizationResource = {
       formFieldHint__subjectEmail: LocalizationValue;
       actionLabel__uploadKey: LocalizationValue;
       actionLabel__replaceKey: LocalizationValue;
-      actionLabel__saveCredentials: LocalizationValue;
-      actionLabel__updateCredentials: LocalizationValue;
       badge__credentialsConfigured: LocalizationValue;
       badge__credentialsMissing: LocalizationValue;
       error__invalidKeyFile: LocalizationValue;
