@@ -29,7 +29,22 @@ wait_ready() {
   local udid key
   IFS=, read -r -a udids <<< "${MAESTRO_UDID:?MAESTRO_UDID is required}"
   for udid in "${udids[@]}"; do
-    xcrun simctl bootstatus "$udid" -b
+    # bootstatus blocks with no deadline of its own; a simulator that never
+    # finishes booting would otherwise hold the job until its timeout.
+    xcrun simctl bootstatus "$udid" -b &
+    local pid=$! elapsed=0
+    while kill -0 "$pid" 2>/dev/null; do
+      if [ "$elapsed" -ge 240 ]; then
+        kill "$pid" 2>/dev/null || true
+        wait "$pid" 2>/dev/null || true
+        echo "::error::$udid did not finish booting within ${elapsed}s"
+        xcrun simctl list devices -j | jq -r --arg u "$udid" '.devices[][] | select(.udid == $u) | "\(.name): \(.state)"'
+        return 1
+      fi
+      sleep 5
+      elapsed=$((elapsed + 5))
+    done
+    wait "$pid"
     # Kill animations + predictive keyboard: animations add latency to every
     # tap; predictive text hijacks inputText targets.
     xcrun simctl spawn "$udid" defaults write com.apple.UIKit UIAnimationDragCoefficient -float 0.01 || true
