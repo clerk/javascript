@@ -59,7 +59,9 @@ export const styles = stylex.create({
   },
   optionCode: {
     color: colorVars['--cl-color-neutral-faded'],
+    flexShrink: 0,
     fontVariantNumeric: 'tabular-nums',
+    whiteSpace: 'nowrap',
   },
   indicatorSlot: {
     display: 'flex',
