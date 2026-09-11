@@ -15,6 +15,16 @@ for (const [scenario, payload] of [
       form: { name: 'My Organization', slug: 'my-organization', logo: null, blur_hash: null },
     },
   ],
+  [
+    'partial branding',
+    {
+      advisory: {
+        code: 'organization_already_exists',
+        meta: { organization_domain: 'acme.test', organization_name: 'Acme' },
+      },
+      form: { name: 'Acme', logo: 'https://img.clerk.com/acme.png' },
+    },
+  ],
   ['missing slug', { advisory: null, form: { name: 'My Organization', logo: null, blur_hash: null } }],
 ]) {
   test(`generated organization defaults accept ${scenario}`, async t => {
@@ -33,12 +43,12 @@ for (const [scenario, payload] of [
     const value = f.resource(result.result.$ref);
     assert.equal(value.form.name, payload.form?.name ?? '');
     assert.equal(value.form.slug, payload.form?.slug ?? '');
-    assert.equal(value.form.logo, null);
+    assert.equal(value.form.logo, payload.form?.logo ?? null);
     assert.equal(value.form.blurHash, null);
     if (payload.advisory) {
       assert.equal(value.advisory.code, payload.advisory.code);
       assert.equal(value.advisory.severity, 'warning');
-      assert.equal(value.advisory.meta.organization_domain, 'clerk.dev');
+      assert.deepEqual(value.advisory.meta, payload.advisory.meta);
     } else assert.equal(value.advisory, null);
   });
 }
