@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../components/button';
 import { MosaicProvider } from '../../MosaicProvider';
-import type { UserProfileEditNameViewProps } from '../user-profile-account-section';
-import { UserProfileEditNameView } from '../user-profile-account-section';
+import type { UserProfileEditNameViewProps } from '../user-profile-account-section/user-profile-edit-name.view';
+import { UserProfileEditNameView } from '../user-profile-account-section/user-profile-edit-name.view';
 
 function renderView(overrides: Partial<UserProfileEditNameViewProps> = {}) {
   const props: UserProfileEditNameViewProps = {

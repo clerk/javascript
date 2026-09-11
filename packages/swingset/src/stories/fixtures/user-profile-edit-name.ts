@@ -1,8 +1,6 @@
-import type {
-  UserProfileEditNameValue,
-  UserProfileFormError,
-} from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
-import { UserProfileSaveError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
+import type { UserProfileFormError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
+import { UserProfileSaveError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
+import type { UserProfileEditNameValue } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-edit-name.view';
 import { useState } from 'react';
 
 export interface UserProfileEditNameFixtureOptions {

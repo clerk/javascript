@@ -1,9 +1,9 @@
+import type { UserProfileFormError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
-  UserProfileFormError,
   UserProfilePhone,
-} from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
-import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section';
+} from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
+import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';

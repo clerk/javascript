@@ -7,8 +7,8 @@ import type {
   UserProfileAccountSectionViewProps,
   UserProfileEmail,
   UserProfilePhone,
-} from './user-profile-account-section';
-import { UserProfileAccountSectionView } from './user-profile-account-section';
+} from './user-profile-account-section/user-profile-account-section.view';
+import { UserProfileAccountSectionView } from './user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
@@ -17,7 +17,8 @@ import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
-export type { UserProfileEditNameValue, UserProfileFormError } from './user-profile-account-section';
+export type { UserProfileFormError } from './user-profile-account-section/user-profile-account-section.types';
+export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.view';
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
