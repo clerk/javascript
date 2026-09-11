@@ -3,7 +3,7 @@ import { Field } from '@clerk/ui/mosaic/components/field';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import type { InputGroupRootProps } from '@clerk/ui/mosaic/components/input-group';
 import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
-import { colorVars } from '@clerk/ui/mosaic/tokens.stylex';
+import { colorVars, space } from '@clerk/ui/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
@@ -30,8 +30,13 @@ const styles = stylex.create({
   fieldWidth: {
     width: 320,
   },
-  tintedAddon: {
+  tintedStart: {
     backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+    paddingInlineEnd: space['3'],
+  },
+  tintedEnd: {
+    backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+    paddingInlineStart: space['3'],
   },
 });
 
@@ -91,9 +96,9 @@ export function TextAddons(props: Record<string, unknown>) {
     <Field.Root xstyle={styles.fieldWidth}>
       <Field.Label>Website</Field.Label>
       <InputGroup.Root {...knobsAsProps(props)}>
-        <InputGroup.Start xstyle={styles.tintedAddon}>https://</InputGroup.Start>
+        <InputGroup.Start xstyle={styles.tintedStart}>https://</InputGroup.Start>
         <InputGroup.Input placeholder='example' />
-        <InputGroup.End xstyle={styles.tintedAddon}>.com</InputGroup.End>
+        <InputGroup.End xstyle={styles.tintedEnd}>.com</InputGroup.End>
       </InputGroup.Root>
     </Field.Root>
   );

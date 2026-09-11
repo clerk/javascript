@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Card } from './card';
@@ -159,6 +159,33 @@ describe('Mosaic Card', () => {
   });
 
   // The logo names the link, so the mark is what a screen reader reaches rather than an unnamed link.
+  it('can be the form itself, holding a body of more than one thing', () => {
+    const onSubmit = vi.fn(event => event.preventDefault());
+    render(
+      <Card.Root>
+        <Card.Header>Header</Card.Header>
+        <Card.Content
+          data-testid='content'
+          render={
+            <form
+              id='profile'
+              onSubmit={onSubmit}
+            />
+          }
+        >
+          <p>First</p>
+          <p>Second</p>
+        </Card.Content>
+      </Card.Root>,
+    );
+
+    const content = screen.getByTestId('content');
+    expect(content.tagName).toBe('FORM');
+    expect(content).toHaveClass('cl-card-content');
+    expect(content).toHaveTextContent('First');
+    expect(content).toHaveTextContent('Second');
+  });
+
   it('signs the card with Clerk, in a tab of its own', () => {
     render(
       <Card.Root data-testid='root'>

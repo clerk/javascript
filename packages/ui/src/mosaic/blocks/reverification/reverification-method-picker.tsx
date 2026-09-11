@@ -7,14 +7,9 @@ import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
-import { space } from '../../tokens.stylex';
 
 const styles = stylex.create({
-  backButton: {
-    marginBlockStart: space['2'],
-  },
   helpText: {
-    marginBlockStart: space['1'],
     textAlign: 'center',
   },
 });
@@ -93,7 +88,6 @@ export function ReverificationMethodPicker({
             variant='ghost'
             fullWidth
             onClick={onBack}
-            xstyle={styles.backButton}
           >
             {messages.backButton}
           </Button>
