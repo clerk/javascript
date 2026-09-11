@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
  * - `methods/sign-out.mdx`           – simple zero-arg callable
  * - `methods/handle-redirect-callback.mdx` – multi-param `parametersTable` with nested rows
  * - `methods/handle-email-link-verification.mdx` – required parent (`params`) flattened to `.`
+ * - `methods/create-domain.mdx`     – `Pick<T, K>` parameter flattened to only the selected property
  * - `methods/join-waitlist.mdx`      – single nominal-param section (`JoinWaitlistParams`)
  * - `methods/create.mdx` (api-key)   – another single-nominal-param case + warning callout
  * - `methods/check-authorization.mdx` – generic instantiation (`CheckAuthorization`)
@@ -43,6 +44,11 @@ describe('extract-methods snapshots', () => {
   it('required-parent flatten uses `.` not `?.`: clerk.handleEmailLinkVerification()', async () => {
     const content = await readGenerated('shared/clerk/methods/handle-email-link-verification.mdx');
     await expect(content).toMatchFileSnapshot('./__snapshots__/clerk-methods-handle-email-link-verification.mdx');
+  });
+
+  it('Pick parameter includes only selected properties without linking the full type: organization.createDomain()', async () => {
+    const content = await readGenerated('shared/organization-resource/methods/create-domain.mdx');
+    await expect(content).toMatchFileSnapshot('./__snapshots__/organization-resource-methods-create-domain.mdx');
   });
 
   it('single nominal-param section: clerk.joinWaitlist()', async () => {

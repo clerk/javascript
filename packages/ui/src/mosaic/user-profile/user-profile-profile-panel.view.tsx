@@ -7,8 +7,8 @@ import type {
   UserProfileAccountSectionViewProps,
   UserProfileEmail,
   UserProfilePhone,
-} from './user-profile-account-section.view';
-import { UserProfileAccountSectionView } from './user-profile-account-section.view';
+} from './user-profile-account-section/user-profile-account-section.view';
+import { UserProfileAccountSectionView } from './user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
@@ -17,6 +17,11 @@ import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
+export type {
+  UserProfileFormError,
+  UserProfileNameAttribute,
+} from './user-profile-account-section/user-profile-account-section.types';
+export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.view';
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
@@ -38,6 +43,10 @@ export function UserProfileProfilePanelView({
   hasImage,
   name = '',
   username = '',
+  firstName,
+  lastName,
+  firstNameAttribute,
+  lastNameAttribute,
   emails = [],
   phones = [],
   connectedAccounts = [],
@@ -45,7 +54,7 @@ export function UserProfileProfilePanelView({
   onProfilePictureChange,
   onProfilePictureReject,
   onRemoveProfilePicture,
-  onNameChange,
+  onSubmitName,
   onUsernameChange,
   onAddEmail,
   onManageEmail,
@@ -73,8 +82,12 @@ export function UserProfileProfilePanelView({
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
+          firstName={firstName}
+          firstNameAttribute={firstNameAttribute}
           hasImage={hasImage}
           imageUrl={imageUrl}
+          lastName={lastName}
+          lastNameAttribute={lastNameAttribute}
           name={name}
           phones={phones}
           username={username}
@@ -91,7 +104,7 @@ export function UserProfileProfilePanelView({
           onSetPrimaryPhone={onSetPrimaryPhone}
           onVerifyEmail={onVerifyEmail}
           onVerifyPhone={onVerifyPhone}
-          onNameChange={onNameChange}
+          onSubmitName={onSubmitName}
           onUsernameChange={onUsernameChange}
         />
         {connectedAccounts.length > 0 ? (

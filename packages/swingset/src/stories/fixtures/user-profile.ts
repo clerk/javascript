@@ -13,6 +13,7 @@ import type {
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
+import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 
 export interface UserProfileFixtureOptions {
   /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
@@ -42,6 +43,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
  * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
+  const editName = useUserProfileEditNameFixture();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
@@ -109,10 +111,10 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
 
   const pages: UserProfileViewProps['pages'] = {
     account: {
+      ...editName,
       allowMultipleAccounts: true,
       hasImage: Boolean(imageUrl),
       imageUrl,
-      name: 'Preston Booth',
       username: 'prestonxyz',
       emails,
       phones,
@@ -129,7 +131,6 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onDeleteAccount: () => Promise.resolve(),
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
-      onNameChange: () => undefined,
       onProfilePictureChange: showFile,
       onRemoveEmail: id => setEmails(current => current.filter(email => email.id !== id)),
       onRemoveProfilePicture: clearImage,

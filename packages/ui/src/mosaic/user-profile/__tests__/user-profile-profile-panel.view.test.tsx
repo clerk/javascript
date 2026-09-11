@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -43,7 +43,11 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('composes the profile content without profile navigation', () => {
-    renderView({ onProfilePictureChange: vi.fn(), onNameChange: vi.fn(), onUsernameChange: vi.fn() });
+    renderView({
+      onProfilePictureChange: vi.fn(),
+      onSubmitName: () => Promise.resolve(),
+      onUsernameChange: vi.fn(),
+    });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Account' })).toContainElement(
@@ -346,21 +350,39 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('forwards profile and contact actions', async () => {
-    const onNameChange = vi.fn();
     const onAddEmail = vi.fn();
     const onManageEmail = vi.fn();
-    renderView({ onNameChange, onAddEmail, onManageEmail });
+    renderView({ onSubmitName: () => Promise.resolve(), onAddEmail, onManageEmail });
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Edit name' }));
     await user.click(screen.getByRole('button', { name: 'Add email' }));
     await user.click(screen.getByRole('button', { name: 'Manage item2@clerk.dev' }));
     expect(onManageEmail).not.toHaveBeenCalled();
     await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
+    // Last: the edit-name dialog is modal, so the rest of the panel goes inert once it opens.
+    await user.click(screen.getByRole('button', { name: 'Edit name' }));
 
-    expect(onNameChange).toHaveBeenCalledWith('Preston Booth');
+    expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeInTheDocument();
     expect(onAddEmail).toHaveBeenCalledOnce();
     expect(onManageEmail).toHaveBeenCalledWith('email_2');
+  });
+
+  it('drives the edit-name dialog from the section, seeded with the saved name', async () => {
+    const onSubmitName = vi.fn(() => Promise.resolve());
+    const user = userEvent.setup();
+    renderView({ firstName: 'Preston', lastName: 'Booth', onSubmitName });
+
+    await user.click(screen.getByRole('button', { name: 'Edit name' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+    expect(within(dialog).getByLabelText('First name')).toHaveValue('Preston');
+    expect(within(dialog).getByLabelText('Last name')).toHaveValue('Booth');
+
+    await user.clear(within(dialog).getByLabelText('Last name'));
+    await user.type(within(dialog).getByLabelText('Last name'), 'Barton');
+    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmitName).toHaveBeenCalledWith({ firstName: 'Preston', lastName: 'Barton' });
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit name' })).not.toBeInTheDocument());
   });
 
   it('matches the existing conditional contact and connected-account actions', async () => {

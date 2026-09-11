@@ -51,7 +51,7 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
    * <li>`'oauth_<provider>'`: The user will be authenticated with their [social connection account](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/overview). See a list of [supported values for `<provider>`](https://clerk.com/docs/reference/types/sso).</li>
    * <li>`'enterprise_sso'`: The user will be authenticated either through SAML or OIDC depending on the configuration of their [enterprise SSO account](https://clerk.com/docs/guides/configure/auth-strategies/enterprise-connections/overview).</li>
    * <li>`'ticket'`: The user will be authenticated via the ticket _or token_ generated from the Backend API.</li>
-   * <li>`'google_one_tap'`: The user will be authenticated with the Google One Tap UI. It's recommended to use [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/components/authentication/google-one-tap#authenticate-with-google-one-tap) instead, as it will also set the user's current session as active for you.</li>
+   * <li>`'google_one_tap'`: The user will be authenticated with the Google One Tap UI. It's recommended to use [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/components/authentication/google-one-tap#authenticatewithgoogleonetap) instead, as it will also set the user's current session as active for you.</li>
    * <li>`'oauth_token_apple'`: The user will be authenticated using a native [Sign in with Apple](https://clerk.com/docs/guides/configure/auth-strategies/sign-in-with-apple) identity token.</li>
    * <li>`'phone_code'`: The user will receive a one-time code via SMS to verify their phone number.</li>
    * </ul>
@@ -217,7 +217,7 @@ export interface SignUpFuturePhoneCodeVerifyParams {
 /** @generateWithEmptyComment */
 export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
-   * The strategy to use for authentication. Either [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy) or [`EnterpriseSSOStrategy`](https://clerk.com/docs/reference/types/sso#enterprise-sso-strategy).
+   * The strategy to use for authentication. Either [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#oauthstrategy) or [`EnterpriseSSOStrategy`](https://clerk.com/docs/reference/types/sso#enterprisessostrategy).
    */
   strategy: string;
   /**
@@ -336,7 +336,7 @@ export interface SignUpFutureVerifications {
   sendEmailCode: () => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Verifies a code sent with the [`verifications.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-email-code) method.
+   * Verifies a code sent with the [`verifications.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-sendemailcode) method.
    */
   verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -346,7 +346,7 @@ export interface SignUpFutureVerifications {
   sendEmailLink: (params: SignUpFutureEmailLinkSendParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Will wait for email link verification to complete or expire after calling [`verifications.sendEmailLink()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-email-link).
+   * Will wait for email link verification to complete or expire after calling [`verifications.sendEmailLink()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-sendemaillink).
    */
   waitForEmailLinkVerification: () => Promise<{ error: ClerkError | null }>;
 
@@ -356,7 +356,7 @@ export interface SignUpFutureVerifications {
   sendPhoneCode: (params?: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Verifies a code sent with the [`verifications.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-phone-code) method.
+   * Verifies a code sent with the [`verifications.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-sendphonecode) method.
    */
   verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 }
