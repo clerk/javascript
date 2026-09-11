@@ -10,6 +10,7 @@ import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
+import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -25,11 +26,14 @@ export const meta: StoryMeta = {
 function AccountSection({
   allowMultipleAccounts,
   failWith,
+  usernameFailWith,
 }: {
   allowMultipleAccounts: boolean;
   failWith?: UserProfileFormError;
+  usernameFailWith?: UserProfileFormError;
 }) {
   const editName = useUserProfileEditNameFixture({ failWith });
+  const editUsername = useUserProfileEditUsernameFixture({ failWith: usernameFailWith });
   const [emails, setEmails] = useState<UserProfileEmail[]>(
     allowMultipleAccounts
       ? [
@@ -46,12 +50,12 @@ function AccountSection({
   return (
     <UserProfileAccountSectionView
       {...editName}
+      {...editUsername}
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
       hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}
       phones={phones}
-      username='prestonxyz'
       onAddEmail={() =>
         setEmails(current => [
           ...current,
@@ -74,7 +78,6 @@ function AccountSection({
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onRemoveProfilePicture={clearImage}
-      onUsernameChange={() => undefined}
     />
   );
 }
@@ -95,6 +98,19 @@ export function EditNameFails() {
       failWith={{
         message: 'Your name could not be updated.',
         fields: { lastName: 'Last name must be 64 characters or fewer.' },
+      }}
+    />
+  );
+}
+
+/** Every username save is rejected, so the dialog shows a failure without losing what was typed. */
+export function EditUsernameFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts={false}
+      usernameFailWith={{
+        message: 'Your username could not be updated.',
+        fields: { username: 'That username is already taken.' },
       }}
     />
   );

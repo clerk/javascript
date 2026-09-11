@@ -40,6 +40,11 @@ export const userProfileAccountSectionBase = {
   username: {
     label: 'Username',
     edit: 'Edit username',
+    /** The dialog behind `edit`. */
+    dialogTitle: 'Edit username',
+    fieldLabel: 'Username',
+    cancel: 'Cancel',
+    save: 'Save changes',
   },
   primary: 'Primary',
   add: 'Add',

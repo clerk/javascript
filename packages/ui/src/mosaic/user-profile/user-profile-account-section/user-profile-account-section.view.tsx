@@ -16,6 +16,8 @@ import type { UserProfileNameAttribute } from './user-profile-account-section.ty
 import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
 import { UserProfileEditNameView } from './user-profile-edit-name.view';
+import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
+import { UserProfileEditUsernameView } from './user-profile-edit-username.view';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 /** Matches the limit the row's own description advertises. */
@@ -66,7 +68,8 @@ export interface UserProfileAccountSectionViewProps {
   onRemoveProfilePicture?: () => void;
   /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. Omit to hide the action. */
   onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
-  onUsernameChange?: (value: string) => void;
+  /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. Omit to hide the action. */
+  onSubmitUsername?: (username: string) => Promise<void>;
   onAddEmail?: () => void;
   onManageEmail?: (id: string) => void;
   onVerifyEmail?: (id: string) => void;
@@ -95,7 +98,7 @@ export function UserProfileAccountSectionView({
   onProfilePictureReject,
   onRemoveProfilePicture,
   onSubmitName,
-  onUsernameChange,
+  onSubmitUsername,
   onAddEmail,
   onManageEmail,
   onVerifyEmail,
@@ -114,7 +117,6 @@ export function UserProfileAccountSectionView({
     .slice(0, 2)
     .toUpperCase();
   const [rejection, setRejection] = useState<FileRejectionReason | null>(null);
-  const updateUsername = onUsernameChange ? () => onUsernameChange(username) : undefined;
 
   return (
     <FileUpload.Root
@@ -184,16 +186,12 @@ export function UserProfileAccountSectionView({
                 <Section.Label>{m.username.label}</Section.Label>
                 <Section.Description>{username}</Section.Description>
               </Section.Content>
-              {updateUsername ? (
+              {onSubmitUsername ? (
                 <Section.Actions>
-                  <Button
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    onClick={updateUsername}
-                  >
-                    {m.username.edit}
-                  </Button>
+                  <EditUsername
+                    username={username}
+                    onSubmit={onSubmitUsername}
+                  />
                 </Section.Actions>
               ) : null}
             </Section.Item>
@@ -330,6 +328,27 @@ function EditName({
           variant='outline'
         >
           {m.name.edit}
+        </Button>
+      }
+    />
+  );
+}
+
+/** Split out so the controller is mounted only where the action exists. */
+function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
+  const controller = useUserProfileEditUsernameController({ username, onSubmit });
+
+  return (
+    <UserProfileEditUsernameView
+      {...controller}
+      open={controller.isOpen}
+      trigger={
+        <Button
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {m.username.edit}
         </Button>
       }
     />
