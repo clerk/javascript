@@ -58,5 +58,5 @@ export const styles = stylex.create({
 // an organization. Rounding it fully would draw a circle around a square mark, labelled or not.
 export const triggerShapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: radiusVars['--cl-radius-md'] },
+  square: { borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['1']})` },
 });
