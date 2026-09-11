@@ -3,7 +3,7 @@ import { Button } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { radiusVars, space } from '@clerk/ui/mosaic/styles';
+import { radiusVars, space } from '@clerk/ui/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -11,6 +11,12 @@ import type { StoryMeta } from '@/lib/types';
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './item.stories?raw';
+
+const styles = stylex.create({
+  iconWidth: {
+    width: space['7'],
+  },
+});
 
 export const meta: StoryMeta = {
   group: 'Components',
@@ -162,9 +168,7 @@ export function Group() {
           <Icon
             name='check'
             size='md'
-            style={{
-              width: space['7'],
-            }}
+            xstyle={styles.iconWidth}
           />
         </Item.Root>
         <Item.Root
@@ -356,9 +360,7 @@ export function OutlineGroup() {
           <Icon
             name='chevron-right'
             size='md'
-            style={{
-              width: space['7'],
-            }}
+            xstyle={styles.iconWidth}
           />
         </Item.Root>
       </Item.Group>
@@ -395,7 +397,7 @@ export function Scrolling() {
       className={`${root.className} border-border w-full border`}
       style={{ height: 200, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
-      <Item.Group {...stylex.props(...scrollAreaViewport())}>
+      <Item.Group xstyle={scrollAreaViewport()}>
         {organizations.map(name => (
           <Item.Root
             key={name}

@@ -74,7 +74,7 @@ import * as stylex from '@stylexjs/stylex';
   {...stylex.props(scrollAreaRoot)}
   style={{ height: 260 }}
 >
-  <Item.Group {...stylex.props(...scrollAreaViewport())}>{organizations}</Item.Group>
+  <Item.Group xstyle={scrollAreaViewport()}>{organizations}</Item.Group>
 </div>;
 ```
 

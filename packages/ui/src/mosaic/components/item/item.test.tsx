@@ -1,8 +1,16 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Item } from './item';
+
+const overrides = stylex.create({
+  root: { marginTop: '8px' },
+});
+
+const atoms = (style: stylex.StyleXStyles) =>
+  (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
 describe('Mosaic Item', () => {
   it('renders a div with its children', () => {
@@ -70,18 +78,14 @@ describe('Mosaic Item', () => {
     expect(inherited('Interactive')).toHaveLength(inherited('Default').length + 1);
   });
 
-  it('wires consumer className/style through to the element', () => {
-    render(
-      <Item.Root
-        className='my-item'
-        style={{ marginTop: '8px' }}
-      >
-        Hi
-      </Item.Root>,
-    );
-    const item = screen.getByText('Hi');
-    expect(item).toHaveClass('cl-item', 'my-item');
-    expect(item).toHaveStyle({ marginTop: '8px' });
+  it('applies xstyle to the root element', () => {
+    render(<Item.Root xstyle={overrides.root}>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveClass('cl-item', ...atoms(overrides.root));
+  });
+
+  it('merges a render-sourced className instead of clobbering its own', () => {
+    render(<Item.Content render={<Item.Actions />}>Hi</Item.Content>);
+    expect(screen.getByText('Hi')).toHaveClass('cl-item-content', 'cl-item-actions');
   });
 
   it('renders a custom element via render and marks it interactive', () => {

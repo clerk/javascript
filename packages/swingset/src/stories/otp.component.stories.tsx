@@ -1,6 +1,7 @@
 import { Field } from '@clerk/ui/mosaic/components/field';
 import type { OtpProps } from '@clerk/ui/mosaic/components/otp';
 import { Otp } from '@clerk/ui/mosaic/components/otp';
+import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -23,11 +24,13 @@ export const meta: StoryMeta = {
   },
 };
 
-const stackStyles = {
-  display: 'grid',
-  gap: 8,
-  justifyItems: 'start',
-} as const;
+const styles = stylex.create({
+  stack: {
+    display: 'grid',
+    gap: 8,
+    justifyItems: 'start',
+  },
+});
 
 function knobsAsProps(props: Record<string, unknown>) {
   return props as unknown as OtpProps;
@@ -46,7 +49,7 @@ export function WithField() {
   return (
     <Field.Root
       required
-      style={stackStyles}
+      xstyle={styles.stack}
     >
       <Field.Label>Verification code</Field.Label>
       <Otp name='code' />
@@ -57,7 +60,7 @@ export function WithField() {
 
 export function Success() {
   return (
-    <Field.Root style={stackStyles}>
+    <Field.Root xstyle={styles.stack}>
       <Otp
         status='success'
         defaultValue='123456'
@@ -72,7 +75,7 @@ export function Error() {
   return (
     <Field.Root
       invalid
-      style={stackStyles}
+      xstyle={styles.stack}
     >
       <Otp
         defaultValue='123456'

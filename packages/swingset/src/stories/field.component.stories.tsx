@@ -1,5 +1,6 @@
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Input } from '@clerk/ui/mosaic/components/input';
+import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -14,15 +15,17 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/field/field.tsx',
 };
 
-const stackStyles = {
-  display: 'grid',
-  gap: 8,
-  maxWidth: 384,
-} as const;
+const styles = stylex.create({
+  stack: {
+    display: 'grid',
+    gap: 8,
+    maxWidth: 384,
+  },
+});
 
 export function Default() {
   return (
-    <Field.Root style={stackStyles}>
+    <Field.Root xstyle={styles.stack}>
       <Field.Label>Email address</Field.Label>
       <Input
         name='email'
@@ -36,7 +39,7 @@ export function Default() {
 
 export function VisuallyHiddenLabel() {
   return (
-    <Field.Root style={stackStyles}>
+    <Field.Root xstyle={styles.stack}>
       <Field.Label visuallyHidden>Search members</Field.Label>
       <Input
         name='search'

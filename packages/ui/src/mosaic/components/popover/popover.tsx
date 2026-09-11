@@ -27,49 +27,49 @@ export type PopoverDescriptionProps = MosaicComponentProps<'p'>;
 
 /** The anchor. Renders a `<button>`; `render` swaps in another element. */
 const Trigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(function PopoverTrigger(
-  { className, style, ...props },
+  { xstyle, ...rest },
   ref,
 ) {
   return (
     <Primitive.Trigger
       ref={ref}
-      {...mergeStyleProps(themeProps('popover-trigger'), className, style)}
-      {...props}
+      {...mergeStyleProps(themeProps('popover-trigger'), stylex.props(xstyle), rest)}
     />
   );
 });
 
 /** Dismisses the popover. Renders a `<button>`; `render` swaps in another element. */
-const Close = React.forwardRef<HTMLButtonElement, PopoverCloseProps>(function PopoverClose(props, ref) {
+const Close = React.forwardRef<HTMLButtonElement, PopoverCloseProps>(function PopoverClose({ xstyle, ...rest }, ref) {
   return (
     <Primitive.Close
       ref={ref}
-      {...props}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
     />
   );
 });
 
 /** Names the dialog. Renders an `<h2>` wired to the popup's `aria-labelledby`. */
-const Title = React.forwardRef<HTMLHeadingElement, PopoverTitleProps>(function PopoverTitle(props, ref) {
+const Title = React.forwardRef<HTMLHeadingElement, PopoverTitleProps>(function PopoverTitle({ xstyle, ...rest }, ref) {
   return (
     <Primitive.Title
       ref={ref}
-      {...props}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
     />
   );
 });
 
 /** Describes the dialog. Renders a `<p>` wired to the popup's `aria-describedby`. */
-const Description = React.forwardRef<HTMLParagraphElement, PopoverDescriptionProps>(
-  function PopoverDescription(props, ref) {
-    return (
-      <Primitive.Description
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
+const Description = React.forwardRef<HTMLParagraphElement, PopoverDescriptionProps>(function PopoverDescription(
+  { xstyle, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.Description
+      ref={ref}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
+    />
+  );
+});
 
 /**
  * Mosaic Popover: a floating box anchored to a trigger, built on the
@@ -125,7 +125,7 @@ export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
  * `Popover.Trigger`; supply the surface inside it, usually a `Card`.
  */
 const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function PopoverPopup(
-  { anchor, className, style, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
+  { anchor, xstyle, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
   ref,
 ) {
   return (
@@ -146,11 +146,9 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
           ref={ref}
           {...mergeStyleProps(
             themeProps('popover-popup', { size }),
-            stylex.props(reset.base, styles.popup, sizes[size]),
-            className,
-            style,
+            stylex.props(reset.base, styles.popup, sizes[size], xstyle),
+            rest,
           )}
-          {...rest}
         />
       </Positioner>
     </Primitive.Portal>

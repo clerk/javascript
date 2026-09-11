@@ -181,18 +181,16 @@ describe('Mosaic Menu', () => {
     expect(screen.getByTestId('delete-icon').closest('.cl-menu-item')).toBeInTheDocument();
   });
 
-  it('merges consumer className and style onto the popup and items', async () => {
+  it('composes consumer xstyle onto the popup and items', async () => {
+    const caller = stylex.create({ popup: { marginTop: '8px' }, item: { paddingInline: 0 } });
     const user = userEvent.setup();
     render(
       <Menu.Root>
         <Menu.Trigger />
-        <Menu.Popup
-          className='my-popup'
-          style={{ marginTop: '8px' }}
-        >
+        <Menu.Popup xstyle={caller.popup}>
           <Menu.Item
             label='Sign out'
-            className='my-item'
+            xstyle={caller.item}
           >
             <Menu.Label>Sign out</Menu.Label>
           </Menu.Item>
@@ -202,10 +200,32 @@ describe('Mosaic Menu', () => {
 
     await user.click(screen.getByRole('button'));
 
-    const popup = screen.getByRole('menu').querySelector('.cl-menu-popup');
-    expect(popup).toHaveClass('cl-menu-popup', 'my-popup');
-    expect(popup).toHaveStyle({ marginTop: '8px' });
-    expect(screen.getByRole('menuitem', { name: 'Sign out' })).toHaveClass('cl-menu-item', 'my-item');
+    expect(screen.getByRole('menu').querySelector('.cl-menu-popup')).toHaveClass(
+      'cl-menu-popup',
+      stylex.props(caller.popup).className ?? '',
+    );
+    expect(screen.getByRole('menuitem', { name: 'Sign out' })).toHaveClass(
+      'cl-menu-item',
+      stylex.props(caller.item).className ?? '',
+    );
+  });
+
+  it('merges the className a render source hands an item', () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Popup>
+          <Menu.Item
+            label='Sign out'
+            render={<div className='from-render' />}
+          >
+            <Menu.Label>Sign out</Menu.Label>
+          </Menu.Item>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+
+    expect(screen.getByRole('menuitem', { name: 'Sign out' })).toHaveClass('cl-menu-item', 'from-render');
   });
 
   it('renders the media slot as a span, so it is valid inside the item button', () => {

@@ -53,7 +53,7 @@ const maskImage = `linear-gradient(to bottom, transparent 0, #000 calc(${progres
 
 // Split by concern rather than one object per slot: the sort-keys rule reorders within an
 // object, so a large one ends up interleaving unrelated properties and stranding the comments
-// that explain them. `scrollAreaViewport()` recomposes them, so callers spread one thing.
+// that explain them. `scrollAreaViewport()` recomposes them, so callers pass one thing.
 const styles = stylex.create({
   root: {
     display: 'flex',
@@ -282,7 +282,7 @@ export type ScrollAreaGutter = keyof typeof gutters;
  *
  * ```tsx
  * <div {...stylex.props(scrollAreaRoot)}>
- *   <Item.Group {...stylex.props(...scrollAreaViewport())}>{rows}</Item.Group>
+ *   <Item.Group xstyle={scrollAreaViewport()}>{rows}</Item.Group>
  * </div>
  * ```
  *

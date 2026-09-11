@@ -38,7 +38,7 @@ const SectionTitleContext = React.createContext<React.Dispatch<React.SetStateAct
 const SectionItemsContext = React.createContext(false);
 
 const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot(
-  { render, className, style, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
+  { render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
   ref,
 ) {
   const [titleIds, setTitleIds] = React.useState<string[]>([]);
@@ -48,8 +48,7 @@ const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoo
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section'), stylex.props(reset.base, styles.root), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('section'), stylex.props(reset.base, styles.root, xstyle), rest),
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleIds.join(' ') || undefined),
     },
@@ -59,7 +58,7 @@ const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoo
 });
 
 const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function SectionTitle(
-  { id: idProp, render, className, style, ...rest },
+  { id: idProp, render, xstyle, ...rest },
   ref,
 ) {
   const setTitleIds = React.useContext(SectionTitleContext);
@@ -81,14 +80,13 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
       id={id}
       render={render ?? (props => <h4 {...props} />)}
       size='base'
-      {...mergeStyleProps(themeProps('section-title'), stylex.props(styles.title), className, style)}
-      {...rest}
+      {...mergeStyleProps(themeProps('section-title'), stylex.props(styles.title, xstyle), rest)}
     />
   );
 });
 
 const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function SectionGroup(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -96,14 +94,13 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
     },
   });
 });
 
 const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function SectionItems(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -113,36 +110,27 @@ const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function Secti
     props: {
       ...mergeStyleProps(
         themeProps('section-items', { nested: true }),
-        stylex.props(reset.base, styles.items, sectionItemsMarker),
-        className,
-        style,
+        stylex.props(reset.base, styles.items, sectionItemsMarker, xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 
   return <SectionItemsContext.Provider value>{element}</SectionItemsContext.Provider>;
 });
 
-const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow(
-  { render, className, style, ...rest },
-  ref,
-) {
+const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow({ render, xstyle, ...rest }, ref) {
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-row'), stylex.props(reset.base, styles.row), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('section-row'), stylex.props(reset.base, styles.row, xstyle), rest),
     },
   });
 });
 
-const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem(
-  { render, className, style, ...rest },
-  ref,
-) {
+const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem({ render, xstyle, ...rest }, ref) {
   const nested = React.useContext(SectionItemsContext);
 
   return useRender({
@@ -150,19 +138,13 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('section-item', { nested }),
-        stylex.props(reset.base, styles.item),
-        className,
-        style,
-      ),
-      ...rest,
+      ...mergeStyleProps(themeProps('section-item', { nested }), stylex.props(reset.base, styles.item, xstyle), rest),
     },
   });
 });
 
 const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
-  { size = 'md', render, className, style, ...rest },
+  { size = 'md', render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -172,17 +154,15 @@ const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function Secti
     props: {
       ...mergeStyleProps(
         themeProps('section-media', { size }),
-        stylex.props(reset.base, styles.mediaBase, mediaSizes[size]),
-        className,
-        style,
+        stylex.props(reset.base, styles.mediaBase, mediaSizes[size], xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
 
 const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function SectionContent(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const nested = React.useContext(SectionItemsContext);
@@ -194,17 +174,15 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
     props: {
       ...mergeStyleProps(
         themeProps('section-content', { nested }),
-        stylex.props(reset.base, styles.content),
-        className,
-        style,
+        stylex.props(reset.base, styles.content, xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
 
 const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function SectionLabel(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -212,14 +190,13 @@ const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function Secti
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-label'), stylex.props(reset.base, styles.label), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('section-label'), stylex.props(reset.base, styles.label, xstyle), rest),
     },
   });
 });
 
 const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(function SectionDescription(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -227,19 +204,13 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('section-description'),
-        stylex.props(reset.base, styles.description),
-        className,
-        style,
-      ),
-      ...rest,
+      ...mergeStyleProps(themeProps('section-description'), stylex.props(reset.base, styles.description, xstyle), rest),
     },
   });
 });
 
 const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function SectionActions(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -247,8 +218,7 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-actions'), stylex.props(reset.base, styles.actions), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('section-actions'), stylex.props(reset.base, styles.actions, xstyle), rest),
     },
   });
 });
@@ -260,7 +230,7 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
  * Carries `role='alert'` for the announcement a `Field.Root` would otherwise wire up.
  */
 const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(function SectionError(
-  { render, className, style, children, ...rest },
+  { render, xstyle, children, ...rest },
   ref,
 ) {
   return useRender({
@@ -268,14 +238,12 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
     render,
     ref,
     props: {
+      role: 'alert',
       ...mergeStyleProps(
         themeProps('section-error'),
-        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.error),
-        className,
-        style,
+        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.error, xstyle),
+        rest,
       ),
-      role: 'alert',
-      ...rest,
       children: (
         <>
           <Icon

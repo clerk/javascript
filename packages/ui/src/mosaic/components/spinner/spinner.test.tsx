@@ -1,8 +1,13 @@
+import * as stylex from '@stylexjs/stylex';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Spinner } from './spinner';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 /** The spinner is decorative, so it has no role or name to query — only its slot class. */
 const spinner = (container: HTMLElement) => container.querySelector('.cl-spinner');
@@ -25,16 +30,10 @@ describe('Mosaic Spinner', () => {
     expect(spinner(container)).toHaveAttribute('data-size', size);
   });
 
-  it('lets the consumer className and style win', () => {
-    const { container } = render(
-      <Spinner
-        className='my-spinner'
-        style={{ marginTop: '8px' }}
-      />,
-    );
+  it('merges xstyle atoms after the slot atoms', () => {
+    const { container } = render(<Spinner xstyle={atoms.spaced} />);
     const el = spinner(container);
-    expect(el).toHaveClass('cl-spinner', 'my-spinner');
-    expect(el).toHaveStyle({ marginTop: '8px' });
+    expect(el).toHaveClass('cl-spinner', stylex.props(atoms.spaced).className ?? '');
   });
 
   it('forwards arbitrary span props and the ref', () => {

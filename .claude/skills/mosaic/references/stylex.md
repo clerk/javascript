@@ -25,7 +25,7 @@ conventions to follow by hand, not guarantees the toolchain makes for you.
 | `utils/`                          | everything shared across components — styles and non-style helpers alike                   |
 | `<comp>/<comp>.markers.stylex.ts` | `stylex.defineMarker()` results for scoped ancestor states                                 |
 | `<comp>/<comp>.tsx`               | component; spreads `stylex.props(...)` via `mergeStyleProps`                               |
-| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`) + `mergeStyleProps`                            |
+| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`), `mergeStyleProps`, the `Mosaic*Props` types   |
 | `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                                            |
 
 The `@stylexjs` eslint rules run on `src/mosaic/**`. The `enforce-extension`
@@ -577,28 +577,70 @@ The element carries three things, and nothing else is a contract:
 plus a kebab-cased `data-<axis>` reflection of the visual props, so consumers
 target stable data-attribute selectors, not collision-prone class names.
 
-`mergeStyleProps` fuses everything in precedence order — **theme props → StyleX atoms →
-consumer `className`/`style`** — so the consumer always wins. It concatenates
-className left-to-right and merges `style` with the consumer object spread last:
+`mergeStyleProps` fuses its bags left to right — **theme props → StyleX atoms →
+the props the part was called with** — concatenating `className`, shallow-merging
+`style` with the later bag winning, and letting the later bag overwrite anything else:
 
 ```tsx
-<button
-  {...mergeStyleProps(
-    themeProps('button', { intent, variant }),
-    stylex.props(styles.base, variants[variant], xstyle),
-    className,
-    style,
-  )}
-/>
+function Button({ intent, variant, xstyle, ...rest }: ButtonProps) {
+  return (
+    <button
+      {...mergeStyleProps(
+        themeProps('button', { intent, variant }),
+        stylex.props(styles.base, variants[variant], xstyle),
+        rest,
+      )}
+    />
+  );
+}
 ```
 
-- **DO** put consumer `xstyle` **last** inside `stylex.props(...)` (so their atoms
-  win the cascade) and consumer `className`/`style` last inside `mergeStyleProps` (so
-  their raw CSS wins).
+- **DO** put the caller's `xstyle` **last** inside `stylex.props(...)` so its atoms
+  win the cascade, and pass `rest` as the **last** bag to `mergeStyleProps` so the
+  caller's other props (`id`, handlers, `aria-*`) land as usual.
 - **DON'T** forward `xstyle` down to internal slot elements — it targets the slot
-  the consumer named, not your private structure.
-- **DON'T** call `stylex.props` twice on one element or spread `{...props}` after
-  the merge result — fuse everything through the one `mergeStyleProps` call.
+  the caller named, not your private structure.
+- **DON'T** call `stylex.props` twice on one element or spread `{...rest}` after
+  the merge result — fuse everything through the one `mergeStyleProps` call. A
+  trailing `{...rest}` would clobber the part's own `className` when the part is
+  the target of another part's `render`.
+
+### `xstyle`, not `className`/`style`
+
+A Mosaic part has no `className` or `style` prop. `MosaicComponentProps` and
+`MosaicElementProps` (`props.ts`) omit the pair and add `xstyle?: XStyle`, so
+every part inherits the contract by typing its props off one of them. A lint
+rule in the `packages/ui/mosaic` eslint block names the replacement when either
+attribute shows up on a capitalized element.
+
+- **Inside `packages/ui`** a flow author who needs to nudge a part declares the
+  atoms in the view's own `stylex.create` and passes them as `xstyle`:
+
+  ```tsx
+  const styles = stylex.create({ helpText: { textAlign: 'center', marginBlockStart: space['1'] } });
+
+  <Text
+    size='xs'
+    xstyle={styles.helpText}
+  >
+    {messages.helpText}
+  </Text>;
+  ```
+
+- **Outside `packages/ui`** a theme targets the `.cl-<slot>` class, `data-<axis>`
+  attrs, and `--cl-*` vars in CSS. No prop is involved.
+- **`render` composition still delivers the pair at runtime.** `Dialog.Title
+render={<Heading />}` clones the title's merged `className`/`style` onto the
+  `Heading`, which is why a part passes its `rest` bag through `mergeStyleProps`:
+  the helper merges the incoming pair instead of letting it overwrite the part's
+  own class. The public prop types stay closed; only the merge is tolerant.
+- `xstyle` is typed as `XStyle`: whatever `stylex.props(...)` accepts, since that
+  is where the part passes it on. StyleX's narrower `StyleXStyles` only admits
+  property names it knows and rejects real atoms (the scroll area's
+  `::-webkit-scrollbar` rules), so parts do not use it.
+- `{...stylex.props(atoms)}` on a part is the same pair by another route and the
+  lint rule flags it too. Pass the atoms as `xstyle`; only native elements spread
+  `stylex.props`.
 
 ### Type every part with `MosaicComponentProps`
 
@@ -664,8 +706,8 @@ token colors aren't down-leveled into an invalid polyfill.
 - Avoid manual `@layer` / `@property` inside `create` (StyleX owns layering;
   `@property` compiles but emits invalid output).
 - No need for `stylex.firstThatWorks` or `stylex.attrs` — a proven full library
-  ships without either; reach for conditional-value objects and `mergeStyleProps`
-  instead.
+  ships without either; reach for conditional-value objects, `xstyle`, and
+  `mergeStyleProps` instead.
 - Dynamic functions-in-`create` are allowed but exceptional — see "Dynamic styles"
   above. Default to static atoms, variant maps, and conditional-value objects; use
   a dynamic function only for a continuous runtime value, and prefer writing a

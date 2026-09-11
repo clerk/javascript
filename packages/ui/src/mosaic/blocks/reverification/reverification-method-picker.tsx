@@ -1,3 +1,5 @@
+import * as stylex from '@stylexjs/stylex';
+
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import type { IconProps } from '../../components/icon';
@@ -5,6 +7,12 @@ import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
+
+const styles = stylex.create({
+  helpText: {
+    textAlign: 'center',
+  },
+});
 
 export interface ReverificationMethod {
   id: string;
@@ -87,9 +95,7 @@ export function ReverificationMethodPicker({
         <Text
           size='xs'
           color='neutral'
-          style={{
-            textAlign: 'center',
-          }}
+          xstyle={styles.helpText}
         >
           {messages.helpText}{' '}
           <Button

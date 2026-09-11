@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -300,7 +301,8 @@ describe('dev warnings', () => {
 });
 
 describe('Dialog.Actions', () => {
-  it('merges consumer className and style', () => {
+  it('composes consumer xstyle onto the row', () => {
+    const caller = stylex.create({ actions: { marginBlockStart: '2rem' } });
     render(
       <Dialog.Root
         defaultOpen
@@ -310,8 +312,7 @@ describe('Dialog.Actions', () => {
           <Dialog.Title>Discard changes?</Dialog.Title>
           <Dialog.Description>This address has not been saved.</Dialog.Description>
           <Dialog.Actions
-            className='custom'
-            style={{ marginBlockStart: '2rem' }}
+            xstyle={caller.actions}
             data-testid='actions'
           >
             <Dialog.Close>Keep editing</Dialog.Close>
@@ -320,10 +321,32 @@ describe('Dialog.Actions', () => {
       </Dialog.Root>,
     );
 
-    const actions = screen.getByTestId('actions');
-    expect(actions).toHaveClass('cl-dialog-actions');
-    expect(actions).toHaveClass('custom');
-    expect(actions).toHaveStyle({ marginBlockStart: '2rem' });
+    expect(screen.getByTestId('actions')).toHaveClass(
+      'cl-dialog-actions',
+      stylex.props(caller.actions).className ?? '',
+    );
+  });
+
+  it('merges the className a render source hands the row', () => {
+    render(
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+      >
+        <Dialog.Popup>
+          <Dialog.Title>Discard changes?</Dialog.Title>
+          <Dialog.Description>This address has not been saved.</Dialog.Description>
+          <Dialog.Actions
+            render={<div className='from-render' />}
+            data-testid='actions'
+          >
+            <Dialog.Close>Keep editing</Dialog.Close>
+          </Dialog.Actions>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.getByTestId('actions')).toHaveClass('cl-dialog-actions', 'from-render');
   });
 
   it('renders as another element through render', () => {

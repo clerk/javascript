@@ -118,7 +118,7 @@ function DeviceItem({
       <Section.Content>
         <Section.Label>{device.name}</Section.Label>
         {device.isCurrent || device.description ? (
-          <Section.Description {...stylex.props(styles.descriptionLine)}>
+          <Section.Description xstyle={styles.descriptionLine}>
             {device.isCurrent ? <span {...stylex.props(styles.currentDevice)}>This device</span> : null}
             {device.isCurrent && device.description ? <span>·</span> : null}
             {device.description ? <span>{device.description}</span> : null}

@@ -81,7 +81,7 @@ export function UserProfileApiKeysPanelView({
             size='sm'
             type='search'
             value={searchValue}
-            {...stylex.props(styles.search)}
+            xstyle={styles.search}
             onChange={event => onSearchChange(event.currentTarget.value)}
           />
         </div>

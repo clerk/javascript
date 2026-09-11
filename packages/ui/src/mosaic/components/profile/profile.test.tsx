@@ -84,10 +84,13 @@ describe('Profile', () => {
   });
 
   it('exposes its parts through stable slots and state attributes', () => {
-    const { container } = renderSurface({ value: 'security', className: 'custom', style: { maxWidth: 900 } });
+    const probe = stylex.create({ root: { maxWidth: '900px' } });
+    const { container } = renderSurface({ value: 'security', xstyle: probe.root });
 
-    expect(container.firstChild).toHaveClass('cl-profile', 'custom');
-    expect(container.firstChild).toHaveStyle({ maxWidth: '900px' });
+    expect(container.firstChild).toHaveClass('cl-profile');
+    expect(Array.from(container.firstChild instanceof Element ? container.firstChild.classList : [])).toEqual(
+      expect.arrayContaining(atomsOf(probe.root)),
+    );
     expect(screen.getByRole('navigation')).toHaveClass('cl-profile-nav');
     expect(screen.getByRole('tablist')).toHaveClass('cl-profile-nav-list');
     const security = screen.getByRole('tab', { name: 'Security' });
@@ -97,6 +100,12 @@ describe('Profile', () => {
     expect(screen.getByRole('tabpanel')).toHaveClass('cl-profile-content-panel');
     expect(screen.getByRole('tabpanel')).toHaveAttribute('data-value', 'security');
     expect(container.querySelector('.cl-profile-content')).toContainElement(screen.getByRole('tabpanel'));
+  });
+
+  it('merges the className a render source hands the root', () => {
+    const { container } = renderSurface({ render: <section className='from-render' /> });
+
+    expect(container.firstChild).toHaveClass('cl-profile', 'from-render');
   });
 
   // The profile is often the content of the host's own `main`, or of a dialog.

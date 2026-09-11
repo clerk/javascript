@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -19,7 +20,29 @@ function Sheet({ defaultOpen = true }: { defaultOpen?: boolean }) {
   );
 }
 
+const callerStyles = stylex.create({
+  trigger: { marginBlockStart: 8 },
+  title: { textAlign: 'center' },
+});
+
 describe('Drawer', () => {
+  it('composes caller xstyle onto the passthrough parts', () => {
+    render(
+      <MosaicProvider>
+        <Drawer.Root defaultOpen>
+          <Drawer.Trigger xstyle={callerStyles.trigger}>Open</Drawer.Trigger>
+          <Drawer.Popup>
+            <Drawer.Title xstyle={callerStyles.title}>Filters</Drawer.Title>
+          </Drawer.Popup>
+        </Drawer.Root>
+      </MosaicProvider>,
+    );
+
+    // The open sheet hides the trigger from the accessibility tree, so query it by text.
+    expect(screen.getByText('Open')).toHaveClass(stylex.props(callerStyles.trigger).className ?? '');
+    expect(screen.getByText('Filters')).toHaveClass(stylex.props(callerStyles.title).className ?? '');
+  });
+
   it('renders a named, described sheet with a grip, over a scrim', () => {
     render(
       <MosaicProvider>

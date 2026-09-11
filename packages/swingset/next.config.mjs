@@ -78,6 +78,8 @@ const nextConfig = {
         dev: isDev,
         runtimeInjection: isDev,
         unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../ui') },
+        // Stories reach `tokens.stylex.ts` through the same alias; StyleX resolves it itself.
+        aliases: { '@clerk/ui/mosaic/*': [resolve(__dirname, '../ui/src/mosaic/*')] },
         useCSSLayers: true,
         lightningcssOptions: { targets: mosaicLightningCssTargets },
       }),
