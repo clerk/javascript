@@ -212,21 +212,10 @@ describe('Flow', () => {
   });
 
   it('publishes the entering step height without enabling initial animation', () => {
-    const getBoundingClientRect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+    const offsetHeight = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (
       this: HTMLElement,
     ) {
-      const height = this.dataset.testid === 'password-step' ? 120 : 240;
-      return {
-        x: 0,
-        y: 0,
-        width: 420,
-        height,
-        top: 0,
-        right: 420,
-        bottom: height,
-        left: 0,
-        toJSON: () => ({}),
-      };
+      return this.dataset.testid === 'password-step' ? 120 : 240;
     });
     const { rerender } = render(<TestFlow value='password' />);
     const root = screen.getByTestId('flow-root');
@@ -242,6 +231,6 @@ describe('Flow', () => {
 
     expect(root.style.getPropertyValue('--cl-flow-step-height')).toBe('240px');
     expect(root).not.toHaveAttribute('data-initial');
-    getBoundingClientRect.mockRestore();
+    offsetHeight.mockRestore();
   });
 });

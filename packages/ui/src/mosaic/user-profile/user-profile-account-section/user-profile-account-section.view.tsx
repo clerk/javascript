@@ -3,17 +3,21 @@ import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
 import { useMemo, useRef, useState } from 'react';
 
-import { Avatar } from '../components/avatar';
-import { Badge } from '../components/badge';
-import { Button } from '../components/button';
-import { createConfirmHandle, Dialog } from '../components/dialog';
-import { Icon } from '../components/icon';
-import { Section } from '../components/section';
-import { Text } from '../components/text';
+import { Avatar } from '../../components/avatar';
+import { Badge } from '../../components/badge';
+import { Button } from '../../components/button';
+import { createConfirmHandle, Dialog } from '../../components/dialog';
+import { Icon } from '../../components/icon';
+import { Section } from '../../components/section';
+import { Text } from '../../components/text';
+import type { UserProfileMenuAction } from '../user-profile-action-menu';
+import { UserProfileActionMenu } from '../user-profile-action-menu';
+import { styles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { styles } from './user-profile-profile-panel.styles';
+import type { UserProfileNameAttribute } from './user-profile-account-section.types';
+import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
+import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
+import { UserProfileEditNameView } from './user-profile-edit-name.view';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 /** Matches the limit the row's own description advertises. */
@@ -46,6 +50,12 @@ export interface UserProfileAccountSectionViewProps {
   hasImage?: boolean;
   name: string;
   username: string;
+  /** Passed alongside `name`, which cannot be split back into its two halves. */
+  firstName?: string;
+  lastName?: string;
+  /** How the instance configures each half of the name; both enabled and optional by default. */
+  firstNameAttribute?: UserProfileNameAttribute;
+  lastNameAttribute?: UserProfileNameAttribute;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
   onProfilePictureChange?: (file: File) => void;
@@ -56,7 +66,8 @@ export interface UserProfileAccountSectionViewProps {
    */
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
   onRemoveProfilePicture?: () => void;
-  onNameChange?: (value: string) => void;
+  /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. Omit to hide the action. */
+  onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
   onUsernameChange?: (value: string) => void;
   onAddEmail?: () => void;
   onManageEmail?: (id: string) => void;
@@ -76,12 +87,16 @@ export function UserProfileAccountSectionView({
   hasImage = false,
   name,
   username,
+  firstName,
+  lastName,
+  firstNameAttribute,
+  lastNameAttribute,
   emails,
   phones,
   onProfilePictureChange,
   onProfilePictureReject,
   onRemoveProfilePicture,
-  onNameChange,
+  onSubmitName,
   onUsernameChange,
   onAddEmail,
   onManageEmail,
@@ -101,7 +116,6 @@ export function UserProfileAccountSectionView({
     .slice(0, 2)
     .toUpperCase();
   const [rejection, setRejection] = useState<FileRejectionReason | null>(null);
-  const updateName = onNameChange ? () => onNameChange(name) : undefined;
   const updateUsername = onUsernameChange ? () => onUsernameChange(username) : undefined;
 
   return (
@@ -153,16 +167,15 @@ export function UserProfileAccountSectionView({
                 <Section.Label>{m.name.label}</Section.Label>
                 <Section.Description>{name}</Section.Description>
               </Section.Content>
-              {updateName ? (
+              {onSubmitName ? (
                 <Section.Actions>
-                  <Button
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    onClick={updateName}
-                  >
-                    {m.name.edit}
-                  </Button>
+                  <EditName
+                    firstName={firstName}
+                    lastName={lastName}
+                    firstNameAttribute={firstNameAttribute}
+                    lastNameAttribute={lastNameAttribute}
+                    onSubmit={onSubmitName}
+                  />
                 </Section.Actions>
               ) : null}
             </Section.Item>
@@ -289,6 +302,40 @@ function ProfilePictureActions({
   }
 
   return null;
+}
+
+function EditName({
+  firstName,
+  lastName,
+  firstNameAttribute,
+  lastNameAttribute,
+  onSubmit,
+}: {
+  firstName?: string;
+  lastName?: string;
+  firstNameAttribute?: UserProfileNameAttribute;
+  lastNameAttribute?: UserProfileNameAttribute;
+  onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
+}) {
+  const controller = useUserProfileEditNameController({ firstName, lastName, onSubmit });
+
+  return (
+    <UserProfileEditNameView
+      {...controller}
+      firstNameAttribute={firstNameAttribute}
+      lastNameAttribute={lastNameAttribute}
+      open={controller.isOpen}
+      trigger={
+        <Button
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {m.name.edit}
+        </Button>
+      }
+    />
+  );
 }
 
 interface ContactSectionProps {

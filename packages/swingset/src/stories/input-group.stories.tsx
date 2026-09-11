@@ -3,7 +3,7 @@ import { Field } from '@clerk/ui/mosaic/components/field';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import type { InputGroupRootProps } from '@clerk/ui/mosaic/components/input-group';
 import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
-import { colorVars } from '@clerk/ui/mosaic/styles';
+import { colorVars, space } from '@clerk/ui/mosaic/styles';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -82,13 +82,19 @@ export function TextAddons(props: Record<string, unknown>) {
       <Field.Label>Website</Field.Label>
       <InputGroup.Root {...knobsAsProps(props)}>
         <InputGroup.Start
-          style={{ backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)` }}
+          style={{
+            backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+            paddingInlineEnd: space['3'],
+          }}
         >
           https://
         </InputGroup.Start>
         <InputGroup.Input placeholder='example' />
         <InputGroup.End
-          style={{ backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)` }}
+          style={{
+            backgroundColor: `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+            paddingInlineStart: space['3'],
+          }}
         >
           .com
         </InputGroup.End>
