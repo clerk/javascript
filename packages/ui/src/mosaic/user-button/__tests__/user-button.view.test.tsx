@@ -865,6 +865,18 @@ describe('UserButtonTrigger', () => {
     expect(screen.queryByText('Pro')).toBeNull();
   });
 
+  it('ends the label with a caret, and carries none for the avatar alone', () => {
+    const caret = (props: Partial<UserButtonProps>) => {
+      const { unmount } = renderTrigger(props);
+      const found = screen.getByRole('button', { name: /Open account menu/ }).querySelector('.cl-icon');
+      unmount();
+      return found;
+    };
+
+    expect(caret({ mode: 'organization' })).not.toBeNull();
+    expect(caret({ mode: 'organization', renderTriggerLabel: false })).toBeNull();
+  });
+
   it('takes its corner from the workspace it names, labelled or not', () => {
     const corner = (props: Partial<UserButtonProps>) => {
       const { unmount } = renderTrigger(props);

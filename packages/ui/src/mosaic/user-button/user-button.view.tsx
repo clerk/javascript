@@ -1099,6 +1099,12 @@ export function UserButtonTrigger({
         <>
           <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
+          <Icon
+            aria-hidden
+            name='chevron-down'
+            size='sm'
+            {...stylex.props(styles.triggerCaret)}
+          />
         </>
       ) : null}
     </Popover.Trigger>
