@@ -65,3 +65,28 @@ resend countdown and Cancel. Its caller supplies the address, pending state, err
 After the countdown, resend to see the supplied error message.
 
 <Story name='EmailLinkResendFails' storyModule={Stories} />
+
+## Enterprise SSO verification
+
+When an email matches an enterprise SSO connection, this view presents the provider and a Connect
+action. The option composes `Item` with the shared provider icon, label, description, and button.
+The caller supplies the connection, pending state, errors, and callback. In this preview, Connect
+simulates completion and closes the dialog.
+
+<Story
+  name='EmailSsoVerification'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
+    { name: 'IconFrame', href: '/components/icon-frame', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+### Connection error
+
+Connect to see the supplied error message. The user can retry or cancel.
+
+<Story name='EmailSsoConnectFails' storyModule={Stories} />
