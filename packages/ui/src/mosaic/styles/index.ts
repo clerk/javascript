@@ -26,6 +26,16 @@ export type {
   DrawerTitleProps,
   DrawerTriggerProps,
 } from '../components/drawer';
+export { Combobox } from '../components/combobox';
+export type {
+  ComboboxEmptyProps,
+  ComboboxInputProps,
+  ComboboxListProps,
+  ComboboxOptionProps,
+  ComboboxPopupProps,
+  ComboboxRootProps,
+  ComboboxSize,
+} from '../components/combobox';
 export { Dialog, createConfirmHandle, useConfirmedClose } from '../components/dialog';
 export type {
   ConfirmHandle,
