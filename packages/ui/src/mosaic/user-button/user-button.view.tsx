@@ -188,7 +188,7 @@ const rowButton = (disabled = false) => (
 
 /** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
 function Trailing({ children }: { children: ReactNode }) {
-  return <Item.Actions {...stylex.props(styles.trailing)}>{children}</Item.Actions>;
+  return <Item.Actions xstyle={styles.trailing}>{children}</Item.Actions>;
 }
 
 interface SwitcherRowProps {
@@ -886,7 +886,7 @@ function OrganizationSection() {
       {/* `auto` rather than `stable`: a reserved gutter insets the rows whether or not the list
           overflows, so short lists would sit their avatars and icons off the edge the header and
           footer align to. */}
-      <Item.Group {...stylex.props(...scrollAreaViewport('auto'), styles.scroll)}>
+      <Item.Group xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
         {showOrganizationsHeading ? <OrganizationsHeading /> : null}
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
@@ -1075,12 +1075,12 @@ export function UserButtonTrigger({
   return (
     <Popover.Trigger
       aria-label={fill(m.trigger.open, { name })}
-      {...stylex.props(
+      xstyle={[
         focusOutline.visible,
         styles.trigger,
         renderTriggerLabel ? styles.triggerLabelled : null,
         triggerShapes[shape],
-      )}
+      ]}
     >
       <RowAvatar
         name={name}

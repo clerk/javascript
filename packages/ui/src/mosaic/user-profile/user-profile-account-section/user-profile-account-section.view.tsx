@@ -375,7 +375,7 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
         <Section.Content>
           <Section.Label>{label}</Section.Label>
           {item ? (
-            <Section.Description {...stylex.props(styles.contactValue)}>
+            <Section.Description xstyle={styles.contactValue}>
               <span>{item.value}</span>
               {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
             </Section.Description>
@@ -464,7 +464,7 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
             return (
               <Section.Item key={item.id}>
                 <Section.Content>
-                  <Section.Description {...stylex.props(styles.contactValue)}>
+                  <Section.Description xstyle={styles.contactValue}>
                     <span>{item.value}</span>
                     {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
                   </Section.Description>

@@ -246,7 +246,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 }
               }}
             >
-              <Field.Root {...stylex.props(styles.countrySearchContainer)}>
+              <Field.Root xstyle={styles.countrySearchContainer}>
                 <InputGroup.Root
                   size='md'
                   {...themeProps('phone-input-country-search')}
