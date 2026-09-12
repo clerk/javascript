@@ -1,4 +1,4 @@
-name: 'Expo native (@clerk/expo)'
+name: Expo
 
 on:
   pull_request:
@@ -35,7 +35,7 @@ env:
 jobs:
   native-build:
     if: ${{ github.head_ref != 'changeset-release/main' }}
-    name: Expo ${{ matrix.expo-sdk }} ${{ matrix.run-e2e == true && 'Build + E2E' || 'Build' }} / ${{ matrix.platform }}
+    name: Native ${{ matrix.run-e2e == true && 'E2E' || 'Build' }} (${{ matrix.platform }}, sdk ${{ matrix.expo-sdk }})
     runs-on: ${{ matrix.runner }}
     timeout-minutes: ${{ matrix.run-e2e == true && 60 || 45 }}
     strategy:
