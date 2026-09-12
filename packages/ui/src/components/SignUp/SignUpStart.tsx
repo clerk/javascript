@@ -17,7 +17,7 @@ import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { createUsernameError } from '@/ui/utils/usernameUtils';
 
-import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
+import { ActionBlockedCard, withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
@@ -387,6 +387,14 @@ function SignUpStartInternal(): JSX.Element {
 
   if (mode !== SIGN_UP_MODES.PUBLIC && !(hasTicket || hasExistingSignUpWithTicket)) {
     return <SignUpRestrictedAccess />;
+  }
+
+  // A blocked request is terminal — no field to correct, no retry that helps —
+  // so it replaces the card rather than showing an inline error beside a form
+  // the user cannot resubmit. Detection lives in card state, so every path
+  // that reports an error here is covered.
+  if (card.blockedDetails) {
+    return <ActionBlockedCard details={card.blockedDetails} />;
   }
 
   return (

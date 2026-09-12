@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Dodaj novi ključ',
     action__search: 'Pretraži ključeve',

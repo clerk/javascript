@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const msMY: LocalizationResource = {
   locale: 'ms-MY',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Tambah kunci baharu',
     action__search: 'Cari kunci',
