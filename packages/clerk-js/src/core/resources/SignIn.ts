@@ -110,6 +110,22 @@ import { BaseResource, UserData, Verification } from './internal';
 const isTerminalEmailLinkVerificationStatus = (status: string | null) =>
   status === 'verified' || status === 'expired' || status === 'transferable';
 
+/**
+ * True when `signIn` already holds a passkey challenge that no attempt has consumed and that has
+ * not expired. The sign-in form issues one passkey challenge per mount, so a remount would
+ * otherwise create a fresh sign-in attempt each time and trip the sign-in creation rate limit.
+ */
+function hasPendingPasskeyChallenge(signIn: SignIn): boolean {
+  const { strategy, nonce, status, expireAt } = signIn.firstFactorVerification;
+  return (
+    strategy === 'passkey' &&
+    !!nonce &&
+    (status === null || status === 'unverified') &&
+    !!expireAt &&
+    expireAt.getTime() > Date.now()
+  );
+}
+
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
@@ -574,8 +590,10 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     if (flow === 'autofill' || flow === 'discoverable') {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-      await this.create({ strategy: 'passkey' });
+      if (!hasPendingPasskeyChallenge(this)) {
+        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+        await this.create({ strategy: 'passkey' });
+      }
     } else {
       // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       const passKeyFactor = this.supportedFirstFactors.find(
@@ -1406,7 +1424,9 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.#resource, async () => {
       if (flow === 'autofill' || flow === 'discoverable') {
-        await this._create({ strategy: 'passkey' });
+        if (!hasPendingPasskeyChallenge(this.#resource)) {
+          await this._create({ strategy: 'passkey' });
+        }
       } else {
         const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
 
