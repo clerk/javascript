@@ -6,6 +6,7 @@ import { Flow } from '@/customizables';
 import type { WithInternalRouting } from '@/internal';
 import { Route, Switch } from '@/router';
 
+import { UserVerificationEmailLinkVerify } from './UserVerificationEmailLinkVerify';
 import { UserVerificationFactorOne } from './UserVerificationFactorOne';
 import { UserVerificationFactorTwo } from './UserVerificationFactorTwo';
 import { useUserVerificationSession } from './useUserVerificationSession';
@@ -20,6 +21,9 @@ function UserVerificationRoutes(): JSX.Element {
   return (
     <Flow.Root flow='userVerification'>
       <Switch>
+        <Route path='verify'>
+          <UserVerificationEmailLinkVerify />
+        </Route>
         <Route path='factor-two'>
           <UserVerificationFactorTwo />
         </Route>
