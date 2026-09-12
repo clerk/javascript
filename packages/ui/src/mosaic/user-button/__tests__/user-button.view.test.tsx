@@ -890,7 +890,7 @@ describe('UserButtonTrigger', () => {
     expect(avatarSize({ mode: 'organization', renderTriggerLabel: false })).toBe('sm');
   });
 
-  it('keeps the same corner for a user and an organization', () => {
+  it('rounds fully only around a user avatar on its own', () => {
     const corner = (props: Partial<UserButtonProps>) => {
       const { unmount } = renderTrigger(props);
       const className = screen.getByRole('button', { name: /Open account menu/ }).className;
@@ -899,6 +899,9 @@ describe('UserButtonTrigger', () => {
     };
 
     expect(corner({ mode: 'organization' })).toEqual(corner({ mode: 'user' }));
+    expect(corner({ mode: 'organization', renderTriggerLabel: false })).not.toEqual(
+      corner({ mode: 'user', renderTriggerLabel: false }),
+    );
   });
 
   it('names the active organization before its membership list has loaded', () => {

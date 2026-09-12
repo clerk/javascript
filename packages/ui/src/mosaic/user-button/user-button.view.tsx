@@ -1082,7 +1082,12 @@ export function UserButtonTrigger({
   return (
     <Popover.Trigger
       aria-label={fill(m.trigger.open, { name })}
-      {...stylex.props(focusOutline.visible, styles.trigger, renderTriggerLabel ? styles.triggerLabelled : null)}
+      {...stylex.props(
+        focusOutline.visible,
+        styles.trigger,
+        renderTriggerLabel ? styles.triggerLabelled : null,
+        !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
+      )}
     >
       <RowAvatar
         name={name}

@@ -26,6 +26,10 @@ export const styles = stylex.create({
     gap: space['1.5'],
   },
 
+  triggerRound: {
+    borderRadius: radiusVars['--cl-radius-full'],
+  },
+
   // Matches `Item.Label`, so the trigger names a workspace the same way its row does. Capped,
   // because the trigger sits in a host app's chrome and a long workspace name would push it apart.
   triggerName: {

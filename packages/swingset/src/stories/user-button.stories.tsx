@@ -278,6 +278,18 @@ export function AvatarOnly(_args: Record<string, unknown>) {
   );
 }
 
+export function UserAvatarOnly(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='user'
+      renderTriggerLabel={false}
+    />
+  );
+}
+
 export function WithoutTriggerBadge(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
