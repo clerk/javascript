@@ -1,22 +1,33 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
+import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
 
 export const styles = stylex.create({
-  // The avatar is the trigger, so the button paints nothing of its own.
   trigger: {
     padding: 0,
+    borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'none',
-    backgroundColor: 'transparent',
+    alignItems: 'center',
+    backgroundColor: {
+      default: 'transparent',
+      ':is([data-open])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+      '@media (hover: hover)': {
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+      },
+    },
     cursor: 'pointer',
     display: 'inline-flex',
+    transitionDuration: durationVars['--cl-duration-base'],
+    transitionProperty: 'background-color',
   },
 
-  // A labelled trigger sits in a host app's chrome, so it stays flush like the avatar-only form
-  // and only spaces the avatar from its text.
   triggerLabelled: {
-    gap: space['2'],
-    alignItems: 'center',
+    padding: space['1'],
+    gap: space['1.5'],
+  },
+
+  triggerRound: {
+    borderRadius: radiusVars['--cl-radius-full'],
   },
 
   // Matches `Item.Label`, so the trigger names a workspace the same way its row does. Capped,
@@ -27,6 +38,11 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     maxWidth: '12rem',
+  },
+
+  triggerCaret: {
+    '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
+    marginInlineEnd: space['1'],
   },
 
   // The workspace list scrolls; the header and footer stay put. The scroll area carries the
@@ -43,11 +59,4 @@ export const styles = stylex.create({
     justifyContent: 'center',
     width: space['7'],
   },
-});
-
-// The trigger takes the corner of the workspace mark it carries: round for a person, squared for
-// an organization. Rounding it fully would draw a circle around a square mark, labelled or not.
-export const triggerShapes = stylex.create({
-  circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: radiusVars['--cl-radius-md'] },
 });
