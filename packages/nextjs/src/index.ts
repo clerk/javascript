@@ -22,6 +22,7 @@ export {
  * If you do, app router will break.
  */
 export {
+  AgentActionApproval,
   APIKeys,
   CreateOrganization,
   GoogleOneTap,

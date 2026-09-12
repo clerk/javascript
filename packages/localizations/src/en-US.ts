@@ -2,6 +2,28 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  agentActionApproval: {
+    action__approve: 'Approve',
+    action__deny: 'Deny',
+    commentLabel: 'Comment',
+    commentOptional: 'Optional',
+    commentPlaceholder: 'Add any additional context for your response',
+    copyParameter: 'Copy {{parameter}}',
+    detailsLabel: 'Action details',
+    expiresIn: 'Approval window closes in {{remaining}}',
+    parameterCopied: '{{parameter}} copied',
+    requestedAt: 'Requested {{relativeTime}}',
+    terminal: {
+      approvedSubtitle: 'You can close this window, return to your agent, and continue with your request.',
+      approvedTitle: 'Action approved',
+      deniedSubtitle: 'No action was taken. You can close this window and return to your agent.',
+      deniedTitle: 'Action denied',
+      expiredSubtitle:
+        'The approval window closed. No action was taken. You can close this window and return to your agent.',
+      expiredTitle: 'Approval window closed',
+    },
+    title: 'Approve agent action',
+  },
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',

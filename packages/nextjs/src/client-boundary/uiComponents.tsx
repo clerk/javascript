@@ -12,6 +12,7 @@ import React from 'react';
 import { useEnforceCorrectRoutingProps } from './hooks/useEnforceRoutingProps';
 
 export {
+  AgentActionApproval,
   APIKeys,
   CreateOrganization,
   GoogleOneTap,

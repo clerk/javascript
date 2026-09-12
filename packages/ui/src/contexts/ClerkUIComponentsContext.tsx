@@ -157,6 +157,8 @@ export function ComponentContextProvider({
         </OAuthConsentContext.Provider>
       );
     }
+    case 'AgentActionApproval':
+      return children;
     case 'OAuthDeviceVerification':
       return (
         <OAuthDeviceVerificationContext.Provider value={{ componentName, ...(props as OAuthDeviceVerificationProps) }}>
