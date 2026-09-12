@@ -4,6 +4,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
+import { Menu } from '../menu';
 import { Popover } from '../popover';
 import { useDialogContext } from './dialog-context';
 import { Dialog } from './index';
@@ -754,6 +755,63 @@ describe('Dialog', () => {
       expect(finalFocus).toHaveBeenCalledWith('mouse');
       // A Close press is not a dismissal, so the default still returns focus to the trigger.
       expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open dialog' }));
+    });
+
+    describe('opened from a menu item', () => {
+      function MenuFixture() {
+        const [open, setOpen] = React.useState(false);
+        return (
+          <Menu.Root>
+            <Menu.Trigger>Actions</Menu.Trigger>
+            <Menu.Positioner>
+              <Menu.Popup>
+                <Menu.Item
+                  label='Remove'
+                  onClick={() => setOpen(true)}
+                >
+                  Remove
+                </Menu.Item>
+              </Menu.Popup>
+            </Menu.Positioner>
+            <Dialog.Root
+              open={open}
+              onOpenChange={setOpen}
+            >
+              <Dialog.Popup>
+                <Dialog.Title>Remove?</Dialog.Title>
+                <Dialog.Close>Cancel</Dialog.Close>
+              </Dialog.Popup>
+            </Dialog.Root>
+          </Menu.Root>
+        );
+      }
+
+      it('returns focus to the menu trigger on Escape', async () => {
+        const user = userEvent.setup();
+        render(<MenuFixture />);
+
+        const trigger = screen.getByRole('button', { name: 'Actions' });
+        trigger.focus();
+        await user.keyboard('{Enter}');
+        await user.keyboard('{Enter}');
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+        await user.keyboard('{Escape}');
+
+        expect(document.activeElement).toBe(trigger);
+      });
+
+      it('returns focus to the menu trigger on Close press', async () => {
+        const user = userEvent.setup();
+        render(<MenuFixture />);
+
+        const trigger = screen.getByRole('button', { name: 'Actions' });
+        await user.click(trigger);
+        await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+        await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+        expect(document.activeElement).toBe(trigger);
+      });
     });
 
     it('resolves the function form with an empty type on programmatic close', () => {
