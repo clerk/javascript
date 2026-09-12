@@ -48,6 +48,23 @@ Multiple ids can select the same step. Moving between those ids updates the exis
 
 `Flow.Step` also accepts standard `<div>` attributes and the package's `render` prop.
 
+## Focus
+
+`useFlowAutoFocus()` returns a ref. Attach it to the element a step should focus once its enter transition settles:
+
+```tsx
+function PasswordView() {
+  return (
+    <input
+      ref={useFlowAutoFocus()}
+      type='password'
+    />
+  );
+}
+```
+
+Focus moves only for a step that transitions in; the initially active step is left to whatever container opened it. Focus is applied with `preventScroll` after the step's animations finish, and only when focus is currently on the body or inside `Flow.Root`, so it never steals from elsewhere on the page. When several mounted elements are marked, the first in DOM order is focused, and an element that unmounts before the step settles is skipped. A step that closes before it settles drops its pending focus. Outside a `Flow.Step` the hook returns a no-op ref.
+
 ## Transition attributes
 
 | Attribute             | Description                                              |

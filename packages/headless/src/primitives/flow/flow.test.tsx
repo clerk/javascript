@@ -1,8 +1,17 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { createRef } from 'react';
+import React, { createRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Flow } from './index';
+import { Flow, useFlowAutoFocus } from './index';
+
+function AutoFocusInput(props: React.ComponentProps<'input'>) {
+  return (
+    <input
+      ref={useFlowAutoFocus()}
+      {...props}
+    />
+  );
+}
 
 interface TestFlowProps {
   value: string;
@@ -22,12 +31,14 @@ function TestFlow({ value, direction = 1, passwordContent = 'Password' }: TestFl
         data-testid='password-step'
       >
         {passwordContent}
+        <AutoFocusInput data-testid='password-input' />
       </Flow.Step>
       <Flow.Step
         ids={['otp', 'otp-pending', 'otp-error']}
         data-testid='otp-step'
       >
         OTP
+        <AutoFocusInput data-testid='otp-input' />
       </Flow.Step>
     </Flow.Root>
   );
@@ -232,5 +243,204 @@ describe('Flow', () => {
     expect(root.style.getPropertyValue('--cl-flow-step-height')).toBe('240px');
     expect(root).not.toHaveAttribute('data-initial');
     offsetHeight.mockRestore();
+  });
+  describe('useFlowAutoFocus', () => {
+    let originalGetAnimations: HTMLElement['getAnimations'] | undefined;
+
+    beforeEach(() => {
+      originalGetAnimations = HTMLElement.prototype.getAnimations;
+    });
+
+    afterEach(() => {
+      if (originalGetAnimations) {
+        HTMLElement.prototype.getAnimations = originalGetAnimations;
+      } else {
+        Reflect.deleteProperty(HTMLElement.prototype, 'getAnimations');
+      }
+    });
+
+    function pendingAnimationOn(testid: string) {
+      let finishAnimation!: () => void;
+      const animationFinished = new Promise<void>(resolve => {
+        finishAnimation = resolve;
+      });
+      let finished = false;
+      HTMLElement.prototype.getAnimations = function (this: HTMLElement) {
+        if (finished || this.dataset.testid !== testid) {
+          return [];
+        }
+        return [{ finished: animationFinished }] as unknown as Animation[];
+      };
+      return async () => {
+        finished = true;
+        await act(async () => {
+          finishAnimation();
+          await animationFinished;
+        });
+      };
+    }
+
+    it('does not focus the initially active step', () => {
+      render(<TestFlow value='password' />);
+
+      expect(screen.getByTestId('password-input')).not.toHaveFocus();
+    });
+
+    it('focuses the registered element once the entering step settles', async () => {
+      const focus = vi.spyOn(HTMLElement.prototype, 'focus');
+      const finish = pendingAnimationOn('otp-step');
+      const { rerender } = render(<TestFlow value='password' />);
+
+      rerender(<TestFlow value='otp' />);
+      const input = screen.getByTestId('otp-input');
+      expect(input).not.toHaveFocus();
+
+      act(() => flushRaf());
+      await act(async () => {});
+      expect(input).not.toHaveFocus();
+
+      await finish();
+
+      expect(input).toHaveFocus();
+      expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+      focus.mockRestore();
+    });
+
+    it('focuses immediately after the starting frame when the step has no animations', async () => {
+      HTMLElement.prototype.getAnimations = () => [];
+      const { rerender } = render(<TestFlow value='password' />);
+
+      rerender(<TestFlow value='otp' />);
+      expect(screen.getByTestId('otp-input')).not.toHaveFocus();
+
+      act(() => flushRaf());
+      await act(async () => {});
+
+      expect(screen.getByTestId('otp-input')).toHaveFocus();
+    });
+
+    it('leaves focus alone when it is outside the flow', async () => {
+      HTMLElement.prototype.getAnimations = () => [];
+      const { rerender } = render(
+        <>
+          <button
+            type='button'
+            data-testid='outside'
+          >
+            Outside
+          </button>
+          <TestFlow value='password' />
+        </>,
+      );
+      screen.getByTestId('outside').focus();
+
+      rerender(
+        <>
+          <button
+            type='button'
+            data-testid='outside'
+          >
+            Outside
+          </button>
+          <TestFlow value='otp' />
+        </>,
+      );
+      act(() => flushRaf());
+      await act(async () => {});
+
+      expect(screen.getByTestId('outside')).toHaveFocus();
+      expect(screen.getByTestId('otp-input')).not.toHaveFocus();
+    });
+
+    it('abandons a pending focus when the entering step closes before it settles', async () => {
+      const finish = pendingAnimationOn('otp-step');
+      const { rerender } = render(<TestFlow value='password' />);
+
+      rerender(<TestFlow value='otp' />);
+      const otpInput = screen.getByTestId('otp-input');
+
+      rerender(
+        <TestFlow
+          value='password'
+          direction={-1}
+        />,
+      );
+      act(() => flushRaf());
+      await act(async () => {});
+      await finish();
+
+      expect(otpInput).not.toHaveFocus();
+      expect(screen.getByTestId('password-input')).toHaveFocus();
+    });
+
+    it('focuses the first marked element in DOM order when several are marked', async () => {
+      HTMLElement.prototype.getAnimations = () => [];
+      const otpStep = (
+        <Flow.Step ids={['otp']}>
+          <AutoFocusInput data-testid='first' />
+          <AutoFocusInput data-testid='second' />
+        </Flow.Step>
+      );
+      const { rerender } = render(
+        <Flow.Root value='password'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep}
+        </Flow.Root>,
+      );
+
+      rerender(
+        <Flow.Root value='otp'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep}
+        </Flow.Root>,
+      );
+      act(() => flushRaf());
+      await act(async () => {});
+
+      expect(screen.getByTestId('first')).toHaveFocus();
+    });
+
+    it('focuses whichever marked element is still mounted when the step settles', async () => {
+      const finish = pendingAnimationOn('otp-step');
+      const otpStep = (showFirst: boolean) => (
+        <Flow.Step
+          ids={['otp']}
+          data-testid='otp-step'
+        >
+          {showFirst ? <AutoFocusInput data-testid='first' /> : null}
+          <AutoFocusInput data-testid='second' />
+        </Flow.Step>
+      );
+      const { rerender } = render(
+        <Flow.Root value='password'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep(true)}
+        </Flow.Root>,
+      );
+
+      rerender(
+        <Flow.Root value='otp'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep(true)}
+        </Flow.Root>,
+      );
+      rerender(
+        <Flow.Root value='otp'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep(false)}
+        </Flow.Root>,
+      );
+      act(() => flushRaf());
+      await act(async () => {});
+      await finish();
+
+      expect(screen.queryByTestId('first')).not.toBeInTheDocument();
+      expect(screen.getByTestId('second')).toHaveFocus();
+    });
+
+    it('returns a no-op ref outside a step', () => {
+      expect(() => render(<AutoFocusInput data-testid='lone-input' />)).not.toThrow();
+      expect(screen.getByTestId('lone-input')).toBeInTheDocument();
+    });
   });
 });
