@@ -1,5 +1,6 @@
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
 import type { IconProps } from '../../components/icon';
 import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
@@ -38,6 +39,8 @@ export function ReverificationMethodPicker({
   onHelp,
   onBack,
 }: ReverificationMethodPickerProps) {
+  const firstMethodRef = useFlowAutoFocus<HTMLDivElement>();
+
   return (
     <>
       <Card.Header>
@@ -46,11 +49,12 @@ export function ReverificationMethodPicker({
       </Card.Header>
       <Card.Content>
         <Item.Group variant='outline'>
-          {methods.map(method => {
+          {methods.map((method, index) => {
             const isPending = pendingMethodId === method.id;
             return (
               <Item.Root
                 key={method.id}
+                ref={index === 0 ? firstMethodRef : undefined}
                 size='lg'
                 render={
                   <button

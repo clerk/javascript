@@ -4,6 +4,7 @@ import { useId } from 'react';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
+import { useFlowAutoFocus } from '../../components/flow';
 import { Otp } from '../../components/otp';
 
 export interface ReverificationOtpMessages {
@@ -73,6 +74,7 @@ export function ReverificationOTP({
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Otp
+              ref={useFlowAutoFocus<HTMLInputElement>()}
               name='code'
               length={length}
               value={value}

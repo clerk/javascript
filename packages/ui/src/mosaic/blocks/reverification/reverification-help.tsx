@@ -1,5 +1,6 @@
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
 
 export interface ReverificationHelpMessages {
   title: string;
@@ -23,6 +24,7 @@ export function ReverificationHelp({ messages, onEmailSupport, onBack }: Reverif
       </Card.Header>
       <Card.Footer>
         <Button
+          ref={useFlowAutoFocus<HTMLButtonElement>()}
           type='button'
           variant='outline'
           color='neutral'

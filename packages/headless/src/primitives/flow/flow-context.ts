@@ -1,10 +1,11 @@
-import { createContext, useContext } from 'react';
+import { createContext, type RefObject, useContext } from 'react';
 
 export type FlowDirection = -1 | 1;
 
 export interface FlowContextValue {
   value: string;
   direction: FlowDirection;
+  rootRef: RefObject<HTMLDivElement | null>;
   registerActiveStep: (element: HTMLElement) => void;
   unregisterActiveStep: (element: HTMLElement) => void;
 }

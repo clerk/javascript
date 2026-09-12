@@ -200,4 +200,18 @@ describe('Mosaic Otp', () => {
     );
     expect(document.querySelector('input[name="code"]')).toHaveValue('123');
   });
+
+  it('forwards its ref to the first slot', () => {
+    const ref = React.createRef<HTMLInputElement>();
+
+    render(
+      <Otp
+        ref={ref}
+        length={3}
+        aria-label='Code'
+      />,
+    );
+
+    expect(ref.current).toBe(slots()[0]);
+  });
 });
