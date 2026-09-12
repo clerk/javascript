@@ -1,6 +1,7 @@
 import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
 
 export interface ReverificationPasskeyMessages {
   title: string;
@@ -55,6 +56,7 @@ export function ReverificationPasskey({
           </Button>
         ) : null}
         <SubmitButton
+          ref={useFlowAutoFocus<HTMLButtonElement>()}
           type='button'
           fullWidth
           isPending={isPending}

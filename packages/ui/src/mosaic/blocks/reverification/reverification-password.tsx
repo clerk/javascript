@@ -4,6 +4,7 @@ import { useId } from 'react';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
+import { useFlowAutoFocus } from '../../components/flow';
 import { Input } from '../../components/input';
 
 export interface ReverificationPasswordMessages {
@@ -62,6 +63,7 @@ export function ReverificationPassword({
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Input
+              ref={useFlowAutoFocus<HTMLInputElement>()}
               name='password'
               type='password'
               autoComplete='current-password'

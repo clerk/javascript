@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ReverificationModel } from './reverification';
@@ -133,5 +133,22 @@ describe('Reverification', () => {
     expect(banner).toHaveClass('cl-banner-root');
     expect(banner).toHaveAttribute('data-color', 'negative');
     expect(banner).toHaveTextContent('We couldn’t verify that passkey. Try again.');
+  });
+
+  it('moves focus to the entering step once it settles', async () => {
+    const { rerender } = render(<Reverification {...model('password')} />);
+    expect(screen.getByLabelText('Password')).not.toHaveFocus();
+
+    rerender(<Reverification {...model('otp')} />);
+    await act(async () => {});
+
+    expect(screen.getAllByRole('textbox')[0]).toHaveFocus();
+
+    const picker = model('method-picker', -1);
+    picker.methodPicker.methods = [{ id: 'password', label: 'Password', icon: 'chevron-right' }];
+    rerender(<Reverification {...picker} />);
+    await act(async () => {});
+
+    expect(screen.getByRole('button', { name: 'Password' })).toHaveFocus();
   });
 });
