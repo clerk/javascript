@@ -1,7 +1,55 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- CJS plugin, no ESM export
-const { validateThemeJson } = require('../../app.plugin.js')._testing;
+const clerkPlugin = require('../../app.plugin.js');
+const { withClerkFaceIDPermission, validateThemeJson } = clerkPlugin._testing;
+
+function applyInfoPlistMod(config, modResults) {
+  return config.mods.ios.infoPlist({
+    ...config,
+    modRequest: {},
+    modResults,
+  });
+}
+
+describe('withClerkFaceIDPermission', () => {
+  test('adds the configured Face ID usage description', async () => {
+    const config = withClerkFaceIDPermission(
+      { name: 'test', slug: 'test' },
+      { faceIDPermission: 'Allow $(PRODUCT_NAME) to use Face ID for secure sign-in.' },
+    );
+
+    const result = await applyInfoPlistMod(config, {});
+
+    expect(result.modResults.NSFaceIDUsageDescription).toBe('Allow $(PRODUCT_NAME) to use Face ID for secure sign-in.');
+  });
+
+  test('preserves an app-provided Face ID usage description', async () => {
+    const config = withClerkFaceIDPermission(
+      { name: 'test', slug: 'test' },
+      { faceIDPermission: 'Clerk-provided description' },
+    );
+
+    const result = await applyInfoPlistMod(config, {
+      NSFaceIDUsageDescription: 'App-provided description',
+    });
+
+    expect(result.modResults.NSFaceIDUsageDescription).toBe('App-provided description');
+  });
+
+  test('does not configure the Info.plist without an explicit permission description', () => {
+    const config = { name: 'test', slug: 'test' };
+
+    expect(withClerkFaceIDPermission(config)).toBe(config);
+    expect(config).not.toHaveProperty('mods');
+  });
+
+  test.each([null, '', '   ', true])('rejects an invalid permission description: %j', faceIDPermission => {
+    expect(() => withClerkFaceIDPermission({ name: 'test', slug: 'test' }, { faceIDPermission })).toThrow(
+      'faceIDPermission must be a non-empty string',
+    );
+  });
+});
 
 describe('validateThemeJson', () => {
   beforeEach(() => {

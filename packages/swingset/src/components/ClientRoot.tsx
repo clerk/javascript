@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { getModule } from '@/lib/registry';
 
 import { AppSidebar } from './app-sidebar';
 import { ThemeToggle } from './ThemeToggle';
@@ -20,10 +21,17 @@ import { ThemeToggle } from './ThemeToggle';
 function useBreadcrumb() {
   const pathname = usePathname();
   // /components/button → ["Button"]
-  // /primitives/dialog → ["Dialog"]
-  // The first segment is the group; drop it and surface the component (plus any sub-path).
-  const parts = pathname.split('/').filter(Boolean).slice(1);
-  return parts.map(p => p.charAt(0).toUpperCase() + p.slice(1).replace(/-/g, ' '));
+  // /styles/scroll-area → ["Scroll Area"]
+  // The first segment is the group; drop it and surface the entry (plus any sub-path).
+  const [groupSlug, ...parts] = pathname.split('/').filter(Boolean);
+
+  // Prefer the registry's own `meta.title`, which is the only source that round-trips a slug back
+  // to how the entry is actually written — `scroll-area` → `Scroll Area`, `use-data-table` →
+  // `useDataTable`. Fall back to title-casing the slug for any path the registry doesn't cover.
+  return parts.map((part, index) => {
+    const title = index === 0 ? getModule(groupSlug, part)?.meta.title : undefined;
+    return title ?? part.replace(/(^|-)([a-z])/g, (_, sep: string, ch: string) => (sep ? ' ' : '') + ch.toUpperCase());
+  });
 }
 
 export function ClientRoot({ children }: { children: React.ReactNode }) {

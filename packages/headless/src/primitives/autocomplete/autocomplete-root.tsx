@@ -101,7 +101,8 @@ function AutocompleteInner(props: AutocompleteProps) {
       flip({ padding: 5 }),
       size({
         apply({ rects, availableHeight, elements }) {
-          if (elements.floating.getAttribute('data-cl-slot') !== 'autocomplete-positioner') {
+          // Only size the positioner (identified by its data-side), never the input reference.
+          if (!elements.floating.hasAttribute('data-side')) {
             return;
           }
           Object.assign(elements.floating.style, {

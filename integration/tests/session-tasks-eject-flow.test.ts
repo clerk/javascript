@@ -68,7 +68,7 @@ return (
     await app.dev();
 
     const u = createTestUtils({ app });
-    user = u.services.users.createFakeUser();
+    user = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(user);
   });
 

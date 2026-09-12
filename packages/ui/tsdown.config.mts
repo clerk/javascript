@@ -41,6 +41,7 @@ export default defineConfig(({ watch }) => {
         './src/internal/index.ts',
         './src/themes/index.ts',
         './src/themes/experimental.ts',
+        './src/experimental/index.ts',
       ],
       outDir: './dist',
       unbundle: true,

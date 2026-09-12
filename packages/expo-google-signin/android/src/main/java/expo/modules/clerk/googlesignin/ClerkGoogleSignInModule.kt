@@ -1,5 +1,6 @@
 package expo.modules.clerk.googlesignin
 
+import android.util.Base64
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -18,6 +19,7 @@ import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class ClerkGoogleSignInModule : Module() {
   private var webClientId: String? = null
@@ -98,7 +100,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCancellation(promise, e)
       } catch (e: NoCredentialException) {
         promise.reject("NO_SAVED_CREDENTIAL_FOUND", "No saved credential found", e)
       } catch (e: GetCredentialException) {
@@ -145,7 +147,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCancellation(promise, e)
       } catch (e: NoCredentialException) {
         promise.reject("NO_SAVED_CREDENTIAL_FOUND", "No saved credential found", e)
       } catch (e: GetCredentialException) {
@@ -191,7 +193,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCancellation(promise, e)
       } catch (e: GetCredentialException) {
         promise.reject("GOOGLE_SIGN_IN_ERROR", e.message ?: "Unknown error", e)
       } catch (e: Exception) {
@@ -215,6 +217,21 @@ class ClerkGoogleSignInModule : Module() {
 
   // MARK: - Helpers
 
+  // Credential Manager also reports provider failures through this exception, so the underlying
+  // message has to reach JS for @clerk/expo to tell them apart from a dismissed chooser.
+  private fun rejectCancellation(promise: Promise, exception: GetCredentialCancellationException) {
+    promise.reject("SIGN_IN_CANCELLED", exception.message ?: "User cancelled the sign-in flow", exception)
+  }
+
+  // GoogleIdTokenCredential.id is the email, so the stable account ID has to come from the token's sub claim.
+  private fun subjectFromIdToken(idToken: String): String? {
+    val payload = idToken.split(".").getOrNull(1) ?: return null
+    return runCatching {
+      val json = String(Base64.decode(payload, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING))
+      JSONObject(json).optString("sub").takeIf { it.isNotEmpty() }
+    }.getOrNull()
+  }
+
   private fun handleSignInResult(result: GetCredentialResponse, promise: Promise) {
     when (val credential = result.credential) {
       is CustomCredential -> {
@@ -223,7 +240,7 @@ class ClerkGoogleSignInModule : Module() {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
 
             val user = mapOf(
-              "id" to googleIdTokenCredential.id,
+              "id" to (subjectFromIdToken(googleIdTokenCredential.idToken) ?: ""),
               "email" to googleIdTokenCredential.id,
               "name" to googleIdTokenCredential.displayName,
               "givenName" to googleIdTokenCredential.givenName,

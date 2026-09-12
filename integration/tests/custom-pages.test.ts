@@ -44,7 +44,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
 
     test.beforeAll(async () => {
       const m = createTestUtils({ app });
-      fakeUser = m.services.users.createFakeUser({
+      fakeUser = m.services.users.createFakeUser(test, {
         withUsername: true,
         fictionalEmail: true,
         withPhoneNumber: true,

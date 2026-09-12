@@ -10,12 +10,13 @@ import { flushSync } from 'react-dom';
  * Uses the Web Animations API (`element.getAnimations()` + `animation.finished`)
  * so we're duration-agnostic — CSS owns all timing.
  *
- * When `open` is true, waits for `[data-cl-starting-style]` to be removed
+ * When `open` is true, waits for `[data-starting-style]` to be removed
  * before polling animations. This avoids a race where `getAnimations()` returns
  * an empty array before the enter transition has been registered.
  *
  * Each call aborts any pending wait from a previous call, so rapid open/close
- * toggles don't leak stale callbacks.
+ * toggles don't leak stale callbacks, and returns a cancel function for callers
+ * that need to abandon a wait before it resolves.
  */
 export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: boolean) {
   const abortRef = useRef<AbortController | null>(null);
@@ -34,10 +35,11 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
       const controller = new AbortController();
       abortRef.current = controller;
       const { signal } = controller;
+      const cancel = () => controller.abort();
 
       if (!element || typeof element.getAnimations !== 'function') {
         callback();
-        return;
+        return cancel;
       }
 
       const runCheck = () => {
@@ -75,22 +77,23 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
           });
       };
 
-      if (open && element.hasAttribute('data-cl-starting-style')) {
+      if (open && element.hasAttribute('data-starting-style')) {
         const observer = new MutationObserver(() => {
-          if (!element.hasAttribute('data-cl-starting-style')) {
+          if (!element.hasAttribute('data-starting-style')) {
             observer.disconnect();
             runCheck();
           }
         });
         observer.observe(element, {
           attributes: true,
-          attributeFilter: ['data-cl-starting-style'],
+          attributeFilter: ['data-starting-style'],
         });
         signal.addEventListener('abort', () => observer.disconnect());
-        return;
+        return cancel;
       }
 
       runCheck();
+      return cancel;
     },
     [ref, open],
   );

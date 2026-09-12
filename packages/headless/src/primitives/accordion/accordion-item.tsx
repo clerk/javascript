@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { AccordionItemContext, type AccordionItemContextValue, useAccordionContext } from './accordion-context';
 
 export interface AccordionItemProps extends ComponentProps<'div'> {
@@ -28,19 +28,17 @@ export function AccordionItem(props: AccordionItemProps) {
 
   const state = { open, disabled };
 
-  const defaultProps = {
-    'data-cl-slot': 'accordion-item',
-  };
+  const defaultProps = {};
 
   return (
     <AccordionItemContext.Provider value={itemContextValue}>
-      {renderElement({
+      {useRender({
         defaultTagName: 'div',
         render,
         state,
         stateAttributesMapping: {
-          open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
-          disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+          open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
+          disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
         },
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}

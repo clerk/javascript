@@ -5,7 +5,7 @@ import * as OtpStories from './otp.stories';
 A one-time-password / PIN input from `@clerk/headless`. It is a **headless** primitive: it owns the
 value (a single string), splits it across per-character `Input` slots, and handles focus movement,
 keyboard editing, and paste distribution, but ships **no styles** — you bring your own CSS by
-targeting the `data-cl-*` attributes each part emits.
+targeting the `data-*` attributes each part emits.
 
 ## Example
 
@@ -111,17 +111,19 @@ inside `Otp.Root`.
 
 ### `Otp.Root`
 
-| Prop            | Type                                     | Default      | Description                                         |
-| --------------- | ---------------------------------------- | ------------ | --------------------------------------------------- |
-| `length`        | `number`                                 | — (required) | Number of slots (characters) in the code            |
-| `value`         | `string`                                 | —            | Controlled value                                    |
-| `defaultValue`  | `string`                                 | `''`         | Initial value (uncontrolled)                        |
-| `onValueChange` | `(value: string) => void`                | —            | Called with the full value on every change          |
-| `onComplete`    | `(value: string) => void`                | —            | Called once every slot is filled                    |
-| `pattern`       | `'numeric' \| 'alpha' \| 'alphanumeric'` | `'numeric'`  | Allowed characters; others are stripped             |
-| `mask`          | `boolean`                                | `false`      | Render slots as password inputs                     |
-| `name`          | `string`                                 | —            | Submit the value via a hidden input under this name |
-| `disabled`      | `boolean`                                | `false`      | Disable every slot                                  |
+| Prop            | Type                                     | Default      | Description                                            |
+| --------------- | ---------------------------------------- | ------------ | ------------------------------------------------------ |
+| `length`        | `number`                                 | — (required) | Number of slots (characters) in the code               |
+| `value`         | `string`                                 | —            | Controlled value                                       |
+| `defaultValue`  | `string`                                 | `''`         | Initial value (uncontrolled)                           |
+| `onValueChange` | `(value: string) => void`                | —            | Called with the full value on every change             |
+| `onComplete`    | `(value: string) => void`                | —            | Called once every slot is filled                       |
+| `pattern`       | `'numeric' \| 'alpha' \| 'alphanumeric'` | `'numeric'`  | Allowed characters; others are stripped                |
+| `mask`          | `boolean`                                | `false`      | Render slots as password inputs                        |
+| `name`          | `string`                                 | —            | Submit the value via a hidden input under this name    |
+| `disabled`      | `boolean`                                | `false`      | Disable every slot and the hidden input                |
+| `required`      | `boolean`                                | `false`      | Require every slot to be filled before submitting      |
+| `id`            | `string`                                 | generated    | Applied to the first slot so a `<label>` can target it |
 
 ### `Otp.Input`
 
@@ -131,36 +133,40 @@ inside `Otp.Root`.
 
 ## Styling
 
-Each part emits `data-cl-*` attributes you can target with any CSS solution:
+Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute          | Applies To  | Description                                   |
-| ------------------ | ----------- | --------------------------------------------- |
-| `data-cl-slot`     | All parts   | Part identifier (`"otp-root"`, `"otp-input"`) |
-| `data-cl-empty`    | Root        | Present when no character has been entered    |
-| `data-cl-complete` | Root        | Present when every slot is filled             |
-| `data-cl-disabled` | Root, Input | Present when disabled                         |
-| `data-cl-active`   | Input       | Present when the slot holds focus             |
-| `data-cl-filled`   | Input       | Present when the slot holds a character       |
+| Attribute       | Applies To  | Description                                |
+| --------------- | ----------- | ------------------------------------------ |
+| `data-empty`    | Root        | Present when no character has been entered |
+| `data-complete` | Root        | Present when every slot is filled          |
+| `data-disabled` | Root, Input | Present when disabled                      |
+| `data-active`   | Input       | Present when the slot holds focus          |
+| `data-filled`   | Input       | Present when the slot holds a character    |
 
 ```css
-[data-cl-slot='otp-root'] {
+.cl-otp-root {
   display: flex;
   gap: 8px;
 }
-[data-cl-slot='otp-input'] {
+.cl-otp-input {
   width: 40px;
   height: 48px;
   text-align: center;
   border: 1px solid var(--color-border);
   border-radius: 8px;
 }
-[data-cl-slot='otp-input'][data-cl-active] {
+.cl-otp-input[data-active] {
   border-color: var(--color-accent);
 }
 ```
 
 `Otp.Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
-Each `Otp.Input` gets a default `aria-label` of `"Character N of M"` (overridable), and the slots use
-a roving tab index so `Tab` enters the group once and leaves in one step. When `name` is set, the
-hidden form input is `aria-hidden` and out of the tab order. Arrow keys follow reading order — under
-`dir="rtl"`, `ArrowLeft`/`ArrowRight` are swapped.
+Because a group is not labelable, `Otp.Root`'s `id` lands on the _first_ slot (the rest take
+`${id}-2`, `${id}-3`, …), so a `<label htmlFor>` targets a real control and clicking it focuses the
+code. That first slot inherits the group's name rather than a positional one — a `"Character 1 of N"`
+there would contradict the visible label — while the remaining slots get a default `aria-label` of
+`"Character N of M"` (overridable). The slots use a roving tab index so `Tab` enters the group once
+and leaves in one step. `required` is applied to each slot, not the hidden input, which is `readOnly`
+and therefore barred from constraint validation. When `name` is set, the hidden form input is
+`aria-hidden`, out of the tab order, and disabled alongside the field. Arrow keys follow reading
+order — under `dir="rtl"`, `ArrowLeft`/`ArrowRight` are swapped.

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useDrawerContext } from './drawer-context';
 
 /** Props for {@link DrawerTitle}. */
@@ -15,12 +15,12 @@ export const DrawerTitle = React.forwardRef<HTMLHeadingElement, DrawerTitleProps
 
   const defaultProps = {
     id: labelId,
-    ref,
   } satisfies DefaultProps<'h2'>;
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'h2',
     render,
+    ref,
     props: mergeProps<'h2'>(defaultProps, otherProps),
   });
 });

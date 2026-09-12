@@ -98,24 +98,23 @@ All parts accept a `render` prop for polymorphic rendering and standard HTML att
 
 ## Data Attributes
 
-| Attribute          | Applies To           | Description                                       |
-| ------------------ | -------------------- | ------------------------------------------------- |
-| `data-cl-slot`     | All parts            | Identifies each part (e.g. `"accordion-trigger"`) |
-| `data-cl-open`     | Item, Trigger, Panel | Present when the item is expanded                 |
-| `data-cl-closed`   | Item, Trigger, Panel | Present when the item is collapsed                |
-| `data-cl-disabled` | Item, Trigger        | Present when the item is disabled                 |
+| Attribute       | Applies To           | Description                        |
+| --------------- | -------------------- | ---------------------------------- |
+| `data-open`     | Item, Trigger, Panel | Present when the item is expanded  |
+| `data-closed`   | Item, Trigger, Panel | Present when the item is collapsed |
+| `data-disabled` | Item, Trigger        | Present when the item is disabled  |
 
 ## CSS Animation
 
 `Accordion.Panel` exposes a `--cl-accordion-panel-height` CSS custom property set to the panel's `scrollHeight` in pixels. Use this for height-based expand/collapse animations:
 
 ```css
-[data-cl-slot='accordion-panel'] {
+.cl-accordion-panel {
   overflow: hidden;
   height: var(--cl-accordion-panel-height);
   transition: height 200ms ease;
 }
-[data-cl-slot='accordion-panel'][data-cl-closed] {
+.cl-accordion-panel[data-closed] {
   height: 0;
 }
 ```

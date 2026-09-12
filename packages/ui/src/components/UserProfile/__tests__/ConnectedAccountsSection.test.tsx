@@ -168,7 +168,7 @@ describe('ConnectedAccountsSection ', () => {
           open,
         },
       });
-      const reload = vi.spyOn(fixtures.clerk.user!, 'reload').mockResolvedValue(fixtures.clerk.user!);
+      const reload = vi.spyOn(fixtures.clerk.user, 'reload').mockResolvedValue(fixtures.clerk.user);
       fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
         verification: { externalVerificationRedirectURL: new URL('https://provider.example/auth') },
       } as ExternalAccountResource);
@@ -291,7 +291,7 @@ describe('ConnectedAccountsSection ', () => {
           open,
         },
       });
-      const reload = vi.spyOn(fixtures.clerk.user!, 'reload').mockResolvedValue(fixtures.clerk.user!);
+      const reload = vi.spyOn(fixtures.clerk.user, 'reload').mockResolvedValue(fixtures.clerk.user);
       fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
         verification: { externalVerificationRedirectURL: new URL('https://provider.example/auth') },
       } as ExternalAccountResource);

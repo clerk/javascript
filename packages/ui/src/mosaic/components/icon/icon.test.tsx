@@ -1,0 +1,190 @@
+import * as stylex from '@stylexjs/stylex';
+import { render } from '@testing-library/react';
+import React from 'react';
+import { describe, expect, it } from 'vitest';
+
+import type { MosaicIconOverrides } from '../../icons/overrides';
+import { MosaicProvider } from '../../MosaicProvider';
+import { space } from '../../tokens.stylex';
+import { Icon } from './icon';
+
+const containerStyles = stylex.create({
+  lineBox: { height: '1lh' },
+  mdHeight: { height: space['4'] },
+});
+
+const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
+  render(<MosaicProvider icons={icons}>{ui}</MosaicProvider>);
+
+const override: MosaicIconOverrides = { 'chevron-right': <span data-testid='override' /> };
+
+describe('Mosaic Icon', () => {
+  it('renders the default glyph for a known name', () => {
+    const { container } = wrap(<Icon name='chevron-right' />);
+    const svg = container.querySelector('svg.cl-icon');
+    expect(svg).not.toBeNull();
+    expect(svg?.querySelector('path')).not.toBeNull();
+  });
+
+  it.each(['security-phone', 'security-lock-square', 'security-passkey'] as const)(
+    'renders the %s glyph on its 18px canvas',
+    name => {
+      const { container } = wrap(<Icon name={name} />);
+      const svg = container.querySelector('svg');
+
+      expect(svg).toHaveAttribute('viewBox', '0 0 18 18');
+      expect(svg?.querySelector('path')).toHaveAttribute('fill', 'currentColor');
+    },
+  );
+
+  it.each([
+    ['device-phone', ['#646464', '#646464', '#343434', '#575757', '#171717', 'black']],
+    ['device-laptop', ['black', '#575757', 'black', '#444444', '#171717']],
+  ] as const)('preserves the supplied %s palette', (name, palette) => {
+    const { container } = wrap(<Icon name={name} />);
+    const paths = Array.from(container.querySelectorAll('path'));
+
+    expect(container.querySelector('svg')).toHaveAttribute('viewBox', '0 0 18 18');
+    expect(paths.map(path => path.getAttribute('fill'))).toEqual(palette);
+  });
+
+  it('applies the default size when none is passed', () => {
+    const { container } = wrap(<Icon name='chevron-right' />);
+    expect(container.querySelector('svg')).toHaveAttribute('data-size', 'md');
+  });
+
+  it('wires the size variant and consumer className/style through to the element', () => {
+    const { container } = wrap(
+      <Icon
+        name='chevron-right'
+        size='lg'
+        className='my-icon'
+        style={{ marginTop: '8px' }}
+      />,
+    );
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveAttribute('data-size', 'lg');
+    expect(svg).toHaveClass('cl-icon', 'my-icon');
+    expect(svg).toHaveStyle({ marginTop: '8px' });
+  });
+
+  it('lets a container xstyle override the size atoms instead of stacking a second class', () => {
+    const { container } = wrap(
+      <Icon
+        name='chevron-right'
+        xstyle={containerStyles.lineBox}
+      />,
+    );
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveClass(stylex.props(containerStyles.lineBox).className ?? '');
+    expect(svg).not.toHaveClass(stylex.props(containerStyles.mdHeight).className ?? '');
+  });
+
+  it('emits no placement attribute when the icon is not placed', () => {
+    const { container } = wrap(<Icon name='chevron-right' />);
+    expect(container.querySelector('svg')).not.toHaveAttribute('data-icon');
+  });
+
+  it('reflects placement as data-icon so a container can select on it', () => {
+    const { container } = wrap(
+      <Icon
+        name='chevron-right'
+        placement='inline-end'
+      />,
+    );
+    expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'inline-end');
+  });
+
+  it('does not leak the placement prop itself to the DOM', () => {
+    const { container } = wrap(
+      <Icon
+        name='chevron-right'
+        placement='inline-start'
+      />,
+    );
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveAttribute('data-icon', 'inline-start');
+    expect(svg).not.toHaveAttribute('placement');
+  });
+
+  it('reflects placement on an override element too', () => {
+    const { getByTestId } = wrap(
+      <Icon
+        name='chevron-right'
+        placement='inline-end'
+      />,
+      override,
+    );
+    expect(getByTestId('override')).toHaveAttribute('data-icon', 'inline-end');
+  });
+
+  it('renders the override element instead of the default glyph', () => {
+    const { getByTestId, container } = wrap(<Icon name='chevron-right' />, override);
+    expect(getByTestId('override')).not.toBeNull();
+    expect(container.querySelector('svg')).toBeNull();
+  });
+
+  it('applies the same slot class and size variant to an override as to the built-in glyph', () => {
+    const { getByTestId } = wrap(
+      <Icon
+        name='chevron-right'
+        size='lg'
+      />,
+      override,
+    );
+    const el = getByTestId('override');
+    expect(el).toHaveClass('cl-icon');
+    expect(el).toHaveAttribute('data-size', 'lg');
+  });
+
+  it("merges the override element's own className rather than clobbering it", () => {
+    const { getByTestId } = wrap(
+      <Icon
+        name='chevron-right'
+        className='call-site'
+      />,
+      {
+        'chevron-right': (
+          <span
+            data-testid='override'
+            className='consumer-glyph'
+          />
+        ),
+      },
+    );
+    expect(getByTestId('override')).toHaveClass('cl-icon', 'call-site', 'consumer-glyph');
+  });
+
+  it('forwards svg props from the Icon call site onto the override element', () => {
+    const { getByTestId } = wrap(
+      <Icon
+        name='chevron-right'
+        aria-label='Next'
+      />,
+      override,
+    );
+    expect(getByTestId('override')).toHaveAttribute('aria-label', 'Next');
+  });
+
+  it('falls through to the default when a different name is overridden', () => {
+    const { container, queryByTestId } = wrap(<Icon name='chevron-right' />, {
+      'chevron-left': <span data-testid='override' />,
+    });
+    expect(queryByTestId('override')).toBeNull();
+    expect(container.querySelector('svg.cl-icon')).not.toBeNull();
+  });
+
+  it('forwards arbitrary props and the ref to the built-in glyph', () => {
+    const ref = React.createRef<SVGSVGElement>();
+    const { container } = wrap(
+      <Icon
+        ref={ref}
+        name='chevron-right'
+        aria-label='Next'
+      />,
+    );
+    const svg = container.querySelector('svg');
+    expect(ref.current).toBe(svg);
+    expect(svg).toHaveAttribute('aria-label', 'Next');
+  });
+});

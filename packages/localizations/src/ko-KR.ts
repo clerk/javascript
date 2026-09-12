@@ -63,6 +63,7 @@ export const koKR: LocalizationResource = {
   badge__canceledEndsAt: "취소됨 • {{ date | shortDate('ko-KR') }}에 종료",
   badge__currentPlan: '현재 플랜',
   badge__default: '기본값',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('ko-KR') }}에 종료",
   badge__expired: '만료됨',
   badge__freeTrial: '무료 체험',
@@ -103,8 +104,11 @@ export const koKR: LocalizationResource = {
     cannotSubscribeMonthly: '이 플랜은 월간 결제가 불가해요. 연간 결제를 선택해 주세요.',
     cannotSubscribeUnrecoverable: '이 플랜으로 구독할 수 없어요. 현재 구독이 더 높은 요금제예요.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: '결제가 완료됐어요.',
       description__subscriptionSuccessful: '새 구독이 준비됐어요.',
+      discount: undefined,
       downgradeNotice: '현재 구독은 결제 주기 종료까지 유지되고, 이후 이 구독으로 전환돼요.',
       emailForm: {
         subtitle: '결제를 완료하려면 영수증을 받을 이메일 주소를 추가해야 해요.',
@@ -119,6 +123,8 @@ export const koKR: LocalizationResource = {
       },
       pastDueNotice: '이전 구독이 연체되어 결제가 되지 않았어요.',
       perMonth: '월',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: '결제',
       title__paymentSuccessful: '결제가 완료됐어요!',
       title__subscriptionSuccessful: '성공!',
@@ -129,6 +135,9 @@ export const koKR: LocalizationResource = {
     credit: '크레딧',
     creditRemainder: '현재 구독 남은 기간에 대한 크레딧',
     defaultFreePlanActive: '현재 무료 플랜을 사용 중이에요',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '무료',
     getStarted: '시작하기',
     highlightedPlanBadge: '인기',
@@ -140,6 +149,7 @@ export const koKR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: '월간',
+    months: undefined,
     pastDue: '연체',
     pay: '{{amount}} 결제',
     payerCreditRemainder: undefined,
@@ -218,6 +228,84 @@ export const koKR: LocalizationResource = {
     year: '년',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -244,6 +332,79 @@ export const koKR: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -630,6 +791,10 @@ export const koKR: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '권한을 업그레이드하려면 조직 관리자에게 문의하세요.',
@@ -682,6 +847,10 @@ export const koKR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: '사용자 지정 SAML 공급자',
         google: undefined,
@@ -856,11 +1025,53 @@ export const koKR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: '조직 만들기',
@@ -1070,6 +1281,25 @@ export const koKR: LocalizationResource = {
       title: '도메인 삭제',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1301,6 +1531,10 @@ export const koKR: LocalizationResource = {
         subtitleNewTab: '계속하려면 새로 연 탭으로 돌아가세요',
         titleNewTab: '다른 탭에서 로그인',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: '이메일로 전송된 확인 링크를 사용하세요',
@@ -1311,6 +1545,9 @@ export const koKR: LocalizationResource = {
     enterpriseConnections: {
       subtitle: '계속할 기업 계정을 선택해 주세요.',
       title: '기업 계정 선택',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: '비밀번호 재설정 코드',
@@ -1375,6 +1612,15 @@ export const koKR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: '비밀번호를 재설정하기 전에 신원을 확인해야 해요.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: '회원가입',
@@ -1648,6 +1894,7 @@ export const koKR: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: '비밀번호가 너무 짧아요. 최소 8자 이상이어야 해요.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: '비밀번호가 충분히 안전하지 않아요.',
     form_password_or_identifier_incorrect:
       '비밀번호 또는 이메일 주소가 올바르지 않아요. 다시 시도하거나 다른 방법을 사용해 보세요.',
@@ -1699,6 +1946,8 @@ export const koKR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '이미 로그인 중이에요.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3 지갑 확장 프로그램을 찾을 수 없어요. 계속하려면 설치해 주세요.',
     web3_signature_request_rejected: '서명 요청을 거부했어요. 계속하려면 다시 시도해 주세요.',
     web3_solana_signature_generation_failed: '서명을 생성하는 동안 오류가 발생했어요. 계속하려면 다시 시도해 주세요.',

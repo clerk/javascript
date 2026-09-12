@@ -10,59 +10,38 @@ afterEach(() => cleanup());
 function renderAccordion(props: Partial<React.ComponentProps<typeof Accordion.Root>> = {}) {
   return render(
     <Accordion.Root {...props}>
-      <Accordion.Item value='item1'>
-        <Accordion.Header>
-          <Accordion.Trigger>Section 1</Accordion.Trigger>
+      <Accordion.Item
+        value='item1'
+        data-testid='accordion-item'
+      >
+        <Accordion.Header data-testid='accordion-header'>
+          <Accordion.Trigger data-testid='accordion-trigger'>Section 1</Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Panel>Content 1</Accordion.Panel>
+        <Accordion.Panel data-testid='accordion-panel'>Content 1</Accordion.Panel>
       </Accordion.Item>
-      <Accordion.Item value='item2'>
-        <Accordion.Header>
-          <Accordion.Trigger>Section 2</Accordion.Trigger>
+      <Accordion.Item
+        value='item2'
+        data-testid='accordion-item'
+      >
+        <Accordion.Header data-testid='accordion-header'>
+          <Accordion.Trigger data-testid='accordion-trigger'>Section 2</Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Panel>Content 2</Accordion.Panel>
+        <Accordion.Panel data-testid='accordion-panel'>Content 2</Accordion.Panel>
       </Accordion.Item>
-      <Accordion.Item value='item3'>
-        <Accordion.Header>
-          <Accordion.Trigger>Section 3</Accordion.Trigger>
+      <Accordion.Item
+        value='item3'
+        data-testid='accordion-item'
+      >
+        <Accordion.Header data-testid='accordion-header'>
+          <Accordion.Trigger data-testid='accordion-trigger'>Section 3</Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Panel>Content 3</Accordion.Panel>
+        <Accordion.Panel data-testid='accordion-panel'>Content 3</Accordion.Panel>
       </Accordion.Item>
     </Accordion.Root>,
   );
 }
 
 describe('Accordion', () => {
-  describe('slot attributes', () => {
-    it('renders root with data-cl-slot', () => {
-      renderAccordion();
-      expect(document.querySelector('[data-cl-slot="accordion-root"]')).toBeInTheDocument();
-    });
-
-    it('renders items with data-cl-slot', () => {
-      renderAccordion();
-      const items = document.querySelectorAll('[data-cl-slot="accordion-item"]');
-      expect(items).toHaveLength(3);
-    });
-
-    it('renders headers with data-cl-slot', () => {
-      renderAccordion();
-      const headers = document.querySelectorAll('[data-cl-slot="accordion-header"]');
-      expect(headers).toHaveLength(3);
-    });
-
-    it('renders triggers with data-cl-slot', () => {
-      renderAccordion();
-      const triggers = document.querySelectorAll('[data-cl-slot="accordion-trigger"]');
-      expect(triggers).toHaveLength(3);
-    });
-
-    it('renders panels with data-cl-slot when open', () => {
-      renderAccordion({ defaultValue: ['item1'] });
-      expect(document.querySelector('[data-cl-slot="accordion-panel"]')).toBeInTheDocument();
-    });
-  });
-
   describe('expand/collapse', () => {
     it('opens an item on trigger click', async () => {
       const user = userEvent.setup();
@@ -70,8 +49,8 @@ describe('Accordion', () => {
 
       await user.click(screen.getByRole('button', { name: 'Section 1' }));
 
-      const item = document.querySelectorAll('[data-cl-slot="accordion-item"]')[0];
-      expect(item).toHaveAttribute('data-cl-open', '');
+      const item = document.querySelectorAll('[data-testid="accordion-item"]')[0];
+      expect(item).toHaveAttribute('data-open', '');
       expect(screen.getByText('Content 1')).toBeInTheDocument();
     });
 
@@ -81,8 +60,8 @@ describe('Accordion', () => {
 
       await user.click(screen.getByRole('button', { name: 'Section 1' }));
 
-      const item = document.querySelectorAll('[data-cl-slot="accordion-item"]')[0];
-      expect(item).toHaveAttribute('data-cl-closed', '');
+      const item = document.querySelectorAll('[data-testid="accordion-item"]')[0];
+      expect(item).toHaveAttribute('data-closed', '');
     });
 
     it('calls onValueChange when toggled', async () => {
@@ -152,7 +131,7 @@ describe('Accordion', () => {
     it('trigger has aria-controls linked to panel id', () => {
       renderAccordion({ defaultValue: ['item1'] });
       const trigger = screen.getByRole('button', { name: 'Section 1' });
-      const panel = document.querySelector('[data-cl-slot="accordion-panel"]');
+      const panel = document.querySelector('[data-testid="accordion-panel"]');
 
       expect(trigger).toHaveAttribute('aria-controls', panel?.getAttribute('id'));
     });
@@ -160,7 +139,7 @@ describe('Accordion', () => {
     it('panel has aria-labelledby linked to trigger id', () => {
       renderAccordion({ defaultValue: ['item1'] });
       const trigger = screen.getByRole('button', { name: 'Section 1' });
-      const panel = document.querySelector('[data-cl-slot="accordion-panel"]');
+      const panel = document.querySelector('[data-testid="accordion-panel"]');
 
       expect(panel).toHaveAttribute('aria-labelledby', trigger.getAttribute('id'));
     });
@@ -170,14 +149,19 @@ describe('Accordion', () => {
         <Accordion.Root defaultValue={['item1']}>
           <Accordion.Item value='item1'>
             <Accordion.Header>
-              <Accordion.Trigger id='consumer-trigger-id'>Section 1</Accordion.Trigger>
+              <Accordion.Trigger
+                id='consumer-trigger-id'
+                data-testid='accordion-trigger'
+              >
+                Section 1
+              </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Panel>Content 1</Accordion.Panel>
+            <Accordion.Panel data-testid='accordion-panel'>Content 1</Accordion.Panel>
           </Accordion.Item>
         </Accordion.Root>,
       );
       const trigger = screen.getByRole('button', { name: 'Section 1' });
-      const panel = document.querySelector('[data-cl-slot="accordion-panel"]');
+      const panel = document.querySelector('[data-testid="accordion-panel"]');
 
       // The wired ids are owned by the primitive: a consumer-supplied id must
       // not silently break the aria pairing between trigger and panel.
@@ -194,19 +178,19 @@ describe('Accordion', () => {
   describe('animation lifecycle', () => {
     it('panel is not in DOM when closed', () => {
       renderAccordion();
-      expect(document.querySelector('[data-cl-slot="accordion-panel"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="accordion-panel"]')).not.toBeInTheDocument();
     });
 
-    it('applies data-cl-open on panel when open', () => {
+    it('applies data-open on panel when open', () => {
       renderAccordion({ defaultValue: ['item1'] });
-      const panel = document.querySelector('[data-cl-slot="accordion-panel"]');
-      expect(panel).toHaveAttribute('data-cl-open', '');
+      const panel = document.querySelector('[data-testid="accordion-panel"]');
+      expect(panel).toHaveAttribute('data-open', '');
     });
 
     it('does not apply starting-style on initially open panels', () => {
       renderAccordion({ defaultValue: ['item1'] });
-      const panel = document.querySelector('[data-cl-slot="accordion-panel"]');
-      expect(panel).not.toHaveAttribute('data-cl-starting-style');
+      const panel = document.querySelector('[data-testid="accordion-panel"]');
+      expect(panel).not.toHaveAttribute('data-starting-style');
     });
 
     it('pins --cl-accordion-panel-height while the open animation is in progress', () => {
@@ -217,7 +201,7 @@ describe('Accordion', () => {
       ];
       try {
         renderAccordion({ defaultValue: ['item1'] });
-        const panel = document.querySelector('[data-cl-slot="accordion-panel"]') as HTMLElement;
+        const panel = document.querySelector('[data-testid="accordion-panel"]') as HTMLElement;
         expect(panel.getAttribute('style')).toContain('--cl-accordion-panel-height');
       } finally {
         if (original) {
@@ -232,7 +216,7 @@ describe('Accordion', () => {
       // With no running animations the panel drops the measured pixel height so it
       // flows naturally with its content.
       renderAccordion({ defaultValue: ['item1'] });
-      const panel = document.querySelector('[data-cl-slot="accordion-panel"]') as HTMLElement;
+      const panel = document.querySelector('[data-testid="accordion-panel"]') as HTMLElement;
       expect(panel.getAttribute('style') ?? '').not.toContain('--cl-accordion-panel-height');
     });
   });
@@ -286,25 +270,26 @@ describe('Accordion', () => {
       expect(onValueChange).toHaveBeenCalledWith(['item2']);
     });
 
-    it('applies data-cl-disabled on item and trigger', () => {
+    it('applies data-disabled on item and trigger', () => {
       render(
         <Accordion.Root>
           <Accordion.Item
             value='item1'
             disabled
+            data-testid='accordion-item'
           >
             <Accordion.Header>
-              <Accordion.Trigger>Disabled</Accordion.Trigger>
+              <Accordion.Trigger data-testid='accordion-trigger'>Disabled</Accordion.Trigger>
             </Accordion.Header>
             <Accordion.Panel>Content</Accordion.Panel>
           </Accordion.Item>
         </Accordion.Root>,
       );
 
-      const item = document.querySelector('[data-cl-slot="accordion-item"]');
-      const trigger = document.querySelector('[data-cl-slot="accordion-trigger"]');
-      expect(item).toHaveAttribute('data-cl-disabled', '');
-      expect(trigger).toHaveAttribute('data-cl-disabled', '');
+      const item = document.querySelector('[data-testid="accordion-item"]');
+      const trigger = document.querySelector('[data-testid="accordion-trigger"]');
+      expect(item).toHaveAttribute('data-disabled', '');
+      expect(trigger).toHaveAttribute('data-disabled', '');
     });
   });
 

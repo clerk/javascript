@@ -13,11 +13,11 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
   test.beforeAll(async () => {
     const m = createTestUtils({ app });
-    fakeAdmin = m.services.users.createFakeUser();
+    fakeAdmin = m.services.users.createFakeUser(test);
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
 
-    fakeAdmin2 = m.services.users.createFakeUser();
+    fakeAdmin2 = m.services.users.createFakeUser(test);
     const admin2 = await m.services.users.createBapiUser(fakeAdmin2);
     fakeOrganization2 = await m.services.users.createFakeOrganization(admin2.id);
   });
@@ -222,7 +222,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
   test('SignUpButton renders and respects props', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeAdmin = u.services.users.createFakeUser({
+    const fakeAdmin = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,

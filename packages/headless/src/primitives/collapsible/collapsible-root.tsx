@@ -3,7 +3,7 @@
 import { type ReactNode, useId, useMemo } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { CollapsibleContext, type CollapsibleContextValue } from './collapsible-context';
 
 export interface CollapsibleProps extends ComponentProps<'div'> {
@@ -35,19 +35,18 @@ export function CollapsibleRoot(props: CollapsibleProps) {
   const state = { open, disabled };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'collapsible-root',
     children,
   };
 
   return (
     <CollapsibleContext.Provider value={contextValue}>
-      {renderElement({
+      {useRender({
         defaultTagName: 'div',
         render,
         state,
         stateAttributesMapping: {
-          open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
-          disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+          open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
+          disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
         },
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}

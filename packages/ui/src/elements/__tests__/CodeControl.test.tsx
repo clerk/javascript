@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 
-import { OTPCodeControl, OTPRoot, useFieldOTP } from '../CodeControl';
+import { OTPCodeControl, OTPInputSlot, OTPRoot, useFieldOTP } from '../CodeControl';
 import { withCardStateProvider } from '../contexts';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -51,6 +51,25 @@ const typeCode = async (input: HTMLElement, user: UserEvent, code = '123456') =>
 };
 
 describe('CodeControl', () => {
+  describe('OTPInputSlot', () => {
+    it('allows its dimensions to be overridden', async () => {
+      const { wrapper } = await createFixtures();
+
+      const { getByTestId } = render(
+        <OTPInputSlot
+          char={null}
+          hasFakeCaret={false}
+          isActive={false}
+          placeholderChar={null}
+          sx={{ width: '2rem', height: '2rem' }}
+        />,
+        { wrapper },
+      );
+
+      expect(getByTestId(testId)).toHaveStyle({ width: '2rem', height: '2rem' });
+    });
+  });
+
   describe('OTPCodeControl', () => {
     it('renders 6 "fake" input fields by default', async () => {
       const { wrapper } = await createFixtures();

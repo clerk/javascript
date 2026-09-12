@@ -63,6 +63,7 @@ export const itIT: LocalizationResource = {
   badge__canceledEndsAt: "Cancellato • Termina {{ date | shortDate('it-IT') }}",
   badge__currentPlan: 'Piano attuale',
   badge__default: 'Predefinito',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termina {{ date | shortDate('it-IT') }}",
   badge__expired: 'Scaduto',
   badge__freeTrial: undefined,
@@ -103,8 +104,11 @@ export const itIT: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Non puoi abbonarti a questo piano. Il tuo abbonamento esistente è più costoso di questo piano.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Il pagamento è andato a buon fine.',
       description__subscriptionSuccessful: 'Il tuo nuovo abbonamento è pronto.',
+      discount: undefined,
       downgradeNotice:
         'Manterrai il tuo abbonamento attuale e le sue funzionalità fino alla fine del ciclo di fatturazione, quindi passerai a questo abbonamento.',
       emailForm: {
@@ -121,6 +125,8 @@ export const itIT: LocalizationResource = {
       },
       pastDueNotice: 'Il tuo precedente abbonamento era scaduto, senza alcun pagamento.',
       perMonth: 'al mese',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Checkout',
       title__paymentSuccessful: 'Pagamento riuscito!',
       title__subscriptionSuccessful: 'Successo!',
@@ -131,6 +137,9 @@ export const itIT: LocalizationResource = {
     credit: 'Credito',
     creditRemainder: 'Credito per il resto del tuo abbonamento attuale.',
     defaultFreePlanActive: 'Attualmente sei sul piano Gratuito',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuito',
     getStarted: 'Inizia',
     highlightedPlanBadge: 'Popolare',
@@ -142,6 +151,7 @@ export const itIT: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensile',
+    months: undefined,
     pastDue: 'Scaduto',
     pay: 'Paga {{amount}}',
     payerCreditRemainder: undefined,
@@ -220,6 +230,84 @@ export const itIT: LocalizationResource = {
     year: 'Anno',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -246,6 +334,79 @@ export const itIT: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +793,10 @@ export const itIT: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contatta l'amministratore della tua organizzazione per ampliare i tuoi permessi.",
@@ -685,6 +850,10 @@ export const itIT: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Provider SAML personalizzato',
         google: undefined,
@@ -861,11 +1030,53 @@ export const itIT: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Crea organizzazione',
@@ -1079,6 +1290,25 @@ export const itIT: LocalizationResource = {
       title: 'Rimuovi dominio',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1313,6 +1543,10 @@ export const itIT: LocalizationResource = {
         subtitleNewTab: 'Ritorna sulla nuova scheda aperta per continuare',
         titleNewTab: "Accedi da un'altra scheda",
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Usa il link di verifica inviato alla tua email',
@@ -1323,6 +1557,9 @@ export const itIT: LocalizationResource = {
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Codice di reset della password',
@@ -1388,6 +1625,15 @@ export const itIT: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Dobbiamo verificare la tua identità prima di resettare la tua password.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrati',
@@ -1662,6 +1908,7 @@ export const itIT: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Password errata.',
     form_password_length_too_short: 'La password deve avere almeno 8 caratteri.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'La tua password non è abbastanza forte.',
     form_password_or_identifier_incorrect: "La password o l'indirizzo email è errato. Riprova o usa un altro metodo.",
     form_password_pwned: 'Questa password è stata trovata in una violazione dei dati. Scegli una password diversa.',
@@ -1711,6 +1958,8 @@ export const itIT: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Sei già loggato.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Hai rifiutato la richiesta di firma. Riprova per continuare.',
     web3_solana_signature_generation_failed:

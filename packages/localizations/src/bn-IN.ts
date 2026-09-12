@@ -63,6 +63,7 @@ export const bnIN: LocalizationResource = {
   badge__canceledEndsAt: "বাতিল • শেষ {{ date | shortDate('bn-IN') }}",
   badge__currentPlan: 'বর্তমান প্ল্যান',
   badge__default: 'ডিফল্ট',
+  badge__deprovisioned: undefined,
   badge__endsAt: "শেষ {{ date | shortDate('bn-IN') }}",
   badge__expired: 'মেয়াদ শেষ',
   badge__freeTrial: 'বিনামূল্যের ট্রায়াল',
@@ -104,8 +105,11 @@ export const bnIN: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'আপনি এই প্ল্যানে সাবস্ক্রাইব করতে পারবেন না। আপনার বিদ্যমান সাবস্ক্রিপশন এই প্ল্যানের চেয়ে বেশি ব্যয়বহুল।',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'আপনার পেমেন্ট সফল হয়েছে।',
       description__subscriptionSuccessful: 'আপনার নতুন সাবস্ক্রিপশন সম্পূর্ণ প্রস্তুত।',
+      discount: undefined,
       downgradeNotice:
         'বিলিং চক্রের শেষ পর্যন্ত আপনি আপনার বর্তমান সাবস্ক্রিপশন এবং এর বৈশিষ্ট্যগুলি রাখবেন, তারপরে আপনাকে এই সাবস্ক্রিপশনে স্যুইচ করা হবে।',
       emailForm: {
@@ -121,6 +125,8 @@ export const bnIN: LocalizationResource = {
       },
       pastDueNotice: 'আপনার পূর্ববর্তী সাবস্ক্রিপশন বকেয়া ছিল, কোনো পেমেন্ট ছাড়াই।',
       perMonth: 'প্রতি মাসে',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'চেকআউট',
       title__paymentSuccessful: 'পেমেন্ট সফল হয়েছে!',
       title__subscriptionSuccessful: 'সফল!',
@@ -131,6 +137,9 @@ export const bnIN: LocalizationResource = {
     credit: 'ক্রেডিট',
     creditRemainder: 'আপনার বর্তমান সাবস্ক্রিপশনের অবশিষ্ট সময়ের জন্য ক্রেডিট।',
     defaultFreePlanActive: 'আপনি বর্তমানে বিনামূল্যের প্ল্যানে আছেন',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'বিনামূল্যে',
     getStarted: 'শুরু করুন',
     highlightedPlanBadge: 'জনপ্রিয়',
@@ -142,6 +151,7 @@ export const bnIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'মাসিক',
+    months: undefined,
     pastDue: 'বকেয়া',
     pay: '{{amount}} পরিশোধ করুন',
     payerCreditRemainder: undefined,
@@ -220,6 +230,84 @@ export const bnIN: LocalizationResource = {
     year: 'বছর',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -246,6 +334,79 @@ export const bnIN: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +793,10 @@ export const bnIN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'আপনার অনুমতি আপগ্রেড করতে আপনার সংস্থার প্রশাসকের সাথে যোগাযোগ করুন।',
@@ -685,6 +850,10 @@ export const bnIN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'কাস্টম SAML প্রদানকারী',
         google: undefined,
@@ -860,11 +1029,53 @@ export const bnIN: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'সংগঠন তৈরি করুন',
@@ -1078,6 +1289,25 @@ export const bnIN: LocalizationResource = {
       title: 'ডোমেন সরান',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1313,6 +1543,10 @@ export const bnIN: LocalizationResource = {
         subtitleNewTab: 'চালিয়ে যেতে নতুন খোলা ট্যাবে ফিরে যান',
         titleNewTab: 'অন্য ট্যাবে সাইন ইন হয়েছে',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'আপনার ইমেইলে পাঠানো যাচাইকরণ লিঙ্কটি ব্যবহার করুন',
@@ -1323,6 +1557,9 @@ export const bnIN: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'আপনি যে এন্টারপ্রাইজ অ্যাকাউন্ট দিয়ে চালিয়ে যেতে চান তা নির্বাচন করুন।',
       title: 'আপনার এন্টারপ্রাইজ অ্যাকাউন্ট বেছে নিন',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'পাসওয়ার্ড রিসেট কোড',
@@ -1390,6 +1627,15 @@ export const bnIN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'আপনার পাসওয়ার্ড রিসেট করার আগে আমাদের আপনার পরিচয় যাচাই করতে হবে।',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'সাইন আপ করুন',
@@ -1672,6 +1918,7 @@ export const bnIN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'আপনার পাসওয়ার্ড যথেষ্ট শক্তিশালী নয়।',
     form_password_or_identifier_incorrect:
       'পাসওয়ার্ড বা ইমেইল ঠিকানা ভুল। আবার চেষ্টা করুন বা অন্য পদ্ধতি ব্যবহার করুন।',
@@ -1727,6 +1974,8 @@ export const bnIN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'একটি Web3 ওয়ালেট এক্সটেনশন পাওয়া যায়নি। চালিয়ে যেতে দয়া করে একটি ইনস্টল করুন।',
     web3_signature_request_rejected:
       'আপনি সিগনেচার অনুরোধটি প্রত্যাখ্যান করেছেন। চালিয়ে যেতে অনুগ্রহ করে আবার চেষ্টা করুন।',

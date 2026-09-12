@@ -63,10 +63,12 @@ function registerClerkAppProtocol() {
   });
 }
 
-app.whenReady().then(async () => {
-  registerClerkAppProtocol();
-  await createWindow();
-});
+if (clerk.isPrimaryInstance) {
+  app.whenReady().then(async () => {
+    registerClerkAppProtocol();
+    await createWindow();
+  });
+}
 
 app.on('window-all-closed', () => {
   app.quit();

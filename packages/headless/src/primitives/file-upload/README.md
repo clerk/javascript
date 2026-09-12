@@ -12,7 +12,7 @@ picker and dropped files), single/multiple modes, and a disabled state.
 - Avatar / logo pickers (single mode) or multi-file attachment lists (multiple mode).
 
 The primitive owns a hidden `<input type="file">` internally, so you never render one yourself. It
-emits zero styles — everything is driven by `data-cl-*` attributes.
+emits zero styles — everything is driven by `data-*` attributes.
 
 ## Usage
 
@@ -147,13 +147,12 @@ standard HTML attributes for their default element.
 
 ## Data Attributes
 
-| Attribute          | Applies To                          | Description                                     |
-| ------------------ | ----------------------------------- | ----------------------------------------------- |
-| `data-cl-slot`     | All parts                           | Part identifier (e.g. `"file-upload-dropzone"`) |
-| `data-cl-empty`    | Root                                | Present when no files are selected              |
-| `data-cl-dragging` | Dropzone                            | Present while a valid drag is over the zone     |
-| `data-cl-image`    | Item                                | Present when the item's file is an image        |
-| `data-cl-disabled` | Root, Trigger, Dropzone, ItemDelete | Present when disabled                           |
+| Attribute       | Applies To                          | Description                                 |
+| --------------- | ----------------------------------- | ------------------------------------------- |
+| `data-empty`    | Root                                | Present when no files are selected          |
+| `data-dragging` | Dropzone                            | Present while a valid drag is over the zone |
+| `data-image`    | Item                                | Present when the item's file is an image    |
+| `data-disabled` | Root, Trigger, Dropzone, ItemDelete | Present when disabled                       |
 
 ## ARIA
 

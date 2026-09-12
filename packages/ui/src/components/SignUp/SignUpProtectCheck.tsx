@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type { SignUpProps, SignUpResource } from '@clerk/shared/types';
 import { type ComponentType, useEffect, useRef, useState } from 'react';
 
@@ -7,7 +6,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 
 import { withRedirectToAfterSignUp } from '../../common';
-import { useCoreSignUp, useSignUpContext } from '../../contexts';
+import { useCoreSignUp } from '../../contexts';
 import {
   Box,
   Button,
@@ -22,8 +21,7 @@ import {
 import { useSpinDelay } from '../../hooks';
 import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
-import { useRouter } from '../../router';
-import { completeSignUpFlow } from './util';
+import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 /**
  * Continuation paths default to the standalone `/sign-up/protect-check` mount. When the card is
@@ -48,10 +46,8 @@ function SignUpProtectCheckInternal({
   const card = useCardState();
   const { t } = useLocalizations();
   const signUp = useCoreSignUp();
-  const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
-  const { setActive } = useClerk();
-  const { afterSignUpUrl, navigateOnSetActive } = useSignUpContext();
+  const completeSignUpFlow = useCompleteSignUpFlow();
   // Latches that a protect check existed at some point, so the resolution race
   // (submitProtectCheck clearing protectCheck mid-navigation) isn't mistaken for
   // a stale visit. State adjusted during render (guarded) rather than a ref
@@ -89,14 +85,6 @@ function SignUpProtectCheckInternal({
         verifyPhonePath,
         protectCheckPath, // Defaults to '.' so a chained challenge re-runs this same route
         continuePath,
-        handleComplete: () =>
-          setActive({
-            session: updatedSignUp.createdSessionId,
-            navigate: async ({ session, decorateUrl }) => {
-              await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-            },
-          }),
-        navigate,
       });
     },
   });

@@ -36,7 +36,7 @@ export type UpdateRestrictionsParams = {
   blocklist?: boolean | null | undefined;
   /** Whether the instance should have [**Block email subaddresses**](https://clerk.com/docs/guides/secure/restricting-access#block-email-subaddresses) enabled. */
   blockEmailSubaddresses?: boolean | null | undefined;
-  /** Whether the instance should have [**Block sign-ups that use disposable email domains**](https://clerk.com/docs/guides/secure/restricting-access#block-sign-ups-that-use-disposable-email-addresses) enabled. */
+  /** Whether the instance should have [**Block sign-ups that use disposable email addresses**](https://clerk.com/docs/guides/secure/restricting-access#block-sign-ups-that-use-disposable-email-addresses) enabled. */
   blockDisposableEmailDomains?: boolean | null | undefined;
   /** Whether the instance should [ignore dots for Gmail addresses](https://clerk.com/docs/guides/secure/restricting-access#block-email-subaddresses). */
   ignoreDotsForGmailAddresses?: boolean | null | undefined;

@@ -41,7 +41,7 @@ export default defineNuxtModule<ModuleOptions>({
     version: PACKAGE_VERSION,
     configKey: 'clerk',
     compatibility: {
-      nuxt: '>=3.0.0',
+      nuxt: '>=4.0.0',
     },
   },
   setup(options, nuxt) {
@@ -134,10 +134,6 @@ export default defineNuxtModule<ModuleOptions>({
     // Add auto-imports for Clerk components, composables and client utils
     addImportsDir(resolver.resolve('./runtime/composables'));
     addImports([
-      {
-        name: 'createRouteMatcher',
-        from: resolver.resolve('./runtime/client'),
-      },
       {
         name: 'updateClerkOptions',
         from: resolver.resolve('./runtime/client'),

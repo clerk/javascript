@@ -24,6 +24,7 @@ import {
 import { type ReactNode, type RefObject, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
+import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { cssVars } from '../../utils/css-vars';
 import { SelectContext, type SelectContextValue, type SelectItem } from './select-context';
@@ -133,6 +134,8 @@ function SelectInner(props: SelectProps) {
     whileElementsMounted: autoUpdate,
   });
 
+  const returnFocusRef = useReturnFocus(floatingContext);
+
   const { mounted, transitionProps } = useTransition({
     open,
     ref: popupRef,
@@ -213,6 +216,7 @@ function SelectInner(props: SelectProps) {
       labelsRef,
       popupRef,
       arrowRef,
+      returnFocusRef,
       valueToLabelRef,
       selectedItemRef,
       alignItemWithTrigger: alignProp,
@@ -236,6 +240,7 @@ function SelectInner(props: SelectProps) {
       setSelectedIndex,
       selectedValue,
       selectedLabel,
+      returnFocusRef,
       alignProp,
       handleSelect,
       mounted,

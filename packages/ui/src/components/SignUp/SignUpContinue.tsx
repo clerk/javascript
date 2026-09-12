@@ -23,7 +23,7 @@ import {
   minimizeFieldsForExistingSignup,
 } from './signUpFormHelpers';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
-import { completeSignUpFlow } from './util';
+import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 function SignUpContinueInternal() {
   const card = useCardState();
@@ -32,14 +32,7 @@ function SignUpContinueInternal() {
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes, usernameSettings } = userSettings;
   const { t, locale } = useLocalizations();
-  const {
-    afterSignUpUrl,
-    signInUrl,
-    unsafeMetadata,
-    initialValues = {},
-    isCombinedFlow: _isCombinedFlow,
-    navigateOnSetActive,
-  } = useSignUpContext();
+  const { signInUrl, unsafeMetadata, initialValues = {}, isCombinedFlow: _isCombinedFlow } = useSignUpContext();
   const signUp = useCoreSignUp();
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const isCombinedFlow = !!(_isCombinedFlow && !!isWithinSignInContext);
@@ -47,7 +40,7 @@ function SignUpContinueInternal() {
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
-  const ctx = useSignUpContext();
+  const completeSignUpFlow = useCompleteSignUpFlow();
 
   // TODO: This form should be shared between SignUpStart and SignUpContinue
   const formState = {
@@ -180,15 +173,6 @@ function SignUpContinueInternal() {
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
           protectCheckPath: '../protect-check',
-          handleComplete: () =>
-            clerk.setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-              },
-            }),
-          navigate,
-          oidcPrompt: ctx.oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))

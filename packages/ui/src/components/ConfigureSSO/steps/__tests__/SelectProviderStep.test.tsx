@@ -93,7 +93,7 @@ describe('SelectProviderStep', () => {
     // Each provider card is a <label> wrapping a visually-hidden native radio; the
     // aria-hidden icon span lives inside it.
     const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
-    expect(iconSpans).toHaveLength(4);
+    expect(iconSpans).toHaveLength(5);
 
     const collectedStyles = [
       ...Array.from(document.head.querySelectorAll('style')).map(s => s.textContent ?? ''),
@@ -103,6 +103,16 @@ describe('SelectProviderStep', () => {
     expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/okta\.svg/);
     expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/saml\.svg/);
     expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/google\.svg/);
+    expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/oidc\.svg/);
+  });
+
+  it('renders the OIDC provider tile', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    const { container } = renderStep(wrapper);
+
+    expect(screen.getByRole('radio', { name: 'Okta Workforce' })).toBeInTheDocument();
+    expect(container.querySelector('input[value="oidc_custom"]')).toBeInTheDocument();
   });
 
   it('disables Continue when no provider is selected', async () => {

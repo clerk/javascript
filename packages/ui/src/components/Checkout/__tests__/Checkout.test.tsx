@@ -1645,6 +1645,177 @@ describe('Checkout', () => {
     });
   });
 
+  describe('promo codes', () => {
+    const money = (amount: number, amountFormatted: string) => ({
+      amount,
+      amountFormatted,
+      currency: 'USD',
+      currencySymbol: '$',
+    });
+
+    const plan = {
+      id: 'plan_promo',
+      name: 'Pro',
+      description: 'Pro plan',
+      features: [],
+      fee: money(12989, '129.89'),
+      annualFee: money(155868, '1,558.68'),
+      annualMonthlyFee: money(12989, '129.89'),
+      slug: 'pro',
+      avatarUrl: '',
+      publiclyVisible: true,
+      isDefault: true,
+      isRecurring: true,
+      hasBaseFee: true,
+      forPayerType: 'user',
+      freeTrialDays: 0,
+      freeTrialEnabled: false,
+    };
+
+    const checkout = {
+      id: 'chk_promo',
+      status: 'needs_confirmation',
+      externalClientSecret: 'cs_test_promo',
+      externalGatewayId: 'gw_test',
+      totals: {
+        subtotal: money(12989, '129.89'),
+        baseFee: money(12989, '129.89'),
+        grandTotal: money(12989, '129.89'),
+        taxTotal: money(0, '0.00'),
+        credit: money(0, '0.00'),
+        pastDue: money(0, '0.00'),
+        totalDueNow: money(12989, '129.89'),
+        totalDuePerPeriod: money(12989, '129.89'),
+        discounts: null,
+      },
+      isImmediatePlanChange: true,
+      planPeriod: 'month',
+      plan,
+      payer: { organizationId: null },
+      paymentMethod: undefined,
+      confirm: vi.fn(),
+      freeTrialEndsAt: null,
+      needsPaymentMethod: false,
+    };
+
+    it('shows an inline error when a promo code cannot be applied', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+      fixtures.clerk.billing.startCheckout.mockResolvedValue(checkout as any);
+      fixtures.clerk.billing.updateCheckout.mockRejectedValue(new Error('Invalid promo code'));
+
+      const { baseElement, getByRole, userEvent } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_promo_error'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      const input = await waitFor(() => getByRole('textbox', { name: 'Enter promo code' }));
+      const lineItemsRoot = baseElement.querySelector('.cl-checkoutFormLineItemsRoot');
+      expect(lineItemsRoot?.nextElementSibling).toContainElement(input);
+      await userEvent.type(input, 'INVALID');
+      await userEvent.click(getByRole('button', { name: 'Apply' }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.billing.updateCheckout).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 'chk_promo', promoCode: 'INVALID' }),
+        );
+        expect(input).toHaveAttribute('aria-invalid', 'true');
+        expect(getByRole('alert')).toHaveTextContent('Invalid promo code');
+      });
+    });
+
+    it('shows and removes an applied promo code with its applied amount and duration', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      const appliedCheckout = {
+        ...checkout,
+        totals: {
+          ...checkout.totals,
+          grandTotal: money(10391, '103.91'),
+          totalDueNow: money(10391, '103.91'),
+          discounts: {
+            proration: {
+              amount: money(500, '5.00'),
+              cycleDaysPassed: 15,
+              cycleDaysTotal: 30,
+              cyclePassedPercent: 50,
+            },
+            discount: {
+              amount: money(2598, '25.98'),
+              amountOff: money(5000, '50.00'),
+              discountId: 'disc_20',
+              name: '20% off first month',
+              effect: 'percentage',
+              percentOff: 20,
+              promoCode: 'WELCOME20',
+              cyclesRemaining: 1,
+              durationInCycles: 1,
+            },
+            total: money(2598, '25.98'),
+          },
+        },
+      };
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+      fixtures.clerk.billing.startCheckout.mockResolvedValue(checkout as any);
+      fixtures.clerk.billing.updateCheckout
+        .mockResolvedValueOnce(appliedCheckout as any)
+        .mockResolvedValueOnce(checkout as any);
+
+      const { getByRole, getByText, queryByRole, queryByText, userEvent } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_promo_success'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await userEvent.type(await waitFor(() => getByRole('textbox', { name: 'Enter promo code' })), 'WELCOME20');
+      await userEvent.click(getByRole('button', { name: 'Apply' }));
+
+      await waitFor(() => {
+        expect(getByText('WELCOME20')).toBeVisible();
+        expect(getByText('20% off first 1 month')).toBeVisible();
+        expect(getByText('-$25.98')).toBeVisible();
+        expect(queryByText('-$50.00')).toBeNull();
+        expect(getByText('Prorated discount').closest('.cl-lineItemsGroup')?.nextElementSibling).toBe(
+          getByText('WELCOME20').closest('.cl-lineItemsGroup'),
+        );
+        expect(queryByRole('textbox', { name: 'Enter promo code' })).toBeNull();
+      });
+
+      await userEvent.click(getByRole('button', { name: 'Remove promo code' }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.billing.updateCheckout).toHaveBeenLastCalledWith(
+          expect.objectContaining({ id: 'chk_promo', promoCode: '' }),
+        );
+        expect(queryByText('WELCOME20')).toBeNull();
+        expect(getByRole('textbox', { name: 'Enter promo code' })).toBeVisible();
+      });
+    });
+  });
+
   describe('differentiates between new subscriptions and mid-cycle seat additions in checkout totals', () => {
     const proPlan = {
       id: 'plan_totals',

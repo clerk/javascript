@@ -5,7 +5,7 @@ import * as TabsStories from './tabs.stories';
 A set of layered sections where one panel is shown at a time, selected from a row of tabs,
 from `@clerk/headless`. It is a **headless** primitive: it supplies behavior, active-tab
 state, roving-tabindex keyboard navigation, an optional position-tracking indicator, and
-ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the `data-cl-*`
+ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the `data-*`
 attributes each part emits.
 
 ## Example
@@ -93,18 +93,17 @@ attributes for their default element.
 
 ## Styling
 
-Each part emits `data-cl-*` attributes you can target with any CSS solution:
+Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute                | Applies To   | Description                                                      |
-| ------------------------ | ------------ | ---------------------------------------------------------------- |
-| `data-cl-slot`           | All parts    | Part identifier                                                  |
-| `data-cl-selected`       | Tab, Trigger | Present on the active tab                                        |
-| `data-cl-disabled`       | Tab, Trigger | Present when the tab is disabled                                 |
-| `data-cl-hidden`         | Panel        | Present when the panel is not selected                           |
-| `data-cl-open`           | Panel        | Present while open (force-mounted panels only)                   |
-| `data-cl-closed`         | Panel        | Present while mounted-but-deselected (force-mounted panels only) |
-| `data-cl-starting-style` | Panel        | Enter-animation first frame (force-mounted panels only)          |
-| `data-cl-ending-style`   | Panel        | Exit-animation frame (force-mounted panels only)                 |
+| Attribute             | Applies To   | Description                                                      |
+| --------------------- | ------------ | ---------------------------------------------------------------- |
+| `data-selected`       | Tab, Trigger | Present on the active tab                                        |
+| `data-disabled`       | Tab, Trigger | Present when the tab is disabled                                 |
+| `data-hidden`         | Panel        | Present when the panel is not selected                           |
+| `data-open`           | Panel        | Present while open (force-mounted panels only)                   |
+| `data-closed`         | Panel        | Present while mounted-but-deselected (force-mounted panels only) |
+| `data-starting-style` | Panel        | Enter-animation first frame (force-mounted panels only)          |
+| `data-ending-style`   | Panel        | Exit-animation frame (force-mounted panels only)                 |
 
 `Tabs.Indicator` is absolutely positioned and exposes the active tab's geometry as CSS
 variables (give `Tabs.List` `position: relative`):
@@ -120,7 +119,7 @@ A force-mounted `Tabs.Panel` also exposes `--cl-tab-transition-direction` (`1` w
 to a later tab, `-1` to an earlier one) for directional slide animations.
 
 ```css
-[data-cl-slot='tabs-indicator'] {
+.cl-tabs-indicator {
   position: absolute;
   left: var(--cl-tab-left);
   width: var(--cl-tab-width);

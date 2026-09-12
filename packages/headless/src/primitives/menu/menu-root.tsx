@@ -25,8 +25,10 @@ import {
 import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
+import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { cssVars } from '../../utils/css-vars';
+import { resolveSideOffset, type SideOffset } from '../../utils/side-offset';
 import { MenuContext, type MenuContextValue } from './menu-context';
 
 export interface MenuProps {
@@ -34,18 +36,31 @@ export interface MenuProps {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   placement?: Placement;
-  sideOffset?: number;
+  /**
+   * The gap between the trigger and the menu, in px. `{ x, y }` gives the horizontal and vertical
+   * placements a gap each, for a menu that can flip between the two axes.
+   */
+  sideOffset?: SideOffset;
+  /**
+   * Where the menu goes when `placement` does not fit, in the order it tries them. Defaults to the
+   * opposite side. A menu opened from inside another floating surface wants this: the opposite side
+   * is that surface, so it has to be given somewhere else to land.
+   */
+  fallbackPlacements?: Placement[];
   children: ReactNode;
 }
 
 function MenuInner(props: MenuProps) {
-  const { placement: placementProp, sideOffset, children } = props;
+  const { placement: placementProp, sideOffset, fallbackPlacements, children } = props;
 
   const parentContext = useContext(MenuContext);
   const tree = useFloatingTree();
   const nodeId = useFloatingNodeId();
   const parentId = useFloatingParentNodeId();
-  const isNested = parentId != null;
+  // A submenu, not merely a menu inside some other floating element. A menu rendered in a popover
+  // has a parent node id too, and treating that as nesting makes it hover-open, side-placed, and
+  // unclickable by mouse.
+  const isNested = parentId != null && parentContext != null;
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -70,17 +85,19 @@ function MenuInner(props: MenuProps) {
     onOpenChange: setOpen,
     placement: resolvedPlacement,
     middleware: [
-      offset({
-        mainAxis: resolvedOffset,
+      offset(state => ({
+        mainAxis: resolveSideOffset(resolvedOffset, state.placement),
         alignmentAxis: isNested ? -4 : 0,
-      }),
-      flip(),
+      })),
+      flip({ fallbackPlacements }),
       shift({ padding: 5 }),
       arrow({ element: arrowRef }),
       cssVars({ sideOffset: resolvedOffset }),
     ],
     whileElementsMounted: autoUpdate,
   });
+
+  const returnFocusRef = useReturnFocus(floatingContext);
 
   const { mounted, transitionProps } = useTransition({
     open,
@@ -97,8 +114,20 @@ function MenuInner(props: MenuProps) {
     toggle: !isNested,
     ignoreMouse: isNested,
   });
-  const role = useRole(floatingContext, { role: 'menu' });
-  const dismiss = useDismiss(floatingContext, { bubbles: true });
+  const baseRole = useRole(floatingContext, { role: 'menu' });
+  // `useRole` decides submenu-ness from the floating tree alone, so a menu inside a popover gets
+  // `role="menuitem"` on its trigger with no parent menu to be an item of. `isNested` is the real answer.
+  const role = useMemo(() => {
+    if (isNested) {
+      return baseRole;
+    }
+    const reference = { ...baseRole.reference };
+    delete reference.role;
+    return { ...baseRole, reference };
+  }, [baseRole, isNested]);
+  // Escape must not bubble: it closes this menu and leaves whatever it sits inside — a parent menu,
+  // or a popover — open. An outside press is the opposite, and dismisses the whole stack.
+  const dismiss = useDismiss(floatingContext, { bubbles: { escapeKey: false, outsidePress: true } });
   const listNavigation = useListNavigation(floatingContext, {
     listRef: elementsRef,
     activeIndex,
@@ -166,6 +195,7 @@ function MenuInner(props: MenuProps) {
       labelsRef,
       arrowRef,
       popupRef,
+      returnFocusRef,
       isNested,
       mounted,
       transitionProps,
@@ -181,6 +211,7 @@ function MenuInner(props: MenuProps) {
       getFloatingProps,
       getItemProps,
       activeIndex,
+      returnFocusRef,
       isNested,
       mounted,
       transitionProps,

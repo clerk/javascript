@@ -18,7 +18,7 @@ test.describe('sign-in-or-up restricted mode @nextjs', () => {
     await app.dev();
 
     const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser();
+    fakeUser = m.services.users.createFakeUser(test);
   });
 
   test.afterAll(async () => {

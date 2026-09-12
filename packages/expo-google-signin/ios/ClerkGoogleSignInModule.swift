@@ -143,14 +143,19 @@ public class ClerkGoogleSignInModule: Module {
   }
 
   private func getPresentingViewController() -> UIViewController? {
-    guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-          let window = scene.windows.first,
+    let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+    let scene = scenes.first { $0.activationState == .foregroundActive }
+      ?? scenes.first { $0.activationState == .foregroundInactive }
+      ?? scenes.first
+
+    guard let window = scene?.windows.first(where: { $0.isKeyWindow && !$0.isHidden && $0.rootViewController != nil })
+            ?? scene?.windows.first(where: { !$0.isHidden && $0.rootViewController != nil }),
           let rootVC = window.rootViewController else {
       return nil
     }
 
     var topVC = rootVC
-    while let presentedVC = topVC.presentedViewController {
+    while let presentedVC = topVC.presentedViewController, !presentedVC.isBeingDismissed {
       topVC = presentedVC
     }
     return topVC

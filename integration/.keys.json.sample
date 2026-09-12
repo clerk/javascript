@@ -63,6 +63,10 @@
     "pk": "",
     "sk": ""
   },
+  "with-passkeys": {
+    "pk": "",
+    "sk": ""
+  },
   "with-enterprise-sso": {
     "pk": "",
     "sk": ""

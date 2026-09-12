@@ -1,4 +1,5 @@
 import type {
+  AttackProtectionData,
   Attributes,
   EnterpriseSSOSettings,
   OAuthProviders,
@@ -103,9 +104,11 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       name: 'passkey',
     },
   };
+  attackProtection: AttackProtectionData = { enumeration_protection: { enabled: false } };
   enterpriseSSO: EnterpriseSSOSettings = {
     enabled: false,
     self_serve_sso: false,
+    self_serve_directory_sync: false,
   };
   passkeySettings: PasskeySettingsData = {
     allow_autofill: false,
@@ -214,7 +217,19 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       this.attributes,
     );
     this.actions = this.withDefault(data.actions, this.actions);
-    this.enterpriseSSO = this.withDefault(data.enterprise_sso, this.enterpriseSSO);
+    // Normalize field-by-field rather than withDefault: a present-but-partial
+    // attack_protection object must not leave enumeration_protection undefined.
+    this.attackProtection = {
+      enumeration_protection: {
+        enabled:
+          data.attack_protection?.enumeration_protection?.enabled ??
+          this.attackProtection.enumeration_protection.enabled,
+      },
+    };
+    this.enterpriseSSO = {
+      ...this.withDefault(data.enterprise_sso, this.enterpriseSSO),
+      self_serve_directory_sync: data.enterprise_sso?.self_serve_directory_sync ?? false,
+    };
     this.passkeySettings = this.withDefault(data.passkey_settings, this.passkeySettings);
     this.passwordSettings = data.password_settings
       ? {
@@ -252,6 +267,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   public __internal_toSnapshot(): UserSettingsJSONSnapshot {
     return {
       actions: this.actions,
+      attack_protection: this.attackProtection,
       attributes: this.attributes,
       passkey_settings: this.passkeySettings,
       password_settings: this.passwordSettings,

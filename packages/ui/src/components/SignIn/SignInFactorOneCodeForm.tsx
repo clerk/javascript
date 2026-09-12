@@ -15,6 +15,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
+import { handleSignUpIfMissingTransfer } from './handleSignUpIfMissingTransfer';
 
 export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
@@ -28,6 +29,7 @@ export type SignInFactorOneCodeCard = Pick<
 export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
+  cardNotice?: LocalizationKey;
   inputLabel: LocalizationKey;
   resendButton: LocalizationKey;
   identityPreviewEditButtonAriaLabel: LocalizationKey;
@@ -37,7 +39,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
+  const ctx = useSignInContext();
+  const { afterSignInUrl, afterSignUpUrl, signUpIfMissingEnabled, navigateOnSetActive } = ctx;
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
@@ -141,6 +144,24 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
 
+        if (signUpIfMissingEnabled && signIn.firstFactorVerification.status === 'transferable') {
+          // The code itself was correct (`transferable` = verified, but no matching user), so
+          // mirror the success path above: resolve the OTP card, then navigate. Resolving also
+          // guarantees the card doesn't sit in a loading state forever if the transferred
+          // sign-up requires no further routing.
+          return resolve()
+            .then(() =>
+              handleSignUpIfMissingTransfer({
+                clerk,
+                navigate,
+                afterSignUpUrl,
+                navigateOnSetActive,
+                unsafeMetadata: ctx.unsafeMetadata,
+              }),
+            )
+            .catch(reject);
+        }
+
         return reject(err);
       });
   };
@@ -149,6 +170,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     <VerificationCodeCard
       cardTitle={props.cardTitle}
       cardSubtitle={props.cardSubtitle}
+      cardNotice={props.cardNotice}
       inputLabel={props.inputLabel}
       resendButton={props.resendButton}
       onCodeEntryFinishedAction={action}

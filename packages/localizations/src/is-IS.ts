@@ -63,6 +63,7 @@ export const isIS: LocalizationResource = {
   badge__canceledEndsAt: "Aflýst • Lýkur {{ date | shortDate('is-IS') }}",
   badge__currentPlan: 'Núverandi áskrift',
   badge__default: 'Sjálfgefið',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Lýkur {{ date | shortDate('is-IS') }}",
   badge__expired: 'Útrunnið',
   badge__freeTrial: 'Ókeypis prufuáskrift',
@@ -104,8 +105,11 @@ export const isIS: LocalizationResource = {
       'Þú getur ekki skráð þig í þessa áskrift með mánaðarlegri greiðslu. Til að skrá þig þarftu að velja árlega greiðslu.',
     cannotSubscribeUnrecoverable: 'Þú getur ekki skráð þig í þessa áskrift. Núverandi áskrift þín er dýrari en þessi.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Greiðsla þín tókst.',
       description__subscriptionSuccessful: 'Nýja áskriftin þín er tilbúin.',
+      discount: undefined,
       downgradeNotice:
         'Þú heldur núverandi áskrift og eiginleikum hennar til loka greiðslutímabilsins, síðan verður þú flutt yfir í þessa áskrift.',
       emailForm: {
@@ -121,6 +125,8 @@ export const isIS: LocalizationResource = {
       },
       pastDueNotice: 'Fyrri áskrift þín var gjaldfallin, án greiðslu.',
       perMonth: 'á mánuði',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Greiðsla',
       title__paymentSuccessful: 'Greiðsla tókst!',
       title__subscriptionSuccessful: 'Tókst!',
@@ -131,6 +137,9 @@ export const isIS: LocalizationResource = {
     credit: 'Inneign',
     creditRemainder: 'Inneign fyrir eftirstöðvar núverandi áskriftar.',
     defaultFreePlanActive: 'Þú ert á ókeypis áskrift',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Ókeypis',
     getStarted: 'Byrja',
     highlightedPlanBadge: 'Vinsælt',
@@ -142,6 +151,7 @@ export const isIS: LocalizationResource = {
     monthAbbreviation: 'mán.',
     monthPerUnit: 'Mánuður á {{unitName}}',
     monthly: 'Mánaðarlega',
+    months: undefined,
     pastDue: 'Gjaldfallið',
     pay: 'Greiða {{amount}}',
     payerCreditRemainder: 'Inneign frá reikningsstöðu.',
@@ -220,6 +230,84 @@ export const isIS: LocalizationResource = {
     year: 'Ár',
     yearAbbreviation: 'ár',
     yearPerUnit: 'Ár á {{unitName}}',
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -246,6 +334,79 @@ export const isIS: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +793,10 @@ export const isIS: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Hafðu samband við stjórnanda fyrirtækisins þíns til að uppfæra heimildir þínar.',
@@ -685,6 +850,10 @@ export const isIS: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Sérsniðinn SAML þjónustuaðili',
         google: undefined,
@@ -860,11 +1029,53 @@ export const isIS: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Stofna samtök',
@@ -1079,6 +1290,25 @@ export const isIS: LocalizationResource = {
       title: 'Fjarlægja lén',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1316,6 +1546,10 @@ export const isIS: LocalizationResource = {
         subtitleNewTab: 'Farðu aftur í nýopnaða flipann til að halda áfram',
         titleNewTab: 'Skráður inn á öðrum flipa',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Notaðu staðfestingartengilinn sem sendur var á tölvupóstinn þinn',
@@ -1326,6 +1560,9 @@ export const isIS: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'Veldu fyrirtækjareikninginn sem þú vilt halda áfram með.',
       title: 'Veldu fyrirtækjareikning',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Endurstilla lykilorð kóða',
@@ -1392,6 +1629,15 @@ export const isIS: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Við þurfum að staðfesta auðkenni þitt áður en við endurstillum lykilorðið þitt.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Skrá sig',
@@ -1676,6 +1922,7 @@ export const isIS: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Lykilorðið þitt er of stutt. Það verður að vera að minnsta kosti 8 stafir.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Lykilorðið þitt er ekki nógu sterkt.',
     form_password_or_identifier_incorrect: 'Lykilorðið eða netfangið er rangt. Reyndu aftur eða notaðu aðra aðferð.',
     form_password_pwned:
@@ -1730,6 +1977,8 @@ export const isIS: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Þú ert nú þegar innskráður.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Ekki fannst Web3 veskisviðbót. Vinsamlegast settu upp eina til að halda áfram.',
     web3_signature_request_rejected: 'Þú hafðir hafnað beiðni um undirritun. Reyndu aftur til að halda áfram.',
     web3_solana_signature_generation_failed:

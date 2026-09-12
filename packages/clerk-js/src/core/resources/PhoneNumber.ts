@@ -34,6 +34,7 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   prepareVerification = (): Promise<PhoneNumberResource> => {
     return this._basePost<PhoneNumberJSON>({
       action: 'prepare_verification',
+      coalesce: true,
       body: { strategy: 'phone_code' },
     });
   };

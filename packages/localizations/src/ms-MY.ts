@@ -63,6 +63,7 @@ export const msMY: LocalizationResource = {
   badge__canceledEndsAt: "Dibatalkan • Tamat {{ date | shortDate('ms-MY') }}",
   badge__currentPlan: 'Pelan Semasa',
   badge__default: 'Lalai',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Tamat {{ date | shortDate('ms-MY') }}",
   badge__expired: 'Tamat tempoh',
   badge__freeTrial: 'Percubaan percuma',
@@ -105,8 +106,11 @@ export const msMY: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Anda tidak boleh melanggan pelan ini. Langganan sedia ada anda lebih mahal daripada pelan ini.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Pembayaran anda berjaya.',
       description__subscriptionSuccessful: 'Langganan baharu anda telah sedia.',
+      discount: undefined,
       downgradeNotice:
         'Anda akan mengekalkan langganan semasa anda dan cirinya sehingga akhir kitaran pengebilan, kemudian anda akan ditukar kepada langganan ini.',
       emailForm: {
@@ -123,6 +127,8 @@ export const msMY: LocalizationResource = {
       },
       pastDueNotice: 'Langganan anda sebelum ini tertunggak, tanpa pembayaran.',
       perMonth: 'sebulan',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pembayaran',
       title__paymentSuccessful: 'Pembayaran berjaya!',
       title__subscriptionSuccessful: 'Berjaya!',
@@ -133,6 +139,9 @@ export const msMY: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit untuk baki langganan semasa anda.',
     defaultFreePlanActive: 'Anda kini menggunakan pelan Percuma',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Percuma',
     getStarted: 'Mulakan',
     highlightedPlanBadge: 'Popular',
@@ -144,6 +153,7 @@ export const msMY: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Bulanan',
+    months: undefined,
     pastDue: 'Tertunggak',
     pay: 'Bayar {{amount}}',
     payerCreditRemainder: undefined,
@@ -222,6 +232,84 @@ export const msMY: LocalizationResource = {
     year: 'Tahun',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -248,6 +336,79 @@ export const msMY: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -634,6 +795,10 @@ export const msMY: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Hubungi pentadbir organisasi anda untuk menaik taraf kebenaran anda.',
@@ -687,6 +852,10 @@ export const msMY: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Pembekal SAML Tersuai',
         google: undefined,
@@ -862,11 +1031,53 @@ export const msMY: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Cipta organisasi',
@@ -1081,6 +1292,25 @@ export const msMY: LocalizationResource = {
       title: 'Keluarkan domain',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1318,6 +1548,10 @@ export const msMY: LocalizationResource = {
         subtitleNewTab: 'Kembali ke tab yang baru dibuka untuk meneruskan',
         titleNewTab: 'Didaftarkan masuk pada tab lain',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Gunakan pautan pengesahan yang dihantar ke e-mel anda',
@@ -1328,6 +1562,9 @@ export const msMY: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'Pilih akaun perusahaan yang anda ingin teruskan.',
       title: 'Pilih akaun perusahaan anda',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Kod tetapan semula kata laluan',
@@ -1394,6 +1631,15 @@ export const msMY: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Kami perlu mengesahkan identiti anda sebelum menetapkan semula kata laluan anda.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Daftar',
@@ -1679,6 +1925,7 @@ export const msMY: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
     form_password_or_identifier_incorrect:
       'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
@@ -1737,6 +1984,8 @@ export const msMY: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
     web3_signature_request_rejected: 'Anda telah menolak permintaan tandatangan. Sila cuba lagi untuk meneruskan.',
     web3_solana_signature_generation_failed:

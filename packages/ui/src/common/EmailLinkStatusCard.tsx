@@ -10,6 +10,9 @@ import { ArrowLeftRight, ExclamationTriangle, ShieldCheck } from '../icons';
 import type { InternalTheme } from '../styledSystem';
 import { animations } from '../styledSystem';
 
+// `transferable` renders in a `signUpIfMissing` flow: the email was verified but no user
+// exists, so the tab holding the sign-in's client carries the flow forward as a sign-up
+// and this card tells the user to switch to whichever tab that is.
 export type EmailLinkUIStatus = VerifyTokenStatus | 'verified_switch_tab' | 'loading';
 
 type EmailLinkStatusCardProps = React.PropsWithChildren<{
@@ -21,6 +24,7 @@ type EmailLinkStatusCardProps = React.PropsWithChildren<{
 const StatusToIcon: Record<Exclude<EmailLinkUIStatus, 'loading'>, React.ComponentType> = {
   verified: ShieldCheck,
   verified_switch_tab: ArrowLeftRight,
+  transferable: ArrowLeftRight,
   expired: ExclamationTriangle,
   failed: ExclamationTriangle,
   client_mismatch: ExclamationTriangle,
@@ -30,6 +34,7 @@ const statusToColor = (theme: InternalTheme, status: Exclude<EmailLinkUIStatus, 
   ({
     verified: theme.colors.$success500,
     verified_switch_tab: theme.colors.$primary500,
+    transferable: theme.colors.$primary500,
     expired: theme.colors.$warning500,
     failed: theme.colors.$danger500,
     client_mismatch: theme.colors.$warning500,

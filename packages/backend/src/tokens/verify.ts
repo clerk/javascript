@@ -14,12 +14,12 @@ import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
+import { JWT_CATEGORY_M2M_TOKEN } from './jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import {
   API_KEY_PREFIX,
   isJwtFormat,
-  JWT_CATEGORY_M2M_TOKEN,
   M2M_SUBJECT_PREFIX,
   M2M_TOKEN_PREFIX,
   OAUTH_ACCESS_TOKEN_TYPES,
@@ -35,7 +35,7 @@ export type VerifyTokenOptions = Simplify<
   Omit<VerifyJwtOptions, 'key'> &
     Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
       /**
-       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
+       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/~/api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
        */
       jwtKey?: string;
     }

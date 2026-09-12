@@ -2,7 +2,7 @@
 
 import { type DragEvent, useRef, useState } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useFileUploadContext } from './file-upload-context';
 
 export type FileUploadDropzoneProps = ComponentProps<'div'>;
@@ -19,7 +19,6 @@ export function FileUploadDropzone(props: FileUploadDropzoneProps) {
   const state = { dragging, disabled };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'file-upload-dropzone',
     'aria-disabled': disabled || undefined,
     onDragEnter: (event: DragEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -61,13 +60,13 @@ export function FileUploadDropzone(props: FileUploadDropzoneProps) {
     },
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'div',
     render,
     state,
     stateAttributesMapping: {
-      dragging: (v: boolean) => (v ? { 'data-cl-dragging': '' } : null),
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      dragging: (v: boolean) => (v ? { 'data-dragging': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: mergeProps<'div'>(defaultProps, otherProps),
   });

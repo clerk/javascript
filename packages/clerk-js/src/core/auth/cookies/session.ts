@@ -35,16 +35,25 @@ export const createSessionCookie = (cookieSuffix: string, options: SessionCookie
   const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
   const suffixedSessionCookie = createCookieHandler(getSuffixedCookieName(SESSION_COOKIE_NAME, cookieSuffix));
 
+  const removeNonPartitionedCookies = () => {
+    const nonPartitionedCookieAttributes = [
+      { sameSite: 'Lax', secure: getSecureAttribute('Lax'), partitioned: false },
+      { sameSite: 'None', secure: getSecureAttribute('None'), partitioned: false },
+    ] as const;
+
+    for (const attributes of nonPartitionedCookieAttributes) {
+      sessionCookie.remove(attributes);
+      suffixedSessionCookie.remove(attributes);
+    }
+  };
+
   const remove = () => {
     const attributes = getCookieAttributes(options);
     sessionCookie.remove(attributes);
     suffixedSessionCookie.remove(attributes);
 
-    // Also remove non-partitioned variants — the browser treats partitioned and
-    // non-partitioned cookies with the same name as distinct cookies.
     if (attributes.partitioned) {
-      sessionCookie.remove();
-      suffixedSessionCookie.remove();
+      removeNonPartitionedCookies();
     }
   };
 
@@ -52,11 +61,8 @@ export const createSessionCookie = (cookieSuffix: string, options: SessionCookie
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
-    // Remove old non-partitioned cookies — the browser treats partitioned and
-    // non-partitioned cookies with the same name as distinct cookies.
     if (partitioned) {
-      sessionCookie.remove();
-      suffixedSessionCookie.remove();
+      removeNonPartitionedCookies();
     }
 
     sessionCookie.set(token, { expires, sameSite, secure, partitioned });

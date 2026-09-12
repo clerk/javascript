@@ -25,8 +25,18 @@ export type BaseFetchOptions = ClerkResourceReloadParams & {
 export type BaseMutateParams = {
   action?: string;
   body?: any;
+  coalesce?: boolean;
   method?: HTTPMethod;
   path?: string;
+  signal?: AbortSignal;
+};
+
+const COALESCED_POST_TTL_MS = 30_000;
+
+type PendingCoalescedPost<T> = {
+  promise: Promise<T>;
+  controller: AbortController;
+  expiresAt: number;
 };
 
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
@@ -57,6 +67,8 @@ export abstract class BaseResource {
   static clerk: Clerk;
   id?: string;
   pathRoot = '';
+
+  #pendingCoalescedPosts?: Map<string, PendingCoalescedPost<this>>;
 
   static get fapiClient(): FapiClient {
     return BaseResource.clerk.getFapiClient();
@@ -217,9 +229,9 @@ export abstract class BaseResource {
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    const { action, body, method, path } = params;
+    const { action, body, method, path, signal } = params;
     // TODO @userland-errors:
-    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
+    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body, signal });
     return this.fromJSON((json?.response || json) as J);
   }
 
@@ -230,7 +242,32 @@ export abstract class BaseResource {
   }
 
   protected async _basePost<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {
-    return this._baseMutate<J>({ ...params, method: 'POST' });
+    if (!params.coalesce) {
+      return this._baseMutate<J>({ ...params, method: 'POST' });
+    }
+
+    const key = this.#coalescedPostKey(params);
+    const posts = (this.#pendingCoalescedPosts ??= new Map());
+    const pending = posts.get(key);
+    if (pending && Date.now() < pending.expiresAt) {
+      return pending.promise;
+    }
+
+    const controller = new AbortController();
+    const promise = this._baseMutate<J>({ ...params, method: 'POST', signal: controller.signal }).finally(() => {
+      if (posts.get(key)?.promise === promise) {
+        posts.delete(key);
+      }
+    });
+    posts.set(key, { promise, controller, expiresAt: Date.now() + COALESCED_POST_TTL_MS });
+    return promise;
+  }
+
+  #coalescedPostKey(params: BaseMutateParams): string {
+    const body = Object.entries(params.body ?? {})
+      .filter(([, value]) => value !== undefined)
+      .sort(([left], [right]) => (left < right ? -1 : 1));
+    return JSON.stringify([this.id, params.path, params.action, body]);
   }
 
   protected async _basePostBypass<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {

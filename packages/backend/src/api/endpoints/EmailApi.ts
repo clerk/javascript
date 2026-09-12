@@ -2,21 +2,14 @@ import type { Email } from '../resources/Email';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/email';
+const idempotencyKeyPattern = /^[a-zA-Z0-9_-]{1,255}$/;
 
 /**
- * A subset of mailbox object as specified in RFC 5322 §3.4. Specifically, a
- * `name-addr` with an optional `display-name` and a required `addr-spec`.
+ * A mailbox address as specified by RFC 5322's `addr-spec`.
  *
  * @see {@link https://datatracker.ietf.org/doc/html/rfc5322#section-3.4}
  */
 type Mailbox = {
-  /**
-   * (Optional) Display name for the mailbox. Currently accepted by the API but
-   * not yet rendered server-side, so it has no effect on the delivered email
-   * for now.
-   */
-  name?: string;
-
   /**
    * The `addr-spec` of the mailbox, i.e. the email address itself.
    */
@@ -27,7 +20,7 @@ type Mailbox = {
  * The recipient of the email. Provide exactly one of the two mutually exclusive
  * forms:
  *
- * - a literal mailbox: an `address` (plus an optional `name`), or
+ * - a literal mailbox: an `address`, or
  * - a `userId`: the ID of a Clerk user whose primary email address Clerk
  *   resolves server-side, from the instance the secret key belongs to.
  */
@@ -37,11 +30,6 @@ type EmailRecipient =
        * The `addr-spec` of the recipient mailbox, i.e. the email address itself.
        */
       address: string;
-      /**
-       * (Optional) Display name for the recipient mailbox. Currently accepted
-       * by the API but not yet rendered server-side.
-       */
-      name?: string;
       userId?: never;
     }
   | {
@@ -52,13 +40,13 @@ type EmailRecipient =
        */
       userId: string;
       address?: never;
-      name?: never;
     };
 
 /**
  * The body of the email. At least one of `html` and `text` must be provided; if
- * both are provided, the `html` version takes precedence. Encoded as a union so
- * that omitting both is a compile-time error rather than a server-side one.
+ * both are provided, the `html` version takes precedence. Their combined UTF-8
+ * encoding is limited to 50,000 bytes. Encoded as a union so that omitting both
+ * is a compile-time error rather than a server-side one.
  */
 type EmailContent =
   | {
@@ -87,24 +75,39 @@ type EmailContent =
 export type CreateEmailParams = {
   /**
    * The recipient of the email. Currently only a single recipient is supported.
-   * Provide either an `address` (with an optional `name`) or the `userId` of a
+   * Provide either an `address` or the `userId` of a
    * Clerk user; the two forms are mutually exclusive.
    */
   to: EmailRecipient;
 
   /**
-   * The sender of the email. See {@link Mailbox} for the accepted format. Note
-   * that the API does not yet render the `name` field of the `from` mailbox.
+   * The sender of the email. Its domain must exactly match the instance's
+   * verified production sending domain.
    */
   from: Mailbox;
 
   /**
-   * (Optional) The mailbox to include in the `reply-to` header of the email.
+   * (Optional) The mailbox to include in the `reply-to` header. Its domain must
+   * exactly match the same verified production domain as `from`.
    */
   replyTo?: Mailbox;
 
+  /** Maximum 998 characters. */
   subject: string;
 } & EmailContent;
+
+export type CreateEmailOptions = {
+  /**
+   * Deduplicates retries of the same logical send. Reuse a key only when the
+   * recipient and content are identical; use one stable key per recipient when
+   * fanning out a batch. Clerk durably returns the original email for the same
+   * key and request, and returns a conflict if the key is reused with different
+   * parameters. Without a key, each call is a distinct send and the SDK does
+   * not retry an ambiguous POST. Keys may contain only ASCII letters, digits,
+   * underscores, and hyphens, up to 255 characters.
+   */
+  idempotencyKey?: string;
+};
 
 export class EmailApi extends AbstractAPI {
   /**
@@ -113,18 +116,66 @@ export class EmailApi extends AbstractAPI {
    * the SDK version to avoid breaking changes.
    *
    * Sends a transactional email.
+   *
+   * @param params - The recipient, sender, subject, and content of the email.
+   * @param options - Optional request settings, including an idempotency key.
+   * @returns The stored email and its current send status.
+   * @throws If the idempotency key does not match the supported format.
+   * @example
+   * ```ts
+   * const email = await clerkClient.emails.create(
+   *   {
+   *     to: { address: 'customer@example.com' },
+   *     from: { address: 'support@example.com' },
+   *     subject: 'Your receipt',
+   *     html: '<p>Thanks for your order.</p>',
+   *   },
+   *   { idempotencyKey: 'order_123_receipt' },
+   * );
+   * ```
    */
-  public async create(params: CreateEmailParams) {
+  public async create(params: CreateEmailParams, options: CreateEmailOptions = {}): Promise<Email> {
+    const { idempotencyKey } = options;
+    if (
+      idempotencyKey !== undefined &&
+      (typeof idempotencyKey !== 'string' || !idempotencyKeyPattern.test(idempotencyKey))
+    ) {
+      throw new Error(
+        'Idempotency key must contain only ASCII letters, digits, underscores, and hyphens and cannot exceed 255 characters.',
+      );
+    }
+
     return this.request<Email>({
       method: 'POST',
       path: basePath,
       bodyParams: params,
+      ...(idempotencyKey !== undefined ? { headerParams: { 'Idempotency-Key': idempotencyKey } } : {}),
       options: {
         // Snakecase nested keys too, so a `to: { userId }` recipient is sent as
         // `to: { user_id }` on the wire (the default only snakecases top-level
         // keys, which would leave the nested `userId` untouched).
         deepSnakecaseBodyParamKeys: true,
       },
+    });
+  }
+
+  /**
+   * Returns Clerk's stored send state for a transactional email. `accepted`
+   * means the provider accepted the request; it does not prove delivery.
+   *
+   * @param emailId - The ID returned when the email was created.
+   * @returns The stored email and its current send status.
+   * @throws If `emailId` is empty.
+   * @example
+   * ```ts
+   * const email = await clerkClient.emails.get('ema_123');
+   * ```
+   */
+  public async get(emailId: string): Promise<Email> {
+    this.requireId(emailId);
+    return this.request<Email>({
+      method: 'GET',
+      path: `${basePath}/${emailId}`,
     });
   }
 }

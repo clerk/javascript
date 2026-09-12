@@ -1,11 +1,10 @@
 'use client';
 
 import { inertProps } from '@clerk/shared/inert';
-import { useMergeRefs } from '@floating-ui/react';
 import React, { useRef } from 'react';
 
 import { useTransition } from '../../hooks/use-transition';
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useTabsContext } from './tabs-context';
 
 export interface TabsPanelProps extends ComponentProps<'div'> {
@@ -23,9 +22,6 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
   const panelId = `${tabsId}-panel-${panelValue}`;
 
   const panelRef = useRef<HTMLDivElement | null>(null);
-  // Merge the consumer ref with the internal panelRef so passing a ref does not
-  // clobber the ref the panel relies on for transition tracking.
-  const combinedRef = useMergeRefs([panelRef, ref]);
   const { transitionProps } = useTransition({
     open: isSelected,
     ref: panelRef,
@@ -41,20 +37,18 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
 
   const effectiveTransitionProps =
     shouldForceMount && !hasBeenDeselected.current
-      ? { ...transitionProps, 'data-cl-starting-style': undefined, style: undefined }
+      ? { ...transitionProps, 'data-starting-style': undefined, style: undefined }
       : transitionProps;
 
   const state = { hidden: !isSelected };
 
   const defaultProps = {
-    'data-cl-slot': 'tabs-panel',
     id: panelId,
     role: 'tabpanel' as const,
     'aria-labelledby': tabId,
     tabIndex: 0,
     ...inertProps(!isSelected),
     hidden: !isSelected && !shouldForceMount ? true : undefined,
-    ref: combinedRef,
     ...(shouldForceMount
       ? {
           ...effectiveTransitionProps,
@@ -68,12 +62,13 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
   // override it, or the tab/panel aria pairing would silently break.
   merged.id = panelId;
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'div',
     render,
+    ref: [panelRef, ref],
     state,
     stateAttributesMapping: {
-      hidden: (v: boolean) => (v ? { 'data-cl-hidden': '' } : null),
+      hidden: (v: boolean) => (v ? { 'data-hidden': '' } : null),
     },
     props: merged,
   });

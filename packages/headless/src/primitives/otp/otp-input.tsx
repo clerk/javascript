@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React, { useCallback } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useOtpContext } from './otp-context';
 import { inputModeForPattern, removeAt, replaceAt, sanitize } from './otp-utils';
 
@@ -18,12 +17,15 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     value,
     length,
     disabled,
+    required,
     pattern,
     mask,
     activeIndex,
     setValue,
     queueFocus,
     focus,
+    getInputId,
+    firstInputLabel,
     registerInput,
     onSlotFocus,
     onSlotBlur,
@@ -36,18 +38,19 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     element => registerInput(index, element),
     [registerInput, index],
   );
-  // Compose our slot registration with any ref the consumer forwards.
-  const setRef = useMergeRefs([registerRef, forwardedRef]);
 
   // Roving tab order: the focused slot is the tab stop, or the next empty slot
   // when the field is unfocused, so Tab enters and leaves the group once.
   const tabStop = activeIndex ?? Math.min(value.length, length - 1);
 
+  // The first slot answers to the field's own name; the rest are positional.
+  const labelProps = index === 0 ? (firstInputLabel ?? {}) : { 'aria-label': `Character ${index + 1} of ${length}` };
+
   const state = { active: activeIndex === index, filled: char !== '', disabled };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'otp-input',
-    ref: setRef,
+    id: getInputId(index),
+    ...labelProps,
     value: char,
     type: mask ? 'password' : 'text',
     inputMode: inputModeForPattern(pattern),
@@ -61,7 +64,9 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     maxLength: index === 0 ? length : 1,
     tabIndex: tabStop === index ? 0 : -1,
     disabled,
-    'aria-label': `Character ${index + 1} of ${length}`,
+    // Constraint validation rides on the visible slots: the hidden input is `readOnly`,
+    // which bars it from validation entirely.
+    required,
     onMouseDown: (event: React.MouseEvent<HTMLInputElement>) => {
       if (disabled) {
         return;
@@ -202,14 +207,15 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     },
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'input',
     render,
+    ref: [registerRef, forwardedRef],
     state,
     stateAttributesMapping: {
-      active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
-      filled: (v: boolean) => (v ? { 'data-cl-filled': '' } : null),
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      active: (v: boolean) => (v ? { 'data-active': '' } : null),
+      filled: (v: boolean) => (v ? { 'data-filled': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: mergeProps<'input'>(defaultProps, otherProps),
   });

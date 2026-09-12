@@ -18,7 +18,7 @@ import {
 } from '../../fixtures/machine';
 import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
-import { JWT_CATEGORY_M2M_TOKEN } from '../machine';
+import { JWT_CATEGORY_M2M_TOKEN } from '../jwtCategories';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
 async function createSignedOAuthJwt(

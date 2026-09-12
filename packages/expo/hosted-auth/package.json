@@ -1,0 +1,4 @@
+{
+  "main": "../dist/hosted-auth/index.js",
+  "types": "../dist/hosted-auth/index.d.ts"
+}

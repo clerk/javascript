@@ -10,6 +10,7 @@ type ElectronWindow = Window & {
     tokenCache?: Partial<Record<'clearToken' | 'getToken' | 'saveToken', unknown>>;
     oauthTransport?: Partial<Record<'getRedirectUrl' | 'open', unknown>>;
   };
+  __hardNavigations?: string[];
 };
 
 test.describe('electron basic auth @electron', () => {
@@ -19,7 +20,7 @@ test.describe('electron basic auth @electron', () => {
 
   test.beforeAll(async ({ electronTestApp }) => {
     const u = createTestUtils({ app: electronTestApp });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
 
@@ -73,5 +74,25 @@ test.describe('electron basic auth @electron', () => {
 
   test('keeps the signed-out state after relaunch', async ({ electronPage }) => {
     await expect(electronPage.locator('.cl-signIn-root')).toBeVisible({ timeout: 30_000 });
+  });
+
+  test('never hard navigates the renderer during sign-in', async ({ electronPage }) => {
+    const { signIn } = createPageObjects({ page: electronPage, useTestingToken: false });
+
+    await electronPage.evaluate(() => {
+      (window as ElectronWindow).__hardNavigations = [];
+      addEventListener('clerk:beforeunload', () => {
+        (window as ElectronWindow).__hardNavigations?.push(location.href);
+      });
+    });
+
+    await signIn.waitForMounted();
+    await signIn.setIdentifier(fakeUser.email!);
+    await signIn.continue();
+    await signIn.setPassword(fakeUser.password);
+    await signIn.continue();
+
+    await expect(electronPage.locator('[data-testid="user-id"]')).toHaveText(/^user_/, { timeout: 30_000 });
+    await expect(electronPage.evaluate(() => (window as ElectronWindow).__hardNavigations)).resolves.toEqual([]);
   });
 });

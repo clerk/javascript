@@ -398,6 +398,13 @@ export const pathFromFullPath = (fullPath: string) => {
   return fullPath.replace(/CLERK-ROUTER\/(.*?)\//, '');
 };
 
+export const VIRTUAL_ROUTER_BASE_PATH = 'CLERK-ROUTER/VIRTUAL';
+
+/**
+ * Whether `to` addresses the in-memory component router rather than a real application route.
+ */
+export const isVirtualRouterPath = (to: string): boolean => to.includes(VIRTUAL_ROUTER_BASE_PATH);
+
 const frontendApiRedirectPathsWithUserInput: string[] = [
   '/oauth/authorize', // OAuth2 identify provider flow
 ];

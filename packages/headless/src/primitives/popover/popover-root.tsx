@@ -20,6 +20,7 @@ import {
 import { type ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
+import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { cssVars } from '../../utils/css-vars';
 import { PopoverContext, type PopoverContextValue } from './popover-context';
@@ -30,13 +31,31 @@ export interface PopoverProps {
   onOpenChange?: (open: boolean) => void;
   placement?: Placement;
   sideOffset?: number;
+  alignOffset?: number;
   modal?: boolean;
+  /**
+   * Where focus lands when the popup opens.
+   *
+   * - `'auto'` (default): the first tabbable element when opened with the keyboard,
+   *   the popup itself when opened with a pointer, so a mouse click never puts a
+   *   focus ring on a control the user did not navigate to.
+   * - `'first'`: always the first tabbable element. Use it for popups whose content
+   *   is meant to be typed into immediately, such as a combobox.
+   */
+  initialFocus?: 'auto' | 'first';
   children: ReactNode;
 }
 
 function PopoverInner(props: PopoverProps) {
   const nodeId = useFloatingNodeId();
-  const { placement: placementProp = 'bottom', sideOffset = 4, modal = false, children } = props;
+  const {
+    placement: placementProp = 'bottom',
+    sideOffset = 4,
+    alignOffset = 0,
+    modal = false,
+    initialFocus = 'auto',
+    children,
+  } = props;
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -49,7 +68,6 @@ function PopoverInner(props: PopoverProps) {
 
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
-
   const {
     refs,
     floatingStyles,
@@ -61,7 +79,7 @@ function PopoverInner(props: PopoverProps) {
     onOpenChange: setOpen,
     placement: placementProp,
     middleware: [
-      offset(sideOffset),
+      offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
       flip({
         crossAxis: placementProp.includes('-'),
         fallbackAxisSideDirection: 'end',
@@ -73,6 +91,8 @@ function PopoverInner(props: PopoverProps) {
     ],
     whileElementsMounted: autoUpdate,
   });
+
+  const returnFocusRef = useReturnFocus(floatingContext);
 
   const { mounted, transitionProps } = useTransition({
     open,
@@ -98,6 +118,8 @@ function PopoverInner(props: PopoverProps) {
       popupRef,
       arrowRef,
       modal,
+      initialFocus,
+      returnFocusRef,
       labelId,
       descriptionId,
       hasTitle,
@@ -117,6 +139,8 @@ function PopoverInner(props: PopoverProps) {
       getReferenceProps,
       getFloatingProps,
       modal,
+      initialFocus,
+      returnFocusRef,
       labelId,
       descriptionId,
       hasTitle,

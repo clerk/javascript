@@ -4,13 +4,14 @@ import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
 // unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
-// and ARIA wiring via the `data-cl-*` attributes each part emits, with zero appearance.
+// and ARIA wiring via the `data-*` attributes each part emits, with zero appearance.
 // It is embedded once into the overview via `<Story>` in the MDX (the one thing prose
 // can't convey: that items actually expand/collapse). There is no interactive knob canvas
 // for headless primitives.
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Accordion',
   source: 'packages/headless/src/primitives/accordion/index.ts',
 };
@@ -27,7 +28,7 @@ export function Default() {
         </Accordion.Header>
         <Accordion.Panel>
           A headless component provides behavior, state management, and accessibility without imposing any styles — you
-          bring your own CSS via the <code>data-cl-slot</code> attributes it emits.
+          bring your own classNames and target the <code>data-*</code> state attributes it emits.
         </Accordion.Panel>
       </Accordion.Item>
       <Accordion.Item value='why'>

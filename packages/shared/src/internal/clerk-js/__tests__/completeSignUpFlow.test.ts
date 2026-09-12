@@ -31,6 +31,52 @@ describe('completeSignUpFlow', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
+  it('removes ticket query parameters before calling handleComplete', async () => {
+    const mockSignUp = {
+      status: 'complete',
+      missingFields: [] as SignUpField[],
+    } as SignUpResource;
+    let currentUrl = new URL(
+      'http://localhost/sign-up/continue?__clerk_ticket=test_ticket&__clerk_invitation_token=test_invitation',
+    );
+    let ticketAtHandleComplete: string | null | undefined;
+    let invitationAtHandleComplete: string | null | undefined;
+
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        get href() {
+          return currentUrl.href;
+        },
+        get search() {
+          return currentUrl.search;
+        },
+      },
+    });
+    Object.defineProperty(window, 'history', {
+      configurable: true,
+      value: {
+        state: undefined,
+        replaceState: vi.fn((_state, _title, url) => {
+          currentUrl = new URL(url, currentUrl);
+        }),
+      },
+    });
+    mockHandleComplete.mockImplementationOnce(() => {
+      ticketAtHandleComplete = currentUrl.searchParams.get('__clerk_ticket');
+      invitationAtHandleComplete = currentUrl.searchParams.get('__clerk_invitation_token');
+    });
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+    });
+
+    expect(ticketAtHandleComplete).toBeNull();
+    expect(invitationAtHandleComplete).toBeNull();
+  });
+
   it('navigates to verify email page if email still unverified', async () => {
     const mockSignUp = {
       status: 'missing_requirements',
@@ -191,6 +237,33 @@ describe('completeSignUpFlow', () => {
       redirectUrlComplete,
       continueSignUp: true,
     });
+  });
+
+  it.each([
+    ['redirectUrl is missing', { redirectUrlComplete: 'https://example.com/done' }],
+    ['redirectUrlComplete is missing', { redirectUrl: 'https://example.com/acs' }],
+    ['both are missing', {}],
+    ['redirectUrl is empty', { redirectUrl: '', redirectUrlComplete: 'https://example.com/done' }],
+    ['redirectUrlComplete is empty', { redirectUrl: 'https://example.com/acs', redirectUrlComplete: '' }],
+  ])('throws rather than starting an Enterprise SSO flow when %s', (_label, urls) => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso'],
+      authenticateWithRedirect: mockAuthenticateWithRedirect,
+    } as unknown as SignUpResource;
+
+    expect(() =>
+      completeSignUpFlow({
+        signUp: mockSignUp,
+        handleComplete: mockHandleComplete,
+        navigate: mockNavigate,
+        ...urls,
+      }),
+    ).toThrow(/redirectUrl/);
+
+    expect(mockAuthenticateWithRedirect).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockHandleComplete).not.toHaveBeenCalled();
   });
 
   it('forwards clerk ticket and status query params when navigating to verify email', async () => {

@@ -21,13 +21,14 @@ import { handleError } from '@/utils/errorHandler';
 
 import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
+import { isOidcProvider } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
-import type { ProviderType } from '../types';
+import type { EnterpriseConnectionProviderType, ProviderType } from '../types';
 
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 const PROVIDER_GROUPS: ReadonlyArray<{
-  id: 'saml';
+  id: 'saml' | 'oidc';
   label: LocalizationKey;
   options: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }>;
 }> = [
@@ -53,10 +54,24 @@ const PROVIDER_GROUPS: ReadonlyArray<{
       },
     ],
   },
+  {
+    id: 'oidc',
+    label: localizationKeys('configureSSO.selectProviderStep.oidc.groupLabel'),
+    options: [
+      {
+        id: 'oidc_custom',
+        label: localizationKeys('configureSSO.selectProviderStep.oidc.oidcProvider'),
+        iconId: 'oidc',
+      },
+    ],
+  },
 ];
 
 const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
   PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
+
+const toProviderCard = (provider: EnterpriseConnectionProviderType): ProviderType =>
+  isOidcProvider(provider) ? 'oidc_custom' : provider;
 
 export const SelectProviderStep = (): JSX.Element => {
   const {
@@ -67,7 +82,9 @@ export const SelectProviderStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep } = useWizard();
   const { t } = useLocalizations();
 
-  const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
+  const currentCard = c.provider ? toProviderCard(c.provider) : null;
+
+  const [selected, setSelected] = React.useState<ProviderType | null>(currentCard);
   const card = useCardState();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -78,20 +95,20 @@ export const SelectProviderStep = (): JSX.Element => {
     setSelected(next);
   };
 
-  const isChangingProvider = c.hasConnection && selected !== null && selected !== c.provider;
+  const isChangingProvider = c.hasConnection && selected !== null && selected !== currentCard;
 
   const handleContinue = async (): Promise<void> => {
     if (!selected) {
       return;
     }
 
-    if (c.hasConnection && selected === c.provider) {
+    if (c.hasConnection && selected === currentCard) {
       void goNext();
       return;
     }
 
     if (isChangingProvider) {
-      setChangeFromProvider(c.provider ?? null);
+      setChangeFromProvider(currentCard);
       setIsChangeDialogOpen(true);
       return;
     }

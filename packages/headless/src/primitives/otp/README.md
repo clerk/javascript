@@ -13,7 +13,7 @@ across the slots. Supports controlled/uncontrolled value, a character `pattern`,
 - Any fixed-length PIN or code split into per-character boxes.
 
 Each slot is a real, individually styleable `<input>` — the primitive emits zero styles and injects
-no global CSS. Everything is driven by `data-cl-*` attributes.
+no global CSS. Everything is driven by `data-*` attributes.
 
 ## Usage
 
@@ -148,18 +148,24 @@ and the `Ctrl`/`Cmd` boundary jumps stay logical (first / last-entered).
 
 ## Data Attributes
 
-| Attribute          | Applies To  | Description                                   |
-| ------------------ | ----------- | --------------------------------------------- |
-| `data-cl-slot`     | All parts   | Part identifier (`"otp-root"`, `"otp-input"`) |
-| `data-cl-empty`    | Root        | Present when no character has been entered    |
-| `data-cl-complete` | Root        | Present when every slot is filled             |
-| `data-cl-disabled` | Root, Input | Present when disabled                         |
-| `data-cl-active`   | Input       | Present when the slot holds focus             |
-| `data-cl-filled`   | Input       | Present when the slot holds a character       |
+| Attribute       | Applies To  | Description                                |
+| --------------- | ----------- | ------------------------------------------ |
+| `data-empty`    | Root        | Present when no character has been entered |
+| `data-complete` | Root        | Present when every slot is filled          |
+| `data-disabled` | Root, Input | Present when disabled                      |
+| `data-active`   | Input       | Present when the slot holds focus          |
+| `data-filled`   | Input       | Present when the slot holds a character    |
 
 ## ARIA
 
 - `Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
-- Each `Input` gets a default `aria-label` of `"Character N of M"`, overridable per input.
+- `Root`'s `id` lands on the first `Input`, not the group, so a `<label htmlFor>` targets a real
+  control and clicking it focuses the code. Remaining slots take `${id}-2`, `${id}-3`, and so on.
+- The first `Input` inherits the group's name (from `aria-labelledby`, then `aria-label`), or is
+  left to a native `<label>`. The rest get a default `aria-label` of `"Character N of M"`,
+  overridable per input.
 - Slots use a roving tab index: `Tab` enters the group at the next empty slot and leaves in one step.
-- When `name` is set, the hidden form input is `aria-hidden` and removed from the tab order.
+- When `name` is set, the hidden form input is `aria-hidden`, removed from the tab order, and
+  disabled alongside the field so a disabled code submits nothing.
+- `required` is applied to each slot rather than the hidden input, which is `readOnly` and so barred
+  from constraint validation. A partially entered code fails validation on its first empty slot.

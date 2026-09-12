@@ -1,14 +1,21 @@
 'use client';
 
-import { FloatingFocusManager, useMergeRefs } from '@floating-ui/react';
+import { FloatingFocusManager } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type FocusTarget, useFinalFocus } from '../../hooks/use-focus-target';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { DrawerAttrs, DrawerCssVars } from './css-vars';
 import { useDrawerContext } from './drawer-context';
 
 /** Props for {@link DrawerPopup}. */
-export type DrawerPopupProps = ComponentProps<'div'>;
+export interface DrawerPopupProps extends ComponentProps<'div'> {
+  /**
+   * Where focus returns when the drawer closes. Default: the trigger, via `useReturnFocus`. The
+   * function form is called with the close's interaction type and may return an element.
+   */
+  finalFocus?: FocusTarget;
+}
 
 /**
  * The drawer sheet (`role="dialog"`). Hosts the drag gesture, focus trapping
@@ -17,13 +24,14 @@ export type DrawerPopupProps = ComponentProps<'div'>;
  * opening on touch does not summon the keyboard.
  */
 export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function DrawerPopup(props, ref) {
-  const { render, ...otherProps } = props;
+  const { render, finalFocus, ...otherProps } = props;
   const {
     popupRef,
     refs,
     getFloatingProps,
     floatingContext,
     modal,
+    returnFocusRef,
     labelId,
     descriptionId,
     mounted,
@@ -36,12 +44,6 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     isNested,
     nestedOpenCount,
   } = useDrawerContext();
-
-  // floating-ui types `setFloating` as a method signature, but at runtime it's
-  // a stable callback that doesn't use `this`, so the unbound-method check is a
-  // false positive here.
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const combinedRef = useMergeRefs([popupRef, refs.setFloating, ref]);
 
   // The nested-child count is a raw CSS input for the styled stack math. Written
   // imperatively (a `--*` custom property) rather than via React inline style.
@@ -58,12 +60,7 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     popupRef.current?.style.setProperty(DrawerCssVars.snapOffset, `${snapRestOffset}px`);
   }, [popupRef, snapRestOffset]);
 
-  if (!mounted) {
-    return null;
-  }
-
   const ownProps = {
-    ref: combinedRef,
     tabIndex: -1,
     'aria-labelledby': labelId,
     'aria-describedby': descriptionId,
@@ -88,26 +85,41 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     nestedOpen: nestedOpenCount > 0,
   };
 
+  const element = useRender({
+    defaultTagName: 'div',
+    render,
+    enabled: mounted,
+    // floating-ui types `setFloating` as a method signature, but at runtime it's
+    // a stable callback that doesn't use `this`, so the unbound-method check is a
+    // false positive here.
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    ref: [popupRef, refs.setFloating, ref],
+    state,
+    stateAttributesMapping: {
+      swiping: (v): Record<string, string> | null => (v ? { [DrawerAttrs.swiping]: '' } : null),
+      snap: (v): Record<string, string> | null => (v === null ? null : { [DrawerAttrs.snap]: String(v) }),
+      expanded: (v): Record<string, string> | null => (v ? { [DrawerAttrs.expanded]: '' } : null),
+      nested: (v): Record<string, string> | null => (v ? { [DrawerAttrs.nested]: '' } : null),
+      nestedOpen: (v): Record<string, string> | null => (v ? { [DrawerAttrs.nestedOpen]: '' } : null),
+    },
+    props: mergeProps<'div'>(defaultProps, otherProps),
+  });
+
+  const resolvedReturnFocus = useFinalFocus(finalFocus, returnFocusRef, floatingContext);
+
+  if (!element) {
+    return null;
+  }
+
   return (
     <FloatingFocusManager
       context={floatingContext}
       modal={modal}
       outsideElementsInert={modal}
       initialFocus={autoFocus ? undefined : popupRef}
+      returnFocus={resolvedReturnFocus}
     >
-      {renderElement({
-        defaultTagName: 'div',
-        render,
-        state,
-        stateAttributesMapping: {
-          swiping: (v): Record<string, string> | null => (v ? { [DrawerAttrs.swiping]: '' } : null),
-          snap: (v): Record<string, string> | null => (v === null ? null : { [DrawerAttrs.snap]: String(v) }),
-          expanded: (v): Record<string, string> | null => (v ? { [DrawerAttrs.expanded]: '' } : null),
-          nested: (v): Record<string, string> | null => (v ? { [DrawerAttrs.nested]: '' } : null),
-          nestedOpen: (v): Record<string, string> | null => (v ? { [DrawerAttrs.nestedOpen]: '' } : null),
-        },
-        props: mergeProps<'div'>(defaultProps, otherProps),
-      })}
+      {element}
     </FloatingFocusManager>
   );
 });

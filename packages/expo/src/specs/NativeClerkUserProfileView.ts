@@ -6,7 +6,9 @@ type ProfileEvent = Readonly<{ type: string }>;
 
 interface NativeProps extends ViewProps {
   isDismissible?: boolean;
+  hostBackButton?: boolean;
   onProfileEvent?: (event: NativeSyntheticEvent<ProfileEvent>) => void;
+  onHostBack?: (event: NativeSyntheticEvent<object>) => void;
 }
 
 const NativeClerkUserProfileView =

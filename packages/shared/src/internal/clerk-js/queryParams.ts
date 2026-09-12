@@ -20,9 +20,16 @@ const _ClerkQueryParams = [
 type ClerkQueryParam = (typeof _ClerkQueryParams)[number];
 
 /**
- * Used for email link verification
+ * Possible values of `__clerk_status` returned from the email link verify
+ * endpoint. `transferable` belongs to the `signUpIfMissing` flow - the
+ * verification succeeded but the user does not exist, so a sign-up transfer is
+ * banked on the client that owns the sign-in and whichever tab shares that
+ * client performs it; see `EmailLinkUIStatus`.
  */
-export type VerifyTokenStatus = 'verified' | (typeof EmailLinkErrorCodeStatus)[keyof typeof EmailLinkErrorCodeStatus];
+export type VerifyTokenStatus =
+  | 'verified'
+  | 'transferable'
+  | (typeof EmailLinkErrorCodeStatus)[keyof typeof EmailLinkErrorCodeStatus];
 
 /**
  * Used for instance invitations and organization invitations

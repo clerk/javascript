@@ -3,6 +3,7 @@ appId: com.clerk.exponativebuildfixture
 ---
 - launchApp:
     clearState: true
+    clearKeychain: true
 - extendedWaitUntil:
     visible:
       id: 'auth-state'
@@ -13,15 +14,4 @@ appId: com.clerk.exponativebuildfixture
 - extendedWaitUntil:
     visible: 'signed (in|out)'
     timeout: 45000
-# clearState does not wipe the iOS Keychain, so a session from a previous
-# flow (or retry attempt) can survive the relaunch. Sign out via JS first.
-- runFlow:
-    when:
-      visible: 'signed in'
-    commands:
-      - tapOn:
-          id: 'sign-out-button'
-      - extendedWaitUntil:
-          visible: 'signed out'
-          timeout: 15000
 - assertVisible: 'signed out'

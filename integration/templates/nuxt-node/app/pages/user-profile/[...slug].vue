@@ -1,4 +1,6 @@
 <script setup>
+definePageMeta({ middleware: 'auth' });
+
 const { data: user } = await useFetch('/api/me');
 </script>
 

@@ -63,6 +63,7 @@ export const fiFI: LocalizationResource = {
   badge__canceledEndsAt: "Peruutettu • Päättyy {{ date | shortDate('fi-FI') }}",
   badge__currentPlan: 'Nykyinen paketti',
   badge__default: 'Oletus',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Päättyy {{ date | shortDate('fi-FI') }}",
   badge__expired: 'Vanhentunut',
   badge__freeTrial: 'Ilmainen kokeilu',
@@ -104,8 +105,11 @@ export const fiFI: LocalizationResource = {
       'Et voi tilata tätä pakettia kuukausimaksulla. Tilataksesi tämän sinun on valittava vuositilaus.',
     cannotSubscribeUnrecoverable: 'Et voi tilata tätä pakettia. Nykyinen tilauksesi on kalliimpi kuin tämä paketti.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Maksusi onnistui.',
       description__subscriptionSuccessful: 'Uusi tilauksesi on valmis.',
+      discount: undefined,
       downgradeNotice:
         'Säilytät nykyisen tilauksesi ja sen ominaisuudet laskutuskauden loppuun asti, minkä jälkeen siirryt tähän tilaukseen.',
       emailForm: {
@@ -121,6 +125,8 @@ export const fiFI: LocalizationResource = {
       },
       pastDueNotice: 'Edellinen tilauksesi oli erääntynyt eikä maksua ole suoritettu.',
       perMonth: 'kuukaudessa',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Kassa',
       title__paymentSuccessful: 'Maksu onnistui!',
       title__subscriptionSuccessful: 'Onnistui!',
@@ -131,6 +137,9 @@ export const fiFI: LocalizationResource = {
     credit: 'Hyvitys',
     creditRemainder: 'Hyvitys nykyisen tilauksesi jäljellä olevalta ajalta.',
     defaultFreePlanActive: 'Olet tällä hetkellä ilmaisella tilauksella.',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Ilmainen',
     getStarted: 'Aloita',
     highlightedPlanBadge: 'Suosittu',
@@ -142,6 +151,7 @@ export const fiFI: LocalizationResource = {
     monthAbbreviation: 'kk',
     monthPerUnit: 'Kuukausi per {{unitName}}',
     monthly: 'Kuukausittain',
+    months: undefined,
     pastDue: 'Erääntynyt',
     pay: 'Maksa {{amount}}',
     payerCreditRemainder: 'Hyvitys tilin saldosta.',
@@ -220,6 +230,84 @@ export const fiFI: LocalizationResource = {
     year: 'Vuosi',
     yearAbbreviation: 'v',
     yearPerUnit: 'Vuosi per {{unitName}}',
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -246,6 +334,79 @@ export const fiFI: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +793,10 @@ export const fiFI: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan päivittääksesi oikeuksiasi.',
@@ -685,6 +850,10 @@ export const fiFI: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Mukautettu SAML-palveluntarjoaja',
         google: undefined,
@@ -860,11 +1029,53 @@ export const fiFI: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Luo organisaatio',
@@ -1079,6 +1290,25 @@ export const fiFI: LocalizationResource = {
       title: 'Poista verkkotunnus',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1315,6 +1545,10 @@ export const fiFI: LocalizationResource = {
         subtitleNewTab: 'Palaa uuteen välilehteen jatkaaksesi',
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
+      verifiedTransferable: {
+        subtitle: 'Palaa alkuperäiseen välilehteen jatkaaksesi',
+        title: 'Sähköposti vahvistettu',
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
@@ -1325,6 +1559,9 @@ export const fiFI: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'Valitse yritystili, jolla haluat jatkaa.',
       title: 'Valitse yritystilisi',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Nollaa salasana',
@@ -1378,10 +1615,10 @@ export const fiFI: LocalizationResource = {
       title: 'Tarkista puhelimesi',
     },
     protectCheck: {
-      loading: undefined,
-      retryButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      loading: 'Ladataan…',
+      retryButton: 'Yritä uudelleen',
+      subtitle: 'Odota hetki, tarkistamme pyyntöäsi.',
+      title: 'Tarkistetaan pyyntöäsi',
     },
     resetPassword: {
       formButtonPrimary: 'Nollaa salasana',
@@ -1391,6 +1628,15 @@ export const fiFI: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Ennen salasanan nollaamista on varmistettava henkilöllisyytesi.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Rekisteröidy',
@@ -1489,10 +1735,10 @@ export const fiFI: LocalizationResource = {
       title: 'Tarkista puhelimesi',
     },
     protectCheck: {
-      loading: undefined,
-      retryButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      loading: 'Ladataan…',
+      retryButton: 'Yritä uudelleen',
+      subtitle: 'Odota hetki, tarkistamme pyyntöäsi.',
+      title: 'Tarkistetaan pyyntöäsi',
     },
     restrictedAccess: {
       actionLink: 'Kirjaudu sisään',
@@ -1641,7 +1887,8 @@ export const fiFI: LocalizationResource = {
     },
   },
   unstable__errors: {
-    action_blocked: undefined,
+    action_blocked:
+      'Toimintoa ei voitu suorittaa. Yritä myöhemmin uudelleen tai ota yhteyttä tukeen, jos ongelma jatkuu.',
     already_a_member_in_organization: '{{email}} on jo tämän organisaation jäsen.',
     api_key_name_already_exists: 'API-avaimen nimi on jo olemassa.',
     api_key_usage_exceeded:
@@ -1674,6 +1921,8 @@ export const fiFI: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Salasanasi on liian lyhyt. Sen on oltava vähintään 8 merkkiä pitkä.',
+    form_password_matches_identifier:
+      'Salasana ei voi olla sama kuin sähköpostiosoitteesi, puhelinnumerosi tai käyttäjänimesi. Valitse tilisi turvallisuuden vuoksi toinen salasana.',
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_or_identifier_incorrect:
       'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
@@ -1691,8 +1940,8 @@ export const fiFI: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
-      "Sähköpostiosoite tai puhelinnumero ei ole sallittu rekisteröityäksesi. Tämä voi johtua siitä, että sähköpostiosoite sisältää '+', '=', '#' tai '.' merkkejä, käyttäät aluetta, joka on sidottu tilapäisyyden sähköpostitilaukseen, tai olet eksplisiittisesti estetty. Jos uskoo, että tämä on virhe, ota yhteyttä tukeen.",
-    oauth_access_denied: undefined,
+      "Sähköpostiosoitteella tai puhelinnumerolla ei voi rekisteröityä. Syynä voi olla, että sähköpostiosoite sisältää merkkejä '+', '=', '#' tai '.', että verkkotunnus kuuluu väliaikaiseen sähköpostipalveluun, tai että osoite on erikseen estetty. Jos tämä on mielestäsi virhe, ota yhteyttä tukeen.",
+    oauth_access_denied: 'Et myöntänyt käyttöoikeutta tiliisi.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1720,13 +1969,17 @@ export const fiFI: LocalizationResource = {
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,
-    protect_check_execution_failed: undefined,
-    protect_check_invalid_script: undefined,
-    protect_check_invalid_sdk_url: undefined,
-    protect_check_script_load_failed: undefined,
-    protect_check_timed_out: undefined,
-    protect_check_unsupported_environment: undefined,
+    protect_check_execution_failed: 'Tarkistus ei valmistunut. Yritä uudelleen.',
+    protect_check_invalid_script: 'Tarkistusta ei voitu ladata. Ota yhteyttä tukeen, jos ongelma jatkuu.',
+    protect_check_invalid_sdk_url: 'Tarkistusta ei voitu käynnistää. Ota yhteyttä tukeen.',
+    protect_check_script_load_failed:
+      'Tarkistusta ei voitu ladata. Syynä voi olla verkkoyhteys tai sisällön suojauskäytäntö, joka estää tarkistuksen skriptin. Yritä uudelleen tai ota yhteyttä tukeen.',
+    protect_check_timed_out: 'Tarkistus ei valmistunut ajoissa. Yritä uudelleen.',
+    protect_check_unsupported_environment:
+      'Tarkistusta ei tueta tässä ympäristössä. Jatka tavallisella selaimella tai ota yhteyttä tukeen.',
     session_exists: 'Olet jo kirjautunut sisään.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3-lompakkoa ei löytynyt. Asenna sellainen jatkaaksesi.',
     web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',
     web3_solana_signature_generation_failed: 'Allekirjoitusta luotaessa tapahtui virhe. Yritä uudelleen jatkaaksesi.',

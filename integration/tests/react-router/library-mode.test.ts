@@ -20,7 +20,7 @@ test.describe('Library Mode basic tests for @react-router', () => {
     await app.dev();
 
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
   });

@@ -69,7 +69,7 @@ export default function Page() {
     await app.dev();
 
     const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser({
+    fakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
       withPhoneNumber: true,
@@ -112,7 +112,7 @@ export default function Page() {
 
   test('Sign up page with invitation render correctly and sign up', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const invitedUser = u.services.users.createFakeUser({ fictionalEmail: true });
+    const invitedUser = u.services.users.createFakeUser(test, { fictionalEmail: true });
 
     const invitation = await u.services.invitations.createBapiInvitation(invitedUser.email);
 

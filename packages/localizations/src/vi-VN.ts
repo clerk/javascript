@@ -63,6 +63,7 @@ export const viVN: LocalizationResource = {
   badge__canceledEndsAt: "Đã hủy • Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__currentPlan: 'Gói hiện tại',
   badge__default: 'Mặc định',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__expired: 'Đã hết hạn',
   badge__freeTrial: 'Dùng thử miễn phí',
@@ -104,8 +105,11 @@ export const viVN: LocalizationResource = {
       'Bạn không thể đăng ký gói này bằng cách thanh toán hàng tháng. Để đăng ký gói này, bạn cần chọn thanh toán hàng năm.',
     cannotSubscribeUnrecoverable: 'Bạn không thể đăng ký gói này. Gói đăng ký hiện tại của bạn đắt hơn gói này.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Thanh toán của bạn đã thành công.',
       description__subscriptionSuccessful: 'Đăng ký mới của bạn đã được thiết lập.',
+      discount: undefined,
       downgradeNotice:
         'Bạn sẽ giữ đăng ký hiện tại và các tính năng của nó cho đến cuối chu kỳ thanh toán, sau đó bạn sẽ được chuyển sang đăng ký này.',
       emailForm: {
@@ -121,6 +125,8 @@ export const viVN: LocalizationResource = {
       },
       pastDueNotice: 'Đăng ký trước của bạn đã quá hạn và chưa thanh toán.',
       perMonth: 'hàng tháng',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Thanh toán',
       title__paymentSuccessful: 'Thanh toán thành công!',
       title__subscriptionSuccessful: 'Thành công!',
@@ -131,6 +137,9 @@ export const viVN: LocalizationResource = {
     credit: 'Tín dụng',
     creditRemainder: 'Tín dụng cho phần còn lại của đăng ký hiện tại.',
     defaultFreePlanActive: 'Bạn hiện đang trên gói Miễn phí',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Miễn phí',
     getStarted: 'Bắt đầu',
     highlightedPlanBadge: 'Phổ biến',
@@ -142,6 +151,7 @@ export const viVN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Hàng tháng',
+    months: undefined,
     pastDue: 'Quá hạn',
     pay: 'Thanh toán {{amount}}',
     payerCreditRemainder: undefined,
@@ -220,6 +230,84 @@ export const viVN: LocalizationResource = {
     year: 'Năm',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -246,6 +334,79 @@ export const viVN: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +793,10 @@ export const viVN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nâng cấp quyền của bạn.',
@@ -685,6 +850,10 @@ export const viVN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Nhà cung cấp SAML tùy chỉnh',
         google: undefined,
@@ -860,11 +1029,53 @@ export const viVN: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Tạo tổ chức',
@@ -1078,6 +1289,25 @@ export const viVN: LocalizationResource = {
       title: 'Xóa tên miền',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1313,6 +1543,10 @@ export const viVN: LocalizationResource = {
         subtitleNewTab: 'Quay lại tab mới được mở để tiếp tục',
         titleNewTab: 'Đăng nhập trên tab khác',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Sử dụng liên kết xác minh được gửi đến email của bạn',
@@ -1323,6 +1557,9 @@ export const viVN: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'Chọn tài khoản doanh nghiệp bạn muốn dùng để tiếp tục.',
       title: 'Chọn tài khoản doanh nghiệp của bạn',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Mã xác minh mật khẩu',
@@ -1389,6 +1626,15 @@ export const viVN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Chúng tôi cần xác minh danh tính của bạn trước khi đặt lại mật khẩu.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Đăng ký',
@@ -1670,6 +1916,7 @@ export const viVN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
     form_password_or_identifier_incorrect:
       'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',
@@ -1723,6 +1970,8 @@ export const viVN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
     web3_signature_request_rejected: 'Bạn đã từ chối yêu cầu ký. Vui lòng thử lại để tiếp tục.',
     web3_solana_signature_generation_failed: 'Đã xảy ra lỗi khi tạo chữ ký. Vui lòng thử lại để tiếp tục.',

@@ -25,7 +25,9 @@ export {
   APIKeys,
   CreateOrganization,
   GoogleOneTap,
+  InviteMembersButton,
   OAuthConsent,
+  OAuthDeviceVerification,
   OrganizationList,
   OrganizationProfile,
   OrganizationSwitcher,
@@ -54,6 +56,7 @@ export {
   useClerk,
   useEmailLink,
   useOAuthConsent,
+  useOAuthDeviceVerification,
   useOrganization,
   useOrganizationCreationDefaults,
   useOrganizationList,
@@ -81,8 +84,15 @@ import * as ComponentsModule from '#components';
 
 import type { ServerComponentsServerModuleTypes } from './components.server';
 
+/**
+ * To set up Clerk in your project, run `npx -y clerk@latest init` from your project's root directory.
+ * The Clerk CLI can provision temporary development keys without a Clerk account and write them to `.env.local`. See
+ * the [Clerk CLI docs](https://clerk.com/docs/cli).
+ */
 export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsServerModuleTypes['ClerkProvider'];
 export const Show = ComponentsModule.Show as ServerComponentsServerModuleTypes['Show'];
+
+export { Protect, SignedIn, SignedOut } from './removedControlComponents';
 
 /**
  * `auth` is not available from this import path.

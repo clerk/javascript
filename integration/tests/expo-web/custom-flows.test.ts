@@ -13,7 +13,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
     test.beforeAll(async () => {
       const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser({
+      fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
@@ -54,7 +54,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
     test('sign up using custom flow and also delete user', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
-      const fakeSignUpUser = u.services.users.createFakeUser({
+      const fakeSignUpUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,

@@ -14,6 +14,7 @@ function Harness(props: Partial<React.ComponentProps<typeof Otp.Root>> & { lengt
   return (
     <Otp.Root
       length={length}
+      data-testid='otp-root'
       {...rootProps}
     >
       <Slots />
@@ -29,6 +30,7 @@ function Slots() {
         <Otp.Input
           key={slot.index}
           index={slot.index}
+          data-testid='otp-input'
         />
       ))}
     </>
@@ -36,29 +38,29 @@ function Slots() {
 }
 
 function inputs() {
-  return Array.from(document.querySelectorAll<HTMLInputElement>('[data-cl-slot="otp-input"]'));
+  return Array.from(document.querySelectorAll<HTMLInputElement>('[data-testid="otp-input"]'));
 }
 
 describe('Otp', () => {
   describe('slot attributes', () => {
     it('renders the root and one input per slot', () => {
       render(<Harness length={4} />);
-      expect(document.querySelector('[data-cl-slot="otp-root"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="otp-root"]')).toBeInTheDocument();
       expect(inputs()).toHaveLength(4);
     });
 
     it('marks the root empty until a character is entered, then complete when full', async () => {
       const user = userEvent.setup();
       render(<Harness length={2} />);
-      const root = document.querySelector('[data-cl-slot="otp-root"]');
-      expect(root).toHaveAttribute('data-cl-empty', '');
+      const root = document.querySelector('[data-testid="otp-root"]');
+      expect(root).toHaveAttribute('data-empty', '');
 
       await user.type(inputs()[0], '1');
-      expect(root).not.toHaveAttribute('data-cl-empty');
-      expect(root).not.toHaveAttribute('data-cl-complete');
+      expect(root).not.toHaveAttribute('data-empty');
+      expect(root).not.toHaveAttribute('data-complete');
 
       await user.type(inputs()[1], '2');
-      expect(root).toHaveAttribute('data-cl-complete', '');
+      expect(root).toHaveAttribute('data-complete', '');
     });
 
     it('marks a filled input and the active input', async () => {
@@ -69,11 +71,11 @@ describe('Otp', () => {
           defaultValue='1'
         />,
       );
-      expect(inputs()[0]).toHaveAttribute('data-cl-filled', '');
-      expect(inputs()[1]).not.toHaveAttribute('data-cl-filled');
+      expect(inputs()[0]).toHaveAttribute('data-filled', '');
+      expect(inputs()[1]).not.toHaveAttribute('data-filled');
 
       await user.click(inputs()[1]);
-      expect(inputs()[1]).toHaveAttribute('data-cl-active', '');
+      expect(inputs()[1]).toHaveAttribute('data-active', '');
     });
   });
 
@@ -408,7 +410,7 @@ describe('Otp', () => {
       for (const input of inputs()) {
         expect(input).toBeDisabled();
       }
-      expect(document.querySelector('[data-cl-slot="otp-root"]')).toHaveAttribute('data-cl-disabled', '');
+      expect(document.querySelector('[data-testid="otp-root"]')).toHaveAttribute('data-disabled', '');
 
       await user.type(inputs()[0], '1');
       expect(onValueChange).not.toHaveBeenCalled();
@@ -424,14 +426,14 @@ describe('Otp', () => {
           defaultValue='1234'
         />,
       );
-      const hidden = document.querySelector<HTMLInputElement>('[data-cl-slot="otp-hidden-input"]');
+      const hidden = document.querySelector<HTMLInputElement>('input[aria-hidden="true"]');
       expect(hidden).toHaveAttribute('name', 'code');
       expect(hidden).toHaveValue('1234');
     });
 
     it('omits the hidden input when no name is given', () => {
       render(<Harness length={4} />);
-      expect(document.querySelector('[data-cl-slot="otp-hidden-input"]')).not.toBeInTheDocument();
+      expect(document.querySelector('input[aria-hidden="true"]')).not.toBeInTheDocument();
     });
   });
 
@@ -495,7 +497,7 @@ describe('Otp', () => {
         </Otp.Root>,
       );
       const custom = screen.getByTestId('custom');
-      expect(custom).toHaveAttribute('data-cl-slot', 'otp-input');
+      expect(custom).toBeInTheDocument();
     });
   });
 
@@ -507,10 +509,112 @@ describe('Otp', () => {
           <Otp.Input
             index={0}
             ref={ref}
+            data-testid='otp-input'
           />
         </Otp.Root>,
       );
       expect(ref.current).toBe(inputs()[0]);
+    });
+  });
+
+  describe('form integration', () => {
+    it('marks every slot required so a partial code fails validation', () => {
+      render(
+        <Harness
+          required
+          name='code'
+          defaultValue='12'
+        />,
+      );
+      expect(inputs().every(input => input.required)).toBe(true);
+      expect(inputs()[2].checkValidity()).toBe(false);
+      expect(inputs()[0].checkValidity()).toBe(true);
+    });
+
+    it('does not require slots by default', () => {
+      render(<Harness />);
+      expect(inputs().some(input => input.required)).toBe(false);
+    });
+
+    it('disables the hidden input so a disabled field submits nothing', () => {
+      render(
+        <Harness
+          disabled
+          name='code'
+          defaultValue='1234'
+        />,
+      );
+      const hidden = document.querySelector<HTMLInputElement>('input[name="code"]');
+      expect(hidden).toBeDisabled();
+
+      const form = document.createElement('form');
+      form.append(hidden as Node);
+      expect(Array.from(new FormData(form).keys())).toEqual([]);
+    });
+
+    it('submits the hidden input when enabled', () => {
+      render(
+        <Harness
+          name='code'
+          defaultValue='1234'
+        />,
+      );
+      const hidden = document.querySelector<HTMLInputElement>('input[name="code"]');
+      expect(hidden).not.toBeDisabled();
+
+      const form = document.createElement('form');
+      form.append(hidden as Node);
+      expect(new FormData(form).get('code')).toBe('1234');
+    });
+  });
+
+  describe('labelling', () => {
+    it('puts the root id on the first slot and derives the rest from it', () => {
+      render(<Harness id='code' />);
+      expect(inputs().map(input => input.id)).toEqual(['code', 'code-2', 'code-3', 'code-4']);
+      expect(document.querySelector('[data-testid="otp-root"]')).not.toHaveAttribute('id');
+    });
+
+    it('generates slot ids when no id is given', () => {
+      render(<Harness />);
+      expect(inputs().every(input => input.id !== '')).toBe(true);
+      expect(new Set(inputs().map(input => input.id)).size).toBe(4);
+    });
+
+    it('names the first slot after a native label targeting it', () => {
+      render(
+        <>
+          <label htmlFor='code'>Verification code</label>
+          <Harness id='code' />
+        </>,
+      );
+      expect(inputs()[0]).not.toHaveAttribute('aria-label');
+      expect(screen.getByLabelText('Verification code')).toBe(inputs()[0]);
+    });
+
+    it('passes the root aria-labelledby down to the first slot', () => {
+      render(
+        <>
+          <span id='code-label'>Verification code</span>
+          <Harness aria-labelledby='code-label' />
+        </>,
+      );
+      expect(inputs()[0]).toHaveAttribute('aria-labelledby', 'code-label');
+      expect(inputs()[0]).not.toHaveAttribute('aria-label');
+    });
+
+    it('passes the root aria-label down to the first slot', () => {
+      render(<Harness aria-label='Verification code' />);
+      expect(inputs()[0]).toHaveAttribute('aria-label', 'Verification code');
+    });
+
+    it('labels the remaining slots positionally', () => {
+      render(<Harness aria-label='Verification code' />);
+      expect(
+        inputs()
+          .slice(1)
+          .map(input => input.getAttribute('aria-label')),
+      ).toEqual(['Character 2 of 4', 'Character 3 of 4', 'Character 4 of 4']);
     });
   });
 

@@ -34,7 +34,9 @@ const AVAILABLE_COMPONENTS = [
   'pricingTable',
   'apiKeys',
   'configureSSO',
+  'configureDirectorySync',
   'oauthConsent',
+  'oauthDeviceVerification',
   'taskChooseOrganization',
   'taskResetPassword',
   'taskSetupMFA',
@@ -153,7 +155,9 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
   configureSSO: buildComponentControls('configureSSO'),
+  configureDirectorySync: buildComponentControls('configureDirectorySync'),
   oauthConsent: buildComponentControls('oauthConsent'),
+  oauthDeviceVerification: buildComponentControls('oauthDeviceVerification'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
   taskSetupMFA: buildComponentControls('taskSetupMFA'),
@@ -425,6 +429,14 @@ void (async () => {
     '/pricing-table': { mount: 'mountPricingTable', component: 'pricingTable' },
     '/api-keys': { mount: 'mountAPIKeys', component: 'apiKeys' },
     '/configure-sso': { mount: '__internal_mountConfigureSSO', component: 'configureSSO' },
+    '/oauth-device-verification': {
+      mount: '__internal_mountOAuthDeviceVerification',
+      component: 'oauthDeviceVerification',
+    },
+    '/configure-directory-sync': {
+      mount: '__internal_mountConfigureDirectorySync',
+      component: 'configureDirectorySync',
+    },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',
       component: 'taskChooseOrganization',
@@ -472,6 +484,7 @@ void (async () => {
       mountOpenButton(app, 'Open Sign In', p => Clerk?.openSignIn(p), componentControls.signIn.getProps() ?? {}),
     '/open-sign-up': () =>
       mountOpenButton(app, 'Open Sign Up', p => Clerk?.openSignUp(p), componentControls.signUp.getProps() ?? {}),
+    '/open-invite-members': () => mountOpenButton(app, 'Open Invite Members', p => Clerk?.openInviteMembers(p), {}),
   };
 
   for (const [path, { mount, component, defaultProps }] of Object.entries(mountableRoutes)) {

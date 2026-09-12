@@ -1,9 +1,9 @@
 'use client';
 
-import { FloatingFocusManager, FloatingList, useMergeRefs } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../../utils';
 import { useMenuContext } from './menu-context';
 
 export type MenuPositionerProps = ComponentProps<'div'>;
@@ -21,14 +21,9 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
       elementsRef,
       labelsRef,
       isNested,
+      returnFocusRef,
       setActiveIndex,
     } = useMenuContext();
-
-    // floating-ui types `setFloating` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([refs.setFloating, ref]);
 
     const side = placement.split('-')[0];
 
@@ -56,17 +51,11 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
     });
 
     const ownProps = {
-      'data-cl-slot': 'menu-positioner',
-      'data-cl-side': side,
-      ref: combinedRef,
+      'data-side': side,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 
     const defaultProps = { ...ownProps, ...floatingProps };
-
-    if (!mounted) {
-      return null;
-    }
 
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The menu id is owned by floating-ui's menu role: a consumer-supplied id must
@@ -75,18 +64,28 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
       merged.id = floatingProps.id;
     }
 
-    const element = renderElement({
+    const element = useRender({
       defaultTagName: 'div',
       render,
+      enabled: mounted,
+      // floating-ui types `setFloating` as a method signature, but at runtime it's
+      // a stable callback that doesn't use `this`, so the unbound-method check is a
+      // false positive here.
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      ref: [refs.setFloating, ref],
       props: merged,
     });
+
+    if (!element) {
+      return null;
+    }
 
     return (
       <FloatingFocusManager
         context={floatingContext}
         modal={false}
-        initialFocus={isNested ? -1 : 0}
-        returnFocus={!isNested}
+        initialFocus={isNested ? -1 : isKeyboardOpen(floatingContext) ? 0 : refs.floating}
+        returnFocus={isNested ? false : returnFocusRef}
       >
         <FloatingList
           elementsRef={elementsRef}

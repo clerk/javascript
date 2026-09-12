@@ -63,6 +63,7 @@ export const hrHR: LocalizationResource = {
   badge__canceledEndsAt: "Otkazan • Završava {{ date | shortDate('hr-HR') }}",
   badge__currentPlan: 'Trenutni plan',
   badge__default: 'Zadano',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Završava {{ date | shortDate('hr-HR') }}",
   badge__expired: 'Isteklo',
   badge__freeTrial: 'Besplatno probno razdoblje',
@@ -105,8 +106,11 @@ export const hrHR: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Ne možete se pretplatiti na ovaj plan. Vaša postojeća pretplata je skuplja od ovog plana.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Vaše plaćanje je uspješno.',
       description__subscriptionSuccessful: 'Vaša nova pretplata je spremna.',
+      discount: undefined,
       downgradeNotice:
         'Zadržat ćete svoju trenutnu pretplatu i njezine značajke do kraja obračunskog razdoblja, nakon čega ćete biti prebačeni na ovu pretplatu.',
       emailForm: {
@@ -122,6 +126,8 @@ export const hrHR: LocalizationResource = {
       },
       pastDueNotice: 'Vaša prethodna pretplata je bila dospjela, bez plaćanja.',
       perMonth: 'mjesečno',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Naplata',
       title__paymentSuccessful: 'Plaćanje je uspjelo!',
       title__subscriptionSuccessful: 'Uspjeh!',
@@ -132,6 +138,9 @@ export const hrHR: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit za preostalo razdoblje vaše trenutne pretplate.',
     defaultFreePlanActive: 'Trenutno ste na besplatnom planu',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Besplatno',
     getStarted: 'Započnite',
     highlightedPlanBadge: 'Popularno',
@@ -143,6 +152,7 @@ export const hrHR: LocalizationResource = {
     monthAbbreviation: 'mj',
     monthPerUnit: 'Mjesec po {{unitName}}',
     monthly: 'Mjesečno',
+    months: undefined,
     pastDue: 'Dospjelo',
     pay: 'Plati {{amount}}',
     payerCreditRemainder: 'Kredit sa stanja računa.',
@@ -221,6 +231,84 @@ export const hrHR: LocalizationResource = {
     year: 'Godina',
     yearAbbreviation: 'god',
     yearPerUnit: 'Godina po {{unitName}}',
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -247,6 +335,79 @@ export const hrHR: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -633,6 +794,10 @@ export const hrHR: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Obratite se administratoru vaše organizacije kako biste nadogradili svoja dopuštenja.',
@@ -686,6 +851,10 @@ export const hrHR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Prilagođeni SAML pružatelj',
         google: undefined,
@@ -860,11 +1029,53 @@ export const hrHR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Kreiraj organizaciju',
@@ -1079,6 +1290,25 @@ export const hrHR: LocalizationResource = {
       title: 'Ukloni domenu',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1315,6 +1545,10 @@ export const hrHR: LocalizationResource = {
         subtitleNewTab: 'Vratite se na novootvorenu karticu za nastavak',
         titleNewTab: 'Prijavljeni na drugoj kartici',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Koristite vezu za provjeru poslanu na vašu e-poštu',
@@ -1325,6 +1559,9 @@ export const hrHR: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'Odaberite poslovni račun s kojim želite nastaviti.',
       title: 'Odaberite svoj poslovni račun',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Kod za resetiranje lozinke',
@@ -1391,6 +1628,15 @@ export const hrHR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Moramo potvrditi vaš identitet prije resetiranja lozinke.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrirajte se',
@@ -1677,6 +1923,7 @@ export const hrHR: LocalizationResource = {
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti. Molimo resetirajte svoju lozinku.',
     form_password_incorrect: 'Netočna lozinka. Pokušajte ponovno.',
     form_password_length_too_short: 'Vaša lozinka je prekratka. Mora sadržavati najmanje 8 znakova.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
     form_password_or_identifier_incorrect:
       'Lozinka ili e-mail adresa nisu točne. Pokušajte ponovno ili koristite drugu metodu.',
@@ -1733,6 +1980,8 @@ export const hrHR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Već ste prijavljeni.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Nije pronađeno proširenje za Web3 novčanik. Molimo instalirajte jedno za nastavak.',
     web3_signature_request_rejected: 'Odbili ste zahtjev za potpis. Pokušajte ponovno za nastavak.',
     web3_solana_signature_generation_failed:

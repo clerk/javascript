@@ -7,7 +7,7 @@ down, from `@clerk/headless`. It is a **headless** primitive: it supplies open s
 portalling, an overlay surface, a scroll-locked viewport, focus management, dismissal
 (drag / outside press / Escape), optional snap points, virtual-keyboard awareness, nesting,
 and ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the
-`data-cl-*` state attributes each part emits and composing the raw `--cl-drawer-*` custom
+`data-*` state attributes each part emits and composing the raw `--cl-drawer-*` custom
 properties it writes. It reuses the same Floating UI infrastructure as `Dialog` with a
 hand-rolled drag engine layered on top; prefer `Dialog` for centered modals with no drag.
 
@@ -156,21 +156,20 @@ additional props beyond standard HTML attributes for their default element.
 
 ## Styling
 
-The headless parts don't emit `data-cl-slot` — slot identity is applied by the styled
-(Mosaic) layer. Target a part with your own class (or `render` prop) and combine it with the
-`data-cl-*` state attributes each part emits:
+The headless parts are unstyled. Target a part with your own class (or `render` prop) and
+combine it with the `data-*` state attributes each part emits:
 
-| Attribute                                         | Applies To                         | Description                                         |
-| ------------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
-| `data-cl-open` / `data-cl-closed`                 | Trigger, Backdrop, Viewport, Popup | Present while open / closed (still mounted exiting) |
-| `data-cl-starting-style` / `data-cl-ending-style` | Backdrop, Viewport, Popup          | Present on the entering / exiting frame             |
-| `data-cl-swiping`                                 | Popup, Backdrop                    | Present while a drag is in progress                 |
-| `data-cl-snap`                                    | Popup                              | The active snap index                               |
-| `data-cl-expanded`                                | Popup                              | Present when resting at the full-height snap        |
-| `data-cl-nested`                                  | Popup                              | This drawer is itself nested                        |
-| `data-cl-nested-drawer-open`                      | Popup                              | A nested child drawer is open                       |
-| `data-cl-drawer-handle`                           | Handle                             | Grip / `handleOnly` hit-test target                 |
-| `data-cl-drawer-no-drag`                          | (consumer-set)                     | Opt a subtree out of the drag gesture               |
+| Attribute                                   | Applies To                         | Description                                         |
+| ------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
+| `data-open` / `data-closed`                 | Trigger, Backdrop, Viewport, Popup | Present while open / closed (still mounted exiting) |
+| `data-starting-style` / `data-ending-style` | Backdrop, Viewport, Popup          | Present on the entering / exiting frame             |
+| `data-swiping`                              | Popup, Backdrop                    | Present while a drag is in progress                 |
+| `data-snap`                                 | Popup                              | The active snap index                               |
+| `data-expanded`                             | Popup                              | Present when resting at the full-height snap        |
+| `data-nested`                               | Popup                              | This drawer is itself nested                        |
+| `data-nested-drawer-open`                   | Popup                              | A nested child drawer is open                       |
+| `data-drawer-handle`                        | Handle                             | Grip / `handleOnly` hit-test target                 |
+| `data-drawer-no-drag`                       | (consumer-set)                     | Opt a subtree out of the drag gesture               |
 
 The drag engine and snap layer write raw inputs as CSS custom properties on `Drawer.Popup`;
 the styled layer composes them into the actual `transform` / `opacity` chains (the headless
@@ -187,18 +186,18 @@ via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` is unavailab
 
 The backdrop, viewport, and popup stay mounted through the exit animation, so enter/exit
 transitions are CSS-driven. Sum the resting snap offset with the live drag delta so the sheet
-follows the finger, and drop the transition while `data-cl-swiping` is present:
+follows the finger, and drop the transition while `data-swiping` is present:
 
 ```css
 .drawer-popup {
   transform: translateY(calc(var(--cl-drawer-snap-point-offset, 0px) + var(--cl-drawer-swipe-movement-y, 0px)));
   transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
 }
-.drawer-popup[data-cl-starting-style],
-.drawer-popup[data-cl-ending-style] {
+.drawer-popup[data-starting-style],
+.drawer-popup[data-ending-style] {
   transform: translateY(100%);
 }
-.drawer-popup[data-cl-swiping] {
+.drawer-popup[data-swiping] {
   transition-duration: 0ms;
 }
 .drawer-backdrop {

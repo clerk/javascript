@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
 
   test('sign up persists unsafeMetadata', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,
@@ -41,7 +41,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
 
   test('combined sign up persists unsafeMetadata', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPassword: true,
       withUsername: true,
@@ -74,7 +74,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
   // these specs share the same baseline (`unsafeMetadata: { position: 'goalie' }`).
   const signUpAndGetUser = async ({ page, context }: { page: any; context: any }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,

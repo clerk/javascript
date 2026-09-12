@@ -143,7 +143,7 @@ test.describe('chrome extension sync-host @chrome-extension', () => {
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    fakeUser = await createTestUser(env);
+    fakeUser = await createTestUser(env, test);
   });
 
   test.afterAll(async () => {

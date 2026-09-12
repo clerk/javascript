@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import { AuthStatus } from '@clerk/backend/internal';
+import { AuthStatus, signedOutAuthObject } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import type { FastifyReply, FastifyRequest } from 'fastify';
@@ -7,10 +7,11 @@ import { Readable } from 'stream';
 
 import * as constants from './constants';
 import type { ClerkFastifyOptions } from './types';
-import { fastifyRequestToRequest, requestToProxyRequest } from './utils';
+import { fastifyRequestToRequest, requestToProxyRequest, stripHandshakeCookiesAndParams } from './utils';
 
 export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
-  const { hookName: _hookName, frontendApiProxy, ...clerkOptions } = options;
+  const { hookName: _hookName, frontendApiProxy, __internal_enableHandshake, ...clerkOptions } = options;
+  const enableHandshake = __internal_enableHandshake ?? true;
   const proxyPath = stripTrailingSlashes(frontendApiProxy?.path ?? DEFAULT_PROXY_PATH) || DEFAULT_PROXY_PATH;
   const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
   const secretKey = options.secretKey || constants.SECRET_KEY;
@@ -31,10 +32,15 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
     // Handle Frontend API proxy requests and auto-derive proxyUrl
     let resolvedProxyUrl = options.proxyUrl;
     if (frontendApiProxy) {
-      const requestUrl = new URL(
-        fastifyRequest.url,
-        `${fastifyRequest.protocol}://${fastifyRequest.hostname || 'localhost'}`,
-      );
+      let requestUrl: URL;
+      try {
+        requestUrl = new URL(
+          fastifyRequest.url,
+          `${fastifyRequest.protocol}://${fastifyRequest.hostname || 'localhost'}`,
+        );
+      } catch {
+        return reply.code(400).send();
+      }
       const isEnabled =
         typeof frontendApiProxy.enabled === 'function'
           ? frontendApiProxy.enabled(requestUrl)
@@ -42,7 +48,12 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
       if (isEnabled) {
         if (requestUrl.pathname === proxyPath || requestUrl.pathname.startsWith(proxyPath + '/')) {
-          const proxyRequest = requestToProxyRequest(fastifyRequest);
+          let proxyRequest: Request;
+          try {
+            proxyRequest = requestToProxyRequest(fastifyRequest);
+          } catch {
+            return reply.code(400).send();
+          }
 
           const proxyResponse = await clerkFrontendApiProxy(proxyRequest, {
             proxyPath,
@@ -84,10 +95,20 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       }
     }
 
-    const req = fastifyRequestToRequest(fastifyRequest);
+    // Node accepts request targets/methods (`//`, TRACE) the fetch spec cannot represent; reject those instead of 500ing.
+    let req: Request;
+    try {
+      req = fastifyRequestToRequest(fastifyRequest);
+    } catch {
+      return reply.code(400).send();
+    }
+
+    if (!enableHandshake) {
+      req = stripHandshakeCookiesAndParams(req, [constants.Cookies.Handshake, constants.Cookies.HandshakeNonce]);
+    }
 
     const requestState = await clerkClient.authenticateRequest(req, {
-      ...options,
+      ...clerkOptions,
       secretKey,
       publishableKey,
       proxyUrl: resolvedProxyUrl,
@@ -98,13 +119,22 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      return reply.code(307).send();
-    } else if (requestState.status === AuthStatus.Handshake) {
+      // Development instances cannot establish auth state without the dev browser handshake.
+      const isDevBrowserHandshake =
+        requestState.reason === 'dev-browser-missing' || requestState.reason === 'dev-browser-sync';
+      if (enableHandshake || isDevBrowserHandshake) {
+        return reply.code(307).send();
+      }
+      reply.removeHeader(constants.Headers.Location);
+      reply.removeHeader(constants.Headers.CacheControl);
+    } else if (enableHandshake && requestState.status === AuthStatus.Handshake) {
       throw new Error('Clerk: handshake status without redirect');
     }
 
+    // A skipped handshake redirect leaves a handshake state whose toAuth() is null.
     // @ts-expect-error Inject auth so getAuth can read it
-    fastifyRequest.auth = requestState.toAuth();
+    fastifyRequest.auth =
+      requestState.toAuth() ?? signedOutAuthObject({ reason: requestState.reason, message: requestState.message });
     fastifyRequest.clerk = clerkClient;
   };
 };

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import type { SelectItem } from './select-context';
 import { useSelectContext } from './select-context';
 
@@ -39,11 +39,10 @@ export function SelectValue(props: SelectValueProps) {
     selectedValue !== undefined ? (selectedLabel ?? resolveLabel(selectedValue, items, valueToLabelRef)) : placeholder;
 
   const defaultProps = {
-    'data-cl-slot': 'select-value',
     children: displayText,
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'span',
     render,
     props: mergeProps<'span'>(defaultProps, otherProps),

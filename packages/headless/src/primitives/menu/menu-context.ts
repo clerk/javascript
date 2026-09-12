@@ -24,6 +24,8 @@ export interface MenuContextValue {
   labelsRef: React.MutableRefObject<Array<string | null>>;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   popupRef: React.RefObject<HTMLDivElement | null>;
+  /** Where focus goes when the menu closes, or `null` to leave focus alone. */
+  returnFocusRef: React.MutableRefObject<HTMLElement | null>;
   isNested: boolean;
   mounted: boolean;
   transitionProps: TransitionProps;

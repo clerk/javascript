@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { TokenVerificationError } from '../../errors';
 import {
   createJwt,
   mockJwks,
@@ -84,6 +85,18 @@ describe('decodeJwt(jwt)', () => {
   it('throws an error if number is given as jwt', () => {
     const { errors: [error] = [] } = decodeJwt('42');
     expect(error).toMatchObject(invalidTokenError);
+  });
+
+  it('returns an error if the token segments are not valid base64url', () => {
+    const { errors: [error] = [] } = decodeJwt('aaa.bbb.ccc');
+    expect(error).toBeInstanceOf(TokenVerificationError);
+    expect(error).toMatchObject({ reason: 'token-invalid' });
+  });
+
+  it('returns an error if the token segments do not decode to JSON', () => {
+    const { errors: [error] = [] } = decodeJwt('YWJj.YWJj.YWJj');
+    expect(error).toBeInstanceOf(TokenVerificationError);
+    expect(error).toMatchObject({ reason: 'token-invalid' });
   });
 });
 

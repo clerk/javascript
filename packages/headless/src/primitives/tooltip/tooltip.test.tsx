@@ -15,29 +15,14 @@ function renderTooltip(props: Partial<React.ComponentProps<typeof Tooltip.Root>>
       {...props}
     >
       <Tooltip.Trigger>Hover me</Tooltip.Trigger>
-      <Tooltip.Positioner>
-        <Tooltip.Popup>Tooltip content</Tooltip.Popup>
+      <Tooltip.Positioner data-testid='tooltip-positioner'>
+        <Tooltip.Popup data-testid='tooltip-popup'>Tooltip content</Tooltip.Popup>
       </Tooltip.Positioner>
     </Tooltip.Root>,
   );
 }
 
 describe('Tooltip', () => {
-  describe('slot attributes', () => {
-    it('renders trigger with data-cl-slot', () => {
-      renderTooltip();
-      const trigger = screen.getByRole('button', { name: 'Hover me' });
-      expect(trigger).toHaveAttribute('data-cl-slot', 'tooltip-trigger');
-    });
-
-    it('renders all parts with correct slot attributes when open', () => {
-      renderTooltip({ defaultOpen: true });
-
-      expect(document.querySelector('[data-cl-slot="tooltip-positioner"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="tooltip-popup"]')).toBeInTheDocument();
-    });
-  });
-
   describe('open/close', () => {
     it('opens on hover', async () => {
       const user = userEvent.setup();
@@ -46,7 +31,7 @@ describe('Tooltip', () => {
       const trigger = screen.getByRole('button', { name: 'Hover me' });
       await user.hover(trigger);
 
-      expect(document.querySelector('[data-cl-slot="tooltip-popup"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="tooltip-popup"]')).toBeInTheDocument();
     });
 
     it('closes on unhover', async () => {
@@ -56,12 +41,12 @@ describe('Tooltip', () => {
       const trigger = screen.getByRole('button', { name: 'Hover me' });
       await user.hover(trigger);
 
-      expect(document.querySelector('[data-cl-slot="tooltip-popup"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="tooltip-popup"]')).toBeInTheDocument();
 
       await user.unhover(trigger);
 
       const triggerEl = screen.getByRole('button', { name: 'Hover me' });
-      expect(triggerEl).toHaveAttribute('data-cl-closed', '');
+      expect(triggerEl).toHaveAttribute('data-closed', '');
     });
 
     it('opens on focus', async () => {
@@ -72,7 +57,7 @@ describe('Tooltip', () => {
         trigger.focus();
       });
 
-      expect(document.querySelector('[data-cl-slot="tooltip-popup"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="tooltip-popup"]')).toBeInTheDocument();
     });
 
     it('closes on Escape', async () => {
@@ -82,7 +67,7 @@ describe('Tooltip', () => {
       await user.keyboard('{Escape}');
 
       const trigger = screen.getByRole('button', { name: 'Hover me' });
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
 
     it('calls onOpenChange when toggled', async () => {
@@ -101,7 +86,7 @@ describe('Tooltip', () => {
     it('respects controlled open prop', () => {
       renderTooltip({ open: true });
 
-      expect(document.querySelector('[data-cl-slot="tooltip-positioner"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="tooltip-positioner"]')).toBeInTheDocument();
     });
 
     it('does not open when controlled open is false', async () => {
@@ -110,7 +95,7 @@ describe('Tooltip', () => {
 
       await user.hover(screen.getByRole('button', { name: 'Hover me' }));
 
-      expect(document.querySelector('[data-cl-slot="tooltip-positioner"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="tooltip-positioner"]')).not.toBeInTheDocument();
     });
   });
 
@@ -123,7 +108,7 @@ describe('Tooltip', () => {
       await user.hover(trigger);
 
       // aria-describedby must reference the tooltip positioner's id
-      const positioner = document.querySelector('[data-cl-slot="tooltip-positioner"]');
+      const positioner = document.querySelector('[data-testid="tooltip-positioner"]');
       expect(positioner).toBeInTheDocument();
       const positionerId = positioner!.getAttribute('id');
       expect(positionerId).toBeTruthy();
@@ -146,9 +131,9 @@ describe('Tooltip', () => {
       const trigger = screen.getByRole('button', { name: 'Hover me' });
       await user.hover(trigger);
 
-      expect(document.querySelector('[data-cl-slot="tooltip-popup"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="tooltip-popup"]')).toBeInTheDocument();
       // Tooltip must not steal focus — active element should not be inside the tooltip
-      const popup = document.querySelector('[data-cl-slot="tooltip-popup"]');
+      const popup = document.querySelector('[data-testid="tooltip-popup"]');
       expect(popup).not.toContainElement(document.activeElement as HTMLElement);
     });
 
@@ -157,8 +142,11 @@ describe('Tooltip', () => {
       render(
         <Tooltip.Root delay={0}>
           <Tooltip.Trigger>Hover me</Tooltip.Trigger>
-          <Tooltip.Positioner id='consumer-custom-id'>
-            <Tooltip.Popup>Tooltip content</Tooltip.Popup>
+          <Tooltip.Positioner
+            id='consumer-custom-id'
+            data-testid='tooltip-positioner'
+          >
+            <Tooltip.Popup data-testid='tooltip-popup'>Tooltip content</Tooltip.Popup>
           </Tooltip.Positioner>
         </Tooltip.Root>,
       );
@@ -166,7 +154,7 @@ describe('Tooltip', () => {
       const trigger = screen.getByRole('button', { name: 'Hover me' });
       await user.hover(trigger);
 
-      const positioner = document.querySelector('[data-cl-slot="tooltip-positioner"]');
+      const positioner = document.querySelector('[data-testid="tooltip-positioner"]');
       expect(positioner).toBeInTheDocument();
       // The wired id is owned by floating-ui: a consumer-supplied id must not
       // silently break the aria-describedby pairing between trigger and positioner.
@@ -179,27 +167,27 @@ describe('Tooltip', () => {
   describe('animation lifecycle', () => {
     it('positioner is not rendered when closed', () => {
       renderTooltip();
-      expect(document.querySelector('[data-cl-slot="tooltip-positioner"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="tooltip-positioner"]')).not.toBeInTheDocument();
     });
 
-    it('applies data-cl-open on popup when open', async () => {
+    it('applies data-open on popup when open', async () => {
       const user = userEvent.setup();
       renderTooltip();
 
       await user.hover(screen.getByRole('button', { name: 'Hover me' }));
 
-      const popup = document.querySelector('[data-cl-slot="tooltip-popup"]');
-      expect(popup).toHaveAttribute('data-cl-open', '');
+      const popup = document.querySelector('[data-testid="tooltip-popup"]');
+      expect(popup).toHaveAttribute('data-open', '');
     });
 
-    it('positioner has data-cl-side', async () => {
+    it('positioner has data-side', async () => {
       const user = userEvent.setup();
       renderTooltip();
 
       await user.hover(screen.getByRole('button', { name: 'Hover me' }));
 
-      const positioner = document.querySelector('[data-cl-slot="tooltip-positioner"]');
-      expect(positioner).toHaveAttribute('data-cl-side');
+      const positioner = document.querySelector('[data-testid="tooltip-positioner"]');
+      expect(positioner).toHaveAttribute('data-side');
     });
   });
 
@@ -207,34 +195,34 @@ describe('Tooltip', () => {
     it('accepts custom placement', () => {
       renderTooltip({ defaultOpen: true, placement: 'bottom-end' });
 
-      const positioner = document.querySelector('[data-cl-slot="tooltip-positioner"]');
-      expect(positioner).toHaveAttribute('data-cl-side', 'bottom');
+      const positioner = document.querySelector('[data-testid="tooltip-positioner"]');
+      expect(positioner).toHaveAttribute('data-side', 'bottom');
     });
 
     it('defaults to top placement', () => {
       renderTooltip({ defaultOpen: true });
 
-      const positioner = document.querySelector('[data-cl-slot="tooltip-positioner"]');
-      expect(positioner).toHaveAttribute('data-cl-side', 'top');
+      const positioner = document.querySelector('[data-testid="tooltip-positioner"]');
+      expect(positioner).toHaveAttribute('data-side', 'top');
     });
   });
 
   describe('trigger state attributes', () => {
-    it('trigger has data-cl-open when tooltip is visible', async () => {
+    it('trigger has data-open when tooltip is visible', async () => {
       const user = userEvent.setup();
       renderTooltip();
 
       const trigger = screen.getByRole('button', { name: 'Hover me' });
       await user.hover(trigger);
 
-      expect(trigger).toHaveAttribute('data-cl-open', '');
+      expect(trigger).toHaveAttribute('data-open', '');
     });
 
-    it('trigger has data-cl-closed when tooltip is hidden', () => {
+    it('trigger has data-closed when tooltip is hidden', () => {
       renderTooltip();
 
       const trigger = screen.getByRole('button', { name: 'Hover me' });
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
   });
 
@@ -347,7 +335,7 @@ describe('Tooltip', () => {
       );
 
       expect(ref.current).not.toBeNull();
-      expect(ref.current).toHaveAttribute('data-cl-slot', 'tooltip-arrow');
+      expect(ref.current).toHaveAttribute('data-side');
     });
   });
 });

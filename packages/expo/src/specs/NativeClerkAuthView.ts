@@ -8,7 +8,9 @@ interface NativeProps extends ViewProps {
   mode?: string;
   isDismissible?: boolean;
   logoMaxHeight?: number;
+  hostBackButton?: boolean;
   onAuthEvent?: (event: NativeSyntheticEvent<AuthEvent>) => void;
+  onHostBack?: (event: NativeSyntheticEvent<object>) => void;
 }
 
 const NativeClerkAuthView =

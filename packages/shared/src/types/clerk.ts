@@ -1,4 +1,6 @@
-import type { ClerkGlobalHookError } from '../errors/globalHookError';
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
+import type { ModuleManager } from '../moduleManager';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -23,6 +25,7 @@ import type { OAuthTransport } from './oauthTransport';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
+import type { ProtectAssertion } from './protectConfig';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
@@ -139,11 +142,13 @@ export type SDKMetadata = {
 
 /**
  * A callback function that is called when Clerk resources change.
+ *
  * @inline
  */
 export type ListenerCallback = (emission: Resources) => void;
 /**
  * Optional configuration for the `addListener()` method.
+ *
  * @param skipInitialEmit - If `true`, the callback will not be called immediately after registration. Defaults to `false`.
  * @inline
  */
@@ -188,7 +193,8 @@ export type SetActiveNavigate = (params: {
 
 /**
  * A callback that runs after sign out completes.
- * @inline */
+ *
+  @inline */
 export type SignOutCallback = () => void | Promise<any>;
 
 /**
@@ -289,6 +295,20 @@ export interface Clerk {
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
   /**
+   * Sets the Protect assertion attached to subsequent sign-in and sign-up requests, replacing
+   * any value supplied via the `protectAssertion` option. Pass `undefined` to clear it.
+   *
+   * Use this when the token is not available at `Clerk.load()` time — for example when your
+   * app fetches one from your backend after the page has started. Passing a function instead
+   * of a string has it re-read for each request, which is what you want if the token is
+   * refreshed while the page is open.
+   *
+   * @param assertion - A token minted by your backend, a function returning one, or
+   * `undefined`.
+   */
+  setProtectAssertion: (assertion?: ProtectAssertion) => void;
+
+  /**
    * @internal
    * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
    * By default the resolved URL is validated against the customer-supplied
@@ -297,6 +317,30 @@ export interface Clerk {
    * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension.
    */
   __internal_windowNavigate: (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }) => void;
+
+  /**
+   * Internal handle to the bundled ModuleManager. Exposed so framework SDK
+   * wrappers (e.g. IsomorphicClerk) can forward it to composed UI components
+   * that need dynamic-imported modules (Coinbase Wallet, Base, Stripe, zxcvbn).
+   * Plain property access crosses the bundle boundary that other channels
+   * cannot — clerk-js inlines its own @clerk/shared, so module-scoped state is
+   * invisible to consumers loading @clerk/shared from node_modules. It is
+   * `undefined` on a wrapper whose inner clerk-js has not loaded yet, so
+   * readers must handle the absent case.
+   *
+   * @internal
+   */
+  __internal_moduleManager: ModuleManager | undefined;
+
+  /**
+   * The verification-module load timeout asked for by the loader this browser was assigned, or
+   * undefined when it asked for nothing. The assignment is randomized per page load, so it cannot
+   * be recomputed from the environment config; callers fall back to the instance-wide value on
+   * that config, and then to the SDK default.
+   *
+   * @internal
+   */
+  __internal_protectChallengeLoadTimeoutMs?: number;
 
   frontendApi: string;
 
@@ -317,6 +361,7 @@ export interface Clerk {
 
   /**
    * Indicates whether the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
+   *
    * @inline
    */
   isStandardBrowser: boolean | undefined;
@@ -350,6 +395,7 @@ export interface Clerk {
    * `effect()` that can be used to subscribe to changes from Signals.
    *
    * @hidden
+   *
    * @experimental This experimental API is subject to change.
    */
   __internal_state: State;
@@ -398,6 +444,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk Checkout drawer.
+   *
    * @hidden
    */
   __internal_closeCheckout: () => void;
@@ -412,6 +459,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk PlanDetails drawer.
+   *
    * @hidden
    */
   __internal_closePlanDetails: () => void;
@@ -426,6 +474,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk SubscriptionDetails drawer.
+   *
    * @hidden
    */
   __internal_closeSubscriptionDetails: () => void;
@@ -440,12 +489,14 @@ export interface Clerk {
 
   /**
    * Closes the Clerk user verification modal.
+   *
    * @hidden
    */
   __internal_closeReverification: () => void;
 
   /**
    * Attempts to enable a environment setting from a development instance, prompting if disabled.
+   *
    * @hidden
    */
   __internal_attemptToEnableEnvironmentSetting: (
@@ -454,12 +505,14 @@ export interface Clerk {
 
   /**
    * Opens the Clerk Enable Organizations prompt for development instance
+   *
    * @hidden
    */
   __internal_openEnableOrganizationsPrompt: (props: __internal_EnableOrganizationsPromptProps) => void;
 
   /**
    * Closes the Clerk Enable Organizations modal.
+   *
    * @hidden
    */
   __internal_closeEnableOrganizationsPrompt: () => void;
@@ -512,6 +565,18 @@ export interface Clerk {
    * Closes the Clerk OrganizationProfile modal.
    */
   closeOrganizationProfile: () => void;
+
+  /**
+   * Opens a modal containing the organization invite-members form.
+   *
+   * @param props - Optional props that will be passed to the invite-members modal.
+   */
+  openInviteMembers: (props?: InviteMembersModalProps) => void;
+
+  /**
+   * Closes the invite-members modal.
+   */
+  closeInviteMembers: () => void;
 
   /**
    * Opens the Clerk CreateOrganization modal.
@@ -752,6 +817,24 @@ export interface Clerk {
   __internal_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a configure Directory Sync component at the target element.
+   *
+   * @param targetNode - Target to mount the ConfigureDirectorySync component.
+   * @param props - Configuration parameters.
+   * @hidden
+   */
+  __internal_mountConfigureDirectorySync: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+
+  /**
+   * Unmount a configure Directory Sync component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the ConfigureDirectorySync component from.
+   * @hidden
+   */
+  __internal_unmountConfigureDirectorySync: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -782,6 +865,23 @@ export interface Clerk {
    * @param targetNode - Target node to unmount the OAuth consent component from.
    */
   unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts an OAuth device verification component at the target element.
+   *
+   * @param targetNode - Target node to mount the OAuth device verification component.
+   * @param props - OAuth device verification configuration parameters.
+   * @internal
+   */
+  __internal_mountOAuthDeviceVerification: (targetNode: HTMLDivElement, props?: OAuthDeviceVerificationProps) => void;
+
+  /**
+   * Unmounts an OAuth device verification component from the target element.
+   * If there is no component mounted at the target node, this is a noop.
+   *
+   * @internal
+   */
+  __internal_unmountOAuthDeviceVerification: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a TaskChooseOrganization component at the target element.
@@ -939,12 +1039,14 @@ export interface Clerk {
 
   /**
    * Returns the configured `afterSignInUrl` of the instance.
+   *
    * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured `afterSignUpUrl` of the instance.
+   *
    * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
@@ -1049,7 +1151,7 @@ export interface Clerk {
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
-   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticatewithgoogleonetap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
    *
    * @param signInOrUp - The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).
    * @param params - Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.
@@ -1099,7 +1201,24 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
+   * Resumes redirect-callback routing after a verification challenge has been cleared, from
+   * a page that is no longer the callback route.
+   *
+   * A challenge can interrupt a callback partway through routing, on a step whose
+   * continuation is not one of the interactive sign-in cards — an OAuth sign-in that has to
+   * become a sign-up, for instance. Once the challenge clears, the flow has to pick up where
+   * the callback left off rather than start over.
+   *
+   * @internal
+   */
+  __internal_resumeAfterProtectCheck: (
+    params?: ResumeAfterProtectCheckParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
+   *
    * @param params - Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution.
    * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
@@ -1282,9 +1401,42 @@ export type HandleOAuthCallbackParams = TransferableOption &
       redirectUrl: string;
       decorateUrl: (url: string) => string;
     }) => Promise<unknown>;
+    /**
+     * Internal navigation hook used by Clerk UI to keep intermediate OAuth callback navigations
+     * (continue, factor steps, sign-in/sign-up switches) inside the component's own router when the
+     * callback completes in-process (transport flows). Not set by the web redirect/popup paths.
+     *
+     * @internal
+     */
+    __internal_navigate?: (to: string) => Promise<unknown>;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
+
+/**
+ * The continuation a caller observed on the resource *before* it ran a verification
+ * challenge. Supplied explicitly, because resolving a challenge re-serializes the sign-in
+ * and sign-up resources and can drop the marker the router would otherwise read back off
+ * them.
+ *
+ * @internal
+ */
+export type ProtectCheckContinuation = 'transfer_to_sign_up';
+
+/**
+ * Params for resuming a redirect callback that a Protect challenge interrupted.
+ *
+ * @internal
+ */
+export type ResumeAfterProtectCheckParams = HandleOAuthCallbackParams & {
+  /**
+   * What the flow was doing before the challenge interrupted it. See
+   * {@link ProtectCheckContinuation}.
+   *
+   * @internal
+   */
+  continuation?: ProtectCheckContinuation;
+};
 
 /**
  * A function used to navigate to a given URL after certain steps in the Clerk processes.
@@ -1384,7 +1536,20 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     localization?: LocalizationResource;
     /**
+     * A Clerk Protect assertion — a short-lived, signed token you mint from your own backend
+     * with the Clerk Backend API — carrying key/value pairs your Protect rules can read. Clerk
+     * attaches it to sign-in and sign-up requests.
+     *
+     * Pass a string if you already have one, or a function to have it re-read for each request.
+     * Prefer the function when a page can outlive the token: assertions are short-lived by
+     * design, and a string captured here stops applying once it expires.
+     *
+     * Can also be set later with `Clerk.setProtectAssertion()`.
+     */
+    protectAssertion?: ProtectAssertion;
+    /**
      * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
+     *
      * @default true
      */
     polling?: boolean;
@@ -1481,10 +1646,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
          * directly with the provided Clerk instance. Used by React Native / Expo.
          */
         runtimeEnvironment: 'headless';
-        /**
-         * Temporary flag that gates the self-serve OIDC flow in `<ConfigureSSO />`. Remove once the self-serve OIDC flow reaches GA.
-         */
-        oidcSelfServe: boolean;
       },
       Record<string, any>
     >;
@@ -1825,6 +1986,7 @@ export type __internal_EnableOrganizationsPromptProps = {
   caller:
     | 'OrganizationSwitcher'
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationList'
     | 'useOrganizationList'
     | 'useOrganization';
@@ -1835,10 +1997,12 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
   caller:
     | 'OrganizationSwitcher'
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationList'
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
     | 'ConfigureSSO'
+    | 'ConfigureDirectorySync'
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;
@@ -2033,6 +2197,23 @@ export type OrganizationProfileProps = RoutingOptions & {
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
+
+/** @generateWithEmptyComment */
+export type InviteMembersProps = {
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+   */
+  appearance?: OrganizationProfileProps['appearance'];
+};
+
+export type InviteMembersModalProps = InviteMembersProps & {
   /**
    * Function that returns the container element where portals should be rendered.
    * This allows Clerk components to render inside external dialogs/popovers
@@ -2625,6 +2806,13 @@ export type OAuthConsentProps = {
   onDeny?: () => void;
 };
 
+export type OAuthDeviceVerificationProps = {
+  /**
+   * Customization options to fully match the Clerk component to your own brand.
+   */
+  appearance?: ClerkAppearanceTheme;
+};
+
 /** @deprecated Use OAuthConsentProps instead. */
 export type __internal_OAuthConsentProps = OAuthConsentProps;
 
@@ -2682,6 +2870,11 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'initialValues'
     | 'oauthFlow'
   >;
+
+/**
+ * The invite-members form is only available as a modal, so there is no `mode` prop.
+ */
+export type InviteMembersButtonProps = InviteMembersProps;
 
 /** @generateWithEmptyComment */
 export type TaskChooseOrganizationProps = {
@@ -3010,7 +3203,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   __internal_clerkUIVersion?: string;
   /**
-   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard.
    */
   publishableKey: string;
   /**

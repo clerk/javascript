@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkWebAuthnError } from '@clerk/shared/error';
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/shared/types';
@@ -152,6 +152,113 @@ describe('SignInStart', () => {
             flow: 'autofill',
           });
         });
+      });
+
+      it('does not display related-origin errors from passkey autofill', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: true,
+          });
+        });
+
+        fixtures.signIn.authenticateWithPasskey.mockRejectedValue(
+          new ClerkWebAuthnError('The operation is insecure.', {
+            code: 'passkey_invalid_rpID_or_domain',
+          }),
+        );
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalledWith({
+            flow: 'autofill',
+          });
+        });
+        expect(screen.queryByText(/operation is insecure/i)).not.toBeInTheDocument();
+        screen.getByText('Use passkey instead');
+      });
+
+      it('skips autofill when the host reports no autofill support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: false,
+          });
+        });
+
+        const isAutoFillSupported = vi.fn(() => Promise.resolve(false));
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnAutofillSupported = isAutoFillSupported;
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(isAutoFillSupported).toHaveBeenCalled();
+        });
+        expect(fixtures.signIn.authenticateWithPasskey).not.toHaveBeenCalled();
+      });
+
+      it('hides the passkey action when the host reports no WebAuthn support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnSupported = () => false;
+        render(<SignInStart />, { wrapper });
+
+        expect(screen.queryByText('Use passkey instead')).not.toBeInTheDocument();
+      });
+    });
+
+    describe('with a host-provided WebAuthn implementation', () => {
+      it('starts autofill when the host reports support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: false,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnAutofillSupported = () => Promise.resolve(true);
+        fixtures.signIn.authenticateWithPasskey.mockResolvedValue({
+          status: 'complete',
+        } as SignInResource);
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalledWith({
+            flow: 'autofill',
+          });
+        });
+      });
+
+      it('shows the passkey action when the host reports support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnSupported = () => true;
+        render(<SignInStart />, { wrapper });
+
+        screen.getByText('Use passkey instead');
       });
     });
   });
@@ -369,6 +476,26 @@ describe('SignInStart', () => {
         continueSignIn: true,
       });
     });
+
+    it('stops short of the redirect when the instance offers an SSO fallback', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+          ssoFallbackFirstFactors: [
+            { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
+          ],
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one');
+    });
   });
 
   describe('Identifier switching', () => {
@@ -447,6 +574,18 @@ describe('SignInStart', () => {
       render(<SignInStart />, { wrapper });
 
       expect(screen.getByRole('textbox', { name: /phone number/i })).toHaveAttribute('type', 'tel');
+    });
+
+    it('ignores paste events without clipboard data', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+
+      const input = screen.getByRole('textbox', { name: /phone number/i });
+
+      expect(() => fireEvent.paste(input, { clipboardData: null })).not.toThrow();
     });
   });
 
@@ -696,6 +835,134 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('signUpIfMissing', () => {
+    it('passes signUpIfMissing: true when combined flow and enumeration protection are enabled', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when enumeration protection is disabled', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when not in combined flow', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when password is present', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { container, userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      const passwordField = container.querySelector('#password-field') as Element;
+      expect(passwordField).not.toBeNull();
+      fireEvent.change(passwordField, { target: { value: 'some-password' } });
+      const form = container.querySelector('form') as Element;
+      fireEvent.submit(form);
+      await waitFor(() => {
+        expect(fixtures.signIn.create).toHaveBeenCalledWith(
+          expect.not.objectContaining({
+            signUpIfMissing: true,
+          }),
+        );
+      });
+    });
+
+    it('does not pass signUpIfMissing when sign-up mode is restricted', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+        f.withRestrictedMode();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when sign-up mode is waitlist', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+        f.withWaitlistMode();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when the identifier is a username', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUsername();
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/username/i), 'hello');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+  });
+
   describe('ticket flow', () => {
     it('calls the appropriate resource function upon detecting the ticket', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -761,6 +1028,38 @@ describe('SignInStart', () => {
         '',
         expect.not.stringContaining('__clerk_ticket'),
       );
+    });
+
+    it('stops short of the redirect when the instance offers an SSO fallback', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        ssoFallbackFirstFactors: [
+          { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
+        ],
+      } as unknown as SignInResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-in?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: vi.fn() },
+      });
+
+      render(
+        <CardStateProvider>
+          <SignInStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one'));
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
     });
   });
 

@@ -1,0 +1,214 @@
+import { useRender } from '@clerk/headless/utils';
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
+import type { MosaicComponentProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../utils/reset.styles';
+import { Branding } from '../branding';
+import { Button } from '../button';
+import { Dialog, DialogContext, isOverlayDialog } from '../dialog';
+import { Icon } from '../icon';
+import { cardContentMarker } from './card.markers.stylex';
+import * as slots from './card.styles';
+
+type CardElevation = 'card' | 'flush' | 'overlay';
+
+const DEFAULT_ELEVATION: CardElevation = 'card';
+
+const CardElevationContext = React.createContext<CardElevation>(DEFAULT_ELEVATION);
+
+function CardBranding() {
+  return (
+    <div {...stylex.props(reset.base, slots.branding.base)}>
+      <Branding />
+    </div>
+  );
+}
+
+export interface CardProps extends MosaicComponentProps<'div'> {
+  /** Surface treatment applied to the card. @default 'card' */
+  elevation?: CardElevation;
+  /**
+   * Signs the foot of the card with "Secured by Clerk". An instance that has paid the branding off
+   * carries none of it, so a connected surface passes `displayConfig.branded` here.
+   *
+   * @default true
+   */
+  renderBranding?: boolean;
+}
+
+const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
+  { elevation = DEFAULT_ELEVATION, renderBranding = true, render, className, style, children, ...rest },
+  ref,
+) {
+  const element = useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-root', { elevation }),
+        stylex.props(reset.base, slots.root.base, slots.root[elevation]),
+        className,
+        style,
+      ),
+      ...rest,
+      children: (
+        <>
+          {children}
+          {renderBranding ? <CardBranding /> : null}
+        </>
+      ),
+    },
+  });
+
+  return <CardElevationContext.Provider value={elevation}>{element}</CardElevationContext.Provider>;
+});
+
+/**
+ * Dismisses the dialog from inside the header, in flow, so the header reserves the width it takes
+ * and a long title cannot run under it. `Dialog.CloseButton` stays the corner affordance, for
+ * dialogs that hold no card.
+ */
+function HeaderCloseButton() {
+  return (
+    <Dialog.Close
+      aria-label='Close'
+      render={props => (
+        <Button
+          variant='ghost'
+          shape='circle'
+          size='sm'
+          {...props}
+        />
+      )}
+    >
+      <Icon name='close' />
+    </Dialog.Close>
+  );
+}
+
+const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
+  { render, className, style, children, ...rest },
+  ref,
+) {
+  const dialog = React.useContext(DialogContext);
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base), className, style),
+      ...rest,
+      children: (
+        <>
+          {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
+              focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
+              Not for an inline dialog, which nothing closes. */}
+          {isOverlayDialog(dialog) ? <HeaderCloseButton /> : null}
+          <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
+            {children}
+          </div>
+        </>
+      ),
+    },
+  });
+});
+
+/**
+ * Names the card. Renders an `<h2>`, and inside a dialog takes the id the popup points
+ * `aria-labelledby` at, so the card names the dialog without knowing it is in one.
+ */
+const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(function CardTitle(
+  { render, className, style, ...rest },
+  ref,
+) {
+  const dialog = React.useContext(DialogContext);
+  return useRender({
+    defaultTagName: 'h2',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('card-title'), stylex.props(reset.base, slots.header.title), className, style),
+      ...rest,
+      // The popup points `aria-labelledby` at this id, so the surface outranks the caller: an id
+      // that displaced it would leave the dialog with no accessible name.
+      ...(dialog && { id: dialog.labelId }),
+    },
+  });
+});
+
+/** Describes the card. The `aria-describedby` counterpart to {@link Title}. */
+const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<'p'>>(function CardDescription(
+  { render, className, style, ...rest },
+  ref,
+) {
+  const dialog = React.useContext(DialogContext);
+  return useRender({
+    defaultTagName: 'p',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-description'),
+        stylex.props(reset.base, slots.header.description),
+        className,
+        style,
+      ),
+      ...rest,
+      ...(dialog && { id: dialog.descriptionId }),
+    },
+  });
+});
+
+const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardContent(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-content'),
+        stylex.props(reset.base, slots.content.base, cardContentMarker),
+        className,
+        style,
+      ),
+      ...rest,
+    },
+  });
+});
+
+const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardFooter(
+  { render, className, style, ...rest },
+  ref,
+) {
+  const elevation = React.useContext(CardElevationContext);
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-footer', { elevation }),
+        stylex.props(reset.base, slots.footer.base),
+        className,
+        style,
+      ),
+      ...rest,
+    },
+  });
+});
+
+/**
+ * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Title`, `Card.Description`,
+ * `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic `render` prop and forwards its
+ * ref.
+ *
+ * Rendered as the content of a `Dialog.Popup`, the card reads that surface from `DialogContext`:
+ * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
+ */
+export const Card = { Root, Header, Title, Description, Content, Footer };

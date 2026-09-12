@@ -214,7 +214,7 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
       await app.dev();
 
       const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser();
+      fakeUser = u.services.users.createFakeUser(test);
       fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
       fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
     });
@@ -390,7 +390,7 @@ export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void =>
       await app.dev();
 
       const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser();
+      fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
       fakeOAuth = await createFakeOAuthApp(
         createOAuthClient(app),

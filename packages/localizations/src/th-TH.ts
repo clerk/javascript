@@ -63,6 +63,7 @@ export const thTH: LocalizationResource = {
   badge__canceledEndsAt: "ถูกยกเลิก • สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__currentPlan: 'แผนปัจจุบัน',
   badge__default: 'ค่าเริ่มต้น',
+  badge__deprovisioned: undefined,
   badge__endsAt: "สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__expired: 'หมดอายุ',
   badge__freeTrial: 'ทดลองใช้ฟรี',
@@ -102,8 +103,11 @@ export const thTH: LocalizationResource = {
     cannotSubscribeMonthly: 'คุณไม่สามารถสมัครแผนนี้โดยการชำระรายเดือน หากต้องการสมัครแผนนี้ คุณต้องเลือกชำระรายปี',
     cannotSubscribeUnrecoverable: 'คุณไม่สามารถสมัครแผนนี้ได้ การสมัครสมาชิกปัจจุบันของคุณมีราคาแพงกว่าแผนนี้',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'การชำระเงินของคุณสำเร็จ',
       description__subscriptionSuccessful: 'การสมัครสมาชิกใหม่ของคุณพร้อมแล้ว',
+      discount: undefined,
       downgradeNotice:
         'คุณจะยังคงใช้การสมัครสมาชิกปัจจุบันและฟีเจอร์ของมันจนจบรอบบิล จากนั้นคุณจะถูกเปลี่ยนไปใช้การสมัครสมาชิกนี้',
       emailForm: {
@@ -119,6 +123,8 @@ export const thTH: LocalizationResource = {
       },
       pastDueNotice: 'การสมัครสมาชิกก่อนหน้าของคุณเกินกำหนดและไม่มีการชำระเงิน',
       perMonth: 'ต่อเดือน',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'ชำระเงิน',
       title__paymentSuccessful: 'ชำระเงินสำเร็จ!',
       title__subscriptionSuccessful: 'สำเร็จ!',
@@ -129,6 +135,9 @@ export const thTH: LocalizationResource = {
     credit: 'เครดิต',
     creditRemainder: 'เครดิตสำหรับส่วนที่เหลือของการสมัครสมาชิกปัจจุบันของคุณ',
     defaultFreePlanActive: 'คุณกำลังใช้แผนฟรีอยู่',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'ฟรี',
     getStarted: 'เริ่มต้นใช้งาน',
     highlightedPlanBadge: 'ยอดนิยม',
@@ -140,6 +149,7 @@ export const thTH: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'รายเดือน',
+    months: undefined,
     pastDue: 'เกินกำหนด',
     pay: 'ชำระ {{amount}}',
     payerCreditRemainder: undefined,
@@ -218,6 +228,84 @@ export const thTH: LocalizationResource = {
     year: 'ปี',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -244,6 +332,79 @@ export const thTH: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -630,6 +791,10 @@ export const thTH: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่ออัปเกรดสิทธิ์ของคุณ',
@@ -682,6 +847,10 @@ export const thTH: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'ผู้ให้บริการ SAML แบบกำหนดเอง',
         google: undefined,
@@ -856,11 +1025,53 @@ export const thTH: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'สร้างองค์กร',
@@ -1071,6 +1282,25 @@ export const thTH: LocalizationResource = {
       title: 'ลบโดเมน',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1305,6 +1535,10 @@ export const thTH: LocalizationResource = {
         subtitleNewTab: 'กลับไปยังแท็บที่เปิดใหม่เพื่อดำเนินการต่อ',
         titleNewTab: 'เข้าสู่ระบบในแท็บอื่น',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'ใช้ลิงก์ยืนยันที่ส่งไปยังอีเมลของคุณ',
@@ -1315,6 +1549,9 @@ export const thTH: LocalizationResource = {
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'รหัสรีเซ็ตรหัสผ่าน',
@@ -1380,6 +1617,15 @@ export const thTH: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'เราต้องยืนยันตัวตนของคุณก่อนรีเซ็ตรหัสผ่าน',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'สมัครสมาชิก',
@@ -1651,6 +1897,7 @@ export const thTH: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'รหัสผ่านของคุณสั้นเกินไป ต้องมีความยาวอย่างน้อย 8 ตัวอักษร',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'รหัสผ่านของคุณไม่แข็งแกร่งพอ',
     form_password_or_identifier_incorrect: 'รหัสผ่านหรือที่อยู่อีเมลไม่ถูกต้อง ลองอีกครั้งหรือใช้วิธีอื่น',
     form_password_pwned:
@@ -1700,6 +1947,8 @@ export const thTH: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'ไม่พบส่วนขยาย Web3 Wallet โปรดติดตั้งเพื่อดำเนินการต่อ',
     web3_signature_request_rejected: 'คุณได้ปฏิเสธคำขอการลงลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',
     web3_solana_signature_generation_failed: 'เกิดข้อผิดพลาดขณะสร้างลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',

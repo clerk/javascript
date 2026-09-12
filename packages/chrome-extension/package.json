@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "3.1.56",
+  "version": "3.1.82",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -53,6 +53,16 @@
         "default": "./dist/cjs/background/index.js"
       }
     },
+    "./legacy": {
+      "import": {
+        "types": "./dist/types/legacy.d.ts",
+        "default": "./dist/esm/legacy.js"
+      },
+      "require": {
+        "types": "./dist/types/legacy.d.ts",
+        "default": "./dist/cjs/legacy.js"
+      }
+    },
     "./types": {
       "types": "./dist/types/types/index.d.ts"
     },
@@ -66,6 +76,7 @@
     "client",
     "dist",
     "internal",
+    "legacy",
     "react",
     "types"
   ],
@@ -93,7 +104,7 @@
     "webextension-polyfill": "~0.12.0"
   },
   "devDependencies": {
-    "@types/chrome": "^0.1.40",
+    "@types/chrome": "^0.2.6",
     "@types/webextension-polyfill": "^0.12.5",
     "type-fest": "^4.41.0",
     "vitest-chrome": "^0.1.0"

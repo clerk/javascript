@@ -1,5 +1,6 @@
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
 import { InternalClerkProvider as ReactClerkProvider } from '@clerk/react/internal';
+import { isVirtualRouterPath } from '@clerk/shared/internal/clerk-js/url';
 import { ALLOWED_PROTOCOLS } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
@@ -79,6 +80,30 @@ function createOAuthTransport(): ClerkOAuthTransport | undefined {
   };
 }
 
+type ClerkRouterFn = NonNullable<ReactClerkProviderProps['routerPush']>;
+
+/** Always supplied, so clerk-js never reaches `window.location` and reloads the renderer. */
+function createRouterHandlers(
+  routerPush: ClerkRouterFn | undefined,
+  routerReplace: ClerkRouterFn | undefined,
+): { routerPush: ClerkRouterFn; routerReplace: ClerkRouterFn } {
+  const wrap =
+    (delegate: ClerkRouterFn | undefined): ClerkRouterFn =>
+    (to, metadata) => {
+      if (isVirtualRouterPath(to)) {
+        return;
+      }
+
+      if (delegate) {
+        return delegate(to, metadata);
+      }
+
+      metadata?.windowNavigate(to);
+    };
+
+  return { routerPush: wrap(routerPush), routerReplace: wrap(routerReplace) };
+}
+
 /**
  * Infer the custom renderer scheme registered with `createClerkBridge({ renderer })`.
  * Built-in Clerk protocols and local file renderers are not inferred.
@@ -98,15 +123,19 @@ export function ClerkProvider({
   publishableKey,
   passkeys,
   allowedRedirectProtocols,
+  routerPush,
+  routerReplace,
   ...props
 }: ClerkProviderProps): JSX.Element {
   const clerk = createClerkInstance(publishableKey, passkeys);
   const oauthTransport = createOAuthTransport();
   const clerkUI = loadClerkUI(publishableKey, props);
+  const routerHandlers = createRouterHandlers(routerPush, routerReplace);
 
   return (
     <ReactClerkProvider
       {...props}
+      {...routerHandlers}
       Clerk={clerk}
       __internal_oauthTransport={oauthTransport}
       allowedRedirectProtocols={allowedRedirectProtocols ?? defaultAllowedRedirectProtocols()}

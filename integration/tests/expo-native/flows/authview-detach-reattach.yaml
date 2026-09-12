@@ -3,6 +3,8 @@
 # is the platform-native gesture: Android's system back button (doubling as
 # the back-dismisses-AuthView regression), iOS's sheet Close control
 # (clerk-ios exposes the stable clerk.dismissButton identifier).
+# Also asserts the custom `logo` React element is rehosted into the native
+# logo slot with a nonzero size, both on first mount and after reattach.
 appId: com.clerk.exponativebuildfixture
 name: AuthView survives detach and reattach
 ---
@@ -12,6 +14,11 @@ name: AuthView survives detach and reattach
 - extendedWaitUntil:
     visible: 'Welcome! Sign in to continue\.?'
     timeout: 25000
+# Retrying wait (not assertVisible): the rehosted logo is sized on the first
+# RN layout pass, so it can lag the welcome copy by a frame or two.
+- extendedWaitUntil:
+    visible: 'E2E Custom Logo'
+    timeout: 10000
 - runFlow:
     when:
       platform: Android
@@ -29,6 +36,9 @@ name: AuthView survives detach and reattach
     timeout: 15000
 - tapOn:
     id: 'open-auth-view-button'
+- extendedWaitUntil:
+    visible: 'E2E Custom Logo'
+    timeout: 15000
 - runFlow: subflows/sign-in-email-password.yaml
 - runFlow: subflows/assert-signed-in.yaml
 - tapOn:

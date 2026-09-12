@@ -63,6 +63,7 @@ export const teIN: LocalizationResource = {
   badge__canceledEndsAt: "రద్దు చేయబడింది • ముగుస్తుంది {{ date | shortDate('te-IN') }}",
   badge__currentPlan: 'ప్రస్తుత ప్లాన్',
   badge__default: 'డిఫాల్ట్',
+  badge__deprovisioned: undefined,
   badge__endsAt: "ముగుస్తుంది {{ date | shortDate('te-IN') }}",
   badge__expired: 'గడువు ముగిసింది',
   badge__freeTrial: 'ఉచిత ట్రయల్',
@@ -105,8 +106,11 @@ export const teIN: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'మీరు ఈ ప్లాన్‌కు సబ్‌స్క్రైబ్ చేయలేరు. మీ ప్రస్తుత సబ్‌స్క్రిప్షన్ ఈ ప్లాన్ కంటే ఖరీదైనది.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'మీ చెల్లింపు విజయవంతమైంది.',
       description__subscriptionSuccessful: 'మీ కొత్త సబ్‌స్క్రిప్షన్ పూర్తిగా సిద్ధంగా ఉంది.',
+      discount: undefined,
       downgradeNotice:
         'బిల్లింగ్ చక్రం ముగిసే వరకు మీరు మీ ప్రస్తుత సబ్‌స్క్రిప్షన్‌ను మరియు దాని ఫీచర్లను ఉంచుకుంటారు, ఆ తర్వాత మీరు ఈ సబ్‌స్క్రిప్షన్‌కు మార్చబడతారు.',
       emailForm: {
@@ -122,6 +126,8 @@ export const teIN: LocalizationResource = {
       },
       pastDueNotice: 'మీ మునుపటి సబ్‌స్క్రిప్షన్ చెల్లింపు లేకుండా బకాయిగా ఉంది.',
       perMonth: 'నెలకు',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'చెక్అవుట్',
       title__paymentSuccessful: 'చెల్లింపు విజయవంతమైంది!',
       title__subscriptionSuccessful: 'విజయం!',
@@ -132,6 +138,9 @@ export const teIN: LocalizationResource = {
     credit: 'క్రెడిట్',
     creditRemainder: 'మీ ప్రస్తుత సబ్‌స్క్రిప్షన్ యొక్క మిగిలిన కాలానికి క్రెడిట్.',
     defaultFreePlanActive: 'మీరు ప్రస్తుతం ఉచిత ప్లాన్‌లో ఉన్నారు',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'ఉచితం',
     getStarted: 'ప్రారంభించండి',
     highlightedPlanBadge: 'ప్రసిద్ధ',
@@ -143,6 +152,7 @@ export const teIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'నెలవారీ',
+    months: undefined,
     pastDue: 'బకాయి',
     pay: '{{amount}} చెల్లించు',
     payerCreditRemainder: undefined,
@@ -221,6 +231,84 @@ export const teIN: LocalizationResource = {
     year: 'సంవత్సరం',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -247,6 +335,79 @@ export const teIN: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -633,6 +794,10 @@ export const teIN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'మీ అనుమతులను అప్‌గ్రేడ్ చేయడానికి మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
@@ -686,6 +851,10 @@ export const teIN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'కస్టమ్ SAML ప్రొవైడర్',
         google: undefined,
@@ -860,11 +1029,53 @@ export const teIN: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'సంస్థను సృష్టించండి',
@@ -1080,6 +1291,25 @@ export const teIN: LocalizationResource = {
       title: 'డొమైన్‌ను తొలగించండి',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1316,6 +1546,10 @@ export const teIN: LocalizationResource = {
         subtitleNewTab: 'కొనసాగించడానికి కొత్తగా తెరిచిన ట్యాబ్‌కి తిరిగి వెళ్ళండి',
         titleNewTab: 'ఇతర ట్యాబ్‌లో సైన్ ఇన్ చేశారు',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'మీ ఇమెయిల్‌కు పంపబడిన ధృవీకరణ లింక్‌ను ఉపయోగించండి',
@@ -1326,6 +1560,9 @@ export const teIN: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'మీరు కొనసాగించాలనుకుంటున్న ఎంటర్‌ప్రైజ్ ఖాతాను ఎంచుకోండి.',
       title: 'మీ ఎంటర్‌ప్రైజ్ ఖాతాను ఎంచుకోండి',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'పాస్‌వర్డ్ రీసెట్ కోడ్',
@@ -1393,6 +1630,15 @@ export const teIN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'మీ పాస్‌వర్డ్‌ను రీసెట్ చేయడానికి ముందు మీ గుర్తింపును మేము ధృవీకరించాలి.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'సైన్ అప్ చేయండి',
@@ -1676,6 +1922,7 @@ export const teIN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
     form_password_or_identifier_incorrect:
       'పాస్‌వర్డ్ లేదా ఇమెయిల్ చిరునామా తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి లేదా మరొక పద్ధతిని ఉపయోగించండి.',
@@ -1732,6 +1979,8 @@ export const teIN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
     web3_signature_request_rejected: 'మీరు సంతకం అభ్యర్థనను తిరస్కరించారు. కొనసాగేందుకు దయచేసి మళ్లీ ప్రయత్నించండి.',
     web3_solana_signature_generation_failed:

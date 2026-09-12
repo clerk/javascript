@@ -1,8 +1,6 @@
 import type { EnterpriseConnectionResource, OrganizationDomainResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
-import { useOptions } from '@/contexts';
-
 import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
 import type {
   EnterpriseConnectionMutations,
@@ -28,8 +26,6 @@ export interface ConfigureSSOData {
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
   onExit?: () => void;
-  /** Temporary gate for the self-serve OIDC flow; remove at OIDC GA. */
-  isOIDCFlowEnabled: boolean;
 }
 
 interface ConfigureSSOProviderProps {
@@ -57,8 +53,6 @@ export const ConfigureSSOProvider = ({
   onExit,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
-  const isOIDCFlowEnabled = useOptions().experimental?.oidcSelfServe ?? false;
-
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
       contentRef,
@@ -69,7 +63,6 @@ export const ConfigureSSOProvider = ({
       enterpriseConnectionMutations,
       organizationDomainMutations,
       onExit,
-      isOIDCFlowEnabled,
     }),
     [
       contentRef,
@@ -80,7 +73,6 @@ export const ConfigureSSOProvider = ({
       organizationDomains,
       enterpriseConnection,
       onExit,
-      isOIDCFlowEnabled,
     ],
   );
 

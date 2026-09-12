@@ -16,8 +16,7 @@ export const PopoverArrow = React.forwardRef<SVGSVGElement, PopoverArrowProps>(f
 
   return (
     <FloatingArrow
-      data-cl-slot='popover-arrow'
-      data-cl-side={side}
+      data-side={side}
       {...props}
       ref={combinedRef}
       context={floatingContext}

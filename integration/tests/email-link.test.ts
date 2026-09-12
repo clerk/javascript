@@ -81,7 +81,7 @@ const performSignUpVerificationLinkSameDevice = async (
   searchParams?: URLSearchParams,
 ) => {
   const u = createTestUtils({ app, page, context });
-  const fakeUser = u.services.users.createFakeUser();
+  const fakeUser = u.services.users.createFakeUser(test);
   await u.po.signUp.goTo({ searchParams });
   await u.po.signUp.signUpWithEmailAndPassword({ email: fakeUser.email, password: fakeUser.password });
   await u.po.signUp.waitForEmailVerificationScreen();
@@ -105,7 +105,7 @@ const performSignUpVerificationLinkDifferentDevice = async (
   searchParams?: URLSearchParams,
 ) => {
   const u = createTestUtils({ app, page, context, browser });
-  const fakeUser = u.services.users.createFakeUser();
+  const fakeUser = u.services.users.createFakeUser(test);
   await u.po.signUp.goTo({ searchParams });
   await u.po.signUp.signUpWithEmailAndPassword({ email: fakeUser.email, password: fakeUser.password });
   await u.po.signUp.waitForEmailVerificationScreen();

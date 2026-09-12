@@ -1,0 +1,115 @@
+import * as stylex from '@stylexjs/stylex';
+
+import { colorVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
+import { cardContentMarker } from './card.markers.stylex';
+
+const compactCard = '@container card (max-width: 20rem)' as const;
+
+export const root = stylex.create({
+  base: {
+    color: colorVars['--cl-color-card-foreground'],
+    containerName: 'card',
+    containerType: 'inline-size',
+    display: 'flex',
+    flexDirection: 'column',
+    maxWidth: '26.25rem',
+    width: '100%',
+  },
+  card: {
+    borderRadius: radiusVars['--cl-radius-xl'],
+    overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-card'],
+    boxShadow: shadowVars['--cl-shadow-card'],
+  },
+  flush: {
+    borderRadius: radiusVars['--cl-radius-xl'],
+    overflow: 'visible',
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+  },
+  overlay: {
+    borderRadius: radiusVars['--cl-radius-xl'],
+    overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-card'],
+    boxShadow: shadowVars['--cl-shadow-card'],
+  },
+});
+
+export const header = stylex.create({
+  // `row-reverse` so the dismiss button leads in the DOM — and so takes the dialog's opening
+  // focus — while sitting at the inline end.
+  base: {
+    paddingInline: space['5'],
+    columnGap: space['1'],
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    paddingBlockStart: space['4'],
+  },
+  content: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: '1',
+    rowGap: space['1'],
+  },
+  title: {
+    color: colorVars['--cl-color-card-foreground'],
+    fontSize: typeScaleVars['--cl-text-base-size'],
+    fontWeight: fontWeightVars['--cl-font-semibold'],
+    lineHeight: typeScaleVars['--cl-text-base-leading'],
+    textWrap: 'balance',
+  },
+  description: {
+    color: colorVars['--cl-color-neutral-faded'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    textWrap: 'pretty',
+  },
+});
+
+export const content = stylex.create({
+  // A grid rather than a flex column: grid ignores a child's `flex`, so a `fullWidth` button
+  // keeps its height instead of collapsing to a zero basis on the block axis.
+  base: {
+    gap: space['4'],
+    paddingBlock: space['4'],
+    paddingInline: space['5'],
+    display: 'grid',
+    flexBasis: 'auto',
+    flexGrow: '1',
+    flexShrink: '1',
+    gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+  },
+});
+
+export const footer = stylex.create({
+  base: {
+    gap: space['2'],
+    paddingBlock: space['4'],
+    paddingInline: space['5'],
+    alignItems: 'center',
+    display: { [compactCard]: 'grid', default: 'flex' },
+    flexDirection: 'row',
+    flexShrink: 0,
+    gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
+    justifyContent: 'space-between',
+    borderTopColor: colorVars['--cl-color-border'],
+    borderTopStyle: 'solid',
+    borderTopWidth: {
+      default: '0px',
+      [stylex.when.siblingBefore(':where(*)', cardContentMarker)]: '1px',
+    },
+    width: '100%',
+  },
+});
+
+export const branding = stylex.create({
+  // Placement only; the mark itself is `Branding`.
+  base: {
+    paddingBlock: space['3'],
+    paddingInline: space['6'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
+    textAlign: 'center',
+  },
+});

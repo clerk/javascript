@@ -1,6 +1,5 @@
-/** @jsxImportSource @emotion/react */
 import type { InputProps } from '@clerk/ui/mosaic/components/input';
-import { Input, inputRecipe } from '@clerk/ui/mosaic/components/input';
+import { Input } from '@clerk/ui/mosaic/components/input';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,9 +9,19 @@ export { default as __source } from './input.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Input',
-  source: 'packages/ui/src/mosaic/components/input.tsx',
-  styles: inputRecipe,
+  source: 'packages/ui/src/mosaic/components/input/input.tsx',
+  styles: {
+    _variants: {
+      size: { sm: {}, md: {}, lg: {} },
+      variant: { default: {}, ghost: {} },
+    },
+    _defaultVariants: {
+      size: 'md',
+      variant: 'default',
+    },
+  },
 };
 
 function knobsAsProps(props: Record<string, unknown>) {
@@ -41,6 +50,11 @@ export function Sizes(props: Record<string, unknown>) {
         size='md'
         placeholder='Medium'
       />
+      <Input
+        {...knobsAsProps(props)}
+        size='lg'
+        placeholder='Large'
+      />
     </div>
   );
 }
@@ -61,6 +75,16 @@ export function Invalid(props: Record<string, unknown>) {
       {...knobsAsProps(props)}
       aria-invalid='true'
       placeholder='Invalid'
+    />
+  );
+}
+
+export function Ghost(props: Record<string, unknown>) {
+  return (
+    <Input
+      {...knobsAsProps(props)}
+      variant='ghost'
+      placeholder='Enter text…'
     />
   );
 }

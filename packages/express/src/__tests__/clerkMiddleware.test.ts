@@ -1,5 +1,7 @@
 import type * as ClerkBackend from '@clerk/backend';
 import type { Request, RequestHandler, Response } from 'express';
+import express from 'express';
+import supertest from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockClerkFrontendApiProxy } = vi.hoisted(() => ({
@@ -565,19 +567,46 @@ describe('clerkMiddleware', () => {
     });
   });
 
-  it('calls next with an error when request URL is invalid', () => {
-    const req = {
-      url: '//',
-      cookies: {},
-      headers: { host: 'example.com' },
-    } as Request;
-    const res = {} as Response;
-    const mockNext = vi.fn();
+  describe('requests that cannot be converted to a web Request', () => {
+    it('responds 400 without calling next when the request URL is invalid', async () => {
+      const req = {
+        method: 'GET',
+        url: '//',
+        cookies: {},
+        headers: { host: 'example.com' },
+      } as Request;
+      const status = vi.fn().mockReturnThis();
+      const end = vi.fn();
+      const res = { status, end } as unknown as Response;
+      const mockNext = vi.fn();
 
-    clerkMiddleware()(req, res, mockNext);
+      await clerkMiddleware()(req, res, mockNext);
 
-    expect(mockNext.mock.calls[0][0].message).toBe('Invalid URL');
+      expect(status).toHaveBeenCalledWith(400);
+      expect(end).toHaveBeenCalled();
+      expect(mockNext).not.toHaveBeenCalled();
+    });
 
-    mockNext.mockReset();
+    it('responds 400 to a hostless // request target', async () => {
+      await runMiddlewareOnPath(clerkMiddleware(), '//').expect(400);
+    });
+
+    it('responds 400 to a request target that parses as a credentialed URL', async () => {
+      await runMiddlewareOnPath(clerkMiddleware(), '//$%7B%23context@example.com%7D.action').expect(400);
+    });
+
+    it('responds 400 to a forbidden method (TRACE)', async () => {
+      const app = express();
+      app.use(clerkMiddleware());
+      app.use((_req, res) => res.end('Hello world!'));
+
+      await supertest(app).trace('/').expect(400);
+    });
+
+    it('responds 400 to a hostless // request target when proxy is enabled', async () => {
+      await runMiddlewareOnPath(clerkMiddleware({ frontendApiProxy: { enabled: true } }), '//').expect(400);
+
+      expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
+    });
   });
 });

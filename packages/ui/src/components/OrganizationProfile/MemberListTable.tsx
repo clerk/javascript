@@ -130,11 +130,18 @@ const EmptyRow = (props: { localizationKey: LocalizationKey }) => {
   );
 };
 
-export const RowContainer = (props: PropsOfComponent<typeof Tr>) => {
+export const RowContainer = (props: PropsOfComponent<typeof Tr> & { isDisabled?: boolean }) => {
+  const { isDisabled, ...rest } = props;
+
   return (
     <Tr
-      {...props}
-      sx={t => ({ ':hover': { backgroundColor: t.colors.$neutralAlpha50 } })}
+      {...rest}
+      aria-disabled={isDisabled}
+      sx={t =>
+        isDisabled
+          ? { opacity: t.opacity.$disabled, ':hover': { backgroundColor: 'transparent' } }
+          : { ':hover': { backgroundColor: t.colors.$neutralAlpha50 } }
+      }
     />
   );
 };

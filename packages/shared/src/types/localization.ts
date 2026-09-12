@@ -158,6 +158,7 @@ export type __internal_LocalizationResource = {
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
   badge__banned: LocalizationValue;
+  badge__deprovisioned: LocalizationValue;
   badge__freeTrial: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
@@ -185,9 +186,11 @@ export type __internal_LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   billing: {
     month: LocalizationValue;
+    months: LocalizationValue;
     monthAbbreviation: LocalizationValue;
     monthPerUnit: LocalizationValue<'unitName'>;
     year: LocalizationValue;
+    years: LocalizationValue;
     yearAbbreviation: LocalizationValue;
     yearPerUnit: LocalizationValue<'unitName'>;
     free: LocalizationValue;
@@ -222,6 +225,9 @@ export type __internal_LocalizationResource = {
     alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
+    discountAmount: LocalizationValue<'amount'>;
+    discountCyclesRemaining: LocalizationValue<'cycles' | 'period'>;
+    discountDuration: LocalizationValue<'amount' | 'cycles' | 'period'>;
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
     viewPayment: LocalizationValue;
@@ -297,6 +303,11 @@ export type __internal_LocalizationResource = {
       };
     };
     checkout: {
+      addPromoCode: LocalizationValue;
+      applyPromoCode: LocalizationValue;
+      discount: LocalizationValue;
+      promoCodePlaceholder: LocalizationValue;
+      removePromoCode: LocalizationValue;
       title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
@@ -510,6 +521,14 @@ export type __internal_LocalizationResource = {
         titleNewTab: LocalizationValue;
         subtitleNewTab: LocalizationValue;
       };
+      /**
+       * Shown when the verified email has no matching user and the flow transfers to sign-up
+       * (`signUpIfMissing`), in whichever tab is not the one carrying that transfer.
+       */
+      verifiedTransferable: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
       loading: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
@@ -599,6 +618,18 @@ export type __internal_LocalizationResource = {
     enterpriseConnections: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+    };
+    enterpriseSSO: {
+      formButtonPrimary: LocalizationValue;
+    };
+    ssoFallback: {
+      actionLink: LocalizationValue;
+      notice: LocalizationValue;
+      code: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        resendButton: LocalizationValue;
+      };
     };
     web3Solana: {
       title: LocalizationValue;
@@ -1187,6 +1218,25 @@ export type __internal_LocalizationResource = {
         tooltip__noRole: LocalizationValue;
         tooltipLabel: LocalizationValue;
       };
+      directorySyncSection: {
+        title: LocalizationValue;
+        badge__unconfigured: LocalizationValue;
+        badge__ssoRequired: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        description: LocalizationValue;
+        error__load: LocalizationValue;
+        primaryButton__startConfiguration: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+        removeDialog: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          confirmButton: LocalizationValue;
+        };
+      };
     };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
@@ -1341,6 +1391,7 @@ export type __internal_LocalizationResource = {
   oauthConsent: {
     subtitle: LocalizationValue<'applicationName' | 'identifier'>;
     scopeList: {
+      privateMetadata: LocalizationValue<'applicationName'>;
       title: LocalizationValue<'applicationName'>;
     };
     action__deny: LocalizationValue;
@@ -1353,6 +1404,47 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue<'applicationName'>;
     };
+  };
+  oauthDeviceVerification: {
+    start: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      userCodeLabel: LocalizationValue;
+      action__continue: LocalizationValue;
+    };
+    confirmation: {
+      title: LocalizationValue<'applicationName'>;
+      subtitle: LocalizationValue<'identifier'>;
+      scopeListTitle: LocalizationValue<'applicationName'>;
+      warning: LocalizationValue;
+      action__deny: LocalizationValue;
+      action__approve: LocalizationValue;
+    };
+    status: {
+      approvedTitle: LocalizationValue;
+      approvedSubtitle: LocalizationValue;
+      alreadyApprovedTitle: LocalizationValue;
+      alreadyApprovedSubtitle: LocalizationValue;
+      alreadyDecidedTitle: LocalizationValue;
+      alreadyDecidedSubtitle: LocalizationValue;
+      deniedTitle: LocalizationValue;
+      deniedSubtitle: LocalizationValue;
+      alreadyDeniedTitle: LocalizationValue;
+      alreadyDeniedSubtitle: LocalizationValue;
+      consumedTitle: LocalizationValue;
+      consumedSubtitle: LocalizationValue;
+    };
+    error: {
+      invalidCode: LocalizationValue;
+      unknownCode: LocalizationValue;
+      expiredTitle: LocalizationValue;
+      expiredSubtitle: LocalizationValue;
+      rateLimitedTitle: LocalizationValue;
+      rateLimitedSubtitle: LocalizationValue;
+      genericTitle: LocalizationValue;
+      genericSubtitle: LocalizationValue;
+    };
+    action__tryAnotherCode: LocalizationValue;
   };
   unstable__errors: UnstableErrors;
   dates: {
@@ -1375,6 +1467,83 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       message: LocalizationValue;
+    };
+  };
+  configureDirectorySync: {
+    navbar: {
+      title: LocalizationValue;
+    };
+    stepper: {
+      configure: LocalizationValue;
+      attributes: LocalizationValue;
+      test: LocalizationValue;
+    };
+    providers: {
+      okta: LocalizationValue;
+      entra: LocalizationValue;
+      google: LocalizationValue;
+      custom: LocalizationValue;
+    };
+    configureStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      error__ssoRequired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      warning__googleUnsupported: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      warning__ssoInactive: LocalizationValue;
+      domainsLabel: LocalizationValue;
+      instructions: {
+        actionLabel__toggle: LocalizationValue;
+        okta: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+        entra: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+        custom: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+      };
+      formFieldLabel__endpointUrl: LocalizationValue;
+      formFieldLabel__token: LocalizationValue;
+      formFieldInputPlaceholder__token: LocalizationValue;
+      actionLabel__generateToken: LocalizationValue;
+      notice__tokenShownOnce: LocalizationValue;
+      actionLabel__retry: LocalizationValue;
+    };
+    attributeMappingStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      columns: {
+        directoryAttribute: LocalizationValue;
+        clerkAttribute: LocalizationValue;
+      };
+    };
+    testStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'provider'>;
+      description: LocalizationValue;
+      noteLabel: LocalizationValue;
+      note: LocalizationValue;
+      empty__waitingForFirstUser: LocalizationValue;
+      badge__active: LocalizationValue;
+      badge__deprovisioned: LocalizationValue;
+      error__loadUsers: LocalizationValue;
+      actionLabel__complete: LocalizationValue;
     };
   };
   configureSSO: {
@@ -1402,6 +1571,10 @@ export type __internal_LocalizationResource = {
         customSaml: LocalizationValue;
         google: LocalizationValue;
         microsoft: LocalizationValue;
+      };
+      oidc: {
+        groupLabel: LocalizationValue;
+        oidcProvider: LocalizationValue;
       };
       warning: LocalizationValue;
     };
@@ -1520,6 +1693,75 @@ export type __internal_LocalizationResource = {
       activeConnectionWarning: {
         title: LocalizationValue;
         dismiss: LocalizationValue;
+      };
+      oidcCustom: {
+        mainHeaderTitle: LocalizationValue;
+        redirectUriStep: {
+          headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+          claims: {
+            description: LocalizationValue;
+            table: {
+              columns: {
+                attribute: LocalizationValue;
+                claim: LocalizationValue;
+              };
+              rows: {
+                email: { attribute: LocalizationValue };
+                firstName: { attribute: LocalizationValue };
+                lastName: { attribute: LocalizationValue };
+                subject: { attribute: LocalizationValue };
+              };
+            };
+          };
+          redirectUri: {
+            label: LocalizationValue;
+          };
+        };
+        endpointsStep: {
+          headerSubtitle: LocalizationValue;
+          discoveryUrl: {
+            description: LocalizationValue;
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          manual: {
+            authUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            description: LocalizationValue;
+            tokenUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            userInfoUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+          };
+          modes: {
+            ariaLabel: LocalizationValue;
+            discoveryUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
+        };
+        credentialsStep: {
+          headerSubtitle: LocalizationValue;
+          clientId: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          clientSecret: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          paragraph: LocalizationValue;
+        };
+      };
+      unsupportedProvider: {
+        title: LocalizationValue;
+        description: LocalizationValue;
       };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;
@@ -2065,6 +2307,7 @@ type UnstableErrors = WithParamName<{
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
   form_new_password_matches_current: LocalizationValue;
+  form_password_matches_identifier: LocalizationValue;
   /** @deprecated Use `form_password_compromised__sign_in` instead */
   form_password_untrusted__sign_in: LocalizationValue;
   form_password_compromised__sign_in: LocalizationValue;
@@ -2102,6 +2345,8 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  ticket_expired_code: LocalizationValue;
+  ticket_invalid_code: LocalizationValue;
   zxcvbn: {
     notEnough: LocalizationValue;
     couldBeStronger: LocalizationValue;

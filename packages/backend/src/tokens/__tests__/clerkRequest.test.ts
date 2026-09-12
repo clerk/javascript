@@ -89,12 +89,46 @@ describe('createClerkRequest', () => {
       expect(req.cookies.get('foo')).toBe('bar');
     });
 
-    it('should parse and return cookies with special characters', () => {
+    it('should percent-decode cookie values', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=hello%20world' }) }),
+      );
+      expect(req.cookies.get('foo')).toBe('hello world');
+    });
+
+    it('should not treat encoded delimiters inside a value as cookie separators', () => {
       const req = createClerkRequest(
         new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=%20bar%3B%20baz%3Dqux' }) }),
       );
-      expect(req.cookies.get('foo')).toBe('bar');
-      expect(req.cookies.get('baz')).toBe('qux');
+      expect(req.cookies.get('foo')).toBe(' bar; baz=qux');
+      expect(req.cookies.get('baz')).toBeUndefined();
+    });
+
+    it('should not let an encoded value forge a session cookie', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', {
+          headers: new Headers({ cookie: 'sid=x%3B__session%3Dforged%3B__client_uat%3D1700000000' }),
+        }),
+      );
+      expect(req.cookies.get('sid')).toBe('x;__session=forged;__client_uat=1700000000');
+      expect(req.cookies.get('__session')).toBeUndefined();
+      expect(req.cookies.get('__client_uat')).toBeUndefined();
+    });
+
+    it('should keep the first value when a cookie name is repeated', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', { headers: new Headers({ cookie: '__session=first; __session=second' }) }),
+      );
+      expect(req.cookies.get('__session')).toBe('first');
+    });
+
+    it('should not throw on malformed percent-sequences', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=%C0; bar=100%D0; baz=ok' }) }),
+      );
+      expect(req.cookies.get('foo')).toBe('%C0');
+      expect(req.cookies.get('bar')).toBe('100%D0');
+      expect(req.cookies.get('baz')).toBe('ok');
     });
 
     it('should parse and return cookies even if no cookie header exists', () => {

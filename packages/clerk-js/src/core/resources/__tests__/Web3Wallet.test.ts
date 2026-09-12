@@ -1,4 +1,5 @@
 import type { Web3WalletJSON } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource, Web3Wallet } from '../internal';
@@ -33,20 +34,28 @@ describe('Web3 wallet', () => {
       web3_wallet: '0x0000000000000000000000000000000000000000',
     } as Web3WalletJSON;
 
+    const deferred = createDeferredPromise<any>();
+    const mockFetch = vi.fn().mockReturnValue(deferred.promise);
     // @ts-ignore
-    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
+    BaseResource._fetch = mockFetch;
 
     const web3Wallet = new Web3Wallet(web3WalletJSON, '/me/web3_wallets');
-    await web3Wallet.prepareVerification({ strategy: 'web3_metamask_signature' });
+    const params = { strategy: 'web3_metamask_signature' as const };
+    const first = web3Wallet.prepareVerification(params);
+    const second = web3Wallet.prepareVerification(params);
 
-    // @ts-ignore
-    expect(BaseResource._fetch).toHaveBeenCalledWith({
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledWith({
       method: 'POST',
       path: `/me/web3_wallets/${web3WalletJSON.id}/prepare_verification`,
       body: {
         strategy: 'web3_metamask_signature',
       },
+      signal: expect.any(AbortSignal),
     });
+
+    deferred.resolve({ response: web3WalletJSON });
+    await Promise.all([first, second]);
   });
 
   it('attemptVerification', async () => {

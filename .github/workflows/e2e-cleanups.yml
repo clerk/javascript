@@ -2,8 +2,8 @@ name: Cleanup e2e instances
 on:
   workflow_dispatch:
   schedule:
-    # run every 6 hours on every weekday
-    - cron: '0 */6 * * 1-5'
+    # run every 2 hours on every weekday
+    - cron: '0 */2 * * 1-5'
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -38,5 +38,7 @@ jobs:
       - name: Run cleanup
         run: pnpm test:integration:cleanup
         env:
+          E2E_CLEANUP_STALE_APPLICATIONS: '1'
+          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}

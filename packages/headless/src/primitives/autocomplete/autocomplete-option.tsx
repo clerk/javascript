@@ -1,9 +1,9 @@
 'use client';
 
-import { useListItem, useMergeRefs } from '@floating-ui/react';
+import { useListItem } from '@floating-ui/react';
 import React, { useEffect, useId } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useAutocompleteContext } from './autocomplete-context';
 
 export interface AutocompleteOptionProps extends ComponentProps<'div'> {
@@ -21,7 +21,6 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
     const id = useId();
     const displayLabel = label ?? value;
     const { ref: itemRef, index } = useListItem({ label: displayLabel });
-    const combinedRef = useMergeRefs([itemRef, ref]);
 
     const isSelected = selectedValue === value;
     const isActive = activeIndex === index;
@@ -44,9 +43,7 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
     };
 
     const ownProps = {
-      'data-cl-slot': 'autocomplete-option',
       id,
-      ref: combinedRef,
       role: 'option',
       'aria-selected': isActive,
       'aria-disabled': disabled || undefined,
@@ -69,14 +66,15 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
     // aria-activedescendant linkage: a consumer-supplied id must not override it.
     merged.id = id;
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'div',
       render,
+      ref: [itemRef, ref],
       state,
       stateAttributesMapping: {
-        selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),
-        active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
-        disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+        selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
+        active: (v: boolean) => (v ? { 'data-active': '' } : null),
+        disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
       },
       props: merged,
     });

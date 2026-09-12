@@ -34,6 +34,8 @@ export interface SelectContextValue {
   labelsRef: React.MutableRefObject<Array<string | null>>;
   popupRef: RefObject<HTMLDivElement | null>;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
+  /** Where focus goes when the listbox closes, or `null` to leave focus alone. */
+  returnFocusRef: React.MutableRefObject<HTMLElement | null>;
   valueToLabelRef: React.MutableRefObject<Map<string, string>>;
   selectedItemRef: React.MutableRefObject<HTMLElement | null>;
   alignItemWithTrigger: boolean;

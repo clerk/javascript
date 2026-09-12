@@ -64,20 +64,20 @@ describe('useTransition', () => {
 
     expect(result.current.mounted).toBe(true);
     expect(result.current.transitionProps).toEqual({
-      'data-cl-open': '',
-      'data-cl-starting-style': '',
+      'data-open': '',
+      'data-starting-style': '',
       style: { transition: 'none' },
     });
   });
 
-  it('clears starting-style after first frame, keeps data-cl-open', () => {
+  it('clears starting-style after first frame, keeps data-open', () => {
     const ref = createElementRef();
     const { result } = renderHook(() => useTransition({ open: true, ref }));
 
     act(() => flushRaf());
 
     expect(result.current.transitionProps).toEqual({
-      'data-cl-open': '',
+      'data-open': '',
     });
   });
 
@@ -97,8 +97,8 @@ describe('useTransition', () => {
 
     expect(result.current.mounted).toBe(true);
     expect(result.current.transitionProps).toEqual({
-      'data-cl-closed': '',
-      'data-cl-ending-style': '',
+      'data-closed': '',
+      'data-ending-style': '',
     });
 
     // Cleanup: resolve to prevent hanging
@@ -186,12 +186,12 @@ describe('useTransition', () => {
     rerender({ open: true });
 
     expect(result.current.mounted).toBe(true);
-    expect(result.current.transitionProps['data-cl-open']).toBe('');
+    expect(result.current.transitionProps['data-open']).toBe('');
 
     // After rAF, ending-style is cleared and we're in stable open state
     act(() => flushRaf());
-    expect(result.current.transitionProps['data-cl-ending-style']).toBeUndefined();
-    expect(result.current.transitionProps['data-cl-open']).toBe('');
+    expect(result.current.transitionProps['data-ending-style']).toBeUndefined();
+    expect(result.current.transitionProps['data-open']).toBe('');
 
     // Cleanup
     el.getAnimations = vi.fn(() => [] as unknown as Animation[]);
@@ -199,5 +199,29 @@ describe('useTransition', () => {
       resolveAnim();
       await new Promise(r => setTimeout(r, 0));
     });
+  });
+
+  it('does not unmount when the interrupted exit settles', async () => {
+    const { ref, el, resolveAnim } = createAnimatingRef();
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
+      initialProps: { open: true },
+    });
+    act(() => flushRaf());
+
+    // Close, then reopen before the exit animation finishes.
+    rerender({ open: false });
+    rerender({ open: true });
+    act(() => flushRaf());
+
+    // The exit's pending unmount must have been abandoned, so settling the
+    // animation leaves the element mounted rather than restarting its entrance.
+    el.getAnimations = vi.fn(() => [] as unknown as Animation[]);
+    await act(async () => {
+      resolveAnim();
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    expect(result.current.mounted).toBe(true);
+    expect(result.current.transitionProps).toEqual({ 'data-open': '' });
   });
 });

@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
+import { OptionsProvider } from '../../../contexts';
 import { OAuthConsent } from '../OAuthConsent';
 
 const { createFixtures } = bindCreateFixtures('OAuthConsent');
@@ -25,6 +26,14 @@ const fakeConsentInfoWithOrgScope = {
   scopes: [
     ...fakeConsentInfo.scopes,
     { scope: 'user:org:read', description: 'Access your organizations', requiresConsent: true },
+  ],
+};
+
+const fakeConsentInfoWithPrivateMetadataScope = {
+  ...fakeConsentInfo,
+  scopes: [
+    ...fakeConsentInfo.scopes,
+    { scope: 'private_metadata', description: 'Your private metadata', requiresConsent: true },
   ],
 };
 
@@ -96,6 +105,63 @@ describe('OAuthConsent', () => {
     expect(getConsentInfo).toHaveBeenCalledWith({
       oauthClientId: 'client_test',
       redirectUri: 'https://app.example/callback',
+    });
+  });
+
+  it('identifies private metadata as potentially sensitive data set by the Clerk application', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfoWithPrivateMetadataScope),
+    });
+
+    const { getByText, queryByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Your private metadata set by TestApp, which may include sensitive information')).toBeVisible();
+    });
+    expect(queryByText('Your private metadata')).toBeNull();
+  });
+
+  it('supports localizing the private metadata scope description', async () => {
+    const {
+      wrapper: Wrapper,
+      fixtures,
+      props,
+    } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfoWithPrivateMetadataScope),
+    });
+
+    const wrapper = ({ children }) => (
+      <Wrapper>
+        <OptionsProvider
+          value={{
+            localization: {
+              oauthConsent: {
+                scopeList: {
+                  privateMetadata: 'Localized private metadata from {{applicationName}}',
+                },
+              },
+            },
+          }}
+        >
+          {children}
+        </OptionsProvider>
+      </Wrapper>
+    );
+
+    const { getByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Localized private metadata from TestApp')).toBeVisible();
     });
   });
 

@@ -48,9 +48,14 @@ export interface Ui<A = any> {
  */
 export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<
   IsomorphicClerkOptions,
-  'appearance' | keyof InternalClerkScriptProps
+  'appearance' | 'publishableKey' | keyof InternalClerkScriptProps
 > & {
   children: React.ReactNode;
+  /**
+   * The Clerk Publishable Key for your instance. When omitted, `@clerk/react` reads the key from
+   * `VITE_CLERK_PUBLISHABLE_KEY` or `CLERK_PUBLISHABLE_KEY`.
+   */
+  publishableKey?: string;
   /**
    * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */

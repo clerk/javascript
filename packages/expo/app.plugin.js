@@ -9,10 +9,12 @@
  * Native modules and views are registered via Expo Modules autolinking.
  */
 const {
+  AndroidConfig,
   withXcodeProject,
   withDangerousMod,
   withInfoPlist,
   withAppBuildGradle,
+  withAndroidManifest,
   withEntitlementsPlist,
 } = require('@expo/config-plugins');
 const path = require('path');
@@ -20,6 +22,35 @@ const fs = require('fs');
 const packageJson = require('./package.json');
 
 const CLERK_MIN_IOS_VERSION = '17.0';
+
+const addHostedAuthIntentFilter = (mainActivity, packageName) => {
+  const callbackHost = `${packageName}.hosted-callback`;
+  const intentFilters = mainActivity['intent-filter'] || [];
+  const hasAndroidName = (entries, name) => entries?.some(entry => entry.$?.['android:name'] === name);
+  const callbackIsRegistered = intentFilters.some(
+    intentFilter =>
+      hasAndroidName(intentFilter.action, 'android.intent.action.VIEW') &&
+      hasAndroidName(intentFilter.category, 'android.intent.category.DEFAULT') &&
+      hasAndroidName(intentFilter.category, 'android.intent.category.BROWSABLE') &&
+      intentFilter.data?.some(
+        data => data.$?.['android:scheme'] === 'clerk' && data.$?.['android:host'] === callbackHost,
+      ),
+  );
+
+  if (callbackIsRegistered) {
+    return;
+  }
+
+  intentFilters.push({
+    action: [{ $: { 'android:name': 'android.intent.action.VIEW' } }],
+    category: [
+      { $: { 'android:name': 'android.intent.category.DEFAULT' } },
+      { $: { 'android:name': 'android.intent.category.BROWSABLE' } },
+    ],
+    data: [{ $: { 'android:scheme': 'clerk', 'android:host': callbackHost } }],
+  });
+  mainActivity['intent-filter'] = intentFilters;
+};
 
 const withClerkIOS = config => {
   console.log('✅ Clerk iOS plugin loaded');
@@ -93,6 +124,15 @@ const withClerkIOS = config => {
  */
 const withClerkAndroid = config => {
   console.log('✅ Clerk Android plugin loaded');
+
+  config = withAndroidManifest(config, modConfig => {
+    const packageName = config.android?.package;
+    if (packageName) {
+      const mainActivity = AndroidConfig.Manifest.getMainActivityOrThrow(modConfig.modResults);
+      addHostedAuthIntentFilter(mainActivity, packageName);
+    }
+    return modConfig;
+  });
 
   return withAppBuildGradle(config, modConfig => {
     let buildGradle = modConfig.modResults.contents;
@@ -168,6 +208,23 @@ const withClerkKeychainService = (config, { keychainService } = {}) => {
   return withInfoPlist(config, modConfig => {
     modConfig.modResults.ClerkKeychainService = keychainService;
     console.log(`✅ Set ClerkKeychainService in Info.plist: ${keychainService}`);
+    return modConfig;
+  });
+};
+
+const withClerkFaceIDPermission = (config, { faceIDPermission } = {}) => {
+  if (faceIDPermission === undefined) {
+    return config;
+  }
+
+  if (typeof faceIDPermission !== 'string' || faceIDPermission.trim().length === 0) {
+    throw new Error('Clerk: faceIDPermission must be a non-empty string');
+  }
+
+  return withInfoPlist(config, modConfig => {
+    if (!Object.hasOwn(modConfig.modResults, 'NSFaceIDUsageDescription')) {
+      modConfig.modResults.NSFaceIDUsageDescription = faceIDPermission;
+    }
     return modConfig;
   });
 };
@@ -314,12 +371,15 @@ const withClerkExpo = (config, props = {}) => {
   }
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);
+  config = withClerkFaceIDPermission(config, props);
   config = withClerkTheme(config, props);
   return config;
 };
 
 module.exports = withClerkExpo;
 module.exports._testing = {
+  addHostedAuthIntentFilter,
+  withClerkFaceIDPermission,
   validateThemeJson,
   isPlainObject,
   VALID_COLOR_KEYS,

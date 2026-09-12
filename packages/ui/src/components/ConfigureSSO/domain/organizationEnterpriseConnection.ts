@@ -5,7 +5,10 @@ import type {
   UserResource,
 } from '@clerk/shared/types';
 
-import type { ProviderType } from '../types';
+import type { EnterpriseConnectionProviderType, OidcProviderType } from '../types';
+
+export const isOidcProvider = (provider: string): provider is OidcProviderType =>
+  provider.startsWith('oidc_') || provider.startsWith('oauth_custom_');
 
 /**
  * The email whose domain backs the connection: the user's primary address if
@@ -40,7 +43,7 @@ export type OrganizationEnterpriseConnectionStatus = 'unconfigured' | 'in_progre
  * object the wizard makes every flow decision from. A snapshot of flattened booleans/values.
  */
 export interface OrganizationEnterpriseConnection {
-  readonly provider: ProviderType | undefined;
+  readonly provider: EnterpriseConnectionProviderType | undefined;
   readonly hasConnection: boolean;
   readonly isActive: boolean;
   readonly hasMinimumConfiguration: boolean;
@@ -48,10 +51,20 @@ export interface OrganizationEnterpriseConnection {
   readonly status: OrganizationEnterpriseConnectionStatus;
 }
 
-// TODO - Update to support OpenID Connect
 export const isEnterpriseConnectionConfigured = (
   connection: EnterpriseConnectionResource | null | undefined,
-): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
+): boolean => {
+  if (!connection) {
+    return false;
+  }
+  if (isOidcProvider(connection.provider)) {
+    const oauthConfig = connection.oauthConfig;
+    return Boolean(
+      oauthConfig?.clientId && (oauthConfig.discoveryUrl || (oauthConfig.authUrl && oauthConfig.tokenUrl)),
+    );
+  }
+  return Boolean(connection.samlConnection?.idpSsoUrl && connection.samlConnection?.idpEntityId);
+};
 
 export const areAllOrganizationDomainsVerified = (domains: OrganizationDomainResource[] | null | undefined): boolean =>
   !!domains?.length && domains.every(domain => domain.ownershipVerification?.status === 'verified');
@@ -86,7 +99,7 @@ export const organizationEnterpriseConnection = ({
   const hasMinimumConfiguration = isEnterpriseConnectionConfigured(connection);
 
   return {
-    provider: connection?.provider as ProviderType | undefined,
+    provider: connection?.provider as EnterpriseConnectionProviderType | undefined,
     hasConnection,
     isActive,
     hasMinimumConfiguration,

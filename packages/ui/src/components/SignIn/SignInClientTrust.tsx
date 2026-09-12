@@ -19,6 +19,8 @@ function SignInClientTrustInternal(): JSX.Element {
     showAllStrategies,
     toggleAllStrategies,
   } = useSecondFactorSelection(signIn.supportedSecondFactors);
+  const onShowAlternativeMethodsClicked =
+    signIn.supportedSecondFactors && signIn.supportedSecondFactors.length > 1 ? toggleAllStrategies : undefined;
 
   if (!currentFactor) {
     return <LoadingCard />;
@@ -41,7 +43,7 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'email_code':
@@ -51,7 +53,7 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'email_link':
@@ -61,7 +63,7 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     default:

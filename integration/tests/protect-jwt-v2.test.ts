@@ -17,17 +17,17 @@ testAgainstRunningApps({
 
   test.beforeAll(async () => {
     const m = createTestUtils({ app });
-    fakeAdmin = m.services.users.createFakeUser();
+    fakeAdmin = m.services.users.createFakeUser(test);
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
-    fakeReader = m.services.users.createFakeUser();
+    fakeReader = m.services.users.createFakeUser(test);
     const reader = await m.services.users.createBapiUser(fakeReader);
     await m.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,
       role: 'org:impersonation_reader' as OrganizationMembershipRole,
       userId: reader.id,
     });
-    fakeManager = m.services.users.createFakeUser();
+    fakeManager = m.services.users.createFakeUser(test);
     const manager = await m.services.users.createBapiUser(fakeManager);
     await m.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,

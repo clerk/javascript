@@ -51,6 +51,7 @@ export const enUS: LocalizationResource = {
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'Current plan',
   badge__default: 'Default',
+  badge__deprovisioned: 'Deprovisioned',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
   badge__freeTrial: 'Free trial',
@@ -93,8 +94,11 @@ export const enUS: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'You cannot subscribe to this plan. Your existing subscription is more expensive than this plan.',
     checkout: {
+      addPromoCode: 'Add promo code',
+      applyPromoCode: 'Apply',
       description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
+      discount: 'Discount',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
       emailForm: {
@@ -110,6 +114,8 @@ export const enUS: LocalizationResource = {
       },
       pastDueNotice: 'Your previous subscription was past due, with no payment.',
       perMonth: 'per month',
+      promoCodePlaceholder: 'Enter promo code',
+      removePromoCode: 'Remove promo code',
       title: 'Checkout',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
@@ -120,6 +126,9 @@ export const enUS: LocalizationResource = {
     credit: 'Credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
     defaultFreePlanActive: "You're currently on the Free plan",
+    discountAmount: '{{amount}} off',
+    discountCyclesRemaining: '{{cycles}} {{period}} remaining',
+    discountDuration: '{{amount}} off first {{cycles}} {{period}}',
     free: 'Free',
     getStarted: 'Get started',
     highlightedPlanBadge: 'Popular',
@@ -131,6 +140,7 @@ export const enUS: LocalizationResource = {
     monthAbbreviation: 'mo',
     monthPerUnit: 'Month per {{unitName}}',
     monthly: 'Monthly',
+    months: 'Months',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
     payerCreditRemainder: 'Credit from account balance.',
@@ -209,6 +219,88 @@ export const enUS: LocalizationResource = {
     year: 'Year',
     yearAbbreviation: 'yr',
     yearPerUnit: 'Year per {{unitName}}',
+    years: 'Years',
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: 'User attributes',
+        directoryAttribute: 'Directory attributes',
+      },
+      subtitle: 'Standard directory attributes are pre-configured. Attributes not listed here are ignored.',
+      title: 'Attribute review',
+    },
+    configureStep: {
+      actionLabel__generateToken: 'Generate new token',
+      actionLabel__retry: 'Try again',
+      domainsLabel: 'Domains:',
+      error__ssoRequired: {
+        subtitle:
+          'Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.',
+        title: 'Single Sign-On is not configured yet',
+      },
+      formFieldInputPlaceholder__token: 'Generate a new token to reveal it',
+      formFieldLabel__endpointUrl: 'SCIM endpoint URL',
+      formFieldLabel__token: 'Bearer token',
+      instructions: {
+        actionLabel__toggle: 'View instructions',
+        custom: {
+          step1: 'Create a SCIM 2.0 provisioning integration in your identity provider.',
+          step2: 'Paste the SCIM endpoint URL as the base URL for the integration.',
+          step3: 'Configure the integration to authenticate with the bearer token below.',
+          step4: 'Enable provisioning for user create, update, and deactivate events.',
+        },
+        entra: {
+          step1:
+            'In the Microsoft Entra admin center, open Enterprise applications and select the application used for your SSO connection.',
+          step2:
+            'Under Connectivity, paste the SCIM endpoint URL as the Tenant URL and the bearer token as the Secret Token, then select Test Connection.',
+          step3: 'Select Provisioning and set the provisioning mode to Automatic.',
+          step4: 'Assign the users and groups to provision, then turn provisioning On.',
+        },
+        okta: {
+          step1: 'In the Okta Admin Console, open the application used for your SSO connection.',
+          step2: 'Open the Provisioning tab and select the Integration setting.',
+          step3: 'Paste the SCIM endpoint URL and bearer token found below.',
+          step4: 'For provisioning actions, enable pushing of New Users, Profile Updates, and Groups.',
+        },
+      },
+      notice__tokenShownOnce: 'This token is only shown once. Generate a new token if you lose it.',
+      subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
+      title: 'Configure',
+      warning__googleUnsupported: {
+        subtitle: 'Please contact support to set up your Google Workspace integration.',
+        title: 'Google Workspace connections are not configurable via self-serve',
+      },
+      warning__ssoInactive:
+        'Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.',
+    },
+    navbar: {
+      title: 'Configure Directory Sync',
+    },
+    providers: {
+      custom: 'Custom SCIM provider',
+      entra: 'Microsoft Entra ID',
+      google: 'Google Workspace',
+      okta: 'Okta Workforce',
+    },
+    stepper: {
+      attributes: 'Attributes',
+      configure: 'Configure',
+      test: 'Test',
+    },
+    testStep: {
+      actionLabel__complete: 'Complete',
+      badge__active: 'Active',
+      badge__deprovisioned: 'Deprovisioned',
+      description: 'Users appear here as your identity provider provisions them, most recent activity first.',
+      empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
+      error__loadUsers: 'Could not load provisioned users',
+      note: 'only users with an email address from a configured domain will be processed.',
+      noteLabel: 'Note:',
+      subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',
+      title: 'Test provisioning',
+    },
   },
   configureSSO: {
     activate: {
@@ -237,6 +329,81 @@ export const enUS: LocalizationResource = {
         badges: {
           optional: 'Optional',
           required: 'Required',
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: 'Client ID',
+            placeholder: 'Paste client ID here...',
+          },
+          clientSecret: {
+            label: 'Client secret',
+            placeholder: 'Paste client secret here...',
+          },
+          headerSubtitle: 'Add your application credentials',
+          paragraph: 'In your identity provider’s OIDC application, retrieve these values.',
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description:
+              'In your identity provider’s OIDC application, retrieve the discovery endpoint. Paste it below.',
+            label: 'Discovery endpoint',
+            placeholder: 'Paste URL here...',
+          },
+          headerSubtitle: 'Add your identity provider’s endpoints',
+          manual: {
+            authUrl: {
+              label: 'Authorization URL',
+              placeholder: 'Paste URL here...',
+            },
+            description: 'In your identity provider’s OIDC application, retrieve these values.',
+            tokenUrl: {
+              label: 'Token URL',
+              placeholder: 'Paste URL here...',
+            },
+            userInfoUrl: {
+              label: 'User Info URL',
+              placeholder: 'Paste URL here...',
+            },
+          },
+          modes: {
+            ariaLabel: 'OIDC endpoint configuration method',
+            discoveryUrl: 'Add via discovery endpoint',
+            manual: 'Configure manually',
+          },
+        },
+        mainHeaderTitle: 'Configure your identity provider',
+        redirectUriStep: {
+          claims: {
+            description: 'Ensure your ID token includes the following claims:',
+            table: {
+              columns: {
+                attribute: 'Clerk attribute',
+                claim: 'ID token claim',
+              },
+              rows: {
+                email: {
+                  attribute: 'Primary email',
+                },
+                firstName: {
+                  attribute: 'First name',
+                },
+                lastName: {
+                  attribute: 'Last name',
+                },
+                subject: {
+                  attribute: 'External user ID',
+                },
+              },
+            },
+          },
+          headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+          paragraph:
+            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
+          redirectUri: {
+            label: 'Authorized redirect URI',
+          },
         },
       },
       samlCustom: {
@@ -639,6 +806,11 @@ export const enUS: LocalizationResource = {
         },
         mainHeaderTitle: 'Configure Okta Workforce',
       },
+      unsupportedProvider: {
+        description:
+          'This identity provider isn’t supported in this version of Clerk. Update to the latest version to finish setting it up.',
+        title: 'Unsupported provider',
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contact your organization's administrator to upgrade your permissions.",
@@ -694,6 +866,10 @@ export const enUS: LocalizationResource = {
       title: 'Reset connection',
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: 'OpenID Connect (OIDC)',
+        oidcProvider: 'OIDC Provider',
+      },
       saml: {
         customSaml: 'Custom SAML Provider',
         google: 'Google Workspace',
@@ -875,12 +1051,54 @@ export const enUS: LocalizationResource = {
       title: 'Redirect URL',
     },
     scopeList: {
+      privateMetadata: 'Your private metadata set by {{applicationName}}, which may include sensitive information',
       title: 'This will allow {{applicationName}} access to:',
     },
     subtitle: 'wants to access {{applicationName}} on behalf of {{identifier}}',
     viewFullUrl: 'View full URL',
     warning:
       'Make sure that you trust {{applicationName}} ({{domainAction}}). You may be sharing sensitive data with this site or app.',
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: 'Enter another code',
+    confirmation: {
+      action__approve: 'Approve',
+      action__deny: 'Deny',
+      scopeListTitle: 'This will allow {{applicationName}} access to:',
+      subtitle: 'Confirm this request for {{identifier}}',
+      title: 'Allow {{applicationName}} to access your account?',
+      warning: 'Only approve this request if you started it on your other device.',
+    },
+    error: {
+      expiredSubtitle: 'Start over on your device.',
+      expiredTitle: 'This code expired',
+      genericSubtitle: 'Check your connection and try again.',
+      genericTitle: 'We could not verify this code',
+      invalidCode: 'Enter a valid 8-character code.',
+      rateLimitedSubtitle: 'Wait before trying another code.',
+      rateLimitedTitle: 'Too many attempts',
+      unknownCode: "We couldn't find that code. Check it and try again.",
+    },
+    start: {
+      action__continue: 'Continue',
+      subtitle: 'Enter the code shown on the device or app you want to authorize.',
+      title: 'Verify a device',
+      userCodeLabel: 'Device code',
+    },
+    status: {
+      alreadyApprovedSubtitle: 'Return to your device to continue.',
+      alreadyApprovedTitle: "You've approved this",
+      alreadyDecidedSubtitle: 'It was decided elsewhere. Return to your device.',
+      alreadyDecidedTitle: 'This request was already completed',
+      alreadyDeniedSubtitle: 'Start over on your device if you want to try again.',
+      alreadyDeniedTitle: 'This request was denied',
+      approvedSubtitle: 'You approved this request. Return to your device to continue.',
+      approvedTitle: 'Device approved',
+      consumedSubtitle: 'Your device is authorized. You can close this window.',
+      consumedTitle: 'This code has already been used',
+      deniedSubtitle: 'You denied this request. Return to your device.',
+      deniedTitle: 'Access denied',
+    },
   },
   organizationList: {
     action__createOrganization: 'Create organization',
@@ -1095,6 +1313,27 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: 'Active',
+        badge__inactive: 'Inactive',
+        badge__ssoRequired: 'SSO Required',
+        badge__unconfigured: 'Unconfigured',
+        description:
+          "Automatically add, update, and remove organization members from your identity provider's directory. Requires an SSO connection.",
+        error__load: 'Could not load Directory Sync',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__startConfiguration: 'Start configuration',
+        removeDialog: {
+          confirmButton: 'Remove Directory Sync',
+          subtitle:
+            'Are you sure you want to remove Directory Sync? This action is irreversible: the directory and its bearer token are deleted and your identity provider will no longer be able to provision members. Existing members keep their memberships.',
+          title: 'Remove Directory Sync',
+        },
+        title: 'Directory Sync',
+      },
       removeDialog: {
         confirmButton: 'Remove connection',
         subtitle:
@@ -1333,6 +1572,10 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
       },
+      verifiedTransferable: {
+        subtitle: 'Return to original tab to continue',
+        title: 'Email verified',
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Use the verification link sent to your email',
@@ -1343,6 +1586,9 @@ export const enUS: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'Select the enterprise account with which you wish to continue.',
       title: 'Choose your enterprise account',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: 'Continue with SSO',
     },
     forgotPassword: {
       formTitle: 'Reset password code',
@@ -1408,6 +1654,15 @@ export const enUS: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
+    },
+    ssoFallback: {
+      actionLink: "Can't use SSO?",
+      code: {
+        resendButton: "Didn't receive a code? Resend",
+        subtitle: 'to continue to {{applicationName}}',
+        title: 'Check your email',
+      },
+      notice: 'Your organization requires single sign-on. Continuing without it is recorded.',
     },
     start: {
       actionLink: 'Sign up',
@@ -1687,6 +1942,8 @@ export const enUS: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
+    form_password_matches_identifier:
+      'Password cannot match your email address, phone number or username. For account safety, please use a different password.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_or_identifier_incorrect: undefined,
     form_password_pwned:
@@ -1743,6 +2000,9 @@ export const enUS: LocalizationResource = {
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    ticket_expired_code: 'This link has expired. Please start again or request a new link.',
+    ticket_invalid_code:
+      'This link is no longer valid or has already been used. Please start again or request a new link.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:

@@ -62,6 +62,7 @@ export const elGR: LocalizationResource = {
   badge__canceledEndsAt: 'Ακυρώθηκε, λήγει {{date | timeString("el-GR")}}',
   badge__currentPlan: 'Τρέχον πλάνο',
   badge__default: 'Προεπιλογή',
+  badge__deprovisioned: undefined,
   badge__endsAt: 'Λήγει {{date | timeString("el-GR")}}',
   badge__expired: 'Έληξε',
   badge__freeTrial: 'Δωρεάν δοκιμή',
@@ -99,8 +100,11 @@ export const elGR: LocalizationResource = {
     cannotSubscribeMonthly: 'Δεν μπορείτε να εγγραφείτε μηνιαίως σε αυτό το πλάνο',
     cannotSubscribeUnrecoverable: 'Δεν μπορείτε να εγγραφείτε σε αυτό το πλάνο αυτήν τη στιγμή',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Η πληρωμή σας ολοκληρώθηκε επιτυχώς',
       description__subscriptionSuccessful: 'Η συνδρομή σας ξεκίνησε επιτυχώς',
+      discount: undefined,
       downgradeNotice: 'Θα υποβαθμιστείτε στο τέλος της τρέχουσας περιόδου χρέωσης',
       emailForm: {
         subtitle: 'Εισάγετε τη διεύθυνση email σας για να συνεχίσετε',
@@ -115,6 +119,8 @@ export const elGR: LocalizationResource = {
       },
       pastDueNotice: 'Η συνδρομή σας είναι ληξιπρόθεσμη. Παρακαλώ ενημερώστε τη μέθοδο πληρωμής σας.',
       perMonth: 'ανά μήνα',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Ολοκλήρωση πληρωμής',
       title__paymentSuccessful: 'Επιτυχής πληρωμή',
       title__subscriptionSuccessful: 'Επιτυχής συνδρομή',
@@ -125,6 +131,9 @@ export const elGR: LocalizationResource = {
     credit: 'Πίστωση',
     creditRemainder: 'Υπόλοιπο πίστωσης',
     defaultFreePlanActive: 'Το προεπιλεγμένο δωρεάν πλάνο είναι ενεργό',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Δωρεάν',
     getStarted: 'Ξεκινήστε',
     highlightedPlanBadge: 'Δημοφιλές',
@@ -136,6 +145,7 @@ export const elGR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Μηνιαία',
+    months: undefined,
     pastDue: 'Ληξιπρόθεσμο',
     pay: 'Πληρωμή',
     payerCreditRemainder: undefined,
@@ -214,6 +224,84 @@ export const elGR: LocalizationResource = {
     year: 'έτος',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -240,6 +328,79 @@ export const elGR: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -626,6 +787,10 @@ export const elGR: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για να αναβαθμίσετε τις άδειές σας.',
@@ -679,6 +844,10 @@ export const elGR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Προσαρμοσμένος πάροχος SAML',
         google: undefined,
@@ -856,11 +1025,53 @@ export const elGR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Δημιουργία οργανισμού',
@@ -1074,6 +1285,25 @@ export const elGR: LocalizationResource = {
       title: 'Αφαίρεση τομέα',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1313,6 +1543,10 @@ export const elGR: LocalizationResource = {
         subtitleNewTab: 'Επιστροφή στη νέα καρτέλα που άνοιξε για να συνεχίσετε',
         titleNewTab: 'Έχετε συνδεθεί σε άλλη καρτέλα',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που στάλθηκε στο email σας',
@@ -1323,6 +1557,9 @@ export const elGR: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'Συνδεθείτε με SSO επιχείρησης',
       title: 'Σύνδεση επιχείρησης',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Επαναφορά κωδικού πρόσβασης',
@@ -1390,6 +1627,15 @@ export const elGR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Πρέπει να επαληθεύσουμε την ταυτότητά σας πριν επαναφέρουμε τον κωδικό πρόσβασής σας.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Εγγραφή',
@@ -1668,6 +1914,7 @@ export const elGR: LocalizationResource = {
     form_password_incorrect: 'Ο κωδικός πρόσβασης δεν είναι σωστός.',
     form_password_length_too_short:
       'Ο κωδικός πρόσβασής σας πρέπει να αποτελείται από τουλάχιστον {{length}} χαρακτήρες.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Ο κωδικός πρόσβασής σας δεν είναι αρκετά ισχυρός.',
     form_password_or_identifier_incorrect:
       'Ο κωδικός πρόσβασης ή η διεύθυνση email είναι λανθασμένη. Δοκιμάστε ξανά ή χρησιμοποιήστε άλλη μέθοδο.',
@@ -1723,6 +1970,8 @@ export const elGR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Έχετε ήδη συνδεθεί.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Δεν εντοπίστηκε αναγνωριστικό Web3. Παρακαλώ δοκιμάστε ξανά.',
     web3_signature_request_rejected: 'Απορρίψατε το αίτημα υπογραφής. Δοκιμάστε ξανά για να συνεχίσετε.',
     web3_solana_signature_generation_failed:

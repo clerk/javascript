@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
   });
@@ -304,7 +304,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
 
   test('<SignUpButton /> renders and respects props', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeAdmin = u.services.users.createFakeUser({
+    const fakeAdmin = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,

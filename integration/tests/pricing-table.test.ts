@@ -11,7 +11,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
 
@@ -221,7 +221,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
   test('user is prompted to add email before checkout', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
-    const fakeUser = u.services.users.createFakeUser({ withEmail: false, withPhoneNumber: true });
+    const fakeUser = u.services.users.createFakeUser(test, { withEmail: false, withPhoneNumber: true });
     await u.services.users.createBapiUser(fakeUser);
 
     await u.po.signIn.goTo();
@@ -237,7 +237,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
     await expect(u.po.page.getByText(/^Add an email address$/i)).toBeVisible();
 
-    const newFakeUser = u.services.users.createFakeUser();
+    const newFakeUser = u.services.users.createFakeUser(test);
     await u.po.userProfile.typeEmailAddress(newFakeUser.email);
 
     await u.page.getByRole('button', { name: /^add$/i }).click();
@@ -251,7 +251,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     const u = createTestUtils({ app, page, context });
 
     // Create a new user specifically for this trial test
-    const trialUser = u.services.users.createFakeUser();
+    const trialUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(trialUser);
 
     try {
@@ -400,7 +400,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     const u = createTestUtils({ app, page, context });
 
     // Create a new user specifically for this trial test
-    const trialUser = u.services.users.createFakeUser();
+    const trialUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(trialUser);
 
     try {
@@ -473,7 +473,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     }) => {
       const u = createTestUtils({ app, page, context });
 
-      const fakeUser = u.services.users.createFakeUser();
+      const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
 
       await u.po.signIn.goTo();
@@ -524,7 +524,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     test('unsubscribes from a plan', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      const fakeUser = u.services.users.createFakeUser();
+      const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
 
       await u.po.signIn.goTo();
@@ -573,7 +573,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     test('checkout always revalidates on open', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      const fakeUser = u.services.users.createFakeUser();
+      const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
 
       await u.po.signIn.goTo();
@@ -606,7 +606,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     }) => {
       const u = createTestUtils({ app, page, context });
 
-      const fakeUser = u.services.users.createFakeUser();
+      const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
 
       await u.po.signIn.goTo();
@@ -640,7 +640,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     test('displays notice the plan cannot change', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      const fakeUser = u.services.users.createFakeUser();
+      const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
 
       await u.po.signIn.goTo();
@@ -675,7 +675,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     }) => {
       const u = createTestUtils({ app, page, context });
 
-      const fakeUser = u.services.users.createFakeUser();
+      const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
 
       try {
@@ -827,7 +827,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     test('adds two payment methods and sets the last as default', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      const fakeUser = u.services.users.createFakeUser();
+      const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
 
       await u.po.signIn.goTo();

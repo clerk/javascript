@@ -1,0 +1,44 @@
+import * as BadgeStories from './badge.stories';
+
+# Badge
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={BadgeStories}
+/>
+
+## Props
+
+<PropTable
+  meta={BadgeStories.meta}
+  extra={[{ name: 'render', type: '(props) => ReactNode' }]}
+/>
+
+## Usage
+
+<Usage
+  component='Badge'
+  module='@clerk/ui/mosaic/components/badge'
+>
+  Badge Label
+</Usage>
+
+---
+
+## Examples
+
+### Colors
+
+<Story
+  name='Colors'
+  storyModule={BadgeStories}
+/>
+
+### With an icon
+
+<Story
+  name='WithIcon'
+  storyModule={BadgeStories}
+/>

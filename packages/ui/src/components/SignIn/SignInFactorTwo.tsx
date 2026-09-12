@@ -28,6 +28,8 @@ function SignInFactorTwoInternal(): JSX.Element {
     showAllStrategies,
     toggleAllStrategies,
   } = useSecondFactorSelection(signIn.supportedSecondFactors);
+  const onShowAlternativeMethodsClicked =
+    signIn.supportedSecondFactors && signIn.supportedSecondFactors.length > 1 ? toggleAllStrategies : undefined;
 
   React.useEffect(() => {
     if (clerk.__internal_setActiveInProgress) {
@@ -69,7 +71,7 @@ function SignInFactorTwoInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'totp':
@@ -78,18 +80,18 @@ function SignInFactorTwoInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'backup_code':
-      return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+      return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked} />;
     case 'email_code':
       return (
         <SignInFactorTwoEmailCodeCard
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'email_link':
@@ -98,7 +100,7 @@ function SignInFactorTwoInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     default:

@@ -1,6 +1,5 @@
-/** @jsxImportSource @emotion/react */
 import type { HeadingProps } from '@clerk/ui/mosaic/components/heading';
-import { Heading, headingRecipe } from '@clerk/ui/mosaic/components/heading';
+import { Heading } from '@clerk/ui/mosaic/components/heading';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,9 +9,19 @@ export { default as __source } from './heading.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Heading',
-  source: 'packages/ui/src/mosaic/components/heading.tsx',
-  styles: headingRecipe,
+  source: 'packages/ui/src/mosaic/components/heading/heading.tsx',
+  styles: {
+    _variants: {
+      size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },
+      color: { primary: {}, neutral: {}, warning: {}, negative: {}, positive: {} },
+    },
+    _defaultVariants: {
+      size: 'base',
+      color: 'primary',
+    },
+  },
 };
 
 // Story functions accept Record<string,unknown> (knob values) and cast to HeadingProps.
@@ -68,26 +77,38 @@ export function Sizes(props: Record<string, unknown>) {
   );
 }
 
-export function Intents(props: Record<string, unknown>) {
+export function Colors(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <Heading
         {...knobsAsProps(props)}
-        intent='primary'
+        color='primary'
       >
         Primary heading
       </Heading>
       <Heading
         {...knobsAsProps(props)}
-        intent='mutedForeground'
+        color='neutral'
       >
-        Muted foreground heading
+        Neutral heading
       </Heading>
       <Heading
         {...knobsAsProps(props)}
-        intent='destructive'
+        color='warning'
       >
-        Destructive heading
+        Warning heading
+      </Heading>
+      <Heading
+        {...knobsAsProps(props)}
+        color='negative'
+      >
+        Negative heading
+      </Heading>
+      <Heading
+        {...knobsAsProps(props)}
+        color='positive'
+      >
+        Positive heading
       </Heading>
     </div>
   );

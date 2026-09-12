@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "4.0.0",
+  "version": "4.1.1",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -59,7 +59,7 @@
       "types": "./dist/webhooks.d.ts",
       "default": "./dist/webhooks.js"
     },
-    "./types": "./dist/types/index.d.ts",
+    "./types": "./dist/types/types/index.d.ts",
     "./env": "./env.d.ts",
     "./components": "./components/index.ts",
     "./package.json": "./package.json"
@@ -92,12 +92,12 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "nanoid": "5.1.6",
-    "nanostores": "1.0.1"
+    "nanoid": "5.1.16",
+    "nanostores": "1.5.1"
   },
   "devDependencies": {
     "@clerk/ui": "workspace:^",
-    "astro": "^6.4.8"
+    "astro": "^7.0.0"
   },
   "peerDependencies": {
     "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"

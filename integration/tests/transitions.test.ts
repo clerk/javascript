@@ -47,7 +47,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitio
       dotenv: false,
     });
 
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
     fakeOrganization2 = await u.services.users.createFakeOrganization(user.id);

@@ -63,6 +63,18 @@ export const createClientUatCookie = (
     suffixedClientUatCookie.remove();
     clientUatCookie.remove();
 
+    if (partitioned) {
+      const nonPartitionedCookieAttributes = [
+        { domain, sameSite: 'Strict', secure: getSecureAttribute('Strict'), partitioned: false },
+        { domain, sameSite: 'None', secure: getSecureAttribute('None'), partitioned: false },
+      ] as const;
+
+      for (const attributes of nonPartitionedCookieAttributes) {
+        suffixedClientUatCookie.remove(attributes);
+        clientUatCookie.remove(attributes);
+      }
+    }
+
     suffixedClientUatCookie.set(val, { domain, expires, partitioned, sameSite, secure });
     clientUatCookie.set(val, { domain, expires, partitioned, sameSite, secure });
   };

@@ -63,6 +63,7 @@ export const jaJP: LocalizationResource = {
   badge__canceledEndsAt: "キャンセル済み • {{ date | shortDate('ja-JP') }}に終了",
   badge__currentPlan: '現在のプラン',
   badge__default: 'デフォルト',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('ja-JP') }}に終了",
   badge__expired: '期限切れ',
   badge__freeTrial: '無料トライアル',
@@ -105,8 +106,11 @@ export const jaJP: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'このプランを契約することはできません。現在のサブスクリプションの方がこのプランより高額です。',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: '支払いが完了しました。',
       description__subscriptionSuccessful: '新しいサブスクリプションの設定が完了しました。',
+      discount: undefined,
       downgradeNotice:
         '現在の請求期間が終了するまでは既存のサブスクリプションとその機能を利用でき、その後このサブスクリプションに切り替わります。',
       emailForm: {
@@ -122,6 +126,8 @@ export const jaJP: LocalizationResource = {
       },
       pastDueNotice: '前回のサブスクリプションには未払い分が残っています。',
       perMonth: '月あたり',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'チェックアウト',
       title__paymentSuccessful: '支払いが完了しました！',
       title__subscriptionSuccessful: '成功しました！',
@@ -132,6 +138,9 @@ export const jaJP: LocalizationResource = {
     credit: 'クレジット',
     creditRemainder: '現在のサブスクリプションの残り期間に対するクレジット。',
     defaultFreePlanActive: '現在は無料プランをご利用中です',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '無料',
     getStarted: 'はじめる',
     highlightedPlanBadge: '人気',
@@ -143,6 +152,7 @@ export const jaJP: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: '月払い',
+    months: undefined,
     pastDue: '支払い遅延',
     pay: '{{amount}}を支払う',
     payerCreditRemainder: 'アカウント残高からのクレジット。',
@@ -221,6 +231,84 @@ export const jaJP: LocalizationResource = {
     year: '年',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -247,6 +335,79 @@ export const jaJP: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -633,6 +794,10 @@ export const jaJP: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '権限をアップグレードするには、組織の管理者にお問い合わせください。',
@@ -686,6 +851,10 @@ export const jaJP: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'カスタムSAMLプロバイダー',
         google: undefined,
@@ -860,11 +1029,53 @@ export const jaJP: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: '組織を作成する',
@@ -1078,6 +1289,25 @@ export const jaJP: LocalizationResource = {
       title: 'ドメインの削除',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1314,6 +1544,10 @@ export const jaJP: LocalizationResource = {
         subtitleNewTab: '新しく開いたタブに戻って続行してください',
         titleNewTab: '他のタブでサインイン済み',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'メールに送信された確認リンクを使用してください',
@@ -1324,6 +1558,9 @@ export const jaJP: LocalizationResource = {
     enterpriseConnections: {
       subtitle: '続行するエンタープライズアカウントを選択してください。',
       title: 'エンタープライズアカウントを選択',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'パスワードリセットコード',
@@ -1390,6 +1627,15 @@ export const jaJP: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'パスワードをリセットする前に、身元を確認する必要があります。',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'サインアップ',
@@ -1672,6 +1918,7 @@ export const jaJP: LocalizationResource = {
       'このパスワードは侵害された可能性があります。アカウントを保護するため、別のサインイン方法を使用してください。サインイン後にパスワードのリセットが必要になります。',
     form_password_incorrect: '入力されたパスワードが正しくありません。もう一度お試しください。',
     form_password_length_too_short: 'パスワードが短すぎます。8文字以上である必要があります。',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_or_identifier_incorrect:
       'パスワードまたはメールアドレスが正しくありません。もう一度お試しいただくか、別の方法をご利用ください。',
@@ -1726,6 +1973,8 @@ export const jaJP: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '既にサインインしています。',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3ウォレット拡張機能が見つかりません。続行するにはインストールしてください。',
     web3_signature_request_rejected: '署名リクエストを拒否しました。続行するにはもう一度お試しください。',
     web3_solana_signature_generation_failed: '署名の生成中にエラーが発生しました。続行するにはもう一度お試しください。',

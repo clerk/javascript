@@ -52,9 +52,9 @@ export function useWarnAboutCustomizationWithoutPinning(appearance: Appearance |
 
     return () => {
       if (useIdleCallback) {
-        cancelIdleCallback(handle as number);
+        cancelIdleCallback(handle);
       } else {
-        clearTimeout(handle as ReturnType<typeof setTimeout>);
+        clearTimeout(handle);
       }
     };
   }, [clerkCtx?.value, stableAppearance, uiPinned]);

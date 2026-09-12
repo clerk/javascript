@@ -2,6 +2,7 @@ import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { ALLOWED_PROTOCOLS, windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
+import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -33,19 +34,23 @@ import type {
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
+  InviteMembersModalProps,
   JoinWaitlistParams,
   ListenerCallback,
   ListenerOptions,
   LoadedClerk,
   OAuthApplicationNamespace,
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
   PricingTableProps,
+  ProtectAssertion,
   RedirectOptions,
   Resources,
+  ResumeAfterProtectCheckParams,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -144,6 +149,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
+  private preopenInviteMembers?: null | InviteMembersModalProps = null;
   private preopenCreateOrganization?: null | CreateOrganizationProps = null;
   private preOpenWaitlist?: null | WaitlistProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps | undefined>();
@@ -160,7 +166,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
+  private premountConfigureDirectorySyncNodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
+  private premountOAuthDeviceVerificationNodes = new Map<HTMLDivElement, OAuthDeviceVerificationProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
   private premountTaskSetupMFANodes = new Map<HTMLDivElement, TaskSetupMFAProps | undefined>();
@@ -285,6 +293,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     windowNavigate(to, { allowedProtocols });
   };
 
+  /**
+   * Proxies to the inner Clerk instance's ModuleManager. Returns `undefined`
+   * before clerk-js has loaded; composed UI components read this getter
+   * (via `useClerk()`) to resolve dynamic-imported modules and fall back to a
+   * rejecting manager while it is `undefined`.
+   *
+   * @internal
+   */
+  public get __internal_moduleManager(): ModuleManager | undefined {
+    return this.clerkjs?.__internal_moduleManager;
+  }
+
+  public get __internal_protectChallengeLoadTimeoutMs(): number | undefined {
+    return this.clerkjs?.__internal_protectChallengeLoadTimeoutMs;
+  }
+
   constructor(options: IsomorphicClerkOptions) {
     this.#publishableKey = options?.publishableKey;
     this.#proxyUrl = options?.proxyUrl;
@@ -375,6 +399,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
     return false;
   }
+
+  setProtectAssertion = (assertion?: ProtectAssertion): void => {
+    const callback = () => this.clerkjs?.setProtectAssertion(assertion);
+    if (this.clerkjs && this.loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('setProtectAssertion', callback);
+    }
+  };
 
   buildSignInUrl = (opts?: RedirectOptions): string | void => {
     const callback = () => this.clerkjs?.buildSignInUrl(opts) || '';
@@ -713,6 +746,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openOrganizationProfile(this.preopenOrganizationProfile);
     }
 
+    if (this.preopenInviteMembers !== null) {
+      clerkjs.openInviteMembers(this.preopenInviteMembers);
+    }
+
     if (this.preopenCreateOrganization !== null) {
       clerkjs.openCreateOrganization(this.preopenCreateOrganization);
     }
@@ -765,9 +802,21 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_mountConfigureSSO(node, props);
     });
 
+    if (typeof clerkjs.__internal_mountConfigureDirectorySync === 'function') {
+      this.premountConfigureDirectorySyncNodes.forEach((props, node) => {
+        clerkjs.__internal_mountConfigureDirectorySync(node, props);
+      });
+    }
+
     this.premountOAuthConsentNodes.forEach((props, node) => {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
+
+    if (typeof clerkjs.__internal_mountOAuthDeviceVerification === 'function') {
+      this.premountOAuthDeviceVerificationNodes.forEach((props, node) => {
+        clerkjs.__internal_mountOAuthDeviceVerification(node, props);
+      });
+    }
 
     this.premountTaskChooseOrganizationNodes.forEach((props, node) => {
       clerkjs.mountTaskChooseOrganization(node, props);
@@ -1064,6 +1113,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  openInviteMembers = (props?: InviteMembersModalProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.openInviteMembers(props);
+    } else {
+      this.preopenInviteMembers = props;
+    }
+  };
+
+  closeInviteMembers = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.closeInviteMembers();
+    } else {
+      this.preopenInviteMembers = null;
+    }
+  };
+
   openCreateOrganization = (props?: CreateOrganizationProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.openCreateOrganization(props);
@@ -1329,6 +1394,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  __internal_mountConfigureDirectorySync = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+    if (this.clerkjs && this.loaded) {
+      if (typeof this.clerkjs.__internal_mountConfigureDirectorySync === 'function') {
+        this.clerkjs.__internal_mountConfigureDirectorySync(node, props);
+      }
+    } else {
+      this.premountConfigureDirectorySyncNodes.set(node, props);
+    }
+  };
+
+  __internal_unmountConfigureDirectorySync = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded && typeof this.clerkjs.__internal_unmountConfigureDirectorySync === 'function') {
+      this.clerkjs.__internal_unmountConfigureDirectorySync(node);
+    }
+    this.premountConfigureDirectorySyncNodes.delete(node);
+  };
+
   __internal_mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_mountOAuthConsent(node, props);
@@ -1351,6 +1433,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   unmountOAuthConsent = (node: HTMLDivElement) => {
     this.__internal_unmountOAuthConsent(node);
+  };
+
+  __internal_mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
+    if (this.clerkjs && this.loaded) {
+      if (typeof this.clerkjs.__internal_mountOAuthDeviceVerification === 'function') {
+        this.clerkjs.__internal_mountOAuthDeviceVerification(node, props);
+      }
+    } else {
+      this.premountOAuthDeviceVerificationNodes.set(node, props);
+    }
+  };
+
+  __internal_unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded && typeof this.clerkjs.__internal_unmountOAuthDeviceVerification === 'function') {
+      this.clerkjs.__internal_unmountOAuthDeviceVerification(node);
+    }
+    this.premountOAuthDeviceVerificationNodes.delete(node);
   };
 
   mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {
@@ -1547,6 +1646,24 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       });
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
+    }
+  };
+
+  __internal_resumeAfterProtectCheck = async (
+    params?: ResumeAfterProtectCheckParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<void> => {
+    const callback = () => {
+      const clerkjs = this.clerkjs;
+      if (typeof clerkjs?.__internal_resumeAfterProtectCheck !== 'function') {
+        return;
+      }
+      void clerkjs.__internal_resumeAfterProtectCheck(params, customNavigate)?.catch(() => {});
+    };
+    if (this.clerkjs && this.loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('__internal_resumeAfterProtectCheck', callback);
     }
   };
 

@@ -44,7 +44,7 @@ test.describe('api keys component @machine', () => {
     await app.dev();
 
     const u = createTestUtils({ app });
-    fakeAdmin = u.services.users.createFakeUser();
+    fakeAdmin = u.services.users.createFakeUser(test);
     const admin = await u.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await u.services.users.createFakeOrganization(admin.id);
   });
@@ -99,7 +99,7 @@ test.describe('api keys component @machine', () => {
     const u = createTestUtils({ app, page, context });
 
     // Create user and 11 API keys to trigger pagination (default perPage is 10)
-    const fakeUser = u.services.users.createFakeUser();
+    const fakeUser = u.services.users.createFakeUser(test);
     const bapiUser = await u.services.users.createBapiUser(fakeUser);
     const fakeAPIKeys = await Promise.all(
       Array.from({ length: 11 }, () => u.services.users.createFakeAPIKey(bapiUser.id)),
@@ -388,6 +388,44 @@ test.describe('api keys component @machine', () => {
     await u.page.unrouteAll();
   });
 
+  test('standalone API keys component renders in org context when user API keys are disabled', async ({
+    page,
+    context,
+  }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.organizationSwitcher.goTo();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: false });
+
+    let capturedSubject: string | null = null;
+    const apiKeyRequestPromise = u.page.waitForRequest(request => {
+      if (request.url().includes('api_keys')) {
+        const url = new URL(request.url());
+        capturedSubject = url.searchParams.get('subject');
+        return true;
+      }
+      return false;
+    });
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeVisible();
+
+    // Org API keys are listed, so the subject must be the organization
+    await apiKeyRequestPromise;
+    expect(capturedSubject).toBe(fakeOrganization.organization.id);
+
+    await u.page.unrouteAll();
+  });
+
   test.describe('api key list invalidation', () => {
     // Helper function to count actual API key rows (not empty state)
     const createAPIKeyCountHelper = (u: any) => async () => {
@@ -515,7 +553,7 @@ test.describe('api keys component @machine', () => {
       const u = createTestUtils({ app, page, context });
 
       // Create a dedicated user for this test to ensure clean state
-      const dedicatedUser = u.services.users.createFakeUser();
+      const dedicatedUser = u.services.users.createFakeUser(test);
       const bapiUser = await u.services.users.createBapiUser(dedicatedUser);
 
       // Create exactly 9 API keys for this user (not using shared organization)
@@ -647,7 +685,7 @@ test.describe('api keys component @machine', () => {
       const u = createTestUtils({ app, page, context });
 
       // Create a dedicated user for this test to ensure clean state
-      const dedicatedUser = u.services.users.createFakeUser();
+      const dedicatedUser = u.services.users.createFakeUser(test);
       const bapiUser = await u.services.users.createBapiUser(dedicatedUser);
 
       // Create exactly 15 API keys for this user to have 2 pages (10 per page)

@@ -63,6 +63,7 @@ export const csCZ: LocalizationResource = {
   badge__canceledEndsAt: "Zrušeno • Končí {{ date | shortDate('cs-CZ') }}",
   badge__currentPlan: 'Aktuální plán',
   badge__default: 'Výchozí',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Končí {{ date | shortDate('cs-CZ') }}",
   badge__expired: 'Vypršelo',
   badge__freeTrial: undefined,
@@ -102,8 +103,11 @@ export const csCZ: LocalizationResource = {
       'Nelze se přihlásit k tomuto plánu s měsíční platbou. Abyste se k němu přihlásili, musíte zvolit roční platbu.',
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Vaše platba byla úspěšná.',
       description__subscriptionSuccessful: 'Vaše nové předplatné je nastaveno.',
+      discount: undefined,
       downgradeNotice:
         'Současné předplatné a jeho funkce si ponecháte do konce fakturačního cyklu, poté budete převedeni na toto předplatné.',
       emailForm: {
@@ -119,6 +123,8 @@ export const csCZ: LocalizationResource = {
       },
       pastDueNotice: 'Vaše předchozí předplatné bylo po splatnosti, bez platby.',
       perMonth: 'měsíčně',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pokladna',
       title__paymentSuccessful: 'Platba byla úspěšná!',
       title__subscriptionSuccessful: 'Úspěch!',
@@ -129,6 +135,9 @@ export const csCZ: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit za zbytek vašeho současného předplatného.',
     defaultFreePlanActive: 'Aktuálně používáte bezplatný plán',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Zdarma',
     getStarted: 'Začít',
     highlightedPlanBadge: 'Populární',
@@ -140,6 +149,7 @@ export const csCZ: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Měsíčně',
+    months: undefined,
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
     payerCreditRemainder: undefined,
@@ -218,6 +228,84 @@ export const csCZ: LocalizationResource = {
     year: 'Rok',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -244,6 +332,79 @@ export const csCZ: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -630,6 +791,10 @@ export const csCZ: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Kontaktujte správce vaší organizace pro rozšíření vašich oprávnění.',
@@ -683,6 +848,10 @@ export const csCZ: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Vlastní poskytovatel SAML',
         google: undefined,
@@ -858,11 +1027,53 @@ export const csCZ: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Vytvořit organizaci',
@@ -1076,6 +1287,25 @@ export const csCZ: LocalizationResource = {
       title: 'Odebrat doménu',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1312,6 +1542,10 @@ export const csCZ: LocalizationResource = {
         subtitleNewTab: 'Vraťte se na nově otevřenou kartu pro pokračování',
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Použijte ověřovací odkaz zaslaný na váš e-mail',
@@ -1322,6 +1556,9 @@ export const csCZ: LocalizationResource = {
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Kód pro resetování hesla',
@@ -1388,6 +1625,15 @@ export const csCZ: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Před resetováním hesla musíme ověřit vaši identitu.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrovat se',
@@ -1665,6 +1911,7 @@ export const csCZ: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Heslo je nesprávné.',
     form_password_length_too_short: 'Heslo je příliš krátké.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
     form_password_or_identifier_incorrect:
       'Heslo nebo e-mailová adresa je nesprávná. Zkuste to znovu nebo použijte jinou metodu.',
@@ -1714,6 +1961,8 @@ export const csCZ: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Jste již přihlášen.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
     web3_signature_request_rejected: 'Odmítli jste žádost o podpis. Chcete-li pokračovat, zkuste to prosím znovu.',
     web3_solana_signature_generation_failed:

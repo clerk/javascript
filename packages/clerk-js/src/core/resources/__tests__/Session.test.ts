@@ -2,13 +2,20 @@ import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import { clerkMock, createUser, mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import {
+  restoreDocument,
+  setDocument,
+  setDocumentHasFocus,
+  setDocumentHasFocusValue,
+  setDocumentVisibilityState,
+} from '@/test/document-helpers';
 import { TokenId } from '@/utils/tokenId';
 
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
-import { BaseResource, Organization, Session } from '../internal';
+import { BaseResource, Client, Organization, Session } from '../internal';
 
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
@@ -29,6 +36,7 @@ describe('Session', () => {
 
   afterEach(() => {
     SessionTokenCache.clear();
+    restoreDocument();
     vi.useRealTimers();
   });
 
@@ -43,6 +51,83 @@ describe('Session', () => {
     afterEach(() => {
       dispatchSpy?.mockRestore();
       BaseResource.clerk = null as any;
+    });
+
+    describe('focus-biased proactive refresh', () => {
+      const createSession = (lastActiveToken?: SessionJSON['last_active_token']) =>
+        new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: lastActiveToken,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+      it('registers proactive refresh after a focused network mint', async () => {
+        setDocumentHasFocus(true);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+      });
+
+      it('does not register proactive refresh after an unfocused network mint', async () => {
+        setDocumentHasFocus(false);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toBeUndefined();
+      });
+
+      it('does not register proactive refresh for an unfocused hydrated token', async () => {
+        setDocumentHasFocus(false);
+
+        createSession({ object: 'token', jwt: mockJwt });
+        await Promise.resolve();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toBeUndefined();
+      });
+
+      it('registers proactive refresh when document.hasFocus is not callable', async () => {
+        setDocumentHasFocusValue(undefined);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+      });
+
+      it('registers proactive refresh when document.hasFocus throws', async () => {
+        setDocumentHasFocusValue(() => {
+          throw new Error('broken document');
+        });
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+      });
+
+      it('registers proactive refresh when document is missing', async () => {
+        setDocument(undefined);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+      });
     });
 
     it('dispatches token:update event on getToken without active organization', async () => {
@@ -543,6 +628,10 @@ describe('Session', () => {
     });
 
     describe('timer-based proactive refresh', () => {
+      beforeEach(() => {
+        setDocumentHasFocus(true);
+      });
+
       it('triggers background refresh via timer before leeway period', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
@@ -687,6 +776,9 @@ describe('Session', () => {
         const freshToken = await session.getToken();
         expect(freshToken).toEqual(newMockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
+        expect(
+          SessionTokenCache.get({ tokenId: TokenId.build('session_1', undefined, null) })?.entry.onRefresh,
+        ).toEqual(expect.any(Function));
       });
 
       it('does not emit token:update with an empty token when background refresh fires while offline', async () => {
@@ -1844,6 +1936,72 @@ describe('Session', () => {
     });
   });
 
+  describe('sends tab_state in /tokens request body', () => {
+    const createSession = () =>
+      new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+    beforeEach(() => {
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+      mockFetch(true, 200, { object: 'token', jwt: mockJwt });
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it.each([
+      ['focused', true, 'hidden'],
+      ['visible', false, 'visible'],
+      ['hidden', false, 'hidden'],
+    ])('serializes tab_state=%s', async (tabState, hasFocus, visibilityState) => {
+      setDocumentHasFocus(hasFocus);
+      setDocumentVisibilityState(visibilityState as DocumentVisibilityState);
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe(`organization_id=&tab_state=${tabState}`);
+    });
+
+    it('omits tab_state when document is undefined', async () => {
+      setDocument(undefined);
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
+    });
+
+    it('omits tab_state when document.hasFocus is not a function', async () => {
+      setDocumentHasFocusValue(undefined);
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
+    });
+
+    it('omits tab_state when document.hasFocus throws', async () => {
+      setDocumentHasFocusValue(() => {
+        throw new Error('focus unavailable');
+      });
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
+    });
+  });
+
   describe('origin outage mode fallback', () => {
     let dispatchSpy: ReturnType<typeof vi.spyOn>;
     let fetchSpy: ReturnType<typeof vi.spyOn>;
@@ -2111,6 +2269,7 @@ describe('Session', () => {
     afterEach(() => {
       dispatchSpy?.mockRestore();
       fetchSpy?.mockRestore();
+      Client.clearInstance();
       BaseResource.clerk = null as any;
       SessionTokenCache.clear();
     });
@@ -2285,6 +2444,82 @@ describe('Session', () => {
       // A cross-org lastActiveToken is not a freshness baseline: the new org's token
       // wins even though a stale edge minted it with a lower oiat.
       expect(session.lastActiveToken?.getRawString()).toBe(orgLow);
+    });
+
+    describe('fromJSON', () => {
+      const tokenJSON = (jwt: string) => ({ object: 'token' as const, id: 'tok_1', jwt });
+
+      const touchResponse = (lastActiveToken: ReturnType<typeof tokenJSON> | null) => ({
+        response: {
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+          last_active_token: lastActiveToken,
+        } as unknown as SessionJSON,
+      });
+
+      it('a stale touch response does not regress lastActiveToken', async () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const low = createJwtWithOiat(NOW, NOW);
+        const session = makeSession({ last_active_token: tokenJSON(high) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(tokenJSON(low)) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(high);
+      });
+
+      it('a fresher touch response replaces lastActiveToken', async () => {
+        const low = createJwtWithOiat(NOW, NOW);
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const session = makeSession({ last_active_token: tokenJSON(low) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(tokenJSON(high)) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(high);
+      });
+
+      it('a touch response without a token still clears lastActiveToken', async () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const session = makeSession({ last_active_token: tokenJSON(high) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(null) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken).toBeNull();
+      });
+
+      it('a stale piggybacked client payload does not regress the rebuilt session token', () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const low = createJwtWithOiat(NOW, NOW);
+        const higher = createJwtWithOiat(NOW, NOW + 60);
+
+        const clientJSON = (lastActiveToken: ReturnType<typeof tokenJSON> | null) =>
+          ({
+            object: 'client',
+            id: 'client_1',
+            last_active_session_id: 'session_1',
+            sessions: [touchResponse(lastActiveToken).response],
+          }) as any;
+
+        const client = Client.getOrCreateInstance().fromJSON(clientJSON(tokenJSON(high)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(high);
+
+        client.fromJSON(clientJSON(tokenJSON(low)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(high);
+
+        client.fromJSON(clientJSON(tokenJSON(higher)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(higher);
+
+        client.fromJSON(clientJSON(null));
+        expect(client.sessions[0]?.lastActiveToken).toBeNull();
+      });
     });
   });
 });

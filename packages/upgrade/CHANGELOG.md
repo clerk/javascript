@@ -1,5 +1,19 @@
 # @clerk/upgrade
 
+## 2.0.6
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Update the `chalk`, `jscodeshift`, `marked`, and `tinyglobby` dependency ranges. ([#9026](https://github.com/clerk/javascript/pull/9026)) by [@renovate](https://github.com/apps/renovate)
+
+## 2.0.5
+
+### Patch Changes
+
+- Rename "Client Trust" to "Device Trust" in documentation strings and links. This is a naming change only — the `needs_client_trust` sign-in status, the `clientTrustState` property, and every other API value keep their existing names, so no integration changes are required. ([#9266](https://github.com/clerk/javascript/pull/9266)) by [@mwickett](https://github.com/mwickett)
+
 ## 2.0.4
 
 ### Patch Changes

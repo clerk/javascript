@@ -73,12 +73,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 external: ['node:async_hooks'],
               },
 
-              // We need this for top-level await
-              optimizeDeps: {
-                esbuildOptions: {
-                  target: 'es2022',
-                },
-              },
               build: {
                 target: 'es2022',
                 rollupOptions: {

@@ -63,6 +63,7 @@ export const faIR: LocalizationResource = {
   badge__canceledEndsAt: "لغو شد • پایان می‌یابد {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'طرح فعلی',
   badge__default: 'پیش فرض',
+  badge__deprovisioned: undefined,
   badge__endsAt: "به پایان می رسد {{ date | shortDate('en-US') }}",
   badge__expired: 'مننقضی شده',
   badge__freeTrial: undefined,
@@ -102,8 +103,11 @@ export const faIR: LocalizationResource = {
       'شما نمی‌توانید با پرداخت ماهانه در این طرح مشترک شوید. برای عضویت در این طرح، باید پرداخت سالانه را انتخاب کنید.',
     cannotSubscribeUnrecoverable: 'شما نمی‌توانید در این طرح مشترک شوید. اشتراک موجود شما گران‌تر از این طرح است.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'پرداخت شما با موفقیت انجام شد.',
       description__subscriptionSuccessful: 'اشتراک شما با موفقیت ایجاد شد.',
+      discount: undefined,
       downgradeNotice:
         'شما اشتراک فعلی و ویژگی‌های آن را تا پایان دوره صورتحساب حفظ خواهید کرد، سپس به این اشتراک منتقل خواهید شد.',
       emailForm: {
@@ -120,6 +124,8 @@ export const faIR: LocalizationResource = {
       },
       pastDueNotice: 'اشتراک قبلی شما سررسید گذشته بود، بدون پرداخت.',
       perMonth: 'ماهانه',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'تسویه حساب',
       title__paymentSuccessful: 'پرداخت موفقیت آمیز بود!',
       title__subscriptionSuccessful: 'موفقیت آمیز!',
@@ -130,6 +136,9 @@ export const faIR: LocalizationResource = {
     credit: 'اعتبار',
     creditRemainder: 'اعتبار برای باقیمانده اشتراک فعلی شما.',
     defaultFreePlanActive: 'شما در حال حاضر در طرح رایگان هستید',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'رایگان',
     getStarted: 'شروع کنید',
     highlightedPlanBadge: 'محبوب',
@@ -141,6 +150,7 @@ export const faIR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'ماهانه',
+    months: undefined,
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
     payerCreditRemainder: undefined,
@@ -219,6 +229,84 @@ export const faIR: LocalizationResource = {
     year: 'سال',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -245,6 +333,79 @@ export const faIR: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -631,6 +792,10 @@ export const faIR: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'برای ارتقای مجوزهای خود با مدیر سازمان تماس بگیرید.',
@@ -684,6 +849,10 @@ export const faIR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'ارائه‌دهنده SAML سفارشی',
         google: undefined,
@@ -859,11 +1028,53 @@ export const faIR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'ایجاد سازمان',
@@ -1078,6 +1289,25 @@ export const faIR: LocalizationResource = {
       title: 'حذف دامنه',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1314,6 +1544,10 @@ export const faIR: LocalizationResource = {
         subtitleNewTab: 'برای ادامه به برگه تازه باز شده برگردید',
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'از لینک تأیید ارسال شده به ایمیل خود استفاده کنید',
@@ -1324,6 +1558,9 @@ export const faIR: LocalizationResource = {
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'کد رمز عبور را بازنشانی کنید',
@@ -1390,6 +1627,15 @@ export const faIR: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'قبل از تنظیم مجدد رمز عبور، باید هویت شما را تأیید کنیم.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'ثبت نام',
@@ -1664,6 +1910,7 @@ export const faIR: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'رمز عبور نادرست است.',
     form_password_length_too_short: 'رمز عبور شما خیلی کوتاه است. باید حداقل ۸ کاراکتر داشته باشد.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'رمز عبور شما به اندازه کافی قوی نیست.',
     form_password_or_identifier_incorrect:
       'رمز عبور یا آدرس ایمیل نادرست است. دوباره تلاش کنید یا از روش دیگری استفاده کنید.',
@@ -1713,6 +1960,8 @@ export const faIR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'جلسه از قبل وجود دارد.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
     web3_signature_request_rejected: 'درخواست امضا را رد کرده‌اید. برای ادامه دوباره تلاش کنید.',
     web3_solana_signature_generation_failed: 'هنگام ایجاد امضا خطایی رخ داد. برای ادامه دوباره تلاش کنید.',

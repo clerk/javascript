@@ -1,4 +1,4 @@
-import { app, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 
 import { OAUTH_TRANSPORT_CHANNELS } from '../shared/ipc';
 import type { RendererSchemeOptions } from '../shared/types';
@@ -10,6 +10,7 @@ type PendingOAuthFlow = {
   resolve: (value: { callbackUrl: string }) => void;
   reject: (reason: Error) => void;
   timeout: NodeJS.Timeout;
+  window: Electron.BrowserWindow | null;
 };
 
 type OAuthTransportOptions = {
@@ -33,6 +34,23 @@ function isMatchingCallbackUrl(url: string, redirectUrl: string): boolean {
   } catch {
     return false;
   }
+}
+
+function findMatchingCallbackUrl(argv: string[], redirectUrl: string): string | undefined {
+  return argv.find(url => isMatchingCallbackUrl(url, redirectUrl));
+}
+
+// Windows and Linux deliver the callback to a background process; macOS activates the app itself.
+function focusWindow(window: Electron.BrowserWindow | null): void {
+  if (!window || window.isDestroyed()) {
+    return;
+  }
+
+  if (window.isMinimized()) {
+    window.restore();
+  }
+
+  window.focus();
 }
 
 function assertExternalOAuthUrl(url: string): void {
@@ -68,6 +86,7 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
 
     const pending = pendingOAuthFlow;
     disposePendingOAuthFlow();
+    focusWindow(pending.window);
     pending.resolve({ callbackUrl: url });
   };
 
@@ -81,7 +100,7 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
   };
 
   const secondInstanceListener = (_event: Electron.Event, argv: string[]): void => {
-    const callbackUrl = argv.find(url => isMatchingCallbackUrl(url, redirectUrl));
+    const callbackUrl = findMatchingCallbackUrl(argv, redirectUrl);
 
     if (callbackUrl) {
       handleCallbackUrl(callbackUrl);
@@ -110,13 +129,15 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
 
     assertExternalOAuthUrl(url);
 
+    const window = BrowserWindow.fromWebContents(event.sender);
+
     const callbackPromise = new Promise<{ callbackUrl: string }>((resolve, reject) => {
       const timeout = setTimeout(() => {
         disposePendingOAuthFlow();
         reject(new Error('Clerk: OAuth callback timed out.'));
       }, CALLBACK_TIMEOUT_MS);
 
-      pendingOAuthFlow = { resolve, reject, timeout };
+      pendingOAuthFlow = { resolve, reject, timeout, window };
     });
 
     try {

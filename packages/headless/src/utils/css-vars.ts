@@ -1,5 +1,7 @@
 import { detectOverflow, type Middleware } from '@floating-ui/react';
 
+import { resolveSideOffset, type SideOffset } from './side-offset';
+
 /**
  * Positioning middleware that sets CSS custom properties on the floating element:
  *
@@ -8,16 +10,17 @@ import { detectOverflow, type Middleware } from '@floating-ui/react';
  * - `--cl-available-width`   – available width between anchor and viewport edge (px)
  * - `--cl-available-height`  – available height between anchor and viewport edge (px)
  * - `--cl-transform-origin`  – CSS transform-origin pointing back toward the anchor
+ * - `--cl-anchor-origin`     – CSS transform-origin at the anchor's own center
  *
  * Place **after** `arrow()` so arrow position data is available for transform-origin.
  */
-export function cssVars(opts?: { sideOffset?: number }): Middleware {
+export function cssVars(opts?: { sideOffset?: SideOffset }): Middleware {
   return {
     name: 'cssVars',
     async fn(state) {
       const { elements, rects, middlewareData, placement } = state;
       const style = elements.floating.style;
-      const sideOffset = opts?.sideOffset ?? 0;
+      const sideOffset = resolveSideOffset(opts?.sideOffset ?? 0, placement);
 
       // Anchor dimensions
       style.setProperty('--cl-anchor-width', `${rects.reference.width}px`);
@@ -45,7 +48,12 @@ export function cssVars(opts?: { sideOffset?: number }): Middleware {
       style.setProperty('--cl-available-height', `${availableHeight}px`);
 
       // Transform origin — points back toward the anchor
-      const arrowEl = elements.floating.querySelector("[data-cl-slot$='-arrow']");
+      // The arrow is the only FloatingArrow <svg> descendant carrying data-side.
+      const arrowEl = elements.floating.querySelector('svg[data-side]');
+
+      // The anchor's center, relative to the floating element.
+      const anchorX = rects.reference.x + rects.reference.width / 2 - state.x;
+      const anchorY = rects.reference.y + rects.reference.height / 2 - state.y;
 
       let transformX: number;
       let transformY: number;
@@ -56,9 +64,8 @@ export function cssVars(opts?: { sideOffset?: number }): Middleware {
         transformX = arrowX + arrowEl.clientWidth / 2;
         transformY = arrowY + arrowEl.clientHeight / 2;
       } else {
-        // No arrow — use the anchor's center relative to the floating element
-        transformX = rects.reference.x + rects.reference.width / 2 - state.x;
-        transformY = rects.reference.y + rects.reference.height / 2 - state.y;
+        transformX = anchorX;
+        transformY = anchorY;
       }
 
       const originMap: Record<string, string> = {
@@ -69,6 +76,10 @@ export function cssVars(opts?: { sideOffset?: number }): Middleware {
       };
 
       style.setProperty('--cl-transform-origin', originMap[side]);
+      // Keeps both axes, where `--cl-transform-origin` pins the cross axis to the floating
+      // element's own edge. Scaling about this point makes the popup travel out of the
+      // anchor instead of growing in place.
+      style.setProperty('--cl-anchor-origin', `${anchorX}px ${anchorY}px`);
 
       return {};
     },

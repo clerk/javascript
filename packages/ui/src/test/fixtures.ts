@@ -235,6 +235,11 @@ const createBaseUserSettings = (): UserSettingsJSON => {
     },
     password_settings: passwordSettingsConfig,
     passkey_settings: passkeySettingsConfig,
+    attack_protection: {
+      enumeration_protection: {
+        enabled: false,
+      },
+    },
   };
 };
 

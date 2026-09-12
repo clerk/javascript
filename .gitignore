@@ -114,3 +114,5 @@ CLAUDE.local.md
 
 # Git worktrees
 .worktrees
+# Claude Code creates agent worktrees here
+.claude/worktrees

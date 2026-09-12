@@ -1,5 +1,6 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -45,7 +46,7 @@ function DrawerFixture(props: Partial<React.ComponentProps<typeof Drawer.Root>> 
             <div data-testid='scrollable'>scrollable content</div>
             <button
               type='button'
-              data-cl-drawer-no-drag
+              data-drawer-no-drag
               data-testid='nodrag'
             >
               No drag
@@ -201,10 +202,16 @@ function stubMeasuredHeight(el: HTMLElement, naturalHeight: number) {
 
 function makeScrollable(
   el: HTMLElement,
-  { scrollHeight, clientHeight, scrollTop }: { scrollHeight: number; clientHeight: number; scrollTop: number },
+  {
+    scrollHeight,
+    clientHeight,
+    scrollTop,
+    overflowY = 'auto',
+  }: { scrollHeight: number; clientHeight: number; scrollTop: number; overflowY?: string },
 ) {
   Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true });
   Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true });
+  el.style.overflowY = overflowY;
   el.scrollTop = scrollTop;
 }
 
@@ -238,7 +245,7 @@ describe('Drawer', () => {
       const trigger = screen.getByRole('button', { name: 'Open drawer' });
       await user.click(trigger);
 
-      expect(trigger).toHaveAttribute('data-cl-open', '');
+      expect(trigger).toHaveAttribute('data-open', '');
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
@@ -248,7 +255,7 @@ describe('Drawer', () => {
 
       await user.keyboard('{Escape}');
 
-      expect(screen.getByTestId('trigger')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByTestId('trigger')).toHaveAttribute('data-closed', '');
     });
 
     it('closes via Close button', async () => {
@@ -257,7 +264,7 @@ describe('Drawer', () => {
 
       await user.click(screen.getByRole('button', { name: 'Close' }));
 
-      expect(screen.getByTestId('trigger')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByTestId('trigger')).toHaveAttribute('data-closed', '');
     });
 
     it('calls onOpenChange when toggled', async () => {
@@ -289,6 +296,56 @@ describe('Drawer', () => {
       expect(screen.queryByText('Drawer body content')).not.toBeInTheDocument();
       expect(screen.queryByTestId('backdrop')).not.toBeInTheDocument();
       expect(screen.queryByTestId('viewport')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('final focus', () => {
+    // A close driven from outside — a controlled `open` flipping — never passes through
+    // floating-ui's own emit, so the function is consulted when focus is restored instead.
+    it('returns focus where the finalFocus function points, on a controlled close', async () => {
+      function Controlled() {
+        const [open, setOpen] = React.useState(true);
+        const target = React.useRef<HTMLButtonElement>(null);
+        return (
+          <>
+            <button
+              ref={target}
+              data-testid='target'
+            >
+              Landing
+            </button>
+            <button
+              data-testid='outside-close'
+              onClick={() => setOpen(false)}
+            >
+              Close from outside
+            </button>
+            <Drawer.Root
+              open={open}
+              onOpenChange={setOpen}
+            >
+              <Drawer.Portal>
+                <Drawer.Viewport>
+                  <Drawer.Popup finalFocus={() => target.current}>
+                    <Drawer.Title>Sheet</Drawer.Title>
+                    <button
+                      data-testid='inside-close'
+                      onClick={() => setOpen(false)}
+                    >
+                      Choose
+                    </button>
+                  </Drawer.Popup>
+                </Drawer.Viewport>
+              </Drawer.Portal>
+            </Drawer.Root>
+          </>
+        );
+      }
+      const user = userEvent.setup();
+      render(<Controlled />);
+      await user.click(screen.getByTestId('inside-close'));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.getByTestId('target')).toHaveFocus());
     });
   });
 
@@ -370,7 +427,7 @@ describe('Drawer', () => {
 
       expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(handle.isOpen).toBe(true);
-      expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-open', '');
     });
 
     it('handle.close() closes the drawer and updates the trigger', async () => {
@@ -382,7 +439,7 @@ describe('Drawer', () => {
       await user.click(screen.getByRole('button', { name: 'Close' }));
 
       expect(handle.isOpen).toBe(false);
-      expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-closed', '');
     });
 
     it('fires onOpenChange for handle-driven transitions', async () => {
@@ -438,15 +495,15 @@ describe('Drawer', () => {
       expect(popup).toHaveAttribute('aria-describedby', desc.getAttribute('id'));
     });
 
-    it('applies data-cl-open on popup, backdrop and viewport when open', async () => {
+    it('applies data-open on popup, backdrop and viewport when open', async () => {
       const user = userEvent.setup();
       render(<DrawerFixture />);
 
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
 
-      expect(screen.getByRole('dialog')).toHaveAttribute('data-cl-open', '');
-      expect(screen.getByTestId('backdrop')).toHaveAttribute('data-cl-open', '');
-      expect(screen.getByTestId('viewport')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByRole('dialog')).toHaveAttribute('data-open', '');
+      expect(screen.getByTestId('backdrop')).toHaveAttribute('data-open', '');
+      expect(screen.getByTestId('viewport')).toHaveAttribute('data-open', '');
     });
   });
 
@@ -568,6 +625,38 @@ describe('Drawer', () => {
       expect(onOpenChange).not.toHaveBeenCalledWith(false);
     });
 
+    it('mirrors the swipe vars onto the backdrop, which cannot inherit them from the popup', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 0, button: 0, isPrimary: true, pointerType: 'touch' });
+      clock.t += 50;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 });
+
+      const backdrop = screen.getByTestId('backdrop');
+      expect(swipeProgress(backdrop)).toBe(swipeProgress(popup));
+      expect(swipeY(backdrop)).toBe('100px');
+
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 100 });
+    });
+
+    // A press on a control inside the sheet is not a drag: nothing that keys on `data-swiping` — the
+    // grip's held colour, the transition freeze — should react until the sheet actually moves.
+    it('marks swiping only once a move commits to dragging the sheet', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 100, button: 0, pointerType: 'touch' });
+      expect(popup).not.toHaveAttribute('data-swiping');
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 140 });
+      expect(popup).toHaveAttribute('data-swiping');
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 140 });
+      expect(popup).not.toHaveAttribute('data-swiping');
+    });
+
     it('updates the swipe-progress var and swiping attribute during a drag', () => {
       render(<DrawerFixture defaultOpen />);
       const popup = screen.getByRole('dialog');
@@ -578,11 +667,145 @@ describe('Drawer', () => {
       clock.t += 50;
       fireEvent.pointerMove(popup, { pointerId: 1, clientY: 50 });
 
-      expect(popup).toHaveAttribute('data-cl-swiping', '');
+      expect(popup).toHaveAttribute('data-swiping', '');
       expect(swipeProgress(popup)).toBe('0.125'); // 50 / 400
 
       fireEvent.pointerUp(popup, { pointerId: 1, clientY: 50 });
-      expect(popup).not.toHaveAttribute('data-cl-swiping');
+      expect(popup).not.toHaveAttribute('data-swiping');
+    });
+
+    it('rubber-bands an upward drag at rest when nothing under the finger can scroll', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 300, button: 0, pointerType: 'touch' });
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 }); // up 200px, never dragged down
+
+      expect(parseFloat(swipeY(popup))).toBeLessThan(0);
+      expect(popup).toHaveAttribute('data-swiping');
+
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 100 });
+      expect(swipeY(popup)).toBe('0px');
+    });
+
+    // The styled sheet bleeds below the screen, so its viewport measures taller than it shows; that
+    // is not inner content, and must not swallow the upward drag.
+    it('rubber-bands upward at rest even when the viewport above the sheet overflows', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      makeScrollable(screen.getByTestId('viewport'), { scrollHeight: 940, clientHeight: 844, scrollTop: 0 });
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 300, button: 0, pointerType: 'touch' });
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 });
+
+      expect(parseFloat(swipeY(popup))).toBeLessThan(0);
+
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 100 });
+    });
+
+    // A clipped box with a fixed height overflows the same way a scroller does and scrolls not at
+    // all; it is not inner content.
+    it('rubber-bands upward at rest over a box that overflows but cannot scroll', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      const box = screen.getByTestId('scrollable');
+      makeScrollable(box, { scrollHeight: 500, clientHeight: 100, scrollTop: 0, overflowY: 'clip' });
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(box, { pointerId: 1, clientY: 300, button: 0, pointerType: 'touch' });
+      clock.t += 30;
+      fireEvent.pointerMove(box, { pointerId: 1, clientY: 100 });
+
+      expect(parseFloat(swipeY(popup))).toBeLessThan(0);
+
+      fireEvent.pointerUp(box, { pointerId: 1, clientY: 100 });
+    });
+
+    it('lets inner content scroll on an upward drag at rest when it has room to', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      const list = screen.getByTestId('scrollable');
+      makeScrollable(list, { scrollHeight: 500, clientHeight: 100, scrollTop: 0 });
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(list, { pointerId: 1, clientY: 300, button: 0, pointerType: 'touch' });
+      clock.t += 30;
+      fireEvent.pointerMove(list, { pointerId: 1, clientY: 100 });
+
+      expect(swipeY(popup)).toBe('');
+
+      fireEvent.pointerUp(list, { pointerId: 1, clientY: 100 });
+    });
+
+    // Pointer capture is asked for, not guaranteed. A release the popup never receives used to leave
+    // the engine armed: the sheet held its drag offset and `data-swiping`, and the next open started
+    // that way too, until a fresh press on the sheet released it.
+    it('ends the gesture on a release that reaches only the window', () => {
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 300, button: 0, pointerType: 'mouse' });
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 });
+      expect(popup).toHaveAttribute('data-swiping');
+
+      fireEvent.pointerUp(window, { pointerId: 1, clientY: 100 });
+
+      expect(popup).not.toHaveAttribute('data-swiping');
+      expect(swipeY(popup)).toBe('0px');
+    });
+
+    // A dismiss leaves the swipe offset in place for the exit; the next open must not inherit it,
+    // or `shouldDrag` short-circuits past the inner-scroll check and drags a list that should scroll.
+    it('starts the next open at rest after a swipe dismiss', async () => {
+      const user = userEvent.setup();
+      const onOpenChange = vi.fn();
+      render(<DrawerFixture onOpenChange={onOpenChange} />);
+      await user.click(screen.getByTestId('trigger'));
+      stubHeight(screen.getByRole('dialog'), 400);
+      drag(screen.getByRole('dialog'), 0, 200, 200);
+      expect(onOpenChange).toHaveBeenLastCalledWith(false);
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      await user.click(screen.getByTestId('trigger'));
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      const list = screen.getByTestId('scrollable');
+      makeScrollable(list, { scrollHeight: 500, clientHeight: 100, scrollTop: 50 });
+
+      drag(list, 0, 120, 60);
+
+      expect(swipeY(popup)).toBe('');
+      expect(popup).toBeInTheDocument();
+    });
+
+    it('does not carry a lost gesture into the next open', async () => {
+      const user = userEvent.setup();
+      render(<DrawerFixture />);
+      await user.click(screen.getByTestId('trigger'));
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 300, button: 0, pointerType: 'mouse' });
+      clock.t += 30;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 });
+      // No release at all; close from the keyboard instead.
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      await user.click(screen.getByTestId('trigger'));
+      expect(screen.getByRole('dialog')).not.toHaveAttribute('data-swiping');
     });
 
     it('rubber-bands upward over-drag without ever moving the sheet downward', () => {
@@ -653,7 +876,7 @@ describe('Drawer', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
-    it('does not drag from a [data-cl-drawer-no-drag] subtree', () => {
+    it('does not drag from a [data-drawer-no-drag] subtree', () => {
       const onOpenChange = vi.fn();
       render(
         <DrawerFixture
@@ -735,7 +958,9 @@ describe('Drawer', () => {
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
-    it('does not drag when a scrollable ancestor of the popup is scrolled', () => {
+    // Nothing above the sheet is inner content: the walk ends at the sheet in either direction, so
+    // a scrolled box the sheet happens to sit in never takes the gesture from it.
+    it('drags when a scrollable ancestor of the popup is scrolled', () => {
       const onOpenChange = vi.fn();
       render(
         <AncestorScrollFixture
@@ -749,8 +974,33 @@ describe('Drawer', () => {
 
       drag(screen.getByTestId('ancestor-item'), 0, 120, 200);
 
-      expect(onOpenChange).not.toHaveBeenCalledWith(false);
-      expect(swipeY(popup)).toBe('');
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    // A portalled sheet's ancestors above the viewport are the page itself; the walk used to reach a
+    // scrolled `<html>` and read it as inner content, so a drawer over a scrolled page could not be
+    // dragged at all unless the sheet happened to scroll.
+    it('drags when the page behind the sheet is scrolled', () => {
+      const onOpenChange = vi.fn();
+      render(
+        <DrawerFixture
+          defaultOpen
+          onOpenChange={onOpenChange}
+        />,
+      );
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+      makeScrollable(document.documentElement, { scrollHeight: 3000, clientHeight: 800, scrollTop: 900 });
+
+      try {
+        drag(popup, 0, 120, 200);
+      } finally {
+        delete (document.documentElement as unknown as Record<string, unknown>).scrollHeight;
+        delete (document.documentElement as unknown as Record<string, unknown>).clientHeight;
+        document.documentElement.scrollTop = 0;
+      }
+
+      expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
     it('ignores cross-axis (horizontal) jitter during a vertical drag', () => {
@@ -923,8 +1173,8 @@ describe('Drawer', () => {
       );
       const popup = screen.getByRole('dialog');
       expect(snapOffset(popup)).toBe('0px');
-      expect(popup).toHaveAttribute('data-cl-snap', '1');
-      expect(popup).toHaveAttribute('data-cl-expanded', '');
+      expect(popup).toHaveAttribute('data-snap', '1');
+      expect(popup).toHaveAttribute('data-expanded', '');
     });
 
     it('positions at a controlled activeSnapPoint', () => {
@@ -937,8 +1187,8 @@ describe('Drawer', () => {
       );
       const popup = screen.getByRole('dialog');
       expect(snapOffset(popup)).toBe('400px');
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
-      expect(popup).not.toHaveAttribute('data-cl-expanded');
+      expect(popup).toHaveAttribute('data-snap', '0');
+      expect(popup).not.toHaveAttribute('data-expanded');
     });
 
     it('settles to the closest snap point on a slow release', () => {
@@ -957,7 +1207,7 @@ describe('Drawer', () => {
 
       expect(onActiveSnapPointChange).toHaveBeenCalledWith(0);
       expect(snapOffset(popup)).toBe('400px');
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
+      expect(popup).toHaveAttribute('data-snap', '0');
     });
 
     it('fast upward flick steps to the next-higher snap point', () => {
@@ -1066,7 +1316,7 @@ describe('Drawer', () => {
         />,
       );
       const popup = screen.getByRole('dialog');
-      expect(popup).not.toHaveAttribute('data-cl-snap');
+      expect(popup).not.toHaveAttribute('data-snap');
       expect(snapOffset(popup)).toBe('');
     });
 
@@ -1079,7 +1329,7 @@ describe('Drawer', () => {
         />,
       );
       const popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '1'); // clamped to lastIndex, not NaN
+      expect(popup).toHaveAttribute('data-snap', '1'); // clamped to lastIndex, not NaN
       expect(snapOffset(popup)).toBe('0px');
     });
   });
@@ -1098,16 +1348,16 @@ describe('Drawer', () => {
 
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
       let popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '1');
+      expect(popup).toHaveAttribute('data-snap', '1');
 
       drag(popup, 0, 260, 300); // settle to snap 0 (closest to offset(0) = 400)
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
+      expect(popup).toHaveAttribute('data-snap', '0');
 
       await user.keyboard('{Escape}');
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
 
       popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '1'); // reset to the default
+      expect(popup).toHaveAttribute('data-snap', '1'); // reset to the default
       expect(snapOffset(popup)).toBe('0px');
     });
 
@@ -1122,16 +1372,16 @@ describe('Drawer', () => {
 
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
       let popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
+      expect(popup).toHaveAttribute('data-snap', '0');
 
       drag(popup, 400, 0, 300); // move up to snap 1
-      expect(popup).toHaveAttribute('data-cl-snap', '1');
+      expect(popup).toHaveAttribute('data-snap', '1');
 
       await user.keyboard('{Escape}');
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
 
       popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '0'); // back to the provided default
+      expect(popup).toHaveAttribute('data-snap', '0'); // back to the provided default
     });
 
     it('does not reset the snap point when a close is canceled', async () => {
@@ -1147,15 +1397,15 @@ describe('Drawer', () => {
         />,
       );
       const popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
+      expect(popup).toHaveAttribute('data-snap', '0');
 
       drag(popup, 400, 0, 300); // move up to snap 1
-      expect(popup).toHaveAttribute('data-cl-snap', '1');
+      expect(popup).toHaveAttribute('data-snap', '1');
 
       await user.keyboard('{Escape}');
 
       expect(onOpenChange).toHaveBeenCalledWith(false); // the consumer was asked to close
-      expect(popup).toHaveAttribute('data-cl-snap', '1'); // but the snap point was not reset
+      expect(popup).toHaveAttribute('data-snap', '1'); // but the snap point was not reset
     });
   });
 
@@ -1346,16 +1596,16 @@ describe('Drawer', () => {
       render(<NestedFixture />);
 
       const parentPopup = screen.getByRole('dialog'); // only the parent is open initially
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-open');
 
       await user.click(screen.getByRole('button', { name: 'Open child' }));
 
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-open', '');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('1');
 
       const childPopup = screen.getByText('Child drawer').closest('[role="dialog"]');
-      expect(childPopup).toHaveAttribute('data-cl-nested', '');
-      expect(parentPopup).toHaveAttribute('data-cl-open', ''); // parent survives the child opening
+      expect(childPopup).toHaveAttribute('data-nested', '');
+      expect(parentPopup).toHaveAttribute('data-open', ''); // parent survives the child opening
     });
 
     it('clears the parent nested-open state when the child closes', async () => {
@@ -1364,11 +1614,11 @@ describe('Drawer', () => {
 
       const parentPopup = screen.getByRole('dialog');
       await user.click(screen.getByRole('button', { name: 'Open child' }));
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-open', '');
 
       await user.click(screen.getByRole('button', { name: 'Close child' }));
 
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-open');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('0');
     });
 
@@ -1383,7 +1633,7 @@ describe('Drawer', () => {
 
       expect(screen.getByText('Inner dialog')).toBeInTheDocument();
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('0');
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-open');
     });
 
     function getChildPopup() {
@@ -1407,16 +1657,16 @@ describe('Drawer', () => {
       clock.t += 50;
       fireEvent.pointerMove(childPopup, { pointerId: 1, clientY: 200 }); // 200 / 400 = 0.5
 
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-swiping', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-swiping', '');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0.5');
 
       // Fast, past-threshold release = dismiss. The parent settles toward full (1),
       // the same direction the open-count drop takes it, so the styled scale never
       // jumps backward.
       fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: 200 });
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-swiping');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-swiping');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('1');
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open'); // child dismissed
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-open'); // child dismissed
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('0');
     });
 
@@ -1437,9 +1687,9 @@ describe('Drawer', () => {
       // Small, slow release = snap back. The child stays open, so the parent
       // returns to its scaled-back rest (0) and remains nested-open.
       fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: 40 });
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-swiping');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-swiping');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0');
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-open', '');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('1');
     });
 
@@ -1462,7 +1712,7 @@ describe('Drawer', () => {
       // Opening the next child must re-scale the parent, not leave it parked at 1.
       await user.click(screen.getByRole('button', { name: 'Open child' }));
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0');
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-open', '');
     });
 
     it('clamps the reported nested progress to the 0..1 range', async () => {

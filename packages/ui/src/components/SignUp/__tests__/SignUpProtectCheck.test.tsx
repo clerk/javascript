@@ -306,6 +306,32 @@ describe('SignUpProtectCheck', () => {
     });
   });
 
+  it('continues an enterprise SSO sign-up with populated redirect urls', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignUpWithProtectCheck();
+    });
+    mockExecute.mockResolvedValue('proof-abc');
+    const authenticateWithRedirect = vi.fn().mockResolvedValue(undefined);
+    // Resolving the check is what first surfaces `enterprise_sso`: the identity is only known
+    // once the challenge is out of the way, so this route owns the SSO hand-off.
+    fixtures.signUp.submitProtectCheck.mockResolvedValue({
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso'],
+      protectCheck: null,
+      authenticateWithRedirect,
+    } as unknown as SignUpResource);
+
+    render(<SignUpProtectCheck />, { wrapper });
+
+    await waitFor(() => expect(authenticateWithRedirect).toHaveBeenCalled());
+
+    const params = authenticateWithRedirect.mock.calls[0][0];
+    expect(params.strategy).toBe('enterprise_sso');
+    expect(params.continueSignUp).toBe(true);
+    expect(params.redirectUrl).toBeTruthy();
+    expect(params.redirectUrlComplete).toBeTruthy();
+  });
+
   it('shows a retry control after a failure and re-runs the challenge when clicked', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignUpWithProtectCheck();

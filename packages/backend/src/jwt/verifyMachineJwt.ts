@@ -9,9 +9,10 @@ import {
 } from '../errors';
 import type { MachineTokenReturnType } from '../jwt/types';
 import { verifyJwt } from '../jwt/verifyJwt';
+import { JWT_CATEGORY_M2M_TOKEN } from '../tokens/jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from '../tokens/keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../tokens/keys';
-import { JWT_CATEGORY_M2M_TOKEN, OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
+import { OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
 import { TokenType } from '../tokens/tokenTypes';
 
 export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'skipJwksCache'> & {

@@ -9,6 +9,7 @@ const componentImportPaths = {
   CreateOrganization: () => import(/* webpackChunkName: "createorganization" */ './../components/CreateOrganization'),
   OrganizationProfile: () =>
     import(/* webpackChunkName: "organizationprofile" */ './../components/OrganizationProfile'),
+  InviteMembers: () => import(/* webpackChunkName: "invitemembers" */ './../components/InviteMembers'),
   OrganizationSwitcher: () =>
     import(/* webpackChunkName: "organizationswitcher" */ './../components/OrganizationSwitcher'),
   OrganizationList: () => import(/* webpackChunkName: "organizationlist" */ './../components/OrganizationList'),
@@ -30,7 +31,15 @@ const componentImportPaths = {
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   ConfigureSSO: () => import(/* webpackChunkName: "configureSSO" */ '../components/ConfigureSSO/ConfigureSSO'),
+  ConfigureDirectorySync: () =>
+    import(
+      /* webpackChunkName: "configureDirectorySync" */ '../components/ConfigureDirectorySync/ConfigureDirectorySync'
+    ),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
+  OAuthDeviceVerification: () =>
+    import(
+      /* webpackChunkName: "oauthDeviceVerification" */ '../components/OAuthDeviceVerification/OAuthDeviceVerification'
+    ),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
 } as const;
@@ -90,6 +99,10 @@ export const OrganizationProfileModal = lazy(() =>
   componentImportPaths.OrganizationProfile().then(module => ({ default: module.OrganizationProfileModal })),
 );
 
+export const InviteMembersModal = lazy(() =>
+  componentImportPaths.InviteMembers().then(module => ({ default: module.InviteMembersModal })),
+);
+
 export const OrganizationSwitcher = lazy(() =>
   componentImportPaths.OrganizationSwitcher().then(module => ({ default: module.OrganizationSwitcher })),
 );
@@ -125,6 +138,10 @@ export const ConfigureSSO = lazy(() =>
   componentImportPaths.ConfigureSSO().then(module => ({ default: module.ConfigureSSO })),
 );
 
+export const ConfigureDirectorySync = lazy(() =>
+  componentImportPaths.ConfigureDirectorySync().then(module => ({ default: module.ConfigureDirectorySync })),
+);
+
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
 export const TaskChooseOrganization = lazy(() =>
@@ -151,6 +168,10 @@ export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
 );
 
+export const OAuthDeviceVerification = lazy(() =>
+  componentImportPaths.OAuthDeviceVerification().then(module => ({ default: module.OAuthDeviceVerification })),
+);
+
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTasks })),
 );
@@ -175,6 +196,7 @@ export const ClerkComponents = {
   SignUpModal,
   UserProfileModal,
   OrganizationProfileModal,
+  InviteMembersModal,
   CreateOrganizationModal,
   UserVerificationModal,
   GoogleOneTap,
@@ -186,7 +208,9 @@ export const ClerkComponents = {
   PlanDetails,
   APIKeys,
   ConfigureSSO,
+  ConfigureDirectorySync,
   OAuthConsent,
+  OAuthDeviceVerification,
   SubscriptionDetails,
   TaskChooseOrganization,
   TaskResetPassword,

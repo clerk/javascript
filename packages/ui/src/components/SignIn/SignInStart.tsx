@@ -41,6 +41,7 @@ import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
+  getSSOFallbackFactor,
   hasMultipleEnterpriseConnections,
   SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
   useHandleAuthenticateWithPasskey,
@@ -60,10 +61,12 @@ const useAutoFillPasskey = () => {
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const { userSettings } = useEnvironment();
   const { passkeySettings, attributes } = userSettings;
+  // @ts-expect-error - This is not a public API
+  const { __internal_isWebAuthnAutofillSupported } = useClerk();
 
   useEffect(() => {
     async function runAutofillPasskey() {
-      const _isSupported = await isWebAuthnAutofillSupported();
+      const _isSupported = await (__internal_isWebAuthnAutofillSupported ?? isWebAuthnAutofillSupported)();
       setIsSupported(_isSupported);
       if (!_isSupported) {
         return;
@@ -90,7 +93,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, signUpIfMissingEnabled, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
@@ -105,7 +108,9 @@ function SignInStartInternal(): JSX.Element {
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const onSecondFactor = () => navigate('factor-two');
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
-  const isWebSupported = isWebAuthnSupported();
+  // @ts-expect-error - This is not a public API
+  const { __internal_isWebAuthnSupported } = clerk;
+  const isWebSupported = (__internal_isWebAuthnSupported ?? isWebAuthnSupported)();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
@@ -237,7 +242,7 @@ function SignInStartInternal(): JSX.Element {
         }
         switch (res.status) {
           case 'needs_first_factor': {
-            if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            if (!canRedirectToEnterpriseSSO(res)) {
               return navigate('factor-one');
             }
 
@@ -388,7 +393,19 @@ function SignInStartInternal(): JSX.Element {
       } as any);
     }
     try {
-      const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
+      // On top of the context-level preconditions, sign-up-if-missing only
+      // supports identifiers that can be verified out-of-band.
+      const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
+      const signUpAttribute = getSignUpAttributeFromIdentifier(identifierField);
+      const shouldSignUpIfMissing = signUpIfMissingEnabled && signUpAttribute !== 'username' && !hasPassword;
+
+      const res = await safePasswordSignInForEnterpriseSSOInstance(
+        signIn.create({
+          ...buildSignInParams(fields),
+          ...(shouldSignUpIfMissing && { signUpIfMissing: true }),
+        }),
+        fields,
+      );
 
       if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
         return;
@@ -402,7 +419,7 @@ function SignInStartInternal(): JSX.Element {
           }
           break;
         case 'needs_first_factor': {
-          if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+          if (!canRedirectToEnterpriseSSO(res)) {
             if (options?.resetPasswordIntent) {
               return navigate('factor-one', {
                 searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
@@ -519,6 +536,7 @@ function SignInStartInternal(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
         navigateOnSetActive,
         passwordEnabled: userSettings.attributes.password?.required ?? false,
         alternativePhoneCodeChannel:
@@ -709,6 +727,17 @@ const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
 
   return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
 };
+
+/**
+ * Whether the sign-in can go straight to the identity provider without showing a card first.
+ *
+ * A connection choice and an SSO fallback are both only reachable from one, so either sends the
+ * user to `factor-one` instead.
+ */
+const canRedirectToEnterpriseSSO = (signIn: SignInResource): boolean =>
+  hasOnlyEnterpriseSSOFirstFactors(signIn) &&
+  !hasMultipleEnterpriseConnections(signIn.supportedFirstFactors) &&
+  !getSSOFallbackFactor(signIn);
 
 const InstantPasswordRow = ({
   field,

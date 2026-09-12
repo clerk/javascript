@@ -1,10 +1,13 @@
 import { createWorkerTimers } from '@clerk/shared/workerTimers';
 
+import { isTabFocused } from '@/utils/isTabFocused';
+
 import { SafeLock } from './safeLock';
 
 const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
 
 export const POLLER_INTERVAL_IN_MS = 5 * 1_000;
+export const FOCUSED_POLLER_INTERVAL_IN_MS = 1_500;
 
 export class SessionCookiePoller {
   private lock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
@@ -21,7 +24,8 @@ export class SessionCookiePoller {
     const run = async () => {
       this.initiated = true;
       await this.lock.acquireLockAndRun(cb);
-      this.timerId = this.workerTimers.setTimeout(run, POLLER_INTERVAL_IN_MS);
+      const interval = isTabFocused() === true ? FOCUSED_POLLER_INTERVAL_IN_MS : POLLER_INTERVAL_IN_MS;
+      this.timerId = this.workerTimers.setTimeout(run, interval);
     };
 
     void run();

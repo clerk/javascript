@@ -63,6 +63,7 @@ export const zhTW: LocalizationResource = {
   badge__canceledEndsAt: "已取消 • 將於 {{ date | shortDate('zh-TW') }} 到期",
   badge__currentPlan: '目前計劃',
   badge__default: '預設',
+  badge__deprovisioned: undefined,
   badge__endsAt: "將於 {{ date | shortDate('zh-TW') }} 到期",
   badge__expired: '已過期',
   badge__freeTrial: '免費試用',
@@ -102,8 +103,11 @@ export const zhTW: LocalizationResource = {
     cannotSubscribeMonthly: '您無法每月支付訂閱此計劃。要訂閱此計劃，您需要選擇每年支付。',
     cannotSubscribeUnrecoverable: '您無法訂閱此計劃。您的現有訂閱比此計劃更昂貴。',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: '您的付款已成功。',
       description__subscriptionSuccessful: '您的訂閱已成功設定。',
+      discount: undefined,
       downgradeNotice: '您將保留目前的訂閱及其功能直到本計費週期結束，然後您將被切換到此訂閱。',
       emailForm: {
         subtitle: '在您可以完成購買之前，您必須新增一個電子郵件地址，以便發送收據。',
@@ -118,6 +122,8 @@ export const zhTW: LocalizationResource = {
       },
       pastDueNotice: '您的上一個訂閱已逾期，未付款。',
       perMonth: '每月',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: '結帳',
       title__paymentSuccessful: '付款成功！',
       title__subscriptionSuccessful: '成功！',
@@ -128,6 +134,9 @@ export const zhTW: LocalizationResource = {
     credit: '餘額',
     creditRemainder: '您目前訂閱的剩餘期間的餘額。',
     defaultFreePlanActive: '您目前正在免費計劃中',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '免費',
     getStarted: '開始',
     highlightedPlanBadge: '熱門',
@@ -139,6 +148,7 @@ export const zhTW: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: '每月',
+    months: undefined,
     pastDue: '逾期',
     pay: '支付 {{amount}}',
     payerCreditRemainder: '來自帳戶餘額的折抵。',
@@ -217,6 +227,84 @@ export const zhTW: LocalizationResource = {
     year: '年',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -243,6 +331,79 @@ export const zhTW: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -629,6 +790,10 @@ export const zhTW: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '請聯絡您的組織管理員以升級您的權限。',
@@ -681,6 +846,10 @@ export const zhTW: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: '自訂 SAML 提供者',
         google: undefined,
@@ -854,11 +1023,53 @@ export const zhTW: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: '建立組織',
@@ -1066,6 +1277,25 @@ export const zhTW: LocalizationResource = {
       title: '移除網域',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1296,6 +1526,10 @@ export const zhTW: LocalizationResource = {
         subtitleNewTab: '返回新開啟的分頁以繼續',
         titleNewTab: '已在其他分頁登入',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: '使用發送到您電子郵件的驗證連結',
@@ -1306,6 +1540,9 @@ export const zhTW: LocalizationResource = {
     enterpriseConnections: {
       subtitle: '請選擇您想要繼續使用的企業帳戶。',
       title: '選擇一個企業帳戶',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: '重設密碼代碼',
@@ -1370,6 +1607,15 @@ export const zhTW: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: '我們需要驗證您的身份才能重設您的密碼。',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: '註冊',
@@ -1640,6 +1886,7 @@ export const zhTW: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: '您的密碼太短。長度必須至少為 8 個字元。',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: '您的密碼強度不足。',
     form_password_or_identifier_incorrect: '密碼或電子郵件地址不正確。請重試或使用其他方法。',
     form_password_pwned: '此密碼已在已知的資料外洩事件中出現，請改用其他密碼。',
@@ -1688,6 +1935,8 @@ export const zhTW: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '您已經登錄。',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: '找不到 Web3 錢包擴充功能。請安裝以繼續。',
     web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',
     web3_solana_signature_generation_failed: '產生簽名時發生錯誤。請再試一次以繼續。',

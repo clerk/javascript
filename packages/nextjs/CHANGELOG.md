@@ -1,5 +1,249 @@
 # Change Log
 
+## 7.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+  - @clerk/backend@3.17.2
+  - @clerk/react@6.15.2
+
+## 7.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`2b3341f`](https://github.com/clerk/javascript/commit/2b3341fd5f666ab86ac13c2dabbab06345cd39b4)]:
+  - @clerk/react@6.15.1
+
+## 7.9.0
+
+### Minor Changes
+
+- Add an authenticated OAuth device verification component and workflow hook for approving or denying OAuth Device Authorization Grant requests. ([#9518](https://github.com/clerk/javascript/pull/9518)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/react@6.15.0
+  - @clerk/shared@4.31.0
+  - @clerk/backend@3.17.1
+
+## 7.8.4
+
+### Patch Changes
+
+- Add `@deprecated` tags to the removed `<SignedIn>`, `<SignedOut>`, and `<Protect>` control-component stubs so editors and lint rules flag them at authoring time (with the `<Show>` migration guidance) instead of only failing when rendered. ([#9627](https://github.com/clerk/javascript/pull/9627)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c4f9883`](https://github.com/clerk/javascript/commit/c4f98834434edd7821f5c6f344583c07e30013cd), [`eef0ceb`](https://github.com/clerk/javascript/commit/eef0ceb97926688384ec480afe44199b16f13993)]:
+  - @clerk/backend@3.17.0
+
+## 7.8.3
+
+### Patch Changes
+
+- Align JSDoc link targets with the docs link rules: internal docs links don't open in a new tab (removed `{{ target: '_blank' }}` from the `Invitation` Metadata link), while API reference links do (added it to the `ExternalAccount` Backend API link and the `currentUser()` endpoint link). ([#9556](https://github.com/clerk/javascript/pull/9556)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`9c5e93c`](https://github.com/clerk/javascript/commit/9c5e93c9ea93561242ab26ff0e2b100940ac6308), [`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/backend@3.16.13
+  - @clerk/shared@4.30.2
+  - @clerk/react@6.14.8
+
+## 7.8.2
+
+### Patch Changes
+
+- Updated dependencies [[`dbaa95a`](https://github.com/clerk/javascript/commit/dbaa95a4e9e2ebd0a6b7fdb266024490a35b7caf)]:
+  - @clerk/react@6.14.7
+  - @clerk/shared@4.30.1
+  - @clerk/backend@3.16.12
+
+## 7.8.1
+
+### Patch Changes
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+  - @clerk/react@6.14.6
+  - @clerk/backend@3.16.11
+
+## 7.8.0
+
+### Minor Changes
+
+- In development, missing Clerk keys no longer activate keyless mode. When `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` are not set, the SDK now throws an error directing you to run `npx clerk@latest init`, which provisions a Clerk application and writes the keys to `.env.local`. Keyless credentials stored in the development keyless cookie are no longer read. Existing apps with configured or claimed keys are unaffected. ([#9493](https://github.com/clerk/javascript/pull/9493)) by [@djgould](https://github.com/djgould)
+
+### Patch Changes
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4), [`f541dbf`](https://github.com/clerk/javascript/commit/f541dbfeea2b840409733222d40b53b0580e7c47)]:
+  - @clerk/shared@4.29.3
+  - @clerk/backend@3.16.10
+  - @clerk/react@6.14.5
+
+## 7.7.9
+
+### Patch Changes
+
+- Updated dependencies [[`10615ea`](https://github.com/clerk/javascript/commit/10615eac545d855c5f83c90b38579d04d36c9b1d)]:
+  - @clerk/backend@3.16.9
+  - @clerk/react@6.14.4
+
+## 7.7.8
+
+### Patch Changes
+
+- Allow Clerk's abuse and fraud protection hosts on all ports in the generated `connect-src` directive. The `contentSecurityPolicy` option previously emitted `https://*.protect.clerk.com`, which matches port 443 only, so requests to those hosts on other ports were blocked by the resulting policy. ([#9458](https://github.com/clerk/javascript/pull/9458)) by [@mwickett](https://github.com/mwickett)
+
+- Updated dependencies [[`4ebcff3`](https://github.com/clerk/javascript/commit/4ebcff39c7a9ba532307e50b8ab673637d9f7540)]:
+  - @clerk/backend@3.16.8
+
+## 7.7.7
+
+### Patch Changes
+
+- Updated dependencies [[`daae528`](https://github.com/clerk/javascript/commit/daae5281dc3babb3e4f93ff05861736c3b784d0e), [`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/backend@3.16.7
+  - @clerk/shared@4.29.2
+  - @clerk/react@6.14.4
+
+## 7.7.6
+
+### Patch Changes
+
+- Fix a stray double space in the `getAuth()` "Clerk can't detect usage of clerkMiddleware()" error, so the first bullet renders as `- clerkMiddleware() is used in your Next.js middleware or proxy file.` ([#9408](https://github.com/clerk/javascript/pull/9408)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`7f5c294`](https://github.com/clerk/javascript/commit/7f5c2947e2b3b2ac9677116ff7eede61a1dab649)]:
+  - @clerk/shared@4.29.1
+  - @clerk/backend@3.16.6
+  - @clerk/react@6.14.3
+
+## 7.7.5
+
+### Patch Changes
+
+- Adds runtime migration errors when using the removed `<SignedIn>`, `<SignedOut>`, and `<Protect>` components. ([#9273](https://github.com/clerk/javascript/pull/9273)) by [@royanger](https://github.com/royanger)
+
+- Updated dependencies [[`81840b3`](https://github.com/clerk/javascript/commit/81840b3b28bf89fdd6afcc155a84bc641dcd3b69), [`b7fb564`](https://github.com/clerk/javascript/commit/b7fb56455a657b209c0bb292bf05145e6dcde790), [`44edcc9`](https://github.com/clerk/javascript/commit/44edcc961664e83b8ff7d3c946b880fbb5a7d897)]:
+  - @clerk/shared@4.29.0
+  - @clerk/backend@3.16.5
+  - @clerk/react@6.14.2
+
+## 7.7.4
+
+### Patch Changes
+
+- Updated dependencies [[`167204b`](https://github.com/clerk/javascript/commit/167204b8b810a302364883a1aa048233a0216be8)]:
+  - @clerk/backend@3.16.4
+
+## 7.7.3
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/shared@4.28.1
+  - @clerk/backend@3.16.3
+  - @clerk/react@6.14.1
+
+## 7.7.2
+
+### Patch Changes
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/shared@4.28.0
+  - @clerk/react@6.14.0
+  - @clerk/backend@3.16.2
+
+## 7.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`63d25ba`](https://github.com/clerk/javascript/commit/63d25ba21386c77e186b3cbb00d09f9c6d0f1f8f), [`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/backend@3.16.1
+  - @clerk/shared@4.27.1
+  - @clerk/react@6.13.1
+
+## 7.7.0
+
+### Minor Changes
+
+- Add `<InviteMembersButton />`, a control component that opens the organization invite-members form in a modal when clicked, working like `<SignInButton mode="modal">`. ([#9124](https://github.com/clerk/javascript/pull/9124)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Wrap your own button (or omit children for a default one). The button requires an active organization and should be rendered for members who can manage memberships (`org:sys_memberships:manage`). Opening it without an active organization or that permission is a no-op in production, and throws a descriptive error in development.
+
+  ```tsx
+  import { InviteMembersButton } from '@clerk/nextjs';
+
+  <InviteMembersButton>
+    <button>Invite members</button>
+  </InviteMembersButton>;
+  ```
+
+  This also adds `Clerk.openInviteMembers()` and `Clerk.closeInviteMembers()` for opening and closing the modal programmatically.
+
+### Patch Changes
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`f38cf02`](https://github.com/clerk/javascript/commit/f38cf02fd55a551fcf1d43c89371cf2132c2ba92), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df), [`58d8ff5`](https://github.com/clerk/javascript/commit/58d8ff50b121ebf42744ba32302da6b22e90b704)]:
+  - @clerk/backend@3.16.0
+  - @clerk/shared@4.27.0
+  - @clerk/react@6.13.0
+
+## 7.6.5
+
+### Patch Changes
+
+- Updated dependencies [[`a601cd7`](https://github.com/clerk/javascript/commit/a601cd7f45095fdbf8b0a23b01d9f559feeda347), [`bbe51ff`](https://github.com/clerk/javascript/commit/bbe51ffc343a878022c5863796450d6d97069ea0), [`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/backend@3.15.1
+  - @clerk/react@6.12.11
+  - @clerk/shared@4.26.0
+
+## 7.6.4
+
+### Patch Changes
+
+- Updated dependencies [[`9c51d74`](https://github.com/clerk/javascript/commit/9c51d74ac36391888367e4da44912c92999a7ac2), [`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f), [`fe6ee54`](https://github.com/clerk/javascript/commit/fe6ee5489d9efcdc5aec53b1ba74b0260e539f80)]:
+  - @clerk/backend@3.15.0
+  - @clerk/shared@4.25.10
+  - @clerk/react@6.12.10
+
+## 7.6.3
+
+### Patch Changes
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`23071bd`](https://github.com/clerk/javascript/commit/23071bdd6b511c63ac8312d5adb13ed9d907d4b8), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/shared@4.25.9
+  - @clerk/backend@3.14.0
+  - @clerk/react@6.12.9
+
+## 7.6.2
+
+### Patch Changes
+
+- Updated dependencies [[`6f5fde9`](https://github.com/clerk/javascript/commit/6f5fde9005ca4e90dc59a8b5a04b5742aa540173)]:
+  - @clerk/backend@3.13.2
+  - @clerk/react@6.12.8
+
+## 7.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+  - @clerk/react@6.12.8
+  - @clerk/backend@3.13.1
+
+## 7.6.0
+
+### Minor Changes
+
+- Add an `fapiUrl` option to Frontend API proxy helpers so requests can target a custom Clerk Frontend API URL. ([#9223](https://github.com/clerk/javascript/pull/9223)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Updated dependencies [[`848eefe`](https://github.com/clerk/javascript/commit/848eefe6dcc23cbad617a5c6ccb582eaae2a9bac), [`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/backend@3.13.0
+  - @clerk/shared@4.25.7
+  - @clerk/react@6.12.7
+
 ## 7.5.22
 
 ### Patch Changes
