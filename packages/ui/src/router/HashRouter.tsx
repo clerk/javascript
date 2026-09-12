@@ -18,7 +18,9 @@ export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.
     if (!toURL) {
       return;
     }
-    window.location.hash = stripOrigin(toURL).substring(1 + hashRouterBase.length);
+    const hash = stripOrigin(toURL).substring(1 + hashRouterBase.length);
+    // The index route with a query would otherwise become `#?x`, which is not read as a fragment URL.
+    window.location.hash = hash.startsWith('?') ? '/' + hash : hash;
     return Promise.resolve();
   };
 
