@@ -1,4 +1,4 @@
-name: 'Expo native (@clerk/expo)'
+name: Expo
 
 on:
   pull_request:
@@ -27,12 +27,15 @@ env:
   SDK_PACK_DIR: /tmp/clerk-expo-pack
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
-  MAESTRO_VERSION: '2.8.0'
+  MAESTRO_VERSION: '2.10.0'
+  MAESTRO_CLI_NO_ANALYTICS: '1'
+  MAESTRO_SHARDS: '2'
+  MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
 
 jobs:
   native-build:
     if: ${{ github.head_ref != 'changeset-release/main' }}
-    name: Expo ${{ matrix.expo-sdk }} ${{ matrix.run-e2e == true && 'Build + E2E' || 'Build' }} / ${{ matrix.platform }}
+    name: Native ${{ matrix.run-e2e == true && 'E2E' || 'Build' }} (${{ matrix.platform }}, sdk ${{ matrix.expo-sdk }})
     runs-on: ${{ matrix.runner }}
     timeout-minutes: ${{ matrix.run-e2e == true && 60 || 45 }}
     strategy:
@@ -223,6 +226,10 @@ jobs:
           path: ${{ steps.native-build-key.outputs.artifact }}
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
 
+      - name: Boot iOS simulators
+        if: matrix.platform == 'ios' && matrix.run-e2e == true
+        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$MAESTRO_SHARDS"
+
       - name: Cache maestro CLI
         if: steps.keys.outputs.pk != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -233,29 +240,17 @@ jobs:
       - name: Install maestro CLI
         if: steps.keys.outputs.pk != ''
         run: |
-          set -o pipefail
           if [ -x "$HOME/.maestro/bin/maestro" ]; then
             echo "Using cached Maestro"
           else
-            installed=0
-            for i in 1 2 3; do
-              if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | MAESTRO_VERSION="$MAESTRO_VERSION" bash; then
-                if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
-              fi
-              echo "Maestro install attempt $i failed (or binary missing); retrying"
-              sleep 5
-            done
-            [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
+            archive="$RUNNER_TEMP/maestro.zip"
+            curl -fLs --retry 3 --retry-delay 5 -o "$archive" \
+              "https://github.com/mobile-dev-inc/Maestro/releases/download/cli-$MAESTRO_VERSION/maestro.zip"
+            unzip -q "$archive" -d "$RUNNER_TEMP/maestro-dist"
+            mv "$RUNNER_TEMP/maestro-dist/maestro" "$HOME/.maestro"
           fi
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-          "$HOME/.maestro/bin/maestro" --version
-
-      - name: Boot iOS simulator
-        id: sim
-        if: matrix.platform == 'ios' && steps.keys.outputs.pk != ''
-        uses: futureware-tech/simulator-action@e89aa8f93d3aec35083ff49d2854d07f7186f7f5 # v5
-        with:
-          model: 'iPhone 17 Pro'
+          test "$("$HOME/.maestro/bin/maestro" --version)" = "$MAESTRO_VERSION"
 
       # Provisioned as late as possible so live credentials exist for the
       # shortest window.
@@ -293,35 +288,21 @@ jobs:
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-          SIM_UDID: ${{ steps.sim.outputs.udid }}
         run: |
-          echo "Using simulator $SIM_UDID"
-          # Kill animations + predictive keyboard: animations add latency to
-          # every tap; predictive text hijacks inputText targets.
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.UIKit UIAnimationDragCoefficient -float 0.01 || true
-          xcrun simctl spawn "$SIM_UDID" defaults write -g ApplePersistenceIgnoreState -bool YES || true
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.ContinuousPath -bool NO || true
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
-          xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
-          # The one-time keyboard tutorial sheets carry their own Continue
-          # button, which can hijack taps on the AuthView's Continue.
-          for key in DidShowContinuousPathIntroduction DidShowGestureKeyboardIntroduction KeyboardDidShowProductivityTutorial UIKeyboardDidShowInternationalInfoIntroduction; do
-            xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.preferences "$key" -bool YES || true
-          done
-          xcrun simctl install "$SIM_UDID" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
-          # Stream the app's console output into the debug artifact so a hang has
-          # actionable evidence (keychain/network errors) instead of just screenshots.
+          "$GITHUB_WORKSPACE/$E2E_DIR/boot-ios-simulators.sh" wait
           mkdir -p "$RUNNER_TEMP/maestro-debug"
-          xcrun simctl spawn "$SIM_UDID" log stream --style compact \
-            --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
-            > "$RUNNER_TEMP/maestro-debug/sim-console.log" 2>&1 &
-          LOG_PID=$!
-          cd "$GITHUB_WORKSPACE/$E2E_DIR"
+          log_pids=()
+          for udid in ${MAESTRO_UDID//,/ }; do
+            xcrun simctl install "$udid" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
+            xcrun simctl spawn "$udid" log stream --style compact \
+              --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
+              > "$RUNNER_TEMP/maestro-debug/$udid-console.log" 2>&1 &
+            log_pids+=($!)
+          done
           rc=0
-          MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-flows.sh \
-            xcrun simctl terminate "$SIM_UDID" com.clerk.exponativebuildfixture || rc=$?
-          kill "$LOG_PID" 2>/dev/null || true
+          PLATFORM=ios MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" \
+            "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh" || rc=$?
+          kill "${log_pids[@]}" 2>/dev/null || true
           exit "$rc"
 
       - name: Enable KVM
@@ -365,7 +346,8 @@ jobs:
           target: google_apis
           arch: x86_64
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          # read-only: a writable instance holds a lock the shard emulators wait on forever
+          emulator-options: -read-only -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           # The action runs each script line in a separate sh -c; the folded
           # scalar (>-) plus && keeps everything in one shell invocation.
@@ -386,9 +368,11 @@ jobs:
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
 
       # Test reports record flow env (and typed input) in plaintext;
-      # add-mask only covers step logs, not artifact contents.
+      # add-mask only covers step logs, not artifact contents. Must run whenever
+      # the upload does, or a passing run uploads the password.
       - name: Scrub test credentials from Maestro debug output
-        if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
+        id: scrub
+        if: always() && steps.user.outputs.user_id != ''
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         run: |
@@ -399,12 +383,13 @@ jobs:
             \( -name '*.html' -o -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' \) \
             -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
 
-      - name: Upload Maestro artifacts on e2e failure
-        if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
+      - name: Upload Maestro artifacts
+        if: always() && steps.scrub.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: maestro-${{ matrix.platform }}
           path: ${{ runner.temp }}/maestro-debug
+          if-no-files-found: warn
           retention-days: 7
 
       - name: Report e2e outcome
