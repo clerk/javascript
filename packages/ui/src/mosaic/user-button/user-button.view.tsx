@@ -1075,7 +1075,12 @@ export function UserButtonTrigger({
   return (
     <Popover.Trigger
       aria-label={fill(m.trigger.open, { name })}
-      xstyle={[focusOutline.visible, styles.trigger, renderTriggerLabel ? styles.triggerLabelled : null]}
+      xstyle={[
+        focusOutline.visible,
+        styles.trigger,
+        renderTriggerLabel ? styles.triggerLabelled : null,
+        !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
+      ]}
     >
       <RowAvatar
         name={name}
