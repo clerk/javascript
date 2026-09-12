@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 2.0.7
+
+### Patch Changes
+
+- Update docs deep links in JSDoc comments to match clerk.com's new heading anchors (`#get-token` is now `#gettoken`, `#o-auth-strategy` is now `#oauthstrategy`, and so on). ([#9520](https://github.com/clerk/javascript/pull/9520)) by [@manovotny](https://github.com/manovotny)
+
 ## 2.0.6
 
 ### Patch Changes
