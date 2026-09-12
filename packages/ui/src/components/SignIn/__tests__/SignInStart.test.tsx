@@ -2,17 +2,20 @@ import { ClerkAPIResponseError, ClerkWebAuthnError } from '@clerk/shared/error';
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { simulateCaptchaInteractive, simulateCaptchaResolved } from '@/test/captcha';
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { fireEvent, mockWebAuthn, render, screen } from '@/test/utils';
+import { act, fireEvent, mockWebAuthn, render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
+import { Route, Switch, VirtualRouter } from '@/ui/router';
 
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
 import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
+import { SignInFactorOne } from '../SignInFactorOne';
 import { SignInStart } from '../SignInStart';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -64,6 +67,162 @@ describe('SignInStart', () => {
     });
     render(<SignInStart />, { wrapper });
     screen.getAllByText(/sign in to .*/i);
+  });
+
+  describe('identifier focus during submission', () => {
+    it('keeps the phone input focused and rejects edits while the request is pending', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withEmailAddress();
+      });
+      props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
+      const request = createDeferredPromise();
+      fixtures.signIn.create.mockReturnValueOnce(request.promise);
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      const input = screen.getByRole('textbox', { name: /phone number/i });
+
+      await userEvent.click(input);
+      await userEvent.click(screen.getByText('Continue'));
+
+      expect(input).not.toBeDisabled();
+      expect(input).not.toHaveAttribute('readonly');
+      expect(input).toHaveFocus();
+      expect(input).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByText('Continue').closest('button')).toBeDisabled();
+      expect(screen.getByRole('button', { name: /gr/i })).toBeDisabled();
+      await userEvent.keyboard('9{Backspace}');
+      await userEvent.paste('+14155552671');
+      fireEvent.change(input, { target: { value: '+14155552671' } });
+      expect(fireEvent.cut(input)).toBe(false);
+      await userEvent.keyboard('{Enter}');
+
+      expect(input).toHaveValue('691 1111111');
+      expect(fixtures.signIn.create).toHaveBeenCalledExactlyOnceWith({ identifier: '+306911111111' });
+      await act(async () => {
+        request.resolve({ status: 'needs_first_factor' });
+        await request.promise;
+      });
+    });
+
+    it('ignores duplicate submissions before a render and allows editing after an error', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => f.withPhoneNumber());
+      props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
+      const request = createDeferredPromise();
+      fixtures.signIn.create.mockReturnValueOnce(request.promise);
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+      const input = screen.getByRole('textbox', { name: /phone number/i });
+      const form = container.querySelector('form');
+      await userEvent.click(input);
+
+      act(() => {
+        form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      });
+
+      expect(fixtures.signIn.create).toHaveBeenCalledTimes(1);
+      expect(input).toHaveFocus();
+      await act(async () => {
+        request.reject(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              { code: 'form_identifier_not_found', message: 'No account found', meta: { param_name: 'identifier' } },
+            ],
+            status: 422,
+          }),
+        );
+        await request.promise.catch(() => undefined);
+      });
+
+      expect(input).not.toBeDisabled();
+      expect(input).toHaveFocus();
+      expect(screen.getByText('Continue').closest('button')).not.toBeDisabled();
+      await waitFor(() => expect(input).toHaveAttribute('aria-invalid', 'true'));
+      fireEvent.change(input, { target: { value: '691 2222222' } });
+      fixtures.signIn.create.mockResolvedValueOnce({ status: 'needs_first_factor' } as SignInResource);
+      await userEvent.keyboard('{Enter}');
+      expect(fixtures.signIn.create).toHaveBeenLastCalledWith({ identifier: '+306912222222' });
+    });
+
+    it.each([
+      { submitWith: 'click', autoFocus: true },
+      { submitWith: 'Enter', autoFocus: true },
+      { submitWith: 'click', autoFocus: false },
+    ])('keeps OTP autofocus=$autoFocus after submitting with $submitWith', async options => {
+      const { submitWith, autoFocus } = options;
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+      });
+      props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
+      fixtures.signIn.firstFactorVerification.status = 'unverified';
+      fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
+      const request = createDeferredPromise();
+      fixtures.signIn.create.mockReturnValueOnce(request.promise);
+      const { userEvent } = render(
+        <AppearanceProvider appearance={{ options: { autoFocus } }}>
+          <VirtualRouter startPath='/sign-in'>
+            <Route path='sign-in'>
+              <Switch>
+                <Route path='factor-one'>
+                  <SignInFactorOne />
+                </Route>
+                <Route index>
+                  <SignInStart />
+                </Route>
+              </Switch>
+            </Route>
+          </VirtualRouter>
+        </AppearanceProvider>,
+        { wrapper },
+      );
+      const input = screen.getByRole('textbox', { name: /phone number/i });
+      await userEvent.click(input);
+      if (submitWith === 'click') {
+        await userEvent.click(screen.getByText('Continue'));
+      } else {
+        await userEvent.keyboard('{Enter}');
+      }
+
+      expect(input).not.toBeDisabled();
+      expect(input).toHaveFocus();
+      await act(async () => {
+        request.resolve(fixtures.signIn);
+        await request.promise;
+      });
+
+      expect(input).not.toBeInTheDocument();
+      const otp = screen.getByLabelText('Enter verification code');
+      expect(otp).toHaveAttribute('autocomplete', 'one-time-code');
+      if (autoFocus) {
+        expect(otp).toHaveFocus();
+      } else {
+        expect(otp).not.toHaveFocus();
+        await userEvent.click(otp);
+      }
+      await userEvent.keyboard('1');
+      expect(otp).toHaveValue('1');
+    });
+
+    it('does not restore identifier focus when the user moves focus during the request', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => f.withPhoneNumber());
+      props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
+      const request = createDeferredPromise();
+      fixtures.signIn.create.mockReturnValueOnce(request.promise);
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      const input = screen.getByRole('textbox', { name: /phone number/i });
+      await userEvent.click(input);
+      await userEvent.keyboard('{Enter}');
+      act(() => input.blur());
+
+      expect(input).not.toHaveFocus();
+      expect(input).toBeDisabled();
+      await act(async () => {
+        request.reject(new ClerkAPIResponseError('Error', { data: [], status: 422 }));
+        await request.promise.catch(() => undefined);
+      });
+      expect(input).not.toHaveFocus();
+      expect(input).not.toBeDisabled();
+    });
   });
 
   describe('Login Methods', () => {

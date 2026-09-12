@@ -646,6 +646,7 @@ function SignInStartInternal(): JSX.Element {
                 {standardFormAttributes.length ? (
                   <Form.Root
                     onSubmit={handleFirstPartySubmit}
+                    preserveFocusOnSubmit='identifier'
                     gap={8}
                   >
                     <Col gap={6}>
