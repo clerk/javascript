@@ -1,5 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
-import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
+import { CLERK_ADD_ACCOUNT, ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
@@ -46,6 +46,7 @@ import {
   SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
   useHandleAuthenticateWithPasskey,
 } from './shared';
+import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -809,6 +810,21 @@ const InstantPasswordRow = ({
   );
 };
 
-export const SignInStart = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
-);
+const SignInStartCard = withRedirectToSignInTask(withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)));
+
+export const SignInStart = () => {
+  const clerk = useClerk();
+  const { authConfig } = useEnvironment();
+  const { multiSessionStart } = useSignInContext();
+  const { queryParams } = useRouter();
+  // Snapshot on mount: the sign-in POST adds a session before setActive navigates; keep the form until then.
+  const [hadSignedInSessions] = useState(() => clerk.client.signedInSessions.length > 0);
+
+  const showSwitcher =
+    multiSessionStart === 'switcher' &&
+    !authConfig.singleSessionMode &&
+    hadSignedInSessions &&
+    queryParams[CLERK_ADD_ACCOUNT] === undefined;
+
+  return showSwitcher ? <SignInAccountSwitcher addAccountPath='.' /> : <SignInStartCard />;
+};

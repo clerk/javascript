@@ -25,12 +25,16 @@ vi.mock('@clerk/shared/react', () => {
   };
 });
 
-const Button = ({ to, children }: React.PropsWithChildren<{ to: string }>) => {
+const Button = ({
+  to,
+  searchParams,
+  children,
+}: React.PropsWithChildren<{ to: string; searchParams?: URLSearchParams }>) => {
   const router = useRouter();
   return (
     <button
       onClick={() => {
-        void router.navigate(to);
+        void router.navigate(to, { searchParams });
       }}
     >
       {children}
@@ -47,6 +51,12 @@ const Tester = () => (
     </Route>
     <Route path='foo'>
       <div id='bar'>Bar</div>
+      <Button
+        to='..'
+        searchParams={new URLSearchParams({ flag: '1' })}
+      >
+        Index with query
+      </Button>
     </Route>
   </HashRouter>
 );
@@ -104,6 +114,23 @@ describe('HashRouter', () => {
       await userEvent.click(button);
 
       expect(mockNavigate).toHaveBeenNthCalledWith(1, 'https://www.example.com/external');
+    });
+  });
+
+  describe('when navigating to the index route with a query', () => {
+    beforeEach(() => {
+      // @ts-ignore
+      window.location = new URL('https://www.example.com/hash#/foo?preserved=1');
+    });
+
+    it('keeps the fragment readable as a URL', async () => {
+      render(<Tester />);
+
+      const button = screen.getByRole('button', { name: /Index with query/i });
+      await userEvent.click(button);
+
+      expect(window.location.hash).toBe('#/?flag=1&preserved=1');
+      expect(screen.queryByText('Index')).toBeInTheDocument();
     });
   });
 });
