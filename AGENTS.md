@@ -10,7 +10,6 @@ Clerk's JavaScript SDK and library monorepo.
 - Use `pnpm` only. `npm` and `yarn` are blocked by `preinstall`. Node `>=24.15`, pnpm `>=10.33`.
 - Every PR needs a changeset. `pnpm changeset` for package changes, `pnpm changeset:empty` for tooling/repo-only. Empty changesets are two `---` delimiters with no body. A changeset is a changelog entry for users upgrading the package, not a summary of the work done in the PR. Describe the user-facing change (what changed for someone consuming the library and how it affects them) rather than the implementation details of the diff. If a change has no user-facing impact, use an empty changeset.
 - PR descriptions follow `.github/PULL_REQUEST_TEMPLATE.md` and add no sections of their own. Never add a "Testing" (or "Test plan" / "How to test") section summarizing the tests written or the checks run; the Checklist covers that and reviewers read the diff. Describe the change, not the work done on it.
-- Keep functions under a cognitive complexity of 15 (`sonarjs/cognitive-complexity`, reported as an error). Pre-existing violations are grandfathered in each package's `eslint-suppressions.json`. A change that pushes a function past the limit must split it; do not add new suppressions or `eslint-disable` comments for this rule. When a grandfathered function is simplified, run `pnpm eslint src --prune-suppressions` in that package and commit the result.
 
 ## References
 
