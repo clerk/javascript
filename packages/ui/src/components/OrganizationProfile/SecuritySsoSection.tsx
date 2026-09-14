@@ -1,16 +1,10 @@
 import type { EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
-import { useState } from 'react';
 
-import { Card } from '@/ui/elements/Card';
-import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { handleError } from '@/utils/errorHandler';
 
 import { ProviderIcon } from '../../common';
 import { useEnvironment } from '../../contexts';
-import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
   Button,
@@ -23,53 +17,24 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
-import { InformationCircle } from '../../icons';
+import { ChevronRight, InformationCircle } from '../../icons';
 import type { ConnectionScope } from '../ConfigureSSO/domain/connectionScope';
-import type { OrganizationEnterpriseConnectionStatus } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import { providerLabel, toProviderCard } from '../ConfigureSSO/domain/providers';
-import type { EnterpriseConnectionMutations } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { useOrganizationEnterpriseConnectionStatus } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnectionStatus';
-import { ResetConnectionDialog } from '../ConfigureSSO/ResetConnectionDialog';
 import type { EnterpriseConnectionProviderType } from '../ConfigureSSO/types';
+import { STATUS_BADGES } from './enterpriseConnectionStatusBadges';
 
 type SecuritySsoSectionProps = {
   enterpriseConnections: EnterpriseConnectionResource[];
-  setConnectionActive: EnterpriseConnectionMutations['setConnectionActive'];
-  deleteConnection: EnterpriseConnectionMutations['deleteConnection'];
-  organizationName: string;
-  contentRef: React.RefObject<HTMLDivElement>;
   onConfigure: (scope: ConnectionScope, forceInitialStep?: boolean) => void;
+  onOpenConnection: (id: string) => void;
 };
 
-const STATUS_BADGES: Record<
-  OrganizationEnterpriseConnectionStatus,
-  { id: string; colorScheme?: 'primary' | 'danger' | 'warning' | 'success'; label: LocalizationKey }
-> = {
-  unconfigured: {
-    id: 'unconfigured',
-    colorScheme: 'primary',
-    label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__unconfigured'),
-  },
-  in_progress: {
-    id: 'inProgress',
-    colorScheme: 'warning',
-    label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__inProgress'),
-  },
-  active: {
-    id: 'active',
-    colorScheme: 'success',
-    label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__active'),
-  },
-  inactive: {
-    id: 'inactive',
-    colorScheme: 'danger',
-    label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__inactive'),
-  },
-};
-
-export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element => {
-  const { enterpriseConnections, onConfigure } = props;
-
+export const SecuritySsoSection = ({
+  enterpriseConnections,
+  onConfigure,
+  onOpenConnection,
+}: SecuritySsoSectionProps): JSX.Element => {
   return (
     <ProfileSection.Root
       title={localizationKeys('organizationProfile.securityPage.ssoSection.title')}
@@ -111,12 +76,11 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
 
           <ProfileSection.ItemList id='sso'>
             {enterpriseConnections.map(connection => (
-              <CardStateProvider key={connection.id}>
-                <ConnectionRow
-                  {...props}
-                  connection={connection}
-                />
-              </CardStateProvider>
+              <ConnectionRow
+                key={connection.id}
+                connection={connection}
+                onOpenConnection={onOpenConnection}
+              />
             ))}
           </ProfileSection.ItemList>
 
@@ -133,85 +97,32 @@ export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element 
   );
 };
 
-type ConnectionRowProps = SecuritySsoSectionProps & {
+type ConnectionRowProps = {
   connection: EnterpriseConnectionResource;
+  onOpenConnection: (id: string) => void;
 };
 
-const ConnectionRow = ({
-  connection,
-  setConnectionActive,
-  deleteConnection,
-  organizationName,
-  contentRef,
-  onConfigure,
-}: ConnectionRowProps): JSX.Element => {
-  const card = useCardState();
-  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JSX.Element => {
   const { status } = useOrganizationEnterpriseConnectionStatus(connection);
 
   const badge = STATUS_BADGES[status];
   const label = providerLabel(toProviderCard(connection.provider as EnterpriseConnectionProviderType));
 
-  const onSetActive = async (active: boolean) => {
-    if (card.isLoading) {
-      return;
-    }
-
-    card.setError(undefined);
-    card.setLoading();
-
-    try {
-      // The mutation revalidates before resolving, so the refreshed entity drives the settled UI.
-      await setConnectionActive(connection.id, active);
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
-  };
-
-  const actions = [
-    {
-      label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__edit'),
-      onClick: () => onConfigure({ kind: 'existing', id: connection.id }, true),
-    },
-    ...(status === 'in_progress'
-      ? [
-          {
-            label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__continue'),
-            onClick: () => onConfigure({ kind: 'existing', id: connection.id }),
-          },
-        ]
-      : []),
-    ...(status === 'active'
-      ? [
-          {
-            label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__deactivate'),
-            isDisabled: card.isLoading,
-            onClick: () => void onSetActive(false),
-          },
-        ]
-      : []),
-    ...(status === 'inactive'
-      ? [
-          {
-            label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__activate'),
-            isDisabled: card.isLoading,
-            onClick: () => void onSetActive(true),
-          },
-        ]
-      : []),
-    {
-      label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__remove'),
-      isDestructive: true,
-      onClick: () => setIsRemoveDialogOpen(true),
-    },
-  ];
-
   return (
-    <Col gap={2}>
-      <ProfileSection.Item id='sso'>
+    <Button
+      elementDescriptor={descriptors.organizationProfileSecuritySsoConnectionRow}
+      variant='unstyled'
+      aria-label={connection.name}
+      onClick={() => onOpenConnection(connection.id)}
+      sx={{ display: 'block', width: '100%', height: 'auto', padding: 0, textAlign: 'start' }}
+    >
+      <ProfileSection.Item
+        as='span'
+        id='sso'
+        hoverable
+      >
         <Flex
+          as='span'
           align='center'
           wrap='wrap'
           sx={t => ({ minWidth: 0, flex: 1, gap: t.space.$2 })}
@@ -223,10 +134,14 @@ const ConnectionRow = ({
             elementDescriptor={descriptors.organizationProfileSecuritySsoProviderIcon}
           />
 
-          <Col sx={{ minWidth: 0 }}>
-            <Text>{connection.name}</Text>
+          <Col
+            as='span'
+            sx={{ minWidth: 0 }}
+          >
+            <Text as='span'>{connection.name}</Text>
             {label && (
               <Text
+                as='span'
                 colorScheme='secondary'
                 variant='caption'
                 localizationKey={label}
@@ -236,6 +151,7 @@ const ConnectionRow = ({
 
           {connection.domains.length > 0 && (
             <Flex
+              as='span'
               align='center'
               wrap='wrap'
               sx={t => ({ minWidth: 0, gap: t.space.$1x5 })}
@@ -253,6 +169,7 @@ const ConnectionRow = ({
         </Flex>
 
         <Flex
+          as='span'
           align='center'
           sx={t => ({ gap: t.space.$2 })}
         >
@@ -263,28 +180,14 @@ const ConnectionRow = ({
             localizationKey={badge.label}
           />
 
-          <ThreeDotsMenu
-            elementId='sso'
-            actions={actions}
+          <Icon
+            icon={ChevronRight}
+            aria-hidden
+            sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
           />
         </Flex>
       </ProfileSection.Item>
-
-      <Card.Alert>{card.error}</Card.Alert>
-
-      <ResetConnectionDialog
-        isOpen={isRemoveDialogOpen}
-        onClose={() => setIsRemoveDialogOpen(false)}
-        confirmationValue={organizationName}
-        title={localizationKeys('organizationProfile.securityPage.removeDialog.title')}
-        subtitle={localizationKeys('organizationProfile.securityPage.removeDialog.subtitle', {
-          name: connection.name,
-        })}
-        confirmButtonLabel={localizationKeys('organizationProfile.securityPage.removeDialog.confirmButton')}
-        onDelete={() => deleteConnection(connection.id)}
-        contentRef={contentRef}
-      />
-    </Col>
+    </Button>
   );
 };
 

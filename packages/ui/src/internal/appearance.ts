@@ -380,6 +380,8 @@ export type ElementsConfig = {
   organizationProfileSecuritySsoDetailRowChip: WithOptions<string>;
   organizationProfileSecuritySsoDetailRowLink: WithOptions<string>;
   organizationProfileSecuritySsoProviderIcon: WithOptions;
+  organizationProfileSecuritySsoConnectionRow: WithOptions;
+  organizationProfileSecuritySsoConnectionPage: WithOptions;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;

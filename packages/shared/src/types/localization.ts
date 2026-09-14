@@ -1220,6 +1220,65 @@ export type __internal_LocalizationResource = {
         tooltip__noRole: LocalizationValue;
         tooltipLabel: LocalizationValue;
       };
+      connectionPage: {
+        saveButton: LocalizationValue;
+        actions: {
+          activate: LocalizationValue;
+          deactivate: LocalizationValue;
+          openWizard: LocalizationValue;
+          remove: LocalizationValue;
+        };
+        general: {
+          title: LocalizationValue;
+          nameLabel: LocalizationValue;
+          domainsLabel: LocalizationValue;
+          providerLabel: LocalizationValue;
+          createdLabel: LocalizationValue;
+          editNameButton: LocalizationValue;
+          nameForm: {
+            title: LocalizationValue;
+          };
+        };
+        serviceProvider: {
+          title: LocalizationValue;
+          description: LocalizationValue;
+          acsUrl: LocalizationValue;
+          entityId: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          redirectUri: LocalizationValue;
+        };
+        identityProvider: {
+          title: LocalizationValue;
+          description: LocalizationValue;
+          certificateExpires: LocalizationValue<'date'>;
+          clientSecret: {
+            placeholder: LocalizationValue;
+          };
+        };
+        settings: {
+          title: LocalizationValue;
+          syncUserAttributes: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowAdditionalIdentifiers: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowSubdomains: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowIdpInitiated: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          forceAuthn: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+        };
+      };
       directorySyncSection: {
         title: LocalizationValue;
         badge__unconfigured: LocalizationValue;
