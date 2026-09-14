@@ -7,6 +7,16 @@ import { UserProfileConnectedAccountsSectionView } from '../user-profile-connect
 const account = { id: 'account_1', provider: 'Google', identifier: 'test@example.com' };
 
 describe('connected accounts section', () => {
+  it('shows provider names without announcing decorative logos', () => {
+    render(
+      <UserProfileConnectedAccountsSectionView
+        accounts={[{ ...account, iconUrl: 'https://img.clerk.com/static/google.svg' }]}
+      />,
+    );
+    expect(screen.getByText('Google')).toBeVisible();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
   it('forwards connect actions and allows retrying after an error', async () => {
     const user = userEvent.setup();
     const onConnect = vi.fn();

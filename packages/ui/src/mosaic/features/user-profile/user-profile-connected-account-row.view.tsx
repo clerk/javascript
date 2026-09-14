@@ -40,7 +40,8 @@ export function UserProfileConnectedAccountRowView({
             {iconUrl ? (
               <img
                 src={iconUrl}
-                alt={account.provider}
+                alt=''
+                aria-hidden
                 {...stylex.props(styles.icon)}
               />
             ) : (
