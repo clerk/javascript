@@ -5,7 +5,6 @@ import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
-import type { IconProps } from '../../components/icon';
 
 export interface ReverificationMethod {
   id: string;
