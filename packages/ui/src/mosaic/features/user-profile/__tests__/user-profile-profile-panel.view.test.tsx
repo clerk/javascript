@@ -236,7 +236,9 @@ describe('UserProfileProfilePanelView', () => {
   it('renders provider images in icon frames', () => {
     const { container } = renderView({
       connectedAccounts: [{ id: 'google', provider: 'Google', iconUrl: '/google.svg' }],
-      web3Wallets: [{ id: 'metamask', provider: 'MetaMask', iconUrl: '/metamask.svg' }],
+      web3Wallets: [
+        { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
+      ],
     });
 
     const frames = container.querySelectorAll('.cl-icon-frame');
@@ -268,12 +270,8 @@ describe('UserProfileProfilePanelView', () => {
           provider: 'Coinbase Wallet',
           isVerified: true,
         },
-        {
-          id: 'disconnected',
-          provider: 'Coinbase Wallet',
-          connected: false,
-        },
       ],
+      availableWeb3Providers: [{ id: 'disconnected', provider: 'Coinbase Wallet' }],
       onConnectWeb3Wallet,
       onSetPrimaryWeb3Wallet,
       onRemoveWeb3Wallet,
@@ -288,7 +286,9 @@ describe('UserProfileProfilePanelView', () => {
     expect(within(screen.getByRole('region', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();
 
     await user.click(
-      within(screen.getByRole('region', { name: 'Web3 wallets' })).getByRole('button', { name: 'Connect' }),
+      within(screen.getByRole('region', { name: 'Web3 wallets' })).getByRole('button', {
+        name: 'Connect Coinbase Wallet',
+      }),
     );
     await user.click(screen.getByRole('button', { name: 'Manage Coinbase Wallet' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));

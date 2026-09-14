@@ -1,131 +1,88 @@
 import * as stylex from '@stylexjs/stylex';
-import type { RefObject } from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
-import { Icon } from '../components/icon';
+import { Icon, IconFrame } from '../components/icon';
 import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
-import { styles } from './user-profile-profile-panel.styles';
-import { UserProfileProviderIcon } from './user-profile-provider-icon';
 import { UserProfileRemoveWeb3WalletDialog } from './user-profile-remove-web3-wallet.dialog';
 import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
-import type {
-  UserProfileWeb3Wallet,
-  UserProfileWeb3WalletsSectionViewProps,
-} from './user-profile-web3-wallets-section.view';
-
-interface UserProfileWeb3WalletRowViewProps extends Pick<
-  UserProfileWeb3WalletsSectionViewProps,
-  'onConnect' | 'onManage' | 'onSetPrimary' | 'onRemove'
-> {
-  wallet: UserProfileWeb3Wallet;
-  removalFocusRef: RefObject<HTMLElement | null>;
-}
+import { styles } from './user-profile-web3-wallets.styles';
+import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 
 export function UserProfileWeb3WalletRowView({
   wallet,
   onConnect,
-  onManage,
   onSetPrimary,
   onRemove,
-  removalFocusRef,
-}: UserProfileWeb3WalletRowViewProps) {
+}: {
+  wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
+  onConnect?: (id: string) => void;
+  onSetPrimary?: (id: string) => void;
+  onRemove?: (id: string) => void;
+}) {
   const [open, setOpen] = useState(false);
-  const [removeError, setRemoveError] = useState<string>();
-  const removing = useRef(false);
-  const confirmedRemoval = useRef(false);
-  const connectRef = useRef<HTMLButtonElement>(null);
-  const connected = wallet.connected ?? Boolean(wallet.address);
+  const iconUrl = wallet.iconUrl?.trim();
+  const linkedWallet = 'address' in wallet ? wallet : undefined;
+  const address = linkedWallet?.address;
+  const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
   const actions: UserProfileMenuAction[] = [];
 
-  const confirmRemove = async () => {
-    if (!onRemove || wallet.canRemove === false || removing.current) {
-      return;
-    }
-    removing.current = true;
-    confirmedRemoval.current = true;
-    setOpen(false);
-    try {
-      await onRemove(wallet.id);
-    } catch (error) {
-      setRemoveError(error instanceof Error ? error.message : m.removeError);
-    } finally {
-      removing.current = false;
-    }
-  };
-
-  if (!wallet.isPrimary && wallet.isVerified !== false && onSetPrimary) {
+  if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
   }
-
-  if (onRemove && wallet.canRemove !== false) {
-    actions.push({
-      label: m.remove,
-      color: 'negative',
-      onClick: () => {
-        if (removing.current) {
-          return;
-        }
-        confirmedRemoval.current = false;
-        setRemoveError(undefined);
-        setOpen(true);
-      },
-    });
-  }
-  if (!onSetPrimary && !onRemove && onManage) {
-    actions.push({ label: m.manage, onClick: () => onManage(wallet.id) });
+  if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
+    actions.push({ label: m.remove, color: 'negative', onClick: () => setOpen(true) });
   }
 
   return (
-    <Section.Row>
+    <Section.Row xstyle={onConnect && styles.connectRow}>
       <Section.Item>
-        {wallet.iconUrl ? <UserProfileProviderIcon iconUrl={wallet.iconUrl} /> : null}
+        {wallet.provider || iconUrl ? (
+          <Section.Media size='lg'>
+            <IconFrame>
+              {iconUrl ? (
+                <img
+                  src={iconUrl}
+                  alt=''
+                  aria-hidden
+                  {...stylex.props(styles.icon)}
+                />
+              ) : (
+                <span
+                  aria-hidden
+                  {...stylex.props(styles.fallback)}
+                >
+                  {wallet.provider?.trim().charAt(0).toUpperCase()}
+                </span>
+              )}
+            </IconFrame>
+          </Section.Media>
+        ) : null}
         <Section.Content>
-          <Section.Label>
-            <span {...stylex.props(styles.contactValue)}>
-              {wallet.provider}
-              {wallet.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
-              {wallet.isVerified === false ? <Badge color='warning'>{m.unverified}</Badge> : null}
-            </span>
+          <Section.Label xstyle={styles.label}>
+            <span title={wallet.provider || address}>{wallet.provider || shortAddress}</span>
+            {linkedWallet?.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
+            {linkedWallet && !linkedWallet.isVerified ? <Badge color='warning'>{m.unverified}</Badge> : null}
           </Section.Label>
-          {wallet.address ? (
-            <Section.Description>
-              {wallet.address.length <= 10
-                ? wallet.address
-                : `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`}
+          {wallet.provider && address ? (
+            <Section.Description
+              xstyle={styles.text}
+              title={address}
+            >
+              {shortAddress}
             </Section.Description>
           ) : null}
-          {removeError ? <Section.Error role='alert'>{removeError}</Section.Error> : null}
         </Section.Content>
-        <Section.Actions>
-          {connected ? (
-            <UserProfileActionMenu
-              actions={actions}
-              label={`${m.manage} ${wallet.provider}`}
-            >
-              {onRemove && wallet.canRemove !== false ? (
-                <UserProfileRemoveWeb3WalletDialog
-                  provider={wallet.provider}
-                  address={wallet.address}
-                  open={open}
-                  onOpenChange={setOpen}
-                  onConfirm={() => void confirmRemove()}
-                  finalFocus={() =>
-                    confirmedRemoval.current ? (connectRef.current ?? removalFocusRef.current) : undefined
-                  }
-                />
-              ) : null}
-            </UserProfileActionMenu>
-          ) : null}
-          {!connected && onConnect ? (
+        {onConnect ? (
+          <Section.Actions>
             <Button
-              ref={connectRef}
               color='neutral'
               size='sm'
               variant='outline'
+              aria-label={`${m.connect} ${wallet.provider}`}
               onClick={() => onConnect(wallet.id)}
             >
               {m.connect}
@@ -135,9 +92,30 @@ export function UserProfileWeb3WalletRowView({
                 size='sm'
               />
             </Button>
-          ) : null}
-        </Section.Actions>
+          </Section.Actions>
+        ) : actions.length > 0 ? (
+          <Section.Actions>
+            <UserProfileActionMenu
+              actions={actions}
+              label={`${m.manage} ${wallet.provider || address}`}
+            >
+              {linkedWallet && onRemove && linkedWallet.canRemove !== false ? (
+                <UserProfileRemoveWeb3WalletDialog
+                  address={linkedWallet.address}
+                  isVerified={linkedWallet.isVerified}
+                  open={open}
+                  onOpenChange={setOpen}
+                  onConfirm={() => onRemove(wallet.id)}
+                  isPending={linkedWallet.isRemoving}
+                  errorMessage={linkedWallet.removalError}
+                />
+              ) : null}
+            </UserProfileActionMenu>
+          </Section.Actions>
+        ) : null}
       </Section.Item>
+      {'connectError' in wallet && wallet.connectError ? <Section.Error>{wallet.connectError}</Section.Error> : null}
+      {linkedWallet?.primaryError ? <Section.Error>{linkedWallet.primaryError}</Section.Error> : null}
     </Section.Row>
   );
 }

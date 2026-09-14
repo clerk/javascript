@@ -13,7 +13,7 @@ import type { UserProfileConnectedAccount } from './user-profile-connected-accou
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
 import { styles } from './user-profile-profile-panel.styles';
-import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
+import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
@@ -26,13 +26,13 @@ export type { UserProfileEditNameValue } from './user-profile-account-section/us
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
   web3Wallets?: UserProfileWeb3Wallet[];
+  availableWeb3Providers?: UserProfileWeb3Provider[];
   onConnectAccount?: (id: string) => void;
   onManageConnectedAccount?: (id: string) => void;
   onRemoveConnectedAccount?: (id: string) => void;
   onConnectWeb3Wallet?: (id: string) => void;
-  onManageWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
-  onRemoveWeb3Wallet?: (id: string) => void | Promise<void>;
+  onRemoveWeb3Wallet?: (id: string) => void;
   /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
   onDeleteAccount?: () => Promise<void>;
 }
@@ -51,6 +51,7 @@ export function UserProfileProfilePanelView({
   phones = [],
   connectedAccounts = [],
   web3Wallets = [],
+  availableWeb3Providers = [],
   onProfilePictureChange,
   onProfilePictureReject,
   onRemoveProfilePicture,
@@ -71,7 +72,6 @@ export function UserProfileProfilePanelView({
   onManageConnectedAccount,
   onRemoveConnectedAccount,
   onConnectWeb3Wallet,
-  onManageWeb3Wallet,
   onSetPrimaryWeb3Wallet,
   onRemoveWeb3Wallet,
   onDeleteAccount,
@@ -117,11 +117,11 @@ export function UserProfileProfilePanelView({
             onRemove={onRemoveConnectedAccount}
           />
         ) : null}
-        {web3Wallets.length > 0 ? (
+        {web3Wallets.length > 0 || (availableWeb3Providers.length > 0 && onConnectWeb3Wallet) ? (
           <UserProfileWeb3WalletsSectionView
             wallets={web3Wallets}
+            availableProviders={availableWeb3Providers}
             onConnect={onConnectWeb3Wallet}
-            onManage={onManageWeb3Wallet}
             onRemove={onRemoveWeb3Wallet}
             onSetPrimary={onSetPrimaryWeb3Wallet}
           />

@@ -1,26 +1,28 @@
-import { Button } from '../components/button';
-import type { DialogFocusTarget } from '../components/dialog';
+import { Banner } from '../components/banner';
+import { Button, SubmitButton } from '../components/button';
 import { Dialog } from '../components/dialog';
 import { Heading } from '../components/heading';
 import { Text } from '../components/text';
 import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
 
 export interface UserProfileRemoveWeb3WalletDialogProps {
-  provider: string;
-  address?: string;
+  address: string;
+  isVerified: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  finalFocus?: DialogFocusTarget;
+  isPending?: boolean;
+  errorMessage?: string;
 }
 
 export function UserProfileRemoveWeb3WalletDialog({
-  provider,
   address,
+  isVerified,
   open,
   onOpenChange,
   onConfirm,
-  finalFocus,
+  isPending,
+  errorMessage,
 }: UserProfileRemoveWeb3WalletDialogProps) {
   return (
     <Dialog.Root
@@ -28,19 +30,36 @@ export function UserProfileRemoveWeb3WalletDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <Dialog.Popup finalFocus={finalFocus}>
+      <Dialog.Popup>
         <Dialog.Title render={<Heading size='sm' />}>{m.removeDialog.title}</Dialog.Title>
         <Dialog.Description render={<Text />}>
-          {m.removeDialog.description.replace('{wallet}', address ? `${provider} (${address})` : provider)}
+          {m.removeDialog.description.replace('{wallet}', address)}
         </Dialog.Description>
+        {isVerified ? <Text>{m.removeDialog.signInWarning}</Text> : null}
+        {errorMessage ? (
+          <Banner.Root
+            role='alert'
+            color='negative'
+          >
+            <Banner.Label>{errorMessage}</Banner.Label>
+          </Banner.Root>
+        ) : null}
         <Dialog.Actions>
-          <Dialog.Close render={<Button variant='outline' />}>{m.removeDialog.cancel}</Dialog.Close>
-          <Button
+          <Dialog.Close
+            disabled={isPending}
+            render={<Button variant='outline' />}
+          >
+            {m.removeDialog.cancel}
+          </Dialog.Close>
+          <SubmitButton
+            type='button'
+            isPending={isPending}
+            pendingLabel={m.removeDialog.pending}
             color='negative'
             onClick={onConfirm}
           >
             {m.removeDialog.confirm}
-          </Button>
+          </SubmitButton>
         </Dialog.Actions>
       </Dialog.Popup>
     </Dialog.Root>

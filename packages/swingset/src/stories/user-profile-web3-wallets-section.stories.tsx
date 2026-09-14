@@ -16,23 +16,31 @@ export const meta: StoryMeta = {
 
 export function Default() {
   const [connected, setConnected] = useState(true);
+  const metamask = {
+    id: 'metamask',
+    provider: 'MetaMask',
+    iconUrl: 'https://img.clerk.com/static/metamask.svg',
+  };
   return (
     <UserProfileWeb3WalletsSectionView
-      wallets={[
-        {
-          id: 'metamask',
-          address: connected ? '0x71C7656EC7ab88b098defB751B7401B5f6d8976F' : undefined,
-          connected,
-          provider: 'MetaMask',
-          iconUrl: 'https://img.clerk.com/static/metamask.svg',
-          isPrimary: connected,
-          isVerified: true,
-        },
+      wallets={
+        connected
+          ? [
+              {
+                ...metamask,
+                address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+                isPrimary: true,
+                isVerified: true,
+              },
+            ]
+          : []
+      }
+      availableProviders={[
+        ...(!connected ? [metamask] : []),
         {
           id: 'coinbase-wallet',
           provider: 'Coinbase Wallet',
           iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
-          connected: false,
         },
       ]}
       onConnect={() => undefined}

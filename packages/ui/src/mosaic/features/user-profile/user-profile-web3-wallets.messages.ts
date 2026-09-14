@@ -6,11 +6,12 @@ export const userProfileWeb3WalletsMessages = {
   setPrimary: 'Set as primary',
   primary: 'Primary',
   unverified: 'Unverified',
-  removeError: 'Unable to remove wallet. Please try again.',
   removeDialog: {
     title: 'Remove wallet?',
-    description: 'Are you sure you want to remove {wallet}?',
+    description: '{wallet} will be removed from this account.',
+    signInWarning: 'You will no longer be able to sign in using this web3 wallet.',
     confirm: 'Remove',
+    pending: 'Removing wallet',
     cancel: 'Cancel',
   },
 };
