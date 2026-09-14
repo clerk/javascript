@@ -1,5 +1,6 @@
 import type { FileRejection } from '@clerk/headless/file-upload';
 import { FileUpload } from '@clerk/headless/file-upload';
+import { useState } from 'react';
 
 import { Avatar } from '../../components/avatar';
 import { Button } from '../../components/button';
@@ -31,6 +32,8 @@ export function UserProfilePictureRowView({
   onReject,
   onRemove,
 }: UserProfilePictureRowViewProps) {
+  const [rejectionError, setRejectionError] = useState<string>();
+  const displayedError = errorMessage ?? rejectionError;
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -43,10 +46,15 @@ export function UserProfilePictureRowView({
       accept={PROFILE_PICTURE_MIME_TYPES}
       maxSize={PROFILE_PICTURE_MAX_BYTES}
       render={<Section.Row />}
-      onReject={onReject}
+      onReject={rejections => {
+        const rejection = rejections[0];
+        setRejectionError(rejection ? m.picture.errors[rejection.reason] : undefined);
+        onReject?.(rejections);
+      }}
       onValueChange={files => {
         const file = files[0];
         if (file) {
+          setRejectionError(undefined);
           onChange?.(file);
         }
       }}
@@ -71,7 +79,7 @@ export function UserProfilePictureRowView({
           onRemove={onRemove}
         />
       </Section.Item>
-      {errorMessage ? <Section.Error>{errorMessage}</Section.Error> : null}
+      {displayedError ? <Section.Error>{displayedError}</Section.Error> : null}
     </FileUpload.Root>
   );
 }

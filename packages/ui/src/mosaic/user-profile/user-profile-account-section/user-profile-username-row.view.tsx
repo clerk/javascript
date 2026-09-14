@@ -1,14 +1,15 @@
-import type { ReactNode } from 'react';
-
+import { Button } from '../../components/button';
 import { Section } from '../../components/section';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
+import { UserProfileEditUsernameView } from './user-profile-edit-username.view';
 
 export interface UserProfileUsernameRowViewProps {
   username: string;
-  action?: ReactNode;
+  onSubmit?: (username: string) => Promise<void>;
 }
 
-export function UserProfileUsernameRowView({ username, action }: UserProfileUsernameRowViewProps) {
+export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUsernameRowViewProps) {
   return (
     <Section.Row>
       <Section.Item>
@@ -16,8 +17,35 @@ export function UserProfileUsernameRowView({ username, action }: UserProfileUser
           <Section.Label>{m.username.label}</Section.Label>
           <Section.Description>{username}</Section.Description>
         </Section.Content>
-        {action ? <Section.Actions>{action}</Section.Actions> : null}
+        {onSubmit ? (
+          <Section.Actions>
+            <EditUsername
+              username={username}
+              onSubmit={onSubmit}
+            />
+          </Section.Actions>
+        ) : null}
       </Section.Item>
     </Section.Row>
+  );
+}
+
+function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
+  const controller = useUserProfileEditUsernameController({ username, onSubmit });
+
+  return (
+    <UserProfileEditUsernameView
+      {...controller}
+      open={controller.isOpen}
+      trigger={
+        <Button
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {m.username.edit}
+        </Button>
+      }
+    />
   );
 }

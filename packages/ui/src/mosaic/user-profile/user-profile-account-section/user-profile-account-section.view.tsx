@@ -1,6 +1,5 @@
 import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
-import { useState } from 'react';
 
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
@@ -11,11 +10,7 @@ import { UserProfileActionMenu } from '../user-profile-action-menu';
 import { styles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
-import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
-import { UserProfileEditNameView } from './user-profile-edit-name.view';
-import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
-import { UserProfileEditUsernameView } from './user-profile-edit-username.view';
 import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePictureRowView } from './user-profile-picture-row.view';
 import { UserProfileUsernameRowView } from './user-profile-username-row.view';
@@ -99,8 +94,6 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
-  const [pictureError, setPictureError] = useState<string>();
-
   return (
     <div {...stylex.props(styles.sections)}>
       <Section.Root aria-label={m.sectionLabel}>
@@ -110,46 +103,21 @@ export function UserProfileAccountSectionView({
             name={name}
             imageUrl={imageUrl}
             hasImage={hasImage}
-            errorMessage={pictureError}
-            onChange={
-              onProfilePictureChange
-                ? file => {
-                    setPictureError(undefined);
-                    onProfilePictureChange(file);
-                  }
-                : undefined
-            }
-            onReject={rejections => {
-              const rejection = rejections[0];
-              setPictureError(rejection ? m.picture.errors[rejection.reason] : undefined);
-              onProfilePictureReject?.(rejections);
-            }}
+            onChange={onProfilePictureChange}
+            onReject={onProfilePictureReject}
             onRemove={onRemoveProfilePicture}
           />
           <UserProfileNameRowView
             name={name}
-            action={
-              onSubmitName ? (
-                <EditName
-                  firstName={firstName}
-                  lastName={lastName}
-                  firstNameAttribute={firstNameAttribute}
-                  lastNameAttribute={lastNameAttribute}
-                  onSubmit={onSubmitName}
-                />
-              ) : undefined
-            }
+            firstName={firstName}
+            lastName={lastName}
+            firstNameAttribute={firstNameAttribute}
+            lastNameAttribute={lastNameAttribute}
+            onSubmit={onSubmitName}
           />
           <UserProfileUsernameRowView
             username={username}
-            action={
-              onSubmitUsername ? (
-                <EditUsername
-                  username={username}
-                  onSubmit={onSubmitUsername}
-                />
-              ) : undefined
-            }
+            onSubmit={onSubmitUsername}
           />
           {!allowMultipleAccounts ? (
             <SingleContactRow
@@ -196,60 +164,6 @@ export function UserProfileAccountSectionView({
         />
       ) : null}
     </div>
-  );
-}
-
-function EditName({
-  firstName,
-  lastName,
-  firstNameAttribute,
-  lastNameAttribute,
-  onSubmit,
-}: {
-  firstName?: string;
-  lastName?: string;
-  firstNameAttribute?: UserProfileNameAttribute;
-  lastNameAttribute?: UserProfileNameAttribute;
-  onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
-}) {
-  const controller = useUserProfileEditNameController({ firstName, lastName, onSubmit });
-
-  return (
-    <UserProfileEditNameView
-      {...controller}
-      firstNameAttribute={firstNameAttribute}
-      lastNameAttribute={lastNameAttribute}
-      open={controller.isOpen}
-      trigger={
-        <Button
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {m.name.edit}
-        </Button>
-      }
-    />
-  );
-}
-
-function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
-  const controller = useUserProfileEditUsernameController({ username, onSubmit });
-
-  return (
-    <UserProfileEditUsernameView
-      {...controller}
-      open={controller.isOpen}
-      trigger={
-        <Button
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {m.username.edit}
-        </Button>
-      }
-    />
   );
 }
 
