@@ -39,10 +39,9 @@ Every Mosaic part carries a **stable class** and reflects its variants and state
 
 Consumers target the class and its attributes, never StyleX's hashed `x…` atoms.
 
-Two ways to style a part — both hit the same class + attributes:
+A theme styles a part from CSS, against that class and its attributes:
 
 ```css
-/* 1. Plain CSS / stylesheet */
 .cl-button {
   border-radius: 8px;
 }
@@ -54,15 +53,20 @@ Two ways to style a part — both hit the same class + attributes:
 }
 ```
 
+A part exposes no `className` or `style` prop. Inside `packages/ui`, code that renders a part and needs to nudge it passes StyleX atoms through `xstyle`, declared in its own `stylex.create` and composed last so they win:
+
 ```tsx
-// 2. className / style props — merged onto the element by `mergeStyleProps`, applied last so they win
-<Button
-  className='MyButton'
-  style={{ borderRadius: 12 }}
-/>
+const styles = stylex.create({ helpText: { textAlign: 'center' } });
+
+<Text
+  size='xs'
+  xstyle={styles.helpText}
+>
+  {helpText}
+</Text>;
 ```
 
-Tokens are a third, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-font-family-sans`, `--cl-spacing`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
+Tokens are a second, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-font-family-sans`, `--cl-spacing`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
 
 State styling uses real class + attribute-selector specificity — no `&&` boost, no data-attr-vs-class ambiguity.
 
@@ -80,7 +84,7 @@ import { MosaicProvider } from '../mosaic/MosaicProvider';
 
 ## Component authoring pattern
 
-Styles are declared once per component with `stylex.create`, keyed off the same axes the component exposes as props, then fused with `themeProps` output and the consumer's `className`/`style`:
+Styles are declared once per component with `stylex.create`, keyed off the same axes the component exposes as props, then fused with `themeProps` output and the props the component was called with:
 
 ```tsx
 const styles = stylex.create({
@@ -97,27 +101,27 @@ const variants = stylex.create({
 });
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { color = 'primary', variant = 'filled', size = 'md', disabled, className, style, ...rest },
+  { color = 'primary', variant = 'filled', size = 'md', disabled, xstyle, ...rest },
   ref,
 ) {
   const props = mergeStyleProps(
     themeProps('button', { color, variant, size, disabled }),
-    stylex.props(reset.base, styles.base, variants[`${variant}-${color}`]),
-    className,
-    style,
+    stylex.props(reset.base, styles.base, variants[`${variant}-${color}`], xstyle),
+    rest,
   );
   return (
     <button
       ref={ref}
       disabled={disabled}
       {...props}
-      {...rest}
     />
   );
 });
 ```
 
-`mergeStyleProps` applies its arguments in order — stable class + data attrs, then StyleX atoms, then the consumer's `className` and `style`. Only `style` wins by that ordering: it is an inline style, which outranks any stylesheet rule. A consumer's `className` wins for a different reason — class order inside the attribute has no effect on the cascade, so the consumer's rule wins because the Mosaic sheet is imported into a cascade layer (`@import '@clerk/ui/styles.css' layer(components)`) and an unlayered rule beats any layered one.
+`mergeStyleProps` applies its bags in order — stable class + data attrs, then StyleX atoms, then the props the component was called with — concatenating `className`, shallow-merging `style`, and letting the later bag overwrite anything else. `ButtonProps` extends `MosaicElementProps<'button'>`, which omits `className`/`style` and adds `xstyle`, so the caller's only styling lever is StyleX atoms composed last inside `stylex.props`. The `rest` bag still goes through the merge rather than a trailing spread because a `render` source (`Dialog.Title render={<Heading />}`) hands its own merged `className`/`style` to the part it renders; the merge fuses that pair, a spread would clobber the part's own class.
+
+A theme's CSS wins over the Mosaic sheet without any prop: the sheet is imported into a cascade layer (`@import '@clerk/ui/styles.css' layer(components)`) and an unlayered rule beats any layered one.
 
 `utils/reset.styles.ts` holds the per-element resets so a component does not re-declare UA-normalization; `utils/typography.styles.ts` and `utils/focus-outline.styles.ts` do the same for the treatments several components share.
 
@@ -411,6 +415,7 @@ the only test that mocks Clerk, and the view needs no machinery at all. See the
 ### Rules
 
 - **Do** author components with StyleX (`stylex.create` + `themeProps` / `mergeStyleProps`)
+- **Do** type a part's props off `MosaicComponentProps` / `MosaicElementProps`; a part takes `xstyle`, never `className` / `style`
 - **Do not** use Emotion in Mosaic — no `css` prop, no `styled`, no theme callbacks
 - **Do** export every new component from `styles/index.ts`, or its CSS never ships
 - **Do** import from `src/mosaic/` directly (no barrel files) inside `packages/ui`
@@ -428,7 +433,7 @@ the only test that mocks Clerk, and the view needs no machinery at all. See the
 To migrate a component from the old system to Mosaic:
 
 1. Replace `createVariants` with `stylex.create` — one style key per variant value, selected by the prop at render time instead of merged by a runtime engine.
-2. Replace `applyVariants(props)` with `mergeStyleProps(themeProps(slot, variants), stylex.props(...), className, style)` and spread the result onto the element.
+2. Replace `applyVariants(props)` with `mergeStyleProps(themeProps(slot, variants), stylex.props(..., xstyle), rest)` and spread the result onto the element. Drop any `className` / `style` props the legacy component accepted; callers pass `xstyle`.
 3. Move stateful styling (disabled/hover/focus/invalid) into StyleX conditions. A condition is a key _inside a property's value object_ alongside `default`, never a top-level style key, and an attribute selector must be wrapped in `:is(...)`:
 
    ```ts
@@ -442,29 +447,29 @@ The steps above cover the **styling** migration. For **flow** components — whe
 
 ## Files
 
-| File                                           | Purpose                                                                   |
-| ---------------------------------------------- | ------------------------------------------------------------------------- |
-| `src/mosaic/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`                   |
-| `src/mosaic/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`                   |
-| `src/mosaic/MosaicProvider.tsx`                | Provider for the `icons` prop (per-name glyph overrides)                  |
-| `src/mosaic/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context                   |
-| `src/mosaic/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                                  |
-| `src/mosaic/components/`                       | One subdirectory per component, and nothing else                          |
-| `src/mosaic/blocks/`                           | View fragments that own one piece of state of their own (`destructive`)   |
-| `src/mosaic/utils/*.styles.ts`                 | Atoms shared across components: `reset`, `typography`, `focus-outline`    |
-| `src/mosaic/hooks/`                            | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)          |
-| `src/mosaic/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                        |
-| `src/mosaic/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`)      |
-| `src/mosaic/machines/`                         | Standalone machines and the shared `__tests__/test-utils.ts`              |
-| `src/mosaic/<feature>/*.model.tsx`             | Clerk adapter — the only file in a feature that may import Clerk          |
-| `src/mosaic/<feature>/*.controller.tsx`        | Local state and action wrapping; holds the feature's machine              |
-| `src/mosaic/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                     |
-| `src/mosaic/<feature>/*.types.ts`              | The data contract the model and the view both agree on                    |
-| `src/mosaic/<feature>/*.messages.ts`           | Every string the surface renders, shaped the way `@clerk/i18n` takes them |
-| `src/mosaic/utils/reset.test.tsx`              | Reset specs                                                               |
-| `src/mosaic/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                               |
-| `src/mosaic/components/button/button.test.tsx` | Component-level slot/state/variant specs                                  |
-| `src/mosaic/user-button/__tests__/`            | The canonical per-layer test set to copy from                             |
+| File                                           | Purpose                                                                     |
+| ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `src/mosaic/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`                     |
+| `src/mosaic/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`, `MosaicStyleProps` |
+| `src/mosaic/MosaicProvider.tsx`                | Provider for the `icons` prop (per-name glyph overrides)                    |
+| `src/mosaic/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context                     |
+| `src/mosaic/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                                    |
+| `src/mosaic/components/`                       | One subdirectory per component, and nothing else                            |
+| `src/mosaic/blocks/`                           | View fragments that own one piece of state of their own (`destructive`)     |
+| `src/mosaic/utils/*.styles.ts`                 | Atoms shared across components: `reset`, `typography`, `focus-outline`      |
+| `src/mosaic/hooks/`                            | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)            |
+| `src/mosaic/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                          |
+| `src/mosaic/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`)        |
+| `src/mosaic/machines/`                         | Standalone machines and the shared `__tests__/test-utils.ts`                |
+| `src/mosaic/<feature>/*.model.tsx`             | Clerk adapter — the only file in a feature that may import Clerk            |
+| `src/mosaic/<feature>/*.controller.tsx`        | Local state and action wrapping; holds the feature's machine                |
+| `src/mosaic/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                       |
+| `src/mosaic/<feature>/*.types.ts`              | The data contract the model and the view both agree on                      |
+| `src/mosaic/<feature>/*.messages.ts`           | Every string the surface renders, shaped the way `@clerk/i18n` takes them   |
+| `src/mosaic/utils/reset.test.tsx`              | Reset specs                                                                 |
+| `src/mosaic/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                                 |
+| `src/mosaic/components/button/button.test.tsx` | Component-level slot/state/variant specs                                    |
+| `src/mosaic/user-button/__tests__/`            | The canonical per-layer test set to copy from                               |
 
 `machine/` is the runtime; `machines/` is machines written with it. The one-letter
 difference is easy to misread — a feature's own machine belongs in its

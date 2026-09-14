@@ -113,8 +113,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     elevation = 'card',
     children,
     render,
-    className,
-    style,
+    xstyle,
     ...rest
   },
   ref,
@@ -168,11 +167,9 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
-        stylex.props(reset.base, styles.root, isOverlayDialog(dialog) && styles.rootInDialog),
-        className,
-        style,
+        stylex.props(reset.base, styles.root, isOverlayDialog(dialog) && styles.rootInDialog, xstyle),
+        rest,
       ),
-      ...rest,
       children: (
         <>
           <span
@@ -225,7 +222,7 @@ export type ProfileTitleProps = MosaicComponentProps<'h2'>;
  * surface whose visible headings belong to its pages.
  */
 const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function ProfileTitle(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const { titleId } = useProfileContext('Profile.Title');
@@ -233,8 +230,7 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
     <VisuallyHidden
       ref={ref as React.Ref<HTMLSpanElement>}
       render={render ?? <h2 />}
-      {...mergeStyleProps(themeProps('profile-title'), className, style)}
-      {...rest}
+      {...mergeStyleProps(themeProps('profile-title'), stylex.props(xstyle), rest)}
       // The ids the navigation and the dialog point at, so the caller's cannot displace it.
       id={titleId}
     />
@@ -261,7 +257,7 @@ function NavBranding() {
  * two sets of tabs for one set of pages.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
-  { children, render, className, style, ...rest },
+  { children, render, xstyle, ...rest },
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
@@ -283,11 +279,9 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       'aria-labelledby': titleId,
       ...mergeStyleProps(
         themeProps('profile-nav', { compact }),
-        stylex.props(reset.base, styles.nav, (inline || compact) && styles.navFlush),
-        className,
-        style,
+        stylex.props(reset.base, styles.nav, (inline || compact) && styles.navFlush, xstyle),
+        rest,
       ),
-      ...rest,
       children: (
         <>
           {list}
@@ -329,7 +323,7 @@ export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
 
 /** A destination. Selecting it shows the `Profile.ContentPanel` sharing its `value`. */
 const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(function ProfileNavItem(
-  { value, icon, disabled, children, render, className, style, onClick, ...rest },
+  { value, icon, disabled, children, render, xstyle, onClick, ...rest },
   ref,
 ) {
   const { compact, closeNav } = useProfileContext('Profile.NavItem');
@@ -348,11 +342,9 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
       }}
       {...mergeStyleProps(
         themeProps('profile-nav-item'),
-        stylex.props(reset.base, styles.navItem, focusOutline.visible),
-        className,
-        style,
+        stylex.props(reset.base, styles.navItem, focusOutline.visible, xstyle),
+        rest,
       )}
-      {...rest}
     >
       {icon ? (
         <span
@@ -379,7 +371,7 @@ export type ProfilePageTitleProps = MosaicComponentProps<'div'>;
  * line box. That needs an inline formatting context, so the button is `display: inline`.
  */
 const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(function ProfilePageTitle(
-  { children, render, className, style, ...rest },
+  { children, render, xstyle, ...rest },
   ref,
 ) {
   const profile = React.useContext(ProfileContext);
@@ -400,13 +392,7 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('profile-page-title'),
-        stylex.props(reset.base, styles.pageTitle),
-        className,
-        style,
-      ),
-      ...rest,
+      ...mergeStyleProps(themeProps('profile-page-title'), stylex.props(reset.base, styles.pageTitle, xstyle), rest),
       children: (
         <Heading
           id={panel?.titleId}
@@ -451,7 +437,7 @@ export type ProfileContentProps = MosaicComponentProps<'div'>;
  * own `main`, or of a dialog, so it claims no landmark.
  */
 const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function ProfileContent(
-  { children, render, className, style, ...rest },
+  { children, render, xstyle, ...rest },
   ref,
 ) {
   const { inline, compact, renderBranding } = useProfileContext('Profile.Content');
@@ -462,11 +448,9 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
     props: {
       ...mergeStyleProps(
         themeProps('profile-content', { inline }),
-        stylex.props(reset.base, styles.content, inline ? styles.contentInline : contentScroll),
-        className,
-        style,
+        stylex.props(reset.base, styles.content, inline ? styles.contentInline : contentScroll, xstyle),
+        rest,
       ),
-      ...rest,
       children: (
         <div
           {...mergeStyleProps(
@@ -515,7 +499,7 @@ export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
  * `--cl-tab-transition-direction` — so a page transition is a styling change rather than a new part.
  */
 const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
-  { value, shouldForceMount, className, style, ...rest },
+  { value, shouldForceMount, xstyle, ...rest },
   ref,
 ) {
   const { compact } = useProfileContext('Profile.ContentPanel');
@@ -531,8 +515,7 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
         // is named by its own title instead — `Profile.PageTitle` takes this id. Spread only then:
         // an explicit `undefined` would displace the primitive's own `aria-labelledby`.
         {...(compact ? { 'aria-labelledby': titleId } : null)}
-        {...mergeStyleProps(themeProps('profile-content-panel', { value }), className, style)}
-        {...rest}
+        {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
       />
     </ContentPanelContext.Provider>
   );

@@ -26,8 +26,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
     disabled: disabledProp,
     required: requiredProp,
     render,
-    className,
-    style,
+    xstyle,
     id,
     'aria-invalid': ariaInvalid,
     'aria-labelledby': ariaLabelledBy,
@@ -71,11 +70,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
           variant === 'default' && inputStyles.base,
           variant === 'ghost' && styles.ghost,
           variant === 'default' && disabled && inputStyles.disabled,
+          xstyle,
         ),
-        className,
-        style,
+        rest,
       ),
-      ...rest,
     },
   });
 });
