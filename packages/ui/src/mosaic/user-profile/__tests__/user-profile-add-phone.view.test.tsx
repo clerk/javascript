@@ -107,7 +107,6 @@ describe('UserProfileAddPhoneView', () => {
     expect(screen.getByText('Enter the code sent to +1 (801) 888-8181')).toBeInTheDocument();
     expect(screen.queryByRole('textbox', { name: 'Phone' })).not.toBeInTheDocument();
     const firstSlot = screen.getByRole('textbox', { name: 'Verification code' });
-    await waitFor(() => expect(firstSlot).toHaveFocus());
     const verifyForm = firstSlot.closest('form');
     if (!verifyForm) {
       throw new Error('Verification form missing');

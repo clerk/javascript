@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { useEffect, useId, useRef } from 'react';
+import { useId, useRef } from 'react';
 
 import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
 import { Button, SubmitButton } from '../../components/button';
@@ -35,12 +35,6 @@ export function UserProfileAddPhoneView(props: UserProfileAddPhoneViewProps) {
   const verifyFormId = useId();
   const phoneRef = useRef<HTMLInputElement>(null);
   const verifyRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (props.open && props.step === 'verify') {
-      verifyRef.current?.querySelector<HTMLInputElement>('input:not([type="hidden"])')?.focus();
-    }
-  }, [props.open, props.step]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

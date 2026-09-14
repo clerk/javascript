@@ -30,8 +30,7 @@ describe('profile add phone', () => {
       expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeInTheDocument();
       await user.type(screen.getByRole('textbox', { name: 'Phone' }), '8015550100');
       await user.click(screen.getByRole('button', { name: 'Send code' }));
-      await waitFor(() => expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus());
-      await user.keyboard('123456');
+      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
       expect(onSend).toHaveBeenCalledExactlyOnceWith('+18015550100');
       expect(onVerify).toHaveBeenCalledExactlyOnceWith('+18015550100', '123456');
