@@ -296,6 +296,10 @@ describe('UserProfileProfilePanelView', () => {
     const removeWallet = screen.getByRole('menuitem', { name: 'Remove wallet' });
     expect(removeWallet).toHaveAttribute('data-color', 'negative');
     await user.click(removeWallet);
+    expect(onRemoveWeb3Wallet).not.toHaveBeenCalled();
+    await user.click(
+      within(screen.getByRole('alertdialog', { name: 'Remove wallet?' })).getByRole('button', { name: 'Remove' }),
+    );
 
     expect(onConnectWeb3Wallet).toHaveBeenCalledWith('disconnected');
     expect(onSetPrimaryWeb3Wallet).toHaveBeenCalledWith('secondary');

@@ -32,7 +32,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   onConnectWeb3Wallet?: (id: string) => void;
   onManageWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
-  onRemoveWeb3Wallet?: (id: string) => void;
+  onRemoveWeb3Wallet?: (id: string) => void | Promise<void>;
   /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
   onDeleteAccount?: () => Promise<void>;
 }
