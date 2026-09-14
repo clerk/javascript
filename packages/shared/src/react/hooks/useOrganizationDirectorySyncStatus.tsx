@@ -76,7 +76,12 @@ function useOrganizationDirectorySyncStatus(
     stableKeys: stableKey,
   });
 
-  const queryEnabled = enabled && clerk.loaded && Boolean(organization) && Boolean(directory);
+  // The directory comes from the caller while the organization comes from
+  // context, and the cache key is built from both. A directory belonging to
+  // another organization would therefore cache that organization's sync result
+  // under this one's key, so refuse to read it.
+  const belongsToActiveOrganization = Boolean(organization) && directory?.organizationId === organization?.id;
+  const queryEnabled = enabled && clerk.loaded && belongsToActiveOrganization && Boolean(directory);
 
   const query = useClerkQuery({
     queryKey,
