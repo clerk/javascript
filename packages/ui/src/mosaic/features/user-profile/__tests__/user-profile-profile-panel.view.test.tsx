@@ -337,6 +337,9 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Manage item2@clerk.dev' }));
     expect(onRemoveEmail).not.toHaveBeenCalled();
     await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
+    expect(onRemoveEmail).not.toHaveBeenCalled();
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     // Last: the edit-name dialog is modal, so the rest of the panel goes inert once it opens.
     await user.click(screen.getByRole('button', { name: 'Edit name' }));
 

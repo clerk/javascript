@@ -1,4 +1,3 @@
-import type { Ref } from 'react';
 import { useRef, useState } from 'react';
 
 import { Button } from '../../components/button';
@@ -36,17 +35,14 @@ export function UserProfileEmailRowView({
   onSetPrimaryEmail,
   onRemoveEmail,
 }: UserProfileEmailRowViewProps) {
-  const addEmailTriggerRef = useRef<HTMLButtonElement>(null);
   const addEmailAction =
     onSendEmailCode && onVerifyEmailCode ? (
       <AddEmail
         options={{ onSend: onSendEmailCode, onVerify: onVerifyEmailCode }}
         compact={allowMultipleAccounts}
-        triggerRef={addEmailTriggerRef}
       />
     ) : onAddEmail ? (
       <Button
-        ref={addEmailTriggerRef}
         onClick={onAddEmail}
         aria-label={m.email.add}
         color='neutral'
@@ -63,7 +59,6 @@ export function UserProfileEmailRowView({
         {allowMultipleAccounts ? m.add : m.email.add}
       </Button>
     ) : undefined;
-  const confirmedRemoval = useRef(false);
   const [emailToRemove, setEmailToRemove] = useState<UserProfileEmail>();
   const [removeError, setRemoveError] = useState<string>();
   const removing = useRef(false);
@@ -94,7 +89,6 @@ export function UserProfileEmailRowView({
     if (!email || email.canRemove === false || !onRemoveEmail || removing.current) {
       return;
     }
-    confirmedRemoval.current = false;
     setEmailToRemove(email);
     setRemoveError(undefined);
   };
@@ -104,7 +98,6 @@ export function UserProfileEmailRowView({
       return;
     }
     removing.current = true;
-    confirmedRemoval.current = true;
     setEmailToRemove(undefined);
     try {
       await onRemoveEmail(emailToRemove.id);
@@ -134,7 +127,6 @@ export function UserProfileEmailRowView({
         kind='email'
         label={m.email.label}
         addAction={addEmailAction}
-        onManage={isSettingPrimary ? undefined : onManageEmail}
         onRemove={onRemoveEmail ? removeEmail : undefined}
         onSetPrimary={onSetPrimaryEmail && !isSettingPrimary ? id => void setPrimaryEmail(id) : undefined}
         onVerify={onVerifyEmail}
@@ -150,7 +142,6 @@ export function UserProfileEmailRowView({
                     }
                   }}
                   onConfirm={() => void confirmRemoveEmail()}
-                  finalFocus={() => (confirmedRemoval.current ? addEmailTriggerRef.current : undefined)}
                 />
               )
             : undefined
@@ -176,15 +167,7 @@ export function UserProfileEmailRowView({
   );
 }
 
-function AddEmail({
-  options,
-  compact,
-  triggerRef,
-}: {
-  options: UserProfileAddEmailControllerOptions;
-  compact: boolean;
-  triggerRef?: Ref<HTMLButtonElement>;
-}) {
+function AddEmail({ options, compact }: { options: UserProfileAddEmailControllerOptions; compact: boolean }) {
   const controller = useUserProfileAddEmailController(options);
   return (
     <UserProfileAddEmailDialog
@@ -192,7 +175,6 @@ function AddEmail({
       trigger={
         <Button
           aria-label={m.email.add}
-          ref={triggerRef}
           color='neutral'
           size='sm'
           variant='outline'

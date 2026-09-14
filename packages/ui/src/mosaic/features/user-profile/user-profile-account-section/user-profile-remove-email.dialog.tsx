@@ -1,7 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../../components/button';
-import type { DialogFocusTarget } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Heading } from '../../components/heading';
 import { Text } from '../../components/text';
@@ -13,7 +12,6 @@ export interface UserProfileRemoveEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  finalFocus?: DialogFocusTarget;
 }
 
 export function UserProfileRemoveEmailDialog({
@@ -21,7 +19,6 @@ export function UserProfileRemoveEmailDialog({
   open,
   onOpenChange,
   onConfirm,
-  finalFocus,
 }: UserProfileRemoveEmailDialogProps) {
   const [beforeEmail, afterEmail] = m.email.removeDialog.description.split('{emailAddress}');
 
@@ -31,7 +28,7 @@ export function UserProfileRemoveEmailDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <Dialog.Popup finalFocus={finalFocus}>
+      <Dialog.Popup>
         <Dialog.Title render={<Heading size='sm' />}>{m.email.removeDialog.title}</Dialog.Title>
         <Dialog.Description render={<Text />}>
           {beforeEmail}

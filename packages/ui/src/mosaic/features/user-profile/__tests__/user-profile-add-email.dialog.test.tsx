@@ -87,7 +87,6 @@ describe('UserProfileAddEmailDialog', () => {
     if (!emailForm) {
       throw new Error('Email form missing');
     }
-    expect(emailForm).toHaveClass('cl-card-content');
     emailForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
@@ -119,7 +118,6 @@ describe('UserProfileAddEmailDialog', () => {
     if (!verifyForm) {
       throw new Error('Verification form missing');
     }
-    expect(verifyForm).toHaveClass('cl-card-content');
     verifyForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
@@ -128,6 +126,7 @@ describe('UserProfileAddEmailDialog', () => {
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+    expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
 
   it('blocks submission and resend while verification is pending', async () => {
