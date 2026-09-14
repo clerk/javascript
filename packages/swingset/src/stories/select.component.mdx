@@ -68,8 +68,8 @@ row is built to the trigger's measurements — the same height, the same text in
 so the label does not appear to move when the list opens.
 
 That only holds while every row is the height of the trigger. An item with a `description` renders
-a second line, so a list with descriptions hangs below the trigger instead: pass
-`alignItemWithTrigger={false}`.
+a second line, so a list with any description hangs below the trigger instead. Pass
+`alignItemWithTrigger` yourself to override either default.
 
 The overlay also gives way on its own where it would not work: a touch opening, or a trigger within
 20px of the top or bottom of the viewport, places the list below the trigger like a menu.
@@ -83,7 +83,6 @@ const roles = [
 <Select.Root
   items={roles}
   defaultValue='member'
-  alignItemWithTrigger={false}
 >
   <Select.Trigger />
   <Select.Popup />
