@@ -7,6 +7,7 @@ import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
+import { styles as panelStyles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import { styles } from './user-profile-account-section.styles';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
@@ -200,7 +201,7 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
         <Section.Content>
           <Section.Label>{label}</Section.Label>
           {item ? (
-            <Section.Description xstyle={styles.contactValue}>
+            <Section.Description xstyle={panelStyles.contactValue}>
               <span>{item.value}</span>
               {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
             </Section.Description>
@@ -289,7 +290,7 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
             return (
               <Section.Item key={item.id}>
                 <Section.Content>
-                  <Section.Description xstyle={styles.contactValue}>
+                  <Section.Description xstyle={panelStyles.contactValue}>
                     <span>{item.value}</span>
                     {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
                   </Section.Description>
