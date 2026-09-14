@@ -2,7 +2,7 @@ import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/useMachine';
 import type { UserProfileFormError } from './user-profile-account-section.types';
 import { UserProfileSaveError } from './user-profile-account-section.types';
-import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.view';
+import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 
 export interface UserProfileEditNameContext {
   saveName: (value: UserProfileEditNameValue) => Promise<void>;

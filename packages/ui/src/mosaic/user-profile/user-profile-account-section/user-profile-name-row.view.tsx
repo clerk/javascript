@@ -3,8 +3,8 @@ import { Section } from '../../components/section';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
-import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
-import { UserProfileEditNameView } from './user-profile-edit-name.view';
+import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
+import { UserProfileEditNameDialog } from './user-profile-edit-name.dialog';
 
 export interface UserProfileNameRowViewProps {
   name: string;
@@ -62,7 +62,7 @@ function EditName({
   const controller = useUserProfileEditNameController({ firstName, lastName, onSubmit });
 
   return (
-    <UserProfileEditNameView
+    <UserProfileEditNameDialog
       {...controller}
       firstNameAttribute={firstNameAttribute}
       lastNameAttribute={lastNameAttribute}

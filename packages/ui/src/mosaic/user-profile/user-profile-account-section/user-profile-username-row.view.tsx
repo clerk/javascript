@@ -2,7 +2,7 @@ import { Button } from '../../components/button';
 import { Section } from '../../components/section';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
-import { UserProfileEditUsernameView } from './user-profile-edit-username.view';
+import { UserProfileEditUsernameDialog } from './user-profile-edit-username.dialog';
 
 export interface UserProfileUsernameRowViewProps {
   username: string;
@@ -34,7 +34,7 @@ function EditUsername({ username, onSubmit }: { username: string; onSubmit: (use
   const controller = useUserProfileEditUsernameController({ username, onSubmit });
 
   return (
-    <UserProfileEditUsernameView
+    <UserProfileEditUsernameDialog
       {...controller}
       open={controller.isOpen}
       trigger={

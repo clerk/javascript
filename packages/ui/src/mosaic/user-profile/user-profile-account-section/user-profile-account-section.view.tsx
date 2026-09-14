@@ -10,7 +10,7 @@ import { UserProfileActionMenu } from '../user-profile-action-menu';
 import { styles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
-import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
+import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePictureRowView } from './user-profile-picture-row.view';
 import { UserProfileUsernameRowView } from './user-profile-username-row.view';

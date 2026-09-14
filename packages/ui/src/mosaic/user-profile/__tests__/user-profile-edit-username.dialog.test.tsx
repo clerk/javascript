@@ -4,11 +4,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../components/button';
 import { MosaicProvider } from '../../MosaicProvider';
-import type { UserProfileEditUsernameViewProps } from '../user-profile-account-section/user-profile-edit-username.view';
-import { UserProfileEditUsernameView } from '../user-profile-account-section/user-profile-edit-username.view';
+import type { UserProfileEditUsernameDialogProps } from '../user-profile-account-section/user-profile-edit-username.dialog';
+import { UserProfileEditUsernameDialog } from '../user-profile-account-section/user-profile-edit-username.dialog';
 
-function renderView(overrides: Partial<UserProfileEditUsernameViewProps> = {}) {
-  const props: UserProfileEditUsernameViewProps = {
+function renderView(overrides: Partial<UserProfileEditUsernameDialogProps> = {}) {
+  const props: UserProfileEditUsernameDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
     username: 'prestonxyz',
@@ -20,7 +20,7 @@ function renderView(overrides: Partial<UserProfileEditUsernameViewProps> = {}) {
     props,
     ...render(
       <MosaicProvider>
-        <UserProfileEditUsernameView {...props} />
+        <UserProfileEditUsernameDialog {...props} />
       </MosaicProvider>,
     ),
   };
@@ -29,7 +29,7 @@ function renderView(overrides: Partial<UserProfileEditUsernameViewProps> = {}) {
 const usernameField = () => screen.getByLabelText('Username');
 const saveButton = () => screen.getByRole('button', { name: 'Save changes' });
 
-describe('UserProfileEditUsernameView', () => {
+describe('UserProfileEditUsernameDialog', () => {
   it('renders nothing until the caller opens it', () => {
     renderView({ open: false });
 
