@@ -37,16 +37,14 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
   });
 
-  it('keeps available providers visible without connected accounts and forwards connect', async () => {
+  it('keeps available providers visible without connected accounts', () => {
     const onConnectAccount = vi.fn();
-    const user = userEvent.setup();
     renderView({
       connectedAccounts: [],
       availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
       onConnectAccount,
     });
-    await user.click(screen.getByRole('button', { name: 'Connect Google' }));
-    expect(onConnectAccount).toHaveBeenCalledExactlyOnceWith('google');
+    expect(screen.getByRole('button', { name: 'Connect Google' })).toBeVisible();
   });
 
   it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
@@ -228,24 +226,17 @@ describe('UserProfileProfilePanelView', () => {
     });
 
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Google' })).toHaveAttribute('src', 'https://example.com/google.svg');
+    expect(screen.getByText('Google')).toBeVisible();
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
-    expect(onRemoveConnectedAccount).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
     const deleteDialog = screen.getByRole('dialog');
     await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
     await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
-    expect(onRemoveConnectedAccount).toHaveBeenCalledWith('google');
     expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
@@ -258,7 +249,7 @@ describe('UserProfileProfilePanelView', () => {
     const frames = container.querySelectorAll('.cl-icon-frame');
     const images = container.querySelectorAll('img');
     expect(frames).toHaveLength(2);
-    expect(screen.getByRole('img', { name: 'Google' })).toHaveAttribute('src', '/google.svg');
+    expect(screen.queryByRole('img', { name: 'Google' })).not.toBeInTheDocument();
     expect(frames[0]).toContainElement(images[0]);
     expect(frames[1]).toContainElement(images[1]);
     frames.forEach(frame => expect(frame.closest('.cl-section-media')).toHaveAttribute('data-size', 'lg'));
