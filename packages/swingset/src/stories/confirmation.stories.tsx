@@ -10,7 +10,7 @@ export { default as __source } from './confirmation.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Blocks',
-  status: 'stable',
+  status: 'wip',
   title: 'Confirmation',
   source: 'packages/ui/src/mosaic/blocks/confirmation/confirmation.tsx',
 };
