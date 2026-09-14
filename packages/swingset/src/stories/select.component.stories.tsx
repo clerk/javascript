@@ -96,6 +96,7 @@ export function Ghost() {
           <Select.Root
             items={roles}
             defaultValue={member.role}
+            alignItemWithTrigger={false}
           >
             <Select.Trigger variant='ghost' />
             <Select.Popup />
