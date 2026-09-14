@@ -112,9 +112,9 @@ export function Route(props: RouteProps): JSX.Element | null {
           return newGetMatchData(path, index) ? true : false;
         },
         resolve: resolve,
-        navigate: (to: string, { searchParams } = {}) => {
+        navigate: (to: string, { searchParams, replace } = {}) => {
           const toURL = resolve(to, { searchParams });
-          return router.baseNavigate(toURL);
+          return router.baseNavigate(toURL, { replace });
         },
         refresh: router.refresh,
         params: paramsDict,
