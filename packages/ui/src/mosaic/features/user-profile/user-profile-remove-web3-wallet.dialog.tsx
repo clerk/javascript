@@ -1,8 +1,8 @@
-import { Banner } from '../components/banner';
-import { Button, SubmitButton } from '../components/button';
-import { Dialog } from '../components/dialog';
-import { Heading } from '../components/heading';
-import { Text } from '../components/text';
+import { Banner } from '../../components/banner';
+import { Button, SubmitButton } from '../../components/button';
+import { Dialog } from '../../components/dialog';
+import { Heading } from '../../components/heading';
+import { Text } from '../../components/text';
 import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
 
 export interface UserProfileRemoveWeb3WalletDialogProps {

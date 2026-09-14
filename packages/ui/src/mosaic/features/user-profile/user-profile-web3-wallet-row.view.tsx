@@ -1,10 +1,10 @@
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
-import { Badge } from '../components/badge';
-import { Button } from '../components/button';
-import { Icon, IconFrame } from '../components/icon';
-import { Section } from '../components/section';
+import { Badge } from '../../components/badge';
+import { Button } from '../../components/button';
+import { Icon, IconFrame } from '../../components/icon';
+import { Section } from '../../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileRemoveWeb3WalletDialog } from './user-profile-remove-web3-wallet.dialog';

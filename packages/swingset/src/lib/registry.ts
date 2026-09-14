@@ -257,8 +257,16 @@ import {
   meta as userProfileSubscriptionSectionMeta,
 } from '../stories/user-profile-subscription-section.stories';
 import {
+  AdminWallet as UserProfileWeb3WalletsSectionAdminWallet,
+  ConnectedWallets as UserProfileWeb3WalletsSectionConnectedWallets,
+  ConnectionError as UserProfileWeb3WalletsSectionConnectionError,
+  ConnectOnly as UserProfileWeb3WalletsSectionConnectOnly,
   Default as UserProfileWeb3WalletsSectionDefault,
   meta as userProfileWeb3WalletsSectionMeta,
+  PrimaryError as UserProfileWeb3WalletsSectionPrimaryError,
+  RemovalError as UserProfileWeb3WalletsSectionRemovalError,
+  RemovalPending as UserProfileWeb3WalletsSectionRemovalPending,
+  UnverifiedWallet as UserProfileWeb3WalletsSectionUnverifiedWallet,
 } from '../stories/user-profile-web3-wallets-section.stories';
 import {
   Default as VisuallyHiddenDefault,
@@ -526,6 +534,14 @@ const userProfileConnectedAccountsSectionModule: StoryModule = {
 const userProfileWeb3WalletsSectionModule: StoryModule = {
   meta: userProfileWeb3WalletsSectionMeta,
   Default: UserProfileWeb3WalletsSectionDefault,
+  AdminWallet: UserProfileWeb3WalletsSectionAdminWallet,
+  ConnectedWallets: UserProfileWeb3WalletsSectionConnectedWallets,
+  ConnectOnly: UserProfileWeb3WalletsSectionConnectOnly,
+  ConnectionError: UserProfileWeb3WalletsSectionConnectionError,
+  PrimaryError: UserProfileWeb3WalletsSectionPrimaryError,
+  RemovalPending: UserProfileWeb3WalletsSectionRemovalPending,
+  RemovalError: UserProfileWeb3WalletsSectionRemovalError,
+  UnverifiedWallet: UserProfileWeb3WalletsSectionUnverifiedWallet,
 };
 const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
