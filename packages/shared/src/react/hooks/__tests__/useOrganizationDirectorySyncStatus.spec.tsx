@@ -13,8 +13,13 @@ const getSyncStatusSpy = vi.fn(() =>
   Promise.resolve({ lastSyncedAt: new Date(1700000000000), lastSyncStatus: 'succeeded', lastSyncError: null }),
 );
 
-const createDirectory = (id: string) =>
-  ({ id, enterpriseConnectionId: 'ent_1', getSyncStatus: getSyncStatusSpy }) as unknown as DirectorySyncResource;
+const createDirectory = (id: string, organizationId = 'org_1') =>
+  ({
+    id,
+    organizationId,
+    enterpriseConnectionId: 'ent_1',
+    getSyncStatus: getSyncStatusSpy,
+  }) as unknown as DirectorySyncResource;
 
 const defaultQueryClient = createMockQueryClient();
 
@@ -75,6 +80,16 @@ describe('useOrganizationDirectorySyncStatus', () => {
 
     const callsAfterFirstLoad = getSyncStatusSpy.mock.calls.length;
     await waitFor(() => expect(getSyncStatusSpy.mock.calls.length).toBeGreaterThan(callsAfterFirstLoad));
+  });
+
+  it('refuses a directory belonging to another organization', async () => {
+    const { result } = renderStatus({ directory: createDirectory('dir_other', 'org_2') });
+
+    // The cache key is built from the context organization, so reading a
+    // foreign directory would file its result under this organization.
+    expect(getSyncStatusSpy).not.toHaveBeenCalled();
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.isPolling).toBe(false);
   });
 
   it('does not carry one directory status onto another', async () => {
