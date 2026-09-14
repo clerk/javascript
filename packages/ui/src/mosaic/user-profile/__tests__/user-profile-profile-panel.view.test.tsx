@@ -450,6 +450,12 @@ describe('UserProfileProfilePanelView', () => {
     const removeConnectedAccount = screen.getByRole('menuitem', { name: 'Remove' });
     expect(removeConnectedAccount).toHaveAttribute('data-color', 'negative');
     await user.click(removeConnectedAccount);
+    expect(onRemoveConnectedAccount).not.toHaveBeenCalled();
+    await user.click(
+      within(screen.getByRole('alertdialog', { name: 'Remove connected account?' })).getByRole('button', {
+        name: 'Remove',
+      }),
+    );
     expect(onRemoveConnectedAccount).toHaveBeenCalledWith('github');
   });
 

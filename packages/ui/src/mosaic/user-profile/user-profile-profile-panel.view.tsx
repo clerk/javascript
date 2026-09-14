@@ -28,7 +28,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   web3Wallets?: UserProfileWeb3Wallet[];
   onConnectAccount?: (id: string) => void;
   onManageConnectedAccount?: (id: string) => void;
-  onRemoveConnectedAccount?: (id: string) => void;
+  onRemoveConnectedAccount?: (id: string) => void | Promise<void>;
   onConnectWeb3Wallet?: (id: string) => void;
   onManageWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;

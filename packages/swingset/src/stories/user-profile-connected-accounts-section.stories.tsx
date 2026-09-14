@@ -1,4 +1,5 @@
 import { UserProfileConnectedAccountsSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-connected-accounts-section.view';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -14,15 +15,16 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
+  const [connected, setConnected] = useState(true);
   return (
     <UserProfileConnectedAccountsSectionView
       accounts={[
         {
           id: 'google',
           provider: 'Google',
-          identifier: 'test@google.com',
+          identifier: connected ? 'test@google.com' : undefined,
           iconUrl: 'https://img.clerk.com/static/google.svg',
-          connected: true,
+          connected,
         },
         {
           id: 'apple',
@@ -32,7 +34,7 @@ export function Default() {
         },
       ]}
       onConnect={() => undefined}
-      onManage={() => undefined}
+      onRemove={() => setConnected(false)}
     />
   );
 }

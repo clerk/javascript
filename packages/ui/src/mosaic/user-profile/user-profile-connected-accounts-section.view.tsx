@@ -1,9 +1,8 @@
-import { Button } from '../components/button';
-import { Icon } from '../components/icon';
+import { useRef } from 'react';
+
 import { Section } from '../components/section';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { UserProfileProviderIcon } from './user-profile-provider-icon';
+import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
+import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 
 export interface UserProfileConnectedAccount {
   id: string;
@@ -18,7 +17,7 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   accounts: UserProfileConnectedAccount[];
   onConnect?: (id: string) => void;
   onManage?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (id: string) => void | Promise<void>;
 }
 
 export function UserProfileConnectedAccountsSectionView({
@@ -27,54 +26,24 @@ export function UserProfileConnectedAccountsSectionView({
   onManage,
   onRemove,
 }: UserProfileConnectedAccountsSectionViewProps) {
+  const sectionRef = useRef<HTMLElement>(null);
   return (
-    <Section.Root>
-      <Section.Title>Connected accounts</Section.Title>
+    <Section.Root
+      ref={sectionRef}
+      tabIndex={-1}
+    >
+      <Section.Title>{m.title}</Section.Title>
       <Section.Group>
-        {accounts.map(account => {
-          const connected = account.connected ?? Boolean(account.identifier);
-          const actions: UserProfileMenuAction[] = [];
-          if (onRemove && account.canRemove !== false) {
-            actions.push({ label: 'Remove', color: 'negative', onClick: () => onRemove(account.id) });
-          } else if (!onRemove && onManage) {
-            actions.push({ label: 'Manage', onClick: () => onManage(account.id) });
-          }
-
-          return (
-            <Section.Row key={account.id}>
-              <Section.Item>
-                {account.iconUrl ? <UserProfileProviderIcon iconUrl={account.iconUrl} /> : null}
-                <Section.Content>
-                  <Section.Label>{account.provider}</Section.Label>
-                  {account.identifier ? <Section.Description>{account.identifier}</Section.Description> : null}
-                </Section.Content>
-                <Section.Actions>
-                  {connected ? (
-                    <UserProfileActionMenu
-                      actions={actions}
-                      label={`Manage ${account.provider}`}
-                    />
-                  ) : null}
-                  {!connected && onConnect ? (
-                    <Button
-                      color='neutral'
-                      size='sm'
-                      variant='outline'
-                      onClick={() => onConnect(account.id)}
-                    >
-                      Connect
-                      <Icon
-                        name='arrow-right-top'
-                        placement='inline-end'
-                        size='sm'
-                      />
-                    </Button>
-                  ) : null}
-                </Section.Actions>
-              </Section.Item>
-            </Section.Row>
-          );
-        })}
+        {accounts.map(account => (
+          <UserProfileConnectedAccountRowView
+            key={account.id}
+            account={account}
+            onConnect={onConnect}
+            onManage={onManage}
+            onRemove={onRemove}
+            removalFocusRef={sectionRef}
+          />
+        ))}
       </Section.Group>
     </Section.Root>
   );
