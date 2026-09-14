@@ -34,29 +34,12 @@ const isPlatformApplication = (value: unknown): value is PlatformApplication => 
 const getPlatformApplication = async (
   keyName: string,
   definition: PlatformApplicationConfig,
+  cachePath: string,
 ): Promise<PlatformApplication> => {
   const platformApiKey = constants.CLERK_PLATFORM_API_KEY;
   if (!platformApiKey) {
     throw new Error('CLERK_PLATFORM_API_KEY is required to create a Platform API application.');
   }
-  if (!constants.E2E_APP_ID) {
-    const application = await createApplicationFromConfig(
-      platformApiKey,
-      keyName,
-      definition,
-      constants.INTEGRATION_TEST_RUN_KEY,
-    );
-    console.log(`Created Platform API application ${application.applicationId} for ${keyName}.`);
-    return application;
-  }
-  const cacheKey = createHash('sha256')
-    .update(keyName)
-    .update(JSON.stringify(definition.config))
-    .update(constants.INTEGRATION_TEST_RUN_KEY || '')
-    .update(constants.E2E_APP_ID)
-    .digest('hex');
-  const cachePath = resolve(constants.TMP_DIR, 'platform-applications', `${cacheKey}.json`);
-  platformApplicationCachePaths.add(cachePath);
   const cached = (await fs.pathExists(cachePath)) ? await fs.readJSON(cachePath, { throws: false }) : null;
 
   if (isPlatformApplication(cached)) {
@@ -104,20 +87,38 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
 }
 
 /**
- * Creates an application from a matching config file or sets PK/SK from the instance keys map.
+ * Defers application creation for a matching config file or sets PK/SK from the instance keys map.
  * When E2E_STAGING=1 is set, swaps PK/SK to staging keys (looked up as `clerkstage-<keyName>`)
  * and adds CLERK_API_URL. If the staging key doesn't exist, removes any inherited CLERK_API_URL
  * so the config falls back to production and is filtered from long-running apps by isStagingReady.
- * In non-staging mode, sets the production PK/SK and returns.
+ * In non-staging mode, loads application keys when the environment is resolved.
  */
 async function withInstanceKeys(keyName: string, env: EnvironmentConfig): Promise<EnvironmentConfig> {
   const configPath = resolve(import.meta.dirname, '..', 'configs', `${keyName}.js`);
-  // if we're not testing against staging, and the keyName provided matches a config file on disk, and we have a PLAPI
-  // key, create an application and obtain its keys, otherwise use the existing instance keys
-  const keys =
-    process.env.E2E_STAGING !== '1' && (await fs.pathExists(configPath)) && constants.CLERK_PLATFORM_API_KEY
-      ? await getPlatformApplication(keyName, await loadPlatformApplicationConfig(configPath))
-      : instanceKeys.get(keyName)!;
+  const configPathExists = await fs.pathExists(configPath);
+  env.setInstanceKeyLoader();
+
+  if (process.env.E2E_STAGING !== '1' && configPathExists && constants.CLERK_PLATFORM_API_KEY) {
+    const definition = await loadPlatformApplicationConfig(configPath);
+    const cacheKey = createHash('sha256')
+      .update(keyName)
+      .update(JSON.stringify(definition.config))
+      .update(constants.INTEGRATION_TEST_RUN_KEY || '')
+      .digest('hex');
+
+    const cachePath = resolve(constants.TMP_DIR, 'platform-applications', `${cacheKey}.json`);
+    platformApplicationCachePaths.add(cachePath);
+
+    let application: Promise<PlatformApplication>;
+    return env.setInstanceKeyLoader(() => {
+      if (!application) {
+        application = getPlatformApplication(keyName, definition, cachePath);
+      }
+      return application;
+    });
+  }
+
+  const keys = instanceKeys.get(keyName)!;
   instanceKeys.set(keyName, keys);
   env.setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk).setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
 

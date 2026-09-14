@@ -79,8 +79,8 @@ export const application = (
       return state.env;
     },
     withEnv: async (env: EnvironmentConfig) => {
-      state.env = env;
-      return envWriter(appDirPath, env);
+      state.env = await env.resolve();
+      return envWriter(appDirPath, state.env);
     },
     keylessToEnv: async () => {
       return copyKeylessToEnv(appDirPath);

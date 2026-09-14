@@ -5,7 +5,6 @@ import { awaitableTreekill, fs } from '../scripts';
 import type { Application } from './application';
 import type { ApplicationConfig } from './applicationConfig';
 import type { EnvironmentConfig } from './environment';
-import { environmentConfig } from './environment';
 import { stateFile } from './stateFile';
 
 const getPort = (_url: string) => {
@@ -40,7 +39,7 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
   let port = getPort(params.serverUrl);
   let serverUrl: string = params.serverUrl;
   let appDir: string;
-  let env: EnvironmentConfig = params.env;
+  const env: EnvironmentConfig = params.env;
 
   const readFromStateFile = () => {
     if (!stateFile.getLongRunningApps() || [port, serverUrl, pid, appDir, env].filter(Boolean).length === 0) {
@@ -51,7 +50,9 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
     serverUrl ||= data.serverUrl;
     pid ||= data.pid;
     appDir ||= data.appDir;
-    env ||= environmentConfig().fromJson(data.env);
+    if (data.env) {
+      env.fromJson(data.env);
+    }
   };
 
   const self = new Proxy(
@@ -59,6 +60,7 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       // will be called by global.setup.ts and by the test runner
       // the first time this is called, the app starts and the state is persisted in the state file
       init: async () => {
+        await params.env.resolve();
         const log = (msg: string) => console.log(`[${name}] ${msg}`);
         log('Starting init...');
         try {
