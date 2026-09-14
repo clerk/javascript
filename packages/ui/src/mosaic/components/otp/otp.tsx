@@ -12,7 +12,7 @@ import { styles } from './otp.styles';
 /** How the entered code currently reads back to the user. */
 export type OtpStatus = 'neutral' | 'success' | 'error';
 
-export interface OtpProps extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style'> {
+export interface OtpProps extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style' | 'ref'> {
   /** The number of boxes in the code. @default 6 */
   length?: number;
   /** Colours every slot for the verification outcome. Defaults to the enclosing `Field`'s validity. */
