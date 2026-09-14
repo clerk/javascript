@@ -5,6 +5,7 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 
@@ -75,16 +76,9 @@ export function Default(_args: Record<string, unknown>) {
           { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
         ])
       }
-      onAddPhone={() =>
-        setPhones(current => [
-          ...current,
-          {
-            id: `phone_${Date.now()}`,
-            value: `+1 801-555-${String(current.length + 1).padStart(4, '0')}`,
-            isVerified: true,
-          },
-        ])
-      }
+      {...createUserProfileAddPhoneFixture({
+        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+      })}
       onConnectAccount={() => undefined}
       onDeleteAccount={() => Promise.resolve()}
       onManageEmail={() => undefined}
@@ -98,7 +92,7 @@ export function Default(_args: Record<string, unknown>) {
       onRemoveWeb3Wallet={() => undefined}
       onSetPrimaryWeb3Wallet={() => undefined}
       onSetPrimaryEmail={() => undefined}
-      onSetPrimaryPhone={() => undefined}
+      onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
       onVerifyEmail={() => undefined}
       onVerifyPhone={() => undefined}
     />
