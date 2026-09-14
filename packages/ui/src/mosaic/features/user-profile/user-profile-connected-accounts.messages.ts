@@ -1,9 +1,10 @@
 export const userProfileConnectedAccountsMessages = {
   title: 'Connected accounts',
   connect: 'Connect',
+  connectLabel: 'Connect {provider}',
   reconnect: 'Reconnect',
   disconnected: 'Disconnected',
-  manage: 'Manage',
+  manageLabel: 'Manage {provider}',
   remove: 'Remove',
   removeDialog: {
     title: 'Remove connected account',

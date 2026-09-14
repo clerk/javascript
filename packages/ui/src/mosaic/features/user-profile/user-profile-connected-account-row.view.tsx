@@ -74,7 +74,7 @@ export function UserProfileConnectedAccountRowView({
               size='sm'
               variant='outline'
               color='neutral'
-              aria-label={`${m.connect} ${account.provider}`}
+              aria-label={m.connectLabel.replace('{provider}', account.provider)}
               onClick={() => onConnect(account.id)}
             >
               {m.connect}
@@ -88,7 +88,7 @@ export function UserProfileConnectedAccountRowView({
         ) : actions.length > 0 ? (
           <Section.Actions>
             <UserProfileActionMenu
-              label={`${m.manage} ${account.provider}`}
+              label={m.manageLabel.replace('{provider}', account.provider)}
               actions={actions}
             >
               {onRemove && account.canRemove !== false ? (
