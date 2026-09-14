@@ -1,5 +1,6 @@
 import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 import { useRef, useState } from 'react';
 
 import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
@@ -18,6 +19,7 @@ import { UserProfileContactRowView } from './user-profile-contact-row.view';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePictureRowView } from './user-profile-picture-row.view';
+import { UserProfileRemovePhoneView } from './user-profile-remove-phone.view';
 import { UserProfileUsernameRowView } from './user-profile-username-row.view';
 
 export interface UserProfileEmail {
@@ -69,7 +71,7 @@ export interface UserProfileAccountSectionViewProps {
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
   onSetPrimaryPhone?: (id: string) => void | Promise<void>;
-  onRemovePhone?: (id: string) => void;
+  onRemovePhone?: (id: string) => void | Promise<void>;
 }
 
 export function UserProfileAccountSectionView({
@@ -101,13 +103,19 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const addPhoneTriggerRef = useRef<HTMLButtonElement>(null);
   const addPhoneAction =
     onSendPhoneCode && onVerifyPhoneCode ? (
       <AddPhone
         options={{ onSend: onSendPhoneCode, onVerify: onVerifyPhoneCode }}
         compact={allowMultipleAccounts}
+        triggerRef={addPhoneTriggerRef}
       />
     ) : undefined;
+  const confirmedRemoval = useRef(false);
+  const [phoneToRemove, setPhoneToRemove] = useState<UserProfilePhone>();
+  const [removeError, setRemoveError] = useState<string>();
+  const removing = useRef(false);
   const [isSettingPrimary, setIsSettingPrimary] = useState(false);
   const [primaryError, setPrimaryError] = useState<string>();
   const settingPrimary = useRef(false);
@@ -130,6 +138,31 @@ export function UserProfileAccountSectionView({
     }
   };
 
+  const removePhone = (id: string) => {
+    const phone = phones.find(phone => phone.id === id);
+    if (!phone || phone.canRemove === false || !onRemovePhone || removing.current) {
+      return;
+    }
+    confirmedRemoval.current = false;
+    setPhoneToRemove(phone);
+    setRemoveError(undefined);
+  };
+
+  const confirmRemovePhone = async () => {
+    if (!phoneToRemove || !onRemovePhone || removing.current) {
+      return;
+    }
+    removing.current = true;
+    confirmedRemoval.current = true;
+    setPhoneToRemove(undefined);
+    try {
+      await onRemovePhone(phoneToRemove.id);
+    } catch (error) {
+      setRemoveError(error instanceof Error ? error.message : m.phone.removeError);
+    } finally {
+      removing.current = false;
+    }
+  };
   const formattedPhones = phones.map(phone => ({
     ...phone,
     value: stringToFormattedPhoneString(phone.value),
@@ -205,9 +238,26 @@ export function UserProfileAccountSectionView({
               label={m.phone.label}
               addAction={addPhoneAction}
               onManage={isSettingPrimary ? undefined : onManagePhone}
-              onRemove={onRemovePhone}
+              onRemove={onRemovePhone ? removePhone : undefined}
               onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
               onVerify={onVerifyPhone}
+              renderActionDialog={
+                onRemovePhone
+                  ? phone => (
+                      <UserProfileRemovePhoneView
+                        phoneNumber={phone.value}
+                        open={phoneToRemove?.id === phone.id}
+                        onOpenChange={open => {
+                          if (!open) {
+                            setPhoneToRemove(undefined);
+                          }
+                        }}
+                        onConfirm={() => void confirmRemovePhone()}
+                        finalFocus={() => (confirmedRemoval.current ? addPhoneTriggerRef.current : undefined)}
+                      />
+                    )
+                  : undefined
+              }
             />
           </Section.Group>
         </Section.Root>
@@ -220,11 +270,27 @@ export function UserProfileAccountSectionView({
           {primaryError}
         </Text>
       ) : null}
+      {removeError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {removeError}
+        </Text>
+      ) : null}
     </div>
   );
 }
 
-function AddPhone({ options, compact }: { options: UserProfileAddPhoneControllerOptions; compact: boolean }) {
+function AddPhone({
+  options,
+  compact,
+  triggerRef,
+}: {
+  options: UserProfileAddPhoneControllerOptions;
+  compact: boolean;
+  triggerRef?: Ref<HTMLButtonElement>;
+}) {
   const controller = useUserProfileAddPhoneController(options);
   return (
     <UserProfileAddPhoneView
@@ -232,6 +298,7 @@ function AddPhone({ options, compact }: { options: UserProfileAddPhoneController
       trigger={
         <Button
           aria-label={m.phone.add}
+          ref={triggerRef}
           color='neutral'
           size='sm'
           variant='outline'
