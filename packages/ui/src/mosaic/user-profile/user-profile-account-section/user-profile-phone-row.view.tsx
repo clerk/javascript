@@ -1,4 +1,3 @@
-import type { Ref } from 'react';
 import { useRef, useState } from 'react';
 
 import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
@@ -35,16 +34,13 @@ export function UserProfilePhoneRowView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfilePhoneRowViewProps) {
-  const addPhoneTriggerRef = useRef<HTMLButtonElement>(null);
   const addPhoneAction =
     onSendPhoneCode && onVerifyPhoneCode ? (
       <AddPhone
         options={{ onSend: onSendPhoneCode, onVerify: onVerifyPhoneCode }}
         compact={allowMultipleAccounts}
-        triggerRef={addPhoneTriggerRef}
       />
     ) : undefined;
-  const confirmedRemoval = useRef(false);
   const [phoneToRemove, setPhoneToRemove] = useState<UserProfilePhone>();
   const [removeError, setRemoveError] = useState<string>();
   const removing = useRef(false);
@@ -75,7 +71,6 @@ export function UserProfilePhoneRowView({
     if (!phone || phone.canRemove === false || !onRemovePhone || removing.current) {
       return;
     }
-    confirmedRemoval.current = false;
     setPhoneToRemove(phone);
     setRemoveError(undefined);
   };
@@ -85,7 +80,6 @@ export function UserProfilePhoneRowView({
       return;
     }
     removing.current = true;
-    confirmedRemoval.current = true;
     setPhoneToRemove(undefined);
     try {
       await onRemovePhone(phoneToRemove.id);
@@ -135,7 +129,6 @@ export function UserProfilePhoneRowView({
                     }
                   }}
                   onConfirm={() => void confirmRemovePhone()}
-                  finalFocus={() => (confirmedRemoval.current ? addPhoneTriggerRef.current : undefined)}
                 />
               )
             : undefined
@@ -161,15 +154,7 @@ export function UserProfilePhoneRowView({
   );
 }
 
-function AddPhone({
-  options,
-  compact,
-  triggerRef,
-}: {
-  options: UserProfileAddPhoneControllerOptions;
-  compact: boolean;
-  triggerRef?: Ref<HTMLButtonElement>;
-}) {
+function AddPhone({ options, compact }: { options: UserProfileAddPhoneControllerOptions; compact: boolean }) {
   const controller = useUserProfileAddPhoneController(options);
   return (
     <UserProfileAddPhoneDialog
@@ -177,7 +162,6 @@ function AddPhone({
       trigger={
         <Button
           aria-label={m.phone.add}
-          ref={triggerRef}
           color='neutral'
           size='sm'
           variant='outline'
