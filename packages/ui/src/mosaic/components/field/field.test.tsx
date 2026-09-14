@@ -3,7 +3,7 @@ import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Input } from '../input';
 import { Field } from './field';
@@ -18,7 +18,25 @@ const overrides = stylex.create({
 const atoms = (style: stylex.StyleXStyles) =>
   (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
+const restores: Array<() => void> = [];
+
+function stubPrototype(target: object, name: string, descriptor: PropertyDescriptor) {
+  const original = Object.getOwnPropertyDescriptor(target, name);
+  Object.defineProperty(target, name, { configurable: true, ...descriptor });
+  restores.push(() => {
+    if (original) {
+      Object.defineProperty(target, name, original);
+    } else {
+      Reflect.deleteProperty(target, name);
+    }
+  });
+}
+
 describe('Mosaic Field', () => {
+  afterEach(() => {
+    restores.splice(0).forEach(restore => restore());
+  });
+
   it('generates native label and message relationships', () => {
     render(
       <Field.Root>
@@ -414,8 +432,9 @@ describe('Mosaic Field', () => {
   });
 
   it('crossfades an error into a success message inside one Field.Message', async () => {
-    const getAnimations = vi.fn(() => [{ finished: new Promise<void>(() => undefined) }] as unknown as Animation[]);
-    Object.defineProperty(Element.prototype, 'getAnimations', { configurable: true, value: getAnimations });
+    stubPrototype(Element.prototype, 'getAnimations', {
+      value: () => [{ finished: new Promise<void>(() => undefined) }],
+    });
 
     const { container, rerender } = render(
       <Field.Root>
@@ -452,8 +471,40 @@ describe('Mosaic Field', () => {
     expect(success).toHaveAttribute('data-starting-style');
     expect(success).not.toHaveAttribute('aria-hidden');
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', success?.id);
+  });
 
-    Reflect.deleteProperty(Element.prototype, 'getAnimations');
+  it('re-measures when an open message swaps its rendered element', () => {
+    stubPrototype(HTMLElement.prototype, 'offsetHeight', {
+      get(this: HTMLElement) {
+        return this.tagName === 'DIV' ? 40 : 24;
+      },
+    });
+
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+    const message = container.querySelector('.cl-field-message');
+    expect(message).toHaveAttribute('data-open');
+    expect(message?.getAttribute('style')).toContain('24px');
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error render={<div />}>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(screen.getByText('Enter a valid email.').closest('div')).toHaveClass('cl-field-error');
+    expect(message).toHaveAttribute('data-open');
+    expect(message).not.toHaveAttribute('data-ending-style');
+    expect(message?.getAttribute('style')).toContain('40px');
   });
 
   it('announces messages from a persistent polite live region that callers can escalate', () => {
@@ -489,8 +540,8 @@ describe('Mosaic Field', () => {
     const finished = new Promise<void>(resolve => {
       finish = resolve;
     });
-    const getAnimations = vi.fn(() => [{ finished }] as unknown as Animation[]);
-    Object.defineProperty(Element.prototype, 'getAnimations', { configurable: true, value: getAnimations });
+    const getAnimations = vi.fn(() => [{ finished }]);
+    stubPrototype(Element.prototype, 'getAnimations', { value: getAnimations });
 
     const { container, rerender } = render(
       <Field.Root>
@@ -530,7 +581,6 @@ describe('Mosaic Field', () => {
     });
 
     expect(screen.queryByText('Enter a valid email.')).toBeNull();
-    Reflect.deleteProperty(Element.prototype, 'getAnimations');
   });
 
   it('warns when Field.Label does not render a native label', () => {

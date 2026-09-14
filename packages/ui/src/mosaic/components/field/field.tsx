@@ -217,12 +217,12 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
     lastMessage.current = children;
   }
   useRegisterFieldPartId(open ? id : undefined, context?.setMessageIds);
-  useRegisterFieldMessage(open, element);
+  const registerMessage = useRegisterFieldMessage(open);
   return useRender({
     defaultTagName: 'p',
     render,
     enabled: mounted,
-    ref: [ref, element],
+    ref: [ref, element, registerMessage],
     props: {
       ...mergeStyleProps(
         themeProps(slot),

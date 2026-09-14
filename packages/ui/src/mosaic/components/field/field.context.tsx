@@ -104,18 +104,16 @@ export function FieldMessageProvider({ register, children }: React.PropsWithChil
   return <FieldMessageContext.Provider value={context}>{children}</FieldMessageContext.Provider>;
 }
 
-export function useRegisterFieldMessage(open: boolean, element: React.RefObject<HTMLElement | null>) {
+export function useRegisterFieldMessage(open: boolean) {
   const register = React.useContext(FieldMessageContext)?.register;
   const key = React.useRef(Symbol('field-message'));
 
-  useSafeLayoutEffect(() => {
-    if (!register) {
-      return undefined;
-    }
-
-    register(key.current, open ? element.current : null);
-    return () => register(key.current, null);
-  }, [register, open, element]);
+  return React.useCallback(
+    (element: HTMLElement | null) => {
+      register?.(key.current, open ? element : null);
+    },
+    [register, open],
+  );
 }
 
 interface FieldControlProps {
