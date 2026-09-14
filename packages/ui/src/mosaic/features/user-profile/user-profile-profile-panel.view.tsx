@@ -9,7 +9,10 @@ import type {
   UserProfilePhone,
 } from './user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from './user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
+import type {
+  UserProfileConnectedAccount,
+  UserProfileConnectionProvider,
+} from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
 import { styles } from './user-profile-profile-panel.styles';
@@ -25,9 +28,10 @@ export type { UserProfileEditNameValue } from './user-profile-account-section/us
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
+  availableConnectionProviders?: UserProfileConnectionProvider[];
+  onReconnectAccount?: (id: string) => void;
   web3Wallets?: UserProfileWeb3Wallet[];
   onConnectAccount?: (id: string) => void;
-  onManageConnectedAccount?: (id: string) => void;
   onRemoveConnectedAccount?: (id: string) => void;
   onConnectWeb3Wallet?: (id: string) => void;
   onManageWeb3Wallet?: (id: string) => void;
@@ -50,6 +54,8 @@ export function UserProfileProfilePanelView({
   emails = [],
   phones = [],
   connectedAccounts = [],
+  availableConnectionProviders = [],
+  onReconnectAccount,
   web3Wallets = [],
   onProfilePictureChange,
   onProfilePictureReject,
@@ -68,7 +74,6 @@ export function UserProfileProfilePanelView({
   onSetPrimaryPhone,
   onRemovePhone,
   onConnectAccount,
-  onManageConnectedAccount,
   onRemoveConnectedAccount,
   onConnectWeb3Wallet,
   onManageWeb3Wallet,
@@ -109,11 +114,12 @@ export function UserProfileProfilePanelView({
           onSubmitName={onSubmitName}
           onSubmitUsername={onSubmitUsername}
         />
-        {connectedAccounts.length > 0 ? (
+        {connectedAccounts.length > 0 || availableConnectionProviders.length > 0 ? (
           <UserProfileConnectedAccountsSectionView
             accounts={connectedAccounts}
+            availableProviders={availableConnectionProviders}
+            onReconnect={onReconnectAccount}
             onConnect={onConnectAccount}
-            onManage={onManageConnectedAccount}
             onRemove={onRemoveConnectedAccount}
           />
         ) : null}
