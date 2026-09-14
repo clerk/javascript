@@ -1,10 +1,16 @@
 import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
 
+import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
+import { Button } from '../../components/button';
+import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import { styles } from './user-profile-account-section.styles';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
+import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
+import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
+import { UserProfileAddPhoneView } from './user-profile-add-phone.view';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
@@ -56,7 +62,8 @@ export interface UserProfileAccountSectionViewProps {
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void;
   onRemoveEmail?: (id: string) => void;
-  onAddPhone?: () => void;
+  onSendPhoneCode?: (phoneNumber: string) => Promise<void>;
+  onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
   onSetPrimaryPhone?: (id: string) => void;
@@ -85,12 +92,25 @@ export function UserProfileAccountSectionView({
   onVerifyEmail,
   onSetPrimaryEmail,
   onRemoveEmail,
-  onAddPhone,
+  onSendPhoneCode,
+  onVerifyPhoneCode,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const addPhoneAction =
+    onSendPhoneCode && onVerifyPhoneCode ? (
+      <AddPhone
+        options={{ onSend: onSendPhoneCode, onVerify: onVerifyPhoneCode }}
+        compact={allowMultipleAccounts}
+      />
+    ) : undefined;
+  const formattedPhones = phones.map(phone => ({
+    ...phone,
+    value: stringToFormattedPhoneString(phone.value),
+  }));
+
   return (
     <div {...stylex.props(styles.sections)}>
       <Section.Root aria-label={m.sectionLabel}>
@@ -127,10 +147,10 @@ export function UserProfileAccountSectionView({
           ) : null}
           {!allowMultipleAccounts ? (
             <UserProfileContactRowView
-              items={phones}
+              items={formattedPhones}
               kind='phone'
               label={m.phone.label}
-              onAdd={onAddPhone}
+              addAction={addPhoneAction}
               onManage={onManagePhone}
             />
           ) : null}
@@ -156,10 +176,10 @@ export function UserProfileAccountSectionView({
         <Section.Root aria-label={m.phone.label}>
           <Section.Group>
             <UserProfileContactListRowView
-              items={phones}
+              items={formattedPhones}
               kind='phone'
               label={m.phone.label}
-              onAdd={onAddPhone}
+              addAction={addPhoneAction}
               onManage={onManagePhone}
               onRemove={onRemovePhone}
               onSetPrimary={onSetPrimaryPhone}
@@ -169,5 +189,31 @@ export function UserProfileAccountSectionView({
         </Section.Root>
       ) : null}
     </div>
+  );
+}
+
+function AddPhone({ options, compact }: { options: UserProfileAddPhoneControllerOptions; compact: boolean }) {
+  const controller = useUserProfileAddPhoneController(options);
+  return (
+    <UserProfileAddPhoneView
+      {...controller}
+      trigger={
+        <Button
+          aria-label={m.phone.add}
+          color='neutral'
+          size='sm'
+          variant='outline'
+        >
+          {compact ? (
+            <Icon
+              name='plus'
+              placement='inline-start'
+              size='sm'
+            />
+          ) : null}
+          {compact ? m.add : m.phone.add}
+        </Button>
+      }
+    />
   );
 }

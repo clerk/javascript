@@ -4,11 +4,13 @@ import type {
   UserProfilePhone,
 } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
+import type { UserProfileAddPhoneViewProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 
@@ -25,10 +27,12 @@ export const meta: StoryMeta = {
 
 function AccountSection({
   allowMultipleAccounts,
+  failAt,
   failWith,
   usernameFailWith,
 }: {
   allowMultipleAccounts: boolean;
+  failAt?: UserProfileAddPhoneViewProps['step'];
   failWith?: UserProfileFormError;
   usernameFailWith?: UserProfileFormError;
 }) {
@@ -46,6 +50,10 @@ function AccountSection({
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
+  const addPhone = createUserProfileAddPhoneFixture({
+    failAt,
+    onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+  });
 
   return (
     <UserProfileAccountSectionView
@@ -62,22 +70,13 @@ function AccountSection({
           { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
         ])
       }
-      onAddPhone={() =>
-        setPhones(current => [
-          ...current,
-          {
-            id: `phone_${Date.now()}`,
-            value: `+1 801-555-${String(current.length + 1).padStart(4, '0')}`,
-            isVerified: true,
-          },
-        ])
-      }
+      {...addPhone}
+      onProfilePictureChange={showFile}
+      onRemoveProfilePicture={clearImage}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
-      onProfilePictureChange={showFile}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
-      onRemoveProfilePicture={clearImage}
     />
   );
 }
@@ -111,6 +110,15 @@ export function EditUsernameFails() {
         message: 'Your username could not be updated.',
         fields: { username: 'That username is already taken.' },
       }}
+    />
+  );
+}
+
+export function AddPhoneFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      failAt='phone'
     />
   );
 }

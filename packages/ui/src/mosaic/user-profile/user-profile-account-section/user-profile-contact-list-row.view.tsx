@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
@@ -9,6 +10,7 @@ import { styles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 
 export interface UserProfileContactListRowViewProps {
+  addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
   items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
@@ -28,6 +30,7 @@ export function UserProfileContactListRowView({
   onVerify,
   onSetPrimary,
   onRemove,
+  addAction,
 }: UserProfileContactListRowViewProps) {
   const emptyDescription = m[kind].empty;
 
@@ -37,7 +40,9 @@ export function UserProfileContactListRowView({
         <Section.Content>
           <Section.Label>{label}</Section.Label>
         </Section.Content>
-        {onAdd ? (
+        {addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onAdd ? (
           <Section.Actions>
             <Button
               aria-label={m[kind].add}

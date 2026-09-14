@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
@@ -11,9 +12,17 @@ export interface UserProfileContactRowViewProps {
   items: Array<{ id: string; value: string; isDefault?: boolean }>;
   onAdd?: () => void;
   onManage?: (id: string) => void;
+  addAction?: ReactNode;
 }
 
-export function UserProfileContactRowView({ kind, label, items, onAdd, onManage }: UserProfileContactRowViewProps) {
+export function UserProfileContactRowView({
+  kind,
+  label,
+  items,
+  onAdd,
+  onManage,
+  addAction,
+}: UserProfileContactRowViewProps) {
   const item = items[0];
   const onClick = item ? (onManage ? () => onManage(item.id) : undefined) : onAdd;
   const emptyDescription = m[kind].empty;
@@ -33,7 +42,9 @@ export function UserProfileContactRowView({ kind, label, items, onAdd, onManage 
             <Section.Description>{emptyDescription}</Section.Description>
           )}
         </Section.Content>
-        {onClick ? (
+        {!item && addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onClick ? (
           <Section.Actions>
             <Button
               color='neutral'
