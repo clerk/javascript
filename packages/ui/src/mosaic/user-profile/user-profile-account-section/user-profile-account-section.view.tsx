@@ -16,6 +16,7 @@ import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
 import { UserProfileEditNameView } from './user-profile-edit-name.view';
 import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
 import { UserProfileEditUsernameView } from './user-profile-edit-username.view';
+import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePictureRowView } from './user-profile-picture-row.view';
 
 export interface UserProfileEmail {
@@ -124,25 +125,20 @@ export function UserProfileAccountSectionView({
             }}
             onRemove={onRemoveProfilePicture}
           />
-          <Section.Row>
-            <Section.Item>
-              <Section.Content>
-                <Section.Label>{m.name.label}</Section.Label>
-                <Section.Description>{name}</Section.Description>
-              </Section.Content>
-              {onSubmitName ? (
-                <Section.Actions>
-                  <EditName
-                    firstName={firstName}
-                    lastName={lastName}
-                    firstNameAttribute={firstNameAttribute}
-                    lastNameAttribute={lastNameAttribute}
-                    onSubmit={onSubmitName}
-                  />
-                </Section.Actions>
-              ) : null}
-            </Section.Item>
-          </Section.Row>
+          <UserProfileNameRowView
+            name={name}
+            action={
+              onSubmitName ? (
+                <EditName
+                  firstName={firstName}
+                  lastName={lastName}
+                  firstNameAttribute={firstNameAttribute}
+                  lastNameAttribute={lastNameAttribute}
+                  onSubmit={onSubmitName}
+                />
+              ) : undefined
+            }
+          />
           <Section.Row>
             <Section.Item>
               <Section.Content>
