@@ -25,6 +25,10 @@ const fileToText = (file: File): Promise<string> =>
     reader.onerror = () => reject(new Error('Could not read the selected file'));
   });
 
+// Same shape as the copies in InviteMembersForm and SignIn/utils: enough to
+// stop an obviously malformed address reaching the provider, no more.
+const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+
 export type GoogleCredentialsState = {
   fileName: string | null;
   subjectEmail: string;
@@ -55,19 +59,26 @@ export const useGoogleCredentialsState = (): GoogleCredentialsState => {
   const [fileError, setFileError] = useState<string | null>(null);
 
   const isConfigured = Boolean(directory?.credentialsConfigured);
-  const hasPendingCredential = Boolean(serviceAccountJson) && Boolean(subjectEmail);
+  const trimmedSubjectEmail = subjectEmail.trim();
+  // Continue lives outside the form, so the input's type='email' never triggers
+  // native validation. Without this, whitespace alone enables it.
+  const hasPendingCredential = Boolean(serviceAccountJson) && isEmail(trimmedSubjectEmail);
 
   const selectFile = useCallback(
     async (file: File | undefined): Promise<void> => {
       if (!file) {
         return;
       }
+      // Drop whatever was selected before reading: a failed read must not leave
+      // the previous key staged and submittable.
+      setServiceAccountJson('');
+      setFileName(null);
+      setFileError(null);
+
       let contents: string;
       try {
         contents = await fileToText(file);
       } catch {
-        setServiceAccountJson('');
-        setFileName(null);
         setFileError(t(localizationKeys('configureDirectorySync.configureStep.error__invalidKeyFile')));
         return;
       }
@@ -77,12 +88,9 @@ export const useGoogleCredentialsState = (): GoogleCredentialsState => {
       } catch {
         // Catch the obvious wrong-file case here; anything structurally valid is
         // the identity provider's to judge, and its message is better than ours.
-        setServiceAccountJson('');
-        setFileName(null);
         setFileError(t(localizationKeys('configureDirectorySync.configureStep.error__invalidKeyFile')));
         return;
       }
-      setFileError(null);
       setServiceAccountJson(contents);
       setFileName(file.name);
     },
@@ -93,12 +101,12 @@ export const useGoogleCredentialsState = (): GoogleCredentialsState => {
     if (!hasPendingCredential) {
       return;
     }
-    await setCredentials({ serviceAccountJson, subjectEmail });
+    await setCredentials({ serviceAccountJson, subjectEmail: trimmedSubjectEmail });
     // Drop the key as soon as it has been accepted. Nothing in this flow needs
     // it again, and holding it only widens where it can leak from.
     setServiceAccountJson('');
     setFileName(null);
-  }, [hasPendingCredential, setCredentials, serviceAccountJson, subjectEmail]);
+  }, [hasPendingCredential, setCredentials, serviceAccountJson, trimmedSubjectEmail]);
 
   return {
     fileName,

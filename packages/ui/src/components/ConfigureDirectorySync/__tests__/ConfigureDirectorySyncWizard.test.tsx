@@ -186,6 +186,35 @@ describe('ConfigureDirectorySyncWizard configure step', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled());
   });
 
+  it('does not accept whitespace or a malformed address as the admin email', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(googleDirectory());
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['{"type":"service_account"}'], 'key.json', { type: 'application/json' })] },
+    });
+    await screen.findByText('key.json');
+
+    // Continue sits outside the form, so the input's type='email' never runs
+    // native validation. These would otherwise reach the provider as-is.
+    const emailInput = screen.getByPlaceholderText('admin@yourcompany.com');
+    await userEvent.type(emailInput, '   ');
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, 'not-an-email');
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, '  admin@clerk.com  ');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled());
+  });
+
   it('blocks the step without an SSO connection', async () => {
     const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
     fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
