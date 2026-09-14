@@ -15,7 +15,8 @@
  * delta is small. Authoritative disclosure for those setups lives in the Clerk
  * telemetry docs (https://clerk.com/docs/telemetry). Opt-out continues to work the
  * same way (`telemetry={false}` on `<ClerkProvider>` or the framework-specific
- * `*_CLERK_TELEMETRY_DISABLED` env var).
+ * `*_CLERK_TELEMETRY_DISABLED` env var). Users who keep telemetry enabled can suppress
+ * just this notice with `CLERK_TELEMETRY_NOTICE_DISABLED=1`.
  *
  * Persistence is in-process via a `globalThis` Symbol, which survives Next.js HMR
  * module reloads. No filesystem access, no `node:` imports, no dynamic-code APIs, so
@@ -61,6 +62,14 @@ function isCI(): boolean {
   return automatedEnvironmentVariables.some(name => isTruthy(process.env[name]));
 }
 
+// Silences only the notice, unlike CLERK_TELEMETRY_DISABLED which also turns off collection.
+function isNoticeDisabled(): boolean {
+  if (typeof process === 'undefined' || !process.env) {
+    return false;
+  }
+  return isTruthy(process.env.CLERK_TELEMETRY_NOTICE_DISABLED);
+}
+
 function hasSeen(): boolean {
   return Boolean((globalThis as Record<symbol, unknown>)[PROCESS_FLAG]);
 }
@@ -101,6 +110,9 @@ export function maybeShowTelemetryNotice(options: MaybeShowTelemetryNoticeOption
       return;
     }
     if (isCI()) {
+      return;
+    }
+    if (isNoticeDisabled()) {
       return;
     }
     if (hasSeen()) {
