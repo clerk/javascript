@@ -176,7 +176,7 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
       ...mergeStyleProps(
         themeProps('field-message'),
         stylex.props(reset.base, styles.messageRoot, dynamic.messageHeight(height), xstyle),
-        { ...transitionProps },
+        { role: 'status', ...transitionProps },
         rest,
       ),
       children,
@@ -235,7 +235,7 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
           color,
           xstyle,
         ),
-        { ...transitionProps },
+        { 'aria-hidden': open ? undefined : true, ...transitionProps },
         rest,
       ),
       id,

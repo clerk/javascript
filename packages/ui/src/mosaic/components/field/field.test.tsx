@@ -447,11 +447,41 @@ describe('Mosaic Field', () => {
     expect(container.querySelector('.cl-field-message')).not.toHaveAttribute('data-ending-style');
     expect(error).toHaveTextContent('Password is incorrect.');
     expect(error).toHaveAttribute('data-ending-style');
+    expect(error).toHaveAttribute('aria-hidden', 'true');
     expect(success).toHaveTextContent('Password verified.');
     expect(success).toHaveAttribute('data-starting-style');
+    expect(success).not.toHaveAttribute('aria-hidden');
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', success?.id);
 
     Reflect.deleteProperty(Element.prototype, 'getAnimations');
+  });
+
+  it('announces messages from a persistent polite live region that callers can escalate', () => {
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>{null}</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    const message = container.querySelector('.cl-field-message');
+    expect(message).toHaveAttribute('role', 'status');
+    expect(message).toBeEmptyDOMElement();
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message role='alert'>
+          <Field.Error>Required.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(container.querySelector('.cl-field-message')).toBe(message);
+    expect(message).toHaveAttribute('role', 'alert');
+    expect(message).toHaveTextContent('Required.');
   });
 
   it('holds the last message through the exit transition, then unmounts', async () => {

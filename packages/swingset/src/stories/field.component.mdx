@@ -54,6 +54,8 @@ Pass `visuallyHidden` to `Field.Label` when the surrounding UI already makes the
 
 Wrap `Field.Error` in `Field.Message` and pass the message as its children. `Field.Message` measures whichever message is showing and animates its own height to match, so it grows when a message arrives, follows the text when the message changes, and collapses after it clears. The caller never conditionally mounts either part. Under `prefers-reduced-motion` the height snaps and only the message fades.
 
+`Field.Message` is also the field's live region. It stays mounted and carries `role='status'`, so a message that arrives while the user is in the control is announced politely, and a message that is fading out is hidden from assistive technology so only the incoming one is read. Pass `role='alert'` when a message must interrupt, for example a submit-time validation error.
+
 ### Success
 
 <Story
@@ -65,14 +67,14 @@ Wrap `Field.Error` in `Field.Message` and pass the message as its children. `Fie
 
 ## Parts
 
-| Part                | Stable slot class       | Description                                       |
-| ------------------- | ----------------------- | ------------------------------------------------- |
-| `Field.Root`        | `.cl-field-root`        | Unstyled `div` and field context provider.        |
-| `Field.Label`       | `.cl-field-label`       | Native `label` associated with the field control. |
-| `Field.Description` | `.cl-field-description` | Supporting `p` associated with the field control. |
-| `Field.Message`     | `.cl-field-message`     | Height-animated container for the messages below. |
-| `Field.Error`       | `.cl-field-error`       | Associated error `p` with an alert icon.          |
-| `Field.Success`     | `.cl-field-success`     | Associated success `p` with a check icon.         |
+| Part                | Stable slot class       | Description                                         |
+| ------------------- | ----------------------- | --------------------------------------------------- |
+| `Field.Root`        | `.cl-field-root`        | Unstyled `div` and field context provider.          |
+| `Field.Label`       | `.cl-field-label`       | Native `label` associated with the field control.   |
+| `Field.Description` | `.cl-field-description` | Supporting `p` associated with the field control.   |
+| `Field.Message`     | `.cl-field-message`     | Height-animated live region for the messages below. |
+| `Field.Error`       | `.cl-field-error`       | Associated error `p` with an alert icon.            |
+| `Field.Success`     | `.cl-field-success`     | Associated success `p` with a check icon.           |
 
 ## Styling
 
