@@ -8,6 +8,7 @@ export { default as __source } from './user-profile-api-keys-panel.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileApiKeysPanel',
   label: 'API keys panel',
   navigation: { category: 'Panels' },

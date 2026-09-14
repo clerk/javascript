@@ -1,5 +1,13 @@
 # @clerk/upgrade
 
+## 2.0.6
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Update the `chalk`, `jscodeshift`, `marked`, and `tinyglobby` dependency ranges. ([#9026](https://github.com/clerk/javascript/pull/9026)) by [@renovate](https://github.com/apps/renovate)
+
 ## 2.0.5
 
 ### Patch Changes

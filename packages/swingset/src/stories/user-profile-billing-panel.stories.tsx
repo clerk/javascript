@@ -12,6 +12,7 @@ export { default as __source } from './user-profile-billing-panel.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileBillingPanel',
   label: 'Billing panel',
   navigation: { category: 'Panels' },

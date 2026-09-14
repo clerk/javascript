@@ -7,6 +7,7 @@ export { default as __source } from './user-profile-delete-section.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileDeleteSection',
   label: 'Danger zone',
   navigation: { category: 'Sections' },

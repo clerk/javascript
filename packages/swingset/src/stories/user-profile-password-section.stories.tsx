@@ -6,6 +6,7 @@ export { default as __source } from './user-profile-password-section.stories?raw
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfilePasswordSection',
   label: 'Password',
   navigation: { category: 'Sections' },

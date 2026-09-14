@@ -11,6 +11,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Dialog',
   source: 'packages/headless/src/primitives/dialog/index.ts',
 };

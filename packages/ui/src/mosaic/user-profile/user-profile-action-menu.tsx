@@ -1,12 +1,25 @@
+import type { ReactNode } from 'react';
+
+import { Icon } from '../components/icon';
 import { Menu } from '../components/menu';
+import type { IconName } from '../icons/registry';
 
 export interface UserProfileMenuAction {
   label: string;
   color?: 'neutral' | 'negative';
+  icon?: IconName;
   onClick: () => void;
 }
 
-export function UserProfileActionMenu({ label, actions }: { label: string; actions: UserProfileMenuAction[] }) {
+export function UserProfileActionMenu({
+  label,
+  actions,
+  children,
+}: {
+  label: string;
+  actions: UserProfileMenuAction[];
+  children?: ReactNode;
+}) {
   if (actions.length === 0) {
     return null;
   }
@@ -22,10 +35,16 @@ export function UserProfileActionMenu({ label, actions }: { label: string; actio
             label={action.label}
             onClick={action.onClick}
           >
+            {action.icon ? (
+              <Menu.Media>
+                <Icon name={action.icon} />
+              </Menu.Media>
+            ) : null}
             <Menu.Label>{action.label}</Menu.Label>
           </Menu.Item>
         ))}
       </Menu.Popup>
+      {children}
     </Menu.Root>
   );
 }

@@ -2,7 +2,7 @@ import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useClerk } from '@clerk/shared/react';
-import type { EnterpriseSSOFactor, SignInFirstFactor, SignInResource } from '@clerk/shared/types';
+import type { EmailCodeFactor, EnterpriseSSOFactor, SignInFirstFactor, SignInResource } from '@clerk/shared/types';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -111,4 +111,16 @@ function hasMultipleEnterpriseConnections(
   );
 }
 
-export { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey };
+/**
+ * Returns the email code factor a sign-in may fall back to, or `null`.
+ * @experimental
+ */
+function getSSOFallbackFactor(signIn: SignInResource): EmailCodeFactor | null {
+  if (!signIn.supportedFirstFactors?.some(factor => factor.strategy === 'enterprise_sso')) {
+    return null;
+  }
+
+  return (signIn.ssoFallbackFirstFactors?.find(factor => factor.strategy === 'email_code') as EmailCodeFactor) ?? null;
+}
+
+export { getSSOFallbackFactor, hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey };

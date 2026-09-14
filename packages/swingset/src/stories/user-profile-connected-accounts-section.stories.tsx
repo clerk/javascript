@@ -6,6 +6,7 @@ export { default as __source } from './user-profile-connected-accounts-section.s
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileConnectedAccountsSection',
   label: 'Connected accounts',
   navigation: { category: 'Sections' },

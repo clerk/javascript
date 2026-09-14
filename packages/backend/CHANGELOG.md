@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.17.2
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+
 ## 3.17.1
 
 ### Patch Changes

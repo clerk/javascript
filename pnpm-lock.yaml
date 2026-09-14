@@ -87,6 +87,7 @@ catalogs:
       version: 2.0.1
 
 overrides:
+  '@astrojs/compiler': 2.13.0
   '@babel/plugin-transform-modules-systemjs@<=7.29.3': 7.29.8
   axios@<0.33.0: 0.33.0
   chokidar@<5.0.0: 5.0.0
@@ -9059,7 +9060,6 @@ packages:
   eslint@9.31.0:
     resolution: {integrity: sha512-QldCVh/ztyKJJZLr4jXNUByx3gR+TDYZCRXEktiZoUR3PGy4qCmSbkxcIle8GEwGpb5JBZazlaJ/CxLidXdEbQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'

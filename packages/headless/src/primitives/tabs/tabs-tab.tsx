@@ -80,6 +80,16 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
         // where useRender's merged ref would overwrite it and break focus navigation.
         const { ref: compositeRef, ...mergedProps } = merged;
 
+        // The state markers lead: React writes changed attributes in key order, and Chrome flushes
+        // style when `tabindex` changes on the focused element, so a `data-selected` written after
+        // the roving `tabindex` is missing from that flush and a CSS anchor named on it snaps for a
+        // recalc. Only the key position is claimed here; `useRender` sets the values.
+        const orderedProps = {
+          ...(isSelected ? { 'data-selected': '' } : null),
+          ...(disabled ? { 'data-disabled': '' } : null),
+          ...mergedProps,
+        };
+
         // floating-ui's CompositeItem invokes this render callback synchronously and
         // unconditionally during its own render (see renderJsx), so useRender runs in a
         // stable hook position on the CompositeItem fiber. The rule can't see that.
@@ -95,7 +105,7 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
             selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
             disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
           },
-          props: mergedProps,
+          props: orderedProps,
         });
       }}
     >

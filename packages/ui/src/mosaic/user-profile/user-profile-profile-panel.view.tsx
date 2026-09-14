@@ -1,14 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { Heading } from '../components/heading';
+import { Profile } from '../components/profile';
 import { mergeStyleProps, themeProps } from '../props';
 import type {
   UserProfileAccountSectionViewProps,
   UserProfileEmail,
   UserProfilePhone,
-} from './user-profile-account-section.view';
-import { UserProfileAccountSectionView } from './user-profile-account-section.view';
+} from './user-profile-account-section/user-profile-account-section.view';
+import { UserProfileAccountSectionView } from './user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
@@ -17,6 +17,11 @@ import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
+export type {
+  UserProfileFormError,
+  UserProfileNameAttribute,
+} from './user-profile-account-section/user-profile-account-section.types';
+export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.dialog';
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
@@ -35,21 +40,29 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
 export function UserProfileProfilePanelView({
   allowMultipleAccounts,
   imageUrl,
+  hasImage,
   name = '',
   username = '',
+  firstName,
+  lastName,
+  firstNameAttribute,
+  lastNameAttribute,
   emails = [],
   phones = [],
   connectedAccounts = [],
   web3Wallets = [],
-  onEditProfilePicture,
-  onNameChange,
-  onUsernameChange,
+  onProfilePictureChange,
+  onProfilePictureReject,
+  onRemoveProfilePicture,
+  onSubmitName,
+  onSubmitUsername,
   onAddEmail,
   onManageEmail,
   onVerifyEmail,
   onSetPrimaryEmail,
   onRemoveEmail,
-  onAddPhone,
+  onSendPhoneCode,
+  onVerifyPhoneCode,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
@@ -65,33 +78,36 @@ export function UserProfileProfilePanelView({
 }: UserProfileProfilePanelViewProps): ReactElement {
   return (
     <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(styles.root))}>
-      <Heading
-        render={props => <h3 {...props} />}
-        size='2xl'
-      >
-        Account
-      </Heading>
+      <Profile.PageTitle>Account</Profile.PageTitle>
       <div {...stylex.props(styles.sections)}>
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
+          firstName={firstName}
+          firstNameAttribute={firstNameAttribute}
+          hasImage={hasImage}
           imageUrl={imageUrl}
+          lastName={lastName}
+          lastNameAttribute={lastNameAttribute}
           name={name}
           phones={phones}
           username={username}
           onAddEmail={onAddEmail}
-          onAddPhone={onAddPhone}
-          onEditProfilePicture={onEditProfilePicture}
+          onSendPhoneCode={onSendPhoneCode}
+          onVerifyPhoneCode={onVerifyPhoneCode}
           onManageEmail={onManageEmail}
           onManagePhone={onManagePhone}
+          onProfilePictureChange={onProfilePictureChange}
+          onProfilePictureReject={onProfilePictureReject}
           onRemoveEmail={onRemoveEmail}
           onRemovePhone={onRemovePhone}
+          onRemoveProfilePicture={onRemoveProfilePicture}
           onSetPrimaryEmail={onSetPrimaryEmail}
           onSetPrimaryPhone={onSetPrimaryPhone}
           onVerifyEmail={onVerifyEmail}
           onVerifyPhone={onVerifyPhone}
-          onNameChange={onNameChange}
-          onUsernameChange={onUsernameChange}
+          onSubmitName={onSubmitName}
+          onSubmitUsername={onSubmitUsername}
         />
         {connectedAccounts.length > 0 ? (
           <UserProfileConnectedAccountsSectionView

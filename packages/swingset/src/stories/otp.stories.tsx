@@ -12,6 +12,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'OTP',
   source: 'packages/headless/src/primitives/otp/index.ts',
 };

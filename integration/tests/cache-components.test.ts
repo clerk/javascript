@@ -36,7 +36,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/auth-server-component');
       await expect(u.page.getByText('auth() in Server Component')).toBeVisible();
-      await expect(u.page.getByTestId('user-id')).toContainText('Not signed in');
+      await expect(u.page.getByTestId('user-id').filter({ visible: true })).toContainText('Not signed in');
     });
 
     test('auth() in server component works when signed in', async ({ page, context }) => {
@@ -55,7 +55,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       await expect(u.page.getByText('auth() in Server Component')).toBeVisible();
 
       // Should show user ID (starts with 'user_')
-      const userIdElement = u.page.getByTestId('user-id');
+      const userIdElement = u.page.getByTestId('user-id').filter({ visible: true });
       await expect(userIdElement).toBeVisible();
       const userId = await userIdElement.textContent();
       expect(userId).toMatch(/^user_/);
@@ -65,7 +65,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/current-user-server-component');
       await expect(u.page.getByText('currentUser() in Server Component')).toBeVisible();
-      await expect(u.page.getByTestId('current-user-id')).toContainText('Not signed in');
+      await expect(u.page.getByTestId('current-user-id').filter({ visible: true })).toContainText('Not signed in');
     });
 
     test('currentUser() in server component works when signed in', async ({ page, context }) => {
@@ -84,13 +84,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       await expect(u.page.getByText('currentUser() in Server Component')).toBeVisible();
 
       // Should show user ID (starts with 'user_')
-      const userIdElement = u.page.getByTestId('current-user-id');
+      const userIdElement = u.page.getByTestId('current-user-id').filter({ visible: true });
       await expect(userIdElement).toBeVisible();
       const userId = await userIdElement.textContent();
       expect(userId).toMatch(/^user_/);
 
       // Should also show the email
-      const emailElement = u.page.getByTestId('current-user-email');
+      const emailElement = u.page.getByTestId('current-user-email').filter({ visible: true });
       await expect(emailElement).toBeVisible();
       const email = await emailElement.textContent();
       expect(email).toContain('@');
@@ -208,7 +208,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       expect(profileText).toContain('userId');
 
       // Should also show the user ID
-      const userIdElement = u.page.getByTestId('current-user-id');
+      const userIdElement = u.page.getByTestId('current-user-id').filter({ visible: true });
       await expect(userIdElement).toBeVisible();
       const userId = await userIdElement.textContent();
       expect(userId).toMatch(/^user_/);

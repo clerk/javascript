@@ -278,7 +278,9 @@ Changesets provides streamlined tooling and enforcement to ensure that developer
 Even though we don't use commit messages to track changes between releases, all commit messages need to respect the [conventional-commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 Use of a `type` and a `scope` in commit message is **mandatory**.
 
-As per the conventional commits specification, the `type` can be one of the following: `feat`, `fix`, `chore`, `docs`. The `scope` can be one of the package names defined in `packages/{package}/package.json`, `repo` for repository level changes or `release` for releases.
+We use commitlint to check PR titles in the [PR Title Lint workflow](../.github/workflows/pr-title-linter.yml). The PR title becomes the commit message when the PR is squash merged. Use the format `type(scope): description`.
+
+See [commitlint.config.ts](../commitlint.config.ts) for the rules. The `scope-enum` rule defines the valid scopes. It combines package scopes from `getPackageNames()` with additional scopes listed in that rule. The function reads `packages/*/package.json`, removes the package namespace, and also accepts names with the `clerk-` prefix removed. Valid types come from the extended `@commitlint/config-conventional` configuration.
 
 ### What is the difference between a commit message, a PR description, and a changeset description?
 

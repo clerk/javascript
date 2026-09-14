@@ -4,6 +4,11 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
+import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
+import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
+
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 const profileImageUrl = 'https://avatars.githubusercontent.com/u/51144033?v=4';
 
@@ -11,6 +16,7 @@ export { default as __source } from './user-profile-profile-panel.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileProfilePanel',
   label: 'Profile panel',
   navigation: { category: 'Panels' },
@@ -25,9 +31,14 @@ export function Default(_args: Record<string, unknown>) {
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
+  const { imageUrl, showFile, clearImage } = usePreviewImage(profileImageUrl);
+  const editName = useUserProfileEditNameFixture();
+  const editUsername = useUserProfileEditUsernameFixture();
 
   return (
     <UserProfileProfilePanelView
+      {...editName}
+      {...editUsername}
       allowMultipleAccounts
       emails={emails}
       connectedAccounts={[
@@ -56,43 +67,34 @@ export function Default(_args: Record<string, unknown>) {
           connected: false,
         },
       ]}
-      imageUrl={profileImageUrl}
-      name='Preston Booth'
+      hasImage={Boolean(imageUrl)}
+      imageUrl={imageUrl}
       phones={phones}
-      username='prestonxyz'
       onAddEmail={() =>
         setEmails(current => [
           ...current,
           { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
         ])
       }
-      onAddPhone={() =>
-        setPhones(current => [
-          ...current,
-          {
-            id: `phone_${Date.now()}`,
-            value: `+1 801-555-${String(current.length + 1).padStart(4, '0')}`,
-            isVerified: true,
-          },
-        ])
-      }
+      {...createUserProfileAddPhoneFixture({
+        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+      })}
       onConnectAccount={() => undefined}
       onDeleteAccount={() => Promise.resolve()}
-      onEditProfilePicture={() => undefined}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
+      onProfilePictureChange={showFile}
       onRemoveConnectedAccount={() => undefined}
+      onRemoveProfilePicture={clearImage}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onConnectWeb3Wallet={() => undefined}
       onRemoveWeb3Wallet={() => undefined}
       onSetPrimaryWeb3Wallet={() => undefined}
       onSetPrimaryEmail={() => undefined}
-      onSetPrimaryPhone={() => undefined}
+      onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
       onVerifyEmail={() => undefined}
       onVerifyPhone={() => undefined}
-      onNameChange={() => undefined}
-      onUsernameChange={() => undefined}
     />
   );
 }

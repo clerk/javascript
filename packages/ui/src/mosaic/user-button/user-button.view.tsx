@@ -18,13 +18,13 @@ import { Popover } from '../components/popover';
 import { scrollAreaViewport } from '../components/scroll-area';
 import { Spinner } from '../components/spinner';
 import type { IconName } from '../icons/registry';
-import { fontWeightVars } from '../tokens.stylex';
+import { applyOrder } from '../utils/apply-order';
 import { focusOutline } from '../utils/focus-outline.styles';
 import { truncationStyles } from '../utils/typography.styles';
 import type { UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
 import { fill, plural, userButtonBase as m } from './user-button.messages';
-import { styles, triggerShapes } from './user-button.styles';
+import { styles } from './user-button.styles';
 import type {
   UserButtonBrandingProps,
   UserButtonBusyState,
@@ -36,7 +36,6 @@ import type {
   UserButtonModeProps,
   UserButtonSession,
 } from './user-button.types';
-import { applyOrder } from './user-button.utils';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
 // what the model and the view agree on, so neither file owns them.
@@ -189,7 +188,7 @@ const rowButton = (disabled = false) => (
 
 /** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
 function Trailing({ children }: { children: ReactNode }) {
-  return <Item.Actions {...stylex.props(styles.trailing)}>{children}</Item.Actions>;
+  return <Item.Actions xstyle={styles.trailing}>{children}</Item.Actions>;
 }
 
 interface SwitcherRowProps {
@@ -504,13 +503,7 @@ function OrganizationsHeading() {
   return (
     <Item.Root size='xs'>
       <Item.Content>
-        <Item.Description
-          style={{
-            fontWeight: fontWeightVars['--cl-font-medium'],
-          }}
-        >
-          {identifier}
-        </Item.Description>
+        <Item.Description xstyle={styles.accountIdentifier}>{identifier}</Item.Description>
       </Item.Content>
       {busy ? (
         <Trailing>
@@ -893,7 +886,7 @@ function OrganizationSection() {
       {/* `auto` rather than `stable`: a reserved gutter insets the rows whether or not the list
           overflows, so short lists would sit their avatars and icons off the edge the header and
           footer align to. */}
-      <Item.Group {...stylex.props(...scrollAreaViewport('auto'), styles.scroll)}>
+      <Item.Group xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
         {showOrganizationsHeading ? <OrganizationsHeading /> : null}
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
@@ -1082,23 +1075,29 @@ export function UserButtonTrigger({
   return (
     <Popover.Trigger
       aria-label={fill(m.trigger.open, { name })}
-      {...stylex.props(
+      xstyle={[
         focusOutline.visible,
         styles.trigger,
-        renderTriggerLabel ? styles.triggerLabelled : null,
-        triggerShapes[shape],
-      )}
+        renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
+        !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
+      ]}
     >
       <RowAvatar
         name={name}
         imageUrl={imageUrl}
         shape={shape}
-        size='sm'
+        size={renderTriggerLabel ? 'xs' : 'sm'}
       />
       {renderTriggerLabel ? (
         <>
           <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
+          <Icon
+            aria-hidden
+            name='chevron-down'
+            size='sm'
+            xstyle={styles.triggerCaret}
+          />
         </>
       ) : null}
     </Popover.Trigger>

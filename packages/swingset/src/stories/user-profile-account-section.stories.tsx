@@ -1,23 +1,43 @@
+import type { UserProfileFormError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
-} from '@clerk/ui/mosaic/user-profile/user-profile-account-section.view';
-import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section.view';
+} from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
+import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
+import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
+import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
+import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileAccountSection',
   label: 'Account',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-account-section.view.tsx',
+  source: 'packages/ui/src/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
 };
 
-function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: boolean }) {
+function AccountSection({
+  allowMultipleAccounts,
+  failAt,
+  failWith,
+  usernameFailWith,
+}: {
+  allowMultipleAccounts: boolean;
+  failAt?: UserProfileAddPhoneDialogProps['step'];
+  failWith?: UserProfileFormError;
+  usernameFailWith?: UserProfileFormError;
+}) {
+  const editName = useUserProfileEditNameFixture({ failWith });
+  const editUsername = useUserProfileEditUsernameFixture({ failWith: usernameFailWith });
   const [emails, setEmails] = useState<UserProfileEmail[]>(
     allowMultipleAccounts
       ? [
@@ -28,39 +48,37 @@ function AccountSection({ allowMultipleAccounts }: { allowMultipleAccounts: bool
   );
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
+    ...(allowMultipleAccounts ? [{ id: 'phone_2', value: '+18015550100', isVerified: true }] : []),
   ]);
+  const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
+  const addPhone = createUserProfileAddPhoneFixture({
+    failAt,
+    onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+  });
 
   return (
     <UserProfileAccountSectionView
+      {...editName}
+      {...editUsername}
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
-      imageUrl='https://avatars.githubusercontent.com/u/51144033?v=4'
-      name='Preston Booth'
+      hasImage={Boolean(imageUrl)}
+      imageUrl={imageUrl}
       phones={phones}
-      username='prestonxyz'
       onAddEmail={() =>
         setEmails(current => [
           ...current,
           { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
         ])
       }
-      onAddPhone={() =>
-        setPhones(current => [
-          ...current,
-          {
-            id: `phone_${Date.now()}`,
-            value: `+1 801-555-${String(current.length + 1).padStart(4, '0')}`,
-            isVerified: true,
-          },
-        ])
-      }
-      onEditProfilePicture={() => undefined}
+      {...addPhone}
+      onProfilePictureChange={showFile}
+      onRemoveProfilePicture={clearImage}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
-      onNameChange={() => undefined}
-      onUsernameChange={() => undefined}
+      onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
     />
   );
 }
@@ -71,4 +89,38 @@ export function Default() {
 
 export function MultipleAccounts() {
   return <AccountSection allowMultipleAccounts />;
+}
+
+/** Every save is rejected, so the dialog shows both halves of a failure at once. */
+export function EditNameFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts={false}
+      failWith={{
+        message: 'Your name could not be updated.',
+        fields: { lastName: 'Last name must be 64 characters or fewer.' },
+      }}
+    />
+  );
+}
+
+export function EditUsernameFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts={false}
+      usernameFailWith={{
+        message: 'Your username could not be updated.',
+        fields: { username: 'That username is already taken.' },
+      }}
+    />
+  );
+}
+
+export function AddPhoneFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      failAt='phone'
+    />
+  );
 }

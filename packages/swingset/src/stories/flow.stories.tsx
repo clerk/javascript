@@ -7,6 +7,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Flow',
   source: 'packages/headless/src/primitives/flow/index.ts',
 };

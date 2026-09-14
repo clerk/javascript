@@ -20,6 +20,8 @@ export const meta: StoryMeta = {
   group: 'User Button',
   title: 'UserButton',
   label: 'User button',
+  status: 'wip',
+  substatus: 'needs wire-up',
   source: 'packages/ui/src/mosaic/user-button/user-button.view.tsx',
 };
 
@@ -271,6 +273,18 @@ export function AvatarOnly(_args: Record<string, unknown>) {
   return (
     <UserButtonView
       {...prototype}
+      renderTriggerLabel={false}
+    />
+  );
+}
+
+export function UserAvatarOnly(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='user'
       renderTriggerLabel={false}
     />
   );

@@ -6,6 +6,7 @@ export { default as __source } from './user-profile-web3-wallets-section.stories
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileWeb3WalletsSection',
   label: 'Web3 wallets',
   navigation: { category: 'Sections' },

@@ -4,7 +4,7 @@ import { durationVars, easingVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
-    overflow: 'hidden',
+    overflow: 'clip',
     position: 'relative',
     transitionDuration: {
       default: durationVars['--cl-duration-slow'],

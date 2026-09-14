@@ -4,11 +4,10 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
+import { Branding } from '../branding';
 import { Button } from '../button';
-import { ClerkLogo } from '../clerk-logo';
-import { Dialog, DialogContext } from '../dialog';
+import { Dialog, DialogContext, isOverlayDialog } from '../dialog';
 import { Icon } from '../icon';
 import { cardContentMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
@@ -19,20 +18,10 @@ const DEFAULT_ELEVATION: CardElevation = 'card';
 
 const CardElevationContext = React.createContext<CardElevation>(DEFAULT_ELEVATION);
 
-function Branding() {
+function CardBranding() {
   return (
     <div {...stylex.props(reset.base, slots.branding.base)}>
-      <span {...stylex.props(reset.base, slots.branding.text)}>
-        Secured by{' '}
-        <a
-          href='https://go.clerk.com/components'
-          target='_blank'
-          rel='noopener noreferrer'
-          {...stylex.props(reset.base, slots.branding.link, focusOutline.visible)}
-        >
-          <ClerkLogo height={14} />
-        </a>
-      </span>
+      <Branding />
     </div>
   );
 }
@@ -50,7 +39,7 @@ export interface CardProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
-  { elevation = DEFAULT_ELEVATION, renderBranding = true, render, className, style, children, ...rest },
+  { elevation = DEFAULT_ELEVATION, renderBranding = true, render, xstyle, children, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -60,15 +49,13 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     props: {
       ...mergeStyleProps(
         themeProps('card-root', { elevation }),
-        stylex.props(reset.base, slots.root.base, slots.root[elevation]),
-        className,
-        style,
+        stylex.props(reset.base, slots.root.base, slots.root[elevation], xstyle),
+        rest,
       ),
-      ...rest,
       children: (
         <>
           {children}
-          {renderBranding ? <Branding /> : null}
+          {renderBranding ? <CardBranding /> : null}
         </>
       ),
     },
@@ -101,7 +88,7 @@ function HeaderCloseButton() {
 }
 
 const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
-  { render, className, style, children, ...rest },
+  { render, xstyle, children, ...rest },
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
@@ -110,14 +97,13 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base, xstyle), rest),
       children: (
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
               Not for an inline dialog, which nothing closes. */}
-          {dialog && !dialog.inline ? <HeaderCloseButton /> : null}
+          {isOverlayDialog(dialog) ? <HeaderCloseButton /> : null}
           <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
             {children}
           </div>
@@ -132,7 +118,7 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
  * `aria-labelledby` at, so the card names the dialog without knowing it is in one.
  */
 const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(function CardTitle(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
@@ -141,8 +127,7 @@ const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(f
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-title'), stylex.props(reset.base, slots.header.title), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('card-title'), stylex.props(reset.base, slots.header.title, xstyle), rest),
       // The popup points `aria-labelledby` at this id, so the surface outranks the caller: an id
       // that displaced it would leave the dialog with no accessible name.
       ...(dialog && { id: dialog.labelId }),
@@ -152,7 +137,7 @@ const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(f
 
 /** Describes the card. The `aria-describedby` counterpart to {@link Title}. */
 const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<'p'>>(function CardDescription(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
@@ -163,18 +148,16 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
     props: {
       ...mergeStyleProps(
         themeProps('card-description'),
-        stylex.props(reset.base, slots.header.description),
-        className,
-        style,
+        stylex.props(reset.base, slots.header.description, xstyle),
+        rest,
       ),
-      ...rest,
       ...(dialog && { id: dialog.descriptionId }),
     },
   });
 });
 
 const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardContent(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -184,17 +167,15 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
     props: {
       ...mergeStyleProps(
         themeProps('card-content'),
-        stylex.props(reset.base, slots.content.base, cardContentMarker),
-        className,
-        style,
+        stylex.props(reset.base, slots.content.base, cardContentMarker, xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
 
 const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardFooter(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   const elevation = React.useContext(CardElevationContext);
@@ -205,11 +186,9 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     props: {
       ...mergeStyleProps(
         themeProps('card-footer', { elevation }),
-        stylex.props(reset.base, slots.footer.base),
-        className,
-        style,
+        stylex.props(reset.base, slots.footer.base, xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });

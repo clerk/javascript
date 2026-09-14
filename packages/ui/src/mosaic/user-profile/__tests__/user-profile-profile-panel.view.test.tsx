@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -29,8 +29,25 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
+  it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
+    renderView({
+      allowMultipleAccounts,
+      phones: [{ id: 'phone_added', value: '+18015558181' }],
+      onRemovePhone: vi.fn(),
+    });
+
+    expect(screen.getByText('+1 (801) 555-8181')).toBeInTheDocument();
+    if (allowMultipleAccounts) {
+      expect(screen.getByRole('button', { name: 'Manage +1 (801) 555-8181' })).toBeInTheDocument();
+    }
+  });
+
   it('composes the profile content without profile navigation', () => {
-    renderView({ onEditProfilePicture: vi.fn(), onNameChange: vi.fn(), onUsernameChange: vi.fn() });
+    renderView({
+      onProfilePictureChange: vi.fn(),
+      onSubmitName: () => Promise.resolve(),
+      onSubmitUsername: () => Promise.resolve(),
+    });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Account' })).toContainElement(
@@ -45,7 +62,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev')).toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev').closest('.cl-section-item')).toHaveTextContent('Primary');
-    expect(screen.getByText('+1 801-888-8181')).toBeInTheDocument();
+    expect(screen.getByText('+1 (801) 888-8181')).toBeInTheDocument();
     expect(screen.getByText('Profile picture')).toHaveClass('cl-section-label');
     expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toHaveClass('cl-section-description');
     expect(screen.getByText('Email')).toHaveClass('cl-section-label');
@@ -59,21 +76,63 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('heading', { name: 'User Profile' })).toBeNull();
   });
 
-  it('edits the profile picture when Upload is clicked', async () => {
-    const onEditProfilePicture = vi.fn();
+  it('uploads the picked file when no profile picture is set', async () => {
+    const onProfilePictureChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ onEditProfilePicture });
+    const { container } = renderView({ onProfilePictureChange, onRemoveProfilePicture: vi.fn() });
 
-    await user.click(screen.getByRole('button', { name: 'Upload' }));
+    expect(screen.queryByRole('button', { name: 'Manage profile picture' })).toBeNull();
 
-    expect(onEditProfilePicture).toHaveBeenCalledOnce();
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!input) {
+      throw new Error('File picker not found');
+    }
+    const file = new File(['avatar'], 'avatar.png', { type: 'image/png' });
+    await user.upload(input, file);
+
+    expect(onProfilePictureChange).toHaveBeenCalledWith(file);
+  });
+
+  it('turns away a file past the size the row advertises', async () => {
+    const onProfilePictureChange = vi.fn();
+    const onProfilePictureReject = vi.fn();
+    const user = userEvent.setup();
+    const { container } = renderView({ onProfilePictureChange, onProfilePictureReject });
+
+    const oversized = new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'big.png', { type: 'image/png' });
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!input) {
+      throw new Error('File picker not found');
+    }
+    await user.upload(input, oversized);
+
+    expect(onProfilePictureChange).not.toHaveBeenCalled();
+    expect(onProfilePictureReject).toHaveBeenCalledWith([{ file: oversized, reason: 'size' }]);
+    expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
+    expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toBeInTheDocument();
+  });
+
+  it('clears the rejection once an acceptable file is picked', async () => {
+    const user = userEvent.setup();
+    const { container } = renderView({ onProfilePictureChange: vi.fn() });
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!input) {
+      throw new Error('File picker not found');
+    }
+
+    await user.upload(input, new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'big.png', { type: 'image/png' }));
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+
+    await user.upload(input, new File(['small'], 'small.png', { type: 'image/png' }));
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('breaks out both contact types when multiple accounts are allowed', () => {
     renderView({
       emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
       onAddEmail: vi.fn(),
-      onAddPhone: vi.fn(),
+      onSendPhoneCode: () => Promise.resolve(),
+      onVerifyPhoneCode: () => Promise.resolve(),
     });
 
     const accountSection = screen.getByRole('region', { name: 'Account' });
@@ -83,7 +142,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(accountSection).not.toContainElement(emailSection);
     expect(accountSection).not.toContainElement(phoneSection);
     expect(emailSection).toHaveTextContent('item1@clerk.dev');
-    expect(phoneSection).toHaveTextContent('+1 801-888-8181');
+    expect(phoneSection).toHaveTextContent('+1 (801) 888-8181');
     expect(within(emailSection).getByRole('button', { name: 'Add email' })).toHaveTextContent('Add');
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toHaveTextContent('Add');
   });
@@ -99,7 +158,7 @@ describe('UserProfileProfilePanelView', () => {
     const accountSection = screen.getByRole('region', { name: 'Account' });
 
     expect(accountSection).toHaveTextContent('item1@clerk.dev');
-    expect(accountSection).toHaveTextContent('+1 801-888-8181');
+    expect(accountSection).toHaveTextContent('+1 (801) 888-8181');
     expect(within(accountSection).getByRole('button', { name: 'Update email' })).toBeInTheDocument();
     expect(within(accountSection).getByRole('button', { name: 'Update phone number' })).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Email' })).not.toBeInTheDocument();
@@ -126,7 +185,7 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('renders an actionable empty state when no phone number exists', () => {
-    renderView({ phones: [], onAddPhone: vi.fn() });
+    renderView({ phones: [], onSendPhoneCode: () => Promise.resolve(), onVerifyPhoneCode: () => Promise.resolve() });
 
     const phoneSection = screen.getByRole('region', { name: 'Phone' });
     const emptyState = within(phoneSection).getByText('No phone numbers added');
@@ -269,21 +328,56 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('forwards profile and contact actions', async () => {
-    const onNameChange = vi.fn();
     const onAddEmail = vi.fn();
-    const onManageEmail = vi.fn();
-    renderView({ onNameChange, onAddEmail, onManageEmail });
+    const onRemoveEmail = vi.fn();
+    renderView({ onSubmitName: () => Promise.resolve(), onAddEmail, onRemoveEmail });
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Edit name' }));
     await user.click(screen.getByRole('button', { name: 'Add email' }));
     await user.click(screen.getByRole('button', { name: 'Manage item2@clerk.dev' }));
-    expect(onManageEmail).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
+    expect(onRemoveEmail).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
+    // Last: the edit-name dialog is modal, so the rest of the panel goes inert once it opens.
+    await user.click(screen.getByRole('button', { name: 'Edit name' }));
 
-    expect(onNameChange).toHaveBeenCalledWith('Preston Booth');
+    expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeInTheDocument();
     expect(onAddEmail).toHaveBeenCalledOnce();
-    expect(onManageEmail).toHaveBeenCalledWith('email_2');
+    expect(onRemoveEmail).toHaveBeenCalledWith('email_2');
+  });
+
+  it('drives the edit-name dialog from the section, seeded with the saved name', async () => {
+    const onSubmitName = vi.fn(() => Promise.resolve());
+    const user = userEvent.setup();
+    renderView({ firstName: 'Preston', lastName: 'Booth', onSubmitName });
+
+    await user.click(screen.getByRole('button', { name: 'Edit name' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+    expect(within(dialog).getByLabelText('First name')).toHaveValue('Preston');
+    expect(within(dialog).getByLabelText('Last name')).toHaveValue('Booth');
+
+    await user.clear(within(dialog).getByLabelText('Last name'));
+    await user.type(within(dialog).getByLabelText('Last name'), 'Barton');
+    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmitName).toHaveBeenCalledWith({ firstName: 'Preston', lastName: 'Barton' });
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit name' })).not.toBeInTheDocument());
+  });
+
+  it('drives the edit-username dialog from the section, seeded with the saved username', async () => {
+    const onSubmitUsername = vi.fn(() => Promise.resolve());
+    const user = userEvent.setup();
+    renderView({ username: 'prestonxyz', onSubmitUsername });
+
+    await user.click(screen.getByRole('button', { name: 'Edit username' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit username' });
+    expect(within(dialog).getByLabelText('Username')).toHaveValue('prestonxyz');
+
+    await user.clear(within(dialog).getByLabelText('Username'));
+    await user.type(within(dialog).getByLabelText('Username'), 'preston');
+    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmitUsername).toHaveBeenCalledWith('preston');
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit username' })).not.toBeInTheDocument());
   });
 
   it('matches the existing conditional contact and connected-account actions', async () => {
@@ -334,15 +428,21 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
     expect(onVerifyEmail).toHaveBeenCalledWith('email_unverified');
 
-    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0100' }));
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Verify phone number' }));
     expect(onVerifyPhone).toHaveBeenCalledWith('phone_unverified');
 
-    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0100' }));
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
+    expect(onRemovePhone).not.toHaveBeenCalled();
+    await user.click(
+      within(screen.getByRole('alertdialog', { name: 'Remove phone number?' })).getByRole('button', {
+        name: 'Remove',
+      }),
+    );
     expect(onRemovePhone).toHaveBeenCalledWith('phone_unverified');
 
-    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0101' }));
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0101' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledWith('phone_secondary');
 

@@ -6,6 +6,7 @@ import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import { withRetry } from '../testUtils/retryableClerkClient';
 import { createUserService } from '../testUtils/usersService';
 
 const grantOAuthConsent = async (page: Page) => {
@@ -25,7 +26,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
       secretKey: instanceKeys.get('oauth-provider').sk,
       publishableKey: instanceKeys.get('oauth-provider').pk,
     });
-    const users = createUserService(client);
+    const users = createUserService(withRetry(client));
     fakeUser = users.createFakeUser(test, {
       withUsername: true,
     });
@@ -284,7 +285,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
         secretKey: instanceKeys.get('oauth-provider').sk,
         publishableKey: instanceKeys.get('oauth-provider').pk,
       });
-      const users = createUserService(client);
+      const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });
@@ -341,7 +342,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
         secretKey: instanceKeys.get('oauth-provider').sk,
         publishableKey: instanceKeys.get('oauth-provider').pk,
       });
-      const users = createUserService(client);
+      const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });
@@ -402,7 +403,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
         secretKey: instanceKeys.get('oauth-provider').sk,
         publishableKey: instanceKeys.get('oauth-provider').pk,
       });
-      const users = createUserService(client);
+      const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });

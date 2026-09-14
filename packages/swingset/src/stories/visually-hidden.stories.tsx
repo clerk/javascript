@@ -13,6 +13,7 @@ export { default as __source } from './visually-hidden.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'VisuallyHidden',
   source: 'packages/ui/src/mosaic/components/visually-hidden/visually-hidden.tsx',
 };

@@ -25,6 +25,12 @@ import {
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
+import {
+  Default as ComboboxDefault,
+  meta as comboboxMeta,
+  Scrolling as ComboboxScrolling,
+} from '../stories/combobox.stories';
 import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
@@ -32,6 +38,11 @@ import {
 } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import {
+  Default as DrawerComponentDefault,
+  InsideProfile as DrawerComponentInsideProfile,
+  meta as drawerComponentMeta,
+} from '../stories/drawer.component.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
 import {
   Default as FieldDefault,
@@ -65,10 +76,18 @@ import {
 import {
   Default,
   Disabled as InputDisabled,
+  Ghost as InputGhost,
   Invalid,
   meta as inputMeta,
   Sizes as InputSizes,
 } from '../stories/input.stories';
+import {
+  Default as InputGroupDefault,
+  Disabled as InputGroupDisabled,
+  Invalid as InputGroupInvalid,
+  meta as inputGroupMeta,
+  Sizes as InputGroupSizes,
+} from '../stories/input-group.stories';
 import {
   Default as ItemDefault,
   Group as ItemGroup,
@@ -87,12 +106,26 @@ import {
 } from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
+  Default as PhoneInputDefault,
+  Disabled as PhoneInputDisabled,
+  Invalid as PhoneInputInvalid,
+  meta as phoneInputMeta,
+  Prefilled as PhoneInputPrefilled,
+  Sizes as PhoneInputSizes,
+} from '../stories/phone-input.stories';
+import {
   Alignment as PopoverComponentAlignment,
   Default as PopoverComponentDefault,
   meta as popoverComponentMeta,
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import {
+  Customized as ProfileCustomized,
+  Default as ProfileDefault,
+  meta as profileComponentMeta,
+  Transitions as ProfileTransitions,
+} from '../stories/profile.component.stories';
 import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
@@ -132,6 +165,7 @@ import {
   MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import { meta as tableMeta } from '../stories/table.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
   Colors as TextColors,
@@ -139,6 +173,7 @@ import {
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
+import { meta as toastMeta } from '../stories/toast.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import {
@@ -147,8 +182,13 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
-import { Default as UserPageDefault, meta as userPageMeta } from '../stories/user-page.stories';
 import {
+  Default as UserProfileDefault,
+  meta as userProfileMeta,
+  Overlay as UserProfileOverlay,
+} from '../stories/user-profile.stories';
+import {
+  AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
   Default as UserProfileAccountSectionDefault,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
@@ -232,8 +272,19 @@ const sectionModule: StoryModule = {
   Destructive: SectionDestructive,
 };
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+const drawerComponentModule: StoryModule = {
+  meta: drawerComponentMeta,
+  Default: DrawerComponentDefault,
+  InsideProfile: DrawerComponentInsideProfile,
+};
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
+
+const comboboxModule: StoryModule = {
+  meta: comboboxMeta,
+  Default: ComboboxDefault,
+  Scrolling: ComboboxScrolling,
+};
 
 const avatarModule: StoryModule = {
   meta: avatarMeta,
@@ -261,13 +312,43 @@ const bannerModule: StoryModule = {
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
-const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
+const inputModule: StoryModule = {
+  meta: inputMeta,
+  Default,
+  Sizes: InputSizes,
+  Disabled: InputDisabled,
+  Invalid,
+  Ghost: InputGhost,
+};
+
+const inputGroupModule: StoryModule = {
+  meta: inputGroupMeta,
+  Default: InputGroupDefault,
+  Sizes: InputGroupSizes,
+  Disabled: InputGroupDisabled,
+  Invalid: InputGroupInvalid,
+};
+
+const phoneInputModule: StoryModule = {
+  meta: phoneInputMeta,
+  Default: PhoneInputDefault,
+  Sizes: PhoneInputSizes,
+  Prefilled: PhoneInputPrefilled,
+  Disabled: PhoneInputDisabled,
+  Invalid: PhoneInputInvalid,
+};
 
 const popoverComponentModule: StoryModule = {
   meta: popoverComponentMeta,
   Default: PopoverComponentDefault,
   Placement: PopoverComponentPlacement,
   Alignment: PopoverComponentAlignment,
+};
+const profileComponentModule: StoryModule = {
+  meta: profileComponentMeta,
+  Default: ProfileDefault,
+  Customized: ProfileCustomized,
+  Transitions: ProfileTransitions,
 };
 
 const itemModule: StoryModule = {
@@ -343,6 +424,7 @@ const iconFrameModule: StoryModule = {
 // `<Preview>` embeds in the MDX, which import the stories module directly.
 const accordionModule: StoryModule = { meta: accordionMeta };
 const autocompleteModule: StoryModule = { meta: autocompleteMeta };
+const comboboxPrimitiveModule: StoryModule = { meta: comboboxPrimitiveMeta };
 const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
@@ -367,20 +449,26 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+// Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
+const tableModule: StoryModule = { meta: tableMeta };
+const toastModule: StoryModule = { meta: toastMeta };
+
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
-const userPageModule: StoryModule = {
-  meta: userPageMeta,
-  Default: UserPageDefault,
+const userProfileModule: StoryModule = {
+  meta: userProfileMeta,
+  Default: UserProfileDefault,
+  Overlay: UserProfileOverlay,
 };
 
 const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
+  AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
@@ -471,7 +559,7 @@ export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
   // User Profile
-  userPageModule,
+  userProfileModule,
   // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
@@ -498,23 +586,31 @@ export const registry: StoryModule[] = [
   bannerModule,
   buttonModule,
   cardComponentModule,
+  comboboxModule,
   flowComponentModule,
   inputModule,
+  inputGroupModule,
+  phoneInputModule,
   itemModule,
   dialogComponentModule,
+  drawerComponentModule,
   headingModule,
   iconModule,
   iconFrameModule,
   menuComponentModule,
   otpComponentModule,
   popoverComponentModule,
+  profileComponentModule,
   sectionModule,
+  tableModule,
   textModule,
+  toastModule,
   fieldModule,
   visuallyHiddenModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
+  comboboxPrimitiveModule,
   collapsibleModule,
   dialogModule,
   drawerModule,

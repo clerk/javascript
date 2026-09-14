@@ -2,10 +2,10 @@
 
 import type { ReactElement, ReactNode } from 'react';
 
+import type { CustomProfileItem, UserProfilePageId } from '../user-profile/user-profile.types';
 import { useUserButtonController } from './user-button.controller';
 import type { UserButtonModelOptions } from './user-button.model';
 import { useUserButtonModel } from './user-button.model';
-import type { CustomProfileItem, UserProfilePageId } from './user-button.pages';
 import { useCustomPages, useUserProfilePages } from './user-button.pages';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonTriggerProps } from './user-button.view';

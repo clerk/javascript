@@ -1,8 +1,13 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Badge } from './badge';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 describe('Mosaic Badge', () => {
   it('renders its children', () => {
@@ -22,18 +27,15 @@ describe('Mosaic Badge', () => {
     expect(screen.getByText('Active')).toHaveAttribute('data-color', color);
   });
 
-  it('lets the consumer className and style win', () => {
-    render(
-      <Badge
-        className='my-badge'
-        style={{ marginTop: '8px' }}
-      >
-        Active
-      </Badge>,
-    );
+  it('merges xstyle atoms after the slot atoms', () => {
+    render(<Badge xstyle={atoms.spaced}>Active</Badge>);
     const badge = screen.getByText('Active');
-    expect(badge).toHaveClass('cl-badge', 'my-badge');
-    expect(badge).toHaveStyle({ marginTop: '8px' });
+    expect(badge).toHaveClass('cl-badge', stylex.props(atoms.spaced).className ?? '');
+  });
+
+  it('merges a className carried by the render element instead of clobbering the slot class', () => {
+    render(<Badge render={<span className='from-source' />}>Active</Badge>);
+    expect(screen.getByText('Active')).toHaveClass('cl-badge', 'from-source');
   });
 
   it('forwards arbitrary span props and the ref', () => {

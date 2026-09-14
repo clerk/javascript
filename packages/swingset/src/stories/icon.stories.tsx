@@ -11,6 +11,7 @@ export { default as __source } from './icon.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Icon',
   source: 'packages/ui/src/mosaic/components/icon/icon.tsx',
   styles: {
