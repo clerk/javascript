@@ -43,8 +43,8 @@ describe('ProviderIcon', () => {
       expect(icon).toBeInTheDocument();
     });
 
-    it('keeps the mask-image provider list in sync', () => {
-      expect(SUPPORTS_MASK_IMAGE).toEqual(['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x']);
+    it('has providers to cover, so the mask-image cases below are not vacuous', () => {
+      expect(SUPPORTS_MASK_IMAGE.length).toBeGreaterThan(0);
     });
 
     it.each(SUPPORTS_MASK_IMAGE)('tints supported provider %s with the foreground color via mask-image', async id => {

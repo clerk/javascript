@@ -178,7 +178,7 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     provider: 'agentid',
     strategy: 'oauth_agentid',
     name: 'AgentID',
-    docsUrl: 'https://www.agentid.com/docs/clerk',
+    docsUrl: 'https://clerk.com/docs/guides/configure/auth-strategies/social-connections/agentid',
   },
 ];
 
