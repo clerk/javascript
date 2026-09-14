@@ -814,6 +814,64 @@ describe('Dialog', () => {
       });
     });
 
+    describe('opened from a menu item into a dialog mounted elsewhere', () => {
+      function HoistedFixture() {
+        const handle = React.useMemo(() => Dialog.createHandle<string>(), []);
+        return (
+          <>
+            <Menu.Root>
+              <Menu.Trigger>Actions</Menu.Trigger>
+              <Menu.Positioner>
+                <Menu.Popup>
+                  <Menu.Item
+                    label='Remove'
+                    onClick={() => handle.open('item-1')}
+                  >
+                    Remove
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Root>
+            <Dialog.Root handle={handle}>
+              {({ payload }) => (
+                <Dialog.Popup>
+                  <Dialog.Title>Remove {payload}?</Dialog.Title>
+                  <Dialog.Close>Cancel</Dialog.Close>
+                </Dialog.Popup>
+              )}
+            </Dialog.Root>
+          </>
+        );
+      }
+
+      it('returns focus to the menu trigger on Escape', async () => {
+        const user = userEvent.setup();
+        render(<HoistedFixture />);
+
+        const trigger = screen.getByRole('button', { name: 'Actions' });
+        trigger.focus();
+        await user.keyboard('{Enter}');
+        await user.keyboard('{Enter}');
+        expect(screen.getByRole('dialog', { name: 'Remove item-1?' })).toBeInTheDocument();
+
+        await user.keyboard('{Escape}');
+
+        expect(document.activeElement).toBe(trigger);
+      });
+
+      it('returns focus to the menu trigger on Close press', async () => {
+        const user = userEvent.setup();
+        render(<HoistedFixture />);
+
+        const trigger = screen.getByRole('button', { name: 'Actions' });
+        await user.click(trigger);
+        await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+        await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+        expect(document.activeElement).toBe(trigger);
+      });
+    });
+
     it('resolves the function form with an empty type on programmatic close', () => {
       const handle = Dialog.createHandle();
       const finalFocus = vi.fn(() => undefined);
