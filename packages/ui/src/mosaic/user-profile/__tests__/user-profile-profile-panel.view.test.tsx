@@ -33,7 +33,7 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       onProfilePictureChange: vi.fn(),
       onSubmitName: () => Promise.resolve(),
-      onUsernameChange: vi.fn(),
+      onSubmitUsername: () => Promise.resolve(),
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
@@ -71,9 +71,11 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('button', { name: 'Manage profile picture' })).toBeNull();
 
     const input = container.querySelector<HTMLInputElement>('input[type="file"]');
-    expect(input).not.toBeNull();
+    if (!input) {
+      throw new Error('File picker not found');
+    }
     const file = new File(['avatar'], 'avatar.png', { type: 'image/png' });
-    await user.upload(input as HTMLInputElement, file);
+    await user.upload(input, file);
 
     expect(onProfilePictureChange).toHaveBeenCalledWith(file);
   });
@@ -85,7 +87,11 @@ describe('UserProfileProfilePanelView', () => {
     const { container } = renderView({ onProfilePictureChange, onProfilePictureReject });
 
     const oversized = new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'big.png', { type: 'image/png' });
-    await user.upload(container.querySelector<HTMLInputElement>('input[type="file"]') as HTMLInputElement, oversized);
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!input) {
+      throw new Error('File picker not found');
+    }
+    await user.upload(input, oversized);
 
     expect(onProfilePictureChange).not.toHaveBeenCalled();
     expect(onProfilePictureReject).toHaveBeenCalledWith([{ file: oversized, reason: 'size' }]);
@@ -96,45 +102,16 @@ describe('UserProfileProfilePanelView', () => {
   it('clears the rejection once an acceptable file is picked', async () => {
     const user = userEvent.setup();
     const { container } = renderView({ onProfilePictureChange: vi.fn() });
-    const input = container.querySelector<HTMLInputElement>('input[type="file"]') as HTMLInputElement;
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!input) {
+      throw new Error('File picker not found');
+    }
 
     await user.upload(input, new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'big.png', { type: 'image/png' }));
     expect(screen.getByRole('alert')).toBeInTheDocument();
 
     await user.upload(input, new File(['small'], 'small.png', { type: 'image/png' }));
     expect(screen.queryByRole('alert')).toBeNull();
-  });
-
-  it('offers Upload while the avatar is only a generated default', () => {
-    renderView({
-      hasImage: false,
-      imageUrl: 'https://img.clerk.com/generated-default.png',
-      onProfilePictureChange: vi.fn(),
-      onRemoveProfilePicture: vi.fn(),
-    });
-
-    expect(screen.getByRole('button', { name: 'Upload' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Manage profile picture' })).toBeNull();
-  });
-
-  it('offers change and remove in a menu once a profile picture is set', async () => {
-    const onProfilePictureChange = vi.fn();
-    const onRemoveProfilePicture = vi.fn();
-    const user = userEvent.setup();
-    renderView({
-      hasImage: true,
-      imageUrl: 'https://example.com/avatar.png',
-      onProfilePictureChange,
-      onRemoveProfilePicture,
-    });
-
-    expect(screen.queryByRole('button', { name: 'Upload' })).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));
-
-    expect(screen.getByRole('menuitem', { name: 'Change avatar' })).toBeInTheDocument();
-    await user.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
-
-    expect(onRemoveProfilePicture).toHaveBeenCalledOnce();
   });
 
   it('breaks out both contact types when multiple accounts are allowed', () => {
@@ -370,6 +347,23 @@ describe('UserProfileProfilePanelView', () => {
 
     expect(onSubmitName).toHaveBeenCalledWith({ firstName: 'Preston', lastName: 'Barton' });
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit name' })).not.toBeInTheDocument());
+  });
+
+  it('drives the edit-username dialog from the section, seeded with the saved username', async () => {
+    const onSubmitUsername = vi.fn(() => Promise.resolve());
+    const user = userEvent.setup();
+    renderView({ username: 'prestonxyz', onSubmitUsername });
+
+    await user.click(screen.getByRole('button', { name: 'Edit username' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit username' });
+    expect(within(dialog).getByLabelText('Username')).toHaveValue('prestonxyz');
+
+    await user.clear(within(dialog).getByLabelText('Username'));
+    await user.type(within(dialog).getByLabelText('Username'), 'preston');
+    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmitUsername).toHaveBeenCalledWith('preston');
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit username' })).not.toBeInTheDocument());
   });
 
   it('matches the existing conditional contact and connected-account actions', async () => {

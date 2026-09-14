@@ -1,10 +1,19 @@
-import { Button } from '../../components/button';
-import { Card } from '../../components/card';
-import type { IconProps } from '../../components/icon';
-import { Icon, IconFrame } from '../../components/icon';
-import { Item } from '../../components/item';
-import { Spinner } from '../../components/spinner';
-import { Text } from '../../components/text';
+import * as stylex from '@stylexjs/stylex';
+
+import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { useFlowAutoFocus } from '../../../components/flow';
+import type { IconProps } from '../../../components/icon';
+import { Icon, IconFrame } from '../../../components/icon';
+import { Item } from '../../../components/item';
+import { Spinner } from '../../../components/spinner';
+import { Text } from '../../../components/text';
+
+const styles = stylex.create({
+  helpText: {
+    textAlign: 'center',
+  },
+});
 
 export interface ReverificationMethod {
   id: string;
@@ -38,6 +47,8 @@ export function ReverificationMethodPicker({
   onHelp,
   onBack,
 }: ReverificationMethodPickerProps) {
+  const firstMethodRef = useFlowAutoFocus<HTMLDivElement>();
+
   return (
     <>
       <Card.Header>
@@ -46,11 +57,12 @@ export function ReverificationMethodPicker({
       </Card.Header>
       <Card.Content>
         <Item.Group variant='outline'>
-          {methods.map(method => {
+          {methods.map((method, index) => {
             const isPending = pendingMethodId === method.id;
             return (
               <Item.Root
                 key={method.id}
+                ref={index === 0 ? firstMethodRef : undefined}
                 size='lg'
                 render={
                   <button
@@ -79,6 +91,7 @@ export function ReverificationMethodPicker({
             type='button'
             variant='ghost'
             fullWidth
+            disabled={Boolean(pendingMethodId)}
             onClick={onBack}
           >
             {messages.backButton}
@@ -87,16 +100,19 @@ export function ReverificationMethodPicker({
         <Text
           size='xs'
           color='neutral'
-          style={{
-            textAlign: 'center',
-          }}
+          xstyle={styles.helpText}
         >
           {messages.helpText}{' '}
           <Button
             type='button'
             size='sm'
             variant='link'
-            onClick={onHelp}
+            disabled={Boolean(pendingMethodId)}
+            onClick={() => {
+              if (!pendingMethodId) {
+                onHelp();
+              }
+            }}
           >
             {messages.helpButton}
           </Button>

@@ -53,19 +53,17 @@ describe('Mosaic Icon', () => {
     expect(container.querySelector('svg')).toHaveAttribute('data-size', 'md');
   });
 
-  it('wires the size variant and consumer className/style through to the element', () => {
+  it('wires the size variant and xstyle atoms through to the element', () => {
     const { container } = wrap(
       <Icon
         name='chevron-right'
         size='lg'
-        className='my-icon'
-        style={{ marginTop: '8px' }}
+        xstyle={containerStyles.lineBox}
       />,
     );
     const svg = container.querySelector('svg');
     expect(svg).toHaveAttribute('data-size', 'lg');
-    expect(svg).toHaveClass('cl-icon', 'my-icon');
-    expect(svg).toHaveStyle({ marginTop: '8px' });
+    expect(svg).toHaveClass('cl-icon', stylex.props(containerStyles.lineBox).className ?? '');
   });
 
   it('lets a container xstyle override the size atoms instead of stacking a second class', () => {
@@ -141,7 +139,7 @@ describe('Mosaic Icon', () => {
     const { getByTestId } = wrap(
       <Icon
         name='chevron-right'
-        className='call-site'
+        xstyle={containerStyles.lineBox}
       />,
       {
         'chevron-right': (
@@ -152,7 +150,11 @@ describe('Mosaic Icon', () => {
         ),
       },
     );
-    expect(getByTestId('override')).toHaveClass('cl-icon', 'call-site', 'consumer-glyph');
+    expect(getByTestId('override')).toHaveClass(
+      'cl-icon',
+      stylex.props(containerStyles.lineBox).className ?? '',
+      'consumer-glyph',
+    );
   });
 
   it('forwards svg props from the Icon call site onto the override element', () => {

@@ -21,7 +21,7 @@ export type {
   UserProfileFormError,
   UserProfileNameAttribute,
 } from './user-profile-account-section/user-profile-account-section.types';
-export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.view';
+export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.dialog';
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
@@ -55,7 +55,7 @@ export function UserProfileProfilePanelView({
   onProfilePictureReject,
   onRemoveProfilePicture,
   onSubmitName,
-  onUsernameChange,
+  onSubmitUsername,
   onAddEmail,
   onManageEmail,
   onVerifyEmail,
@@ -105,7 +105,7 @@ export function UserProfileProfilePanelView({
           onVerifyEmail={onVerifyEmail}
           onVerifyPhone={onVerifyPhone}
           onSubmitName={onSubmitName}
-          onUsernameChange={onUsernameChange}
+          onSubmitUsername={onSubmitUsername}
         />
         {connectedAccounts.length > 0 ? (
           <UserProfileConnectedAccountsSectionView

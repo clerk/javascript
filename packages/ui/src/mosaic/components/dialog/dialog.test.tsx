@@ -81,21 +81,28 @@ describe('Mosaic Dialog', () => {
     expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-size', 'profile');
   });
 
-  it('merges consumer className and style onto the popup', () => {
+  it('composes consumer xstyle onto the popup', () => {
+    const caller = stylex.create({ popup: { marginTop: '8px' } });
     render(
       <Dialog.Root defaultOpen>
-        <Dialog.Popup
-          className='my-popup'
-          style={{ marginTop: '8px' }}
-        >
-          Body
-        </Dialog.Popup>
+        <Dialog.Popup xstyle={caller.popup}>Body</Dialog.Popup>
       </Dialog.Root>,
     );
 
-    const popup = document.querySelector('.cl-dialog-popup');
-    expect(popup).toHaveClass('cl-dialog-popup', 'my-popup');
-    expect(popup).toHaveStyle({ marginTop: '8px' });
+    expect(document.querySelector('.cl-dialog-popup')).toHaveClass(
+      'cl-dialog-popup',
+      stylex.props(caller.popup).className ?? '',
+    );
+  });
+
+  it('merges the className a render source hands the popup', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup render={<div className='from-render' />}>Body</Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(document.querySelector('.cl-dialog-popup')).toHaveClass('cl-dialog-popup', 'from-render');
   });
 
   it('closes on Dialog.Close, reporting it through onOpenChange', async () => {

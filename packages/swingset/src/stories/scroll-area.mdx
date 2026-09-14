@@ -17,7 +17,8 @@ slot class, which stays the hook a theme targets.
 
 ## Usage
 
-`scrollAreaViewport()` returns an array, hence the `...` spread.
+`scrollAreaViewport()` returns an array of atoms. A Mosaic part takes it as `xstyle`; a native element
+spreads it into `stylex.props`.
 
 ```tsx
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
@@ -27,7 +28,7 @@ import * as stylex from '@stylexjs/stylex';
   {...stylex.props(scrollAreaRoot)}
   style={{ height: 260 }}
 >
-  <Item.Group {...stylex.props(...scrollAreaViewport())}>{organizations}</Item.Group>
+  <Item.Group xstyle={scrollAreaViewport()}>{organizations}</Item.Group>
 </div>;
 ```
 

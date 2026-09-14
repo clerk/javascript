@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import { hydrateRoot } from 'react-dom/client';
@@ -6,6 +7,16 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Input } from '../input';
 import { Field } from './field';
+
+const overrides = stylex.create({
+  root: { display: 'grid' },
+  label: { fontWeight: 700 },
+  description: { opacity: 0.8 },
+  error: { fontWeight: 600 },
+});
+
+const atoms = (style: stylex.StyleXStyles) =>
+  (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
 describe('Mosaic Field', () => {
   it('generates native label and message relationships', () => {
@@ -288,42 +299,32 @@ describe('Mosaic Field', () => {
     expect(errorRef.current).toHaveAttribute('role', 'status');
   });
 
-  it('lets caller styling win without prescribing layout', () => {
+  it('applies xstyle on every part without prescribing layout', () => {
     render(
       <Field.Root
-        className='root'
-        style={{ display: 'grid' }}
+        xstyle={overrides.root}
         data-testid='root'
       >
-        <Field.Label
-          className='label'
-          style={{ fontWeight: 700 }}
-        >
-          Email
-        </Field.Label>
-        <Field.Description
-          className='description'
-          style={{ opacity: 0.8 }}
-        >
-          Description
-        </Field.Description>
-        <Field.Error
-          className='error'
-          style={{ fontWeight: 600 }}
-        >
-          Error
-        </Field.Error>
+        <Field.Label xstyle={overrides.label}>Email</Field.Label>
+        <Field.Description xstyle={overrides.description}>Description</Field.Description>
+        <Field.Error xstyle={overrides.error}>Error</Field.Error>
       </Field.Root>,
     );
 
-    expect(screen.getByTestId('root')).toHaveClass('cl-field-root', 'root');
-    expect(screen.getByTestId('root')).toHaveStyle({ display: 'grid' });
-    expect(screen.getByText('Email')).toHaveClass('cl-field-label', 'label');
-    expect(screen.getByText('Email')).toHaveStyle({ fontWeight: 700 });
-    expect(screen.getByText('Description')).toHaveClass('cl-field-description', 'description');
-    expect(screen.getByText('Description')).toHaveStyle({ opacity: 0.8 });
-    expect(screen.getByText('Error').closest('p')).toHaveClass('cl-field-error', 'error');
-    expect(screen.getByText('Error').closest('p')).toHaveStyle({ fontWeight: 600 });
+    expect(screen.getByTestId('root')).toHaveClass('cl-field-root', ...atoms(overrides.root));
+    expect(screen.getByText('Email')).toHaveClass('cl-field-label', ...atoms(overrides.label));
+    expect(screen.getByText('Description')).toHaveClass('cl-field-description', ...atoms(overrides.description));
+    expect(screen.getByText('Error').closest('p')).toHaveClass('cl-field-error', ...atoms(overrides.error));
+  });
+
+  it('merges a render-sourced className instead of clobbering its own', () => {
+    render(
+      <Field.Root>
+        <Field.Description render={<Field.Error />}>Description</Field.Description>
+      </Field.Root>,
+    );
+
+    expect(screen.getByText('Description').closest('p')).toHaveClass('cl-field-description', 'cl-field-error');
   });
 
   it('hides the label visually while keeping it associated with the control', () => {

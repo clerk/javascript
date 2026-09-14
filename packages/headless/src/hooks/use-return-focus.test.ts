@@ -2,6 +2,7 @@ import type { FloatingEvents, OpenChangeReason } from '@floating-ui/react';
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { withInteractionOrigin } from '../utils/interaction-origin';
 import { useReturnFocus } from './use-return-focus';
 
 function createEvents(): FloatingEvents & { close: (event?: Event, reason?: OpenChangeReason) => void } {
@@ -26,7 +27,7 @@ function createEvents(): FloatingEvents & { close: (event?: Event, reason?: Open
   };
 }
 
-function renderReturnFocus(trigger: HTMLElement) {
+function renderReturnFocus(trigger: HTMLElement | null) {
   const events = createEvents();
 
   const { result, rerender } = renderHook(
@@ -35,7 +36,14 @@ function renderReturnFocus(trigger: HTMLElement) {
     { initialProps: { open: false } },
   );
 
-  return { events, result, open: (open: boolean) => rerender({ open }) };
+  return {
+    events,
+    result,
+    open: (open: boolean) => {
+      events.emit('openchange', { open });
+      rerender({ open });
+    },
+  };
 }
 
 let trigger: HTMLElement;
@@ -104,5 +112,60 @@ describe('useReturnFocus', () => {
     open(true);
 
     expect(result.current.current).toBe(trigger);
+  });
+
+  describe('opened from inside another floating element', () => {
+    let menuTrigger: HTMLElement;
+
+    beforeEach(() => {
+      menuTrigger = document.createElement('button');
+      document.body.append(menuTrigger);
+    });
+
+    afterEach(() => menuTrigger.remove());
+
+    it('falls back to the interaction origin when it has no trigger of its own', () => {
+      const { result, open } = renderReturnFocus(null);
+
+      withInteractionOrigin(menuTrigger, () => open(true));
+
+      expect(result.current.current).toBe(menuTrigger);
+    });
+
+    it('prefers its own trigger over the interaction origin', () => {
+      const { result, open } = renderReturnFocus(trigger);
+
+      withInteractionOrigin(menuTrigger, () => open(true));
+
+      expect(result.current.current).toBe(trigger);
+    });
+
+    it('falls back to the origin once its own trigger has left the page', () => {
+      const { result, open } = renderReturnFocus(trigger);
+      withInteractionOrigin(menuTrigger, () => open(true));
+
+      trigger.remove();
+
+      expect(result.current.current).toBe(menuTrigger);
+    });
+
+    it('resolves to nothing once the origin has left the page too', () => {
+      const { result, open } = renderReturnFocus(null);
+      withInteractionOrigin(menuTrigger, () => open(true));
+
+      menuTrigger.remove();
+
+      expect(result.current.current).toBeNull();
+    });
+
+    it('forgets the origin on an open that has none', () => {
+      const { result, open } = renderReturnFocus(null);
+      withInteractionOrigin(menuTrigger, () => open(true));
+      open(false);
+
+      open(true);
+
+      expect(result.current.current).toBeNull();
+    });
   });
 });

@@ -27,7 +27,7 @@ export interface FieldRootProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFieldRoot(
-  { render, className, style, disabled = false, required = false, invalid = false, ...rest },
+  { render, xstyle, disabled = false, required = false, invalid = false, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -35,8 +35,7 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root, xstyle), rest),
     },
   });
 
@@ -58,7 +57,7 @@ export interface FieldLabelProps extends MosaicComponentProps<'label'> {
 }
 
 const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function MosaicFieldLabel(
-  { render, className, style, id: idProp, htmlFor: htmlForProp, visuallyHidden: isVisuallyHidden = false, ...rest },
+  { render, xstyle, id: idProp, htmlFor: htmlForProp, visuallyHidden: isVisuallyHidden = false, ...rest },
   ref,
 ) {
   const context = useOptionalFieldContext();
@@ -81,11 +80,10 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
           typographySizes.sm,
           styles.label,
           isVisuallyHidden && visuallyHidden.base,
+          xstyle,
         ),
-        className,
-        style,
+        rest,
       ),
-      ...rest,
       id,
       htmlFor,
     },
@@ -96,7 +94,7 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
 export type FieldDescriptionProps = MosaicComponentProps<'p'>;
 
 const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps>(function MosaicFieldDescription(
-  { render, className, style, id: idProp, ...rest },
+  { render, xstyle, id: idProp, ...rest },
   ref,
 ) {
   const context = useOptionalFieldContext();
@@ -110,11 +108,9 @@ const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps
     props: {
       ...mergeStyleProps(
         themeProps('field-description'),
-        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.message, styles.description),
-        className,
-        style,
+        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.message, styles.description, xstyle),
+        rest,
       ),
-      ...rest,
       id,
     },
   });
@@ -124,7 +120,7 @@ const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps
 export type FieldErrorProps = MosaicComponentProps<'p'>;
 
 const FieldError = React.forwardRef<HTMLParagraphElement, FieldErrorProps>(function MosaicFieldError(
-  { render, className, style, id: idProp, children, ...rest },
+  { render, xstyle, id: idProp, children, ...rest },
   ref,
 ) {
   const context = useOptionalFieldContext();
@@ -138,11 +134,9 @@ const FieldError = React.forwardRef<HTMLParagraphElement, FieldErrorProps>(funct
     props: {
       ...mergeStyleProps(
         themeProps('field-error'),
-        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.message, styles.error),
-        className,
-        style,
+        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.message, styles.error, xstyle),
+        rest,
       ),
-      ...rest,
       id,
       children: (
         <>

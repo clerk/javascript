@@ -1,9 +1,14 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Icon } from './icon';
 import { IconFrame } from './icon-frame';
+
+const atoms = stylex.create({
+  tinted: { backgroundColor: 'rgb(255, 0, 0)' },
+});
 
 describe('Mosaic IconFrame', () => {
   it('renders its children in a span by default', () => {
@@ -56,17 +61,25 @@ describe('Mosaic IconFrame', () => {
     expect(frame).toHaveAttribute('aria-label', 'Status icon');
   });
 
-  it('lets the consumer className and style win', () => {
+  it('merges xstyle atoms after the slot atoms', () => {
     render(
       <IconFrame
         data-testid='frame'
-        className='my-frame'
-        style={{ backgroundColor: 'rgb(255, 0, 0)' }}
+        xstyle={atoms.tinted}
       />,
     );
     const frame = screen.getByTestId('frame');
-    expect(frame).toHaveClass('cl-icon-frame', 'my-frame');
-    expect(frame).toHaveStyle({ backgroundColor: 'rgb(255, 0, 0)' });
+    expect(frame).toHaveClass('cl-icon-frame', stylex.props(atoms.tinted).className ?? '');
+  });
+
+  it('merges a className carried by the render element instead of clobbering the slot class', () => {
+    render(
+      <IconFrame
+        data-testid='frame'
+        render={<div className='from-source' />}
+      />,
+    );
+    expect(screen.getByTestId('frame')).toHaveClass('cl-icon-frame', 'from-source');
   });
 
   it('renders a custom element via render, keeping styles and props', () => {

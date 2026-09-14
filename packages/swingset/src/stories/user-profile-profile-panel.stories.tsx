@@ -6,6 +6,7 @@ import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
+import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 const profileImageUrl = 'https://avatars.githubusercontent.com/u/51144033?v=4';
@@ -31,10 +32,12 @@ export function Default(_args: Record<string, unknown>) {
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage(profileImageUrl);
   const editName = useUserProfileEditNameFixture();
+  const editUsername = useUserProfileEditUsernameFixture();
 
   return (
     <UserProfileProfilePanelView
       {...editName}
+      {...editUsername}
       allowMultipleAccounts
       emails={emails}
       connectedAccounts={[
@@ -66,7 +69,6 @@ export function Default(_args: Record<string, unknown>) {
       hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}
       phones={phones}
-      username='prestonxyz'
       onAddEmail={() =>
         setEmails(current => [
           ...current,
@@ -99,7 +101,6 @@ export function Default(_args: Record<string, unknown>) {
       onSetPrimaryPhone={() => undefined}
       onVerifyEmail={() => undefined}
       onVerifyPhone={() => undefined}
-      onUsernameChange={() => undefined}
     />
   );
 }
