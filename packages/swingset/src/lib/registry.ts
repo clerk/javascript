@@ -257,7 +257,6 @@ import {
   meta as userProfileSubscriptionSectionMeta,
 } from '../stories/user-profile-subscription-section.stories';
 import {
-  AdminWallet as UserProfileWeb3WalletsSectionAdminWallet,
   ConnectedWallets as UserProfileWeb3WalletsSectionConnectedWallets,
   ConnectionError as UserProfileWeb3WalletsSectionConnectionError,
   ConnectOnly as UserProfileWeb3WalletsSectionConnectOnly,
@@ -534,7 +533,6 @@ const userProfileConnectedAccountsSectionModule: StoryModule = {
 const userProfileWeb3WalletsSectionModule: StoryModule = {
   meta: userProfileWeb3WalletsSectionMeta,
   Default: UserProfileWeb3WalletsSectionDefault,
-  AdminWallet: UserProfileWeb3WalletsSectionAdminWallet,
   ConnectedWallets: UserProfileWeb3WalletsSectionConnectedWallets,
   ConnectOnly: UserProfileWeb3WalletsSectionConnectOnly,
   ConnectionError: UserProfileWeb3WalletsSectionConnectionError,

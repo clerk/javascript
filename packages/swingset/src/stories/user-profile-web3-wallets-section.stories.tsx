@@ -34,16 +34,14 @@ export function ConnectOnly() {
 export function UnverifiedWallet() {
   const fixture = useWeb3WalletsFixture({
     initialWallets: [{ ...primaryWallet, isPrimary: false, isVerified: false }],
+    availableProviders: [{ id: 'metamask', provider: 'MetaMask', iconUrl: primaryWallet.iconUrl }],
   });
-  return <UserProfileWeb3WalletsSectionView {...fixture} />;
-}
-
-export function AdminWallet() {
-  const fixture = useWeb3WalletsFixture({
-    initialWallets: [{ id: 'admin_wallet', address: primaryWallet.address, isVerified: true }],
-    availableProviders: [],
-  });
-  return fixture.wallets.length > 0 ? <UserProfileWeb3WalletsSectionView {...fixture} /> : null;
+  return (
+    <UserProfileWeb3WalletsSectionView
+      {...fixture}
+      availableProviders={fixture.wallets.length === 0 ? fixture.availableProviders : []}
+    />
+  );
 }
 
 export function ConnectionError() {
