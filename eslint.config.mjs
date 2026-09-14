@@ -398,6 +398,7 @@ export default tseslint.config([
       'sort-imports': 'off',
       ...pluginTurbo.configs['flat/recommended'].rules,
       'unused-imports/no-unused-imports': 'error',
+      complexity: ['warn', { max: 20, variant: 'modified' }],
       // TYPESCRIPT RULE DISABLES
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',

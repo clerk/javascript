@@ -85,6 +85,9 @@ pnpm --filter @clerk/backend test:node path/to/file.test.ts
 pnpm lint
 pnpm format            # workspace packages plus root files, docs/, integration/, scripts/
 pnpm prettier --write '.claude/**/*.md'   # pnpm format does not cover .claude/; format skill files this way
+# Cyclomatic complexity (ESLint `complexity` at warn, max 20, modified variant) is a warning, not a gate.
+# Check just the files this branch changed before opening a PR:
+pnpm eslint $(git diff --name-only origin/main -- '*.ts' '*.tsx')
 
 # Changesets — write the file, don't run the CLI (both scripts are interactive prompts)
 pnpm changeset status --since=origin/main   # what CI checks; run this to verify
