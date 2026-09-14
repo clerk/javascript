@@ -233,11 +233,11 @@ describe('UserProfileEditPasswordView', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('explains itself and offers only cancel while the password is read-only', async () => {
+  it('explains itself and offers only cancel while an enterprise account is active', async () => {
     const onSubmit = vi.fn();
     const onConfirmPasswordChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ isReadOnly: true, onSubmit, onConfirmPasswordChange });
+    renderView({ hasActiveEnterpriseAccount: true, onSubmit, onConfirmPasswordChange });
 
     expect(
       screen.getByText(

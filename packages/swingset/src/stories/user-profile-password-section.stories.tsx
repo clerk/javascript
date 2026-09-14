@@ -20,12 +20,12 @@ export const meta: StoryMeta = {
 function PasswordSection({
   hasPassword,
   requiresCurrentPassword,
-  isReadOnly,
+  hasActiveEnterpriseAccount,
   failWith,
 }: {
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
-  isReadOnly?: boolean;
+  hasActiveEnterpriseAccount?: boolean;
   failWith?: UserProfileFormError;
 }) {
   const editPassword = useUserProfileEditPasswordFixture({ hasPassword, requiresCurrentPassword, failWith });
@@ -33,7 +33,7 @@ function PasswordSection({
   return (
     <UserProfilePasswordSectionView
       {...editPassword}
-      isReadOnly={isReadOnly}
+      hasActiveEnterpriseAccount={hasActiveEnterpriseAccount}
     />
   );
 }
@@ -53,8 +53,8 @@ export function WithoutCurrentPassword() {
 }
 
 /** The account signs in only through an enterprise connection: the dialog opens to say so, and nothing else. */
-export function ReadOnly() {
-  return <PasswordSection isReadOnly />;
+export function ActiveEnterpriseAccount() {
+  return <PasswordSection hasActiveEnterpriseAccount />;
 }
 
 /** Every save is rejected, so the dialog shows both halves of a failure at once. */

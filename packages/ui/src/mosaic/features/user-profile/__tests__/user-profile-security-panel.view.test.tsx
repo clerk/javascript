@@ -173,9 +173,9 @@ describe('UserProfileSecurityPanelView', () => {
     });
   });
 
-  it('keeps the password row inert while it is read-only', async () => {
+  it('keeps the password row inert while an enterprise account is active', async () => {
     const user = userEvent.setup();
-    renderView({ isPasswordReadOnly: true, onSubmitPassword: vi.fn(() => Promise.resolve()) });
+    renderView({ hasActiveEnterpriseAccount: true, onSubmitPassword: vi.fn(() => Promise.resolve()) });
 
     await user.click(screen.getByRole('button', { name: 'Change password' }));
     const dialog = screen.getByRole('dialog', { name: 'Change password' });

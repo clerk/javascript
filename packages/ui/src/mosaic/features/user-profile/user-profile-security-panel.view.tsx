@@ -32,7 +32,7 @@ export interface UserProfileSecurityPanelViewProps
   extends
     Omit<UserProfileActiveDevicesSectionViewProps, 'devices'>,
     Pick<UserProfilePasswordSectionViewProps, 'hasPassword' | 'requiresCurrentPassword' | 'onSubmitPassword'> {
-  isPasswordReadOnly?: boolean;
+  hasActiveEnterpriseAccount?: boolean;
   passkeys?: UserProfilePasskey[];
   mfaMethods?: UserProfileMfaMethod[];
   devices?: UserProfileDevice[];
@@ -49,7 +49,7 @@ export interface UserProfileSecurityPanelViewProps
 export function UserProfileSecurityPanelView({
   hasPassword = false,
   requiresCurrentPassword,
-  isPasswordReadOnly,
+  hasActiveEnterpriseAccount,
   passkeys,
   mfaMethods,
   devices,
@@ -77,7 +77,7 @@ export function UserProfileSecurityPanelView({
             {showPassword ? (
               <UserProfilePasswordSectionView
                 hasPassword={hasPassword}
-                isReadOnly={isPasswordReadOnly}
+                hasActiveEnterpriseAccount={hasActiveEnterpriseAccount}
                 requiresCurrentPassword={requiresCurrentPassword}
                 onSubmitPassword={onSubmitPassword}
               />

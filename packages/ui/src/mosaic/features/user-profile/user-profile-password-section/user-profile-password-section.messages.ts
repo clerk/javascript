@@ -15,7 +15,8 @@ export const userProfilePasswordSectionBase = {
     change: 'Change password',
     set: 'Set password',
   },
-  readOnly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+  enterpriseAccount:
+    'Your password can currently not be edited because you can sign in only via the enterprise connection.',
   currentPasswordLabel: 'Current password',
   newPasswordLabel: 'New password',
   confirmPasswordLabel: 'Confirm password',

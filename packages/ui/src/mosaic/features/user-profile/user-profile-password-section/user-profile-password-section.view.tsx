@@ -13,8 +13,8 @@ export interface UserProfilePasswordSectionViewProps {
   hasPassword?: boolean;
   /** Whether the save must carry the password being replaced. Off when reverification stands in for it. */
   requiresCurrentPassword?: boolean;
-  /** The account signs in only through an enterprise connection, so the password cannot change. */
-  isReadOnly?: boolean;
+  /** Supplied from `user.enterpriseAccounts`. An active one stops the password from changing. */
+  hasActiveEnterpriseAccount?: boolean;
   /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. */
   onSubmitPassword?: (value: UserProfileEditPasswordValue) => Promise<void>;
 }
@@ -23,7 +23,7 @@ export function UserProfilePasswordSectionView({
   sectionTitle = m.sectionTitle,
   hasPassword = false,
   requiresCurrentPassword = false,
-  isReadOnly = false,
+  hasActiveEnterpriseAccount = false,
   onSubmitPassword,
 }: UserProfilePasswordSectionViewProps) {
   return (
@@ -40,7 +40,7 @@ export function UserProfilePasswordSectionView({
               <Section.Actions>
                 <EditPassword
                   hasPassword={hasPassword}
-                  isReadOnly={isReadOnly}
+                  hasActiveEnterpriseAccount={hasActiveEnterpriseAccount}
                   requiresCurrentPassword={requiresCurrentPassword}
                   onSubmit={onSubmitPassword}
                 />
@@ -56,12 +56,12 @@ export function UserProfilePasswordSectionView({
 function EditPassword({
   hasPassword,
   requiresCurrentPassword,
-  isReadOnly,
+  hasActiveEnterpriseAccount,
   onSubmit,
 }: {
   hasPassword: boolean;
   requiresCurrentPassword: boolean;
-  isReadOnly: boolean;
+  hasActiveEnterpriseAccount: boolean;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<void>;
 }) {
   const controller = useUserProfileEditPasswordController({
@@ -73,7 +73,7 @@ function EditPassword({
     <UserProfileEditPasswordView
       {...controller}
       hasPassword={hasPassword}
-      isReadOnly={isReadOnly}
+      hasActiveEnterpriseAccount={hasActiveEnterpriseAccount}
       open={controller.isOpen}
       requiresCurrentPassword={requiresCurrentPassword}
       trigger={

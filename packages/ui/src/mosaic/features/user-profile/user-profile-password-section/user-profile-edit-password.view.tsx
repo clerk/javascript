@@ -34,10 +34,11 @@ export interface UserProfileEditPasswordViewProps {
   /** Asks for the password being replaced. Off when reverification stands in for it. */
   requiresCurrentPassword?: boolean;
   /**
-   * The password cannot change while the account signs in only through an enterprise connection.
-   * The dialog still opens so it can say so, but every field is inert and only cancel remains.
+   * Whether the account signs in through an active enterprise connection, which is what stops the
+   * password from changing. The dialog still opens so it can say so, but every field is inert and
+   * only cancel remains.
    */
-  isReadOnly?: boolean;
+  hasActiveEnterpriseAccount?: boolean;
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
@@ -63,7 +64,7 @@ export function UserProfileEditPasswordView({
   trigger,
   hasPassword = false,
   requiresCurrentPassword = false,
-  isReadOnly = false,
+  hasActiveEnterpriseAccount = false,
   currentPassword,
   newPassword,
   confirmPassword,
@@ -82,7 +83,7 @@ export function UserProfileEditPasswordView({
   const signOutDescriptionId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
-  const inert = isSaving || isReadOnly;
+  const inert = isSaving || hasActiveEnterpriseAccount;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -117,9 +118,9 @@ export function UserProfileEditPasswordView({
               />
             }
           >
-            {isReadOnly ? (
+            {hasActiveEnterpriseAccount ? (
               <Banner.Root color='neutral'>
-                <Banner.Label>{m.readOnly}</Banner.Label>
+                <Banner.Label>{m.enterpriseAccount}</Banner.Label>
               </Banner.Root>
             ) : null}
             {error?.message ? (
@@ -198,7 +199,7 @@ export function UserProfileEditPasswordView({
                 </Button>
               }
             />
-            {isReadOnly ? null : (
+            {hasActiveEnterpriseAccount ? null : (
               <SubmitButton
                 form={formId}
                 fullWidth
