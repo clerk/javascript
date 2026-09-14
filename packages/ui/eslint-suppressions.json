@@ -1,166 +1,111 @@
 {
-  "src/Components.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
   "src/components/Checkout/CheckoutComplete.tsx": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/components/Checkout/CheckoutForm.tsx": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/components/ConfigureDirectorySync/steps/ConfigureStep.tsx": {
-    "complexity": {
+  "src/components/ConfigureDirectorySync/SecurityDirectorySyncSection.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/components/ConfigureSSO/steps/ConfigureStep/saml/SamlCustomConfigureSteps.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/components/ConfigureSSO/steps/ConfigureStep/saml/SamlGoogleConfigureSteps.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/components/ConfigureSSO/steps/ConfigureStep/saml/SamlMicrosoftConfigureSteps.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/components/ConfigureSSO/steps/ConfigureStep/saml/SamlOktaConfigureSteps.tsx": {
-    "complexity": {
+  "src/components/ConfigureSSO/elements/Wizard/reducer.ts": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/components/OAuthConsent/OAuthConsent.tsx": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/components/OAuthDeviceVerification/OAuthDeviceVerification.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/components/OrganizationList/OrganizationListPage.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/components/OrganizationProfile/OrganizationMembers.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/components/PaymentAttempts/PaymentAttemptPage.tsx": {
-    "complexity": {
+  "src/components/OrganizationProfile/InviteMembersForm.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/components/PricingTable/PricingTableDefault.tsx": {
-    "complexity": {
-      "count": 1
+    "sonarjs/cognitive-complexity": {
+      "count": 2
     }
   },
-  "src/components/SessionTasks/tasks/TaskChooseOrganization/ChooseOrganizationScreen.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/components/SessionTasks/tasks/TaskChooseOrganization/index.tsx": {
-    "complexity": {
+  "src/components/SignIn/SignInFactorOne.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/components/SignIn/SignInStart.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/components/SignUp/SignUpForm.tsx": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/components/SignUp/SignUpStart.tsx": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/components/UserProfile/ConnectedAccountsSection.tsx": {
-    "complexity": {
+  "src/components/SignUp/signUpFormHelpers.ts": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/components/UserProfile/ProfileForm.tsx": {
-    "complexity": {
+  "src/components/SubscriptionDetails/index.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 2
+    }
+  },
+  "src/components/Subscriptions/SubscriptionsList.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/contexts/components/SignIn.ts": {
-    "complexity": {
+  "src/components/devPrompts/EnableOrganizationsPrompt/index.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/contexts/components/SignUp.ts": {
-    "complexity": {
+  "src/components/devPrompts/KeylessPrompt/index.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/elements/FormControl.tsx": {
-    "complexity": {
+  "src/contexts/components/Plans.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/elements/SocialButtons.tsx": {
-    "complexity": {
+  "src/hooks/useProtectCheckRunner.ts": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/elements/UserPreview.tsx": {
-    "complexity": {
+  "src/mosaic/user-button/user-button.view.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/hooks/__tests__/useCoreOrganization.test.tsx": {
-    "complexity": {
-      "count": 4
-    }
-  },
-  "src/mosaic/components/button/button.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/mosaic/components/input/input.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/mosaic/user-button/user-button.model.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/mosaic/user-profile/user-profile-account-section/user-profile-edit-name.view.tsx": {
-    "complexity": {
+  "src/mosaic/user-profile/user-profile-security-panel.view.tsx": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/router/pathToRegexp.ts": {
-    "complexity": {
-      "count": 3
+    "sonarjs/cognitive-complexity": {
+      "count": 4
     }
   },
-  "src/utils/passwordUtils.ts": {
-    "complexity": {
+  "src/utils/colors/legacy.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/utils/detectClerkStylesheetUsage.ts": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   }

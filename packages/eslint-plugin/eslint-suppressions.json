@@ -1,7 +1,27 @@
 {
-  "src/next/require-auth-protection.ts": {
-    "complexity": {
+  "src/next/fix-auth-protection.ts": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
+    }
+  },
+  "src/next/lib/exports.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 3
+    }
+  },
+  "src/next/lib/fixers.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/next/lib/match-folders.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/next/lib/protection-checks.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 2
     }
   }
 }

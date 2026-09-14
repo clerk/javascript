@@ -1,10 +1,10 @@
 {
-  "src/common/helpers-utils.ts": {
+  "src/main/create-clerk-bridge.ts": {
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/playwright/setupClerkTestingToken.ts": {
+  "src/storage/index.ts": {
     "sonarjs/cognitive-complexity": {
       "count": 1
     }

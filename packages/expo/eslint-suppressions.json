@@ -1,16 +1,11 @@
 {
   "src/hooks/useSignInWithApple.ios.ts": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/provider/nativeClientSync.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/provider/singleton/createClerkInstance.ts": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   }

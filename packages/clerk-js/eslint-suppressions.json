@@ -1,26 +1,51 @@
 {
   "src/core/clerk.ts": {
-    "complexity": {
-      "count": 4
+    "sonarjs/cognitive-complexity": {
+      "count": 7
     }
   },
   "src/core/fapiClient.ts": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/core/fraudProtection.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/core/protect.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/core/protectSession.ts": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/core/resources/Base.ts": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/core/resources/User.ts": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/core/tokenCache.ts": {
-    "complexity": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/utils/billing.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/utils/captcha/turnstile.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/utils/mergePatch.ts": {
+    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   }

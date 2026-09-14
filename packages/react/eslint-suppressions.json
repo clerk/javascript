@@ -1,10 +1,10 @@
 {
-  "src/common/helpers-utils.ts": {
+  "src/isomorphicClerk.ts": {
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
-  "src/playwright/setupClerkTestingToken.ts": {
+  "src/utils/useCustomMenuItems.tsx": {
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
