@@ -73,7 +73,6 @@ export function UserProfileContactListRowView({
         ) : (
           items.map(item => {
             const actions: UserProfileMenuAction[] = [];
-            const hasExplicitActions = Boolean(onVerify || onSetPrimary || onRemove);
 
             if (item.isVerified === false && onVerify) {
               actions.push({
@@ -92,7 +91,7 @@ export function UserProfileContactListRowView({
               });
             }
 
-            if (!hasExplicitActions && onManage) {
+            if (actions.length === 0 && onManage) {
               actions.push({ label: m.manage, onClick: () => onManage(item.id) });
             }
 
