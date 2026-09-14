@@ -64,16 +64,7 @@ const ServiceProviderSectionRoot = ({ children }: { children: ReactNode }): JSX.
     id='sso'
     centered={false}
   >
-    <Col gap={4}>
-      <Text
-        as='p'
-        colorScheme='secondary'
-        localizationKey={localizationKeys(
-          'organizationProfile.securityPage.connectionPage.serviceProvider.description',
-        )}
-      />
-      {children}
-    </Col>
+    <Col gap={4}>{children}</Col>
   </ProfileSection.Root>
 );
 
@@ -89,6 +80,7 @@ const CopyableValue = ({ label, value }: { label: LocalizationKey; value: string
       />
       <ClipboardInput
         value={value}
+        readOnly
         aria-label={t(label)}
         copyIcon={Clipboard}
         copiedIcon={Checkmark}

@@ -65,7 +65,7 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
 
-      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
       expect(screen.queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
@@ -87,7 +87,7 @@ describe('OrganizationSecurityPage', () => {
       expect(await screen.findByText('In Progress')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
       expect(screen.queryByText(/you have started a configuration/i)).not.toBeInTheDocument();
-      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
 
       expect(screen.getByRole('button', { name: 'clerk.com' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
@@ -107,7 +107,7 @@ describe('OrganizationSecurityPage', () => {
       expect(await screen.findByText('Active')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
 
-      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
 
       expect(screen.queryByText(/^Domains:?$/)).not.toBeInTheDocument();
       expect(screen.getAllByText('clerk.com').length).toBeGreaterThan(0);
@@ -133,7 +133,7 @@ describe('OrganizationSecurityPage', () => {
 
       expect(await screen.findByText('Inactive')).toBeInTheDocument();
 
-      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
 
       for (const domain of ['github.com', 'gmail.com', 'maps.com', 'another.com']) {
@@ -221,7 +221,7 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
     });
 
-    it("resumes the wizard at the reachable step from the connection page's Open setup wizard", async () => {
+    it("resumes the wizard at the reachable step from the connection page's Continue setup", async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       // A connection without SAML configuration is mid-setup (in_progress).
@@ -237,7 +237,7 @@ describe('OrganizationSecurityPage', () => {
       const { userEvent } = renderPage(wrapper);
 
       await userEvent.click(await screen.findByRole('button', { name: 'clerk.com' }));
-      await userEvent.click(await screen.findByRole('button', { name: 'Open setup wizard' }));
+      await userEvent.click(await screen.findByRole('button', { name: 'Continue setup' }));
 
       // The connection page forces no step, so the wizard resumes at the furthest-
       // reachable step for this connection (configure, since a provider connection
@@ -328,7 +328,8 @@ describe('OrganizationSecurityPage', () => {
       const { userEvent } = renderPage(wrapper);
 
       await userEvent.click(await screen.findByRole('button', { name: 'clerk.com' }));
-      await userEvent.click(await screen.findByRole('switch', { name: 'Sync user attributes' }));
+      await userEvent.click(await screen.findByRole('checkbox', { name: /Sync user attributes/ }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
       expect(screen.queryByText('Identity provider')).not.toBeInTheDocument();

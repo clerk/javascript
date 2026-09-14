@@ -1221,19 +1221,15 @@ export type __internal_LocalizationResource = {
         tooltipLabel: LocalizationValue;
       };
       connectionPage: {
-        saveButton: LocalizationValue;
         actions: {
           activate: LocalizationValue;
           deactivate: LocalizationValue;
-          openWizard: LocalizationValue;
-          remove: LocalizationValue;
+          continueSetup: LocalizationValue;
         };
         general: {
           title: LocalizationValue;
           nameLabel: LocalizationValue;
           domainsLabel: LocalizationValue;
-          providerLabel: LocalizationValue;
-          createdLabel: LocalizationValue;
           editNameButton: LocalizationValue;
           nameForm: {
             title: LocalizationValue;
@@ -1241,7 +1237,6 @@ export type __internal_LocalizationResource = {
         };
         serviceProvider: {
           title: LocalizationValue;
-          description: LocalizationValue;
           acsUrl: LocalizationValue;
           entityId: LocalizationValue;
           metadataUrl: LocalizationValue;
@@ -1249,11 +1244,18 @@ export type __internal_LocalizationResource = {
         };
         identityProvider: {
           title: LocalizationValue;
-          description: LocalizationValue;
-          certificateExpires: LocalizationValue<'date'>;
+          certificateExpires: LocalizationValue;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
           clientSecret: {
             placeholder: LocalizationValue;
           };
+        };
+        remove: {
+          title: LocalizationValue;
+          button: LocalizationValue;
         };
         settings: {
           title: LocalizationValue;

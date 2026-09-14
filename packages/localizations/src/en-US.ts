@@ -1323,33 +1323,35 @@ export const enUS: LocalizationResource = {
       connectionPage: {
         actions: {
           activate: 'Activate',
+          continueSetup: 'Continue setup',
           deactivate: 'Deactivate',
-          openWizard: 'Open setup wizard',
-          remove: 'Remove',
         },
         general: {
-          createdLabel: 'Created',
           domainsLabel: 'Domains',
           editNameButton: 'Edit',
           nameForm: {
             title: 'Rename connection',
           },
           nameLabel: 'Name',
-          providerLabel: 'Provider',
           title: 'General',
         },
         identityProvider: {
-          certificateExpires: 'Certificate expires {{date}}',
+          certificateExpires: 'Certificate expires',
           clientSecret: {
             placeholder: 'Leave empty to keep the current secret',
           },
-          description: 'Retrieve these values from your identity provider.',
+          editButton: 'Edit',
+          form: {
+            title: 'Edit identity provider',
+          },
           title: 'Identity provider',
         },
-        saveButton: 'Save',
+        remove: {
+          button: 'Remove connection',
+          title: 'Remove connection',
+        },
         serviceProvider: {
           acsUrl: 'Assertion consumer service (ACS) URL',
-          description: 'Enter these values into your identity provider.',
           entityId: 'Entity ID',
           metadataUrl: 'Metadata URL',
           redirectUri: 'Redirect URI',
@@ -1357,23 +1359,23 @@ export const enUS: LocalizationResource = {
         },
         settings: {
           allowAdditionalIdentifiers: {
-            description: 'Let users keep other sign-in methods alongside this connection.',
+            description: 'Members may keep other sign-in methods.',
             label: 'Allow additional identifiers',
           },
           allowIdpInitiated: {
-            description: 'Let users start sign-in from the identity provider.',
+            description: 'Sign-in may start from the identity provider.',
             label: 'Allow IdP-initiated flow',
           },
           allowSubdomains: {
-            description: "Accept email addresses on subdomains of the connection's domains.",
+            description: "Also match subdomains of the connection's domains.",
             label: 'Allow subdomains',
           },
           forceAuthn: {
-            description: 'Ask the identity provider to re-authenticate the user on every sign-in.',
+            description: 'Re-authenticate at the identity provider on every sign-in.',
             label: 'Force authentication',
           },
           syncUserAttributes: {
-            description: "Update the user's attributes from the identity provider on every sign-in.",
+            description: 'Refresh name and email from the identity provider on each sign-in.',
             label: 'Sync user attributes',
           },
           title: 'Settings',
