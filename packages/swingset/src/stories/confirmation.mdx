@@ -57,7 +57,34 @@ A failed attempt leaves the dialog up. Pass the sentence the user should read as
   storyModule={Stories}
 />
 
+## One block, many rows
+
+A table of members has a Remove in every row, but it needs one confirmation, not one per row. Create a handle, mount the block once after the table, and open it from any row with the member it is about. The copy props take a function of that payload, and `onConfirm` receives it. The block owns `open`, the pending state, and the error: a resolved promise closes it, a rejected one keeps it open showing why.
+
+```tsx
+const removeMember = Confirmation.createHandle<Member>();
+
+<Menu.Item color='negative' onClick={() => removeMember.open(member)}>Remove</Menu.Item>
+
+<Confirmation
+  handle={removeMember}
+  title='Remove member'
+  description={member => <><strong>{member.name}</strong> will be removed from the organization.</>}
+  actionLabel='Remove'
+  onConfirm={member => api.removeMember(member.id)}
+/>
+```
+
+Opened from a menu item, focus returns to that menu's trigger when the dialog closes.
+
+<Story
+  name='WithHandle'
+  storyModule={Stories}
+/>
+
 ## Props
+
+Controlled:
 
 | Prop           | Type                      | Default      | Description                                                                    |
 | -------------- | ------------------------- | ------------ | ------------------------------------------------------------------------------ |
@@ -71,6 +98,17 @@ A failed attempt leaves the dialog up. Pass the sentence the user should read as
 | `onConfirm`    | `() => void`              | — (required) | Asks the caller to run the action.                                             |
 | `isConfirming` | `boolean`                 | `false`      | Renders the action pending and ignores further presses.                        |
 | `errorMessage` | `string`                  | —            | Renders as a negative banner above the actions.                                |
+
+With a handle:
+
+| Prop          | Type                                           | Default      | Description                                                                            |
+| ------------- | ---------------------------------------------- | ------------ | -------------------------------------------------------------------------------------- |
+| `handle`      | `ConfirmationHandle<Payload>`                  | — (required) | From `Confirmation.createHandle<Payload>()`. `handle.open(payload)` opens the block.   |
+| `title`       | `string \| (payload: Payload) => string`       | — (required) | Names what is about to happen.                                                         |
+| `description` | `ReactNode \| (payload: Payload) => ReactNode` | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                       |
+| `actionLabel` | `string \| (payload: Payload) => string`       | — (required) | The destructive button's label.                                                        |
+| `cancelLabel` | `string`                                       | `'Cancel'`   | The cancel button's label.                                                             |
+| `onConfirm`   | `(payload: Payload) => Promise<void> \| void`  | — (required) | Runs the action. Resolve to close; reject with an `Error` to keep it open showing why. |
 
 ## Driving it from a machine
 

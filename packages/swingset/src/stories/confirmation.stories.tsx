@@ -97,3 +97,66 @@ export function WithError() {
     />
   );
 }
+
+interface ConnectedAccount {
+  id: string;
+  provider: string;
+}
+
+const removeAccount = Confirmation.createHandle<ConnectedAccount>();
+
+const describeRemoval = (account: ConnectedAccount) => (
+  <>
+    <strong>{account.provider}</strong> will be removed from this account. You will no longer be able to use this
+    connected account and any dependent features will no longer work.
+  </>
+);
+
+/**
+ * One block for many rows. `handle.open(account)` opens it with the account it is about, and the
+ * promise `onConfirm` returns closes it or explains the failure. The block owns the rest.
+ */
+export function WithHandle() {
+  const [accounts, setAccounts] = React.useState<ConnectedAccount[]>([
+    { id: 'eac_1', provider: 'Google' },
+    { id: 'eac_2', provider: 'GitHub' },
+    { id: 'eac_3', provider: 'Microsoft' },
+  ]);
+
+  const handleConfirm = async (account: ConnectedAccount) => {
+    await settleAfter(2000);
+    if (account.provider === 'Google') {
+      throw new Error('Google is your only way to sign in. Add a password or another account first.');
+    }
+    setAccounts(current => current.filter(item => item.id !== account.id));
+  };
+
+  return (
+    <>
+      <ul style={{ display: 'grid', gap: 8, margin: 0, padding: 0, listStyle: 'none' }}>
+        {accounts.map(account => (
+          <li
+            key={account.id}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}
+          >
+            {account.provider}
+            <Button
+              color='negative'
+              variant='outline'
+              onClick={() => removeAccount.open(account)}
+            >
+              Remove
+            </Button>
+          </li>
+        ))}
+      </ul>
+      <Confirmation
+        handle={removeAccount}
+        title='Remove connected account'
+        description={describeRemoval}
+        actionLabel='Remove'
+        onConfirm={handleConfirm}
+      />
+    </>
+  );
+}
