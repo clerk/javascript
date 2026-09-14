@@ -1,15 +1,15 @@
+import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
-import { Icon } from '../components/icon';
+import { Icon, IconFrame } from '../components/icon';
 import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 import { styles } from './user-profile-connected-accounts.styles';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
-import { UserProfileConnectedProviderIcon } from './user-profile-connected-provider-icon';
 import { UserProfileRemoveConnectedAccountDialog } from './user-profile-remove-connected-account.dialog';
 
 export function UserProfileConnectedAccountRowView({
@@ -24,6 +24,7 @@ export function UserProfileConnectedAccountRowView({
   onRemove?: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const iconUrl = account.iconUrl?.trim();
   const actions: UserProfileMenuAction[] = [];
   if (account.status === 'reconnect' && onReconnect) {
     actions.push({ label: m.reconnect, onClick: () => onReconnect(account.id) });
@@ -35,7 +36,22 @@ export function UserProfileConnectedAccountRowView({
     <Section.Row xstyle={onConnect && styles.connectRow}>
       <Section.Item>
         <Section.Media size='lg'>
-          <UserProfileConnectedProviderIcon {...account} />
+          <IconFrame>
+            {iconUrl ? (
+              <img
+                src={iconUrl}
+                alt={account.provider}
+                {...stylex.props(styles.icon)}
+              />
+            ) : (
+              <span
+                aria-hidden
+                {...stylex.props(styles.fallback)}
+              >
+                {account.provider.trim().charAt(0).toUpperCase()}
+              </span>
+            )}
+          </IconFrame>
         </Section.Media>
         <Section.Content>
           <Section.Label xstyle={styles.label}>
