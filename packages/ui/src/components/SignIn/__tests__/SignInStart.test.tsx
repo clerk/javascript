@@ -1,7 +1,7 @@
 import { ClerkAPIResponseError, ClerkWebAuthnError } from '@clerk/shared/error';
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import type { SignInResource } from '@clerk/shared/types';
+import type { SignedInSessionResource, SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -12,7 +12,7 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
-import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
+import { SIGN_IN_PROMPT_PARAM, SIGN_IN_PROMPT_SELECT_ACCOUNT, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
 import { SignInStart } from '../SignInStart';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -64,6 +64,74 @@ describe('SignInStart', () => {
     });
     render(<SignInStart />, { wrapper });
     screen.getAllByText(/sign in to .*/i);
+  });
+
+  describe('prompt=select_account', () => {
+    const { createFixtures: createFixturesWithPrompt } = bindCreateFixtures('SignIn', {
+      router: { queryParams: { [SIGN_IN_PROMPT_PARAM]: SIGN_IN_PROMPT_SELECT_ACCOUNT } },
+    });
+    const withSignedInSessions = createFixtures.config(f => {
+      f.withEmailAddress();
+      f.withMultiSessionMode();
+      f.withUser({ email_addresses: ['test1@clerk.com'] });
+    });
+    const expectForm = () => {
+      screen.getAllByText(/sign in to .*/i);
+      expect(screen.queryByText('Add account')).toBeNull();
+    };
+
+    it('renders the identifier form without the prompt even when signed-in sessions exist', async () => {
+      const { wrapper } = await createFixtures(withSignedInSessions);
+      render(<SignInStart />, { wrapper });
+      expectForm();
+    });
+
+    it('renders the account switcher with the prompt when signed-in sessions exist', async () => {
+      const { wrapper, fixtures } = await createFixturesWithPrompt(withSignedInSessions);
+      render(<SignInStart />, { wrapper });
+      screen.getByText('Add account');
+      expect(screen.queryByText(/sign in to .*/i)).toBeNull();
+      expect(fixtures.router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('navigates to the index without the prompt when "Add account" is clicked', async () => {
+      const { wrapper, fixtures } = await createFixturesWithPrompt(withSignedInSessions);
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.click(screen.getByText('Add account'));
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('.');
+    });
+
+    it('renders the identifier form with the prompt when no signed-in sessions exist', async () => {
+      const { wrapper } = await createFixturesWithPrompt(f => {
+        f.withEmailAddress();
+        f.withMultiSessionMode();
+      });
+      render(<SignInStart />, { wrapper });
+      expectForm();
+    });
+
+    it('keeps the identifier form when a session appears after mount', async () => {
+      const { wrapper, fixtures } = await createFixturesWithPrompt(f => {
+        f.withEmailAddress();
+        f.withMultiSessionMode();
+      });
+      const { rerender } = render(<SignInStart />, { wrapper });
+      vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
+        { id: 'sess_1' } as unknown as SignedInSessionResource,
+      ]);
+      rerender(<SignInStart />);
+      expectForm();
+    });
+
+    it('ignores the prompt in single-session mode', async () => {
+      const { wrapper, fixtures } = await createFixturesWithPrompt(f => {
+        f.withEmailAddress();
+        f.withUser({ email_addresses: ['test1@clerk.com'] });
+      });
+      render(<SignInStart />, { wrapper });
+      expect(screen.queryByText('Add account')).toBeNull();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+    });
   });
 
   describe('Login Methods', () => {

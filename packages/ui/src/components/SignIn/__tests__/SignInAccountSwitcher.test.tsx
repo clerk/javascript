@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
@@ -42,6 +42,14 @@ describe('SignInAccountSwitcher', () => {
     const { userEvent, getByText } = render(<SignInAccountSwitcher />, { wrapper });
     await userEvent.click(getByText('Add account'));
     expect(fixtures.router.navigate).toHaveBeenCalled();
+  });
+
+  it('uses the given "Add account" handler when one is passed', async () => {
+    const onAddAccount = vi.fn();
+    const { wrapper } = await createFixtures(initConfig);
+    const { userEvent, getByText } = render(<SignInAccountSwitcher onAddAccount={onAddAccount} />, { wrapper });
+    await userEvent.click(getByText('Add account'));
+    expect(onAddAccount).toHaveBeenCalled();
   });
 
   it('signs out when user clicks on "Sign out of all accounts"', async () => {
