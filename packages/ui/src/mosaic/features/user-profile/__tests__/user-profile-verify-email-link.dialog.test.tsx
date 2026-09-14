@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
-import type { UserProfileVerifyEmailLinkViewProps } from '../user-profile-verify-email-link.view';
-import { UserProfileVerifyEmailLinkView } from '../user-profile-verify-email-link.view';
+import type { UserProfileVerifyEmailLinkDialogProps } from '../user-profile-account-section/user-profile-verify-email-link.dialog';
+import { UserProfileVerifyEmailLinkDialog } from '../user-profile-account-section/user-profile-verify-email-link.dialog';
 
-function renderView(overrides: Partial<UserProfileVerifyEmailLinkViewProps> = {}) {
-  const props: UserProfileVerifyEmailLinkViewProps = {
+function renderView(overrides: Partial<UserProfileVerifyEmailLinkDialogProps> = {}) {
+  const props: UserProfileVerifyEmailLinkDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
     emailAddress: 'example@email.com',
@@ -18,13 +18,13 @@ function renderView(overrides: Partial<UserProfileVerifyEmailLinkViewProps> = {}
     props,
     ...render(
       <MosaicProvider>
-        <UserProfileVerifyEmailLinkView {...props} />
+        <UserProfileVerifyEmailLinkDialog {...props} />
       </MosaicProvider>,
     ),
   };
 }
 
-describe('UserProfileVerifyEmailLinkView', () => {
+describe('UserProfileVerifyEmailLinkDialog', () => {
   it('shows the address awaiting verification and lets the user resend the link', async () => {
     const user = userEvent.setup();
     const { props } = renderView();

@@ -8,8 +8,8 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
-import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
+import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 

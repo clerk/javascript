@@ -1,36 +1,22 @@
 import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
-import type { ReactNode } from 'react';
-import { useMemo, useRef, useState } from 'react';
 
-import { createConfirmHandle, Dialog } from '../../../components/dialog';
-import { Text } from '../../../components/text';
 import { Section } from '../../../components/section';
-import { Button } from '../../../components/button';
-import { Icon } from '../../../components/icon';
-import type { UserProfileAddEmailControllerOptions } from '../user-profile-add-email.controller';
-import { useUserProfileAddEmailController } from '../user-profile-add-email.controller';
-import { UserProfileAddEmailView } from '../user-profile-add-email.view';
-import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import { styles } from './user-profile-account-section.styles';
-import type { UserProfileNameAttribute, UserProfilePhone } from './user-profile-account-section.types';
-import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
-import { UserProfileContactRowView } from './user-profile-contact-row.view';
+import type {
+  UserProfileEmail,
+  UserProfileNameAttribute,
+  UserProfilePhone,
+} from './user-profile-account-section.types';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
+import { UserProfileEmailRowView } from './user-profile-email-row.view';
 import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePhoneRowView } from './user-profile-phone-row.view';
 import { UserProfilePictureRowView } from './user-profile-picture-row.view';
 import { UserProfileUsernameRowView } from './user-profile-username-row.view';
 
-export type { UserProfilePhone } from './user-profile-account-section.types';
-
-export interface UserProfileEmail {
-  id: string;
-  value: string;
-  isDefault?: boolean;
-  isVerified?: boolean;
-  canRemove?: boolean;
-}
+export type { UserProfileEmail, UserProfilePhone } from './user-profile-account-section.types';
 
 export interface UserProfileAccountSectionViewProps {
   allowMultipleAccounts?: boolean;
@@ -113,13 +99,19 @@ export function UserProfileAccountSectionView({
       onRemovePhone={onRemovePhone}
     />
   );
-  const addEmailAction =
-    onSendEmailCode && onVerifyEmailCode ? (
-      <AddEmail
-        options={{ onSend: onSendEmailCode, onVerify: onVerifyEmailCode }}
-        compact={allowMultipleAccounts}
-      />
-    ) : undefined;
+  const emailRow = (
+    <UserProfileEmailRowView
+      emails={emails}
+      allowMultipleAccounts={allowMultipleAccounts}
+      onAddEmail={onAddEmail}
+      onSendEmailCode={onSendEmailCode}
+      onVerifyEmailCode={onVerifyEmailCode}
+      onManageEmail={onManageEmail}
+      onVerifyEmail={onVerifyEmail}
+      onSetPrimaryEmail={onSetPrimaryEmail}
+      onRemoveEmail={onRemoveEmail}
+    />
+  );
 
   return (
     <div {...stylex.props(styles.sections)}>
@@ -146,30 +138,14 @@ export function UserProfileAccountSectionView({
             username={username}
             onSubmit={onSubmitUsername}
           />
-          {!allowMultipleAccounts ? (
-            <UserProfileContactRowView
-              items={emails}
-              kind='email'
-              label={m.email.label}
-              addAction={addEmailAction}
-              onAdd={onAddEmail}
-              onManage={onManageEmail}
-            />
-          ) : null}
+          {!allowMultipleAccounts ? emailRow : null}
           {!allowMultipleAccounts ? phoneRow : null}
         </Section.Group>
       </Section.Root>
       {allowMultipleAccounts ? (
-        <EmailContactSection
-          items={emails}
-          kind='email'
-          label={m.email.label}
-          addAction={addEmailAction}
-          onAdd={onAddEmail}
-          onRemove={onRemoveEmail}
-          onSetPrimary={onSetPrimaryEmail}
-          onVerify={onVerifyEmail}
-        />
+        <Section.Root aria-label={m.email.label}>
+          <Section.Group>{emailRow}</Section.Group>
+        </Section.Root>
       ) : null}
       {allowMultipleAccounts ? (
         <Section.Root aria-label={m.phone.label}>
@@ -177,152 +153,5 @@ export function UserProfileAccountSectionView({
         </Section.Root>
       ) : null}
     </div>
-  );
-}
-
-function AddEmail({ options, compact }: { options: UserProfileAddEmailControllerOptions; compact: boolean }) {
-  const controller = useUserProfileAddEmailController(options);
-  return (
-    <UserProfileAddEmailView
-      {...controller}
-      trigger={
-        <Button
-          aria-label={m.email.add}
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {compact ? (
-            <Icon
-              name='plus'
-              placement='inline-start'
-              size='sm'
-            />
-          ) : null}
-          {compact ? m.add : m.email.add}
-        </Button>
-      }
-    />
-  );
-}
-
-interface ContactSectionProps {
-  addAction?: ReactNode;
-  kind: 'email' | 'phone';
-  label: string;
-  items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
-  onAdd?: () => void;
-  onManage?: (id: string) => void;
-  onVerify?: (id: string) => void;
-  onSetPrimary?: (id: string) => void | Promise<void>;
-  onRemove?: (id: string) => void | Promise<void>;
-}
-
-function EmailContactSection(props: ContactSectionProps) {
-  const { items, onSetPrimary, onRemove } = props;
-  const messages = m.email;
-  const sectionRef = useRef<HTMLElement>(null);
-  const removeConfirm = useMemo(() => createConfirmHandle(), []);
-  const [contactToRemove, setContactToRemove] = useState<ContactSectionProps['items'][number]>();
-  const [removeError, setRemoveError] = useState<string>();
-  const removing = useRef(false);
-  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
-  const [primaryError, setPrimaryError] = useState<string>();
-  const settingPrimary = useRef(false);
-
-  const setPrimary = async (id: string) => {
-    const contact = items.find(item => item.id === id);
-    if (!onSetPrimary || !contact?.isVerified || contact.isDefault || settingPrimary.current) {
-      return;
-    }
-    settingPrimary.current = true;
-    setIsSettingPrimary(true);
-    setPrimaryError(undefined);
-    try {
-      await onSetPrimary(id);
-    } catch (error) {
-      setPrimaryError(error instanceof Error ? error.message : messages.primaryError);
-    } finally {
-      settingPrimary.current = false;
-      setIsSettingPrimary(false);
-    }
-  };
-
-  const removeContact = async (id: string) => {
-    const contact = items.find(item => item.id === id);
-    if (!contact || contact.canRemove === false || !onRemove || removing.current) {
-      return;
-    }
-    removing.current = true;
-    setContactToRemove(contact);
-    setRemoveError(undefined);
-    try {
-      const [beforeEmail, afterEmail] = messages.removeDialog.description.split('{emailAddress}');
-      const confirmed = await removeConfirm.show({
-        title: messages.removeDialog.title,
-        description: (
-          <>
-            {beforeEmail}
-            <strong {...stylex.props(styles.confirmationContactValue)}>{contact.value}</strong>
-            {afterEmail}
-          </>
-        ),
-        actionLabel: messages.removeDialog.confirm,
-        cancelLabel: messages.removeDialog.cancel,
-        destructive: true,
-      });
-      if (confirmed) {
-        await onRemove(id);
-      }
-    } catch (error) {
-      setRemoveError(error instanceof Error ? error.message : messages.removeError);
-    } finally {
-      removing.current = false;
-    }
-  };
-
-  return (
-    <Section.Root
-      ref={sectionRef}
-      aria-label={props.label}
-    >
-      <Section.Group>
-        <UserProfileContactListRowView
-          {...props}
-          onManage={isSettingPrimary ? undefined : props.onManage}
-          onSetPrimary={onSetPrimary && !isSettingPrimary ? id => void setPrimary(id) : undefined}
-          onRemove={onRemove ? id => void removeContact(id) : undefined}
-        />
-      </Section.Group>
-      {primaryError ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {primaryError}
-        </Text>
-      ) : null}
-      {removeError ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {removeError}
-        </Text>
-      ) : null}
-      <Dialog.Confirm
-        handle={removeConfirm}
-        finalFocus={() => {
-          const buttons = Array.from(sectionRef.current?.querySelectorAll('button') ?? []);
-          const label = contactToRemove ? fill(m.manageValue, { value: contactToRemove.value }) : '';
-          return (
-            buttons.find(button => button.getAttribute('aria-label') === label) ??
-            buttons.find(button => button.getAttribute('aria-label') === messages.add) ??
-            buttons[0] ??
-            false
-          );
-        }}
-      />
-    </Section.Root>
   );
 }

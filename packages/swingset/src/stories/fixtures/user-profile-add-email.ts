@@ -1,8 +1,8 @@
 import type { UserProfileAccountSectionViewProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddEmailViewProps } from '@clerk/ui/mosaic/user-profile/user-profile-add-email.view';
+import type { UserProfileAddEmailDialogProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-add-email.dialog';
 
 interface FixtureOptions {
-  failAt?: UserProfileAddEmailViewProps['step'];
+  failAt?: UserProfileAddEmailDialogProps['step'];
   onVerified?: (emailAddress: string) => void;
 }
 

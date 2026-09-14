@@ -1,18 +1,18 @@
 import type { FormEvent } from 'react';
-import { useEffect, useId, useRef } from 'react';
+import { useId, useRef } from 'react';
 
-import { Button, SubmitButton } from '../components/button';
-import { Card } from '../components/card';
-import type { DialogTriggerProps } from '../components/dialog';
-import { Dialog } from '../components/dialog';
-import { Field } from '../components/field';
-import { Flow } from '../components/flow';
-import { Input } from '../components/input';
-import { Otp } from '../components/otp';
-import { fill } from './user-profile-account-section/user-profile-account-section.messages';
+import { Button, SubmitButton } from '../../components/button';
+import { Card } from '../../components/card';
+import type { DialogTriggerProps } from '../../components/dialog';
+import { Dialog } from '../../components/dialog';
+import { Field } from '../../components/field';
+import { Flow } from '../../components/flow';
+import { Input } from '../../components/input';
+import { Otp } from '../../components/otp';
+import { fill } from './user-profile-account-section.messages';
 import { userProfileAddEmailMessages as m } from './user-profile-add-email.messages';
 
-export interface UserProfileAddEmailViewProps {
+export interface UserProfileAddEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
@@ -29,17 +29,11 @@ export interface UserProfileAddEmailViewProps {
   resendSeconds?: number;
 }
 
-export function UserProfileAddEmailView(props: UserProfileAddEmailViewProps) {
+export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps) {
   const emailFormId = useId();
   const verifyFormId = useId();
   const emailRef = useRef<HTMLInputElement>(null);
   const verifyRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (props.open && props.step === 'verify') {
-      verifyRef.current?.querySelector<HTMLInputElement>('input:not([type="hidden"])')?.focus();
-    }
-  }, [props.open, props.step]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -193,8 +193,8 @@ import {
   Overlay as UserProfileOverlay,
 } from '../stories/user-profile.stories';
 import {
-  AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
   AddEmailFails as UserProfileAccountSectionAddEmailFails,
+  AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
   Default as UserProfileAccountSectionDefault,
   EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
   EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,

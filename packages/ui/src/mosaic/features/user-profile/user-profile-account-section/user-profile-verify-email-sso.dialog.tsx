@@ -1,16 +1,16 @@
-import { Banner } from '../components/banner';
-import { Button } from '../components/button';
-import { Card } from '../components/card';
-import type { DialogTriggerProps } from '../components/dialog';
-import { Dialog } from '../components/dialog';
-import { Icon } from '../components/icon';
-import { Item } from '../components/item';
-import { Spinner } from '../components/spinner';
-import { fill } from './user-profile-account-section/user-profile-account-section.messages';
-import { UserProfileProviderIcon } from './user-profile-provider-icon';
+import { Banner } from '../../components/banner';
+import { Button } from '../../components/button';
+import { Card } from '../../components/card';
+import type { DialogTriggerProps } from '../../components/dialog';
+import { Dialog } from '../../components/dialog';
+import { Icon } from '../../components/icon';
+import { Item } from '../../components/item';
+import { Spinner } from '../../components/spinner';
+import { UserProfileProviderIcon } from '../user-profile-provider-icon';
+import { fill } from './user-profile-account-section.messages';
 import { userProfileVerifyEmailSsoMessages as m } from './user-profile-verify-email-sso.messages';
 
-export interface UserProfileVerifyEmailSsoViewProps {
+export interface UserProfileVerifyEmailSsoDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
@@ -25,7 +25,7 @@ export interface UserProfileVerifyEmailSsoViewProps {
   errorMessage?: string;
 }
 
-export function UserProfileVerifyEmailSsoView({
+export function UserProfileVerifyEmailSsoDialog({
   open,
   onOpenChange,
   trigger,
@@ -34,7 +34,7 @@ export function UserProfileVerifyEmailSsoView({
   onConnect,
   isConnecting = false,
   errorMessage,
-}: UserProfileVerifyEmailSsoViewProps) {
+}: UserProfileVerifyEmailSsoDialogProps) {
   return (
     <Dialog.Root
       closedBy='closerequest'

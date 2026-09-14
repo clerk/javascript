@@ -32,3 +32,11 @@ export interface UserProfilePhone {
   isVerified?: boolean;
   canRemove?: boolean;
 }
+
+export interface UserProfileEmail {
+  id: string;
+  value: string;
+  isDefault?: boolean;
+  isVerified?: boolean;
+  canRemove?: boolean;
+}

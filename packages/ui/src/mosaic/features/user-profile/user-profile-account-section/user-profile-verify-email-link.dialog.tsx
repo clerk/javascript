@@ -1,17 +1,17 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Banner } from '../components/banner';
-import { Button } from '../components/button';
-import { Card } from '../components/card';
-import type { DialogTriggerProps } from '../components/dialog';
-import { Dialog } from '../components/dialog';
-import { Spinner } from '../components/spinner';
-import { Text } from '../components/text';
-import { fill } from './user-profile-account-section/user-profile-account-section.messages';
+import { Banner } from '../../components/banner';
+import { Button } from '../../components/button';
+import { Card } from '../../components/card';
+import type { DialogTriggerProps } from '../../components/dialog';
+import { Dialog } from '../../components/dialog';
+import { Spinner } from '../../components/spinner';
+import { Text } from '../../components/text';
+import { fill } from './user-profile-account-section.messages';
 import { userProfileVerifyEmailLinkMessages as m } from './user-profile-verify-email-link.messages';
 import { styles } from './user-profile-verify-email-link.styles';
 
-export interface UserProfileVerifyEmailLinkViewProps {
+export interface UserProfileVerifyEmailLinkDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
@@ -22,7 +22,7 @@ export interface UserProfileVerifyEmailLinkViewProps {
   errorMessage?: string;
 }
 
-export function UserProfileVerifyEmailLinkView({
+export function UserProfileVerifyEmailLinkDialog({
   open,
   onOpenChange,
   trigger,
@@ -31,7 +31,7 @@ export function UserProfileVerifyEmailLinkView({
   isResending = false,
   resendSeconds = 0,
   errorMessage,
-}: UserProfileVerifyEmailLinkViewProps) {
+}: UserProfileVerifyEmailLinkDialogProps) {
   const [beforeEmail, afterEmail] = m.description.split('{emailAddress}');
 
   return (

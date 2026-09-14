@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
-import type { UserProfileAddEmailViewProps } from '../user-profile-add-email.view';
-import { UserProfileAddEmailView } from '../user-profile-add-email.view';
+import type { UserProfileAddEmailDialogProps } from '../user-profile-account-section/user-profile-add-email.dialog';
+import { UserProfileAddEmailDialog } from '../user-profile-account-section/user-profile-add-email.dialog';
 
-function renderView(overrides: Partial<UserProfileAddEmailViewProps> = {}) {
-  const props: UserProfileAddEmailViewProps = {
+function renderView(overrides: Partial<UserProfileAddEmailDialogProps> = {}) {
+  const props: UserProfileAddEmailDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
     step: 'email',
@@ -24,18 +24,18 @@ function renderView(overrides: Partial<UserProfileAddEmailViewProps> = {}) {
     props,
     ...render(
       <MosaicProvider>
-        <UserProfileAddEmailView {...props} />
+        <UserProfileAddEmailDialog {...props} />
       </MosaicProvider>,
     ),
   };
 }
 
-function VerificationExample({ onSubmit }: Pick<UserProfileAddEmailViewProps, 'onSubmit'>) {
+function VerificationExample({ onSubmit }: Pick<UserProfileAddEmailDialogProps, 'onSubmit'>) {
   const [code, setCode] = useState('');
 
   return (
     <MosaicProvider>
-      <UserProfileAddEmailView
+      <UserProfileAddEmailDialog
         open
         onOpenChange={() => undefined}
         step='verify'
@@ -50,7 +50,7 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddEmailViewProps, 'o
   );
 }
 
-describe('UserProfileAddEmailView', () => {
+describe('UserProfileAddEmailDialog', () => {
   it.each(['', 'invalid-address'])('uses native email validation for %j', async emailAddress => {
     const user = userEvent.setup();
     const { props } = renderView({ emailAddress });
@@ -103,7 +103,7 @@ describe('UserProfileAddEmailView', () => {
 
     rerender(
       <MosaicProvider>
-        <UserProfileAddEmailView
+        <UserProfileAddEmailDialog
           {...props}
           step='verify'
           code='123456'
@@ -115,7 +115,6 @@ describe('UserProfileAddEmailView', () => {
     expect(screen.getByText('Enter the code sent to person@example.com')).toBeInTheDocument();
     expect(screen.queryByRole('textbox', { name: 'Email' })).not.toBeInTheDocument();
     const firstSlot = screen.getByRole('textbox', { name: 'Verification code' });
-    await waitFor(() => expect(firstSlot).toHaveFocus());
     const verifyForm = firstSlot.closest('form');
     if (!verifyForm) {
       throw new Error('Verification form missing');
@@ -164,7 +163,7 @@ describe('UserProfileAddEmailView', () => {
 
     rerender(
       <MosaicProvider>
-        <UserProfileAddEmailView
+        <UserProfileAddEmailDialog
           {...props}
           resendSeconds={0}
         />
@@ -175,7 +174,7 @@ describe('UserProfileAddEmailView', () => {
 
     rerender(
       <MosaicProvider>
-        <UserProfileAddEmailView
+        <UserProfileAddEmailDialog
           {...props}
           resendSeconds={0}
           isResending

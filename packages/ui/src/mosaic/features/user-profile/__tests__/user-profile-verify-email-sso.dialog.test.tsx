@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
-import type { UserProfileVerifyEmailSsoViewProps } from '../user-profile-verify-email-sso.view';
-import { UserProfileVerifyEmailSsoView } from '../user-profile-verify-email-sso.view';
+import type { UserProfileVerifyEmailSsoDialogProps } from '../user-profile-account-section/user-profile-verify-email-sso.dialog';
+import { UserProfileVerifyEmailSsoDialog } from '../user-profile-account-section/user-profile-verify-email-sso.dialog';
 
-function renderView(overrides: Partial<UserProfileVerifyEmailSsoViewProps> = {}) {
-  const props: UserProfileVerifyEmailSsoViewProps = {
+function renderView(overrides: Partial<UserProfileVerifyEmailSsoDialogProps> = {}) {
+  const props: UserProfileVerifyEmailSsoDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
     emailAddress: 'example@email.com',
@@ -19,13 +19,13 @@ function renderView(overrides: Partial<UserProfileVerifyEmailSsoViewProps> = {})
     props,
     ...render(
       <MosaicProvider>
-        <UserProfileVerifyEmailSsoView {...props} />
+        <UserProfileVerifyEmailSsoDialog {...props} />
       </MosaicProvider>,
     ),
   };
 }
 
-describe('UserProfileVerifyEmailSsoView', () => {
+describe('UserProfileVerifyEmailSsoDialog', () => {
   it('shows the matching connection and lets the user connect to verify their email', async () => {
     const user = userEvent.setup();
     const { props } = renderView();

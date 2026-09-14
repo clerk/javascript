@@ -16,8 +16,8 @@ import type {
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
-import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
+import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
 
