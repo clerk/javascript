@@ -273,7 +273,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth
     await app.teardown();
   });
 
-  test('openSignIn OAuth in combined flow targets /sign-in#/create/sso-callback', async ({ page, context }) => {
+  test('openSignIn OAuth in combined flow targets /sign-in#/sso-callback', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
@@ -297,13 +297,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth
     expect(redirectUrl).toBeTruthy();
 
     // Combined flow (CLERK_SIGN_UP_URL is unset in this env): the sso-callback must anchor to
-    // ClerkProvider.signInUrl and carry the combined-flow /create segment, since the
-    // create/sso-callback route is mounted under the SignIn tree — not SignUp.
+    // ClerkProvider.signInUrl. The modal cannot know whether the SignIn mounted at that URL has the
+    // combined-flow `create/*` routes, so it targets `sso-callback`, which every SignIn mounts and
+    // whose handler transfers new users into a sign-up itself.
     const parsed = new URL(redirectUrl!);
     const appOrigin = new URL(app.serverUrl).origin;
     expect(parsed.origin).toBe(appOrigin);
     expect(parsed.pathname).toBe('/sign-in');
-    expect(parsed.hash).toMatch(/^#\/create\/sso-callback/);
+    expect(parsed.hash).toMatch(/^#\/sso-callback/);
   });
 });
 
