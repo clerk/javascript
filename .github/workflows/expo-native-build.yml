@@ -227,7 +227,7 @@ jobs:
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
 
       - name: Boot iOS simulators
-        if: matrix.platform == 'ios' && matrix.run-e2e == true
+        if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
         run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$MAESTRO_SHARDS"
 
       - name: Cache maestro CLI
@@ -292,6 +292,7 @@ jobs:
           "$GITHUB_WORKSPACE/$E2E_DIR/boot-ios-simulators.sh" wait
           mkdir -p "$RUNNER_TEMP/maestro-debug"
           log_pids=()
+          trap 'kill "${log_pids[@]}" 2>/dev/null || true; wait "${log_pids[@]}" 2>/dev/null || true' EXIT
           for udid in ${MAESTRO_UDID//,/ }; do
             xcrun simctl install "$udid" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
             xcrun simctl spawn "$udid" log stream --style compact \
@@ -299,11 +300,8 @@ jobs:
               > "$RUNNER_TEMP/maestro-debug/$udid-console.log" 2>&1 &
             log_pids+=($!)
           done
-          rc=0
           PLATFORM=ios MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" \
-            "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh" || rc=$?
-          kill "${log_pids[@]}" 2>/dev/null || true
-          exit "$rc"
+            "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh"
 
       - name: Enable KVM
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
