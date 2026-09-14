@@ -14,7 +14,7 @@ const styles = stylex.create({ stack: { display: 'grid', gap: 8, maxWidth: 384 }
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'stable',
+  status: 'wip',
   title: 'Select',
   source: 'packages/ui/src/mosaic/components/select/select.tsx',
 };
