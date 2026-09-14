@@ -102,6 +102,20 @@ describe('alignSelectedItem', () => {
     expect(floating.style.getPropertyValue('--cl-available-height')).toBe('784px');
   });
 
+  it('counts the borders of the boxes between the option and the popup edge', async () => {
+    const { middleware, state, floating, scroller } = setup({
+      referenceTop: 300,
+      floatingHeight: 200,
+      selectedOffset: 60,
+    });
+    define(floating, { clientTop: 1 });
+    define(scroller, { clientTop: 2 });
+
+    const result = await middleware.fn(state);
+
+    expect(result).toMatchObject({ x: 100, y: 237 });
+  });
+
   it('returns coordinates in the floating element space, not the viewport', async () => {
     // The document is scrolled 1000px: the trigger is at 300 in the viewport, 1300 on the page.
     const { middleware, state } = setup({
