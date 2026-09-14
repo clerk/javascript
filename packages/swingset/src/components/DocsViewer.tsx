@@ -49,6 +49,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     combobox: dynamic(() => import('../stories/combobox.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
+    pagination: dynamic(() => import('../stories/pagination.mdx')),
     'phone-input': dynamic(() => import('../stories/phone-input.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),

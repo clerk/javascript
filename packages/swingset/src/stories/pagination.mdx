@@ -1,0 +1,74 @@
+import * as PaginationStories from './pagination.stories';
+
+# Pagination
+
+Page navigation for a paged list. Renders a labelled `nav` with previous and next controls, the page numbers around the current one, and a results-per-page control. Pages are 1-based and the component is controlled: `onChange` receives the page the user asked for. The results-per-page control is a placeholder trigger until the Mosaic `Select` lands.
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={PaginationStories}
+/>
+
+## Props
+
+<PropTable
+  meta={PaginationStories.meta}
+  extra={[
+    { name: 'page', type: 'number', description: 'The current page, 1-based.' },
+    { name: 'totalItems', type: 'number', description: 'Total number of items across every page.' },
+    { name: 'pageSize', type: 'number', description: 'Items per page. The page count is derived from this and `totalItems`.' },
+    { name: 'onChange', type: '(page: number) => void', description: 'Called with the page the user navigated to.' },
+    { name: 'step', type: 'number', default: '1', description: 'How many pages the previous and next controls move.' },
+    { name: 'siblingCount', type: 'number', default: '1', description: 'Pages shown on each side of the current one.' },
+    { name: 'label', type: 'string', default: "'Pagination'", description: 'Accessible name of the `nav`.' },
+  ]}
+/>
+
+## Usage
+
+<Usage
+  component='Pagination'
+  module='@clerk/ui/mosaic/components/pagination'
+  props={{ page: 1, totalItems: 100, pageSize: 10 }}
+/>
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={PaginationStories}
+/>
+
+### First and last
+
+<Story
+  name='FirstLast'
+  storyModule={PaginationStories}
+/>
+
+### Sibling count
+
+<Story
+  name='Siblings'
+  storyModule={PaginationStories}
+/>
+
+### Single page
+
+<Story
+  name='SinglePage'
+  storyModule={PaginationStories}
+/>
+
+### Disabled
+
+<Story
+  name='Disabled'
+  storyModule={PaginationStories}
+/>
