@@ -1,0 +1,7 @@
+{
+  "src/next/require-auth-protection.ts": {
+    "complexity": {
+      "count": 1
+    }
+  }
+}

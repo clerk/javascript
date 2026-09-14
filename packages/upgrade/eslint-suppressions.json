@@ -1,0 +1,12 @@
+{
+  "src/cli.js": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/codemods/transform-protect-to-show.cjs": {
+    "complexity": {
+      "count": 1
+    }
+  }
+}

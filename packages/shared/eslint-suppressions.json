@@ -1,0 +1,27 @@
+{
+  "src/authorization.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/errors/parseError.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/internal/clerk-js/web3.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/react/hooks/useBillingIsEnabled.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/react/hooks/useOrganizationDirectorySyncUsers.tsx": {
+    "complexity": {
+      "count": 1
+    }
+  }
+}

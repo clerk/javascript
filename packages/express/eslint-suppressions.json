@@ -1,0 +1,7 @@
+{
+  "src/authenticateRequest.ts": {
+    "complexity": {
+      "count": 1
+    }
+  }
+}

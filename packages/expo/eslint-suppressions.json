@@ -1,0 +1,17 @@
+{
+  "src/hooks/useSignInWithApple.ios.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/provider/nativeClientSync.tsx": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/provider/singleton/createClerkInstance.ts": {
+    "complexity": {
+      "count": 1
+    }
+  }
+}

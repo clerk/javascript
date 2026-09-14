@@ -1,0 +1,27 @@
+{
+  "src/core/clerk.ts": {
+    "complexity": {
+      "count": 4
+    }
+  },
+  "src/core/fapiClient.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/core/resources/Base.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/core/resources/User.ts": {
+    "complexity": {
+      "count": 1
+    }
+  },
+  "src/core/tokenCache.ts": {
+    "complexity": {
+      "count": 1
+    }
+  }
+}
