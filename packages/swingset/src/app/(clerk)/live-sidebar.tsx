@@ -40,6 +40,21 @@ export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className='gap-0'>
         <SidebarGroup className='py-1'>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className='h-auto py-1 text-xs'
+                  isActive={pathname === '/live'}
+                  render={<Link href='/live' />}
+                >
+                  Overview
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup className='py-1'>
           <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
             Flows
           </SidebarGroupLabel>

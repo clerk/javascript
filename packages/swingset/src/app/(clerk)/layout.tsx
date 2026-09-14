@@ -1,6 +1,8 @@
 import { ClerkProvider } from '@clerk/nextjs';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
@@ -18,8 +20,16 @@ function LiveChrome({ children, userButton }: { children: ReactNode; userButton?
             orientation='vertical'
             className='data-vertical:h-4 data-vertical:self-auto mr-2'
           />
-          <span className='text-muted-foreground text-xs'>Live Sandbox</span>
-          <div className='ml-auto'>{userButton}</div>
+          <Link
+            href='/live'
+            className='text-muted-foreground hover:text-foreground text-xs'
+          >
+            Live Sandbox
+          </Link>
+          <div className='ml-auto flex items-center gap-3'>
+            <ThemeToggle />
+            {userButton}
+          </div>
         </header>
         {children}
       </SidebarInset>

@@ -46,8 +46,7 @@ function DeleteAccountHarness() {
               try {
                 setStatus('idle');
                 setMessage(null);
-                const result = await deleteAccount();
-                console.info('[swingset] mock delete succeeded', result);
+                await deleteAccount();
                 setStatus('success');
                 setMessage('Mock delete completed. The account was not deleted.');
               } catch (error) {
@@ -75,7 +74,6 @@ function DeleteAccountHarness() {
   );
 }
 
-// Throwaway live harness. Not a story.
 export default function ReverificationLivePage() {
   const { isLoaded, isSignedIn } = useUser();
 
@@ -85,8 +83,8 @@ export default function ReverificationLivePage() {
         <div className='flex flex-col gap-1'>
           <h1 className='text-xl font-semibold'>Reverification</h1>
           <p className='text-muted-foreground text-sm'>
-            Throwaway live page. Delete account hits a mock route that returns a reverification hint, then a fake
-            success. The account is not deleted.
+            Delete account hits a mock route that returns a reverification hint, then a fake success. The account is not
+            deleted.
           </p>
         </div>
         {!isLoaded ? <p className='text-muted-foreground text-sm'>Loading…</p> : null}

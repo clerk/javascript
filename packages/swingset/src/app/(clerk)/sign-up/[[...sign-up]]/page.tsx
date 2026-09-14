@@ -8,7 +8,6 @@ export default function SignUpPage() {
       <SignUp
         path='/sign-up'
         signInUrl='/sign-in'
-        fallbackRedirectUrl='/live/reverification'
       />
     </div>
   );
