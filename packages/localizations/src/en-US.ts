@@ -1324,7 +1324,11 @@ export const enUS: LocalizationResource = {
         actions: {
           activate: 'Activate',
           continueSetup: 'Continue setup',
-          deactivate: 'Deactivate',
+        },
+        dangerZone: {
+          deactivateButton: 'Deactivate connection',
+          removeButton: 'Remove connection',
+          title: 'Danger zone',
         },
         domains: {
           title: 'Domains',
@@ -1346,10 +1350,6 @@ export const enUS: LocalizationResource = {
             title: 'Rename connection',
           },
           title: 'Name',
-        },
-        remove: {
-          button: 'Remove connection',
-          title: 'Remove connection',
         },
         serviceProvider: {
           acsUrl: 'Assertion consumer service (ACS) URL',
@@ -1373,7 +1373,7 @@ export const enUS: LocalizationResource = {
           },
           forceAuthn: {
             description: 'Re-authenticate at the identity provider on every sign-in.',
-            label: 'Force authentication',
+            label: 'Force re-authentication',
           },
           syncUserAttributes: {
             description: 'Refresh name and email from the identity provider on each sign-in.',

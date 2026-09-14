@@ -1223,8 +1223,12 @@ export type __internal_LocalizationResource = {
       connectionPage: {
         actions: {
           activate: LocalizationValue;
-          deactivate: LocalizationValue;
           continueSetup: LocalizationValue;
+        };
+        dangerZone: {
+          title: LocalizationValue;
+          deactivateButton: LocalizationValue;
+          removeButton: LocalizationValue;
         };
         name: {
           title: LocalizationValue;
@@ -1253,10 +1257,6 @@ export type __internal_LocalizationResource = {
           clientSecret: {
             placeholder: LocalizationValue;
           };
-        };
-        remove: {
-          title: LocalizationValue;
-          button: LocalizationValue;
         };
         settings: {
           title: LocalizationValue;
@@ -1617,12 +1617,6 @@ export type __internal_LocalizationResource = {
     };
     navbar: {
       title: LocalizationValue;
-    };
-    connectionScopeBanner: {
-      title__editing: LocalizationValue<'name'>;
-      subtitle__editing: LocalizationValue<'count'>;
-      title__adding: LocalizationValue;
-      subtitle__adding: LocalizationValue<'count'>;
     };
     resetConnectionDialog: {
       cancelButton: LocalizationValue;

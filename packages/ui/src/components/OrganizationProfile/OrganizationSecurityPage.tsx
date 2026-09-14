@@ -42,7 +42,6 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     isLoading,
     enterpriseConnection,
     enterpriseConnections,
-    connectionScope,
     selectConnection,
     organizationEnterpriseConnection,
     testRuns,
@@ -127,8 +126,6 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         organizationEnterpriseConnection={organizationEnterpriseConnection}
         testRuns={testRuns}
         enterpriseConnection={enterpriseConnection}
-        enterpriseConnections={enterpriseConnections}
-        connectionScope={connectionScope}
         contentRef={contentRef}
         enterpriseConnectionMutations={enterpriseConnectionMutations}
         organizationDomainMutations={organizationDomainMutations}

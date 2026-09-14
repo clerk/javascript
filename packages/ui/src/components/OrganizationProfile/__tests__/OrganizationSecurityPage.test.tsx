@@ -400,8 +400,8 @@ describe('OrganizationSecurityPage', () => {
 
       await userEvent.click(await screen.findByRole('button', { name: /Add connection/i }));
 
-      expect(await screen.findByText('Adding a new SSO connection')).toBeInTheDocument();
-      expect(screen.queryByText(/^Editing /)).not.toBeInTheDocument();
+      expect(await screen.findByText(/add and verify ownership of the domains/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Add connection/i })).not.toBeInTheDocument();
     });
   });
 
