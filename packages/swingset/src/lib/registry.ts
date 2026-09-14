@@ -193,6 +193,7 @@ import {
   Overlay as UserProfileOverlay,
 } from '../stories/user-profile.stories';
 import {
+  AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
   Default as UserProfileAccountSectionDefault,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
@@ -472,6 +473,7 @@ const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
+  AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,

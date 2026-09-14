@@ -24,3 +24,11 @@ export class UserProfileSaveError<TField extends string = string> extends Error 
     this.fields = fields;
   }
 }
+
+export interface UserProfilePhone {
+  id: string;
+  value: string;
+  isDefault?: boolean;
+  isVerified?: boolean;
+  canRemove?: boolean;
+}
