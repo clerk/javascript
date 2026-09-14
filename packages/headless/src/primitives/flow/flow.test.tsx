@@ -1,5 +1,6 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import React, { createRef } from 'react';
+import { createPortal } from 'react-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Flow, useFlowAutoFocus } from './index';
@@ -357,6 +358,27 @@ describe('Flow', () => {
 
       expect(screen.queryByTestId('first')).not.toBeInTheDocument();
       expect(screen.getByTestId('second')).toHaveFocus();
+    });
+
+    it('ignores a marked element portaled outside the root', () => {
+      const otpStep = (
+        <Flow.Step ids={['otp']}>{createPortal(<AutoFocusInput data-testid='portaled' />, document.body)}</Flow.Step>
+      );
+      const { rerender } = render(
+        <Flow.Root value='password'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep}
+        </Flow.Root>,
+      );
+
+      rerender(
+        <Flow.Root value='otp'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep}
+        </Flow.Root>,
+      );
+
+      expect(screen.getByTestId('portaled')).not.toHaveFocus();
     });
 
     it('returns a no-op ref outside a step', () => {

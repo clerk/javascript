@@ -64,7 +64,7 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
 
     const target = firstInDocumentOrder(focusTargetsRef.current);
     const root = rootRef.current;
-    if (target && root && focusIsWithin(root)) {
+    if (target && root && root.contains(target) && focusIsWithin(root)) {
       target.focus({ preventScroll: true });
     }
   }, [open, rootRef]);

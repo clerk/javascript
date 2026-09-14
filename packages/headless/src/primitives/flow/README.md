@@ -53,6 +53,8 @@ Multiple ids can select the same step. Moving between those ids updates the exis
 `useFlowAutoFocus()` returns a ref. Attach it to the element a step should focus when it enters:
 
 ```tsx
+import { useFlowAutoFocus } from '@clerk/headless/flow';
+
 function PasswordView() {
   return (
     <input
