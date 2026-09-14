@@ -225,7 +225,7 @@ export type ConfirmationProps<Payload = unknown> = ConfirmationControlledProps |
  *   title='Remove member'
  *   description={member => <><strong>{member.name}</strong> will be removed from the organization.</>}
  *   actionLabel='Remove'
- *   onConfirm={member => removeMember(member.id)}
+ *   onConfirm={member => api.removeMember(member.id)}
  * />
  *
  * <Menu.Item color='negative' onClick={() => removeMember.open(member)}>Remove</Menu.Item>
