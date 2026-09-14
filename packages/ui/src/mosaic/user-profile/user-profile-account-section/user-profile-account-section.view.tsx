@@ -1,27 +1,20 @@
-import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
-import { FileUpload } from '@clerk/headless/file-upload';
+import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
-import { useState } from 'react';
 
-import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
-import { styles } from '../user-profile-profile-panel.styles';
+import { styles as panelStyles } from '../user-profile-profile-panel.styles';
 import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { styles } from './user-profile-account-section.styles';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
-import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
-import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
-import { UserProfileEditNameView } from './user-profile-edit-name.view';
-import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
-import { UserProfileEditUsernameView } from './user-profile-edit-username.view';
-
-const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-/** Matches the limit the row's own description advertises. */
-const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
+import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
+import { UserProfileNameRowView } from './user-profile-name-row.view';
+import { UserProfilePictureRowView } from './user-profile-picture-row.view';
+import { UserProfileUsernameRowView } from './user-profile-username-row.view';
 
 export interface UserProfileEmail {
   id: string;
@@ -102,92 +95,31 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
-  const initials = name
-    .split(/\s+/)
-    .map(part => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-  const [rejection, setRejection] = useState<FileRejectionReason | null>(null);
-
   return (
-    <FileUpload.Root
-      accept={PROFILE_PICTURE_MIME_TYPES}
-      maxSize={PROFILE_PICTURE_MAX_BYTES}
-      render={<div {...stylex.props(styles.sections)} />}
-      onReject={rejections => {
-        setRejection(rejections[0]?.reason ?? null);
-        onProfilePictureReject?.(rejections);
-      }}
-      onValueChange={files => {
-        const file = files[0];
-        if (file) {
-          setRejection(null);
-          onProfilePictureChange?.(file);
-        }
-      }}
-    >
+    <div {...stylex.props(styles.sections)}>
       <Section.Root aria-label={m.sectionLabel}>
         <Section.Title>{m.sectionTitle}</Section.Title>
         <Section.Group>
-          <Section.Row>
-            <Section.Item>
-              <Section.Media size='lg'>
-                <Avatar.Root size='fit'>
-                  <Avatar.Image
-                    alt={name}
-                    src={imageUrl}
-                  />
-                  <Avatar.Fallback>{initials}</Avatar.Fallback>
-                </Avatar.Root>
-              </Section.Media>
-              <Section.Content>
-                <Section.Label>{m.picture.label}</Section.Label>
-                <Section.Description>{m.picture.description}</Section.Description>
-              </Section.Content>
-              <ProfilePictureActions
-                canChange={Boolean(onProfilePictureChange)}
-                hasImage={hasImage}
-                onRemove={onRemoveProfilePicture}
-              />
-            </Section.Item>
-            {rejection ? <Section.Error>{m.picture.errors[rejection]}</Section.Error> : null}
-          </Section.Row>
-          <Section.Row>
-            <Section.Item>
-              <Section.Content>
-                <Section.Label>{m.name.label}</Section.Label>
-                <Section.Description>{name}</Section.Description>
-              </Section.Content>
-              {onSubmitName ? (
-                <Section.Actions>
-                  <EditName
-                    firstName={firstName}
-                    lastName={lastName}
-                    firstNameAttribute={firstNameAttribute}
-                    lastNameAttribute={lastNameAttribute}
-                    onSubmit={onSubmitName}
-                  />
-                </Section.Actions>
-              ) : null}
-            </Section.Item>
-          </Section.Row>
-          <Section.Row>
-            <Section.Item>
-              <Section.Content>
-                <Section.Label>{m.username.label}</Section.Label>
-                <Section.Description>{username}</Section.Description>
-              </Section.Content>
-              {onSubmitUsername ? (
-                <Section.Actions>
-                  <EditUsername
-                    username={username}
-                    onSubmit={onSubmitUsername}
-                  />
-                </Section.Actions>
-              ) : null}
-            </Section.Item>
-          </Section.Row>
+          <UserProfilePictureRowView
+            name={name}
+            imageUrl={imageUrl}
+            hasImage={hasImage}
+            onChange={onProfilePictureChange}
+            onReject={onProfilePictureReject}
+            onRemove={onRemoveProfilePicture}
+          />
+          <UserProfileNameRowView
+            name={name}
+            firstName={firstName}
+            lastName={lastName}
+            firstNameAttribute={firstNameAttribute}
+            lastNameAttribute={lastNameAttribute}
+            onSubmit={onSubmitName}
+          />
+          <UserProfileUsernameRowView
+            username={username}
+            onSubmit={onSubmitUsername}
+          />
           {!allowMultipleAccounts ? (
             <SingleContactRow
               items={emails}
@@ -232,113 +164,7 @@ export function UserProfileAccountSectionView({
           onVerify={onVerifyPhone}
         />
       ) : null}
-    </FileUpload.Root>
-  );
-}
-
-function ProfilePictureActions({
-  hasImage,
-  canChange,
-  onRemove,
-}: {
-  hasImage: boolean;
-  canChange: boolean;
-  onRemove?: () => void;
-}) {
-  const { openFilePicker } = FileUpload.useFileUpload();
-  const actions: UserProfileMenuAction[] = [];
-
-  if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
-  }
-
-  if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'close', onClick: onRemove });
-  }
-
-  if (actions.length > 0) {
-    return (
-      <Section.Actions>
-        <UserProfileActionMenu
-          actions={actions}
-          label={m.picture.manage}
-        />
-      </Section.Actions>
-    );
-  }
-
-  if (!hasImage && canChange) {
-    return (
-      <Section.Actions>
-        <FileUpload.Trigger
-          render={
-            <Button
-              color='neutral'
-              size='sm'
-              variant='outline'
-            />
-          }
-        >
-          {m.picture.upload}
-        </FileUpload.Trigger>
-      </Section.Actions>
-    );
-  }
-
-  return null;
-}
-
-function EditName({
-  firstName,
-  lastName,
-  firstNameAttribute,
-  lastNameAttribute,
-  onSubmit,
-}: {
-  firstName?: string;
-  lastName?: string;
-  firstNameAttribute?: UserProfileNameAttribute;
-  lastNameAttribute?: UserProfileNameAttribute;
-  onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
-}) {
-  const controller = useUserProfileEditNameController({ firstName, lastName, onSubmit });
-
-  return (
-    <UserProfileEditNameView
-      {...controller}
-      firstNameAttribute={firstNameAttribute}
-      lastNameAttribute={lastNameAttribute}
-      open={controller.isOpen}
-      trigger={
-        <Button
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {m.name.edit}
-        </Button>
-      }
-    />
-  );
-}
-
-function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
-  const controller = useUserProfileEditUsernameController({ username, onSubmit });
-
-  return (
-    <UserProfileEditUsernameView
-      {...controller}
-      open={controller.isOpen}
-      trigger={
-        <Button
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {m.username.edit}
-        </Button>
-      }
-    />
+    </div>
   );
 }
 
@@ -375,7 +201,7 @@ function SingleContactRow({ kind, label, items, onAdd, onManage }: ContactSectio
         <Section.Content>
           <Section.Label>{label}</Section.Label>
           {item ? (
-            <Section.Description xstyle={styles.contactValue}>
+            <Section.Description xstyle={panelStyles.contactValue}>
               <span>{item.value}</span>
               {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
             </Section.Description>
@@ -464,7 +290,7 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
             return (
               <Section.Item key={item.id}>
                 <Section.Content>
-                  <Section.Description xstyle={styles.contactValue}>
+                  <Section.Description xstyle={panelStyles.contactValue}>
                     <span>{item.value}</span>
                     {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
                   </Section.Description>
