@@ -63,6 +63,7 @@ export default defineConfig((overrideOptions: Options) => {
       internal: 'src/internal.ts',
       errors: 'src/errors.ts',
       experimental: 'src/experimental.ts',
+      'experimental/mosaic': 'src/experimental/mosaic.ts',
       legacy: 'src/legacy.ts',
       types: 'src/types/index.ts',
     },
@@ -76,7 +77,12 @@ export default defineConfig((overrideOptions: Options) => {
     // Bundle @clerk/ui/register inline at build time so consumers don't need
     // @clerk/ui as a dependency. The registration code sets up globalThis.__clerkSharedModules
     // to enable @clerk/ui's shared variant to use the host app's React.
-    noExternal: ['@clerk/ui/register'],
+    //
+    // The Mosaic entry is inlined for the same reason: left external, the re-export resolves from
+    // the consumer's tree at runtime, which makes @clerk/ui a dependency and installs its whole
+    // graph (Emotion, the Solana wallet adapters, ...) for every consumer, Mosaic or not. Its build
+    // already bundles everything except React and @clerk/shared, both of which we ship anyway.
+    noExternal: ['@clerk/ui/register', '@clerk/ui/experimental/mosaic'],
     define: {
       PACKAGE_NAME: `"${pkgJson.name}"`,
       PACKAGE_VERSION: `"${pkgJson.version}"`,
