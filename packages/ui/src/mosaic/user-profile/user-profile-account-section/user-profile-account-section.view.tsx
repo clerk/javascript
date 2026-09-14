@@ -18,6 +18,7 @@ import { useUserProfileEditUsernameController } from './user-profile-edit-userna
 import { UserProfileEditUsernameView } from './user-profile-edit-username.view';
 import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePictureRowView } from './user-profile-picture-row.view';
+import { UserProfileUsernameRowView } from './user-profile-username-row.view';
 
 export interface UserProfileEmail {
   id: string;
@@ -139,22 +140,17 @@ export function UserProfileAccountSectionView({
               ) : undefined
             }
           />
-          <Section.Row>
-            <Section.Item>
-              <Section.Content>
-                <Section.Label>{m.username.label}</Section.Label>
-                <Section.Description>{username}</Section.Description>
-              </Section.Content>
-              {onSubmitUsername ? (
-                <Section.Actions>
-                  <EditUsername
-                    username={username}
-                    onSubmit={onSubmitUsername}
-                  />
-                </Section.Actions>
-              ) : null}
-            </Section.Item>
-          </Section.Row>
+          <UserProfileUsernameRowView
+            username={username}
+            action={
+              onSubmitUsername ? (
+                <EditUsername
+                  username={username}
+                  onSubmit={onSubmitUsername}
+                />
+              ) : undefined
+            }
+          />
           {!allowMultipleAccounts ? (
             <SingleContactRow
               items={emails}
