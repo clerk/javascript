@@ -114,7 +114,7 @@ export function UserProfileProfilePanelView({
           onSubmitName={onSubmitName}
           onSubmitUsername={onSubmitUsername}
         />
-        {connectedAccounts.length > 0 || availableConnectionProviders.length > 0 ? (
+        {connectedAccounts.length > 0 || (availableConnectionProviders.length > 0 && onConnectAccount) ? (
           <UserProfileConnectedAccountsSectionView
             accounts={connectedAccounts}
             availableProviders={availableConnectionProviders}

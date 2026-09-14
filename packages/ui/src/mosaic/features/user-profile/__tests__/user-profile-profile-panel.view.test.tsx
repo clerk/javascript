@@ -29,6 +29,14 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
+  it('hides connected accounts when only providers without a connect callback are supplied', () => {
+    renderView({
+      connectedAccounts: [],
+      availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
+    });
+    expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
+  });
+
   it('keeps available providers visible without connected accounts and forwards connect', async () => {
     const onConnectAccount = vi.fn();
     const user = userEvent.setup();
