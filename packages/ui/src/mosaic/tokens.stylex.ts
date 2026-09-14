@@ -63,8 +63,8 @@ export const colorVars = stylex.defineVars(colorDefaults);
 // =============================================================================
 // Radius Tokens
 // =============================================================================
-// `md` is 6px rather than a 4/8/12 step: it is the control radius (button, avatar
-// square), and neither neighbour sits right on a control.
+// `md` is 6px rather than a 4/8/12 step: it is the control radius (button), and
+// neither neighbour sits right on a control.
 
 const radiusDefaults = {
   '--cl-radius-none': '0rem',

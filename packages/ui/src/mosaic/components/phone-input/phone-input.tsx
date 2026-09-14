@@ -14,7 +14,6 @@ import {
 } from '../../../utils/phoneUtils';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { colorVars, space } from '../../tokens.stylex';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Combobox } from '../combobox';
@@ -52,7 +51,7 @@ function toE164(country: CountryEntry, nationalNumber: string): string {
 
 export interface PhoneInputProps extends Omit<
   MosaicElementProps<'input'>,
-  'className' | 'style' | 'type' | 'size' | 'value' | 'defaultValue' | 'onChange'
+  'type' | 'size' | 'value' | 'defaultValue' | 'onChange'
 > {
   /** The normalized E.164 value. */
   value?: string;
@@ -94,8 +93,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     inputMode = 'tel',
     maxLength = 25,
     spellCheck = false,
-    className,
-    style,
+    xstyle,
     'aria-invalid': ariaInvalidProp,
     'aria-labelledby': ariaLabelledBy,
     'aria-describedby': ariaDescribedBy,
@@ -188,7 +186,8 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
         size={size}
         disabled={disabled}
         invalid={invalid}
-        {...mergeStyleProps(themeProps('phone-input', { size, disabled, invalid }), className, style)}
+        {...themeProps('phone-input', { size, disabled, invalid })}
+        xstyle={xstyle}
       >
         <Popover.Root
           open={open}
@@ -232,7 +231,8 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
             anchor={anchor}
             aria-label='Choose a country'
             size='anchor'
-            {...mergeStyleProps(themeProps('phone-input-popup'), stylex.props(reset.base, styles.popup))}
+            {...themeProps('phone-input-popup')}
+            xstyle={[reset.base, styles.popup]}
           >
             <Combobox.Root
               open
@@ -246,7 +246,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 }
               }}
             >
-              <Field.Root {...stylex.props(styles.countrySearchContainer)}>
+              <Field.Root xstyle={styles.countrySearchContainer}>
                 <InputGroup.Root
                   size='md'
                   {...themeProps('phone-input-country-search')}
@@ -297,8 +297,8 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
 
         <InputGroup.Start
           aria-hidden='true'
-          {...mergeStyleProps(themeProps('phone-input-prefix'), stylex.props(styles.prefix))}
-          style={{ color: colorVars['--cl-color-primary'], paddingInlineStart: space['2'], paddingInlineEnd: 0 }}
+          {...themeProps('phone-input-prefix')}
+          xstyle={styles.prefix}
         >
           <span
             aria-hidden='true'
@@ -308,7 +308,8 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
         </InputGroup.Start>
         <InputGroup.Input
           ref={mergedInputRef}
-          {...mergeStyleProps(themeProps('phone-input-control'), stylex.props(styles.control))}
+          {...themeProps('phone-input-control')}
+          xstyle={styles.control}
           {...inputProps}
           id={id}
           type='tel'

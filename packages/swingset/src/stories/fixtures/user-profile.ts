@@ -14,6 +14,7 @@ import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
+import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
 
 export interface UserProfileFixtureOptions {
   /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
@@ -44,6 +45,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
  */
 export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
   const editName = useUserProfileEditNameFixture();
+  const editUsername = useUserProfileEditUsernameFixture();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
@@ -112,10 +114,10 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const pages: UserProfileViewProps['pages'] = {
     account: {
       ...editName,
+      ...editUsername,
       allowMultipleAccounts: true,
       hasImage: Boolean(imageUrl),
       imageUrl,
-      username: 'prestonxyz',
       emails,
       phones,
       onAddEmail: onAddEmail ?? (() => addEmail(`preston+${emails.length}@clerk.dev`)),
@@ -137,7 +139,6 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onRemovePhone: id => setPhones(current => current.filter(phone => phone.id !== id)),
       onSetPrimaryEmail: id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id }))),
       onSetPrimaryPhone: id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id }))),
-      onUsernameChange: () => undefined,
       onVerifyEmail: id =>
         setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
       onVerifyPhone: id =>

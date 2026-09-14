@@ -18,7 +18,7 @@ export interface UserProfileEditNameValue {
   lastName: string;
 }
 
-export interface UserProfileEditNameViewProps {
+export interface UserProfileEditNameDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Rendering the opener here is what returns focus to it on close. */
@@ -40,7 +40,7 @@ export interface UserProfileEditNameViewProps {
  * `required` the instance asks for: the name the API will take is the API's to decide, so the action
  * stays live and a rejection comes back as `error`.
  */
-export function UserProfileEditNameView({
+export function UserProfileEditNameDialog({
   open,
   onOpenChange,
   trigger,
@@ -53,7 +53,7 @@ export function UserProfileEditNameView({
   isSaving = false,
   error,
   onSubmit,
-}: UserProfileEditNameViewProps) {
+}: UserProfileEditNameDialogProps) {
   const formId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;

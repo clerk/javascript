@@ -1,10 +1,18 @@
 import type { IconFrameProps } from '@clerk/ui/mosaic/components/icon';
 import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
-import { colorVars, space } from '@clerk/ui/mosaic/styles';
+import { colorVars, space } from '@clerk/ui/mosaic/tokens.stylex';
+import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
 
 export { default as __source } from './icon-frame.stories?raw';
+
+const styles = stylex.create({
+  customSurface: {
+    backgroundColor: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-primary-foreground'],
+  },
+});
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 
@@ -111,12 +119,7 @@ export function Treatments() {
 
 export function CustomSurface() {
   return (
-    <IconFrame
-      style={{
-        backgroundColor: colorVars['--cl-color-primary'],
-        color: colorVars['--cl-color-primary-foreground'],
-      }}
-    >
+    <IconFrame xstyle={styles.customSurface}>
       <Icon
         name='check'
         size='lg'

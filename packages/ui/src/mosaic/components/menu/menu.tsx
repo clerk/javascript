@@ -3,14 +3,14 @@ import type {
   MenuPopupProps as PrimitiveMenuPopupProps,
   MenuPortalProps,
   MenuProps,
-  MenuSeparatorProps,
+  MenuSeparatorProps as PrimitiveMenuSeparatorProps,
 } from '@clerk/headless/menu';
 import { Menu as Primitive } from '@clerk/headless/menu';
 import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { MosaicComponentProps } from '../../props';
+import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
@@ -20,7 +20,7 @@ import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import * as slots from './menu.styles';
 
-export type { MenuProps, MenuSeparatorProps };
+export type { MenuProps };
 
 export type MenuTriggerProps = MosaicComponentProps<'button'>;
 
@@ -29,7 +29,7 @@ export type MenuTriggerProps = MosaicComponentProps<'button'>;
  * pass `children` for a labelled trigger, or `render` to supply your own element.
  */
 export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(function MosaicMenuTrigger(
-  { render, className, style, children, ...rest },
+  { render, xstyle, children, ...rest },
   ref,
 ) {
   const trigger: MenuTriggerProps['render'] =
@@ -47,15 +47,14 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
     <Primitive.Trigger
       ref={ref}
       render={trigger}
-      {...mergeStyleProps(themeProps('menu-trigger'), className, style)}
-      {...rest}
+      {...mergeStyleProps(themeProps('menu-trigger'), stylex.props(xstyle), rest)}
     >
       {children ?? <Icon name='ellipsis' />}
     </Primitive.Trigger>
   );
 });
 
-export interface MenuPopupProps extends PrimitiveMenuPopupProps {
+export interface MenuPopupProps extends Omit<PrimitiveMenuPopupProps, 'className' | 'style'>, MosaicStyleProps {
   /** Container the menu portals into. Defaults to `document.body`. */
   portalRoot?: MenuPortalProps['root'];
 }
@@ -65,7 +64,7 @@ export interface MenuPopupProps extends PrimitiveMenuPopupProps {
  * positioner are not parts a consumer composes, so they stay out of the public API.
  */
 export const MenuPopup = React.forwardRef<HTMLDivElement, MenuPopupProps>(function MosaicMenuPopup(
-  { portalRoot, className, style, children, ...rest },
+  { portalRoot, xstyle, children, ...rest },
   ref,
 ) {
   return (
@@ -77,11 +76,9 @@ export const MenuPopup = React.forwardRef<HTMLDivElement, MenuPopupProps>(functi
           ref={ref}
           {...mergeStyleProps(
             themeProps('menu-popup'),
-            stylex.props(reset.base, scrollAreaRoot, slots.popup.base),
-            className,
-            style,
+            stylex.props(reset.base, scrollAreaRoot, slots.popup.base, xstyle),
+            rest,
           )}
-          {...rest}
         >
           <div
             {...mergeStyleProps(
@@ -117,7 +114,7 @@ export type MenuMediaProps = MosaicComponentProps<'span'> & {
  * text starts on the same line whatever each one leads with.
  */
 export const MenuMedia = React.forwardRef<HTMLSpanElement, MenuMediaProps>(function MosaicMenuMedia(
-  { size = 'sm', render, className, style, ...rest },
+  { size = 'sm', render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -127,11 +124,9 @@ export const MenuMedia = React.forwardRef<HTMLSpanElement, MenuMediaProps>(funct
     props: {
       ...mergeStyleProps(
         themeProps('menu-media', { size }),
-        stylex.props(reset.base, slots.media.base, slots.media[size]),
-        className,
-        style,
+        stylex.props(reset.base, slots.media.base, slots.media[size], xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
@@ -145,7 +140,7 @@ export type MenuLabelProps = MosaicComponentProps<'span'>;
  * built from the parts has to write it.
  */
 export const MenuLabel = React.forwardRef<HTMLSpanElement, MenuLabelProps>(function MosaicMenuLabel(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -155,16 +150,14 @@ export const MenuLabel = React.forwardRef<HTMLSpanElement, MenuLabelProps>(funct
     props: {
       ...mergeStyleProps(
         themeProps('menu-label'),
-        stylex.props(reset.base, slots.label.base, truncationStyles.singleLine),
-        className,
-        style,
+        stylex.props(reset.base, slots.label.base, truncationStyles.singleLine, xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
 
-export interface MenuItemProps extends PrimitiveMenuItemProps {
+export interface MenuItemProps extends Omit<PrimitiveMenuItemProps, 'className' | 'style'>, MosaicStyleProps {
   /** Semantic color of the action. */
   color?: 'neutral' | 'negative';
   /**
@@ -180,7 +173,7 @@ export interface MenuItemProps extends PrimitiveMenuItemProps {
  * shows is whatever `Menu.Media` and `Menu.Label` are composed into it.
  */
 export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(function MosaicMenuItem(
-  { color = 'neutral', label, className, style, children, ...rest },
+  { color = 'neutral', label, xstyle, children, ...rest },
   ref,
 ) {
   return (
@@ -189,28 +182,28 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
       label={label}
       {...mergeStyleProps(
         themeProps('menu-item', { color }),
-        stylex.props(reset.base, focusOutline.visible, slots.item.base, color === 'negative' && slots.item.negative),
-        className,
-        style,
+        stylex.props(
+          reset.base,
+          focusOutline.visible,
+          slots.item.base,
+          color === 'negative' && slots.item.negative,
+          xstyle,
+        ),
+        rest,
       )}
-      {...rest}
     >
       {children}
     </Primitive.Item>
   );
 });
 
+export type MenuSeparatorProps = Omit<PrimitiveMenuSeparatorProps, 'className' | 'style'> & MosaicStyleProps;
+
 /** A full-bleed divider between groups of items. */
-export function MenuSeparator({ className, style, ...rest }: MenuSeparatorProps): React.ReactElement {
+export function MenuSeparator({ xstyle, ...rest }: MenuSeparatorProps): React.ReactElement {
   return (
     <Primitive.Separator
-      {...mergeStyleProps(
-        themeProps('menu-separator'),
-        stylex.props(reset.base, slots.separator.base),
-        className,
-        style,
-      )}
-      {...rest}
+      {...mergeStyleProps(themeProps('menu-separator'), stylex.props(reset.base, slots.separator.base, xstyle), rest)}
     />
   );
 }

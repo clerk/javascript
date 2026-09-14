@@ -22,15 +22,14 @@ export type SpinnerProps = MosaicElementProps<'span'> & {
  * <Spinner size='sm' />
  */
 export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(function MosaicSpinner(
-  { size = 'md', className, style, ...rest },
+  { size = 'md', xstyle, ...rest },
   ref,
 ) {
   return (
     <span
       ref={ref}
       aria-hidden
-      {...mergeStyleProps(themeProps('spinner', { size }), stylex.props(styles.base, sizes[size]), className, style)}
-      {...rest}
+      {...mergeStyleProps(themeProps('spinner', { size }), stylex.props(styles.base, sizes[size], xstyle), rest)}
     />
   );
 });
