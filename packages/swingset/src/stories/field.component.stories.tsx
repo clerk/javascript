@@ -58,7 +58,7 @@ const roles = [
 
 export function WithSelect() {
   return (
-    <Field.Root style={stackStyles}>
+    <Field.Root xstyle={styles.stack}>
       <Field.Label>Role</Field.Label>
       <Select.Root
         items={roles}

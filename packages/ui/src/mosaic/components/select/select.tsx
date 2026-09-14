@@ -8,7 +8,7 @@ import { Select as Primitive } from '@clerk/headless/select';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { MosaicComponentProps } from '../../props';
+import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
@@ -81,8 +81,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
     variant = 'outline',
     placeholder,
     render,
-    className,
-    style,
+    xstyle,
     children,
     id: idProp,
     disabled: disabledProp,
@@ -131,8 +130,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
       aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
       aria-required={ariaRequired ?? (fieldProps?.required ? true : undefined)}
-      {...mergeStyleProps(themeProps('select-trigger', { variant }), className, style)}
-      {...rest}
+      {...mergeStyleProps(themeProps('select-trigger', { variant }), stylex.props(xstyle), rest)}
     >
       {children ?? (
         <Primitive.Value
@@ -154,7 +152,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
   );
 });
 
-export interface SelectPopupProps extends PrimitiveSelectPopupProps {
+export interface SelectPopupProps extends Omit<PrimitiveSelectPopupProps, 'className' | 'style'>, MosaicStyleProps {
   /** Container the listbox portals into. Defaults to `document.body`. */
   portalRoot?: SelectPortalProps['root'];
 }
@@ -165,7 +163,7 @@ export interface SelectPopupProps extends PrimitiveSelectPopupProps {
  * the positioner are not parts a consumer composes, so they stay out of the public API.
  */
 export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(function MosaicSelectPopup(
-  { portalRoot, className, style, children, ...rest },
+  { portalRoot, xstyle, children, ...rest },
   ref,
 ) {
   const items = React.useContext(ItemsContext);
@@ -179,11 +177,9 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
           ref={ref}
           {...mergeStyleProps(
             themeProps('select-popup'),
-            stylex.props(reset.base, scrollAreaRoot, slots.popup.base),
-            className,
-            style,
+            stylex.props(reset.base, scrollAreaRoot, slots.popup.base, xstyle),
+            rest,
           )}
-          {...rest}
         >
           <div
             {...mergeStyleProps(
@@ -205,11 +201,15 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
   );
 });
 
-export interface SelectOptionProps extends Omit<PrimitiveSelectOptionProps, 'label' | 'children'>, SelectItem {}
+export interface SelectOptionProps
+  extends
+    Omit<PrimitiveSelectOptionProps, 'label' | 'children' | 'className' | 'style'>,
+    MosaicStyleProps,
+    SelectItem {}
 
 /** A single choice: its label, an optional description, and a check when it is the selection. */
 export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function MosaicSelectOption(
-  { label, description, className, style, ...rest },
+  { label, description, xstyle, ...rest },
   ref,
 ) {
   const id = React.useId();
@@ -231,11 +231,10 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
           selectOptionScope,
           slots.option.base,
           described && slots.option.described,
+          xstyle,
         ),
-        className,
-        style,
+        rest,
       )}
-      {...rest}
     >
       <span {...mergeStyleProps(themeProps('select-option-content'), stylex.props(reset.base, slots.content.base))}>
         <span

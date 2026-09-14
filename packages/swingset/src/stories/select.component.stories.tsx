@@ -1,6 +1,7 @@
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Select } from '@clerk/ui/mosaic/components/select';
 import { Text } from '@clerk/ui/mosaic/components/text';
+import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -8,6 +9,8 @@ import type { StoryMeta } from '@/lib/types';
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './select.component.stories?raw';
+
+const styles = stylex.create({ stack: { display: 'grid', gap: 8, maxWidth: 384 } });
 
 export const meta: StoryMeta = {
   group: 'Components',
@@ -46,7 +49,7 @@ const roles = [
  */
 export function Descriptions() {
   return (
-    <Field.Root style={{ display: 'grid', gap: 8, maxWidth: 384 }}>
+    <Field.Root xstyle={styles.stack}>
       <Field.Label>Role</Field.Label>
       <Select.Root
         items={roles}
@@ -122,7 +125,7 @@ export function WithField() {
     <Field.Root
       required
       invalid
-      style={{ display: 'grid', gap: 8, maxWidth: 384 }}
+      xstyle={styles.stack}
     >
       <Field.Label>Role</Field.Label>
       <Select.Root
