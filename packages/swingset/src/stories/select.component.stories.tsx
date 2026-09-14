@@ -45,7 +45,7 @@ const roles = [
 
 /**
  * Rows with a description are taller than the trigger, so nothing in them could line up with it:
- * the list hangs below the trigger instead, with `alignItemWithTrigger={false}`.
+ * the list hangs below the trigger instead.
  */
 export function Descriptions() {
   return (
@@ -54,7 +54,6 @@ export function Descriptions() {
       <Select.Root
         items={roles}
         defaultValue='member'
-        alignItemWithTrigger={false}
       >
         <Select.Trigger />
         <Select.Popup />
@@ -96,7 +95,6 @@ export function Ghost() {
           <Select.Root
             items={roles}
             defaultValue={member.role}
-            alignItemWithTrigger={false}
           >
             <Select.Trigger variant='ghost' />
             <Select.Popup />

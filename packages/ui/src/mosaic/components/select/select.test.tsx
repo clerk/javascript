@@ -332,6 +332,36 @@ describe('Mosaic Select', () => {
     expect(trigger).toHaveAccessibleName('All roles');
   });
 
+  describe('alignItemWithTrigger', () => {
+    const describedRoles = [
+      { value: 'member', label: 'Member', description: 'Non-privileged permissions.' },
+      { value: 'admin', label: 'Admin', description: 'Elevated permissions.' },
+    ];
+
+    function positioner() {
+      const element = document.querySelector('.cl-select-positioner');
+      if (!(element instanceof HTMLElement)) {
+        throw new Error('positioner not rendered');
+      }
+      return element;
+    }
+
+    it('aligns the selected option over the trigger by default', () => {
+      renderSelect({ defaultOpen: true });
+      expect(positioner()).toHaveAttribute('data-side', 'none');
+    });
+
+    it('hangs below the trigger by default when any item has a description', () => {
+      renderSelect({ items: describedRoles, defaultValue: 'member', defaultOpen: true });
+      expect(positioner()).not.toHaveAttribute('data-side', 'none');
+    });
+
+    it('lets an explicit alignItemWithTrigger override the derived default', () => {
+      renderSelect({ items: describedRoles, defaultValue: 'member', defaultOpen: true, alignItemWithTrigger: true });
+      expect(positioner()).toHaveAttribute('data-side', 'none');
+    });
+  });
+
   it('keeps a consumer aria-label ahead of the value', () => {
     render(
       <Select.Root

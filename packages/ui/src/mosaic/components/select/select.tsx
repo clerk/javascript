@@ -25,8 +25,8 @@ export interface SelectItem {
   /** Shown in the row and in the trigger once selected; also drives typeahead. */
   label: string;
   /**
-   * Secondary line under the label. Rows with one are taller than the trigger, so pair it with
-   * `alignItemWithTrigger={false}`.
+   * Secondary line under the label. Rows with one are taller than the trigger, so a list with any
+   * description hangs below the trigger unless `alignItemWithTrigger` says otherwise.
    */
   description?: string;
   disabled?: boolean;
@@ -44,11 +44,14 @@ export interface SelectProps extends Omit<PrimitiveSelectProps, 'items'> {
 const ItemsContext = React.createContext<SelectItem[]>([]);
 
 /** Holds the selection and the items; renders no element of its own. */
-export function SelectRoot({ items, children, ...rest }: SelectProps): React.ReactElement {
+export function SelectRoot({ items, alignItemWithTrigger, children, ...rest }: SelectProps): React.ReactElement {
+  const described = items.some(item => item.description !== undefined);
+
   return (
     <ItemsContext.Provider value={items}>
       <Primitive.Root
         items={items}
+        alignItemWithTrigger={alignItemWithTrigger ?? !described}
         {...rest}
       >
         {children}
