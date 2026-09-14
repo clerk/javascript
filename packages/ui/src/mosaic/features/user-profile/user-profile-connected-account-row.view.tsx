@@ -30,7 +30,7 @@ export function UserProfileConnectedAccountRowView({
   return (
     <Section.Row>
       <Section.Item>
-        <Section.Media size='md'>
+        <Section.Media size='lg'>
           <UserProfileConnectedProviderIcon {...account} />
         </Section.Media>
         <Section.Content>

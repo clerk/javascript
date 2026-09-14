@@ -241,7 +241,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
-  it('renders connected provider images and Web3 icon frames', () => {
+  it('renders connected provider and Web3 images inside icon frames', () => {
     const { container } = renderView({
       connectedAccounts: [{ id: 'google', provider: 'Google', iconUrl: '/google.svg' }],
       web3Wallets: [{ id: 'metamask', provider: 'MetaMask', iconUrl: '/metamask.svg' }],
@@ -249,9 +249,10 @@ describe('UserProfileProfilePanelView', () => {
 
     const frames = container.querySelectorAll('.cl-icon-frame');
     const images = container.querySelectorAll('img');
-    expect(frames).toHaveLength(1);
+    expect(frames).toHaveLength(2);
     expect(screen.getByRole('img', { name: 'Google' })).toHaveAttribute('src', '/google.svg');
-    expect(frames[0]).toContainElement(images[1]);
+    expect(frames[0]).toContainElement(images[0]);
+    expect(frames[1]).toContainElement(images[1]);
     frames.forEach(frame => expect(frame.closest('.cl-section-media')).toHaveAttribute('data-size', 'lg'));
   });
 

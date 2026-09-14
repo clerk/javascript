@@ -16,7 +16,7 @@ export function UserProfileConnectAccountRowView({
   return (
     <Section.Row xstyle={styles.connectRow}>
       <Section.Item>
-        <Section.Media size='md'>
+        <Section.Media size='lg'>
           <UserProfileConnectedProviderIcon {...provider} />
         </Section.Media>
         <Section.Content>
