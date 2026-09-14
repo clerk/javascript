@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -205,30 +206,52 @@ describe('Mosaic Select', () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
-  it('merges consumer className and style onto the popup and options', () => {
+  it('composes consumer xstyle onto the popup and options', () => {
+    const caller = stylex.create({ popup: { marginTop: '8px' }, option: { paddingInline: 0 } });
     render(
       <Select.Root
         items={[{ value: 'admin', label: 'Admin' }]}
         defaultOpen
       >
         <Select.Trigger />
-        <Select.Popup
-          className='my-popup'
-          style={{ marginTop: '8px' }}
-        >
+        <Select.Popup xstyle={caller.popup}>
           <Select.Option
             value='admin'
             label='Admin'
-            className='my-option'
+            xstyle={caller.option}
           />
         </Select.Popup>
       </Select.Root>,
     );
 
-    const popup = screen.getByRole('listbox').querySelector('.cl-select-popup');
-    expect(popup).toHaveClass('cl-select-popup', 'my-popup');
-    expect(popup).toHaveStyle({ marginTop: '8px' });
-    expect(screen.getByRole('option', { name: 'Admin' })).toHaveClass('cl-select-option', 'my-option');
+    expect(screen.getByRole('listbox').querySelector('.cl-select-popup')).toHaveClass(
+      'cl-select-popup',
+      stylex.props(caller.popup).className ?? '',
+    );
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveClass(
+      'cl-select-option',
+      stylex.props(caller.option).className ?? '',
+    );
+  });
+
+  it('merges the className a render source hands an option', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'admin', label: 'Admin' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='admin'
+            label='Admin'
+            render={<div className='from-render' />}
+          />
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveClass('cl-select-option', 'from-render');
   });
 
   it('forwards the trigger ref', () => {
