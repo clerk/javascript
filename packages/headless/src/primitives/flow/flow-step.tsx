@@ -3,7 +3,6 @@
 import { inertProps } from '@clerk/shared/inert';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
-import { useAnimationsFinished } from '../../hooks/use-animations-finished';
 import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useFlowContext } from './flow-context';
@@ -45,7 +44,6 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
   }
 
   const { mounted, transitionProps } = useTransition({ open, ref: stepRef });
-  const runOnEntered = useAnimationsFinished(stepRef, open);
 
   useLayoutEffect(() => {
     const element = stepRef.current;
@@ -64,14 +62,12 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
       return;
     }
 
-    return runOnEntered(() => {
-      const target = firstInDocumentOrder(focusTargetsRef.current);
-      const root = rootRef.current;
-      if (target && root && focusIsWithin(root)) {
-        target.focus({ preventScroll: true });
-      }
-    });
-  }, [open, rootRef, runOnEntered]);
+    const target = firstInDocumentOrder(focusTargetsRef.current);
+    const root = rootRef.current;
+    if (target && root && focusIsWithin(root)) {
+      target.focus({ preventScroll: true });
+    }
+  }, [open, rootRef]);
 
   const registerFocusTarget = useCallback((element: HTMLElement) => {
     focusTargetsRef.current.add(element);

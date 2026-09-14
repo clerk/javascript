@@ -245,82 +245,24 @@ describe('Flow', () => {
     offsetHeight.mockRestore();
   });
   describe('useFlowAutoFocus', () => {
-    let originalGetAnimations: HTMLElement['getAnimations'] | undefined;
-
-    beforeEach(() => {
-      originalGetAnimations = HTMLElement.prototype.getAnimations;
-    });
-
-    afterEach(() => {
-      if (originalGetAnimations) {
-        HTMLElement.prototype.getAnimations = originalGetAnimations;
-      } else {
-        Reflect.deleteProperty(HTMLElement.prototype, 'getAnimations');
-      }
-    });
-
-    function pendingAnimationOn(testid: string) {
-      let finishAnimation!: () => void;
-      const animationFinished = new Promise<void>(resolve => {
-        finishAnimation = resolve;
-      });
-      let finished = false;
-      HTMLElement.prototype.getAnimations = function (this: HTMLElement) {
-        if (finished || this.dataset.testid !== testid) {
-          return [];
-        }
-        return [{ finished: animationFinished }] as unknown as Animation[];
-      };
-      return async () => {
-        finished = true;
-        await act(async () => {
-          finishAnimation();
-          await animationFinished;
-        });
-      };
-    }
-
     it('does not focus the initially active step', () => {
       render(<TestFlow value='password' />);
 
       expect(screen.getByTestId('password-input')).not.toHaveFocus();
     });
 
-    it('focuses the registered element once the entering step settles', async () => {
+    it('focuses the registered element without scrolling when the step enters', () => {
       const focus = vi.spyOn(HTMLElement.prototype, 'focus');
-      const finish = pendingAnimationOn('otp-step');
       const { rerender } = render(<TestFlow value='password' />);
 
       rerender(<TestFlow value='otp' />);
-      const input = screen.getByTestId('otp-input');
-      expect(input).not.toHaveFocus();
 
-      act(() => flushRaf());
-      await act(async () => {});
-      expect(input).not.toHaveFocus();
-
-      await finish();
-
-      expect(input).toHaveFocus();
+      expect(screen.getByTestId('otp-input')).toHaveFocus();
       expect(focus).toHaveBeenCalledWith({ preventScroll: true });
       focus.mockRestore();
     });
 
-    it('focuses immediately after the starting frame when the step has no animations', async () => {
-      HTMLElement.prototype.getAnimations = () => [];
-      const { rerender } = render(<TestFlow value='password' />);
-
-      rerender(<TestFlow value='otp' />);
-      expect(screen.getByTestId('otp-input')).not.toHaveFocus();
-
-      act(() => flushRaf());
-      await act(async () => {});
-
-      expect(screen.getByTestId('otp-input')).toHaveFocus();
-    });
-
-    it('leaves focus alone when it is outside the flow', async () => {
-      HTMLElement.prototype.getAnimations = () => [];
+    it('leaves focus alone when it is outside the flow', () => {
       const { rerender } = render(
         <>
           <button
@@ -345,19 +287,17 @@ describe('Flow', () => {
           <TestFlow value='otp' />
         </>,
       );
-      act(() => flushRaf());
-      await act(async () => {});
 
       expect(screen.getByTestId('outside')).toHaveFocus();
       expect(screen.getByTestId('otp-input')).not.toHaveFocus();
     });
 
-    it('abandons a pending focus when the entering step closes before it settles', async () => {
-      const finish = pendingAnimationOn('otp-step');
+    it('focuses the returning step when navigation reverses mid-transition', () => {
       const { rerender } = render(<TestFlow value='password' />);
 
       rerender(<TestFlow value='otp' />);
       const otpInput = screen.getByTestId('otp-input');
+      expect(otpInput).toHaveFocus();
 
       rerender(
         <TestFlow
@@ -365,16 +305,12 @@ describe('Flow', () => {
           direction={-1}
         />,
       );
-      act(() => flushRaf());
-      await act(async () => {});
-      await finish();
 
       expect(otpInput).not.toHaveFocus();
       expect(screen.getByTestId('password-input')).toHaveFocus();
     });
 
-    it('focuses the first marked element in DOM order when several are marked', async () => {
-      HTMLElement.prototype.getAnimations = () => [];
+    it('focuses the first marked element in DOM order when several are marked', () => {
       const otpStep = (
         <Flow.Step ids={['otp']}>
           <AutoFocusInput data-testid='first' />
@@ -394,19 +330,13 @@ describe('Flow', () => {
           {otpStep}
         </Flow.Root>,
       );
-      act(() => flushRaf());
-      await act(async () => {});
 
       expect(screen.getByTestId('first')).toHaveFocus();
     });
 
-    it('focuses whichever marked element is still mounted when the step settles', async () => {
-      const finish = pendingAnimationOn('otp-step');
+    it('skips a marked element that is not rendered', () => {
       const otpStep = (showFirst: boolean) => (
-        <Flow.Step
-          ids={['otp']}
-          data-testid='otp-step'
-        >
+        <Flow.Step ids={['otp']}>
           {showFirst ? <AutoFocusInput data-testid='first' /> : null}
           <AutoFocusInput data-testid='second' />
         </Flow.Step>
@@ -414,25 +344,16 @@ describe('Flow', () => {
       const { rerender } = render(
         <Flow.Root value='password'>
           <Flow.Step ids={['password']}>Password</Flow.Step>
-          {otpStep(true)}
+          {otpStep(false)}
         </Flow.Root>,
       );
 
       rerender(
         <Flow.Root value='otp'>
           <Flow.Step ids={['password']}>Password</Flow.Step>
-          {otpStep(true)}
-        </Flow.Root>,
-      );
-      rerender(
-        <Flow.Root value='otp'>
-          <Flow.Step ids={['password']}>Password</Flow.Step>
           {otpStep(false)}
         </Flow.Root>,
       );
-      act(() => flushRaf());
-      await act(async () => {});
-      await finish();
 
       expect(screen.queryByTestId('first')).not.toBeInTheDocument();
       expect(screen.getByTestId('second')).toHaveFocus();

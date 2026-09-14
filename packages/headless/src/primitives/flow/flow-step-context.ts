@@ -10,7 +10,7 @@ export interface FlowStepContextValue {
 export const FlowStepContext = createContext<FlowStepContextValue | null>(null);
 
 /**
- * Marks an element as the one to focus after the enclosing `Flow.Step` finishes entering.
+ * Marks an element as the one to focus when the enclosing `Flow.Step` enters.
  * When several mounted elements are marked, the first in DOM order is focused. Outside a
  * step the ref is a no-op, so a view can render standalone without a wrapper.
  */
