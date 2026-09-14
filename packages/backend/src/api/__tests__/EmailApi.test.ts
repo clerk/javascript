@@ -28,6 +28,193 @@ describe('EmailApi', () => {
     suppression_reason: null,
   };
 
+  it('submits a batch with per-message keys and returns typed mixed results', async () => {
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', async ({ request }) => {
+        expect(request.headers.has('Idempotency-Key')).toBe(false);
+        expect(await request.json()).toEqual({
+          messages: [
+            {
+              to: { user_id: 'user_123' },
+              from: { address: 'notify@acme.com' },
+              reply_to: { address: 'support@acme.com' },
+              subject: 'Update',
+              text: 'Done',
+              idempotency_key: 'update_123',
+            },
+            {
+              to: { address: 'second@acme.com' },
+              from: { address: 'notify@acme.com' },
+              subject: 'Update',
+              text: 'Done',
+            },
+          ],
+        });
+        return HttpResponse.json({
+          data: [
+            { index: 0, email: mockEmail, status_code: 200 },
+            {
+              index: 1,
+              status_code: 429,
+              retry_after_seconds: 30,
+              errors: [{ code: 'rate_limit_exceeded', message: 'Too many requests', long_message: 'Try again later' }],
+            },
+          ],
+        });
+      }),
+    );
+    const results = await apiClient.emails.createBatch([
+      {
+        to: { userId: 'user_123' },
+        from: { address: 'notify@acme.com' },
+        replyTo: { address: 'support@acme.com' },
+        subject: 'Update',
+        text: 'Done',
+        idempotencyKey: 'update_123',
+      },
+      {
+        to: { address: 'second@acme.com' },
+        from: { address: 'notify@acme.com' },
+        subject: 'Update',
+        text: 'Done',
+      },
+    ]);
+    expect(results.map(result => result.index)).toEqual([0, 1]);
+    expect(results[0].email?.toEmailAddress).toBe('admin@acme.com');
+    expect(results[0].email?.deliveredByClerk).toBe(true);
+    expect(results[1].statusCode).toBe(429);
+    expect(results[1].retryAfterSeconds).toBe(30);
+    expect(results[1].errors?.[0].longMessage).toBe('Try again later');
+  });
+
+  it.each(['single', 'batch'] as const)('preserves rich message fields in a %s request', async mode => {
+    const params = {
+      to: { userId: 'user_123' },
+      from: { address: 'updates@roadmap.clerk.app', name: 'Roadmap' },
+      replyTo: { address: 'support@clerk.com', name: 'Clerk Support' },
+      subject: 'Your report',
+      text: 'See attachment',
+      cc: ['copy@example.com'],
+      bcc: ['blind@example.com'],
+      headers: { 'In-Reply-To': '<parent@example.com>', 'X-Ticket-ID': 'ticket_123' },
+      attachments: [{ filename: 'report.txt', content: 'aGVsbG8=' }],
+    };
+    const { replyTo, ...rest } = params;
+    const expected = { ...rest, to: { user_id: 'user_123' }, reply_to: replyTo };
+    server.use(
+      http.post(`https://api.clerk.test/v1/email${mode === 'batch' ? '/batch' : ''}`, async ({ request }) => {
+        expect(await request.json()).toEqual(mode === 'batch' ? { messages: [expected] } : expected);
+        return HttpResponse.json(
+          mode === 'batch' ? { data: [{ index: 0, email: mockEmail, status_code: 200 }] } : mockEmail,
+        );
+      }),
+    );
+    if (mode === 'batch') {
+      await apiClient.emails.createBatch([params]);
+    } else {
+      await apiClient.emails.create(params);
+    }
+  });
+
+  it('rejects an invalid batch key before submitting any messages', async () => {
+    let requests = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', () => {
+        requests++;
+        return HttpResponse.json({ data: [] });
+      }),
+    );
+    await expect(
+      apiClient.emails.createBatch([
+        {
+          to: { address: 'admin@acme.com' },
+          from: { address: 'notify@acme.com' },
+          subject: 'Update',
+          text: 'Done',
+          idempotencyKey: 'invalid:key',
+        },
+      ]),
+    ).rejects.toThrow('Idempotency key must contain');
+    expect(requests).toBe(0);
+  });
+
+  it.each([0, 101])('rejects a batch of %i messages before sending a request', async count => {
+    let requests = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', () => {
+        requests++;
+        return HttpResponse.json({ data: [] });
+      }),
+    );
+    const messages = Array.from({ length: count }, () => ({
+      to: { address: 'admin@acme.com' },
+      from: { address: 'notify@acme.com' },
+      subject: 'Update',
+      text: 'Done',
+    }));
+    await expect(apiClient.emails.createBatch(messages)).rejects.toThrow('between 1 and 100');
+    expect(requests).toBe(0);
+  });
+
+  it('accepts a batch of 100 messages in one request', async () => {
+    const messages = Array.from({ length: 100 }, (_, index) => ({
+      to: { address: `recipient${index}@acme.com` },
+      from: { address: 'notify@acme.com' },
+      subject: 'Update',
+      text: 'Done',
+    }));
+    let requests = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', async ({ request }) => {
+        requests++;
+        expect(await request.json()).toEqual({ messages });
+        return HttpResponse.json({
+          data: messages.map((message, index) => ({
+            index,
+            email: { ...mockEmail, id: `ema_${index}`, to_email_address: message.to.address },
+            status_code: 200,
+          })),
+        });
+      }),
+    );
+    const results = await apiClient.emails.createBatch(messages);
+    expect(requests).toBe(1);
+    expect(results).toHaveLength(100);
+    expect(results.map(result => result.email?.id)).toEqual(messages.map((_, index) => `ema_${index}`));
+  });
+
+  it('does not retry a batch POST after a network interruption', async () => {
+    let requests = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', () => {
+        requests++;
+        return HttpResponse.error();
+      }),
+    );
+    await expect(
+      apiClient.emails.createBatch([
+        { to: { address: 'admin@acme.com' }, from: { address: 'notify@acme.com' }, subject: 'Update', text: 'Done' },
+      ]),
+    ).rejects.toMatchObject({ errors: [expect.objectContaining({ code: 'unexpected_error' })] });
+    expect(requests).toBe(1);
+  });
+
+  it('does not retry a batch POST automatically', async () => {
+    let requests = 0;
+    server.use(
+      http.post('https://api.clerk.test/v1/email/batch', () => {
+        requests++;
+        return HttpResponse.json({ errors: [{ code: 'internal_error', message: 'Unavailable' }] }, { status: 503 });
+      }),
+    );
+    await expect(
+      apiClient.emails.createBatch([
+        { to: { address: 'admin@acme.com' }, from: { address: 'notify@acme.com' }, subject: 'Update', text: 'Done' },
+      ]),
+    ).rejects.toThrow();
+    expect(requests).toBe(1);
+  });
+
   it('sends a transactional email and snake_cases the body', async () => {
     server.use(
       http.post(

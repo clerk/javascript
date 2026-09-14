@@ -58,7 +58,7 @@ const DEFAULT_SPIN_DELAY = 300;
  * <SubmitButton color='negative' isPending={isDeleting}>Delete</SubmitButton>
  */
 export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProps>(function MosaicSubmitButton(
-  { isPending = false, pendingLabel = 'pending', size = 'md', spinDelay, className, children, onClick, ...rest },
+  { isPending = false, pendingLabel = 'pending', size = 'md', spinDelay, xstyle, children, onClick, ...rest },
   ref,
 ) {
   const { delay = DEFAULT_SPIN_DELAY, minDuration } = spinDelay ?? {};
@@ -93,7 +93,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
       // puts there when the button is disabled but not pending.
       {...(isPending ? { 'aria-busy': true, 'aria-disabled': true, 'data-pending': '' } : null)}
       onClick={handleClick}
-      {...mergeStyleProps(stylex.props(styles.root, isPending && styles.rootPending), className)}
+      xstyle={[styles.root, isPending && styles.rootPending, xstyle]}
       {...rest}
     >
       <span
@@ -116,7 +116,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
           aria-hidden={undefined}
           aria-label={pendingLabel}
           size={spinnerSizes[size]}
-          {...stylex.props(styles.spinner, !showPending && styles.spinnerHidden)}
+          xstyle={[styles.spinner, !showPending && styles.spinnerHidden]}
         />
       ) : null}
     </Button>

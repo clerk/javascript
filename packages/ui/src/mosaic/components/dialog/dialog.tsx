@@ -185,11 +185,14 @@ function Root<Payload = unknown>({
 }
 
 /** Opens the dialog. Renders a `<button>`; `render` swaps in another element. */
-const Trigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger(props, ref) {
+const Trigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger(
+  { xstyle, ...rest },
+  ref,
+) {
   return (
     <Primitive.Trigger
       ref={ref}
-      {...props}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
     />
   );
 }) as <Payload = unknown>(
@@ -197,36 +200,37 @@ const Trigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(function
 ) => React.ReactElement;
 
 /** Dismisses the dialog. Renders a `<button>`; `render` swaps in another element. */
-const Close = React.forwardRef<HTMLButtonElement, DialogCloseProps>(function DialogClose(props, ref) {
+const Close = React.forwardRef<HTMLButtonElement, DialogCloseProps>(function DialogClose({ xstyle, ...rest }, ref) {
   return (
     <Primitive.Close
       ref={ref}
-      {...props}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
     />
   );
 });
 
 /** Names the dialog. Renders an `<h2>` wired to the popup's `aria-labelledby`. */
-const Title = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(function DialogTitle(props, ref) {
+const Title = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(function DialogTitle({ xstyle, ...rest }, ref) {
   return (
     <Primitive.Title
       ref={ref}
-      {...props}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
     />
   );
 });
 
 /** Describes the dialog. Renders a `<p>` wired to the popup's `aria-describedby`. */
-const Description = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
-  function DialogDescription(props, ref) {
-    return (
-      <Primitive.Description
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
+const Description = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(function DialogDescription(
+  { xstyle, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.Description
+      ref={ref}
+      {...mergeStyleProps(stylex.props(xstyle), rest)}
+    />
+  );
+});
 
 /**
  * Warns when the corner dismiss is rendered where it has no business being: inside an alert
@@ -256,7 +260,7 @@ function useCloseButtonWarning(isAlert: boolean, inline: boolean) {
  * choice away from the consumer.
  */
 const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(function DialogCloseButton(
-  { 'aria-label': ariaLabel = 'Close', className, style, ...rest },
+  { 'aria-label': ariaLabel = 'Close', xstyle, ...rest },
   ref,
 ) {
   const surface = React.useContext(DialogContext);
@@ -280,8 +284,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
             {...props}
           />
         )}
-        {...mergeStyleProps(themeProps('dialog-close-button'), className, style)}
-        {...rest}
+        {...mergeStyleProps(themeProps('dialog-close-button'), stylex.props(xstyle), rest)}
       >
         <Icon name='close' />
       </Primitive.Close>
@@ -381,7 +384,7 @@ function useAlertSizeWarning(isAlert: boolean, size: DialogSize | undefined) {
  * part a consumer composes, so they stay out of the public API.
  */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
-  { size: sizeProp, initialFocus, finalFocus, className, style, ...rest },
+  { size: sizeProp, initialFocus, finalFocus, xstyle, ...rest },
   ref,
 ) {
   const { inline } = React.useContext(DialogPresentationContext);
@@ -427,11 +430,9 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
         finalFocus={inline ? (finalFocus ?? false) : finalFocus}
         {...mergeStyleProps(
           themeProps('dialog-popup', { size, inline }),
-          stylex.props(reset.base, styles.popup, sizes[size], popupMotion[size]),
-          className,
-          style,
+          stylex.props(reset.base, styles.popup, sizes[size], popupMotion[size], xstyle),
+          rest,
         )}
-        {...rest}
         // After the spread on purpose: `mergeProps` lets consumer props win, so a `role` passed
         // here would otherwise downgrade the alert back to a plain dialog.
         {...(isAlert ? { role: 'alertdialog' } : null)}
@@ -476,7 +477,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
  * why that ordering is what focuses it on open.
  */
 const Actions = React.forwardRef<HTMLDivElement, DialogActionsProps>(function DialogActions(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -484,8 +485,7 @@ const Actions = React.forwardRef<HTMLDivElement, DialogActionsProps>(function Di
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('dialog-actions'), stylex.props(reset.base, styles.actions), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('dialog-actions'), stylex.props(reset.base, styles.actions, xstyle), rest),
     },
   });
 });

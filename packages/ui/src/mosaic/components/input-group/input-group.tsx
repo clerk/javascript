@@ -22,7 +22,7 @@ export interface InputGroupRootProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function MosaicInputGroupRoot(
-  { render, className, style, onClick, disabled: disabledProp, invalid: invalidProp, size = 'md', ...otherProps },
+  { render, xstyle, onClick, disabled: disabledProp, invalid: invalidProp, size = 'md', ...otherProps },
   ref,
 ) {
   const field = useOptionalFieldContext();
@@ -44,11 +44,9 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
     props: {
       ...mergeStyleProps(
         themeProps('input-group', { size, disabled, invalid }),
-        stylex.props(reset.base, inputStyles.group, styles.root, sizes[size], disabled && inputStyles.disabled),
-        className,
-        style,
+        stylex.props(reset.base, inputStyles.group, styles.root, sizes[size], disabled && inputStyles.disabled, xstyle),
+        otherProps,
       ),
-      ...otherProps,
       onClick: (event: React.MouseEvent<HTMLDivElement>) => {
         onClick?.(event);
         if (event.defaultPrevented || disabled || !(event.target instanceof Element)) {
@@ -77,7 +75,7 @@ const addonButtonSizes = { sm: 'xs', md: 'sm', lg: 'md' } as const;
 
 function useAddon(
   side: 'start' | 'end',
-  { render, className, style, ...props }: InputGroupAddonProps,
+  { render, xstyle, ...props }: InputGroupAddonProps,
   ref: React.ForwardedRef<HTMLSpanElement>,
 ) {
   const group = useInputGroupContext();
@@ -105,11 +103,9 @@ function useAddon(
           size: group.size,
           disabled: group.disabled,
         }),
-        stylex.props(reset.base, styles.addon, textSizes[group.size], styles[side]),
-        className,
-        style,
+        stylex.props(reset.base, styles.addon, textSizes[group.size], styles[side], xstyle),
+        props,
       ),
-      ...props,
     },
   });
   return <ButtonContext.Provider value={defaults}>{element}</ButtonContext.Provider>;
