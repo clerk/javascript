@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
-import type { UserProfileAddPhoneViewProps } from '../user-profile-account-section/user-profile-add-phone.view';
-import { UserProfileAddPhoneView } from '../user-profile-account-section/user-profile-add-phone.view';
+import type { UserProfileAddPhoneDialogProps } from '../user-profile-account-section/user-profile-add-phone.dialog';
+import { UserProfileAddPhoneDialog } from '../user-profile-account-section/user-profile-add-phone.dialog';
 
-function renderView(overrides: Partial<UserProfileAddPhoneViewProps> = {}) {
-  const props: UserProfileAddPhoneViewProps = {
+function renderView(overrides: Partial<UserProfileAddPhoneDialogProps> = {}) {
+  const props: UserProfileAddPhoneDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
     step: 'phone',
@@ -24,18 +24,18 @@ function renderView(overrides: Partial<UserProfileAddPhoneViewProps> = {}) {
     props,
     ...render(
       <MosaicProvider>
-        <UserProfileAddPhoneView {...props} />
+        <UserProfileAddPhoneDialog {...props} />
       </MosaicProvider>,
     ),
   };
 }
 
-function VerificationExample({ onSubmit }: Pick<UserProfileAddPhoneViewProps, 'onSubmit'>) {
+function VerificationExample({ onSubmit }: Pick<UserProfileAddPhoneDialogProps, 'onSubmit'>) {
   const [code, setCode] = useState('');
 
   return (
     <MosaicProvider>
-      <UserProfileAddPhoneView
+      <UserProfileAddPhoneDialog
         open
         onOpenChange={() => undefined}
         step='verify'
@@ -50,7 +50,7 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddPhoneViewProps, 'o
   );
 }
 
-describe('UserProfileAddPhoneView', () => {
+describe('UserProfileAddPhoneDialog', () => {
   it.each(['typing', 'pasting'] as const)('automatically submits a complete code after %s', async method => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -95,7 +95,7 @@ describe('UserProfileAddPhoneView', () => {
 
     rerender(
       <MosaicProvider>
-        <UserProfileAddPhoneView
+        <UserProfileAddPhoneDialog
           {...props}
           step='verify'
           code='123456'
@@ -155,7 +155,7 @@ describe('UserProfileAddPhoneView', () => {
 
     rerender(
       <MosaicProvider>
-        <UserProfileAddPhoneView
+        <UserProfileAddPhoneDialog
           {...props}
           resendSeconds={0}
         />
@@ -166,7 +166,7 @@ describe('UserProfileAddPhoneView', () => {
 
     rerender(
       <MosaicProvider>
-        <UserProfileAddPhoneView
+        <UserProfileAddPhoneDialog
           {...props}
           resendSeconds={0}
           isResending

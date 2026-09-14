@@ -4,7 +4,7 @@ import type {
   UserProfilePhone,
 } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneViewProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.view';
+import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -32,7 +32,7 @@ function AccountSection({
   usernameFailWith,
 }: {
   allowMultipleAccounts: boolean;
-  failAt?: UserProfileAddPhoneViewProps['step'];
+  failAt?: UserProfileAddPhoneDialogProps['step'];
   failWith?: UserProfileFormError;
   usernameFailWith?: UserProfileFormError;
 }) {

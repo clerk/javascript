@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/useMachine';
+import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
 import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
-import type { UserProfileAddPhoneViewProps } from './user-profile-add-phone.view';
 
 export interface UserProfileAddPhoneControllerOptions {
   initialPhoneNumber?: string;
@@ -126,7 +126,7 @@ const machine = createMachine({
 
 export function useUserProfileAddPhoneController(
   options: UserProfileAddPhoneControllerOptions,
-): UserProfileAddPhoneViewProps {
+): UserProfileAddPhoneDialogProps {
   const [snapshot, send] = useMachine(machine, { context: options });
   const { resendSeconds } = snapshot.context;
   const open = snapshot.value !== 'idle';

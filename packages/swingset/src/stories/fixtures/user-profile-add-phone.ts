@@ -1,8 +1,8 @@
 import type { UserProfileAccountSectionViewProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneViewProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.view';
+import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 
 interface FixtureOptions {
-  failAt?: UserProfileAddPhoneViewProps['step'];
+  failAt?: UserProfileAddPhoneDialogProps['step'];
   onVerified?: (phoneNumber: string) => void;
 }
 

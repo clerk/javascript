@@ -9,7 +9,7 @@ import { userProfileAccountSectionBase as m } from './user-profile-account-secti
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
-import { UserProfileAddPhoneView } from './user-profile-add-phone.view';
+import { UserProfileAddPhoneDialog } from './user-profile-add-phone.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
 import { UserProfileRemovePhoneDialog } from './user-profile-remove-phone.dialog';
@@ -172,7 +172,7 @@ function AddPhone({
 }) {
   const controller = useUserProfileAddPhoneController(options);
   return (
-    <UserProfileAddPhoneView
+    <UserProfileAddPhoneDialog
       {...controller}
       trigger={
         <Button

@@ -13,7 +13,7 @@ import { PhoneInput } from '../../components/phone-input';
 import { fill } from './user-profile-account-section.messages';
 import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
 
-export interface UserProfileAddPhoneViewProps {
+export interface UserProfileAddPhoneDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
@@ -30,7 +30,7 @@ export interface UserProfileAddPhoneViewProps {
   resendSeconds?: number;
 }
 
-export function UserProfileAddPhoneView(props: UserProfileAddPhoneViewProps) {
+export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps) {
   const phoneFormId = useId();
   const verifyFormId = useId();
   const phoneRef = useRef<HTMLInputElement>(null);
