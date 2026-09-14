@@ -114,7 +114,9 @@ export function UserProfileEditNameDialog({
                   value={firstName}
                   onChange={event => onFirstNameChange(event.target.value)}
                 />
-                {error?.fields?.firstName ? <Field.Error>{error.fields.firstName}</Field.Error> : null}
+                <Field.Message>
+                  <Field.Error>{error?.fields?.firstName}</Field.Error>
+                </Field.Message>
               </Field.Root>
             ) : null}
             {showLastName ? (
@@ -130,7 +132,9 @@ export function UserProfileEditNameDialog({
                   value={lastName}
                   onChange={event => onLastNameChange(event.target.value)}
                 />
-                {error?.fields?.lastName ? <Field.Error>{error.fields.lastName}</Field.Error> : null}
+                <Field.Message>
+                  <Field.Error>{error?.fields?.lastName}</Field.Error>
+                </Field.Message>
               </Field.Root>
             ) : null}
           </Card.Content>

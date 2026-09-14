@@ -25,7 +25,10 @@ import { Input } from '@clerk/ui/mosaic/components/input';
     required
     aria-invalid={Boolean(error)}
   />
-  {error ? <Field.Error>{error}</Field.Error> : <Field.Description>Used for account notifications.</Field.Description>}
+  <Field.Description>Used for account notifications.</Field.Description>
+  <Field.Message>
+    <Field.Error>{error}</Field.Error>
+  </Field.Message>
 </Field.Root>;
 ```
 
@@ -42,6 +45,24 @@ Field does not validate controls or render errors automatically. Its parts may a
 
 Pass `visuallyHidden` to `Field.Label` when the surrounding UI already makes the label redundant. The label is still rendered and still associated with the control, so the control keeps its accessible name — unlike dropping the label and relying on a `placeholder`, which is not an accessible name. It applies the same style as the [VisuallyHidden](/components/visually-hidden) component.
 
+### Error
+
+<Story
+  name='WithError'
+  storyModule={FieldStories}
+/>
+
+Wrap `Field.Error` in `Field.Message` and pass the message as its children. `Field.Message` measures whichever message is showing and animates its own height to match, so it grows when a message arrives, follows the text when the message changes, and collapses after it clears. The caller never conditionally mounts either part. Under `prefers-reduced-motion` the height snaps and only the message fades.
+
+### Success
+
+<Story
+  name='WithFeedback'
+  storyModule={FieldStories}
+/>
+
+`Field.Success` is the positive counterpart. Render both inside one `Field.Message` and pass each its own message; when one replaces the other, the outgoing message fades out over the incoming one while the container height moves once from the old height to the new.
+
 ## Parts
 
 | Part                | Stable slot class       | Description                                       |
@@ -49,7 +70,9 @@ Pass `visuallyHidden` to `Field.Label` when the surrounding UI already makes the
 | `Field.Root`        | `.cl-field-root`        | Unstyled `div` and field context provider.        |
 | `Field.Label`       | `.cl-field-label`       | Native `label` associated with the field control. |
 | `Field.Description` | `.cl-field-description` | Supporting `p` associated with the field control. |
+| `Field.Message`     | `.cl-field-message`     | Height-animated container for the messages below. |
 | `Field.Error`       | `.cl-field-error`       | Associated error `p` with an alert icon.          |
+| `Field.Success`     | `.cl-field-success`     | Associated success `p` with a check icon.         |
 
 ## Styling
 
