@@ -13,7 +13,7 @@ import type { UserProfileFormError } from './user-profile-account-section.types'
 
 export type UserProfileEditUsernameField = 'username';
 
-export interface UserProfileEditUsernameViewProps {
+export interface UserProfileEditUsernameDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
@@ -25,7 +25,7 @@ export interface UserProfileEditUsernameViewProps {
   onSubmit: () => void;
 }
 
-export function UserProfileEditUsernameView({
+export function UserProfileEditUsernameDialog({
   open,
   onOpenChange,
   trigger,
@@ -35,7 +35,7 @@ export function UserProfileEditUsernameView({
   isSaving = false,
   error,
   onSubmit,
-}: UserProfileEditUsernameViewProps) {
+}: UserProfileEditUsernameDialogProps) {
   const formId = useId();
   const usernameRef = useRef<HTMLInputElement>(null);
 

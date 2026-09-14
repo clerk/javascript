@@ -21,7 +21,7 @@ export type {
   UserProfileFormError,
   UserProfileNameAttribute,
 } from './user-profile-account-section/user-profile-account-section.types';
-export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.view';
+export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.dialog';
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
