@@ -127,8 +127,17 @@ function ControlledConfirmation({
   );
 }
 
-/** Opens the block from anywhere with the payload the confirmation is about. Create with `Confirmation.createHandle()` */
-export type ConfirmationHandle<Payload> = DialogHandle<Payload>;
+/**
+ * Opens the block from anywhere with the payload the confirmation is about. Create with
+ * `Confirmation.createHandle()`. The copy is derived from the payload, so `open` requires one.
+ */
+export interface ConfirmationHandle<Payload> extends DialogHandle<Payload> {
+  open(payload: Payload): void;
+}
+
+function createHandle<Payload>(): ConfirmationHandle<Payload> {
+  return Dialog.createHandle<Payload>();
+}
 
 type FromPayload<Payload, Value> = Value | ((payload: Payload) => Value);
 
@@ -234,4 +243,4 @@ export function Confirmation<Payload = unknown>(props: ConfirmationProps<Payload
   return 'handle' in props ? <HandleConfirmation<Payload> {...props} /> : <ControlledConfirmation {...props} />;
 }
 
-Confirmation.createHandle = Dialog.createHandle;
+Confirmation.createHandle = createHandle;

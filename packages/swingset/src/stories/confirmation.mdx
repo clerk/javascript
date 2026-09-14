@@ -28,12 +28,19 @@ import { useState } from 'react';
 
 const [open, setOpen] = useState(false);
 const [isConfirming, setIsConfirming] = useState(false);
+const [errorMessage, setErrorMessage] = useState<string>();
 
 const handleConfirm = async () => {
   setIsConfirming(true);
-  await removeConnectedAccount();
-  setIsConfirming(false);
-  setOpen(false);
+  setErrorMessage(undefined);
+  try {
+    await removeConnectedAccount();
+    setOpen(false);
+  } catch {
+    setErrorMessage('Google could not be removed. Please try again.');
+  } finally {
+    setIsConfirming(false);
+  }
 };
 
 <Confirmation
@@ -45,6 +52,7 @@ const handleConfirm = async () => {
   actionLabel='Remove'
   onConfirm={() => void handleConfirm()}
   isConfirming={isConfirming}
+  errorMessage={errorMessage}
 />;
 ```
 
