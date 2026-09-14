@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -8,11 +9,13 @@ describe('useUserProfileAddPhoneController', () => {
 
   it('keeps the resend countdown running while verification is pending', async () => {
     vi.useFakeTimers();
-    const verification = Promise.withResolvers<void>();
+    const verification = createDeferredPromise();
     const { result } = renderHook(() =>
       useUserProfileAddPhoneController({
         onSend: () => Promise.resolve(),
-        onVerify: () => verification.promise,
+        onVerify: async () => {
+          await verification.promise;
+        },
       }),
     );
     act(() => result.current.onOpenChange(true));
@@ -46,8 +49,10 @@ describe('useUserProfileAddPhoneController', () => {
   });
 
   it('ignores cancellation and duplicate submissions while sending, then resets on reopen', async () => {
-    const request = Promise.withResolvers<void>();
-    const onSend = vi.fn(() => request.promise);
+    const request = createDeferredPromise();
+    const onSend = vi.fn(async () => {
+      await request.promise;
+    });
     const { result } = renderHook(() =>
       useUserProfileAddPhoneController({ onSend, onVerify: () => Promise.resolve() }),
     );
