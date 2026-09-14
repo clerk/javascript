@@ -20,6 +20,7 @@ import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
+import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
 
 export interface UserProfileFixtureOptions {
@@ -53,6 +54,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const connections = useConnectedAccountsFixture();
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
+  const editPassword = useUserProfileEditPasswordFixture();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
@@ -156,7 +158,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
         setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      hasPassword: true,
+      ...editPassword,
       passkeys,
       mfaMethods,
       devices,
@@ -170,7 +172,6 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
           ...current,
           { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
         ]),
-      onChangePassword: () => undefined,
       onDeleteAccount: () => Promise.resolve(),
       onManageDevice: () => undefined,
       onManagePasskey: () => undefined,

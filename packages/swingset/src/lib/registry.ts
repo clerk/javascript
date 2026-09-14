@@ -257,7 +257,11 @@ import {
 } from '../stories/user-profile-passkeys-section.stories';
 import {
   Default as UserProfilePasswordSectionDefault,
+  EditPasswordFails as UserProfilePasswordSectionEditPasswordFails,
   meta as userProfilePasswordSectionMeta,
+  ReadOnly as UserProfilePasswordSectionReadOnly,
+  SetPassword as UserProfilePasswordSectionSetPassword,
+  WithoutCurrentPassword as UserProfilePasswordSectionWithoutCurrentPassword,
 } from '../stories/user-profile-password-section.stories';
 import {
   Default as UserProfilePaymentMethodsSectionDefault,
@@ -527,6 +531,10 @@ const userProfileBillingHistorySectionModule: StoryModule = {
 const userProfilePasswordSectionModule: StoryModule = {
   meta: userProfilePasswordSectionMeta,
   Default: UserProfilePasswordSectionDefault,
+  SetPassword: UserProfilePasswordSectionSetPassword,
+  WithoutCurrentPassword: UserProfilePasswordSectionWithoutCurrentPassword,
+  ReadOnly: UserProfilePasswordSectionReadOnly,
+  EditPasswordFails: UserProfilePasswordSectionEditPasswordFails,
 };
 const userProfilePasskeysSectionModule: StoryModule = {
   meta: userProfilePasskeysSectionMeta,

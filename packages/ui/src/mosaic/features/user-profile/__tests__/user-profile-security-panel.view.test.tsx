@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -76,7 +76,6 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('forwards security actions', async () => {
-    const onChangePassword = vi.fn();
     const onAddPasskey = vi.fn();
     const onManagePasskey = vi.fn();
     const onRemovePasskey = vi.fn();
@@ -91,7 +90,6 @@ describe('UserProfileSecurityPanelView', () => {
         { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
         { id: 'backup_1', type: 'backup-codes' },
       ],
-      onChangePassword,
       onAddPasskey,
       onManagePasskey,
       onRemovePasskey,
@@ -101,7 +99,6 @@ describe('UserProfileSecurityPanelView', () => {
       onDeleteAccount,
     });
 
-    await user.click(screen.getByRole('button', { name: 'Change password' }));
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     expect(screen.queryByRole('menuitem', { name: 'SMS verification' })).not.toBeInTheDocument();
@@ -123,7 +120,6 @@ describe('UserProfileSecurityPanelView', () => {
     await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
     await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
-    expect(onChangePassword).toHaveBeenCalledOnce();
     expect(onAddPasskey).toHaveBeenCalledOnce();
     expect(onManagePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
@@ -131,6 +127,62 @@ describe('UserProfileSecurityPanelView', () => {
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
     expect(onDeleteAccount).toHaveBeenCalledOnce();
+  });
+
+  it('drives the change-password dialog from the section', async () => {
+    const onSubmitPassword = vi.fn(() => Promise.resolve());
+    const user = userEvent.setup();
+    renderView({ requiresCurrentPassword: true, onSubmitPassword });
+
+    expect(screen.getByText('••••••••••••••••••')).toHaveClass('cl-section-description');
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    const dialog = screen.getByRole('dialog', { name: 'Change password' });
+    await user.type(within(dialog).getByLabelText('Current password'), 'old-secret');
+    await user.type(within(dialog).getByLabelText('New password'), 'new-secret-123');
+    await user.type(within(dialog).getByLabelText('Confirm password'), 'new-secret-123');
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Sign out of all other devices' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmitPassword).toHaveBeenCalledWith({
+      currentPassword: 'old-secret',
+      newPassword: 'new-secret-123',
+      signOutOfOtherSessions: false,
+    });
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Change password' })).not.toBeInTheDocument());
+  });
+
+  it('offers to set a password when the instance takes one but the account has none', async () => {
+    const onSubmitPassword = vi.fn(() => Promise.resolve());
+    const user = userEvent.setup();
+    renderView({ hasPassword: false, passkeys: undefined, mfaMethods: undefined, onSubmitPassword });
+
+    expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
+    expect(screen.getByText('Password')).toHaveClass('cl-section-label');
+    expect(screen.queryByText('••••••••••••••••••')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Set password' }));
+    const dialog = screen.getByRole('dialog', { name: 'Set password' });
+    expect(within(dialog).queryByLabelText('Current password')).not.toBeInTheDocument();
+    await user.type(within(dialog).getByLabelText('New password'), 'new-secret-123');
+    await user.type(within(dialog).getByLabelText('Confirm password'), 'new-secret-123');
+    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmitPassword).toHaveBeenCalledWith({
+      currentPassword: undefined,
+      newPassword: 'new-secret-123',
+      signOutOfOtherSessions: true,
+    });
+  });
+
+  it('keeps the password row inert while it is read-only', async () => {
+    const user = userEvent.setup();
+    renderView({ isPasswordReadOnly: true, onSubmitPassword: vi.fn(() => Promise.resolve()) });
+
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    const dialog = screen.getByRole('dialog', { name: 'Change password' });
+
+    expect(within(dialog).getByText(/can sign in only via the enterprise connection/)).toBeInTheDocument();
+    expect(within(dialog).getByLabelText('New password')).toBeDisabled();
+    expect(within(dialog).queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument();
   });
 
   it('keeps supported empty authentication methods actionable', () => {
