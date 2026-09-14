@@ -30,7 +30,6 @@ const SVIX_SIGNATURE_HEADER = 'svix-signature';
  *     const evt = await verifyWebhook(req);
  *
  *     // Access the event data
- *     const { id } = evt.data;
  *     const eventType = evt.type;
  *
  *     // Handle specific event types
