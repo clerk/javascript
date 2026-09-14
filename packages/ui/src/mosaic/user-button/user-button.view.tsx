@@ -24,7 +24,7 @@ import { truncationStyles } from '../utils/typography.styles';
 import type { UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
 import { fill, plural, userButtonBase as m } from './user-button.messages';
-import { styles, triggerShapes } from './user-button.styles';
+import { styles } from './user-button.styles';
 import type {
   UserButtonBrandingProps,
   UserButtonBusyState,
@@ -1078,20 +1078,26 @@ export function UserButtonTrigger({
       xstyle={[
         focusOutline.visible,
         styles.trigger,
-        renderTriggerLabel ? styles.triggerLabelled : null,
-        triggerShapes[shape],
+        renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
+        !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
       <RowAvatar
         name={name}
         imageUrl={imageUrl}
         shape={shape}
-        size='sm'
+        size={renderTriggerLabel ? 'xs' : 'sm'}
       />
       {renderTriggerLabel ? (
         <>
           <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
+          <Icon
+            aria-hidden
+            name='chevron-down'
+            size='sm'
+            xstyle={styles.triggerCaret}
+          />
         </>
       ) : null}
     </Popover.Trigger>
