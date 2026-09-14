@@ -54,7 +54,7 @@ export type {
 } from '../components/dialog';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
-export { Flow } from '../components/flow';
+export { Flow, useFlowAutoFocus } from '../components/flow';
 export type { FlowRootProps, FlowStepProps } from '../components/flow';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';

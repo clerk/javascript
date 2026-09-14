@@ -12,20 +12,21 @@ import { styles } from './otp.styles';
 /** How the entered code currently reads back to the user. */
 export type OtpStatus = 'neutral' | 'success' | 'error';
 
-export interface OtpProps extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style'> {
+export interface OtpProps extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style' | 'ref'> {
   /** The number of boxes in the code. @default 6 */
   length?: number;
   /** Colours every slot for the verification outcome. Defaults to the enclosing `Field`'s validity. */
   status?: OtpStatus;
 }
 
-function OtpSlots({ status }: { status: OtpStatus }) {
+function OtpSlots({ status, firstSlotRef }: { status: OtpStatus; firstSlotRef: React.ForwardedRef<HTMLInputElement> }) {
   const { slots, disabled } = Primitive.useOtp();
 
   return slots.map(slot => (
     <Primitive.Input
       key={slot.index}
       index={slot.index}
+      ref={slot.index === 0 ? firstSlotRef : undefined}
       aria-invalid={status === 'error' ? true : undefined}
       {...mergeStyleProps(
         themeProps('otp-slot', { status, disabled }),
@@ -44,19 +45,23 @@ function OtpSlots({ status }: { status: OtpStatus }) {
 
 /**
  * A fixed-length verification code field: one styled box per character, with focus
- * advancing as the code is typed and a pasted code spread across the boxes.
+ * advancing as the code is typed and a pasted code spread across the boxes. The ref
+ * points at the first slot, the input a label targets and where focus lands.
  */
-export function Otp({
-  length = 6,
-  status: statusProp,
-  disabled: disabledProp,
-  required: requiredProp,
-  id,
-  'aria-invalid': ariaInvalidProp,
-  'aria-labelledby': ariaLabelledBy,
-  'aria-describedby': ariaDescribedBy,
-  ...rest
-}: OtpProps): React.ReactElement {
+export const Otp = React.forwardRef<HTMLInputElement, OtpProps>(function MosaicOtp(
+  {
+    length = 6,
+    status: statusProp,
+    disabled: disabledProp,
+    required: requiredProp,
+    id,
+    'aria-invalid': ariaInvalidProp,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    ...rest
+  },
+  ref,
+) {
   const fieldProps = useOptionalFieldControlProps({
     id,
     disabled: disabledProp,
@@ -81,7 +86,10 @@ export function Otp({
       aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
     >
-      <OtpSlots status={status} />
+      <OtpSlots
+        status={status}
+        firstSlotRef={ref}
+      />
     </Primitive.Root>
   );
-}
+});

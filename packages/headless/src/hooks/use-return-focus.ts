@@ -5,6 +5,7 @@ import { useFloatingParentNodeId, useFloatingTree } from '@floating-ui/react';
 import { useEffect, useMemo, useRef } from 'react';
 
 import { isKeyboardEvent } from '../utils/interaction-modality';
+import { currentInteractionOrigin } from '../utils/interaction-origin';
 
 /**
  * The element `FloatingFocusManager` restores focus to when the floating element closes.
@@ -18,8 +19,10 @@ import { isKeyboardEvent } from '../utils/interaction-modality';
  * A floating element opened from inside another one — a dialog from a menu item — may have no
  * trigger of its own, or one that is gone by the time it closes: the item unmounted with the menu.
  * Focus then goes to the nearest ancestor in the floating tree whose reference is still on the
- * page, which for a menu is its trigger. Resolved lazily, at restore time, since that is when it is
- * known whether the trigger survived.
+ * page, which for a menu is its trigger. A dialog mounted outside that tree — one instance at the
+ * end of a table, opened from any row's menu — has no ancestor to walk, so the interaction origin
+ * the menu item published while its `onClick` ran is recorded on open and used instead. Resolved
+ * lazily, at restore time, since that is when it is known whether the trigger survived.
  *
  * Pass the result to `FloatingFocusManager`'s `returnFocus`. On `null` it falls back to the
  * hidden guard element it keeps next to the trigger, so the tab position survives; verify that
@@ -32,6 +35,7 @@ export function useReturnFocus(
   const tree = useFloatingTree();
   const parentId = useFloatingParentNodeId();
   const triggerRef = useRef<HTMLElement | null>(null);
+  const originRef = useRef<HTMLElement | null>(null);
   const dismissedByPointerRef = useRef(false);
   const trigger = elements.domReference;
 
@@ -48,7 +52,9 @@ export function useReturnFocus(
     // forwarded without a reason — a Close button press — keeps the trigger, and programmatic
     // closes carry no event at all.
     function onOpenChange({ open, event, reason }: { open: boolean; event?: Event; reason?: OpenChangeReason }) {
-      if (!open && event && reason && !isKeyboardEvent(event)) {
+      if (open) {
+        originRef.current = currentInteractionOrigin();
+      } else if (event && reason && !isKeyboardEvent(event)) {
         dismissedByPointerRef.current = true;
       }
     }
@@ -66,6 +72,10 @@ export function useReturnFocus(
         const own = triggerRef.current;
         if (own?.isConnected) {
           return own;
+        }
+        const origin = originRef.current;
+        if (origin?.isConnected) {
+          return origin;
         }
         return ancestorReference(tree, parentId);
       },
