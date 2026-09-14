@@ -49,7 +49,7 @@ export function UserProfileVerifyEmailLinkDialog({
           <Card.Header>
             <Card.Title>{m.title}</Card.Title>
           </Card.Header>
-          <Card.Content {...stylex.props(styles.content)}>
+          <Card.Content xstyle={styles.content}>
             {errorMessage ? (
               <Banner.Root
                 role='alert'
@@ -63,7 +63,7 @@ export function UserProfileVerifyEmailLinkDialog({
               {...stylex.props(styles.status)}
             >
               <Spinner size='sm' />
-              <Text {...stylex.props(styles.emphasis)}>{m.waiting}</Text>
+              <Text xstyle={styles.emphasis}>{m.waiting}</Text>
             </div>
             <div {...stylex.props(styles.details)}>
               <Card.Description>

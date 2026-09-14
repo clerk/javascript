@@ -9,6 +9,7 @@ import { Spinner } from '../../components/spinner';
 import { UserProfileProviderIcon } from '../user-profile-provider-icon';
 import { fill } from './user-profile-account-section.messages';
 import { userProfileVerifyEmailSsoMessages as m } from './user-profile-verify-email-sso.messages';
+import { styles } from './user-profile-verify-email-sso.styles';
 
 export interface UserProfileVerifyEmailSsoDialogProps {
   open: boolean;
@@ -60,7 +61,7 @@ export function UserProfileVerifyEmailSsoDialog({
                 <Banner.Label>{errorMessage}</Banner.Label>
               </Banner.Root>
             ) : null}
-            <Item.Root style={{ paddingInline: 0 }}>
+            <Item.Root xstyle={styles.connection}>
               {connection.iconUrl ? <UserProfileProviderIcon iconUrl={connection.iconUrl} /> : null}
               <Item.Content>
                 <Item.Label>{connection.provider}</Item.Label>
