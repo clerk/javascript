@@ -94,6 +94,53 @@ export function withTruncatableLabel(children: React.ReactNode): React.ReactNode
   return result;
 }
 
+interface ButtonStyleOptions {
+  color: NonNullable<ButtonProps['color']>;
+  variant: NonNullable<ButtonProps['variant']>;
+  size: NonNullable<ButtonProps['size']>;
+  shape: NonNullable<ButtonProps['shape']>;
+  fullWidth: boolean;
+  touchTarget: boolean;
+  disabled: boolean;
+  defaults: React.ContextType<typeof ButtonContext>;
+  xstyle: ButtonProps['xstyle'];
+}
+
+function buttonStyleProps({
+  color,
+  variant,
+  size,
+  shape,
+  fullWidth,
+  touchTarget,
+  disabled,
+  defaults,
+  xstyle,
+}: ButtonStyleOptions) {
+  const isIconShape = shape === 'square' || shape === 'circle';
+  const hasTouchTarget = touchTarget && variant !== 'link';
+  return stylex.props(
+    reset.base,
+    buttonScope,
+    // one ring for every color and variant — it reads as focus, not as the button's color
+    focusOutline.visible,
+    styles.base,
+    sizes[size],
+    variants[`${variant}-${color}`],
+    shape === 'square' && styles.shapeSquare,
+    shape === 'circle' && styles.shapeCircle,
+    isIconShape && iconSizes[size],
+    hasTouchTarget && styles.touchTarget,
+    hasTouchTarget && isIconShape && styles.touchTargetIcon,
+    defaults.sizeStyles,
+    isIconShape && defaults.iconStyles,
+    fullWidth && styles.fullWidth,
+    disabled && styles.disabled,
+    defaults.styles,
+    xstyle,
+  );
+}
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(
   {
     color: colorProp,
@@ -116,8 +163,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
   const size = sizeProp ?? defaults.size ?? 'md';
   const shape = shapeProp ?? defaults.shape ?? 'default';
   const disabled = defaults.disabled || disabledProp || false;
-  const isIconShape = shape === 'square' || shape === 'circle';
-  const hasTouchTarget = touchTarget && variant !== 'link';
   return (
     <HeadlessButton
       ref={ref}
@@ -125,26 +170,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       focusableWhenDisabled={focusableWhenDisabled}
       {...mergeStyleProps(
         themeProps('button', { color, variant, size, shape, fullWidth, disabled }),
-        stylex.props(
-          reset.base,
-          buttonScope,
-          // one ring for every color and variant — it reads as focus, not as the button's color
-          focusOutline.visible,
-          styles.base,
-          sizes[size],
-          variants[`${variant}-${color}`],
-          shape === 'square' && styles.shapeSquare,
-          shape === 'circle' && styles.shapeCircle,
-          isIconShape && iconSizes[size],
-          hasTouchTarget && styles.touchTarget,
-          hasTouchTarget && isIconShape && styles.touchTargetIcon,
-          defaults.sizeStyles,
-          isIconShape && defaults.iconStyles,
-          fullWidth && styles.fullWidth,
-          disabled && styles.disabled,
-          defaults.styles,
-          xstyle,
-        ),
+        buttonStyleProps({ color, variant, size, shape, fullWidth, touchTarget, disabled, defaults, xstyle }),
         rest,
       )}
     >

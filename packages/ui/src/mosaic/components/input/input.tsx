@@ -19,6 +19,11 @@ export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> 
   variant?: InputVariant;
 }
 
+const variantStyles = {
+  default: inputStyles.base,
+  ghost: styles.ghost,
+} as const;
+
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(function MosaicInput(
   {
     size: sizeProp,
@@ -45,30 +50,32 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
     ariaLabelledBy,
     ariaDescribedBy,
   });
+  const control = fieldProps ?? {
+    id,
+    disabled: disabledProp,
+    required: requiredProp,
+    'aria-invalid': ariaInvalid,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+  };
   const size = inputGroup?.size ?? sizeProp ?? 'md';
-  const disabled = inputGroup?.disabled || fieldProps?.disabled || disabledProp || false;
-  const required = fieldProps?.required ?? requiredProp;
-  const ariaInvalidValue = inputGroup?.invalid ? true : (fieldProps?.['aria-invalid'] ?? ariaInvalid);
+  const disabled = inputGroup?.disabled || control.disabled || false;
 
   return useRender({
     defaultTagName: 'input',
     render,
     ref: [forwardedRef, inputGroup?.inputRef],
     props: {
+      ...control,
       disabled,
-      required,
-      id: fieldProps?.id ?? id,
-      'aria-invalid': ariaInvalidValue,
-      'aria-labelledby': fieldProps?.['aria-labelledby'] ?? ariaLabelledBy,
-      'aria-describedby': fieldProps?.['aria-describedby'] ?? ariaDescribedBy,
+      'aria-invalid': inputGroup?.invalid ? true : control['aria-invalid'],
       ...mergeStyleProps(
         themeProps('input', { size, variant, disabled }),
         stylex.props(
           reset.base,
           styles.base,
           sizes[size],
-          variant === 'default' && inputStyles.base,
-          variant === 'ghost' && styles.ghost,
+          variantStyles[variant],
           variant === 'default' && disabled && inputStyles.disabled,
           xstyle,
         ),

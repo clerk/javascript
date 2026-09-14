@@ -134,16 +134,6 @@
       "count": 4
     }
   },
-  "src/mosaic/components/button/button.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
-  "src/mosaic/components/input/input.tsx": {
-    "complexity": {
-      "count": 1
-    }
-  },
   "src/mosaic/user-button/user-button.model.tsx": {
     "complexity": {
       "count": 1
