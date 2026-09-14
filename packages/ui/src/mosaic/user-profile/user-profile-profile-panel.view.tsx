@@ -28,7 +28,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   web3Wallets?: UserProfileWeb3Wallet[];
   onConnectAccount?: (id: string) => void;
   onManageConnectedAccount?: (id: string) => void;
-  onRemoveConnectedAccount?: (id: string) => void | Promise<void>;
+  onRemoveConnectedAccount?: (id: string) => void;
   onConnectWeb3Wallet?: (id: string) => void;
   onManageWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
@@ -68,7 +68,6 @@ export function UserProfileProfilePanelView({
   onSetPrimaryPhone,
   onRemovePhone,
   onConnectAccount,
-  onManageConnectedAccount,
   onRemoveConnectedAccount,
   onConnectWeb3Wallet,
   onManageWeb3Wallet,
@@ -113,7 +112,6 @@ export function UserProfileProfilePanelView({
           <UserProfileConnectedAccountsSectionView
             accounts={connectedAccounts}
             onConnect={onConnectAccount}
-            onManage={onManageConnectedAccount}
             onRemove={onRemoveConnectedAccount}
           />
         ) : null}

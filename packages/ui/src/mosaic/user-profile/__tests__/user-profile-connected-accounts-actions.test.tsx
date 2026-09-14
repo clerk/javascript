@@ -8,7 +8,7 @@ import { UserProfileConnectedAccountsSectionView } from '../user-profile-connect
 
 const account = { id: 'github', provider: 'GitHub', identifier: 'test' };
 
-function renderAccounts(onRemove: (id: string) => void | Promise<void>) {
+function renderAccounts(onRemove: (id: string) => void) {
   return render(
     <MosaicProvider>
       <UserProfileConnectedAccountsSectionView
@@ -38,7 +38,7 @@ describe('connected account removal', () => {
     expect(onRemove).not.toHaveBeenCalled();
   });
 
-  it('keeps focus in the section when a removed account disappears', async () => {
+  it('closes confirmation when the caller removes the account', async () => {
     const user = userEvent.setup();
     function Example() {
       const [accounts, setAccounts] = useState([account]);
@@ -55,17 +55,30 @@ describe('connected account removal', () => {
     await openRemoval(user);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage GitHub' })).not.toBeInTheDocument());
-    await waitFor(() => expect(screen.getByRole('region', { name: 'Connected accounts' })).toHaveFocus());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('shows a removal failure and allows retrying', async () => {
     const user = userEvent.setup();
-    const onRemove = vi.fn().mockRejectedValueOnce(new Error('Unable to disconnect')).mockResolvedValueOnce(undefined);
-    renderAccounts(onRemove);
+    const onRemove = vi.fn();
+    function Example() {
+      const [removalError, setRemovalError] = useState<string>();
+      return (
+        <MosaicProvider>
+          <UserProfileConnectedAccountsSectionView
+            accounts={[{ ...account, removalError }]}
+            onRemove={id => {
+              onRemove(id);
+              setRemovalError(onRemove.mock.calls.length === 1 ? 'Unable to disconnect' : undefined);
+            }}
+          />
+        </MosaicProvider>
+      );
+    }
+    render(<Example />);
     await openRemoval(user);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Unable to disconnect');
-    await openRemoval(user);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     expect(onRemove).toHaveBeenCalledTimes(2);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();

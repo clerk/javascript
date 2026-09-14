@@ -47,9 +47,7 @@ export function Default(_args: Record<string, unknown>) {
           provider: 'Google',
           identifier: 'test@google.com',
           iconUrl: providerIconUrl('google'),
-          connected: true,
         },
-        { id: 'apple', provider: 'Apple', iconUrl: providerIconUrl('apple'), connected: false },
       ]}
       web3Wallets={[
         {

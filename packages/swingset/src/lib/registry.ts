@@ -212,8 +212,18 @@ import {
   meta as userProfileBillingPanelMeta,
 } from '../stories/user-profile-billing-panel.stories';
 import {
+  Connecting as ConnectedAccountsConnecting,
+  ConnectionError as ConnectedAccountsConnectionError,
+  ConnectOnly as ConnectedAccountsConnectOnly,
   Default as UserProfileConnectedAccountsSectionDefault,
+  DisplayEdgeCases as ConnectedAccountsDisplayEdgeCases,
+  Empty as ConnectedAccountsEmpty,
+  LinkedAccounts as ConnectedAccountsLinkedAccounts,
   meta as userProfileConnectedAccountsSectionMeta,
+  ReconnectRequired as ConnectedAccountsReconnectRequired,
+  RemovalError as ConnectedAccountsRemovalError,
+  RemovalPending as ConnectedAccountsRemovalPending,
+  VerificationError as ConnectedAccountsVerificationError,
 } from '../stories/user-profile-connected-accounts-section.stories';
 import {
   Default as UserProfileDeleteSectionDefault,
@@ -517,6 +527,16 @@ const userProfilePaymentMethodsSectionModule: StoryModule = {
 const userProfileConnectedAccountsSectionModule: StoryModule = {
   meta: userProfileConnectedAccountsSectionMeta,
   Default: UserProfileConnectedAccountsSectionDefault,
+  LinkedAccounts: ConnectedAccountsLinkedAccounts,
+  ConnectOnly: ConnectedAccountsConnectOnly,
+  Connecting: ConnectedAccountsConnecting,
+  ReconnectRequired: ConnectedAccountsReconnectRequired,
+  VerificationError: ConnectedAccountsVerificationError,
+  ConnectionError: ConnectedAccountsConnectionError,
+  RemovalPending: ConnectedAccountsRemovalPending,
+  RemovalError: ConnectedAccountsRemovalError,
+  DisplayEdgeCases: ConnectedAccountsDisplayEdgeCases,
+  Empty: ConnectedAccountsEmpty,
 };
 const userProfileWeb3WalletsSectionModule: StoryModule = {
   meta: userProfileWeb3WalletsSectionMeta,
