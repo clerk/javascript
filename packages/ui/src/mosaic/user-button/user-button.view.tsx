@@ -1096,7 +1096,7 @@ export function UserButtonTrigger({
             aria-hidden
             name='chevron-down'
             size='sm'
-            {...stylex.props(styles.triggerCaret)}
+            xstyle={styles.triggerCaret}
           />
         </>
       ) : null}
