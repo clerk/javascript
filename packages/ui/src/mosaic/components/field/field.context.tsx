@@ -104,7 +104,7 @@ export function FieldMessageProvider({ register, children }: React.PropsWithChil
   return <FieldMessageContext.Provider value={context}>{children}</FieldMessageContext.Provider>;
 }
 
-export function useRegisterFieldMessage(open: boolean) {
+export function useRegisterFieldMessage(open: boolean): React.RefCallback<HTMLElement> {
   const register = React.useContext(FieldMessageContext)?.register;
   const key = React.useRef(Symbol('field-message'));
 
