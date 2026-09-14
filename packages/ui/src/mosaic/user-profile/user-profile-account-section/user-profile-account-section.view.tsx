@@ -1,9 +1,7 @@
-import type { FileRejection, FileRejectionReason } from '@clerk/headless/file-upload';
-import { FileUpload } from '@clerk/headless/file-upload';
+import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
-import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
@@ -18,10 +16,7 @@ import type { UserProfileEditNameValue } from './user-profile-edit-name.view';
 import { UserProfileEditNameView } from './user-profile-edit-name.view';
 import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
 import { UserProfileEditUsernameView } from './user-profile-edit-username.view';
-
-const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-/** Matches the limit the row's own description advertises. */
-const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
+import { UserProfilePictureRowView } from './user-profile-picture-row.view';
 
 export interface UserProfileEmail {
   id: string;
@@ -102,57 +97,33 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
-  const initials = name
-    .split(/\s+/)
-    .map(part => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-  const [rejection, setRejection] = useState<FileRejectionReason | null>(null);
+  const [pictureError, setPictureError] = useState<string>();
 
   return (
-    <FileUpload.Root
-      accept={PROFILE_PICTURE_MIME_TYPES}
-      maxSize={PROFILE_PICTURE_MAX_BYTES}
-      render={<div {...stylex.props(styles.sections)} />}
-      onReject={rejections => {
-        setRejection(rejections[0]?.reason ?? null);
-        onProfilePictureReject?.(rejections);
-      }}
-      onValueChange={files => {
-        const file = files[0];
-        if (file) {
-          setRejection(null);
-          onProfilePictureChange?.(file);
-        }
-      }}
-    >
+    <div {...stylex.props(styles.sections)}>
       <Section.Root aria-label={m.sectionLabel}>
         <Section.Title>{m.sectionTitle}</Section.Title>
         <Section.Group>
-          <Section.Row>
-            <Section.Item>
-              <Section.Media size='lg'>
-                <Avatar.Root size='fit'>
-                  <Avatar.Image
-                    alt={name}
-                    src={imageUrl}
-                  />
-                  <Avatar.Fallback>{initials}</Avatar.Fallback>
-                </Avatar.Root>
-              </Section.Media>
-              <Section.Content>
-                <Section.Label>{m.picture.label}</Section.Label>
-                <Section.Description>{m.picture.description}</Section.Description>
-              </Section.Content>
-              <ProfilePictureActions
-                canChange={Boolean(onProfilePictureChange)}
-                hasImage={hasImage}
-                onRemove={onRemoveProfilePicture}
-              />
-            </Section.Item>
-            {rejection ? <Section.Error>{m.picture.errors[rejection]}</Section.Error> : null}
-          </Section.Row>
+          <UserProfilePictureRowView
+            name={name}
+            imageUrl={imageUrl}
+            hasImage={hasImage}
+            errorMessage={pictureError}
+            onChange={
+              onProfilePictureChange
+                ? file => {
+                    setPictureError(undefined);
+                    onProfilePictureChange(file);
+                  }
+                : undefined
+            }
+            onReject={rejections => {
+              const rejection = rejections[0];
+              setPictureError(rejection ? m.picture.errors[rejection.reason] : undefined);
+              onProfilePictureReject?.(rejections);
+            }}
+            onRemove={onRemoveProfilePicture}
+          />
           <Section.Row>
             <Section.Item>
               <Section.Content>
@@ -232,60 +203,8 @@ export function UserProfileAccountSectionView({
           onVerify={onVerifyPhone}
         />
       ) : null}
-    </FileUpload.Root>
+    </div>
   );
-}
-
-function ProfilePictureActions({
-  hasImage,
-  canChange,
-  onRemove,
-}: {
-  hasImage: boolean;
-  canChange: boolean;
-  onRemove?: () => void;
-}) {
-  const { openFilePicker } = FileUpload.useFileUpload();
-  const actions: UserProfileMenuAction[] = [];
-
-  if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
-  }
-
-  if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'close', onClick: onRemove });
-  }
-
-  if (actions.length > 0) {
-    return (
-      <Section.Actions>
-        <UserProfileActionMenu
-          actions={actions}
-          label={m.picture.manage}
-        />
-      </Section.Actions>
-    );
-  }
-
-  if (!hasImage && canChange) {
-    return (
-      <Section.Actions>
-        <FileUpload.Trigger
-          render={
-            <Button
-              color='neutral'
-              size='sm'
-              variant='outline'
-            />
-          }
-        >
-          {m.picture.upload}
-        </FileUpload.Trigger>
-      </Section.Actions>
-    );
-  }
-
-  return null;
 }
 
 function EditName({
