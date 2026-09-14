@@ -320,6 +320,7 @@ export const hrHR: LocalizationResource = {
       empty__waitingForFirstUser: undefined,
       error__lastSyncFailed: undefined,
       error__loadUsers: undefined,
+      error__syncFailed: undefined,
       note: undefined,
       noteLabel: undefined,
       subtitle: undefined,

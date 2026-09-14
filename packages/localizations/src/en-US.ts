@@ -316,6 +316,7 @@ export const enUS: LocalizationResource = {
       empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
       error__lastSyncFailed: 'The last sync failed',
       error__loadUsers: 'Could not load provisioned users',
+      error__syncFailed: 'Could not start the sync. Check your connection and try again.',
       note: 'only users with an email address from a configured domain will be processed.',
       noteLabel: 'Note:',
       subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',

@@ -1,7 +1,7 @@
 import type { DirectorySyncStatusResource } from '@clerk/shared/types';
 import { useState } from 'react';
 
-import { Badge, Button, Col, descriptors, Flex, localizationKeys, Text } from '@/customizables';
+import { Badge, Button, Col, descriptors, Flex, localizationKeys, Text, useLocalizations } from '@/customizables';
 import { Alert } from '@/ui/elements/Alert';
 import { handleError } from '@/utils/errorHandler';
 
@@ -26,6 +26,7 @@ const STATUS_COLOR_SCHEME = {
  * one.
  */
 export const SyncNowRow = ({ status, onSync, onSynced }: SyncNowRowProps): JSX.Element => {
+  const { t } = useLocalizations();
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -41,7 +42,14 @@ export const SyncNowRow = ({ status, onSync, onSynced }: SyncNowRowProps): JSX.E
     } catch (err) {
       // Includes the already-running case, which is a normal thing to hit by
       // clicking twice rather than a failure worth alarming about.
-      handleError(err as Error, [], message => setError(typeof message === 'string' ? message : undefined));
+      try {
+        handleError(err as Error, [], message => setError(typeof message === 'string' ? message : undefined));
+      } catch {
+        // handleError rethrows anything it does not recognise, and a network
+        // failure is exactly that. Without this the click would appear to do
+        // nothing at all.
+        setError(t(localizationKeys('configureDirectorySync.testStep.error__syncFailed')));
+      }
     } finally {
       setIsSyncing(false);
     }
