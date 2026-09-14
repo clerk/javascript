@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
@@ -66,6 +66,36 @@ describe('ReverificationView', () => {
     const otpStep = screen.getByRole('group', { name: 'Verification code' }).closest('.cl-flow-step');
     expect(otpStep).toBeInTheDocument();
     expect(otpStep?.style.getPropertyValue('--cl-flow-transition-direction')).toBe('-1');
+  });
+
+  it('moves focus to the entering step once it settles', async () => {
+    const { rerender } = renderView();
+
+    expect(screen.getByLabelText('Password')).not.toHaveFocus();
+
+    rerender(
+      <MosaicProvider>
+        <ReverificationView {...viewProps({ step: 'otp', otpChannel: 'totp', direction: 1 })} />
+      </MosaicProvider>,
+    );
+    await act(async () => {});
+
+    expect(screen.getAllByRole('textbox')[0]).toHaveFocus();
+
+    rerender(
+      <MosaicProvider>
+        <ReverificationView
+          {...viewProps({
+            step: 'method-picker',
+            direction: 1,
+            methods: [{ id: 'password', stage: 'first', strategy: 'password' }],
+          })}
+        />
+      </MosaicProvider>,
+    );
+    await act(async () => {});
+
+    expect(screen.getByRole('button', { name: 'Continue with your password' })).toHaveFocus();
   });
 
   it('keeps a disabled resend control during the cooldown', () => {

@@ -5,6 +5,9 @@ import * as Stories from './user-profile-account-section.stories';
 Account details, profile image, email addresses, and phone numbers composed with `Section`. The
 `allowMultipleAccounts` flag controls whether contact methods appear inline or in dedicated sections.
 
+In the multiple-account example, Add phone opens the flow using local state and simulated requests.
+Entering or pasting six digits submits automatically. Use `000000` to see an incorrect-code error.
+
 ## Single account
 
 <Story
@@ -29,3 +32,9 @@ Account details, profile image, email addresses, and phone numbers composed with
     { name: 'Icon', href: '/components/icon', layer: 'Components' },
   ]}
 />
+
+## Add phone failure
+
+Add a phone number to see a failed send request while keeping the entered number.
+
+<Story name='AddPhoneFails' storyModule={Stories} />
