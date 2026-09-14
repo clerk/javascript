@@ -21,7 +21,8 @@ const fileToText = (file: File): Promise<string> =>
     const reader = new FileReader();
     reader.readAsText(file);
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
+    // onerror hands back a ProgressEvent, which is useless to a caller.
+    reader.onerror = () => reject(new Error('Could not read the selected file'));
   });
 
 export type GoogleCredentialsState = {
@@ -61,7 +62,16 @@ export const useGoogleCredentialsState = (): GoogleCredentialsState => {
       if (!file) {
         return;
       }
-      const contents = await fileToText(file);
+      let contents: string;
+      try {
+        contents = await fileToText(file);
+      } catch {
+        setServiceAccountJson('');
+        setFileName(null);
+        setFileError(t(localizationKeys('configureDirectorySync.configureStep.error__invalidKeyFile')));
+        return;
+      }
+
       try {
         JSON.parse(contents);
       } catch {
