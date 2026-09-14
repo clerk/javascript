@@ -68,6 +68,7 @@ export const userProfileAccountSectionBase = {
     add: 'Add phone number',
     verify: 'Verify phone number',
     remove: 'Remove phone number',
+    primaryError: 'Unable to set the primary phone number. Try again.',
   },
 };
 

@@ -1,10 +1,12 @@
 import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
+import { useRef, useState } from 'react';
 
 import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { Text } from '../../components/text';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import { styles } from './user-profile-account-section.styles';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
@@ -66,7 +68,7 @@ export interface UserProfileAccountSectionViewProps {
   onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
-  onSetPrimaryPhone?: (id: string) => void;
+  onSetPrimaryPhone?: (id: string) => void | Promise<void>;
   onRemovePhone?: (id: string) => void;
 }
 
@@ -106,6 +108,28 @@ export function UserProfileAccountSectionView({
         compact={allowMultipleAccounts}
       />
     ) : undefined;
+  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
+  const [primaryError, setPrimaryError] = useState<string>();
+  const settingPrimary = useRef(false);
+
+  const setPrimaryPhone = async (id: string) => {
+    const phone = phones.find(phone => phone.id === id);
+    if (!onSetPrimaryPhone || !phone?.isVerified || phone.isDefault || settingPrimary.current) {
+      return;
+    }
+    settingPrimary.current = true;
+    setIsSettingPrimary(true);
+    setPrimaryError(undefined);
+    try {
+      await onSetPrimaryPhone(id);
+    } catch (error) {
+      setPrimaryError(error instanceof Error ? error.message : m.phone.primaryError);
+    } finally {
+      settingPrimary.current = false;
+      setIsSettingPrimary(false);
+    }
+  };
+
   const formattedPhones = phones.map(phone => ({
     ...phone,
     value: stringToFormattedPhoneString(phone.value),
@@ -180,13 +204,21 @@ export function UserProfileAccountSectionView({
               kind='phone'
               label={m.phone.label}
               addAction={addPhoneAction}
-              onManage={onManagePhone}
+              onManage={isSettingPrimary ? undefined : onManagePhone}
               onRemove={onRemovePhone}
-              onSetPrimary={onSetPrimaryPhone}
+              onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
               onVerify={onVerifyPhone}
             />
           </Section.Group>
         </Section.Root>
+      ) : null}
+      {primaryError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {primaryError}
+        </Text>
       ) : null}
     </div>
   );
