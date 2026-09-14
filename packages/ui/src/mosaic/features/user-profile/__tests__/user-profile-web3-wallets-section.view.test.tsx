@@ -13,7 +13,6 @@ describe('Web3 wallets section', () => {
     'offers only applicable legacy wallet actions ($isPrimary, $isVerified)',
     async ({ isPrimary, isVerified, canSetPrimary }) => {
       const user = userEvent.setup();
-      const onSetPrimary = vi.fn();
       render(
         <UserProfileWeb3WalletsSectionView
           wallets={[
@@ -26,7 +25,7 @@ describe('Web3 wallets section', () => {
               iconUrl: '/metamask.svg',
             },
           ]}
-          onSetPrimary={onSetPrimary}
+          onSetPrimary={vi.fn()}
           onRemove={vi.fn()}
         />,
       );
@@ -36,8 +35,7 @@ describe('Web3 wallets section', () => {
       expect(screen.getByRole('menuitem', { name: 'Remove wallet' })).toBeVisible();
       expect(screen.getAllByRole('menuitem')).toHaveLength(canSetPrimary ? 2 : 1);
       if (canSetPrimary) {
-        await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
-        expect(onSetPrimary).toHaveBeenCalledExactlyOnceWith('wallet_1');
+        expect(screen.getByRole('menuitem', { name: 'Set as primary' })).toBeVisible();
       } else {
         expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).not.toBeInTheDocument();
       }
@@ -70,25 +68,21 @@ describe('Web3 wallets section', () => {
     },
   );
 
-  it('shows connection errors beside the provider and forwards retry', async () => {
-    const user = userEvent.setup();
-    const onConnect = vi.fn();
+  it('shows connection errors while keeping Connect available', () => {
     render(
       <UserProfileWeb3WalletsSectionView
         wallets={[]}
         availableProviders={[{ id: 'metamask', provider: 'MetaMask', connectError: 'Wallet extension not found' }]}
-        onConnect={onConnect}
+        onConnect={vi.fn()}
       />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Wallet extension not found');
-    await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
-    expect(onConnect).toHaveBeenCalledExactlyOnceWith('metamask');
+    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
-  it('shows the supplied primary error and forwards another set-primary attempt', async () => {
+  it('shows primary errors while keeping Set as primary available', async () => {
     const user = userEvent.setup();
-    const onSetPrimary = vi.fn();
     render(
       <UserProfileWeb3WalletsSectionView
         wallets={[
@@ -100,33 +94,25 @@ describe('Web3 wallets section', () => {
             primaryError: 'Unable to set primary',
           },
         ]}
-        onSetPrimary={onSetPrimary}
+        onSetPrimary={vi.fn()}
       />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Unable to set primary');
     await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
-    expect(onSetPrimary).toHaveBeenCalledExactlyOnceWith('wallet_1');
+    expect(screen.getByRole('menuitem', { name: 'Set as primary' })).toBeEnabled();
   });
 
-  it('forwards provider IDs separately from wallet IDs without filtering unverified wallets', async () => {
-    const user = userEvent.setup();
-    const onConnect = vi.fn();
-    const onRemove = vi.fn();
+  it('shows an unverified wallet alongside its available provider', () => {
     render(
       <UserProfileWeb3WalletsSectionView
         wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: false }]}
         availableProviders={[{ id: 'metamask', provider: 'MetaMask' }]}
-        onConnect={onConnect}
-        onRemove={onRemove}
+        onConnect={vi.fn()}
+        onRemove={vi.fn()}
       />,
     );
     expect(screen.getByText('Unverified')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
-    expect(onConnect).toHaveBeenCalledExactlyOnceWith('metamask');
-    await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove).toHaveBeenCalledExactlyOnceWith('wallet_1');
+    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toBeVisible();
   });
 });

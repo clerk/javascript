@@ -64,6 +64,7 @@ describe('Web3 wallet removal', () => {
     const { rerender } = renderWallets(onRemove);
     await openRemoval(user);
     const dialog = screen.getByRole('alertdialog');
+    expect(onRemove).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
     expect(onRemove).toHaveBeenCalledExactlyOnceWith('wallet_1');
     rerender(
