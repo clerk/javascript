@@ -1,11 +1,15 @@
 import type { EnterpriseConnectionResource, UpdateOrganizationEnterpriseConnectionParams } from '@clerk/shared/types';
+import type React from 'react';
 
 import { useCardState } from '@/elements/contexts';
+import { Form } from '@/elements/Form';
+import { FormButtons } from '@/elements/FormButtons';
 import { ProfileSection } from '@/elements/Section';
-import { Switch } from '@/elements/Switch';
+import type { FormControlState } from '@/ui/utils/useFormControl';
+import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
-import { Col, localizationKeys, Text } from '../../../customizables';
+import { localizationKeys } from '../../../customizables';
 import type { EnterpriseConnectionMutations } from '../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 
 export type ProviderFamily = 'saml' | 'oidc';
@@ -28,7 +32,7 @@ const SETTINGS: ReadonlyArray<Setting> = [
   {
     id: 'syncUserAttributes',
     appliesTo: 'all',
-    isChecked: connection => connection.syncUserAttributes,
+    isChecked: connection => Boolean(connection.syncUserAttributes),
     toParams: syncUserAttributes => ({ syncUserAttributes }),
   },
   {
@@ -57,70 +61,98 @@ const SETTINGS: ReadonlyArray<Setting> = [
   },
 ];
 
+const mergeParams = (
+  params: UpdateOrganizationEnterpriseConnectionParams[],
+): UpdateOrganizationEnterpriseConnectionParams =>
+  params.reduce<UpdateOrganizationEnterpriseConnectionParams>(
+    (merged, next) => ({
+      ...merged,
+      ...next,
+      ...(merged.saml || next.saml ? { saml: { ...merged.saml, ...next.saml } } : {}),
+    }),
+    {},
+  );
+
+const settingById = (id: SettingId): Setting => SETTINGS.find(setting => setting.id === id) as Setting;
+
+const useSettingField = (id: SettingId, connection: EnterpriseConnectionResource) =>
+  useFormControl(id, '', {
+    type: 'checkbox',
+    label: localizationKeys(`organizationProfile.securityPage.connectionPage.settings.${id}.label`),
+    defaultChecked: settingById(id).isChecked(connection),
+  });
+
+const settingDescription = (id: SettingId) =>
+  localizationKeys(`organizationProfile.securityPage.connectionPage.settings.${id}.description`);
+
 type SettingsSectionProps = {
   connection: EnterpriseConnectionResource;
   family: ProviderFamily;
   updateConnection: EnterpriseConnectionMutations['updateConnection'];
 };
 
-export const SettingsSection = ({ connection, family, updateConnection }: SettingsSectionProps): JSX.Element => (
-  <ProfileSection.Root
-    title={localizationKeys('organizationProfile.securityPage.connectionPage.settings.title')}
-    id='sso'
-    centered={false}
-  >
-    <Col gap={4}>
-      {SETTINGS.filter(setting => setting.appliesTo === 'all' || setting.appliesTo === family).map(setting => (
-        <SettingRow
-          key={setting.id}
-          setting={setting}
-          connection={connection}
-          updateConnection={updateConnection}
-        />
-      ))}
-    </Col>
-  </ProfileSection.Root>
-);
-
-const SettingRow = ({
-  setting,
-  connection,
-  updateConnection,
-}: {
-  setting: Setting;
-  connection: EnterpriseConnectionResource;
-  updateConnection: EnterpriseConnectionMutations['updateConnection'];
-}): JSX.Element => {
+export const SettingsSection = ({ connection, family, updateConnection }: SettingsSectionProps): JSX.Element => {
   const card = useCardState();
 
-  const onChange = async (checked: boolean) => {
+  const fields: Record<SettingId, FormControlState<SettingId>> = {
+    syncUserAttributes: useSettingField('syncUserAttributes', connection),
+    allowAdditionalIdentifiers: useSettingField('allowAdditionalIdentifiers', connection),
+    allowSubdomains: useSettingField('allowSubdomains', connection),
+    allowIdpInitiated: useSettingField('allowIdpInitiated', connection),
+    forceAuthn: useSettingField('forceAuthn', connection),
+  };
+
+  const applicable = SETTINGS.filter(setting => setting.appliesTo === 'all' || setting.appliesTo === family);
+  const changed = applicable.filter(setting => Boolean(fields[setting.id].checked) !== setting.isChecked(connection));
+
+  const onReset = () => {
     card.setError(undefined);
-    card.setLoading();
+    applicable.forEach(setting => fields[setting.id].setChecked(setting.isChecked(connection)));
+  };
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (changed.length === 0) {
+      return;
+    }
+
+    card.setError(undefined);
 
     try {
-      await updateConnection(connection.id, setting.toParams(checked));
+      await updateConnection(
+        connection.id,
+        mergeParams(changed.map(setting => setting.toParams(Boolean(fields[setting.id].checked)))),
+      );
     } catch (err) {
       handleError(err as Error, [], card.setError);
-    } finally {
-      card.setIdle();
     }
   };
 
   return (
-    <Col gap={1}>
-      <Switch
-        isChecked={setting.isChecked(connection)}
-        isDisabled={card.isLoading}
-        onChange={checked => void onChange(checked)}
-        label={localizationKeys(`organizationProfile.securityPage.connectionPage.settings.${setting.id}.label`)}
-      />
-      <Text
-        colorScheme='secondary'
-        variant='caption'
-        localizationKey={localizationKeys(
-          `organizationProfile.securityPage.connectionPage.settings.${setting.id}.description`,
-        )}
-      />
-    </Col>
+    <ProfileSection.Root
+      title={localizationKeys('organizationProfile.securityPage.connectionPage.settings.title')}
+      id='sso'
+      centered={false}
+    >
+      <Form.Root onSubmit={onSubmit}>
+        {applicable.map(setting => (
+          <Form.ControlRow
+            key={setting.id}
+            elementId={setting.id}
+          >
+            <Form.Checkbox
+              {...fields[setting.id].props}
+              description={settingDescription(setting.id)}
+            />
+          </Form.ControlRow>
+        ))}
+
+        <FormButtons
+          isDisabled={changed.length === 0}
+          onReset={onReset}
+        />
+      </Form.Root>
+    </ProfileSection.Root>
   );
 };

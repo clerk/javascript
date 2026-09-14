@@ -1,5 +1,4 @@
 import type { EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
-import { useState } from 'react';
 
 import { Card } from '@/elements/Card';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
@@ -13,12 +12,12 @@ import { isOidcProvider } from '../../ConfigureSSO/domain/organizationEnterprise
 import { providerLabel, toProviderCard } from '../../ConfigureSSO/domain/providers';
 import type { EnterpriseConnectionMutations } from '../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { useOrganizationEnterpriseConnectionStatus } from '../../ConfigureSSO/hooks/useOrganizationEnterpriseConnectionStatus';
-import { ResetConnectionDialog } from '../../ConfigureSSO/ResetConnectionDialog';
 import type { EnterpriseConnectionProviderType } from '../../ConfigureSSO/types';
 import { STATUS_BADGES } from '../enterpriseConnectionStatusBadges';
 import { SecurityBackControl } from '../SecurityBackControl';
 import { GeneralSection } from './GeneralSection';
 import { IdentityProviderSection } from './IdentityProviderSection';
+import { RemoveSection } from './RemoveSection';
 import { OidcServiceProviderSection, SamlServiceProviderSection } from './ServiceProviderSection';
 import { SettingsSection } from './SettingsSection';
 
@@ -41,7 +40,7 @@ export const EnterpriseConnectionPage = withCardStateProvider(
     onBack,
     onOpenWizard,
   }: EnterpriseConnectionPageProps): JSX.Element => {
-    const { updateConnection } = enterpriseConnectionMutations;
+    const { updateConnection, deleteConnection } = enterpriseConnectionMutations;
     const isOidc = isOidcProvider(connection.provider);
 
     return (
@@ -57,8 +56,6 @@ export const EnterpriseConnectionPage = withCardStateProvider(
             <ConnectionHeader
               connection={connection}
               enterpriseConnectionMutations={enterpriseConnectionMutations}
-              organizationName={organizationName}
-              contentRef={contentRef}
               onBack={onBack}
               onOpenWizard={onOpenWizard}
             />
@@ -84,6 +81,14 @@ export const EnterpriseConnectionPage = withCardStateProvider(
               family={isOidc ? 'oidc' : 'saml'}
               updateConnection={updateConnection}
             />
+
+            <RemoveSection
+              connection={connection}
+              deleteConnection={deleteConnection}
+              organizationName={organizationName}
+              contentRef={contentRef}
+              onBack={onBack}
+            />
           </Col>
         </Col>
       </ProfileCard.Page>
@@ -91,16 +96,18 @@ export const EnterpriseConnectionPage = withCardStateProvider(
   },
 );
 
+type ConnectionHeaderProps = Pick<
+  EnterpriseConnectionPageProps,
+  'connection' | 'enterpriseConnectionMutations' | 'onBack' | 'onOpenWizard'
+>;
+
 const ConnectionHeader = ({
   connection,
-  enterpriseConnectionMutations: { setConnectionActive, deleteConnection },
-  organizationName,
-  contentRef,
+  enterpriseConnectionMutations: { setConnectionActive },
   onBack,
   onOpenWizard,
-}: EnterpriseConnectionPageProps): JSX.Element => {
+}: ConnectionHeaderProps): JSX.Element => {
   const card = useCardState();
-  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const { status } = useOrganizationEnterpriseConnectionStatus(connection);
 
   const badge = STATUS_BADGES[status];
@@ -157,13 +164,8 @@ const ConnectionHeader = ({
           colorScheme={badge.colorScheme}
           localizationKey={badge.label}
         />
-      </Flex>
 
-      <Flex
-        wrap='wrap'
-        sx={t => ({ gap: t.space.$2 })}
-      >
-        {status === 'active' && (
+        {status === 'active' ? (
           <Button
             variant='bordered'
             colorScheme='secondary'
@@ -171,55 +173,30 @@ const ConnectionHeader = ({
             isDisabled={card.isLoading}
             onClick={() => void onSetActive(false)}
             localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.actions.deactivate')}
+            sx={{ marginInlineStart: 'auto' }}
           />
-        )}
-
-        {status === 'inactive' && (
+        ) : status === 'inactive' ? (
           <Button
             variant='solid'
             size='sm'
             isDisabled={card.isLoading}
             onClick={() => void onSetActive(true)}
             localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.actions.activate')}
+            sx={{ marginInlineStart: 'auto' }}
           />
-        )}
-
-        {(status === 'in_progress' || status === 'unconfigured') && (
+        ) : (
           <Button
             variant='bordered'
             colorScheme='secondary'
             size='sm'
             onClick={onOpenWizard}
-            localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.actions.openWizard')}
+            localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.actions.continueSetup')}
+            sx={{ marginInlineStart: 'auto' }}
           />
         )}
-
-        <Button
-          variant='bordered'
-          colorScheme='danger'
-          size='sm'
-          onClick={() => setIsRemoveDialogOpen(true)}
-          localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.actions.remove')}
-        />
       </Flex>
 
       <Card.Alert>{card.error}</Card.Alert>
-
-      <ResetConnectionDialog
-        isOpen={isRemoveDialogOpen}
-        onClose={() => setIsRemoveDialogOpen(false)}
-        confirmationValue={organizationName}
-        title={localizationKeys('organizationProfile.securityPage.removeDialog.title')}
-        subtitle={localizationKeys('organizationProfile.securityPage.removeDialog.subtitle', {
-          name: connection.name,
-        })}
-        confirmButtonLabel={localizationKeys('organizationProfile.securityPage.removeDialog.confirmButton')}
-        onDelete={async () => {
-          await deleteConnection(connection.id);
-          onBack();
-        }}
-        contentRef={contentRef}
-      />
     </Col>
   );
 };
