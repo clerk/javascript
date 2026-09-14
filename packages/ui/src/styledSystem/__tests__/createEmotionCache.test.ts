@@ -15,8 +15,8 @@ describe('createEmotionCache', () => {
     vi.restoreAllMocks();
   });
 
-  it('wraps insertions in the configured layer', () => {
-    expect(insertAndRead('app.clerk', 'color:red;')).toContain('@layer app.clerk');
+  it.each(['app.clerk', '--vendor', 'clérk'])('wraps insertions in the configured layer %s', name => {
+    expect(insertAndRead(name, 'color:red;')).toContain(`@layer ${name}`);
   });
 
   it('drops a cssLayerName that would break out of the @layer rule', () => {
