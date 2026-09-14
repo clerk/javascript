@@ -1,4 +1,5 @@
 import { navigateIfTaskExists } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { buildAddAccountUrl } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk, usePortalRoot } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/shared/types';
 
@@ -102,7 +103,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleAddAccountClicked = () => {
-    clerkWindowNavigate(clerk, opts.signInUrl || window.location.href);
+    clerkWindowNavigate(clerk, buildAddAccountUrl(opts.signInUrl || window.location.href));
     return sleep(2000);
   };
 

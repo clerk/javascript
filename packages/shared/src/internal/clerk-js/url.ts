@@ -4,6 +4,7 @@ import { logger } from '../../logger';
 import type { SignUpResource } from '../../types';
 import { camelToSnake } from '../../underscore';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '../../url';
+import { CLERK_ADD_ACCOUNT } from './constants';
 import { joinPaths } from './path';
 import { getQueryParams } from './querystring';
 
@@ -155,6 +156,14 @@ export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolea
   }
   return url;
 }
+
+/**
+ * @internal
+ * Flags a sign-in navigation as "add account" so the start screen renders the form, not the account switcher.
+ */
+export const buildAddAccountUrl = (base: string): string => {
+  return buildURL({ base, hashSearchParams: { [CLERK_ADD_ACCOUNT]: 'true' } }, { stringify: true });
+};
 
 export function toURL(url: string | URL): URL {
   return new URL(url.toString(), window.location.origin);

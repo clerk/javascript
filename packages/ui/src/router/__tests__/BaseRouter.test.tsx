@@ -1,5 +1,6 @@
+import { PRESERVED_QUERYSTRING_PARAMS } from '@clerk/shared/internal/clerk-js/constants';
 import type { Clerk } from '@clerk/shared/types';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -193,6 +194,46 @@ describe('BaseRouter basePath guard', () => {
 
       // currentPath should have updated
       expect(screen.getByTestId('factor-one')).toBeInTheDocument();
+    });
+  });
+
+  describe('preserved query params', () => {
+    it('carries __clerk_add_account across an internal navigation', async () => {
+      setWindowLocation('https://www.example.com/sign-in?__clerk_add_account=true');
+
+      const NavigateTrigger = () => {
+        const router = useRouter();
+        return (
+          <button
+            type='button'
+            data-testid='go'
+            onClick={() => void router.navigate('factor-one')}
+          >
+            Go
+          </button>
+        );
+      };
+
+      render(
+        <PathRouter
+          basePath='/sign-in'
+          preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+        >
+          <Route path='factor-one'>
+            <div data-testid='factor-one'>Factor One</div>
+          </Route>
+          <Route index>
+            <NavigateTrigger />
+          </Route>
+        </PathRouter>,
+      );
+
+      act(() => {
+        screen.getByTestId('go').click();
+      });
+
+      await waitFor(() => expect(screen.getByTestId('factor-one')).toBeInTheDocument());
+      expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('__clerk_add_account=true'));
     });
   });
 });

@@ -1,4 +1,5 @@
 import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { buildAddAccountUrl } from '@clerk/shared/internal/clerk-js/url';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
 import type { CustomPage, OrganizationResource, UserResource } from '@clerk/shared/types';
@@ -292,7 +293,9 @@ export function useUserButtonModel(
     onInviteMembers: canInviteMembers ? () => clerk.openInviteMembers({ getContainer }) : undefined,
     // Covers both restricted instances and users at their creation limit.
     onCreateOrganization: user.createOrganizationEnabled ? createOrganization : undefined,
-    onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
+    onAddAccount: singleSessionMode
+      ? undefined
+      : () => void router.navigate(buildAddAccountUrl(clerk.buildSignInUrl())),
     onAcceptSuggestion: async suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
       try {

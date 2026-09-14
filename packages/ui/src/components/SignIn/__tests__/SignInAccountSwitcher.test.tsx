@@ -36,12 +36,20 @@ describe('SignInAccountSwitcher', () => {
     expect(fixtures.clerk.setActive).toHaveBeenCalled();
   });
 
-  // this one uses the windowNavigate method. we need to mock it correctly
-  it.skip('navigates to SignInStart component if user clicks on "Add account" button', async () => {
+  it('navigates to the sign-in start screen with the add-account param when "Add account" is clicked', async () => {
     const { wrapper, fixtures } = await createFixtures(initConfig);
     const { userEvent, getByText } = render(<SignInAccountSwitcher />, { wrapper });
     await userEvent.click(getByText('Add account'));
-    expect(fixtures.router.navigate).toHaveBeenCalled();
+    expect(fixtures.router.navigate).toHaveBeenCalledWith('..', {
+      searchParams: new URLSearchParams({ __clerk_add_account: 'true' }),
+    });
+  });
+
+  it('navigates to the given start screen path when rendered in place', async () => {
+    const { wrapper, fixtures } = await createFixtures(initConfig);
+    const { userEvent, getByText } = render(<SignInAccountSwitcher addAccountPath='.' />, { wrapper });
+    await userEvent.click(getByText('Add account'));
+    expect(fixtures.router.navigate).toHaveBeenCalledWith('.', expect.anything());
   });
 
   it('signs out when user clicks on "Sign out of all accounts"', async () => {

@@ -789,7 +789,7 @@ describe('useUserButtonModel', () => {
     expect(navigate).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByText('add-account'));
-    expect(navigate).toHaveBeenCalledWith('/sign-in');
+    expect(navigate).toHaveBeenCalledWith('http://localhost:3000/sign-in#/?__clerk_add_account=true');
   });
 
   it('navigates to a create-organization URL when one is given', () => {
