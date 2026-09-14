@@ -1,5 +1,8 @@
-import type { UserProfileEmail, UserProfilePhone } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
-import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
+import type {
+  UserProfileEmail,
+  UserProfilePhone,
+} from '@clerk/ui/mosaic/features/user-profile/user-profile-profile-panel.view';
+import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -20,7 +23,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileProfilePanel',
   label: 'Profile panel',
   navigation: { category: 'Panels' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-profile-panel.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-profile-panel.view.tsx',
 };
 
 export function Default(_args: Record<string, unknown>) {

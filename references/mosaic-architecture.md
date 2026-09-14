@@ -469,7 +469,7 @@ The steps above cover the **styling** migration. For **flow** components — whe
 | `src/mosaic/utils/reset.test.tsx`              | Reset specs                                                                 |
 | `src/mosaic/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                                 |
 | `src/mosaic/components/button/button.test.tsx` | Component-level slot/state/variant specs                                    |
-| `src/mosaic/user-button/__tests__/`            | The canonical per-layer test set to copy from                               |
+| `src/mosaic/features/user-button/__tests__/`   | The canonical per-layer test set to copy from                               |
 
 `machine/` is the runtime; `machines/` is machines written with it. The one-letter
 difference is easy to misread — a feature's own machine belongs in its

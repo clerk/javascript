@@ -1,5 +1,5 @@
-import type { UserProfileFormError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
-import { UserProfileSaveError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
+import type { UserProfileFormError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import { UserProfileSaveError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import { useState } from 'react';
 
 export interface UserProfileEditUsernameFixtureOptions {
