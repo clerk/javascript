@@ -77,11 +77,7 @@ test.describe('root and subdomain production apps @sessions', () => {
 
       const u = createTestUtils({ app: apps[0].app });
       fakeUser = u.services.users.createFakeUser(test);
-      try {
-        await u.services.users.createBapiUser(fakeUser);
-      } catch (error) {
-        console.error(error);
-      }
+      await u.services.users.createBapiUser(fakeUser);
     });
 
     test.afterAll(async () => {
