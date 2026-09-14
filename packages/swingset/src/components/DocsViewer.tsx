@@ -30,6 +30,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-billing-history-section': dynamic(
       () => import('../stories/user-profile-billing-history-section.mdx'),
     ),
+    'user-profile-enterprise-accounts-section': dynamic(
+      () => import('../stories/user-profile-enterprise-accounts-section.mdx'),
+    ),
     'user-profile-connected-accounts-section': dynamic(
       () => import('../stories/user-profile-connected-accounts-section.mdx'),
     ),
