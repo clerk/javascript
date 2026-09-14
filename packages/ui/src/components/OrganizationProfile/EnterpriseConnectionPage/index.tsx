@@ -15,8 +15,9 @@ import { useOrganizationEnterpriseConnectionStatus } from '../../ConfigureSSO/ho
 import type { EnterpriseConnectionProviderType } from '../../ConfigureSSO/types';
 import { STATUS_BADGES } from '../enterpriseConnectionStatusBadges';
 import { SecurityBackControl } from '../SecurityBackControl';
-import { GeneralSection } from './GeneralSection';
+import { DomainsSection } from './DomainsSection';
 import { IdentityProviderSection } from './IdentityProviderSection';
+import { NameSection } from './NameSection';
 import { RemoveSection } from './RemoveSection';
 import { OidcServiceProviderSection, SamlServiceProviderSection } from './ServiceProviderSection';
 import { SettingsSection } from './SettingsSection';
@@ -60,10 +61,12 @@ export const EnterpriseConnectionPage = withCardStateProvider(
               onOpenWizard={onOpenWizard}
             />
 
-            <GeneralSection
+            <NameSection
               connection={connection}
               updateConnection={updateConnection}
             />
+
+            <DomainsSection connection={connection} />
 
             {isOidc ? (
               <OidcServiceProviderSection connection={connection} />
@@ -133,7 +136,9 @@ const ConnectionHeader = ({
 
   return (
     <Col sx={t => ({ gap: t.space.$4, marginBottom: t.space.$4 })}>
-      <SecurityBackControl onClick={onBack} />
+      <Flex>
+        <SecurityBackControl onClick={onBack} />
+      </Flex>
 
       <Flex
         align='center'

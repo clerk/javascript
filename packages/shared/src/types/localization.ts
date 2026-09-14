@@ -1226,14 +1226,15 @@ export type __internal_LocalizationResource = {
           deactivate: LocalizationValue;
           continueSetup: LocalizationValue;
         };
-        general: {
+        name: {
           title: LocalizationValue;
-          nameLabel: LocalizationValue;
-          domainsLabel: LocalizationValue;
-          editNameButton: LocalizationValue;
-          nameForm: {
+          editButton: LocalizationValue;
+          form: {
             title: LocalizationValue;
           };
+        };
+        domains: {
+          title: LocalizationValue;
         };
         serviceProvider: {
           title: LocalizationValue;

@@ -120,7 +120,8 @@ describe('EnterpriseConnectionPage', () => {
 
       expect(await screen.findByRole('heading', { name: 'clerk.com' })).toBeInTheDocument();
 
-      expect(screen.getByText('General')).toBeInTheDocument();
+      expect(screen.getByText('Name')).toBeInTheDocument();
+      expect(screen.getByText('Domains')).toBeInTheDocument();
       expect(screen.getByText('Service provider')).toBeInTheDocument();
       expect(screen.getByText('Identity provider')).toBeInTheDocument();
       expect(screen.getByText('Settings')).toBeInTheDocument();
@@ -132,30 +133,43 @@ describe('EnterpriseConnectionPage', () => {
       expect(screen.getAllByRole('checkbox')).toHaveLength(5);
     });
 
-    it('drops the Provider and Created rows from the General section', async () => {
+    it('labels the name and the domains with the section titles alone', async () => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);
       withNoTestRuns(fixtures);
 
       renderPage(wrapper, fixtures, samlConnection());
 
       expect(await screen.findByText('Name')).toBeInTheDocument();
-      expect(screen.getByText('Domains')).toBeInTheDocument();
+      expect(screen.getAllByText('Name')).toHaveLength(1);
+      expect(screen.getAllByText('Domains')).toHaveLength(1);
+      expect(screen.queryByText('General')).not.toBeInTheDocument();
       expect(screen.queryByText('Provider')).not.toBeInTheDocument();
       expect(screen.queryByText('Created')).not.toBeInTheDocument();
 
       expect(screen.getAllByText('Okta Workforce')).toHaveLength(1);
     });
 
-    it('renders the manual SAML endpoints as read-only rows', async () => {
+    it('omits the Domains section when the connection has no domains', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      renderPage(wrapper, fixtures, samlConnection({ domains: [] }));
+
+      expect(await screen.findByText('Name')).toBeInTheDocument();
+      expect(screen.queryByText('Domains')).not.toBeInTheDocument();
+    });
+
+    it('renders the manual SAML endpoints as read-only captioned values', async () => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);
       withNoTestRuns(fixtures);
 
       renderPage(wrapper, fixtures, samlConnection());
 
-      expect(await screen.findByText('Sign on URL')).toBeInTheDocument();
-      expect(screen.getByText('https://idp.example.com/sso')).toBeInTheDocument();
-      expect(screen.getByText('Issuer')).toBeInTheDocument();
-      expect(screen.getByText('https://idp.example.com/entity')).toBeInTheDocument();
+      const signOnUrl = await screen.findByText('Sign on URL');
+      expect(signOnUrl.parentElement).toHaveTextContent('https://idp.example.com/sso');
+
+      const issuer = screen.getByText('Issuer');
+      expect(issuer.parentElement).toHaveTextContent('https://idp.example.com/entity');
 
       expect(screen.queryByDisplayValue('https://idp.example.com/sso')).not.toBeInTheDocument();
       expect(screen.queryByText('Certificate expires')).not.toBeInTheDocument();
@@ -266,7 +280,7 @@ describe('EnterpriseConnectionPage', () => {
   });
 
   describe('editing', () => {
-    it('renames the connection from the General section', async () => {
+    it('renames the connection from the Name section', async () => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);
       withNoTestRuns(fixtures);
       fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue(samlConnection({ name: 'Renamed' }));

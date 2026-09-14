@@ -11,68 +11,47 @@ import { ProfileSection } from '@/elements/Section';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
-import { Badge, descriptors, localizationKeys, Text } from '../../../customizables';
+import { localizationKeys, Text } from '../../../customizables';
 import type { EnterpriseConnectionMutations } from '../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
-import { DetailRow } from './DetailRow';
 
-type GeneralSectionProps = {
+type NameSectionProps = {
   connection: EnterpriseConnectionResource;
   updateConnection: EnterpriseConnectionMutations['updateConnection'];
 };
 
-export const GeneralSection = ({ connection, updateConnection }: GeneralSectionProps): JSX.Element => (
+export const NameSection = ({ connection, updateConnection }: NameSectionProps): JSX.Element => (
   <ProfileSection.Root
-    title={localizationKeys('organizationProfile.securityPage.connectionPage.general.title')}
+    title={localizationKeys('organizationProfile.securityPage.connectionPage.name.title')}
     id='sso'
     centered={false}
   >
-    <ProfileSection.ItemList id='sso'>
-      <NameRow
-        connection={connection}
-        updateConnection={updateConnection}
-      />
+    <Action.Root>
+      <Action.Closed value='name'>
+        <ProfileSection.Item id='sso'>
+          <Text>{connection.name}</Text>
 
-      <DetailRow label={localizationKeys('organizationProfile.securityPage.connectionPage.general.domainsLabel')}>
-        {connection.domains.map(domain => (
-          <Badge
-            key={domain}
-            elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowChip}
-          >
-            {domain}
-          </Badge>
-        ))}
-      </DetailRow>
-    </ProfileSection.ItemList>
+          <Action.Trigger value='name'>
+            <ProfileSection.Button
+              id='sso'
+              localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.name.editButton')}
+            />
+          </Action.Trigger>
+        </ProfileSection.Item>
+      </Action.Closed>
+
+      <Action.Open value='name'>
+        <Action.Card>
+          <NameScreen
+            connection={connection}
+            updateConnection={updateConnection}
+          />
+        </Action.Card>
+      </Action.Open>
+    </Action.Root>
   </ProfileSection.Root>
 );
 
-const NameRow = ({ connection, updateConnection }: GeneralSectionProps): JSX.Element => (
-  <Action.Root>
-    <Action.Closed value='name'>
-      <DetailRow label={localizationKeys('organizationProfile.securityPage.connectionPage.general.nameLabel')}>
-        <Text sx={{ minWidth: 0 }}>{connection.name}</Text>
-
-        <Action.Trigger value='name'>
-          <ProfileSection.Button
-            id='sso'
-            localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.general.editNameButton')}
-          />
-        </Action.Trigger>
-      </DetailRow>
-    </Action.Closed>
-
-    <Action.Open value='name'>
-      <Action.Card>
-        <NameScreen
-          connection={connection}
-          updateConnection={updateConnection}
-        />
-      </Action.Card>
-    </Action.Open>
-  </Action.Root>
-);
-
-const NameScreen = (props: GeneralSectionProps): JSX.Element => {
+const NameScreen = (props: NameSectionProps): JSX.Element => {
   const { close } = useActionContext();
 
   return (
@@ -90,11 +69,11 @@ const NameForm = withCardStateProvider(
     updateConnection,
     onSuccess,
     onReset,
-  }: GeneralSectionProps & { onSuccess: () => void; onReset: () => void }): JSX.Element => {
+  }: NameSectionProps & { onSuccess: () => void; onReset: () => void }): JSX.Element => {
     const card = useCardState();
     const nameField = useFormControl('name', connection.name, {
       type: 'text',
-      label: localizationKeys('organizationProfile.securityPage.connectionPage.general.nameLabel'),
+      label: localizationKeys('organizationProfile.securityPage.connectionPage.name.title'),
       isRequired: true,
     });
 
@@ -117,9 +96,7 @@ const NameForm = withCardStateProvider(
     };
 
     return (
-      <FormContainer
-        headerTitle={localizationKeys('organizationProfile.securityPage.connectionPage.general.nameForm.title')}
-      >
+      <FormContainer headerTitle={localizationKeys('organizationProfile.securityPage.connectionPage.name.form.title')}>
         <Form.Root onSubmit={onSubmit}>
           <Form.ControlRow elementId={nameField.id}>
             <Form.PlainInput
