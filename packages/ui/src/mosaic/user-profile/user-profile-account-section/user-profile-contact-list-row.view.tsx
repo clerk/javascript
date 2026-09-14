@@ -15,7 +15,6 @@ export interface UserProfileContactListRowViewProps {
   label: string;
   items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
   onAdd?: () => void;
-  onManage?: (id: string) => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (id: string) => void;
@@ -27,7 +26,6 @@ export function UserProfileContactListRowView({
   label,
   items,
   onAdd,
-  onManage,
   onVerify,
   onSetPrimary,
   onRemove,
@@ -89,10 +87,6 @@ export function UserProfileContactListRowView({
                 color: 'negative',
                 onClick: () => onRemove(item.id),
               });
-            }
-
-            if (actions.length === 0 && onManage) {
-              actions.push({ label: m.manage, onClick: () => onManage(item.id) });
             }
 
             return (

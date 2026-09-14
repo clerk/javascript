@@ -33,7 +33,7 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       allowMultipleAccounts,
       phones: [{ id: 'phone_added', value: '+18015558181' }],
-      onManagePhone: vi.fn(),
+      onRemovePhone: vi.fn(),
     });
 
     expect(screen.getByText('+1 (801) 555-8181')).toBeInTheDocument();
@@ -329,20 +329,20 @@ describe('UserProfileProfilePanelView', () => {
 
   it('forwards profile and contact actions', async () => {
     const onAddEmail = vi.fn();
-    const onManageEmail = vi.fn();
-    renderView({ onSubmitName: () => Promise.resolve(), onAddEmail, onManageEmail });
+    const onRemoveEmail = vi.fn();
+    renderView({ onSubmitName: () => Promise.resolve(), onAddEmail, onRemoveEmail });
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
     await user.click(screen.getByRole('button', { name: 'Manage item2@clerk.dev' }));
-    expect(onManageEmail).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
+    expect(onRemoveEmail).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
     // Last: the edit-name dialog is modal, so the rest of the panel goes inert once it opens.
     await user.click(screen.getByRole('button', { name: 'Edit name' }));
 
     expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeInTheDocument();
     expect(onAddEmail).toHaveBeenCalledOnce();
-    expect(onManageEmail).toHaveBeenCalledWith('email_2');
+    expect(onRemoveEmail).toHaveBeenCalledWith('email_2');
   });
 
   it('drives the edit-name dialog from the section, seeded with the saved name', async () => {

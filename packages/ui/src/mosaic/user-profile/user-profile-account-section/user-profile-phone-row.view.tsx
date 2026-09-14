@@ -113,7 +113,6 @@ export function UserProfilePhoneRowView({
         kind='phone'
         label={m.phone.label}
         addAction={addPhoneAction}
-        onManage={isSettingPrimary ? undefined : onManagePhone}
         onRemove={onRemovePhone ? removePhone : undefined}
         onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
         onVerify={onVerifyPhone}

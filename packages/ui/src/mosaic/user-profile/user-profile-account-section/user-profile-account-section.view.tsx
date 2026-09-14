@@ -146,7 +146,6 @@ export function UserProfileAccountSectionView({
               kind='email'
               label={m.email.label}
               onAdd={onAddEmail}
-              onManage={onManageEmail}
               onRemove={onRemoveEmail}
               onSetPrimary={onSetPrimaryEmail}
               onVerify={onVerifyEmail}
