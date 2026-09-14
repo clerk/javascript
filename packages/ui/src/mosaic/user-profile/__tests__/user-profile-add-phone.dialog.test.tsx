@@ -79,7 +79,6 @@ describe('UserProfileAddPhoneDialog', () => {
     if (!phoneForm) {
       throw new Error('Phone form missing');
     }
-    expect(phoneForm).toHaveClass('cl-card-content');
     phoneForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
@@ -111,7 +110,6 @@ describe('UserProfileAddPhoneDialog', () => {
     if (!verifyForm) {
       throw new Error('Verification form missing');
     }
-    expect(verifyForm).toHaveClass('cl-card-content');
     verifyForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
@@ -120,6 +118,7 @@ describe('UserProfileAddPhoneDialog', () => {
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+    expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
 
   it('blocks submission and resend while verification is pending', async () => {

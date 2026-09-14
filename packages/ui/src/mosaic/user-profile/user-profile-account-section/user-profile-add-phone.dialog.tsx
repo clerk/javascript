@@ -38,9 +38,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!props.isPending && !props.isResending) {
-      props.onSubmit();
-    }
+    props.onSubmit();
   };
 
   return (
@@ -133,11 +131,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                         name='code'
                         value={current.code}
                         onValueChange={current.onCodeChange}
-                        onComplete={code => {
-                          if (!current.isPending && !current.isResending) {
-                            current.onSubmit(code);
-                          }
-                        }}
+                        onComplete={current.onSubmit}
                       />
                       {current.errorMessage ? <Field.Error>{current.errorMessage}</Field.Error> : null}
                       <Button
