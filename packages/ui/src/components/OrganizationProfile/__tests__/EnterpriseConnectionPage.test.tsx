@@ -125,6 +125,7 @@ describe('EnterpriseConnectionPage', () => {
       expect(screen.getByText('Service provider')).toBeInTheDocument();
       expect(screen.getByText('Identity provider')).toBeInTheDocument();
       expect(screen.getByText('Settings')).toBeInTheDocument();
+      expect(screen.getByText('Danger zone')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Remove connection' })).toBeInTheDocument();
 
       expect(screen.getByDisplayValue('https://accounts.clerk.com/v1/acs')).toBeInTheDocument();
@@ -224,17 +225,32 @@ describe('EnterpriseConnectionPage', () => {
   });
 
   describe('header actions', () => {
-    it('deactivates an active connection', async () => {
+    it('offers no header action for an active connection', async () => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);
       withNoTestRuns(fixtures);
-      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue({ active: false } as any);
 
-      const { userEvent } = renderPage(wrapper, fixtures, samlConnection({ active: true }));
+      renderPage(wrapper, fixtures, samlConnection({ active: true }));
 
-      await userEvent.click(await screen.findByRole('button', { name: 'Deactivate' }));
-
-      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', { active: false });
+      expect(await screen.findByRole('heading', { name: 'clerk.com' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Activate' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Deactivate' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Continue setup' })).not.toBeInTheDocument();
+    });
+
+    it('activates an inactive connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [{ id: 'run_1', status: 'success' }],
+        total_count: 1,
+      } as any);
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue({ active: true } as any);
+
+      const { userEvent } = renderPage(wrapper, fixtures, samlConnection({ active: false }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Activate' }));
+
+      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', { active: true });
     });
 
     it('offers Continue setup for a connection that is still mid-setup', async () => {
@@ -254,15 +270,38 @@ describe('EnterpriseConnectionPage', () => {
     });
   });
 
-  describe('removing', () => {
-    it('removes the connection from the bottom section and returns to the overview', async () => {
+  describe('danger zone', () => {
+    it('deactivates an active connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue({ active: false } as any);
+
+      const { userEvent } = renderPage(wrapper, fixtures, samlConnection({ active: true }));
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Deactivate connection' }));
+
+      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', { active: false });
+    });
+
+    it('offers no Deactivate connection button for an inactive connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      renderPage(wrapper, fixtures, samlConnection({ active: false }));
+
+      expect(await screen.findByRole('button', { name: 'Remove connection' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Deactivate connection' })).not.toBeInTheDocument();
+    });
+
+    it('removes the connection from the danger zone and returns to the overview', async () => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);
       withNoTestRuns(fixtures);
       fixtures.clerk.organization?.deleteEnterpriseConnection.mockResolvedValue({} as any);
 
       const { userEvent, onBack } = renderPage(wrapper, fixtures, samlConnection({ active: true }));
 
-      await userEvent.click(await screen.findByRole('button', { name: 'Remove connection' }));
+      expect(await screen.findAllByRole('button', { name: 'Remove connection' })).toHaveLength(1);
+      await userEvent.click(screen.getByRole('button', { name: 'Remove connection' }));
 
       const dialog = within(await screen.findByRole('dialog'));
       expect(dialog.getByRole('heading', { name: 'Remove SSO connection' })).toBeInTheDocument();

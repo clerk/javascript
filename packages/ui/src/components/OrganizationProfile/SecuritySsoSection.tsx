@@ -41,14 +41,20 @@ export const SecuritySsoSection = ({
       id='sso'
       centered={false}
       badge={
-        enterpriseConnections.length === 0 ? (
-          <Badge
-            elementDescriptor={descriptors.organizationProfileSecuritySsoBadge}
-            elementId={descriptors.organizationProfileSecuritySsoBadge.setId(STATUS_BADGES.unconfigured.id)}
-            colorScheme={STATUS_BADGES.unconfigured.colorScheme}
-            localizationKey={STATUS_BADGES.unconfigured.label}
-          />
-        ) : undefined
+        <Flex
+          align='center'
+          gap={2}
+        >
+          <SsoInfoTooltip />
+          {enterpriseConnections.length === 0 ? (
+            <Badge
+              elementDescriptor={descriptors.organizationProfileSecuritySsoBadge}
+              elementId={descriptors.organizationProfileSecuritySsoBadge.setId(STATUS_BADGES.unconfigured.id)}
+              colorScheme={STATUS_BADGES.unconfigured.colorScheme}
+              localizationKey={STATUS_BADGES.unconfigured.label}
+            />
+          ) : undefined}
+        </Flex>
       }
     >
       {enterpriseConnections.length === 0 ? (
@@ -191,51 +197,49 @@ const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JS
   );
 };
 
-const SsoDescription = (): JSX.Element => {
+const SsoDescription = (): JSX.Element => (
+  <Text
+    as='p'
+    elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
+    colorScheme='secondary'
+    localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
+  />
+);
+
+const SsoInfoTooltip = (): JSX.Element => {
   const roleName = useEnrollmentRoleName();
   const { t } = useLocalizations();
 
   return (
-    <Text as='p'>
-      <Text
-        as='span'
-        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
-        colorScheme='secondary'
-        localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <Button
+          variant='unstyled'
+          aria-label={t(localizationKeys('organizationProfile.securityPage.ssoSection.tooltipLabel'))}
+          sx={t => ({
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: 0,
+            height: 'fit-content',
+            borderRadius: t.radii.$sm,
+            color: t.colors.$colorMutedForeground,
+          })}
+        >
+          <Icon
+            icon={InformationCircle}
+            aria-hidden
+            sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+          />
+        </Button>
+      </Tooltip.Trigger>
+      <Tooltip.Content
+        text={
+          roleName
+            ? localizationKeys('organizationProfile.securityPage.ssoSection.tooltip', { role: roleName })
+            : localizationKeys('organizationProfile.securityPage.ssoSection.tooltip__noRole')
+        }
       />
-
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <Button
-            variant='unstyled'
-            aria-label={t(localizationKeys('organizationProfile.securityPage.ssoSection.tooltipLabel'))}
-            sx={t => ({
-              display: 'inline-flex',
-              alignItems: 'center',
-              verticalAlign: 'middle',
-              padding: 0,
-              height: 'fit-content',
-              borderRadius: t.radii.$sm,
-              color: t.colors.$colorMutedForeground,
-              marginInlineStart: t.space.$1,
-            })}
-          >
-            <Icon
-              icon={InformationCircle}
-              aria-hidden
-              sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-            />
-          </Button>
-        </Tooltip.Trigger>
-        <Tooltip.Content
-          text={
-            roleName
-              ? localizationKeys('organizationProfile.securityPage.ssoSection.tooltip', { role: roleName })
-              : localizationKeys('organizationProfile.securityPage.ssoSection.tooltip__noRole')
-          }
-        />
-      </Tooltip.Root>
-    </Text>
+    </Tooltip.Root>
   );
 };
 

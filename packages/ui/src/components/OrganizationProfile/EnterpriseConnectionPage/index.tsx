@@ -15,10 +15,10 @@ import { useOrganizationEnterpriseConnectionStatus } from '../../ConfigureSSO/ho
 import type { EnterpriseConnectionProviderType } from '../../ConfigureSSO/types';
 import { STATUS_BADGES } from '../enterpriseConnectionStatusBadges';
 import { SecurityBackControl } from '../SecurityBackControl';
+import { DangerZoneSection } from './DangerZoneSection';
 import { DomainsSection } from './DomainsSection';
 import { IdentityProviderSection } from './IdentityProviderSection';
 import { NameSection } from './NameSection';
-import { RemoveSection } from './RemoveSection';
 import { OidcServiceProviderSection, SamlServiceProviderSection } from './ServiceProviderSection';
 import { SettingsSection } from './SettingsSection';
 
@@ -41,7 +41,7 @@ export const EnterpriseConnectionPage = withCardStateProvider(
     onBack,
     onOpenWizard,
   }: EnterpriseConnectionPageProps): JSX.Element => {
-    const { updateConnection, deleteConnection } = enterpriseConnectionMutations;
+    const { updateConnection } = enterpriseConnectionMutations;
     const isOidc = isOidcProvider(connection.provider);
 
     return (
@@ -85,9 +85,9 @@ export const EnterpriseConnectionPage = withCardStateProvider(
               updateConnection={updateConnection}
             />
 
-            <RemoveSection
+            <DangerZoneSection
               connection={connection}
-              deleteConnection={deleteConnection}
+              enterpriseConnectionMutations={enterpriseConnectionMutations}
               organizationName={organizationName}
               contentRef={contentRef}
               onBack={onBack}
@@ -116,7 +116,7 @@ const ConnectionHeader = ({
   const badge = STATUS_BADGES[status];
   const label = providerLabel(toProviderCard(connection.provider as EnterpriseConnectionProviderType));
 
-  const onSetActive = async (active: boolean) => {
+  const onActivate = async () => {
     if (card.isLoading) {
       return;
     }
@@ -126,7 +126,7 @@ const ConnectionHeader = ({
 
     try {
       // The mutation revalidates before resolving, so the refreshed entity drives the settled UI.
-      await setConnectionActive(connection.id, active);
+      await setConnectionActive(connection.id, true);
     } catch (err) {
       handleError(err as Error, [], card.setError);
     } finally {
@@ -170,22 +170,12 @@ const ConnectionHeader = ({
           localizationKey={badge.label}
         />
 
-        {status === 'active' ? (
-          <Button
-            variant='bordered'
-            colorScheme='secondary'
-            size='sm'
-            isDisabled={card.isLoading}
-            onClick={() => void onSetActive(false)}
-            localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.actions.deactivate')}
-            sx={{ marginInlineStart: 'auto' }}
-          />
-        ) : status === 'inactive' ? (
+        {status === 'active' ? null : status === 'inactive' ? (
           <Button
             variant='solid'
             size='sm'
             isDisabled={card.isLoading}
-            onClick={() => void onSetActive(true)}
+            onClick={() => void onActivate()}
             localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.actions.activate')}
             sx={{ marginInlineStart: 'auto' }}
           />
