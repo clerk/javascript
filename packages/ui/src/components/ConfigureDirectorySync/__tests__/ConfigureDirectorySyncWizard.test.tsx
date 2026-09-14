@@ -48,7 +48,7 @@ const directory = (overrides: Record<string, unknown> = {}) =>
     ...overrides,
   }) as any;
 
-const googleConnection = { ...oktaConnection, provider: 'saml_google' } as any;
+const googleConnection = { ...oktaConnection, provider: 'saml_google' };
 
 const googleDirectory = (overrides: Record<string, unknown> = {}) =>
   directory({

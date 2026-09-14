@@ -1,6 +1,5 @@
-import { useState } from 'react';
-
 import type { DirectorySyncStatusResource } from '@clerk/shared/types';
+import { useState } from 'react';
 
 import { Badge, Button, Col, descriptors, Flex, localizationKeys, Text } from '@/customizables';
 import { Alert } from '@/ui/elements/Alert';
