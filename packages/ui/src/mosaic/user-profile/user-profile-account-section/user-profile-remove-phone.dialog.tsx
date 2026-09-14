@@ -8,7 +8,7 @@ import { Text } from '../../components/text';
 import { styles } from '../user-profile-profile-panel.styles';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 
-export interface UserProfileRemovePhoneViewProps {
+export interface UserProfileRemovePhoneDialogProps {
   phoneNumber: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -16,13 +16,13 @@ export interface UserProfileRemovePhoneViewProps {
   finalFocus?: DialogFocusTarget;
 }
 
-export function UserProfileRemovePhoneView({
+export function UserProfileRemovePhoneDialog({
   phoneNumber,
   open,
   onOpenChange,
   onConfirm,
   finalFocus,
-}: UserProfileRemovePhoneViewProps) {
+}: UserProfileRemovePhoneDialogProps) {
   const [beforePhone, afterPhone] = m.phone.removeDialog.description.split('{phoneNumber}');
 
   return (

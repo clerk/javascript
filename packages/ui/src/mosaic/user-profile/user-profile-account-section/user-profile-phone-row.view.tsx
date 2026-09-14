@@ -12,7 +12,7 @@ import { useUserProfileAddPhoneController } from './user-profile-add-phone.contr
 import { UserProfileAddPhoneView } from './user-profile-add-phone.view';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
-import { UserProfileRemovePhoneView } from './user-profile-remove-phone.view';
+import { UserProfileRemovePhoneDialog } from './user-profile-remove-phone.dialog';
 
 export interface UserProfilePhoneRowViewProps {
   phones: UserProfilePhone[];
@@ -126,7 +126,7 @@ export function UserProfilePhoneRowView({
         renderActionDialog={
           onRemovePhone
             ? phone => (
-                <UserProfileRemovePhoneView
+                <UserProfileRemovePhoneDialog
                   phoneNumber={phone.value}
                   open={phoneToRemove?.id === phone.id}
                   onOpenChange={open => {
