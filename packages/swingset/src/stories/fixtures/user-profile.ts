@@ -17,6 +17,7 @@ import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
+import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
 
@@ -48,6 +49,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
  * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
+  const connections = useConnectedAccountsFixture();
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
@@ -119,6 +121,11 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     account: {
       ...editName,
       ...editUsername,
+      connectedAccounts: connections.accounts,
+      availableConnectionProviders: connections.availableProviders,
+      onConnectAccount: connections.onConnect,
+      onReconnectAccount: connections.onReconnect,
+      onRemoveConnectedAccount: connections.onRemove,
       allowMultipleAccounts: true,
       hasImage: Boolean(imageUrl),
       imageUrl,
