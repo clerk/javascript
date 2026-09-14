@@ -28,7 +28,7 @@ function offsetWithin(child: HTMLElement, ancestor: HTMLElement): number {
   let top = 0;
   let el: HTMLElement | null = child;
   while (el && el !== ancestor) {
-    const parent = el.offsetParent instanceof HTMLElement ? el.offsetParent : null;
+    const parent: HTMLElement | null = el.offsetParent instanceof HTMLElement ? el.offsetParent : null;
     top += el.offsetTop + (parent?.clientTop ?? 0);
     el = parent;
   }
