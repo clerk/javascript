@@ -1078,7 +1078,7 @@ export function UserButtonTrigger({
       xstyle={[
         focusOutline.visible,
         styles.trigger,
-        renderTriggerLabel ? styles.triggerLabelled : null,
+        renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >

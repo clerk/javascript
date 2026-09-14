@@ -11,6 +11,15 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'none',
     alignItems: 'center',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    transitionDuration: durationVars['--cl-duration-base'],
+  },
+
+  triggerLabelled: {
+    padding: space['1'],
+    gap: space['1.5'],
     backgroundColor: {
       default: 'transparent',
       ':is([data-open])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
@@ -18,15 +27,18 @@ export const styles = stylex.create({
         ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
-    cursor: 'pointer',
-    display: 'inline-flex',
-    transitionDuration: durationVars['--cl-duration-base'],
     transitionProperty: 'background-color',
   },
 
-  triggerLabelled: {
-    padding: space['1'],
-    gap: space['1.5'],
+  triggerAvatarOnly: {
+    opacity: {
+      default: 1,
+      ':is([data-open])': 0.8,
+      '@media (hover: hover)': {
+        ':hover': 0.8,
+      },
+    },
+    transitionProperty: 'opacity',
   },
 
   triggerRound: {
