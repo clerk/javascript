@@ -32,7 +32,6 @@ import {
   type OidcIdpConfigurationMode,
   type SamlIdpConfigurationMode,
 } from '../../ConfigureSSO/steps/ConfigureStep/shared/IdentityProviderConfigurationModes';
-import { DetailRow } from './DetailRow';
 
 type IdentityProviderSectionProps = {
   connection: EnterpriseConnectionResource;
@@ -131,28 +130,37 @@ export const IdentityProviderSection = (props: IdentityProviderSectionProps): JS
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <Col gap={2}>
-            <ProfileSection.ItemList id='sso'>
-              {details.map(detail => (
-                <DetailRow
-                  key={detail.id}
-                  label={detail.label}
-                >
-                  {detail.value && <Text sx={{ minWidth: 0 }}>{detail.value}</Text>}
-                </DetailRow>
-              ))}
-            </ProfileSection.ItemList>
+          <ProfileSection.Item
+            id='sso'
+            sx={{ alignItems: 'flex-start' }}
+          >
+            <Col sx={t => ({ gap: t.space.$3, minWidth: 0 })}>
+              {details
+                .filter(detail => detail.value)
+                .map(detail => (
+                  <Col
+                    key={detail.id}
+                    sx={t => ({ gap: t.space.$0x5 })}
+                  >
+                    <Text
+                      colorScheme='secondary'
+                      variant='caption'
+                      localizationKey={detail.label}
+                    />
+                    <Text sx={{ overflowWrap: 'anywhere' }}>{detail.value}</Text>
+                  </Col>
+                ))}
+            </Col>
 
             <Action.Trigger value='edit'>
               <ProfileSection.Button
                 id='sso'
-                sx={{ alignSelf: 'start' }}
                 localizationKey={localizationKeys(
                   'organizationProfile.securityPage.connectionPage.identityProvider.editButton',
                 )}
               />
             </Action.Trigger>
-          </Col>
+          </ProfileSection.Item>
         </Action.Closed>
 
         <Action.Open value='edit'>

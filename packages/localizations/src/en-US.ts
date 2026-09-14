@@ -1326,14 +1326,8 @@ export const enUS: LocalizationResource = {
           continueSetup: 'Continue setup',
           deactivate: 'Deactivate',
         },
-        general: {
-          domainsLabel: 'Domains',
-          editNameButton: 'Edit',
-          nameForm: {
-            title: 'Rename connection',
-          },
-          nameLabel: 'Name',
-          title: 'General',
+        domains: {
+          title: 'Domains',
         },
         identityProvider: {
           certificateExpires: 'Certificate expires',
@@ -1345,6 +1339,13 @@ export const enUS: LocalizationResource = {
             title: 'Edit identity provider',
           },
           title: 'Identity provider',
+        },
+        name: {
+          editButton: 'Edit',
+          form: {
+            title: 'Rename connection',
+          },
+          title: 'Name',
         },
         remove: {
           button: 'Remove connection',
