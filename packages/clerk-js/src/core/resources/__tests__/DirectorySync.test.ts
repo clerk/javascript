@@ -95,6 +95,26 @@ describe('DirectorySync', () => {
     expect(result.enabled).toBe(true);
   });
 
+  it('surfaces the provider validation message unchanged when the credential is refused', async () => {
+    // This message is the only thing telling the admin what is wrong with their
+    // Workspace setup, so it must reach the caller intact rather than being
+    // replaced by a generic failure.
+    const refusal = new Error(
+      "Domain-wide delegation isn't set up for this service account, or its granted scopes don't match the required read-only scopes.",
+    );
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockRejectedValue(refusal);
+
+    await expect(
+      createDirectorySync().setCredentials({
+        serviceAccountJson: '{"type":"service_account"}',
+        subjectEmail: 'admin@example.com',
+      }),
+    ).rejects.toThrow(
+      "Domain-wide delegation isn't set up for this service account, or its granted scopes don't match the required read-only scopes.",
+    );
+  });
+
   it('never retains the uploaded credential on the resource or its snapshot', async () => {
     // @ts-ignore
     BaseResource._fetch = vi
