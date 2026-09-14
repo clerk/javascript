@@ -1855,6 +1855,90 @@ describe('SignIn', () => {
         expect(mockWebAuthnGetCredential).toHaveBeenCalled();
       });
 
+      describe('pending passkey challenge', () => {
+        const credential = {
+          id: 'credential_123',
+          rawId: new ArrayBuffer(32),
+          response: {
+            authenticatorData: new ArrayBuffer(37),
+            clientDataJSON: new ArrayBuffer(121),
+            signature: new ArrayBuffer(64),
+            userHandle: null,
+          },
+          type: 'public-key',
+        };
+
+        const createResponse = (expireAt: number) => ({
+          client: null,
+          response: {
+            id: 'signin_123',
+            first_factor_verification: {
+              strategy: 'passkey',
+              status: 'unverified',
+              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+              expire_at: expireAt,
+            },
+          },
+        });
+
+        const isCreate = (call: any[]) =>
+          call[0].path === '/client/sign_ins' && !('publicKeyCredential' in call[0].body);
+
+        const setup = (expireAt: number) => {
+          const mockWebAuthnGetCredential = vi
+            .fn()
+            .mockResolvedValueOnce({ publicKeyCredential: null, error: new Error('aborted') })
+            .mockResolvedValueOnce({ publicKeyCredential: credential, error: null });
+
+          SignIn.clerk = {
+            __internal_isWebAuthnSupported: vi.fn().mockReturnValue(true),
+            __internal_isWebAuthnAutofillSupported: vi.fn().mockResolvedValue(true),
+            __internal_getPublicCredentials: mockWebAuthnGetCredential,
+            __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+          } as any;
+
+          const mockFetch = vi
+            .fn()
+            .mockResolvedValueOnce(createResponse(expireAt))
+            .mockResolvedValueOnce(createResponse(expireAt))
+            .mockResolvedValueOnce({ client: null, response: { id: 'signin_123', status: 'complete' } });
+          BaseResource._fetch = mockFetch;
+          return mockFetch;
+        };
+
+        it('reuses the challenge when autofill runs again', async () => {
+          const mockFetch = setup(Date.now() + 60_000);
+          const signIn = new SignIn();
+
+          const first = await signIn.__internal_future.passkey({ flow: 'autofill' });
+          expect(first.error).not.toBeNull();
+          const second = await signIn.__internal_future.passkey({ flow: 'autofill' });
+          expect(second.error).toBeNull();
+
+          expect(mockFetch.mock.calls.filter(isCreate)).toHaveLength(1);
+        });
+
+        it('creates a new sign-in when the challenge expired', async () => {
+          const mockFetch = setup(Date.now() - 1_000);
+          const signIn = new SignIn();
+
+          await signIn.__internal_future.passkey({ flow: 'autofill' });
+          await signIn.__internal_future.passkey({ flow: 'autofill' });
+
+          expect(mockFetch.mock.calls.filter(isCreate)).toHaveLength(2);
+        });
+
+        it('reuses the challenge in authenticateWithPasskey', async () => {
+          const mockFetch = setup(Date.now() + 60_000);
+          const signIn = new SignIn();
+
+          await expect(signIn.authenticateWithPasskey({ flow: 'autofill' })).rejects.toThrow('aborted');
+          await signIn.authenticateWithPasskey({ flow: 'autofill' });
+
+          expect(mockFetch.mock.calls.filter(isCreate)).toHaveLength(1);
+        });
+      });
+
       it('creates signIn with passkey for discoverable flow', async () => {
         const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
         const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
