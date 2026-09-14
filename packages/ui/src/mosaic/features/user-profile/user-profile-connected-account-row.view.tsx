@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
 import { Badge } from '../components/badge';
+import { Button } from '../components/button';
+import { Icon } from '../components/icon';
 import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
@@ -12,10 +14,12 @@ import { UserProfileRemoveConnectedAccountDialog } from './user-profile-remove-c
 
 export function UserProfileConnectedAccountRowView({
   account,
+  onConnect,
   onReconnect,
   onRemove,
 }: {
   account: UserProfileConnectedAccount;
+  onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
   onRemove?: (id: string) => void;
 }) {
@@ -28,7 +32,7 @@ export function UserProfileConnectedAccountRowView({
     actions.push({ label: m.remove, color: 'negative', onClick: () => setOpen(true) });
   }
   return (
-    <Section.Row>
+    <Section.Row xstyle={onConnect && styles.connectRow}>
       <Section.Item>
         <Section.Media size='lg'>
           <UserProfileConnectedProviderIcon {...account} />
@@ -47,7 +51,24 @@ export function UserProfileConnectedAccountRowView({
             </Section.Description>
           ) : null}
         </Section.Content>
-        {actions.length > 0 ? (
+        {onConnect ? (
+          <Section.Actions>
+            <Button
+              size='sm'
+              variant='outline'
+              color='neutral'
+              aria-label={`${m.connect} ${account.provider}`}
+              onClick={() => onConnect(account.id)}
+            >
+              {m.connect}
+              <Icon
+                name='arrow-right-top'
+                placement='inline-end'
+                size='sm'
+              />
+            </Button>
+          </Section.Actions>
+        ) : actions.length > 0 ? (
           <Section.Actions>
             <UserProfileActionMenu
               label={`${m.manage} ${account.provider}`}
@@ -67,6 +88,7 @@ export function UserProfileConnectedAccountRowView({
           </Section.Actions>
         ) : null}
       </Section.Item>
+      {account.connectError ? <Section.Error>{account.connectError}</Section.Error> : null}
       {account.reconnectError ? <Section.Error>{account.reconnectError}</Section.Error> : null}
       {account.status === 'error' && account.verificationError ? (
         <Section.Error>{account.verificationError}</Section.Error>

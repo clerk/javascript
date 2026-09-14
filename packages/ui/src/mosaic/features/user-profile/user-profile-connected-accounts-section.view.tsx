@@ -1,5 +1,4 @@
 import { Section } from '../../components/section';
-import { UserProfileConnectAccountRowView } from './user-profile-connect-account-row.view';
 import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
 import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 
@@ -50,9 +49,9 @@ export function UserProfileConnectedAccountsSectionView({
           ))}
           {onConnect
             ? availableProviders.map(provider => (
-                <UserProfileConnectAccountRowView
+                <UserProfileConnectedAccountRowView
                   key={provider.id}
-                  provider={provider}
+                  account={provider}
                   onConnect={onConnect}
                 />
               ))
