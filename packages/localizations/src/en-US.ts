@@ -1320,6 +1320,65 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: 'Activate',
+          deactivate: 'Deactivate',
+          openWizard: 'Open setup wizard',
+          remove: 'Remove',
+        },
+        general: {
+          createdLabel: 'Created',
+          domainsLabel: 'Domains',
+          editNameButton: 'Edit',
+          nameForm: {
+            title: 'Rename connection',
+          },
+          nameLabel: 'Name',
+          providerLabel: 'Provider',
+          title: 'General',
+        },
+        identityProvider: {
+          certificateExpires: 'Certificate expires {{date}}',
+          clientSecret: {
+            placeholder: 'Leave empty to keep the current secret',
+          },
+          description: 'Retrieve these values from your identity provider.',
+          title: 'Identity provider',
+        },
+        saveButton: 'Save',
+        serviceProvider: {
+          acsUrl: 'Assertion consumer service (ACS) URL',
+          description: 'Enter these values into your identity provider.',
+          entityId: 'Entity ID',
+          metadataUrl: 'Metadata URL',
+          redirectUri: 'Redirect URI',
+          title: 'Service provider',
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: 'Let users keep other sign-in methods alongside this connection.',
+            label: 'Allow additional identifiers',
+          },
+          allowIdpInitiated: {
+            description: 'Let users start sign-in from the identity provider.',
+            label: 'Allow IdP-initiated flow',
+          },
+          allowSubdomains: {
+            description: "Accept email addresses on subdomains of the connection's domains.",
+            label: 'Allow subdomains',
+          },
+          forceAuthn: {
+            description: 'Ask the identity provider to re-authenticate the user on every sign-in.',
+            label: 'Force authentication',
+          },
+          syncUserAttributes: {
+            description: "Update the user's attributes from the identity provider on every sign-in.",
+            label: 'Sync user attributes',
+          },
+          title: 'Settings',
+        },
+      },
       directorySyncSection: {
         badge__active: 'Active',
         badge__inactive: 'Inactive',

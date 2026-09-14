@@ -240,6 +240,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationProfileSecuritySsoDetailRowChip',
   'organizationProfileSecuritySsoDetailRowLink',
   'organizationProfileSecuritySsoProviderIcon',
+  'organizationProfileSecuritySsoConnectionRow',
+  'organizationProfileSecuritySsoConnectionPage',
 
   'organizationListPreviewItems',
   'organizationListPreviewItem',
