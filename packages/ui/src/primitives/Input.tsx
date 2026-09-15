@@ -111,7 +111,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
     ...props,
     hasError: props.hasError || fieldControlProps.hasError,
   });
-  const { onChange } = useInput(propsWithoutVariants.onChange);
+  const { preserveFocus } = fieldControl;
+  const { onChange } = useInput(preserveFocus ? undefined : propsWithoutVariants.onChange);
   const { isDisabled, hasError, focusRing, isRequired, type, ...rest } = propsWithoutVariants;
   const _disabled = isDisabled || fieldControlProps.isDisabled;
   const _required = isRequired || fieldControlProps.isRequired;
@@ -145,7 +146,29 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       {...passwordManagerProps}
       ref={ref}
       onChange={onChange}
-      disabled={isDisabled}
+      onBeforeInput={e => {
+        if (preserveFocus) {
+          e.preventDefault();
+          return;
+        }
+        rest.onBeforeInput?.(e);
+      }}
+      onPaste={e => {
+        if (preserveFocus) {
+          e.preventDefault();
+          return;
+        }
+        rest.onPaste?.(e);
+      }}
+      onCut={e => {
+        if (preserveFocus) {
+          e.preventDefault();
+          return;
+        }
+        rest.onCut?.(e);
+      }}
+      disabled={isDisabled && !preserveFocus}
+      data-disabled={preserveFocus || undefined}
       required={_required}
       id={props.id || fieldControlProps.id}
       aria-invalid={_hasError}
