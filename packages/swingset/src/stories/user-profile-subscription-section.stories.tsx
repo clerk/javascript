@@ -1,4 +1,4 @@
-import { UserProfileSubscriptionSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-subscription-section.view';
+import { UserProfileSubscriptionSectionView } from '@clerk/mosaic/features/user-profile/user-profile-subscription-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -11,7 +11,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileSubscriptionSection',
   label: 'Subscription',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-subscription-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-subscription-section.view.tsx',
 };
 
 export function Default() {

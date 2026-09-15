@@ -1,6 +1,6 @@
 'use client';
 
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { Layers2Icon } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
