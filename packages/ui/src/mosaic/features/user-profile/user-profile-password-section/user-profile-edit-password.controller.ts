@@ -101,9 +101,7 @@ export const userProfileEditPasswordMachine = createMachine({
 });
 
 export interface UserProfileEditPasswordControllerOptions {
-  /** Whether the save must carry the password being replaced. Off when reverification stands in for it. */
   requiresCurrentPassword?: boolean;
-  /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. */
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<void>;
 }
 

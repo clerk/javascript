@@ -19,11 +19,8 @@ import type { UserProfileEditPasswordField } from './user-profile-password-secti
 export interface UserProfileEditPasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Rendering the opener here is what returns focus to it on close. */
   trigger?: DialogTriggerProps['render'];
-  /** Whether a password is being replaced or set for the first time. Decides the copy. */
   hasPassword?: boolean;
-  /** Asks for the password being replaced. Off when reverification stands in for it. */
   requiresCurrentPassword?: boolean;
   currentPassword: string;
   newPassword: string;
@@ -39,11 +36,6 @@ export interface UserProfileEditPasswordDialogProps {
   onSubmit: () => void;
 }
 
-/**
- * Sets or replaces the user's password. Holds nothing, and validates nothing itself: whether the
- * halves match and whether the new password is acceptable arrive as `canSave` and `error`, so the
- * rules live in one place and a rejection from the API lands the same way a local one does.
- */
 export function UserProfileEditPasswordDialog({
   open,
   onOpenChange,

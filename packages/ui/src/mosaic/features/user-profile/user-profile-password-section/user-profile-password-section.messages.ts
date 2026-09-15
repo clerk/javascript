@@ -1,9 +1,3 @@
-/**
- * Every string the surface renders. Shaped the way `@clerk/i18n` takes a base definition, so
- * localizing this component is a matter of registering the namespace and swapping the reads for
- * `useMessages('userProfilePasswordSection', userProfilePasswordSectionBase)`, not of hunting the
- * literals down first.
- */
 export const userProfilePasswordSectionBase = {
   sectionTitle: 'Authentication',
   label: 'Password',
