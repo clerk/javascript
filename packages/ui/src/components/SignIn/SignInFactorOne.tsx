@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
@@ -25,6 +24,7 @@ import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { SignInFactorOneSSOFallback } from './SignInFactorOneSSOFallback';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
+import { useSignInStepGuard } from './useSignInStepGuard';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
@@ -76,7 +76,6 @@ function removeSignInResetPasswordIntentParam(): void {
 }
 
 function SignInFactorOneInternal(): JSX.Element {
-  const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
   const availableFactors = signIn.supportedFirstFactors;
@@ -128,18 +127,11 @@ function SignInFactorOneInternal(): JSX.Element {
 
   const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
 
-  React.useEffect(() => {
-    if (__internal_setActiveInProgress) {
-      return;
-    }
-
-    // Handle the case where a user lands on alternative methods screen,
-    // clicks a social button but then navigates back to sign in.
-    // SignIn status resets to 'needs_identifier'
-    if (signIn.status === 'needs_identifier' || signIn.status === null) {
-      void router.navigate('../');
-    }
-  }, [__internal_setActiveInProgress]);
+  // A social flow returning to the component resets the sign-in to `needs_identifier`.
+  useSignInStepGuard({
+    redirectStatuses: ['needs_identifier'],
+    onLeave: () => void router.navigate('../'),
+  });
 
   if (!currentFactor) {
     return signIn.status ? (

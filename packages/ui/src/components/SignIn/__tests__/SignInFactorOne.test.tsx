@@ -70,6 +70,61 @@ describe('SignInFactorOne', () => {
       render(<SignInFactorOne />, { wrapper });
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
     });
+
+    it('does not navigate to the start card when it mounts while setActive is in progress', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      render(<SignInFactorOne />, { wrapper });
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+    });
+
+    it('navigates to the start card when a setActive running on mount finishes without restoring a sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      render(<SignInFactorOne />, { wrapper });
+
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+
+      fixtures.clerk.__internal_setActiveInProgress = false;
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'), { timeout: 500 });
+    });
+
+    it('does not navigate to the start card when a setActive running on mount restores a sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      render(<SignInFactorOne />, { wrapper });
+
+      fixtures.signIn.status = 'needs_first_factor';
+      fixtures.clerk.__internal_setActiveInProgress = false;
+
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      });
+
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+    });
+
+    it('navigates to the start card when setActive completes and the sign-in was abandoned', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withMultiSessionMode();
+        f.withEmailAddress();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: false });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+      const { rerender } = render(<SignInFactorOne />, { wrapper });
+
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      rerender(<SignInFactorOne />);
+
+      fixtures.clerk.__internal_setActiveInProgress = false;
+      fixtures.signIn.status = 'needs_identifier';
+      rerender(<SignInFactorOne />);
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+    });
   });
 
   describe('Submitting', () => {
