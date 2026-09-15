@@ -2,26 +2,25 @@ import * as stylex from '@stylexjs/stylex';
 import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
-import { stringToFormattedPhoneString } from '../../../../utils/phoneUtils';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Flow } from '../../../components/flow';
+import { Input } from '../../../components/input';
 import { Otp } from '../../../components/otp';
-import { PhoneInput } from '../../../components/phone-input';
 import { styles } from '../user-profile-profile-panel.styles';
 import { fill } from './user-profile-account-section.messages';
-import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
+import { userProfileAddEmailMessages as m } from './user-profile-add-email.messages';
 
-export interface UserProfileAddPhoneDialogProps {
+export interface UserProfileAddEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
-  step: 'phone' | 'verify';
-  phoneNumber: string;
-  onPhoneNumberChange: (value: string) => void;
+  step: 'email' | 'verify';
+  emailAddress: string;
+  onEmailAddressChange: (value: string) => void;
   code: string;
   onCodeChange: (value: string) => void;
   onSubmit: (code?: string) => void;
@@ -32,10 +31,10 @@ export interface UserProfileAddPhoneDialogProps {
   resendSeconds?: number;
 }
 
-export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps) {
-  const phoneFormId = useId();
+export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps) {
+  const emailFormId = useId();
   const verifyFormId = useId();
-  const phoneRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
   const verifyRef = useRef<HTMLDivElement>(null);
   const [beforeSeconds, afterSeconds] = m.verify.resendCountdown.split('{seconds}');
 
@@ -54,7 +53,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
       <Dialog.Popup
         size='card'
         initialFocus={() =>
-          phoneRef.current ?? verifyRef.current?.querySelector<HTMLInputElement>('input:not([type="hidden"])') ?? true
+          emailRef.current ?? verifyRef.current?.querySelector<HTMLInputElement>('input:not([type="hidden"])') ?? true
         }
       >
         <Card.Root
@@ -67,15 +66,15 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
           >
             {current => (
               <>
-                <Flow.Step ids={['phone']}>
+                <Flow.Step ids={['email']}>
                   <Card.Header>
-                    <Card.Title>{m.phone.title}</Card.Title>
-                    <Card.Description>{m.phone.description}</Card.Description>
+                    <Card.Title>{m.email.title}</Card.Title>
+                    <Card.Description>{m.email.description}</Card.Description>
                   </Card.Header>
                   <Card.Content
                     render={
                       <form
-                        id={phoneFormId}
+                        id={emailFormId}
                         onSubmit={handleSubmit}
                       />
                     }
@@ -85,24 +84,26 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                       disabled={current.isPending}
                       invalid={Boolean(current.errorMessage)}
                     >
-                      <Field.Label>{m.phone.label}</Field.Label>
-                      <PhoneInput
-                        ref={phoneRef}
-                        name='phoneNumber'
-                        value={current.phoneNumber}
-                        onValueChange={current.onPhoneNumberChange}
+                      <Field.Label>{m.email.label}</Field.Label>
+                      <Input
+                        ref={emailRef}
+                        name='emailAddress'
+                        type='email'
+                        autoComplete='email'
+                        value={current.emailAddress}
+                        onChange={event => current.onEmailAddressChange(event.target.value)}
                       />
                       {current.errorMessage ? <Field.Error>{current.errorMessage}</Field.Error> : null}
                     </Field.Root>
                   </Card.Content>
                   <Card.Footer>
                     <SubmitButton
-                      form={phoneFormId}
+                      form={emailFormId}
                       fullWidth
                       isPending={current.isPending}
-                      pendingLabel={m.phone.pending}
+                      pendingLabel={m.email.pending}
                     >
-                      {m.phone.submit}
+                      {m.email.submit}
                     </SubmitButton>
                   </Card.Footer>
                 </Flow.Step>
@@ -113,7 +114,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                   <Card.Header>
                     <Card.Title>{m.verify.title}</Card.Title>
                     <Card.Description>
-                      {fill(m.verify.description, { phoneNumber: stringToFormattedPhoneString(current.phoneNumber) })}
+                      {fill(m.verify.description, { emailAddress: current.emailAddress })}
                     </Card.Description>
                   </Card.Header>
                   <Card.Content
