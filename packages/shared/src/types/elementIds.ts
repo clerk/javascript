@@ -41,6 +41,11 @@ export type FieldId =
   | 'redirectUri'
   | 'acsUrl'
   | 'spEntityId'
+  | 'syncUserAttributes'
+  | 'allowAdditionalIdentifiers'
+  | 'allowSubdomains'
+  | 'allowIdpInitiated'
+  | 'forceAuthn'
   | 'web3WalletName'
   | 'domain';
 export type ProfileSectionId =

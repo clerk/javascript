@@ -1220,6 +1220,68 @@ export type __internal_LocalizationResource = {
         tooltip__noRole: LocalizationValue;
         tooltipLabel: LocalizationValue;
       };
+      connectionPage: {
+        actions: {
+          activate: LocalizationValue;
+          continueSetup: LocalizationValue;
+        };
+        dangerZone: {
+          title: LocalizationValue;
+          deactivateButton: LocalizationValue;
+          removeButton: LocalizationValue;
+        };
+        name: {
+          title: LocalizationValue;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
+        };
+        domains: {
+          title: LocalizationValue;
+        };
+        serviceProvider: {
+          title: LocalizationValue;
+          acsUrl: LocalizationValue;
+          entityId: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          redirectUri: LocalizationValue;
+        };
+        identityProvider: {
+          title: LocalizationValue;
+          certificateExpires: LocalizationValue;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
+          clientSecret: {
+            placeholder: LocalizationValue;
+          };
+        };
+        settings: {
+          title: LocalizationValue;
+          syncUserAttributes: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowAdditionalIdentifiers: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowSubdomains: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowIdpInitiated: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          forceAuthn: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+        };
+      };
       directorySyncSection: {
         title: LocalizationValue;
         badge__unconfigured: LocalizationValue;
@@ -1556,12 +1618,6 @@ export type __internal_LocalizationResource = {
     navbar: {
       title: LocalizationValue;
     };
-    connectionScopeBanner: {
-      title__editing: LocalizationValue<'name'>;
-      subtitle__editing: LocalizationValue<'count'>;
-      title__adding: LocalizationValue;
-      subtitle__adding: LocalizationValue<'count'>;
-    };
     resetConnectionDialog: {
       cancelButton: LocalizationValue;
       confirmationFieldLabel: LocalizationValue<'name'>;
@@ -1606,6 +1662,8 @@ export type __internal_LocalizationResource = {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
         badge__expired: LocalizationValue;
+        badge__claimed: LocalizationValue;
+        checkboxLabel: LocalizationValue<'domain'>;
         verifiedAtLabel: LocalizationValue<'date'>;
         expiredAtLabel: LocalizationValue<'date'>;
         expiredLabel: LocalizationValue;

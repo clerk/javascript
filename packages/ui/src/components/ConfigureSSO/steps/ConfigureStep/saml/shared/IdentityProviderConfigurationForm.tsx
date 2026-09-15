@@ -21,7 +21,6 @@ import { ArrowUpTray, Close } from '@/icons';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
-import { ActiveConnectionAlert } from '../../shared/ActiveConnectionAlert';
 import type { SamlIdpConfigurationMode } from '../../shared/IdentityProviderConfigurationModes';
 
 type CardState = ReturnType<typeof useCardState>;
@@ -71,7 +70,7 @@ export type IdentityProviderConfigurationFormProps =
   | { mode: 'metadataFile'; form: MetadataFileForm; labels: MetadataFileLabels }
   | { mode: 'manual'; form: ManualConfigurationForm; labels: ManualConfigurationLabels };
 
-const ConfigurationPanel = (config: IdentityProviderConfigurationFormProps): JSX.Element => {
+export const IdentityProviderConfigurationForm = (config: IdentityProviderConfigurationFormProps): JSX.Element => {
   switch (config.mode) {
     case 'metadataUrl':
       return (
@@ -95,15 +94,6 @@ const ConfigurationPanel = (config: IdentityProviderConfigurationFormProps): JSX
         />
       );
   }
-};
-
-export const IdentityProviderConfigurationForm = (config: IdentityProviderConfigurationFormProps): JSX.Element => {
-  return (
-    <>
-      <ConfigurationPanel {...config} />
-      <ActiveConnectionAlert />
-    </>
-  );
 };
 
 type MetadataUrlPanelProps = {
