@@ -49,6 +49,29 @@ describe('createKeylessService', () => {
     expect(source).toBe('nextjs');
   });
 
+  it('getOrCreateKeys resolves to null when the API cannot create applications and storage is empty', async () => {
+    const service = createKeylessService({
+      storage: createStorage(),
+      api: { completeOnboarding: vi.fn(() => Promise.resolve(accountlessApplication)) },
+      framework: 'astro',
+    });
+
+    await expect(service.getOrCreateKeys()).resolves.toBeNull();
+  });
+
+  it('getOrCreateKeys returns stored keys even when the API cannot create applications', async () => {
+    const storage = createStorage();
+    storage.write(JSON.stringify(accountlessApplication));
+
+    const service = createKeylessService({
+      storage,
+      api: { completeOnboarding: vi.fn(() => Promise.resolve(accountlessApplication)) },
+      framework: 'astro',
+    });
+
+    await expect(service.getOrCreateKeys()).resolves.toEqual(accountlessApplication);
+  });
+
   it('passes the framework as the source when completing accountless application onboarding', async () => {
     const completeOnboarding = vi.fn<KeylessAPI['completeOnboarding']>(() => Promise.resolve(accountlessApplication));
 

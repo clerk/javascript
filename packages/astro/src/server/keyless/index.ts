@@ -12,16 +12,6 @@ export function keyless(context: APIContext) {
     keylessServiceInstance = createKeylessService({
       storage: createFileStorage(),
       api: {
-        async createAccountlessApplication(requestHeaders?: Headers, source?: string) {
-          try {
-            return await clerkClient(context).__experimental_accountlessApplications.createAccountlessApplication({
-              requestHeaders,
-              source,
-            });
-          } catch {
-            return null;
-          }
-        },
         async completeOnboarding(requestHeaders?: Headers, source?: string) {
           try {
             return await clerkClient(
