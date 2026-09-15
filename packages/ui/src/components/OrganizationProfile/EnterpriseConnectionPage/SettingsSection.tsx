@@ -113,7 +113,7 @@ export const SettingsSection = ({ connection, family, updateConnection }: Settin
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (changed.length === 0) {
+    if (changed.length === 0 || card.isLoading) {
       return;
     }
 
@@ -149,7 +149,7 @@ export const SettingsSection = ({ connection, family, updateConnection }: Settin
         ))}
 
         <FormButtons
-          isDisabled={changed.length === 0}
+          isDisabled={changed.length === 0 || card.isLoading}
           onReset={onReset}
         />
       </Form.Root>

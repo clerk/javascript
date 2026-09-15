@@ -132,9 +132,13 @@ export const defaultConnectionDomains = (
 export const areConnectionDomainsReady = (
   connectionDomains: readonly string[],
   organizationDomains: OrganizationDomainResource[] | null | undefined,
+  claimedDomains?: ReadonlyMap<string, string>,
 ): boolean =>
   connectionDomains.length > 0 &&
   connectionDomains.every(name => {
+    if (claimedDomains?.has(name)) {
+      return false;
+    }
     const organizationDomain = organizationDomains?.find(domain => domain.name === name);
     return !organizationDomain || isOrganizationDomainVerified(organizationDomain);
   });

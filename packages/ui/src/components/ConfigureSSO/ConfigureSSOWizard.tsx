@@ -14,9 +14,9 @@ export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOPro
 };
 
 export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: ConfigureSSOWizardProps): JSX.Element => {
-  const { organizationEnterpriseConnection: c, connectionDomains, organizationDomains } = props;
+  const { organizationEnterpriseConnection: c, connectionDomains, claimedDomains, organizationDomains } = props;
 
-  const domainsReady = areConnectionDomainsReady(connectionDomains, organizationDomains);
+  const domainsReady = areConnectionDomainsReady(connectionDomains, organizationDomains, claimedDomains);
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
