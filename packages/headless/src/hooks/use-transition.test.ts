@@ -224,4 +224,63 @@ describe('useTransition', () => {
     expect(result.current.mounted).toBe(true);
     expect(result.current.transitionProps).toEqual({ 'data-open': '' });
   });
+
+  it('reports the close complete once the exit settles and the element has unmounted', async () => {
+    const { ref, resolveAnim } = createAnimatingRef();
+    const onOpenChangeComplete = vi.fn();
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref, onOpenChangeComplete }), {
+      initialProps: { open: true },
+    });
+    act(() => flushRaf());
+    onOpenChangeComplete.mockClear();
+
+    rerender({ open: false });
+    expect(onOpenChangeComplete).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveAnim();
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    expect(result.current.mounted).toBe(false);
+    expect(onOpenChangeComplete).toHaveBeenCalledTimes(1);
+    expect(onOpenChangeComplete).toHaveBeenCalledWith(false);
+  });
+
+  it('reports the open complete once the enter settles', async () => {
+    const { ref, resolveAnim } = createAnimatingRef();
+    const onOpenChangeComplete = vi.fn();
+    renderHook(({ open }) => useTransition({ open, ref, onOpenChangeComplete }), {
+      initialProps: { open: true },
+    });
+    expect(onOpenChangeComplete).not.toHaveBeenCalled();
+
+    act(() => flushRaf());
+    await act(async () => {
+      resolveAnim();
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    expect(onOpenChangeComplete).toHaveBeenCalledTimes(1);
+    expect(onOpenChangeComplete).toHaveBeenCalledWith(true);
+  });
+
+  it('does not report a close that reopening interrupted', async () => {
+    const { ref, resolveAnim } = createAnimatingRef();
+    const onOpenChangeComplete = vi.fn();
+    const { rerender } = renderHook(({ open }) => useTransition({ open, ref, onOpenChangeComplete }), {
+      initialProps: { open: true },
+    });
+    act(() => flushRaf());
+    onOpenChangeComplete.mockClear();
+
+    rerender({ open: false });
+    rerender({ open: true });
+    await act(async () => {
+      resolveAnim();
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    expect(onOpenChangeComplete).not.toHaveBeenCalledWith(false);
+  });
 });

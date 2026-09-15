@@ -56,6 +56,12 @@ export interface DialogProps<Payload = unknown> {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean, details: DialogOpenChangeDetails) => void;
+  /**
+   * Fires once the open or close animation has finished. Reset what the dialog showed here
+   * rather than in `onOpenChange`: the popup's contents hold their last frame while closing, and
+   * this is the first moment a reset cannot show through the animation.
+   */
+  onOpenChangeComplete?: (open: boolean) => void;
   /** When true, the dialog traps focus and blocks interaction with the rest of the page. Default: true */
   modal?: boolean;
   /** Which gestures dismiss the dialog. Default: `any` */
@@ -207,6 +213,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   const { mounted, transitionProps } = useTransition({
     open,
     ref: popupRef,
+    onOpenChangeComplete: props.onOpenChangeComplete,
   });
 
   // Below `useTransition` because it needs `mounted`: what a stacked child has to key off is
