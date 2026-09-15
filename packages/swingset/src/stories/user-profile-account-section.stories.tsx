@@ -38,13 +38,16 @@ function AccountSection({
   failWith,
   usernameFailWith,
   failEmailVerification = false,
+  emailRemovalState,
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
   failWith?: UserProfileFormError;
   usernameFailWith?: UserProfileFormError;
   failEmailVerification?: boolean;
+  emailRemovalState?: 'pending' | 'error';
 }) {
+  const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
   const editName = useUserProfileEditNameFixture({ failWith });
   const editUsername = useUserProfileEditUsernameFixture({ failWith: usernameFailWith });
   const [emails, setEmails] = useState<UserProfileEmail[]>(
@@ -84,7 +87,16 @@ function AccountSection({
       onRemoveProfilePicture={clearImage}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
-      onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
+      onRemoveEmail={async id => {
+        if (emailRemovalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (emailRemovalState === 'error' && !emailRemovalFailed) {
+          setEmailRemovalFailed(true);
+          throw new Error('Unable to remove this email address. Try again.');
+        }
+        setEmails(current => current.filter(email => email.id !== id));
+      }}
       onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
@@ -207,6 +219,24 @@ export function AddPhoneFails() {
     <AccountSection
       allowMultipleAccounts
       failAt='phone'
+    />
+  );
+}
+
+export function EmailRemovalPending() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      emailRemovalState='pending'
+    />
+  );
+}
+
+export function EmailRemovalError() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      emailRemovalState='error'
     />
   );
 }

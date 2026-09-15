@@ -343,8 +343,8 @@ describe('UserProfileProfilePanelView', () => {
     expect(onRemoveEmail).not.toHaveBeenCalled();
     await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
     expect(onRemoveEmail).not.toHaveBeenCalled();
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     // Last: the edit-name dialog is modal, so the rest of the panel goes inert once it opens.
     await user.click(screen.getByRole('button', { name: 'Edit name' }));
 
@@ -432,7 +432,7 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(removeEmail);
     expect(onRemoveEmail).not.toHaveBeenCalled();
     await user.click(
-      within(screen.getByRole('alertdialog', { name: 'Remove email address?' })).getByRole('button', {
+      within(screen.getByRole('dialog', { name: 'Remove email address?' })).getByRole('button', {
         name: 'Remove',
       }),
     );

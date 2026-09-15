@@ -1,8 +1,11 @@
-import { useRef, useState } from 'react';
+import * as stylex from '@stylexjs/stylex';
+import { useMemo, useRef, useState } from 'react';
 
+import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
+import { styles } from '../user-profile-profile-panel.styles';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileEmail } from './user-profile-account-section.types';
 import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
@@ -10,7 +13,6 @@ import { useUserProfileAddEmailController } from './user-profile-add-email.contr
 import { UserProfileAddEmailDialog } from './user-profile-add-email.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
-import { UserProfileRemoveEmailDialog } from './user-profile-remove-email.dialog';
 
 export interface UserProfileEmailRowViewProps {
   emails: UserProfileEmail[];
@@ -59,9 +61,7 @@ export function UserProfileEmailRowView({
         {allowMultipleAccounts ? m.add : m.email.add}
       </Button>
     ) : undefined;
-  const [emailToRemove, setEmailToRemove] = useState<UserProfileEmail>();
-  const [removeError, setRemoveError] = useState<string>();
-  const removing = useRef(false);
+  const removeEmailConfirmation = useMemo(() => Confirmation.createHandle<UserProfileEmail>(), []);
   const [isSettingPrimary, setIsSettingPrimary] = useState(false);
   const [primaryError, setPrimaryError] = useState<string>();
   const settingPrimary = useRef(false);
@@ -86,25 +86,8 @@ export function UserProfileEmailRowView({
 
   const removeEmail = (id: string) => {
     const email = emails.find(email => email.id === id);
-    if (!email || email.canRemove === false || !onRemoveEmail || removing.current) {
-      return;
-    }
-    setEmailToRemove(email);
-    setRemoveError(undefined);
-  };
-
-  const confirmRemoveEmail = async () => {
-    if (!emailToRemove || !onRemoveEmail || removing.current) {
-      return;
-    }
-    removing.current = true;
-    setEmailToRemove(undefined);
-    try {
-      await onRemoveEmail(emailToRemove.id);
-    } catch (error) {
-      setRemoveError(error instanceof Error ? error.message : m.email.removeError);
-    } finally {
-      removing.current = false;
+    if (email && email.canRemove !== false && onRemoveEmail) {
+      removeEmailConfirmation.open(email);
     }
   };
 
@@ -130,22 +113,6 @@ export function UserProfileEmailRowView({
         onRemove={onRemoveEmail ? removeEmail : undefined}
         onSetPrimary={onSetPrimaryEmail && !isSettingPrimary ? id => void setPrimaryEmail(id) : undefined}
         onVerify={onVerifyEmail}
-        renderActionDialog={
-          onRemoveEmail
-            ? email => (
-                <UserProfileRemoveEmailDialog
-                  emailAddress={email.value}
-                  open={emailToRemove?.id === email.id}
-                  onOpenChange={open => {
-                    if (!open) {
-                      setEmailToRemove(undefined);
-                    }
-                  }}
-                  onConfirm={() => void confirmRemoveEmail()}
-                />
-              )
-            : undefined
-        }
       />
       {primaryError ? (
         <Text
@@ -155,13 +122,15 @@ export function UserProfileEmailRowView({
           {primaryError}
         </Text>
       ) : null}
-      {removeError ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {removeError}
-        </Text>
+      {onRemoveEmail ? (
+        <Confirmation
+          handle={removeEmailConfirmation}
+          title={m.email.removeDialog.title}
+          description={describeEmailRemoval}
+          actionLabel={m.email.removeDialog.confirm}
+          cancelLabel={m.email.removeDialog.cancel}
+          onConfirm={email => onRemoveEmail(email.id)}
+        />
       ) : null}
     </>
   );
@@ -190,5 +159,16 @@ function AddEmail({ options, compact }: { options: UserProfileAddEmailController
         </Button>
       }
     />
+  );
+}
+
+function describeEmailRemoval(email: UserProfileEmail) {
+  const [beforeEmail, afterEmail] = m.email.removeDialog.description.split('{emailAddress}');
+  return (
+    <>
+      {beforeEmail}
+      <strong {...stylex.props(styles.confirmationContactValue)}>{email.value}</strong>
+      {afterEmail}
+    </>
   );
 }
