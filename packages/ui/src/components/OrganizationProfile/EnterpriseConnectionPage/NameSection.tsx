@@ -83,7 +83,7 @@ const NameForm = withCardStateProvider(
     const onSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!canSubmit) {
+      if (!canSubmit || card.isLoading) {
         return;
       }
 
@@ -106,7 +106,7 @@ const NameForm = withCardStateProvider(
             />
           </Form.ControlRow>
           <FormButtons
-            isDisabled={!canSubmit}
+            isDisabled={!canSubmit || card.isLoading}
             onReset={onReset}
           />
         </Form.Root>

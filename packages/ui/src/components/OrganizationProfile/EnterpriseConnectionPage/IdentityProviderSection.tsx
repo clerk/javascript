@@ -114,6 +114,11 @@ const oidcDetails = (connection: EnterpriseConnectionResource): Detail[] => {
             label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.tokenUrl.label'),
             value: oauthConfig?.tokenUrl ?? '',
           },
+          {
+            id: 'userInfoUrl',
+            label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.userInfoUrl.label'),
+            value: oauthConfig?.userInfoUrl ?? '',
+          },
         ]),
   ];
 };
@@ -292,7 +297,7 @@ const SamlForm = withCardStateProvider(
     const onSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!isValid) {
+      if (!isValid || card.isLoading) {
         return;
       }
 
@@ -344,7 +349,7 @@ const SamlForm = withCardStateProvider(
           <IdentityProviderConfigurationForm {...formProps} />
 
           <FormButtons
-            isDisabled={!isValid}
+            isDisabled={!isValid || card.isLoading}
             onReset={onReset}
           />
         </Form.Root>
@@ -434,7 +439,7 @@ const OidcForm = withCardStateProvider(
     const onSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!isValid) {
+      if (!isValid || card.isLoading) {
         return;
       }
 
@@ -490,7 +495,7 @@ const OidcForm = withCardStateProvider(
           <OidcEndpointsConfigurationForm {...endpointsProps} />
 
           <FormButtons
-            isDisabled={!isValid}
+            isDisabled={!isValid || card.isLoading}
             onReset={onReset}
           />
         </Form.Root>

@@ -54,6 +54,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [domainToRemove, setDomainToRemove] = useState<OrganizationDomainResource | null>(null);
+  const [isUpdatingDomains, setIsUpdatingDomains] = useState(false);
 
   const hasRecordedTelemetryEvent = useRef(false);
   useEffect(() => {
@@ -96,7 +97,12 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   };
 
   const handleToggleDomain = async (domain: OrganizationDomainResource, checked: boolean) => {
+    if (isUpdatingDomains) {
+      return;
+    }
+
     card.setError(undefined);
+    setIsUpdatingDomains(true);
 
     const domains = checked
       ? [...connectionDomains, domain.name]
@@ -107,6 +113,8 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     } catch (err: any) {
       const apiError = getFieldError(err) ?? getGlobalError(err);
       card.setError(apiError);
+    } finally {
+      setIsUpdatingDomains(false);
     }
   };
 
@@ -119,7 +127,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     await revalidate();
   };
 
-  const domainsReady = areConnectionDomainsReady(connectionDomains, organizationDomains);
+  const domainsReady = areConnectionDomainsReady(connectionDomains, organizationDomains, claimedDomains);
 
   // An existing connection must keep at least one domain, so its last one can
   // be neither deselected nor removed.
@@ -185,7 +193,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                       isSelected={isSelected}
                       claimedBy={claimedDomains.get(domain.name)}
                       onToggle={checked => void handleToggleDomain(domain, checked)}
-                      isToggleDisabled={isLocked}
+                      isToggleDisabled={isLocked || isUpdatingDomains}
                       onRemove={() => setDomainToRemove(domain)}
                       onPrepareOwnershipVerification={() => handlePrepareOwnershipVerification(domain)}
                       isRemoveDisabled={isLocked}
@@ -414,7 +422,7 @@ const DomainCard = ({
   const isExpired = ownershipVerification?.status === 'expired';
   const cardId = ownershipVerification?.status ?? 'unverified';
   // Only a verified domain no other connection claims can join this one.
-  const isSelectable = isVerified && !claimedBy;
+  const isSelectable = isVerified && (!claimedBy || isSelected);
 
   const removeButton = (
     <Button

@@ -418,6 +418,11 @@ describe('areConnectionDomainsReady', () => {
   it('every connection domain verified → true', () => {
     expect(areConnectionDomainsReady(['acme.com'], [makeDomain('acme.com', 'verified')])).toBe(true);
   });
+  it('a connection domain another connection claims → false', () => {
+    expect(
+      areConnectionDomainsReady(['acme.com'], [makeDomain('acme.com', 'verified')], new Map([['acme.com', 'Other']])),
+    ).toBe(false);
+  });
   it('a connection domain still unverified → false', () => {
     expect(
       areConnectionDomainsReady(
