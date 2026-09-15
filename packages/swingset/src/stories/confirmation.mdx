@@ -19,6 +19,8 @@ import * as Stories from './confirmation.stories';
 
 A confirmation for a destructive action that is worth a second look but not worth making the user type for. Removing a connected account, revoking a session, signing out everywhere. For the actions that do warrant typing, use [Destructive](/components/destructive).
 
+It is an `alertdialog`: it announces as an interruption, an outside press cannot answer it, and the card carries no corner dismiss — the footer is the only way out. Under the phone band it arrives as a bottom sheet.
+
 The block holds nothing of its own. Everything that decides what the dialog does next belongs to the caller. `open` closes it, `isConfirming` marks it busy, `errorMessage` explains a failure.
 
 ```tsx

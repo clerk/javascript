@@ -1,8 +1,4 @@
 export { Dialog, DialogContext, isOverlayDialog } from './dialog';
-export { createConfirmHandle } from './confirm-handle';
-export { useConfirmedClose } from './use-confirmed-close';
-export type { ConfirmHandle, ConfirmOptions } from './confirm-handle';
-export type { UseConfirmedCloseOptions } from './use-confirmed-close';
 export type {
   DialogClosedBy,
   DialogFocusTarget,
@@ -11,15 +7,12 @@ export type {
   DialogRole,
 } from '@clerk/headless/dialog';
 export type {
-  DialogActionsProps,
   DialogCloseButtonProps,
   DialogCloseProps,
-  DialogConfirmProps,
   DialogContextValue,
-  DialogDescriptionProps,
+  DialogCompactPlacement,
   DialogPopupProps,
   DialogRootProps,
   DialogSize,
-  DialogTitleProps,
   DialogTriggerProps,
 } from './dialog';

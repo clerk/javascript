@@ -63,7 +63,7 @@ describe('mergeStyleProps', () => {
   });
 
   it("merges a render source's className/style out of the incoming prop bag", () => {
-    // `Dialog.Title render={<Heading />}` hands Heading the title's merged pair through its
+    // `Card.Title render={<Heading />}` hands Heading the title's merged pair through its
     // props; passing that bag last must merge them rather than clobber the part's own class.
     const rest = { className: 'cl-dialog-title', style: { color: 'red' }, id: 'title' };
     const merged = mergeStyleProps({ className: 'cl-heading' }, { className: 'x1', style: { margin: 0 } }, rest);

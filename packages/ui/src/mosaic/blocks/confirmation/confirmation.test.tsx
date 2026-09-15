@@ -29,7 +29,7 @@ describe('Confirmation', () => {
   it('renders nothing until the caller opens it', () => {
     renderBlock({ open: false });
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
   it('asks to open from the trigger', async () => {
@@ -61,7 +61,7 @@ describe('Confirmation', () => {
       ),
     });
 
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(
       'preston@clerk.dev will be removed from this account.',
     );
     expect(screen.getByText('preston@clerk.dev').tagName).toBe('STRONG');
@@ -127,7 +127,7 @@ describe('Confirmation with a handle', () => {
   it('renders nothing until opened through the handle', () => {
     renderWithHandle();
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
   it('opens with a payload and renders the copy from it', () => {
@@ -137,8 +137,8 @@ describe('Confirmation with a handle', () => {
       handle.open(preston);
     });
 
-    expect(screen.getByRole('dialog')).toHaveAccessibleName('Remove member');
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Remove member');
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(
       'Preston Booth will be removed from the organization.',
     );
     expect(screen.getByText('Preston Booth').tagName).toBe('STRONG');
@@ -156,7 +156,7 @@ describe('Confirmation with a handle', () => {
     await user.click(removeButton());
 
     expect(onConfirm).toHaveBeenCalledWith(preston);
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('stays inert and open while the action is pending', async () => {
@@ -170,7 +170,7 @@ describe('Confirmation with a handle', () => {
 
     expect(removeButton()).toHaveAttribute('aria-busy', 'true');
     await user.keyboard('{Escape}');
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 
   it('keeps the dialog open and explains a failed attempt', async () => {
@@ -183,7 +183,7 @@ describe('Confirmation with a handle', () => {
     await user.click(removeButton());
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Preston Booth is the last admin.'));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     expect(removeButton()).not.toHaveAttribute('aria-busy', 'true');
   });
 
@@ -197,12 +197,12 @@ describe('Confirmation with a handle', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     act(() => {
       handle.open(preston);
     });
 
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
@@ -217,7 +217,7 @@ describe('Confirmation with a handle', () => {
       handle.close();
     });
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(handle.isOpen).toBe(false);
   });
 });

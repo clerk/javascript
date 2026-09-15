@@ -1,9 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
-import { Heading } from '../../../components/heading';
-import { Text } from '../../../components/text';
 import { styles } from '../user-profile-profile-panel.styles';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 
@@ -28,22 +27,39 @@ export function UserProfileRemovePhoneDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <Dialog.Popup>
-        <Dialog.Title render={<Heading size='sm' />}>{m.phone.removeDialog.title}</Dialog.Title>
-        <Dialog.Description render={<Text />}>
-          {beforePhone}
-          <strong {...stylex.props(styles.confirmPhoneNumber)}>{phoneNumber}</strong>
-          {afterPhone}
-        </Dialog.Description>
-        <Dialog.Actions>
-          <Dialog.Close render={<Button variant='outline' />}>{m.phone.removeDialog.cancel}</Dialog.Close>
-          <Button
-            color='negative'
-            onClick={onConfirm}
-          >
-            {m.phone.removeDialog.confirm}
-          </Button>
-        </Dialog.Actions>
+      <Dialog.Popup compactPlacement='sheet'>
+        <Card.Root
+          elevation='overlay'
+          renderBranding={false}
+        >
+          <Card.Header>
+            <Card.Title>{m.phone.removeDialog.title}</Card.Title>
+            <Card.Description>
+              {beforePhone}
+              <strong {...stylex.props(styles.confirmPhoneNumber)}>{phoneNumber}</strong>
+              {afterPhone}
+            </Card.Description>
+          </Card.Header>
+          <Card.Footer>
+            <Dialog.Close
+              render={
+                <Button
+                  variant='outline'
+                  fullWidth
+                />
+              }
+            >
+              {m.phone.removeDialog.cancel}
+            </Dialog.Close>
+            <Button
+              color='negative'
+              fullWidth
+              onClick={onConfirm}
+            >
+              {m.phone.removeDialog.confirm}
+            </Button>
+          </Card.Footer>
+        </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );

@@ -1,9 +1,9 @@
-import * as stylex from '@stylexjs/stylex';
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Card } from '../card';
 import type { DialogRootProps } from './dialog';
 import { Dialog } from './dialog';
 
@@ -24,19 +24,23 @@ function Confirm({ onOpenChange, ...rest }: Partial<DialogRootProps> = {}) {
       onOpenChange={onOpenChange}
     >
       <Dialog.Popup>
-        <Dialog.Title>Discard changes?</Dialog.Title>
-        <Dialog.Description>This address has not been saved.</Dialog.Description>
-        <Dialog.Actions>
-          <Dialog.Close>Keep editing</Dialog.Close>
-          <button type='button'>Discard</button>
-        </Dialog.Actions>
+        <Card.Root elevation='overlay'>
+          <Card.Header>
+            <Card.Title>Discard changes?</Card.Title>
+            <Card.Description>This address has not been saved.</Card.Description>
+          </Card.Header>
+          <Card.Footer>
+            <Dialog.Close>Keep editing</Dialog.Close>
+            <button type='button'>Discard</button>
+          </Card.Footer>
+        </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );
 }
 
 describe('role="alertdialog"', () => {
-  it('renders as an alertdialog, named and described by its parts', () => {
+  it('renders as an alertdialog, named and described by the card inside it', () => {
     render(<Confirm />);
 
     const popup = screen.getByRole('alertdialog', { name: 'Discard changes?' });
@@ -50,8 +54,12 @@ describe('role="alertdialog"', () => {
         role='alertdialog'
       >
         <Dialog.Popup role='dialog'>
-          <Dialog.Title>Discard changes?</Dialog.Title>
-          <Dialog.Description>This address has not been saved.</Dialog.Description>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Discard changes?</Card.Title>
+              <Card.Description>This address has not been saved.</Card.Description>
+            </Card.Header>
+          </Card.Root>
         </Dialog.Popup>
       </Dialog.Root>,
     );
@@ -66,26 +74,38 @@ describe('role="alertdialog"', () => {
     expect(document.querySelector('.cl-dialog-backdrop')).toBeInTheDocument();
     expect(document.querySelector('.cl-dialog-viewport')).toBeInTheDocument();
     expect(document.querySelector('.cl-dialog-popup')).toBeInTheDocument();
-    expect(document.querySelector('.cl-dialog-actions')).toBeInTheDocument();
   });
 
-  it('is always the prompt size, and warns when asked for another', () => {
+  // The role decides the dismissal policy, and nothing else: an alert is a `Card` at the card
+  // size like every other dialog, and may be asked for any size and placement.
+  it('takes the size it is given, like any other dialog', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<Confirm />);
+
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'card');
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  // A corner X answers the question by leaving, which is the one thing an alert must not offer.
+  it('renders no dismiss in the card header, unlike a plain dialog', () => {
+    const { unmount } = render(<Confirm />);
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    unmount();
+
     render(
-      <Dialog.Root
-        defaultOpen
-        role='alertdialog'
-      >
-        <Dialog.Popup size='profile'>
-          <Dialog.Title>Discard changes?</Dialog.Title>
-          <Dialog.Description>This address has not been saved.</Dialog.Description>
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Add email address</Card.Title>
+            </Card.Header>
+          </Card.Root>
         </Dialog.Popup>
       </Dialog.Root>,
     );
 
-    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'prompt');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="profile"'));
-    warn.mockRestore();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
   });
 
   it('opens from a trigger', async () => {
@@ -94,8 +114,12 @@ describe('role="alertdialog"', () => {
       <Dialog.Root role='alertdialog'>
         <Dialog.Trigger>Delete</Dialog.Trigger>
         <Dialog.Popup>
-          <Dialog.Title>Delete this key?</Dialog.Title>
-          <Dialog.Description>Applications using it stop working.</Dialog.Description>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Delete this key?</Card.Title>
+              <Card.Description>Applications using it stop working.</Card.Description>
+            </Card.Header>
+          </Card.Root>
         </Dialog.Popup>
       </Dialog.Root>,
     );
@@ -107,7 +131,9 @@ describe('role="alertdialog"', () => {
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 
-  it('opens focused on the cancel button, as the first element in the actions row', async () => {
+  // With no corner dismiss to take it, the opening focus lands on the first button in the footer
+  // — which is why the cancel is rendered first.
+  it('opens focused on the cancel button, as the first element in the footer', async () => {
     render(<Confirm />);
 
     // `FloatingFocusManager` moves focus asynchronously after mount, so this waits rather than
@@ -148,11 +174,15 @@ describe('focus', () => {
             onOpenChange={setConfirmOpen}
           >
             <Dialog.Popup finalFocus={inputRef}>
-              <Dialog.Title>Discard changes?</Dialog.Title>
-              <Dialog.Description>This address has not been saved.</Dialog.Description>
-              <Dialog.Actions>
-                <Dialog.Close>Keep editing</Dialog.Close>
-              </Dialog.Actions>
+              <Card.Root elevation='overlay'>
+                <Card.Header>
+                  <Card.Title>Discard changes?</Card.Title>
+                  <Card.Description>This address has not been saved.</Card.Description>
+                </Card.Header>
+                <Card.Footer>
+                  <Dialog.Close>Keep editing</Dialog.Close>
+                </Card.Footer>
+              </Card.Root>
             </Dialog.Popup>
           </Dialog.Root>
         </>
@@ -212,11 +242,15 @@ describe('dismissal', () => {
           }}
         >
           <Dialog.Popup>
-            <Dialog.Title>Discard changes?</Dialog.Title>
-            <Dialog.Description>This address has not been saved.</Dialog.Description>
-            <Dialog.Actions>
-              <Dialog.Close>Keep editing</Dialog.Close>
-            </Dialog.Actions>
+            <Card.Root elevation='overlay'>
+              <Card.Header>
+                <Card.Title>Discard changes?</Card.Title>
+                <Card.Description>This address has not been saved.</Card.Description>
+              </Card.Header>
+              <Card.Footer>
+                <Dialog.Close>Keep editing</Dialog.Close>
+              </Card.Footer>
+            </Card.Root>
           </Dialog.Popup>
         </Dialog.Root>
       );
@@ -239,7 +273,11 @@ describe('dev warnings', () => {
         role='alertdialog'
       >
         <Dialog.Popup>
-          <Dialog.Title>Discard changes?</Dialog.Title>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Discard changes?</Card.Title>
+            </Card.Header>
+          </Card.Root>
         </Dialog.Popup>
       </Dialog.Root>,
     );
@@ -247,7 +285,7 @@ describe('dev warnings', () => {
     await settle();
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no description'));
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Dialog.Description>'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Card.Description>'));
     warn.mockRestore();
   });
 
@@ -256,7 +294,11 @@ describe('dev warnings', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Dialog.Title>Notifications</Dialog.Title>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Notifications</Card.Title>
+            </Card.Header>
+          </Card.Root>
         </Dialog.Popup>
       </Dialog.Root>,
     );
@@ -277,7 +319,11 @@ describe('dev warnings', () => {
         role='alertdialog'
       >
         <Dialog.Popup>
-          <Dialog.Description>This address has not been saved.</Dialog.Description>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Description>This address has not been saved.</Card.Description>
+            </Card.Header>
+          </Card.Root>
         </Dialog.Popup>
       </Dialog.Root>,
     );
@@ -285,7 +331,7 @@ describe('dev warnings', () => {
     await settle();
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Dialog.Title>'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Card.Title>'));
     warn.mockRestore();
   });
 
@@ -300,90 +346,28 @@ describe('dev warnings', () => {
   });
 });
 
-describe('Dialog.Actions', () => {
-  it('composes consumer xstyle onto the row', () => {
-    const caller = stylex.create({ actions: { marginBlockStart: '2rem' } });
-    render(
-      <Dialog.Root
-        defaultOpen
-        role='alertdialog'
-      >
-        <Dialog.Popup>
-          <Dialog.Title>Discard changes?</Dialog.Title>
-          <Dialog.Description>This address has not been saved.</Dialog.Description>
-          <Dialog.Actions
-            xstyle={caller.actions}
-            data-testid='actions'
-          >
-            <Dialog.Close>Keep editing</Dialog.Close>
-          </Dialog.Actions>
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    expect(screen.getByTestId('actions')).toHaveClass(
-      'cl-dialog-actions',
-      stylex.props(caller.actions).className ?? '',
-    );
-  });
-
-  it('merges the className a render source hands the row', () => {
-    render(
-      <Dialog.Root
-        defaultOpen
-        role='alertdialog'
-      >
-        <Dialog.Popup>
-          <Dialog.Title>Discard changes?</Dialog.Title>
-          <Dialog.Description>This address has not been saved.</Dialog.Description>
-          <Dialog.Actions
-            render={<div className='from-render' />}
-            data-testid='actions'
-          >
-            <Dialog.Close>Keep editing</Dialog.Close>
-          </Dialog.Actions>
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    expect(screen.getByTestId('actions')).toHaveClass('cl-dialog-actions', 'from-render');
-  });
-
-  it('renders as another element through render', () => {
-    render(
-      <Dialog.Root
-        defaultOpen
-        role='alertdialog'
-      >
-        <Dialog.Popup>
-          <Dialog.Title>Discard changes?</Dialog.Title>
-          <Dialog.Description>This address has not been saved.</Dialog.Description>
-          <Dialog.Actions render={props => <footer {...props} />}>
-            <Dialog.Close>Keep editing</Dialog.Close>
-          </Dialog.Actions>
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    expect(document.querySelector('footer.cl-dialog-actions')).toBeInTheDocument();
-  });
-});
-
-// An alert dialog is a `prompt`, which is the size that may stack — a form prompt raising a
-// "discard changes?" over itself is the case the whole stack was built for.
+// A form dialog raising a "discard changes?" over itself is the case the whole stack was built for.
 describe('stacked on another dialog', () => {
-  it('stacks on a prompt without warning, and marks the surface beneath', async () => {
+  it('stacks on a card without warning, and marks the surface beneath', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const user = userEvent.setup();
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Dialog.Title>Add email address</Dialog.Title>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Add email address</Card.Title>
+            </Card.Header>
+          </Card.Root>
           <Dialog.Root role='alertdialog'>
             <Dialog.Trigger>Discard</Dialog.Trigger>
             <Dialog.Popup>
-              <Dialog.Title>Discard changes?</Dialog.Title>
-              <Dialog.Description>This address has not been saved.</Dialog.Description>
+              <Card.Root elevation='overlay'>
+                <Card.Header>
+                  <Card.Title>Discard changes?</Card.Title>
+                  <Card.Description>This address has not been saved.</Card.Description>
+                </Card.Header>
+              </Card.Root>
             </Dialog.Popup>
           </Dialog.Root>
         </Dialog.Popup>

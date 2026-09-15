@@ -6,10 +6,24 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../props';
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
+import { Card } from '../card';
 import type { DialogSize } from './dialog';
 import { Dialog } from './dialog';
 
 afterEach(() => cleanup());
+
+// Every dialog brings its own surface, and the surface is what names it: `Card.Title` takes the
+// id the popup points `aria-labelledby` at. These tests need nothing else from it.
+function Surface({ title, description }: { title: string; description?: string }) {
+  return (
+    <Card.Root elevation='overlay'>
+      <Card.Header>
+        <Card.Title>{title}</Card.Title>
+        {description ? <Card.Description>{description}</Card.Description> : null}
+      </Card.Header>
+    </Card.Root>
+  );
+}
 
 // The accessible-name warning defers by a task, so the assertions have to let one elapse.
 const settle = () =>
@@ -60,14 +74,14 @@ describe('Mosaic Dialog', () => {
     expect(screen.getByTestId('host')).not.toContainElement(document.querySelector('.cl-dialog-viewport'));
   });
 
-  it('defaults the popup to the prompt size and reflects it as data-size', () => {
+  it('defaults the popup to the card size and reflects it as data-size', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>Body</Dialog.Popup>
       </Dialog.Root>,
     );
 
-    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'prompt');
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'card');
   });
 
   it('reflects an explicit size as data-size on the popup and the viewport', () => {
@@ -125,11 +139,11 @@ describe('Mosaic Dialog', () => {
     expect(screen.queryByRole('button', { name: 'Dismiss' })).not.toBeInTheDocument();
   });
 
-  it('names the dialog from Dialog.Title', () => {
+  it('names the dialog from the card inside it', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Dialog.Title>Confirm action</Dialog.Title>
+          <Surface title='Confirm action' />
         </Dialog.Popup>
       </Dialog.Root>,
     );
@@ -149,7 +163,7 @@ describe('Mosaic Dialog', () => {
   });
 });
 
-// A `profile` dialog (account profile) opening a `prompt` dialog (add an email address) is a real
+// A `profile` dialog (account profile) opening a `card` dialog (add an email address) is a real
 // shape, so the `FloatingTree` nesting the headless README claims is exercised here rather than
 // assumed. Dismissal must reach the topmost dialog only, and the body must stay locked until the
 // last one closes.
@@ -158,12 +172,12 @@ describe('nested Mosaic Dialogs', () => {
     return (
       <Dialog.Root defaultOpen>
         <Dialog.Popup size='profile'>
-          <Dialog.Title>Account</Dialog.Title>
+          <Surface title='Account' />
           <div>Outer body</div>
           <Dialog.Root>
             <Dialog.Trigger render={nativeTrigger('Add email')} />
             <Dialog.Popup size={innerSize}>
-              <Dialog.Title>Add email address</Dialog.Title>
+              <Surface title='Add email address' />
               <div>Inner body</div>
             </Dialog.Popup>
           </Dialog.Root>
@@ -237,19 +251,16 @@ describe('nested Mosaic Dialogs', () => {
   });
 
   // A card over a profile is the delete-account confirmation: a `Card` inside a `card` dialog.
-  it.each(['prompt', 'card'] as const)(
-    'does not warn for a %s over a profile, or for the profile itself',
-    async size => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const user = userEvent.setup();
-      render(<Nested innerSize={size} />);
+  it('does not warn for a card over a profile, or for the profile itself', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(<Nested innerSize='card' />);
 
-      await user.click(screen.getByRole('button', { name: 'Add email' }));
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
 
-      expect(warn).not.toHaveBeenCalled();
-      warn.mockRestore();
-    },
-  );
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
 });
 
 describe('stacked backdrops', () => {
@@ -264,11 +275,11 @@ describe('stacked backdrops', () => {
         inline={host.inline}
       >
         <Dialog.Popup size={host.size}>
-          <Dialog.Title>Host</Dialog.Title>
+          <Surface title='Host' />
           <Dialog.Root>
             <Dialog.Trigger render={nativeTrigger('Add email')} />
             <Dialog.Popup>
-              <Dialog.Title>Add email address</Dialog.Title>
+              <Surface title='Add email address' />
             </Dialog.Popup>
           </Dialog.Root>
         </Dialog.Popup>
@@ -282,22 +293,15 @@ describe('stacked backdrops', () => {
     return className;
   }
 
-  it('drops the scrim for a prompt over a prompt, and keeps it for one over a profile', async () => {
-    const overPrompt = await innerBackdropClass({ size: 'prompt' });
-    const overPanel = await innerBackdropClass({ size: 'profile' });
-
-    expect(overPrompt).not.toBe(overPanel);
-  });
-
-  it('keeps a prompt over a card on the nested scrim, same as over a profile', async () => {
+  it('drops the scrim for a card over a card, and keeps it for one over a profile', async () => {
     const overCard = await innerBackdropClass({ size: 'card' });
     const overPanel = await innerBackdropClass({ size: 'profile' });
 
-    expect(overCard).toBe(overPanel);
+    expect(overCard).not.toBe(overPanel);
   });
 
   // The nested scrim is solved to composite over the host's own, and an inline host has none.
-  it('paints the base scrim, not the nested one, for a prompt over an inline profile', async () => {
+  it('paints the base scrim, not the nested one, for a card over an inline profile', async () => {
     const overInline = await innerBackdropClass({ size: 'profile', inline: true });
     const overPanel = await innerBackdropClass({ size: 'profile' });
 
@@ -309,11 +313,11 @@ describe('stacked backdrops', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup size='profile'>
-          <Dialog.Title>Account</Dialog.Title>
+          <Surface title='Account' />
           <Dialog.Root>
             <Dialog.Trigger render={nativeTrigger('Add email')} />
             <Dialog.Popup>
-              <Dialog.Title>Add email address</Dialog.Title>
+              <Surface title='Add email address' />
             </Dialog.Popup>
           </Dialog.Root>
         </Dialog.Popup>
@@ -387,8 +391,10 @@ describe('Dialog.CloseButton', () => {
       >
         <Dialog.Popup>
           <Dialog.CloseButton />
-          <Dialog.Title>Discard?</Dialog.Title>
-          <Dialog.Description>Unsaved.</Dialog.Description>
+          <Surface
+            title='Discard?'
+            description='Unsaved.'
+          />
         </Dialog.Popup>
       </Dialog.Root>,
     );
@@ -407,7 +413,7 @@ describe('composition APIs', () => {
         <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
         <Dialog.Root handle={handle}>
           <Dialog.Popup>
-            <Dialog.Title>Detached</Dialog.Title>
+            <Surface title='Detached' />
           </Dialog.Popup>
         </Dialog.Root>
       </>,
@@ -432,7 +438,7 @@ describe('composition APIs', () => {
         <Dialog.Root handle={handle}>
           {({ payload }) => (
             <Dialog.Popup>
-              <Dialog.Title>{payload ?? 'none'}</Dialog.Title>
+              <Surface title={payload ?? 'none'} />
             </Dialog.Popup>
           )}
         </Dialog.Root>
@@ -501,15 +507,8 @@ describe('popup padding', () => {
     return classes;
   };
 
-  it('gives a prompt 1rem, overriding the popup default', () => {
-    const prompt = popupClassesFor('prompt');
-
-    expect(prompt).toEqual(expect.arrayContaining(atomFor(probe.four)));
-    expect(prompt).not.toEqual(expect.arrayContaining(atomFor(probe.six)));
-  });
-
-  // A `card` takes its padding from the `Card` rendered as the popup, and a `profile` from the
-  // `Profile`, so the popup must emit NO padding atom at all — a competing value would put
+  // A `card` takes its padding from the `Card` rendered inside the popup, and a `profile` from
+  // the `Profile`, so the popup must emit NO padding atom at all — a competing value would put
   // two atoms for the same property on the element, and StyleX cannot dedupe across the two
   // `stylex.props` calls involved.
   it.each(['card', 'profile'] as const)('emits no padding at all for a %s, deferring to its surface', size => {
@@ -531,23 +530,84 @@ describe('popup surface', () => {
     radius: { borderRadius: radiusVars['--cl-radius-xl'] },
   });
 
-  it('paints a prompt itself', () => {
-    renderSize('prompt');
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.background)));
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.radius)));
-  });
-
   it.each(['card', 'profile'] as const)('emits no background for a %s, deferring to its surface', size => {
     renderSize(size);
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.background)));
   });
 
-  it.each(['card', 'profile'] as const)('leaves the radius to the surface for a %s', size => {
-    renderSize(size);
+  // The radius is the exception to "the popup does not paint": the stacking veil and the
+  // forced-colors border are drawn by the popup and have to follow the card's corners.
+  it('keeps the radius for a card, which the veil and the forced-colors edge trace', () => {
+    renderSize('card');
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.radius)));
+  });
+
+  it('leaves the radius to the surface for a profile, which owns its corners at every band', () => {
+    renderSize('profile');
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.radius)));
+  });
+});
+
+// The sheet is the compact band's bottom anchor: the geometry that used to ride on the `prompt`
+// size, now asked for by name. Above the band it resolves back to a centred card, so what the
+// atoms pin is that the placement reaches the popup and the track at all.
+describe('compactPlacement', () => {
+  // Written out rather than imported: an atom is named from its property, value AND condition, so
+  // the probe only yields the popup's own atom if the query string matches `dialog.styles.ts`
+  // exactly. A drift here shows up as a failing test rather than as a silently empty assertion.
+  const PHONE = '@container cl-dialog (width < 48rem)';
+  const probe = stylex.create({
+    anchored: { alignSelf: { [PHONE]: 'end', default: null } },
+    centred: { alignItems: { [PHONE]: 'center', default: null } },
+    clipped: { overflow: { [PHONE]: 'clip', default: null } },
+  });
+
+  const renderPlacement = (compactPlacement: 'center' | 'sheet', size: DialogSize = 'card') =>
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup
+          size={size}
+          compactPlacement={compactPlacement}
+        >
+          <Surface title='Add email address' />
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+  it('centres by default, anchoring nothing to the bottom edge', () => {
+    renderPlacement('center');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+    expect(classesOf('.cl-dialog-track')).not.toEqual(expect.arrayContaining(atomFor(probe.clipped)));
+  });
+
+  it('anchors the sheet to the bottom edge and clips the track it slides through', () => {
+    renderPlacement('sheet');
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+    expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.clipped)));
+  });
+
+  // The band runs to 48rem but a `Card` caps at 26.25rem, so between the two the surface sits
+  // inside a wider popup. Without this it lands against the inline-start edge — a sheet hugging one
+  // side of the screen — because the popup is a flex column and `stretch` is the default.
+  it('centres what the sheet holds, for the widths where the surface caps first', () => {
+    renderPlacement('sheet');
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.centred)));
+  });
+
+  // A profile fills the compact band, with no room to be anchored anywhere else.
+  it('ignores a placement on a profile, and warns', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPlacement('sheet', 'profile');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
+    warn.mockRestore();
   });
 });
 
@@ -569,8 +629,8 @@ describe('viewport scroll behaviour', () => {
     return classes;
   };
 
-  it.each(['prompt', 'card'] as const)('lets the viewport grow for %s, so the inset survives', size => {
-    const viewport = viewportClassesFor(size);
+  it('lets the viewport grow for a card, so the inset survives', () => {
+    const viewport = viewportClassesFor('card');
 
     expect(viewport).toEqual(expect.arrayContaining(atomFor(probe.grows)));
     expect(viewport).not.toEqual(expect.arrayContaining(atomFor(probe.fixed)));
@@ -594,7 +654,7 @@ describe('sizing container', () => {
   });
 
   it('makes the viewport the named inline-size container the bands query', () => {
-    renderSize('prompt');
+    renderSize('card');
 
     expect(classesOf('.cl-dialog-viewport')).toEqual(expect.arrayContaining(atomFor(probe.container)));
   });
@@ -603,7 +663,7 @@ describe('sizing container', () => {
   // against an OUTER dialog's container, or nothing — so every banded rule has to sit on the track
   // inside it, and none may sit on the viewport.
   it('keeps every banded rule inside the container, on the track', () => {
-    renderSize('prompt');
+    renderSize('card');
 
     const viewport = document.querySelector('.cl-dialog-viewport')!;
     const track = document.querySelector('.cl-dialog-track')!;
@@ -628,7 +688,7 @@ describe('inline presentation', () => {
           onOpenChange={onOpenChange}
         >
           <Dialog.Popup size='profile'>
-            <Dialog.Title>Account</Dialog.Title>
+            <Surface title='Account' />
             <input aria-label='Name' />
           </Dialog.Popup>
         </Dialog.Root>
@@ -696,7 +756,7 @@ describe('inline presentation', () => {
       <Dialog.Root inline>
         <Dialog.Popup size='profile'>
           <Dialog.CloseButton />
-          <Dialog.Title>Account</Dialog.Title>
+          <Surface title='Account' />
         </Dialog.Popup>
       </Dialog.Root>,
     );
@@ -714,11 +774,11 @@ describe('inline presentation', () => {
       <div data-testid='host'>
         <Dialog.Root inline>
           <Dialog.Popup size='profile'>
-            <Dialog.Title>Account</Dialog.Title>
+            <Surface title='Account' />
             <Dialog.Root>
               <Dialog.Trigger render={nativeTrigger('Add email')} />
               <Dialog.Popup>
-                <Dialog.Title>Add email address</Dialog.Title>
+                <Surface title='Add email address' />
               </Dialog.Popup>
             </Dialog.Root>
           </Dialog.Popup>
@@ -757,12 +817,12 @@ describe('accessible name warning', () => {
     warn.mockRestore();
   });
 
-  it('does not warn when a Dialog.Title supplies the name', async () => {
+  it('does not warn when the card inside it supplies the name', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Dialog.Title>Confirm action</Dialog.Title>
+          <Surface title='Confirm action' />
         </Dialog.Popup>
       </Dialog.Root>,
     );
