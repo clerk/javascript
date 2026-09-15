@@ -828,9 +828,11 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: 'Used by {{connection}}',
         badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
+        checkboxLabel: 'Use {{domain}} for this connection',
         expiredAtLabel:
           "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
         expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
@@ -860,7 +862,8 @@ export const enUS: LocalizationResource = {
         subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
         title: 'Removing domain',
       },
-      subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
+      subtitle:
+        'Add and verify ownership of the domains your organization uses to sign in, then pick the ones this connection covers.',
       title: 'Add SSO domains',
     },
     resetConnectionDialog: {

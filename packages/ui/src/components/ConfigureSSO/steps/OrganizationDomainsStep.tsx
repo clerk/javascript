@@ -8,6 +8,7 @@ import {
   Badge,
   Box,
   Button,
+  CheckboxInput,
   Col,
   descriptors,
   Flex,
@@ -31,7 +32,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { getFieldError, getGlobalError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../ConfigureSSOContext';
-import { areAllOrganizationDomainsVerified } from '../domain/organizationEnterpriseConnection';
+import { areConnectionDomainsReady, isOrganizationDomainVerified } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard/WizardContext';
 import { RemoveDomainDialog } from '../RemoveDomainDialog';
@@ -40,11 +41,13 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
   const {
     enterpriseConnection,
+    connectionDomains,
+    setConnectionDomains,
+    claimedDomains,
     organizationDomains,
     organizationEnterpriseConnection,
     contentRef,
     organizationDomainMutations: { createDomain, revalidate, prepareOwnershipVerification },
-    enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
   const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
   const card = useCardState();
@@ -92,24 +95,36 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     }
   };
 
+  const handleToggleDomain = async (domain: OrganizationDomainResource, checked: boolean) => {
+    card.setError(undefined);
+
+    const domains = checked
+      ? [...connectionDomains, domain.name]
+      : connectionDomains.filter(name => name !== domain.name);
+
+    try {
+      await setConnectionDomains(domains);
+    } catch (err: any) {
+      const apiError = getFieldError(err) ?? getGlobalError(err);
+      card.setError(apiError);
+    }
+  };
+
   const handleRemoveDomain = async (domain: OrganizationDomainResource) => {
-    if (enterpriseConnection) {
-      const domains = enterpriseConnection.domains.filter(name => name !== domain.name);
-      await updateConnection(enterpriseConnection.id, { domains });
+    if (connectionDomains.includes(domain.name)) {
+      await setConnectionDomains(connectionDomains.filter(name => name !== domain.name));
     }
 
     await domain.delete();
     await revalidate();
   };
 
-  const hasAllDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
+  const domainsReady = areConnectionDomainsReady(connectionDomains, organizationDomains);
 
-  // A connection needs at least one verified domain to point at, so the last
-  // remaining verified domain cannot be removed while a connection exists
-  const verifiedDomainCount =
-    organizationDomains?.filter(domain => domain.ownershipVerification?.status === 'verified').length ?? 0;
-  const lockLastVerifiedDomain = Boolean(enterpriseConnection);
-  const lastVerifiedDomainTooltip = enterpriseConnection?.active
+  // An existing connection must keep at least one domain, so its last one can
+  // be neither deselected nor removed.
+  const lockLastConnectionDomain = Boolean(enterpriseConnection) && connectionDomains.length === 1;
+  const lastConnectionDomainTooltip = enterpriseConnection?.active
     ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.removeButtonTooltip__lastVerifiedDomainActive')
     : localizationKeys('configureSSO.organizationDomainsStep.domainCard.removeButtonTooltip__lastVerifiedDomain');
 
@@ -161,17 +176,20 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                 })}
               >
                 {organizationDomains.map(domain => {
-                  const isVerified = domain.ownershipVerification?.status === 'verified';
-                  const isLastVerifiedDomain = isVerified && verifiedDomainCount === 1;
-                  const isRemoveDisabled = lockLastVerifiedDomain && isLastVerifiedDomain;
+                  const isSelected = connectionDomains.includes(domain.name);
+                  const isLocked = isSelected && lockLastConnectionDomain;
                   return (
                     <DomainCard
                       key={domain.id}
                       domain={domain}
+                      isSelected={isSelected}
+                      claimedBy={claimedDomains.get(domain.name)}
+                      onToggle={checked => void handleToggleDomain(domain, checked)}
+                      isToggleDisabled={isLocked}
                       onRemove={() => setDomainToRemove(domain)}
                       onPrepareOwnershipVerification={() => handlePrepareOwnershipVerification(domain)}
-                      isRemoveDisabled={isRemoveDisabled}
-                      removeDisabledTooltip={lastVerifiedDomainTooltip}
+                      isRemoveDisabled={isLocked}
+                      removeDisabledTooltip={lastConnectionDomainTooltip}
                     />
                   );
                 })}
@@ -187,7 +205,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
           />
           <Step.Footer.Continue
             onClick={() => goNext()}
-            isDisabled={isLastStep || !hasAllDomainsVerified}
+            isDisabled={isLastStep || !domainsReady}
           />
         </Step.Footer>
       </Step>
@@ -364,25 +382,39 @@ const DomainSuggestion = ({ onSubmit }: { onSubmit: (domain: string) => Promise<
 
 const DomainCard = ({
   domain,
+  isSelected,
+  claimedBy,
+  onToggle,
+  isToggleDisabled = false,
   onRemove,
   onPrepareOwnershipVerification,
   isRemoveDisabled = false,
   removeDisabledTooltip,
 }: {
   domain: OrganizationDomainResource;
+  /** Whether the scoped connection authenticates this domain. */
+  isSelected: boolean;
+  /** The name of the other connection that already authenticates this domain. */
+  claimedBy: string | undefined;
+  onToggle: (checked: boolean) => void;
+  isToggleDisabled?: boolean;
   onRemove: () => void;
   onPrepareOwnershipVerification: () => Promise<void>;
   isRemoveDisabled?: boolean;
   removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
 }): JSX.Element | null => {
+  const { t } = useLocalizations();
+
   if (!domain.name) {
     return null;
   }
 
   const ownershipVerification = domain.ownershipVerification;
-  const isVerified = ownershipVerification?.status === 'verified';
+  const isVerified = isOrganizationDomainVerified(domain);
   const isExpired = ownershipVerification?.status === 'expired';
   const cardId = ownershipVerification?.status ?? 'unverified';
+  // Only a verified domain no other connection claims can join this one.
+  const isSelectable = isVerified && !claimedBy;
 
   const removeButton = (
     <Button
@@ -422,6 +454,18 @@ const DomainCard = ({
           align='center'
           sx={t => ({ gap: t.space.$2, minWidth: 0 })}
         >
+          <CheckboxInput
+            elementDescriptor={descriptors.configureSSOVerifyDomainCardCheckbox}
+            checked={isSelected}
+            isDisabled={!isSelectable || isToggleDisabled}
+            aria-label={t(
+              localizationKeys('configureSSO.organizationDomainsStep.domainCard.checkboxLabel', {
+                domain: domain.name,
+              }),
+            )}
+            onChange={e => onToggle(e.target.checked)}
+          />
+
           <Text
             as='span'
             sx={t => ({
@@ -446,6 +490,17 @@ const DomainCard = ({
                   : localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__unverified')
             }
           />
+
+          {claimedBy && (
+            <Badge
+              elementDescriptor={descriptors.configureSSOVerifyDomainCardBadge}
+              elementId={descriptors.configureSSOVerifyDomainCardBadge.setId('claimed')}
+              colorScheme='primary'
+              localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__claimed', {
+                connection: claimedBy,
+              })}
+            />
+          )}
 
           {!isVerified && !isExpired && (
             <Spinner

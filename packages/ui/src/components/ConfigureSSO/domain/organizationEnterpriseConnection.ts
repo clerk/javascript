@@ -87,8 +87,57 @@ export const isEnterpriseConnectionConfigured = (
   return Boolean(connection.samlConnection?.idpSsoUrl && connection.samlConnection?.idpEntityId);
 };
 
-export const areAllOrganizationDomainsVerified = (domains: OrganizationDomainResource[] | null | undefined): boolean =>
-  !!domains?.length && domains.every(domain => domain.ownershipVerification?.status === 'verified');
+export const isOrganizationDomainVerified = (domain: OrganizationDomainResource): boolean =>
+  domain.ownershipVerification?.status === 'verified';
+
+/**
+ * Domains every connection other than `scopedConnectionId` already authenticates,
+ * keyed to that connection's name. FAPI rejects a domain shared by two
+ * connections of the same instance, so the wizard never offers these.
+ */
+export const domainsClaimedByOtherConnections = (
+  connections: EnterpriseConnectionResource[],
+  scopedConnectionId: string | undefined,
+): Map<string, string> => {
+  const claimed = new Map<string, string>();
+  for (const connection of connections) {
+    if (connection.id === scopedConnectionId) {
+      continue;
+    }
+    for (const domain of connection.domains ?? []) {
+      claimed.set(domain, connection.name);
+    }
+  }
+  return claimed;
+};
+
+/**
+ * The domains a connection would receive before its admin touches the
+ * selection: every verified organization domain no other connection claims.
+ */
+export const defaultConnectionDomains = (
+  organizationDomains: OrganizationDomainResource[] | null | undefined,
+  claimed: Map<string, string>,
+): string[] =>
+  (organizationDomains ?? [])
+    .filter(domain => isOrganizationDomainVerified(domain) && !claimed.has(domain.name))
+    .map(domain => domain.name);
+
+/**
+ * Whether the connection's domains let the wizard move past the domains step:
+ * at least one domain, none of them still pending verification. A connection
+ * domain missing from the organization list was accepted by FAPI already, so it
+ * does not block.
+ */
+export const areConnectionDomainsReady = (
+  connectionDomains: readonly string[],
+  organizationDomains: OrganizationDomainResource[] | null | undefined,
+): boolean =>
+  connectionDomains.length > 0 &&
+  connectionDomains.every(name => {
+    const organizationDomain = organizationDomains?.find(domain => domain.name === name);
+    return !organizationDomain || isOrganizationDomainVerified(organizationDomain);
+  });
 
 const connectionStatus = ({
   hasConnection,

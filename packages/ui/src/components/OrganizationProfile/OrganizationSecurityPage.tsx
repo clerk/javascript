@@ -43,6 +43,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     enterpriseConnection,
     enterpriseConnections,
     selectConnection,
+    connectionDomains,
+    setConnectionDomains,
+    claimedDomains,
     organizationEnterpriseConnection,
     testRuns,
     enterpriseConnectionMutations,
@@ -126,6 +129,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         organizationEnterpriseConnection={organizationEnterpriseConnection}
         testRuns={testRuns}
         enterpriseConnection={enterpriseConnection}
+        connectionDomains={connectionDomains}
+        setConnectionDomains={setConnectionDomains}
+        claimedDomains={claimedDomains}
         contentRef={contentRef}
         enterpriseConnectionMutations={enterpriseConnectionMutations}
         organizationDomainMutations={organizationDomainMutations}

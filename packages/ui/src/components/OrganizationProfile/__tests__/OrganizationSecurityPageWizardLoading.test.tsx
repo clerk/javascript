@@ -68,6 +68,9 @@ vi.mock('../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection', () => ({
       enterpriseConnections: [activeConnection],
       connectionScope: { kind: 'existing', id: activeConnection.id },
       selectConnection: () => {},
+      connectionDomains: activeConnection.domains,
+      setConnectionDomains: noop,
+      claimedDomains: new Map(),
       organizationEnterpriseConnection: buildOrganizationEnterpriseConnection({
         connection: activeConnection,
         hasSuccessfulTestRun: true,
