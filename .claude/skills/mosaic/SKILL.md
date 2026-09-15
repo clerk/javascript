@@ -56,7 +56,7 @@ canonical contract for the whole design system — the `--cl-*` tokens, the
 architecture" section that defines the split. Read it for the _what_; this skill
 is the _how-to_.
 
-`packages/ui/src/mosaic/user-button/` is the fullest worked example of the split
+`packages/ui/src/mosaic/features/user-button/` is the fullest worked example of the split
 in the repo — model, controller, view, wrapper, types, messages, and a test per
 layer. Copy from it.
 

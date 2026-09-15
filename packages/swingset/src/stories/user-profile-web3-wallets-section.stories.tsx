@@ -1,4 +1,4 @@
-import { UserProfileWeb3WalletsSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-web3-wallets-section.view';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,7 +10,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileWeb3WalletsSection',
   label: 'Web3 wallets',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-web3-wallets-section.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-web3-wallets-section.view.tsx',
 };
 
 export function Default() {

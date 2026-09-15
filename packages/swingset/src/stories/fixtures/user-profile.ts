@@ -1,15 +1,18 @@
-import type { UserProfileViewProps } from '@clerk/ui/mosaic/user-profile/user-profile.view';
-import type { UserProfileAPIKey } from '@clerk/ui/mosaic/user-profile/user-profile-api-keys-panel.view';
+import type { UserProfileViewProps } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
+import type { UserProfileAPIKey } from '@clerk/ui/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
-} from '@clerk/ui/mosaic/user-profile/user-profile-billing-panel.view';
-import type { UserProfileEmail, UserProfilePhone } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
+} from '@clerk/ui/mosaic/features/user-profile/user-profile-billing-panel.view';
+import type {
+  UserProfileEmail,
+  UserProfilePhone,
+} from '@clerk/ui/mosaic/features/user-profile/user-profile-profile-panel.view';
 import type {
   UserProfileDevice,
   UserProfileMfaMethod,
   UserProfilePasskey,
-} from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
+} from '@clerk/ui/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';

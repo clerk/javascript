@@ -1,4 +1,4 @@
-import { UserProfilePasswordSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-password-section.view';
+import { UserProfilePasswordSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-password-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,7 +10,7 @@ export const meta: StoryMeta = {
   title: 'UserProfilePasswordSection',
   label: 'Password',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-password-section.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-password-section.view.tsx',
 };
 
 export function Default() {

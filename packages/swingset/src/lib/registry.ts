@@ -588,10 +588,11 @@ export const registry: StoryModule[] = [
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  // Reverification
+  reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
-  reverificationModule,
   // Components
   avatarModule,
   badgeModule,
