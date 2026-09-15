@@ -1,6 +1,6 @@
 # Motion: entrances and exits
 
-Token semantics live in `packages/ui/src/mosaic/tokens.stylex.ts`, above
+Token semantics live in `packages/mosaic/src/tokens.stylex.ts`, above
 `durationDefaults` / `easingDefaults` — read those comments first. This file is the
 how-to layer: the rules that decide a transition's shape, and how to check one
 rather than eyeball it.
