@@ -96,7 +96,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
 
 // Stubbed at the same seam as the controller test: the in-view helper is the controller's whole
 // fetch boundary, so `ref` doubles as the assertion that the paging sentinel mounted.
-vi.mock('../../../hooks/useOrganizationListInView', () => ({
+vi.mock('../../hooks/useOrganizationListInView', () => ({
   useOrganizationListInView: () => ({ userMemberships, userInvitations, userSuggestions, ref: pagingRef }),
 }));
 
