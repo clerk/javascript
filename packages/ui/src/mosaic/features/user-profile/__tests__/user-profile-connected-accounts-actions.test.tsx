@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileConnectedAccountsSectionView } from '../user-profile-connected-accounts-section.view';
 
 const account = { id: 'github', provider: 'GitHub', identifier: 'test' };

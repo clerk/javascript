@@ -1,8 +1,8 @@
-import { Banner } from '../components/banner';
-import { Button, SubmitButton } from '../components/button';
-import { Dialog } from '../components/dialog';
-import { Heading } from '../components/heading';
-import { Text } from '../components/text';
+import { Banner } from '../../components/banner';
+import { Button, SubmitButton } from '../../components/button';
+import { Dialog } from '../../components/dialog';
+import { Heading } from '../../components/heading';
+import { Text } from '../../components/text';
 import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 
 export interface UserProfileRemoveConnectedAccountDialogProps {

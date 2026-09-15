@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space } from '../tokens.stylex';
+import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   connectRow: { justifyContent: 'center' },

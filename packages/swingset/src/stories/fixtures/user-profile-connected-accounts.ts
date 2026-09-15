@@ -1,7 +1,7 @@
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
-} from '@clerk/ui/mosaic/user-profile/user-profile-connected-accounts-section.view';
+} from '@clerk/ui/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
 import { useState } from 'react';
 
 export const connectedAccount = {
