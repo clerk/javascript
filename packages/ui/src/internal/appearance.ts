@@ -1186,6 +1186,7 @@ export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type ConfigureSSOTheme = Theme;
 export type OAuthConsentTheme = Theme;
+export type AgentActionApprovalTheme = Theme;
 export type OAuthDeviceVerificationTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
@@ -1274,6 +1275,10 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
     __internal_oauthConsent?: T;
+    /**
+     * Theme overrides that only apply to the experimental `<AgentActionApproval />` component
+     */
+    __experimental_agentActionApproval?: T;
     /**
      * Theme overrides that only apply to the `<OAuthDeviceVerification />` component
      */
