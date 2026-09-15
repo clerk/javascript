@@ -1,4 +1,4 @@
 'use client';
 
-export type { UserButtonProps } from './user-button/user-button';
-export { UserButton } from './user-button/user-button';
+export type { UserButtonProps } from './features/user-button/user-button';
+export { UserButton } from './features/user-button/user-button';
