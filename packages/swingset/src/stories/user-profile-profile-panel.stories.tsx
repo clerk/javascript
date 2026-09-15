@@ -63,12 +63,9 @@ export function Default(_args: Record<string, unknown>) {
           isPrimary: true,
           isVerified: true,
         },
-        {
-          id: 'coinbase-wallet',
-          provider: 'Coinbase Wallet',
-          iconUrl: providerIconUrl('coinbase_wallet'),
-          connected: false,
-        },
+      ]}
+      availableWeb3Providers={[
+        { id: 'coinbase-wallet', provider: 'Coinbase Wallet', iconUrl: providerIconUrl('coinbase_wallet') },
       ]}
       hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}

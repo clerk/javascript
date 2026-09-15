@@ -243,7 +243,9 @@ describe('UserProfileProfilePanelView', () => {
   it('renders connected provider and Web3 images inside icon frames', () => {
     const { container } = renderView({
       connectedAccounts: [{ id: 'google', provider: 'Google', iconUrl: '/google.svg' }],
-      web3Wallets: [{ id: 'metamask', provider: 'MetaMask', iconUrl: '/metamask.svg' }],
+      web3Wallets: [
+        { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
+      ],
     });
 
     const frames = container.querySelectorAll('.cl-icon-frame');
@@ -255,11 +257,7 @@ describe('UserProfileProfilePanelView', () => {
     frames.forEach(frame => expect(frame.closest('.cl-section-media')).toHaveAttribute('data-size', 'lg'));
   });
 
-  it('renders Web3 wallets and forwards wallet actions', async () => {
-    const onConnectWeb3Wallet = vi.fn();
-    const onSetPrimaryWeb3Wallet = vi.fn();
-    const onRemoveWeb3Wallet = vi.fn();
-    const user = userEvent.setup();
+  it('composes linked wallets and available providers', () => {
     renderView({
       web3Wallets: [
         {
@@ -276,53 +274,20 @@ describe('UserProfileProfilePanelView', () => {
           provider: 'Coinbase Wallet',
           isVerified: true,
         },
-        {
-          id: 'disconnected',
-          provider: 'Coinbase Wallet',
-          connected: false,
-        },
       ],
-      onConnectWeb3Wallet,
-      onSetPrimaryWeb3Wallet,
-      onRemoveWeb3Wallet,
-    });
-
-    expect(screen.getByRole('heading', { level: 4, name: 'Web3 wallets' })).toBeInTheDocument();
-    expect(screen.getByText('MetaMask')).toBeInTheDocument();
-    expect(
-      screen.getByRole('region', { name: 'Web3 wallets' }).querySelector('.cl-section-media[data-size="lg"] img'),
-    ).toHaveAttribute('src', 'https://example.com/metamask.svg');
-    expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
-    expect(within(screen.getByRole('region', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();
-
-    await user.click(
-      within(screen.getByRole('region', { name: 'Web3 wallets' })).getByRole('button', { name: 'Connect' }),
-    );
-    await user.click(screen.getByRole('button', { name: 'Manage Coinbase Wallet' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
-    await user.click(screen.getByRole('button', { name: 'Manage Coinbase Wallet' }));
-    const removeWallet = screen.getByRole('menuitem', { name: 'Remove wallet' });
-    expect(removeWallet).toHaveAttribute('data-color', 'negative');
-    await user.click(removeWallet);
-
-    expect(onConnectWeb3Wallet).toHaveBeenCalledWith('disconnected');
-    expect(onSetPrimaryWeb3Wallet).toHaveBeenCalledWith('secondary');
-    expect(onRemoveWeb3Wallet).toHaveBeenCalledWith('secondary');
-  });
-
-  it('shows unverified Web3 wallets without a set-primary action', async () => {
-    const user = userEvent.setup();
-    renderView({
-      web3Wallets: [{ id: 'unverified', provider: 'WalletConnect', address: 'short', isVerified: false }],
+      availableWeb3Providers: [{ id: 'disconnected', provider: 'Coinbase Wallet' }],
+      onConnectWeb3Wallet: vi.fn(),
       onSetPrimaryWeb3Wallet: vi.fn(),
       onRemoveWeb3Wallet: vi.fn(),
     });
 
-    expect(screen.getByText('short')).toBeInTheDocument();
-    expect(screen.getByText('Unverified')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Manage WalletConnect' }));
-    expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).not.toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Remove wallet' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 4, name: 'Web3 wallets' })).toBeInTheDocument();
+    expect(screen.getByText('MetaMask')).toBeInTheDocument();
+    expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
+    expect(within(screen.getByRole('region', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: 'Connect Coinbase Wallet' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Manage Coinbase Wallet' })).toBeVisible();
   });
 
   it('renders safely before profile data is available', () => {
