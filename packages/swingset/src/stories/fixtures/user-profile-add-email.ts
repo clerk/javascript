@@ -1,5 +1,5 @@
-import type { UserProfileAccountSectionViewProps } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddEmailDialogProps } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-add-email.dialog';
+import type { UserProfileAccountSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
+import type { UserProfileAddEmailDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-email.dialog';
 
 interface FixtureOptions {
   failAt?: UserProfileAddEmailDialogProps['step'];

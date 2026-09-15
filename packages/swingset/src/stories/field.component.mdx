@@ -14,8 +14,8 @@ import * as FieldStories from './field.component.stories';
 Compose one Mosaic control inside each `Field.Root` to generate its ID, the label's `htmlFor`, and the message relationships. Rendering multiple controls logs a development warning. The caller owns validation and decides when to render an error. Use a separate `Field.Root` for each control; grouped controls should use native `<fieldset>` and `<legend>` semantics until dedicated Mosaic `Fieldset` and `Field.Item` components are available.
 
 ```tsx
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Input } from '@clerk/ui/mosaic/components/input';
+import { Field } from '@clerk/mosaic/components/field';
+import { Input } from '@clerk/mosaic/components/input';
 
 <Field.Root>
   <Field.Label>Email address</Field.Label>
@@ -78,10 +78,10 @@ Wrap `Field.Error` in `Field.Message` and pass the message as its children. `Fie
 
 ## Styling
 
-The Mosaic field is themed with **StyleX**. Each styled part carries the stable public slot class shown above alongside the generated StyleX atoms. Consumers never target the hashed atomic classes—override a `.cl-field-*` class from a CSS layer that wins over `@clerk/ui/styles.css`:
+The Mosaic field is themed with **StyleX**. Each styled part carries the stable public slot class shown above alongside the generated StyleX atoms. Consumers never target the hashed atomic classes—override a `.cl-field-*` class from a CSS layer that wins over `@clerk/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-field-label {

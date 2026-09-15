@@ -2,7 +2,7 @@
 
 This file provides guidance to Coding Agents when working with code in this repository.
 
-`@clerk/swingset` is a private (unpublished) component explorer — a Storybook-like app — for the **Mosaic** design system that lives in `@clerk/ui`. It is a Next.js App Router app that renders Mosaic components interactively with live knobs and design-token overrides.
+`@clerk/swingset` is a private (unpublished) component explorer — a Storybook-like app — for the **Mosaic** design system that lives in `@clerk/mosaic`. It is a Next.js App Router app that renders Mosaic components interactively with live knobs and design-token overrides.
 
 ## Commands
 
@@ -20,7 +20,7 @@ There are no tests or lint scripts in this package, yet.
 
 These require reading several files together; the `README.md` covers the step-by-step "add a component" workflow.
 
-- **Consumes Mosaic from source, not build.** `@clerk/ui/mosaic` is aliased to `../ui/src/mosaic` in *two* places that must stay in sync: `next.config.mjs` (webpack `resolve.alias`) and `tsconfig.json` (`paths`). Editing Mosaic source in `packages/ui` reflects live in swingset's dev server — no rebuild of `@clerk/ui` needed.
+- **Consumes Mosaic from source, not build.** `@clerk/mosaic` is aliased to `../mosaic/src` in *two* places that must stay in sync: `next.config.mjs` (webpack `resolve.alias`) and `tsconfig.json` (`paths`). Editing Mosaic source in `packages/mosaic` reflects live in swingset's dev server — no rebuild of `@clerk/mosaic` needed.
 
 - **Knobs are generated from a story's declared variant surface.** A story's `meta.styles` is a hand-written `{ _variants, _defaultVariants }` object describing the component's variant props — StyleX compiles its styles away, so there is no runtime recipe to derive this from. `lib/generateKnobs.ts` turns each variant into a control: variants whose keys are only `true`/`false` become boolean toggles, everything else becomes a select. Knob values are passed as props straight into the story component. This is why story functions take `Record<string, unknown>` and cast to the real prop type.
 
@@ -40,7 +40,7 @@ These require reading several files together; the `README.md` covers the step-by
 - **`<Story>` examples can show their source in a collapsible code footer.** When a story module exposes its own source as `__source` — via a `?raw` self-import (`export { default as __source } from './x.stories?raw'`) — `StoryEmbed` runs `extractStorySource` (`lib/extractStorySource.ts`) to pull the *previewed story function's* source out of that raw text, then `toUsageSnippet` (`lib/exampleSnippet.ts`) to reduce that knob harness to a clean usage snippet (unwraps `export function …() { return (…) }` down to the returned JSX and strips the `{...knobsAsProps(props)}` / `{...props}` knob plumbing), and renders a `CodeFooter` (`CodeFooter.tsx`): a "View code" toggle that's collapsed by default and reveals the snippet with a height animation (Base UI's `--collapsible-panel-height` + `data-starting/ending-style`). It's **opt-in per module** — only modules that export `__source` get a footer, and it's keyed to whichever story `name` the `<Story>` renders, so each example shows its own code. Shiki highlighting is shared with the `<pre>`/`CodeBlock` path through the `useShikiHtml` hook. A `<Story>` can carry both a code footer and a `composition` footer; they stack under the preview.
   - The `?raw` query is wired in `next.config.mjs`: an `asset/source` rule handles `?raw` imports, and — crucially — a recursive `excludeRawQuery` pass adds `resourceQuery: { not: [/raw/] }` to every *other* loader so Next's SWC loader doesn't compile the file first (otherwise `__source` would contain `_jsxDEV(…)` output instead of the authored source).
 
-- **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's *own* chrome (sidebar, tabs, inputs). The components being *documented* come from `@clerk/ui/mosaic`. Don't confuse the two.
+- **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's *own* chrome (sidebar, tabs, inputs). The components being *documented* come from `@clerk/mosaic`. Don't confuse the two.
 
 ## Documenting Mosaic components
 
@@ -85,7 +85,7 @@ export const meta: StoryMeta = {
   title: 'Button', // drives slug + the page <h1>
   label: 'Delete Org', // optional friendlier sidebar text
   status: 'stable', // maturity dot in sidebar + page badge; omit to show no status
-  source: 'packages/ui/src/mosaic/components/button/button.tsx', // repo-root path → "View source"
+  source: 'packages/mosaic/src/components/button/button.tsx', // repo-root path → "View source"
   styles: {
     // Hand-written variant surface — archetype A · simple only
     _variants: { variant: { primary: {}, outline: {} }, size: { sm: {}, md: {} } },
@@ -142,7 +142,7 @@ import * as ButtonStories from './button.stories';
 
 <Usage
   component='Button'
-  module='@clerk/ui/mosaic/components/button'
+  module='@clerk/mosaic/components/button'
 >
   Click me
 </Usage>

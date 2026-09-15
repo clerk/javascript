@@ -19,7 +19,7 @@ import * as BannerStories from './banner.stories';
 ## Usage
 
 ```tsx
-import { Banner } from '@clerk/ui/mosaic/components/banner';
+import { Banner } from '@clerk/mosaic/components/banner';
 
 <Banner.Root color='negative'>
   <Banner.Label>Error banner</Banner.Label>
@@ -41,10 +41,10 @@ import { Banner } from '@clerk/ui/mosaic/components/banner';
 
 ## Styling
 
-Each part carries its stable slot class alongside the generated StyleX atoms and reflects the active color as `data-color`. Override a `.cl-banner-*` class from a CSS layer that wins over `@clerk/ui/styles.css`:
+Each part carries its stable slot class alongside the generated StyleX atoms and reflects the active color as `data-color`. Override a `.cl-banner-*` class from a CSS layer that wins over `@clerk/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-banner-root[data-color='negative'] {

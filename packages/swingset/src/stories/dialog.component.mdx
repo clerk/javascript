@@ -33,8 +33,8 @@ trapping, scroll lock and ARIA wiring come from the primitive.
 ## Usage
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Open dialog</Dialog.Trigger>
@@ -92,9 +92,9 @@ dialog, carries the dismiss, scrolls its own content column, and collapses its o
 full example is under [A profile](#a-profile):
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
@@ -142,7 +142,7 @@ Guard a dialog's close behind a confirmation with a handle, a hook, and `Dialog.
 />
 
 ```tsx
-import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/ui/mosaic/components/dialog';
+import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/mosaic/components/dialog';
 
 const confirm = React.useMemo(() => createConfirmHandle(), []);
 
@@ -269,10 +269,10 @@ machine returning to idle) does not flash through the exit.
 
 ## Styling
 
-Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/ui/styles.css`:
+Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-dialog-popup[data-size='profile'] {

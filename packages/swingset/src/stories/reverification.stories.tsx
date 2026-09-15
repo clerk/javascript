@@ -1,14 +1,14 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import type { ReverificationMethod, ReverificationStep } from '@clerk/ui/mosaic/features/reverification';
-import { otpChannelFor } from '@clerk/ui/mosaic/features/reverification/reverification.utils';
-import { ReverificationView } from '@clerk/ui/mosaic/features/reverification/reverification.view';
-import { ReverificationBackupCode } from '@clerk/ui/mosaic/features/reverification/steps/reverification-backup-code';
-import { ReverificationHelp } from '@clerk/ui/mosaic/features/reverification/steps/reverification-help';
-import { ReverificationMethodPicker } from '@clerk/ui/mosaic/features/reverification/steps/reverification-method-picker';
-import { ReverificationOTP } from '@clerk/ui/mosaic/features/reverification/steps/reverification-otp';
-import { ReverificationPasskey } from '@clerk/ui/mosaic/features/reverification/steps/reverification-passkey';
-import { ReverificationPassword } from '@clerk/ui/mosaic/features/reverification/steps/reverification-password';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import type { ReverificationMethod, ReverificationStep } from '@clerk/mosaic/features/reverification';
+import { otpChannelFor } from '@clerk/mosaic/features/reverification/reverification.utils';
+import { ReverificationView } from '@clerk/mosaic/features/reverification/reverification.view';
+import { ReverificationBackupCode } from '@clerk/mosaic/features/reverification/steps/reverification-backup-code';
+import { ReverificationHelp } from '@clerk/mosaic/features/reverification/steps/reverification-help';
+import { ReverificationMethodPicker } from '@clerk/mosaic/features/reverification/steps/reverification-method-picker';
+import { ReverificationOTP } from '@clerk/mosaic/features/reverification/steps/reverification-otp';
+import { ReverificationPasskey } from '@clerk/mosaic/features/reverification/steps/reverification-passkey';
+import { ReverificationPassword } from '@clerk/mosaic/features/reverification/steps/reverification-password';
 import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -19,7 +19,7 @@ export const meta: StoryMeta = {
   group: 'Reverification',
   status: 'wip',
   title: 'Reverification',
-  source: 'packages/ui/src/mosaic/features/reverification/reverification.view.tsx',
+  source: 'packages/mosaic/src/features/reverification/reverification.view.tsx',
 };
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
@@ -376,10 +376,10 @@ function OTPPanel({
         resend={
           renderResend
             ? {
-                label: isResending ? 'Sending a new code…' : 'Didn’t receive a code? Resend',
-                disabled: isResending,
-                onClick: () => setValue(''),
-              }
+              label: isResending ? 'Sending a new code…' : 'Didn’t receive a code? Resend',
+              disabled: isResending,
+              onClick: () => setValue(''),
+            }
             : undefined
         }
         onValueChange={setValue}
