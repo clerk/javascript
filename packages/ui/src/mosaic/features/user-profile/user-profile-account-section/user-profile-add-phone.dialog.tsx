@@ -89,7 +89,9 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                         value={current.phoneNumber}
                         onValueChange={current.onPhoneNumberChange}
                       />
-                      {current.errorMessage ? <Field.Error>{current.errorMessage}</Field.Error> : null}
+                      <Field.Message>
+                        <Field.Error>{current.errorMessage}</Field.Error>
+                      </Field.Message>
                     </Field.Root>
                   </Card.Content>
                   <Card.Footer>
@@ -133,7 +135,9 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                         onValueChange={current.onCodeChange}
                         onComplete={current.onSubmit}
                       />
-                      {current.errorMessage ? <Field.Error>{current.errorMessage}</Field.Error> : null}
+                      <Field.Message>
+                        <Field.Error>{current.errorMessage}</Field.Error>
+                      </Field.Message>
                       <Button
                         type='button'
                         size='sm'
