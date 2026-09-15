@@ -14,8 +14,10 @@ import type { LoadClerkJWKFromRemoteOptions } from '../tokens/keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../tokens/keys';
 import { OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
 import { TokenType } from '../tokens/tokenTypes';
+import { assertOAuthAudienceClaim } from './assertions';
 
 export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'skipJwksCache'> & {
+  audience?: string | string[];
   jwtKey?: string;
   clockSkewInMs?: number;
 };
@@ -129,6 +131,21 @@ export async function verifyOAuthJwt(
 
   if ('error' in result) {
     return { data: undefined, tokenType: TokenType.OAuthToken, errors: [result.error] };
+  }
+
+  try {
+    assertOAuthAudienceClaim(result.payload.aud, options.audience);
+  } catch (error) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: (error as Error).message,
+        }),
+      ],
+    };
   }
 
   return {

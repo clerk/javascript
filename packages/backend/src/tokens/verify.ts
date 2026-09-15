@@ -11,6 +11,7 @@ import {
   TokenVerificationErrorReason,
 } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
+import { assertOAuthAudienceClaim } from '../jwt/assertions';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
@@ -228,8 +229,21 @@ async function verifyOAuthToken(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken);
+    assertOAuthAudienceClaim(verifiedToken.aud, options.audience);
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
+    if (err instanceof TokenVerificationError) {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message: err.message,
+          }),
+        ],
+      };
+    }
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
   }
 }
