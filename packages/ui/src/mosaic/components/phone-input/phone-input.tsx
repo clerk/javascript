@@ -1,17 +1,17 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
-import * as stylex from '@stylexjs/stylex';
-import React from 'react';
-
-import type { CountryEntry, CountryIso } from '../../../elements/PhoneInput/countryCodeData';
-import { IsoToCountryMap } from '../../../elements/PhoneInput/countryCodeData';
+import type { CountryEntry, CountryIso } from '@clerk/shared/phone';
 import {
   extractDigits,
   formatPhoneNumber,
   getFlagEmojiFromCountryIso,
+  IsoToCountryMap,
   parsePhoneString,
-} from '../../../utils/phoneUtils';
+} from '@clerk/shared/phone';
+import { useMergeRefs } from '@floating-ui/react';
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';

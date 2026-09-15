@@ -1,6 +1,6 @@
-import type { PhoneCodeChannel } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
+import type { PhoneCodeChannel } from '../../types';
 import {
   extractDigits,
   formatPhoneNumber,

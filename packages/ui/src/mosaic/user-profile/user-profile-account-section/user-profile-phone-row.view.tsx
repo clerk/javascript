@@ -1,6 +1,6 @@
+import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useRef, useState } from 'react';
 
-import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Text } from '../../components/text';
