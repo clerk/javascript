@@ -232,28 +232,4 @@ describe('UserProfileEditPasswordView', () => {
     await user.click(saveButton());
     expect(onSubmit).not.toHaveBeenCalled();
   });
-
-  it('explains itself and offers only cancel while an enterprise account is active', async () => {
-    const onSubmit = vi.fn();
-    const onConfirmPasswordChange = vi.fn();
-    const user = userEvent.setup();
-    renderView({ hasActiveEnterpriseAccount: true, onSubmit, onConfirmPasswordChange });
-
-    expect(
-      screen.getByText(
-        'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      ),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(currentPasswordField()).toBeDisabled();
-    expect(newPasswordField()).toBeDisabled();
-    expect(confirmPasswordField()).toBeDisabled();
-    expect(signOutCheckbox()).toBeDisabled();
-    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-
-    await user.type(confirmPasswordField(), 'abc');
-    expect(onConfirmPasswordChange).not.toHaveBeenCalled();
-    expect(onSubmit).not.toHaveBeenCalled();
-  });
 });

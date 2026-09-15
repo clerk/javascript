@@ -33,12 +33,6 @@ export interface UserProfileEditPasswordViewProps {
   hasPassword?: boolean;
   /** Asks for the password being replaced. Off when reverification stands in for it. */
   requiresCurrentPassword?: boolean;
-  /**
-   * Whether the account signs in through an active enterprise connection, which is what stops the
-   * password from changing. The dialog still opens so it can say so, but every field is inert and
-   * only cancel remains.
-   */
-  hasActiveEnterpriseAccount?: boolean;
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
@@ -64,7 +58,6 @@ export function UserProfileEditPasswordView({
   trigger,
   hasPassword = false,
   requiresCurrentPassword = false,
-  hasActiveEnterpriseAccount = false,
   currentPassword,
   newPassword,
   confirmPassword,
@@ -83,11 +76,10 @@ export function UserProfileEditPasswordView({
   const signOutDescriptionId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
-  const inert = isSaving || hasActiveEnterpriseAccount;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSave && !inert) {
+    if (canSave && !isSaving) {
       onSubmit();
     }
   };
@@ -118,11 +110,6 @@ export function UserProfileEditPasswordView({
               />
             }
           >
-            {hasActiveEnterpriseAccount ? (
-              <Banner.Root color='neutral'>
-                <Banner.Label>{m.enterpriseAccount}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             {error?.message ? (
               <Banner.Root
                 role='alert'
@@ -134,7 +121,7 @@ export function UserProfileEditPasswordView({
             {showCurrentPassword ? (
               <PasswordField
                 autoComplete='current-password'
-                disabled={inert}
+                disabled={isSaving}
                 error={error?.fields?.currentPassword}
                 inputRef={initialFocusRef}
                 label={m.currentPasswordLabel}
@@ -144,7 +131,7 @@ export function UserProfileEditPasswordView({
             ) : null}
             <PasswordField
               autoComplete='new-password'
-              disabled={inert}
+              disabled={isSaving}
               error={error?.fields?.newPassword}
               inputRef={showCurrentPassword ? undefined : initialFocusRef}
               label={m.newPasswordLabel}
@@ -153,7 +140,7 @@ export function UserProfileEditPasswordView({
             />
             <PasswordField
               autoComplete='new-password'
-              disabled={inert}
+              disabled={isSaving}
               error={error?.fields?.confirmPassword}
               label={m.confirmPasswordLabel}
               value={confirmPassword}
@@ -163,7 +150,7 @@ export function UserProfileEditPasswordView({
               <input
                 aria-describedby={signOutDescriptionId}
                 checked={signOutOfOtherSessions}
-                disabled={inert}
+                disabled={isSaving}
                 id={signOutId}
                 type='checkbox'
                 {...stylex.props(styles.checkbox)}
@@ -199,17 +186,15 @@ export function UserProfileEditPasswordView({
                 </Button>
               }
             />
-            {hasActiveEnterpriseAccount ? null : (
-              <SubmitButton
-                form={formId}
-                fullWidth
-                isPending={isSaving}
-                disabled={!canSave}
-                focusableWhenDisabled
-              >
-                {m.save}
-              </SubmitButton>
-            )}
+            <SubmitButton
+              form={formId}
+              fullWidth
+              isPending={isSaving}
+              disabled={!canSave}
+              focusableWhenDisabled
+            >
+              {m.save}
+            </SubmitButton>
           </Card.Footer>
         </Card.Root>
       </Dialog.Popup>

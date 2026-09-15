@@ -174,14 +174,6 @@ describe('UserProfileSecurityPanelView', () => {
     });
   });
 
-  it('shows who manages the password in place of an edit action when an enterprise connection owns it', () => {
-    renderView({ managedBy: { name: 'Okta' }, onSubmitPassword: vi.fn(() => Promise.resolve()) });
-
-    expect(screen.getByText('Managed by Okta')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Set password' })).not.toBeInTheDocument();
-  });
-
   it('keeps supported empty authentication methods actionable', () => {
     renderView({
       hasPassword: false,
