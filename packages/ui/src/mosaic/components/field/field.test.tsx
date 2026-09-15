@@ -5,9 +5,10 @@ import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { space } from '../../tokens.stylex';
+import { scrollFadeVars } from '../../tokens.stylex';
 import { Input } from '../input';
 import { Field } from './field';
+import { fieldMessageVars } from './field.vars.stylex';
 
 const overrides = stylex.create({
   root: { display: 'grid' },
@@ -386,7 +387,7 @@ describe('Mosaic Field', () => {
     const probe = stylex.create({
       message: {
         transitionProperty: {
-          default: 'height, margin-top, mask-size',
+          default: 'height, margin-top, --_cl-field-message-fade',
           '@media (prefers-reduced-motion: reduce)': 'none',
         },
         height: {
@@ -423,12 +424,11 @@ describe('Mosaic Field', () => {
   it('fades the clipped edge while the height moves and clears it at rest', () => {
     const probe = stylex.create({
       message: {
-        maskImage: `linear-gradient(to bottom, black calc(100% - ${space['3']}), transparent)`,
-        maskRepeat: 'no-repeat',
-        maskSize: {
-          default: `100% calc(100% + ${space['3']})`,
-          ':where(:not([data-open]), [data-starting-style])': '100% 100%',
+        '--_cl-field-message-fade': {
+          default: 0,
+          ':where(:not([data-open]), [data-starting-style])': 1,
         },
+        maskImage: `linear-gradient(to bottom, #000 calc(100% - ${scrollFadeVars['--cl-scroll-fade-size']}), rgb(0 0 0 / calc(1 - ${fieldMessageVars['--_cl-field-message-fade']})))`,
       },
     });
 
@@ -440,7 +440,7 @@ describe('Mosaic Field', () => {
       </Field.Root>,
     );
 
-    expect(atoms(probe.message)).toHaveLength(4);
+    expect(atoms(probe.message)).toHaveLength(3);
     expect(container.querySelector('.cl-field-message')).toHaveClass(...atoms(probe.message));
   });
 
