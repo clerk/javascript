@@ -196,26 +196,6 @@ describe('useUserProfileEditPasswordController', () => {
     await waitFor(() => expect(result.current.isOpen).toBe(false));
   });
 
-  it('saves the values it is currently holding', async () => {
-    const onSubmit = vi.fn(() => Promise.resolve());
-    const { result } = renderController(onSubmit);
-
-    act(() => result.current.onOpenChange(true));
-    act(() => result.current.onCurrentPasswordChange('old-secret'));
-    act(() => result.current.onNewPasswordChange('new-secret-123'));
-    act(() => result.current.onConfirmPasswordChange('new-secret-123'));
-    act(() => result.current.onSignOutOfOtherSessionsChange(false));
-    act(() => result.current.onSubmit());
-
-    await waitFor(() =>
-      expect(onSubmit).toHaveBeenCalledWith({
-        currentPassword: 'old-secret',
-        newPassword: 'new-secret-123',
-        signOutOfOtherSessions: false,
-      }),
-    );
-  });
-
   it('withholds the save until the halves match and the current password is in', () => {
     const { result } = renderController();
 

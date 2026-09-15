@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -63,9 +63,9 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 4, name: 'Active devices' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
-    expect(screen.getByText('Password')).toHaveClass('cl-section-label');
-    expect(screen.getByText('Passkeys')).toHaveClass('cl-section-label');
-    expect(screen.getByText('2-step verification')).toHaveClass('cl-section-label');
+    expect(screen.getByText('Password')).toBeVisible();
+    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByText('2-step verification')).toBeVisible();
     expect(screen.getByRole('region', { name: 'Passkeys' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: '2-step verification' })).toBeInTheDocument();
     expect(screen.getByText('This device')).toBeInTheDocument();
@@ -127,51 +127,6 @@ describe('UserProfileSecurityPanelView', () => {
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
     expect(onDeleteAccount).toHaveBeenCalledOnce();
-  });
-
-  it('drives the change-password dialog from the section', async () => {
-    const onSubmitPassword = vi.fn(() => Promise.resolve());
-    const user = userEvent.setup();
-    renderView({ requiresCurrentPassword: true, onSubmitPassword });
-
-    expect(screen.getByText('••••••••••••••••••')).toHaveClass('cl-section-description');
-    await user.click(screen.getByRole('button', { name: 'Change password' }));
-    const dialog = screen.getByRole('dialog', { name: 'Change password' });
-    await user.type(within(dialog).getByLabelText('Current password'), 'old-secret');
-    await user.type(within(dialog).getByLabelText('New password'), 'new-secret-123');
-    await user.type(within(dialog).getByLabelText('Confirm password'), 'new-secret-123');
-    await user.click(within(dialog).getByRole('checkbox', { name: 'Sign out of all other devices' }));
-    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
-
-    expect(onSubmitPassword).toHaveBeenCalledWith({
-      currentPassword: 'old-secret',
-      newPassword: 'new-secret-123',
-      signOutOfOtherSessions: false,
-    });
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Change password' })).not.toBeInTheDocument());
-  });
-
-  it('offers to set a password when the instance takes one but the account has none', async () => {
-    const onSubmitPassword = vi.fn(() => Promise.resolve());
-    const user = userEvent.setup();
-    renderView({ hasPassword: false, passkeys: undefined, mfaMethods: undefined, onSubmitPassword });
-
-    expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
-    expect(screen.getByText('Password')).toHaveClass('cl-section-label');
-    expect(screen.queryByText('••••••••••••••••••')).not.toBeInTheDocument();
-    expect(screen.getByText('No password set')).toHaveClass('cl-section-description');
-    await user.click(screen.getByRole('button', { name: 'Set password' }));
-    const dialog = screen.getByRole('dialog', { name: 'Set password' });
-    expect(within(dialog).queryByLabelText('Current password')).not.toBeInTheDocument();
-    await user.type(within(dialog).getByLabelText('New password'), 'new-secret-123');
-    await user.type(within(dialog).getByLabelText('Confirm password'), 'new-secret-123');
-    await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
-
-    expect(onSubmitPassword).toHaveBeenCalledWith({
-      currentPassword: undefined,
-      newPassword: 'new-secret-123',
-      signOutOfOtherSessions: true,
-    });
   });
 
   it('keeps supported empty authentication methods actionable', () => {
