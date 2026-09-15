@@ -1,5 +1,6 @@
 import { Field } from '@clerk/ui/mosaic/components/field';
 import { Input } from '@clerk/ui/mosaic/components/input';
+import { Select } from '@clerk/ui/mosaic/components/select';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -46,6 +47,27 @@ export function VisuallyHiddenLabel() {
         type='search'
         placeholder='Search members'
       />
+    </Field.Root>
+  );
+}
+
+const roles = [
+  { value: 'member', label: 'Member' },
+  { value: 'admin', label: 'Admin' },
+];
+
+export function WithSelect() {
+  return (
+    <Field.Root xstyle={styles.stack}>
+      <Field.Label>Role</Field.Label>
+      <Select.Root
+        items={roles}
+        defaultValue='member'
+      >
+        <Select.Trigger />
+        <Select.Popup />
+      </Select.Root>
+      <Field.Description>Applies to new members of the organization.</Field.Description>
     </Field.Root>
   );
 }

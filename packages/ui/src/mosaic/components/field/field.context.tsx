@@ -1,21 +1,30 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import React from 'react';
 
+/** `label` for natively labelable controls; `span` for a control a `<label>` would activate on click. */
+export type FieldLabelElementType = 'label' | 'span';
+
+interface RegisteredControl {
+  id: string | null;
+  labelElementType: FieldLabelElementType;
+}
+
 interface FieldContextValue {
   controlId: string;
+  labelElementType: FieldLabelElementType;
   disabled: boolean;
   required: boolean;
   invalid: boolean;
   labelIds: string[];
   messageIds: string[];
-  registerControlId: (source: symbol, id: string | null | undefined) => void;
+  registerControlId: (source: symbol, control: RegisteredControl | undefined) => void;
   setLabelIds: React.Dispatch<React.SetStateAction<string[]>>;
   setMessageIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const FieldContext = React.createContext<FieldContextValue | null>(null);
 
-function mergeIds(...values: Array<string | undefined>): string | undefined {
+export function mergeIds(...values: Array<string | undefined>): string | undefined {
   const ids = Array.from(new Set(values.flatMap(value => value?.split(/\s+/).filter(Boolean) ?? [])));
   return ids.length > 0 ? ids.join(' ') : undefined;
 }
@@ -30,16 +39,17 @@ export function FieldProvider({ children, disabled, required, invalid }: FieldPr
   const generatedId = React.useId();
   const defaultControlId = `cl-field-${generatedId}`;
   const [controlId, setControlId] = React.useState(defaultControlId);
+  const [labelElementType, setLabelElementType] = React.useState<FieldLabelElementType>('label');
   const [labelIds, setLabelIds] = React.useState<string[]>([]);
   const [messageIds, setMessageIds] = React.useState<string[]>([]);
-  const controlIds = React.useRef(new Map<symbol, string | null>());
+  const controlIds = React.useRef(new Map<symbol, RegisteredControl>());
   const warnedAboutMultipleControls = React.useRef(false);
   const registerControlId = React.useCallback(
-    (source: symbol, id: string | null | undefined) => {
-      if (id === undefined) {
+    (source: symbol, control: RegisteredControl | undefined) => {
+      if (control === undefined) {
         controlIds.current.delete(source);
       } else {
-        controlIds.current.set(source, id);
+        controlIds.current.set(source, control);
       }
 
       if (
@@ -53,13 +63,16 @@ export function FieldProvider({ children, disabled, required, invalid }: FieldPr
         );
       }
 
-      setControlId(controlIds.current.values().next().value ?? defaultControlId);
+      const first = controlIds.current.values().next().value;
+      setControlId(first?.id ?? defaultControlId);
+      setLabelElementType(first?.labelElementType ?? 'label');
     },
     [defaultControlId],
   );
   const context = React.useMemo<FieldContextValue>(
     () => ({
       controlId,
+      labelElementType,
       disabled,
       required,
       invalid,
@@ -69,7 +82,7 @@ export function FieldProvider({ children, disabled, required, invalid }: FieldPr
       setLabelIds,
       setMessageIds,
     }),
-    [controlId, disabled, required, invalid, labelIds, messageIds, registerControlId],
+    [controlId, labelElementType, disabled, required, invalid, labelIds, messageIds, registerControlId],
   );
 
   return <FieldContext.Provider value={context}>{children}</FieldContext.Provider>;
@@ -100,6 +113,7 @@ interface FieldControlProps {
   ariaInvalid?: React.AriaAttributes['aria-invalid'];
   ariaLabelledBy?: string;
   ariaDescribedBy?: string;
+  labelElementType?: FieldLabelElementType;
 }
 
 export function useOptionalFieldControlProps({
@@ -109,6 +123,7 @@ export function useOptionalFieldControlProps({
   ariaInvalid,
   ariaLabelledBy,
   ariaDescribedBy,
+  labelElementType = 'label',
 }: FieldControlProps) {
   const context = useOptionalFieldContext();
   const registerControlId = context?.registerControlId;
@@ -119,9 +134,9 @@ export function useOptionalFieldControlProps({
       return undefined;
     }
 
-    registerControlId(source.current, id ?? null);
+    registerControlId(source.current, { id: id ?? null, labelElementType });
     return () => registerControlId(source.current, undefined);
-  }, [registerControlId, id]);
+  }, [registerControlId, id, labelElementType]);
 
   if (!context) {
     return null;
