@@ -34,7 +34,7 @@ that would navigate (Manage, Invite, Create organization, Add account) only clos
 `UserButtonView` renders trigger and popup from one prop-driven call:
 
 ```tsx
-import { UserButtonView } from '@clerk/ui/mosaic/user-button/user-button.view';
+import { UserButtonView } from '@clerk/mosaic/user-button/user-button.view';
 
 <UserButtonView
   activeSession={{ sessionId: 'sess_colin', name: 'Colin', identifier: 'colin@clerk.dev' }}
@@ -61,7 +61,7 @@ import {
   UserButtonRoot,
   UserButtonTrigger,
   UserButtonPopup,
-} from '@clerk/ui/mosaic/user-button/user-button.view';
+} from '@clerk/mosaic/user-button/user-button.view';
 
 <UserButtonRoot {...data} {...callbacks}>
   <UserButtonTrigger />

@@ -1,12 +1,12 @@
 import type { RenderProps } from '@clerk/headless/utils';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import type { DialogSize } from '@clerk/ui/mosaic/components/dialog';
-import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/ui/mosaic/components/dialog';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Input } from '@clerk/ui/mosaic/components/input';
-import { Text } from '@clerk/ui/mosaic/components/text';
-import { UserProfileView } from '@clerk/ui/mosaic/user-profile/user-profile.view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import type { DialogSize } from '@clerk/mosaic/components/dialog';
+import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/mosaic/components/dialog';
+import { Heading } from '@clerk/mosaic/components/heading';
+import { Input } from '@clerk/mosaic/components/input';
+import { Text } from '@clerk/mosaic/components/text';
+import { UserProfileView } from '@clerk/mosaic/user-profile/user-profile.view';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -21,7 +21,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Dialog',
-  source: 'packages/ui/src/mosaic/components/dialog/dialog.tsx',
+  source: 'packages/mosaic/src/components/dialog/dialog.tsx',
   styles: {
     _variants: {
       size: { prompt: {}, card: {}, profile: {} },
