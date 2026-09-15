@@ -18,7 +18,6 @@ export interface UserProfileContactListRowViewProps {
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (id: string) => void;
-  renderActionDialog?: (item: { id: string; value: string }) => ReactNode;
 }
 
 export function UserProfileContactListRowView({
@@ -30,7 +29,6 @@ export function UserProfileContactListRowView({
   onSetPrimary,
   onRemove,
   addAction,
-  renderActionDialog,
 }: UserProfileContactListRowViewProps) {
   const emptyDescription = m[kind].empty;
 
@@ -102,9 +100,7 @@ export function UserProfileContactListRowView({
                     <UserProfileActionMenu
                       actions={actions}
                       label={fill(m.manageValue, { value: item.value })}
-                    >
-                      {renderActionDialog?.(item)}
-                    </UserProfileActionMenu>
+                    />
                   </Section.Actions>
                 ) : null}
               </Section.Item>
