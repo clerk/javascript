@@ -25,8 +25,8 @@ test.describe('Keyless mode @tanstack-react-start', () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    // Without keys the app 500s on every request, so readiness can't wait for a 2xx
-    await app.dev({ acceptAnyResponse: true });
+    // Without keys the app 500s on every request (opaque JSON body), so readiness can't wait for a 2xx and the error is asserted from the detached server's stderr file
+    await app.dev({ acceptAnyResponse: true, detached: true });
   });
 
   test.afterAll(async () => {
@@ -38,8 +38,11 @@ test.describe('Keyless mode @tanstack-react-start', () => {
   }) => {
     const response = await page.goto(`${app.serverUrl}/`);
     expect(response?.status()).toBe(500);
-    await expect(page.getByText('Publishable key is missing').first()).toBeVisible();
-    await expect(page.getByText('npx clerk@latest init').first()).toBeVisible();
+
+    const stderrLogs = (await fs.readdir(app.appDir)).filter(f => f.endsWith('.err.log'));
+    const stderr = (await Promise.all(stderrLogs.map(f => fs.readFile(path.join(app.appDir, f), 'utf-8')))).join('\n');
+    expect(stderr).toContain('Publishable key is missing');
+    expect(stderr).toContain('npx clerk@latest init');
   });
 
   test('Claimed application with keys inside .env boots and serves the app.', async ({ page, context }) => {
