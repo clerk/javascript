@@ -29,6 +29,24 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
+  it('hides connected accounts when only providers without a connect callback are supplied', () => {
+    renderView({
+      connectedAccounts: [],
+      availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
+    });
+    expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
+  });
+
+  it('keeps available providers visible without connected accounts', () => {
+    const onConnectAccount = vi.fn();
+    renderView({
+      connectedAccounts: [],
+      availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
+      onConnectAccount,
+    });
+    expect(screen.getByRole('button', { name: 'Connect Google' })).toBeVisible();
+  });
+
   it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
     renderView({
       allowMultipleAccounts,
@@ -196,44 +214,33 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('renders connected accounts and the danger zone when provided', async () => {
-    const onConnectAccount = vi.fn();
-    const onManageConnectedAccount = vi.fn();
+    const onRemoveConnectedAccount = vi.fn();
     const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
     renderView({
       connectedAccounts: [
         { id: 'google', provider: 'Google', identifier: 'test@google.com', iconUrl: 'https://example.com/google.svg' },
-        { id: 'apple', provider: 'Apple', connected: false },
       ],
-      onConnectAccount,
-      onManageConnectedAccount,
+      onRemoveConnectedAccount,
       onDeleteAccount,
     });
 
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('region', { name: 'Connected accounts' }).querySelector('.cl-section-media[data-size="lg"] img'),
-    ).toHaveAttribute('src', 'https://example.com/google.svg');
+    expect(screen.getByText('Google')).toBeVisible();
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
-    expect(onManageConnectedAccount).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
-    await user.click(screen.getByRole('button', { name: 'Connect' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
     const deleteDialog = screen.getByRole('dialog');
     await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
     await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
-    expect(onManageConnectedAccount).toHaveBeenCalledWith('google');
-    expect(onConnectAccount).toHaveBeenCalledWith('apple');
     expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
-  it('renders provider images in icon frames', () => {
+  it('renders connected provider and Web3 images inside icon frames', () => {
     const { container } = renderView({
       connectedAccounts: [{ id: 'google', provider: 'Google', iconUrl: '/google.svg' }],
       web3Wallets: [{ id: 'metamask', provider: 'MetaMask', iconUrl: '/metamask.svg' }],
@@ -242,6 +249,7 @@ describe('UserProfileProfilePanelView', () => {
     const frames = container.querySelectorAll('.cl-icon-frame');
     const images = container.querySelectorAll('img');
     expect(frames).toHaveLength(2);
+    expect(screen.queryByRole('img', { name: 'Google' })).not.toBeInTheDocument();
     expect(frames[0]).toContainElement(images[0]);
     expect(frames[1]).toContainElement(images[1]);
     frames.forEach(frame => expect(frame.closest('.cl-section-media')).toHaveAttribute('data-size', 'lg'));
@@ -459,6 +467,12 @@ describe('UserProfileProfilePanelView', () => {
     const removeConnectedAccount = screen.getByRole('menuitem', { name: 'Remove' });
     expect(removeConnectedAccount).toHaveAttribute('data-color', 'negative');
     await user.click(removeConnectedAccount);
+    expect(onRemoveConnectedAccount).not.toHaveBeenCalled();
+    await user.click(
+      within(screen.getByRole('alertdialog', { name: 'Remove connected account' })).getByRole('button', {
+        name: 'Remove',
+      }),
+    );
     expect(onRemoveConnectedAccount).toHaveBeenCalledWith('github');
   });
 

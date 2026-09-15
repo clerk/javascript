@@ -10,6 +10,7 @@ import type { StoryMeta } from '@/lib/types';
 import { usePreviewImage } from './fixtures/use-preview-image';
 import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
+import { useConnectedAccountsFixture } from './fixtures/user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 
@@ -36,6 +37,7 @@ export function Default(_args: Record<string, unknown>) {
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage(profileImageUrl);
+  const connections = useConnectedAccountsFixture();
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
   const emailFlow = createUserProfileAddEmailFixture({
@@ -49,16 +51,9 @@ export function Default(_args: Record<string, unknown>) {
       {...emailFlow}
       allowMultipleAccounts
       emails={emails}
-      connectedAccounts={[
-        {
-          id: 'google',
-          provider: 'Google',
-          identifier: 'test@google.com',
-          iconUrl: providerIconUrl('google'),
-          connected: true,
-        },
-        { id: 'apple', provider: 'Apple', iconUrl: providerIconUrl('apple'), connected: false },
-      ]}
+      connectedAccounts={connections.accounts}
+      availableConnectionProviders={connections.availableProviders}
+      onReconnectAccount={connections.onReconnect}
       web3Wallets={[
         {
           id: 'metamask',
@@ -81,12 +76,12 @@ export function Default(_args: Record<string, unknown>) {
       {...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       })}
-      onConnectAccount={() => undefined}
+      onConnectAccount={connections.onConnect}
       onDeleteAccount={() => Promise.resolve()}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
       onProfilePictureChange={showFile}
-      onRemoveConnectedAccount={() => undefined}
+      onRemoveConnectedAccount={connections.onRemove}
       onRemoveProfilePicture={clearImage}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
