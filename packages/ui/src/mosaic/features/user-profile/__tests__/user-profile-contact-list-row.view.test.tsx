@@ -5,6 +5,23 @@ import { describe, expect, it, vi } from 'vitest';
 import { UserProfileContactListRowView } from '../user-profile-account-section/user-profile-contact-list-row.view';
 
 describe('UserProfileContactListRowView', () => {
+  it('lists the primary item first, keeping the rest in the given order', () => {
+    render(
+      <UserProfileContactListRowView
+        kind='phone'
+        label='Phones'
+        items={[
+          { id: 'contact_1', value: 'First' },
+          { id: 'contact_2', value: 'Second', isDefault: true },
+          { id: 'contact_3', value: 'Third' },
+        ]}
+      />,
+    );
+
+    const values = screen.getAllByText(/^(First|Second|Third)$/).map(element => element.textContent);
+    expect(values).toEqual(['Second', 'First', 'Third']);
+  });
+
   it.each(['email', 'phone'] as const)('hides the menu when no %s action applies', kind => {
     const onVerify = vi.fn();
     const onSetPrimary = vi.fn();
