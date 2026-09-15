@@ -53,6 +53,8 @@
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map",
     "no-rhc"
   ],
   "scripts": {
