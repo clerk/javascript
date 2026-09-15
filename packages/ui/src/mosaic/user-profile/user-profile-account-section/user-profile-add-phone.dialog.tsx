@@ -1,7 +1,7 @@
+import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
-import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogTriggerProps } from '../../components/dialog';
