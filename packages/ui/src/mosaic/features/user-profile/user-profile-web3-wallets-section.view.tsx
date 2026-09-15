@@ -89,7 +89,7 @@ function describeWalletRemoval(wallet: UserProfileWeb3Wallet) {
         <>
           <br />
           <br />
-          <span>{m.removeDialog.signInWarning}</span>
+          {m.removeDialog.signInWarning}
         </>
       ) : null}
     </>

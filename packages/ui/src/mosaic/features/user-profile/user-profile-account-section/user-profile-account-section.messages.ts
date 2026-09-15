@@ -1,9 +1,4 @@
 /**
- * Every string the surface renders. Shaped the way `@clerk/i18n` takes a base definition, so
- * localizing this component is a matter of registering the namespace and swapping the reads for
- * `useMessages('userProfileAccountSection', userProfileAccountSectionBase)`, not of hunting the
- * literals down first.
- *
  * A parameterized message is its template, the way `params()` takes it. `fill` below resolves them
  * until that layer lands.
  *
@@ -61,10 +56,8 @@ export const userProfileAccountSectionBase = {
     verify: 'Verify',
     remove: 'Remove email',
     primaryError: 'Unable to set the primary email address. Try again.',
-    removeError: 'Unable to remove this email address. Try again.',
     removeDialog: {
       title: 'Remove email address?',
-      description: '{emailAddress} will be removed from your account. You won’t be able to use it to sign in.',
       confirm: 'Remove',
       cancel: 'Cancel',
     },
@@ -77,10 +70,8 @@ export const userProfileAccountSectionBase = {
     verify: 'Verify phone number',
     remove: 'Remove phone number',
     primaryError: 'Unable to set the primary phone number. Try again.',
-    removeError: 'Unable to remove this phone number. Try again.',
     removeDialog: {
       title: 'Remove phone number?',
-      description: '{phoneNumber} will be removed from your account. You won’t be able to use it to sign in.',
       confirm: 'Remove',
       cancel: 'Cancel',
     },

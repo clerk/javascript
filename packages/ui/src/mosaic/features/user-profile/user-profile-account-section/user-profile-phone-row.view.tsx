@@ -1,4 +1,3 @@
-import * as stylex from '@stylexjs/stylex';
 import { useMemo, useRef, useState } from 'react';
 
 import { stringToFormattedPhoneString } from '../../../../utils/phoneUtils';
@@ -6,7 +5,6 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { styles } from '../user-profile-profile-panel.styles';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
@@ -149,12 +147,10 @@ function AddPhone({ options, compact }: { options: UserProfileAddPhoneController
 }
 
 function describePhoneRemoval(phone: UserProfilePhone) {
-  const [beforePhone, afterPhone] = m.phone.removeDialog.description.split('{phoneNumber}');
   return (
     <>
-      {beforePhone}
-      <strong {...stylex.props(styles.confirmPhoneNumber)}>{stringToFormattedPhoneString(phone.value)}</strong>
-      {afterPhone}
+      <strong>{stringToFormattedPhoneString(phone.value)}</strong> will be removed from your account. You won’t be able
+      to use it to sign in.
     </>
   );
 }

@@ -32,7 +32,6 @@ export function UserProfileVerifyEmailLinkDialog({
   resendSeconds = 0,
   errorMessage,
 }: UserProfileVerifyEmailLinkDialogProps) {
-  const [beforeEmail, afterEmail] = m.description.split('{emailAddress}');
   const [beforeSeconds, afterSeconds] = m.resendCountdown.split('{seconds}');
 
   return (
@@ -68,9 +67,7 @@ export function UserProfileVerifyEmailLinkDialog({
             </div>
             <div {...stylex.props(styles.details)}>
               <Card.Description>
-                {beforeEmail}
-                <strong {...stylex.props(styles.emphasis, styles.emailAddress)}>{emailAddress}</strong>
-                {afterEmail}
+                A verification link was sent to <strong>{emailAddress}</strong>
               </Card.Description>
               <Button
                 type='button'
