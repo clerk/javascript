@@ -2,8 +2,8 @@ import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
 import type { CustomPage, OrganizationResource, UserResource } from '@clerk/shared/types';
+import { populateParamFromObject } from '@clerk/shared/url';
 
-import { populateParamFromObject } from '../../contexts/utils';
 import { useOrganizationListInView } from '../../hooks/useOrganizationListInView';
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../hooks/useMosaicRouter';
