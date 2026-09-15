@@ -6,9 +6,12 @@ import type {
   DirectorySyncJSONSnapshot,
   DirectorySyncProvider,
   DirectorySyncResource,
+  DirectorySyncStatusJSON,
+  DirectorySyncStatusResource,
   DirectorySyncUserJSON,
   DirectorySyncUserResource,
   GetDirectorySyncUsersParams,
+  SetDirectorySyncCredentialsParams,
   UpdateDirectorySyncParams,
 } from '@clerk/shared/types';
 
@@ -27,6 +30,7 @@ export class DirectorySync extends BaseResource implements DirectorySyncResource
   enabled!: boolean;
   groupRoleMappingEnabled!: boolean;
   attributeMapping: Record<string, string> = {};
+  credentialsConfigured: boolean | null = null;
   apiKey: string | null = null;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
@@ -83,6 +87,47 @@ export class DirectorySync extends BaseResource implements DirectorySyncResource
     return new DeletedObject(json);
   };
 
+  setCredentials = async (params: SetDirectorySyncCredentialsParams): Promise<DirectorySyncResource> => {
+    const json = (
+      await BaseResource._fetch<DirectorySyncJSON>({
+        path: `${this.directoryPath}/credentials`,
+        method: 'POST',
+        body: {
+          service_account_json: params.serviceAccountJson,
+          subject_email: params.subjectEmail,
+        } as any,
+      })
+    )?.response as unknown as DirectorySyncJSON;
+
+    // The credential is deliberately not kept on the resource. It is an input
+    // only; the server stores it and reports `credentials_configured` back.
+    return new DirectorySync(json, this.organizationId);
+  };
+
+  sync = async (): Promise<void> => {
+    await BaseResource._fetch({
+      path: `${this.directoryPath}/sync`,
+      method: 'POST',
+    });
+  };
+
+  getSyncStatus = async (): Promise<DirectorySyncStatusResource> => {
+    // Not a Clerk resource — it has no id or object — so it is fetched
+    // untyped and cast, the same way getUsers handles its paginated payload.
+    const res = await BaseResource._fetch({
+      path: `${this.directoryPath}/sync_status`,
+      method: 'GET',
+    });
+
+    const json = res?.response as unknown as DirectorySyncStatusJSON | undefined;
+
+    return {
+      lastSyncedAt: json?.last_synced_at ? unixEpochToDate(json.last_synced_at) : null,
+      lastSyncStatus: json?.last_sync_status ?? null,
+      lastSyncError: json?.last_sync_error ?? null,
+    };
+  };
+
   getUsers = async (
     params?: GetDirectorySyncUsersParams,
   ): Promise<ClerkPaginatedResponse<DirectorySyncUserResource>> => {
@@ -113,6 +158,7 @@ export class DirectorySync extends BaseResource implements DirectorySyncResource
     this.enabled = data.enabled;
     this.groupRoleMappingEnabled = data.group_role_mapping_enabled;
     this.attributeMapping = data.attribute_mapping ?? {};
+    this.credentialsConfigured = data.credentials_configured ?? null;
     this.apiKey = data.api_key ?? null;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
@@ -131,6 +177,7 @@ export class DirectorySync extends BaseResource implements DirectorySyncResource
       enabled: this.enabled,
       group_role_mapping_enabled: this.groupRoleMappingEnabled,
       attribute_mapping: this.attributeMapping,
+      credentials_configured: this.credentialsConfigured,
       // The bearer token is deliberately absent: snapshots may be persisted
       // and the secret must never outlive the response it arrived on.
       created_at: this.createdAt?.getTime() ?? 0,
