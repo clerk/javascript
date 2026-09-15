@@ -5,6 +5,7 @@ import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { space } from '../../tokens.stylex';
 import { Input } from '../input';
 import { Field } from './field';
 
@@ -385,7 +386,7 @@ describe('Mosaic Field', () => {
     const probe = stylex.create({
       message: {
         transitionProperty: {
-          default: 'height, margin-top',
+          default: 'height, margin-top, mask-size',
           '@media (prefers-reduced-motion: reduce)': 'none',
         },
         height: {
@@ -417,6 +418,30 @@ describe('Mosaic Field', () => {
     expect(error).toHaveClass(...atoms(probe.feedback));
     expect(error).toHaveAttribute('data-open');
     expect(error).toHaveAttribute('data-starting-style');
+  });
+
+  it('fades the clipped edge while the height moves and clears it at rest', () => {
+    const probe = stylex.create({
+      message: {
+        maskImage: `linear-gradient(to bottom, black calc(100% - ${space['3']}), transparent)`,
+        maskRepeat: 'no-repeat',
+        maskSize: {
+          default: `100% calc(100% + ${space['3']})`,
+          ':where(:not([data-open]), [data-starting-style])': '100% 100%',
+        },
+      },
+    });
+
+    const { container } = render(
+      <Field.Root>
+        <Field.Message>
+          <Field.Error>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(atoms(probe.message)).toHaveLength(4);
+    expect(container.querySelector('.cl-field-message')).toHaveClass(...atoms(probe.message));
   });
 
   it('renders nothing without a message', () => {

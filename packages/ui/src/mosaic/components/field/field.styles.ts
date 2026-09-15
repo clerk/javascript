@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, durationVars, easingVars, fontWeightVars, space } from '../../tokens.stylex';
 
 const ROOT_GAP = space['2'];
+const MESSAGE_FADE = space['3'];
 
 export const styles = stylex.create({
   root: {
@@ -24,10 +25,16 @@ export const styles = stylex.create({
     overflow: 'clip',
     alignContent: 'start',
     display: 'grid',
+    maskImage: `linear-gradient(to bottom, black calc(100% - ${MESSAGE_FADE}), transparent)`,
+    maskRepeat: 'no-repeat',
+    maskSize: {
+      default: `100% calc(100% + ${MESSAGE_FADE})`,
+      ':where(:not([data-open]), [data-starting-style])': '100% 100%',
+    },
     position: 'relative',
     transitionDuration: durationVars['--cl-duration-slow'],
     transitionProperty: {
-      default: 'height, margin-top',
+      default: 'height, margin-top, mask-size',
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
     transitionTimingFunction: easingVars['--cl-ease-enter'],
