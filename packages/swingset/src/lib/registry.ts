@@ -32,6 +32,11 @@ import {
   Scrolling as ComboboxScrolling,
 } from '../stories/combobox.stories';
 import {
+  Default as ConfirmationDefault,
+  meta as confirmationMeta,
+  WithError as ConfirmationWithError,
+} from '../stories/confirmation.stories';
+import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
   WithError as DestructiveWithError,
@@ -528,6 +533,12 @@ const userProfileDeleteSectionModule: StoryModule = {
   WithError: UserProfileDeleteSectionWithError,
 };
 
+const confirmationModule: StoryModule = {
+  meta: confirmationMeta,
+  Default: ConfirmationDefault,
+  WithError: ConfirmationWithError,
+};
+
 const destructiveModule: StoryModule = {
   meta: destructiveMeta,
   Default: DestructiveDefault,
@@ -580,6 +591,7 @@ export const registry: StoryModule[] = [
   // Reverification
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
+  confirmationModule,
   destructiveModule,
   // Components
   avatarModule,
