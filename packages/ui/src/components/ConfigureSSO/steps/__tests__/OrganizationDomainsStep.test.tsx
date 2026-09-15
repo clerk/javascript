@@ -101,7 +101,7 @@ describe('OrganizationDomainsStep domain selection', () => {
     await renderStep();
 
     expect(screen.getByRole('checkbox', { name: 'Use taken.com for this connection' })).toBeDisabled();
-    expect(screen.getByText('Used by Google Workspace')).toBeInTheDocument();
+    expect(screen.getByText('Used by another connection')).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: 'Use acme.com for this connection' })).toBeEnabled();
   });
 

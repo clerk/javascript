@@ -496,9 +496,7 @@ const DomainCard = ({
               elementDescriptor={descriptors.configureSSOVerifyDomainCardBadge}
               elementId={descriptors.configureSSOVerifyDomainCardBadge.setId('claimed')}
               colorScheme='primary'
-              localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__claimed', {
-                connection: claimedBy,
-              })}
+              localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__claimed')}
             />
           )}
 

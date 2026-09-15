@@ -828,7 +828,7 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
-        badge__claimed: 'Used by {{connection}}',
+        badge__claimed: 'Used by another connection',
         badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
