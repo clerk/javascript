@@ -279,6 +279,12 @@ export type ElementsConfig = {
   formHeaderSubtitle: WithOptions<never, ErrorState>;
   formResendCodeLink: WithOptions;
 
+  actionBlockedIconBox: WithOptions;
+  actionBlockedIcon: WithOptions;
+  actionBlockedLink: WithOptions;
+  actionBlockedTraceIdBox: WithOptions;
+  actionBlockedTraceIdLabel: WithOptions;
+  actionBlockedTraceId: WithOptions;
   verificationLinkStatusBox: WithOptions;
   verificationLinkStatusIconBox: WithOptions;
   verificationLinkStatusIcon: WithOptions;

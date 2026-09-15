@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const bnIN: LocalizationResource = {
   locale: 'bn-IN',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'নতুন কী যোগ করুন',
     action__search: 'কী অনুসন্ধান করুন',

@@ -7,6 +7,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 
 import { withRedirectToAfterSignIn } from '../../common';
+import { ActionBlockedCard } from '../../common';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import {
   Box,
@@ -106,6 +107,13 @@ function SignInProtectCheckInternal(): JSX.Element | null {
   // below every hook call.
   if (!signIn.protectCheck && !everSawProtectCheck) {
     return null;
+  }
+
+  // A block that arrives HERE is still terminal: the challenge was submitted and
+  // denied, so there is nothing to retry, and the runner's inline error would
+  // otherwise offer a Retry button for something that cannot succeed.
+  if (card.blockedDetails) {
+    return <ActionBlockedCard details={card.blockedDetails} />;
   }
 
   return (

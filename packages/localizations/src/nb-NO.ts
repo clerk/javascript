@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Legg til ny nøkkel',
     action__search: 'Søk i nøkler',

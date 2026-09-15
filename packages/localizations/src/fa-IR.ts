@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const faIR: LocalizationResource = {
   locale: 'fa-IR',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'افزودن کلید جدید',
     action__search: 'جستجوی کلیدها',

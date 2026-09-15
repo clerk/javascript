@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Bæta við lykli',
     action__search: 'Leita að lyklum',

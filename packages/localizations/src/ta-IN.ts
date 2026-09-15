@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const taIN: LocalizationResource = {
   locale: 'ta-IN',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'புதிய விசையைச் சேர்',
     action__search: 'விசைகளைத் தேடு',
