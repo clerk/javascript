@@ -537,9 +537,9 @@ export default tseslint.config([
     },
   },
   {
-    name: 'packages/ui/mosaic',
-    files: ['packages/ui/src/mosaic/**/*'],
-    ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
+    name: 'packages/mosaic',
+    files: ['packages/mosaic/src/**/*'],
+    ignores: ['packages/mosaic/src/__tests__/**'],
     plugins: {
       '@stylexjs': pluginStylex,
     },
@@ -604,8 +604,8 @@ export default tseslint.config([
     // is compile-time and cannot inline a `hover()`/`motionSafe()` helper imported into `create`,
     // so the media-query restrictions above (an Emotion-runtime convention) can't apply here. The
     // `@stylexjs/*` rules from the mosaic block still cover these files.
-    name: 'packages/ui/mosaic - stylex styles',
-    files: ['packages/ui/src/mosaic/**/*.styles.ts'],
+    name: 'packages/mosaic - stylex styles',
+    files: ['packages/mosaic/src/**/*.styles.ts'],
     rules: {
       'no-restricted-syntax': 'off',
     },

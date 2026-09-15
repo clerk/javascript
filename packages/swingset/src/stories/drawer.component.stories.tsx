@@ -1,9 +1,9 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { Drawer } from '@clerk/ui/mosaic/components/drawer';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Text } from '@clerk/ui/mosaic/components/text';
-import { UserProfileView } from '@clerk/ui/mosaic/user-profile/user-profile.view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { Drawer } from '@clerk/mosaic/components/drawer';
+import { Heading } from '@clerk/mosaic/components/heading';
+import { Text } from '@clerk/mosaic/components/text';
+import { UserProfileView } from '@clerk/mosaic/user-profile/user-profile.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -17,7 +17,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Drawer',
-  source: 'packages/ui/src/mosaic/components/drawer/drawer.tsx',
+  source: 'packages/mosaic/src/components/drawer/drawer.tsx',
 };
 
 function SheetContent() {

@@ -11,8 +11,8 @@ against a fake object instead of a mocked Clerk.
 
 Worked examples:
 
-- `packages/ui/src/mosaic/user-button/user-button.controller.tsx` — wraps a model
-- `packages/ui/src/mosaic/user-profile/user-profile-delete-section/user-profile-delete-section.controller.ts`
+- `packages/mosaic/src/user-button/user-button.controller.tsx` — wraps a model
+- `packages/mosaic/src/user-profile/user-profile-delete-section/user-profile-delete-section.controller.ts`
   — takes its one effect as a prop
 
 See `references/mosaic-architecture.md` → "Controllers" for the layer contract.
@@ -55,7 +55,7 @@ later is a change to one file. Don't front-load a machine for a flow that has
 not earned one; don't leave a coordinated async flow in flag soup because it
 started as one boolean.
 
-`packages/ui/src/mosaic/machine/ADOPTION.md` is the full criteria, including its
+`packages/mosaic/src/machine/ADOPTION.md` is the full criteria, including its
 "honest boundary" table of what stays `useState` inside a component that does
 have a machine.
 

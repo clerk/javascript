@@ -1,10 +1,10 @@
-import type { UserProfileFormError } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
+import type { UserProfileFormError } from '@clerk/mosaic/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
-} from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
-import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
+} from '@clerk/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
+import { UserProfileAccountSectionView } from '@clerk/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
+import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -22,7 +22,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileAccountSection',
   label: 'Account',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
+  source: 'packages/mosaic/src/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
 };
 
 function AccountSection({

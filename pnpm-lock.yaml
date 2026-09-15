@@ -845,6 +845,49 @@ importers:
         specifier: workspace:^
         version: link:../shared
 
+  packages/mosaic:
+    dependencies:
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
+    devDependencies:
+      '@clerk/headless':
+        specifier: workspace:^
+        version: link:../headless
+      '@floating-ui/react':
+        specifier: catalog:repo
+        version: 0.27.20(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@stylexjs/eslint-plugin':
+        specifier: 0.19.0
+        version: 0.19.0
+      '@stylexjs/rollup-plugin':
+        specifier: 0.19.0
+        version: 0.19.0
+      '@stylexjs/stylex':
+        specifier: 0.19.0
+        version: 0.19.0
+      '@stylexjs/unplugin':
+        specifier: 0.19.0
+        version: 0.19.0(unplugin@3.3.0(@rspack/core@2.0.6)(esbuild@0.28.1)(rolldown@1.1.0)(rollup@4.61.0)(vite@8.2.2(@types/node@25.6.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.28.1)))
+      '@types/react':
+        specifier: catalog:react
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: catalog:react
+        version: 18.3.7(@types/react@18.3.28)
+      bundlewatch:
+        specifier: ^0.4.2
+        version: 0.4.2
+      react:
+        specifier: 18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: 18.3.1
+        version: 18.3.1(react@18.3.1)
+      tsdown:
+        specifier: catalog:repo
+        version: 0.22.2(@arethetypeswrong/core@0.18.2)(publint@0.3.18)(tsx@4.20.6)(typescript@6.0.3)(unrun@0.3.1(synckit@0.11.11))(vue-tsc@3.2.4(typescript@6.0.3))
+
   packages/msw:
     dependencies:
       '@clerk/shared':
@@ -1056,9 +1099,9 @@ importers:
       '@clerk/headless':
         specifier: workspace:*
         version: link:../headless
-      '@clerk/ui':
+      '@clerk/mosaic':
         specifier: workspace:*
-        version: link:../ui
+        version: link:../mosaic
       '@stylexjs/stylex':
         specifier: 0.19.0
         version: 0.19.0
@@ -1230,9 +1273,6 @@ importers:
       '@solana/wallet-standard':
         specifier: catalog:module-manager
         version: 1.1.4(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10))(bs58@6.0.0)(react@18.3.1)
-      '@stylexjs/stylex':
-        specifier: 0.19.0
-        version: 0.19.0
       '@swc/helpers':
         specifier: catalog:repo
         version: 0.5.21
@@ -1261,9 +1301,6 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
-      '@clerk/headless':
-        specifier: workspace:^
-        version: link:../headless
       '@floating-ui/react-dom':
         specifier: ^2.1.8
         version: 2.1.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1282,15 +1319,6 @@ importers:
       '@rspack/plugin-react-refresh':
         specifier: catalog:rspack
         version: 2.0.1(@rspack/core@2.0.6(@swc/helpers@0.5.21))(react-refresh@0.17.0)
-      '@stylexjs/eslint-plugin':
-        specifier: 0.19.0
-        version: 0.19.0
-      '@stylexjs/rollup-plugin':
-        specifier: 0.19.0
-        version: 0.19.0
-      '@stylexjs/unplugin':
-        specifier: 0.19.0
-        version: 0.19.0(unplugin@2.3.11)
       '@svgr/rollup':
         specifier: ^8.1.0
         version: 8.1.0(rollup@4.61.0)(typescript@6.0.3)
@@ -20933,6 +20961,19 @@ snapshots:
       browserslist: 4.28.8
       lightningcss: 1.33.0
       unplugin: 2.3.11
+    transitivePeerDependencies:
+      - supports-color
+
+  '@stylexjs/unplugin@0.19.0(unplugin@3.3.0(@rspack/core@2.0.6)(esbuild@0.28.1)(rolldown@1.1.0)(rollup@4.61.0)(vite@8.2.2(@types/node@25.6.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.28.1)))':
+    dependencies:
+      '@babel/core': 7.29.7
+      '@babel/plugin-syntax-flow': 7.27.1(@babel/core@7.29.7)
+      '@babel/plugin-syntax-jsx': 7.29.7(@babel/core@7.29.7)
+      '@babel/plugin-syntax-typescript': 7.29.7(@babel/core@7.29.7)
+      '@stylexjs/babel-plugin': 0.19.0
+      browserslist: 4.28.8
+      lightningcss: 1.33.0
+      unplugin: 3.3.0(@rspack/core@2.0.6)(esbuild@0.28.1)(rolldown@1.1.0)(rollup@4.61.0)(vite@8.2.2(@types/node@25.6.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.28.1))
     transitivePeerDependencies:
       - supports-color
 
