@@ -12,7 +12,7 @@ export type AddDomainParams = {
    * The new domain name. For development instances, can contain the port, e.g., `myhostname:3000`. For production instances, must be a valid FQDN, e.g., `mysite.com`. Cannot contain protocol scheme.
    */
   name: string;
-  /** Whether the new domain is a satellite domain. Set to `false` to add the first custom primary domain to a production instance with an active provider domain. */
+  /** Whether the new domain is a satellite domain. Set to `false` when migrating a production instance from a `.vercel.app` or `.replit.app` domain to its first custom primary domain. */
   is_satellite: boolean;
   /** The proxy URL for the domain. Applicable only to production instances. */
   proxy_url?: string | null;
@@ -42,7 +42,7 @@ export class DomainAPI extends AbstractAPI {
   /**
    * Adds a [satellite domain](https://clerk.com/docs/guides/dashboard/dns-domains/satellite-domains) or the first custom primary domain to the instance.
    *
-   * To migrate a production instance from an active provider domain to a custom primary domain, set `is_satellite` to `false`. The custom domain becomes active, and the provider domain remains attached. Additional custom primary domains are not supported.
+   * To replace a production instance's `.vercel.app` or `.replit.app` primary domain with a custom primary domain, set `is_satellite` to `false`. The custom domain becomes the instance's active domain, and the original domain remains attached. Additional custom primary domains are not supported.
    * @returns The created [`Domain`](https://clerk.com/docs/reference/backend/types/domain) object.
    */
   public async add(params: AddDomainParams) {
