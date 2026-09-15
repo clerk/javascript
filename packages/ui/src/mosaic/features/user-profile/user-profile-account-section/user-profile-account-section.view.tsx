@@ -4,24 +4,19 @@ import * as stylex from '@stylexjs/stylex';
 import { Section } from '../../../components/section';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import { styles } from './user-profile-account-section.styles';
-import type { UserProfileNameAttribute, UserProfilePhone } from './user-profile-account-section.types';
-import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
-import { UserProfileContactRowView } from './user-profile-contact-row.view';
+import type {
+  UserProfileEmail,
+  UserProfileNameAttribute,
+  UserProfilePhone,
+} from './user-profile-account-section.types';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
+import { UserProfileEmailRowView } from './user-profile-email-row.view';
 import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePhoneRowView } from './user-profile-phone-row.view';
 import { UserProfilePictureRowView } from './user-profile-picture-row.view';
 import { UserProfileUsernameRowView } from './user-profile-username-row.view';
 
-export type { UserProfilePhone } from './user-profile-account-section.types';
-
-export interface UserProfileEmail {
-  id: string;
-  value: string;
-  isDefault?: boolean;
-  isVerified?: boolean;
-  canRemove?: boolean;
-}
+export type { UserProfileEmail, UserProfilePhone } from './user-profile-account-section.types';
 
 export interface UserProfileAccountSectionViewProps {
   allowMultipleAccounts?: boolean;
@@ -47,10 +42,12 @@ export interface UserProfileAccountSectionViewProps {
   onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
   onSubmitUsername?: (username: string) => Promise<void>;
   onAddEmail?: () => void;
+  onSendEmailCode?: (emailAddress: string) => Promise<void>;
+  onVerifyEmailCode?: (emailAddress: string, code: string) => Promise<void>;
   onManageEmail?: (id: string) => void;
   onVerifyEmail?: (id: string) => void;
-  onSetPrimaryEmail?: (id: string) => void;
-  onRemoveEmail?: (id: string) => void;
+  onSetPrimaryEmail?: (id: string) => void | Promise<void>;
+  onRemoveEmail?: (id: string) => void | Promise<void>;
   onSendPhoneCode?: (phoneNumber: string) => Promise<void>;
   onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
   onManagePhone?: (id: string) => void;
@@ -77,6 +74,8 @@ export function UserProfileAccountSectionView({
   onSubmitName,
   onSubmitUsername,
   onAddEmail,
+  onSendEmailCode,
+  onVerifyEmailCode,
   onManageEmail,
   onVerifyEmail,
   onSetPrimaryEmail,
@@ -98,6 +97,19 @@ export function UserProfileAccountSectionView({
       onVerifyPhone={onVerifyPhone}
       onSetPrimaryPhone={onSetPrimaryPhone}
       onRemovePhone={onRemovePhone}
+    />
+  );
+  const emailRow = (
+    <UserProfileEmailRowView
+      emails={emails}
+      allowMultipleAccounts={allowMultipleAccounts}
+      onAddEmail={onAddEmail}
+      onSendEmailCode={onSendEmailCode}
+      onVerifyEmailCode={onVerifyEmailCode}
+      onManageEmail={onManageEmail}
+      onVerifyEmail={onVerifyEmail}
+      onSetPrimaryEmail={onSetPrimaryEmail}
+      onRemoveEmail={onRemoveEmail}
     />
   );
 
@@ -126,31 +138,13 @@ export function UserProfileAccountSectionView({
             username={username}
             onSubmit={onSubmitUsername}
           />
-          {!allowMultipleAccounts ? (
-            <UserProfileContactRowView
-              items={emails}
-              kind='email'
-              label={m.email.label}
-              onAdd={onAddEmail}
-              onManage={onManageEmail}
-            />
-          ) : null}
+          {!allowMultipleAccounts ? emailRow : null}
           {!allowMultipleAccounts ? phoneRow : null}
         </Section.Group>
       </Section.Root>
       {allowMultipleAccounts ? (
         <Section.Root aria-label={m.email.label}>
-          <Section.Group>
-            <UserProfileContactListRowView
-              items={emails}
-              kind='email'
-              label={m.email.label}
-              onAdd={onAddEmail}
-              onRemove={onRemoveEmail}
-              onSetPrimary={onSetPrimaryEmail}
-              onVerify={onVerifyEmail}
-            />
-          </Section.Group>
+          <Section.Group>{emailRow}</Section.Group>
         </Section.Root>
       ) : null}
       {allowMultipleAccounts ? (
