@@ -36,7 +36,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   onRemoveConnectedAccount?: (id: string) => void | Promise<void>;
   onConnectWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
-  onRemoveWeb3Wallet?: (id: string) => void;
+  onRemoveWeb3Wallet?: (id: string) => void | Promise<void>;
   /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
   onDeleteAccount?: () => Promise<void>;
 }
@@ -125,15 +125,13 @@ export function UserProfileProfilePanelView({
           onConnect={onConnectAccount}
           onRemove={onRemoveConnectedAccount}
         />
-        {web3Wallets.length > 0 || (availableWeb3Providers.length > 0 && onConnectWeb3Wallet) ? (
-          <UserProfileWeb3WalletsSectionView
-            wallets={web3Wallets}
-            availableProviders={availableWeb3Providers}
-            onConnect={onConnectWeb3Wallet}
-            onRemove={onRemoveWeb3Wallet}
-            onSetPrimary={onSetPrimaryWeb3Wallet}
-          />
-        ) : null}
+        <UserProfileWeb3WalletsSectionView
+          wallets={web3Wallets}
+          availableProviders={availableWeb3Providers}
+          onConnect={onConnectWeb3Wallet}
+          onRemove={onRemoveWeb3Wallet}
+          onSetPrimary={onSetPrimaryWeb3Wallet}
+        />
         {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
       </div>
     </div>

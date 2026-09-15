@@ -69,6 +69,35 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByRole('heading', { name: 'Account', level: 3 })).toBeVisible();
   });
 
+  it('keeps the final wallet confirmation mounted until removal settles', async () => {
+    const user = userEvent.setup();
+    const removal = Promise.withResolvers<void>();
+    const onRemoveWeb3Wallet = vi.fn(() => removal.promise);
+    const { rerender } = renderView({
+      web3Wallets: [{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }],
+      onRemoveWeb3Wallet,
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    rerender(
+      <MosaicProvider>
+        <UserProfileProfilePanelView
+          {...props}
+          web3Wallets={[]}
+          onRemoveWeb3Wallet={onRemoveWeb3Wallet}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveTextContent('0x1234');
+    await act(async () => {
+      removal.resolve();
+      await removal.promise;
+    });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
   it('keeps available providers visible without connected accounts', () => {
     const onConnectAccount = vi.fn();
     renderView({
