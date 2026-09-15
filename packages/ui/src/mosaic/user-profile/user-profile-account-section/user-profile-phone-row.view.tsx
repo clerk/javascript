@@ -119,17 +119,17 @@ export function UserProfilePhoneRowView({
         renderActionDialog={
           onRemovePhone
             ? phone => (
-              <UserProfileRemovePhoneDialog
-                phoneNumber={phone.value}
-                open={phoneToRemove?.id === phone.id}
-                onOpenChange={open => {
-                  if (!open) {
-                    setPhoneToRemove(undefined);
-                  }
-                }}
-                onConfirm={() => void confirmRemovePhone()}
-              />
-            )
+                <UserProfileRemovePhoneDialog
+                  phoneNumber={phone.value}
+                  open={phoneToRemove?.id === phone.id}
+                  onOpenChange={open => {
+                    if (!open) {
+                      setPhoneToRemove(undefined);
+                    }
+                  }}
+                  onConfirm={() => void confirmRemovePhone()}
+                />
+              )
             : undefined
         }
       />
