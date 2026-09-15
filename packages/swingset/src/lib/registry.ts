@@ -193,8 +193,13 @@ import {
   Overlay as UserProfileOverlay,
 } from '../stories/user-profile.stories';
 import {
+  AddEmailFails as UserProfileAccountSectionAddEmailFails,
   AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
   Default as UserProfileAccountSectionDefault,
+  EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
+  EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
+  EmailSsoConnectFails as UserProfileAccountSectionEmailSsoConnectFails,
+  EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
 } from '../stories/user-profile-account-section.stories';
@@ -482,6 +487,11 @@ const userProfileAccountSectionModule: StoryModule = {
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
   AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
+  AddEmailFails: UserProfileAccountSectionAddEmailFails,
+  EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,
+  EmailLinkResendFails: UserProfileAccountSectionEmailLinkResendFails,
+  EmailSsoVerification: UserProfileAccountSectionEmailSsoVerification,
+  EmailSsoConnectFails: UserProfileAccountSectionEmailSsoConnectFails,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
