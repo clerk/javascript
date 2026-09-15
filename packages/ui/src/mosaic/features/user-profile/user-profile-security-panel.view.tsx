@@ -15,6 +15,7 @@ import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
 import type {
   UserProfileEditPasswordValue,
+  UserProfilePasswordManagedBy,
   UserProfilePasswordSectionViewProps,
 } from './user-profile-password-section/user-profile-password-section.view';
 import { UserProfilePasswordSectionView } from './user-profile-password-section/user-profile-password-section.view';
@@ -26,13 +27,16 @@ export type {
   UserProfileMfaAddableMethod,
   UserProfileMfaMethod,
   UserProfilePasskey,
+  UserProfilePasswordManagedBy,
 };
 
 export interface UserProfileSecurityPanelViewProps
   extends
     Omit<UserProfileActiveDevicesSectionViewProps, 'devices'>,
-    Pick<UserProfilePasswordSectionViewProps, 'hasPassword' | 'requiresCurrentPassword' | 'onSubmitPassword'> {
-  hasActiveEnterpriseAccount?: boolean;
+    Pick<
+      UserProfilePasswordSectionViewProps,
+      'hasPassword' | 'requiresCurrentPassword' | 'managedBy' | 'onSubmitPassword'
+    > {
   passkeys?: UserProfilePasskey[];
   mfaMethods?: UserProfileMfaMethod[];
   devices?: UserProfileDevice[];
@@ -49,7 +53,7 @@ export interface UserProfileSecurityPanelViewProps
 export function UserProfileSecurityPanelView({
   hasPassword = false,
   requiresCurrentPassword,
-  hasActiveEnterpriseAccount,
+  managedBy,
   passkeys,
   mfaMethods,
   devices,
@@ -65,7 +69,7 @@ export function UserProfileSecurityPanelView({
   onSignOutAllOtherDevices,
   onDeleteAccount,
 }: UserProfileSecurityPanelViewProps): ReactElement {
-  const showPassword = hasPassword || Boolean(onSubmitPassword);
+  const showPassword = hasPassword || Boolean(onSubmitPassword) || Boolean(managedBy);
   const hasAuthentication = showPassword || passkeys !== undefined || mfaMethods !== undefined;
 
   return (
@@ -77,7 +81,7 @@ export function UserProfileSecurityPanelView({
             {showPassword ? (
               <UserProfilePasswordSectionView
                 hasPassword={hasPassword}
-                hasActiveEnterpriseAccount={hasActiveEnterpriseAccount}
+                managedBy={managedBy}
                 requiresCurrentPassword={requiresCurrentPassword}
                 onSubmitPassword={onSubmitPassword}
               />

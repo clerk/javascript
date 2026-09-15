@@ -8,6 +8,8 @@ export const userProfilePasswordSectionBase = {
   sectionTitle: 'Authentication',
   label: 'Password',
   masked: '••••••••••••••••••',
+  noPasswordSet: 'No password set',
+  managedBy: 'Managed by {name}',
   change: 'Change password',
   set: 'Set password',
 

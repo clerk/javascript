@@ -1,11 +1,25 @@
+import * as stylex from '@stylexjs/stylex';
+
 import { Button } from '../../../components/button';
+import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { Text } from '../../../components/text';
+import { fill } from '../user-profile-account-section/user-profile-account-section.messages';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import type { UserProfileEditPasswordValue } from './user-profile-edit-password.view';
 import { UserProfileEditPasswordView } from './user-profile-edit-password.view';
 import { userProfilePasswordSectionBase as m } from './user-profile-password-section.messages';
+import { styles } from './user-profile-password-section.styles';
 
 export type { UserProfileEditPasswordField, UserProfileEditPasswordValue } from './user-profile-edit-password.view';
+
+/** The enterprise connection that owns the password, shown in place of the edit action. */
+export interface UserProfilePasswordManagedBy {
+  /** The connection's display name, e.g. `'Okta'`. Rendered as "Managed by {name}". */
+  name: string;
+  /** The connection's logo. A generic lock stands in when absent (a custom IDP with no icon). */
+  iconUrl?: string;
+}
 
 export interface UserProfilePasswordSectionViewProps {
   sectionTitle?: string;
@@ -13,8 +27,11 @@ export interface UserProfilePasswordSectionViewProps {
   hasPassword?: boolean;
   /** Whether the save must carry the password being replaced. Off when reverification stands in for it. */
   requiresCurrentPassword?: boolean;
-  /** Supplied from `user.enterpriseAccounts`. An active one stops the password from changing. */
-  hasActiveEnterpriseAccount?: boolean;
+  /**
+   * Supplied from `user.enterpriseAccounts`. When set, the connection owns the password: the row
+   * shows "Managed by {name}" in place of the edit action and never opens the dialog.
+   */
+  managedBy?: UserProfilePasswordManagedBy;
   /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. */
   onSubmitPassword?: (value: UserProfileEditPasswordValue) => Promise<void>;
 }
@@ -23,7 +40,7 @@ export function UserProfilePasswordSectionView({
   sectionTitle = m.sectionTitle,
   hasPassword = false,
   requiresCurrentPassword = false,
-  hasActiveEnterpriseAccount = false,
+  managedBy,
   onSubmitPassword,
 }: UserProfilePasswordSectionViewProps) {
   return (
@@ -34,13 +51,16 @@ export function UserProfilePasswordSectionView({
           <Section.Item>
             <Section.Content>
               <Section.Label>{m.label}</Section.Label>
-              {hasPassword ? <Section.Description>{m.masked}</Section.Description> : null}
+              <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
             </Section.Content>
-            {onSubmitPassword ? (
+            {managedBy ? (
+              <Section.Actions>
+                <ManagedByLabel {...managedBy} />
+              </Section.Actions>
+            ) : onSubmitPassword ? (
               <Section.Actions>
                 <EditPassword
                   hasPassword={hasPassword}
-                  hasActiveEnterpriseAccount={hasActiveEnterpriseAccount}
                   requiresCurrentPassword={requiresCurrentPassword}
                   onSubmit={onSubmitPassword}
                 />
@@ -53,15 +73,41 @@ export function UserProfilePasswordSectionView({
   );
 }
 
+function ManagedByLabel({ name, iconUrl }: UserProfilePasswordManagedBy) {
+  return (
+    <div {...stylex.props(styles.managedBy)}>
+      {iconUrl ? (
+        <img
+          alt=''
+          src={iconUrl}
+          {...stylex.props(styles.managedByIcon)}
+        />
+      ) : (
+        <Icon
+          aria-hidden
+          name='security-lock'
+          size='sm'
+          xstyle={styles.managedByText}
+        />
+      )}
+      <Text
+        render={<span />}
+        size='sm'
+        {...stylex.props(styles.managedByText)}
+      >
+        {fill(m.managedBy, { name })}
+      </Text>
+    </div>
+  );
+}
+
 function EditPassword({
   hasPassword,
   requiresCurrentPassword,
-  hasActiveEnterpriseAccount,
   onSubmit,
 }: {
   hasPassword: boolean;
   requiresCurrentPassword: boolean;
-  hasActiveEnterpriseAccount: boolean;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<void>;
 }) {
   const controller = useUserProfileEditPasswordController({
@@ -73,7 +119,6 @@ function EditPassword({
     <UserProfileEditPasswordView
       {...controller}
       hasPassword={hasPassword}
-      hasActiveEnterpriseAccount={hasActiveEnterpriseAccount}
       open={controller.isOpen}
       requiresCurrentPassword={requiresCurrentPassword}
       trigger={

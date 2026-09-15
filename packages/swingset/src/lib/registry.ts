@@ -256,9 +256,9 @@ import {
   meta as userProfilePasskeysSectionMeta,
 } from '../stories/user-profile-passkeys-section.stories';
 import {
-  ActiveEnterpriseAccount as UserProfilePasswordSectionActiveEnterpriseAccount,
   Default as UserProfilePasswordSectionDefault,
   EditPasswordFails as UserProfilePasswordSectionEditPasswordFails,
+  ManagedByEnterprise as UserProfilePasswordSectionManagedByEnterprise,
   meta as userProfilePasswordSectionMeta,
   SetPassword as UserProfilePasswordSectionSetPassword,
   WithoutCurrentPassword as UserProfilePasswordSectionWithoutCurrentPassword,
@@ -533,7 +533,7 @@ const userProfilePasswordSectionModule: StoryModule = {
   Default: UserProfilePasswordSectionDefault,
   SetPassword: UserProfilePasswordSectionSetPassword,
   WithoutCurrentPassword: UserProfilePasswordSectionWithoutCurrentPassword,
-  ActiveEnterpriseAccount: UserProfilePasswordSectionActiveEnterpriseAccount,
+  ManagedByEnterprise: UserProfilePasswordSectionManagedByEnterprise,
   EditPasswordFails: UserProfilePasswordSectionEditPasswordFails,
 };
 const userProfilePasskeysSectionModule: StoryModule = {

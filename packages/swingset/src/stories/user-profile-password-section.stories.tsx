@@ -20,23 +20,20 @@ export const meta: StoryMeta = {
 function PasswordSection({
   hasPassword,
   requiresCurrentPassword,
-  hasActiveEnterpriseAccount,
   failWith,
 }: {
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
-  hasActiveEnterpriseAccount?: boolean;
   failWith?: UserProfileFormError;
 }) {
   const editPassword = useUserProfileEditPasswordFixture({ hasPassword, requiresCurrentPassword, failWith });
 
-  return (
-    <UserProfilePasswordSectionView
-      {...editPassword}
-      hasActiveEnterpriseAccount={hasActiveEnterpriseAccount}
-    />
-  );
+  return <UserProfilePasswordSectionView {...editPassword} />;
 }
+
+// Stands in for the enterprise account's `logoPublicUrl`: a real hosted image URL, served from
+// swingset's `public/` the same way production serves the connection's logo.
+const oktaIcon = '/okta-placeholder.svg';
 
 export function Default() {
   return <PasswordSection />;
@@ -52,9 +49,24 @@ export function WithoutCurrentPassword() {
   return <PasswordSection requiresCurrentPassword={false} />;
 }
 
-/** The account signs in only through an enterprise connection: the dialog opens to say so, and nothing else. */
-export function ActiveEnterpriseAccount() {
-  return <PasswordSection hasActiveEnterpriseAccount />;
+/**
+ * An enterprise connection owns the password, so the row names who manages it in place of an edit
+ * action and never opens the dialog. The connection's logo leads the label, or a generic lock when
+ * a custom IDP ships none.
+ */
+export function ManagedByEnterprise() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
+      <UserProfilePasswordSectionView
+        hasPassword
+        managedBy={{ name: 'Okta', iconUrl: oktaIcon }}
+      />
+      <UserProfilePasswordSectionView
+        hasPassword
+        managedBy={{ name: 'Acme SSO' }}
+      />
+    </div>
+  );
 }
 
 /** Every save is rejected, so the dialog shows both halves of a failure at once. */

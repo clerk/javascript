@@ -159,6 +159,7 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
     expect(screen.getByText('Password')).toHaveClass('cl-section-label');
     expect(screen.queryByText('••••••••••••••••••')).not.toBeInTheDocument();
+    expect(screen.getByText('No password set')).toHaveClass('cl-section-description');
     await user.click(screen.getByRole('button', { name: 'Set password' }));
     const dialog = screen.getByRole('dialog', { name: 'Set password' });
     expect(within(dialog).queryByLabelText('Current password')).not.toBeInTheDocument();
@@ -173,16 +174,12 @@ describe('UserProfileSecurityPanelView', () => {
     });
   });
 
-  it('keeps the password row inert while an enterprise account is active', async () => {
-    const user = userEvent.setup();
-    renderView({ hasActiveEnterpriseAccount: true, onSubmitPassword: vi.fn(() => Promise.resolve()) });
+  it('shows who manages the password in place of an edit action when an enterprise connection owns it', () => {
+    renderView({ managedBy: { name: 'Okta' }, onSubmitPassword: vi.fn(() => Promise.resolve()) });
 
-    await user.click(screen.getByRole('button', { name: 'Change password' }));
-    const dialog = screen.getByRole('dialog', { name: 'Change password' });
-
-    expect(within(dialog).getByText(/can sign in only via the enterprise connection/)).toBeInTheDocument();
-    expect(within(dialog).getByLabelText('New password')).toBeDisabled();
-    expect(within(dialog).queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument();
+    expect(screen.getByText('Managed by Okta')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Set password' })).not.toBeInTheDocument();
   });
 
   it('keeps supported empty authentication methods actionable', () => {
