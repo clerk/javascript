@@ -3,6 +3,12 @@ import * as stylex from '@stylexjs/stylex';
 import { fontWeightVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  countdown: {
+    display: 'inline-block',
+    fontVariantNumeric: 'tabular-nums',
+    minWidth: '2ch',
+    textAlign: 'center',
+  },
   confirmPhoneNumber: {
     fontWeight: fontWeightVars['--cl-font-medium'],
   },

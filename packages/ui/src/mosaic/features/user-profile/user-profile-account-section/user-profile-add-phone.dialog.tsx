@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
@@ -10,6 +11,7 @@ import { Field } from '../../../components/field';
 import { Flow } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
 import { PhoneInput } from '../../../components/phone-input';
+import { styles } from '../user-profile-profile-panel.styles';
 import { fill } from './user-profile-account-section.messages';
 import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
 
@@ -35,6 +37,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
   const verifyFormId = useId();
   const phoneRef = useRef<HTMLInputElement>(null);
   const verifyRef = useRef<HTMLDivElement>(null);
+  const [beforeSeconds, afterSeconds] = m.verify.resendCountdown.split('{seconds}');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -142,11 +145,17 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                         disabled={current.isPending || current.isResending || (current.resendSeconds ?? 0) > 0}
                         onClick={current.onResend}
                       >
-                        {current.isResending
-                          ? m.verify.resending
-                          : (current.resendSeconds ?? 0) > 0
-                            ? fill(m.verify.resendCountdown, { seconds: current.resendSeconds ?? 0 })
-                            : m.verify.resend}
+                        {current.isResending ? (
+                          m.verify.resending
+                        ) : (current.resendSeconds ?? 0) > 0 ? (
+                          <span>
+                            {beforeSeconds}
+                            <span {...stylex.props(styles.countdown)}>{current.resendSeconds}</span>
+                            {afterSeconds}
+                          </span>
+                        ) : (
+                          m.verify.resend
+                        )}
                       </Button>
                     </Field.Root>
                   </Card.Content>

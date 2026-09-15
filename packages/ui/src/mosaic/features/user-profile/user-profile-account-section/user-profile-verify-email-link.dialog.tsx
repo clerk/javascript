@@ -7,7 +7,7 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
-import { fill } from './user-profile-account-section.messages';
+import { styles as profileStyles } from '../user-profile-profile-panel.styles';
 import { userProfileVerifyEmailLinkMessages as m } from './user-profile-verify-email-link.messages';
 import { styles } from './user-profile-verify-email-link.styles';
 
@@ -33,6 +33,7 @@ export function UserProfileVerifyEmailLinkDialog({
   errorMessage,
 }: UserProfileVerifyEmailLinkDialogProps) {
   const [beforeEmail, afterEmail] = m.description.split('{emailAddress}');
+  const [beforeSeconds, afterSeconds] = m.resendCountdown.split('{seconds}');
 
   return (
     <Dialog.Root
@@ -79,11 +80,17 @@ export function UserProfileVerifyEmailLinkDialog({
                 disabled={isResending || resendSeconds > 0}
                 onClick={onResend}
               >
-                {isResending
-                  ? m.resending
-                  : resendSeconds > 0
-                    ? fill(m.resendCountdown, { seconds: resendSeconds })
-                    : m.resend}
+                {isResending ? (
+                  m.resending
+                ) : resendSeconds > 0 ? (
+                  <span>
+                    {beforeSeconds}
+                    <span {...stylex.props(profileStyles.countdown)}>{resendSeconds}</span>
+                    {afterSeconds}
+                  </span>
+                ) : (
+                  m.resend
+                )}
               </Button>
             </div>
           </Card.Content>
