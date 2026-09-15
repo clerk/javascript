@@ -55,7 +55,7 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 ### Layers
 
-`meta.group` places an entry in one of these layers. Sidebar order follows the `registry` array; group order follows first appearance there. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
+`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, and `Reverification` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
 
 | Group        | What lives here                                                | Archetype |
 | ------------ | -------------------------------------------------------------- | --------- |
