@@ -434,7 +434,7 @@ export const variants = stylex.create({
 // it already has above and below, `(height - icon) / 2`, so it sits in a square cell.
 //
 /* eslint-disable @stylexjs/no-lookahead-selectors -- every browser this package builds for
-   supports `:has()` (`tsdown.mosaic.config.mts`); an older one keeps the untightened padding. */
+   supports `:has()` (`stylex-lightningcss.config.mjs`); an older one keeps the untightened padding. */
 export const sizes = stylex.create({
   xs: {
     gap: space['1'],
