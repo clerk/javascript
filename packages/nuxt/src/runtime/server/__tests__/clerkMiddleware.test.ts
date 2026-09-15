@@ -113,6 +113,34 @@ describe('clerkMiddleware(params)', () => {
     expect(await response.json()).toEqual(SESSION_AUTH_RESPONSE);
   });
 
+  test('preserves multiple Set-Cookie headers returned by authenticateRequest', async () => {
+    const authHeaders = new Headers();
+    const cookies = [
+      '__clerk_handshake=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax',
+      '__session=refreshed; Path=/; HttpOnly; SameSite=Lax',
+    ];
+    cookies.forEach(cookie => authHeaders.append('set-cookie', cookie));
+    authHeaders.set('x-clerk-auth-status', 'signed-in');
+    authenticateRequestMock.mockResolvedValueOnce({
+      toAuth: () => SESSION_AUTH_RESPONSE,
+      headers: authHeaders,
+    });
+
+    const app = createApp();
+    const handler = toWebHandler(app);
+    app.use(clerkMiddleware());
+    app.use(
+      '/',
+      eventHandler(event => event.context.auth()),
+    );
+
+    const response = await handler(new Request(new URL('/', 'http://localhost')));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.getSetCookie()).toEqual(cookies);
+    expect(response.headers.get('x-clerk-auth-status')).toBe('signed-in');
+  });
+
   test('executes handler and renders route when used with a custom handler', async () => {
     const app = createApp();
     const handler = toWebHandler(app);
