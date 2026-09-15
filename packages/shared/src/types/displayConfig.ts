@@ -5,7 +5,7 @@ import type { OAuthStrategy } from './strategies';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
 export type CaptchaWidgetType = 'smart' | 'invisible' | null;
-export type CaptchaProvider = 'turnstile';
+export type CaptchaProvider = 'turnstile' | 'prosopo';
 
 export interface DisplayConfigJSON {
   object: 'display_config';
