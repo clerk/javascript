@@ -59,6 +59,11 @@ export type {
   UseOrganizationDirectorySyncUsersParams,
   UseOrganizationDirectorySyncUsersReturn,
 } from './useOrganizationDirectorySyncUsers';
+export { __internal_useOrganizationDirectorySyncStatus } from './useOrganizationDirectorySyncStatus';
+export type {
+  UseOrganizationDirectorySyncStatusParams,
+  UseOrganizationDirectorySyncStatusReturn,
+} from './useOrganizationDirectorySyncStatus';
 export { __internal_useOrganizationEnterpriseConnectionTestRuns } from './useOrganizationEnterpriseConnectionTestRuns';
 export type {
   UseOrganizationEnterpriseConnectionTestRunsParams,
