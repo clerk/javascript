@@ -7,7 +7,7 @@ import {
   userProfileEditPasswordMachine,
   useUserProfileEditPasswordController,
 } from './user-profile-edit-password.controller';
-import type { UserProfileEditPasswordValue } from './user-profile-edit-password.view';
+import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
 
 function start(savePassword: (value: UserProfileEditPasswordValue) => Promise<void>, requiresCurrentPassword = true) {
   const actor = createActor(userProfileEditPasswordMachine, {

@@ -4,11 +4,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../../components/button';
 import { MosaicProvider } from '../../../MosaicProvider';
-import type { UserProfileEditPasswordViewProps } from '../user-profile-password-section/user-profile-edit-password.view';
-import { UserProfileEditPasswordView } from '../user-profile-password-section/user-profile-edit-password.view';
+import type { UserProfileEditPasswordDialogProps } from '../user-profile-password-section/user-profile-edit-password.dialog';
+import { UserProfileEditPasswordDialog } from '../user-profile-password-section/user-profile-edit-password.dialog';
 
-function renderView(overrides: Partial<UserProfileEditPasswordViewProps> = {}) {
-  const props: UserProfileEditPasswordViewProps = {
+function renderView(overrides: Partial<UserProfileEditPasswordDialogProps> = {}) {
+  const props: UserProfileEditPasswordDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
     hasPassword: true,
@@ -28,7 +28,7 @@ function renderView(overrides: Partial<UserProfileEditPasswordViewProps> = {}) {
     props,
     ...render(
       <MosaicProvider>
-        <UserProfileEditPasswordView {...props} />
+        <UserProfileEditPasswordDialog {...props} />
       </MosaicProvider>,
     ),
   };
@@ -40,7 +40,7 @@ const confirmPasswordField = () => screen.getByLabelText('Confirm password');
 const signOutCheckbox = () => screen.getByRole('checkbox', { name: 'Sign out of all other devices' });
 const saveButton = () => screen.getByRole('button', { name: 'Save changes' });
 
-describe('UserProfileEditPasswordView', () => {
+describe('UserProfileEditPasswordDialog', () => {
   it('renders nothing until the caller opens it', () => {
     renderView({ open: false });
 

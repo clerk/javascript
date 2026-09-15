@@ -14,17 +14,9 @@ import { Text } from '../../../components/text';
 import type { UserProfileFormError } from '../user-profile-account-section/user-profile-account-section.types';
 import { userProfilePasswordSectionBase as m } from './user-profile-password-section.messages';
 import { styles } from './user-profile-password-section.styles';
+import type { UserProfileEditPasswordField } from './user-profile-password-section.types';
 
-export type UserProfileEditPasswordField = 'currentPassword' | 'newPassword' | 'confirmPassword';
-
-export interface UserProfileEditPasswordValue {
-  /** Only carried when the flow asked for it. */
-  currentPassword?: string;
-  newPassword: string;
-  signOutOfOtherSessions: boolean;
-}
-
-export interface UserProfileEditPasswordViewProps {
+export interface UserProfileEditPasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Rendering the opener here is what returns focus to it on close. */
@@ -52,7 +44,7 @@ export interface UserProfileEditPasswordViewProps {
  * halves match and whether the new password is acceptable arrive as `canSave` and `error`, so the
  * rules live in one place and a rejection from the API lands the same way a local one does.
  */
-export function UserProfileEditPasswordView({
+export function UserProfileEditPasswordDialog({
   open,
   onOpenChange,
   trigger,
@@ -70,7 +62,7 @@ export function UserProfileEditPasswordView({
   isSaving = false,
   error,
   onSubmit,
-}: UserProfileEditPasswordViewProps) {
+}: UserProfileEditPasswordDialogProps) {
   const formId = useId();
   const signOutId = useId();
   const signOutDescriptionId = useId();
@@ -160,14 +152,14 @@ export function UserProfileEditPasswordView({
                 <Text
                   render={<label htmlFor={signOutId} />}
                   size='sm'
-                  {...stylex.props(styles.checkboxLabel)}
+                  xstyle={styles.checkboxLabel}
                 >
                   {m.signOutOfOtherSessionsLabel}
                 </Text>
                 <Text
                   id={signOutDescriptionId}
                   size='xs'
-                  {...stylex.props(styles.checkboxDescription)}
+                  xstyle={styles.checkboxDescription}
                 >
                   {m.signOutOfOtherSessionsDescription}
                 </Text>

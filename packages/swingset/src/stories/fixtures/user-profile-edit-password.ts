@@ -1,6 +1,6 @@
 import type { UserProfileFormError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import { UserProfileSaveError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
-import type { UserProfileEditPasswordValue } from '@clerk/ui/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.view';
+import type { UserProfileEditPasswordValue } from '@clerk/ui/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
 import { useState } from 'react';
 
 export interface UserProfileEditPasswordFixtureOptions {
