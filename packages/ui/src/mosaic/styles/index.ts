@@ -36,21 +36,15 @@ export type {
   ComboboxRootProps,
   ComboboxSize,
 } from '../components/combobox';
-export { Dialog, createConfirmHandle, useConfirmedClose } from '../components/dialog';
+export { Dialog } from '../components/dialog';
 export type {
-  ConfirmHandle,
-  ConfirmOptions,
-  DialogActionsProps,
   DialogCloseButtonProps,
   DialogCloseProps,
-  DialogConfirmProps,
-  DialogDescriptionProps,
+  DialogCompactPlacement,
   DialogPopupProps,
   DialogRootProps,
   DialogSize,
-  DialogTitleProps,
   DialogTriggerProps,
-  UseConfirmedCloseOptions,
 } from '../components/dialog';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';

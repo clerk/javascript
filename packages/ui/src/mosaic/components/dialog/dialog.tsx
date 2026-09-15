@@ -3,9 +3,9 @@ import type {
   DialogFocusTarget,
   DialogHandle,
   DialogProps as HeadlessDialogProps,
+  DialogRole,
 } from '@clerk/headless/dialog';
 import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '@clerk/headless/dialog';
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -15,15 +15,29 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
-import { Heading } from '../heading';
 import { Icon } from '../icon';
-import { Text } from '../text';
-import { type ConfirmHandle, createConfirmHandle } from './confirm-handle';
-import { backdropMotion, closeInsets, popupMotion, sizes, styles, trackSizes, viewportSizes } from './dialog.styles';
+import {
+  backdropMotion,
+  closeInsets,
+  compactPlacements,
+  popupMotion,
+  sizes,
+  styles,
+  trackCompactPlacements,
+  trackSizes,
+  viewportSizes,
+} from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
 /** Width of the dialog surface, and for `profile` its height too. */
 export type DialogSize = keyof typeof sizes;
+
+/**
+ * Where the surface sits in the compact band — the dialog viewport under `48rem`, which an
+ * `inline` dialog can reach inside a narrow host on any screen. `center` everywhere above it:
+ * there is no edge close enough for anchoring to mean anything at those widths.
+ */
+export type DialogCompactPlacement = keyof typeof compactPlacements;
 
 /**
  * The dialog surface a part is rendered inside, or `null` when there is none.
@@ -38,7 +52,7 @@ export type DialogSize = keyof typeof sizes;
  *
  * It is also how a dialog learns about the one it renders inside: `Dialog.Popup` reads it before
  * publishing its own, and that is what decides whether two dialogs form a STACK — successive
- * prompts — or a nested dialog over a `profile` or `card`. The two want opposite backdrops.
+ * cards — or a nested dialog over a `profile`. The two want opposite backdrops.
  */
 export interface DialogContextValue {
   /** Id the popup points `aria-labelledby` at. The part that names the dialog takes it. */
@@ -47,6 +61,12 @@ export interface DialogContextValue {
   descriptionId: string;
   /** Width, and for `profile` also height, of the surface. */
   size: DialogSize;
+  /**
+   * The popup's ARIA role, for a surface that has to adapt to being an interruption: `Card.Header`
+   * reads it and withholds its dismiss inside an `alertdialog`, where leaving without answering is
+   * the one way out an alert must not offer.
+   */
+  role: DialogRole;
   /** Whether the surface is presented in its host rather than over the page — see `Dialog.Root`. */
   inline: boolean;
 }
@@ -84,10 +104,6 @@ export type DialogTriggerProps<Payload = unknown> = MosaicComponentProps<'button
   payload?: Payload;
 };
 export type DialogCloseProps = MosaicComponentProps<'button'>;
-/** `id` is owned by the primitive, which wires it to the popup's `aria-labelledby`. */
-export type DialogTitleProps = Omit<MosaicComponentProps<'h2'>, 'id'>;
-/** `id` is owned by the primitive, which wires it to the popup's `aria-describedby`. */
-export type DialogDescriptionProps = Omit<MosaicComponentProps<'p'>, 'id'>;
 export interface DialogCloseButtonProps extends MosaicComponentProps<'button'> {
   /**
    * Names the button for assistive technology. Defaults to English; pass a localized string
@@ -95,14 +111,16 @@ export interface DialogCloseButtonProps extends MosaicComponentProps<'button'> {
    */
   'aria-label'?: string;
 }
-export type DialogActionsProps = MosaicComponentProps<'div'>;
-
 export interface DialogPopupProps extends MosaicComponentProps<'div'> {
-  /**
-   * Width, and for `profile` also height, of the dialog surface. Ignored under
-   * `role="alertdialog"`, which is always a `prompt`. @default 'prompt'
-   */
+  /** Width, and for `profile` also height, of the dialog surface. @default 'card' */
   size?: DialogSize;
+  /**
+   * Bottom-anchors the surface in the compact band — the dialog viewport under `48rem` — and
+   * slides it up as a sheet, instead of centring it. For a dialog that asks one thing and returns
+   * — a confirmation, a single-field form — where the answer belongs within thumb's reach.
+   * `card` only. @default 'center'
+   */
+  compactPlacement?: DialogCompactPlacement;
   /**
    * Where focus moves when the dialog opens. Default: the first tabbable element inside it —
    * or nowhere, for an `inline` dialog, which mounts with the page rather than in answer to a
@@ -126,14 +144,15 @@ type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 
 };
 
 /**
- * `role` decides the dismissal policy and the size, so the props that would contradict it are
- * narrowed away rather than checked at runtime:
+ * `role` decides the dismissal policy, so the prop that would contradict it is narrowed away
+ * rather than checked at runtime:
  *
  * - `alertdialog` announces as an interruption rather than as a surface the user navigated to;
  * - it cannot be dismissed by an outside press. A dialog asking a question it needs an answer to
  *   must not be answerable by clicking next to it. Escape still closes, which is the keyboard's
- *   equivalent of the cancel button that is always present;
- * - it is always a `prompt`, the size that means "asks one thing and returns".
+ *   equivalent of the cancel button that is always present.
+ *
+ * It says nothing about the size: an alert is a `Card` like every other dialog.
  */
 export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> &
   (
@@ -209,29 +228,6 @@ const Close = React.forwardRef<HTMLButtonElement, DialogCloseProps>(function Dia
   );
 });
 
-/** Names the dialog. Renders an `<h2>` wired to the popup's `aria-labelledby`. */
-const Title = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(function DialogTitle({ xstyle, ...rest }, ref) {
-  return (
-    <Primitive.Title
-      ref={ref}
-      {...mergeStyleProps(stylex.props(xstyle), rest)}
-    />
-  );
-});
-
-/** Describes the dialog. Renders a `<p>` wired to the popup's `aria-describedby`. */
-const Description = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(function DialogDescription(
-  { xstyle, ...rest },
-  ref,
-) {
-  return (
-    <Primitive.Description
-      ref={ref}
-      {...mergeStyleProps(stylex.props(xstyle), rest)}
-    />
-  );
-});
-
 /**
  * Warns when the corner dismiss is rendered where it has no business being: inside an alert
  * dialog, where a corner X is a way out without answering, or an inline dialog, which nothing
@@ -244,7 +240,7 @@ function useCloseButtonWarning(isAlert: boolean, inline: boolean) {
     }
     console.warn(
       isAlert
-        ? '[clerk] <Dialog.CloseButton> is rendered inside an alert dialog. A corner X is a way out without answering; the cancel action in <Dialog.Actions> is the way out.'
+        ? '[clerk] <Dialog.CloseButton> is rendered inside an alert dialog. A corner X is a way out without answering; the cancel action in the surface is the way out.'
         : '[clerk] <Dialog.CloseButton> is rendered inside an inline dialog, which nothing closes. It was not rendered.',
     );
   }, [isAlert, inline]);
@@ -265,7 +261,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
 ) {
   const surface = React.useContext(DialogContext);
   const { role } = useHeadlessDialogContext();
-  const size = surface?.size ?? 'prompt';
+  const size = surface?.size ?? 'card';
   const inline = surface?.inline ?? false;
   useCloseButtonWarning(role === 'alertdialog', inline);
   if (inline) {
@@ -323,7 +319,17 @@ function Backdrop({ size, stacked, overInline }: { size: DialogSize; stacked: bo
  * owns the inset — publishes the on-screen keyboard's share of the viewport for the track's
  * bottom padding to consume. See `keyboard-inset.ts`. Inline, it is a plain box that fills its host.
  */
-function Viewport({ size, inline, children }: { size: DialogSize; inline: boolean; children: React.ReactNode }) {
+function Viewport({
+  size,
+  compactPlacement,
+  inline,
+  children,
+}: {
+  size: DialogSize;
+  compactPlacement: DialogCompactPlacement;
+  inline: boolean;
+  children: React.ReactNode;
+}) {
   React.useEffect(() => (inline ? undefined : acquireKeyboardInset()), [inline]);
   return (
     <Primitive.Viewport
@@ -337,7 +343,13 @@ function Viewport({ size, inline, children }: { size: DialogSize; inline: boolea
       <div
         {...mergeStyleProps(
           themeProps('dialog-track', { size, inline }),
-          stylex.props(reset.base, styles.track, trackSizes[size], inline && styles.trackInline),
+          stylex.props(
+            reset.base,
+            styles.track,
+            trackSizes[size],
+            trackCompactPlacements[compactPlacement],
+            inline && styles.trackInline,
+          ),
         )}
       >
         {children}
@@ -351,8 +363,8 @@ function Viewport({ size, inline, children }: { size: DialogSize; inline: boolea
  *
  * A `profile` is a root-level surface: it hosts what opens over it and is never the thing that
  * opens. Inside a dialog it renders at a size that assumes it owns the viewport, over a surface it
- * was meant to replace. A `prompt` or a `card` — a confirmation holding a `Card`, say — is what
- * opens over a profile, and either is fine.
+ * was meant to replace. A `card` — a confirmation, say — is what opens over a profile, and that is
+ * fine.
  */
 function useNestedSizeWarning(isNestedInDialog: boolean, size: DialogSize) {
   React.useEffect(() => {
@@ -360,21 +372,26 @@ function useNestedSizeWarning(isNestedInDialog: boolean, size: DialogSize) {
       return;
     }
     console.warn(
-      '[clerk] a size="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a prompt or a card instead.',
+      '[clerk] a size="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.',
     );
   }, [isNestedInDialog, size]);
 }
 
-/** Warns when a size other than `prompt` is asked of an alert dialog, which ignores it. */
-function useAlertSizeWarning(isAlert: boolean, size: DialogSize | undefined) {
+/**
+ * Warns when a compact placement is asked of a `profile`, which ignores it.
+ *
+ * A profile already fills the compact band — it is the page there, not a surface over one — so
+ * there is no room for it to be anchored anywhere else.
+ */
+function useCompactPlacementWarning(size: DialogSize, placement: DialogCompactPlacement) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !isAlert || size === undefined || size === 'prompt') {
+    if (process.env.NODE_ENV === 'production' || size !== 'profile' || placement === 'center') {
       return;
     }
     console.warn(
-      `[clerk] <Dialog.Popup size="${size}"> is inside a role="alertdialog" root, which is always a prompt. The size was ignored.`,
+      `[clerk] <Dialog.Popup size="profile" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
     );
-  }, [isAlert, size]);
+  }, [size, placement]);
 }
 
 /**
@@ -384,31 +401,32 @@ function useAlertSizeWarning(isAlert: boolean, size: DialogSize | undefined) {
  * part a consumer composes, so they stay out of the public API.
  */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
-  { size: sizeProp, initialFocus, finalFocus, xstyle, ...rest },
+  { size = 'card', compactPlacement: compactPlacementProp = 'center', initialFocus, finalFocus, xstyle, ...rest },
   ref,
 ) {
   const { inline } = React.useContext(DialogPresentationContext);
   // The dialog this one renders inside, read before this popup publishes its own.
   const host = React.useContext(DialogContext);
   // The headless flag, not the stack check below — the size rule is about opening a dialog inside
-  // ANY dialog, which is broader than the prompt-on-prompt case the stacking styles cover.
+  // ANY dialog, which is broader than the card-on-card case the stacking styles cover.
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
   const isAlert = role === 'alertdialog';
-  const size: DialogSize = isAlert ? 'prompt' : (sizeProp ?? 'prompt');
-  useAlertSizeWarning(isAlert, sizeProp);
+  // A profile has its own compact-band treatment and takes no placement; the warning says so.
+  const compactPlacement: DialogCompactPlacement = size === 'profile' ? 'center' : compactPlacementProp;
+  useCompactPlacementWarning(size, compactPlacementProp);
   useNestedSizeWarning(isNestedInDialog, size);
 
   const surface = React.useMemo(
-    () => ({ labelId, descriptionId, size, inline }),
-    [labelId, descriptionId, size, inline],
+    () => ({ labelId, descriptionId, size, role, inline }),
+    [labelId, descriptionId, size, role, inline],
   );
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog');
+  useAccessibleNameWarning(node, 'Dialog', 'Card.Title');
   // A name alone is enough for an ordinary dialog; an alert is announced as an interruption and
   // its description is what says which decision is being asked for.
-  useAccessibleDescriptionWarning(isAlert ? node : null, 'Dialog');
+  useAccessibleDescriptionWarning(isAlert ? node : null, 'Dialog', 'Card.Description');
 
   const mergedRef = React.useCallback(
     (element: HTMLDivElement | null) => {
@@ -430,7 +448,17 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
         finalFocus={inline ? (finalFocus ?? false) : finalFocus}
         {...mergeStyleProps(
           themeProps('dialog-popup', { size, inline }),
-          stylex.props(reset.base, styles.popup, sizes[size], popupMotion[size], xstyle),
+          stylex.props(
+            reset.base,
+            styles.popup,
+            sizes[size],
+            compactPlacements[compactPlacement],
+            // One cell per (size, placement) that exists, selected rather than layered: StyleX
+            // dedupes by PROPERTY across a `stylex.props` call, so a thin "sheet only" atom would
+            // replace the centred cell's `transform` wholesale and take the desktop scale with it.
+            compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[size],
+            xstyle,
+          ),
           rest,
         )}
         // After the spread on purpose: `mergeProps` lets consumer props win, so a `role` passed
@@ -444,6 +472,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     return (
       <Viewport
         size={size}
+        compactPlacement={compactPlacement}
         inline
       >
         {popup}
@@ -455,15 +484,16 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     <Primitive.Portal>
       <Backdrop
         size={size}
-        // A prompt stacked on a prompt paints no scrim of its own — one serves the whole stack.
+        // A card stacked on a card paints no scrim of its own — one serves the whole stack.
         // Decided here rather than keyed on `data-stacked`, because whether this is a stack
         // depends on the size of the dialog beneath, which the headless layer has no notion of.
-        stacked={isNestedInDialog && host?.size === 'prompt'}
+        stacked={isNestedInDialog && host?.size === 'card'}
         // The nested scrim is solved to composite over the host's own; an inline host has none.
         overInline={host?.inline ?? false}
       />
       <Viewport
         size={size}
+        compactPlacement={compactPlacement}
         inline={false}
       >
         {popup}
@@ -473,106 +503,32 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
 });
 
 /**
- * The row holding an alert dialog's answer. Render the cancel first — see `dialog.styles.ts` for
- * why that ordering is what focuses it on open.
- */
-const Actions = React.forwardRef<HTMLDivElement, DialogActionsProps>(function DialogActions(
-  { render, xstyle, ...rest },
-  ref,
-) {
-  return useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(themeProps('dialog-actions'), stylex.props(reset.base, styles.actions, xstyle), rest),
-    },
-  });
-});
-
-export interface DialogConfirmProps {
-  /** Shared with the `show()` call, or with `useConfirmedClose`, that raises this confirmation. */
-  handle: ConfirmHandle;
-  /**
-   * Where focus goes when the confirmation closes. Worth passing: the confirmation has no trigger,
-   * so by default there is nothing for focus to return to. Point it at the field the question was
-   * about and declining puts the caret back in it.
-   */
-  finalFocus?: DialogFocusTarget;
-}
-
-/**
- * The dialog half of `createConfirmHandle` — an alert dialog rendered from whatever the `show()`
- * call asked, and closed by answering it.
- *
- * Render it INSIDE the dialog it guards (anywhere in its popup). That is what puts the two in one
- * floating tree, which is what escape ordering, the stacking styles and the refcounted scroll
- * lock all read.
- */
-function Confirm({ handle, finalFocus }: DialogConfirmProps) {
-  // A question can only be answered while the thing that asks it is on screen. Going away with one
-  // in flight would leave the promise unresolved forever, and `show()` short-circuits on an
-  // in-flight question — so the handle would never open a confirmation again, and a guarded dialog
-  // whose closes route through one could no longer be closed at all.
-  React.useEffect(() => () => handle.settle(false), [handle]);
-
-  return (
-    <Root
-      handle={handle.dialog}
-      role='alertdialog'
-      onOpenChange={open => {
-        // Every close that is not the action lands here — cancel, Escape, a programmatic close —
-        // and they all mean no. The action settles `true` BEFORE closing, and `settle` is a no-op
-        // once the question is answered, so this cannot overwrite it.
-        if (!open) {
-          handle.settle(false);
-        }
-      }}
-    >
-      {({ payload }) =>
-        payload ? (
-          <Popup finalFocus={finalFocus}>
-            <Title render={<Heading size='sm' />}>{payload.title}</Title>
-            <Description render={<Text />}>{payload.description}</Description>
-            <Actions>
-              <Close render={<Button variant='outline' />}>{payload.cancelLabel ?? 'Cancel'}</Close>
-              <Button
-                color={payload.destructive ? 'negative' : undefined}
-                onClick={() => {
-                  handle.settle(true);
-                  handle.dialog.close();
-                }}
-              >
-                {payload.actionLabel ?? 'Confirm'}
-              </Button>
-            </Actions>
-          </Popup>
-        ) : null
-      }
-    </Root>
-  );
-}
-
-/**
  * Mosaic `Dialog` — a modal surface built on the `@clerk/headless` dialog primitive, composed
  * via dot syntax:
  *
  * ```tsx
  * <Dialog.Root>
  *   <Dialog.Trigger render={<Button />}>Open</Dialog.Trigger>
- *   <Dialog.Popup size='prompt'>
- *     <Dialog.CloseButton />
- *     <Dialog.Title>…</Dialog.Title>
- *     <Dialog.Description>…</Dialog.Description>
+ *   <Dialog.Popup>
+ *     <Card.Root elevation='overlay'>
+ *       <Card.Header>
+ *         <Card.Title>…</Card.Title>
+ *         <Card.Description>…</Card.Description>
+ *       </Card.Header>
+ *     </Card.Root>
  *   </Dialog.Popup>
  * </Dialog.Root>
  * ```
  *
+ * The dialog brings the geometry, the motion and the floating tree; the SURFACE comes from what
+ * is rendered inside it — a `Card` for a `card`, a `Profile` for a `profile`. Those surfaces read
+ * `DialogContext`, so `Card.Title` names the dialog and `Card.Header` carries its dismiss without
+ * either knowing it is in one.
+ *
  * `Dialog.Popup` renders the portal, the scrim and the centering viewport itself, so those are
  * not parts. `role='alertdialog'` on the root makes it an alert dialog — one that interrupts to
- * ask for a decision and waits for one — with `Dialog.Actions` for the answer and
- * `Dialog.Confirm` for a whole confirmation raised from a `show()` call. `inline` on the root
- * presents it in its host instead of over the page.
+ * ask for a decision and waits for one. `compactPlacement='sheet'` bottom-anchors it in the
+ * compact band, and `inline` on the root presents it in its host instead of over the page.
  *
  * Each styled part spreads `themeProps` + `stylex.props` through `mergeStyleProps`, so it
  * carries the public `.cl-<slot>` class and StyleX atoms while the headless part keeps its focus
@@ -582,14 +538,8 @@ export const Dialog = {
   Root,
   Trigger,
   Popup,
-  Title,
-  Description,
   Close,
   CloseButton,
-  Actions,
-  Confirm,
   /** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
   createHandle: Primitive.createHandle,
-  /** Creates the handle pairing an awaitable `show()` with a `<Dialog.Confirm>`. */
-  createConfirmHandle,
 };

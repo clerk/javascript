@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 /**
  * Warns in development when a part that renders `role="dialog"` has no accessible name.
  *
- * An overlay's name comes from a `Title` part, which reports itself to its root through an
- * effect — so `aria-labelledby` is legitimately absent on the commit that mounts the surface.
+ * An overlay's name comes from a title part — its own, or the surface's, for a `Dialog` — which
+ * reports itself to its root through an effect — so `aria-labelledby` is legitimately absent on the commit that mounts the surface.
  * Two consequences, both load-bearing:
  *
  * - it has to read the DOM after mount rather than the root's state at render, since the
@@ -18,8 +18,10 @@ import { useEffect } from 'react';
  *
  * @param node - The element carrying `role="dialog"`, once mounted.
  * @param component - Compound component name, used to name the parts in the message.
+ * @param titlePart - The part that supplies the name, when it is not the component's own `Title`.
+ *   A `Dialog` takes its name from the surface rendered inside it, not from a part of its own.
  */
-export function useAccessibleNameWarning(node: HTMLElement | null, component: string): void {
+export function useAccessibleNameWarning(node: HTMLElement | null, component: string, titlePart?: string): void {
   useEffect(() => {
     if (process.env.NODE_ENV === 'production' || !node) {
       return;
@@ -34,7 +36,7 @@ export function useAccessibleNameWarning(node: HTMLElement | null, component: st
         return;
       }
       // RESOLVED, not merely present. `Dialog` emits `aria-labelledby` unconditionally, so with no
-      // `Dialog.Title` the attribute points at an id that is not in the document — which names the
+      // title part the attribute points at an id that is not in the document — which names the
       // dialog exactly as poorly as having no attribute at all, and is what a presence check would
       // wave through. `Popover` omits the attribute instead, so resolving covers both shapes.
       const labelledBy = node.getAttribute('aria-labelledby');
@@ -46,7 +48,7 @@ export function useAccessibleNameWarning(node: HTMLElement | null, component: st
         return;
       }
       console.warn(
-        `[clerk] <${component}.Popup> renders a dialog with no accessible name. Pass \`aria-label\`, or render a \`<${component}.Title>\` inside it.`,
+        `[clerk] <${component}.Popup> renders a dialog with no accessible name. Pass \`aria-label\`, or render a \`<${titlePart ?? `${component}.Title`}>\` inside it.`,
       );
     }, 0);
 

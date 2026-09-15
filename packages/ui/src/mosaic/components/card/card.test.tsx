@@ -277,7 +277,14 @@ describe('Mosaic Card', () => {
         </Card.Root>
         <Dialog.Trigger>Open</Dialog.Trigger>
         <Dialog.Popup>
-          <Dialog.Title>Review terms</Dialog.Title>
+          <Card.Root
+            elevation='overlay'
+            renderBranding={false}
+          >
+            <Card.Header>
+              <Card.Title>Review terms</Card.Title>
+            </Card.Header>
+          </Card.Root>
         </Dialog.Popup>
       </Dialog.Root>,
     );
