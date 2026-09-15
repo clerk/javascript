@@ -320,12 +320,6 @@ export const enUS: LocalizationResource = {
         'Switching to {{provider}} will remove the {{currentProvider}} connection "{{name}}" and require a new setup.',
       title: 'Change provider to {{provider}}',
     },
-    connectionScopeBanner: {
-      subtitle__adding: 'This organization already has {{count}} SSO connections.',
-      subtitle__editing: 'This organization has {{count}} SSO connections. Changes here apply only to this connection.',
-      title__adding: 'Adding a new SSO connection',
-      title__editing: 'Editing "{{name}}"',
-    },
     configureStep: {
       activeConnectionWarning: {
         dismiss: 'Dismiss',
@@ -818,6 +812,12 @@ export const enUS: LocalizationResource = {
           'This identity provider isn’t supported in this version of Clerk. Update to the latest version to finish setting it up.',
         title: 'Unsupported provider',
       },
+    },
+    connectionScopeBanner: {
+      subtitle__adding: 'This organization already has {{count}} SSO connections.',
+      subtitle__editing: 'This organization has {{count}} SSO connections. Changes here apply only to this connection.',
+      title__adding: 'Adding a new SSO connection',
+      title__editing: 'Editing "{{name}}"',
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contact your organization's administrator to upgrade your permissions.",
