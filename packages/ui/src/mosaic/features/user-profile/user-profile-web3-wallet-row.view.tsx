@@ -14,12 +14,12 @@ export function UserProfileWeb3WalletRowView({
   wallet,
   onConnect,
   onSetPrimary,
-  onRequestRemove,
+  onRemove,
 }: {
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
-  onRequestRemove?: (wallet: UserProfileWeb3Wallet) => void;
+  onRemove?: (wallet: UserProfileWeb3Wallet) => void;
 }) {
   const iconUrl = wallet.iconUrl?.trim();
   const linkedWallet = 'address' in wallet ? wallet : undefined;
@@ -30,8 +30,8 @@ export function UserProfileWeb3WalletRowView({
   if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
   }
-  if (linkedWallet && onRequestRemove && linkedWallet.canRemove !== false) {
-    actions.push({ label: m.remove, color: 'negative', onClick: () => onRequestRemove(linkedWallet) });
+  if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
+    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(linkedWallet) });
   }
 
   return (

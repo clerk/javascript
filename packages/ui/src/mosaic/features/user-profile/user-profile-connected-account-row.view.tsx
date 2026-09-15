@@ -14,20 +14,20 @@ export function UserProfileConnectedAccountRowView({
   account,
   onConnect,
   onReconnect,
-  onRequestRemove,
+  onRemove,
 }: {
   account: UserProfileConnectedAccount;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
-  onRequestRemove?: (account: UserProfileConnectedAccount) => void;
+  onRemove?: (account: UserProfileConnectedAccount) => void;
 }) {
   const iconUrl = account.iconUrl?.trim();
   const actions: UserProfileMenuAction[] = [];
   if (account.status === 'reconnect' && onReconnect) {
     actions.push({ label: m.reconnect, onClick: () => onReconnect(account.id) });
   }
-  if (onRequestRemove && account.canRemove !== false) {
-    actions.push({ label: m.remove, color: 'negative', onClick: () => onRequestRemove(account) });
+  if (onRemove && account.canRemove !== false) {
+    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(account) });
   }
   return (
     <Section.Row xstyle={onConnect && styles.connectRow}>

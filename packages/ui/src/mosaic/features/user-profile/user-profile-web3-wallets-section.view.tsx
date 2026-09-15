@@ -52,7 +52,7 @@ export function UserProfileWeb3WalletsSectionView({
                 key={wallet.id}
                 wallet={wallet}
                 onSetPrimary={onSetPrimary}
-                onRequestRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
+                onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
               />
             ))}
             {onConnect

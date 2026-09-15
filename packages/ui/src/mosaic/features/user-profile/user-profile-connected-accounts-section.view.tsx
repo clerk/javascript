@@ -49,7 +49,7 @@ export function UserProfileConnectedAccountsSectionView({
                 key={account.id}
                 account={account}
                 onReconnect={onReconnect}
-                onRequestRemove={onRemove ? account => removeAccount.open(account) : undefined}
+                onRemove={onRemove ? account => removeAccount.open(account) : undefined}
               />
             ))}
             {onConnect
