@@ -37,30 +37,32 @@ export function UserProfileWeb3WalletsSectionView({
   onSetPrimary,
   onRemove,
 }: UserProfileWeb3WalletsSectionViewProps) {
+  if (wallets.length === 0 && (availableProviders.length === 0 || !onConnect)) {
+    return null;
+  }
+
   return (
     <Section.Root>
       <Section.Title>{m.title}</Section.Title>
-      {wallets.length > 0 || (availableProviders.length > 0 && onConnect) ? (
-        <Section.Group>
-          {wallets.map(wallet => (
-            <UserProfileWeb3WalletRowView
-              key={wallet.id}
-              wallet={wallet}
-              onSetPrimary={onSetPrimary}
-              onRemove={onRemove}
-            />
-          ))}
-          {onConnect
-            ? availableProviders.map(provider => (
-                <UserProfileWeb3WalletRowView
-                  key={provider.id}
-                  wallet={provider}
-                  onConnect={onConnect}
-                />
-              ))
-            : null}
-        </Section.Group>
-      ) : null}
+      <Section.Group>
+        {wallets.map(wallet => (
+          <UserProfileWeb3WalletRowView
+            key={wallet.id}
+            wallet={wallet}
+            onSetPrimary={onSetPrimary}
+            onRemove={onRemove}
+          />
+        ))}
+        {onConnect
+          ? availableProviders.map(provider => (
+              <UserProfileWeb3WalletRowView
+                key={provider.id}
+                wallet={provider}
+                onConnect={onConnect}
+              />
+            ))
+          : null}
+      </Section.Group>
     </Section.Root>
   );
 }

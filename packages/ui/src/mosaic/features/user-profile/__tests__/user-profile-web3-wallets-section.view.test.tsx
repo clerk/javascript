@@ -5,6 +5,19 @@ import { describe, expect, it, vi } from 'vitest';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 
 describe('Web3 wallets section', () => {
+  it.each([{ availableProviders: [] }, { availableProviders: [{ id: 'metamask', provider: 'MetaMask' }] }])(
+    'hides the entire section without wallets or actionable providers (%j)',
+    ({ availableProviders }) => {
+      const { container } = render(
+        <UserProfileWeb3WalletsSectionView
+          wallets={[]}
+          availableProviders={availableProviders}
+        />,
+      );
+      expect(container).toBeEmptyDOMElement();
+    },
+  );
+
   it.each([
     { isPrimary: true, isVerified: true, canSetPrimary: false },
     { isPrimary: false, isVerified: true, canSetPrimary: true },

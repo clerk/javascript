@@ -95,10 +95,14 @@ export function useWeb3WalletsFixture({
       );
     },
     onRemove: (id: string) => {
+      if (removalState === 'pending') {
+        setWallets(current => current.map(wallet => (wallet.id === id ? { ...wallet, isRemoving: true } : wallet)));
+        setTimeout(() => {
+          setWallets(current => current.filter(wallet => wallet.id !== id));
+        }, 1500);
+        return;
+      }
       setWallets(current => {
-        if (removalState === 'pending') {
-          return current.map(wallet => (wallet.id === id ? { ...wallet, isRemoving: true } : wallet));
-        }
         if (removalState === 'error' && !current.find(wallet => wallet.id === id)?.removalError) {
           return current.map(wallet =>
             wallet.id === id ? { ...wallet, removalError: 'Unable to remove wallet. Please try again.' } : wallet,

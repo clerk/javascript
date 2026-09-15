@@ -82,7 +82,7 @@ export function UserProfileWeb3WalletRowView({
               color='neutral'
               size='sm'
               variant='outline'
-              aria-label={`${m.connect} ${wallet.provider}`}
+              aria-label={m.connectLabel.replace('{provider}', wallet.provider ?? '')}
               onClick={() => onConnect(wallet.id)}
             >
               {m.connect}
@@ -97,7 +97,7 @@ export function UserProfileWeb3WalletRowView({
           <Section.Actions>
             <UserProfileActionMenu
               actions={actions}
-              label={`${m.manage} ${wallet.provider || address}`}
+              label={m.manageLabel.replace('{wallet}', wallet.provider || address || '')}
             >
               {linkedWallet && onRemove && linkedWallet.canRemove !== false ? (
                 <UserProfileRemoveWeb3WalletDialog
