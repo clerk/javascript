@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRightIcon } from 'lucide-react';
+import { ChevronRightIcon, FlaskConicalIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -253,6 +254,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </React.Fragment>
         ))}
       </SidebarContent>
+      <SidebarFooter className='gap-0 p-0'>
+        <SidebarSeparator className='data-horizontal:w-auto my-1' />
+        <SidebarGroup className='py-1'>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className='h-auto py-1 text-xs'
+                  isActive={pathname.startsWith('/live')}
+                  render={<Link href='/live' />}
+                >
+                  <FlaskConicalIcon className='size-3.5!' />
+                  Live Sandbox
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
