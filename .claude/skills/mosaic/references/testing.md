@@ -8,7 +8,7 @@ against plain props.
 Tests are Vitest + React Testing Library, co-located in `__tests__/` next to the
 feature and named for the layer they cover.
 
-`packages/ui/src/mosaic/features/user-button/__tests__/` is the canonical set to copy from:
+`packages/mosaic/src/features/user-button/__tests__/` is the canonical set to copy from:
 
 | File                               | Covers                                                      |
 | ---------------------------------- | ----------------------------------------------------------- |
@@ -20,12 +20,12 @@ feature and named for the layer they cover.
 | `user-button.layout.test.ts`       | Pure derivation, no React.                                  |
 | `user-button.utils.test.ts`        | Pure helpers, no React.                                     |
 
-Shared helpers live in `packages/ui/src/mosaic/machines/__tests__/test-utils.ts`:
+Shared helpers live in `packages/mosaic/src/machines/__tests__/test-utils.ts`:
 `deferred<T>()` (a promise whose `resolve`/`reject` are captured, so you can
 assert an in-flight state before settling it), `tick()` (flush microtasks so an
 `invoke`'s `onDone`/`onError` runs), and `noop`.
 
-Run one file with `pnpm --filter @clerk/ui test <substr>`.
+Run one file with `pnpm --filter @clerk/mosaic test <substr>`.
 
 ---
 

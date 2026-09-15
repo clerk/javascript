@@ -1,5 +1,5 @@
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Input } from '@clerk/ui/mosaic/components/input';
+import { Field } from '@clerk/mosaic/components/field';
+import { Input } from '@clerk/mosaic/components/input';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,7 +12,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Field',
-  source: 'packages/ui/src/mosaic/components/field/field.tsx',
+  source: 'packages/mosaic/src/components/field/field.tsx',
 };
 
 const styles = stylex.create({

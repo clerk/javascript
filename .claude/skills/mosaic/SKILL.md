@@ -48,7 +48,7 @@ ways a controller can hold its state, and picking one is a complexity call:
 interaction has an async lifecycle or two values that must change together, and
 sometimes both in one controller. Either way the controller returns plain props,
 so the view cannot tell and neither can its tests. Criteria and worked
-before/afters: `packages/ui/src/mosaic/machine/ADOPTION.md`.
+before/afters: `packages/mosaic/src/machine/ADOPTION.md`.
 
 `references/mosaic-architecture.md` (repo root, read by all agents) is the
 canonical contract for the whole design system — the `--cl-*` tokens, the
@@ -56,7 +56,7 @@ canonical contract for the whole design system — the `--cl-*` tokens, the
 architecture" section that defines the split. Read it for the _what_; this skill
 is the _how-to_.
 
-`packages/ui/src/mosaic/features/user-button/` is the fullest worked example of the split
+`packages/mosaic/src/features/user-button/` is the fullest worked example of the split
 in the repo — model, controller, view, wrapper, types, messages, and a test per
 layer. Copy from it.
 

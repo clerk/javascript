@@ -2,8 +2,8 @@ import type {
   UserProfileDevice,
   UserProfileMfaMethod,
   UserProfilePasskey,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-security-panel.view';
-import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/features/user-profile/user-profile-security-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
+import { UserProfileSecurityPanelView } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -16,7 +16,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileSecurityPanel',
   label: 'Security panel',
   navigation: { category: 'Panels' },
-  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-security-panel.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-security-panel.view.tsx',
 };
 
 export function Default() {
