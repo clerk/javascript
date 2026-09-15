@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
 
-import { stringToFormattedPhoneString } from '../../../../utils/phoneUtils';
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
