@@ -6,8 +6,8 @@ export const styles = stylex.create({
   countdown: {
     display: 'inline-block',
     fontVariantNumeric: 'tabular-nums',
-    minWidth: '2ch',
     textAlign: 'center',
+    minWidth: '2ch',
   },
   confirmPhoneNumber: {
     fontWeight: fontWeightVars['--cl-font-medium'],
