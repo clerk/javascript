@@ -10,3 +10,9 @@ export const styles = stylex.create({
     width: '100%',
   },
 });
+
+export const motionStyles = stylex.create({
+  // `view-transition-name` is a document-global ident, so it has to come from the render
+  // rather than a static atom.
+  name: (name: string | null) => ({ viewTransitionName: name }),
+});

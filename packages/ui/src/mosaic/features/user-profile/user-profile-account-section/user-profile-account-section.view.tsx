@@ -145,6 +145,8 @@ export function UserProfileAccountSectionView({
               items={emails}
               kind='email'
               label={m.email.label}
+              sortPrimaryFirst
+              animateChanges
               onAdd={onAddEmail}
               onRemove={onRemoveEmail}
               onSetPrimary={onSetPrimaryEmail}
