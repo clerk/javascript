@@ -90,7 +90,9 @@ export function UserProfileEditUsernameDialog({
                 value={username}
                 onChange={event => onUsernameChange(event.target.value)}
               />
-              {error?.fields?.username ? <Field.Error>{error.fields.username}</Field.Error> : null}
+              <Field.Message>
+                <Field.Error>{error?.fields?.username}</Field.Error>
+              </Field.Message>
             </Field.Root>
           </Card.Content>
           <Card.Footer>

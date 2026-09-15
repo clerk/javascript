@@ -3,7 +3,7 @@ import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Input } from '../input';
 import { Field } from './field';
@@ -18,7 +18,25 @@ const overrides = stylex.create({
 const atoms = (style: stylex.StyleXStyles) =>
   (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
+const restores: Array<() => void> = [];
+
+function stubPrototype(target: object, name: string, descriptor: PropertyDescriptor) {
+  const original = Object.getOwnPropertyDescriptor(target, name);
+  Object.defineProperty(target, name, { configurable: true, ...descriptor });
+  restores.push(() => {
+    if (original) {
+      Object.defineProperty(target, name, original);
+    } else {
+      Reflect.deleteProperty(target, name);
+    }
+  });
+}
+
 describe('Mosaic Field', () => {
+  afterEach(() => {
+    restores.splice(0).forEach(restore => restore());
+  });
+
   it('generates native label and message relationships', () => {
     render(
       <Field.Root>
@@ -361,6 +379,208 @@ describe('Mosaic Field', () => {
     expect(error).not.toHaveAttribute('role');
     expect(error).not.toHaveAttribute('aria-live');
     expect(error?.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('mounts through the headless enter transition and animates the message height', () => {
+    const probe = stylex.create({
+      message: {
+        transitionProperty: {
+          default: 'height, margin-top',
+          '@media (prefers-reduced-motion: reduce)': 'none',
+        },
+        height: {
+          default: 'var(--_cl-field-message-height)',
+          ':where(:not([data-open]), [data-starting-style])': 0,
+        },
+      },
+      feedback: {
+        opacity: { default: 1, ':where([data-starting-style], [data-ending-style])': 0 },
+        position: { default: null, ':where([data-ending-style])': 'absolute' },
+      },
+    });
+
+    const { container } = render(
+      <Field.Root>
+        <Field.Message>
+          <Field.Error>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    const message = container.querySelector('.cl-field-message');
+    const error = screen.getByText('Enter a valid email.').closest('p');
+    expect(atoms(probe.message)).toHaveLength(4);
+    expect(message).toHaveClass(...atoms(probe.message));
+    expect(message).toHaveAttribute('data-open');
+    expect(message).toHaveAttribute('data-starting-style');
+    expect(atoms(probe.feedback)).toHaveLength(3);
+    expect(error).toHaveClass(...atoms(probe.feedback));
+    expect(error).toHaveAttribute('data-open');
+    expect(error).toHaveAttribute('data-starting-style');
+  });
+
+  it('renders nothing without a message', () => {
+    const { container } = render(
+      <Field.Root>
+        <Field.Error>{null}</Field.Error>
+        <Field.Error>{''}</Field.Error>
+        <Field.Error>{false}</Field.Error>
+      </Field.Root>,
+    );
+
+    expect(container.querySelector('.cl-field-error')).toBeNull();
+  });
+
+  it('crossfades an error into a success message inside one Field.Message', async () => {
+    stubPrototype(Element.prototype, 'getAnimations', {
+      value: () => [{ finished: new Promise<void>(() => undefined) }],
+    });
+
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>Password is incorrect.</Field.Error>
+          <Field.Success>{null}</Field.Success>
+        </Field.Message>
+      </Field.Root>,
+    );
+    await act(async () => {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    });
+    expect(container.querySelector('.cl-field-success')).toBeNull();
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>{null}</Field.Error>
+          <Field.Success>Password verified.</Field.Success>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    const error = container.querySelector('.cl-field-error');
+    const success = container.querySelector('.cl-field-success');
+    expect(container.querySelector('.cl-field-message')).toHaveAttribute('data-open');
+    expect(container.querySelector('.cl-field-message')).not.toHaveAttribute('data-ending-style');
+    expect(error).toHaveTextContent('Password is incorrect.');
+    expect(error).toHaveAttribute('data-ending-style');
+    expect(error).toHaveAttribute('aria-hidden', 'true');
+    expect(success).toHaveTextContent('Password verified.');
+    expect(success).toHaveAttribute('data-starting-style');
+    expect(success).not.toHaveAttribute('aria-hidden');
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', success?.id);
+  });
+
+  it('re-measures when an open message swaps its rendered element', () => {
+    stubPrototype(HTMLElement.prototype, 'offsetHeight', {
+      get(this: HTMLElement) {
+        return this.tagName === 'DIV' ? 40 : 24;
+      },
+    });
+
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+    const message = container.querySelector('.cl-field-message');
+    expect(message).toHaveAttribute('data-open');
+    expect(message?.getAttribute('style')).toContain('24px');
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error render={<div />}>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(screen.getByText('Enter a valid email.').closest('div')).toHaveClass('cl-field-error');
+    expect(message).toHaveAttribute('data-open');
+    expect(message).not.toHaveAttribute('data-ending-style');
+    expect(message?.getAttribute('style')).toContain('40px');
+  });
+
+  it('announces messages from a persistent polite live region that callers can escalate', () => {
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>{null}</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    const message = container.querySelector('.cl-field-message');
+    expect(message).toHaveAttribute('role', 'status');
+    expect(message).toBeEmptyDOMElement();
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message role='alert'>
+          <Field.Error>Required.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(container.querySelector('.cl-field-message')).toBe(message);
+    expect(message).toHaveAttribute('role', 'alert');
+    expect(message).toHaveTextContent('Required.');
+  });
+
+  it('holds the last message through the exit transition, then unmounts', async () => {
+    let finish = () => undefined as void;
+    const finished = new Promise<void>(resolve => {
+      finish = resolve;
+    });
+    const getAnimations = vi.fn(() => [{ finished }]);
+    stubPrototype(Element.prototype, 'getAnimations', { value: getAnimations });
+
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+    const error = screen.getByText('Enter a valid email.').closest('p');
+    await act(async () => {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    });
+    expect(error).not.toHaveAttribute('data-starting-style');
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', error?.id);
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>{null}</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    expect(screen.getByText('Enter a valid email.').closest('p')).toHaveAttribute('data-ending-style');
+    expect(container.querySelector('.cl-field-message')).toHaveAttribute('data-ending-style');
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-describedby');
+
+    getAnimations.mockReturnValue([]);
+    await act(async () => {
+      finish();
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    expect(screen.queryByText('Enter a valid email.')).toBeNull();
   });
 
   it('warns when Field.Label does not render a native label', () => {

@@ -93,6 +93,29 @@ export function useRegisterFieldPartId(
   }, [id, setIds]);
 }
 
+interface FieldMessageContextValue {
+  register: (key: symbol, element: HTMLElement | null) => void;
+}
+
+const FieldMessageContext = React.createContext<FieldMessageContextValue | null>(null);
+
+export function FieldMessageProvider({ register, children }: React.PropsWithChildren<FieldMessageContextValue>) {
+  const context = React.useMemo<FieldMessageContextValue>(() => ({ register }), [register]);
+  return <FieldMessageContext.Provider value={context}>{children}</FieldMessageContext.Provider>;
+}
+
+export function useRegisterFieldMessage(open: boolean): React.RefCallback<HTMLElement> {
+  const register = React.useContext(FieldMessageContext)?.register;
+  const key = React.useRef(Symbol('field-message'));
+
+  return React.useCallback(
+    (element: HTMLElement | null) => {
+      register?.(key.current, open ? element : null);
+    },
+    [register, open],
+  );
+}
+
 interface FieldControlProps {
   id?: string;
   disabled?: boolean;
