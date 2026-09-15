@@ -238,6 +238,14 @@ import {
   WithError as UserProfileDeleteSectionWithError,
 } from '../stories/user-profile-delete-section.stories';
 import {
+  ConnectionError as UserProfileEnterpriseAccountsSectionConnectionError,
+  ConnectOnly as UserProfileEnterpriseAccountsSectionConnectOnly,
+  Default as UserProfileEnterpriseAccountsSectionDefault,
+  LinkedAccounts as UserProfileEnterpriseAccountsSectionLinkedAccounts,
+  meta as userProfileEnterpriseAccountsSectionMeta,
+  RequiresAction as UserProfileEnterpriseAccountsSectionRequiresAction,
+} from '../stories/user-profile-enterprise-accounts-section.stories';
+import {
   Default as UserProfileMfaSectionDefault,
   Empty as UserProfileMfaSectionEmpty,
   meta as userProfileMfaSectionMeta,
@@ -543,6 +551,14 @@ const userProfilePaymentMethodsSectionModule: StoryModule = {
   Default: UserProfilePaymentMethodsSectionDefault,
   Empty: UserProfilePaymentMethodsSectionEmpty,
 };
+const userProfileEnterpriseAccountsSectionModule: StoryModule = {
+  meta: userProfileEnterpriseAccountsSectionMeta,
+  Default: UserProfileEnterpriseAccountsSectionDefault,
+  LinkedAccounts: UserProfileEnterpriseAccountsSectionLinkedAccounts,
+  RequiresAction: UserProfileEnterpriseAccountsSectionRequiresAction,
+  ConnectOnly: UserProfileEnterpriseAccountsSectionConnectOnly,
+  ConnectionError: UserProfileEnterpriseAccountsSectionConnectionError,
+};
 const userProfileConnectedAccountsSectionModule: StoryModule = {
   meta: userProfileConnectedAccountsSectionMeta,
   Default: UserProfileConnectedAccountsSectionDefault,
@@ -624,6 +640,7 @@ export const registry: StoryModule[] = [
   userProfilePaymentMethodsSectionModule,
   userProfileBillingHistorySectionModule,
   userProfileConnectedAccountsSectionModule,
+  userProfileEnterpriseAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
   // Reverification
