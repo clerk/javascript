@@ -40,6 +40,7 @@ describe('subpath /internal exports', () => {
   it('should not include a breaking change', () => {
     expect(Object.keys(internalExports).sort()).toMatchInlineSnapshot(`
       [
+        "AuthErrorReason",
         "AuthStatus",
         "TokenType",
         "authenticatedMachineObject",
