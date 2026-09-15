@@ -1,0 +1,12 @@
+{
+  "src/hooks/useSignInWithApple.ios.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/provider/nativeClientSync.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

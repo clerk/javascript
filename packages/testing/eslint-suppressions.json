@@ -1,0 +1,12 @@
+{
+  "src/common/helpers-utils.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/playwright/setupClerkTestingToken.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

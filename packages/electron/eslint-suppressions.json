@@ -1,0 +1,12 @@
+{
+  "src/main/create-clerk-bridge.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/storage/index.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

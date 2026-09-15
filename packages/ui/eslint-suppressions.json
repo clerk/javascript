@@ -1,0 +1,112 @@
+{
+  "src/components/Checkout/CheckoutComplete.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/Checkout/CheckoutForm.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ConfigureDirectorySync/SecurityDirectorySyncSection.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/ConfigureSSO/elements/Wizard/reducer.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/OAuthConsent/OAuthConsent.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/OrganizationProfile/InviteMembersForm.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/PricingTable/PricingTableDefault.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 2
+    }
+  },
+  "src/components/SignIn/SignInFactorOne.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/SignIn/SignInStart.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/SignUp/SignUpStart.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/SignUp/signUpFormHelpers.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/SubscriptionDetails/index.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 2
+    }
+  },
+  "src/components/Subscriptions/SubscriptionsList.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/devPrompts/EnableOrganizationsPrompt/index.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/components/devPrompts/KeylessPrompt/index.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/contexts/components/Plans.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/hooks/useProtectCheckRunner.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/mosaic/user-button/user-button.view.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/mosaic/user-profile/user-profile-security-panel.view.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/router/pathToRegexp.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 4
+    }
+  },
+  "src/utils/colors/legacy.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/utils/detectClerkStylesheetUsage.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

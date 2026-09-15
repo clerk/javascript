@@ -27,3 +27,5 @@ renovate.json5
 # Frozen snapshots of TypeDoc-generated MDX; must match raw `extract-methods.mjs` output.
 .typedoc/__tests__/__snapshots__/
 CLAUDE.md
+# Written by `eslint --suppress-rule` / `--prune-suppressions`; ESLint owns the formatting.
+/**/eslint-suppressions.json

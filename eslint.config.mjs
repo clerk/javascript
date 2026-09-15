@@ -9,6 +9,7 @@ import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
 import pluginStylex from '@stylexjs/eslint-plugin';
 import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
+import pluginSonarjs from 'eslint-plugin-sonarjs';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import pluginYml from 'eslint-plugin-yml';
@@ -330,6 +331,7 @@ export default tseslint.config([
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
+      sonarjs: pluginSonarjs,
       'unused-imports': pluginUnusedImports,
       turbo: pluginTurbo,
     },
@@ -398,6 +400,7 @@ export default tseslint.config([
       'sort-imports': 'off',
       ...pluginTurbo.configs['flat/recommended'].rules,
       'unused-imports/no-unused-imports': 'error',
+      'sonarjs/cognitive-complexity': ['error', 15],
       // TYPESCRIPT RULE DISABLES
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',

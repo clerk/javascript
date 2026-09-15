@@ -85,6 +85,10 @@ pnpm --filter @clerk/backend test:node path/to/file.test.ts
 pnpm lint
 pnpm format            # workspace packages plus root files, docs/, integration/, scripts/
 pnpm prettier --write '.claude/**/*.md'   # pnpm format does not cover .claude/; format skill files this way
+# Cognitive complexity (`sonarjs/cognitive-complexity`, max 15) is an error. Existing violations are
+# grandfathered in each package's eslint-suppressions.json. After simplifying one of those functions, drop its
+# stale entry (lint fails until you do) from inside that package:
+pnpm eslint src --prune-suppressions
 
 # Changesets — write the file, don't run the CLI (both scripts are interactive prompts)
 pnpm changeset status --since=origin/main   # what CI checks; run this to verify

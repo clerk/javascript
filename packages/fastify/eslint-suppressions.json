@@ -1,0 +1,7 @@
+{
+  "src/withClerkMiddleware.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

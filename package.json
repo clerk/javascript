@@ -117,6 +117,7 @@
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "5.2.0",
     "eslint-plugin-simple-import-sort": "12.1.1",
+    "eslint-plugin-sonarjs": "4.2.0",
     "eslint-plugin-turbo": "2.5.5",
     "eslint-plugin-unused-imports": "4.4.1",
     "eslint-plugin-yml": "1.18.0",

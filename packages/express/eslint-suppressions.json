@@ -1,0 +1,7 @@
+{
+  "src/authenticateRequest.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

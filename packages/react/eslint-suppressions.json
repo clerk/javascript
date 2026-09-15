@@ -1,0 +1,12 @@
+{
+  "src/isomorphicClerk.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/utils/useCustomMenuItems.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

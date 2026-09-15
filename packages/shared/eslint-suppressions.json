@@ -1,0 +1,32 @@
+{
+  "src/authorization.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 3
+    }
+  },
+  "src/internal/clerk-js/completeSignUpFlow.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/internal/clerk-js/url.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/internal/clerk-js/web3.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/keys.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/loadClerkJsScript.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

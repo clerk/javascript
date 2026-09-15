@@ -1,0 +1,22 @@
+{
+  "src/primitives/drawer/use-drawer-drag.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/primitives/drawer/use-snap-points.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/primitives/otp/otp-input.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/utils/use-render.tsx": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

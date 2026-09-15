@@ -1,0 +1,7 @@
+{
+  "src/utils/useCustomMenuItems.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}

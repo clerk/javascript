@@ -1,0 +1,22 @@
+{
+  "src/api/request.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/proxy.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/tokens/authenticateContext.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/tokens/request.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 2
+    }
+  }
+}

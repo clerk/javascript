@@ -1,0 +1,47 @@
+{
+  "src/cli.js": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/codemods/transform-align-experimental-unstable-prefixes.cjs": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/codemods/transform-protect-to-show-vue.cjs": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/codemods/transform-protect-to-show.cjs": {
+    "sonarjs/cognitive-complexity": {
+      "count": 3
+    }
+  },
+  "src/codemods/transform-remove-deprecated-props.cjs": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/config.js": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/runner.js": {
+    "sonarjs/cognitive-complexity": {
+      "count": 2
+    }
+  },
+  "src/util/detect-sdk.js": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/util/package-manager.js": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  }
+}
