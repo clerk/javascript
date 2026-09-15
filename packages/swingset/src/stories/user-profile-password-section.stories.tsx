@@ -69,7 +69,7 @@ export function ManagedByEnterprise() {
   );
 }
 
-/** Every save is rejected, so the dialog shows both halves of a failure at once. */
+/** The first save shows field and form errors; retrying succeeds. */
 export function EditPasswordFails() {
   return (
     <PasswordSection
