@@ -4,7 +4,7 @@ import type { CustomPage } from '@clerk/shared/types';
 import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useOrganizationListInView } from '../../../../hooks/useOrganizationListInView';
+import { useOrganizationListInView } from '../../../hooks/useOrganizationListInView';
 import type { UserButtonModalProps, UserButtonModelOptions } from '../user-button.model';
 import { useUserButtonModel } from '../user-button.model';
 
@@ -57,10 +57,10 @@ let environmentHydrated: boolean;
 function environment() {
   return environmentHydrated
     ? {
-        displayConfig: { afterSwitchSessionUrl, branded },
-        authConfig: { singleSessionMode },
-        organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
-      }
+      displayConfig: { afterSwitchSessionUrl, branded },
+      authConfig: { singleSessionMode },
+      organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
+    }
     : null;
 }
 
@@ -104,9 +104,9 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   };
 });
 
-// The model reads its three paginated lists through the shared in-view helper, so the fetch
+// The model reads its three paginated lists through the Mosaic in-view helper, so the fetch
 // boundary is stubbed there rather than at `useOrganizationList`.
-vi.mock('../../../../hooks/useOrganizationListInView', () => ({
+vi.mock('../../../hooks/useOrganizationListInView', () => ({
   useOrganizationListInView: vi.fn(() => ({ userMemberships, userInvitations, userSuggestions, ref: pagingRef })),
 }));
 
