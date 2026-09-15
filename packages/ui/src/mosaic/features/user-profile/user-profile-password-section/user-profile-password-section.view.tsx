@@ -43,6 +43,10 @@ export function UserProfilePasswordSectionView({
   managedBy,
   onSubmitPassword,
 }: UserProfilePasswordSectionViewProps) {
+  if (!hasPassword && !managedBy && !onSubmitPassword) {
+    return null;
+  }
+
   return (
     <Section.Root aria-label={sectionTitle ? undefined : m.label}>
       {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
