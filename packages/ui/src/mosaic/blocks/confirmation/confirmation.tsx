@@ -27,7 +27,7 @@ function ConfirmationCard({
   errorMessage,
 }: ConfirmationCardProps) {
   return (
-    <Dialog.Popup size='card'>
+    <Dialog.Popup compactPlacement='sheet'>
       <Card.Root
         elevation='overlay'
         renderBranding={false}
@@ -109,7 +109,7 @@ function ControlledConfirmation({
 }: ConfirmationControlledProps) {
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      role='alertdialog'
       open={open}
       onOpenChange={onOpenChange}
     >
@@ -176,7 +176,7 @@ function HandleConfirmation<Payload>({
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      role='alertdialog'
       handle={handle}
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
@@ -207,6 +207,10 @@ export type ConfirmationProps<Payload = unknown> = ConfirmationControlledProps |
 /**
  * Confirmation dialog for a destructive action that is worth a second look but not worth
  * making the user type for. Use `Destructive` for the actions that are.
+ *
+ * An `alertdialog`: it announces as an interruption, an outside press cannot answer it, and the
+ * card withholds its corner dismiss — the footer is the only way out. Under the phone band it
+ * arrives as a bottom sheet, within reach of the thumb that has to answer it.
  *
  * Two forms. Controlled: the caller owns `open`, `isConfirming`, and `errorMessage`, and the
  * block holds nothing of its own. With a `handle`: the block owns all three. Mount it once,
