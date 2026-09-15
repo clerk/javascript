@@ -5,6 +5,20 @@ import { BaseResource } from '../internal';
 import { User } from '../User';
 
 describe('User', () => {
+  it('keeps a null timezone across JSON, resource, and snapshot representations', () => {
+    const user = new User({ timezone: null } as unknown as UserJSON);
+
+    expect(user.timezone).toBeNull();
+    expect(user.__internal_toSnapshot().timezone).toBeNull();
+  });
+
+  it('defaults a missing timezone from an older snapshot to null', () => {
+    const user = new User({} as unknown as UserJSON);
+
+    expect(user.timezone).toBeNull();
+    expect(user.__internal_toSnapshot().timezone).toBeNull();
+  });
+
   it('creates an external account', async () => {
     const externalAccountJSON = {
       object: 'external_account',
