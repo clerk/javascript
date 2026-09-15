@@ -19,6 +19,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   test.describe.configure({ mode: 'serial' });
 
   let fakeUser: FakeUser;
+  let modalSignUpUser: FakeUser;
 
   test.beforeAll(async () => {
     // Create a clerkClient for the OAuth provider instance.
@@ -30,16 +31,22 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     fakeUser = users.createFakeUser(test, {
       withUsername: true,
     });
+    modalSignUpUser = users.createFakeUser(test, {
+      withUsername: true,
+    });
     // Create the user on the OAuth provider instance so we do not need to sign up twice.
     await users.createBapiUser(fakeUser);
+    await users.createBapiUser(modalSignUpUser);
   });
 
   test.afterAll(async () => {
     const u = createTestUtils({ app });
     // Delete the user on the OAuth provider instance.
     await fakeUser.deleteIfExists();
+    await modalSignUpUser.deleteIfExists();
     // Delete the user on the app instance.
     await u.services.users.deleteIfExists({ email: fakeUser.email });
+    await u.services.users.deleteIfExists({ email: modalSignUpUser.email });
     await app.teardown();
   });
 
@@ -100,6 +107,33 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.page.waitForAppUrl('/protected');
 
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('openSignIn with withSignUp signs up a new user with custom oauth provider', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.page.goToRelative('/buttons');
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.page.evaluate(() => {
+      (window as any).Clerk.openSignIn({
+        withSignUp: true,
+        forceRedirectUrl: '/protected',
+        signUpForceRedirectUrl: '/protected',
+      });
+    });
+    await u.po.signIn.waitForModal();
+    await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+    await u.page.getByText('Sign in to oauth-provider').waitFor();
+
+    await u.po.signIn.setIdentifier(modalSignUpUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
+
+    await u.page.waitForAppUrl('/protected');
     await u.po.expect.toBeSignedIn();
   });
 
@@ -239,7 +273,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth
     await app.teardown();
   });
 
-  test('openSignIn OAuth in combined flow targets /sign-in#/create/sso-callback', async ({ page, context }) => {
+  test('openSignIn OAuth in combined flow targets /sign-in#/sso-callback', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
@@ -263,13 +297,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth
     expect(redirectUrl).toBeTruthy();
 
     // Combined flow (CLERK_SIGN_UP_URL is unset in this env): the sso-callback must anchor to
-    // ClerkProvider.signInUrl and carry the combined-flow /create segment, since the
-    // create/sso-callback route is mounted under the SignIn tree — not SignUp.
+    // ClerkProvider.signInUrl. The modal cannot know whether the SignIn mounted at that URL has the
+    // combined-flow `create/*` routes, so it targets `sso-callback`, which every SignIn mounts and
+    // whose handler transfers new users into a sign-up itself.
     const parsed = new URL(redirectUrl!);
     const appOrigin = new URL(app.serverUrl).origin;
     expect(parsed.origin).toBe(appOrigin);
     expect(parsed.pathname).toBe('/sign-in');
-    expect(parsed.hash).toMatch(/^#\/create\/sso-callback/);
+    expect(parsed.hash).toMatch(/^#\/sso-callback/);
   });
 });
 
