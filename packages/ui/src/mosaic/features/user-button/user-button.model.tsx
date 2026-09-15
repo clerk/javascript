@@ -7,10 +7,10 @@ import type {
   OrganizationSwitcherProps,
   UserButtonProps as ClerkUserButtonProps,
   UserProfileModalProps,
-  UserResource,
+  UserResource
 } from '@clerk/shared/types';
+import { populateParamFromObject } from '@clerk/shared/url';
 
-import { populateParamFromObject } from '../../../contexts/utils';
 import { useOrganizationListInView } from '../../../hooks/useOrganizationListInView';
 import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../../hooks/useMosaicRouter';
@@ -38,13 +38,13 @@ export type UserButtonModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | (UserButtonData &
-      Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-      UserButtonAsyncCallbacks &
-      UserButtonBrandingProps & {
-        status: 'ready';
-        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
-        organizationsEnabled: boolean;
-      });
+    Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
+    UserButtonAsyncCallbacks &
+    UserButtonBrandingProps & {
+      status: 'ready';
+      /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
+      organizationsEnabled: boolean;
+    });
 
 /** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
 type UserProfileMode =
@@ -227,15 +227,15 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
   const invitations: UserButtonInvitation[] = invitationData.flatMap(i =>
     i.status === 'pending' || i.status === 'accepted'
       ? [
-          {
-            kind: 'invitation',
-            id: i.id,
-            status: i.status,
-            organizationId: i.publicOrganizationData.id,
-            organizationName: i.publicOrganizationData.name,
-            imageUrl: i.publicOrganizationData.imageUrl || undefined,
-          },
-        ]
+        {
+          kind: 'invitation',
+          id: i.id,
+          status: i.status,
+          organizationId: i.publicOrganizationData.id,
+          organizationName: i.publicOrganizationData.name,
+          imageUrl: i.publicOrganizationData.imageUrl || undefined,
+        },
+      ]
       : [],
   );
 
