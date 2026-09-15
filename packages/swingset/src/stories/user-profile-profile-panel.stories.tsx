@@ -8,6 +8,7 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
@@ -37,11 +38,15 @@ export function Default(_args: Record<string, unknown>) {
   const { imageUrl, showFile, clearImage } = usePreviewImage(profileImageUrl);
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
+  const emailFlow = createUserProfileAddEmailFixture({
+    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+  });
 
   return (
     <UserProfileProfilePanelView
       {...editName}
       {...editUsername}
+      {...emailFlow}
       allowMultipleAccounts
       emails={emails}
       connectedAccounts={[
@@ -73,12 +78,6 @@ export function Default(_args: Record<string, unknown>) {
       hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}
       phones={phones}
-      onAddEmail={() =>
-        setEmails(current => [
-          ...current,
-          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
-        ])
-      }
       {...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       })}
@@ -94,7 +93,7 @@ export function Default(_args: Record<string, unknown>) {
       onConnectWeb3Wallet={() => undefined}
       onRemoveWeb3Wallet={() => undefined}
       onSetPrimaryWeb3Wallet={() => undefined}
-      onSetPrimaryEmail={() => undefined}
+      onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
       onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
       onVerifyEmail={() => undefined}
       onVerifyPhone={() => undefined}
