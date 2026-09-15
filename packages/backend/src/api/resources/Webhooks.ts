@@ -40,7 +40,7 @@ type EmailOutcomeWebhook<Type, Details = unknown> = {
   type: Type;
   timestamp: number;
   instance_id: string;
-  event_attributes: null;
+  event_attributes: WebhookEventAttributes;
   data: { id: string; to: [string] } & Details;
 };
 

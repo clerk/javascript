@@ -8,6 +8,7 @@ describe('transactional email outcome webhooks', () => {
     type VerifiedEvent = Awaited<ReturnType<typeof verifyWebhook>>;
     expectTypeOf<VerifiedEvent['data']['id']>().toEqualTypeOf<string | undefined>();
     expectTypeOf<EmailDeliveryWebhookEvent['data']['id']>().toEqualTypeOf<string>();
+    expectTypeOf<VerifiedEvent['event_attributes']>().toEqualTypeOf<EmailWebhookEvent['event_attributes']>();
   });
 
   test('narrows the bounce classification', () => {
@@ -15,7 +16,7 @@ describe('transactional email outcome webhooks', () => {
     expectTypeOf<Bounced['data']['bounce']['type']>().toEqualTypeOf<EmailBounceType>();
     expectTypeOf<Bounced['data']['to']>().toEqualTypeOf<[string]>();
     expectTypeOf<Bounced['timestamp']>().toEqualTypeOf<number>();
-    expectTypeOf<Bounced['event_attributes']>().toEqualTypeOf<null>();
+    expectTypeOf<Bounced['event_attributes']>().toEqualTypeOf<EmailWebhookEvent['event_attributes']>();
   });
 
   test('keeps existing email.created types separate', () => {

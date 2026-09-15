@@ -25,7 +25,7 @@ describe('verifyWebhook', () => {
       type: 'email.bounced',
       timestamp: 1789387200123,
       instance_id: 'ins_example',
-      event_attributes: null,
+      event_attributes: { http_request: { client_ip: '', user_agent: '' } },
       data: {
         id: 'ema_example',
         to: ['recipient@example.com'],
