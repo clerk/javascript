@@ -71,7 +71,9 @@ export function ReverificationPassword({
               value={value}
               onChange={event => onValueChange(event.target.value)}
             />
-            {errorMessage ? <Field.Error>{errorMessage}</Field.Error> : null}
+            <Field.Message>
+              <Field.Error>{errorMessage}</Field.Error>
+            </Field.Message>
           </Field.Root>
         </form>
       </Card.Content>

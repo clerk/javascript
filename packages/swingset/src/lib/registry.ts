@@ -193,8 +193,13 @@ import {
   Overlay as UserProfileOverlay,
 } from '../stories/user-profile.stories';
 import {
+  AddEmailFails as UserProfileAccountSectionAddEmailFails,
   AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
   Default as UserProfileAccountSectionDefault,
+  EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
+  EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
+  EmailSsoConnectFails as UserProfileAccountSectionEmailSsoConnectFails,
+  EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
 } from '../stories/user-profile-account-section.stories';
@@ -217,14 +222,29 @@ import {
   meta as userProfileBillingPanelMeta,
 } from '../stories/user-profile-billing-panel.stories';
 import {
+  ConnectionError as ConnectedAccountsConnectionError,
+  ConnectOnly as ConnectedAccountsConnectOnly,
   Default as UserProfileConnectedAccountsSectionDefault,
+  LinkedAccounts as ConnectedAccountsLinkedAccounts,
   meta as userProfileConnectedAccountsSectionMeta,
+  ReconnectRequired as ConnectedAccountsReconnectRequired,
+  RemovalError as ConnectedAccountsRemovalError,
+  RemovalPending as ConnectedAccountsRemovalPending,
+  VerificationError as ConnectedAccountsVerificationError,
 } from '../stories/user-profile-connected-accounts-section.stories';
 import {
   Default as UserProfileDeleteSectionDefault,
   meta as userProfileDeleteSectionMeta,
   WithError as UserProfileDeleteSectionWithError,
 } from '../stories/user-profile-delete-section.stories';
+import {
+  ConnectionError as UserProfileEnterpriseAccountsSectionConnectionError,
+  ConnectOnly as UserProfileEnterpriseAccountsSectionConnectOnly,
+  Default as UserProfileEnterpriseAccountsSectionDefault,
+  LinkedAccounts as UserProfileEnterpriseAccountsSectionLinkedAccounts,
+  meta as userProfileEnterpriseAccountsSectionMeta,
+  RequiresAction as UserProfileEnterpriseAccountsSectionRequiresAction,
+} from '../stories/user-profile-enterprise-accounts-section.stories';
 import {
   Default as UserProfileMfaSectionDefault,
   Empty as UserProfileMfaSectionEmpty,
@@ -257,8 +277,15 @@ import {
   meta as userProfileSubscriptionSectionMeta,
 } from '../stories/user-profile-subscription-section.stories';
 import {
+  ConnectedWallets as UserProfileWeb3WalletsSectionConnectedWallets,
+  ConnectionError as UserProfileWeb3WalletsSectionConnectionError,
+  ConnectOnly as UserProfileWeb3WalletsSectionConnectOnly,
   Default as UserProfileWeb3WalletsSectionDefault,
   meta as userProfileWeb3WalletsSectionMeta,
+  PrimaryError as UserProfileWeb3WalletsSectionPrimaryError,
+  RemovalError as UserProfileWeb3WalletsSectionRemovalError,
+  RemovalPending as UserProfileWeb3WalletsSectionRemovalPending,
+  UnverifiedWallet as UserProfileWeb3WalletsSectionUnverifiedWallet,
 } from '../stories/user-profile-web3-wallets-section.stories';
 import {
   Default as VisuallyHiddenDefault,
@@ -474,6 +501,11 @@ const userProfileAccountSectionModule: StoryModule = {
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
   AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
+  AddEmailFails: UserProfileAccountSectionAddEmailFails,
+  EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,
+  EmailLinkResendFails: UserProfileAccountSectionEmailLinkResendFails,
+  EmailSsoVerification: UserProfileAccountSectionEmailSsoVerification,
+  EmailSsoConnectFails: UserProfileAccountSectionEmailSsoConnectFails,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
@@ -519,13 +551,35 @@ const userProfilePaymentMethodsSectionModule: StoryModule = {
   Default: UserProfilePaymentMethodsSectionDefault,
   Empty: UserProfilePaymentMethodsSectionEmpty,
 };
+const userProfileEnterpriseAccountsSectionModule: StoryModule = {
+  meta: userProfileEnterpriseAccountsSectionMeta,
+  Default: UserProfileEnterpriseAccountsSectionDefault,
+  LinkedAccounts: UserProfileEnterpriseAccountsSectionLinkedAccounts,
+  RequiresAction: UserProfileEnterpriseAccountsSectionRequiresAction,
+  ConnectOnly: UserProfileEnterpriseAccountsSectionConnectOnly,
+  ConnectionError: UserProfileEnterpriseAccountsSectionConnectionError,
+};
 const userProfileConnectedAccountsSectionModule: StoryModule = {
   meta: userProfileConnectedAccountsSectionMeta,
   Default: UserProfileConnectedAccountsSectionDefault,
+  LinkedAccounts: ConnectedAccountsLinkedAccounts,
+  ConnectOnly: ConnectedAccountsConnectOnly,
+  ReconnectRequired: ConnectedAccountsReconnectRequired,
+  VerificationError: ConnectedAccountsVerificationError,
+  ConnectionError: ConnectedAccountsConnectionError,
+  RemovalPending: ConnectedAccountsRemovalPending,
+  RemovalError: ConnectedAccountsRemovalError,
 };
 const userProfileWeb3WalletsSectionModule: StoryModule = {
   meta: userProfileWeb3WalletsSectionMeta,
   Default: UserProfileWeb3WalletsSectionDefault,
+  ConnectedWallets: UserProfileWeb3WalletsSectionConnectedWallets,
+  ConnectOnly: UserProfileWeb3WalletsSectionConnectOnly,
+  ConnectionError: UserProfileWeb3WalletsSectionConnectionError,
+  PrimaryError: UserProfileWeb3WalletsSectionPrimaryError,
+  RemovalPending: UserProfileWeb3WalletsSectionRemovalPending,
+  RemovalError: UserProfileWeb3WalletsSectionRemovalError,
+  UnverifiedWallet: UserProfileWeb3WalletsSectionUnverifiedWallet,
 };
 const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
@@ -586,6 +640,7 @@ export const registry: StoryModule[] = [
   userProfilePaymentMethodsSectionModule,
   userProfileBillingHistorySectionModule,
   userProfileConnectedAccountsSectionModule,
+  userProfileEnterpriseAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
   // Reverification
