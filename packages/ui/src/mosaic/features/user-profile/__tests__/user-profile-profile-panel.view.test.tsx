@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -35,6 +35,38 @@ describe('UserProfileProfilePanelView', () => {
       availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
     });
     expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the final account confirmation mounted until removal settles', async () => {
+    const user = userEvent.setup();
+    const removal = Promise.withResolvers<void>();
+    const onRemoveConnectedAccount = vi.fn(() => removal.promise);
+    const { rerender } = renderView({
+      connectedAccounts: [{ id: 'github', provider: 'GitHub' }],
+      onRemoveConnectedAccount,
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage GitHub' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileProfilePanelView
+          {...props}
+          connectedAccounts={[]}
+          onRemoveConnectedAccount={onRemoveConnectedAccount}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('heading', { name: 'Connected accounts' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Remove connected account' })).toBeInTheDocument();
+
+    await act(async () => {
+      removal.resolve();
+      await removal.promise;
+    });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('heading', { name: 'Account', level: 3 })).toBeVisible();
   });
 
   it('keeps available providers visible without connected accounts', () => {
@@ -434,7 +466,7 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(removeConnectedAccount);
     expect(onRemoveConnectedAccount).not.toHaveBeenCalled();
     await user.click(
-      within(screen.getByRole('alertdialog', { name: 'Remove connected account' })).getByRole('button', {
+      within(screen.getByRole('dialog', { name: 'Remove connected account' })).getByRole('button', {
         name: 'Remove',
       }),
     );
