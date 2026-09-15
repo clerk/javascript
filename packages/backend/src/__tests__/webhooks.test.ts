@@ -27,7 +27,7 @@ describe('verifyWebhook', () => {
       instance_id: 'ins_example',
       event_attributes: null,
       data: {
-        email_id: 'ema_example',
+        id: 'ema_example',
         to: ['recipient@example.com'],
         bounce: { type: 'Permanent', message: 'Unknown mailbox' },
       },

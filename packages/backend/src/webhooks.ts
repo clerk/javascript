@@ -70,6 +70,7 @@ function createStandardWebhookHeaders(request: Request): Record<string, string> 
  *     const evt = await verifyWebhook(request)
  *
  *     // Access the event data
+ *     const { id } = evt.data
  *     const eventType = evt.type
  *
  *     // Handle specific event types
