@@ -130,10 +130,7 @@ export const IdentityProviderSection = (props: IdentityProviderSectionProps): JS
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.Item
-            id='sso'
-            sx={{ alignItems: 'flex-start' }}
-          >
+          <ProfileSection.Item id='sso'>
             <Col sx={t => ({ gap: t.space.$3, minWidth: 0 })}>
               {details
                 .filter(detail => detail.value)

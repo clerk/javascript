@@ -729,7 +729,8 @@ export type ElementsConfig = {
   configureSSOVerifyDomainList: WithOptions;
   configureSSOVerifyDomainSuggestion: WithOptions;
   configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified' | 'expired'>;
-  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired' | 'claimed'>;
+  configureSSOVerifyDomainCardCheckbox: WithOptions;
   configureSSOVerifyDomainCardRemoveButton: WithOptions;
   configureSSOVerifyDomainCardTxtRecord: WithOptions;
   configureSSOVerifyDomainCardTxtRecordValue: WithOptions;

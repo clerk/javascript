@@ -1662,6 +1662,8 @@ export type __internal_LocalizationResource = {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
         badge__expired: LocalizationValue;
+        badge__claimed: LocalizationValue<'connection'>;
+        checkboxLabel: LocalizationValue<'domain'>;
         verifiedAtLabel: LocalizationValue<'date'>;
         expiredAtLabel: LocalizationValue<'date'>;
         expiredLabel: LocalizationValue;

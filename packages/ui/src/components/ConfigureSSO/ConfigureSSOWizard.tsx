@@ -4,7 +4,7 @@ import { CardStateProvider } from '@/elements/contexts';
 
 import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
-import { areAllOrganizationDomainsVerified } from './domain/organizationEnterpriseConnection';
+import { areConnectionDomainsReady } from './domain/organizationEnterpriseConnection';
 import { Wizard, type WizardStepConfig } from './elements/Wizard';
 import { ActivateStep, ConfigureStep, OrganizationDomainsStep, TestConfigurationStep } from './steps';
 
@@ -14,17 +14,17 @@ export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOPro
 };
 
 export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: ConfigureSSOWizardProps): JSX.Element => {
-  const { organizationEnterpriseConnection: c, organizationDomains } = props;
+  const { organizationEnterpriseConnection: c, connectionDomains, organizationDomains } = props;
 
-  const allDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
+  const domainsReady = areConnectionDomainsReady(connectionDomains, organizationDomains);
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'verify-domain', label: 'Domains', isComplete: () => allDomainsVerified },
+      { id: 'verify-domain', label: 'Domains', isComplete: () => domainsReady },
       {
         id: 'configure',
         label: 'Connection',
-        isReachable: () => allDomainsVerified || c.hasConnection,
+        isReachable: () => domainsReady || c.hasConnection,
         isComplete: () => c.hasMinimumConfiguration || c.isActive,
       },
       {
@@ -40,7 +40,7 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
         isComplete: () => c.isActive,
       },
     ],
-    [c, allDomainsVerified],
+    [c, domainsReady],
   );
 
   const initialStepId = forceInitialStep ? steps[0].id : undefined;
