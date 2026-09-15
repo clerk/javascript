@@ -13,17 +13,33 @@ import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-p
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
-import { UserProfilePasswordSectionView } from './user-profile-password-section.view';
+import type {
+  UserProfileEditPasswordValue,
+  UserProfilePasswordManagedBy,
+  UserProfilePasswordSectionViewProps,
+} from './user-profile-password-section/user-profile-password-section.view';
+import { UserProfilePasswordSectionView } from './user-profile-password-section/user-profile-password-section.view';
 import { styles } from './user-profile-security-panel.styles';
 
-export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
+export type {
+  UserProfileDevice,
+  UserProfileEditPasswordValue,
+  UserProfileMfaAddableMethod,
+  UserProfileMfaMethod,
+  UserProfilePasskey,
+  UserProfilePasswordManagedBy,
+};
 
-export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
-  hasPassword?: boolean;
+export interface UserProfileSecurityPanelViewProps
+  extends
+    Omit<UserProfileActiveDevicesSectionViewProps, 'devices'>,
+    Pick<
+      UserProfilePasswordSectionViewProps,
+      'hasPassword' | 'requiresCurrentPassword' | 'managedBy' | 'onSubmitPassword'
+    > {
   passkeys?: UserProfilePasskey[];
   mfaMethods?: UserProfileMfaMethod[];
   devices?: UserProfileDevice[];
-  onChangePassword?: () => void;
   onAddPasskey?: () => void;
   onManagePasskey?: (id: string) => void;
   onRemovePasskey?: (id: string) => void;
@@ -36,10 +52,12 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
 
 export function UserProfileSecurityPanelView({
   hasPassword = false,
+  requiresCurrentPassword,
+  managedBy,
   passkeys,
   mfaMethods,
   devices,
-  onChangePassword,
+  onSubmitPassword,
   onAddPasskey,
   onManagePasskey,
   onRemovePasskey,
@@ -51,7 +69,8 @@ export function UserProfileSecurityPanelView({
   onSignOutAllOtherDevices,
   onDeleteAccount,
 }: UserProfileSecurityPanelViewProps): ReactElement {
-  const hasAuthentication = hasPassword || passkeys !== undefined || mfaMethods !== undefined;
+  const showPassword = hasPassword || Boolean(onSubmitPassword) || Boolean(managedBy);
+  const hasAuthentication = showPassword || passkeys !== undefined || mfaMethods !== undefined;
 
   return (
     <div {...mergeStyleProps(themeProps('user-profile-security-panel'), stylex.props(styles.root))}>
@@ -59,11 +78,18 @@ export function UserProfileSecurityPanelView({
       <div {...stylex.props(styles.sections)}>
         {hasAuthentication ? (
           <div {...stylex.props(styles.sectionCards)}>
-            {hasPassword ? <UserProfilePasswordSectionView onChangePassword={onChangePassword} /> : null}
+            {showPassword ? (
+              <UserProfilePasswordSectionView
+                hasPassword={hasPassword}
+                managedBy={managedBy}
+                requiresCurrentPassword={requiresCurrentPassword}
+                onSubmitPassword={onSubmitPassword}
+              />
+            ) : null}
             {passkeys !== undefined ? (
               <UserProfilePasskeysSectionView
                 passkeys={passkeys}
-                sectionTitle={hasPassword ? undefined : 'Authentication'}
+                sectionTitle={showPassword ? undefined : 'Authentication'}
                 onAdd={onAddPasskey}
                 onManage={onManagePasskey}
                 onRemove={onRemovePasskey}
@@ -72,7 +98,7 @@ export function UserProfileSecurityPanelView({
             {mfaMethods !== undefined ? (
               <UserProfileMfaSectionView
                 methods={mfaMethods}
-                sectionTitle={!hasPassword && passkeys === undefined ? 'Authentication' : undefined}
+                sectionTitle={!showPassword && passkeys === undefined ? 'Authentication' : undefined}
                 onAdd={onAddMfaMethod}
                 onRegenerateBackupCodes={onRegenerateBackupCodes}
                 onRemove={onRemoveMfaMethod}
