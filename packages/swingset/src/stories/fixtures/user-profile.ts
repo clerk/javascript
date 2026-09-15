@@ -1,24 +1,28 @@
-import type { UserProfileViewProps } from '@clerk/mosaic/user-profile/user-profile.view';
-import type { UserProfileAPIKey } from '@clerk/mosaic/user-profile/user-profile-api-keys-panel.view';
+import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import type { UserProfileAPIKey } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
-} from '@clerk/mosaic/user-profile/user-profile-billing-panel.view';
-import type { UserProfileEmail, UserProfilePhone } from '@clerk/mosaic/user-profile/user-profile-profile-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
+import type {
+  UserProfileEmail,
+  UserProfilePhone,
+} from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import type {
   UserProfileDevice,
   UserProfileMfaMethod,
   UserProfilePasskey,
-} from '@clerk/mosaic/user-profile/user-profile-security-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
+import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
 
 export interface UserProfileFixtureOptions {
-  /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
+  /** Replaces the default OTP flow, e.g. for a custom dialog example. */
   onAddEmail?: () => void;
 }
 
@@ -111,6 +115,9 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
 
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
+  const emailFlow = createUserProfileAddEmailFixture({
+    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+  });
 
   const pages: UserProfileViewProps['pages'] = {
     account: {
@@ -121,7 +128,9 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       imageUrl,
       emails,
       phones,
-      onAddEmail: onAddEmail ?? (() => addEmail(`preston+${emails.length}@clerk.dev`)),
+      onAddEmail,
+      onSendEmailCode: onAddEmail ? undefined : emailFlow.onSendEmailCode,
+      onVerifyEmailCode: onAddEmail ? undefined : emailFlow.onVerifyEmailCode,
       ...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       }),

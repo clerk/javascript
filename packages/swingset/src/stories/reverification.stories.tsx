@@ -1,14 +1,14 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import type { ReverificationMethod, ReverificationStep } from '@clerk/mosaic/features/reverification';
-import { ReverificationBackupCode } from '@clerk/mosaic/features/reverification/panels/reverification-backup-code';
-import { ReverificationHelp } from '@clerk/mosaic/features/reverification/panels/reverification-help';
-import { ReverificationMethodPicker } from '@clerk/mosaic/features/reverification/panels/reverification-method-picker';
-import { ReverificationOTP } from '@clerk/mosaic/features/reverification/panels/reverification-otp';
-import { ReverificationPasskey } from '@clerk/mosaic/features/reverification/panels/reverification-passkey';
-import { ReverificationPassword } from '@clerk/mosaic/features/reverification/panels/reverification-password';
 import { otpChannelFor } from '@clerk/mosaic/features/reverification/reverification.utils';
 import { ReverificationView } from '@clerk/mosaic/features/reverification/reverification.view';
+import { ReverificationBackupCode } from '@clerk/mosaic/features/reverification/steps/reverification-backup-code';
+import { ReverificationHelp } from '@clerk/mosaic/features/reverification/steps/reverification-help';
+import { ReverificationMethodPicker } from '@clerk/mosaic/features/reverification/steps/reverification-method-picker';
+import { ReverificationOTP } from '@clerk/mosaic/features/reverification/steps/reverification-otp';
+import { ReverificationPasskey } from '@clerk/mosaic/features/reverification/steps/reverification-passkey';
+import { ReverificationPassword } from '@clerk/mosaic/features/reverification/steps/reverification-password';
 import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -16,7 +16,7 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './reverification.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'Blocks',
+  group: 'Reverification',
   status: 'wip',
   title: 'Reverification',
   source: 'packages/mosaic/src/features/reverification/reverification.view.tsx',

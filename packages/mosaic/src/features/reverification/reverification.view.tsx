@@ -1,14 +1,14 @@
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import type { IconName } from '../../icons/registry';
-import { ReverificationBackupCode } from './panels/reverification-backup-code';
-import { ReverificationHelp } from './panels/reverification-help';
-import { ReverificationMethodPicker } from './panels/reverification-method-picker';
-import { ReverificationOTP } from './panels/reverification-otp';
-import { ReverificationPasskey } from './panels/reverification-passkey';
-import { ReverificationPassword } from './panels/reverification-password';
 import { fill, reverificationBase as m } from './reverification.messages';
 import type { ReverificationMethod, ReverificationOtpChannel, ReverificationViewProps } from './reverification.types';
+import { ReverificationBackupCode } from './steps/reverification-backup-code';
+import { ReverificationHelp } from './steps/reverification-help';
+import { ReverificationMethodPicker } from './steps/reverification-method-picker';
+import { ReverificationOTP } from './steps/reverification-otp';
+import { ReverificationPasskey } from './steps/reverification-passkey';
+import { ReverificationPassword } from './steps/reverification-password';
 
 const actions = {
   secondaryActionLabel: m.footerActionLink__useAnotherMethod,

@@ -1,5 +1,5 @@
-import type { UserProfileDevice } from '@clerk/mosaic/user-profile/user-profile-active-devices-section.view';
-import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/user-profile/user-profile-active-devices-section.view';
+import type { UserProfileDevice } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
+import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,7 +12,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileActiveDevicesSection',
   label: 'Active devices',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/user-profile/user-profile-active-devices-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-active-devices-section.view.tsx',
 };
 
 export function Default() {

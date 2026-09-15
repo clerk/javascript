@@ -1,5 +1,5 @@
-import type { UserProfilePaymentMethod } from '@clerk/mosaic/user-profile/user-profile-payment-methods-section.view';
-import { UserProfilePaymentMethodsSectionView } from '@clerk/mosaic/user-profile/user-profile-payment-methods-section.view';
+import type { UserProfilePaymentMethod } from '@clerk/mosaic/features/user-profile/user-profile-payment-methods-section.view';
+import { UserProfilePaymentMethodsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-payment-methods-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,7 +12,7 @@ export const meta: StoryMeta = {
   title: 'UserProfilePaymentMethodsSection',
   label: 'Payment methods',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/user-profile/user-profile-payment-methods-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-payment-methods-section.view.tsx',
 };
 
 export function Default() {

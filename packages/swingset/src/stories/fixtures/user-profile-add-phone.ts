@@ -1,5 +1,5 @@
-import type { UserProfileAccountSectionViewProps } from '@clerk/mosaic/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
+import type { UserProfileAccountSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
+import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 
 interface FixtureOptions {
   failAt?: UserProfileAddPhoneDialogProps['step'];

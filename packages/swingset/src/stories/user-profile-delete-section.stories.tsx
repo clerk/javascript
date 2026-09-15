@@ -1,4 +1,4 @@
-import { UserProfileDeleteSectionView } from '@clerk/mosaic/user-profile/user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -11,7 +11,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileDeleteSection',
   label: 'Danger zone',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/user-profile/user-profile-delete-section/user-profile-delete-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-delete-section/user-profile-delete-section.view.tsx',
 };
 
 // A real delete is a network round trip. Without one the button never renders its pending

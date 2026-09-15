@@ -6,7 +6,7 @@ import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/mosaic/co
 import { Heading } from '@clerk/mosaic/components/heading';
 import { Input } from '@clerk/mosaic/components/input';
 import { Text } from '@clerk/mosaic/components/text';
-import { UserProfileView } from '@clerk/mosaic/user-profile/user-profile.view';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
