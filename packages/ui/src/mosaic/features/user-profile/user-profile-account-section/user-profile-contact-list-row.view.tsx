@@ -4,6 +4,7 @@ import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { useFlipReorder } from '../../../hooks/useFlipReorder';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
 import { styles } from '../user-profile-profile-panel.styles';
@@ -33,6 +34,8 @@ export function UserProfileContactListRowView({
   renderActionDialog,
 }: UserProfileContactListRowViewProps) {
   const emptyDescription = m[kind].empty;
+  const orderedItems = [...items.filter(item => item.isDefault), ...items.filter(item => !item.isDefault)];
+  const itemsRef = useFlipReorder<HTMLDivElement>(orderedItems.map(item => item.id));
 
   return (
     <Section.Row>
@@ -61,7 +64,7 @@ export function UserProfileContactListRowView({
           </Section.Actions>
         ) : null}
       </Section.Item>
-      <Section.Items>
+      <Section.Items ref={itemsRef}>
         {items.length === 0 ? (
           <Section.Item>
             <Section.Content>
@@ -69,7 +72,7 @@ export function UserProfileContactListRowView({
             </Section.Content>
           </Section.Item>
         ) : (
-          items.map(item => {
+          orderedItems.map(item => {
             const actions: UserProfileMenuAction[] = [];
 
             if (item.isVerified === false && onVerify) {
