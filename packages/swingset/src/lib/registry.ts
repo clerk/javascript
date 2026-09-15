@@ -683,7 +683,7 @@ export const registry: StoryModule[] = [
   toastModule,
   fieldModule,
   visuallyHiddenModule,
-  // Primitives — alphabetical within the group.
+  // Primitives
   accordionModule,
   autocompleteModule,
   comboboxPrimitiveModule,
@@ -700,7 +700,7 @@ export const registry: StoryModule[] = [
   tooltipModule,
   // Styles — atomic styles that ship as StyleX atoms rather than components.
   scrollAreaModule,
-  // Hooks — alphabetical within the group.
+  // Hooks
   useDataTableModule,
 ];
 
@@ -712,6 +712,8 @@ export const registry: StoryModule[] = [
 export function getModule(groupSlug: string, componentSlug: string): StoryModule | undefined {
   return registry.find(mod => toSlug(mod.meta.group) === groupSlug && toSlug(mod.meta.title) === componentSlug);
 }
+
+const ALPHABETICAL_GROUPS = new Set(['Blocks', 'Components', 'Primitives', 'Styles', 'Hooks']);
 
 export function getSidebarGroups(): Array<{
   group: string;
@@ -731,6 +733,8 @@ export function getSidebarGroups(): Array<{
   return Array.from(groupMap.entries()).map(([group, components]) => ({
     group,
     groupSlug: toSlug(group),
-    components,
+    components: ALPHABETICAL_GROUPS.has(group)
+      ? [...components].sort((a, b) => a.mod.meta.title.localeCompare(b.mod.meta.title))
+      : components,
   }));
 }
