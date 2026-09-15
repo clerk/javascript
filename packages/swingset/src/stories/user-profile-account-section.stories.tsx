@@ -39,6 +39,7 @@ function AccountSection({
   usernameFailWith,
   failEmailVerification = false,
   emailRemovalState,
+  phoneRemovalState,
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
@@ -46,7 +47,9 @@ function AccountSection({
   usernameFailWith?: UserProfileFormError;
   failEmailVerification?: boolean;
   emailRemovalState?: 'pending' | 'error';
+  phoneRemovalState?: 'pending' | 'error';
 }) {
+  const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
   const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
   const editName = useUserProfileEditNameFixture({ failWith });
   const editUsername = useUserProfileEditUsernameFixture({ failWith: usernameFailWith });
@@ -98,7 +101,16 @@ function AccountSection({
         setEmails(current => current.filter(email => email.id !== id));
       }}
       onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
-      onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
+      onRemovePhone={async id => {
+        if (phoneRemovalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (phoneRemovalState === 'error' && !phoneRemovalFailed) {
+          setPhoneRemovalFailed(true);
+          throw new Error('Unable to remove this phone number. Try again.');
+        }
+        setPhones(current => current.filter(phone => phone.id !== id));
+      }}
       onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
     />
   );
@@ -237,6 +249,24 @@ export function EmailRemovalError() {
     <AccountSection
       allowMultipleAccounts
       emailRemovalState='error'
+    />
+  );
+}
+
+export function PhoneRemovalPending() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      phoneRemovalState='pending'
+    />
+  );
+}
+
+export function PhoneRemovalError() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      phoneRemovalState='error'
     />
   );
 }

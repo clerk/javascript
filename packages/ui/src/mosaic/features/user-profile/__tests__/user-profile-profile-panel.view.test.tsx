@@ -450,7 +450,7 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
     expect(onRemovePhone).not.toHaveBeenCalled();
     await user.click(
-      within(screen.getByRole('alertdialog', { name: 'Remove phone number?' })).getByRole('button', {
+      within(screen.getByRole('dialog', { name: 'Remove phone number?' })).getByRole('button', {
         name: 'Remove',
       }),
     );
