@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.33.0
+
+### Minor Changes
+
+- Add `agentid` to `OAuthProvider` and `OAUTH_PROVIDERS` to support the "Continue with AgentID" OAuth flow. Instances with the connection enabled now render a "Continue with AgentID" button, with the AgentID mark tinted to match the theme's foreground color so it stays legible in dark mode. ([#9735](https://github.com/clerk/javascript/pull/9735)) by [@wyattjoh](https://github.com/wyattjoh)
+
+### Patch Changes
+
+- The organization Security page now lists every enterprise SSO connection of the organization, each with its own status, domains, and actions. The SSO wizard edits one explicit connection, and a banner names it when the organization has more than one. Changing a provider or removing a connection now targets that connection instead of the first one returned by the API. ([#9729](https://github.com/clerk/javascript/pull/9729)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
 ## 4.32.0
 
 ### Minor Changes
