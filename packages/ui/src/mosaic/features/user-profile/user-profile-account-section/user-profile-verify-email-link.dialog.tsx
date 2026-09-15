@@ -1,12 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Banner } from '../../components/banner';
-import { Button } from '../../components/button';
-import { Card } from '../../components/card';
-import type { DialogTriggerProps } from '../../components/dialog';
-import { Dialog } from '../../components/dialog';
-import { Spinner } from '../../components/spinner';
-import { Text } from '../../components/text';
+import { Banner } from '../../../components/banner';
+import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
+import type { DialogTriggerProps } from '../../../components/dialog';
+import { Dialog } from '../../../components/dialog';
+import { Spinner } from '../../../components/spinner';
+import { Text } from '../../../components/text';
 import { fill } from './user-profile-account-section.messages';
 import { userProfileVerifyEmailLinkMessages as m } from './user-profile-verify-email-link.messages';
 import { styles } from './user-profile-verify-email-link.styles';

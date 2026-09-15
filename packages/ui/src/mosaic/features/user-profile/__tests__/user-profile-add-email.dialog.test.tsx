@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileAddEmailDialogProps } from '../user-profile-account-section/user-profile-add-email.dialog';
 import { UserProfileAddEmailDialog } from '../user-profile-account-section/user-profile-add-email.dialog';
 

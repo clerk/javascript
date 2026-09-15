@@ -1,14 +1,14 @@
 import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import type { DialogTriggerProps } from '../../components/dialog';
-import { Dialog } from '../../components/dialog';
-import { Field } from '../../components/field';
-import { Flow } from '../../components/flow';
-import { Input } from '../../components/input';
-import { Otp } from '../../components/otp';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import type { DialogTriggerProps } from '../../../components/dialog';
+import { Dialog } from '../../../components/dialog';
+import { Field } from '../../../components/field';
+import { Flow } from '../../../components/flow';
+import { Input } from '../../../components/input';
+import { Otp } from '../../../components/otp';
 import { fill } from './user-profile-account-section.messages';
 import { userProfileAddEmailMessages as m } from './user-profile-add-email.messages';
 

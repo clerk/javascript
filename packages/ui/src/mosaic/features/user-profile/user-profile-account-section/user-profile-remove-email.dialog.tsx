@@ -1,9 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Button } from '../../components/button';
-import { Dialog } from '../../components/dialog';
-import { Heading } from '../../components/heading';
-import { Text } from '../../components/text';
+import { Button } from '../../../components/button';
+import { Dialog } from '../../../components/dialog';
+import { Heading } from '../../../components/heading';
+import { Text } from '../../../components/text';
 import { styles } from '../user-profile-profile-panel.styles';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 

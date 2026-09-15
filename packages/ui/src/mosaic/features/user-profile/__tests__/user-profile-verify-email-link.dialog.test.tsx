@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileVerifyEmailLinkDialogProps } from '../user-profile-account-section/user-profile-verify-email-link.dialog';
 import { UserProfileVerifyEmailLinkDialog } from '../user-profile-account-section/user-profile-verify-email-link.dialog';
 

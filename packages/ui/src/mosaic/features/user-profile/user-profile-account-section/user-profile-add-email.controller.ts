@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/useMachine';
+import { setup } from '../../../machine/setup';
+import { useMachine } from '../../../machine/useMachine';
 import type { UserProfileAddEmailDialogProps } from './user-profile-add-email.dialog';
 import { userProfileAddEmailMessages as m } from './user-profile-add-email.messages';
 

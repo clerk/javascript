@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileAccountSectionViewProps } from '../user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '../user-profile-account-section/user-profile-account-section.view';
 

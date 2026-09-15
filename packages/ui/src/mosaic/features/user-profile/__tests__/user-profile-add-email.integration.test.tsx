@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
 
 describe('profile add email', () => {
