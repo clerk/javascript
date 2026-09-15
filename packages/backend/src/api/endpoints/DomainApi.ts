@@ -73,24 +73,24 @@ export class DomainAPI extends AbstractAPI {
 
   /**
    * Deletes a domain for the instance. The active domain cannot be deleted.
-   * @param satelliteDomainId - The ID of the domain to delete.
+   * @param domainId - The ID of the domain to delete.
    * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object).
    */
-  public async delete(satelliteDomainId: string) {
-    return this.deleteDomain(satelliteDomainId);
+  public async delete(domainId: string) {
+    return this.deleteDomain(domainId);
   }
 
   /**
    * Deletes a domain for the instance. The active domain cannot be deleted.
-   * @param satelliteDomainId - The ID of the domain to delete.
+   * @param domainId - The ID of the domain to delete.
    * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object).
    * @deprecated Use `delete()` instead.
    */
-  public async deleteDomain(satelliteDomainId: string) {
-    this.requireId(satelliteDomainId);
+  public async deleteDomain(domainId: string) {
+    this.requireId(domainId);
     return this.request<DeletedObject>({
       method: 'DELETE',
-      path: joinPaths(basePath, satelliteDomainId),
+      path: joinPaths(basePath, domainId),
     });
   }
 }
