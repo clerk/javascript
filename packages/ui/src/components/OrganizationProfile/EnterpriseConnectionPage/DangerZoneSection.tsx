@@ -22,7 +22,7 @@ type DangerZoneSectionProps = {
 export const DangerZoneSection = (props: DangerZoneSectionProps): JSX.Element => (
   <ProfileSection.Root
     title={localizationKeys('organizationProfile.securityPage.connectionPage.dangerZone.title')}
-    id='sso'
+    id='ssoConnectionDangerZone'
   >
     {/* Own card state so a failed deactivation reports here instead of in the page header. */}
     <CardStateProvider>
@@ -66,14 +66,14 @@ const DangerZoneActions = ({
 
   return (
     <>
-      <ProfileSection.ItemList id='sso'>
+      <ProfileSection.ItemList id='ssoConnectionDangerZone'>
         {connection.active && (
           <ProfileSection.Item
-            id='sso'
+            id='ssoConnectionDangerZone'
             sx={itemSx}
           >
             <ProfileSection.Button
-              id='sso'
+              id='ssoConnectionDangerZone'
               variant='ghost'
               colorScheme='danger'
               textVariant='buttonLarge'
@@ -87,11 +87,11 @@ const DangerZoneActions = ({
         )}
 
         <ProfileSection.Item
-          id='sso'
+          id='ssoConnectionDangerZone'
           sx={itemSx}
         >
           <ProfileSection.Button
-            id='sso'
+            id='ssoConnectionDangerZone'
             variant='ghost'
             colorScheme='danger'
             textVariant='buttonLarge'

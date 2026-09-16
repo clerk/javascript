@@ -109,7 +109,7 @@ type ConnectionRowProps = {
 };
 
 const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JSX.Element => {
-  const { status } = useOrganizationEnterpriseConnectionStatus(connection);
+  const { status } = useOrganizationEnterpriseConnectionStatus(connection, { probe: false });
 
   const badge = STATUS_BADGES[status];
   const label = providerLabel(toProviderCard(connection.provider as EnterpriseConnectionProviderType));
@@ -118,7 +118,6 @@ const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JS
     <Button
       elementDescriptor={descriptors.organizationProfileSecuritySsoConnectionRow}
       variant='unstyled'
-      aria-label={connection.name}
       onClick={() => onOpenConnection(connection.id)}
       sx={{ display: 'block', width: '100%', height: 'auto', padding: 0, textAlign: 'start' }}
     >

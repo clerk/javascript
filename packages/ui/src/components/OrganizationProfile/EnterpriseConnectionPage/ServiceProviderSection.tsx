@@ -61,7 +61,7 @@ export const OidcServiceProviderSection = ({
 const ServiceProviderSectionRoot = ({ children }: { children: ReactNode }): JSX.Element => (
   <ProfileSection.Root
     title={localizationKeys('organizationProfile.securityPage.connectionPage.serviceProvider.title')}
-    id='sso'
+    id='ssoConnectionServiceProvider'
     centered={false}
   >
     <Col gap={4}>{children}</Col>

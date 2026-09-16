@@ -1,4 +1,5 @@
-import { within } from '@testing-library/react';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { fireEvent, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -87,21 +88,27 @@ const renderPage = (
   connection: any,
   onBack = vi.fn(),
   onOpenWizard = vi.fn(),
-) => ({
-  onBack,
-  onOpenWizard,
-  ...render(
+) => {
+  const page = (next: any) => (
     <EnterpriseConnectionPage
-      connection={connection}
+      connection={next}
       enterpriseConnectionMutations={mutationsFor(fixtures)}
       organizationName='Org1'
       contentRef={{ current: null }}
       onBack={onBack}
       onOpenWizard={onOpenWizard}
-    />,
-    { wrapper },
-  ),
-});
+    />
+  );
+
+  const result = render(page(connection), { wrapper });
+
+  return {
+    onBack,
+    onOpenWizard,
+    ...result,
+    rerenderWith: (next: any) => result.rerender(page(next)),
+  };
+};
 
 const withNoTestRuns = (fixtures: any) => {
   fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
@@ -374,9 +381,114 @@ describe('EnterpriseConnectionPage', () => {
         timeout: 10_000,
       });
     }, 15_000);
+
+    it('opens the SAML Edit form on the metadata URL mode for a metadata-configured connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { userEvent, container } = renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({ idpMetadataUrl: 'https://idp.example.com/metadata', idpSsoUrl: '', idpEntityId: '' }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      expect(within(form).getByDisplayValue('https://idp.example.com/metadata')).toBeInTheDocument();
+      expect(within(form).queryByLabelText('Sign on URL')).not.toBeInTheDocument();
+    });
+
+    it('opens the OIDC Edit form on the discovery mode for a discovery-configured connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { userEvent, container } = renderPage(
+        wrapper,
+        fixtures,
+        oidcConnection({
+          oauthConfig: {
+            ...oidcConnection().oauthConfig,
+            authUrl: 'https://idp.example.com/authorize',
+            tokenUrl: 'https://idp.example.com/token',
+          },
+        }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      expect(
+        within(form).getByDisplayValue('https://idp.example.com/.well-known/openid-configuration'),
+      ).toBeInTheDocument();
+      expect(within(form).queryByLabelText('Authorization URL')).not.toBeInTheDocument();
+    });
   });
 
   describe('settings', () => {
+    it('reports a failed save inside the Settings section', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockRejectedValue(
+        new ClerkAPIResponseError('Error', {
+          data: [
+            { code: 'form_param_format_invalid', message: 'Settings rejected', long_message: 'Settings rejected' },
+          ],
+          status: 422,
+        }),
+      );
+
+      const { userEvent, container } = renderPage(wrapper, fixtures, samlConnection());
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: /Sync user attributes/ }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+      const alert = await screen.findByText('Settings rejected');
+      expect(container.querySelector('.cl-profileSection__ssoConnectionSettings')).toContainElement(alert);
+    });
+
+    it('submits once when Save is clicked twice in a row', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      let resolveUpdate: (value: unknown) => void = () => {};
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockReturnValue(
+        new Promise(resolve => {
+          resolveUpdate = resolve;
+        }) as any,
+      );
+
+      const { userEvent } = renderPage(wrapper, fixtures, samlConnection());
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: /Sync user attributes/ }));
+
+      const save = screen.getByRole('button', { name: 'Save' });
+      await userEvent.click(save);
+      // The in-flight Save is disabled, so the second click has to bypass the pointer-events guard
+      // to reach the submit handler at all.
+      fireEvent.click(save);
+
+      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledTimes(1);
+
+      resolveUpdate(samlConnection({ syncUserAttributes: true }));
+    });
+
+    it('reseats the checkboxes when the connection comes back changed', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { rerenderWith } = renderPage(wrapper, fixtures, samlConnection());
+
+      expect(await screen.findByRole('checkbox', { name: /Sync user attributes/ })).not.toBeChecked();
+
+      rerenderWith(samlConnection({ syncUserAttributes: true }));
+
+      await waitFor(() => expect(screen.getByRole('checkbox', { name: /Sync user attributes/ })).toBeChecked());
+      expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    });
+
     it('keeps Save disabled until a setting differs from the connection', async () => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);
       withNoTestRuns(fixtures);

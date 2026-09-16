@@ -19,9 +19,11 @@ type OrganizationSecurityPageProps = {
   contentRef: React.RefObject<HTMLDivElement>;
 };
 
+type WizardReturnTo = { kind: 'overview' } | { kind: 'connection'; id: string };
+
 type SecurityPageView =
   | { kind: 'overview' }
-  | { kind: 'wizard'; forceInitialStep: boolean }
+  | { kind: 'wizard'; forceInitialStep: boolean; returnTo: WizardReturnTo }
   | { kind: 'connection'; id: string }
   | { kind: 'directorySync' };
 
@@ -60,9 +62,13 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
 
   const exitToOverview = () => setRequestedView({ kind: 'overview' });
 
-  const openWizard = (scope: ConnectionScope, forceInitialStep = false) => {
+  const openWizard = (
+    scope: ConnectionScope,
+    forceInitialStep = false,
+    returnTo: WizardReturnTo = { kind: 'overview' },
+  ) => {
     selectConnection(scope);
-    setRequestedView({ kind: 'wizard', forceInitialStep });
+    setRequestedView({ kind: 'wizard', forceInitialStep, returnTo });
   };
 
   const openConnection = (id: string) => setRequestedView({ kind: 'connection', id });
@@ -118,12 +124,25 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         organizationName={organization?.name ?? ''}
         contentRef={contentRef}
         onBack={exitToOverview}
-        onOpenWizard={() => openWizard({ kind: 'existing', id: openedConnection.id })}
+        onOpenWizard={() =>
+          openWizard({ kind: 'existing', id: openedConnection.id }, false, {
+            kind: 'connection',
+            id: openedConnection.id,
+          })
+        }
       />
     );
   }
 
   if (view.kind === 'wizard') {
+    const { returnTo } = view;
+    const exitWizard = () =>
+      setRequestedView(
+        returnTo.kind === 'connection' && enterpriseConnections.some(connection => connection.id === returnTo.id)
+          ? returnTo
+          : { kind: 'overview' },
+      );
+
     return (
       <ConfigureSSOWizard
         organizationEnterpriseConnection={organizationEnterpriseConnection}
@@ -137,8 +156,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         organizationDomainMutations={organizationDomainMutations}
         organizationDomains={organizationDomains}
         forceInitialStep={view.forceInitialStep}
-        title={<SecurityBackControl onClick={exitToOverview} />}
-        onExit={exitToOverview}
+        title={<SecurityBackControl onClick={exitWizard} />}
+        onExit={exitWizard}
       />
     );
   }

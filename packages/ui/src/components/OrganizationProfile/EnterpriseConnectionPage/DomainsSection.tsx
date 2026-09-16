@@ -12,14 +12,14 @@ export const DomainsSection = ({ connection }: { connection: EnterpriseConnectio
   return (
     <ProfileSection.Root
       title={localizationKeys('organizationProfile.securityPage.connectionPage.domains.title')}
-      id='sso'
+      id='ssoConnectionDomains'
       centered={false}
     >
-      <ProfileSection.ItemList id='sso'>
+      <ProfileSection.ItemList id='ssoConnectionDomains'>
         {connection.domains.map(domain => (
           <ProfileSection.Item
             key={domain}
-            id='sso'
+            id='ssoConnectionDomains'
           >
             <Text>{domain}</Text>
           </ProfileSection.Item>

@@ -130,12 +130,12 @@ export const IdentityProviderSection = (props: IdentityProviderSectionProps): JS
   return (
     <ProfileSection.Root
       title={localizationKeys('organizationProfile.securityPage.connectionPage.identityProvider.title')}
-      id='sso'
+      id='ssoConnectionIdentityProvider'
       centered={false}
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.Item id='sso'>
+          <ProfileSection.Item id='ssoConnectionIdentityProvider'>
             <Col sx={t => ({ gap: t.space.$3, minWidth: 0 })}>
               {details
                 .filter(detail => detail.value)
@@ -156,7 +156,7 @@ export const IdentityProviderSection = (props: IdentityProviderSectionProps): JS
 
             <Action.Trigger value='edit'>
               <ProfileSection.Button
-                id='sso'
+                id='ssoConnectionIdentityProvider'
                 localizationKey={localizationKeys(
                   'organizationProfile.securityPage.connectionPage.identityProvider.editButton',
                 )}
@@ -205,9 +205,7 @@ const SamlForm = withCardStateProvider(
     const saml = connection.samlConnection;
     const existingCertPresent = Boolean(saml?.idpCertificate);
 
-    const [mode, setMode] = useState<SamlIdpConfigurationMode>(
-      saml?.idpSsoUrl || saml?.idpEntityId || saml?.idpCertificate ? 'manual' : 'metadataUrl',
-    );
+    const [mode, setMode] = useState<SamlIdpConfigurationMode>(saml?.idpMetadataUrl ? 'metadataUrl' : 'manual');
     const [certFile, setCertFile] = useState<File | null>(null);
 
     const metadataUrlField = useFormControl('idpMetadataUrl', saml?.idpMetadataUrl ?? '', {
@@ -363,9 +361,7 @@ const OidcForm = withCardStateProvider(
     const card = useCardState();
     const oauthConfig = connection.oauthConfig;
 
-    const [mode, setMode] = useState<OidcIdpConfigurationMode>(
-      oauthConfig?.authUrl || oauthConfig?.tokenUrl ? 'manual' : 'discoveryUrl',
-    );
+    const [mode, setMode] = useState<OidcIdpConfigurationMode>(oauthConfig?.discoveryUrl ? 'discoveryUrl' : 'manual');
 
     const clientIdField = useFormControl('clientId', oauthConfig?.clientId ?? '', {
       type: 'text',

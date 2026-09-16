@@ -77,6 +77,12 @@ export type ProfileSectionId =
   | 'resetSso'
   | 'testSsoUrl'
   | 'testResults'
+  | 'ssoConnectionName'
+  | 'ssoConnectionDomains'
+  | 'ssoConnectionServiceProvider'
+  | 'ssoConnectionIdentityProvider'
+  | 'ssoConnectionSettings'
+  | 'ssoConnectionDangerZone'
   | 'accountCredits';
 export type ProfilePageId =
   | 'account'

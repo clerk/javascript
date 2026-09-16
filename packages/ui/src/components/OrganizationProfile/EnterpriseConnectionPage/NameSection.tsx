@@ -22,17 +22,17 @@ type NameSectionProps = {
 export const NameSection = ({ connection, updateConnection }: NameSectionProps): JSX.Element => (
   <ProfileSection.Root
     title={localizationKeys('organizationProfile.securityPage.connectionPage.name.title')}
-    id='sso'
+    id='ssoConnectionName'
     centered={false}
   >
     <Action.Root>
       <Action.Closed value='name'>
-        <ProfileSection.Item id='sso'>
+        <ProfileSection.Item id='ssoConnectionName'>
           <Text>{connection.name}</Text>
 
           <Action.Trigger value='name'>
             <ProfileSection.Button
-              id='sso'
+              id='ssoConnectionName'
               localizationKey={localizationKeys('organizationProfile.securityPage.connectionPage.name.editButton')}
             />
           </Action.Trigger>

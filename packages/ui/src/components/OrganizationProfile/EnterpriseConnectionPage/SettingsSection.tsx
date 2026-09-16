@@ -1,7 +1,8 @@
 import type { EnterpriseConnectionResource, UpdateOrganizationEnterpriseConnectionParams } from '@clerk/shared/types';
 import type React from 'react';
 
-import { useCardState } from '@/elements/contexts';
+import { Card } from '@/elements/Card';
+import { CardStateProvider, useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { FormButtons } from '@/elements/FormButtons';
 import { ProfileSection } from '@/elements/Section';
@@ -82,6 +83,9 @@ const useSettingField = (id: SettingId, connection: EnterpriseConnectionResource
     defaultChecked: settingById(id).isChecked(connection),
   });
 
+const settingsSignature = (connection: EnterpriseConnectionResource): string =>
+  SETTINGS.map(setting => (setting.isChecked(connection) ? '1' : '0')).join('');
+
 const settingDescription = (id: SettingId) =>
   localizationKeys(`organizationProfile.securityPage.connectionPage.settings.${id}.description`);
 
@@ -91,7 +95,24 @@ type SettingsSectionProps = {
   updateConnection: EnterpriseConnectionMutations['updateConnection'];
 };
 
-export const SettingsSection = ({ connection, family, updateConnection }: SettingsSectionProps): JSX.Element => {
+export const SettingsSection = ({ connection, family, updateConnection }: SettingsSectionProps): JSX.Element => (
+  <ProfileSection.Root
+    title={localizationKeys('organizationProfile.securityPage.connectionPage.settings.title')}
+    id='ssoConnectionSettings'
+    centered={false}
+  >
+    <CardStateProvider>
+      <SettingsForm
+        key={settingsSignature(connection)}
+        connection={connection}
+        family={family}
+        updateConnection={updateConnection}
+      />
+    </CardStateProvider>
+  </ProfileSection.Root>
+);
+
+const SettingsForm = ({ connection, family, updateConnection }: SettingsSectionProps): JSX.Element => {
   const card = useCardState();
 
   const fields: Record<SettingId, FormControlState<SettingId>> = {
@@ -118,6 +139,7 @@ export const SettingsSection = ({ connection, family, updateConnection }: Settin
     }
 
     card.setError(undefined);
+    card.setLoading();
 
     try {
       await updateConnection(
@@ -126,33 +148,31 @@ export const SettingsSection = ({ connection, family, updateConnection }: Settin
       );
     } catch (err) {
       handleError(err as Error, [], card.setError);
+    } finally {
+      card.setIdle();
     }
   };
 
   return (
-    <ProfileSection.Root
-      title={localizationKeys('organizationProfile.securityPage.connectionPage.settings.title')}
-      id='sso'
-      centered={false}
-    >
-      <Form.Root onSubmit={onSubmit}>
-        {applicable.map(setting => (
-          <Form.ControlRow
-            key={setting.id}
-            elementId={setting.id}
-          >
-            <Form.Checkbox
-              {...fields[setting.id].props}
-              description={settingDescription(setting.id)}
-            />
-          </Form.ControlRow>
-        ))}
+    <Form.Root onSubmit={onSubmit}>
+      {applicable.map(setting => (
+        <Form.ControlRow
+          key={setting.id}
+          elementId={setting.id}
+        >
+          <Form.Checkbox
+            {...fields[setting.id].props}
+            description={settingDescription(setting.id)}
+          />
+        </Form.ControlRow>
+      ))}
 
-        <FormButtons
-          isDisabled={changed.length === 0 || card.isLoading}
-          onReset={onReset}
-        />
-      </Form.Root>
-    </ProfileSection.Root>
+      <Card.Alert>{card.error}</Card.Alert>
+
+      <FormButtons
+        isDisabled={changed.length === 0 || card.isLoading}
+        onReset={onReset}
+      />
+    </Form.Root>
   );
 };

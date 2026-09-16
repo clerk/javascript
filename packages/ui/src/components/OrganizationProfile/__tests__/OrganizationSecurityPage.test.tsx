@@ -89,7 +89,7 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByText(/you have started a configuration/i)).not.toBeInTheDocument();
       expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
 
-      expect(screen.getByRole('button', { name: 'clerk.com' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /clerk\.com/ })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
     });
 
@@ -112,7 +112,7 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByText(/^Domains:?$/)).not.toBeInTheDocument();
       expect(screen.getAllByText('clerk.com').length).toBeGreaterThan(0);
 
-      expect(screen.getByRole('button', { name: 'clerk.com' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /clerk\.com/ })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Continue configuration' })).not.toBeInTheDocument();
@@ -236,7 +236,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: 'clerk.com' }));
+      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
       await userEvent.click(await screen.findByRole('button', { name: 'Continue setup' }));
 
       // The connection page forces no step, so the wizard resumes at the furthest-
@@ -271,6 +271,30 @@ describe('OrganizationSecurityPage', () => {
       expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
       expect(screen.queryByRole('heading', { name: /add SSO domains/i })).not.toBeInTheDocument();
     });
+
+    it('returns to the connection page when the wizard was opened from it', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        configuredConnection({ samlConnection: null }),
+      ]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
+      await userEvent.click(await screen.findByRole('button', { name: 'Continue setup' }));
+      expect(await screen.findByRole('heading', { name: /configure okta workforce/i })).toBeInTheDocument();
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Security' }));
+
+      expect(await screen.findByText('Danger zone')).toBeInTheDocument();
+      expect(screen.queryByText(DESCRIPTION_LINE_1)).not.toBeInTheDocument();
+    });
   });
 
   describe('connection page', () => {
@@ -285,7 +309,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: 'clerk.com' }));
+      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
 
       expect(await screen.findByRole('heading', { name: 'clerk.com' })).toBeInTheDocument();
       expect(screen.getAllByText('Okta Workforce').length).toBeGreaterThan(0);
@@ -304,7 +328,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: 'clerk.com' }));
+      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
       await userEvent.click(await screen.findByRole('button', { name: 'Security' }));
 
       expect(await screen.findByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
@@ -327,7 +351,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: 'clerk.com' }));
+      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
       await userEvent.click(await screen.findByRole('checkbox', { name: /Sync user attributes/ }));
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
@@ -386,7 +410,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: 'second.com' }));
+      await userEvent.click(await screen.findByRole('button', { name: /second\.com/ }));
 
       expect(await screen.findByRole('heading', { name: 'second.com' })).toBeInTheDocument();
       expect(screen.queryByRole('heading', { name: 'first.com' })).not.toBeInTheDocument();
@@ -445,7 +469,7 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      expect(await screen.findByRole('button', { name: 'clerk.com' })).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name: /clerk\.com/ })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
       expect(screen.queryByText('Directory Sync')).not.toBeInTheDocument();
       expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
