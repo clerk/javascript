@@ -43,7 +43,7 @@ const userProfileRenamePasskeyMachine = createMachine({
     },
     editing: {
       on: {
-        TYPE: { actions: assign((_, event) => ({ name: event.value, error: undefined })) },
+        TYPE: { actions: assign((_, event) => ({ name: event.value })) },
         SAVE: { target: 'saving', guard: isSaveable, actions: assign(() => ({ error: undefined })) },
         CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined })) },
       },

@@ -89,7 +89,7 @@ describe('passkeys section', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Try again');
     expect(input).toHaveValue('Work laptop');
     await user.type(input, ' updated');
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Try again');
     expect(input).toHaveValue('Work laptop updated');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     expect(onRename).toHaveBeenLastCalledWith('laptop', 'Work laptop updated');
