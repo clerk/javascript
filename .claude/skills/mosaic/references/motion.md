@@ -23,14 +23,23 @@ the shared vocabulary.
 ## `--cl-ease-default` vs `--cl-ease-enter`: count the overshoot in pixels
 
 `--cl-ease-default` is the default, and should stay that way — its ~2% pass past
-the target is what makes a small surface feel snappy rather than merely fast. But
-that 2% is a fraction of the delta, so the same curve overshoots by a different
-amount depending on what it is applied to, and what the eye judges is the absolute
-distance. A 200px popup scaling from 0.96 passes its target by under a pixel and
-reads as a settle. A full-width dialog does the same thing by tens of pixels and
-reads as playful — the surface arriving past its inset and correcting. That is
-where `--cl-ease-enter` came from: the dialogs, where the default had too much
-play in it.
+the target is what makes a surface feel snappy rather than merely fast. What
+decides whether that pass is charm or play is how far it actually travels in
+pixels, and the arithmetic is worth doing rather than eyeballing: the overshoot is
+2% of the **delta**, not of the element.
+
+| what moves                              | travel | overshoot |
+| --------------------------------------- | ------ | --------- |
+| popover, `scale(0.94 → 1)` at 320px     | 19px   | 0.4px     |
+| dialog card, `scale(0.98 → 1)` at 600px | 12px   | 0.3px     |
+| sheet, `translate` its own 640px height | 640px  | 15px      |
+
+A scale delta is a few percent of the element, so its overshoot lands sub-pixel
+however large the surface — `--cl-ease-default` is right for all of them. It is
+travel-based motion that crosses the threshold: a sheet passes its inset by ~15px
+and visibly corrects. That is where `--cl-ease-enter` came from, and the dialog
+surfaces now take it for their scale too, as a house choice at that size rather
+than because the arithmetic demands it.
 
 So the axis is not the element's type but the size of its overshoot. Work out what
 2% of the travel actually is; once it is enough pixels to notice as a bounce, take

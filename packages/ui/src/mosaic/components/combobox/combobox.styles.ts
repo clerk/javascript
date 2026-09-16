@@ -27,8 +27,7 @@ export const styles = stylex.create({
       default: 1,
       ':where([data-ending-style], [data-starting-style])': 0,
     },
-    // Reduced motion drops the scale VALUE as well as its transition: left in, it would
-    // apply instantly and snap the popup out of 96% on the way out.
+    // The reduced-motion scale value goes too, or the exit snaps out of 96%.
     scale: {
       default: 1,
       ':where([data-ending-style], [data-starting-style])': 0.96,
