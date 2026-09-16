@@ -33,11 +33,11 @@ describe('email actions', () => {
     trigger.focus();
     await user.keyboard('{Enter}');
     await user.keyboard('{Enter}');
-    expect(screen.getByRole('dialog', { name: 'Remove email address?' })).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog', { name: 'Remove email address?' })).toBeInTheDocument();
 
     await user.keyboard('{Escape}');
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onRemoveEmail).not.toHaveBeenCalled();
     await waitFor(() => expect(trigger).toHaveFocus());
   });
@@ -64,9 +64,9 @@ describe('email actions', () => {
     render(<Example />);
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.queryByRole('button', { name: 'Manage test@example.com' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add email' })).toBeEnabled();
   });
@@ -79,7 +79,7 @@ describe('email actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryEmail).toHaveBeenCalledExactlyOnceWith('email_1');
     expect(await screen.findByRole('alert')).toHaveTextContent('Unable to update primary email.');
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
   it('keeps removal pending and lets the user retry a failure in the dialog', async () => {
@@ -89,7 +89,7 @@ describe('email actions', () => {
     renderEmail({ onRemoveEmail });
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
-    const dialog = screen.getByRole('dialog', { name: 'Remove email address?' });
+    const dialog = screen.getByRole('alertdialog', { name: 'Remove email address?' });
     expect(dialog).toHaveAccessibleDescription(/test@example.com/);
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
     expect(within(dialog).getByRole('button', { name: 'Remove' })).toHaveAttribute('aria-busy', 'true');
@@ -100,7 +100,7 @@ describe('email actions', () => {
     });
     expect(within(dialog).getByRole('alert')).toHaveTextContent('Unable to remove email.');
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onRemoveEmail).toHaveBeenNthCalledWith(1, 'email_1');
     expect(onRemoveEmail).toHaveBeenNthCalledWith(2, 'email_1');
   });

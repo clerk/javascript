@@ -33,7 +33,7 @@ describe('connected account removal', () => {
     const trigger = screen.getByRole('button', { name: 'Manage GitHub' });
     trigger.focus();
     await user.keyboard('{Enter}{Enter}');
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     await waitFor(() => expect(trigger).toHaveFocus());
     expect(onRemove).not.toHaveBeenCalled();
@@ -54,9 +54,9 @@ describe('connected account removal', () => {
     }
     render(<Example />);
     await openRemoval(user);
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage GitHub' })).not.toBeInTheDocument());
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.queryByText('Connected accounts')).not.toBeInTheDocument();
   });
 
@@ -65,11 +65,11 @@ describe('connected account removal', () => {
     const onRemove = vi.fn().mockRejectedValueOnce(new Error('Unable to disconnect')).mockResolvedValue(undefined);
     renderAccounts(onRemove);
     await openRemoval(user);
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Unable to disconnect');
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     expect(onRemove).toHaveBeenCalledTimes(2);
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('keeps the selected account pending until its removal finishes', async () => {
@@ -80,10 +80,10 @@ describe('connected account removal', () => {
     });
     renderAccounts(onRemove);
     await openRemoval(user);
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
 
     expect(onRemove).toHaveBeenCalledExactlyOnceWith('github');
-    expect(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' })).toHaveAttribute(
+    expect(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' })).toHaveAttribute(
       'aria-busy',
       'true',
     );
@@ -91,7 +91,7 @@ describe('connected account removal', () => {
       removal.resolve();
       await removal.promise;
     });
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('opens the same confirmation for the chosen account after cancelling another', async () => {
@@ -106,15 +106,15 @@ describe('connected account removal', () => {
       </MosaicProvider>,
     );
     await openRemoval(user);
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(/GitHub will be removed/);
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(/GitHub will be removed/);
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.getByRole('button', { name: 'Manage GitHub' })).toHaveFocus();
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
-    expect(screen.getAllByRole('dialog')).toHaveLength(1);
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(/Google will be removed/);
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    expect(screen.getAllByRole('alertdialog')).toHaveLength(1);
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(/Google will be removed/);
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     expect(onRemove).toHaveBeenCalledExactlyOnceWith('google');
   });
 
@@ -135,16 +135,16 @@ describe('connected account removal', () => {
       </MosaicProvider>,
     );
     await openRemoval(user);
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(/GitHub will be removed/);
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(/GitHub will be removed/);
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(removeGitHub).toHaveBeenCalledExactlyOnceWith('github');
     expect(removeGoogle).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(/Google will be removed/);
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(/Google will be removed/);
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     expect(removeGoogle).toHaveBeenCalledExactlyOnceWith('google');
     expect(removeGitHub).toHaveBeenCalledTimes(1);
   });

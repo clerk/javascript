@@ -38,12 +38,12 @@ export function UserProfileVerifyEmailSsoDialog({
 }: UserProfileVerifyEmailSsoDialogProps) {
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      dismissOn='escape'
       open={open}
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <Dialog.Popup size='card'>
+      <Dialog.Popup variant='card'>
         <Card.Root
           elevation='overlay'
           renderBranding={false}

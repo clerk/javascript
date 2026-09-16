@@ -70,13 +70,13 @@ export function UserProfileEditPasswordDialog({
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      dismissOn='escape'
       open={open}
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
-        size='card'
+        variant='card'
         initialFocus={initialFocusRef}
       >
         <Card.Root
