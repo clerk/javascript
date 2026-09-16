@@ -209,8 +209,9 @@ export type ConfirmationProps<Payload = unknown> = ConfirmationControlledProps |
  * making the user type for. Use `Destructive` for the actions that are.
  *
  * An `alertdialog`: it announces as an interruption, an outside press cannot answer it, and the
- * card withholds its corner dismiss — the footer is the only way out. Under the phone band it
- * arrives as a bottom sheet, within reach of the thumb that has to answer it.
+ * card withholds its corner dismiss. Escape remains a dismissal path unless the dialog's
+ * `dismissOn` is `none`. Under the phone band it arrives as a bottom sheet, within reach of
+ * the thumb that has to answer it.
  *
  * Two forms. Controlled: the caller owns `open`, `isConfirming`, and `errorMessage`, and the
  * block holds nothing of its own. With a `handle`: the block owns all three. Mount it once,

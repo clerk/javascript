@@ -422,16 +422,8 @@ export const variants = stylex.create({
 export const compactPlacements = stylex.create({
   center: {},
   sheet: {
-    // Centres what the popup holds, because the band and the SURFACE's own cap do not meet: the
-    // band runs to `48rem` while a `Card` stops at `26.25rem`, so between the two the popup spans
-    // the track with the card sitting at its cap. The popup is a flex column, so the default
-    // `stretch` leaves that card against the inline-start edge — a sheet hugging one side of the
-    // screen. Centring is the half of the fix the dialog owns; lifting the card's cap instead
-    // would mean reaching into `Card` to make the one surface that spans edge to edge, and at
-    // `700px` that is a very wide sheet with a very long measure.
-    //
-    // Below `26.25rem` — every actual phone — the cap does not bind and the card fills the sheet,
-    // so this changes nothing there. It is the tablet and the narrow window it is for.
+    // The sheet popup can be wider than Card.Root's own width cap.
+    // Keep the card centered within the available space.
     alignItems: { [PHONE]: 'center', default: null },
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
     // shared: bottom-aligning there would drag a centred dialog down with it.

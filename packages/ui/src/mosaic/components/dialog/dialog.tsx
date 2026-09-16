@@ -387,7 +387,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog', 'Card.Title');
+  useAccessibleNameWarning(node, 'Dialog', variant === 'profile' ? 'Profile.Title' : 'Card.Title');
   // A name alone is enough for an ordinary dialog; an alert is announced as an interruption and
   // its description is what says which decision is being asked for.
   useAccessibleDescriptionWarning(isAlert ? node : null, 'Dialog', 'Card.Description');

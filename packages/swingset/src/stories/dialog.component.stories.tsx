@@ -98,8 +98,8 @@ const deleteTrigger = (props: RenderProps) => (
 /**
  * `role='alertdialog'` is the whole difference: it announces as an interruption, and an outside
  * press cannot dismiss it — a question that needs an answer must not be answerable by clicking
- * next to it. `Card.Header` withholds its corner dismiss for the same reason, so the footer is the
- * only way out. Cancel first, so it takes the opening focus.
+ * next to it. `Card.Header` withholds its corner dismiss for the same reason. Escape also dismisses
+ * it unless `dismissOn='none'`. Cancel first, so it takes the opening focus.
  */
 export function Alert() {
   const [open, setOpen] = React.useState(false);

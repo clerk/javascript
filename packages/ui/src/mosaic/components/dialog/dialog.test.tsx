@@ -660,17 +660,21 @@ describe('sizing container', () => {
 });
 
 describe('accessible name warning', () => {
-  it('warns when the dialog has no accessible name', async () => {
+  it.each([
+    ['card', 'Card.Title'],
+    ['profile', 'Profile.Title'],
+  ] as const)('recommends the title part for an unnamed %s dialog', async (variant, titlePart) => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
       <Dialog.Root defaultOpen>
-        <Dialog.Popup>Body</Dialog.Popup>
+        <Dialog.Popup variant={variant}>Body</Dialog.Popup>
       </Dialog.Root>,
     );
 
     await settle();
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining(`<${titlePart}>`));
     warn.mockRestore();
   });
 
