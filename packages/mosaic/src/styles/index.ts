@@ -210,3 +210,4 @@ export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';
 export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
+export { UserProfileAuthenticatorSetupView } from '../features/user-profile/user-profile-authenticator-setup.view';
