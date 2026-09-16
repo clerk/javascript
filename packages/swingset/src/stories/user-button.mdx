@@ -162,9 +162,9 @@ Reopen the popup to watch it again.
 
 An instance in single-session mode holds one account at a time, so there is nothing to switch to and
 no second account to add. It hands the view an empty `additionalSessions` and leaves `onAddAccount`
-and `onSignOutAll` off — the surface withholds **Switch account**, **Add account**, and **Sign out of
-all accounts** together. The account's own `⋯` still carries **Sign out**, which is all "all
-accounts" ever meant here.
+and `onSignOutAll` off — the surface withholds **Switch account** and **Add account**. The foot keeps
+its sign-out row, but as **Sign out** of the one account, since that is all "all accounts" ever
+meant here.
 
 <Story
   name='SingleSession'
@@ -191,13 +191,14 @@ on its own, so it stays followable while another action is in flight. The `icon`
 without one still holds the column, so labels stay in line.
 
 `menuItemOrder` names the foot's rows by id, and whatever it leaves out follows what it named. The
-ids it knows are `switchAccount`, `addAccount`, `signOutAll`, and each custom item's `id`. Those are
-the only actions the foot lists as rows; the rest live in the header, behind a `⋯`, or with the
-workspaces, where there is no list for an order to run in.
+ids it knows are `switchAccount`, `addAccount`, `signOutAll`, `signOut`, and each custom item's `id`.
+Those are the only actions the foot lists as rows; the rest live in the header, behind a `⋯`, or with
+the workspaces, where there is no list for an order to run in.
 
 The accounts row is `switchAccount` where there is somebody to switch to and `addAccount` where there
-is not. Name both to place that row whichever way it resolves. An id the surface has not got is
-ignored rather than an error, so one order can cover every mode.
+is not, and the sign-out row is `signOutAll` where there is a second account and `signOut` where
+there is not. Name both ids to place a row whichever way it resolves. An id the surface has not got
+is ignored rather than an error, so one order can cover every mode.
 
 <Story
   name='CustomMenuItems'

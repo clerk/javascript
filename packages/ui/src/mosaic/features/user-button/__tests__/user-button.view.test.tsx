@@ -679,11 +679,16 @@ describe('UserButtonView, the foot', () => {
     expect(within(popup()).queryByRole('link', { name: 'Clerk' })).toBeNull();
   });
 
-  // "All accounts" is one account, and the account's own row already signs out of it.
-  it('withholds "Sign out of all accounts" where there is no second account', () => {
-    renderView({ additionalSessions: [] });
+  // "All accounts" is one account, so the foot keeps its sign-out row and signs out of just that one.
+  it('signs out of the one account at the foot where there is no second', async () => {
+    const onSignOutSession = vi.fn();
+    renderView({ additionalSessions: [], onSignOutSession });
 
     expect(screen.queryByRole('button', { name: 'Sign out of all accounts' })).toBeNull();
+    const rows = within(groups().at(-1) ?? document.body);
+    await userEvent.click(rows.getByRole('button', { name: 'Sign out' }));
+
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
   });
 });
 

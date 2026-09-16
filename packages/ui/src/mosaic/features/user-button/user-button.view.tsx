@@ -923,6 +923,8 @@ interface FooterRow {
 /** The actions that close out the surface. */
 function Footer() {
   const data = useUserButtonContext();
+  const signOutSession = data.onSignOutSession;
+  const { sessionId } = data.activeSession;
 
   const builtIn: FooterRow[] = [];
   for (const action of data.layout.actions.footer) {
@@ -962,6 +964,24 @@ function Footer() {
             label={m.accounts.signOutAll}
             onClick={data.onSignOutAll}
             busyKey={userButtonBusyKeys.signOutAll()}
+          />
+        ),
+      });
+    }
+    if (action === 'signOut' && signOutSession) {
+      builtIn.push({
+        id: 'signOut',
+        node: (
+          <ActionRow
+            icon={
+              <Icon
+                name='log-out'
+                size='sm'
+              />
+            }
+            label={m.accounts.signOut}
+            onClick={() => signOutSession(sessionId)}
+            busyKey={userButtonBusyKeys.signOutSession(sessionId)}
           />
         ),
       });

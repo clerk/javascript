@@ -59,11 +59,11 @@ describe('resolveUserButtonLayout, what the data settles', () => {
   });
 
   // With no second account the flyout would open onto one row, so the foot offers that row instead.
-  // "All accounts" is that one account too, and the account's own row already signs out of it.
+  // "All accounts" is that one account too, so the foot signs out of just it, in the singular.
   it.each<UserButtonMode>(['combined', 'user'])(
-    'leaves the foot "Add account" alone in %s mode where there is one account',
+    'collapses the foot to "Add account" and "Sign out" in %s mode where there is one account',
     mode => {
-      expect(resolve(mode, { additionalSessions: [] }).actions.footer).toEqual(['addAccount']);
+      expect(resolve(mode, { additionalSessions: [] }).actions.footer).toEqual(['addAccount', 'signOut']);
     },
   );
 });

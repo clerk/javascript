@@ -109,10 +109,9 @@ export function resolveUserButtonLayout(
       // the surface.
       case 'inviteMembers':
         return data.activeOrganization ? action : null;
-      // "All accounts" is one account. The account's own row already signs out of it, so the foot
-      // would be offering the same thing over again, in the plural.
+      // "All accounts" is one account, so the foot signs out of just that one, in the singular.
       case 'signOutAll':
-        return hasOtherSessions ? action : null;
+        return hasOtherSessions ? action : 'signOut';
       // With no second account there is nothing to switch between, so the flyout collapses to the
       // one row it would have opened onto.
       case 'switchAccount':
