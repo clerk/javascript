@@ -38,7 +38,6 @@ export function UserProfileVerifyEmailSsoDialog({
 }: UserProfileVerifyEmailSsoDialogProps) {
   return (
     <Dialog.Root
-      dismissOn='escape'
       open={open}
       onOpenChange={onOpenChange}
     >

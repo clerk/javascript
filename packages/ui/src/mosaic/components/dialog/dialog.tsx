@@ -1,5 +1,4 @@
 import type {
-  DialogClosedBy,
   DialogFocusTarget,
   DialogHandle,
   DialogProps as HeadlessDialogProps,
@@ -131,59 +130,29 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
 type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 'closedBy'>;
 
 /**
- * Which gestures dismiss the dialog, in one ordered axis rather than a flag per gesture: Escape is
- * the keyboard's equivalent of an outside press, so a dialog that allows the press and refuses the
- * key is not a state worth being able to express.
+ * `role` is the whole dismissal API: it decides how the dialog announces itself AND what closes it,
+ * with no prop to contradict either.
  *
- * - `any` — an outside press, Escape, or a programmatic close;
- * - `escape` — Escape or a programmatic close, but not an outside press. For anything holding
- *   input, where a stray click would discard what was typed;
- * - `none` — a programmatic close only. For a flow the user has to complete or acknowledge.
- *
- * Maps to the native `<dialog closedby>` values `any` / `closerequest` / `none`.
- */
-export type DialogDismissOn = 'any' | 'escape' | 'none';
-
-/** The native `closedby` value each `dismissOn` stands for. */
-const CLOSED_BY: Record<DialogDismissOn, DialogClosedBy> = {
-  any: 'any',
-  escape: 'closerequest',
-  none: 'none',
-};
-
-/**
- * `role` decides the dismissal policy, so the prop that would contradict it is narrowed away
- * rather than checked at runtime:
- *
- * - `alertdialog` announces as an interruption rather than as a surface the user navigated to;
- * - it cannot be dismissed by an outside press. A dialog asking a question it needs an answer to
- *   must not be answerable by clicking next to it. Escape still closes, which is the keyboard's
- *   equivalent of the cancel button that is always present.
+ * - `alertdialog` announces as an interruption rather than as a surface the user navigated to, and
+ *   cannot be dismissed by an outside press. A dialog asking a question it needs an answer to must
+ *   not be answerable by clicking next to it. Escape still closes, which is the keyboard's
+ *   equivalent of the cancel button that is always present;
+ * - `dialog` dismisses on an outside press as well.
  *
  * It says nothing about the variant: an alert is a `Card` like every other dialog.
  */
-export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> &
-  (
-    | {
-        /** The popup's ARIA role. @default 'dialog' */
-        role?: 'dialog';
-        /** Which gestures dismiss the dialog. @default 'any' */
-        dismissOn?: DialogDismissOn;
-      }
-    | {
-        role: 'alertdialog';
-        /** An alert dialog never dismisses on an outside press. @default 'escape' */
-        dismissOn?: Exclude<DialogDismissOn, 'any'>;
-      }
-  );
+export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> & {
+  /** The popup's ARIA role, and with it what dismisses the dialog. @default 'dialog' */
+  role?: DialogRole;
+};
 
 /** Owns the open state and the decisions — role, dismissal — every part reads. */
-function Root<Payload = unknown>({ role = 'dialog', dismissOn, children, ...rest }: DialogRootProps<Payload>) {
+function Root<Payload = unknown>({ role = 'dialog', children, ...rest }: DialogRootProps<Payload>) {
   return (
     <Primitive.Root<Payload>
       {...rest}
       role={role}
-      closedBy={CLOSED_BY[dismissOn ?? (role === 'alertdialog' ? 'escape' : 'any')]}
+      closedBy={role === 'alertdialog' ? 'closerequest' : 'any'}
     >
       {children}
     </Primitive.Root>
@@ -477,7 +446,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
  * `Dialog.Popup` renders the portal, the scrim and the centering viewport itself, so those are
  * not parts. `role='alertdialog'` on the root makes it an alert dialog — one that interrupts to
  * ask for a decision and waits for one. `compactPlacement='sheet'` bottom-anchors it in the
- * compact band, and `dismissOn` on the root says which gestures dismiss it.
+ * compact band.
  *
  * Each styled part spreads `themeProps` + `stylex.props` through `mergeStyleProps`, so it
  * carries the public `.cl-<slot>` class and StyleX atoms while the headless part keeps its focus

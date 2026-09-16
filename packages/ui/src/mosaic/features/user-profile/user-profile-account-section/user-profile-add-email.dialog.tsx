@@ -36,7 +36,6 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
 
   return (
     <Dialog.Root
-      dismissOn='escape'
       open={props.open}
       onOpenChange={props.onOpenChange}
     >

@@ -217,15 +217,6 @@ describe('dismissal', () => {
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
-  it("keeps Escape out too under dismissOn='none'", async () => {
-    const user = userEvent.setup();
-    render(<Confirm dismissOn='none' />);
-
-    await user.keyboard('{Escape}');
-
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-  });
-
   it('lets a controlled consumer decline a close', async () => {
     const user = userEvent.setup();
 

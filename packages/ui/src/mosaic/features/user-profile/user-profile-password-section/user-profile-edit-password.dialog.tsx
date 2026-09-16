@@ -70,7 +70,6 @@ export function UserProfileEditPasswordDialog({
 
   return (
     <Dialog.Root
-      dismissOn='escape'
       open={open}
       onOpenChange={onOpenChange}
     >

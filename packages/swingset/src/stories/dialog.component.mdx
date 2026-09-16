@@ -17,7 +17,6 @@ import * as DialogStories from './dialog.component.stories';
     { name: 'defaultOpen', type: 'boolean', default: 'false' },
     { name: 'onOpenChange', type: '(open: boolean, details: DialogOpenChangeDetails) => void' },
     { name: 'modal', type: 'boolean', default: 'true' },
-    { name: 'dismissOn', type: "'any' | 'escape' | 'none'", default: "'any'" },
   ]}
 />
 
@@ -134,8 +133,7 @@ destructive confirmation, a "discard changes?".
 What follows from the role:
 
 - Announced as an interruption.
-- No outside-press dismissal. `dismissOn` narrows to `escape` (default) or `none`; Escape still
-  cancels.
+- No outside-press dismissal; Escape still cancels.
 - A name **and** a description are required — `Card.Title` and `Card.Description`; both warn in dev
   when missing.
 - `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns.
@@ -174,26 +172,21 @@ the DOM. Point `initialFocus` on `Dialog.Popup` at the field that should have it
 
 ### Dismissal
 
-`dismissOn` controls escape and light dismissal behavior. This is opinionated based on the role passed in but provides a lever to override.
+`role` decides what closes the dialog. There is no prop for it.
 
-| Value    | Escape | Outside press | Programmatic | Use for                                     |
-| -------- | ------ | ------------- | ------------ | ------------------------------------------- |
-| `any`    | ✅     | ✅            | ✅           | Read-and-dismiss content (default)          |
-| `escape` | ✅     | ❌            | ✅           | Anything holding input; alert dialogs       |
-| `none`   | ❌     | ❌            | ✅           | Flows the user must complete or acknowledge |
+| Role          | Escape | Outside press | Programmatic |
+| ------------- | ------ | ------------- | ------------ |
+| `dialog`      | ✅     | ✅            | ✅           |
+| `alertdialog` | ✅     | ❌            | ✅           |
 
-```tsx
-<Dialog.Root dismissOn='escape'>…</Dialog.Root>
-```
-
-The three map to the native [`<dialog closedby>`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/closedBy) values `any` / `closerequest` / `none`.
+The two map to the native [`<dialog closedby>`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/closedBy) values `any` and `closerequest`.
 
 ### Keyboard
 
 | Key                | Does                                                              |
 | ------------------ | ----------------------------------------------------------------- |
 | Enter (in a field) | Submits the dialog's form — the primary action                    |
-| Escape             | Cancels, per `dismissOn`                                          |
+| Escape             | Cancels                                                           |
 | Tab                | Moves through the popup in visual order: field → Cancel → confirm |
 
 Tab follows the layout (WCAG 2.4.3), so a dialog with a field should be a form with the primary
@@ -213,7 +206,7 @@ action as its submit.
 
 | Part                 | Slot                  | Description                                                                               |
 | -------------------- | --------------------- | ----------------------------------------------------------------------------------------- |
-| `Dialog.Root`        | —                     | State: open/close, `role`, `dismissOn`, `modal`, `handle`.                                |
+| `Dialog.Root`        | —                     | State: open/close, `role`, `modal`, `handle`.                                             |
 | `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                       |
 | `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `variant`, `compactPlacement`, `initialFocus`, `finalFocus`. |
 | `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                       |

@@ -35,7 +35,6 @@ export function UserProfileVerifyEmailLinkDialog({
 }: UserProfileVerifyEmailLinkDialogProps) {
   return (
     <Dialog.Root
-      dismissOn='escape'
       open={open}
       onOpenChange={onOpenChange}
     >

@@ -98,8 +98,8 @@ const deleteTrigger = (props: RenderProps) => (
 /**
  * `role='alertdialog'` is the whole difference: it announces as an interruption, and an outside
  * press cannot dismiss it — a question that needs an answer must not be answerable by clicking
- * next to it. `Card.Header` withholds its corner dismiss for the same reason. Escape also dismisses
- * it unless `dismissOn='none'`. Cancel first, so it takes the opening focus.
+ * next to it. `Card.Header` withholds its corner dismiss for the same reason, and Escape still
+ * closes it. Cancel first, so it takes the opening focus.
  */
 export function Alert() {
   const [open, setOpen] = React.useState(false);
@@ -165,7 +165,6 @@ export function Sheet() {
 
   return (
     <Dialog.Root
-      dismissOn='escape'
       open={open}
       onOpenChange={next => {
         setOpen(next);
@@ -255,7 +254,6 @@ export function Stacked() {
 
   return (
     <Dialog.Root
-      dismissOn='escape'
       open={open}
       onOpenChange={next => {
         if (next) {
@@ -372,7 +370,6 @@ function AddEmailDialog({
 
   return (
     <Dialog.Root
-      dismissOn='escape'
       open={open}
       onOpenChange={next => {
         onOpenChange(next);
