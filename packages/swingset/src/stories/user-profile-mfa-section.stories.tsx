@@ -1,8 +1,6 @@
 import { Button } from '@clerk/mosaic/components/button';
-import { Card } from '@clerk/mosaic/components/card';
-import { Dialog } from '@clerk/mosaic/components/dialog';
 import { Text } from '@clerk/mosaic/components/text';
-import { UserProfileAuthenticatorSetupView } from '@clerk/mosaic/features/user-profile/user-profile-authenticator-setup.view';
+import { UserProfileAddAuthenticatorDialog } from '@clerk/mosaic/features/user-profile/user-profile-add-authenticator.dialog';
 import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
 import { useRef, useState } from 'react';
@@ -89,43 +87,67 @@ export function AddMethod() {
 }
 
 export function AuthenticatorSetup() {
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState('');
+  const [isPending, setIsPending] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>();
+  const [verified, setVerified] = useState(false);
+  const hasFailed = useRef(false);
+
+  const submit = async () => {
+    if (isPending) {
+      return;
+    }
+    setIsPending(true);
+    setErrorMessage(undefined);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsPending(false);
+    if (!hasFailed.current) {
+      hasFailed.current = true;
+      setErrorMessage('That code could not be verified. Please try again.');
+      return;
+    }
+    setVerified(true);
+    setOpen(false);
+  };
+
   return (
-    <Dialog.Root>
-      <Dialog.Trigger
-        render={
+    <div className='flex flex-col items-center gap-4'>
+      <UserProfileAddAuthenticatorDialog
+        open={open}
+        onOpenChange={next => {
+          if (isPending) {
+            return;
+          }
+          setOpen(next);
+          setCode('');
+          setErrorMessage(undefined);
+          if (next) {
+            setVerified(false);
+            hasFailed.current = false;
+          }
+        }}
+        trigger={
           <Button
             variant='outline'
             color='neutral'
-          />
+          >
+            Set up authenticator
+          </Button>
         }
-      >
-        Set up authenticator
-      </Dialog.Trigger>
-      <Dialog.Popup variant='card'>
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
-          <UserProfileAuthenticatorSetupView
-            secret='JBSWY3DPEHPK3PXP'
-            uri='otpauth://totp/Swingset:demo@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Swingset'
-          />
-          <Card.Footer>
-            <Dialog.Close
-              render={
-                <Button
-                  variant='outline'
-                  color='neutral'
-                  fullWidth
-                />
-              }
-            >
-              Cancel
-            </Dialog.Close>
-          </Card.Footer>
-        </Card.Root>
-      </Dialog.Popup>
-    </Dialog.Root>
+        secret='JBSWY3DPEHPK3PXP'
+        uri='otpauth://totp/Swingset:demo@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Swingset'
+        code={code}
+        onCodeChange={value => {
+          setCode(value);
+          setErrorMessage(undefined);
+        }}
+        isPending={isPending}
+        errorMessage={errorMessage}
+        onSubmit={() => void submit()}
+      />
+      {verified ? <Text role='status'>Authenticator verified in this demo</Text> : null}
+    </div>
   );
 }
 

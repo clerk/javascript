@@ -47,32 +47,42 @@ Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), a
 | `canRemove`     | `boolean` | `true`  | Allows removal of an SMS or authenticator method when `onRemove` is supplied. |
 | `canSetDefault` | `boolean` | `false` | Allows Set as default on an SMS method when `onSetDefault` is supplied.       |
 
-### Authenticator setup
+### Authenticator dialog
 
-`UserProfileAuthenticatorSetupView` renders the setup header and content inside a `Card.Root`.
+`UserProfileAddAuthenticatorDialog` combines setup and code verification in one controlled dialog.
 
-| Prop     | Type     | Default      | Description                                                                        |
-| -------- | -------- | ------------ | ---------------------------------------------------------------------------------- |
-| `secret` | `string` | — (required) | Prepared authenticator setup key.                                                  |
-| `uri`    | `string` | — (required) | Matching authenticator URI, encoded in the QR code and available for manual entry. |
+| Prop           | Type                           | Default      | Description                                                                          |
+| -------------- | ------------------------------ | ------------ | ------------------------------------------------------------------------------------ |
+| `open`         | `boolean`                      | — (required) | Whether the dialog is open.                                                          |
+| `onOpenChange` | `(open: boolean) => void`      | — (required) | Receives open and dismiss requests.                                                  |
+| `trigger`      | `DialogTriggerProps['render']` | —            | Optional trigger that receives focus when the dialog closes.                         |
+| `secret`       | `string`                       | — (required) | Prepared authenticator setup key.                                                    |
+| `uri`          | `string`                       | — (required) | Matching authenticator URI, encoded in the QR code and available for manual entry.   |
+| `code`         | `string`                       | — (required) | Current verification code.                                                           |
+| `onCodeChange` | `(value: string) => void`      | — (required) | Receives code edits.                                                                 |
+| `onSubmit`     | `(code: string) => void`       | — (required) | Receives six digits after completion or a Verify submission.                         |
+| `isPending`    | `boolean`                      | `false`      | Disables code entry and Cancel; Verify shows progress and blocks repeat submissions. |
+| `errorMessage` | `string`                       | —            | Feedback associated with the verification field.                                     |
 
 ## Usage
 
 The caller decides whether to mount the section from the instance's second-factor configuration, even when existing methods are present. When mounted, the section stays visible with no methods or callbacks. The caller also prepares the method order, default indicators, and removal permissions, including restrictions when MFA is required. Backup-code rows only offer regeneration.
 
-Callbacks report user intent; updated props determine the displayed result. Set as default awaits its callback, blocks overlapping method actions, and leaves the current badge in place until `methods` changes. Rejections appear below the selected row and are announced to assistive technology. Retrying clears the error. The section owns one removal confirmation, opened with the selected method. Confirmation owns its pending and error state; update `methods` after a successful removal. Removing SMS verification leaves the phone number on the account. Enrollment dialogs are still being developed.
+Callbacks report user intent; updated props determine the displayed result. Set as default awaits its callback, blocks overlapping method actions, and leaves the current badge in place until `methods` changes. Rejections appear below the selected row and are announced to assistive technology. Retrying clears the error. The section owns one removal confirmation, opened with the selected method. Confirmation owns its pending and error state; update `methods` after a successful removal. Removing SMS verification leaves the phone number on the account.
 
 ### Choose a method
 
-Open Add and choose a method. Each option is a button with a chevron, matching the reverification picker. This example reports the choice below the section; enrollment and verification are still being developed. Choosing an option reports it immediately and closes the picker. Closing without choosing a method leaves the selection unchanged; focus returns to Add. Omitting `onAdd` or supplying no choices hides Add while keeping the section visible.
+Open Add and choose a method. Each option is a button with a chevron, matching the reverification picker. This example reports the choice below the section; account enrollment wiring is still being developed. Choosing an option reports it immediately and closes the picker. Closing without choosing a method leaves the selection unchanged; focus returns to Add. Omitting `onAdd` or supplying no choices hides Add while keeping the section visible.
 
 <Story name='AddMethod' storyModule={Stories} />
 
-### Authenticator QR code and setup key
+### Set up and verify an authenticator
 
-Open the dialog to view the QR code, then switch to the read-only setup key and URI for manual entry. Both views use the same supplied credentials. Closing and reopening starts with the QR code again. This example uses fixed demo credentials; it does not enroll an authenticator.
+Open the dialog, scan the QR code or view the read-only setup key and URI, then enter six digits. Typing or pasting a complete code submits automatically. Verify is available for retrying the entered code. Authenticator apps generate their own codes, so there is no resend action.
 
-The setup view owns the display toggle. The caller supplies matching `secret` and `uri` values and owns enrollment, loading, and errors. Verification fields are still being developed.
+The first attempt in this example fails after a short delay. Retry to see the pending state and successful closure. Closing and reopening resets the example. The example uses fixed demo credentials and simulated verification; it does not enroll an authenticator.
+
+The caller owns the code, pending state, error feedback, and success closure. Clear the error on edit or retry and keep the same setup credentials throughout the attempt. The caller also decides whether to accept dismissal while pending; this example keeps the dialog open until verification finishes. The setup view owns only the QR/manual display toggle.
 
 <Story
   name='AuthenticatorSetup'
@@ -83,6 +93,7 @@ The setup view owns the display toggle. The caller supplies matching `secret` an
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Otp', href: '/components/otp', layer: 'Components' },
   ]}
 />
 
