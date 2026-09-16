@@ -221,6 +221,87 @@ export const enUS: LocalizationResource = {
     yearPerUnit: 'Year per {{unitName}}',
     years: 'Years',
   },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: 'User attributes',
+        directoryAttribute: 'Directory attributes',
+      },
+      subtitle: 'Standard directory attributes are pre-configured. Attributes not listed here are ignored.',
+      title: 'Attribute review',
+    },
+    configureStep: {
+      actionLabel__generateToken: 'Generate new token',
+      actionLabel__retry: 'Try again',
+      domainsLabel: 'Domains:',
+      error__ssoRequired: {
+        subtitle:
+          'Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.',
+        title: 'Single Sign-On is not configured yet',
+      },
+      formFieldInputPlaceholder__token: 'Generate a new token to reveal it',
+      formFieldLabel__endpointUrl: 'SCIM endpoint URL',
+      formFieldLabel__token: 'Bearer token',
+      instructions: {
+        actionLabel__toggle: 'View instructions',
+        custom: {
+          step1: 'Create a SCIM 2.0 provisioning integration in your identity provider.',
+          step2: 'Paste the SCIM endpoint URL as the base URL for the integration.',
+          step3: 'Configure the integration to authenticate with the bearer token below.',
+          step4: 'Enable provisioning for user create, update, and deactivate events.',
+        },
+        entra: {
+          step1:
+            'In the Microsoft Entra admin center, open Enterprise applications and select the application used for your SSO connection.',
+          step2:
+            'Under Connectivity, paste the SCIM endpoint URL as the Tenant URL and the bearer token as the Secret Token, then select Test Connection.',
+          step3: 'Select Provisioning and set the provisioning mode to Automatic.',
+          step4: 'Assign the users and groups to provision, then turn provisioning On.',
+        },
+        okta: {
+          step1: 'In the Okta Admin Console, open the application used for your SSO connection.',
+          step2: 'Open the Provisioning tab and select the Integration setting.',
+          step3: 'Paste the SCIM endpoint URL and bearer token found below.',
+          step4: 'For provisioning actions, enable pushing of New Users, Profile Updates, and Groups.',
+        },
+      },
+      notice__tokenShownOnce: 'This token is only shown once. Generate a new token if you lose it.',
+      subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
+      title: 'Configure',
+      warning__googleUnsupported: {
+        subtitle: 'Please contact support to set up your Google Workspace integration.',
+        title: 'Google Workspace connections are not configurable via self-serve',
+      },
+      warning__ssoInactive:
+        'Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.',
+    },
+    navbar: {
+      title: 'Configure Directory Sync',
+    },
+    providers: {
+      custom: 'Custom SCIM provider',
+      entra: 'Microsoft Entra ID',
+      google: 'Google Workspace',
+      okta: 'Okta Workforce',
+    },
+    stepper: {
+      attributes: 'Attributes',
+      configure: 'Configure',
+      test: 'Test',
+    },
+    testStep: {
+      actionLabel__complete: 'Complete',
+      badge__active: 'Active',
+      badge__deprovisioned: 'Deprovisioned',
+      description: 'Users appear here as your identity provider provisions them, most recent activity first.',
+      empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
+      error__loadUsers: 'Could not load provisioned users',
+      note: 'only users with an email address from a configured domain will be processed.',
+      noteLabel: 'Note:',
+      subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',
+      title: 'Test provisioning',
+    },
+  },
   configureSSO: {
     activate: {
       activateButton: 'Activate SSO',
@@ -235,7 +316,8 @@ export const enUS: LocalizationResource = {
     changeProviderDialog: {
       cancelButton: 'Cancel',
       confirmButton: 'Change provider',
-      subtitle: 'Switching to {{provider}} will remove your {{currentProvider}} connection and require a new setup.',
+      subtitle:
+        'Switching to {{provider}} will remove the {{currentProvider}} connection "{{name}}" and require a new setup.',
       title: 'Change provider to {{provider}}',
     },
     configureStep: {
@@ -731,6 +813,12 @@ export const enUS: LocalizationResource = {
         title: 'Unsupported provider',
       },
     },
+    connectionScopeBanner: {
+      subtitle__adding: 'This organization already has {{count}} SSO connections.',
+      subtitle__editing: 'This organization has {{count}} SSO connections. Changes here apply only to this connection.',
+      title__adding: 'Adding a new SSO connection',
+      title__editing: 'Editing "{{name}}"',
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contact your organization's administrator to upgrade your permissions.",
       title: 'You do not have permission to manage Single Sign-on (SSO)',
@@ -781,7 +869,7 @@ export const enUS: LocalizationResource = {
       confirmationFieldPlaceholder: '{{name}}',
       resetButton: 'Reset connection',
       subtitle:
-        'Are you sure you want to reset the connection? This action is irreversible and you will have to configure all steps again',
+        'Are you sure you want to reset the connection "{{name}}"? This action is irreversible and you will have to configure all steps again',
       title: 'Reset connection',
     },
     selectProviderStep: {
@@ -1232,10 +1320,31 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: 'Active',
+        badge__inactive: 'Inactive',
+        badge__ssoRequired: 'SSO Required',
+        badge__unconfigured: 'Unconfigured',
+        description:
+          "Automatically add, update, and remove organization members from your identity provider's directory. Requires an SSO connection.",
+        error__load: 'Could not load Directory Sync',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__startConfiguration: 'Start configuration',
+        removeDialog: {
+          confirmButton: 'Remove Directory Sync',
+          subtitle:
+            'Are you sure you want to remove Directory Sync? This action is irreversible: the directory and its bearer token are deleted and your identity provider will no longer be able to provision members. Existing members keep their memberships.',
+          title: 'Remove Directory Sync',
+        },
+        title: 'Directory Sync',
+      },
       removeDialog: {
         confirmButton: 'Remove connection',
         subtitle:
-          'Are you sure you want to remove the connection? This action is irreversible and deletes the connection and all of its configuration.',
+          'Are you sure you want to remove the connection "{{name}}"? This action is irreversible and deletes the connection and all of its configuration.',
         title: 'Remove SSO connection',
       },
       ssoSection: {
@@ -1246,9 +1355,11 @@ export const enUS: LocalizationResource = {
         descriptionLine1: 'Require members with a matching email domain to sign in through your identity provider.',
         domainLabel: 'Domains:',
         menuAction__activate: 'Activate',
+        menuAction__continue: 'Continue configuration',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
+        primaryButton__addConnection: 'Add connection',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',
@@ -1485,6 +1596,9 @@ export const enUS: LocalizationResource = {
       subtitle: 'Select the enterprise account with which you wish to continue.',
       title: 'Choose your enterprise account',
     },
+    enterpriseSSO: {
+      formButtonPrimary: 'Continue with SSO',
+    },
     forgotPassword: {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
@@ -1549,6 +1663,15 @@ export const enUS: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
+    },
+    ssoFallback: {
+      actionLink: "Can't use SSO?",
+      code: {
+        resendButton: "Didn't receive a code? Resend",
+        subtitle: 'to continue to {{applicationName}}',
+        title: 'Check your email',
+      },
+      notice: 'Your organization requires single sign-on. Continuing without it is recorded.',
     },
     start: {
       actionLink: 'Sign up',

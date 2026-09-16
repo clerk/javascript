@@ -2,11 +2,13 @@ import type {
   UserProfileDevice,
   UserProfileMfaMethod,
   UserProfilePasskey,
-} from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
-import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
+} from '@clerk/ui/mosaic/features/user-profile/user-profile-security-panel.view';
+import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { useUserProfileEditPasswordFixture } from './fixtures/user-profile-edit-password';
 
 export { default as __source } from './user-profile-security-panel.stories?raw';
 
@@ -16,10 +18,11 @@ export const meta: StoryMeta = {
   title: 'UserProfileSecurityPanel',
   label: 'Security panel',
   navigation: { category: 'Panels' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-security-panel.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-security-panel.view.tsx',
 };
 
 export function Default() {
+  const editPassword = useUserProfileEditPasswordFixture();
   const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
     {
       id: 'passkey',
@@ -56,8 +59,8 @@ export function Default() {
 
   return (
     <UserProfileSecurityPanelView
+      {...editPassword}
       devices={devices}
-      hasPassword
       mfaMethods={mfaMethods}
       passkeys={passkeys}
       onAddMfaMethod={type =>
@@ -82,7 +85,6 @@ export function Default() {
           { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
         ])
       }
-      onChangePassword={() => undefined}
       onDeleteAccount={() => Promise.resolve()}
       onManageDevice={() => undefined}
       onManagePasskey={() => undefined}

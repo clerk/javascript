@@ -38,7 +38,6 @@ export const styles = stylex.create({
   start: {
     borderEndStartRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
     borderStartStartRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
-    paddingInlineEnd: { default: space['3'], [stylex.when.descendant(':where(*)', buttonScope)]: 0 },
     paddingInlineStart: {
       default: space['3'],
       [stylex.when.descendant(':where(*)', buttonScope)]: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))',
@@ -51,7 +50,6 @@ export const styles = stylex.create({
       default: space['3'],
       [stylex.when.descendant(':where(*)', buttonScope)]: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))',
     },
-    paddingInlineStart: { default: space['3'], [stylex.when.descendant(':where(*)', buttonScope)]: 0 },
   },
   root: {
     '--_cl-input-group-inset': `calc(${focusVars['--cl-focus-outline-width']} + 1px)`,

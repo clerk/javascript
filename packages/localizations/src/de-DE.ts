@@ -232,6 +232,83 @@ export const deDE: LocalizationResource = {
     yearPerUnit: undefined,
     years: undefined,
   },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   configureSSO: {
     activate: {
       activateButton: undefined,
@@ -720,6 +797,12 @@ export const deDE: LocalizationResource = {
         description: undefined,
         title: undefined,
       },
+    },
+    connectionScopeBanner: {
+      subtitle__adding: undefined,
+      subtitle__editing: undefined,
+      title__adding: undefined,
+      title__editing: undefined,
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Wenden Sie sich an Ihren Organisationsadministrator, um Ihre Berechtigungen zu erweitern.',
@@ -1218,6 +1301,25 @@ export const deDE: LocalizationResource = {
       title: 'Domain entfernen',
     },
     securityPage: {
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
@@ -1231,9 +1333,11 @@ export const deDE: LocalizationResource = {
         descriptionLine1: undefined,
         domainLabel: undefined,
         menuAction__activate: undefined,
+        menuAction__continue: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
+        primaryButton__addConnection: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
@@ -1469,6 +1573,9 @@ export const deDE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Passwort-Code zurücksetzen',
       resendButton: 'Sie haben keinen Code erhalten? Erneut senden',
@@ -1535,6 +1642,15 @@ export const deDE: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Bevor wir Ihr Passwort zurücksetzen können, müssen wir Ihre Identität überprüfen.',
+    },
+    ssoFallback: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrieren',

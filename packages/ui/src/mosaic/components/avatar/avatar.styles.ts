@@ -93,19 +93,43 @@ export const styles = stylex.create({
   },
 });
 
-// shape — square shares its radius with Button; circle rounds fully
+// shape — square takes the radius its size sets below; circle rounds fully
 export const shapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: radiusVars['--cl-radius-md'] },
+  square: { borderRadius: 'var(--_cl-avatar-radius)' },
 });
 
 // size — square box; font-size is ~0.4x the box, the ceiling at which two initials still clear
 // the circle's clip.
 export const sizes = stylex.create({
-  xs: { fontSize: '0.5rem', height: space['5'], width: space['5'] },
-  sm: { fontSize: '0.6875rem', height: space['7'], width: space['7'] },
-  md: { fontSize: '0.875rem', height: space['9'], width: space['9'] },
-  lg: { fontSize: '1rem', height: space['10'], width: space['10'] },
-  xl: { fontSize: '1rem', height: space['12'], width: space['12'] },
-  fit: { fontSize: '0.75rem', height: '100%', width: '100%' },
+  xs: {
+    '--_cl-avatar-radius': radiusVars['--cl-radius-sm'],
+    fontSize: '0.625rem',
+    height: space['6'],
+    width: space['6'],
+  },
+  sm: {
+    '--_cl-avatar-radius': radiusVars['--cl-radius-md'],
+    fontSize: '0.8125rem',
+    height: space['8'],
+    width: space['8'],
+  },
+  md: {
+    '--_cl-avatar-radius': radiusVars['--cl-radius-lg'],
+    fontSize: '0.9375rem',
+    height: space['9.5'],
+    width: space['9.5'],
+  },
+  lg: {
+    '--_cl-avatar-radius': radiusVars['--cl-radius-lg'],
+    fontSize: '1.125rem',
+    height: space['12'],
+    width: space['12'],
+  },
+  fit: {
+    '--_cl-avatar-radius': radiusVars['--cl-radius-md'],
+    fontSize: '0.75rem',
+    height: '100%',
+    width: '100%',
+  },
 });

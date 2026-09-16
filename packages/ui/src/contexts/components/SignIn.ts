@@ -119,7 +119,8 @@ export const useSignInContext = (): SignInContextType => {
     baseUrl: signInUrl,
     authQueryString,
     path: ctx.path,
-    endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
+    endpoint:
+      isCombinedFlow && ctx.routing !== 'virtual' ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
   });
 
   if (isCombinedFlow) {

@@ -19,7 +19,8 @@ Two things live under Mosaic, and this skill covers the how-to for both:
 - **Styled components** are authored with **StyleX** — `stylex.create` declares
   the styles, `themeProps` emits the part's public identity (the `.cl-<slot>`
   class plus `data-<axis>` attrs), and `mergeStyleProps` fuses the two with the
-  consumer's `className`/`style`.
+  props the part was called with. A part takes `xstyle` (StyleX atoms for its
+  root), never `className`/`style`.
 - **Flows** follow a **model → controller → view** split — _where the data comes
   from_ → _what the user is doing to it_ → _what that looks like_. What crosses
   each boundary is plain data: no Clerk resource reaches the controller, no
@@ -55,7 +56,7 @@ canonical contract for the whole design system — the `--cl-*` tokens, the
 architecture" section that defines the split. Read it for the _what_; this skill
 is the _how-to_.
 
-`packages/ui/src/mosaic/user-button/` is the fullest worked example of the split
+`packages/ui/src/mosaic/features/user-button/` is the fullest worked example of the split
 in the repo — model, controller, view, wrapper, types, messages, and a test per
 layer. Copy from it.
 

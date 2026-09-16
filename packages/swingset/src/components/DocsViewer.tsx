@@ -30,15 +30,21 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-billing-history-section': dynamic(
       () => import('../stories/user-profile-billing-history-section.mdx'),
     ),
+    'user-profile-enterprise-accounts-section': dynamic(
+      () => import('../stories/user-profile-enterprise-accounts-section.mdx'),
+    ),
     'user-profile-connected-accounts-section': dynamic(
       () => import('../stories/user-profile-connected-accounts-section.mdx'),
     ),
     'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
   },
-  blocks: {
-    destructive: dynamic(() => import('../stories/destructive.mdx')),
+  reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
+  },
+  blocks: {
+    confirmation: dynamic(() => import('../stories/confirmation.mdx')),
+    destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
@@ -46,8 +52,10 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     banner: dynamic(() => import('../stories/banner.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
+    combobox: dynamic(() => import('../stories/combobox.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
+    'phone-input': dynamic(() => import('../stories/phone-input.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     drawer: dynamic(() => import('../stories/drawer.component.mdx')),
@@ -59,7 +67,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     profile: dynamic(() => import('../stories/profile.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    select: dynamic(() => import('../stories/select.component.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
+    toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
@@ -69,6 +79,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     // Headless primitives — alphabetical.
     accordion: dynamic(() => import('../stories/accordion.mdx')),
     autocomplete: dynamic(() => import('../stories/autocomplete.mdx')),
+    combobox: dynamic(() => import('../stories/combobox.primitive.mdx')),
     collapsible: dynamic(() => import('../stories/collapsible.mdx')),
     dialog: dynamic(() => import('../stories/dialog.mdx')),
     drawer: dynamic(() => import('../stories/drawer.mdx')),

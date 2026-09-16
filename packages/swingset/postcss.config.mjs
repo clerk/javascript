@@ -36,6 +36,7 @@ const stylexExtraction = {
             dev: isDev,
             runtimeInjection: false,
             unstable_moduleResolution: { type: 'commonJS', rootDir: uiRoot },
+            aliases: { '@clerk/ui/mosaic/*': [resolve(uiRoot, 'src/mosaic/*')] },
           },
         ],
       ],

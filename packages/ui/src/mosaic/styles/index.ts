@@ -26,6 +26,16 @@ export type {
   DrawerTitleProps,
   DrawerTriggerProps,
 } from '../components/drawer';
+export { Combobox } from '../components/combobox';
+export type {
+  ComboboxEmptyProps,
+  ComboboxInputProps,
+  ComboboxListProps,
+  ComboboxOptionProps,
+  ComboboxPopupProps,
+  ComboboxRootProps,
+  ComboboxSize,
+} from '../components/combobox';
 export { Dialog, createConfirmHandle, useConfirmedClose } from '../components/dialog';
 export type {
   ConfirmHandle,
@@ -44,7 +54,7 @@ export type {
 } from '../components/dialog';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
-export { Flow } from '../components/flow';
+export { Flow, useFlowAutoFocus } from '../components/flow';
 export type { FlowRootProps, FlowStepProps } from '../components/flow';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
@@ -54,6 +64,8 @@ export { Input } from '../components/input';
 export type { InputProps, InputVariant } from '../components/input';
 export { InputGroup } from '../components/input-group';
 export type { InputGroupAddonProps, InputGroupRootProps } from '../components/input-group';
+export { PhoneInput } from '../components/phone-input';
+export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
@@ -71,6 +83,15 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
+export { Select } from '../components/select';
+export type {
+  SelectItem,
+  SelectOptionProps,
+  SelectPopupProps,
+  SelectProps,
+  SelectTriggerProps,
+  SelectTriggerVariant,
+} from '../components/select';
 export { Section } from '../components/section';
 export type {
   SectionActionsProps,

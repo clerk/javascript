@@ -23,13 +23,12 @@ export interface FlowStepProps extends Omit<MosaicComponentProps<'div'>, 'id'> {
 }
 
 function FlowRoot<State>(
-  { value, direction, state, render, className, style, children, ...rest }: FlowRootProps<State>,
+  { value, direction, state, render, xstyle, children, ...rest }: FlowRootProps<State>,
   ref: React.ForwardedRef<HTMLDivElement>,
 ): JSX.Element {
   return (
     <HeadlessFlow.Root
-      {...mergeStyleProps(themeProps('flow-root', { value }), stylex.props(reset.base, styles.root), className, style)}
-      {...rest}
+      {...mergeStyleProps(themeProps('flow-root', { value }), stylex.props(reset.base, styles.root, xstyle), rest)}
       ref={ref}
       render={render}
       value={value}
@@ -47,18 +46,16 @@ type FlowRootComponent = <State>(
 const Root = React.forwardRef(FlowRoot) as FlowRootComponent;
 
 const Step = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(
-  { ids, render, className, style, children, ...rest },
+  { ids, render, xstyle, children, ...rest },
   ref,
 ) {
   return (
     <HeadlessFlow.Step
       {...mergeStyleProps(
         themeProps('flow-step', { step: ids[0] }),
-        stylex.props(reset.base, styles.step),
-        className,
-        style,
+        stylex.props(reset.base, styles.step, xstyle),
+        rest,
       )}
-      {...rest}
       ref={ref}
       render={render}
       ids={ids}

@@ -817,6 +817,24 @@ export interface Clerk {
   __internal_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a configure Directory Sync component at the target element.
+   *
+   * @param targetNode - Target to mount the ConfigureDirectorySync component.
+   * @param props - Configuration parameters.
+   * @hidden
+   */
+  __internal_mountConfigureDirectorySync: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+
+  /**
+   * Unmount a configure Directory Sync component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the ConfigureDirectorySync component from.
+   * @hidden
+   */
+  __internal_unmountConfigureDirectorySync: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -1133,7 +1151,7 @@ export interface Clerk {
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
-   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticatewithgoogleonetap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
    *
    * @param signInOrUp - The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).
    * @param params - Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.
@@ -1984,6 +2002,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
     | 'ConfigureSSO'
+    | 'ConfigureDirectorySync'
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;

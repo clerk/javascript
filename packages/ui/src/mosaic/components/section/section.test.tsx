@@ -1,8 +1,19 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Section } from './section';
+
+const overrides = stylex.create({
+  root: { containerType: 'inline-size' },
+  group: { borderWidth: 2 },
+  item: { minHeight: 80 },
+  label: { color: 'red' },
+});
+
+const atoms = (style: stylex.StyleXStyles) =>
+  (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
 describe('Section', () => {
   it('renders an accessible section and every compound part', () => {
@@ -109,7 +120,7 @@ describe('Section', () => {
     expect(screen.getByText('two@example.com')).toHaveAttribute('data-nested');
   });
 
-  it('lets consumer props win and forwards refs and custom elements', () => {
+  it('applies xstyle on every part and forwards refs and custom elements', () => {
     const rootRef = React.createRef<HTMLElement>();
     const groupRef = React.createRef<HTMLDivElement>();
     const itemRef = React.createRef<HTMLDivElement>();
@@ -120,21 +131,20 @@ describe('Section', () => {
       <Section.Root
         ref={rootRef}
         render={props => <article {...props} />}
-        className='custom-root'
+        xstyle={overrides.root}
       >
         <Section.Title>Account</Section.Title>
         <Section.Group
           ref={groupRef}
-          className='custom-group'
-          style={{ borderWidth: 2 }}
+          xstyle={overrides.group}
         >
           <Section.Row>
             <Section.Item
               ref={itemRef}
-              style={{ minHeight: 80 }}
+              xstyle={overrides.item}
             >
               <Section.Content ref={contentRef}>
-                <Section.Label style={{ color: 'red' }}>Name</Section.Label>
+                <Section.Label xstyle={overrides.label}>Name</Section.Label>
               </Section.Content>
               <Section.Actions ref={actionsRef} />
             </Section.Item>
@@ -144,13 +154,55 @@ describe('Section', () => {
     );
 
     expect(rootRef.current?.tagName).toBe('ARTICLE');
-    expect(rootRef.current).toHaveClass('cl-section', 'custom-root');
-    expect(groupRef.current).toHaveClass('cl-section-group', 'custom-group');
-    expect(groupRef.current).toHaveStyle({ borderWidth: '2px' });
-    expect(itemRef.current).toHaveClass('cl-section-item');
-    expect(itemRef.current).toHaveStyle({ minHeight: '80px' });
+    expect(rootRef.current).toHaveClass('cl-section', ...atoms(overrides.root));
+    expect(groupRef.current).toHaveClass('cl-section-group', ...atoms(overrides.group));
+    expect(itemRef.current).toHaveClass('cl-section-item', ...atoms(overrides.item));
     expect(contentRef.current).toHaveClass('cl-section-content');
-    expect(screen.getByText('Name')).toHaveStyle({ color: 'rgb(255, 0, 0)' });
+    expect(screen.getByText('Name')).toHaveClass('cl-section-label', ...atoms(overrides.label));
     expect(actionsRef.current).toHaveClass('cl-section-actions');
+  });
+
+  it('merges a render-sourced className instead of clobbering its own', () => {
+    render(
+      <Section.Root>
+        <Section.Group render={<Section.Row />}>
+          <Section.Label>Name</Section.Label>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    expect(screen.getByText('Name').parentElement).toHaveClass('cl-section-group', 'cl-section-row');
+  });
+
+  it('renders a row-level error as a sibling of the item, with the alert glyph', () => {
+    render(
+      <Section.Root>
+        <Section.Group>
+          <Section.Row data-testid='row'>
+            <Section.Item data-testid='item'>
+              <Section.Content>
+                <Section.Label>Profile picture</Section.Label>
+              </Section.Content>
+            </Section.Item>
+            <Section.Error data-testid='error'>File type not supported.</Section.Error>
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const error = screen.getByTestId('error');
+    expect(error).toHaveClass('cl-section-error');
+    expect(error.tagName).toBe('P');
+    // A row-level message announces itself; there is no field to describe it.
+    expect(error).toHaveAttribute('role', 'alert');
+    expect(error).toHaveTextContent('File type not supported.');
+    // Outside the item, so the item's media and actions keep their centre line.
+    expect(screen.getByTestId('item')).not.toContainElement(error);
+    expect(screen.getByTestId('row')).toContainElement(error);
+
+    const icon = error.querySelector('.cl-icon');
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
+    expect(icon).toHaveAttribute('data-size', 'sm');
   });
 });

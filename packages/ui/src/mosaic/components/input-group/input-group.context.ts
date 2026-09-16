@@ -5,6 +5,7 @@ import React from 'react';
 export type InputGroupSize = 'sm' | 'md' | 'lg';
 
 interface InputGroupContextValue {
+  element: HTMLDivElement | null;
   disabled: boolean;
   invalid: boolean;
   inputRef: (node: HTMLInputElement | null) => void;

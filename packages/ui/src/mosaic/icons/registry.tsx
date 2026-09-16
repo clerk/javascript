@@ -218,6 +218,13 @@ const SecurityLockSquare = glyph(
   '0 0 18 18',
 );
 
+const SecurityLock = glyph(
+  <path
+    d='M5.25 7.75H3.75V11.25C3.75 12.3546 4.64543 13.25 5.75 13.25H10.25C11.3546 13.25 12.25 12.3546 12.25 11.25V7.75H10.75M5.25 7.75V5.5C5.25 3.98122 6.48122 2.75 8 2.75C9.51878 2.75 10.75 3.98122 10.75 5.5V7.75M5.25 7.75H10.75'
+    {...strokeProps}
+  />,
+);
+
 const DevicePhone = glyph(
   <>
     <path
@@ -300,12 +307,16 @@ const ArrowRightTop = glyph(
 );
 
 const Pen = glyph(
-  <path
-    d='M12.03 3.972a1.59 1.59 0 0 0-2.261 0l-.01.01-5.056 4.89a1.25 1.25 0 0 0-.351.627l-.61 2.747 2.542-.598a1.25 1.25 0 0 0 .59-.325L12.085 6.2c.573-.638.549-1.62-.057-2.228M8.71 2.909a3.09 3.09 0 0 1 4.383.005 3.126 3.126 0 0 1 .06 4.341l-5.228 5.138a2.75 2.75 0 0 1-1.298.715l-3.705.872a.75.75 0 0 1-.904-.893l.87-3.914a2.75 2.75 0 0 1 .772-1.38z'
-    fill='currentColor'
-    fillRule='evenodd'
-    clipRule='evenodd'
-  />,
+  <>
+    <path
+      d='M12.2761 2.60927L13.3905 3.72366C13.9112 4.24436 13.9112 5.08858 13.3905 5.60928L12 6.99977L5.19526 13.8046C5.07024 13.9296 4.90067 13.9998 4.72386 13.9998H2V11.276C2 11.0991 2.07024 10.9296 2.19526 10.8046L9 3.9998L10.3905 2.60928C10.9112 2.08858 11.7555 2.08858 12.2761 2.60927Z'
+      {...strokeProps}
+    />
+    <path
+      d='M9 4L12 7'
+      {...strokeProps}
+    />
+  </>,
 );
 
 const LogOut = glyph(
@@ -378,6 +389,7 @@ export const iconRegistry = {
   'device-laptop': DeviceLaptop,
   'device-phone': DevicePhone,
   'security-authenticator': SecurityLockSquare,
+  'security-lock': SecurityLock,
   'security-lock-square': SecurityLockSquare,
   'security-passkey': SecurityPasskey,
   'security-phone': SecurityPhone,

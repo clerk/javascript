@@ -1,5 +1,39 @@
 # @clerk/ui
 
+## 1.33.1
+
+### Patch Changes
+
+- Add `agentid` to `OAuthProvider` and `OAUTH_PROVIDERS` to support the "Continue with AgentID" OAuth flow. Instances with the connection enabled now render a "Continue with AgentID" button, with the AgentID mark tinted to match the theme's foreground color so it stays legible in dark mode. ([#9735](https://github.com/clerk/javascript/pull/9735)) by [@wyattjoh](https://github.com/wyattjoh)
+
+- The organization Security page now lists every enterprise SSO connection of the organization, each with its own status, domains, and actions. The SSO wizard edits one explicit connection, and a banner names it when the organization has more than one. Changing a provider or removing a connection now targets that connection instead of the first one returned by the API. ([#9729](https://github.com/clerk/javascript/pull/9729)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Validate `appearance.cssLayerName` before wrapping component styles in `@layer`. Values that are not a valid CSS layer name (for example ones containing braces, semicolons, or markup) are now ignored with a one-time console warning instead of being interpolated into the generated stylesheet. ([#9747](https://github.com/clerk/javascript/pull/9747)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+  - @clerk/localizations@4.17.1
+
+## 1.33.0
+
+### Minor Changes
+
+- Introduce self-serve Directory Sync (SCIM) capabilities and related functionality. ([#9590](https://github.com/clerk/javascript/pull/9590)) by [@kalafut](https://github.com/kalafut)
+
+- Add the SSO fallback sign-in flow to `<SignIn />`, for enterprise users the instance has allowlisted to sign in with an email code when they cannot reach their identity provider. ([#9685](https://github.com/clerk/javascript/pull/9685)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+  For such a user the sign-in no longer redirects straight to the identity provider. It shows the SSO action — or the connection picker, when several connections serve the address — alongside a "Can't use SSO?" link leading to the standard email code step, which carries a notice that the organization requires single sign-on and that the attempt is recorded. Users without a fallback, and instances without the feature, are unaffected.
+
+  Custom flows can read the same factor from the new `ssoFallbackFirstFactors` property on the sign-in resource. The flow adds the `signIn.enterpriseSSO` and `signIn.ssoFallback` localization keys and the `ssoFallback` card action element id.
+
+### Patch Changes
+
+- Fixed OAuth sign-ups from `openSignIn({ withSignUp: true })` landing on the sign-in page with an "External Account was not found" error instead of creating the account. ([#9758](https://github.com/clerk/javascript/pull/9758)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`f21352f`](https://github.com/clerk/javascript/commit/f21352f93707211199d2cf267bd07ec80e4f8b53), [`2502266`](https://github.com/clerk/javascript/commit/25022663a36073c4d3014178c730894785cf0dc1), [`607d561`](https://github.com/clerk/javascript/commit/607d56196c7b7205c06edcdcbf521827762baaeb), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42)]:
+  - @clerk/localizations@4.17.0
+  - @clerk/shared@4.32.0
+
 ## 1.32.3
 
 ### Patch Changes

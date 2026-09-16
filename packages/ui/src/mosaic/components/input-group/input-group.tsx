@@ -22,29 +22,31 @@ export interface InputGroupRootProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function MosaicInputGroupRoot(
-  { render, className, style, onClick, disabled: disabledProp, invalid: invalidProp, size = 'md', ...otherProps },
+  { render, xstyle, onClick, disabled: disabledProp, invalid: invalidProp, size = 'md', ...otherProps },
   ref,
 ) {
   const field = useOptionalFieldContext();
   const disabled = disabledProp ?? field?.disabled ?? false;
   const invalid = invalidProp ?? field?.invalid ?? false;
+  const [groupElement, setGroupElement] = React.useState<HTMLDivElement | null>(null);
   const inputElementRef = React.useRef<HTMLInputElement | null>(null);
   const inputRef = React.useCallback((node: HTMLInputElement | null) => {
     inputElementRef.current = node;
   }, []);
-  const context = React.useMemo(() => ({ disabled, invalid, inputRef, size }), [disabled, invalid, inputRef, size]);
+  const context = React.useMemo(
+    () => ({ element: groupElement, disabled, invalid, inputRef, size }),
+    [groupElement, disabled, invalid, inputRef, size],
+  );
   const element = useRender({
     defaultTagName: 'div',
     render,
-    ref,
+    ref: [ref, setGroupElement],
     props: {
       ...mergeStyleProps(
         themeProps('input-group', { size, disabled, invalid }),
-        stylex.props(reset.base, inputStyles.group, styles.root, sizes[size], disabled && inputStyles.disabled),
-        className,
-        style,
+        stylex.props(reset.base, inputStyles.group, styles.root, sizes[size], disabled && inputStyles.disabled, xstyle),
+        otherProps,
       ),
-      ...otherProps,
       onClick: (event: React.MouseEvent<HTMLDivElement>) => {
         onClick?.(event);
         if (event.defaultPrevented || disabled || !(event.target instanceof Element)) {
@@ -73,7 +75,7 @@ const addonButtonSizes = { sm: 'xs', md: 'sm', lg: 'md' } as const;
 
 function useAddon(
   side: 'start' | 'end',
-  { render, className, style, ...props }: InputGroupAddonProps,
+  { render, xstyle, ...props }: InputGroupAddonProps,
   ref: React.ForwardedRef<HTMLSpanElement>,
 ) {
   const group = useInputGroupContext();
@@ -101,11 +103,9 @@ function useAddon(
           size: group.size,
           disabled: group.disabled,
         }),
-        stylex.props(reset.base, styles.addon, textSizes[group.size], styles[side]),
-        className,
-        style,
+        stylex.props(reset.base, styles.addon, textSizes[group.size], styles[side], xstyle),
+        props,
       ),
-      ...props,
     },
   });
   return <ButtonContext.Provider value={defaults}>{element}</ButtonContext.Provider>;

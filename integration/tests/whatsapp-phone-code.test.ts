@@ -1,10 +1,16 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
+import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
+
+const clickSendCodeViaSmsInstead = async (page: Page, verificationHeading: RegExp) => {
+  await page.getByRole('heading', { name: verificationHeading }).waitFor();
+  await page.getByRole('link', { name: /Send code via SMS instead/i }).click();
+};
 
 test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
   // The WhatsApp alternate phone-code channel is not provisioned on the staging
@@ -58,7 +64,8 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
         });
 
         // Click on WhatsApp button
-        await page.getByRole('button', { name: new RegExp(`WhatsApp`, 'gi') }).click();
+        await page.getByRole('button', { name: /WhatsApp/i }).click();
+        await page.getByRole('heading', { name: /with WhatsApp/i }).waitFor();
         // Fill in sign up form with phone number
         await u.po.signUp.signUp({
           phoneNumber: fakeUser.phoneNumber,
@@ -73,8 +80,8 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
           await route.continue();
         });
 
-        // Click the "Use SMS instead" button
-        await page.getByRole('link', { name: new RegExp(`SMS`, 'gi') }).click();
+        // Click the "Send code via SMS instead" link once the verification card is up
+        await clickSendCodeViaSmsInstead(page, /Verify your WhatsApp/i);
 
         // Verify phone number
         await u.po.signUp.enterTestOtpCode();
@@ -97,7 +104,8 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
         });
 
         // Click on WhatsApp button
-        await page.getByRole('button', { name: new RegExp(`WhatsApp`, 'gi') }).click();
+        await page.getByRole('button', { name: /WhatsApp/i }).click();
+        await page.getByRole('heading', { name: /with WhatsApp/i }).waitFor();
         // Fill in WhatsApp sign in form with phone number
         await u.po.signIn.getIdentifierInput().fill(fakeUser.phoneNumber);
         await u.po.signIn.continue();
@@ -111,8 +119,8 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
           await route.continue();
         });
 
-        // Click the "Use SMS instead" button
-        await page.getByRole('link', { name: new RegExp(`SMS`, 'gi') }).click();
+        // Click the "Send code via SMS instead" link once the verification card is up
+        await clickSendCodeViaSmsInstead(page, /Check your WhatsApp/i);
 
         // Verify phone number
         await u.po.signIn.enterTestOtpCode();
@@ -150,8 +158,8 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
           await route.continue();
         });
 
-        // Click the "Use SMS instead" button
-        await page.getByRole('link', { name: new RegExp(`SMS`, 'gi') }).click();
+        // Click the "Send code via SMS instead" link once the verification card is up
+        await clickSendCodeViaSmsInstead(page, /Check your WhatsApp/i);
 
         // Verify phone number
         await u.po.signIn.enterTestOtpCode();

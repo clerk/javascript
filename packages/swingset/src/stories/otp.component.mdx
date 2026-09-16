@@ -13,7 +13,6 @@ import * as OtpStories from './otp.component.stories';
 
 <PropTable
   meta={OtpStories.meta}
-  styleProps={false}
   extra={[
     { name: 'length', type: 'number', default: '6' },
     { name: 'value', type: 'string', default: '—' },
@@ -63,7 +62,10 @@ Inside a `Field.Root`, the field's `disabled`, `required`, and `invalid` flow in
 >
   <Field.Label>Verification code</Field.Label>
   <Otp name='code' />
-  {error ? <Field.Error>{error}</Field.Error> : <Field.Description>Didn’t receive a code? Resend</Field.Description>}
+  <Field.Description>Didn’t receive a code? Resend</Field.Description>
+  <Field.Message>
+    <Field.Error>{error}</Field.Error>
+  </Field.Message>
 </Field.Root>
 ```
 

@@ -1,8 +1,18 @@
-import type { UserProfileEmail, UserProfilePhone } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
-import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
+import type {
+  UserProfileEmail,
+  UserProfilePhone,
+} from '@clerk/ui/mosaic/features/user-profile/user-profile-profile-panel.view';
+import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
+import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
+import { useConnectedAccountsFixture } from './fixtures/user-profile-connected-accounts';
+import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
+import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 const profileImageUrl = 'https://avatars.githubusercontent.com/u/51144033?v=4';
@@ -15,7 +25,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileProfilePanel',
   label: 'Profile panel',
   navigation: { category: 'Panels' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-profile-panel.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-profile-panel.view.tsx',
 };
 
 export function Default(_args: Record<string, unknown>) {
@@ -26,21 +36,24 @@ export function Default(_args: Record<string, unknown>) {
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
+  const { imageUrl, showFile, clearImage } = usePreviewImage(profileImageUrl);
+  const connections = useConnectedAccountsFixture();
+  const editName = useUserProfileEditNameFixture();
+  const editUsername = useUserProfileEditUsernameFixture();
+  const emailFlow = createUserProfileAddEmailFixture({
+    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+  });
 
   return (
     <UserProfileProfilePanelView
+      {...editName}
+      {...editUsername}
+      {...emailFlow}
       allowMultipleAccounts
       emails={emails}
-      connectedAccounts={[
-        {
-          id: 'google',
-          provider: 'Google',
-          identifier: 'test@google.com',
-          iconUrl: providerIconUrl('google'),
-          connected: true,
-        },
-        { id: 'apple', provider: 'Apple', iconUrl: providerIconUrl('apple'), connected: false },
-      ]}
+      connectedAccounts={connections.accounts}
+      availableConnectionProviders={connections.availableProviders}
+      onReconnectAccount={connections.onReconnect}
       web3Wallets={[
         {
           id: 'metamask',
@@ -50,50 +63,32 @@ export function Default(_args: Record<string, unknown>) {
           isPrimary: true,
           isVerified: true,
         },
-        {
-          id: 'coinbase-wallet',
-          provider: 'Coinbase Wallet',
-          iconUrl: providerIconUrl('coinbase_wallet'),
-          connected: false,
-        },
       ]}
-      imageUrl={profileImageUrl}
-      name='Preston Booth'
+      availableWeb3Providers={[
+        { id: 'coinbase-wallet', provider: 'Coinbase Wallet', iconUrl: providerIconUrl('coinbase_wallet') },
+      ]}
+      hasImage={Boolean(imageUrl)}
+      imageUrl={imageUrl}
       phones={phones}
-      username='prestonxyz'
-      onAddEmail={() =>
-        setEmails(current => [
-          ...current,
-          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
-        ])
-      }
-      onAddPhone={() =>
-        setPhones(current => [
-          ...current,
-          {
-            id: `phone_${Date.now()}`,
-            value: `+1 801-555-${String(current.length + 1).padStart(4, '0')}`,
-            isVerified: true,
-          },
-        ])
-      }
-      onConnectAccount={() => undefined}
+      {...createUserProfileAddPhoneFixture({
+        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+      })}
+      onConnectAccount={connections.onConnect}
       onDeleteAccount={() => Promise.resolve()}
-      onEditProfilePicture={() => undefined}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
-      onRemoveConnectedAccount={() => undefined}
+      onProfilePictureChange={showFile}
+      onRemoveConnectedAccount={connections.onRemove}
+      onRemoveProfilePicture={clearImage}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
       onConnectWeb3Wallet={() => undefined}
       onRemoveWeb3Wallet={() => undefined}
       onSetPrimaryWeb3Wallet={() => undefined}
-      onSetPrimaryEmail={() => undefined}
-      onSetPrimaryPhone={() => undefined}
+      onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
+      onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
       onVerifyEmail={() => undefined}
       onVerifyPhone={() => undefined}
-      onNameChange={() => undefined}
-      onUsernameChange={() => undefined}
     />
   );
 }

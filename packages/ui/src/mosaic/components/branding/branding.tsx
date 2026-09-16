@@ -17,7 +17,7 @@ export type BrandingProps = Omit<MosaicComponentProps<'span'>, 'children'>;
  * `renderBranding`. The logo names the link, so a screen reader reaches "Clerk", not an unnamed link.
  */
 export const Branding = React.forwardRef<HTMLSpanElement, BrandingProps>(function Branding(
-  { render, className, style, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -25,8 +25,7 @@ export const Branding = React.forwardRef<HTMLSpanElement, BrandingProps>(functio
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('branding'), stylex.props(reset.base, styles.base), className, style),
-      ...rest,
+      ...mergeStyleProps(themeProps('branding'), stylex.props(reset.base, styles.base, xstyle), rest),
       children: (
         <>
           Secured by{' '}
