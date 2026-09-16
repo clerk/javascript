@@ -17,13 +17,13 @@ export const styles = stylex.create({
   },
   page: {
     color: {
-      default: colorVars['--cl-color-neutral-faded'],
-      ':where([aria-current="page"])': colorVars['--cl-color-neutral-foreground'],
+      default: colorVars['--cl-color-foreground-secondary'],
+      ':where([aria-current="page"])': colorVars['--cl-color-foreground'],
     },
   },
   ellipsis: {
     alignItems: 'center',
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     display: 'inline-flex',
     justifyContent: 'center',
   },
