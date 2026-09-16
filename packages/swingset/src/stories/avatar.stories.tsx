@@ -12,12 +12,13 @@ export { default as __source } from './avatar.stories?raw';
 // here to drive the playground + prop table. Keys mirror `AvatarProps`.
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Avatar',
   source: 'packages/ui/src/mosaic/components/avatar/avatar.tsx',
   styles: {
     _variants: {
       shape: { circle: {}, square: {} },
-      size: { xs: {}, sm: {}, md: {}, lg: {}, xl: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
       shape: 'circle',
@@ -75,7 +76,7 @@ export function Interactive(props: Record<string, unknown>) {
   return (
     <Avatar.Root
       {...knobsAsProps(props)}
-      size='xl'
+      size='lg'
       render={
         <button
           type='button'
@@ -98,7 +99,7 @@ export function Interactive(props: Record<string, unknown>) {
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
         <Avatar.Root
           key={size}
           {...knobsAsProps(props)}

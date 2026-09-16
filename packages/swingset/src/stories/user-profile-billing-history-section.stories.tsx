@@ -1,5 +1,5 @@
-import type { UserProfileBillingHistoryItem } from '@clerk/ui/mosaic/user-profile/user-profile-billing-history-section.view';
-import { UserProfileBillingHistorySectionView } from '@clerk/ui/mosaic/user-profile/user-profile-billing-history-section.view';
+import type { UserProfileBillingHistoryItem } from '@clerk/ui/mosaic/features/user-profile/user-profile-billing-history-section.view';
+import { UserProfileBillingHistorySectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-billing-history-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -8,10 +8,11 @@ export { default as __source } from './user-profile-billing-history-section.stor
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileBillingHistorySection',
   label: 'Billing history',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-billing-history-section.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-billing-history-section.view.tsx',
 };
 
 const items: UserProfileBillingHistoryItem[] = [

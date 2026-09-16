@@ -6,11 +6,8 @@ import { colorVars, durationVars, easingVars } from '../tokens.stylex';
 // system focus ring, so a text-entry field reads as a field rather than a control.
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
 const focusShadow = '0 0 0 3px light-dark(rgb(23 23 23 / 8%), rgb(255 255 255 / 8%))';
-const invalidFocusShadow = `0 0 0 3px light-dark(
-  color-mix(in oklab, ${colorVars['--cl-color-negative']} 12%, transparent),
-  color-mix(in oklab, ${colorVars['--cl-color-negative']} 15%, transparent)
-)`;
-const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
+const invalidFocusShadow = `0 0 0 3px ${colorVars['--cl-color-negative-alpha-300']}`;
+const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-brand']} 5%, transparent)`;
 
 export const inputStyles = stylex.create({
   base: {
@@ -53,6 +50,48 @@ export const inputStyles = stylex.create({
     transitionTimingFunction: {
       default: 'linear',
       ':focus-visible': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
+    },
+  },
+  group: {
+    borderColor: {
+      default: colorVars['--cl-color-border'],
+      ':where([data-invalid])': colorVars['--cl-color-negative'],
+      ':has(input:focus-visible, textarea:focus-visible)': hoverBorderColor,
+      ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': colorVars['--cl-color-negative'],
+      '@media (hover: hover)': {
+        ':hover:not([data-invalid])': hoverBorderColor,
+      },
+    },
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    outline: {
+      default: 'none',
+      '@media (forced-colors: active)': {
+        default: null,
+        ':has(input:focus-visible, textarea:focus-visible)': '2px solid CanvasText',
+      },
+    },
+    backgroundColor: colorVars['--cl-color-input'],
+    boxShadow: {
+      default: null,
+      ':has(input:focus-visible, textarea:focus-visible)': focusShadow,
+      ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': invalidFocusShadow,
+    },
+    outlineOffset: {
+      default: null,
+      '@media (forced-colors: active)': {
+        default: null,
+        ':has(input:focus-visible, textarea:focus-visible)': '2px',
+      },
+    },
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      ':has(input:focus-visible, textarea:focus-visible)': durationVars['--cl-duration-fast'],
+    },
+    transitionProperty: 'color, background-color, border-color, box-shadow',
+    transitionTimingFunction: {
+      default: 'linear',
+      ':has(input:focus-visible, textarea:focus-visible)': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
     },
   },
   disabled: {

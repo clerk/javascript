@@ -31,7 +31,15 @@ const componentImportPaths = {
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   ConfigureSSO: () => import(/* webpackChunkName: "configureSSO" */ '../components/ConfigureSSO/ConfigureSSO'),
+  ConfigureDirectorySync: () =>
+    import(
+      /* webpackChunkName: "configureDirectorySync" */ '../components/ConfigureDirectorySync/ConfigureDirectorySync'
+    ),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
+  OAuthDeviceVerification: () =>
+    import(
+      /* webpackChunkName: "oauthDeviceVerification" */ '../components/OAuthDeviceVerification/OAuthDeviceVerification'
+    ),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
 } as const;
@@ -130,6 +138,10 @@ export const ConfigureSSO = lazy(() =>
   componentImportPaths.ConfigureSSO().then(module => ({ default: module.ConfigureSSO })),
 );
 
+export const ConfigureDirectorySync = lazy(() =>
+  componentImportPaths.ConfigureDirectorySync().then(module => ({ default: module.ConfigureDirectorySync })),
+);
+
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
 export const TaskChooseOrganization = lazy(() =>
@@ -154,6 +166,10 @@ export const SubscriptionDetails = lazy(() =>
 
 export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
+);
+
+export const OAuthDeviceVerification = lazy(() =>
+  componentImportPaths.OAuthDeviceVerification().then(module => ({ default: module.OAuthDeviceVerification })),
 );
 
 export const SessionTasks = lazy(() =>
@@ -192,7 +208,9 @@ export const ClerkComponents = {
   PlanDetails,
   APIKeys,
   ConfigureSSO,
+  ConfigureDirectorySync,
   OAuthConsent,
+  OAuthDeviceVerification,
   SubscriptionDetails,
   TaskChooseOrganization,
   TaskResetPassword,

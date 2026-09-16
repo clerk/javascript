@@ -1,8 +1,14 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { colors } from '../../utils/typography.styles';
 import { Text, TextContext } from './text';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 describe('Mosaic Text', () => {
   it('renders a p with its children', () => {
@@ -16,25 +22,33 @@ describe('Mosaic Text', () => {
     const text = screen.getByText('Body copy');
     expect(text).toHaveClass('cl-text');
     expect(text).toHaveAttribute('data-size', 'sm');
-    expect(text).toHaveAttribute('data-color', 'primary');
+    expect(text).toHaveAttribute('data-color', 'foreground');
   });
 
-  it('wires variant props and consumer className/style through to the element', () => {
+  it('wires variant props and xstyle atoms through to the element', () => {
     render(
       <Text
         size='lg'
-        color='neutral'
-        className='my-text'
-        style={{ marginTop: '8px' }}
+        color='foreground-secondary'
+        xstyle={atoms.spaced}
       >
         Body copy
       </Text>,
     );
     const text = screen.getByText('Body copy');
     expect(text).toHaveAttribute('data-size', 'lg');
-    expect(text).toHaveAttribute('data-color', 'neutral');
-    expect(text).toHaveClass('cl-text', 'my-text');
-    expect(text).toHaveStyle({ marginTop: '8px' });
+    expect(text).toHaveAttribute('data-color', 'foreground-secondary');
+    expect(text).toHaveClass('cl-text', stylex.props(atoms.spaced).className ?? '');
+  });
+
+  it.each(['foreground', 'foreground-secondary'] as const)('applies the %s color atoms', color => {
+    render(<Text color={color}>Body copy</Text>);
+    expect(screen.getByText('Body copy')).toHaveClass(stylex.props(colors[color]).className ?? '');
+  });
+
+  it('merges a className carried by the render element instead of clobbering the slot class', () => {
+    render(<Text render={<span className='from-source' />}>Body copy</Text>);
+    expect(screen.getByText('Body copy')).toHaveClass('cl-text', 'from-source');
   });
 
   it('renders a different element through the render prop, keeping the slot props', () => {
@@ -56,12 +70,12 @@ describe('Mosaic Text', () => {
 
   it('reads defaults from TextContext, with own props winning', () => {
     render(
-      <TextContext.Provider value={{ color: 'neutral', size: 'xs' }}>
+      <TextContext.Provider value={{ color: 'foreground-secondary', size: 'xs' }}>
         <Text size='base'>Body copy</Text>
       </TextContext.Provider>,
     );
     const text = screen.getByText('Body copy');
-    expect(text).toHaveAttribute('data-color', 'neutral');
+    expect(text).toHaveAttribute('data-color', 'foreground-secondary');
     expect(text).toHaveAttribute('data-size', 'base');
   });
 

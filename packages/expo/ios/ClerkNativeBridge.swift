@@ -958,11 +958,8 @@ final class ClerkNativeBridge {
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         logoState: logoState,
-        logoMaxHeight: logoMaxHeight
-      )
-      .environment(
-        \.clerkAuthFlowCompletionAction,
-        ClerkAuthFlowCompletionAction { onEvent(.dismissed, [:]) }
+        logoMaxHeight: logoMaxHeight,
+        onAuthComplete: { onEvent(.dismissed, [:]) }
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
@@ -1264,11 +1261,16 @@ struct ClerkInlineAuthWrapperView: View {
   let darkTheme: ClerkTheme?
   let logoState: ClerkInlineAuthLogoState
   let logoMaxHeight: CGFloat?
+  let onAuthComplete: @MainActor () -> Void
 
   @Environment(\.colorScheme) private var colorScheme
 
   @ViewBuilder private var themedAuthView: some View {
-    let view = AuthView(mode: mode, isDismissible: dismissible)
+    let view = AuthView(
+      mode: mode,
+      isDismissible: dismissible,
+      onAuthComplete: onAuthComplete
+    )
       .environment(Clerk.shared)
       .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme

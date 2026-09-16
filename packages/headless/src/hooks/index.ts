@@ -19,3 +19,4 @@ export {
   type UseTransitionReturn,
 } from './use-transition';
 export { type TransitionStatus, useTransitionStatus } from './use-transition-status';
+export { type FocusTarget, useFinalFocus, useInitialFocus } from './use-focus-target';

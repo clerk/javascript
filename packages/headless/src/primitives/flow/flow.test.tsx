@@ -1,8 +1,18 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { createRef } from 'react';
+import React, { createRef } from 'react';
+import { createPortal } from 'react-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Flow } from './index';
+import { Flow, useFlowAutoFocus } from './index';
+
+function AutoFocusInput(props: React.ComponentProps<'input'>) {
+  return (
+    <input
+      ref={useFlowAutoFocus()}
+      {...props}
+    />
+  );
+}
 
 interface TestFlowProps {
   value: string;
@@ -22,12 +32,14 @@ function TestFlow({ value, direction = 1, passwordContent = 'Password' }: TestFl
         data-testid='password-step'
       >
         {passwordContent}
+        <AutoFocusInput data-testid='password-input' />
       </Flow.Step>
       <Flow.Step
         ids={['otp', 'otp-pending', 'otp-error']}
         data-testid='otp-step'
       >
         OTP
+        <AutoFocusInput data-testid='otp-input' />
       </Flow.Step>
     </Flow.Root>
   );
@@ -56,6 +68,12 @@ describe('Flow', () => {
     globalThis.requestAnimationFrame = originalRaf;
     globalThis.cancelAnimationFrame = originalCaf;
   });
+
+  function flushRaf() {
+    const callbacks = [...rafCallbacks];
+    rafCallbacks = [];
+    callbacks.forEach(callback => callback(performance.now()));
+  }
 
   it('renders only the step matching the controlled value', () => {
     render(<TestFlow value='password' />);
@@ -147,6 +165,39 @@ describe('Flow', () => {
     finishAnimation();
   });
 
+  it('keeps the returning step mounted when its exit is interrupted', async () => {
+    let finishAnimation!: () => void;
+    const animationFinished = new Promise<void>(resolve => {
+      finishAnimation = resolve;
+    });
+    const { rerender } = render(<TestFlow value='password' />);
+    const step = screen.getByTestId('password-step');
+    step.getAnimations = vi.fn(() => [{ finished: animationFinished }] as unknown as Animation[]);
+
+    rerender(<TestFlow value='otp' />);
+    expect(step).toHaveAttribute('data-ending-style');
+
+    rerender(
+      <TestFlow
+        value='password'
+        direction={-1}
+      />,
+    );
+    act(() => flushRaf());
+
+    expect(step).toHaveAttribute('data-open');
+    expect(step).not.toHaveAttribute('data-ending-style');
+
+    step.getAnimations = vi.fn(() => []);
+    await act(async () => {
+      finishAnimation();
+      await animationFinished;
+    });
+
+    expect(screen.getByTestId('password-step')).toBe(step);
+    expect(step).not.toHaveAttribute('data-starting-style');
+  });
+
   it('forwards its ref and supports a custom rendered element', () => {
     const ref = createRef<HTMLDivElement>();
 
@@ -173,21 +224,10 @@ describe('Flow', () => {
   });
 
   it('publishes the entering step height without enabling initial animation', () => {
-    const getBoundingClientRect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+    const offsetHeight = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (
       this: HTMLElement,
     ) {
-      const height = this.dataset.testid === 'password-step' ? 120 : 240;
-      return {
-        x: 0,
-        y: 0,
-        width: 420,
-        height,
-        top: 0,
-        right: 420,
-        bottom: height,
-        left: 0,
-        toJSON: () => ({}),
-      };
+      return this.dataset.testid === 'password-step' ? 120 : 240;
     });
     const { rerender } = render(<TestFlow value='password' />);
     const root = screen.getByTestId('flow-root');
@@ -195,11 +235,7 @@ describe('Flow', () => {
     expect(root.style.getPropertyValue('--cl-flow-step-height')).toBe('120px');
     expect(root).toHaveAttribute('data-initial');
 
-    act(() => {
-      const callbacks = [...rafCallbacks];
-      rafCallbacks = [];
-      callbacks.forEach(callback => callback(performance.now()));
-    });
+    act(() => flushRaf());
 
     expect(root).not.toHaveAttribute('data-initial');
 
@@ -207,6 +243,147 @@ describe('Flow', () => {
 
     expect(root.style.getPropertyValue('--cl-flow-step-height')).toBe('240px');
     expect(root).not.toHaveAttribute('data-initial');
-    getBoundingClientRect.mockRestore();
+    offsetHeight.mockRestore();
+  });
+  describe('useFlowAutoFocus', () => {
+    it('does not focus the initially active step', () => {
+      render(<TestFlow value='password' />);
+
+      expect(screen.getByTestId('password-input')).not.toHaveFocus();
+    });
+
+    it('focuses the registered element without scrolling when the step enters', () => {
+      const focus = vi.spyOn(HTMLElement.prototype, 'focus');
+      const { rerender } = render(<TestFlow value='password' />);
+
+      rerender(<TestFlow value='otp' />);
+
+      expect(screen.getByTestId('otp-input')).toHaveFocus();
+      expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+      focus.mockRestore();
+    });
+
+    it('leaves focus alone when it is outside the flow', () => {
+      const { rerender } = render(
+        <>
+          <button
+            type='button'
+            data-testid='outside'
+          >
+            Outside
+          </button>
+          <TestFlow value='password' />
+        </>,
+      );
+      screen.getByTestId('outside').focus();
+
+      rerender(
+        <>
+          <button
+            type='button'
+            data-testid='outside'
+          >
+            Outside
+          </button>
+          <TestFlow value='otp' />
+        </>,
+      );
+
+      expect(screen.getByTestId('outside')).toHaveFocus();
+      expect(screen.getByTestId('otp-input')).not.toHaveFocus();
+    });
+
+    it('focuses the returning step when navigation reverses mid-transition', () => {
+      const { rerender } = render(<TestFlow value='password' />);
+
+      rerender(<TestFlow value='otp' />);
+      const otpInput = screen.getByTestId('otp-input');
+      expect(otpInput).toHaveFocus();
+
+      rerender(
+        <TestFlow
+          value='password'
+          direction={-1}
+        />,
+      );
+
+      expect(otpInput).not.toHaveFocus();
+      expect(screen.getByTestId('password-input')).toHaveFocus();
+    });
+
+    it('focuses the first marked element in DOM order when several are marked', () => {
+      const otpStep = (
+        <Flow.Step ids={['otp']}>
+          <AutoFocusInput data-testid='first' />
+          <AutoFocusInput data-testid='second' />
+        </Flow.Step>
+      );
+      const { rerender } = render(
+        <Flow.Root value='password'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep}
+        </Flow.Root>,
+      );
+
+      rerender(
+        <Flow.Root value='otp'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep}
+        </Flow.Root>,
+      );
+
+      expect(screen.getByTestId('first')).toHaveFocus();
+    });
+
+    it('skips a marked element that is not rendered', () => {
+      const otpStep = (showFirst: boolean) => (
+        <Flow.Step ids={['otp']}>
+          {showFirst ? <AutoFocusInput data-testid='first' /> : null}
+          <AutoFocusInput data-testid='second' />
+        </Flow.Step>
+      );
+      const { rerender } = render(
+        <Flow.Root value='password'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep(false)}
+        </Flow.Root>,
+      );
+
+      rerender(
+        <Flow.Root value='otp'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep(false)}
+        </Flow.Root>,
+      );
+
+      expect(screen.queryByTestId('first')).not.toBeInTheDocument();
+      expect(screen.getByTestId('second')).toHaveFocus();
+    });
+
+    it('ignores a marked element portaled outside the root', () => {
+      const otpStep = (
+        <Flow.Step ids={['otp']}>{createPortal(<AutoFocusInput data-testid='portaled' />, document.body)}</Flow.Step>
+      );
+      const { rerender } = render(
+        <Flow.Root value='password'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep}
+        </Flow.Root>,
+      );
+
+      rerender(
+        <Flow.Root value='otp'>
+          <Flow.Step ids={['password']}>Password</Flow.Step>
+          {otpStep}
+        </Flow.Root>,
+      );
+
+      expect(screen.getByTestId('portaled')).not.toHaveFocus();
+    });
+
+    it('returns a no-op ref outside a step', () => {
+      expect(() => render(<AutoFocusInput data-testid='lone-input' />)).not.toThrow();
+      expect(screen.getByTestId('lone-input')).toBeInTheDocument();
+    });
   });
 });

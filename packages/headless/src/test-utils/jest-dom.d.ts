@@ -11,7 +11,7 @@ import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers'
 // rather than an ambient module declaration that would shadow vitest's own types.
 declare module 'vitest' {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  interface Assertion<T = any> extends TestingLibraryMatchers<any, T> {}
+  interface Assertion<R, _T> extends TestingLibraryMatchers<any, R> {}
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface AsymmetricMatchersContaining extends TestingLibraryMatchers<any, any> {}
 }

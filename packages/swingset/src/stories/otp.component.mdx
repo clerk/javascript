@@ -2,8 +2,6 @@ import * as OtpStories from './otp.component.stories';
 
 # OTP
 
-The Mosaic `Otp` is the verification-code field: one styled box per character, built on the headless [OTP primitive](/primitives/otp). Focus advances as the code is typed, `Backspace` walks back, and a pasted code spreads across the boxes. Each box carries the same border, hover, and focus treatment as `Input`.
-
 ## Playground
 
 <Preview
@@ -15,7 +13,6 @@ The Mosaic `Otp` is the verification-code field: one styled box per character, b
 
 <PropTable
   meta={OtpStories.meta}
-  styleProps={false}
   extra={[
     { name: 'length', type: 'number', default: '6' },
     { name: 'value', type: 'string', default: '—' },
@@ -56,13 +53,19 @@ const [code, setCode] = useState('');
 />;
 ```
 
-Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes, and the label and messages are associated with the group:
+Inside a `Field.Root`, the field's `disabled`, `required`, and `invalid` flow into the boxes, and the messages are associated with the group. `Field.Label` targets the first box, so clicking it focuses the code — drop `aria-label` and let the label name the field:
 
 ```tsx
-<Field.Root invalid={Boolean(error)}>
+<Field.Root
+  required
+  invalid={Boolean(error)}
+>
   <Field.Label>Verification code</Field.Label>
   <Otp name='code' />
-  {error ? <Field.Error>{error}</Field.Error> : <Field.Description>Didn’t receive a code? Resend</Field.Description>}
+  <Field.Description>Didn’t receive a code? Resend</Field.Description>
+  <Field.Message>
+    <Field.Error>{error}</Field.Error>
+  </Field.Message>
 </Field.Root>
 ```
 
@@ -71,6 +74,13 @@ Inside a `Field.Root`, the field's `disabled` and `invalid` flow into the boxes,
 ---
 
 ## Examples
+
+### In a Field
+
+<Story
+  name='WithField'
+  storyModule={OtpStories}
+/>
 
 ### Success
 

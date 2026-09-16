@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react';
 
 import type { TransitionProps } from '../../hooks/use-transition';
 import type { DialogHandle } from './dialog-handle';
+import type { DialogRole } from './dialog-root';
 
 export interface DialogContextValue {
   open: boolean;
@@ -21,6 +22,8 @@ export interface DialogContextValue {
    */
   store: DialogHandle;
   modal: boolean;
+  /** The popup's ARIA role, as the root was told. Lets a styled layer branch on alert-dialog behaviour. */
+  role: DialogRole;
   /**
    * Whether this dialog opened from inside another floating element, so a stacked overlay can
    * style itself differently from the one beneath it — chiefly so backdrops don't composite into

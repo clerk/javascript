@@ -128,24 +128,16 @@ describe('Legacy Colors', () => {
       };
 
       beforeEach(() => {
-        // @ts-ignore
-        global.window = mockWindow;
-        // @ts-ignore
-        global.getComputedStyle = mockGetComputedStyle;
-        // @ts-ignore
-        global.document = {
+        vi.stubGlobal('window', mockWindow);
+        vi.stubGlobal('getComputedStyle', mockGetComputedStyle);
+        vi.stubGlobal('document', {
           documentElement: document?.createElement?.('div') || {},
-        };
+        });
       });
 
       afterEach(() => {
         vi.clearAllMocks();
-        // @ts-ignore
-        global.window = undefined;
-        // @ts-ignore
-        global.getComputedStyle = undefined;
-        // @ts-ignore
-        global.document = undefined;
+        vi.unstubAllGlobals();
       });
 
       it('should resolve CSS variables with hex values', () => {
@@ -202,10 +194,8 @@ describe('Legacy Colors', () => {
       });
 
       it('should work in server environment without window', () => {
-        // @ts-ignore
-        global.window = undefined;
-        // @ts-ignore
-        global.getComputedStyle = undefined;
+        vi.stubGlobal('window', undefined);
+        vi.stubGlobal('getComputedStyle', undefined);
 
         expect(() => colors.toHslaColor('var(--brand, red)')).not.toThrow();
         const result = colors.toHslaColor('var(--brand, red)');

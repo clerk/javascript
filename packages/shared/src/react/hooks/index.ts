@@ -2,6 +2,8 @@ export { assertContextExists, createContextAndHook } from './createContextAndHoo
 export { useAPIKeys } from './useAPIKeys';
 export { useOAuthConsent } from './useOAuthConsent';
 export type { UseOAuthConsentParams, UseOAuthConsentReturn } from './useOAuthConsent.types';
+export { useOAuthDeviceVerification } from './useOAuthDeviceVerification';
+export type { UseOAuthDeviceVerificationReturn } from './useOAuthDeviceVerification.types';
 export { useOrganization } from './useOrganization';
 export { useOrganizationCreationDefaults } from './useOrganizationCreationDefaults';
 export type {
@@ -47,6 +49,16 @@ export type {
 } from './useOrganizationEnterpriseConnections';
 export { __internal_useOrganizationDomains } from './useOrganizationDomains';
 export type { UseOrganizationDomainsParams, UseOrganizationDomainsReturn } from './useOrganizationDomains';
+export { __internal_useOrganizationDirectorySync } from './useOrganizationDirectorySync';
+export type {
+  UseOrganizationDirectorySyncParams,
+  UseOrganizationDirectorySyncReturn,
+} from './useOrganizationDirectorySync';
+export { __internal_useOrganizationDirectorySyncUsers } from './useOrganizationDirectorySyncUsers';
+export type {
+  UseOrganizationDirectorySyncUsersParams,
+  UseOrganizationDirectorySyncUsersReturn,
+} from './useOrganizationDirectorySyncUsers';
 export { __internal_useOrganizationEnterpriseConnectionTestRuns } from './useOrganizationEnterpriseConnectionTestRuns';
 export type {
   UseOrganizationEnterpriseConnectionTestRunsParams,

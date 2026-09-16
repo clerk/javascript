@@ -17,7 +17,12 @@ describe('External account', () => {
     BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: externalAccountJSON }));
 
     const externalAccount = new ExternalAccount({ id: targetId }, '/me/external_accounts');
-    await externalAccount.reauthorize({ additionalScopes: ['read', 'write'], redirectUrl: 'https://test.com' });
+    await externalAccount.reauthorize({
+      additionalScopes: ['read', 'write'],
+      redirectUrl: 'https://test.com',
+      oidcPrompt: 'consent',
+      oidcLoginHint: 'test@test.com',
+    });
 
     // @ts-ignore
     expect(BaseResource._fetch).toHaveBeenCalledWith({
@@ -26,6 +31,8 @@ describe('External account', () => {
       body: {
         additional_scope: ['read', 'write'],
         redirect_url: 'https://test.com',
+        oidc_prompt: 'consent',
+        oidc_login_hint: 'test@test.com',
       },
     });
   });

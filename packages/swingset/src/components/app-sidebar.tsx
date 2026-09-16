@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
+import { StatusDot } from '@/components/StatusDot';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Sidebar,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getSidebarGroups } from '@/lib/registry';
+import type { StoryStatus, WipSubstatus } from '@/lib/types';
 
 const groups = getSidebarGroups();
 
@@ -44,7 +46,19 @@ function byCategory(components: SidebarEntry[]) {
   return categories;
 }
 
-function SidebarUsageItem({ usage, href, isActive }: { usage: string; href: string; isActive: boolean }) {
+function SidebarUsageItem({
+  usage,
+  href,
+  isActive,
+  status,
+  substatus,
+}: {
+  usage: string;
+  href: string;
+  isActive: boolean;
+  status?: StoryStatus;
+  substatus?: WipSubstatus;
+}) {
   const labelRef = React.useRef<HTMLSpanElement>(null);
   const [isTruncated, setIsTruncated] = React.useState(false);
 
@@ -71,6 +85,12 @@ function SidebarUsageItem({ usage, href, isActive }: { usage: string; href: stri
               isActive={isActive}
               render={<Link href={href} />}
             >
+              {status ? (
+                <StatusDot
+                  status={status}
+                  substatus={substatus}
+                />
+              ) : null}
               <span
                 ref={labelRef}
                 className='truncate font-mono text-[10px] leading-relaxed'
@@ -120,6 +140,8 @@ function SidebarEntryMenu({
             usage={usage}
             href={href}
             isActive={pathname === href}
+            status={mod.meta.status}
+            substatus={mod.meta.substatus}
           />
         );
       })}

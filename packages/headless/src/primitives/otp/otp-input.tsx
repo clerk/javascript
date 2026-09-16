@@ -17,12 +17,15 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     value,
     length,
     disabled,
+    required,
     pattern,
     mask,
     activeIndex,
     setValue,
     queueFocus,
     focus,
+    getInputId,
+    firstInputLabel,
     registerInput,
     onSlotFocus,
     onSlotBlur,
@@ -40,9 +43,14 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
   // when the field is unfocused, so Tab enters and leaves the group once.
   const tabStop = activeIndex ?? Math.min(value.length, length - 1);
 
+  // The first slot answers to the field's own name; the rest are positional.
+  const labelProps = index === 0 ? (firstInputLabel ?? {}) : { 'aria-label': `Character ${index + 1} of ${length}` };
+
   const state = { active: activeIndex === index, filled: char !== '', disabled };
 
   const defaultProps: Record<string, unknown> = {
+    id: getInputId(index),
+    ...labelProps,
     value: char,
     type: mask ? 'password' : 'text',
     inputMode: inputModeForPattern(pattern),
@@ -56,7 +64,9 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     maxLength: index === 0 ? length : 1,
     tabIndex: tabStop === index ? 0 : -1,
     disabled,
-    'aria-label': `Character ${index + 1} of ${length}`,
+    // Constraint validation rides on the visible slots: the hidden input is `readOnly`,
+    // which bars it from validation entirely.
+    required,
     onMouseDown: (event: React.MouseEvent<HTMLInputElement>) => {
       if (disabled) {
         return;

@@ -29,6 +29,7 @@ export type SignInFactorOneCodeCard = Pick<
 export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
+  cardNotice?: LocalizationKey;
   inputLabel: LocalizationKey;
   resendButton: LocalizationKey;
   identityPreviewEditButtonAriaLabel: LocalizationKey;
@@ -169,6 +170,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     <VerificationCodeCard
       cardTitle={props.cardTitle}
       cardSubtitle={props.cardSubtitle}
+      cardNotice={props.cardNotice}
       inputLabel={props.inputLabel}
       resendButton={props.resendButton}
       onCodeEntryFinishedAction={action}

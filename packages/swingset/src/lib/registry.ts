@@ -1,10 +1,5 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
-import {
-  Default as AlertDialogDefault,
-  DiscardChanges as AlertDialogDiscardChanges,
-  meta as alertDialogComponentMeta,
-} from '../stories/alert-dialog.component.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -30,6 +25,17 @@ import {
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
+import {
+  Default as ComboboxDefault,
+  meta as comboboxMeta,
+  Scrolling as ComboboxScrolling,
+} from '../stories/combobox.stories';
+import {
+  Default as ConfirmationDefault,
+  meta as confirmationMeta,
+  WithError as ConfirmationWithError,
+} from '../stories/confirmation.stories';
 import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
@@ -37,9 +43,19 @@ import {
 } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import {
+  Default as DrawerComponentDefault,
+  InsideProfile as DrawerComponentInsideProfile,
+  meta as drawerComponentMeta,
+} from '../stories/drawer.component.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
-import { Default as FieldDefault, meta as fieldMeta } from '../stories/field.component.stories';
+import {
+  Default as FieldDefault,
+  meta as fieldMeta,
+  VisuallyHiddenLabel as FieldVisuallyHiddenLabel,
+} from '../stories/field.component.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
+import { Default as FlowDefault, meta as flowComponentMeta } from '../stories/flow.component.stories';
 import { meta as flowMeta } from '../stories/flow.stories';
 import {
   Colors as HeadingColors,
@@ -65,10 +81,18 @@ import {
 import {
   Default,
   Disabled as InputDisabled,
+  Ghost as InputGhost,
   Invalid,
   meta as inputMeta,
   Sizes as InputSizes,
 } from '../stories/input.stories';
+import {
+  Default as InputGroupDefault,
+  Disabled as InputGroupDisabled,
+  Invalid as InputGroupInvalid,
+  meta as inputGroupMeta,
+  Sizes as InputGroupSizes,
+} from '../stories/input-group.stories';
 import {
   Default as ItemDefault,
   Group as ItemGroup,
@@ -87,6 +111,14 @@ import {
 } from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
+  Default as PhoneInputDefault,
+  Disabled as PhoneInputDisabled,
+  Invalid as PhoneInputInvalid,
+  meta as phoneInputMeta,
+  Prefilled as PhoneInputPrefilled,
+  Sizes as PhoneInputSizes,
+} from '../stories/phone-input.stories';
+import {
   Alignment as PopoverComponentAlignment,
   Default as PopoverComponentDefault,
   meta as popoverComponentMeta,
@@ -94,30 +126,32 @@ import {
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import {
-  Default as ReverificationBackupCodeDefault,
-  meta as reverificationBackupCodeMeta,
-} from '../stories/reverification-backup-code.stories';
+  Customized as ProfileCustomized,
+  Default as ProfileDefault,
+  meta as profileComponentMeta,
+  Transitions as ProfileTransitions,
+} from '../stories/profile.component.stories';
 import {
-  Default as ReverificationHelpDefault,
-  meta as reverificationHelpMeta,
-} from '../stories/reverification-help.stories';
-import {
-  Default as ReverificationMethodPickerDefault,
-  meta as reverificationMethodPickerMeta,
-} from '../stories/reverification-method-picker.stories';
-import {
-  Authenticator as ReverificationOTPAuthenticator,
-  Default as ReverificationOTPDefault,
-  meta as reverificationOTPMeta,
-} from '../stories/reverification-otp.stories';
-import {
-  Default as ReverificationPasskeyDefault,
-  meta as reverificationPasskeyMeta,
-} from '../stories/reverification-passkey.stories';
-import {
-  Default as ReverificationPasswordDefault,
-  meta as reverificationPasswordMeta,
-} from '../stories/reverification-password.stories';
+  AuthenticatorOTP as ReverificationAuthenticatorOTP,
+  BackupCode as ReverificationBackupCode,
+  BackupCodeError as ReverificationBackupCodeError,
+  BackupCodePending as ReverificationBackupCodePending,
+  Default as ReverificationDefault,
+  Help as ReverificationHelp,
+  meta as reverificationMeta,
+  MethodPicker as ReverificationMethodPicker,
+  MethodPickerPending as ReverificationMethodPickerPending,
+  OTP as ReverificationOTP,
+  OTPError as ReverificationOTPError,
+  OTPPending as ReverificationOTPPending,
+  OTPResending as ReverificationOTPResending,
+  Passkey as ReverificationPasskey,
+  PasskeyError as ReverificationPasskeyError,
+  PasskeyPending as ReverificationPasskeyPending,
+  Password as ReverificationPassword,
+  PasswordError as ReverificationPasswordError,
+  PasswordPending as ReverificationPasswordPending,
+} from '../stories/reverification.stories';
 import {
   Default as ScrollAreaDefault,
   Gutter as ScrollAreaGutter,
@@ -135,7 +169,17 @@ import {
   meta as sectionMeta,
   MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
+import {
+  Controlled as SelectComponentControlled,
+  Default as SelectComponentDefault,
+  Descriptions as SelectComponentDescriptions,
+  Ghost as SelectComponentGhost,
+  meta as selectComponentMeta,
+  Overflowing as SelectComponentOverflowing,
+  Placeholder as SelectComponentPlaceholder,
+} from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import { meta as tableMeta } from '../stories/table.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
   Colors as TextColors,
@@ -143,6 +187,7 @@ import {
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
+import { meta as toastMeta } from '../stories/toast.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import {
@@ -151,11 +196,25 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
-import { Default as UserPageDefault, meta as userPageMeta } from '../stories/user-page.stories';
 import {
+  Default as UserProfileDefault,
+  meta as userProfileMeta,
+  Overlay as UserProfileOverlay,
+} from '../stories/user-profile.stories';
+import {
+  AddEmailFails as UserProfileAccountSectionAddEmailFails,
+  AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
   Default as UserProfileAccountSectionDefault,
+  EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
+  EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
+  EmailRemovalError as UserProfileAccountSectionEmailRemovalError,
+  EmailRemovalPending as UserProfileAccountSectionEmailRemovalPending,
+  EmailSsoConnectFails as UserProfileAccountSectionEmailSsoConnectFails,
+  EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
+  PhoneRemovalError as UserProfileAccountSectionPhoneRemovalError,
+  PhoneRemovalPending as UserProfileAccountSectionPhoneRemovalPending,
 } from '../stories/user-profile-account-section.stories';
 import {
   Default as UserProfileActiveDevicesSectionDefault,
@@ -176,14 +235,29 @@ import {
   meta as userProfileBillingPanelMeta,
 } from '../stories/user-profile-billing-panel.stories';
 import {
+  ConnectionError as ConnectedAccountsConnectionError,
+  ConnectOnly as ConnectedAccountsConnectOnly,
   Default as UserProfileConnectedAccountsSectionDefault,
+  LinkedAccounts as ConnectedAccountsLinkedAccounts,
   meta as userProfileConnectedAccountsSectionMeta,
+  ReconnectRequired as ConnectedAccountsReconnectRequired,
+  RemovalError as ConnectedAccountsRemovalError,
+  RemovalPending as ConnectedAccountsRemovalPending,
+  VerificationError as ConnectedAccountsVerificationError,
 } from '../stories/user-profile-connected-accounts-section.stories';
 import {
   Default as UserProfileDeleteSectionDefault,
   meta as userProfileDeleteSectionMeta,
   WithError as UserProfileDeleteSectionWithError,
 } from '../stories/user-profile-delete-section.stories';
+import {
+  ConnectionError as UserProfileEnterpriseAccountsSectionConnectionError,
+  ConnectOnly as UserProfileEnterpriseAccountsSectionConnectOnly,
+  Default as UserProfileEnterpriseAccountsSectionDefault,
+  LinkedAccounts as UserProfileEnterpriseAccountsSectionLinkedAccounts,
+  meta as userProfileEnterpriseAccountsSectionMeta,
+  RequiresAction as UserProfileEnterpriseAccountsSectionRequiresAction,
+} from '../stories/user-profile-enterprise-accounts-section.stories';
 import {
   Default as UserProfileMfaSectionDefault,
   Empty as UserProfileMfaSectionEmpty,
@@ -196,7 +270,11 @@ import {
 } from '../stories/user-profile-passkeys-section.stories';
 import {
   Default as UserProfilePasswordSectionDefault,
+  EditPasswordFails as UserProfilePasswordSectionEditPasswordFails,
+  ManagedByEnterprise as UserProfilePasswordSectionManagedByEnterprise,
   meta as userProfilePasswordSectionMeta,
+  SetPassword as UserProfilePasswordSectionSetPassword,
+  WithoutCurrentPassword as UserProfilePasswordSectionWithoutCurrentPassword,
 } from '../stories/user-profile-password-section.stories';
 import {
   Default as UserProfilePaymentMethodsSectionDefault,
@@ -216,9 +294,21 @@ import {
   meta as userProfileSubscriptionSectionMeta,
 } from '../stories/user-profile-subscription-section.stories';
 import {
+  ConnectedWallets as UserProfileWeb3WalletsSectionConnectedWallets,
+  ConnectionError as UserProfileWeb3WalletsSectionConnectionError,
+  ConnectOnly as UserProfileWeb3WalletsSectionConnectOnly,
   Default as UserProfileWeb3WalletsSectionDefault,
   meta as userProfileWeb3WalletsSectionMeta,
+  PrimaryError as UserProfileWeb3WalletsSectionPrimaryError,
+  RemovalError as UserProfileWeb3WalletsSectionRemovalError,
+  RemovalPending as UserProfileWeb3WalletsSectionRemovalPending,
+  UnverifiedWallet as UserProfileWeb3WalletsSectionUnverifiedWallet,
 } from '../stories/user-profile-web3-wallets-section.stories';
+import {
+  Default as VisuallyHiddenDefault,
+  LiveRegion as VisuallyHiddenLiveRegion,
+  meta as visuallyHiddenMeta,
+} from '../stories/visually-hidden.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -231,14 +321,19 @@ const sectionModule: StoryModule = {
   Destructive: SectionDestructive,
 };
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
-
-const alertDialogComponentModule: StoryModule = {
-  meta: alertDialogComponentMeta,
-  Default: AlertDialogDefault,
-  DiscardChanges: AlertDialogDiscardChanges,
+const drawerComponentModule: StoryModule = {
+  meta: drawerComponentMeta,
+  Default: DrawerComponentDefault,
+  InsideProfile: DrawerComponentInsideProfile,
 };
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
+
+const comboboxModule: StoryModule = {
+  meta: comboboxMeta,
+  Default: ComboboxDefault,
+  Scrolling: ComboboxScrolling,
+};
 
 const avatarModule: StoryModule = {
   meta: avatarMeta,
@@ -266,13 +361,43 @@ const bannerModule: StoryModule = {
 
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
-const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
+const inputModule: StoryModule = {
+  meta: inputMeta,
+  Default,
+  Sizes: InputSizes,
+  Disabled: InputDisabled,
+  Invalid,
+  Ghost: InputGhost,
+};
+
+const inputGroupModule: StoryModule = {
+  meta: inputGroupMeta,
+  Default: InputGroupDefault,
+  Sizes: InputGroupSizes,
+  Disabled: InputGroupDisabled,
+  Invalid: InputGroupInvalid,
+};
+
+const phoneInputModule: StoryModule = {
+  meta: phoneInputMeta,
+  Default: PhoneInputDefault,
+  Sizes: PhoneInputSizes,
+  Prefilled: PhoneInputPrefilled,
+  Disabled: PhoneInputDisabled,
+  Invalid: PhoneInputInvalid,
+};
 
 const popoverComponentModule: StoryModule = {
   meta: popoverComponentMeta,
   Default: PopoverComponentDefault,
   Placement: PopoverComponentPlacement,
   Alignment: PopoverComponentAlignment,
+};
+const profileComponentModule: StoryModule = {
+  meta: profileComponentMeta,
+  Default: ProfileDefault,
+  Customized: ProfileCustomized,
+  Transitions: ProfileTransitions,
 };
 
 const itemModule: StoryModule = {
@@ -299,6 +424,16 @@ const headingModule: StoryModule = {
 
 const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
 
+const selectComponentModule: StoryModule = {
+  meta: selectComponentMeta,
+  Default: SelectComponentDefault,
+  Descriptions: SelectComponentDescriptions,
+  Ghost: SelectComponentGhost,
+  Placeholder: SelectComponentPlaceholder,
+  Controlled: SelectComponentControlled,
+  Overflowing: SelectComponentOverflowing,
+};
+
 const otpComponentModule: StoryModule = {
   meta: otpComponentMeta,
   Default: OtpComponentDefault,
@@ -312,6 +447,18 @@ const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: T
 const fieldModule: StoryModule = {
   meta: fieldMeta,
   Default: FieldDefault,
+  VisuallyHiddenLabel: FieldVisuallyHiddenLabel,
+};
+
+const visuallyHiddenModule: StoryModule = {
+  meta: visuallyHiddenMeta,
+  Default: VisuallyHiddenDefault,
+  LiveRegion: VisuallyHiddenLiveRegion,
+};
+
+const flowComponentModule: StoryModule = {
+  meta: flowComponentMeta,
+  Default: FlowDefault,
 };
 
 const iconModule: StoryModule = {
@@ -336,6 +483,7 @@ const iconFrameModule: StoryModule = {
 // `<Preview>` embeds in the MDX, which import the stories module directly.
 const accordionModule: StoryModule = { meta: accordionMeta };
 const autocompleteModule: StoryModule = { meta: autocompleteMeta };
+const comboboxPrimitiveModule: StoryModule = { meta: comboboxPrimitiveMeta };
 const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
@@ -360,20 +508,35 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+// Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
+const tableModule: StoryModule = { meta: tableMeta };
+const toastModule: StoryModule = { meta: toastMeta };
+
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
-const userPageModule: StoryModule = {
-  meta: userPageMeta,
-  Default: UserPageDefault,
+const userProfileModule: StoryModule = {
+  meta: userProfileMeta,
+  Default: UserProfileDefault,
+  Overlay: UserProfileOverlay,
 };
 
 const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
+  AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
+  AddEmailFails: UserProfileAccountSectionAddEmailFails,
+  EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,
+  EmailLinkResendFails: UserProfileAccountSectionEmailLinkResendFails,
+  EmailSsoVerification: UserProfileAccountSectionEmailSsoVerification,
+  EmailSsoConnectFails: UserProfileAccountSectionEmailSsoConnectFails,
+  EmailRemovalPending: UserProfileAccountSectionEmailRemovalPending,
+  EmailRemovalError: UserProfileAccountSectionEmailRemovalError,
+  PhoneRemovalPending: UserProfileAccountSectionPhoneRemovalPending,
+  PhoneRemovalError: UserProfileAccountSectionPhoneRemovalError,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
@@ -395,6 +558,10 @@ const userProfileBillingHistorySectionModule: StoryModule = {
 const userProfilePasswordSectionModule: StoryModule = {
   meta: userProfilePasswordSectionMeta,
   Default: UserProfilePasswordSectionDefault,
+  SetPassword: UserProfilePasswordSectionSetPassword,
+  WithoutCurrentPassword: UserProfilePasswordSectionWithoutCurrentPassword,
+  ManagedByEnterprise: UserProfilePasswordSectionManagedByEnterprise,
+  EditPasswordFails: UserProfilePasswordSectionEditPasswordFails,
 };
 const userProfilePasskeysSectionModule: StoryModule = {
   meta: userProfilePasskeysSectionMeta,
@@ -419,18 +586,46 @@ const userProfilePaymentMethodsSectionModule: StoryModule = {
   Default: UserProfilePaymentMethodsSectionDefault,
   Empty: UserProfilePaymentMethodsSectionEmpty,
 };
+const userProfileEnterpriseAccountsSectionModule: StoryModule = {
+  meta: userProfileEnterpriseAccountsSectionMeta,
+  Default: UserProfileEnterpriseAccountsSectionDefault,
+  LinkedAccounts: UserProfileEnterpriseAccountsSectionLinkedAccounts,
+  RequiresAction: UserProfileEnterpriseAccountsSectionRequiresAction,
+  ConnectOnly: UserProfileEnterpriseAccountsSectionConnectOnly,
+  ConnectionError: UserProfileEnterpriseAccountsSectionConnectionError,
+};
 const userProfileConnectedAccountsSectionModule: StoryModule = {
   meta: userProfileConnectedAccountsSectionMeta,
   Default: UserProfileConnectedAccountsSectionDefault,
+  LinkedAccounts: ConnectedAccountsLinkedAccounts,
+  ConnectOnly: ConnectedAccountsConnectOnly,
+  ReconnectRequired: ConnectedAccountsReconnectRequired,
+  VerificationError: ConnectedAccountsVerificationError,
+  ConnectionError: ConnectedAccountsConnectionError,
+  RemovalPending: ConnectedAccountsRemovalPending,
+  RemovalError: ConnectedAccountsRemovalError,
 };
 const userProfileWeb3WalletsSectionModule: StoryModule = {
   meta: userProfileWeb3WalletsSectionMeta,
   Default: UserProfileWeb3WalletsSectionDefault,
+  ConnectedWallets: UserProfileWeb3WalletsSectionConnectedWallets,
+  ConnectOnly: UserProfileWeb3WalletsSectionConnectOnly,
+  ConnectionError: UserProfileWeb3WalletsSectionConnectionError,
+  PrimaryError: UserProfileWeb3WalletsSectionPrimaryError,
+  RemovalPending: UserProfileWeb3WalletsSectionRemovalPending,
+  RemovalError: UserProfileWeb3WalletsSectionRemovalError,
+  UnverifiedWallet: UserProfileWeb3WalletsSectionUnverifiedWallet,
 };
 const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
   WithError: UserProfileDeleteSectionWithError,
+};
+
+const confirmationModule: StoryModule = {
+  meta: confirmationMeta,
+  Default: ConfirmationDefault,
+  WithError: ConfirmationWithError,
 };
 
 const destructiveModule: StoryModule = {
@@ -439,36 +634,32 @@ const destructiveModule: StoryModule = {
   WithError: DestructiveWithError,
 };
 
-const reverificationPasswordModule: StoryModule = {
-  meta: reverificationPasswordMeta,
-  Default: ReverificationPasswordDefault,
-};
-const reverificationPasskeyModule: StoryModule = {
-  meta: reverificationPasskeyMeta,
-  Default: ReverificationPasskeyDefault,
-};
-const reverificationOTPModule: StoryModule = {
-  meta: reverificationOTPMeta,
-  Default: ReverificationOTPDefault,
-  Authenticator: ReverificationOTPAuthenticator,
-};
-const reverificationBackupCodeModule: StoryModule = {
-  meta: reverificationBackupCodeMeta,
-  Default: ReverificationBackupCodeDefault,
-};
-const reverificationMethodPickerModule: StoryModule = {
-  meta: reverificationMethodPickerMeta,
-  Default: ReverificationMethodPickerDefault,
-};
-const reverificationHelpModule: StoryModule = {
-  meta: reverificationHelpMeta,
-  Default: ReverificationHelpDefault,
+const reverificationModule: StoryModule = {
+  meta: reverificationMeta,
+  Default: ReverificationDefault,
+  Password: ReverificationPassword,
+  PasswordPending: ReverificationPasswordPending,
+  PasswordError: ReverificationPasswordError,
+  Passkey: ReverificationPasskey,
+  PasskeyPending: ReverificationPasskeyPending,
+  PasskeyError: ReverificationPasskeyError,
+  OTP: ReverificationOTP,
+  AuthenticatorOTP: ReverificationAuthenticatorOTP,
+  OTPPending: ReverificationOTPPending,
+  OTPError: ReverificationOTPError,
+  OTPResending: ReverificationOTPResending,
+  BackupCode: ReverificationBackupCode,
+  BackupCodePending: ReverificationBackupCodePending,
+  BackupCodeError: ReverificationBackupCodeError,
+  MethodPicker: ReverificationMethodPicker,
+  MethodPickerPending: ReverificationMethodPickerPending,
+  Help: ReverificationHelp,
 };
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
   // User Profile
-  userPageModule,
+  userProfileModule,
   // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
@@ -484,38 +675,46 @@ export const registry: StoryModule[] = [
   userProfilePaymentMethodsSectionModule,
   userProfileBillingHistorySectionModule,
   userProfileConnectedAccountsSectionModule,
+  userProfileEnterpriseAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  // Reverification
+  reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
+  confirmationModule,
   destructiveModule,
-  reverificationPasswordModule,
-  reverificationPasskeyModule,
-  reverificationOTPModule,
-  reverificationBackupCodeModule,
-  reverificationMethodPickerModule,
-  reverificationHelpModule,
   // Components
   avatarModule,
   badgeModule,
   bannerModule,
   buttonModule,
   cardComponentModule,
+  comboboxModule,
+  flowComponentModule,
   inputModule,
+  inputGroupModule,
+  phoneInputModule,
   itemModule,
   dialogComponentModule,
-  alertDialogComponentModule,
+  drawerComponentModule,
   headingModule,
   iconModule,
   iconFrameModule,
   menuComponentModule,
   otpComponentModule,
   popoverComponentModule,
+  profileComponentModule,
   sectionModule,
+  selectComponentModule,
+  tableModule,
   textModule,
+  toastModule,
   fieldModule,
-  // Primitives — alphabetical within the group.
+  visuallyHiddenModule,
+  // Primitives
   accordionModule,
   autocompleteModule,
+  comboboxPrimitiveModule,
   collapsibleModule,
   dialogModule,
   drawerModule,
@@ -529,7 +728,7 @@ export const registry: StoryModule[] = [
   tooltipModule,
   // Styles — atomic styles that ship as StyleX atoms rather than components.
   scrollAreaModule,
-  // Hooks — alphabetical within the group.
+  // Hooks
   useDataTableModule,
 ];
 
@@ -541,6 +740,8 @@ export const registry: StoryModule[] = [
 export function getModule(groupSlug: string, componentSlug: string): StoryModule | undefined {
   return registry.find(mod => toSlug(mod.meta.group) === groupSlug && toSlug(mod.meta.title) === componentSlug);
 }
+
+const ALPHABETICAL_GROUPS = new Set(['Blocks', 'Components', 'Primitives', 'Styles', 'Hooks']);
 
 export function getSidebarGroups(): Array<{
   group: string;
@@ -560,6 +761,8 @@ export function getSidebarGroups(): Array<{
   return Array.from(groupMap.entries()).map(([group, components]) => ({
     group,
     groupSlug: toSlug(group),
-    components,
+    components: ALPHABETICAL_GROUPS.has(group)
+      ? [...components].sort((a, b) => a.mod.meta.title.localeCompare(b.mod.meta.title))
+      : components,
   }));
 }

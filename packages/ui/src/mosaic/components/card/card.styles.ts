@@ -1,11 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 import { cardContentMarker } from './card.markers.stylex';
+
+const compactCard = '@container card (max-width: 20rem)' as const;
 
 export const root = stylex.create({
   base: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
+    containerName: 'card',
+    containerType: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
     maxWidth: '26.25rem',
@@ -14,10 +18,8 @@ export const root = stylex.create({
   card: {
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-lg'],
   },
   flush: {
     borderRadius: radiusVars['--cl-radius-xl'],
@@ -28,10 +30,8 @@ export const root = stylex.create({
   overlay: {
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-lg'],
   },
 });
 
@@ -52,14 +52,14 @@ export const header = stylex.create({
     rowGap: space['1'],
   },
   title: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-base-size'],
     fontWeight: fontWeightVars['--cl-font-semibold'],
     lineHeight: typeScaleVars['--cl-text-base-leading'],
     textWrap: 'balance',
   },
   description: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textWrap: 'pretty',
@@ -67,12 +67,17 @@ export const header = stylex.create({
 });
 
 export const content = stylex.create({
+  // A grid rather than a flex column: grid ignores a child's `flex`, so a `fullWidth` button
+  // keeps its height instead of collapsing to a zero basis on the block axis.
   base: {
+    gap: space['4'],
     paddingBlock: space['4'],
     paddingInline: space['5'],
+    display: 'grid',
     flexBasis: 'auto',
     flexGrow: '1',
     flexShrink: '1',
+    gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
   },
 });
 
@@ -82,8 +87,10 @@ export const footer = stylex.create({
     paddingBlock: space['4'],
     paddingInline: space['5'],
     alignItems: 'center',
-    display: 'flex',
+    display: { [compactCard]: 'grid', default: 'flex' },
+    flexDirection: 'row',
     flexShrink: 0,
+    gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
     justifyContent: 'space-between',
     borderTopColor: colorVars['--cl-color-border'],
     borderTopStyle: 'solid',
@@ -96,6 +103,7 @@ export const footer = stylex.create({
 });
 
 export const branding = stylex.create({
+  // Placement only; the mark itself is `Branding`.
   base: {
     paddingBlock: space['3'],
     paddingInline: space['6'],
@@ -103,20 +111,5 @@ export const branding = stylex.create({
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
     textAlign: 'center',
-  },
-  text: {
-    color: colorVars['--cl-color-neutral-faded'],
-    display: 'inline-block',
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-    textWrap: 'pretty',
-  },
-  link: {
-    borderRadius: radiusVars['--cl-radius-sm'],
-    alignItems: 'center',
-    color: 'inherit',
-    display: 'inline-flex',
-    verticalAlign: 'top',
-    height: space['4'],
   },
 });

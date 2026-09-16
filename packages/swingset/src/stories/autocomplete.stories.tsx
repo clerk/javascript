@@ -19,6 +19,7 @@ const FRUITS = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig'];
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Autocomplete',
   source: 'packages/headless/src/primitives/autocomplete/index.ts',
 };

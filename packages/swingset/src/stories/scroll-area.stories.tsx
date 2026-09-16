@@ -2,7 +2,7 @@ import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { radiusVars, space } from '@clerk/ui/mosaic/styles';
+import { radiusVars, space } from '@clerk/ui/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -12,9 +12,19 @@ import type { StoryMeta } from '@/lib/types';
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './scroll-area.stories?raw';
 
+const styles = stylex.create({
+  separatorMargin: {
+    marginBlock: space['2'],
+  },
+  noMask: {
+    maskImage: 'none',
+  },
+});
+
 export const meta: StoryMeta = {
   group: 'Styles',
   title: 'Scroll Area',
+  status: 'stable',
   source: 'packages/ui/src/mosaic/components/scroll-area/scroll-area.styles.ts',
 };
 
@@ -69,10 +79,10 @@ export function Default() {
       className={`${root.className} border-border w-full border`}
       style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
-      <Item.Group {...stylex.props(...scrollAreaViewport())}>
+      <Item.Group xstyle={scrollAreaViewport()}>
         {accounts.map(({ email, organizations }, index) => (
           <React.Fragment key={email}>
-            {index > 0 ? <Item.Separator style={{ marginBlock: space['2'] }} /> : null}
+            {index > 0 ? <Item.Separator xstyle={styles.separatorMargin} /> : null}
             <Item.Root size='xs'>
               <Item.Content>
                 <Item.Description>{email}</Item.Description>
@@ -101,7 +111,7 @@ export function NotScrollable() {
       className={`${root.className} border-border w-full border`}
       style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
-      <Item.Group {...stylex.props(...scrollAreaViewport())}>
+      <Item.Group xstyle={scrollAreaViewport()}>
         {accounts[0].organizations.map(name => (
           <OrganizationRow
             key={name}
@@ -146,7 +156,7 @@ export function Gutter() {
               className={`${root.className} border-border border`}
               style={{ height: 140, borderRadius: radiusVars['--cl-radius-sm'] }}
             >
-              <Item.Group {...stylex.props(...scrollAreaViewport(gutter))}>
+              <Item.Group xstyle={scrollAreaViewport(gutter)}>
                 {names.map(name => (
                   <Item.Root
                     key={name}
@@ -217,7 +227,7 @@ export function HoverReveal() {
         '--cl-scrollbar-thumb-idle': 'oklch(from var(--cl-scrollbar-thumb) l c h / 0)',
       }}
     >
-      <Item.Group {...stylex.props(...scrollAreaViewport())}>
+      <Item.Group xstyle={scrollAreaViewport()}>
         {manyRows.map(name => (
           <OrganizationRow
             key={name}
@@ -258,7 +268,7 @@ export function ThemedScrollbar() {
           '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
         }}
       >
-        <Item.Group {...stylex.props(...scrollAreaViewport())}>
+        <Item.Group xstyle={scrollAreaViewport()}>
           {manyRows.map(name => (
             <OrganizationRow
               key={name}
@@ -273,7 +283,7 @@ export function ThemedScrollbar() {
 
 /**
  * The mask retired for overlay scrims, each reading the progress var for its edge. The scrim mixes
- * from `--cl-color-card-foreground`, so it reads as a shadow on light and a glow on dark;
+ * from `--cl-color-foreground`, so it reads as a shadow on light and a glow on dark;
  * hardcoded black would vanish on a dark surface. `overflow: hidden` on the root keeps the scrims
  * inside its rounded corners.
  *
@@ -301,13 +311,13 @@ export function ShadowIndicators() {
         }
         .demo-scroll-shadows .cl-item-group::before {
           top: 0;
-          background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+          background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-start);
           transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
         }
         .demo-scroll-shadows .cl-item-group::after {
           bottom: 0;
-          background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+          background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-end);
           transform: translateY(calc((1 - var(--cl-scroll-area-progress-end)) * var(--cl-scroll-fade-size)));
         }
@@ -317,10 +327,7 @@ export function ShadowIndicators() {
         className={`${root.className} demo-scroll-shadows border-border w-full overflow-hidden border`}
         style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
       >
-        <Item.Group
-          {...stylex.props(...scrollAreaViewport())}
-          style={{ maskImage: 'none' }}
-        >
+        <Item.Group xstyle={[scrollAreaViewport(), styles.noMask]}>
           {manyRows.map(name => (
             <OrganizationRow
               key={name}

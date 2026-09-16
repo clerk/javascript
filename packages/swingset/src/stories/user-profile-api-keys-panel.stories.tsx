@@ -1,5 +1,5 @@
-import type { UserProfileAPIKey } from '@clerk/ui/mosaic/user-profile/user-profile-api-keys-panel.view';
-import { UserProfileApiKeysPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-api-keys-panel.view';
+import type { UserProfileAPIKey } from '@clerk/ui/mosaic/features/user-profile/user-profile-api-keys-panel.view';
+import { UserProfileApiKeysPanelView } from '@clerk/ui/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -8,10 +8,11 @@ export { default as __source } from './user-profile-api-keys-panel.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
+  status: 'wip',
   title: 'UserProfileApiKeysPanel',
   label: 'API keys panel',
   navigation: { category: 'Panels' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-api-keys-panel.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-api-keys-panel.view.tsx',
 };
 
 const initialAPIKeys: UserProfileAPIKey[] = [

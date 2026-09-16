@@ -3,11 +3,23 @@ import { Badge } from '@clerk/ui/mosaic/components/badge';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
 import { Section } from '@clerk/ui/mosaic/components/section';
-import { space } from '@clerk/ui/mosaic/styles';
+import { space } from '@clerk/ui/mosaic/tokens.stylex';
+import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
 
 export { default as __source } from './section.stories?raw';
+
+const styles = stylex.create({
+  rootMax: {
+    maxWidth: 560,
+  },
+  descriptionFlex: {
+    alignItems: 'center',
+    display: 'flex',
+    gap: 4,
+  },
+});
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 
@@ -27,13 +39,14 @@ function ProviderMedia({ provider }: { provider: string }) {
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Section',
   source: 'packages/ui/src/mosaic/components/section/section.tsx',
 };
 
 export function Default() {
   return (
-    <Section.Root style={{ maxWidth: 560 }}>
+    <Section.Root xstyle={styles.rootMax}>
       <Section.Title>Profile</Section.Title>
       <Section.Group>
         <Section.Row>
@@ -123,7 +136,7 @@ export function Default() {
 
 export function MultipleEmailAndPhoneNumbers() {
   return (
-    <Section.Root style={{ maxWidth: 560 }}>
+    <Section.Root xstyle={styles.rootMax}>
       <Section.Title>Profile</Section.Title>
       <Section.Group>
         <Section.Row>
@@ -207,7 +220,7 @@ export function MultipleEmailAndPhoneNumbers() {
           <Section.Items>
             <Section.Item>
               <Section.Content>
-                <Section.Description style={{ alignItems: 'center', display: 'flex', gap: 4 }}>
+                <Section.Description xstyle={styles.descriptionFlex}>
                   item1@clerk.dev
                   <Badge color='neutral'>Primary</Badge>
                 </Section.Description>
@@ -261,7 +274,7 @@ export function MultipleEmailAndPhoneNumbers() {
           <Section.Items>
             <Section.Item>
               <Section.Content>
-                <Section.Description style={{ alignItems: 'center', display: 'flex', gap: 4 }}>
+                <Section.Description xstyle={styles.descriptionFlex}>
                   +1 801-888-8181
                   <Badge color='neutral'>Primary</Badge>
                 </Section.Description>
@@ -287,7 +300,7 @@ export function MultipleEmailAndPhoneNumbers() {
 
 export function ConnectedAccounts() {
   return (
-    <Section.Root style={{ maxWidth: 560 }}>
+    <Section.Root xstyle={styles.rootMax}>
       <Section.Title>Connected accounts</Section.Title>
       <Section.Group>
         <Section.Row>
@@ -339,7 +352,7 @@ export function ConnectedAccounts() {
 
 export function IconFrameMedia() {
   return (
-    <Section.Root style={{ maxWidth: 560 }}>
+    <Section.Root xstyle={styles.rootMax}>
       <Section.Title>Team</Section.Title>
       <Section.Group>
         <Section.Row>

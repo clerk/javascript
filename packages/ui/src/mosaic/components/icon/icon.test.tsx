@@ -1,10 +1,17 @@
+import * as stylex from '@stylexjs/stylex';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import type { MosaicIconOverrides } from '../../icons/overrides';
 import { MosaicProvider } from '../../MosaicProvider';
+import { space } from '../../tokens.stylex';
 import { Icon } from './icon';
+
+const containerStyles = stylex.create({
+  lineBox: { height: '1lh' },
+  mdHeight: { height: space['4'] },
+});
 
 const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
   render(<MosaicProvider icons={icons}>{ui}</MosaicProvider>);
@@ -46,19 +53,29 @@ describe('Mosaic Icon', () => {
     expect(container.querySelector('svg')).toHaveAttribute('data-size', 'md');
   });
 
-  it('wires the size variant and consumer className/style through to the element', () => {
+  it('wires the size variant and xstyle atoms through to the element', () => {
     const { container } = wrap(
       <Icon
         name='chevron-right'
         size='lg'
-        className='my-icon'
-        style={{ marginTop: '8px' }}
+        xstyle={containerStyles.lineBox}
       />,
     );
     const svg = container.querySelector('svg');
     expect(svg).toHaveAttribute('data-size', 'lg');
-    expect(svg).toHaveClass('cl-icon', 'my-icon');
-    expect(svg).toHaveStyle({ marginTop: '8px' });
+    expect(svg).toHaveClass('cl-icon', stylex.props(containerStyles.lineBox).className ?? '');
+  });
+
+  it('lets a container xstyle override the size atoms instead of stacking a second class', () => {
+    const { container } = wrap(
+      <Icon
+        name='chevron-right'
+        xstyle={containerStyles.lineBox}
+      />,
+    );
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveClass(stylex.props(containerStyles.lineBox).className ?? '');
+    expect(svg).not.toHaveClass(stylex.props(containerStyles.mdHeight).className ?? '');
   });
 
   it('emits no placement attribute when the icon is not placed', () => {
@@ -122,7 +139,7 @@ describe('Mosaic Icon', () => {
     const { getByTestId } = wrap(
       <Icon
         name='chevron-right'
-        className='call-site'
+        xstyle={containerStyles.lineBox}
       />,
       {
         'chevron-right': (
@@ -133,7 +150,11 @@ describe('Mosaic Icon', () => {
         ),
       },
     );
-    expect(getByTestId('override')).toHaveClass('cl-icon', 'call-site', 'consumer-glyph');
+    expect(getByTestId('override')).toHaveClass(
+      'cl-icon',
+      stylex.props(containerStyles.lineBox).className ?? '',
+      'consumer-glyph',
+    );
   });
 
   it('forwards svg props from the Icon call site onto the override element', () => {

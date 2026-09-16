@@ -11,8 +11,8 @@ against a fake object instead of a mocked Clerk.
 
 Worked examples:
 
-- `packages/ui/src/mosaic/user-button/user-button.controller.tsx` — wraps a model
-- `packages/ui/src/mosaic/user-profile/user-profile-delete-section/user-profile-delete-section.controller.ts`
+- `packages/ui/src/mosaic/features/user-button/user-button.controller.tsx` — wraps a model
+- `packages/ui/src/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.controller.ts`
   — takes its one effect as a prop
 
 See `references/mosaic-architecture.md` → "Controllers" for the layer contract.

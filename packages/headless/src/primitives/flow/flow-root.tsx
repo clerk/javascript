@@ -31,7 +31,7 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     }
 
     const measure = () => {
-      setActiveStepHeight(activeStep.getBoundingClientRect().height);
+      setActiveStepHeight(activeStep.offsetHeight);
     };
 
     measure();
@@ -55,7 +55,7 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
   }, [activeStepHeight, initial]);
 
   const contextValue = useMemo<FlowContextValue>(
-    () => ({ value, direction, registerActiveStep, unregisterActiveStep }),
+    () => ({ value, direction, rootRef, registerActiveStep, unregisterActiveStep }),
     [value, direction, registerActiveStep, unregisterActiveStep],
   );
 

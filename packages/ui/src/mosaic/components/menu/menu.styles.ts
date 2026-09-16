@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  shadowVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 // Positioning is applied inline by the headless positioner; this only clears the
 // focus outline it receives. No z-index: the portalled, fixed positioner already
@@ -15,11 +23,9 @@ export const popup = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-lg'],
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
-    color: colorVars['--cl-color-card-foreground'],
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-md'],
+    color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,
       ':is([data-ending-style])': 0,
@@ -73,9 +79,9 @@ export const item = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+      ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
@@ -109,9 +115,9 @@ export const item = stylex.create({
   negative: {
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
+      ':is([data-active])': colorVars['--cl-color-negative-alpha-200'],
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
+        ':hover': colorVars['--cl-color-negative-alpha-200'],
       },
     },
     color: colorVars['--cl-color-negative'],

@@ -2,10 +2,6 @@ import * as UserProfileProfilePanelStories from './user-profile-profile-panel.st
 
 # UserProfileProfilePanel
 
-The Profile panel from UserProfile, composed without the surrounding navigation shell. The
-presentational view uses `Section` for its account details, connected accounts, Web3 wallets, and danger zone
-while preserving the existing resource props and callback seams.
-
 ## Example
 
 <Story
@@ -20,7 +16,7 @@ while preserving the existing resource props and callback seams.
 ## Usage
 
 ```tsx
-import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
+import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/features/user-profile/user-profile-profile-panel.view';
 
 <UserProfileProfilePanelView
   allowMultipleAccounts={allowMultipleAccounts}
@@ -59,6 +55,8 @@ import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-
     };
   })}
   onVerifyEmail={verifyEmail}
+  onSendEmailCode={sendEmailCode}
+  onVerifyEmailCode={verifyEmailCode}
   onSetPrimaryEmail={setPrimaryEmail}
   onRemoveEmail={removeEmail}
   onVerifyPhone={verifyPhone}

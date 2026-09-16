@@ -12,18 +12,20 @@ Once migration is complete, the old system is removed and Mosaic becomes the sol
 
 ## Token architecture
 
-Tokens are CSS custom properties declared through `stylex.defineVars` in `tokens.stylex.ts`. Each var is named explicitly (`'--cl-color-primary'`, not a generated hash) so it is a stable, documented handle a consumer can override:
+Tokens are CSS custom properties declared through `stylex.defineVars` in `tokens.stylex.ts`. Each var is named explicitly (`'--cl-color-brand'`, not a generated hash) so it is a stable, documented handle a consumer can override:
 
 ```ts
 // packages/ui/src/mosaic/tokens.stylex.ts
 export const colorVars = stylex.defineVars({
-  '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
-  '--cl-color-primary-foreground': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+  '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
   // …
 });
 ```
 
 Groups: `colorVars`, `radiusVars`, `targetVars`, `scrollbarVars`, `scrollFadeVars`, `spacingVars`, `space`, `typeScaleVars`, `fontFamilyVars`, `fontWeightVars`, `durationVars`, `easingVars`, `focusVars`.
+
+There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-background-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-background` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp; in dark mode override `--cl-color-background` too, since the ramp mixes toward it. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
 
 Light and dark come from CSS `light-dark()` on the default values, so there is no theme object and no re-render on theme change — the browser resolves it.
 
@@ -39,10 +41,9 @@ Every Mosaic part carries a **stable class** and reflects its variants and state
 
 Consumers target the class and its attributes, never StyleX's hashed `x…` atoms.
 
-Two ways to style a part — both hit the same class + attributes:
+A theme styles a part from CSS, against that class and its attributes:
 
 ```css
-/* 1. Plain CSS / stylesheet */
 .cl-button {
   border-radius: 8px;
 }
@@ -50,19 +51,24 @@ Two ways to style a part — both hit the same class + attributes:
   border-radius: 4px;
 }
 .cl-item[data-interactive] {
-  background-color: var(--cl-color-card);
+  background-color: var(--cl-color-background);
 }
 ```
 
+A part exposes no `className` or `style` prop. Inside `packages/ui`, code that renders a part and needs to nudge it passes StyleX atoms through `xstyle`, declared in its own `stylex.create` and composed last so they win:
+
 ```tsx
-// 2. className / style props — merged onto the element by `mergeStyleProps`, applied last so they win
-<Button
-  className='MyButton'
-  style={{ borderRadius: 12 }}
-/>
+const styles = stylex.create({ helpText: { textAlign: 'center' } });
+
+<Text
+  size='xs'
+  xstyle={styles.helpText}
+>
+  {helpText}
+</Text>;
 ```
 
-Tokens are a third, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-font-family-sans`, `--cl-spacing`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
+Tokens are a second, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-font-family-sans`, `--cl-spacing`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
 
 State styling uses real class + attribute-selector specificity — no `&&` boost, no data-attr-vs-class ambiguity.
 
@@ -80,7 +86,7 @@ import { MosaicProvider } from '../mosaic/MosaicProvider';
 
 ## Component authoring pattern
 
-Styles are declared once per component with `stylex.create`, keyed off the same axes the component exposes as props, then fused with `themeProps` output and the consumer's `className`/`style`:
+Styles are declared once per component with `stylex.create`, keyed off the same axes the component exposes as props, then fused with `themeProps` output and the props the component was called with:
 
 ```tsx
 const styles = stylex.create({
@@ -90,34 +96,34 @@ const styles = stylex.create({
 // `color` and `variant` are independent props, but every pair resolves to one style, so they are
 // keyed compositely rather than merged at render time.
 const variants = stylex.create({
-  'filled-primary': { backgroundColor: colorVars['--cl-color-primary'], borderColor: 'transparent' },
+  'filled-primary': { backgroundColor: colorVars['--cl-color-brand'], borderColor: 'transparent' },
   'filled-negative': { backgroundColor: colorVars['--cl-color-negative'], borderColor: 'transparent' },
-  'outline-primary': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-primary'] },
+  'outline-primary': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-brand'] },
   'outline-negative': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-negative'] },
 });
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { color = 'primary', variant = 'filled', size = 'md', disabled, className, style, ...rest },
+  { color = 'primary', variant = 'filled', size = 'md', disabled, xstyle, ...rest },
   ref,
 ) {
   const props = mergeStyleProps(
     themeProps('button', { color, variant, size, disabled }),
-    stylex.props(reset.base, styles.base, variants[`${variant}-${color}`]),
-    className,
-    style,
+    stylex.props(reset.base, styles.base, variants[`${variant}-${color}`], xstyle),
+    rest,
   );
   return (
     <button
       ref={ref}
       disabled={disabled}
       {...props}
-      {...rest}
     />
   );
 });
 ```
 
-`mergeStyleProps` applies its arguments in order — stable class + data attrs, then StyleX atoms, then the consumer's `className` and `style`. Only `style` wins by that ordering: it is an inline style, which outranks any stylesheet rule. A consumer's `className` wins for a different reason — class order inside the attribute has no effect on the cascade, so the consumer's rule wins because the Mosaic sheet is imported into a cascade layer (`@import '@clerk/ui/styles.css' layer(components)`) and an unlayered rule beats any layered one.
+`mergeStyleProps` applies its bags in order — stable class + data attrs, then StyleX atoms, then the props the component was called with — concatenating `className`, shallow-merging `style`, and letting the later bag overwrite anything else. `ButtonProps` extends `MosaicElementProps<'button'>`, which omits `className`/`style` and adds `xstyle`, so the caller's only styling lever is StyleX atoms composed last inside `stylex.props`. The `rest` bag still goes through the merge rather than a trailing spread because a `render` source (`Dialog.Title render={<Heading />}`) hands its own merged `className`/`style` to the part it renders; the merge fuses that pair, a spread would clobber the part's own class.
+
+A theme's CSS wins over the Mosaic sheet without any prop: the sheet is imported into a cascade layer (`@import '@clerk/ui/styles.css' layer(components)`) and an unlayered rule beats any layered one.
 
 `utils/reset.styles.ts` holds the per-element resets so a component does not re-declare UA-normalization; `utils/typography.styles.ts` and `utils/focus-outline.styles.ts` do the same for the treatments several components share.
 
@@ -187,6 +193,20 @@ user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring 
 
 `*.types.ts` is worth calling out: it holds the data contract so that neither the
 model nor the view owns it, and the two cannot drift.
+
+`*.messages.ts` holds strings only, exported as one `<feature>Messages` object. Views
+resolve them with the helpers in `src/mosaic/utils/messages.ts`, never with
+`.replace` or `.split` on the string:
+
+- `fill(m.manage, { value })` substitutes `{name}` placeholders.
+- `plural(m.members, count)` picks a form from `{ one, other, … }` with
+  `Intl.PluralRules` and fills `{count}`.
+- `rich(m.description, { values, components })` renders `{#strong}…{/strong}`
+  markup through the component authored for that tag, so the sentence stays in the
+  messages file and the view supplies only the element. Markup is for inline
+  emphasis a translator may keep or move. A wrapper the view needs for its own
+  purposes, such as a countdown span, is passed as an element in `values`, so the
+  string only ever sees `{seconds}`.
 
 ### Composition
 
@@ -411,6 +431,7 @@ the only test that mocks Clerk, and the view needs no machinery at all. See the
 ### Rules
 
 - **Do** author components with StyleX (`stylex.create` + `themeProps` / `mergeStyleProps`)
+- **Do** type a part's props off `MosaicComponentProps` / `MosaicElementProps`; a part takes `xstyle`, never `className` / `style`
 - **Do not** use Emotion in Mosaic — no `css` prop, no `styled`, no theme callbacks
 - **Do** export every new component from `styles/index.ts`, or its CSS never ships
 - **Do** import from `src/mosaic/` directly (no barrel files) inside `packages/ui`
@@ -428,43 +449,43 @@ the only test that mocks Clerk, and the view needs no machinery at all. See the
 To migrate a component from the old system to Mosaic:
 
 1. Replace `createVariants` with `stylex.create` — one style key per variant value, selected by the prop at render time instead of merged by a runtime engine.
-2. Replace `applyVariants(props)` with `mergeStyleProps(themeProps(slot, variants), stylex.props(...), className, style)` and spread the result onto the element.
+2. Replace `applyVariants(props)` with `mergeStyleProps(themeProps(slot, variants), stylex.props(..., xstyle), rest)` and spread the result onto the element. Drop any `className` / `style` props the legacy component accepted; callers pass `xstyle`.
 3. Move stateful styling (disabled/hover/focus/invalid) into StyleX conditions. A condition is a key _inside a property's value object_ alongside `default`, never a top-level style key, and an attribute selector must be wrapped in `:is(...)`:
 
    ```ts
    cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
    ```
 
-4. Update token references — e.g. `theme.colors.$primary500` → `colorVars['--cl-color-primary']`.
+4. Update token references — e.g. `theme.colors.$primary500` → `colorVars['--cl-color-brand']`.
 5. Export the component from `styles/index.ts` and run `pnpm build:mosaic`.
 
 The steps above cover the **styling** migration. For **flow** components — where the legacy component also fuses data-fetching and interaction state into the same file — splitting that into the model/controller/view layers and verifying no implicit behavior is dropped is its own end-to-end workflow. See the `mosaic` Claude Code skill (`.claude/skills/mosaic/`), in particular its `references/migration.md`.
 
 ## Files
 
-| File                                           | Purpose                                                                   |
-| ---------------------------------------------- | ------------------------------------------------------------------------- |
-| `src/mosaic/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`                   |
-| `src/mosaic/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`                   |
-| `src/mosaic/MosaicProvider.tsx`                | Provider for the `icons` prop (per-name glyph overrides)                  |
-| `src/mosaic/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context                   |
-| `src/mosaic/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                                  |
-| `src/mosaic/components/`                       | One subdirectory per component, and nothing else                          |
-| `src/mosaic/blocks/`                           | View fragments that own one piece of state of their own (`destructive`)   |
-| `src/mosaic/utils/*.styles.ts`                 | Atoms shared across components: `reset`, `typography`, `focus-outline`    |
-| `src/mosaic/hooks/`                            | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)          |
-| `src/mosaic/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                        |
-| `src/mosaic/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`)      |
-| `src/mosaic/machines/`                         | Standalone machines and the shared `__tests__/test-utils.ts`              |
-| `src/mosaic/<feature>/*.model.tsx`             | Clerk adapter — the only file in a feature that may import Clerk          |
-| `src/mosaic/<feature>/*.controller.tsx`        | Local state and action wrapping; holds the feature's machine              |
-| `src/mosaic/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                     |
-| `src/mosaic/<feature>/*.types.ts`              | The data contract the model and the view both agree on                    |
-| `src/mosaic/<feature>/*.messages.ts`           | Every string the surface renders, shaped the way `@clerk/i18n` takes them |
-| `src/mosaic/utils/reset.test.tsx`              | Reset specs                                                               |
-| `src/mosaic/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                               |
-| `src/mosaic/components/button/button.test.tsx` | Component-level slot/state/variant specs                                  |
-| `src/mosaic/user-button/__tests__/`            | The canonical per-layer test set to copy from                             |
+| File                                           | Purpose                                                                     |
+| ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `src/mosaic/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`                     |
+| `src/mosaic/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`, `MosaicStyleProps` |
+| `src/mosaic/MosaicProvider.tsx`                | Provider for the `icons` prop (per-name glyph overrides)                    |
+| `src/mosaic/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context                     |
+| `src/mosaic/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                                    |
+| `src/mosaic/components/`                       | One subdirectory per component, and nothing else                            |
+| `src/mosaic/blocks/`                           | View fragments that own one piece of state of their own (`destructive`)     |
+| `src/mosaic/utils/*.styles.ts`                 | Atoms shared across components: `reset`, `typography`, `focus-outline`      |
+| `src/mosaic/hooks/`                            | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)            |
+| `src/mosaic/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                          |
+| `src/mosaic/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`)        |
+| `src/mosaic/machines/`                         | Standalone machines and the shared `__tests__/test-utils.ts`                |
+| `src/mosaic/<feature>/*.model.tsx`             | Clerk adapter — the only file in a feature that may import Clerk            |
+| `src/mosaic/<feature>/*.controller.tsx`        | Local state and action wrapping; holds the feature's machine                |
+| `src/mosaic/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                       |
+| `src/mosaic/<feature>/*.types.ts`              | The data contract the model and the view both agree on                      |
+| `src/mosaic/<feature>/*.messages.ts`           | Every string the surface renders, shaped the way `@clerk/i18n` takes them   |
+| `src/mosaic/utils/reset.test.tsx`              | Reset specs                                                                 |
+| `src/mosaic/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                                 |
+| `src/mosaic/components/button/button.test.tsx` | Component-level slot/state/variant specs                                    |
+| `src/mosaic/features/user-button/__tests__/`   | The canonical per-layer test set to copy from                               |
 
 `machine/` is the runtime; `machines/` is machines written with it. The one-letter
 difference is easy to misread — a feature's own machine belongs in its

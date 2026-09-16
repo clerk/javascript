@@ -15,7 +15,8 @@ import { flushSync } from 'react-dom';
  * an empty array before the enter transition has been registered.
  *
  * Each call aborts any pending wait from a previous call, so rapid open/close
- * toggles don't leak stale callbacks.
+ * toggles don't leak stale callbacks, and returns a cancel function for callers
+ * that need to abandon a wait before it resolves.
  */
 export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: boolean) {
   const abortRef = useRef<AbortController | null>(null);
@@ -34,10 +35,11 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
       const controller = new AbortController();
       abortRef.current = controller;
       const { signal } = controller;
+      const cancel = () => controller.abort();
 
       if (!element || typeof element.getAnimations !== 'function') {
         callback();
-        return;
+        return cancel;
       }
 
       const runCheck = () => {
@@ -87,10 +89,11 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
           attributeFilter: ['data-starting-style'],
         });
         signal.addEventListener('abort', () => observer.disconnect());
-        return;
+        return cancel;
       }
 
       runCheck();
+      return cancel;
     },
     [ref, open],
   );

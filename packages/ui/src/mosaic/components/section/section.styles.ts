@@ -13,7 +13,7 @@ export const styles = stylex.create({
     width: '100%',
   },
   title: {
-    color: colorVars['--cl-color-neutral'],
+    color: colorVars['--cl-color-foreground'],
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   group: {
@@ -22,7 +22,7 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-background'],
     width: '100%',
   },
   row: {
@@ -110,13 +110,13 @@ export const styles = stylex.create({
     minWidth: 0,
   },
   label: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
   },
   description: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
@@ -127,6 +127,21 @@ export const styles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'flex-end',
+  },
+  // Sits under the row's item rather than inside its content, so a message never shifts the
+  // media and actions off the centre line they share.
+  error: {
+    margin: 0,
+    gap: space['1'],
+    alignItems: 'flex-start',
+    color: colorVars['--cl-color-negative'],
+    display: 'flex',
+    textWrap: 'pretty',
+    width: '100%',
+  },
+  errorIcon: {
+    flexShrink: 0,
+    height: '1lh',
   },
 });
 /* eslint-enable @stylexjs/no-lookahead-selectors */

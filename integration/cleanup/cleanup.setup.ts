@@ -243,11 +243,16 @@ setup('cleanup instances ', async () => {
       const applications = await listApplications(constants.CLERK_PLATFORM_API_KEY);
       console.log(`Found ${applications.length} Platform API applications.`);
 
-      if (applicationRunMarker) {
+      if (constants.E2E_CLEANUP_STALE_APPLICATIONS || applicationRunMarker) {
+        const oneHourAgo = Date.now() - 60 * 60 * 1000;
         const applicationNameSuffix = `-${applicationRunMarker}`;
-        const applicationsToDelete = applications.filter(application =>
-          application.name.endsWith(applicationNameSuffix),
-        );
+        const applicationsToDelete = applications.filter(application => {
+          if (!constants.E2E_CLEANUP_STALE_APPLICATIONS) {
+            return application.name.endsWith(applicationNameSuffix);
+          }
+          const createdAt = getApplicationCreatedAt(application.application_id);
+          return application.name.startsWith('e2e-') && createdAt !== undefined && createdAt < oneHourAgo;
+        });
 
         for (const application of applicationsToDelete) {
           try {
@@ -317,4 +322,22 @@ function batchElements<T>(objects: T[], batchSize = 5): T[][] {
     batches.push(objects.slice(i, i + batchSize));
   }
   return batches;
+}
+
+function getApplicationCreatedAt(applicationId: string): number | undefined {
+  if (!/^app_[0-9A-Za-z]{27}$/.test(applicationId)) {
+    return;
+  }
+
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let value = 0n;
+  for (const character of applicationId.slice(4)) {
+    value = value * 62n + BigInt(alphabet.indexOf(character));
+  }
+  if (value >= 1n << 160n) {
+    return;
+  }
+
+  const ksuidEpochSeconds = 1_400_000_000;
+  return (Number(value >> 128n) + ksuidEpochSeconds) * 1000;
 }

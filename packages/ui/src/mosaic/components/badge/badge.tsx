@@ -30,7 +30,7 @@ export type BadgeProps = MosaicComponentProps<'span'> & {
  * <Badge render={<a href='/billing' />}>Upgrade</Badge>
  */
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function MosaicBadge(
-  { color = 'primary', render, className, style, ...rest },
+  { color = 'primary', render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -40,11 +40,9 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function Mosa
     props: {
       ...mergeStyleProps(
         themeProps('badge', { color }),
-        stylex.props(reset.base, styles.base, colors[color]),
-        className,
-        style,
+        stylex.props(reset.base, styles.base, colors[color], xstyle),
+        rest,
       ),
-      ...rest,
     },
   });
 });
