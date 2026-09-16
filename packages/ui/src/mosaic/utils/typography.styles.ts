@@ -4,7 +4,7 @@ import { colorVars, fontFamilyVars, typeScaleVars } from '../tokens.stylex';
 
 export type TypographySize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 
-export type TypographyColor = 'primary' | 'neutral' | 'warning' | 'negative' | 'positive';
+export type TypographyColor = 'brand' | 'foreground' | 'foreground-secondary' | 'warning' | 'negative' | 'positive';
 
 export const styles = stylex.create({
   base: {
@@ -40,11 +40,12 @@ export const sizes = stylex.create({
 });
 
 // Text has no fill to sit on, so each color resolves to the readable token of its
-// pair: the saturated one for warning/negative/positive, `-foreground` for neutral
-// (`--cl-color-foreground` is a surface fill).
+// pair: the saturated one for warning/negative/positive, the `-foreground` text tokens
+// for the achromatic pair.
 export const colors = stylex.create({
-  primary: { color: colorVars['--cl-color-brand'] },
-  neutral: { color: colorVars['--cl-color-foreground'] },
+  brand: { color: colorVars['--cl-color-brand'] },
+  foreground: { color: colorVars['--cl-color-foreground'] },
+  'foreground-secondary': { color: colorVars['--cl-color-foreground-secondary'] },
   warning: { color: colorVars['--cl-color-warning'] },
   negative: { color: colorVars['--cl-color-negative'] },
   positive: { color: colorVars['--cl-color-positive'] },
