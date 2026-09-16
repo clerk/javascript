@@ -1,6 +1,5 @@
 import type { IconProps } from '@clerk/mosaic/components/icon';
 import { Icon } from '@clerk/mosaic/components/icon';
-import { ArrowRight } from '@clerk/mosaic/icons/glyphs/arrow-right';
 import { iconRegistry } from '@clerk/mosaic/icons/registry';
 import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 
@@ -17,7 +16,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/icon/icon.tsx',
   styles: {
     _variants: {
-      size: { sm: {}, md: {}, lg: {}, inherit: {} },
+      size: { sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
       size: 'md',
@@ -37,59 +36,28 @@ export function Default(props: Record<string, unknown>) {
     <Icon
       {...knobsAsProps(props)}
       name='chevron-right'
-      role='img'
-      aria-label='Next'
     />
   );
 }
 
-export function Sizes() {
+export function Sizes(props: Record<string, unknown>) {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
-      {(['sm', 'md', 'lg'] as const).map(size => (
-        <span
-          key={size}
-          style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}
-        >
-          <Icon
-            name='chevron-right'
-            size={size}
-            aria-hidden
-          />
-          <code>{size}</code>
-        </span>
-      ))}
-      <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center', fontSize: 24 }}>
-        <Icon
-          name='chevron-right'
-          size='inherit'
-          aria-hidden
-        />
-        <code>inherit</code>
-      </span>
-    </div>
-  );
-}
-
-export function Colors() {
-  return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, color: 'var(--cl-color-positive)' }}>
-      <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
-        <Icon
-          name='checkmark-circle'
-          size='lg'
-          aria-hidden
-        />
-        Inherited color
-      </span>
-      <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
-        <Icon
-          name='device-phone'
-          size='lg'
-          aria-hidden
-        />
-        Fixed palette
-      </span>
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <Icon
+        {...knobsAsProps(props)}
+        name='chevron-right'
+        size='sm'
+      />
+      <Icon
+        {...knobsAsProps(props)}
+        name='chevron-right'
+        size='md'
+      />
+      <Icon
+        {...knobsAsProps(props)}
+        name='chevron-right'
+        size='lg'
+      />
     </div>
   );
 }
@@ -153,25 +121,23 @@ export function Override() {
     // be supplied from a Server Component, since elements serialize across the RSC boundary.
     <MosaicProvider
       icons={{
-        'chevron-right': <ArrowRight />,
+        'chevron-right': (
+          <svg
+            viewBox='0 0 20 20'
+            fill='currentColor'
+          >
+            <circle
+              cx={10}
+              cy={10}
+              r={6}
+            />
+          </svg>
+        ),
       }}
     >
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
-        <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
-          Next
-          <Icon
-            name='chevron-right'
-            placement='inline-end'
-            aria-hidden
-          />
-        </span>
-        <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
-          <Icon
-            name='chevron-left'
-            aria-hidden
-          />
-          Previous
-        </span>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <Icon name='chevron-right' />
+        <Icon name='chevron-left' />
       </div>
     </MosaicProvider>
   );

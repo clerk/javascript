@@ -2,7 +2,9 @@ import * as IconStories from './icon.stories';
 
 # Icon
 
-Icon renders a named glyph from Mosaic's registry. The artwork follows the [Mosaic icon set in Figma](https://www.figma.com/design/yt5qKlfNyIIdaKaMoav1v2/Clerk-Mosaic-2.0?node-id=8004-6488), alongside the filled [device illustrations](https://www.figma.com/design/yt5qKlfNyIIdaKaMoav1v2/Clerk-Mosaic-2.0?node-id=163-1747) and dedicated security glyphs. Monochrome icons inherit color; device illustrations keep their own palettes. `MosaicProvider` can replace any glyph by name.
+Icon renders a named glyph from Mosaic's icon set. It sizes through the `size` variant. Monochrome glyphs inherit `currentColor`; device illustrations keep their Figma palettes. Any glyph can be swapped per name through the `icons` prop on `MosaicProvider`. Mosaic's styling applies to an override just like the built-in glyph — so swapped icons stay visually consistent — and the override also carries the `.cl-icon` class and `data-size` attribute for targeting.
+
+Set `placement` when the icon sits beside text inside a container. It adds no styling of its own; it reflects `data-icon="inline-start"` or `data-icon="inline-end"` so the container can react — a `Button`, for example, tightens its padding on the side the icon sits with `:has([data-icon='inline-end'])`. The values are the CSS logical directions, so they follow the writing mode rather than naming a physical edge. Leave it unset for a standalone icon.
 
 ## Playground
 
@@ -26,14 +28,8 @@ Icon renders a named glyph from Mosaic's registry. The artwork follows the [Mosa
 <Usage
   component='Icon'
   module='@clerk/mosaic/components/icon'
-  props={{ name: 'chevron-right', role: 'img', 'aria-label': 'Next' }}
+  props={{ name: 'chevron-right' }}
 />
-
-SVG props pass through to the rendered element. Use `aria-hidden` for a decorative icon beside text. Give a standalone meaningful icon `role="img"` and an `aria-label`. For an icon-only button, label the button and hide its icon.
-
-Set `placement="inline-start"` or `placement="inline-end"` when the icon leads or trails text. It reflects `data-icon` so containers such as Button can adjust their padding. Placement follows the writing direction and applies no styling of its own.
-
-Built-in glyphs forward `ref` to their SVG. For a provider override, put the ref on the replacement element itself; Icon does not forward its ref to an override.
 
 ---
 
@@ -41,27 +37,14 @@ Built-in glyphs forward `ref` to their SVG. For a provider override, put the ref
 
 ### Sizes
 
-With the default spacing tokens, `sm`, `md`, and `lg` render at 14, 16, and 20px. `inherit` uses `1em`; the example below inherits a 24px font size. `xstyle` can override the size atoms.
-
-Size controls the canvas. Artwork keeps its source proportions: `checkmark-small`, `checkmark-circle`, `user-circle-plus`, and `arrow-up-right` intentionally occupy less space within that canvas.
-
 <Story
   name='Sizes'
   storyModule={IconStories}
 />
 
-### Color
-
-Monochrome artwork uses `currentColor`. Set the surrounding text color or use `xstyle` to color an icon. Both examples below sit in the same positive-color container; the phone illustration keeps its fixed palette.
-
-<Story
-  name='Colors'
-  storyModule={IconStories}
-/>
-
 ### Icons
 
-Monochrome glyphs include the dedicated security icons. `support` is the rescue ring; `dotted-square` is the separate artwork in Figma's second frame named “support.” The building preserves its source paths with corrected placement to prevent clipping.
+The [Figma icon set](https://www.figma.com/design/yt5qKlfNyIIdaKaMoav1v2/Clerk-Mosaic-2.0?node-id=8004-6488), alongside the dedicated security glyphs.
 
 <Story
   name='Names'
@@ -71,7 +54,7 @@ Monochrome glyphs include the dedicated security icons. `support` is the rescue 
 
 ### Device illustrations
 
-The filled phone and laptop keep their Figma palettes. They use the same Icon component and per-name overrides as the monochrome glyphs above.
+The filled phone and laptop from [Figma](https://www.figma.com/design/yt5qKlfNyIIdaKaMoav1v2/Clerk-Mosaic-2.0?node-id=163-1747) use the same Icon component and per-name overrides.
 
 <Story
   name='DeviceIllustrations'
@@ -81,9 +64,7 @@ The filled phone and laptop keep their Figma palettes. They use the same Icon co
 
 ### Overriding a glyph
 
-Pass `icons` to `MosaicProvider` to replace a glyph by its registered name. The example replaces `chevron-right` with the existing arrow glyph; `chevron-left` keeps its default artwork.
-
-Overrides are React elements. Mosaic applies `.cl-icon`, sizing, `data-size`, placement, and SVG props from the Icon call site, while keeping the replacement's own class names. A custom component must pass those props to its root element. Overrides can also be non-SVG elements.
+Pass `icons` to `MosaicProvider` to replace a glyph by name. The override is a plain element of any type, not just an `svg`; Mosaic clones it with the resolved sizing `className` and `data-size`, keeping any class the element already had. The replacement only supplies its own content.
 
 <Story
   name='Override'
