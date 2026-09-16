@@ -4,6 +4,7 @@ import { Confirmation } from '../../blocks/confirmation';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { fill } from './user-profile-account-section/user-profile-account-section.messages';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 
@@ -95,7 +96,7 @@ export function UserProfilePasskeysSectionView({
         <Confirmation
           handle={removePasskey}
           title={m.removeTitle}
-          description={passkey => m.removeDescription.replace('{name}', () => passkey.name)}
+          description={passkey => fill(m.removeDescription, { name: passkey.name })}
           actionLabel={m.remove}
           onConfirm={passkey => onRemove(passkey.id)}
         />

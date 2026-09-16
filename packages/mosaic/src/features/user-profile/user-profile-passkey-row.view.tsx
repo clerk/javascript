@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { Dialog } from '../../components/dialog';
 import { Section } from '../../components/section';
+import { fill } from './user-profile-account-section/user-profile-account-section.messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
@@ -75,7 +76,7 @@ export function UserProfilePasskeyRowView({
           <Section.Actions>
             <UserProfileActionMenu
               actions={actions}
-              label={m.manage.replace('{name}', () => passkey.name)}
+              label={fill(m.manage, { name: passkey.name })}
             />
           </Section.Actions>
         ) : null}
