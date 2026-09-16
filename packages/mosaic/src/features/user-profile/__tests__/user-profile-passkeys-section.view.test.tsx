@@ -52,19 +52,19 @@ describe('passkeys section', () => {
 
     await user.click(screen.getByRole('button', { name: 'Manage MacBook' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription('MacBook will be removed from this account.');
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription('MacBook will be removed from this account.');
     expect(onRemove).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.getByRole('button', { name: 'Manage MacBook' })).toHaveFocus();
 
     await user.click(screen.getByRole('button', { name: 'Manage iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
-    const dialog = screen.getByRole('dialog');
+    const dialog = screen.getByRole('alertdialog');
     expect(dialog).toHaveAccessibleDescription('iPhone will be removed from this account.');
     await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
     expect(onRemove).toHaveBeenCalledExactlyOnceWith('phone');
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
   it('renames through a prefilled form, preserves the draft after failure, and retries', async () => {
     const user = userEvent.setup();
@@ -144,7 +144,7 @@ describe('passkeys section', () => {
       finish();
       await pending;
     });
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.queryByText('MacBook')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     expect(screen.getByText('MacBook')).toBeVisible();
@@ -167,7 +167,7 @@ describe('passkeys section', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Removal failed');
     await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
     expect(onRemove.mock.calls).toEqual([['phone'], ['phone']]);
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
   it('preserves literal passkey names in menu labels and removal copy', async () => {
     const user = userEvent.setup();
@@ -181,7 +181,7 @@ describe('passkeys section', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Manage $& laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription('$& laptop will be removed from this account.');
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription('$& laptop will be removed from this account.');
   });
 
   it('keeps rename pending until saving finishes', async () => {

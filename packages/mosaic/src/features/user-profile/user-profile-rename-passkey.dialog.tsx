@@ -39,12 +39,8 @@ export function UserProfileRenamePasskeyDialog({
       handle={handle}
       open={open}
       onOpenChange={onOpenChange}
-      closedBy='closerequest'
     >
-      <Dialog.Popup
-        size='card'
-        initialFocus={inputRef}
-      >
+      <Dialog.Popup initialFocus={inputRef}>
         <Card.Root
           elevation='overlay'
           renderBranding={false}
