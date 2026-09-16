@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -8,7 +8,7 @@ import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-
 
 const wallet = { id: 'wallet_1', provider: 'MetaMask', address: 'test', isVerified: true };
 
-function renderWallets(onRemove: (id: string) => void) {
+function renderWallets(onRemove: (id: string) => void | Promise<void>) {
   return render(
     <MosaicProvider>
       <UserProfileWeb3WalletsSectionView
@@ -32,7 +32,7 @@ describe('Web3 wallet removal', () => {
     const trigger = screen.getByRole('button', { name: 'Manage MetaMask' });
     trigger.focus();
     await user.keyboard('{Enter}{Enter}');
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     await waitFor(() => expect(trigger).toHaveFocus());
     expect(onRemove).not.toHaveBeenCalled();
@@ -53,45 +53,61 @@ describe('Web3 wallet removal', () => {
     }
     render(<Example />);
     await openRemoval(user);
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage MetaMask' })).not.toBeInTheDocument());
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('keeps confirmation open while pending and allows retrying an error supplied by the caller', async () => {
+  it('keeps confirmation open while pending and allows retrying a rejected removal', async () => {
+    const user = userEvent.setup();
+    const removal = Promise.withResolvers<void>();
+    const onRemove = vi
+      .fn()
+      .mockImplementationOnce(() => removal.promise)
+      .mockResolvedValue(undefined);
+    renderWallets(onRemove);
+    await openRemoval(user);
+    const dialog = screen.getByRole('dialog');
+    const remove = within(dialog).getByRole('button', { name: 'Remove', exact: true });
+    await user.click(remove);
+    expect(onRemove).toHaveBeenCalledExactlyOnceWith('wallet_1');
+    expect(dialog).toBeInTheDocument();
+    expect(remove).toHaveAttribute('aria-busy', 'true');
+    await user.click(remove);
+    expect(onRemove).toHaveBeenCalledOnce();
+    await act(async () => {
+      removal.reject(new Error('Unable to remove wallet'));
+      await removal.promise.catch(() => undefined);
+    });
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('Unable to remove wallet');
+    await user.click(remove);
+    expect(onRemove).toHaveBeenNthCalledWith(2, 'wallet_1');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('uses the newly selected wallet and its warning after canceling another removal', async () => {
     const user = userEvent.setup();
     const onRemove = vi.fn();
-    const { rerender } = renderWallets(onRemove);
+    render(
+      <MosaicProvider>
+        <UserProfileWeb3WalletsSectionView
+          wallets={[
+            wallet,
+            { id: 'wallet_2', provider: 'Coinbase Wallet', address: 'second-wallet', isVerified: false },
+          ]}
+          onRemove={onRemove}
+        />
+      </MosaicProvider>,
+    );
     await openRemoval(user);
-    const dialog = screen.getByRole('alertdialog');
-    expect(onRemove).not.toHaveBeenCalled();
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: 'Manage Coinbase Wallet' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveTextContent('second-wallet');
+    expect(dialog).not.toHaveTextContent('You will no longer be able to sign in using this web3 wallet.');
     await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove).toHaveBeenCalledExactlyOnceWith('wallet_1');
-    rerender(
-      <MosaicProvider>
-        <UserProfileWeb3WalletsSectionView
-          wallets={[{ ...wallet, isRemoving: true }]}
-          onRemove={onRemove}
-        />
-      </MosaicProvider>,
-    );
-    expect(dialog).toBeInTheDocument();
-    expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeDisabled();
-    expect(within(dialog).getByRole('progressbar')).toBeInTheDocument();
-    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove).toHaveBeenCalledTimes(1);
-    rerender(
-      <MosaicProvider>
-        <UserProfileWeb3WalletsSectionView
-          wallets={[{ ...wallet, removalError: 'Unable to remove wallet' }]}
-          onRemove={onRemove}
-        />
-      </MosaicProvider>,
-    );
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('Unable to remove wallet');
-    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove).toHaveBeenCalledTimes(2);
-    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(onRemove).toHaveBeenCalledExactlyOnceWith('wallet_2');
   });
 });

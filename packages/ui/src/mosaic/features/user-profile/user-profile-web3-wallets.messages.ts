@@ -12,7 +12,6 @@ export const userProfileWeb3WalletsMessages = {
     description: '{wallet} will be removed from this account.',
     signInWarning: 'You will no longer be able to sign in using this web3 wallet.',
     confirm: 'Remove',
-    pending: 'Removing wallet',
     cancel: 'Cancel',
   },
 };

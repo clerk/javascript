@@ -198,10 +198,14 @@ import {
   Default as UserProfileAccountSectionDefault,
   EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
   EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
+  EmailRemovalError as UserProfileAccountSectionEmailRemovalError,
+  EmailRemovalPending as UserProfileAccountSectionEmailRemovalPending,
   EmailSsoConnectFails as UserProfileAccountSectionEmailSsoConnectFails,
   EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
+  PhoneRemovalError as UserProfileAccountSectionPhoneRemovalError,
+  PhoneRemovalPending as UserProfileAccountSectionPhoneRemovalPending,
 } from '../stories/user-profile-account-section.stories';
 import {
   Default as UserProfileActiveDevicesSectionDefault,
@@ -510,6 +514,10 @@ const userProfileAccountSectionModule: StoryModule = {
   EmailLinkResendFails: UserProfileAccountSectionEmailLinkResendFails,
   EmailSsoVerification: UserProfileAccountSectionEmailSsoVerification,
   EmailSsoConnectFails: UserProfileAccountSectionEmailSsoConnectFails,
+  EmailRemovalPending: UserProfileAccountSectionEmailRemovalPending,
+  EmailRemovalError: UserProfileAccountSectionEmailRemovalError,
+  PhoneRemovalPending: UserProfileAccountSectionPhoneRemovalPending,
+  PhoneRemovalError: UserProfileAccountSectionPhoneRemovalError,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
