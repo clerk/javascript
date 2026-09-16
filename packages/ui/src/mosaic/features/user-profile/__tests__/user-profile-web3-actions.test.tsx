@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
@@ -62,10 +63,12 @@ describe('Web3 wallet removal', () => {
 
   it('keeps confirmation open while pending and allows retrying a rejected removal', async () => {
     const user = userEvent.setup();
-    const removal = Promise.withResolvers<void>();
+    const removal = createDeferredPromise();
     const onRemove = vi
       .fn()
-      .mockImplementationOnce(() => removal.promise)
+      .mockImplementationOnce(async () => {
+        await removal.promise;
+      })
       .mockResolvedValue(undefined);
     renderWallets(onRemove);
     await openRemoval(user);

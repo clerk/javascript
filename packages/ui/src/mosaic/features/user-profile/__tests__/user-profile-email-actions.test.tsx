@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
@@ -83,7 +84,7 @@ describe('email actions', () => {
 
   it('keeps removal pending and lets the user retry a failure in the dialog', async () => {
     const user = userEvent.setup();
-    const removal = Promise.withResolvers<void>();
+    const removal = createDeferredPromise();
     const onRemoveEmail = vi.fn().mockReturnValueOnce(removal.promise).mockResolvedValue(undefined);
     renderEmail({ onRemoveEmail });
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));

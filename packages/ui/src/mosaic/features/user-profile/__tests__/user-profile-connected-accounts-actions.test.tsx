@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
@@ -73,8 +74,10 @@ describe('connected account removal', () => {
 
   it('keeps the selected account pending until its removal finishes', async () => {
     const user = userEvent.setup();
-    const removal = Promise.withResolvers<void>();
-    const onRemove = vi.fn(() => removal.promise);
+    const removal = createDeferredPromise();
+    const onRemove = vi.fn(async () => {
+      await removal.promise;
+    });
     renderAccounts(onRemove);
     await openRemoval(user);
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));

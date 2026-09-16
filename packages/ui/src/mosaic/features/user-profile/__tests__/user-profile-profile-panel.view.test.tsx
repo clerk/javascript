@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -39,8 +40,10 @@ describe('UserProfileProfilePanelView', () => {
 
   it('keeps the final account confirmation mounted until removal settles', async () => {
     const user = userEvent.setup();
-    const removal = Promise.withResolvers<void>();
-    const onRemoveConnectedAccount = vi.fn(() => removal.promise);
+    const removal = createDeferredPromise();
+    const onRemoveConnectedAccount = vi.fn(async () => {
+      await removal.promise;
+    });
     const { rerender } = renderView({
       connectedAccounts: [{ id: 'github', provider: 'GitHub' }],
       onRemoveConnectedAccount,
@@ -71,8 +74,10 @@ describe('UserProfileProfilePanelView', () => {
 
   it('keeps the final wallet confirmation mounted until removal settles', async () => {
     const user = userEvent.setup();
-    const removal = Promise.withResolvers<void>();
-    const onRemoveWeb3Wallet = vi.fn(() => removal.promise);
+    const removal = createDeferredPromise();
+    const onRemoveWeb3Wallet = vi.fn(async () => {
+      await removal.promise;
+    });
     const { rerender } = renderView({
       web3Wallets: [{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }],
       onRemoveWeb3Wallet,
