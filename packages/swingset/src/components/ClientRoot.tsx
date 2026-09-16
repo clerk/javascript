@@ -16,7 +16,6 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { getModule } from '@/lib/registry';
 
 import { AppSidebar } from './app-sidebar';
-import { NeutralToggle } from './NeutralToggle';
 import { ThemeToggle } from './ThemeToggle';
 
 function useBreadcrumb() {
@@ -66,8 +65,7 @@ export function ClientRoot({ children }: { children: React.ReactNode }) {
               </BreadcrumbList>
             </Breadcrumb>
           )}
-          <div className='ml-auto flex items-center gap-4'>
-            <NeutralToggle />
+          <div className='ml-auto'>
             <ThemeToggle />
           </div>
         </header>
