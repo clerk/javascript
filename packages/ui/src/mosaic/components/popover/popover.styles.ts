@@ -73,15 +73,13 @@ export const styles = stylex.create({
       default: 'opacity, transform',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
-    // Positional, in the order of `transitionProperty`. Opacity takes `linear` —
-    // its interpolation is already perceptually non-uniform, and the overshoot in
-    // `--cl-ease-default` would extrapolate past the target for no gain. The scale
-    // is what moves, so it gets the overshoot on the way in and accelerates away on
-    // the way out; running the entrance curve backwards stalls the exit for most of
-    // its duration and turns the overshoot into a wobble past the target.
+    // Positional, in the order of `transitionProperty`. The fade takes the plain enter and
+    // exit curves; the scale is what moves, so it gets the overshoot on the way in and
+    // accelerates away on the way out — running the entrance curve backwards stalls the
+    // exit for most of its duration and turns the overshoot into a wobble past the target.
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-default']}`,
-      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
     maxHeight: 'min(80dvh, 36rem)',
     maxWidth: 'calc(100vw - 2rem)',

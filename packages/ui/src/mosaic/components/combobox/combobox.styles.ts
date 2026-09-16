@@ -2,6 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 
 import {
   colorVars,
+  durationVars,
+  easingVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -25,17 +27,29 @@ export const styles = stylex.create({
       default: 1,
       ':where([data-ending-style], [data-starting-style])': 0,
     },
+    // Reduced motion drops the scale VALUE as well as its transition: left in, it would
+    // apply instantly and snap the popup out of 96% on the way out.
     scale: {
       default: 1,
       ':where([data-ending-style], [data-starting-style])': 0.96,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 1,
+        ':where([data-ending-style], [data-starting-style])': 1,
+      },
     },
     transformOrigin: 'var(--cl-transform-origin)',
     transitionDuration: {
-      default: '150ms',
-      '@media (prefers-reduced-motion: reduce)': '0.01ms',
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
-    transitionProperty: 'opacity, scale',
-    transitionTimingFunction: 'ease-out',
+    transitionProperty: {
+      default: 'opacity, scale',
+      '@media (prefers-reduced-motion: reduce)': 'opacity',
+    },
+    transitionTimingFunction: {
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
     maxHeight: 'var(--cl-available-height)',
     minWidth: '12.5rem',
   },
