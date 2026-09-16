@@ -9,12 +9,12 @@ import { styles } from './user-profile-security-panel.styles';
 export type UserProfileSecurityIconName = 'authenticator' | 'backup-codes' | 'desktop' | 'mobile' | 'passkey' | 'sms';
 
 const icons = {
-  authenticator: 'lock',
-  'backup-codes': 'numbers',
-  desktop: 'devices',
-  mobile: 'phone',
-  passkey: 'passkey-added',
-  sms: 'phone',
+  authenticator: 'security-lock-square',
+  'backup-codes': 'security-phone',
+  desktop: 'device-laptop',
+  mobile: 'device-phone',
+  passkey: 'security-passkey',
+  sms: 'security-phone',
 } as const;
 
 export function UserProfileSecurityIcon({ name }: { name: UserProfileSecurityIconName }) {
