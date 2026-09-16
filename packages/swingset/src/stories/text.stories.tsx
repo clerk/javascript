@@ -16,7 +16,7 @@ export const meta: StoryMeta = {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },
       color: {
-        primary: {},
+        brand: {},
         foreground: {},
         'foreground-secondary': {},
         warning: {},
@@ -89,9 +89,9 @@ export function Colors(props: Record<string, unknown>) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <Text
         {...knobsAsProps(props)}
-        color='primary'
+        color='brand'
       >
-        Primary text
+        Brand text
       </Text>
       <Text
         {...knobsAsProps(props)}
