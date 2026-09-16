@@ -7,6 +7,7 @@ import {
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
+  shadowVars,
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
@@ -34,15 +35,14 @@ export const positioner = stylex.create({
 export const popup = stylex.create({
   base: {
     // A real border, not a shadow ring, so it occupies the 1px of layout the alignment counts on.
-    borderColor: 'light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))',
+    borderColor: `light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
     borderRadius: radiusVars['--cl-radius-lg'],
     borderStyle: 'solid',
     borderWidth: '1px',
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent)`,
-    color: colorVars['--cl-color-card-foreground'],
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-md'],
+    color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
@@ -101,7 +101,7 @@ export const option = stylex.create({
         ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-foreground'],
     cursor: { default: 'pointer', ':where([data-disabled])': 'not-allowed' },
     display: 'flex',
     // The viewport is a height-capped flex column; without this the rows squash instead of scrolling.
@@ -140,7 +140,7 @@ export const content = stylex.create({
 
 export const description = stylex.create({
   base: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontWeight: fontWeightVars['--cl-font-normal'],
   },
 });
@@ -148,7 +148,7 @@ export const description = stylex.create({
 // Rendered on every row and shown only on the selected one, so labels never shift with selection.
 export const indicator = stylex.create({
   base: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     visibility: {
       default: 'hidden',
       [stylex.when.ancestor('[data-selected]', selectOptionScope)]: 'visible',

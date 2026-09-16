@@ -12,17 +12,17 @@ export const styles = stylex.create({
     flexWrap: 'wrap',
   },
   icon: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     display: 'block',
     height: space['4.5'],
     width: space['4.5'],
   },
   media: {
-    borderColor: colorVars['--cl-color-border-faded'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
     borderWidth: '1px',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-background-subtle'],
   },
   root: {
     gap: space['4'],

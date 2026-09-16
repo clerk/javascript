@@ -21,6 +21,6 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   emailAddress: {
-    color: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-brand'],
   },
 });
