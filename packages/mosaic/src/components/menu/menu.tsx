@@ -49,7 +49,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
       render={trigger}
       {...mergeStyleProps(themeProps('menu-trigger'), stylex.props(xstyle), rest)}
     >
-      {children ?? <Icon name='ellipsis' />}
+      {children ?? <Icon name='ellipsis-horizontal' />}
     </Primitive.Trigger>
   );
 });

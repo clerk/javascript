@@ -59,7 +59,7 @@ function ManagedByLabel({ name, iconUrl }: UserProfilePasswordManagedBy) {
       ) : (
         <Icon
           aria-hidden
-          name='security-lock'
+          name='lock'
           size='sm'
           xstyle={styles.managedByText}
         />

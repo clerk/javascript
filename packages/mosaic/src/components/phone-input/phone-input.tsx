@@ -253,7 +253,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 >
                   <InputGroup.Start>
                     <Icon
-                      name='search'
+                      name='magnifying-glass'
                       size='sm'
                       aria-hidden='true'
                     />

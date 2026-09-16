@@ -71,7 +71,7 @@ export function UserProfileApiKeysPanelView({
         <div {...stylex.props(styles.searchWrapper)}>
           <Icon
             aria-hidden
-            name='search'
+            name='magnifying-glass'
             size='sm'
             xstyle={styles.searchIcon}
           />

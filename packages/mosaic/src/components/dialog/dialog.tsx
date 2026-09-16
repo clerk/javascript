@@ -231,7 +231,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         )}
         {...mergeStyleProps(themeProps('dialog-close-button'), stylex.props(xstyle), rest)}
       >
-        <Icon name='close' />
+        <Icon name='x' />
       </Primitive.Close>
     </span>
   );

@@ -79,7 +79,7 @@ export function UserProfileEnterpriseAccountRowView({
                 <Spinner size='sm' />
               ) : (
                 <Icon
-                  name='arrow-right-top'
+                  name='arrow-up-right'
                   placement='inline-end'
                   size='sm'
                 />

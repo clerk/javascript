@@ -483,7 +483,7 @@ export function MethodPicker(): JSX.Element {
         methods={[
           { id: 'password', label: 'Continue with your password', icon: 'security-lock-square' },
           { id: 'phone', label: 'Send SMS code to ••• ••• 1234', icon: 'security-phone' },
-          { id: 'totp', label: 'Use your authenticator app', icon: 'security-authenticator' },
+          { id: 'totp', label: 'Use your authenticator app', icon: 'security-lock-square' },
           { id: 'passkey', label: 'Use your passkey', icon: 'security-passkey' },
         ]}
         pendingMethodId={pendingMethodId}
@@ -503,7 +503,7 @@ export function MethodPickerPending(): JSX.Element {
         methods={[
           { id: 'password', label: 'Continue with your password', icon: 'security-lock-square' },
           { id: 'phone', label: 'Send SMS code to ••• ••• 1234', icon: 'security-phone' },
-          { id: 'totp', label: 'Use your authenticator app', icon: 'security-authenticator' },
+          { id: 'totp', label: 'Use your authenticator app', icon: 'security-lock-square' },
           { id: 'passkey', label: 'Use your passkey', icon: 'security-passkey' },
         ]}
         pendingMethodId='phone'

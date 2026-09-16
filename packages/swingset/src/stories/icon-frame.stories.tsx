@@ -52,7 +52,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 export function Default(props: Record<string, unknown>) {
   return (
     <IconFrame {...knobsAsProps(props)}>
-      <Icon name='check' />
+      <Icon name='checkmark' />
     </IconFrame>
   );
 }
@@ -62,25 +62,25 @@ export function Sizes() {
     <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
       <IconFrame size='sm'>
         <Icon
-          name='check'
+          name='checkmark'
           size='sm'
         />
       </IconFrame>
       <IconFrame size='md'>
         <Icon
-          name='check'
+          name='checkmark'
           size='md'
         />
       </IconFrame>
       <IconFrame size='lg'>
         <Icon
-          name='check'
+          name='checkmark'
           size='md'
         />
       </IconFrame>
       <IconFrame size='xl'>
         <Icon
-          name='check'
+          name='checkmark'
           size='lg'
         />
       </IconFrame>
@@ -95,23 +95,23 @@ export function Treatments() {
         aria-label='Unframed'
         bordered={false}
       >
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>
       <IconFrame aria-label='Bordered'>
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>
       <IconFrame
         aria-label='Filled'
         bordered={false}
         filled
       >
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>
       <IconFrame
         aria-label='Bordered and filled'
         filled
       >
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>
     </div>
   );
@@ -121,7 +121,7 @@ export function CustomSurface() {
   return (
     <IconFrame xstyle={styles.customSurface}>
       <Icon
-        name='check'
+        name='checkmark'
         size='lg'
       />
     </IconFrame>

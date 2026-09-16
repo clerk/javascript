@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import type { MosaicIconOverrides } from '../../icons/overrides';
 import { MosaicProvider } from '../../MosaicProvider';
 import { space } from '../../tokens.stylex';
+import { Banner } from '../banner';
 import { Icon } from './icon';
 
 const containerStyles = stylex.create({
@@ -19,6 +20,19 @@ const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
 const override: MosaicIconOverrides = { 'chevron-right': <span data-testid='override' /> };
 
 describe('Mosaic Icon', () => {
+  it.each([
+    ['neutral', 'information-circle'],
+    ['warning', 'exclamation-circle'],
+    ['negative', 'exclamation-circle'],
+  ] as const)('applies the canonical %s icon override in a banner', (color, name) => {
+    const { getByTestId } = wrap(<Banner.Root color={color}>Notice</Banner.Root>, {
+      [name]: <svg data-testid='canonical-icon' />,
+    });
+
+    expect(getByTestId('canonical-icon')).toHaveClass('cl-icon', 'cl-banner-icon');
+    expect(getByTestId('canonical-icon')).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it.each([
     'api',
     'application-2',
