@@ -539,7 +539,7 @@ export default tseslint.config([
   {
     name: 'packages/mosaic',
     files: ['packages/mosaic/src/**/*'],
-    ignores: ['packages/mosaic/src/__tests__/**'],
+    ignores: ['packages/mosaic/src/__tests__/**', 'packages/mosaic/src/primitives/**'],
     plugins: {
       '@stylexjs': pluginStylex,
     },

@@ -1,17 +1,17 @@
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
 import type {
   MenuItemProps as PrimitiveMenuItemProps,
   MenuPopupProps as PrimitiveMenuPopupProps,
   MenuPortalProps,
   MenuProps,
   MenuSeparatorProps as PrimitiveMenuSeparatorProps,
-} from '@clerk/headless/menu';
-import { Menu as Primitive } from '@clerk/headless/menu';
-import { useRender } from '@clerk/headless/utils';
-import * as stylex from '@stylexjs/stylex';
-import React from 'react';
-
+} from '../../primitives/menu';
+import { Menu as Primitive } from '../../primitives/menu';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { useRender } from '../../utils';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { truncationStyles } from '../../utils/typography.styles';

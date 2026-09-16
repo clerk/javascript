@@ -17,7 +17,7 @@ emits zero styles — everything is driven by `data-*` attributes.
 ## Usage
 
 ```tsx
-import { FileUpload } from '@clerk/headless/file-upload';
+import { FileUpload } from '@clerk/mosaic/primitives/file-upload';
 
 function Uploader() {
   return (

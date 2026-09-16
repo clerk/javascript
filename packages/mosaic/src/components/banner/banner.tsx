@@ -1,10 +1,10 @@
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { IconName } from '../../icons/registry';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { useRender } from '../../utils';
 import { reset } from '../../utils/reset.styles';
 import { Icon } from '../icon';
 import { descriptionColors, rootColors, styles } from './banner.styles';

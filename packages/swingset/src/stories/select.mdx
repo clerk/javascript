@@ -2,7 +2,7 @@ import * as SelectStories from './select.stories';
 
 # Select
 
-A custom dropdown for picking one value from a list, from `@clerk/headless`. It is a
+A custom dropdown for picking one value from a list, from `@clerk/mosaic/primitives`. It is a
 **headless** primitive: it supplies value and open state, portalling, floating-ui
 positioning (with optional native-`<select>`-style item alignment), keyboard navigation
 with typeahead, and ARIA wiring, but ships **no styles** — you bring your own CSS by
@@ -22,7 +22,7 @@ work); the trigger reflects the selected value.
 ## Usage
 
 ```tsx
-import { Select } from '@clerk/headless/select';
+import { Select } from '@clerk/mosaic/primitives/select';
 
 <Select.Root>
   <Select.Trigger>

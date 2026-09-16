@@ -1,5 +1,6 @@
-import { Dialog as Primitive, type DialogHandle } from '@clerk/headless/dialog';
 import type { ReactNode } from 'react';
+
+import { Dialog as Primitive, type DialogHandle } from '../../primitives/dialog';
 
 /** What a confirmation asks. Delivered to `<Dialog.Confirm>` as the dialog's payload. */
 export interface ConfirmOptions {

@@ -1,9 +1,9 @@
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { useRender } from '../../utils';
 import { useContextProps } from '../../utils/context';
 import { reset } from '../../utils/reset.styles';
 import type { TypographyColor, TypographySize } from '../../utils/typography.styles';

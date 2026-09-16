@@ -5,7 +5,7 @@ A controlled, headless primitive for rendering one step of a multi-step flow at 
 ## Usage
 
 ```tsx
-import { Flow } from '@clerk/headless/flow';
+import { Flow } from '@clerk/mosaic/primitives/flow';
 
 <Flow.Root
   value={machine.status}
@@ -53,7 +53,7 @@ Multiple ids can select the same step. Moving between those ids updates the exis
 `useFlowAutoFocus()` returns a ref. Attach it to the element a step should focus when it enters:
 
 ```tsx
-import { useFlowAutoFocus } from '@clerk/headless/flow';
+import { useFlowAutoFocus } from '@clerk/mosaic/primitives/flow';
 
 function PasswordView() {
   return (

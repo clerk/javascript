@@ -1,7 +1,5 @@
 'use client';
 
-import { Button as HeadlessButton } from '@clerk/headless/button';
-import type { PopoverProps } from '@clerk/headless/popover';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
@@ -18,6 +16,8 @@ import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
+import { Button as HeadlessButton } from '../../primitives/button';
+import type { PopoverProps } from '../../primitives/popover';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { truncationStyles } from '../../utils/typography.styles';

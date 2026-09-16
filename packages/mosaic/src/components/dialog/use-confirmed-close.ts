@@ -1,6 +1,6 @@
-import type { DialogOpenChangeDetails } from '@clerk/headless/dialog';
 import React from 'react';
 
+import type { DialogOpenChangeDetails } from '../../primitives/dialog';
 import type { ConfirmHandle, ConfirmOptions } from './confirm-handle';
 
 export interface UseConfirmedCloseOptions {

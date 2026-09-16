@@ -1,26 +1,25 @@
 # Headless primitives
 
-`@clerk/headless` (`packages/headless/`) is the unstyled, accessible primitive
+`packages/mosaic/src/primitives/` is the unstyled, accessible primitive
 layer under Mosaic: Accordion, Autocomplete, Collapsible, Dialog, Drawer,
 FileUpload, Menu, OTP, Popover, Select, Tabs, Tooltip. Every part emits **zero
 styles** — positioning, keyboard nav, focus management, dismiss, and ARIA are
 delegated to `@floating-ui/react`; all appearance is applied externally via
 `data-*` selectors and consumer classNames.
 
-The package is `private: true` and consumed by `@clerk/mosaic`. It is planned
-to later move into the Mosaic package. Mosaic currently bundles Headless into
-its published artifact.
+The primitives are internal to `@clerk/mosaic`: Mosaic's styled components
+import them by relative path, and they are not exported from the package.
+Swingset stories reach them through the `@clerk/mosaic/primitives/<name>`
+source alias.
 
 ## Read this for the _what_
 
 Per-primitive API docs (parts, props, keyboard, data attributes, ARIA) live
 **next to the code** and are the source of truth:
 
-- **`packages/headless/src/primitives/<name>/README.md`** — one per primitive.
-- **`packages/headless/README.md`** — package overview, the primitive table, and
-  the full **consuming-from-`@clerk/ui`** guide (the `makeCustomizable` wrapper,
-  the TS2742 annotation requirement, pass-through parts, the `render` escape
-  hatch).
+- **`packages/mosaic/src/primitives/<name>/README.md`** — one per primitive.
+- **`packages/mosaic/src/primitives/README.md`** — layer overview and the
+  primitive table.
 
 This file is the _how-to_ for the shared conventions — what every primitive has
 in common, so you can author a new one or a new part without re-deriving the
@@ -32,7 +31,7 @@ Every primitive is a compound component exported as a namespace. Import from the
 subpath; render `Root` + parts:
 
 ```tsx
-import { Select } from '@clerk/headless/select';
+import { Select } from '@clerk/mosaic/primitives/select';
 
 <Select.Root>
   <Select.Trigger>
@@ -58,9 +57,6 @@ import { Select } from '@clerk/headless/select';
   (`render={props => <X {...props} />}`) **or an element**
   (`render={<Link />}`) — the element is cloned with the part's computed props
   and refs merged in.
-- **From `@clerk/ui`**, wrap element-rendering parts with `makeCustomizable` to
-  get the theme-aware `sx` prop; pass-through parts (`Root`, `Portal`) are used
-  directly. See `packages/headless/README.md`.
 
 ## Authoring a part: the useRender contract
 
@@ -150,7 +146,7 @@ Every `primitives/<name>/` folder follows the same shape:
 | `<name>-context.ts` | Context type + `createContext` + guard hook (below).                                           |
 | `parts.ts`          | Re-exports each part under its short alias.                                                    |
 | `index.ts`          | Public entry: namespace + prop-type re-exports.                                                |
-| `<name>.test.tsx`   | Tests (real Chromium via vitest browser mode, not jsdom).                                      |
+| `<name>.test.tsx`   | Tests (vitest, happy-dom).                                                                     |
 | `README.md`         | The primitive's API docs.                                                                      |
 
 **Context + guard hook** — the pattern that makes "used outside Root" a clear error:
@@ -173,8 +169,7 @@ export { type SelectOptionProps, SelectOption as Option } from './select-option'
 // …
 ```
 
-**`index.ts`** — namespace + public prop types (the prop types must be
-re-exported here or `@clerk/ui`'s `.d.ts` rollup hits TS2742):
+**`index.ts`** — namespace + public prop types:
 
 ```ts
 export * as Select from './parts';
@@ -219,7 +214,7 @@ const element = useRender({ defaultTagName: 'div', render, enabled: mounted, ref
 if (!element) return null;
 ```
 
-## Shared hooks (`@clerk/headless/hooks`)
+## Shared hooks (`packages/mosaic/src/hooks`)
 
 | Hook                    | Signature (abridged)                                                | Purpose                                                                |
 | ----------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -229,7 +224,7 @@ if (!element) return null;
 | `useAnimationsFinished` | `(ref, open) => (cb) => void`                                       | Runs `cb` once all CSS animations finish; aborts on rapid toggles.     |
 | `useDataTable`          | `(opts) => { rows, sorting, pagination, rowSelection, … }`          | Table state (sort/filter/paginate/select), controlled or uncontrolled. |
 
-## Shared utils (`@clerk/headless/utils`)
+## Shared utils (`packages/mosaic/src/utils`)
 
 - **`useRender`, `mergeProps`, `ComponentProps<Tag>`, `DefaultProps<Tag>`, `RenderProp`** — the part-authoring primitives (above).
 - **`cssVars({ sideOffset? }): Middleware`** — floating-ui middleware setting
@@ -241,7 +236,8 @@ if (!element) return null;
 
 ## Testing
 
-Tests run in **real Chromium** (vitest browser mode), not jsdom, and include
-`axe` accessibility assertions. `pnpm test` in `packages/headless`. See
-`testing.md` for the Mosaic flow-layer testing model (a different concern — that
+Primitive tests run as the `primitives` vitest project in `packages/mosaic`
+(happy-dom, jest-dom matchers, and `axe` accessibility assertions via
+`vitest.primitives.setup.mts`), separate from the jsdom project the rest of
+Mosaic uses. `pnpm --filter @clerk/mosaic test`. See `testing.md` for the Mosaic flow-layer testing model (a different concern — that
 covers models/controllers/views, not these primitives).

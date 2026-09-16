@@ -2,7 +2,7 @@ import * as PopoverStories from './popover.stories';
 
 # Popover
 
-A floating panel anchored to a trigger, holding interactive content, from `@clerk/headless`.
+A floating panel anchored to a trigger, holding interactive content, from `@clerk/mosaic/primitives`.
 It is a **headless** primitive: it supplies open state, portalling, floating-ui positioning
 (flip/shift/arrow), focus management, dismissal (outside press / Escape), and ARIA wiring,
 but ships **no styles** — you bring your own CSS by targeting the `data-*` attributes
@@ -22,7 +22,7 @@ or Escape.
 ## Usage
 
 ```tsx
-import { Popover } from '@clerk/headless/popover';
+import { Popover } from '@clerk/mosaic/primitives/popover';
 
 <Popover.Root>
   <Popover.Trigger>Settings</Popover.Trigger>

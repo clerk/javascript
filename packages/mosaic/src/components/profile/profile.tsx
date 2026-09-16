@@ -1,12 +1,12 @@
-import type { TabsProps } from '@clerk/headless/tabs';
-import { Tabs } from '@clerk/headless/tabs';
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useMeasure } from '../../hooks/useMeasure';
+import type { TabsProps } from '../../primitives/tabs';
+import { Tabs } from '../../primitives/tabs';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { useRender } from '../../utils';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Branding } from '../branding';

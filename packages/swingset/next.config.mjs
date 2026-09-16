@@ -95,11 +95,6 @@ const nextConfig = {
     }
 
     config.resolve.alias['@clerk/mosaic'] = resolve(__dirname, '../mosaic/src');
-    // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.
-    // `/hooks` and `/utils` live outside `primitives/`, so alias them first (more specific wins).
-    config.resolve.alias['@clerk/headless/hooks'] = resolve(__dirname, '../headless/src/hooks');
-    config.resolve.alias['@clerk/headless/utils'] = resolve(__dirname, '../headless/src/utils');
-    config.resolve.alias['@clerk/headless'] = resolve(__dirname, '../headless/src/primitives');
     return config;
   },
 };

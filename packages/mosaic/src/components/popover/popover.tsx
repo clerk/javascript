@@ -1,9 +1,9 @@
-import type { PopoverProps as HeadlessPopoverProps } from '@clerk/headless/popover';
-import { Popover as Primitive } from '@clerk/headless/popover';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
+import type { PopoverProps as HeadlessPopoverProps } from '../../primitives/popover';
+import { Popover as Primitive } from '../../primitives/popover';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
@@ -73,7 +73,7 @@ const Description = React.forwardRef<HTMLParagraphElement, PopoverDescriptionPro
 
 /**
  * Mosaic Popover: a floating box anchored to a trigger, built on the
- * `@clerk/headless` popover primitive. Composed via dot syntax:
+ * `@clerk/mosaic/primitives` popover primitive. Composed via dot syntax:
  * `Popover.Root`, `Popover.Trigger`, `Popover.Popup`, plus `Popover.Title`,
  * `Popover.Description` and `Popover.Close` for the popup's contents.
  *

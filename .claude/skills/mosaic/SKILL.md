@@ -64,7 +64,7 @@ layer. Copy from it.
 
 | You are…                                                               | Read                                                   |
 | ---------------------------------------------------------------------- | ------------------------------------------------------ |
-| Building on / authoring a headless primitive (`@clerk/headless`)       | `references/headless.md`                               |
+| Building on / authoring a headless primitive (`src/primitives`)        | `references/primitives.md`                             |
 | Styling a component (tokens, `stylex.create`, `themeProps`, CSS build) | `references/stylex.md`                                 |
 | Building an enter/exit transition, or any motion that reads as wrong   | `references/motion.md`                                 |
 | Writing the model (the Clerk adapter, `status`, permissions)           | `references/models.md`                                 |

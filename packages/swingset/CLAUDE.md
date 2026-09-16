@@ -62,7 +62,7 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 | `User Button` | Composed flow UI (e.g. `UserButton`)                          | C         |
 | `User Profile` | Composed flow UI (e.g. `UserProfileProfilePanel`)             | C         |
 | `Components` | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A         |
-| `Primitives` | Headless `@clerk/headless` primitives (`Accordion`)            | B         |
+| `Primitives` | Headless `@clerk/mosaic/primitives` primitives (`Accordion`)   | B         |
 | `Styles`     | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`) | B (adapted) |
 | `Hooks`      | Headless hooks (`useDataTable`)                                | B (adapted) |
 
@@ -181,7 +181,7 @@ import * as PopoverStories from './popover.component.stories';
 
 # Popover
 
-<!-- Intro: state it's the styled Mosaic component built on the `@clerk/headless`
+<!-- Intro: state it's the styled Mosaic component built on the `@clerk/mosaic/primitives`
      primitive, and that it inherits the primitive's behavior/ARIA. -->
 
 ## Example

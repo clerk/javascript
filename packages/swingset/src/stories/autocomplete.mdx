@@ -2,7 +2,7 @@ import * as AutocompleteStories from './autocomplete.stories';
 
 # Autocomplete
 
-A text input paired with a filtered list of suggestions, from `@clerk/headless`. It is a
+A text input paired with a filtered list of suggestions, from `@clerk/mosaic/primitives`. It is a
 **headless** primitive: it supplies input text, selected value, and open state, portalling,
 floating-ui positioning, virtual-focus keyboard navigation, and ARIA `combobox` wiring, but
 ships **no styles** — you bring your own CSS by targeting the `data-*` attributes each
@@ -23,7 +23,7 @@ active option and Enter selects it.
 ## Usage
 
 ```tsx
-import { Autocomplete } from '@clerk/headless/autocomplete';
+import { Autocomplete } from '@clerk/mosaic/primitives/autocomplete';
 
 const [inputValue, setInputValue] = useState('');
 const filtered = items.filter(item => item.toLowerCase().includes(inputValue.toLowerCase()));

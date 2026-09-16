@@ -2,7 +2,7 @@ import * as MenuStories from './menu.stories';
 
 # Menu
 
-A floating list of actions opened from a trigger, from `@clerk/headless`. It is a
+A floating list of actions opened from a trigger, from `@clerk/mosaic/primitives`. It is a
 **headless** primitive: it supplies open state, portalling, floating-ui positioning,
 roving-focus keyboard navigation with typeahead, submenu coordination, and ARIA wiring, but
 ships **no styles** — you bring your own CSS by targeting the `data-*` attributes each
@@ -22,7 +22,7 @@ Escape or selecting an item closes it.
 ## Usage
 
 ```tsx
-import { Menu } from '@clerk/headless/menu';
+import { Menu } from '@clerk/mosaic/primitives/menu';
 
 <Menu.Root>
   <Menu.Trigger>Actions</Menu.Trigger>

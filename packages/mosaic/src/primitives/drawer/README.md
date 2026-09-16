@@ -18,7 +18,7 @@ those inputs.
 ## Usage
 
 ```tsx
-import { Drawer } from '@clerk/headless/drawer';
+import { Drawer } from '@clerk/mosaic/primitives/drawer';
 
 <Drawer.Root>
   <Drawer.Trigger>Open</Drawer.Trigger>

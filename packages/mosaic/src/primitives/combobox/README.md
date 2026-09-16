@@ -3,7 +3,7 @@
 A headless single-selection input. Typing searches options; choosing one remembers its value.
 
 ```tsx
-import { Combobox } from '@clerk/headless/combobox';
+import { Combobox } from '@clerk/mosaic/primitives/combobox';
 
 <Combobox.Root>
   <Combobox.Input aria-label='Fruit' />

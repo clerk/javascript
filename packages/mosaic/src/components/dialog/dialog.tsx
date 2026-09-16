@@ -1,18 +1,18 @@
-import type {
-  DialogClosedBy,
-  DialogFocusTarget,
-  DialogHandle,
-  DialogProps as HeadlessDialogProps,
-} from '@clerk/headless/dialog';
-import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '@clerk/headless/dialog';
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useAccessibleDescriptionWarning } from '../../hooks/useAccessibleDescriptionWarning';
 import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
+import type {
+  DialogClosedBy,
+  DialogFocusTarget,
+  DialogHandle,
+  DialogProps as HeadlessDialogProps,
+} from '../../primitives/dialog';
+import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { useRender } from '../../utils';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Heading } from '../heading';
@@ -554,7 +554,7 @@ function Confirm({ handle, finalFocus }: DialogConfirmProps) {
 }
 
 /**
- * Mosaic `Dialog` — a modal surface built on the `@clerk/headless` dialog primitive, composed
+ * Mosaic `Dialog` — a modal surface built on the `@clerk/mosaic/primitives` dialog primitive, composed
  * via dot syntax:
  *
  * ```tsx

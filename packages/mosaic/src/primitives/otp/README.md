@@ -18,7 +18,7 @@ no global CSS. Everything is driven by `data-*` attributes.
 ## Usage
 
 ```tsx
-import { Otp } from '@clerk/headless/otp';
+import { Otp } from '@clerk/mosaic/primitives/otp';
 
 function VerifyCode() {
   return (

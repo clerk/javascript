@@ -3,7 +3,7 @@ import * as AccordionStories from './accordion.stories';
 # Accordion
 
 A set of stacked sections where each is toggled by its own heading button, from
-`@clerk/headless`. It is a **headless** primitive: it supplies behavior, single/multiple
+`@clerk/mosaic/primitives`. It is a **headless** primitive: it supplies behavior, single/multiple
 open state, roving-focus keyboard navigation, ARIA wiring, and the expand/collapse
 animation lifecycle, but ships **no styles** — you bring your own CSS by targeting the
 `data-*` attributes each part emits.
@@ -22,7 +22,7 @@ closes the others, and arrow keys move focus between triggers.
 ## Usage
 
 ```tsx
-import { Accordion } from '@clerk/headless/accordion';
+import { Accordion } from '@clerk/mosaic/primitives/accordion';
 
 <Accordion.Root>
   <Accordion.Item value='item-1'>

@@ -9,7 +9,7 @@ export type {
   DialogHandle,
   DialogOpenChangeDetails,
   DialogRole,
-} from '@clerk/headless/dialog';
+} from '../../primitives/dialog';
 export type {
   DialogActionsProps,
   DialogCloseButtonProps,

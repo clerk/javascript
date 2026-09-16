@@ -12,9 +12,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@clerk/mosaic": ["../mosaic/src"],
-      "@clerk/mosaic/*": ["../mosaic/src/*"],
-      "@clerk/headless/hooks": ["../headless/src/hooks"],
-      "@clerk/headless/*": ["../headless/src/primitives/*"]
+      "@clerk/mosaic/*": ["../mosaic/src/*"]
     },
     "plugins": [
       {

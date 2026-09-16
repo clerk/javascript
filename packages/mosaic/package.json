@@ -63,7 +63,6 @@
     "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
-    "@clerk/headless": "workspace:^",
     "@floating-ui/react": "catalog:repo",
     "@stylexjs/eslint-plugin": "0.19.0",
     "@stylexjs/rollup-plugin": "0.19.0",
@@ -71,10 +70,13 @@
     "@stylexjs/unplugin": "0.19.0",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
+    "axe-core": "^4.11.3",
     "bundlewatch": "^0.4.2",
+    "happy-dom": "^20.10.2",
     "react": "catalog:react",
     "react-dom": "catalog:react",
-    "tsdown": "catalog:repo"
+    "tsdown": "catalog:repo",
+    "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

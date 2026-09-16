@@ -15,7 +15,7 @@ export default defineConfig({
   sourcemap: false,
   tsconfig: './tsconfig.json',
   deps: {
-    neverBundle: ['react', 'react-dom', '@stylexjs/stylex', /^@clerk\/headless(\/.*)?$/, /^@clerk\/shared(\/.*)?$/],
+    neverBundle: ['react', 'react-dom', '@stylexjs/stylex', /^@clerk\/shared(\/.*)?$/],
     onlyBundle: false,
   },
   plugins: [

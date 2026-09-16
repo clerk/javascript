@@ -10,7 +10,6 @@ if (!source.startsWith("'use client';") && !source.startsWith('"use client";')) 
 
 const forbidden = [
   { name: '@clerk/ui', pattern: /(?:from|import)\s*['"]@clerk\/ui(?:\/[^'"]*)?['"]/ },
-  { name: '@clerk/headless', pattern: /(?:from|import)\s*['"]@clerk\/headless(?:\/[^'"]*)?['"]/ },
   { name: 'Emotion', pattern: /(?:from|import)\s*['"]@emotion\// },
   { name: 'StyleX', pattern: /(?:from|import)\s*['"]@stylexjs\// },
 ];
@@ -28,5 +27,5 @@ if (!/(?:from|import)\s*['"]@clerk\/shared(?:\/[^'"]*)?['"]/.test(source)) {
 }
 
 console.log(
-  '✅ Mosaic bundle is client-boundaried, imports @clerk/shared, and is free of UI, Headless, Emotion, and StyleX runtime imports',
+  '✅ Mosaic bundle is client-boundaried, imports @clerk/shared, and is free of UI, Emotion, and StyleX runtime imports',
 );

@@ -1,11 +1,11 @@
 'use client';
 
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { useRender } from '../../utils';
 import { inputStyles } from '../../utils/input.styles';
 import { reset } from '../../utils/reset.styles';
 import { ButtonContext } from '../button/button.context';

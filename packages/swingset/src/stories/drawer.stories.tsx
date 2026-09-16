@@ -1,9 +1,9 @@
-import { Drawer } from '@clerk/headless/drawer';
+import { Drawer } from '@clerk/mosaic/primitives/drawer';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
+// unstyled — so it faithfully reflects what `@clerk/mosaic/primitives` provides: behavior, state,
 // the drag-to-dismiss gesture, and ARIA wiring via the `data-*` attributes each part
 // emits, with zero appearance. It is embedded once into the overview via `<Story>` in the
 // MDX (the one thing prose can't convey: that it opens, traps focus, and dismisses on drag
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   group: 'Primitives',
   status: 'stable',
   title: 'Drawer',
-  source: 'packages/headless/src/primitives/drawer/index.ts',
+  source: 'packages/mosaic/src/primitives/drawer/index.ts',
 };
 
 export function Default() {

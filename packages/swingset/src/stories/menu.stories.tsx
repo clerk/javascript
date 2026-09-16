@@ -1,9 +1,9 @@
-import { Menu } from '@clerk/headless/menu';
+import { Menu } from '@clerk/mosaic/primitives/menu';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
+// unstyled — so it faithfully reflects what `@clerk/mosaic/primitives` provides: behavior, state,
 // positioning, keyboard navigation, and ARIA wiring via the `data-*` attributes each
 // part emits, with zero appearance. It is embedded once into the overview via `<Story>`
 // in the MDX (the one thing prose can't convey: that it opens and items are keyboard
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   group: 'Primitives',
   status: 'stable',
   title: 'Menu',
-  source: 'packages/headless/src/primitives/menu/index.ts',
+  source: 'packages/mosaic/src/primitives/menu/index.ts',
 };
 
 export function Default() {

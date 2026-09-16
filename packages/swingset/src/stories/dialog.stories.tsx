@@ -1,9 +1,9 @@
-import { Dialog } from '@clerk/headless/dialog';
+import { Dialog } from '@clerk/mosaic/primitives/dialog';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
+// unstyled — so it faithfully reflects what `@clerk/mosaic/primitives` provides: behavior, state,
 // and ARIA wiring via the `data-*` attributes each part emits, with zero appearance.
 // It is embedded once into the overview via `<Story>` in the MDX (the one thing prose
 // can't convey: that it opens, traps focus, and dismisses). There is no interactive knob
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   group: 'Primitives',
   status: 'stable',
   title: 'Dialog',
-  source: 'packages/headless/src/primitives/dialog/index.ts',
+  source: 'packages/mosaic/src/primitives/dialog/index.ts',
 };
 
 export function Default() {

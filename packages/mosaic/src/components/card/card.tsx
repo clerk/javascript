@@ -1,9 +1,9 @@
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { useRender } from '../../utils';
 import { reset } from '../../utils/reset.styles';
 import { Branding } from '../branding';
 import { Button } from '../button';

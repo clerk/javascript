@@ -1,10 +1,10 @@
-import type { FileRejection } from '@clerk/headless/file-upload';
-import { FileUpload } from '@clerk/headless/file-upload';
 import { useState } from 'react';
 
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import type { FileRejection } from '../../../primitives/file-upload';
+import { FileUpload } from '../../../primitives/file-upload';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
 import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';

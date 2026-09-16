@@ -1,4 +1,3 @@
-import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import type { DialogSize } from '@clerk/mosaic/components/dialog';
@@ -7,6 +6,7 @@ import { Heading } from '@clerk/mosaic/components/heading';
 import { Input } from '@clerk/mosaic/components/input';
 import { Text } from '@clerk/mosaic/components/text';
 import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import type { RenderProps } from '@clerk/mosaic/utils';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
