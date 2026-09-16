@@ -88,8 +88,11 @@ describe('passkeys section', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Try again');
     expect(input).toHaveValue('Work laptop');
+    await user.type(input, ' updated');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(input).toHaveValue('Work laptop updated');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(onRename).toHaveBeenLastCalledWith('laptop', 'Work laptop');
+    expect(onRename).toHaveBeenLastCalledWith('laptop', 'Work laptop updated');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
