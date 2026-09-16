@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 
 // Positioning is applied inline by the headless positioner; this only clears the
 // focus outline it receives. No z-index: the portalled, fixed positioner already
@@ -16,9 +16,7 @@ export const popup = stylex.create({
     borderRadius: radiusVars['--cl-radius-lg'],
     outline: 'none',
     backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    boxShadow: shadowVars['--cl-shadow-card'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,

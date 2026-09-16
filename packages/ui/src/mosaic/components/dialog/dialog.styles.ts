@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, durationVars, easingVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
 
 // How far the contents of a surface beneath a stacked prompt are veiled toward its own background.
 // Declared up here rather than beside `STACK_SCALE` further down because `sizes` reads it, and
@@ -210,10 +210,10 @@ export const styles = stylex.create({
     // tabbable content, which would otherwise draw a ring around the whole surface.
     outline: 'none',
     backgroundColor: colorVars['--cl-color-background'],
-    // Matches `Menu`. The two schemes are different treatments, not one at two strengths: light
-    // gets the two drop layers and a dark hairline, dark drops them to `transparent` and separates
-    // with a light hairline instead — a shadow reads as depth against a light page and as nothing
-    // against a dark one.
+    // The card shadow, shared with `Card` and `Menu`. The two schemes are different treatments,
+    // not one at two strengths: light gets the two drop layers and a dark hairline, dark drops them
+    // to `transparent` and separates with a light hairline instead — a shadow reads as depth
+    // against a light page and as nothing against a dark one.
     //
     // Branched per COLOUR via `light-dark()`, which is the only shape available: `light-dark()`
     // resolves to a colour and cannot carry an offset or a blur, so the geometry has to be shared.
@@ -221,9 +221,7 @@ export const styles = stylex.create({
     // OS preference while `light-dark()` tracks the `color-scheme` in scope, so an app forcing a
     // scheme (swingset's own toggle does, via next-themes) would take its colours from one and its
     // geometry from the other.
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    boxShadow: shadowVars['--cl-shadow-card'],
     color: colorVars['--cl-color-foreground'],
     display: 'flex',
     flexDirection: 'column',

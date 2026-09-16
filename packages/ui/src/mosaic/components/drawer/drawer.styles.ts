@@ -83,7 +83,7 @@ export const styles = stylex.create({
     // No drop shadow — the sheet sits on the screen edge, so there is nothing for it to float over.
     // The hairline ring stays: a faint dark edge in light, and the light edge that separates a dark
     // sheet from a dark page.
-    boxShadow: `0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    boxShadow: `0 0 0 1px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
     color: colorVars['--cl-color-foreground'],
     display: 'flex',
     flexDirection: 'column',

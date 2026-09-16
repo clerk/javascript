@@ -420,12 +420,14 @@ export const focusVars = stylex.defineVars(focusDefaults);
 
 // Elevation. The one card shadow, as a token so every surface at that elevation reads the same:
 // two drop layers that fall away in dark, and a hairline ring that is dark on light and light on
-// dark. Branched per colour via `light-dark()` since a shadow's geometry cannot branch — see the
-// note on `Dialog`'s popup for why `@media (prefers-color-scheme)` is not the escape hatch.
+// dark. Every layer is a wash of `--cl-color-neutral` (black on light, white on dark), matching
+// Figma, where shadows are #000 rather than the foreground. Branched per colour via `light-dark()`
+// since a shadow's geometry cannot branch — see the note on `Dialog`'s popup for why
+// `@media (prefers-color-scheme)` is not the escape hatch.
 const shadowDefaults = {
-  '--cl-shadow-card': `0 12px 12px -7px light-dark(color-mix(in oklab, ${colorVars['--cl-color-foreground']} 12%, transparent), transparent),
-    0 24px 24px -10px light-dark(color-mix(in oklab, ${colorVars['--cl-color-foreground']} 4%, transparent), transparent),
-    0 0 0 1px light-dark(color-mix(in oklab, ${colorVars['--cl-color-foreground']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
+  '--cl-shadow-card': `0 12px 12px -7px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 12%, transparent), transparent),
+    0 24px 24px -10px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), transparent),
+    0 0 0 1px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
 };
 
 export const shadowVars = stylex.defineVars(shadowDefaults);
