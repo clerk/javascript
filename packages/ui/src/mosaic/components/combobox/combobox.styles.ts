@@ -19,7 +19,7 @@ export const styles = stylex.create({
     outline: 'none',
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: shadowVars['--cl-shadow-card'],
+    boxShadow: `${shadowVars['--cl-shadow-raised']}, ${shadowVars['--cl-shadow-ring']}`,
     color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,

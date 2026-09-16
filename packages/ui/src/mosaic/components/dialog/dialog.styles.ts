@@ -210,10 +210,10 @@ export const styles = stylex.create({
     // tabbable content, which would otherwise draw a ring around the whole surface.
     outline: 'none',
     backgroundColor: colorVars['--cl-color-background'],
-    // The card shadow, shared with `Card` and `Menu`. The two schemes are different treatments,
-    // not one at two strengths: light gets the two drop layers and a dark hairline, dark drops them
-    // to `transparent` and separates with a light hairline instead — a shadow reads as depth
-    // against a light page and as nothing against a dark one.
+    // The raised shadow and ring, shared with `Card` and `Menu`. The two schemes are different
+    // treatments, not one at two strengths: light gets the two drop layers and a dark hairline,
+    // dark drops them to `transparent` and separates with a light hairline instead — a shadow
+    // reads as depth against a light page and as nothing against a dark one.
     //
     // Branched per COLOUR via `light-dark()`, which is the only shape available: `light-dark()`
     // resolves to a colour and cannot carry an offset or a blur, so the geometry has to be shared.
@@ -221,7 +221,7 @@ export const styles = stylex.create({
     // OS preference while `light-dark()` tracks the `color-scheme` in scope, so an app forcing a
     // scheme (swingset's own toggle does, via next-themes) would take its colours from one and its
     // geometry from the other.
-    boxShadow: shadowVars['--cl-shadow-card'],
+    boxShadow: `${shadowVars['--cl-shadow-raised']}, ${shadowVars['--cl-shadow-ring']}`,
     color: colorVars['--cl-color-foreground'],
     display: 'flex',
     flexDirection: 'column',

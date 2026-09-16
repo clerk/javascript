@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, durationVars, easingVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
 
 // The dialog's scrim, and the nested value a dialog paints over a `profile` or a `card` — see
 // `dialog.styles.ts` for the composite arithmetic. A sheet opening from inside a profile dialog is
@@ -83,7 +83,7 @@ export const styles = stylex.create({
     // No drop shadow — the sheet sits on the screen edge, so there is nothing for it to float over.
     // The hairline ring stays: a faint dark edge in light, and the light edge that separates a dark
     // sheet from a dark page.
-    boxShadow: `0 0 0 1px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
+    boxShadow: shadowVars['--cl-shadow-ring'],
     color: colorVars['--cl-color-foreground'],
     display: 'flex',
     flexDirection: 'column',

@@ -42,7 +42,7 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-lg'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: shadowVars['--cl-shadow-card'],
+    boxShadow: `${shadowVars['--cl-shadow-raised']}, ${shadowVars['--cl-shadow-ring']}`,
     color: colorVars['--cl-color-foreground'],
   },
   countrySearchContainer: {

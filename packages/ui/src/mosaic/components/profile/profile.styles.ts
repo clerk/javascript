@@ -159,7 +159,7 @@ export const styles = stylex.create({
     // popup is the screen and there is nothing to lift off.
     boxShadow: {
       [compact]: 'none',
-      default: shadowVars['--cl-shadow-card'],
+      default: `${shadowVars['--cl-shadow-raised']}, ${shadowVars['--cl-shadow-ring']}`,
     },
     flexGrow: 1,
     minHeight: 0,
