@@ -215,8 +215,53 @@ describe('Mosaic Pagination', () => {
         pageSize={25}
       />,
     );
-    expect(screen.getByText('Results per page')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '25' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Results per page 25' })).toBeInTheDocument();
+  });
+
+  it('treats a page size below one as one', async () => {
+    const onChange = vi.fn();
+    render(
+      <Pagination
+        page={1}
+        totalItems={5}
+        pageSize={0}
+        onChange={onChange}
+      />,
+    );
+    const pages = controls()
+      .getAllByRole('button')
+      .map(button => button.textContent)
+      .filter(Boolean);
+    expect(pages).toEqual(['1', '2', '3', '4', '5']);
+    await userEvent.click(controls().getByRole('button', { name: '5' }));
+    expect(onChange).toHaveBeenCalledWith(5);
+  });
+
+  it('treats a step below one as one', async () => {
+    const onChange = vi.fn();
+    render(
+      <Pagination
+        page={2}
+        totalItems={100}
+        pageSize={10}
+        step={0}
+        onChange={onChange}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    expect(onChange).toHaveBeenCalledWith(3);
+  });
+
+  it('treats a negative sibling count as zero', () => {
+    render(
+      <Pagination
+        page={5}
+        totalItems={100}
+        pageSize={10}
+        siblingCount={-2}
+      />,
+    );
+    expect(controls().getByRole('button', { name: '5' })).toHaveAttribute('aria-current', 'page');
   });
 
   it('renders one page when there are no items', () => {

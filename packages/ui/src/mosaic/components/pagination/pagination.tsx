@@ -24,6 +24,10 @@ export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChan
   label?: string;
 }
 
+function atLeast(value: number, min: number): number {
+  return Number.isFinite(value) && value > min ? Math.floor(value) : min;
+}
+
 const controlSizes = {
   sm: { button: 'xs', icon: 'sm', text: 'xs' },
   md: { button: 'sm', icon: 'sm', text: 'sm' },
@@ -60,8 +64,13 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
   },
   ref,
 ) {
-  const pageCount = Math.max(1, Math.ceil(totalItems / pageSize));
-  const current = Math.min(Math.max(page, 1), pageCount);
+  const itemsPerPage = atLeast(pageSize, 1);
+  const pageStep = atLeast(step, 1);
+  const siblings = atLeast(siblingCount, 0);
+  const pageCount = Math.max(1, Math.ceil(atLeast(totalItems, 0) / itemsPerPage));
+  const current = Math.min(atLeast(page, 1), pageCount);
+  const labelId = React.useId();
+  const pageSizeId = React.useId();
   const isFirst = current <= 1;
   const isLast = current >= pageCount;
   const control = controlSizes[size];
@@ -118,7 +127,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           shape='square'
           touchTarget={false}
           disabled={disabled || isFirst}
-          onClick={() => goTo(current - step)}
+          onClick={() => goTo(current - pageStep)}
         >
           <Icon
             name='chevron-left'
@@ -126,7 +135,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           />
         </Button>
         <ButtonContext.Provider value={pageDefaults}>
-          {getPageItems(current, pageCount, siblingCount).map(item =>
+          {getPageItems(current, pageCount, siblings).map(item =>
             typeof item === 'number' ? (
               <Button
                 key={item}
@@ -161,7 +170,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           shape='square'
           touchTarget={false}
           disabled={disabled || isLast}
-          onClick={() => goTo(current + step)}
+          onClick={() => goTo(current + pageStep)}
         >
           <Icon
             name='chevron-right'
@@ -188,6 +197,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
       </div>
       <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
         <Text
+          id={labelId}
           render={<span />}
           size={control.text}
           color='neutral'
@@ -195,12 +205,14 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           Results per page
         </Text>
         <Button
+          id={pageSizeId}
+          aria-labelledby={`${labelId} ${pageSizeId}`}
           color='neutral'
           variant='outline'
           size={control.button}
           disabled={disabled}
         >
-          {pageSize}
+          {itemsPerPage}
           <Icon
             name='chevron-down'
             placement='inline-end'
