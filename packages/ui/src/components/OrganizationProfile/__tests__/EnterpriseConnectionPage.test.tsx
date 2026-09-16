@@ -370,7 +370,8 @@ describe('EnterpriseConnectionPage', () => {
 
       // The animated action card lingers in jsdom, so the restored Edit trigger is the close signal.
       await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
-    });
+      // Mounting the full SAML form is the slowest render in this file and has hit the 5s default on CI.
+    }, 15_000);
   });
 
   describe('settings', () => {
