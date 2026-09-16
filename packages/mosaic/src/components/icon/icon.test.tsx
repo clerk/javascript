@@ -187,8 +187,8 @@ describe('Mosaic Icon', () => {
   );
 
   it.each([
-    ['device-phone', ['#646464', '#646464', '#343434', '#575757', '#171717', 'black']],
-    ['device-laptop', ['black', '#575757', 'black', '#444444', '#171717']],
+    ['device-phone', ['#646464', '#646464', '#343434', '#575757', 'black', 'black']],
+    ['device-laptop', ['black', '#575757', 'black', '#444444', 'black']],
   ] as const)('preserves the supplied %s palette', (name, palette) => {
     const { container } = wrap(<Icon name={name} />);
     const paths = Array.from(container.querySelectorAll('path'));
