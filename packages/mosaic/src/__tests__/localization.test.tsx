@@ -58,6 +58,12 @@ describe('resolveLocalization', () => {
     expect(resolveLocalization({ locale: 'es-ES' }).locale).toBe('es-ES');
   });
 
+  it('falls back to en when the locale is not a valid BCP 47 tag', () => {
+    expect(resolveLocalization({ locale: 'en_US' }).locale).toBe('en');
+    expect(resolveLocalization({ locale: '' }).locale).toBe('en');
+    expect(resolveLocalization({ locale: 'zz' }).locale).toBe('zz');
+  });
+
   it('does not mutate the base messages', () => {
     resolveLocalization({ messages: { 'userButton.popup.label': 'Konto' } });
     expect(mosaicMessages.userButton.popup.label).toBe('Account');

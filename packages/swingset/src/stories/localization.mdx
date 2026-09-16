@@ -128,7 +128,8 @@ The Spanish catalog from the example above with one string overridden for this a
 `locale` is a BCP 47 tag and does one thing: it is handed to `Intl.PluralRules`, which picks the
 plural category for a count. It defaults to `en`, so an English-only app never sets it. A catalog
 does not declare its own language, so set `locale` alongside `messages` whenever the catalog is
-not English.
+not English. A value that is not a well-formed tag, such as `en_US` with an underscore, is treated
+as `en` rather than thrown at render time.
 
 English has two categories, but Russian and Polish have four and Arabic six, and the rules for
 which number takes which form come from CLDR data in the browser rather than from Mosaic. A

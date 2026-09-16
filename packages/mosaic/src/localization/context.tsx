@@ -36,11 +36,23 @@ function merge(base: unknown, overrides: unknown): unknown {
   return result;
 }
 
+function resolveLocale(locale: string | undefined): string {
+  if (!locale) {
+    return 'en';
+  }
+  try {
+    Intl.getCanonicalLocales(locale);
+    return locale;
+  } catch {
+    return 'en';
+  }
+}
+
 export function resolveLocalization(localization: MosaicLocalization | undefined): MosaicLocalizationValue {
   const layers = [localization?.messages, localization?.overrides];
   return {
     messages: layers.reduce<unknown>(merge, mosaicMessages) as MosaicMessages,
-    locale: localization?.locale ?? 'en',
+    locale: resolveLocale(localization?.locale),
   };
 }
 
