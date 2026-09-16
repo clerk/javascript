@@ -15,11 +15,18 @@ export const meta: StoryMeta = {
   styles: {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },
-      color: { primary: {}, neutral: {}, warning: {}, negative: {}, positive: {} },
+      color: {
+        primary: {},
+        foreground: {},
+        'foreground-secondary': {},
+        warning: {},
+        negative: {},
+        positive: {},
+      },
     },
     _defaultVariants: {
       size: 'base',
-      color: 'primary',
+      color: 'foreground',
     },
   },
 };
@@ -88,9 +95,15 @@ export function Colors(props: Record<string, unknown>) {
       </Heading>
       <Heading
         {...knobsAsProps(props)}
-        color='neutral'
+        color='foreground'
       >
-        Neutral heading
+        Foreground heading
+      </Heading>
+      <Heading
+        {...knobsAsProps(props)}
+        color='foreground-secondary'
+      >
+        Foreground secondary heading
       </Heading>
       <Heading
         {...knobsAsProps(props)}
