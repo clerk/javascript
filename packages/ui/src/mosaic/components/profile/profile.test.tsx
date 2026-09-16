@@ -5,6 +5,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { Icon } from '../icon';
 import type { ProfileRootProps } from './profile';
@@ -339,6 +340,27 @@ describe('Profile', () => {
       expect(popup).toContainElement(document.querySelector('.cl-profile'));
       expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
       expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+    });
+
+    it('withholds the corner dismiss inside an alert dialog', () => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root
+            defaultOpen
+            role='alertdialog'
+          >
+            <Dialog.Popup variant='profile'>
+              <Surface />
+              <Card.Description>Review your profile before continuing.</Card.Description>
+              <Dialog.Close>Cancel</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+
+      expect(screen.getByRole('alertdialog', { name: 'User profile' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
     // The dismiss belongs to the dialog, so a profile that is the page's own content has none.

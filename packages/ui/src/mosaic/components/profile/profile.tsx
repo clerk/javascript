@@ -179,8 +179,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
           />
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Card.Header` renders its dismiss first. Only rendered
-              inside a dialog. */}
-          {isInDialog(dialog) ? <Dialog.CloseButton /> : null}
+              inside a standard dialog. */}
+          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),
