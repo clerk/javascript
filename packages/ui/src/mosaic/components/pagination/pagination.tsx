@@ -4,11 +4,11 @@ import React from 'react';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
-import { sizes } from '../../utils/typography.styles';
 import { Button } from '../button';
 import { ButtonContext } from '../button/button.context';
 import { Icon } from '../icon';
 import { Select } from '../select';
+import { Text } from '../text';
 import { getPageItems } from './page-items';
 import { styles } from './pagination.styles';
 
@@ -192,12 +192,14 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         )}
       </div>
       <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
-        <span
+        <Text
           id={labelId}
-          {...mergeStyleProps(themeProps('pagination-label'), stylex.props(reset.base, sizes.sm, styles.label))}
+          render={<span />}
+          size='sm'
+          color='foreground-secondary'
         >
           {pageSizeLabel}
-        </span>
+        </Text>
         <Select.Root
           items={pageSizeItems}
           value={String(itemsPerPage)}

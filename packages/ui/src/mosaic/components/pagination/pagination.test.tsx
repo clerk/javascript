@@ -248,11 +248,11 @@ describe('Mosaic Pagination', () => {
         pageSizeLabel='Rows per page'
       />,
     );
-    expect(screen.getByText('Rows per page')).toHaveClass('cl-pagination-label');
+    expect(screen.getByText('Rows per page')).toHaveClass('cl-text');
     expect(screen.getByRole('combobox', { name: 'Rows per page 10' })).toBeInTheDocument();
   });
 
-  it('renders the page size label in its own slot', () => {
+  it('renders the page size label as secondary sm text', () => {
     render(
       <Pagination
         page={1}
@@ -260,7 +260,10 @@ describe('Mosaic Pagination', () => {
         pageSize={10}
       />,
     );
-    expect(screen.getByText('Results per page')).toHaveClass('cl-pagination-label');
+    const label = screen.getByText('Results per page');
+    expect(label).toHaveClass('cl-text');
+    expect(label).toHaveAttribute('data-size', 'sm');
+    expect(label).toHaveAttribute('data-color', 'foreground-secondary');
   });
 
   it('sizes the page size options to match the trigger', async () => {
