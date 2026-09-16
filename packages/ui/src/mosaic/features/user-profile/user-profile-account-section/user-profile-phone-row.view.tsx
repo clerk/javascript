@@ -4,7 +4,7 @@ import { stringToFormattedPhoneString } from '../../../../utils/phoneUtils';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';

@@ -1,9 +1,9 @@
 export const userProfileVerifyEmailLinkMessages = {
   title: 'Verify email address',
   waiting: 'Check your email',
-  description: 'A verification link was sent to {emailAddress}',
+  description: 'A verification link was sent to {#strong}{emailAddress}{/strong}',
   resend: 'Didn’t receive a link? Resend',
-  resendCountdown: 'Didn’t receive a link? Resend ({seconds})',
+  resendCountdown: 'Didn’t receive a link? Resend ({#countdown}{seconds}{/countdown})',
   resending: 'Sending a new link…',
   cancel: 'Cancel',
 };

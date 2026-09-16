@@ -5,6 +5,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
+import { fill } from '../../utils/messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileRemoveWeb3WalletDialog } from './user-profile-remove-web3-wallet.dialog';
@@ -82,7 +83,7 @@ export function UserProfileWeb3WalletRowView({
               color='neutral'
               size='sm'
               variant='outline'
-              aria-label={m.connectLabel.replace('{provider}', wallet.provider ?? '')}
+              aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
               onClick={() => onConnect(wallet.id)}
             >
               {m.connect}
@@ -97,7 +98,7 @@ export function UserProfileWeb3WalletRowView({
           <Section.Actions>
             <UserProfileActionMenu
               actions={actions}
-              label={m.manageLabel.replace('{wallet}', wallet.provider || address || '')}
+              label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
             >
               {linkedWallet && onRemove && linkedWallet.canRemove !== false ? (
                 <UserProfileRemoveWeb3WalletDialog

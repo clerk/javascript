@@ -4,7 +4,7 @@ import { Icon } from '../../components/icon';
 import type { ProfileRootProps } from '../../components/profile';
 import { Profile } from '../../components/profile';
 import { getAvailableUserProfilePages, resolveUserProfilePages, USER_PROFILE_PAGE_ICONS } from './user-profile.layout';
-import { userProfileBase as m } from './user-profile.messages';
+import { userProfileMessages as m } from './user-profile.messages';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 import { UserProfileApiKeysPanelView } from './user-profile-api-keys-panel.view';
 import { UserProfileBillingPanelView } from './user-profile-billing-panel.view';

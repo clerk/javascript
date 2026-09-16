@@ -4,7 +4,7 @@ import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { styles } from '../user-profile-profile-panel.styles';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 
 export interface UserProfileContactRowViewProps {
   kind: 'email' | 'phone';

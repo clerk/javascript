@@ -16,6 +16,6 @@ export const userProfileAddPhoneMessages = {
     cancel: 'Cancel',
     resend: 'Didn’t receive a code? Resend',
     resending: 'Sending a new code…',
-    resendCountdown: 'Didn’t receive a code? Resend ({seconds})',
+    resendCountdown: 'Didn’t receive a code? Resend ({#countdown}{seconds}{/countdown})',
   },
 };

@@ -1,6 +1,6 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';

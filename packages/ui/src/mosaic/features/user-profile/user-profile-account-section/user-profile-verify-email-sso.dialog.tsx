@@ -6,8 +6,8 @@ import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
+import { fill } from '../../../utils/messages';
 import { UserProfileProviderIcon } from '../user-profile-provider-icon';
-import { fill } from './user-profile-account-section.messages';
 import { userProfileVerifyEmailSsoMessages as m } from './user-profile-verify-email-sso.messages';
 import { styles } from './user-profile-verify-email-sso.styles';
 
