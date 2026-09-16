@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -5,6 +6,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { getPageItems } from './page-items';
 import { Pagination } from './pagination';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 function controls(): ReturnType<typeof within> {
   const element = document.querySelector('.cl-pagination-controls');
@@ -277,18 +282,15 @@ describe('Mosaic Pagination', () => {
     expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
   });
 
-  it('lets the consumer className and style win', () => {
+  it('merges xstyle atoms after the slot atoms', () => {
     render(
       <Pagination
         page={1}
         totalItems={100}
         pageSize={10}
-        className='my-pagination'
-        style={{ marginTop: '8px' }}
+        xstyle={atoms.spaced}
       />,
     );
-    const nav = screen.getByRole('navigation');
-    expect(nav).toHaveClass('cl-pagination', 'my-pagination');
-    expect(nav).toHaveStyle({ marginTop: '8px' });
+    expect(screen.getByRole('navigation')).toHaveClass('cl-pagination', stylex.props(atoms.spaced).className ?? '');
   });
 });

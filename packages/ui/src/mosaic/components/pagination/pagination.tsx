@@ -58,8 +58,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     size = 'md',
     disabled = false,
     label = 'Pagination',
-    className,
-    style,
+    xstyle,
     ...rest
   },
   ref,
@@ -95,11 +94,9 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
       aria-label={label}
       {...mergeStyleProps(
         themeProps('pagination', { size, disabled }),
-        stylex.props(reset.base, styles.root),
-        className,
-        style,
+        stylex.props(reset.base, styles.root, xstyle),
+        rest,
       )}
-      {...rest}
     >
       <div {...mergeStyleProps(themeProps('pagination-controls'), stylex.props(reset.base, styles.controls))}>
         {hasFirstLast && (
