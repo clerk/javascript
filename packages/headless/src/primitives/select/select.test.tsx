@@ -555,6 +555,24 @@ describe('Select', () => {
       const positioner = document.querySelector('[data-testid="select-positioner"]');
       expect(positioner).toHaveAttribute('data-side');
     });
+
+    it('holds the options at their last frame while the popup exits', async () => {
+      const user = userEvent.setup();
+      renderSelect({ defaultValue: 'apple' });
+
+      await user.click(screen.getByRole('combobox'));
+      const popup = screen.getByTestId('select-popup');
+      Object.defineProperty(popup, 'getAnimations', {
+        value: () => [{ finished: new Promise<void>(() => {}) }],
+      });
+
+      await user.click(screen.getByRole('option', { name: 'Banana' }));
+
+      expect(popup).toHaveAttribute('data-closed', '');
+      expect(screen.getByTestId('select-value')).toHaveTextContent('Banana');
+      expect(screen.getByRole('option', { name: 'Apple', hidden: true })).toHaveAttribute('data-selected', '');
+      expect(screen.getByRole('option', { name: 'Banana', hidden: true })).not.toHaveAttribute('data-selected');
+    });
   });
 
   describe('controlled open', () => {
@@ -719,6 +737,45 @@ describe('Select', () => {
         const newTop = positioner.getBoundingClientRect().top;
         expect(newTop).not.toBe(initialTop);
       });
+    });
+  });
+
+  describe('alignItemWithTrigger', () => {
+    it('marks the positioner with data-side="none" and blocks page scrolling while open', async () => {
+      const user = userEvent.setup();
+      renderSelect({ alignItemWithTrigger: true });
+
+      await user.click(screen.getByRole('combobox'));
+
+      expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'none');
+      expect(document.body).toHaveStyle({ overflow: 'hidden' });
+
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByTestId('select-positioner')).not.toBeInTheDocument());
+      expect(document.body).not.toHaveStyle({ overflow: 'hidden' });
+    });
+
+    it('positions like a menu when opened by touch', async () => {
+      const user = userEvent.setup();
+      renderSelect({ alignItemWithTrigger: true });
+      const trigger = screen.getByRole('combobox');
+
+      await user.pointer({ keys: '[TouchA]', target: trigger });
+
+      expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'bottom');
+      expect(document.body).not.toHaveStyle({ overflow: 'hidden' });
+    });
+
+    it('positions like a menu when the trigger hugs the viewport edge', async () => {
+      const user = userEvent.setup();
+      renderSelect({ alignItemWithTrigger: true, defaultValue: 'banana' });
+      const trigger = screen.getByRole('combobox');
+      // jsdom lays everything out at 0,0: as close to the top edge as it gets.
+      expect(trigger.getBoundingClientRect().top).toBe(0);
+
+      await user.click(trigger);
+
+      await waitFor(() => expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'bottom'));
     });
   });
 
