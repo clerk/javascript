@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import type { FormEvent, ReactNode } from 'react';
+import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
 import { stringToFormattedPhoneString } from '../../../../utils/phoneUtils';
@@ -14,10 +14,6 @@ import { PhoneInput } from '../../../components/phone-input';
 import { fill, rich } from '../../../utils/messages';
 import { styles } from '../user-profile-profile-panel.styles';
 import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
-
-const components = {
-  countdown: (children?: ReactNode) => <span {...stylex.props(styles.countdown)}>{children}</span>,
-};
 
 export interface UserProfileAddPhoneDialogProps {
   open: boolean;
@@ -157,8 +153,9 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                         ) : (current.resendSeconds ?? 0) > 0 ? (
                           <span>
                             {rich(m.verify.resendCountdown, {
-                              values: { seconds: current.resendSeconds ?? 0 },
-                              components,
+                              values: {
+                                seconds: <span {...stylex.props(styles.countdown)}>{current.resendSeconds}</span>,
+                              },
                             })}
                           </span>
                         ) : (

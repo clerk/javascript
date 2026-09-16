@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import type { FormEvent, ReactNode } from 'react';
+import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -13,10 +13,6 @@ import { Otp } from '../../../components/otp';
 import { fill, rich } from '../../../utils/messages';
 import { styles } from '../user-profile-profile-panel.styles';
 import { userProfileAddEmailMessages as m } from './user-profile-add-email.messages';
-
-const components = {
-  countdown: (children?: ReactNode) => <span {...stylex.props(styles.countdown)}>{children}</span>,
-};
 
 export interface UserProfileAddEmailDialogProps {
   open: boolean;
@@ -154,8 +150,9 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                         ) : (current.resendSeconds ?? 0) > 0 ? (
                           <span>
                             {rich(m.verify.resendCountdown, {
-                              values: { seconds: current.resendSeconds ?? 0 },
-                              components,
+                              values: {
+                                seconds: <span {...stylex.props(styles.countdown)}>{current.resendSeconds}</span>,
+                              },
                             })}
                           </span>
                         ) : (

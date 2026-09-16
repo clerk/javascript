@@ -15,7 +15,6 @@ import { styles } from './user-profile-verify-email-link.styles';
 
 const components = {
   strong: (children?: ReactNode) => <strong {...stylex.props(styles.emphasis, styles.emailAddress)}>{children}</strong>,
-  countdown: (children?: ReactNode) => <span {...stylex.props(profileStyles.countdown)}>{children}</span>,
 };
 
 export interface UserProfileVerifyEmailLinkDialogProps {
@@ -83,7 +82,11 @@ export function UserProfileVerifyEmailLinkDialog({
                 {isResending ? (
                   m.resending
                 ) : resendSeconds > 0 ? (
-                  <span>{rich(m.resendCountdown, { values: { seconds: resendSeconds }, components })}</span>
+                  <span>
+                    {rich(m.resendCountdown, {
+                      values: { seconds: <span {...stylex.props(profileStyles.countdown)}>{resendSeconds}</span> },
+                    })}
+                  </span>
                 ) : (
                   m.resend
                 )}
