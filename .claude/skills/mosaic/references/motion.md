@@ -34,12 +34,14 @@ pixels, and the arithmetic is worth doing rather than eyeballing: the overshoot 
 | dialog card, `scale(0.98 → 1)` at 600px | 12px   | 0.3px     |
 | sheet, `translate` its own 640px height | 640px  | 15px      |
 
-A scale delta is a few percent of the element, so its overshoot lands sub-pixel
-however large the surface — `--cl-ease-default` is right for all of them. It is
-travel-based motion that crosses the threshold: a sheet passes its inset by ~15px
-and visibly corrects. That is where `--cl-ease-enter` came from, and the dialog
-surfaces now take it for their scale too, as a house choice at that size rather
-than because the arithmetic demands it.
+A scale delta is a few percent of the element, so the pass reaches a whole pixel
+only on something far larger than it is applied to: ~725px of width at a 6% delta,
+~2,175px at 2%. Menu, Select and Combobox cap at `18rem`, and a Popover would have
+to be stretched most of the way across the viewport, so `--cl-ease-default` is
+right for all of them. It is travel-based motion that crosses the threshold: a
+sheet passes its inset by ~15px and visibly corrects. That is where
+`--cl-ease-enter` came from, and the dialog surfaces now take it for their scale
+too, as a house choice at that size rather than because the arithmetic demands it.
 
 So the axis is not the element's type but the size of its overshoot. Work out what
 2% of the travel actually is; once it is enough pixels to notice as a bounce, take
