@@ -203,6 +203,8 @@ export function Sheet() {
             <Input
               ref={inputRef}
               type='email'
+              required
+              aria-label='Email address'
               placeholder='name@example.com'
               value={value}
               onChange={event => setValue(event.target.value)}
@@ -287,6 +289,7 @@ export function Stacked() {
           >
             <Input
               ref={nameRef}
+              aria-label='Name'
               placeholder='Your name'
               value={name}
               onChange={event => setName(event.target.value)}
@@ -407,6 +410,7 @@ function AddEmailDialog({
               ref={inputRef}
               type='email'
               required
+              aria-label='Email address'
               placeholder='you@example.com'
               value={value}
               onChange={event => setValue(event.target.value)}
@@ -600,7 +604,10 @@ export function CardSurface() {
             <Card.Description>Continue to your account.</Card.Description>
           </Card.Header>
           <Card.Content>
-            <Input placeholder='you@example.com' />
+            <Input
+              aria-label='Email address'
+              placeholder='you@example.com'
+            />
           </Card.Content>
           <Card.Footer>
             <Dialog.Close
@@ -690,9 +697,13 @@ export function CustomFocus() {
             </Card.Description>
           </Card.Header>
           <Card.Content>
-            <Input placeholder='Name' />
+            <Input
+              aria-label='Name'
+              placeholder='Name'
+            />
             <Input
               ref={feedbackRef}
+              aria-label='Feedback'
               placeholder='Feedback'
             />
           </Card.Content>
