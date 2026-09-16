@@ -36,7 +36,7 @@ export const styles = stylex.create({
   },
   pageSizeOption: {
     paddingBlock: 0,
-    paddingInline: space['2.5'],
+    paddingInline: space['2'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
     minHeight: space['7'],
