@@ -18,6 +18,7 @@ export const meta: StoryMeta = {
 
 export function Default() {
   const [defaultId, setDefaultId] = useState('personal');
+  const hasFailed = useRef(false);
   const methods: UserProfileMfaMethod[] = [
     {
       id: 'personal',
@@ -40,7 +41,14 @@ export function Default() {
     <UserProfileMfaSectionView
       methods={methods}
       sectionTitle='Authentication'
-      onSetDefault={setDefaultId}
+      onSetDefault={async id => {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (!hasFailed.current) {
+          hasFailed.current = true;
+          throw new Error('Unable to update the default method. Please try again.');
+        }
+        setDefaultId(id);
+      }}
     />
   );
 }
