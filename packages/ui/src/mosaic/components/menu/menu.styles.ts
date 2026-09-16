@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  shadowVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 // Positioning is applied inline by the headless positioner; this only clears the
 // focus outline it receives. No z-index: the portalled, fixed positioner already
