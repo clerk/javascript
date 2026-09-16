@@ -1,6 +1,6 @@
 import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -54,6 +54,33 @@ export function ReadOnly() {
         { id: 'backup', type: 'backup-codes' },
       ]}
       sectionTitle='Authentication'
+    />
+  );
+}
+
+export function Removal() {
+  const [methods, setMethods] = useState<UserProfileMfaMethod[]>([
+    { id: 'authenticator', type: 'authenticator' },
+    { id: 'sms', type: 'sms', description: '+1 801-555-0100' },
+  ]);
+  const hasFailed = useRef(false);
+  const hasAuthenticator = methods.some(method => method.type === 'authenticator');
+
+  return (
+    <UserProfileMfaSectionView
+      methods={methods.map(method => ({
+        ...method,
+        isDefault: method.type === 'authenticator' || !hasAuthenticator,
+      }))}
+      sectionTitle='Authentication'
+      onRemove={async id => {
+        await new Promise(resolve => setTimeout(resolve, 600));
+        if (!hasFailed.current) {
+          hasFailed.current = true;
+          throw new Error('Could not remove this method. Please try again.');
+        }
+        setMethods(current => current.filter(method => method.id !== id));
+      }}
     />
   );
 }

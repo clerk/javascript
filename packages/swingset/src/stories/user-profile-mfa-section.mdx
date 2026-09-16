@@ -2,7 +2,7 @@ import * as Stories from './user-profile-mfa-section.stories';
 
 # UserProfileMfaSection
 
-Display two-step verification methods, default badges, and permitted row actions. This view takes prepared data and callbacks; the examples use local state.
+Display two-step verification methods, default badges, and permitted row actions. Removal uses shared Confirmation to await the callback and display errors. This view takes prepared data and callbacks; the examples use local state.
 
 ## Playground
 
@@ -17,19 +17,20 @@ Choose Set as default on either SMS number to move the badge.
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Icon', href: '/components/icon', layer: 'Components' },
     { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
   ]}
 />
 
 ## Props
 
-| Prop                      | Type                                          | Default      | Description                                                           |
-| ------------------------- | --------------------------------------------- | ------------ | --------------------------------------------------------------------- |
-| `methods`                 | `UserProfileMfaMethod[]`                      | — (required) | Prepared rows, in display order. All supplied rows render.            |
-| `sectionTitle`            | `string`                                      | —            | Optional surrounding heading.                                         |
-| `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the selected method from the current Add menu.               |
-| `onSetDefault`            | `(id: string) => void`                        | —            | Requests changing the default SMS method.                             |
-| `onRemove`                | `(id: string) => void`                        | —            | Receives the selected method ID. The current row calls this directly. |
-| `onRegenerateBackupCodes` | `() => void`                                  | —            | Requests backup-code regeneration.                                    |
+| Prop                      | Type                                          | Default      | Description                                                                            |
+| ------------------------- | --------------------------------------------- | ------------ | -------------------------------------------------------------------------------------- |
+| `methods`                 | `UserProfileMfaMethod[]`                      | — (required) | Prepared rows, in display order. All supplied rows render.                             |
+| `sectionTitle`            | `string`                                      | —            | Optional surrounding heading.                                                          |
+| `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the selected method from the current Add menu.                                |
+| `onSetDefault`            | `(id: string) => void`                        | —            | Requests changing the default SMS method.                                              |
+| `onRemove`                | `(id: string) => void \| Promise<void>`       | —            | Called after confirmation. Resolve to close; reject with an Error to show the failure. |
+| `onRegenerateBackupCodes` | `() => void`                                  | —            | Requests backup-code regeneration.                                                     |
 
 Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), and optional `label` and `description`. Supply the formatted phone number as the SMS description so its menu has a distinct accessible name.
 
@@ -43,7 +44,13 @@ Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), a
 
 The caller decides whether to mount the section from the instance's second-factor configuration, even when existing methods are present. When mounted, the section stays visible with no methods or callbacks. The caller also prepares the method order, default indicators, and removal permissions, including restrictions when MFA is required. Backup-code rows only offer regeneration.
 
-Callbacks report user intent; updated props determine the displayed result. Enrollment dialogs, removal confirmation, and asynchronous action feedback are still being developed.
+Callbacks report user intent; updated props determine the displayed result. The section owns one removal confirmation, opened with the selected method. Confirmation owns its pending and error state; update `methods` after a successful removal. Removing SMS verification leaves the phone number on the account. Enrollment dialogs and asynchronous feedback for Set as default are still being developed.
+
+### Confirm removal and retry
+
+Choose Remove method from either row. Cancel keeps the method and returns focus to its menu. The first confirmed removal in this example fails after a short delay; retry completes it. Removing both methods leaves the empty section visible.
+
+<Story name='Removal' storyModule={Stories} />
 
 ### Read-only methods
 
