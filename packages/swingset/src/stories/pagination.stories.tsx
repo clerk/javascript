@@ -18,12 +18,10 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/pagination/pagination.tsx',
   styles: {
     _variants: {
-      size: { sm: {}, md: {}, lg: {} },
       hasFirstLast: { true: {}, false: {} },
       disabled: { true: {}, false: {} },
     },
     _defaultVariants: {
-      size: 'md',
       hasFirstLast: false,
       disabled: false,
     },
@@ -51,25 +49,6 @@ export function Primary(props: Record<string, unknown>) {
       }}
       {...knobsAsProps(props)}
     />
-  );
-}
-
-export function Sizes(props: Record<string, unknown>) {
-  const [page, setPage] = useState(3);
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {(['sm', 'md', 'lg'] as const).map(size => (
-        <Pagination
-          key={size}
-          {...knobsAsProps(props)}
-          page={page}
-          totalItems={100}
-          pageSize={10}
-          onChange={setPage}
-          size={size}
-        />
-      ))}
-    </div>
   );
 }
 

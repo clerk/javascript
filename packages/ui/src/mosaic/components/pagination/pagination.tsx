@@ -10,7 +10,7 @@ import { Icon } from '../icon';
 import { Select } from '../select';
 import { Text } from '../text';
 import { getPageItems } from './page-items';
-import { ellipsisSizes, styles } from './pagination.styles';
+import { styles } from './pagination.styles';
 
 export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChange'> {
   page: number;
@@ -22,7 +22,6 @@ export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChan
   hasFirstLast?: boolean;
   step?: number;
   siblingCount?: number;
-  size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   label?: string;
 }
@@ -32,12 +31,6 @@ function atLeast(value: number, min: number): number {
 }
 
 const defaultPageSizeOptions = [10, 25, 50, 100];
-
-const controlSizes = {
-  sm: { button: 'xs', icon: 'sm', text: 'xs' },
-  md: { button: 'sm', icon: 'sm', text: 'sm' },
-  lg: { button: 'md', icon: 'md', text: 'sm' },
-} as const;
 
 /**
  * Page navigation for a paged list. Renders a labelled `nav` with previous/next controls, the
@@ -62,7 +55,6 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     hasFirstLast = false,
     step = 1,
     siblingCount = 1,
-    size = 'md',
     disabled = false,
     label = 'Pagination',
     xstyle,
@@ -85,18 +77,17 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
   }, [pageSizeOptions, itemsPerPage]);
   const isFirst = current <= 1;
   const isLast = current >= pageCount;
-  const control = controlSizes[size];
 
   const pageDefaults = React.useMemo(
     () =>
       ({
         color: 'neutral',
         variant: 'ghost',
-        size: control.button,
+        size: 'sm',
         disabled,
         styles: styles.page,
       }) as const,
-    [control.button, disabled],
+    [disabled],
   );
 
   const goTo = (next: number) => onChange?.(Math.min(Math.max(next, 1), pageCount));
@@ -105,11 +96,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     <nav
       ref={ref}
       aria-label={label}
-      {...mergeStyleProps(
-        themeProps('pagination', { size, disabled }),
-        stylex.props(reset.base, styles.root, xstyle),
-        rest,
-      )}
+      {...mergeStyleProps(themeProps('pagination', { disabled }), stylex.props(reset.base, styles.root, xstyle), rest)}
     >
       <div {...mergeStyleProps(themeProps('pagination-controls'), stylex.props(reset.base, styles.controls))}>
         {hasFirstLast && (
@@ -117,7 +104,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
             aria-label='First page'
             color='neutral'
             variant='outline'
-            size={control.button}
+            size='sm'
             shape='square'
             touchTarget={false}
             disabled={disabled || isFirst}
@@ -125,7 +112,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           >
             <Icon
               name='chevron-double-left'
-              size={control.icon}
+              size='sm'
             />
           </Button>
         )}
@@ -133,7 +120,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           aria-label='Previous page'
           color='neutral'
           variant='outline'
-          size={control.button}
+          size='sm'
           shape='square'
           touchTarget={false}
           disabled={disabled || isFirst}
@@ -141,7 +128,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         >
           <Icon
             name='chevron-left'
-            size={control.icon}
+            size='sm'
           />
         </Button>
         <ButtonContext.Provider value={pageDefaults}>
@@ -159,14 +146,11 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               <span
                 key={item}
                 aria-hidden
-                {...mergeStyleProps(
-                  themeProps('pagination-ellipsis'),
-                  stylex.props(reset.base, styles.ellipsis, ellipsisSizes[size]),
-                )}
+                {...mergeStyleProps(themeProps('pagination-ellipsis'), stylex.props(reset.base, styles.ellipsis))}
               >
                 <Icon
                   name='ellipsis'
-                  size={control.icon}
+                  size='sm'
                 />
               </span>
             ),
@@ -176,7 +160,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           aria-label='Next page'
           color='neutral'
           variant='outline'
-          size={control.button}
+          size='sm'
           shape='square'
           touchTarget={false}
           disabled={disabled || isLast}
@@ -184,7 +168,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         >
           <Icon
             name='chevron-right'
-            size={control.icon}
+            size='sm'
           />
         </Button>
         {hasFirstLast && (
@@ -192,7 +176,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
             aria-label='Last page'
             color='neutral'
             variant='outline'
-            size={control.button}
+            size='sm'
             shape='square'
             touchTarget={false}
             disabled={disabled || isLast}
@@ -200,7 +184,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           >
             <Icon
               name='chevron-double-right'
-              size={control.icon}
+              size='sm'
             />
           </Button>
         )}
@@ -209,7 +193,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         <Text
           id={labelId}
           render={<span />}
-          size={control.text}
+          size='sm'
           color='neutral'
         >
           Results per page
@@ -226,12 +210,20 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               <Button
                 color='neutral'
                 variant='outline'
-                size={control.button}
+                size='sm'
                 {...props}
               />
             )}
           />
-          <Select.Popup />
+          <Select.Popup>
+            {pageSizeItems.map(item => (
+              <Select.Option
+                key={item.value}
+                xstyle={styles.pageSizeOption}
+                {...item}
+              />
+            ))}
+          </Select.Popup>
         </Select.Root>
       </div>
     </nav>

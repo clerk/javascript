@@ -117,7 +117,6 @@ import {
   Primary as PaginationPrimary,
   Siblings as PaginationSiblings,
   SinglePage as PaginationSinglePage,
-  Sizes as PaginationSizes,
 } from '../stories/pagination.stories';
 import {
   Default as PhoneInputDefault,
@@ -386,7 +385,6 @@ const inputGroupModule: StoryModule = {
 const paginationModule: StoryModule = {
   meta: paginationMeta,
   Primary: PaginationPrimary,
-  Sizes: PaginationSizes,
   FirstLast: PaginationFirstLast,
   Siblings: PaginationSiblings,
   SinglePage: PaginationSinglePage,

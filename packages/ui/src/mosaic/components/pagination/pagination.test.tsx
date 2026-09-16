@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { getPageItems } from './page-items';
 import { Pagination } from './pagination';
+import { styles } from './pagination.styles';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -58,7 +59,6 @@ describe('Mosaic Pagination', () => {
     );
     const nav = screen.getByRole('navigation', { name: 'Pagination' });
     expect(nav).toHaveClass('cl-pagination');
-    expect(nav).toHaveAttribute('data-size', 'md');
   });
 
   it('uses the label prop as the accessible name', () => {
@@ -237,6 +237,18 @@ describe('Mosaic Pagination', () => {
     await userEvent.click(screen.getByRole('combobox'));
     await userEvent.click(screen.getByRole('option', { name: '50' }));
     expect(onPageSizeChange).toHaveBeenCalledWith(50);
+  });
+
+  it('sizes the page size options to match the trigger', async () => {
+    render(
+      <Pagination
+        page={1}
+        totalItems={100}
+        pageSize={10}
+      />,
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    expect(screen.getByRole('option', { name: '10' })).toHaveClass(stylex.props(styles.pageSizeOption).className ?? '');
   });
 
   it('offers the given page sizes plus the current one', async () => {

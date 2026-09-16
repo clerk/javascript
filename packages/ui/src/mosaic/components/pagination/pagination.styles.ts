@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, space } from '../../tokens.stylex';
+import { colorVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
@@ -26,16 +26,19 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-foreground-secondary'],
     display: 'inline-flex',
     justifyContent: 'center',
+    height: space['7'],
+    width: space['7'],
   },
   pageSize: {
     gap: space['2'],
     alignItems: 'center',
     display: 'flex',
   },
-});
-
-export const ellipsisSizes = stylex.create({
-  sm: { height: space['6'], width: space['6'] },
-  md: { height: space['7'], width: space['7'] },
-  lg: { height: space['8'], width: space['8'] },
+  pageSizeOption: {
+    paddingBlock: 0,
+    paddingInline: space['2.5'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    minHeight: space['7'],
+  },
 });
