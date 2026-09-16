@@ -19,7 +19,7 @@ import * as Stories from './confirmation.stories';
 
 A confirmation for a destructive action that is worth a second look but not worth making the user type for. Removing a connected account, revoking a session, signing out everywhere. For the actions that do warrant typing, use [Destructive](/components/destructive).
 
-It is an `alertdialog`: it announces as an interruption, an outside press cannot answer it, and the card carries no corner dismiss — the footer is the only way out. Under the phone band it arrives as a bottom sheet.
+It is an `alertdialog`: it announces as an interruption, an outside press cannot dismiss it, and the card carries no corner dismiss. Escape and the footer's Cancel action dismiss it. Under the phone band it arrives as a bottom sheet.
 
 The block holds nothing of its own. Everything that decides what the dialog does next belongs to the caller. `open` closes it, `isConfirming` marks it busy, `errorMessage` explains a failure.
 
@@ -96,18 +96,18 @@ Opened from a menu item, focus returns to that menu's trigger when the dialog cl
 
 Controlled:
 
-| Prop           | Type                      | Default      | Description                                                                    |
-| -------------- | ------------------------- | ------------ | ------------------------------------------------------------------------------ |
-| `open`         | `boolean`                 | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.        |
-| `onOpenChange` | `(open: boolean) => void` | — (required) | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop. |
-| `trigger`      | `ReactNode`               | —            | The button that asks to open the dialog.                                       |
-| `title`        | `string`                  | — (required) | Names what is about to happen.                                                 |
-| `description`  | `ReactNode`               | — (required) | Spells out what it means. Takes markup, for a name to emphasise.               |
-| `actionLabel`  | `string`                  | — (required) | The destructive button's label.                                                |
-| `cancelLabel`  | `string`                  | `'Cancel'`   | The cancel button's label.                                                     |
-| `onConfirm`    | `() => void`              | — (required) | Asks the caller to run the action.                                             |
-| `isConfirming` | `boolean`                 | `false`      | Renders the action pending and ignores further presses.                        |
-| `errorMessage` | `string`                  | —            | Renders as a negative banner above the actions.                                |
+| Prop           | Type                      | Default      | Description                                                                                |
+| -------------- | ------------------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| `open`         | `boolean`                 | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.                    |
+| `onOpenChange` | `(open: boolean) => void` | — (required) | Asks to open or close. Fired by the trigger, Escape, and the `Dialog.Close` Cancel action. |
+| `trigger`      | `ReactNode`               | —            | The button that asks to open the dialog.                                                   |
+| `title`        | `string`                  | — (required) | Names what is about to happen.                                                             |
+| `description`  | `ReactNode`               | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                           |
+| `actionLabel`  | `string`                  | — (required) | The destructive button's label.                                                            |
+| `cancelLabel`  | `string`                  | `'Cancel'`   | The cancel button's label.                                                                 |
+| `onConfirm`    | `() => void`              | — (required) | Asks the caller to run the action.                                                         |
+| `isConfirming` | `boolean`                 | `false`      | Renders the action pending and ignores further presses.                                    |
+| `errorMessage` | `string`                  | —            | Renders as a negative banner above the actions.                                            |
 
 With a handle:
 

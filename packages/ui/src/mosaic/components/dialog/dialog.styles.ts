@@ -369,7 +369,7 @@ export const variants = stylex.create({
    * which is a `Profile` — so the frame comes from `Profile.Root`'s own styles and the popup
    * contributes geometry and motion only. Compose it by rendering the profile INSIDE the popup:
    *
-   *   <Dialog.Popup size='profile'><UserProfileView … /></Dialog.Popup>
+   *   <Dialog.Popup variant='profile'><UserProfileView … /></Dialog.Popup>
    *
    * The profile reads `DialogContext` from there — it names the dialog, carries its dismiss, and
    * fills the popup's height. Rendered with no dialog around it at all, the same surface is the
@@ -381,7 +381,7 @@ export const variants = stylex.create({
    * instead put two atoms for one property on the element, and StyleX cannot dedupe across
    * separate `stylex.props` calls, so the winner would fall to stylesheet order.
    *
-   * Consequence worth knowing: `size="profile"` with no surface inside renders an unpainted box.
+   * Consequence worth knowing: `variant="profile"` with no surface inside renders an unpainted box.
    */
   profile: {
     borderColor: null,

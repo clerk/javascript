@@ -34,7 +34,7 @@ interface ProfileContextValue {
    */
   registerPageTitle: (value: string, element: HTMLElement | null) => void;
   pageTitleFor: (value: string) => HTMLElement | null;
-  /** Flush: the page's own content — `elevation='flush'`, or an `inline` dialog. */
+  /** Flush: the page's own content, selected by `elevation='flush'`. */
   inline: boolean;
 }
 
@@ -86,7 +86,7 @@ export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'chi
    * How the surface sits in its host, the way `Card`'s does. `card` is framed: border, radius, a
    * fixed height with the pages scrolling inside. `flush` is the page's own content: no frame or
    * background, the page scrolls, the columns a gap apart. Over the page, in a `profile` dialog,
-   * the popup decides and this is moot; an `inline` dialog implies `flush`.
+   * the popup decides the geometry.
    *
    * @default 'card'
    */
@@ -178,8 +178,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
-              focus — the same reason `Card.Header` renders its dismiss first. Never inline, which
-              nothing closes. */}
+              focus — the same reason `Card.Header` renders its dismiss first. Only rendered
+              inside a dialog. */}
           {isInDialog(dialog) ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
