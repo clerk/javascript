@@ -39,12 +39,12 @@ const colorDefaults = {
   '--cl-color-background': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
   '--cl-color-background-subtle': neutralMix(3, 4),
 
-  '--cl-color-foreground': neutralMix(80, 98),
-  '--cl-color-foreground-secondary': neutralMix(43, 64),
-  '--cl-color-foreground-disabled': neutralMix(28, 44),
+  '--cl-color-foreground': neutralMix(79.5, 98),
+  '--cl-color-foreground-secondary': neutralMix(56, 64.25),
+  '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
-  '--cl-color-border': neutralMix(5, 8),
-  '--cl-color-border-subtle': neutralMix(3, 4),
+  '--cl-color-border': neutralMix(5.5, 8),
+  '--cl-color-border-subtle': neutralMix(3, 4.25),
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
   '--cl-color-brand-secondary': 'light-dark(oklch(0.5555 0 0), oklch(0.7155 0 0))',
