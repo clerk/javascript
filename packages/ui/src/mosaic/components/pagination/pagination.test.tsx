@@ -210,9 +210,10 @@ describe('Mosaic Pagination', () => {
     for (const button of screen.getAllByRole('button')) {
       expect(button).toBeDisabled();
     }
+    expect(screen.getByRole('combobox')).toBeDisabled();
   });
 
-  it('shows the page size in the results-per-page control', () => {
+  it('shows the page size in the results-per-page select', () => {
     render(
       <Pagination
         page={1}
@@ -220,7 +221,35 @@ describe('Mosaic Pagination', () => {
         pageSize={25}
       />,
     );
-    expect(screen.getByRole('button', { name: 'Results per page 25' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Results per page 25' })).toBeInTheDocument();
+  });
+
+  it('calls onPageSizeChange with the chosen page size', async () => {
+    const onPageSizeChange = vi.fn();
+    render(
+      <Pagination
+        page={1}
+        totalItems={100}
+        pageSize={10}
+        onPageSizeChange={onPageSizeChange}
+      />,
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    await userEvent.click(screen.getByRole('option', { name: '50' }));
+    expect(onPageSizeChange).toHaveBeenCalledWith(50);
+  });
+
+  it('offers the given page sizes plus the current one', async () => {
+    render(
+      <Pagination
+        page={1}
+        totalItems={100}
+        pageSize={15}
+        pageSizeOptions={[10, 20]}
+      />,
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual(['10', '15', '20']);
   });
 
   it('treats a page size below one as one', async () => {

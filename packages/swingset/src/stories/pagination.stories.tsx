@@ -38,12 +38,17 @@ function knobsAsProps(props: Record<string, unknown>) {
 
 export function Primary(props: Record<string, unknown>) {
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   return (
     <Pagination
       page={page}
       totalItems={100}
-      pageSize={10}
+      pageSize={pageSize}
       onChange={setPage}
+      onPageSizeChange={size => {
+        setPageSize(size);
+        setPage(1);
+      }}
       {...knobsAsProps(props)}
     />
   );

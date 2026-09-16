@@ -7,6 +7,7 @@ import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { ButtonContext } from '../button/button.context';
 import { Icon } from '../icon';
+import { Select } from '../select';
 import { Text } from '../text';
 import { getPageItems } from './page-items';
 import { ellipsisSizes, styles } from './pagination.styles';
@@ -16,6 +17,8 @@ export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChan
   totalItems: number;
   pageSize: number;
   onChange?: (page: number) => void;
+  pageSizeOptions?: number[];
+  onPageSizeChange?: (pageSize: number) => void;
   hasFirstLast?: boolean;
   step?: number;
   siblingCount?: number;
@@ -27,6 +30,8 @@ export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChan
 function atLeast(value: number, min: number): number {
   return Number.isFinite(value) && value > min ? Math.floor(value) : min;
 }
+
+const defaultPageSizeOptions = [10, 25, 50, 100];
 
 const controlSizes = {
   sm: { button: 'xs', icon: 'sm', text: 'xs' },
@@ -52,6 +57,8 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     totalItems,
     pageSize,
     onChange,
+    pageSizeOptions = defaultPageSizeOptions,
+    onPageSizeChange,
     hasFirstLast = false,
     step = 1,
     siblingCount = 1,
@@ -69,7 +76,13 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
   const pageCount = Math.max(1, Math.ceil(atLeast(totalItems, 0) / itemsPerPage));
   const current = Math.min(atLeast(page, 1), pageCount);
   const labelId = React.useId();
-  const pageSizeId = React.useId();
+  const pageSizeItems = React.useMemo(() => {
+    const sizes = pageSizeOptions.includes(itemsPerPage) ? pageSizeOptions : [...pageSizeOptions, itemsPerPage];
+    return sizes
+      .slice()
+      .sort((a, b) => a - b)
+      .map(size => ({ value: String(size), label: String(size) }));
+  }, [pageSizeOptions, itemsPerPage]);
   const isFirst = current <= 1;
   const isLast = current >= pageCount;
   const control = controlSizes[size];
@@ -201,21 +214,25 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         >
           Results per page
         </Text>
-        <Button
-          id={pageSizeId}
-          aria-labelledby={`${labelId} ${pageSizeId}`}
-          color='neutral'
-          variant='outline'
-          size={control.button}
-          disabled={disabled}
+        <Select.Root
+          items={pageSizeItems}
+          value={String(itemsPerPage)}
+          onValueChange={value => onPageSizeChange?.(Number(value))}
         >
-          {itemsPerPage}
-          <Icon
-            name='chevron-down'
-            placement='inline-end'
-            size={control.icon}
+          <Select.Trigger
+            aria-labelledby={labelId}
+            disabled={disabled}
+            render={props => (
+              <Button
+                color='neutral'
+                variant='outline'
+                size={control.button}
+                {...props}
+              />
+            )}
           />
-        </Button>
+          <Select.Popup />
+        </Select.Root>
       </div>
     </nav>
   );
