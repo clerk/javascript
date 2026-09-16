@@ -4,7 +4,7 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfileEmail } from './user-profile-account-section.types';
 import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
@@ -124,7 +124,7 @@ export function UserProfileEmailRowView({
         <Confirmation
           handle={removeEmailConfirmation}
           title={m.email.removeDialog.title}
-          description={describeEmailRemoval}
+          description={email => fill(m.email.removeDialog.description, { emailAddress: email.value })}
           actionLabel={m.email.removeDialog.confirm}
           cancelLabel={m.email.removeDialog.cancel}
           onConfirm={email => onRemoveEmail(email.id)}
@@ -157,13 +157,5 @@ function AddEmail({ options, compact }: { options: UserProfileAddEmailController
         </Button>
       }
     />
-  );
-}
-
-function describeEmailRemoval(email: UserProfileEmail) {
-  return (
-    <>
-      <strong>{email.value}</strong> will be removed from your account. You won’t be able to use it to sign in.
-    </>
   );
 }

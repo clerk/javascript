@@ -5,7 +5,7 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { fill, userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
@@ -110,7 +110,9 @@ export function UserProfilePhoneRowView({
         <Confirmation
           handle={removePhoneConfirmation}
           title={m.phone.removeDialog.title}
-          description={describePhoneRemoval}
+          description={phone =>
+            fill(m.phone.removeDialog.description, { phoneNumber: stringToFormattedPhoneString(phone.value) })
+          }
           actionLabel={m.phone.removeDialog.confirm}
           cancelLabel={m.phone.removeDialog.cancel}
           onConfirm={phone => onRemovePhone(phone.id)}
@@ -143,14 +145,5 @@ function AddPhone({ options, compact }: { options: UserProfileAddPhoneController
         </Button>
       }
     />
-  );
-}
-
-function describePhoneRemoval(phone: UserProfilePhone) {
-  return (
-    <>
-      <strong>{stringToFormattedPhoneString(phone.value)}</strong> will be removed from your account. You won’t be able
-      to use it to sign in.
-    </>
   );
 }

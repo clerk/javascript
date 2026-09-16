@@ -8,6 +8,7 @@ import { Dialog } from '../../../components/dialog';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
 import { styles as profileStyles } from '../user-profile-profile-panel.styles';
+import { fill } from './user-profile-account-section.messages';
 import { userProfileVerifyEmailLinkMessages as m } from './user-profile-verify-email-link.messages';
 import { styles } from './user-profile-verify-email-link.styles';
 
@@ -66,9 +67,7 @@ export function UserProfileVerifyEmailLinkDialog({
               <Text xstyle={styles.emphasis}>{m.waiting}</Text>
             </div>
             <div {...stylex.props(styles.details)}>
-              <Card.Description>
-                A verification link was sent to <strong>{emailAddress}</strong>
-              </Card.Description>
+              <Card.Description>{fill(m.description, { emailAddress })}</Card.Description>
               <Button
                 type='button'
                 size='sm'
