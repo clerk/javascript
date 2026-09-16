@@ -114,9 +114,6 @@ export const option = stylex.create({
     outlineOffset: 0,
     position: 'relative',
     textAlign: 'start',
-    transitionDuration: durationVars['--cl-duration-base'],
-    transitionProperty: 'background-color',
-    transitionTimingFunction: 'linear',
     minHeight: space['8'],
     width: '100%',
     // Extends the hit area over the gaps between rows, as Menu items do.
