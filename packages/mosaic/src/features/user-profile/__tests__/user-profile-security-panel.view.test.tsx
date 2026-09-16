@@ -95,6 +95,7 @@ describe('UserProfileSecurityPanelView', () => {
       onRenamePasskey,
       onRemovePasskey,
       onAddMfaMethod,
+      addableMfaMethods: ['authenticator'],
       onSignOutDevice,
       onSignOutAllOtherDevices,
       onDeleteAccount,
@@ -102,8 +103,10 @@ describe('UserProfileSecurityPanelView', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(screen.queryByRole('menuitem', { name: 'SMS verification' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
+    expect(screen.queryByRole('radio', { name: 'SMS verification' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: 'Authenticator app' }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
@@ -149,6 +152,7 @@ describe('UserProfileSecurityPanelView', () => {
       devices: [],
       onAddPasskey: vi.fn(),
       onAddMfaMethod: vi.fn(),
+      addableMfaMethods: ['sms', 'authenticator'],
     });
 
     expect(screen.getByText('No passkeys added')).toBeInTheDocument();

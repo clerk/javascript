@@ -40,6 +40,7 @@ export interface UserProfileSecurityPanelViewProps
   passkeys?: UserProfilePasskey[];
   passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
+  addableMfaMethods?: readonly UserProfileMfaAddableMethod[];
   devices?: UserProfileDevice[];
   onAddPasskey?: () => void;
   addPasskeyError?: string;
@@ -60,6 +61,7 @@ export function UserProfileSecurityPanelView({
   passkeys,
   passkeysVisible = true,
   mfaMethods,
+  addableMfaMethods,
   devices,
   onSubmitPassword,
   onAddPasskey,
@@ -104,6 +106,7 @@ export function UserProfileSecurityPanelView({
           {mfaMethods !== undefined ? (
             <UserProfileMfaSectionView
               methods={mfaMethods}
+              addableMethods={addableMfaMethods}
               sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
               onAdd={onAddMfaMethod}
               onRegenerateBackupCodes={onRegenerateBackupCodes}

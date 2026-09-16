@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
-import { Button } from '../../components/button';
-import { Icon } from '../../components/icon';
-import { Menu } from '../../components/menu';
 import { fill } from '../../utils/messages';
+import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
 import { useUserProfileMfaSectionController } from './user-profile-mfa-section.controller';
 import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
@@ -20,10 +18,11 @@ export interface UserProfileMfaMethod {
   canSetDefault?: boolean;
 }
 
-export type UserProfileMfaAddableMethod = Extract<UserProfileMfaMethod['type'], 'sms' | 'authenticator'>;
+export type UserProfileMfaAddableMethod = UserProfileMfaMethod['type'];
 
 export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];
+  addableMethods?: readonly UserProfileMfaAddableMethod[];
   sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
@@ -31,10 +30,9 @@ export interface UserProfileMfaSectionViewProps {
   onSetDefault?: (id: string) => void | Promise<void>;
 }
 
-const addableMethods: UserProfileMfaAddableMethod[] = ['sms', 'authenticator'];
-
 export function UserProfileMfaSectionView({
   methods,
+  addableMethods = [],
   sectionTitle,
   onAdd,
   onRegenerateBackupCodes,
@@ -44,45 +42,17 @@ export function UserProfileMfaSectionView({
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const controller = useUserProfileMfaSectionController({ methods, onSetDefault });
   const isSettingDefault = controller.pendingMethodId !== undefined;
-  const availableMethods = addableMethods.filter(type => !methods.some(method => method.type === type));
 
   return (
     <>
       <UserProfileSecurityList
         addControl={
-          onAdd && availableMethods.length > 0 ? (
-            <Menu.Root placement='bottom-end'>
-              <Menu.Trigger
-                aria-label={m.addLabel}
-                disabled={isSettingDefault}
-                render={props => (
-                  <Button
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    {...props}
-                  />
-                )}
-              >
-                <Icon
-                  name='plus'
-                  placement='inline-start'
-                  size='sm'
-                />
-                {m.add}
-              </Menu.Trigger>
-              <Menu.Popup>
-                {availableMethods.map(type => (
-                  <Menu.Item
-                    key={type}
-                    label={m.methods[type]}
-                    onClick={() => onAdd(type)}
-                  >
-                    <Menu.Label>{m.methods[type]}</Menu.Label>
-                  </Menu.Item>
-                ))}
-              </Menu.Popup>
-            </Menu.Root>
+          onAdd && addableMethods.length > 0 ? (
+            <UserProfileAddMfaDialog
+              methods={addableMethods}
+              onContinue={onAdd}
+              disabled={isSettingDefault}
+            />
           ) : null
         }
         addLabel={m.addLabel}
