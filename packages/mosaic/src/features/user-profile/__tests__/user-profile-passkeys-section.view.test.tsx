@@ -28,13 +28,13 @@ function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}
 }
 
 describe('passkeys section', () => {
-  it('hides existing passkeys and their actions when the caller hides the section', () => {
-    renderView({ isVisible: false, sectionTitle: 'Authentication' });
+  it('shows existing passkeys without actions when their callbacks are unavailable', () => {
+    renderView({ onAdd: undefined, onRename: undefined, onRemove: undefined, sectionTitle: 'Authentication' });
 
-    expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
-    expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
-    expect(screen.queryByText('MacBook')).not.toBeInTheDocument();
-    expect(screen.queryByText('iPhone')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByText('MacBook')).toBeVisible();
+    expect(screen.getByText('iPhone')).toBeVisible();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 

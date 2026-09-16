@@ -16,21 +16,20 @@ Manage passkey names and confirm removal. These examples mock creation; browser 
 
 ## Props
 
-| Prop           | Type                                                  | Default      | Description                                                                         |
-| -------------- | ----------------------------------------------------- | ------------ | ----------------------------------------------------------------------------------- |
-| `passkeys`     | `UserProfilePasskey[]`                                | — (required) | Names and formatted creation/last-used labels.                                      |
-| `isVisible`    | `boolean`                                             | `true`       | Caller-derived section visibility, independent of Add availability and list length. |
-| `sectionTitle` | `string`                                              | —            | Optional surrounding section heading.                                               |
-| `onAdd`        | `() => void`                                          | —            | Shows Add when supplied.                                                            |
-| `addError`     | `string`                                              | —            | Inline creation error.                                                              |
-| `onRename`     | `(id: string, name: string) => void \| Promise<void>` | —            | Resolve to close; reject with an Error to display the failure.                      |
-| `onRemove`     | `(id: string) => void \| Promise<void>`               | —            | Shared confirmation awaits removal and displays rejected errors.                    |
+| Prop           | Type                                                  | Default      | Description                                                      |
+| -------------- | ----------------------------------------------------- | ------------ | ---------------------------------------------------------------- |
+| `passkeys`     | `UserProfilePasskey[]`                                | — (required) | Names and formatted creation/last-used labels.                   |
+| `sectionTitle` | `string`                                              | —            | Optional surrounding section heading.                            |
+| `onAdd`        | `() => void`                                          | —            | Shows Add when supplied.                                         |
+| `addError`     | `string`                                              | —            | Inline creation error.                                           |
+| `onRename`     | `(id: string, name: string) => void \| Promise<void>` | —            | Resolve to close; reject with an Error to display the failure.   |
+| `onRemove`     | `(id: string) => void \| Promise<void>`               | —            | Shared confirmation awaits removal and displays rejected errors. |
 
 ## Usage
 
 ### Legacy visibility
 
-Legacy hides the entire section when passkeys are disabled for the instance or identification creation is disallowed, even if the user already has passkeys. Future model/controller wiring must express that decision with `isVisible={false}` (`passkeysVisible={false}` in the Security panel). These views do not read instance settings themselves.
+Legacy hides the entire section when passkeys are disabled for the instance or identification creation is disallowed, even if the user already has passkeys. The caller conditionally renders the section using that policy decision. The Security panel accepts `passkeysVisible={false}` to omit it; future model/controller wiring supplies that value. The section itself always renders when mounted and does not read instance settings.
 
 On a satellite domain, an otherwise visible section remains visible even when empty; only Add is unavailable. Represent that by omitting `onAdd`, without hiding the section.
 

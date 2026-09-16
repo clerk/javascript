@@ -17,7 +17,6 @@ export interface UserProfilePasskey {
 
 export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
-  isVisible?: boolean;
   sectionTitle?: string;
   onAdd?: () => void;
   addError?: string;
@@ -27,7 +26,6 @@ export interface UserProfilePasskeysSectionViewProps {
 
 export function UserProfilePasskeysSectionView({
   passkeys,
-  isVisible = true,
   sectionTitle,
   onAdd,
   addError,
@@ -35,10 +33,6 @@ export function UserProfilePasskeysSectionView({
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
   const removePasskey = useMemo(() => Confirmation.createHandle<UserProfilePasskey>(), []);
-
-  if (!isVisible) {
-    return null;
-  }
 
   return (
     <>

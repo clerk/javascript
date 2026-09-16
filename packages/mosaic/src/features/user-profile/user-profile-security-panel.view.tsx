@@ -89,10 +89,9 @@ export function UserProfileSecurityPanelView({
               onSubmitPassword={onSubmitPassword}
             />
           ) : null}
-          {passkeys !== undefined ? (
+          {showPasskeys ? (
             <UserProfilePasskeysSectionView
               passkeys={passkeys}
-              isVisible={passkeysVisible}
               sectionTitle={showPassword ? undefined : 'Authentication'}
               onAdd={onAddPasskey}
               addError={addPasskeyError}
