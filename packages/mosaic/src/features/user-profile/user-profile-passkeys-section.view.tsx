@@ -22,7 +22,6 @@ export interface UserProfilePasskeysSectionViewProps {
   onAdd?: () => void;
   addError?: string;
   onRename?: (id: string, name: string) => void | Promise<void>;
-  onManage?: (id: string) => void;
   onRemove?: (id: string) => void | Promise<void>;
 }
 
@@ -33,7 +32,6 @@ export function UserProfilePasskeysSectionView({
   onAdd,
   addError,
   onRename,
-  onManage,
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
   const removePasskey = useMemo(() => Confirmation.createHandle<UserProfilePasskey>(), []);
@@ -79,7 +77,6 @@ export function UserProfilePasskeysSectionView({
                     key={passkey.id}
                     passkey={passkey}
                     onRename={onRename}
-                    onManage={onManage}
                     onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
                   />
                 ))}

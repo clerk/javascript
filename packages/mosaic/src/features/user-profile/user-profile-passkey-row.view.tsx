@@ -16,12 +16,10 @@ import { UserProfileRenamePasskeyDialog } from './user-profile-rename-passkey.di
 export function UserProfilePasskeyRowView({
   passkey,
   onRename,
-  onManage,
   onRemove,
 }: {
   passkey: UserProfilePasskey;
   onRename?: (id: string, name: string) => void | Promise<void>;
-  onManage?: (id: string) => void;
   onRemove?: () => void;
 }) {
   const renameDialog = useMemo(() => Dialog.createHandle(), []);
@@ -34,8 +32,6 @@ export function UserProfilePasskeyRowView({
   const actions: UserProfileMenuAction[] = [];
   if (onRename) {
     actions.push({ label: m.rename, onClick: () => renameDialog.open(undefined) });
-  } else if (onManage) {
-    actions.push({ label: m.rename, onClick: () => onManage(passkey.id) });
   }
   if (onRemove) {
     actions.push({ label: m.removeAction, color: 'negative', onClick: onRemove });
