@@ -229,7 +229,7 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
   });
 
-  it('only shows backup codes with another verification method and only allows regeneration', async () => {
+  it('shows supplied backup codes independently and only allows regeneration', async () => {
     const onRegenerateBackupCodes = vi.fn();
     const onRemoveMfaMethod = vi.fn();
     const backupCodes = { id: 'backup_1', type: 'backup-codes' as const };
@@ -239,7 +239,7 @@ describe('UserProfileSecurityPanelView', () => {
       onRemoveMfaMethod,
     });
 
-    expect(screen.queryByText('Backup codes')).not.toBeInTheDocument();
+    expect(screen.getByText('Backup codes')).toBeVisible();
     backupOnlyView.unmount();
 
     const user = userEvent.setup();

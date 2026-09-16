@@ -1,10 +1,8 @@
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Menu } from '../../components/menu';
-import { Section } from '../../components/section';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { UserProfileSecurityIcon } from './user-profile-security-icon';
+import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
+import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
 import { UserProfileSecurityList } from './user-profile-security-list';
 
 export interface UserProfileMfaMethod {
@@ -12,6 +10,9 @@ export interface UserProfileMfaMethod {
   type: 'sms' | 'authenticator' | 'backup-codes';
   label?: string;
   description?: string;
+  isDefault?: boolean;
+  canRemove?: boolean;
+  canSetDefault?: boolean;
 }
 
 export type UserProfileMfaAddableMethod = Extract<UserProfileMfaMethod['type'], 'sms' | 'authenticator'>;
@@ -22,13 +23,8 @@ export interface UserProfileMfaSectionViewProps {
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void;
+  onSetDefault?: (id: string) => void;
 }
-
-const labels: Record<UserProfileMfaMethod['type'], string> = {
-  sms: 'SMS verification',
-  authenticator: 'Authenticator app',
-  'backup-codes': 'Backup codes',
-};
 
 const addableMethods: UserProfileMfaAddableMethod[] = ['sms', 'authenticator'];
 
@@ -38,10 +34,9 @@ export function UserProfileMfaSectionView({
   onAdd,
   onRegenerateBackupCodes,
   onRemove,
+  onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const availableMethods = addableMethods.filter(type => !methods.some(method => method.type === type));
-  const hasConfiguredMethod = methods.some(method => method.type === 'sms' || method.type === 'authenticator');
-  const visibleMethods = methods.filter(method => method.type !== 'backup-codes' || hasConfiguredMethod);
 
   return (
     <UserProfileSecurityList
@@ -49,7 +44,7 @@ export function UserProfileMfaSectionView({
         onAdd && availableMethods.length > 0 ? (
           <Menu.Root placement='bottom-end'>
             <Menu.Trigger
-              aria-label='Add verification method'
+              aria-label={m.addLabel}
               render={props => (
                 <Button
                   color='neutral'
@@ -64,59 +59,37 @@ export function UserProfileMfaSectionView({
                 placement='inline-start'
                 size='sm'
               />
-              Add
+              {m.add}
             </Menu.Trigger>
             <Menu.Popup>
               {availableMethods.map(type => (
                 <Menu.Item
                   key={type}
-                  label={labels[type]}
+                  label={m.methods[type]}
                   onClick={() => onAdd(type)}
                 >
-                  <Menu.Label>{labels[type]}</Menu.Label>
+                  <Menu.Label>{m.methods[type]}</Menu.Label>
                 </Menu.Item>
               ))}
             </Menu.Popup>
           </Menu.Root>
         ) : null
       }
-      addLabel='Add verification method'
-      emptyLabel='No verification methods added'
-      hasItems={visibleMethods.length > 0}
-      label='2-step verification'
+      addLabel={m.addLabel}
+      emptyLabel={m.empty}
+      hasItems={methods.length > 0}
+      label={m.label}
       sectionTitle={sectionTitle}
     >
-      {visibleMethods.map(method => {
-        const label = method.label ?? labels[method.type];
-        const actions: UserProfileMenuAction[] = [];
-
-        if (method.type === 'backup-codes') {
-          if (onRegenerateBackupCodes) {
-            actions.push({
-              label: 'Regenerate',
-              onClick: onRegenerateBackupCodes,
-            });
-          }
-        } else if (onRemove) {
-          actions.push({ label: 'Remove method', color: 'negative', onClick: () => onRemove(method.id) });
-        }
-
-        return (
-          <Section.Item key={method.id}>
-            <UserProfileSecurityIcon name={method.type} />
-            <Section.Content>
-              <Section.Label>{label}</Section.Label>
-              {method.description ? <Section.Description>{method.description}</Section.Description> : null}
-            </Section.Content>
-            <Section.Actions>
-              <UserProfileActionMenu
-                actions={actions}
-                label={`Manage ${label}`}
-              />
-            </Section.Actions>
-          </Section.Item>
-        );
-      })}
+      {methods.map(method => (
+        <UserProfileMfaRowView
+          key={method.id}
+          method={method}
+          onRemove={onRemove}
+          onSetDefault={onSetDefault}
+          onRegenerateBackupCodes={onRegenerateBackupCodes}
+        />
+      ))}
     </UserProfileSecurityList>
   );
 }

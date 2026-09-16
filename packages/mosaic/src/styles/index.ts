@@ -209,3 +209,4 @@ export type SpacingVarName = keyof typeof spacingVars;
 export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';
+export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
