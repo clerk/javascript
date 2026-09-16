@@ -1,6 +1,7 @@
 import type { UserProfilePasskey } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
-import { useState } from 'react';
+import type { ReactElement } from 'react';
+import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -15,46 +16,65 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/features/user-profile/user-profile-passkeys-section.view.tsx',
 };
 
-export function Default() {
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
-    {
-      id: 'passkey',
-      name: 'Passkey',
-      createdAtLabel: 'Created today at 10:12 PM',
-      lastUsedAtLabel: 'Last used 1h ago',
-    },
-  ]);
+function PasskeysExample({ empty = false, failOnce = false }: { empty?: boolean; failOnce?: boolean }): ReactElement {
+  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>(
+    empty
+      ? []
+      : [
+          { id: 'laptop', name: 'MacBook', createdAtLabel: 'Created today', lastUsedAtLabel: 'Last used 1 hour ago' },
+          { id: 'phone', name: 'iPhone', createdAtLabel: 'Created yesterday' },
+        ],
+  );
+  const [addError, setAddError] = useState<string>();
+  const failures = useRef(new Set<string>());
+  const nextId = useRef(1);
+
+  const attempt = async (action: string) => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    if (failOnce && !failures.current.has(action)) {
+      failures.current.add(action);
+      throw new Error('Something went wrong. Please try again.');
+    }
+  };
 
   return (
     <UserProfilePasskeysSectionView
       passkeys={passkeys}
       sectionTitle='Authentication'
-      onAdd={() =>
+      addError={addError}
+      onAdd={() => {
+        if (failOnce && !failures.current.has('add')) {
+          failures.current.add('add');
+          setAddError('Could not create a passkey. Please try again.');
+          return;
+        }
+        setAddError(undefined);
+        const id = nextId.current++;
         setPasskeys(current => [
           ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ])
-      }
-      onManage={() => undefined}
-      onRemove={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
+          { id: `new-${id}`, name: `New passkey ${id}`, createdAtLabel: 'Created just now' },
+        ]);
+      }}
+      onRename={async (id, name) => {
+        await attempt('rename');
+        setPasskeys(current => current.map(passkey => (passkey.id === id ? { ...passkey, name } : passkey)));
+      }}
+      onRemove={async id => {
+        await attempt('remove');
+        setPasskeys(current => current.filter(passkey => passkey.id !== id));
+      }}
     />
   );
 }
 
-export function Empty() {
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([]);
+export function Default(): ReactElement {
+  return <PasskeysExample />;
+}
 
-  return (
-    <UserProfilePasskeysSectionView
-      passkeys={passkeys}
-      sectionTitle='Authentication'
-      onAdd={() =>
-        setPasskeys(current => [
-          ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ])
-      }
-      onRemove={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
-    />
-  );
+export function Empty(): ReactElement {
+  return <PasskeysExample empty />;
+}
+
+export function RecoverableErrors(): ReactElement {
+  return <PasskeysExample failOnce />;
 }

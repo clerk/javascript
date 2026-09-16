@@ -304,6 +304,7 @@ import {
 import {
   Default as UserProfilePasskeysSectionDefault,
   Empty as UserProfilePasskeysSectionEmpty,
+  RecoverableErrors as UserProfilePasskeysSectionRecoverableErrors,
   meta as userProfilePasskeysSectionMeta,
 } from '../stories/user-profile-passkeys-section.stories';
 import {
@@ -651,6 +652,7 @@ const userProfilePasskeysSectionModule: StoryModule = {
   meta: userProfilePasskeysSectionMeta,
   Default: UserProfilePasskeysSectionDefault,
   Empty: UserProfilePasskeysSectionEmpty,
+  RecoverableErrors: UserProfilePasskeysSectionRecoverableErrors,
 };
 const userProfileMfaSectionModule: StoryModule = {
   meta: userProfileMfaSectionMeta,

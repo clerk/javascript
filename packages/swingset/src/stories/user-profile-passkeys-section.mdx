@@ -2,16 +2,39 @@ import * as Stories from './user-profile-passkeys-section.stories';
 
 # UserProfilePasskeysSection
 
-Passkey management composed with the shared Security list treatment.
+Manage passkey names and confirm removal. These examples mock creation; browser and authenticator interactions belong to the controller.
 
-<Story
-  name='Default'
-  storyModule={Stories}
-  composition={[{ name: 'Section', href: '/components/section', layer: 'Components' }]}
-/>
+## Playground
 
-<Story
-  name='Empty'
-  storyModule={Stories}
-  composition={[{ name: 'Section', href: '/components/section', layer: 'Components' }]}
-/>
+<Story name='Default' storyModule={Stories} composition={[
+  { name: 'Section', href: '/components/section', layer: 'Components' },
+  { name: 'Button', href: '/components/button', layer: 'Components' },
+  { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+  { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
+]} />
+
+## Props
+
+| Prop           | Type                                                  | Default      | Description                                                      |
+| -------------- | ----------------------------------------------------- | ------------ | ---------------------------------------------------------------- |
+| `passkeys`     | `UserProfilePasskey[]`                                | — (required) | Names and formatted creation/last-used labels.                   |
+| `sectionTitle` | `string`                                              | —            | Optional surrounding section heading.                            |
+| `onAdd`        | `() => void`                                          | —            | Shows Add when supplied.                                         |
+| `addError`     | `string`                                              | —            | Inline creation error.                                           |
+| `onRename`     | `(id: string, name: string) => void \| Promise<void>` | —            | Resolve to close; reject with an Error to display the failure.   |
+| `onRemove`     | `(id: string) => void \| Promise<void>`               | —            | Shared confirmation awaits removal and displays rejected errors. |
+
+## Usage
+
+### No passkeys yet
+
+Add remains available after removing the final passkey. With neither passkeys nor an Add callback, the section is hidden.
+
+<Story name='Empty' storyModule={Stories} />
+
+### Recoverable errors
+
+The first Add, Rename, and Remove attempt fails. Retry completes the action; saving and removal use a short simulated delay.
+
+<Story name='RecoverableErrors' storyModule={Stories} />
