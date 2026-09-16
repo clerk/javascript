@@ -255,7 +255,13 @@ export function Stacked() {
     <Dialog.Root
       dismissOn='escape'
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={next => {
+        if (next) {
+          setOpen(true);
+        } else {
+          close();
+        }
+      }}
     >
       <Dialog.Trigger render={editProfileTrigger} />
       <Dialog.Popup initialFocus={nameRef}>
