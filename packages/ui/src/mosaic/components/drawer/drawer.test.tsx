@@ -81,7 +81,7 @@ describe('Drawer', () => {
     const inDialog = render(
       <MosaicProvider>
         <Dialog.Root defaultOpen>
-          <Dialog.Popup size='profile'>
+          <Dialog.Popup variant='profile'>
             <Sheet />
           </Dialog.Popup>
         </Dialog.Root>

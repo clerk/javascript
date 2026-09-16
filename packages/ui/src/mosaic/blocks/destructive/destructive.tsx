@@ -102,7 +102,7 @@ export function Destructive({
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <Dialog.Popup size='card'>
+      <Dialog.Popup variant='card'>
         <Card.Root
           elevation='overlay'
           renderBranding={false}

@@ -322,7 +322,7 @@ describe('Profile', () => {
       return render(
         <MosaicProvider>
           <Dialog.Root defaultOpen>
-            <Dialog.Popup size='profile'>
+            <Dialog.Popup variant='profile'>
               <Surface />
             </Dialog.Popup>
           </Dialog.Root>

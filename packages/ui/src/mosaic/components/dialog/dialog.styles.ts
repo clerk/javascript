@@ -3,11 +3,11 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
 
 // How far the contents of a surface beneath a stacked dialog are veiled toward its own background.
-// Declared up here rather than beside `STACK_SCALE` further down because `sizes` reads it, and
+// Declared up here rather than beside `STACK_SCALE` further down because `variants` reads it, and
 // StyleX requires a referenced constant to be declared before the `create()` call that reads it.
 const STACK_VEIL_OPACITY = 0.4;
 
-// The card's width cap, read by `sizes.card` and restated by `compactPlacements.sheet` — which
+// The card's width cap, read by `variants.card` and restated by `compactPlacements.sheet` — which
 // has to declare `max-width` itself to lift it in the compact band, and would otherwise fork the
 // value.
 const CARD_MAX_WIDTH = '25rem';
@@ -31,7 +31,7 @@ const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
  * winner to source order, which `@stylexjs/sort-keys` reorders on autofix — and its string sort
  * would put a future `100rem` band BEFORE `48rem`, silently inverting the ladder.
  *
- * `prefers-reduced-motion` and `forced-colors` stay `@media`: they are preferences, not sizes.
+ * `prefers-reduced-motion` and `forced-colors` stay `@media`: they are preferences, not widths.
  */
 // `48rem` is also the Profile's compact band (`compact` in `profile.styles.ts`); the two must agree.
 const PHONE = '@container cl-dialog (width < 48rem)';
@@ -81,16 +81,16 @@ export const styles = stylex.create({
   /**
    * The headless viewport element, inside the `FloatingOverlay` that owns the fixed positioning
    * and the scroll lock. Two jobs: it is the query container every band reads — see `PHONE` and
-   * friends above — and it is the box the sizes measure against. Whether that box is a fixed
-   * height or grows with its content is the whole outside-scroll question, and it differs per
-   * size — see `viewportSizes` below.
+   * friends above — and it is the box each variant is measured against. Whether that box is a
+   * fixed height or grows with its content is the whole outside-scroll question, and it differs
+   * per variant — see `viewportVariants` below.
    *
    * It carries NO band of its own, and cannot: an element is never its own query container, so a
    * `@container cl-dialog` rule on this element would resolve against some OUTER dialog's viewport
    * — or nothing. Everything width-dependent lives on `track`, the padded grid inside it.
    *
    * `inline-size` rather than `size`: block-size containment would stop the box growing with its
-   * content, which is exactly what the outside-scroll sizes need it to do, and no band queries
+   * content, which is exactly what the outside-scroll variants need it to do, and no band queries
    * height. A grid so the track fills it: an `auto` row stretches to the container's used height,
    * `min-height` included, which is what hands the track a definite box to centre within.
    */
@@ -143,7 +143,7 @@ export const styles = stylex.create({
     // so it is inert until `acquireKeyboardInset` has something to report.
     paddingBlockEnd: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
     // A grid item's automatic minimum would otherwise hold this to its content and defeat the
-    // definite row `viewportSizes.profile` pins.
+    // definite row `viewportVariants.profile` pins.
     minHeight: 0,
     width: '100%',
   },
@@ -172,7 +172,7 @@ export const styles = stylex.create({
      * paint over it and stay undimmed. Never interactive: the whole subtree is inert while a
      * stacked dialog holds focus, and `pointer-events: none` keeps it that way regardless.
      *
-     * The variable itself is set per size — only `card` sets it, in `sizes` below — so this
+     * The variable itself is set per variant — only `card` sets it, in `variants` below — so this
      * reads `0` on a `profile`, which gets a scrim of its own between it and what it hosts and
      * would otherwise dim as well as darken.
      */
@@ -189,7 +189,7 @@ export const styles = stylex.create({
     borderColor: { default: null, '@media (forced-colors: active)': 'CanvasText' },
     // No paint of its own, but the radius is what the HCM border above and the veil below trace,
     // and both are standing in for a surface. Matches `Card`'s own radius, which is what they
-    // trace in practice; `sizes.profile` nulls it, since a profile owns its corners at every band.
+    // trace in practice; `variants.profile` nulls it, since a profile owns its corners at every band.
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: { default: null, '@media (forced-colors: active)': 'solid' },
     borderWidth: { default: null, '@media (forced-colors: active)': '1px' },
@@ -232,7 +232,7 @@ export const styles = stylex.create({
    * participates in the column's `gap` and a consumer can render it anywhere in the children
    * without the layout moving.
    *
-   * It stays put on a `profile` because the popup itself never scrolls — see `sizes.profile`. An
+   * It stays put on a `profile` because the popup itself never scrolls — see `variants.profile`. An
    * absolutely positioned child of a scroll container scrolls away with the content, so the
    * scroll region has to live in the profile's children, not on the popup.
    *
@@ -306,7 +306,7 @@ export const closeInsets = stylex.create({
  * instead: the padding travels with the content, and short dialogs still fill the overlay so the
  * track has something to centre against.
  */
-export const viewportSizes = stylex.create({
+export const viewportVariants = stylex.create({
   card: { minHeight: '100%' },
   profile: {
     // A definite container height is NOT enough on its own: an `auto` grid row still sizes to its
@@ -314,11 +314,11 @@ export const viewportSizes = stylex.create({
     // inside a 1251px overlay. `minmax(0, 1fr)` pins the single row to the content box, so the row
     // is what an item stretches to and what its overflow is measured against.
     //
-    // Deliberately NOT applied to the scrolling sizes: it would clamp the row there too, which is
+    // Deliberately NOT applied to the scrolling variants: it would clamp the row there too, which is
     // exactly what has to stop happening for the popup to grow past the fold.
     gridTemplateRows: 'minmax(0, 1fr)',
     // A DEFINITE height, taken from the overlay (`position: fixed; inset: 0`), which makes the
-    // single grid row definite too. That is what lets `sizes.profile` fill the content box with
+    // single grid row definite too. That is what lets `variants.profile` fill the content box with
     // `align-self: stretch` alone — no `dvh` arithmetic, so nothing can disagree with the box a
     // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
     // overlay measures 1251px while `100dvh` reports 844.
@@ -327,7 +327,7 @@ export const viewportSizes = stylex.create({
 });
 
 /** The per-size half of `styles.track` — the rules that need the band, and so must sit inside the container. */
-export const trackSizes = stylex.create({
+export const trackVariants = stylex.create({
   card: {},
   profile: {
     // Under the phone band a profile takes the whole screen: it is the page there, not a surface
@@ -346,7 +346,7 @@ export const trackSizes = stylex.create({
   },
 });
 
-export const sizes = stylex.create({
+export const variants = stylex.create({
   // The surface is a `Card` — so it comes from `Card`'s own `elevations.overlay`, and the popup
   // contributes geometry and motion. Compose it by rendering the card INSIDE the popup:
   //
@@ -437,7 +437,7 @@ export const compactPlacements = stylex.create({
     // shared: bottom-aligning there would drag a centred dialog down with it.
     //
     // The popup's own cap is lifted at the same time so it spans the width the inset leaves, and
-    // the surface inside decides how much of that it takes. `default` restates `sizes.card`'s cap
+    // the surface inside decides how much of that it takes. `default` restates `variants.card`'s cap
     // rather than leaving it to the cascade: this cell is spread after that one in the same
     // `stylex.props` call, so StyleX dedupes `max-width` to whatever is written here. Both read
     // the same constant, so there is one value to retune.
@@ -446,7 +446,7 @@ export const compactPlacements = stylex.create({
   },
 });
 
-/** The per-placement half of `styles.track` — the rules that need the band. See `trackSizes`. */
+/** The per-placement half of `styles.track` — the rules that need the band. See `trackVariants`. */
 export const trackCompactPlacements = stylex.create({
   center: {},
   sheet: {

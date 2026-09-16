@@ -14,6 +14,6 @@ export type {
   DialogDismissOn,
   DialogPopupProps,
   DialogRootProps,
-  DialogSize,
+  DialogVariant,
   DialogTriggerProps,
 } from './dialog';

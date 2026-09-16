@@ -44,7 +44,7 @@ export type {
   DialogDismissOn,
   DialogPopupProps,
   DialogRootProps,
-  DialogSize,
+  DialogVariant,
   DialogTriggerProps,
 } from '../components/dialog';
 export { Field } from '../components/field';

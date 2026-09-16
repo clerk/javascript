@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { MosaicComponentProps } from '../../props';
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 import { Card } from '../card';
-import type { DialogSize } from './dialog';
+import type { DialogVariant } from './dialog';
 import { Dialog } from './dialog';
 
 afterEach(() => cleanup());
@@ -74,25 +74,25 @@ describe('Mosaic Dialog', () => {
     expect(screen.getByTestId('host')).not.toContainElement(document.querySelector('.cl-dialog-viewport'));
   });
 
-  it('defaults the popup to the card size and reflects it as data-size', () => {
+  it('defaults the popup to the card variant and reflects it as data-variant', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>Body</Dialog.Popup>
       </Dialog.Root>,
     );
 
-    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'card');
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-variant', 'card');
   });
 
-  it('reflects an explicit size as data-size on the popup and the viewport', () => {
+  it('reflects an explicit variant as data-variant on the popup and the viewport', () => {
     render(
       <Dialog.Root defaultOpen>
-        <Dialog.Popup size='profile'>Body</Dialog.Popup>
+        <Dialog.Popup variant='profile'>Body</Dialog.Popup>
       </Dialog.Root>,
     );
 
-    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'profile');
-    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-size', 'profile');
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-variant', 'profile');
+    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-variant', 'profile');
   });
 
   it('composes consumer xstyle onto the popup', () => {
@@ -168,15 +168,15 @@ describe('Mosaic Dialog', () => {
 // assumed. Dismissal must reach the topmost dialog only, and the body must stay locked until the
 // last one closes.
 describe('nested Mosaic Dialogs', () => {
-  function Nested({ innerSize }: { innerSize?: DialogSize } = {}) {
+  function Nested({ innerVariant }: { innerVariant?: DialogVariant } = {}) {
     return (
       <Dialog.Root defaultOpen>
-        <Dialog.Popup size='profile'>
+        <Dialog.Popup variant='profile'>
           <Surface title='Account' />
           <div>Outer body</div>
           <Dialog.Root>
             <Dialog.Trigger render={nativeTrigger('Add email')} />
-            <Dialog.Popup size={innerSize}>
+            <Dialog.Popup variant={innerVariant}>
               <Surface title='Add email address' />
               <div>Inner body</div>
             </Dialog.Popup>
@@ -242,11 +242,11 @@ describe('nested Mosaic Dialogs', () => {
   it('warns when a profile opens inside another dialog', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const user = userEvent.setup();
-    render(<Nested innerSize='profile' />);
+    render(<Nested innerVariant='profile' />);
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="profile"'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="profile"'));
     warn.mockRestore();
   });
 
@@ -254,7 +254,7 @@ describe('nested Mosaic Dialogs', () => {
   it('does not warn for a card over a profile, or for the profile itself', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const user = userEvent.setup();
-    render(<Nested innerSize='card' />);
+    render(<Nested innerVariant='card' />);
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
@@ -265,13 +265,13 @@ describe('nested Mosaic Dialogs', () => {
 
 describe('stacked backdrops', () => {
   // The backdrop's two cases differ by a style rather than by an attribute, so the assertion is
-  // that the same tree with only the hosting size changed produces different classes. Comparing
+  // that the same tree with only the hosting variant changed produces different classes. Comparing
   // rather than matching a class: StyleX names are content hashes and would pin the value.
-  async function innerBackdropClass(host: { size?: DialogSize }) {
+  async function innerBackdropClass(host: { variant?: DialogVariant }) {
     const user = userEvent.setup();
     render(
       <Dialog.Root defaultOpen>
-        <Dialog.Popup size={host.size}>
+        <Dialog.Popup variant={host.variant}>
           <Surface title='Host' />
           <Dialog.Root>
             <Dialog.Trigger render={nativeTrigger('Add email')} />
@@ -291,8 +291,8 @@ describe('stacked backdrops', () => {
   }
 
   it('drops the scrim for a card over a card, and keeps it for one over a profile', async () => {
-    const overCard = await innerBackdropClass({ size: 'card' });
-    const overPanel = await innerBackdropClass({ size: 'profile' });
+    const overCard = await innerBackdropClass({ variant: 'card' });
+    const overPanel = await innerBackdropClass({ variant: 'profile' });
 
     expect(overCard).not.toBe(overPanel);
   });
@@ -301,7 +301,7 @@ describe('stacked backdrops', () => {
     const user = userEvent.setup();
     render(
       <Dialog.Root defaultOpen>
-        <Dialog.Popup size='profile'>
+        <Dialog.Popup variant='profile'>
           <Surface title='Account' />
           <Dialog.Root>
             <Dialog.Trigger render={nativeTrigger('Add email')} />
@@ -461,7 +461,7 @@ describe('composition APIs', () => {
 });
 
 // A probe gives us atoms to look for without hard-coding a hash. StyleX dedupes by property
-// within one `stylex.props` call, so a size atom should REPLACE a base one rather than sit
+// within one `stylex.props` call, so a variant atom should REPLACE a base one rather than sit
 // alongside it — and a `null` should remove it outright.
 const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
   stylex
@@ -471,10 +471,10 @@ const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
 
 const classesOf = (selector: string) => Array.from(document.querySelector(selector)!.classList);
 
-function renderSize(size: DialogSize) {
+function renderVariant(variant: DialogVariant) {
   return render(
     <Dialog.Root defaultOpen>
-      <Dialog.Popup size={size}>Body</Dialog.Popup>
+      <Dialog.Popup variant={variant}>Body</Dialog.Popup>
     </Dialog.Root>,
   );
 }
@@ -486,8 +486,8 @@ describe('popup padding', () => {
     six: { padding: space['6'] },
   });
 
-  const popupClassesFor = (size: DialogSize) => {
-    const { unmount } = renderSize(size);
+  const popupClassesFor = (variant: DialogVariant) => {
+    const { unmount } = renderVariant(variant);
     const classes = classesOf('.cl-dialog-popup');
     unmount();
     return classes;
@@ -497,8 +497,8 @@ describe('popup padding', () => {
   // the `Profile`, so the popup must emit NO padding atom at all — a competing value would put
   // two atoms for the same property on the element, and StyleX cannot dedupe across the two
   // `stylex.props` calls involved.
-  it.each(['card', 'profile'] as const)('emits no padding at all for a %s, deferring to its surface', size => {
-    const classes = popupClassesFor(size);
+  it.each(['card', 'profile'] as const)('emits no padding at all for a %s, deferring to its surface', variant => {
+    const classes = popupClassesFor(variant);
 
     for (const value of [probe.zero, probe.four, probe.six]) {
       expect(classes).not.toEqual(expect.arrayContaining(atomFor(value)));
@@ -516,8 +516,8 @@ describe('popup surface', () => {
     radius: { borderRadius: radiusVars['--cl-radius-xl'] },
   });
 
-  it.each(['card', 'profile'] as const)('emits no background for a %s, deferring to its surface', size => {
-    renderSize(size);
+  it.each(['card', 'profile'] as const)('emits no background for a %s, deferring to its surface', variant => {
+    renderVariant(variant);
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.background)));
   });
@@ -525,13 +525,13 @@ describe('popup surface', () => {
   // The radius is the exception to "the popup does not paint": the stacking veil and the
   // forced-colors border are drawn by the popup and have to follow the card's corners.
   it('keeps the radius for a card, which the veil and the forced-colors edge trace', () => {
-    renderSize('card');
+    renderVariant('card');
 
     expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.radius)));
   });
 
   it('leaves the radius to the surface for a profile, which owns its corners at every band', () => {
-    renderSize('profile');
+    renderVariant('profile');
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.radius)));
   });
@@ -551,11 +551,11 @@ describe('compactPlacement', () => {
     clipped: { overflow: { [PHONE]: 'clip', default: null } },
   });
 
-  const renderPlacement = (compactPlacement: 'center' | 'sheet', size: DialogSize = 'card') =>
+  const renderPlacement = (compactPlacement: 'center' | 'sheet', variant: DialogVariant = 'card') =>
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup
-          size={size}
+          variant={variant}
           compactPlacement={compactPlacement}
         >
           <Surface title='Add email address' />
@@ -600,16 +600,16 @@ describe('compactPlacement', () => {
 describe('viewport scroll behaviour', () => {
   // The inside/outside scroll split. A pinned `height: 100%` cannot grow, so an over-tall popup
   // spills past the viewport's padding box and loses the bottom inset; `min-height: 100%` lets the
-  // box grow with it. Which one applies follows from the size, so what this pins is that the
-  // viewport reads the size at all — a regression here is silent, since both values look right
+  // box grow with it. Which one applies follows from the variant, so what this pins is that the
+  // viewport reads the variant at all — a regression here is silent, since both values look right
   // until the content is taller than the screen.
   const probe = stylex.create({
     fixed: { height: '100%' },
     grows: { minHeight: '100%' },
   });
 
-  const viewportClassesFor = (size: DialogSize) => {
-    const { unmount } = renderSize(size);
+  const viewportClassesFor = (variant: DialogVariant) => {
+    const { unmount } = renderVariant(variant);
     const classes = classesOf('.cl-dialog-viewport');
     unmount();
     return classes;
@@ -640,7 +640,7 @@ describe('sizing container', () => {
   });
 
   it('makes the viewport the named inline-size container the bands query', () => {
-    renderSize('card');
+    renderVariant('card');
 
     expect(classesOf('.cl-dialog-viewport')).toEqual(expect.arrayContaining(atomFor(probe.container)));
   });
@@ -649,7 +649,7 @@ describe('sizing container', () => {
   // against an OUTER dialog's container, or nothing — so every banded rule has to sit on the track
   // inside it, and none may sit on the viewport.
   it('keeps every banded rule inside the container, on the track', () => {
-    renderSize('card');
+    renderVariant('card');
 
     const viewport = document.querySelector('.cl-dialog-viewport')!;
     const track = document.querySelector('.cl-dialog-track')!;

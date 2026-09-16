@@ -82,7 +82,7 @@ describe('role="alertdialog"', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(<Confirm />);
 
-    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'card');
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-variant', 'card');
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });

@@ -75,7 +75,7 @@ export function UserProfileEditNameDialog({
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
-        size='card'
+        variant='card'
         initialFocus={initialFocusRef}
       >
         <Card.Root

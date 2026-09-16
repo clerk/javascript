@@ -21,16 +21,21 @@ import {
   closeInsets,
   compactPlacements,
   popupMotion,
-  sizes,
   styles,
   trackCompactPlacements,
-  trackSizes,
-  viewportSizes,
+  trackVariants,
+  variants,
+  viewportVariants,
 } from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
-/** Width of the dialog surface, and for `profile` its height too. */
-export type DialogSize = keyof typeof sizes;
+/**
+ * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
+ * card's width, `profile` a `Profile` filling the height. Not a `size`, because these are
+ * different surfaces rather than one surface at two widths — a second card width would be a size
+ * of the `card` variant.
+ */
+export type DialogVariant = keyof typeof variants;
 
 /**
  * Where the surface sits in the compact band — the dialog viewport under `48rem`. `center`
@@ -59,8 +64,8 @@ export interface DialogContextValue {
   labelId: string;
   /** Id the popup points `aria-describedby` at. The part that describes the dialog takes it. */
   descriptionId: string;
-  /** Width, and for `profile` also height, of the surface. */
-  size: DialogSize;
+  /** Which surface this is, and so the geometry it takes — see `DialogVariant`. */
+  variant: DialogVariant;
   /**
    * The popup's ARIA role, for a surface that has to adapt to being an interruption: `Card.Header`
    * reads it and withholds its dismiss inside an `alertdialog`, where leaving without answering is
@@ -108,8 +113,8 @@ export interface DialogCloseButtonProps extends MosaicComponentProps<'button'> {
   'aria-label'?: string;
 }
 export interface DialogPopupProps extends MosaicComponentProps<'div'> {
-  /** Width, and for `profile` also height, of the dialog surface. @default 'card' */
-  size?: DialogSize;
+  /** Which surface the dialog holds, and so the geometry it takes. @default 'card' */
+  variant?: DialogVariant;
   /**
    * Bottom-anchors the surface in the compact band — the dialog viewport under `48rem` — and
    * slides it up as a sheet, instead of centring it. For a dialog that asks one thing and returns
@@ -155,7 +160,7 @@ const CLOSED_BY: Record<DialogDismissOn, DialogClosedBy> = {
  *   must not be answerable by clicking next to it. Escape still closes, which is the keyboard's
  *   equivalent of the cancel button that is always present.
  *
- * It says nothing about the size: an alert is a `Card` like every other dialog.
+ * It says nothing about the variant: an alert is a `Card` like every other dialog.
  */
 export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> &
   (
@@ -240,10 +245,10 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
 ) {
   const surface = React.useContext(DialogContext);
   const { role } = useHeadlessDialogContext();
-  const size = surface?.size ?? 'card';
+  const variant = surface?.variant ?? 'card';
   useCloseButtonWarning(role === 'alertdialog');
   return (
-    <span {...stylex.props(styles.closeButton, closeInsets[size])}>
+    <span {...stylex.props(styles.closeButton, closeInsets[variant])}>
       <Primitive.Close
         ref={ref}
         aria-label={ariaLabel}
@@ -267,14 +272,14 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
  * The scrim behind the dialog. Owns no scroll lock or positioning — that is the viewport.
  * Rendered by `Dialog.Popup`, which is also what decides the two things it varies on.
  */
-function Backdrop({ size, stacked }: { size: DialogSize; stacked: boolean }) {
+function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boolean }) {
   return (
     <Primitive.Backdrop
       {...mergeStyleProps(
         themeProps('dialog-backdrop'),
         // All in one `stylex.props` call so a later `backgroundColor` replaces the one in
         // `backdrop` outright — across two calls both would emit and the cascade would decide.
-        stylex.props(reset.base, styles.backdrop, stacked && styles.backdropStacked, backdropMotion[size]),
+        stylex.props(reset.base, styles.backdrop, stacked && styles.backdropStacked, backdropMotion[variant]),
       )}
     />
   );
@@ -289,11 +294,11 @@ function Backdrop({ size, stacked }: { size: DialogSize; stacked: boolean }) {
  * consume. See `keyboard-inset.ts`.
  */
 function Viewport({
-  size,
+  variant,
   compactPlacement,
   children,
 }: {
-  size: DialogSize;
+  variant: DialogVariant;
   compactPlacement: DialogCompactPlacement;
   children: React.ReactNode;
 }) {
@@ -303,14 +308,14 @@ function Viewport({
       overlay
       lockScroll
       {...mergeStyleProps(
-        themeProps('dialog-viewport', { size }),
-        stylex.props(reset.base, styles.viewport, viewportSizes[size]),
+        themeProps('dialog-viewport', { variant }),
+        stylex.props(reset.base, styles.viewport, viewportVariants[variant]),
       )}
     >
       <div
         {...mergeStyleProps(
-          themeProps('dialog-track', { size }),
-          stylex.props(reset.base, styles.track, trackSizes[size], trackCompactPlacements[compactPlacement]),
+          themeProps('dialog-track', { variant }),
+          stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
       >
         {children}
@@ -323,19 +328,19 @@ function Viewport({
  * Warns when a `profile` opens inside another dialog.
  *
  * A `profile` is a root-level surface: it hosts what opens over it and is never the thing that
- * opens. Inside a dialog it renders at a size that assumes it owns the viewport, over a surface it
+ * opens. Inside a dialog it takes a geometry that assumes it owns the viewport, over a surface it
  * was meant to replace. A `card` — a confirmation, say — is what opens over a profile, and that is
  * fine.
  */
-function useNestedSizeWarning(isNestedInDialog: boolean, size: DialogSize) {
+function useNestedVariantWarning(isNestedInDialog: boolean, variant: DialogVariant) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || size !== 'profile') {
+    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || variant !== 'profile') {
       return;
     }
     console.warn(
-      '[clerk] a size="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.',
+      '[clerk] a variant="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.',
     );
-  }, [isNestedInDialog, size]);
+  }, [isNestedInDialog, variant]);
 }
 
 /**
@@ -344,15 +349,15 @@ function useNestedSizeWarning(isNestedInDialog: boolean, size: DialogSize) {
  * A profile already fills the compact band — it is the page there, not a surface over one — so
  * there is no room for it to be anchored anywhere else.
  */
-function useCompactPlacementWarning(size: DialogSize, placement: DialogCompactPlacement) {
+function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCompactPlacement) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || size !== 'profile' || placement === 'center') {
+    if (process.env.NODE_ENV === 'production' || variant !== 'profile' || placement === 'center') {
       return;
     }
     console.warn(
-      `[clerk] <Dialog.Popup size="profile" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
+      `[clerk] <Dialog.Popup variant="profile" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
     );
-  }, [size, placement]);
+  }, [variant, placement]);
 }
 
 /**
@@ -361,21 +366,24 @@ function useCompactPlacementWarning(size: DialogSize, placement: DialogCompactPl
  * part a consumer composes, so they stay out of the public API.
  */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
-  { size = 'card', compactPlacement: compactPlacementProp = 'center', initialFocus, finalFocus, xstyle, ...rest },
+  { variant = 'card', compactPlacement: compactPlacementProp = 'center', initialFocus, finalFocus, xstyle, ...rest },
   ref,
 ) {
   // The dialog this one renders inside, read before this popup publishes its own.
   const host = React.useContext(DialogContext);
-  // The headless flag, not the stack check below — the size rule is about opening a dialog inside
+  // The headless flag, not the stack check below — the variant rule is about opening a dialog inside
   // ANY dialog, which is broader than the card-on-card case the stacking styles cover.
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
   const isAlert = role === 'alertdialog';
   // A profile has its own compact-band treatment and takes no placement; the warning says so.
-  const compactPlacement: DialogCompactPlacement = size === 'profile' ? 'center' : compactPlacementProp;
-  useCompactPlacementWarning(size, compactPlacementProp);
-  useNestedSizeWarning(isNestedInDialog, size);
+  const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : compactPlacementProp;
+  useCompactPlacementWarning(variant, compactPlacementProp);
+  useNestedVariantWarning(isNestedInDialog, variant);
 
-  const surface = React.useMemo(() => ({ labelId, descriptionId, size, role }), [labelId, descriptionId, size, role]);
+  const surface = React.useMemo(
+    () => ({ labelId, descriptionId, variant, role }),
+    [labelId, descriptionId, variant, role],
+  );
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
@@ -403,16 +411,16 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
         initialFocus={initialFocus}
         finalFocus={finalFocus}
         {...mergeStyleProps(
-          themeProps('dialog-popup', { size }),
+          themeProps('dialog-popup', { variant }),
           stylex.props(
             reset.base,
             styles.popup,
-            sizes[size],
+            variants[variant],
             compactPlacements[compactPlacement],
-            // One cell per (size, placement) that exists, selected rather than layered: StyleX
+            // One cell per (variant, placement) that exists, selected rather than layered: StyleX
             // dedupes by PROPERTY across a `stylex.props` call, so a thin "sheet only" atom would
             // replace the centred cell's `transform` wholesale and take the desktop scale with it.
-            compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[size],
+            compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[variant],
             xstyle,
           ),
           rest,
@@ -427,14 +435,14 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   return (
     <Primitive.Portal>
       <Backdrop
-        size={size}
+        variant={variant}
         // A card stacked on a card paints no scrim of its own — one serves the whole stack.
         // Decided here rather than keyed on `data-stacked`, because whether this is a stack
-        // depends on the size of the dialog beneath, which the headless layer has no notion of.
-        stacked={isNestedInDialog && host?.size === 'card'}
+        // depends on the variant of the dialog beneath, which the headless layer has no notion of.
+        stacked={isNestedInDialog && host?.variant === 'card'}
       />
       <Viewport
-        size={size}
+        variant={variant}
         compactPlacement={compactPlacement}
       >
         {popup}

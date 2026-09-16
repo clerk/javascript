@@ -1,7 +1,7 @@
 import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Card } from '@clerk/ui/mosaic/components/card';
-import type { DialogCompactPlacement, DialogSize } from '@clerk/ui/mosaic/components/dialog';
+import type { DialogCompactPlacement, DialogVariant } from '@clerk/ui/mosaic/components/dialog';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
 import { Input } from '@clerk/ui/mosaic/components/input';
@@ -24,11 +24,11 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/dialog/dialog.tsx',
   styles: {
     _variants: {
-      size: { card: {}, profile: {} },
+      variant: { card: {}, profile: {} },
       compactPlacement: { center: {}, sheet: {} },
     },
     _defaultVariants: {
-      size: 'card',
+      variant: 'card',
       compactPlacement: 'center',
     },
   },
@@ -37,7 +37,7 @@ export const meta: StoryMeta = {
 const dialogTrigger = (props: RenderProps) => <Button {...props}>Open dialog</Button>;
 
 // A stand-in for a surface, painted by the story rather than by a component, so the playground
-// shows the DIALOG's own box — what each `size` measures and where `compactPlacement` puts it.
+// shows the DIALOG's own box — what each `variant` measures and where `compactPlacement` puts it.
 // Every real dialog holds a `Card` or a `Profile` instead; see the examples below.
 const surface: React.CSSProperties = {
   background: 'var(--cl-color-card)',
@@ -54,19 +54,22 @@ const surface: React.CSSProperties = {
 /**
  * The dialog paints nothing: it brings the geometry, the motion and the floating tree, and the
  * SURFACE comes from what is rendered inside it. This example draws its own box so the two are
- * visible apart — the dashed edge is the popup, and `size` is what it measures.
+ * visible apart — the dashed edge is the popup, and `variant` is what it measures.
  *
  * Every real dialog holds a `Card` (see [the surface section](#every-dialog-brings-its-own-surface))
  * or a `Profile` (see [A profile](#a-profile)), which is also where the name and the dismiss come
  * from — hence the `aria-label` and the corner `Dialog.CloseButton` standing in for them here.
  */
 export function Default(args: Record<string, unknown>) {
-  const { size, compactPlacement } = args as { size?: DialogSize; compactPlacement?: DialogCompactPlacement };
+  const { variant, compactPlacement } = args as {
+    variant?: DialogVariant;
+    compactPlacement?: DialogCompactPlacement;
+  };
   return (
     <Dialog.Root>
       <Dialog.Trigger render={dialogTrigger} />
       <Dialog.Popup
-        size={size}
+        variant={variant}
         compactPlacement={compactPlacement}
         aria-label='Dialog surface'
       >
@@ -443,7 +446,7 @@ export function Nested() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={accountTrigger} />
-      <Dialog.Popup size='profile'>
+      <Dialog.Popup variant='profile'>
         <UserProfileView
           activePage={activePage}
           pages={pages}
@@ -584,7 +587,7 @@ export function CardSurface() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Sign in</Button>} />
-      <Dialog.Popup size='card'>
+      <Dialog.Popup variant='card'>
         <Card.Root elevation='overlay'>
           <Card.Header>
             <Card.Title>Sign in</Card.Title>
@@ -626,7 +629,7 @@ export function OutsideScroll() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Review terms</Button>} />
-      <Dialog.Popup size='card'>
+      <Dialog.Popup variant='card'>
         <Card.Root elevation='overlay'>
           <Card.Header>
             <Card.Title>Terms of service</Card.Title>

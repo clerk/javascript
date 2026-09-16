@@ -21,7 +21,7 @@ import * as DialogStories from './dialog.component.stories';
   ]}
 />
 
-`size` and `compactPlacement` belong to `Dialog.Popup`; the rest belong to `Dialog.Root`.
+`variant` and `compactPlacement` belong to `Dialog.Popup`; the rest belong to `Dialog.Root`.
 
 ## Usage
 
@@ -66,7 +66,11 @@ Every close the dialog owns — Escape, outside press, `Dialog.Close`, `Dialog.C
 `handle.close()` — goes through `onOpenChange`, so a controlled consumer can veto one by not
 committing.
 
-### Size
+### Variant
+
+Which surface the dialog holds, and so the geometry it is given. Not a `size`, because these are
+different surfaces rather than one surface at two widths — a second card width would be a size of
+the `card` variant, with nowhere to sit on this axis.
 
 | Value     | Width                                    | For                                                                  |
 | --------- | ---------------------------------------- | -------------------------------------------------------------------- |
@@ -94,7 +98,7 @@ import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-pro
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
-  <Dialog.Popup size='profile'>
+  <Dialog.Popup variant='profile'>
     <UserProfileView
       activePage={activePage}
       pages={pages}
@@ -211,13 +215,13 @@ action as its submit.
 
 ## Parts
 
-| Part                 | Slot                  | Description                                                                            |
-| -------------------- | --------------------- | -------------------------------------------------------------------------------------- |
-| `Dialog.Root`        | —                     | State: open/close, `role`, `dismissOn`, `modal`, `handle`.                             |
-| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                    |
-| `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `size`, `compactPlacement`, `initialFocus`, `finalFocus`. |
-| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                    |
-| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X, for a surface that anchors its own dismiss.                       |
+| Part                 | Slot                  | Description                                                                               |
+| -------------------- | --------------------- | ----------------------------------------------------------------------------------------- |
+| `Dialog.Root`        | —                     | State: open/close, `role`, `dismissOn`, `modal`, `handle`.                                |
+| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                       |
+| `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `variant`, `compactPlacement`, `initialFocus`, `finalFocus`. |
+| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                       |
+| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X, for a surface that anchors its own dismiss.                          |
 
 The name, the description and the button row come from the surface — `Card.Title`,
 `Card.Description` and `Card.Footer` — not from the dialog.
@@ -233,7 +237,7 @@ Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/ui/st
 @import '@clerk/ui/styles.css' layer(components);
 
 @layer overrides {
-  .cl-dialog-popup[data-size='profile'] {
+  .cl-dialog-popup[data-variant='profile'] {
     max-width: 60rem;
   }
 }
@@ -245,13 +249,13 @@ State attributes:
 | ------------------------------------------- | ---------------------------------- | ------------------------------------- |
 | `data-open` / `data-closed`                 | Trigger, Backdrop, Viewport, Popup | Open state (`closed` during the exit) |
 | `data-starting-style` / `data-ending-style` | Backdrop, Viewport, Popup          | Entering frame / exit animation       |
-| `data-size`                                 | Viewport, Track, Popup             | Resolved size                         |
+| `data-variant`                              | Viewport, Track, Popup             | Resolved variant                      |
 | `data-nested`                               | Backdrop, Viewport, Popup          | Opened inside another overlay         |
 | `data-stacked` / `data-stack-base`          | Popup                              | On top of / beneath another dialog    |
 
 ### Nested dialogs and stacks
 
-A dialog opened inside another is one of two relationships, decided by the size beneath it:
+A dialog opened inside another is one of two relationships, decided by the variant beneath it:
 
 |                     | Nested                     | Stack                              |
 | ------------------- | -------------------------- | ---------------------------------- |
