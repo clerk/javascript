@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 
+import { truncateWithEndVisible } from '../../../utils/truncateTextWithEndVisible';
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
+import { fill } from './user-profile-account-section/user-profile-account-section.messages';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
 import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
 
@@ -82,16 +84,7 @@ export function UserProfileWeb3WalletsSectionView({
 }
 
 function describeWalletRemoval(wallet: UserProfileWeb3Wallet) {
-  return (
-    <>
-      {m.removeDialog.description.replace('{wallet}', wallet.address)}
-      {wallet.isVerified ? (
-        <>
-          <br />
-          <br />
-          {m.removeDialog.signInWarning}
-        </>
-      ) : null}
-    </>
-  );
+  return fill(wallet.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
+    wallet: truncateWithEndVisible(wallet.address, 13, 4),
+  });
 }

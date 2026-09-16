@@ -71,7 +71,6 @@ describe('Web3 wallets section', () => {
       await user.click(screen.getByRole('button', { name: `Manage ${address}` }));
       await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
       const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveTextContent(address);
       const warning = 'You will no longer be able to sign in using this web3 wallet.';
       if (isVerified) {
         expect(dialog).toHaveTextContent(warning);

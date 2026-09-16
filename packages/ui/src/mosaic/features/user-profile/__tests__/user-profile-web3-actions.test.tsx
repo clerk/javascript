@@ -31,7 +31,9 @@ describe('Web3 wallet removal', () => {
     renderWallets(onRemove);
     const trigger = screen.getByRole('button', { name: 'Manage MetaMask' });
     trigger.focus();
-    await user.keyboard('{Enter}{Enter}');
+    await user.keyboard('{Enter}');
+    await screen.findByRole('menuitem', { name: 'Remove wallet' });
+    await user.keyboard('{ArrowDown}{Enter}');
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     await waitFor(() => expect(trigger).toHaveFocus());
