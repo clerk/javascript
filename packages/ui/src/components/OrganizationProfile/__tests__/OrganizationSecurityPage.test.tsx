@@ -574,7 +574,8 @@ describe('OrganizationSecurityPage', () => {
 
       expect(activeDirectory.delete).toHaveBeenCalledWith();
       await waitFor(() => expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument());
-    });
+      // Typing the confirmation and swapping the section back has hit the 5s default on CI.
+    }, 15_000);
 
     it('opens the Directory Sync wizard from Edit', async () => {
       const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
