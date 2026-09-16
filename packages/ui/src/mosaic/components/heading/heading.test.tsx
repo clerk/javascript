@@ -20,7 +20,7 @@ describe('Mosaic Heading', () => {
     const heading = screen.getByRole('heading');
     expect(heading).toHaveClass('cl-heading');
     expect(heading).toHaveAttribute('data-size', 'base');
-    expect(heading).toHaveAttribute('data-color', 'primary');
+    expect(heading).toHaveAttribute('data-color', 'foreground');
   });
 
   it('wires variant props and xstyle atoms through to the element', () => {
@@ -61,7 +61,7 @@ describe('Mosaic Heading', () => {
 
   it('reads defaults from HeadingContext, with own props winning', () => {
     render(
-      <HeadingContext.Provider value={{ size: 'xl', color: 'neutral' }}>
+      <HeadingContext.Provider value={{ size: 'xl', color: 'foreground' }}>
         <Heading color='negative'>Title</Heading>
       </HeadingContext.Provider>,
     );

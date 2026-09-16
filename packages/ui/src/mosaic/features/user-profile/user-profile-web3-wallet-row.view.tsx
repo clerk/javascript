@@ -1,5 +1,4 @@
 import * as stylex from '@stylexjs/stylex';
-import { useState } from 'react';
 
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
@@ -8,7 +7,6 @@ import { Section } from '../../components/section';
 import { fill } from '../../utils/messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
-import { UserProfileRemoveWeb3WalletDialog } from './user-profile-remove-web3-wallet.dialog';
 import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
@@ -22,9 +20,8 @@ export function UserProfileWeb3WalletRowView({
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (wallet: UserProfileWeb3Wallet) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const iconUrl = wallet.iconUrl?.trim();
   const linkedWallet = 'address' in wallet ? wallet : undefined;
   const address = linkedWallet?.address;
@@ -35,7 +32,7 @@ export function UserProfileWeb3WalletRowView({
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
   }
   if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
-    actions.push({ label: m.remove, color: 'negative', onClick: () => setOpen(true) });
+    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(linkedWallet) });
   }
 
   return (
@@ -99,19 +96,7 @@ export function UserProfileWeb3WalletRowView({
             <UserProfileActionMenu
               actions={actions}
               label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
-            >
-              {linkedWallet && onRemove && linkedWallet.canRemove !== false ? (
-                <UserProfileRemoveWeb3WalletDialog
-                  address={linkedWallet.address}
-                  isVerified={linkedWallet.isVerified}
-                  open={open}
-                  onOpenChange={setOpen}
-                  onConfirm={() => onRemove(wallet.id)}
-                  isPending={linkedWallet.isRemoving}
-                  errorMessage={linkedWallet.removalError}
-                />
-              ) : null}
-            </UserProfileActionMenu>
+            />
           </Section.Actions>
         ) : null}
       </Section.Item>

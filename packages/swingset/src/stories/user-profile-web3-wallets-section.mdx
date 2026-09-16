@@ -13,8 +13,7 @@ Wallets and available providers are supplied separately. These examples simulate
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Icon', href: '/components/icon', layer: 'Components' },
     { name: 'Menu', href: '/components/menu', layer: 'Components' },
-    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
-    { name: 'Banner', href: '/components/banner', layer: 'Components' },
+    { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
   ]}
 />
 
@@ -48,7 +47,7 @@ Choose Set as primary on Coinbase Wallet to show an error. Retry succeeds.
 
 ## Removal Pending
 
-Choose Remove wallet, then confirm to hold the pending state. Cancel is disabled while removal is pending.
+Choose Remove wallet, then confirm. The confirmation stays open until removal completes after a short delay.
 
 <Story name='RemovalPending' storyModule={Stories} />
 

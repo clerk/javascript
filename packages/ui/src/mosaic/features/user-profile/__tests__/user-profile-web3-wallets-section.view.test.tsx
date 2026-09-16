@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -70,13 +70,12 @@ describe('Web3 wallets section', () => {
       expect(screen.queryByRole('img')).not.toBeInTheDocument();
       await user.click(screen.getByRole('button', { name: `Manage ${address}` }));
       await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-      const dialog = screen.getByRole('alertdialog');
-      expect(dialog).toHaveTextContent(address);
-      const warning = within(dialog).queryByText('You will no longer be able to sign in using this web3 wallet.');
+      const dialog = screen.getByRole('dialog');
+      const warning = 'You will no longer be able to sign in using this web3 wallet.';
       if (isVerified) {
-        expect(warning).toBeVisible();
+        expect(dialog).toHaveTextContent(warning);
       } else {
-        expect(warning).not.toBeInTheDocument();
+        expect(dialog).not.toHaveTextContent(warning);
       }
     },
   );

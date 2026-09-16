@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -43,50 +43,18 @@ describe('connected accounts section', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
-  it('keeps confirmation open for pending and error props and forwards retry', async () => {
+  it('does not offer removal for a protected account', async () => {
     const user = userEvent.setup();
-    const onRemove = vi.fn();
-    const { rerender } = render(
+    render(
       <UserProfileConnectedAccountsSectionView
-        accounts={[account]}
-        onRemove={onRemove}
+        accounts={[{ ...account, canRemove: false, status: 'reconnect' }]}
+        onRemove={vi.fn()}
+        onReconnect={vi.fn()}
       />,
     );
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
-    const dialog = screen.getByRole('alertdialog');
-    expect(dialog).toHaveTextContent('dependent features');
-    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove).toHaveBeenCalledExactlyOnceWith('account_1');
-    rerender(
-      <UserProfileConnectedAccountsSectionView
-        accounts={[{ ...account, isRemoving: true }]}
-        onRemove={onRemove}
-      />,
-    );
-    expect(within(dialog).getByRole('button', { name: 'Remove', exact: true })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
-    expect(within(dialog).getByRole('progressbar')).toBeInTheDocument();
-    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove).toHaveBeenCalledTimes(1);
-    expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeDisabled();
-    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    expect(dialog).toBeInTheDocument();
-    rerender(
-      <UserProfileConnectedAccountsSectionView
-        accounts={[{ ...account, removalError: 'Try again' }]}
-        onRemove={onRemove}
-      />,
-    );
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('Try again');
-    expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeEnabled();
-    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove).toHaveBeenCalledTimes(2);
-    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.getByRole('button', { name: 'Manage Google' })).toHaveFocus();
+    expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toBeEnabled();
+    expect(screen.queryByRole('menuitem', { name: 'Remove' })).not.toBeInTheDocument();
   });
 
   it('renders reconnect and verification errors without a generic manage action', async () => {

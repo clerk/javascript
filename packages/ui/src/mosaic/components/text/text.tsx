@@ -21,7 +21,7 @@ export const TextContext = React.createContext<Partial<TextProps> | null>(null);
  * `size` and `color` variants. Pass `render` for inline copy (`<span>`).
  */
 export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function MosaicText(rawProps, ref) {
-  const { size = 'sm', color = 'primary', render, xstyle, ...rest } = useContextProps(rawProps, TextContext);
+  const { size = 'sm', color = 'foreground', render, xstyle, ...rest } = useContextProps(rawProps, TextContext);
 
   const props = mergeStyleProps(
     themeProps('text', { size, color }),
