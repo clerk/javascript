@@ -239,6 +239,17 @@ describe('Mosaic Pagination', () => {
     expect(onPageSizeChange).toHaveBeenCalledWith(50);
   });
 
+  it('renders the page size label in its own slot', () => {
+    render(
+      <Pagination
+        page={1}
+        totalItems={100}
+        pageSize={10}
+      />,
+    );
+    expect(screen.getByText('Results per page')).toHaveClass('cl-pagination-label');
+  });
+
   it('sizes the page size options to match the trigger', async () => {
     render(
       <Pagination

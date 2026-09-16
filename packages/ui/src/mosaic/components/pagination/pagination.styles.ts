@@ -29,6 +29,9 @@ export const styles = stylex.create({
     height: space['7'],
     width: space['7'],
   },
+  label: {
+    color: colorVars['--cl-color-foreground-secondary'],
+  },
   pageSize: {
     gap: space['2'],
     alignItems: 'center',
