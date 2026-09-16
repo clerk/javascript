@@ -29,11 +29,7 @@ Manage passkey names and confirm removal. These examples mock creation; browser 
 
 ### Visibility
 
-The caller hides the entire section when passkeys are disabled for the instance or identification creation is disallowed, even if the user already has passkeys. Set `passkeysVisible={false}` on the Security panel to omit it. The standalone section always renders when mounted and does not read instance settings.
-
-On a satellite domain, an otherwise visible section remains visible even when empty; only Add is unavailable. Represent that by omitting `onAdd`, without hiding the section.
-
-A satellite shares the same Clerk user account, so users can see passkeys they created on the primary domain. Those passkeys are tied to the primary domain and cannot authenticate directly on a different satellite domain. Users can still rename or remove them because those actions manage the account's existing passkeys. See [domain restrictions for passkeys](https://clerk.com/docs/guides/development/custom-flows/authentication/passkeys#domain-restrictions-for-passkeys).
+The caller decides whether to render the section. When mounted, the section stays visible even with no passkeys or actions.
 
 ### No passkeys yet
 
@@ -43,7 +39,7 @@ The section remains visible after removing the final passkey. Add remains availa
 
 ### Creation unavailable
 
-Rename and remove existing passkeys. Removing the final passkey leaves the empty section visible, matching a satellite domain where creation is unavailable.
+Omit `onAdd` to hide Add. Existing passkeys can still be renamed or removed, and removing the final passkey leaves the empty state visible.
 
 <Story name='CreationUnavailable' storyModule={Stories} />
 
