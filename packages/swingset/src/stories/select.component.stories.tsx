@@ -85,12 +85,7 @@ export function Ghost() {
         >
           <div style={{ display: 'grid' }}>
             <Text>{member.name}</Text>
-            <Text
-              size='sm'
-              color='neutral'
-            >
-              {member.email}
-            </Text>
+            <Text size='sm'>{member.email}</Text>
           </div>
           <Select.Root
             items={roles}
