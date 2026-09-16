@@ -1,7 +1,8 @@
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import type { IconName } from '../../icons/registry';
-import { fill, reverificationBase as m } from './reverification.messages';
+import { fill } from '../../utils/messages';
+import { reverificationMessages as m } from './reverification.messages';
 import type { ReverificationMethod, ReverificationOtpChannel, ReverificationViewProps } from './reverification.types';
 import { ReverificationBackupCode } from './steps/reverification-backup-code';
 import { ReverificationHelp } from './steps/reverification-help';

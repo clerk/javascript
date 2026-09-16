@@ -1,11 +1,17 @@
 import * as stylex from '@stylexjs/stylex';
+import type { ReactNode } from 'react';
 
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Heading } from '../../../components/heading';
 import { Text } from '../../../components/text';
+import { rich } from '../../../utils/messages';
 import { styles } from '../user-profile-profile-panel.styles';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+
+const components = {
+  strong: (children?: ReactNode) => <strong {...stylex.props(styles.confirmationContactValue)}>{children}</strong>,
+};
 
 export interface UserProfileRemoveEmailDialogProps {
   emailAddress: string;
@@ -20,8 +26,6 @@ export function UserProfileRemoveEmailDialog({
   onOpenChange,
   onConfirm,
 }: UserProfileRemoveEmailDialogProps) {
-  const [beforeEmail, afterEmail] = m.email.removeDialog.description.split('{emailAddress}');
-
   return (
     <Dialog.Root
       role='alertdialog'
@@ -31,9 +35,7 @@ export function UserProfileRemoveEmailDialog({
       <Dialog.Popup>
         <Dialog.Title render={<Heading size='sm' />}>{m.email.removeDialog.title}</Dialog.Title>
         <Dialog.Description render={<Text />}>
-          {beforeEmail}
-          <strong {...stylex.props(styles.confirmationContactValue)}>{emailAddress}</strong>
-          {afterEmail}
+          {rich(m.email.removeDialog.description, { values: { emailAddress }, components })}
         </Dialog.Description>
         <Dialog.Actions>
           <Dialog.Close render={<Button variant='outline' />}>{m.email.removeDialog.cancel}</Dialog.Close>

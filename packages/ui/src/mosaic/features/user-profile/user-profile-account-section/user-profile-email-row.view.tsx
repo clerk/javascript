@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 import type { UserProfileEmail } from './user-profile-account-section.types';
 import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';

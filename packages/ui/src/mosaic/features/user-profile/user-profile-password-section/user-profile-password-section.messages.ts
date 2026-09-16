@@ -1,4 +1,4 @@
-export const userProfilePasswordSectionBase = {
+export const userProfilePasswordSectionMessages = {
   sectionTitle: 'Authentication',
   label: 'Password',
   masked: '••••••••••••••••••',

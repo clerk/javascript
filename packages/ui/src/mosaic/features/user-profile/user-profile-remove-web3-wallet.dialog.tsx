@@ -3,6 +3,7 @@ import { Button, SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Heading } from '../../components/heading';
 import { Text } from '../../components/text';
+import { fill } from '../../utils/messages';
 import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
 
 export interface UserProfileRemoveWeb3WalletDialogProps {
@@ -33,7 +34,7 @@ export function UserProfileRemoveWeb3WalletDialog({
       <Dialog.Popup>
         <Dialog.Title render={<Heading size='sm' />}>{m.removeDialog.title}</Dialog.Title>
         <Dialog.Description render={<Text />}>
-          {m.removeDialog.description.replace('{wallet}', address)}
+          {fill(m.removeDialog.description, { wallet: address })}
         </Dialog.Description>
         {isVerified ? <Text>{m.removeDialog.signInWarning}</Text> : null}
         {errorMessage ? (

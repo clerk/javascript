@@ -1,11 +1,17 @@
 import * as stylex from '@stylexjs/stylex';
+import type { ReactNode } from 'react';
 
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Heading } from '../../../components/heading';
 import { Text } from '../../../components/text';
+import { rich } from '../../../utils/messages';
 import { styles } from '../user-profile-profile-panel.styles';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+
+const components = {
+  strong: (children?: ReactNode) => <strong {...stylex.props(styles.confirmPhoneNumber)}>{children}</strong>,
+};
 
 export interface UserProfileRemovePhoneDialogProps {
   phoneNumber: string;
@@ -20,8 +26,6 @@ export function UserProfileRemovePhoneDialog({
   onOpenChange,
   onConfirm,
 }: UserProfileRemovePhoneDialogProps) {
-  const [beforePhone, afterPhone] = m.phone.removeDialog.description.split('{phoneNumber}');
-
   return (
     <Dialog.Root
       role='alertdialog'
@@ -31,9 +35,7 @@ export function UserProfileRemovePhoneDialog({
       <Dialog.Popup>
         <Dialog.Title render={<Heading size='sm' />}>{m.phone.removeDialog.title}</Dialog.Title>
         <Dialog.Description render={<Text />}>
-          {beforePhone}
-          <strong {...stylex.props(styles.confirmPhoneNumber)}>{phoneNumber}</strong>
-          {afterPhone}
+          {rich(m.phone.removeDialog.description, { values: { phoneNumber }, components })}
         </Dialog.Description>
         <Dialog.Actions>
           <Dialog.Close render={<Button variant='outline' />}>{m.phone.removeDialog.cancel}</Dialog.Close>

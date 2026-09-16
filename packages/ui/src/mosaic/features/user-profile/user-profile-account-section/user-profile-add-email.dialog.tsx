@@ -10,8 +10,8 @@ import { Field } from '../../../components/field';
 import { Flow } from '../../../components/flow';
 import { Input } from '../../../components/input';
 import { Otp } from '../../../components/otp';
+import { fill, rich } from '../../../utils/messages';
 import { styles } from '../user-profile-profile-panel.styles';
-import { fill } from './user-profile-account-section.messages';
 import { userProfileAddEmailMessages as m } from './user-profile-add-email.messages';
 
 export interface UserProfileAddEmailDialogProps {
@@ -36,7 +36,6 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
   const verifyFormId = useId();
   const emailRef = useRef<HTMLInputElement>(null);
   const verifyRef = useRef<HTMLDivElement>(null);
-  const [beforeSeconds, afterSeconds] = m.verify.resendCountdown.split('{seconds}');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -150,9 +149,11 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                           m.verify.resending
                         ) : (current.resendSeconds ?? 0) > 0 ? (
                           <span>
-                            {beforeSeconds}
-                            <span {...stylex.props(styles.countdown)}>{current.resendSeconds}</span>
-                            {afterSeconds}
+                            {rich(m.verify.resendCountdown, {
+                              values: {
+                                seconds: <span {...stylex.props(styles.countdown)}>{current.resendSeconds}</span>,
+                              },
+                            })}
                           </span>
                         ) : (
                           m.verify.resend
