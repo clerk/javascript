@@ -17,6 +17,7 @@ function NativeBuildFixture() {
   const { user } = useUser();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [signOutResult, setSignOutResult] = useState<string | null>(null);
 
   if (isProfileOpen) {
     return (
@@ -56,6 +57,7 @@ function NativeBuildFixture() {
 
       <Text testID='auth-state'>{isLoaded ? `signed ${isSignedIn ? 'in' : 'out'}` : 'loading'}</Text>
       {user?.id && <Text testID='user-id'>{user.id}</Text>}
+      {signOutResult && <Text testID='sign-out-result'>{`sign out: ${signOutResult}`}</Text>}
       <Button
         testID='open-auth-view-button'
         title='Open native AuthView'
@@ -73,7 +75,14 @@ function NativeBuildFixture() {
         <Button
           testID='sign-out-button'
           title='Sign out'
-          onPress={() => void signOut()}
+          onPress={() => {
+            setSignOutResult('pending');
+            signOut().then(
+              () => setSignOutResult('ok'),
+              (error: unknown) =>
+                setSignOutResult((error instanceof Error ? error.message : String(error)).replace(/\s+/g, ' ')),
+            );
+          }}
         />
       )}
 

@@ -7,7 +7,7 @@ import {
   type UserButtonSession,
   type UserButtonSuggestion,
   UserButtonView,
-} from '@clerk/ui/mosaic/user-button/user-button.view';
+} from '@clerk/ui/mosaic/features/user-button/user-button.view';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -22,7 +22,7 @@ export const meta: StoryMeta = {
   label: 'User button',
   status: 'wip',
   substatus: 'needs wire-up',
-  source: 'packages/ui/src/mosaic/user-button/user-button.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-button/user-button.view.tsx',
 };
 
 // Accounts wear their own photo. Only the flagship workspace carries the Clerk mark; the rest wear
@@ -273,6 +273,18 @@ export function AvatarOnly(_args: Record<string, unknown>) {
   return (
     <UserButtonView
       {...prototype}
+      renderTriggerLabel={false}
+    />
+  );
+}
+
+export function UserAvatarOnly(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='user'
       renderTriggerLabel={false}
     />
   );

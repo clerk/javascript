@@ -8,7 +8,7 @@ against plain props.
 Tests are Vitest + React Testing Library, co-located in `__tests__/` next to the
 feature and named for the layer they cover.
 
-`packages/ui/src/mosaic/user-button/__tests__/` is the canonical set to copy from:
+`packages/ui/src/mosaic/features/user-button/__tests__/` is the canonical set to copy from:
 
 | File                               | Covers                                                      |
 | ---------------------------------- | ----------------------------------------------------------- |

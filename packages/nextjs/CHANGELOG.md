@@ -1,5 +1,27 @@
 # Change Log
 
+## 7.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+  - @clerk/backend@3.18.1
+  - @clerk/react@6.16.1
+
+## 7.9.3
+
+### Patch Changes
+
+- Update docs deep links in JSDoc comments to match clerk.com's new heading anchors (`#get-token` is now `#gettoken`, `#o-auth-strategy` is now `#oauthstrategy`, and so on). ([#9520](https://github.com/clerk/javascript/pull/9520)) by [@manovotny](https://github.com/manovotny)
+
+- Add a note to the `ClerkProvider`, `clerkMiddleware()` and `auth()` doc comments explaining that `npx clerk@latest init` can provision temporary development keys without a Clerk account. Update the README prerequisites and installation section to say the same, replacing the statement that an existing Clerk application and account are required. ([#9665](https://github.com/clerk/javascript/pull/9665)) by [@shane-kercheval](https://github.com/shane-kercheval)
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`4e1e432`](https://github.com/clerk/javascript/commit/4e1e43201fbb6cf041b4d4a95851b058a1aef807), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42), [`9801ed5`](https://github.com/clerk/javascript/commit/9801ed5645dc62d58f36cef064feb314448b2502)]:
+  - @clerk/react@6.16.0
+  - @clerk/shared@4.32.0
+  - @clerk/backend@3.18.0
+
 ## 7.9.2
 
 ### Patch Changes

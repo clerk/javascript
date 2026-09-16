@@ -1,5 +1,5 @@
-import type { UserProfilePasskey } from '@clerk/ui/mosaic/user-profile/user-profile-passkeys-section.view';
-import { UserProfilePasskeysSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-passkeys-section.view';
+import type { UserProfilePasskey } from '@clerk/ui/mosaic/features/user-profile/user-profile-passkeys-section.view';
+import { UserProfilePasskeysSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-passkeys-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,7 +12,7 @@ export const meta: StoryMeta = {
   title: 'UserProfilePasskeysSection',
   label: 'Passkeys',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-passkeys-section.view.tsx',
+  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-passkeys-section.view.tsx',
 };
 
 export function Default() {

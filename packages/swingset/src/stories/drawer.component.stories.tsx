@@ -3,7 +3,7 @@ import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import { Drawer } from '@clerk/ui/mosaic/components/drawer';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
 import { Text } from '@clerk/ui/mosaic/components/text';
-import { UserProfileView } from '@clerk/ui/mosaic/user-profile/user-profile.view';
+import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
 
 import type { StoryMeta } from '@/lib/types';
 
