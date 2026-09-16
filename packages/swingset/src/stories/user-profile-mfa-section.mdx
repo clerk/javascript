@@ -2,16 +2,57 @@ import * as Stories from './user-profile-mfa-section.stories';
 
 # UserProfileMfaSection
 
-Two-step verification methods composed with the shared Security list treatment.
+Display two-step verification methods, default badges, and permitted row actions. This view takes prepared data and callbacks; the examples use local state.
+
+## Playground
+
+Choose Set as default on either SMS number to move the badge.
 
 <Story
   name='Default'
   storyModule={Stories}
-  composition={[{ name: 'Section', href: '/components/section', layer: 'Components' }]}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Icon', href: '/components/icon', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  ]}
 />
 
-<Story
-  name='Empty'
-  storyModule={Stories}
-  composition={[{ name: 'Section', href: '/components/section', layer: 'Components' }]}
-/>
+## Props
+
+| Prop                      | Type                                          | Default      | Description                                                           |
+| ------------------------- | --------------------------------------------- | ------------ | --------------------------------------------------------------------- |
+| `methods`                 | `UserProfileMfaMethod[]`                      | — (required) | Prepared rows, in display order. All supplied rows render.            |
+| `sectionTitle`            | `string`                                      | —            | Optional surrounding heading.                                         |
+| `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the selected method from the current Add menu.               |
+| `onSetDefault`            | `(id: string) => void`                        | —            | Requests changing the default SMS method.                             |
+| `onRemove`                | `(id: string) => void`                        | —            | Receives the selected method ID. The current row calls this directly. |
+| `onRegenerateBackupCodes` | `() => void`                                  | —            | Requests backup-code regeneration.                                    |
+
+Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), and optional `label` and `description`. Supply the formatted phone number as the SMS description so its menu has a distinct accessible name.
+
+| Method field    | Type      | Default | Description                                                                   |
+| --------------- | --------- | ------- | ----------------------------------------------------------------------------- |
+| `isDefault`     | `boolean` | `false` | Displays the Default badge.                                                   |
+| `canRemove`     | `boolean` | `true`  | Allows removal of an SMS or authenticator method when `onRemove` is supplied. |
+| `canSetDefault` | `boolean` | `false` | Allows Set as default on an SMS method when `onSetDefault` is supplied.       |
+
+## Usage
+
+The caller decides whether to mount the section from the instance's second-factor configuration, even when existing methods are present. When mounted, the section stays visible with no methods or callbacks. The caller also prepares the method order, default indicators, and removal permissions, including restrictions when MFA is required. Backup-code rows only offer regeneration.
+
+Callbacks report user intent; updated props determine the displayed result. Enrollment dialogs, removal confirmation, and asynchronous action feedback are still being developed.
+
+### Read-only methods
+
+Omitting callbacks hides their actions without hiding the rows.
+
+<Story name='ReadOnly' storyModule={Stories} />
+
+### No methods
+
+An empty section remains visible when Add is unavailable.
+
+<Story name='Empty' storyModule={Stories} />

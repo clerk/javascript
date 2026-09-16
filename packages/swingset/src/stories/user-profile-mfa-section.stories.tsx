@@ -9,6 +9,7 @@ export { default as __source } from './user-profile-mfa-section.stories?raw';
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
+  substatus: 'needs wire-up',
   title: 'UserProfileMfaSection',
   label: '2-step verification',
   navigation: { category: 'Sections' },
@@ -16,70 +17,52 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const [methods, setMethods] = useState<UserProfileMfaMethod[]>([
-    { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
+  const [defaultId, setDefaultId] = useState('personal');
+  const methods: UserProfileMfaMethod[] = [
+    {
+      id: 'personal',
+      type: 'sms',
+      description: '+1 801-555-0100',
+      isDefault: defaultId === 'personal',
+      canSetDefault: defaultId !== 'personal',
+    },
+    {
+      id: 'work',
+      type: 'sms',
+      description: '+1 801-555-0200',
+      isDefault: defaultId === 'work',
+      canSetDefault: defaultId !== 'work',
+    },
     { id: 'backup', type: 'backup-codes' },
-  ]);
+  ];
 
   return (
     <UserProfileMfaSectionView
       methods={methods}
       sectionTitle='Authentication'
-      onAdd={type =>
-        setMethods(current => {
-          const timestamp = Date.now();
-          return [
-            ...current,
-            {
-              id: `${type}-${timestamp}`,
-              type,
-              description: type === 'sms' ? '+1 801-555-0100' : undefined,
-            },
-            ...(current.some(method => method.type === 'backup-codes')
-              ? []
-              : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
-          ];
-        })
-      }
-      onRegenerateBackupCodes={() =>
-        setMethods(current =>
-          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
-        )
-      }
-      onRemove={id => setMethods(current => current.filter(method => method.id !== id))}
+      onSetDefault={setDefaultId}
+    />
+  );
+}
+
+export function ReadOnly() {
+  return (
+    <UserProfileMfaSectionView
+      methods={[
+        { id: 'authenticator', type: 'authenticator', isDefault: true, canRemove: false },
+        { id: 'sms', type: 'sms', description: '+1 801-555-0100' },
+        { id: 'backup', type: 'backup-codes' },
+      ]}
+      sectionTitle='Authentication'
     />
   );
 }
 
 export function Empty() {
-  const [methods, setMethods] = useState<UserProfileMfaMethod[]>([]);
-
   return (
     <UserProfileMfaSectionView
-      methods={methods}
+      methods={[]}
       sectionTitle='Authentication'
-      onAdd={type =>
-        setMethods(current => {
-          const timestamp = Date.now();
-          return [
-            ...current,
-            {
-              id: `${type}-${timestamp}`,
-              type,
-              description: type === 'sms' ? '+1 801-555-0100' : undefined,
-            },
-            ...(current.some(method => method.type === 'backup-codes')
-              ? []
-              : [{ id: `backup-${timestamp}`, type: 'backup-codes' as const }]),
-          ];
-        })
-      }
-      onRegenerateBackupCodes={() =>
-        setMethods(current =>
-          current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
-        )
-      }
-      onRemove={id => setMethods(current => current.filter(method => method.id !== id))}
     />
   );
 }
