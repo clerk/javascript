@@ -1,5 +1,4 @@
 import * as stylex from '@stylexjs/stylex';
-import { useState } from 'react';
 
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
@@ -11,7 +10,6 @@ import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 import { styles } from './user-profile-connected-accounts.styles';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
-import { UserProfileRemoveConnectedAccountDialog } from './user-profile-remove-connected-account.dialog';
 
 export function UserProfileConnectedAccountRowView({
   account,
@@ -22,16 +20,15 @@ export function UserProfileConnectedAccountRowView({
   account: UserProfileConnectedAccount;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (account: UserProfileConnectedAccount) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const iconUrl = account.iconUrl?.trim();
   const actions: UserProfileMenuAction[] = [];
   if (account.status === 'reconnect' && onReconnect) {
     actions.push({ label: m.reconnect, onClick: () => onReconnect(account.id) });
   }
   if (onRemove && account.canRemove !== false) {
-    actions.push({ label: m.remove, color: 'negative', onClick: () => setOpen(true) });
+    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(account) });
   }
   return (
     <Section.Row xstyle={onConnect && styles.connectRow}>
@@ -91,18 +88,7 @@ export function UserProfileConnectedAccountRowView({
             <UserProfileActionMenu
               label={fill(m.manageLabel, { provider: account.provider })}
               actions={actions}
-            >
-              {onRemove && account.canRemove !== false ? (
-                <UserProfileRemoveConnectedAccountDialog
-                  provider={account.provider}
-                  open={open}
-                  onOpenChange={setOpen}
-                  onConfirm={() => onRemove(account.id)}
-                  isPending={account.isRemoving}
-                  errorMessage={account.removalError}
-                />
-              ) : null}
-            </UserProfileActionMenu>
+            />
           </Section.Actions>
         ) : null}
       </Section.Item>

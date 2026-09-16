@@ -1,5 +1,4 @@
 import * as stylex from '@stylexjs/stylex';
-import type { ReactNode } from 'react';
 
 import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
@@ -8,14 +7,10 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
-import { rich } from '../../../utils/messages';
+import { fill, rich } from '../../../utils/messages';
 import { styles as profileStyles } from '../user-profile-profile-panel.styles';
 import { userProfileVerifyEmailLinkMessages as m } from './user-profile-verify-email-link.messages';
 import { styles } from './user-profile-verify-email-link.styles';
-
-const components = {
-  strong: (children?: ReactNode) => <strong {...stylex.props(styles.emphasis, styles.emailAddress)}>{children}</strong>,
-};
 
 export interface UserProfileVerifyEmailLinkDialogProps {
   open: boolean;
@@ -70,7 +65,7 @@ export function UserProfileVerifyEmailLinkDialog({
               <Text xstyle={styles.emphasis}>{m.waiting}</Text>
             </div>
             <div {...stylex.props(styles.details)}>
-              <Card.Description>{rich(m.description, { values: { emailAddress }, components })}</Card.Description>
+              <Card.Description>{fill(m.description, { emailAddress })}</Card.Description>
               <Button
                 type='button'
                 size='sm'

@@ -9,7 +9,6 @@ describe('UserProfileContactListRowView', () => {
     const onVerify = vi.fn();
     const onSetPrimary = vi.fn();
     const onRemove = vi.fn();
-    const renderActionDialog = vi.fn(() => null);
     const item = { id: 'contact_1', value: 'Contact', isDefault: true, isVerified: true, canRemove: false };
     render(
       <UserProfileContactListRowView
@@ -19,12 +18,10 @@ describe('UserProfileContactListRowView', () => {
         onVerify={onVerify}
         onSetPrimary={onSetPrimary}
         onRemove={onRemove}
-        renderActionDialog={renderActionDialog}
       />,
     );
 
     expect(screen.queryByRole('button', { name: 'Manage Contact' })).not.toBeInTheDocument();
-    expect(renderActionDialog).not.toHaveBeenCalled();
   });
 
   it('offers removal when it applies', async () => {
