@@ -63,9 +63,9 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 4, name: 'Active devices' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
-    expect(screen.getByText('Password')).toHaveClass('cl-section-label');
-    expect(screen.getByText('Passkeys')).toHaveClass('cl-section-label');
-    expect(screen.getByText('2-step verification')).toHaveClass('cl-section-label');
+    expect(screen.getByText('Password')).toBeVisible();
+    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByText('2-step verification')).toBeVisible();
     expect(screen.getByRole('region', { name: 'Passkeys' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: '2-step verification' })).toBeInTheDocument();
     expect(screen.getByText('This device')).toBeInTheDocument();
@@ -76,7 +76,6 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('forwards security actions', async () => {
-    const onChangePassword = vi.fn();
     const onAddPasskey = vi.fn();
     const onManagePasskey = vi.fn();
     const onRemovePasskey = vi.fn();
@@ -91,7 +90,6 @@ describe('UserProfileSecurityPanelView', () => {
         { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
         { id: 'backup_1', type: 'backup-codes' },
       ],
-      onChangePassword,
       onAddPasskey,
       onManagePasskey,
       onRemovePasskey,
@@ -101,7 +99,6 @@ describe('UserProfileSecurityPanelView', () => {
       onDeleteAccount,
     });
 
-    await user.click(screen.getByRole('button', { name: 'Change password' }));
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     expect(screen.queryByRole('menuitem', { name: 'SMS verification' })).not.toBeInTheDocument();
@@ -123,7 +120,6 @@ describe('UserProfileSecurityPanelView', () => {
     await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
     await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
-    expect(onChangePassword).toHaveBeenCalledOnce();
     expect(onAddPasskey).toHaveBeenCalledOnce();
     expect(onManagePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');

@@ -1,17 +1,18 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { stringToFormattedPhoneString } from '../../../../utils/phoneUtils';
+import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { fill } from '../../../utils/messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
 import { UserProfileAddPhoneDialog } from './user-profile-add-phone.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
-import { UserProfileRemovePhoneDialog } from './user-profile-remove-phone.dialog';
 
 export interface UserProfilePhoneRowViewProps {
   phones: UserProfilePhone[];
@@ -41,9 +42,7 @@ export function UserProfilePhoneRowView({
         compact={allowMultipleAccounts}
       />
     ) : undefined;
-  const [phoneToRemove, setPhoneToRemove] = useState<UserProfilePhone>();
-  const [removeError, setRemoveError] = useState<string>();
-  const removing = useRef(false);
+  const removePhoneConfirmation = useMemo(() => Confirmation.createHandle<UserProfilePhone>(), []);
   const [isSettingPrimary, setIsSettingPrimary] = useState(false);
   const [primaryError, setPrimaryError] = useState<string>();
   const settingPrimary = useRef(false);
@@ -68,25 +67,8 @@ export function UserProfilePhoneRowView({
 
   const removePhone = (id: string) => {
     const phone = phones.find(phone => phone.id === id);
-    if (!phone || phone.canRemove === false || !onRemovePhone || removing.current) {
-      return;
-    }
-    setPhoneToRemove(phone);
-    setRemoveError(undefined);
-  };
-
-  const confirmRemovePhone = async () => {
-    if (!phoneToRemove || !onRemovePhone || removing.current) {
-      return;
-    }
-    removing.current = true;
-    setPhoneToRemove(undefined);
-    try {
-      await onRemovePhone(phoneToRemove.id);
-    } catch (error) {
-      setRemoveError(error instanceof Error ? error.message : m.phone.removeError);
-    } finally {
-      removing.current = false;
+    if (phone && phone.canRemove !== false && onRemovePhone) {
+      removePhoneConfirmation.open(phone);
     }
   };
   const formattedPhones = phones.map(phone => ({
@@ -116,22 +98,6 @@ export function UserProfilePhoneRowView({
         onRemove={onRemovePhone ? removePhone : undefined}
         onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
         onVerify={onVerifyPhone}
-        renderActionDialog={
-          onRemovePhone
-            ? phone => (
-                <UserProfileRemovePhoneDialog
-                  phoneNumber={phone.value}
-                  open={phoneToRemove?.id === phone.id}
-                  onOpenChange={open => {
-                    if (!open) {
-                      setPhoneToRemove(undefined);
-                    }
-                  }}
-                  onConfirm={() => void confirmRemovePhone()}
-                />
-              )
-            : undefined
-        }
       />
       {primaryError ? (
         <Text
@@ -141,13 +107,17 @@ export function UserProfilePhoneRowView({
           {primaryError}
         </Text>
       ) : null}
-      {removeError ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {removeError}
-        </Text>
+      {onRemovePhone ? (
+        <Confirmation
+          handle={removePhoneConfirmation}
+          title={m.phone.removeDialog.title}
+          description={phone =>
+            fill(m.phone.removeDialog.description, { phoneNumber: stringToFormattedPhoneString(phone.value) })
+          }
+          actionLabel={m.phone.removeDialog.confirm}
+          cancelLabel={m.phone.removeDialog.cancel}
+          onConfirm={phone => onRemovePhone(phone.id)}
+        />
       ) : null}
     </>
   );

@@ -2,11 +2,14 @@ import { UserProfileWeb3WalletsSectionView } from '@clerk/ui/mosaic/features/use
 
 import type { StoryMeta } from '@/lib/types';
 
+import { primaryWallet, secondaryWallet, useWeb3WalletsFixture } from './fixtures/user-profile-web3-wallets';
+
 export { default as __source } from './user-profile-web3-wallets-section.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
+  substatus: 'needs wire-up',
   title: 'UserProfileWeb3WalletsSection',
   label: 'Web3 wallets',
   navigation: { category: 'Sections' },
@@ -14,26 +17,59 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
+  const fixture = useWeb3WalletsFixture();
+  return <UserProfileWeb3WalletsSectionView {...fixture} />;
+}
+
+export function ConnectedWallets() {
+  const fixture = useWeb3WalletsFixture({ initialWallets: [primaryWallet, secondaryWallet] });
+  return <UserProfileWeb3WalletsSectionView {...fixture} />;
+}
+
+export function ConnectOnly() {
+  const fixture = useWeb3WalletsFixture({ initialWallets: [] });
+  return <UserProfileWeb3WalletsSectionView {...fixture} />;
+}
+
+export function UnverifiedWallet() {
+  const fixture = useWeb3WalletsFixture({
+    initialWallets: [{ ...primaryWallet, isPrimary: false, isVerified: false }],
+    availableProviders: [{ id: 'metamask', provider: 'MetaMask', iconUrl: primaryWallet.iconUrl }],
+  });
   return (
     <UserProfileWeb3WalletsSectionView
-      wallets={[
-        {
-          id: 'metamask',
-          address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-          provider: 'MetaMask',
-          iconUrl: 'https://img.clerk.com/static/metamask.svg',
-          isPrimary: true,
-          isVerified: true,
-        },
-        {
-          id: 'coinbase-wallet',
-          provider: 'Coinbase Wallet',
-          iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
-          connected: false,
-        },
-      ]}
-      onConnect={() => undefined}
-      onManage={() => undefined}
+      {...fixture}
+      availableProviders={fixture.wallets.length === 0 ? fixture.availableProviders : []}
     />
   );
+}
+
+export function ConnectionError() {
+  const fixture = useWeb3WalletsFixture({
+    initialWallets: [],
+    availableProviders: [
+      {
+        id: 'metamask',
+        provider: 'MetaMask',
+        iconUrl: primaryWallet.iconUrl,
+        connectError: 'Wallet extension not found. Check your wallet and try again.',
+      },
+    ],
+  });
+  return <UserProfileWeb3WalletsSectionView {...fixture} />;
+}
+
+export function PrimaryError() {
+  const fixture = useWeb3WalletsFixture({ initialWallets: [primaryWallet, secondaryWallet], primaryError: true });
+  return <UserProfileWeb3WalletsSectionView {...fixture} />;
+}
+
+export function RemovalPending() {
+  const fixture = useWeb3WalletsFixture({ removalState: 'pending' });
+  return <UserProfileWeb3WalletsSectionView {...fixture} />;
+}
+
+export function RemovalError() {
+  const fixture = useWeb3WalletsFixture({ removalState: 'error' });
+  return <UserProfileWeb3WalletsSectionView {...fixture} />;
 }

@@ -41,10 +41,10 @@ export const sizes = stylex.create({
 
 // Text has no fill to sit on, so each color resolves to the readable token of its
 // pair: the saturated one for warning/negative/positive, `-foreground` for neutral
-// (`--cl-color-neutral` is a surface fill).
+// (`--cl-color-foreground` is a surface fill).
 export const colors = stylex.create({
-  primary: { color: colorVars['--cl-color-primary'] },
-  neutral: { color: colorVars['--cl-color-neutral-foreground'] },
+  primary: { color: colorVars['--cl-color-brand'] },
+  neutral: { color: colorVars['--cl-color-foreground'] },
   warning: { color: colorVars['--cl-color-warning'] },
   negative: { color: colorVars['--cl-color-negative'] },
   positive: { color: colorVars['--cl-color-positive'] },

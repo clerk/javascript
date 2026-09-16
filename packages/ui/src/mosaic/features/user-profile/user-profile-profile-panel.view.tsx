@@ -9,11 +9,14 @@ import type {
   UserProfilePhone,
 } from './user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from './user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
+import type {
+  UserProfileConnectedAccount,
+  UserProfileConnectionProvider,
+} from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
 import { styles } from './user-profile-profile-panel.styles';
-import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
+import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
@@ -25,14 +28,15 @@ export type { UserProfileEditNameValue } from './user-profile-account-section/us
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {
   connectedAccounts?: UserProfileConnectedAccount[];
+  availableConnectionProviders?: UserProfileConnectionProvider[];
+  onReconnectAccount?: (id: string) => void;
   web3Wallets?: UserProfileWeb3Wallet[];
+  availableWeb3Providers?: UserProfileWeb3Provider[];
   onConnectAccount?: (id: string) => void;
-  onManageConnectedAccount?: (id: string) => void;
-  onRemoveConnectedAccount?: (id: string) => void;
+  onRemoveConnectedAccount?: (id: string) => void | Promise<void>;
   onConnectWeb3Wallet?: (id: string) => void;
-  onManageWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
-  onRemoveWeb3Wallet?: (id: string) => void;
+  onRemoveWeb3Wallet?: (id: string) => void | Promise<void>;
   /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
   onDeleteAccount?: () => Promise<void>;
 }
@@ -50,13 +54,18 @@ export function UserProfileProfilePanelView({
   emails = [],
   phones = [],
   connectedAccounts = [],
+  availableConnectionProviders = [],
+  onReconnectAccount,
   web3Wallets = [],
+  availableWeb3Providers = [],
   onProfilePictureChange,
   onProfilePictureReject,
   onRemoveProfilePicture,
   onSubmitName,
   onSubmitUsername,
   onAddEmail,
+  onSendEmailCode,
+  onVerifyEmailCode,
   onManageEmail,
   onVerifyEmail,
   onSetPrimaryEmail,
@@ -68,10 +77,8 @@ export function UserProfileProfilePanelView({
   onSetPrimaryPhone,
   onRemovePhone,
   onConnectAccount,
-  onManageConnectedAccount,
   onRemoveConnectedAccount,
   onConnectWeb3Wallet,
-  onManageWeb3Wallet,
   onSetPrimaryWeb3Wallet,
   onRemoveWeb3Wallet,
   onDeleteAccount,
@@ -95,6 +102,8 @@ export function UserProfileProfilePanelView({
           onAddEmail={onAddEmail}
           onSendPhoneCode={onSendPhoneCode}
           onVerifyPhoneCode={onVerifyPhoneCode}
+          onSendEmailCode={onSendEmailCode}
+          onVerifyEmailCode={onVerifyEmailCode}
           onManageEmail={onManageEmail}
           onManagePhone={onManagePhone}
           onProfilePictureChange={onProfilePictureChange}
@@ -109,23 +118,20 @@ export function UserProfileProfilePanelView({
           onSubmitName={onSubmitName}
           onSubmitUsername={onSubmitUsername}
         />
-        {connectedAccounts.length > 0 ? (
-          <UserProfileConnectedAccountsSectionView
-            accounts={connectedAccounts}
-            onConnect={onConnectAccount}
-            onManage={onManageConnectedAccount}
-            onRemove={onRemoveConnectedAccount}
-          />
-        ) : null}
-        {web3Wallets.length > 0 ? (
-          <UserProfileWeb3WalletsSectionView
-            wallets={web3Wallets}
-            onConnect={onConnectWeb3Wallet}
-            onManage={onManageWeb3Wallet}
-            onRemove={onRemoveWeb3Wallet}
-            onSetPrimary={onSetPrimaryWeb3Wallet}
-          />
-        ) : null}
+        <UserProfileConnectedAccountsSectionView
+          accounts={connectedAccounts}
+          availableProviders={availableConnectionProviders}
+          onReconnect={onReconnectAccount}
+          onConnect={onConnectAccount}
+          onRemove={onRemoveConnectedAccount}
+        />
+        <UserProfileWeb3WalletsSectionView
+          wallets={web3Wallets}
+          availableProviders={availableWeb3Providers}
+          onConnect={onConnectWeb3Wallet}
+          onRemove={onRemoveWeb3Wallet}
+          onSetPrimary={onSetPrimaryWeb3Wallet}
+        />
         {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { Button } from '@clerk/ui/mosaic/components/button';
 import type { UserProfileFormError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
@@ -5,14 +6,19 @@ import type {
 } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
+import { UserProfileVerifyEmailLinkDialog } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
+import { UserProfileVerifyEmailSsoDialog } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
+import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
+import { useUserProfileVerifyEmailLinkFixture } from './fixtures/user-profile-verify-email-link';
+import { useUserProfileVerifyEmailSsoFixture } from './fixtures/user-profile-verify-email-sso';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -31,12 +37,20 @@ function AccountSection({
   failAt,
   failWith,
   usernameFailWith,
+  failEmailVerification = false,
+  emailRemovalState,
+  phoneRemovalState,
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
   failWith?: UserProfileFormError;
   usernameFailWith?: UserProfileFormError;
+  failEmailVerification?: boolean;
+  emailRemovalState?: 'pending' | 'error';
+  phoneRemovalState?: 'pending' | 'error';
 }) {
+  const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
+  const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
   const editName = useUserProfileEditNameFixture({ failWith });
   const editUsername = useUserProfileEditUsernameFixture({ failWith: usernameFailWith });
   const [emails, setEmails] = useState<UserProfileEmail[]>(
@@ -56,29 +70,47 @@ function AccountSection({
     failAt,
     onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
   });
+  const emailFlow = createUserProfileAddEmailFixture({
+    failAt: failEmailVerification ? 'verify' : undefined,
+    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+  });
 
   return (
     <UserProfileAccountSectionView
       {...editName}
       {...editUsername}
+      {...emailFlow}
       allowMultipleAccounts={allowMultipleAccounts}
       emails={emails}
       hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}
       phones={phones}
-      onAddEmail={() =>
-        setEmails(current => [
-          ...current,
-          { id: `email_${Date.now()}`, value: `item${current.length + 1}@clerk.dev`, isVerified: true },
-        ])
-      }
       {...addPhone}
       onProfilePictureChange={showFile}
       onRemoveProfilePicture={clearImage}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
-      onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
-      onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
+      onRemoveEmail={async id => {
+        if (emailRemovalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (emailRemovalState === 'error' && !emailRemovalFailed) {
+          setEmailRemovalFailed(true);
+          throw new Error('Unable to remove this email address. Try again.');
+        }
+        setEmails(current => current.filter(email => email.id !== id));
+      }}
+      onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
+      onRemovePhone={async id => {
+        if (phoneRemovalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (phoneRemovalState === 'error' && !phoneRemovalFailed) {
+          setPhoneRemovalFailed(true);
+          throw new Error('Unable to remove this phone number. Try again.');
+        }
+        setPhones(current => current.filter(phone => phone.id !== id));
+      }}
       onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
     />
   );
@@ -90,6 +122,83 @@ export function Default() {
 
 export function MultipleAccounts() {
   return <AccountSection allowMultipleAccounts />;
+}
+
+export function AddEmailFails() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      failEmailVerification
+    />
+  );
+}
+
+export function EmailLinkVerification() {
+  const fixture = useUserProfileVerifyEmailLinkFixture();
+  return (
+    <UserProfileVerifyEmailLinkDialog
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify email link
+        </Button>
+      }
+    />
+  );
+}
+
+export function EmailLinkResendFails() {
+  const fixture = useUserProfileVerifyEmailLinkFixture({ failResend: true });
+  return (
+    <UserProfileVerifyEmailLinkDialog
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify email link
+        </Button>
+      }
+    />
+  );
+}
+
+export function EmailSsoVerification() {
+  const fixture = useUserProfileVerifyEmailSsoFixture();
+  return (
+    <UserProfileVerifyEmailSsoDialog
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify with SSO
+        </Button>
+      }
+    />
+  );
+}
+
+export function EmailSsoConnectFails() {
+  const fixture = useUserProfileVerifyEmailSsoFixture({ failConnect: true });
+  return (
+    <UserProfileVerifyEmailSsoDialog
+      {...fixture}
+      trigger={
+        <Button
+          variant='outline'
+          color='neutral'
+        >
+          Verify with SSO
+        </Button>
+      }
+    />
+  );
 }
 
 /** Every save is rejected, so the dialog shows both halves of a failure at once. */
@@ -122,6 +231,42 @@ export function AddPhoneFails() {
     <AccountSection
       allowMultipleAccounts
       failAt='phone'
+    />
+  );
+}
+
+export function EmailRemovalPending() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      emailRemovalState='pending'
+    />
+  );
+}
+
+export function EmailRemovalError() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      emailRemovalState='error'
+    />
+  );
+}
+
+export function PhoneRemovalPending() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      phoneRemovalState='pending'
+    />
+  );
+}
+
+export function PhoneRemovalError() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      phoneRemovalState='error'
     />
   );
 }

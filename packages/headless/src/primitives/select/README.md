@@ -141,19 +141,20 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 
 ## Data Attributes
 
-| Attribute                   | Applies To | Description                     |
-| --------------------------- | ---------- | ------------------------------- |
-| `data-open` / `data-closed` | Trigger    | Popup open state                |
-| `data-selected`             | Option     | The currently selected option   |
-| `data-active`               | Option     | The keyboard-highlighted option |
-| `data-disabled`             | Option     | Disabled option                 |
-| `data-side`                 | Positioner | Resolved placement side         |
+| Attribute                   | Applies To | Description                                                                       |
+| --------------------------- | ---------- | --------------------------------------------------------------------------------- |
+| `data-open` / `data-closed` | Trigger    | Popup open state                                                                  |
+| `data-selected`             | Option     | The currently selected option                                                     |
+| `data-active`               | Option     | The keyboard-highlighted option                                                   |
+| `data-disabled`             | Option     | Disabled option                                                                   |
+| `data-side`                 | Positioner | Resolved placement side, or `none` while the selected option overlays the trigger |
 
 ## Important Notes
 
 - **`label` on `Select.Option`** drives both display in `Select.Value` and typeahead matching. If omitted, `value` is used for both.
 - **`items` prop** is only for label resolution — it does not control which options render. You still render `Select.Option` children yourself.
 - **Disabled options** can still receive keyboard focus but cannot be selected.
+- **Popup contents freeze while closing.** The popup outlives `open` by its exit animation, so its children are wrapped in `Freeze` (`@clerk/headless/utils`) and hold their last frame: picking an option does not move `data-selected` to the new row under the animation. The popup element itself keeps updating, so `data-closed` / `data-ending-style` still land.
 
 ## ARIA
 

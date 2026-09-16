@@ -85,7 +85,9 @@ export function ReverificationOTP({
                 }
               }}
             />
-            {errorMessage ? <Field.Error>{errorMessage}</Field.Error> : null}
+            <Field.Message>
+              <Field.Error>{errorMessage}</Field.Error>
+            </Field.Message>
             {resend ? (
               <Button
                 type='button'

@@ -324,4 +324,13 @@ describe('cssVars middleware', () => {
       ]);
     });
   });
+
+  it('uses the height an alignment middleware already settled on', async () => {
+    const state = createMockState({ floatingHeight: 150 });
+    state.middlewareData.alignSelectedItem = { availableHeight: 784 };
+
+    await cssVars().fn(state);
+
+    expect(getVars(state).get('--cl-available-height')).toBe('784px');
+  });
 });

@@ -25,11 +25,15 @@ const changeProvider = vi.fn();
 const contextState = vi.hoisted(() => ({
   provider: undefined as 'saml_okta' | 'saml_custom' | 'saml_google' | undefined,
   hasConnection: false,
+  // The scoped connection is not necessarily the first one the API returned.
+  scopedConnectionId: 'ent_1',
 }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
-    enterpriseConnection: contextState.hasConnection ? { id: 'ent_1' } : undefined,
+    enterpriseConnection: contextState.hasConnection
+      ? { id: contextState.scopedConnectionId, name: 'acme.com' }
+      : undefined,
     contentRef: { current: null },
     enterpriseConnectionMutations: {
       createConnection: createEnterpriseConnection,
@@ -62,6 +66,7 @@ const resetMocks = () => {
   changeProvider.mockResolvedValue(undefined);
   contextState.provider = undefined;
   contextState.hasConnection = false;
+  contextState.scopedConnectionId = 'ent_1';
 };
 
 describe('SelectProviderStep', () => {
@@ -273,11 +278,29 @@ describe('SelectProviderStep', () => {
       await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
 
       await waitFor(() => {
-        expect(changeProvider).toHaveBeenCalledWith('saml_google');
+        expect(changeProvider).toHaveBeenCalledWith('ent_1', 'saml_google');
       });
       await waitFor(() => {
         expect(goNext).toHaveBeenCalled();
       });
+    });
+
+    it('changes the scoped connection, not the first one in the list', async () => {
+      resetMocks();
+      contextState.provider = 'saml_okta';
+      contextState.hasConnection = true;
+      contextState.scopedConnectionId = 'ent_2';
+      const { wrapper } = await createFixtures();
+      const { userEvent } = renderStep(wrapper);
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Google Workspace' }));
+      await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+      await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
+
+      await waitFor(() => {
+        expect(changeProvider).toHaveBeenCalledWith('ent_2', 'saml_google');
+      });
+      expect(createEnterpriseConnection).not.toHaveBeenCalled();
     });
 
     it('closes the dialog and surfaces the error on the step when the change fails', async () => {
@@ -298,7 +321,7 @@ describe('SelectProviderStep', () => {
       await userEvent.click(await screen.findByRole('button', { name: 'Change provider' }));
 
       await waitFor(() => {
-        expect(changeProvider).toHaveBeenCalledWith('saml_google');
+        expect(changeProvider).toHaveBeenCalledWith('ent_1', 'saml_google');
       });
 
       // The dialog closes and the error surfaces on the step card.

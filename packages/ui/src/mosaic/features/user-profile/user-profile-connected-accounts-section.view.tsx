@@ -1,81 +1,80 @@
-import { Button } from '../../components/button';
-import { Icon } from '../../components/icon';
-import { Section } from '../../components/section';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { UserProfileProviderIcon } from './user-profile-provider-icon';
+import { useMemo } from 'react';
 
-export interface UserProfileConnectedAccount {
+import { Confirmation } from '../../blocks/confirmation';
+import { Section } from '../../components/section';
+import { fill } from '../../utils/messages';
+import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
+import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
+
+export interface UserProfileConnectionProvider {
   id: string;
   provider: string;
-  identifier?: string;
   iconUrl?: string;
-  connected?: boolean;
+  connectError?: string;
+}
+
+export interface UserProfileConnectedAccount extends UserProfileConnectionProvider {
+  identifier?: string;
   canRemove?: boolean;
+  status?: 'connected' | 'reconnect' | 'error';
+  verificationError?: string;
+  reconnectError?: string;
 }
 
 export interface UserProfileConnectedAccountsSectionViewProps {
   accounts: UserProfileConnectedAccount[];
+  availableProviders?: UserProfileConnectionProvider[];
   onConnect?: (id: string) => void;
-  onManage?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onReconnect?: (id: string) => void;
+  onRemove?: (id: string) => void | Promise<void>;
 }
 
 export function UserProfileConnectedAccountsSectionView({
   accounts,
+  availableProviders = [],
   onConnect,
-  onManage,
+  onReconnect,
   onRemove,
 }: UserProfileConnectedAccountsSectionViewProps) {
-  return (
-    <Section.Root>
-      <Section.Title>Connected accounts</Section.Title>
-      <Section.Group>
-        {accounts.map(account => {
-          const connected = account.connected ?? Boolean(account.identifier);
-          const actions: UserProfileMenuAction[] = [];
-          if (onRemove && account.canRemove !== false) {
-            actions.push({ label: 'Remove', color: 'negative', onClick: () => onRemove(account.id) });
-          } else if (!onRemove && onManage) {
-            actions.push({ label: 'Manage', onClick: () => onManage(account.id) });
-          }
+  const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
+  const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
 
-          return (
-            <Section.Row key={account.id}>
-              <Section.Item>
-                {account.iconUrl ? <UserProfileProviderIcon iconUrl={account.iconUrl} /> : null}
-                <Section.Content>
-                  <Section.Label>{account.provider}</Section.Label>
-                  {account.identifier ? <Section.Description>{account.identifier}</Section.Description> : null}
-                </Section.Content>
-                <Section.Actions>
-                  {connected ? (
-                    <UserProfileActionMenu
-                      actions={actions}
-                      label={`Manage ${account.provider}`}
-                    />
-                  ) : null}
-                  {!connected && onConnect ? (
-                    <Button
-                      color='neutral'
-                      size='sm'
-                      variant='outline'
-                      onClick={() => onConnect(account.id)}
-                    >
-                      Connect
-                      <Icon
-                        name='arrow-right-top'
-                        placement='inline-end'
-                        size='sm'
-                      />
-                    </Button>
-                  ) : null}
-                </Section.Actions>
-              </Section.Item>
-            </Section.Row>
-          );
-        })}
-      </Section.Group>
-    </Section.Root>
+  return (
+    <>
+      {hasRows ? (
+        <Section.Root>
+          <Section.Title>{m.title}</Section.Title>
+          <Section.Group>
+            {accounts.map(account => (
+              <UserProfileConnectedAccountRowView
+                key={account.id}
+                account={account}
+                onReconnect={onReconnect}
+                onRemove={onRemove ? account => removeAccount.open(account) : undefined}
+              />
+            ))}
+            {onConnect
+              ? availableProviders.map(provider => (
+                  <UserProfileConnectedAccountRowView
+                    key={provider.id}
+                    account={provider}
+                    onConnect={onConnect}
+                  />
+                ))
+              : null}
+          </Section.Group>
+        </Section.Root>
+      ) : null}
+      {onRemove ? (
+        <Confirmation
+          handle={removeAccount}
+          title={m.removeDialog.title}
+          description={account => fill(m.removeDialog.description, { provider: account.provider })}
+          actionLabel={m.removeDialog.confirm}
+          cancelLabel={m.removeDialog.cancel}
+          onConfirm={account => onRemove(account.id)}
+        />
+      ) : null}
+    </>
   );
 }

@@ -16,12 +16,16 @@ import type {
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
+import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
+import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
+import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
+import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export interface UserProfileFixtureOptions {
-  /** Replaces the default "append an address" behaviour, e.g. to open a real prompt. */
+  /** Replaces the default OTP flow, e.g. for a custom dialog example. */
   onAddEmail?: () => void;
 }
 
@@ -48,8 +52,11 @@ const initialAPIKeys: UserProfileAPIKey[] = [
  * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
+  const connections = useConnectedAccountsFixture();
+  const wallets = useWeb3WalletsFixture();
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
+  const editPassword = useUserProfileEditPasswordFixture();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
@@ -114,17 +121,32 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
 
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
+  const emailFlow = createUserProfileAddEmailFixture({
+    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+  });
 
   const pages: UserProfileViewProps['pages'] = {
     account: {
       ...editName,
       ...editUsername,
+      connectedAccounts: connections.accounts,
+      availableConnectionProviders: connections.availableProviders,
+      onConnectAccount: connections.onConnect,
+      onReconnectAccount: connections.onReconnect,
+      onRemoveConnectedAccount: connections.onRemove,
+      web3Wallets: wallets.wallets,
+      availableWeb3Providers: wallets.availableProviders,
+      onConnectWeb3Wallet: wallets.onConnect,
+      onSetPrimaryWeb3Wallet: wallets.onSetPrimary,
+      onRemoveWeb3Wallet: wallets.onRemove,
       allowMultipleAccounts: true,
       hasImage: Boolean(imageUrl),
       imageUrl,
       emails,
       phones,
-      onAddEmail: onAddEmail ?? (() => addEmail(`preston+${emails.length}@clerk.dev`)),
+      onAddEmail,
+      onSendEmailCode: onAddEmail ? undefined : emailFlow.onSendEmailCode,
+      onVerifyEmailCode: onAddEmail ? undefined : emailFlow.onVerifyEmailCode,
       ...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       }),
@@ -143,7 +165,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
         setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      hasPassword: true,
+      ...editPassword,
       passkeys,
       mfaMethods,
       devices,
@@ -157,7 +179,6 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
           ...current,
           { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
         ]),
-      onChangePassword: () => undefined,
       onDeleteAccount: () => Promise.resolve(),
       onManageDevice: () => undefined,
       onManagePasskey: () => undefined,

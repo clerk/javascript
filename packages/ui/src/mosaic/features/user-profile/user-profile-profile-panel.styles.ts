@@ -1,10 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { fontWeightVars, space } from '../../tokens.stylex';
+import { space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  confirmPhoneNumber: {
-    fontWeight: fontWeightVars['--cl-font-medium'],
+  countdown: {
+    display: 'inline-block',
+    fontVariantNumeric: 'tabular-nums',
+    textAlign: 'center',
+    minWidth: '2ch',
   },
   contactValue: {
     gap: space['2'],

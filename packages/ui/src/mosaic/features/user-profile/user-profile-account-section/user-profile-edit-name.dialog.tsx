@@ -8,7 +8,7 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Input } from '../../../components/input';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 import type { UserProfileFormError, UserProfileNameAttribute } from './user-profile-account-section.types';
 
 export type UserProfileEditNameField = 'firstName' | 'lastName';
@@ -114,7 +114,9 @@ export function UserProfileEditNameDialog({
                   value={firstName}
                   onChange={event => onFirstNameChange(event.target.value)}
                 />
-                {error?.fields?.firstName ? <Field.Error>{error.fields.firstName}</Field.Error> : null}
+                <Field.Message>
+                  <Field.Error>{error?.fields?.firstName}</Field.Error>
+                </Field.Message>
               </Field.Root>
             ) : null}
             {showLastName ? (
@@ -130,7 +132,9 @@ export function UserProfileEditNameDialog({
                   value={lastName}
                   onChange={event => onLastNameChange(event.target.value)}
                 />
-                {error?.fields?.lastName ? <Field.Error>{error.fields.lastName}</Field.Error> : null}
+                <Field.Message>
+                  <Field.Error>{error?.fields?.lastName}</Field.Error>
+                </Field.Message>
               </Field.Root>
             ) : null}
           </Card.Content>
