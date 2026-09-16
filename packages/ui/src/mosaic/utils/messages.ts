@@ -65,7 +65,7 @@ function fold(
   start: number,
   stopTag: string | undefined,
   options: RichOptions,
-): { nodes: ReactNode[]; next: number } {
+): { nodes: ReactNode[]; next: number; closed: boolean } {
   const nodes: ReactNode[] = [];
   let i = start;
   while (i < tokens.length) {
@@ -82,18 +82,22 @@ function fold(
       i++;
     } else if (token.type === 'close') {
       if (token.name === stopTag) {
-        return { nodes, next: i + 1 };
+        return { nodes, next: i + 1, closed: true };
       }
       nodes.push(`{/${token.name}}`);
       i++;
     } else {
       const inner = fold(tokens, i + 1, token.name, options);
-      const component = own(options.components, token.name);
-      nodes.push(createElement(Fragment, { key: i }, component ? component(inner.nodes) : inner.nodes));
+      if (inner.closed) {
+        const component = own(options.components, token.name);
+        nodes.push(createElement(Fragment, { key: i }, component ? component(inner.nodes) : inner.nodes));
+      } else {
+        nodes.push(`{#${token.name}}`, ...inner.nodes);
+      }
       i = inner.next;
     }
   }
-  return { nodes, next: i };
+  return { nodes, next: i, closed: false };
 }
 
 export function rich(template: string, options: RichOptions = {}): ReactNode {

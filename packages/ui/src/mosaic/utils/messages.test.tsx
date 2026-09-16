@@ -100,6 +100,13 @@ describe('rich', () => {
     expect(container.innerHTML).toBe('<p>Use {/strong} literally</p>');
   });
 
+  it('leaves an unmatched opening tag in place and does not wrap the rest', () => {
+    const { container } = render(
+      <p>{rich('Read {#a}terms now', { components: { a: c => <a href='/terms'>{c}</a> } })}</p>,
+    );
+    expect(container.innerHTML).toBe('<p>Read {#a}terms now</p>');
+  });
+
   it('ignores inherited object properties', () => {
     const { container } = render(
       <p>{rich('{#constructor}x{/constructor}{toString}', { values: {}, components: {} })}</p>,
