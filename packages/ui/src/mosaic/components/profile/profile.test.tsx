@@ -318,13 +318,10 @@ describe('Profile', () => {
   });
 
   describe('inside a dialog', () => {
-    function renderInDialog(inline = false) {
+    function renderInDialog() {
       return render(
         <MosaicProvider>
-          <Dialog.Root
-            defaultOpen
-            inline={inline}
-          >
+          <Dialog.Root defaultOpen>
             <Dialog.Popup size='profile'>
               <Surface />
             </Dialog.Popup>
@@ -344,18 +341,15 @@ describe('Profile', () => {
       expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
     });
 
-    it('carries no dismiss standalone, or inline', () => {
-      const standalone = renderSurface();
-      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
-      standalone.unmount();
+    // The dismiss belongs to the dialog, so a profile that is the page's own content has none.
+    it('carries no dismiss standalone', () => {
+      renderSurface();
 
-      renderInDialog(true);
-      expect(screen.getByRole('dialog', { name: 'User profile' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
     });
 
-    // Switching pages must never resize the surface: standalone and inline it holds a fixed height
-    // and scrolls inside; over the page the popup's height is the one that counts.
+    // Switching pages must never resize the surface: standalone it holds a fixed height and
+    // scrolls inside; over the page the popup's height is the one that counts.
     it('holds a fixed height standalone, and hands it to the popup over the page', () => {
       const probe = stylex.create({ fixed: { blockSize: '45rem' }, handed: { blockSize: 'auto' } });
       const fixed = atomsOf(probe.fixed);
@@ -371,14 +365,14 @@ describe('Profile', () => {
       expect(frame()).toEqual(expect.arrayContaining(handed));
     });
 
-    // Inline the profile is the page's content: no frame, no scroll region of its own, and the
+    // Flush, the profile is the page's content: no frame, no scroll region of its own, and the
     // branding closes the pages' column out rather than the navigation's.
-    it('is flush and unframed inline, and scrolls with the page', () => {
+    it('is flush and unframed at that elevation, and scrolls with the page', () => {
       const probe = stylex.create({
         frameless: { borderWidth: '0px', overflow: 'visible', backgroundColor: 'transparent', blockSize: 'auto' },
         scroller: { overflowY: 'auto' },
       });
-      renderInDialog(true);
+      renderSurface({ elevation: 'flush' });
 
       const frame = document.querySelector('.cl-profile-layout')!;
       expect(Array.from(frame.classList)).toEqual(expect.arrayContaining(atomsOf(probe.frameless)));

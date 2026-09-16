@@ -97,7 +97,7 @@ export function Destructive({
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      dismissOn='escape'
       open={open}
       onOpenChange={onOpenChange}
     >

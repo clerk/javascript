@@ -7,7 +7,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { Branding } from '../branding';
 import { Button } from '../button';
-import { Dialog, DialogContext, isOverlayDialog } from '../dialog';
+import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Icon } from '../icon';
 import { cardContentMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
@@ -102,10 +102,10 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
-              Not for an inline dialog, which nothing closes, and not for an alert dialog. */}
+              Not outside a dialog, where there is nothing to close, and not in an alert dialog. */}
           {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
               without answering one. The cancel action in the footer is the way out. */}
-          {isOverlayDialog(dialog) && dialog?.role !== 'alertdialog' ? <HeaderCloseButton /> : null}
+          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <HeaderCloseButton /> : null}
           <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
             {children}
           </div>

@@ -267,13 +267,10 @@ describe('stacked backdrops', () => {
   // The backdrop's two cases differ by a style rather than by an attribute, so the assertion is
   // that the same tree with only the hosting size changed produces different classes. Comparing
   // rather than matching a class: StyleX names are content hashes and would pin the value.
-  async function innerBackdropClass(host: { size?: DialogSize; inline?: boolean }) {
+  async function innerBackdropClass(host: { size?: DialogSize }) {
     const user = userEvent.setup();
     render(
-      <Dialog.Root
-        defaultOpen
-        inline={host.inline}
-      >
+      <Dialog.Root defaultOpen>
         <Dialog.Popup size={host.size}>
           <Surface title='Host' />
           <Dialog.Root>
@@ -286,7 +283,7 @@ describe('stacked backdrops', () => {
       </Dialog.Root>,
     );
     await user.click(screen.getByRole('button', { name: 'Add email' }));
-    // An inline host renders no backdrop of its own, so the inner one is the only one.
+    // The host paints one too, so the inner dialog's is the last.
     const backdrops = document.querySelectorAll('.cl-dialog-backdrop');
     const className = backdrops[backdrops.length - 1].className;
     cleanup();
@@ -298,14 +295,6 @@ describe('stacked backdrops', () => {
     const overPanel = await innerBackdropClass({ size: 'profile' });
 
     expect(overCard).not.toBe(overPanel);
-  });
-
-  // The nested scrim is solved to composite over the host's own, and an inline host has none.
-  it('paints the base scrim, not the nested one, for a card over an inline profile', async () => {
-    const overInline = await innerBackdropClass({ size: 'profile', inline: true });
-    const overPanel = await innerBackdropClass({ size: 'profile' });
-
-    expect(overInline).not.toBe(overPanel);
   });
 
   it('marks the popup beneath as the stack base, so it can recede', async () => {
@@ -482,12 +471,9 @@ const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
 
 const classesOf = (selector: string) => Array.from(document.querySelector(selector)!.classList);
 
-function renderSize(size: DialogSize, inline = false) {
+function renderSize(size: DialogSize) {
   return render(
-    <Dialog.Root
-      defaultOpen
-      inline={inline}
-    >
+    <Dialog.Root defaultOpen>
       <Dialog.Popup size={size}>Body</Dialog.Popup>
     </Dialog.Root>,
   );
@@ -670,135 +656,6 @@ describe('sizing container', () => {
     expect(viewport).toContainElement(track);
     expect(Array.from(track.classList)).toEqual(expect.arrayContaining(atomFor(probe.phoneSides)));
     expect(Array.from(viewport.classList)).not.toEqual(expect.arrayContaining(atomFor(probe.phoneSides)));
-  });
-
-  it('keeps the container inline, where the host width is what the bands should follow', () => {
-    renderSize('profile', true);
-
-    expect(classesOf('.cl-dialog-viewport')).toEqual(expect.arrayContaining(atomFor(probe.container)));
-  });
-});
-
-describe('inline presentation', () => {
-  function Inline({ onOpenChange }: { onOpenChange?: () => void } = {}) {
-    return (
-      <div data-testid='host'>
-        <Dialog.Root
-          inline
-          onOpenChange={onOpenChange}
-        >
-          <Dialog.Popup size='profile'>
-            <Surface title='Account' />
-            <input aria-label='Name' />
-          </Dialog.Popup>
-        </Dialog.Root>
-      </div>
-    );
-  }
-
-  it('renders in place, open, with no portal, backdrop or scroll lock', () => {
-    render(<Inline />);
-
-    const popup = screen.getByRole('dialog', { name: 'Account' });
-    expect(screen.getByTestId('host')).toContainElement(popup);
-    expect(document.querySelector('.cl-dialog-backdrop')).not.toBeInTheDocument();
-    expect(document.body.style.overflow).toBe('');
-    expect(popup).toHaveAttribute('data-inline', '');
-    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-inline', '');
-  });
-
-  it('does not steal focus on mount', async () => {
-    render(<Inline />);
-
-    await settle();
-
-    expect(screen.getByRole('textbox', { name: 'Name' })).not.toHaveFocus();
-  });
-
-  it('is not dismissed by Escape, and reports no close', async () => {
-    const user = userEvent.setup();
-    const onOpenChange = vi.fn();
-    render(<Inline onOpenChange={onOpenChange} />);
-
-    await user.click(screen.getByRole('textbox', { name: 'Name' }));
-    await user.keyboard('{Escape}');
-    await user.tab();
-
-    expect(screen.getByRole('dialog', { name: 'Account' })).toBeInTheDocument();
-    expect(onOpenChange).not.toHaveBeenCalled();
-  });
-
-  it('does not trap focus: the page around it stays reachable', async () => {
-    const user = userEvent.setup();
-    render(
-      <>
-        <Inline />
-        <button type='button'>After</button>
-      </>,
-    );
-
-    await user.click(screen.getByRole('textbox', { name: 'Name' }));
-    await user.tab();
-
-    expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
-  });
-
-  it('drops the inset so the surface fills its host', () => {
-    const probe = stylex.create({ flush: { paddingInline: 0 } });
-    renderSize('profile', true);
-
-    expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.flush)));
-  });
-
-  it('renders no corner close button, and warns', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    render(
-      <Dialog.Root inline>
-        <Dialog.Popup size='profile'>
-          <Dialog.CloseButton />
-          <Surface title='Account' />
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('inline'));
-    warn.mockRestore();
-  });
-
-  // The shape the account profile takes when mounted in a page: the profile is the page, and the
-  // prompts it opens are modal over everything.
-  it('still portals and dismisses a dialog opened from inside it', async () => {
-    const user = userEvent.setup();
-    render(
-      <div data-testid='host'>
-        <Dialog.Root inline>
-          <Dialog.Popup size='profile'>
-            <Surface title='Account' />
-            <Dialog.Root>
-              <Dialog.Trigger render={nativeTrigger('Add email')} />
-              <Dialog.Popup>
-                <Surface title='Add email address' />
-              </Dialog.Popup>
-            </Dialog.Root>
-          </Dialog.Popup>
-        </Dialog.Root>
-      </div>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Add email' }));
-
-    const prompt = screen.getByRole('dialog', { name: 'Add email address' });
-    expect(screen.getByTestId('host')).not.toContainElement(prompt);
-    expect(document.querySelector('.cl-dialog-backdrop')).toBeInTheDocument();
-    expect(document.body.style.overflow).toBe('hidden');
-    expect(prompt).not.toHaveAttribute('data-inline');
-
-    await user.keyboard('{Escape}');
-
-    expect(screen.queryByRole('dialog', { name: 'Add email address' })).not.toBeInTheDocument();
-    expect(screen.getByRole('dialog', { name: 'Account' })).toBeInTheDocument();
-    expect(document.body.style.overflow).toBe('');
   });
 });
 

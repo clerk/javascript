@@ -368,11 +368,11 @@ describe('Mosaic Card', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('carries no dismiss button in an inline dialog, which nothing closes', () => {
+  it('carries a dismiss button inside a dialog, which is what it closes', () => {
     render(
-      <Dialog.Root inline>
-        <Dialog.Popup size='profile'>
-          <Card.Root>
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root elevation='overlay'>
             <Card.Header>
               <Card.Title>Account</Card.Title>
             </Card.Header>
@@ -381,7 +381,7 @@ describe('Mosaic Card', () => {
       </Dialog.Root>,
     );
 
-    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Account');
   });
 

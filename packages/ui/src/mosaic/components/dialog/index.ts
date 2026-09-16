@@ -1,4 +1,4 @@
-export { Dialog, DialogContext, isOverlayDialog } from './dialog';
+export { Dialog, DialogContext, isInDialog } from './dialog';
 export type {
   DialogClosedBy,
   DialogFocusTarget,
@@ -11,6 +11,7 @@ export type {
   DialogCloseProps,
   DialogContextValue,
   DialogCompactPlacement,
+  DialogDismissOn,
   DialogPopupProps,
   DialogRootProps,
   DialogSize,

@@ -10,7 +10,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Branding } from '../branding';
-import { Dialog, DialogContext, isOverlayDialog } from '../dialog';
+import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
 import { Heading } from '../heading';
 import { Icon } from '../icon';
@@ -119,7 +119,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
-  const inline = elevation === 'flush' || (dialog?.inline ?? false);
+  const inline = elevation === 'flush';
   // Inside a dialog the title takes the id the popup points `aria-labelledby` at, so the surface
   // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
@@ -167,7 +167,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
-        stylex.props(reset.base, styles.root, isOverlayDialog(dialog) && styles.rootInDialog, xstyle),
+        stylex.props(reset.base, styles.root, isInDialog(dialog) && styles.rootInDialog, xstyle),
         rest,
       ),
       children: (
@@ -180,7 +180,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Card.Header` renders its dismiss first. Never inline, which
               nothing closes. */}
-          {isOverlayDialog(dialog) ? <Dialog.CloseButton /> : null}
+          {isInDialog(dialog) ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),

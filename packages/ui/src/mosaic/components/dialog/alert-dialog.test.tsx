@@ -217,9 +217,9 @@ describe('dismissal', () => {
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
-  it('keeps Escape out too under closedBy="none"', async () => {
+  it("keeps Escape out too under dismissOn='none'", async () => {
     const user = userEvent.setup();
-    render(<Confirm closedBy='none' />);
+    render(<Confirm dismissOn='none' />);
 
     await user.keyboard('{Escape}');
 

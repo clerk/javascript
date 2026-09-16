@@ -33,9 +33,9 @@ import { acquireKeyboardInset } from './keyboard-inset';
 export type DialogSize = keyof typeof sizes;
 
 /**
- * Where the surface sits in the compact band — the dialog viewport under `48rem`, which an
- * `inline` dialog can reach inside a narrow host on any screen. `center` everywhere above it:
- * there is no edge close enough for anchoring to mean anything at those widths.
+ * Where the surface sits in the compact band — the dialog viewport under `48rem`. `center`
+ * everywhere above it: there is no edge close enough for anchoring to mean anything at those
+ * widths.
  */
 export type DialogCompactPlacement = keyof typeof compactPlacements;
 
@@ -67,22 +67,18 @@ export interface DialogContextValue {
    * the one way out an alert must not offer.
    */
   role: DialogRole;
-  /** Whether the surface is presented in its host rather than over the page — see `Dialog.Root`. */
-  inline: boolean;
 }
 
 export const DialogContext = React.createContext<DialogContextValue | null>(null);
 
-/** Over the page — in a dialog, and not an `inline` one — as opposed to standalone or in the host's flow. */
-export function isOverlayDialog(dialog: DialogContextValue | null): boolean {
-  return dialog !== null && !dialog.inline;
-}
-
 /**
- * What the root decided about how its dialog is presented, for the parts it does not render
- * itself. Only `Dialog.Popup` reads it; a consumer never sets it.
+ * In a dialog, as opposed to standalone. A surface that can be rendered either way — `Card`,
+ * `Profile` — reads this to take the dialog's dismiss and its overlay treatment, without knowing
+ * where it was rendered.
  */
-const DialogPresentationContext = React.createContext<{ inline: boolean }>({ inline: false });
+export function isInDialog(dialog: DialogContextValue | null): dialog is DialogContextValue {
+  return dialog !== null;
+}
 
 /**
  * The headless parts type their props (and the `render` callback's argument) against
@@ -121,26 +117,33 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
    * `card` only. @default 'center'
    */
   compactPlacement?: DialogCompactPlacement;
-  /**
-   * Where focus moves when the dialog opens. Default: the first tabbable element inside it —
-   * or nowhere, for an `inline` dialog, which mounts with the page rather than in answer to a
-   * gesture.
-   */
+  /** Where focus moves when the dialog opens. Default: the first tabbable element inside it. */
   initialFocus?: DialogFocusTarget;
-  /** Where focus returns when the dialog closes. Default: the trigger; nowhere for an `inline` dialog. */
+  /** Where focus returns when the dialog closes. Default: the trigger. */
   finalFocus?: DialogFocusTarget;
 }
 
-type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 'closedBy'> & {
-  /**
-   * Presents the dialog in its host rather than over the page: no portal, no scrim, no scroll
-   * lock, no focus trap, and nothing dismisses it — it is open for as long as it is mounted.
-   * For a surface that is the page's content, such as an account profile mounted in a layout slot.
-   *
-   * Implies `open`, `modal={false}` and `closedBy='none'`; those props are ignored. A dialog
-   * opened from inside an inline one presents normally, over the page.
-   */
-  inline?: boolean;
+type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 'closedBy'>;
+
+/**
+ * Which gestures dismiss the dialog, in one ordered axis rather than a flag per gesture: Escape is
+ * the keyboard's equivalent of an outside press, so a dialog that allows the press and refuses the
+ * key is not a state worth being able to express.
+ *
+ * - `any` — an outside press, Escape, or a programmatic close;
+ * - `escape` — Escape or a programmatic close, but not an outside press. For anything holding
+ *   input, where a stray click would discard what was typed;
+ * - `none` — a programmatic close only. For a flow the user has to complete or acknowledge.
+ *
+ * Maps to the native `<dialog closedby>` values `any` / `closerequest` / `none`.
+ */
+export type DialogDismissOn = 'any' | 'escape' | 'none';
+
+/** The native `closedby` value each `dismissOn` stands for. */
+const CLOSED_BY: Record<DialogDismissOn, DialogClosedBy> = {
+  any: 'any',
+  escape: 'closerequest',
+  none: 'none',
 };
 
 /**
@@ -160,46 +163,25 @@ export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> &
         /** The popup's ARIA role. @default 'dialog' */
         role?: 'dialog';
         /** Which gestures dismiss the dialog. @default 'any' */
-        closedBy?: DialogClosedBy;
+        dismissOn?: DialogDismissOn;
       }
     | {
         role: 'alertdialog';
-        /** An alert dialog never dismisses on an outside press. @default 'closerequest' */
-        closedBy?: Exclude<DialogClosedBy, 'any'>;
+        /** An alert dialog never dismisses on an outside press. @default 'escape' */
+        dismissOn?: Exclude<DialogDismissOn, 'any'>;
       }
   );
 
-/** Owns the open state and the decisions — role, presentation — every part reads. */
-function Root<Payload = unknown>({
-  inline = false,
-  role = 'dialog',
-  closedBy,
-  open,
-  defaultOpen,
-  onOpenChange,
-  modal,
-  children,
-  ...rest
-}: DialogRootProps<Payload>) {
-  const presentation = React.useMemo(() => ({ inline }), [inline]);
-  const resolvedClosedBy = closedBy ?? (role === 'alertdialog' ? 'closerequest' : 'any');
+/** Owns the open state and the decisions — role, dismissal — every part reads. */
+function Root<Payload = unknown>({ role = 'dialog', dismissOn, children, ...rest }: DialogRootProps<Payload>) {
   return (
-    <DialogPresentationContext.Provider value={presentation}>
-      <Primitive.Root<Payload>
-        {...rest}
-        role={role}
-        // An inline dialog is open for as long as it is mounted and closes for nothing, so a
-        // consumer's `onOpenChange` is withheld too: floating-ui asks a non-modal dialog to close
-        // when focus leaves it, and that request would otherwise reach the consumer as a close.
-        closedBy={inline ? 'none' : resolvedClosedBy}
-        modal={inline ? false : modal}
-        open={inline ? true : open}
-        defaultOpen={inline ? undefined : defaultOpen}
-        onOpenChange={inline ? undefined : onOpenChange}
-      >
-        {children}
-      </Primitive.Root>
-    </DialogPresentationContext.Provider>
+    <Primitive.Root<Payload>
+      {...rest}
+      role={role}
+      closedBy={CLOSED_BY[dismissOn ?? (role === 'alertdialog' ? 'escape' : 'any')]}
+    >
+      {children}
+    </Primitive.Root>
   );
 }
 
@@ -229,21 +211,18 @@ const Close = React.forwardRef<HTMLButtonElement, DialogCloseProps>(function Dia
 });
 
 /**
- * Warns when the corner dismiss is rendered where it has no business being: inside an alert
- * dialog, where a corner X is a way out without answering, or an inline dialog, which nothing
- * closes.
+ * Warns when the corner dismiss is rendered inside an alert dialog, where a corner X is a way out
+ * without answering the question.
  */
-function useCloseButtonWarning(isAlert: boolean, inline: boolean) {
+function useCloseButtonWarning(isAlert: boolean) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !(isAlert || inline)) {
+    if (process.env.NODE_ENV === 'production' || !isAlert) {
       return;
     }
     console.warn(
-      isAlert
-        ? '[clerk] <Dialog.CloseButton> is rendered inside an alert dialog. A corner X is a way out without answering; the cancel action in the surface is the way out.'
-        : '[clerk] <Dialog.CloseButton> is rendered inside an inline dialog, which nothing closes. It was not rendered.',
+      '[clerk] <Dialog.CloseButton> is rendered inside an alert dialog. A corner X is a way out without answering; the cancel action in the surface is the way out.',
     );
-  }, [isAlert, inline]);
+  }, [isAlert]);
 }
 
 /**
@@ -262,11 +241,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
   const surface = React.useContext(DialogContext);
   const { role } = useHeadlessDialogContext();
   const size = surface?.size ?? 'card';
-  const inline = surface?.inline ?? false;
-  useCloseButtonWarning(role === 'alertdialog', inline);
-  if (inline) {
-    return null;
-  }
+  useCloseButtonWarning(role === 'alertdialog');
   return (
     <span {...stylex.props(styles.closeButton, closeInsets[size])}>
       <Primitive.Close
@@ -292,20 +267,14 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
  * The scrim behind the dialog. Owns no scroll lock or positioning — that is the viewport.
  * Rendered by `Dialog.Popup`, which is also what decides the two things it varies on.
  */
-function Backdrop({ size, stacked, overInline }: { size: DialogSize; stacked: boolean; overInline: boolean }) {
+function Backdrop({ size, stacked }: { size: DialogSize; stacked: boolean }) {
   return (
     <Primitive.Backdrop
       {...mergeStyleProps(
         themeProps('dialog-backdrop'),
         // All in one `stylex.props` call so a later `backgroundColor` replaces the one in
         // `backdrop` outright — across two calls both would emit and the cascade would decide.
-        stylex.props(
-          reset.base,
-          styles.backdrop,
-          overInline && styles.backdropOverInline,
-          stacked && styles.backdropStacked,
-          backdropMotion[size],
-        ),
+        stylex.props(reset.base, styles.backdrop, stacked && styles.backdropStacked, backdropMotion[size]),
       )}
     />
   );
@@ -315,41 +284,33 @@ function Backdrop({ size, stacked, overInline }: { size: DialogSize; stacked: bo
  * The box the popup is sized against and the query container its bands read, holding the track
  * that centres the popup and carries the inset. Two elements because a container cannot query
  * itself: the width-dependent rules have to sit one level inside the element that is the
- * container. Over the page the viewport also locks body scroll and — because the track is what
- * owns the inset — publishes the on-screen keyboard's share of the viewport for the track's
- * bottom padding to consume. See `keyboard-inset.ts`. Inline, it is a plain box that fills its host.
+ * container. The viewport also locks body scroll and — because the track is what owns the inset —
+ * publishes the on-screen keyboard's share of the viewport for the track's bottom padding to
+ * consume. See `keyboard-inset.ts`.
  */
 function Viewport({
   size,
   compactPlacement,
-  inline,
   children,
 }: {
   size: DialogSize;
   compactPlacement: DialogCompactPlacement;
-  inline: boolean;
   children: React.ReactNode;
 }) {
-  React.useEffect(() => (inline ? undefined : acquireKeyboardInset()), [inline]);
+  React.useEffect(() => acquireKeyboardInset(), []);
   return (
     <Primitive.Viewport
-      overlay={!inline}
-      lockScroll={!inline}
+      overlay
+      lockScroll
       {...mergeStyleProps(
-        themeProps('dialog-viewport', { size, inline }),
+        themeProps('dialog-viewport', { size }),
         stylex.props(reset.base, styles.viewport, viewportSizes[size]),
       )}
     >
       <div
         {...mergeStyleProps(
-          themeProps('dialog-track', { size, inline }),
-          stylex.props(
-            reset.base,
-            styles.track,
-            trackSizes[size],
-            trackCompactPlacements[compactPlacement],
-            inline && styles.trackInline,
-          ),
+          themeProps('dialog-track', { size }),
+          stylex.props(reset.base, styles.track, trackSizes[size], trackCompactPlacements[compactPlacement]),
         )}
       >
         {children}
@@ -395,16 +356,14 @@ function useCompactPlacementWarning(size: DialogSize, placement: DialogCompactPl
 }
 
 /**
- * The dialog surface: `role="dialog"` (or `alertdialog`, from the root), focus-trapped, and the
- * element that paints — and the whole floating tree around it. Over the page that is a portal,
- * a scrim, and a centering viewport; inline it is the viewport alone, in place. Neither is a
+ * The dialog box: `role="dialog"` (or `alertdialog`, from the root), focus-trapped — and the whole
+ * floating tree around it, which is a portal, a scrim and a centering viewport. None of those is a
  * part a consumer composes, so they stay out of the public API.
  */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
   { size = 'card', compactPlacement: compactPlacementProp = 'center', initialFocus, finalFocus, xstyle, ...rest },
   ref,
 ) {
-  const { inline } = React.useContext(DialogPresentationContext);
   // The dialog this one renders inside, read before this popup publishes its own.
   const host = React.useContext(DialogContext);
   // The headless flag, not the stack check below — the size rule is about opening a dialog inside
@@ -416,10 +375,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   useCompactPlacementWarning(size, compactPlacementProp);
   useNestedSizeWarning(isNestedInDialog, size);
 
-  const surface = React.useMemo(
-    () => ({ labelId, descriptionId, size, role, inline }),
-    [labelId, descriptionId, size, role, inline],
-  );
+  const surface = React.useMemo(() => ({ labelId, descriptionId, size, role }), [labelId, descriptionId, size, role]);
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
@@ -444,10 +400,10 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     <DialogContext.Provider value={surface}>
       <Primitive.Popup
         ref={mergedRef}
-        initialFocus={inline ? (initialFocus ?? false) : initialFocus}
-        finalFocus={inline ? (finalFocus ?? false) : finalFocus}
+        initialFocus={initialFocus}
+        finalFocus={finalFocus}
         {...mergeStyleProps(
-          themeProps('dialog-popup', { size, inline }),
+          themeProps('dialog-popup', { size }),
           stylex.props(
             reset.base,
             styles.popup,
@@ -468,18 +424,6 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     </DialogContext.Provider>
   );
 
-  if (inline) {
-    return (
-      <Viewport
-        size={size}
-        compactPlacement={compactPlacement}
-        inline
-      >
-        {popup}
-      </Viewport>
-    );
-  }
-
   return (
     <Primitive.Portal>
       <Backdrop
@@ -488,13 +432,10 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
         // Decided here rather than keyed on `data-stacked`, because whether this is a stack
         // depends on the size of the dialog beneath, which the headless layer has no notion of.
         stacked={isNestedInDialog && host?.size === 'card'}
-        // The nested scrim is solved to composite over the host's own; an inline host has none.
-        overInline={host?.inline ?? false}
       />
       <Viewport
         size={size}
         compactPlacement={compactPlacement}
-        inline={false}
       >
         {popup}
       </Viewport>
@@ -528,7 +469,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
  * `Dialog.Popup` renders the portal, the scrim and the centering viewport itself, so those are
  * not parts. `role='alertdialog'` on the root makes it an alert dialog — one that interrupts to
  * ask for a decision and waits for one. `compactPlacement='sheet'` bottom-anchors it in the
- * compact band, and `inline` on the root presents it in its host instead of over the page.
+ * compact band, and `dismissOn` on the root says which gestures dismiss it.
  *
  * Each styled part spreads `themeProps` + `stylex.props` through `mergeStyleProps`, so it
  * carries the public `.cl-<slot>` class and StyleX atoms while the headless part keeps its focus

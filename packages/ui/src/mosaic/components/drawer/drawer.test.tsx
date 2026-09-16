@@ -77,8 +77,8 @@ describe('Drawer', () => {
 
   // A sheet opened from inside a profile dialog is the same relationship as a prompt opened there,
   // and takes the same, nested scrim.
-  it('takes the nested scrim inside a modal dialog, and the base one inside an inline dialog', () => {
-    const modal = render(
+  it('takes the nested scrim inside a dialog, and the base one standalone', () => {
+    const inDialog = render(
       <MosaicProvider>
         <Dialog.Root defaultOpen>
           <Dialog.Popup size='profile'>
@@ -88,15 +88,11 @@ describe('Drawer', () => {
       </MosaicProvider>,
     );
     expect(document.querySelector('.cl-drawer-backdrop')).toHaveAttribute('data-nested');
-    modal.unmount();
+    inDialog.unmount();
 
     render(
       <MosaicProvider>
-        <Dialog.Root inline>
-          <Dialog.Popup size='profile'>
-            <Sheet />
-          </Dialog.Popup>
-        </Dialog.Root>
+        <Sheet />
       </MosaicProvider>,
     );
     expect(document.querySelector('.cl-drawer-backdrop')).not.toHaveAttribute('data-nested');

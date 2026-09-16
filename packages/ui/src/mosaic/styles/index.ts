@@ -41,6 +41,7 @@ export type {
   DialogCloseButtonProps,
   DialogCloseProps,
   DialogCompactPlacement,
+  DialogDismissOn,
   DialogPopupProps,
   DialogRootProps,
   DialogSize,

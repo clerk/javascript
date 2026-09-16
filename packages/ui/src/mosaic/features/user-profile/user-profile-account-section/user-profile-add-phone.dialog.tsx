@@ -37,7 +37,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      dismissOn='escape'
       open={props.open}
       onOpenChange={props.onOpenChange}
     >

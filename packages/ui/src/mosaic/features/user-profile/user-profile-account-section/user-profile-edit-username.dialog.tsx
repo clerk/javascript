@@ -48,7 +48,7 @@ export function UserProfileEditUsernameDialog({
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      dismissOn='escape'
       open={open}
       onOpenChange={onOpenChange}
     >

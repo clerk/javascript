@@ -150,8 +150,7 @@ const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email add
 /**
  * `compactPlacement='sheet'` bottom-anchors the surface in the compact band — the dialog viewport
  * under `48rem` — and slides it up from the edge, instead of centring it. Above the band nothing
- * changes, so narrow the window to see it. The band is a container query, so an `inline` dialog
- * reaches it inside a narrow host on any screen.
+ * changes, so narrow the window to see it.
  *
  * For a dialog that asks one thing and returns: a confirmation, or a single-field form like this
  * one, where the answer belongs within thumb's reach.
@@ -163,7 +162,7 @@ export function Sheet() {
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      dismissOn='escape'
       open={open}
       onOpenChange={next => {
         setOpen(next);
@@ -251,7 +250,7 @@ export function Stacked() {
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      dismissOn='escape'
       open={open}
       onOpenChange={setOpen}
     >
@@ -361,7 +360,7 @@ function AddEmailDialog({
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
+      dismissOn='escape'
       open={open}
       onOpenChange={next => {
         onOpenChange(next);
@@ -461,15 +460,15 @@ export function Nested() {
 }
 
 /**
- * The same page presented `inline`: it is the page's content rather than a surface over it, so
- * there is no trigger, portal, scrim, scroll lock or focus trap, and nothing dismisses it. The
- * dialogs it opens are still modal over the whole page.
+ * The same page with no dialog around it at all: it is the page's content rather than a surface
+ * over one, so there is no trigger, portal, scrim, scroll lock or focus trap, and nothing dismisses
+ * it. The surface paints itself either way — only the placement differs — and the dialogs it opens
+ * are still modal over the whole page.
  *
- * The host is resizable. The page's compact layout is a container query against the page itself,
- * and the dialog's inset is one against its viewport, so dragging the host below `48rem`
- * collapses the sidebar without the browser window moving.
+ * The host is resizable. The page's compact layout is a container query against the page itself, so
+ * dragging the host below `48rem` collapses the sidebar without the browser window moving.
  */
-export function Inline() {
+export function Standalone() {
   const [addEmailOpen, setAddEmailOpen] = React.useState(false);
   const { activePage, setActivePage, pages, addEmail } = useUserProfileFixture({
     onAddEmail: () => setAddEmailOpen(true),
@@ -487,20 +486,16 @@ export function Inline() {
         width: '52rem',
       }}
     >
-      <Dialog.Root inline>
-        <Dialog.Popup size='profile'>
-          <UserProfileView
-            activePage={activePage}
-            pages={pages}
-            onPageChange={setActivePage}
-          />
-          <AddEmailDialog
-            open={addEmailOpen}
-            onOpenChange={setAddEmailOpen}
-            onAdd={addEmail}
-          />
-        </Dialog.Popup>
-      </Dialog.Root>
+      <UserProfileView
+        activePage={activePage}
+        pages={pages}
+        onPageChange={setActivePage}
+      />
+      <AddEmailDialog
+        open={addEmailOpen}
+        onOpenChange={setAddEmailOpen}
+        onAdd={addEmail}
+      />
     </div>
   );
 }

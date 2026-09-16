@@ -21,11 +21,11 @@ const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
  * The width bands, queried against the VIEWPORT ELEMENT rather than the window — it is a
  * `container-type: inline-size` named `cl-dialog`, and every `@container` below reads it.
  *
- * Over the page the viewport is `position: fixed; inset: 0`, so its width IS the window's and the
- * bands resolve exactly as media queries would. The difference shows when the viewport is smaller
- * than the window: an `inline` dialog fills its host, and its inset and phone-band treatment then
- * follow the host's width, not the browser's. Content inside a dialog may query the same name for
- * its own layout.
+ * The viewport is `position: fixed; inset: 0`, so today its width IS the window's and the bands
+ * resolve exactly as media queries would. They stay container queries because the thing being
+ * measured is the box the dialog is laid out in, which is the honest question to ask and the one
+ * that keeps answering correctly if that box ever stops being the window. Content inside a dialog
+ * may query the same name for its own layout.
  *
  * The two bands are deliberately NON-OVERLAPPING. Overlapping `min-width` bands would leave the
  * winner to source order, which `@stylexjs/sort-keys` reorders on autofix — and its string sort
@@ -56,15 +56,6 @@ export const styles = stylex.create({
       ':where([data-nested])': 'color-mix(in oklab, oklch(0 0 0) 46.67%, transparent)',
     },
     position: 'fixed',
-  },
-
-  /**
-   * A dialog opened from inside an INLINE dialog is nested, but the surface it opens over paints
-   * no scrim for the nested value to composite with — so it takes the base one. Rides the same
-   * `stylex.props` call as `backdrop`, so this `backgroundColor` replaces that one outright.
-   */
-  backdropOverInline: {
-    backgroundColor: BASE_SCRIM,
   },
 
   /**
@@ -155,18 +146,6 @@ export const styles = stylex.create({
     // definite row `viewportSizes.profile` pins.
     minHeight: 0,
     width: '100%',
-  },
-
-  /**
-   * An inline dialog fills its host edge to edge: the inset is the gap between a surface and the
-   * screen, and a surface that IS the page's content has no screen edge to hold off.
-   *
-   * Only the var and the one longhand that departs from it need restating: `padding` and
-   * `paddingBlockEnd` both derive from the var, and the keyboard inset is never published inline.
-   */
-  trackInline: {
-    '--_cl-dialog-inset': '0px',
-    paddingInline: 0,
   },
 
   // The dialog box. It does NOT paint: every surface a dialog can hold brings its own — a `Card`
@@ -393,9 +372,8 @@ export const sizes = stylex.create({
    *   <Dialog.Popup size='profile'><UserProfileView … /></Dialog.Popup>
    *
    * The profile reads `DialogContext` from there — it names the dialog, carries its dismiss, and
-   * fills the popup's height — and that is also what makes `inline` a non-event for the surface:
-   * modal or in a page slot, the page paints itself the same way, and the dialog only decides
-   * where it sits.
+   * fills the popup's height. Rendered with no dialog around it at all, the same surface is the
+   * page's own content: it paints itself the same way and only the placement differs.
    *
    * The `null`s remove the popup's own atoms outright: within one `stylex.props` call a later
    * `null` REMOVES the earlier atom, so the popup emits no class for that property at all — the
@@ -435,9 +413,8 @@ export const sizes = stylex.create({
  *
  * Only that band differs. Above it a sheet is a centred dialog like any other — there is no screen
  * edge close enough for anchoring to mean anything — so `center` is genuinely empty and `sheet`
- * resolves back to the same geometry. The band is a CONTAINER query, which is why the prop is
- * `compactPlacement` rather than a device word: an `inline` dialog inherits its host's width and
- * reaches it on a desktop.
+ * resolves back to the same geometry. Named `compact` rather than for a device because the band is
+ * a width, and because `Profile` already calls the identical `48rem` query that.
  *
  * Applied for `card` alone (see `Dialog.Popup`), which is why `sheet` can restate the card's cap:
  * a profile has its own compact treatment and never takes a placement.
