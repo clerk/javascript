@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Dialog } from '../../components/dialog';
 import { Icon, IconFrame } from '../../components/icon';
@@ -10,6 +10,7 @@ import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
+import { useUserProfileRenamePasskeyController } from './user-profile-rename-passkey.controller';
 import { UserProfileRenamePasskeyDialog } from './user-profile-rename-passkey.dialog';
 
 export function UserProfilePasskeyRowView({
@@ -24,40 +25,11 @@ export function UserProfilePasskeyRowView({
   onRemove?: () => void;
 }) {
   const renameDialog = useMemo(() => Dialog.createHandle(), []);
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState(passkey.name);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string>();
+  const controller = useUserProfileRenamePasskeyController({ id: passkey.id, name: passkey.name, onRename });
   const description =
     passkey.createdAtLabel && passkey.lastUsedAtLabel
       ? fill(m.details, { createdAt: passkey.createdAtLabel, lastUsedAt: passkey.lastUsedAtLabel })
       : passkey.createdAtLabel || passkey.lastUsedAtLabel;
-
-  const onOpenChange = (nextOpen: boolean) => {
-    if (isSaving) {
-      return;
-    }
-    if (nextOpen) {
-      setName(passkey.name);
-      setError(undefined);
-    }
-    setOpen(nextOpen);
-  };
-  const onSubmit = async () => {
-    if (!onRename || isSaving || name.length < 2 || name === passkey.name) {
-      return;
-    }
-    setIsSaving(true);
-    setError(undefined);
-    try {
-      await onRename(passkey.id, name);
-      setOpen(false);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : m.saveError);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const actions: UserProfileMenuAction[] = [];
   if (onRename) {
@@ -100,15 +72,9 @@ export function UserProfilePasskeyRowView({
       </Section.Item>
       {onRename ? (
         <UserProfileRenamePasskeyDialog
+          {...controller}
           handle={renameDialog}
-          open={open}
-          onOpenChange={onOpenChange}
-          name={name}
-          onNameChange={setName}
-          isSaving={isSaving}
-          error={error}
-          canSave={name.length > 1 && name !== passkey.name}
-          onSubmit={() => void onSubmit()}
+          open={controller.isOpen}
         />
       ) : null}
     </>
