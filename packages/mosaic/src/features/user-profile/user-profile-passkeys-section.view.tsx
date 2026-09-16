@@ -47,7 +47,7 @@ export function UserProfilePasskeysSectionView({
               {onAdd ? (
                 <Section.Actions>
                   <Button
-                    aria-label={m.add}
+                    aria-label={m.addLabel}
                     color='neutral'
                     size='sm'
                     variant='outline'

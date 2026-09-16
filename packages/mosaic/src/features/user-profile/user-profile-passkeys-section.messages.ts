@@ -1,6 +1,7 @@
 export const userProfilePasskeysMessages = {
   label: 'Passkeys',
-  add: 'Add passkey',
+  add: 'Add',
+  addLabel: 'Add passkey',
   empty: 'No passkeys added',
   details: '{createdAt} · {lastUsedAt}',
   manage: 'Manage {name}',

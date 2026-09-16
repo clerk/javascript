@@ -33,6 +33,8 @@ The caller hides the entire section when passkeys are disabled for the instance 
 
 On a satellite domain, an otherwise visible section remains visible even when empty; only Add is unavailable. Represent that by omitting `onAdd`, without hiding the section.
 
+A satellite shares the same Clerk user account, so users can see passkeys they created on the primary domain. Those passkeys are tied to the primary domain and cannot authenticate directly on a different satellite domain. Users can still rename or remove them because those actions manage the account's existing passkeys. See [domain restrictions for passkeys](https://clerk.com/docs/guides/development/custom-flows/authentication/passkeys#domain-restrictions-for-passkeys).
+
 ### No passkeys yet
 
 The section remains visible after removing the final passkey. Add remains available when its callback is supplied.

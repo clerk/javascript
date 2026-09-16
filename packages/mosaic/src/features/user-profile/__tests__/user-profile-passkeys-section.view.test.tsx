@@ -108,7 +108,9 @@ describe('passkeys section', () => {
     renderView({ passkeys: [], onAdd, addError: 'Could not create passkey' });
 
     expect(screen.getByRole('alert')).toHaveTextContent('Could not create passkey');
-    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    const addButton = screen.getByRole('button', { name: 'Add passkey' });
+    expect(addButton).toHaveTextContent(/^Add$/);
+    await user.click(addButton);
     expect(onAdd).toHaveBeenCalledOnce();
   });
 
