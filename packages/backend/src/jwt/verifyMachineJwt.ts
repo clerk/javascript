@@ -8,6 +8,7 @@ import {
   TokenVerificationErrorAction,
 } from '../errors';
 import type { MachineTokenReturnType } from '../jwt/types';
+import type { VerifyJwtOptions } from '../jwt/verifyJwt';
 import { verifyJwt } from '../jwt/verifyJwt';
 import { JWT_CATEGORY_M2M_TOKEN } from '../tokens/jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from '../tokens/keys';
@@ -15,15 +16,20 @@ import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../tokens/keys';
 import { OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
 import { TokenType } from '../tokens/tokenTypes';
 
-export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'skipJwksCache'> & {
+export type JwtMachineVerifyOptions = Pick<
+  LoadClerkJWKFromRemoteOptions,
+  'secretKey' | 'publishableKey' | 'apiUrl' | 'skipJwksCache'
+> & {
   jwtKey?: string;
   clockSkewInMs?: number;
+  audience?: VerifyJwtOptions['audience'];
 };
 
 /**
  * Resolves the signing key and verifies a machine JWT's signature and claims.
  *
- * Networkless when `jwtKey` (PEM) is provided; performs a JWKS fetch when only `secretKey` is set.
+ * Networkless when `jwtKey` (PEM) is provided; otherwise fetches the JWKS from the Backend API
+ * (`secretKey`) or the Frontend API (`publishableKey`).
  * Returns a discriminated union so callers can branch on `'error' in result` without try/catch.
  *
  * Note: uses `MachineTokenVerificationError`, not `TokenVerificationError` — the two error types
@@ -41,7 +47,7 @@ async function resolveKeyAndVerifyJwt(
 
     if (options.jwtKey) {
       key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
-    } else if (options.secretKey) {
+    } else if (options.secretKey || options.publishableKey) {
       key = await loadClerkJWKFromRemote({ ...options, kid });
     } else {
       return {
@@ -125,15 +131,33 @@ export async function verifyOAuthJwt(
   decoded: Jwt,
   options: JwtMachineVerifyOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, options, OAUTH_ACCESS_TOKEN_TYPES);
+  const { audience, ...jwtOptions } = options;
+  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, OAUTH_ACCESS_TOKEN_TYPES);
 
   if ('error' in result) {
     return { data: undefined, tokenType: TokenType.OAuthToken, errors: [result.error] };
   }
 
-  return {
-    data: IdPOAuthAccessToken.fromJwtPayload(result.payload, options.clockSkewInMs),
-    tokenType: TokenType.OAuthToken,
-    errors: undefined,
-  };
+  const data = IdPOAuthAccessToken.fromJwtPayload(result.payload, options.clockSkewInMs);
+  const audienceError = verifyOAuthAudience(data.aud, audience);
+  if (audienceError) {
+    return { data: undefined, tokenType: TokenType.OAuthToken, errors: [audienceError] };
+  }
+
+  return { data, tokenType: TokenType.OAuthToken, errors: undefined };
+}
+
+export function verifyOAuthAudience(
+  aud: string[],
+  audience: VerifyJwtOptions['audience'],
+): MachineTokenVerificationError | undefined {
+  const expected = [audience].flat().filter((a): a is string => !!a);
+  if (expected.length === 0 || aud.some(a => expected.includes(a))) {
+    return undefined;
+  }
+
+  return new MachineTokenVerificationError({
+    code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+    message: `Invalid OAuth access token audience (aud) ${JSON.stringify(aud)}. Expected one of ${JSON.stringify(expected)}.`,
+  });
 }

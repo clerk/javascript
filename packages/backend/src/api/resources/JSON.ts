@@ -1,4 +1,5 @@
 import type {
+  ActClaim,
   BillingPerUnitTotalJSON,
   BillingSubscriptionItemNextPaymentJSON,
   BillingSubscriptionItemSeatsJSON,
@@ -957,6 +958,8 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   type: string;
   subject: string;
   scopes: string[];
+  aud?: string[];
+  act?: ActClaim | null;
   revoked: boolean;
   revocation_reason: string | null;
   expired: boolean;

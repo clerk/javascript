@@ -9,6 +9,8 @@ import {
   mockJwt,
   mockJwtPayload,
   mockM2MJwtPayload,
+  mockOAuthAccessTokenJwtPayload,
+  mockRsaJwkKid,
   signingJwks,
 } from '../../fixtures';
 import {
@@ -1624,6 +1626,140 @@ describe('tokens.authenticateRequest(options)', () => {
         'Machine token authentication requires either a Machine secret key or a Clerk secret key. ' +
           'Ensure a Clerk secret key or Machine secret key is set.',
       );
+    });
+
+    describe('OAuth token audience', () => {
+      const audience = 'https://mcp.example.test/mcp';
+      const signOAuthJwt = async (claims: Record<string, unknown>) => {
+        const { data } = await signJwt({ ...mockOAuthAccessTokenJwtPayload, ...claims }, signingJwks, {
+          algorithm: 'RS256',
+          header: { typ: 'at+jwt', kid: mockRsaJwkKid },
+        });
+        return data!;
+      };
+
+      beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(mockJwtPayload.iat * 1000));
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      test('returns authenticated state and exposes aud when the OAuth JWT is bound to the configured audience', async () => {
+        server.use(
+          http.get('https://api.clerk.test/v1/jwks', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${await signOAuthJwt({ aud: audience })}` });
+        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token', audience }));
+
+        expect(requestState).toBeMachineAuthenticated();
+        expect(requestState.toAuth()).toMatchObject({
+          tokenType: 'oauth_token',
+          isAuthenticated: true,
+          aud: [audience],
+          act: null,
+          clientId: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
+          scopes: ['read:foo', 'write:bar'],
+          userId: 'user_2vYVtestTESTtestTESTtestTESTtest',
+        });
+      });
+
+      test('returns unauthenticated state when the OAuth JWT is bound to another audience', async () => {
+        server.use(
+          http.get('https://api.clerk.test/v1/jwks', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const request = mockRequest({
+          authorization: `Bearer ${await signOAuthJwt({ aud: 'https://other.example.test' })}`,
+        });
+        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token', audience }));
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message:
+            'Invalid OAuth access token audience (aud) ["https://other.example.test"]. Expected one of ["https://mcp.example.test/mcp"]. (code=token-verification-failed, status=n/a)',
+        });
+        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+          tokenType: 'oauth_token',
+          isAuthenticated: false,
+        });
+      });
+
+      test('returns unauthenticated state when the OAuth JWT has no aud and an audience is configured', async () => {
+        server.use(
+          http.get('https://api.clerk.test/v1/jwks', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockSignedOAuthAccessTokenJwt}` });
+        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token', audience }));
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message:
+            'Invalid OAuth access token audience (aud) []. Expected one of ["https://mcp.example.test/mcp"]. (code=token-verification-failed, status=n/a)',
+        });
+      });
+
+      test('returns unauthenticated state when an opaque OAuth token is bound to another audience', async () => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
+            return HttpResponse.json({ ...mockVerificationResults.oauth_token, aud: ['https://other.example.test'] });
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
+        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token', audience }));
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message:
+            'Invalid OAuth access token audience (aud) ["https://other.example.test"]. Expected one of ["https://mcp.example.test/mcp"]. (code=token-verification-failed, status=n/a)',
+        });
+      });
+
+      test('verifies the OAuth JWT with the publishable key when no secret key is configured', async () => {
+        server.use(
+          http.get('https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json', () => {
+            return HttpResponse.json(mockJwks);
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${await signOAuthJwt({ aud: audience })}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: 'oauth_token', audience, secretKey: undefined }),
+        );
+
+        expect(requestState).toBeMachineAuthenticated();
+        expect(requestState.toAuth()).toMatchObject({ tokenType: 'oauth_token', aud: [audience] });
+      });
+
+      test('returns unauthenticated state for an opaque OAuth token when no secret key is configured', async () => {
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken: 'oauth_token', secretKey: undefined }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.InvalidSecretKey,
+          message:
+            'Opaque OAuth access tokens can only be verified with a Clerk secret key. (code=secret-key-invalid, status=n/a)',
+        });
+      });
     });
 
     describe('Any Token Type Authentication', () => {

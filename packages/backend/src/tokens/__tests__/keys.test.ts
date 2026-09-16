@@ -10,6 +10,7 @@ import {
   mockPEMKey,
   mockRsaJwk,
   mockRsaJwkKid,
+  pkTest,
 } from '../../fixtures';
 import { server, validateHeaders } from '../../mock-server';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../keys';
@@ -122,6 +123,65 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
     });
 
     expect(jwk).toMatchObject(mockRsaJwk);
+  });
+
+  it('loads JWKS from the Frontend API when only a publishableKey is provided', async () => {
+    server.use(
+      http.get('https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const jwk = await loadClerkJWKFromRemote({
+      publishableKey: pkTest,
+      kid: mockRsaJwkKid,
+      skipJwksCache: true,
+    });
+
+    expect(jwk).toMatchObject(mockRsaJwk);
+  });
+
+  it('prefers the Backend API when both a secretKey and a publishableKey are provided', async () => {
+    const fapiHandler = vi.fn(() => HttpResponse.json(mockJwks));
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+      http.get('https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json', fapiHandler),
+    );
+
+    const jwk = await loadClerkJWKFromRemote({
+      secretKey: 'sk_test_deadbeef',
+      publishableKey: pkTest,
+      kid: mockRsaJwkKid,
+      skipJwksCache: true,
+    });
+
+    expect(jwk).toMatchObject(mockRsaJwk);
+    expect(fapiHandler).not.toHaveBeenCalled();
+  });
+
+  it('retries the Frontend API JWKS request before it fails', async () => {
+    server.use(
+      http.get('https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json', () => {
+        return HttpResponse.json({}, { status: 503 });
+      }),
+    );
+
+    await expect(async () => {
+      const promise = loadClerkJWKFromRemote({
+        publishableKey: pkTest,
+        kid: mockRsaJwkKid,
+        skipJwksCache: true,
+      });
+      void vi.advanceTimersByTimeAsync(10000);
+      await promise;
+    }).rejects.toThrowError(
+      'Error loading Clerk JWKS from https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json with code=503',
+    );
   });
 
   it('caches JWK by kid', async () => {
