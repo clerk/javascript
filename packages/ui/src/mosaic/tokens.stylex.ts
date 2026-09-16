@@ -424,14 +424,15 @@ export const focusVars = stylex.defineVars(focusDefaults);
 // Shadow Tokens
 // =============================================================================
 
-const drop = (wash: string) => `light-dark(${wash}, transparent)`;
+const light = (wash: string) => `light-dark(${wash}, transparent)`;
 const neutral4 = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`;
 const neutral8 = colorVars['--cl-color-neutral-alpha-200'];
+const darkRing = `0 0 0 1px light-dark(transparent, color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`;
 
 const shadowDefaults = {
-  '--cl-shadow-sm': `0 1px 2px 0 ${neutral8}`,
-  '--cl-shadow-md': `0 2px 1px -1px ${drop(neutral4)}, 0 4px 8px 0 ${drop(neutral8)}, 0 0 3px 0 ${neutral8}`,
-  '--cl-shadow-lg': `0 2px 2px -1px ${drop(neutral4)}, 0 8px 16px 0 ${drop(neutral8)}, 0 0 1px 0 ${neutral8}`,
+  '--cl-shadow-sm': `0 1px 2px 0 ${light(neutral8)}, ${darkRing}`,
+  '--cl-shadow-md': `0 2px 1px -1px ${light(neutral4)}, 0 4px 8px 0 ${light(neutral8)}, 0 0 3px 0 ${light(neutral8)}, ${darkRing}`,
+  '--cl-shadow-lg': `0 2px 2px -1px ${light(neutral4)}, 0 8px 16px 0 ${light(neutral8)}, 0 0 1px 0 ${light(neutral8)}, ${darkRing}`,
 };
 
 export const shadowVars = stylex.defineVars(shadowDefaults);
